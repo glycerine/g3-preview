@@ -827,7 +827,10 @@ func (m *AlgebraicRootCore) normalizeCoefficients(l *algebraicLocation, r *algeb
 	return m.store(l, r)
 }
 func (m *AlgebraicRootCore) SetRoot(a *Algebraic, p UPolynomialView, lower, upper *unumeral.BinaryRational, minimal bool) error {
-	return m.setRoot(a, p, lower, upper, minimal, true)
+	if e := m.setRoot(a, p, lower, upper, minimal, true); e != nil {
+		return e
+	}
+	return m.traceSetRoot(a)
 }
 
 // Isolation calls mk_algebraic_cell directly. Its constructor ends before

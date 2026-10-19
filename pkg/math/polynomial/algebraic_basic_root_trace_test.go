@@ -104,14 +104,14 @@ func TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation(t *testing.T) 
 
 func TestAlgebraicBasicRootTraceExactAndPolynomialBranches(t *testing.T) {
 	for _, tc := range []struct {
-		input, expected, tag, body string
-		degree                     uint32
-		line                       string
+		input, expected, tag, body, setter string
+		degree                             uint32
+		line                               string
 	}{
-		{"16/81", "4/9", "root_core", "r_a_val: 4/9 a_val: 16/81\n", 2, "1279"},
-		{"-8/27", "-2/3", "root_core", "r_a_val: -2/3 a_val: -8/27\n", 3, "1279"},
-		{"2", "", "algebraic", "root_core:\nx^2 - 2\n", 2, "1320"},
-		{"-2", "", "algebraic", "root_core:\nx^3 + 2\n", 3, "1320"},
+		{"16/81", "4/9", "root_core", "r_a_val: 4/9 a_val: 16/81\n", "", 2, "1279"},
+		{"-8/27", "-2/3", "root_core", "r_a_val: -2/3 a_val: -8/27\n", "", 3, "1279"},
+		{"2", "", "algebraic", "root_core:\nx^2 - 2\n", "a: (#^2 - 2, 2)\n", 2, "1320"},
+		{"-2", "", "algebraic", "root_core:\nx^3 + 2\n", "a: (#^3 + 2, 1)\n", 3, "1320"},
 	} {
 		t.Run(tc.input, func(t *testing.T) {
 			for _, fail := range []bool{false, true} {
@@ -131,6 +131,10 @@ func TestAlgebraicBasicRootTraceExactAndPolynomialBranches(t *testing.T) {
 				serviceMust(t, c.Root(&a, tc.degree, &out))
 				if tags.ShouldTrace(tc.tag) {
 					want := "-------- [" + tc.tag + "] root_core src/math/polynomial/algebraic_numbers.cpp:" + tc.line + " ---------\n" + tc.body + "------------------------------------------------\n"
+					if tc.setter != "" {
+						// cpp:1323 calls the polynomial setter after the root_core record.
+						want += "-------- [algebraic] set src/math/polynomial/algebraic_numbers.cpp:505 ---------\n" + tc.setter + "------------------------------------------------\n"
+					}
 					if fail {
 						if broken.calls != 1 {
 							t.Fatal("failed root stream retried output", broken.calls)
