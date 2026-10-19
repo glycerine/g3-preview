@@ -160,64 +160,53 @@ func (m *MultivariatePolynomialManager) gcdIntoWithReceipt(u, v Polynomial, r *p
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	if e = polynomialGCDDispatchSourceAssert(4447, "u_var_degrees[sz - 1].get_var() == v_var_degrees[sz - 1].get_var()", func() (bool, error) {
 		other, e := s.powers[1].word(size-1, 0)
-		if e != nil {
-			return e
-		}
-		if other != x {
-			return ErrPolynomialAssertion
-		}
+		return other == x, e
+	}); e != nil {
+		return e
+	}
+	if e = polynomialGCDDispatchSourceAssert(4448, "max_var(u) == max_var(v)", func() (bool, error) {
 		a, e := c.MaxVariable(u)
 		if e != nil {
-			return e
+			return false, e
 		}
 		b, e := c.MaxVariable(v)
-		if e != nil {
-			return e
-		}
-		if a != b {
-			return ErrPolynomialAssertion
-		}
-		a, e = c.MaxVariable(u)
-		if e != nil {
-			return e
-		}
-		if a != x {
-			return ErrPolynomialAssertion
-		}
+		return a == b, e
+	}); e != nil {
+		return e
+	}
+	if e = polynomialGCDDispatchSourceAssert(4449, "max_var(u) == x", func() (bool, error) {
+		a, e := c.MaxVariable(u)
+		return a == x, e
+	}); e != nil {
+		return e
 	}
 	field, e := c.modular.Modular()
 	if e != nil {
 		return e
 	}
 	if !field && !m.usePRSGCD {
-		if polynomialSourceDebug {
+		if e = polynomialGCDDispatchSourceAssert(4468, "max_var(u) == max_var(v)", func() (bool, error) {
 			a, e := c.MaxVariable(u)
 			if e != nil {
-				return e
+				return false, e
 			}
 			b, e := c.MaxVariable(v)
-			if e != nil {
-				return e
-			}
-			if a != b {
-				return ErrPolynomialAssertion
-			}
+			return a == b, e
+		}); e != nil {
+			return e
 		}
 		univariate, e := c.IsUnivariate(u)
 		if e != nil {
 			return e
 		}
 		if univariate {
-			if polynomialSourceDebug {
+			if e = polynomialGCDDispatchSourceAssert(4470, "is_univariate(v)", func() (bool, error) {
 				ok, e := c.IsUnivariate(v)
-				if e != nil {
-					return e
-				}
-				if !ok {
-					return ErrPolynomialAssertion
-				}
+				return ok, e
+			}); e != nil {
+				return e
 			}
 			return m.uniModGCD(u, v, r)
 		}
