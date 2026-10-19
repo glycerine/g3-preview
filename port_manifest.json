@@ -45786,9 +45786,9 @@
           ]
         },
         {
-          "name": "polynomial.cpp:5154-5194 divides: actual R prelude, scoped monomial/NUM lifetime, direct Bool/Div/Neg children and regular ADDMUL; matched GCD child and persistent normal BOOL return",
+          "name": "Complete polynomial.cpp:5154-5191 divides with actual R prelude, scoped monomial/NUM lifetime, direct Bool/Div/Neg children, regular ADDMUL, matched GCD child and persistent normal BOOL return",
           "go_target": "pkg/math/polynomial/polynomial_divides.go",
-          "status": "partial",
+          "status": "ported",
           "tests": [
             "TestPolynomialDividesActualMatchedInvocationEveryPrefix",
             "TestPolynomialDividesBIGActualEveryReservationPrefix",
