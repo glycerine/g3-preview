@@ -229,6 +229,7 @@ func TestPolynomialPseudoDivisionOutputIdentityAndSourceAssertions(t *testing.T)
 	}
 	polynomialPseudoPhysical(t, m, q, r, []Polynomial{p, divisor})
 	if polynomialSourceDebug {
+		polynomialThrowAssertionFixture(t)
 		visits := uint32(0)
 		m.config.Checkpoint = func() bool { visits++; return true }
 		e = m.PseudoDivide(Polynomial{}, Polynomial{}, ^uint32(0), &d, r, r)

@@ -412,14 +412,9 @@ func (m *MultivariatePolynomialCore) pseudoRemainderWithReceipt(p, q Polynomial,
 	if e = s.refs[pseudoRight].assign(m, rhs); e != nil {
 		return e
 	}
-	equal, e := m.Equal(s.refs[pseudoLeft].value, s.refs[pseudoRight].value)
-	if e != nil {
-		return e
-	}
-	if !equal {
-		return ErrPolynomialAssertion
-	}
-	return nil
+	return polynomialPseudoSourceAssert(5078, "is_eq", func() (bool, error) {
+		return m.Equal(s.refs[pseudoLeft].value, s.refs[pseudoRight].value)
+	})
 }
 func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *uint32, Q, R *polynomialReference, exact, quotient, modulo bool, bounds *PolynomialVariableDegrees) (err error) {
 	s := &m.pseudoDivision
@@ -478,17 +473,15 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 			}
 		}
 	}()
-	if polynomialSourceDebug {
-		valid, e := m.monomials.IsValidVar(x)
-		if e != nil {
-			return e
-		}
-		if !valid {
-			return ErrPolynomialAssertion
-		}
+	if e := polynomialPseudoSourceAssert(4907, "is_valid(x)", func() (bool, error) {
+		return m.monomials.IsValidVar(x)
+	}); e != nil {
+		return e
 	}
-	if polynomialSourceDebug && modulo && bounds == nil {
-		return ErrPolynomialAssertion
+	if e := polynomialPseudoSourceAssert(4908, "!ModD || x2d != 0", func() (bool, error) {
+		return !modulo || bounds != nil, nil
+	}); e != nil {
+		return e
 	}
 	degA, e := m.Degree(p, x)
 	if e != nil {
@@ -570,8 +563,10 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 		if degB > degR {
 			if exact {
 				exactD := degA - degB + 1
-				if polynomialSourceDebug && *d > exactD {
-					return ErrPolynomialAssertion
+				if e = polynomialPseudoSourceAssert(4968, "d <= exact_d", func() (bool, error) {
+					return *d <= exactD, nil
+				}); e != nil {
+					return e
 				}
 				if *d < exactD {
 					s.construct(pseudoAdjusted)
@@ -656,21 +651,17 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 				if e = s.monomial.assign(m, prime); e != nil {
 					return e
 				}
-				if polynomialSourceDebug {
+				if e = polynomialPseudoSourceAssert(5014, "m->degree_of(x) == deg_R", func() (bool, error) {
 					before, e := m.monomials.DegreeOf(term, x)
-					if e != nil {
-						return e
-					}
-					if before != degR {
-						return ErrPolynomialAssertion
-					}
+					return before == degR, e
+				}); e != nil {
+					return e
+				}
+				if e = polynomialPseudoSourceAssert(5015, "m_prime->degree_of(x) == deg_R - deg_B", func() (bool, error) {
 					after, e := m.monomials.DegreeOf(s.monomial.value, x)
-					if e != nil {
-						return e
-					}
-					if after != degR-degB {
-						return ErrPolynomialAssertion
-					}
+					return after == degR-degB, e
+				}); e != nil {
+					return e
 				}
 				if quotient {
 					if e = (m.som2).addWithArithmeticReceipt(&a, s.monomial.value, &s.quotientBuffer); e != nil {

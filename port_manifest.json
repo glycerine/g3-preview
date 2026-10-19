@@ -45841,7 +45841,7 @@
           ]
         },
         {
-          "name": "pseudo_remainder polynomial.cpp:4905-5065 and exact_pseudo_division_mod_d polynomial.cpp:5065-5091 actual Coeff/Power/NUM/R/Q/generated/DEBUG invocation transport",
+          "name": "pseudo_remainder cpp4905-5065 and exact_pseudo_division_mod_d cpp5065-5091 assertion actions plus actual Coeff/Power/NUM/R/Q/generated/DEBUG invocation transport; full suffix audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_pseudo_invocation.go",
           "tests": [
@@ -45860,7 +45860,8 @@
             "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
             "TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind",
             "TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop",
-            "TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind"
+            "TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind",
+            "TestPolynomialPseudoSourceAssertionActions"
           ]
         },
         {
