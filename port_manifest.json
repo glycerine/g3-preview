@@ -45744,8 +45744,8 @@
           ]
         },
         {
-          "name": "ExactDiv cpp5094-5151 assertion actions and prelude before NUM/reference declarations, typed child source suffix and public own continuation; full suffix audit remains open",
-          "status": "partial",
+          "name": "Complete ExactDiv cpp5094-5151 assertion and VERIFY actions, prelude before NUM/reference declarations, typed child source suffix and public owning continuation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_exact_div.go",
           "tests": [
             "TestExactDivNumericActualFrameAndImmutableContext",
@@ -45754,7 +45754,8 @@
             "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
             "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
             "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
-            "TestPolynomialExactDivSourceAssertionActions"
+            "TestPolynomialExactDivSourceAssertionActions",
+            "TestPolynomialExactDivSourceVerifyActions"
           ]
         },
         {

@@ -25,3 +25,19 @@ func polynomialExactDivSourceAssert(line int32, expression string, predicate fun
 	}
 	return nil
 }
+
+// VERIFY evaluates its condition in every profile. A Continue action cannot
+// safely resume this site because the next source statement consumes the null
+// quotient, so the Go port retains the typed undefined-domain stop.
+func polynomialExactDivSourceVerifyFailure() error {
+	e := diagnostic.BorrowProcessDebugContext().VerifyFailure(
+		"src/math/polynomial/polynomial.cpp", 5142, "div(m_r, m_q, m_r_q)",
+	)
+	if polynomialSourceDebug && e != nil {
+		return errors.Join(ErrPolynomialAssertion, e)
+	}
+	if e != nil {
+		return errors.Join(ErrPolynomialUnreachable, e)
+	}
+	return ErrPolynomialUnreachable
+}

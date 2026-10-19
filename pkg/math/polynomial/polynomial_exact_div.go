@@ -375,10 +375,7 @@ func (m *MultivariatePolynomialCore) exactDivWithReceipt(p, q Polynomial, receip
 		// VERIFY evaluates in every profile. The selected GNU release profile
 		// invokes __builtin_unreachable on false; this is a typed UB guard.
 		if !divides {
-			if polynomialSourceDebug {
-				return Polynomial{}, ErrPolynomialAssertion
-			}
-			return Polynomial{}, ErrPolynomialUnreachable
+			return Polynomial{}, polynomialExactDivSourceVerifyFailure()
 		}
 		if e = s.monomial.assign(m, quotient); e != nil {
 			return Polynomial{}, e

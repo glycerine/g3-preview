@@ -105,6 +105,7 @@ func TestPolynomialExactDivPhysicalPrefixes(t *testing.T) {
 }
 
 func TestPolynomialExactDivVerifySourceBoundary(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{1}, [][]MonomialPower{{{0, 1}}})
 	q := polynomialQueryTerms(t, m, []int32{1}, [][]MonomialPower{{{0, 2}}})
