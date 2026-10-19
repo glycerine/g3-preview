@@ -38378,7 +38378,11 @@
         "pkg/util/numeral/mpq_display_source.go",
         "pkg/util/numeral/mpq_display_source_test.go",
         "pkg/util/numeral/mpq_root_invocation.go",
-        "pkg/util/numeral/mpq_root_invocation_test.go"
+        "pkg/util/numeral/mpq_root_invocation_test.go",
+        "pkg/util/numeral/mpbq_debug_children.go",
+        "pkg/util/numeral/mpbq_integer_debug_invocation.go",
+        "pkg/util/numeral/mpbq_integer_debug_invocation_test.go",
+        "pkg/math/polynomial/algebraic_basic_root_bounds_source_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38542,7 +38546,9 @@
         "TestAlgebraicBasicRootTraceDisabledDoesNotRead",
         "TestAlgebraicBasicRootTraceCallbackBeforePublication",
         "TestAlgebraicBasicRootPolynomialTraceOwnsStoppedDisplay",
-        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
+        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation",
+        "TestAlgebraicBasicRootNonexactBoundsEveryReservation",
+        "TestBinaryIntegerDebugReceiptRejectsLaterConversion"
       ],
       "conditionals": [
         {
@@ -39568,7 +39574,11 @@
         "pkg/util/numeral/mpq_display_source.go",
         "pkg/util/numeral/mpq_display_source_test.go",
         "pkg/util/numeral/mpq_root_invocation.go",
-        "pkg/util/numeral/mpq_root_invocation_test.go"
+        "pkg/util/numeral/mpq_root_invocation_test.go",
+        "pkg/util/numeral/mpbq_debug_children.go",
+        "pkg/util/numeral/mpbq_integer_debug_invocation.go",
+        "pkg/util/numeral/mpbq_integer_debug_invocation_test.go",
+        "pkg/math/polynomial/algebraic_basic_root_bounds_source_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39729,7 +39739,9 @@
         "TestAlgebraicBasicRootTraceDisabledDoesNotRead",
         "TestAlgebraicBasicRootTraceCallbackBeforePublication",
         "TestAlgebraicBasicRootPolynomialTraceOwnsStoppedDisplay",
-        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
+        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation",
+        "TestAlgebraicBasicRootNonexactBoundsEveryReservation",
+        "TestBinaryIntegerDebugReceiptRejectsLaterConversion"
       ],
       "conditionals": [
         {
@@ -162551,7 +162563,11 @@
         "pkg/util/numeral/mpbq_convert_invocation.go",
         "pkg/util/numeral/mpbq_cleanup_observe.go",
         "pkg/util/numeral/mpbqi_debug_invocation_test.go",
-        "pkg/math/polynomial/algebraic_binary_trace_test.go"
+        "pkg/math/polynomial/algebraic_binary_trace_test.go",
+        "pkg/util/numeral/mpbq_debug_children.go",
+        "pkg/util/numeral/mpbq_integer_debug_invocation.go",
+        "pkg/util/numeral/mpbq_integer_debug_invocation_test.go",
+        "pkg/math/polynomial/algebraic_basic_root_bounds_source_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -162596,7 +162612,9 @@
         "TestUPolynomialConvertBoundsActualReadStops",
         "TestAlgebraicInverseBoundsTraceActualSourceStop",
         "TestBinaryIntervalDebugReceiptActualRAWAndCleanupReads",
-        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix"
+        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix",
+        "TestAlgebraicBasicRootNonexactBoundsEveryReservation",
+        "TestBinaryIntegerDebugReceiptRejectsLaterConversion"
       ],
       "conditionals": [
         {
@@ -163220,7 +163238,11 @@
         "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
         "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go",
         "pkg/util/numeral/mpbq_refine_invocation.go",
-        "pkg/util/numeral/mpbq_convert_invocation.go"
+        "pkg/util/numeral/mpbq_convert_invocation.go",
+        "pkg/util/numeral/mpbq_debug_children.go",
+        "pkg/util/numeral/mpbq_integer_debug_invocation.go",
+        "pkg/util/numeral/mpbq_integer_debug_invocation_test.go",
+        "pkg/math/polynomial/algebraic_basic_root_bounds_source_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -163263,7 +163285,9 @@
         "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
         "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
         "TestUPolynomialConvertBoundsActualReadStops",
-        "TestAlgebraicInverseBoundsTraceActualSourceStop"
+        "TestAlgebraicInverseBoundsTraceActualSourceStop",
+        "TestAlgebraicBasicRootNonexactBoundsEveryReservation",
+        "TestBinaryIntegerDebugReceiptRejectsLaterConversion"
       ],
       "conditionals": [
         {
@@ -163614,7 +163638,11 @@
         "pkg/util/numeral/mpbqi_debug_invocation_test.go",
         "pkg/util/numeral/mpbq_cleanup_observe.go",
         "pkg/math/polynomial/algebraic_binary_trace_test.go",
-        "pkg/math/polynomial/algebraic_unary_trace_test.go"
+        "pkg/math/polynomial/algebraic_unary_trace_test.go",
+        "pkg/util/numeral/mpbq_debug_children.go",
+        "pkg/util/numeral/mpbq_integer_debug_invocation.go",
+        "pkg/util/numeral/mpbq_integer_debug_invocation_test.go",
+        "pkg/math/polynomial/algebraic_basic_root_bounds_source_test.go"
       ],
       "tests": [
         "TestBinaryIntervalQueriesAndScalarRoutes",
@@ -163631,7 +163659,9 @@
         "TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes",
         "TestBinaryIntervalDebugReceiptActualRAWAndCleanupReads",
         "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix",
-        "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes"
+        "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes",
+        "TestAlgebraicBasicRootNonexactBoundsEveryReservation",
+        "TestBinaryIntegerDebugReceiptRejectsLaterConversion"
       ],
       "conditionals": [
         {

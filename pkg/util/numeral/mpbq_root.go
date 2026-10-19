@@ -174,6 +174,7 @@ func (m *BinaryRationalManager) FromRationalWithReceipt(qm *RationalManager, q *
 			}
 		}
 		m.convertDebugPending = m.toOwnedRationalScope.pending || m.debugIntegerPending || m.debugArithmeticPending || len(m.debugSnapshotQueue) != 0
+		m.convertDebugChildren.capture(m)
 		if m.convertSourceCause == nil {
 			m.convertSourceCause = m.toOwnedRationalScope.sourceCause
 		}

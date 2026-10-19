@@ -55,6 +55,12 @@ type binaryOwnedRationalScope struct {
 // This cold operation owner borrows z and diagnostics. Both must outlive it.
 // No operations or shared Budget accesses are concurrently safe.
 type BinaryRationalManager struct {
+	integerDebugInvocation                         uint64
+	integerDebugExecuting, integerDebugPending     bool
+	integerDebugSourceCause                        error
+	integerDebugChildren                           binaryDebugChildren
+	convertDebugChildren                           binaryDebugChildren
+	refineDebugChildren                            binaryDebugChildren
 	toOwnedInvocation                              uint64
 	debugIntegerInvocation                         uint64
 	debugArithmeticInvocation                      uint64

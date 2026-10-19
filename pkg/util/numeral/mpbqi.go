@@ -21,7 +21,7 @@ type BinaryIntervalManager struct {
 	debugExecuting          bool
 	debugPending            bool
 	debugSourceCause        error
-	debugChildren           binaryIntervalDebugChildren
+	debugChildren           binaryDebugChildren
 	bounds                  *BinaryRationalManager
 	self                    *BinaryIntervalManager
 	MulCurr, MulMax, MulMin BinaryRational

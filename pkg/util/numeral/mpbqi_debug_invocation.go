@@ -6,39 +6,6 @@ type BinaryIntervalDebugInvocationReceipt struct {
 	owner      *BinaryIntervalManager
 	invocation uint64
 }
-type binaryIntervalDebugChildren struct {
-	owned, integer, arithmetic uint64
-	snapshots                  *OwnedRational
-}
-
-func (s *binaryIntervalDebugChildren) capture(b *BinaryRationalManager) {
-	*s = binaryIntervalDebugChildren{}
-	if b.toOwnedRationalScope.pending {
-		s.owned = b.toOwnedInvocation
-	}
-	if b.debugIntegerPending {
-		s.integer = b.debugIntegerInvocation
-	}
-	if b.debugArithmeticPending {
-		s.arithmetic = b.debugArithmeticInvocation
-	}
-	if n := len(b.debugSnapshotQueue); n != 0 {
-		s.snapshots = &b.debugSnapshotQueue[n-1]
-	}
-}
-func (s *binaryIntervalDebugChildren) ownsSnapshots(b *BinaryRationalManager) bool {
-	if s.snapshots != nil {
-		for i := range b.debugSnapshotQueue {
-			if &b.debugSnapshotQueue[i] == s.snapshots {
-				return true
-			}
-		}
-	}
-	return false
-}
-func (s *binaryIntervalDebugChildren) pending(b *BinaryRationalManager) bool {
-	return s.owned != 0 && s.owned == b.toOwnedInvocation && b.toOwnedRationalScope.pending || s.integer != 0 && s.integer == b.debugIntegerInvocation && b.debugIntegerPending || s.arithmetic != 0 && s.arithmetic == b.debugArithmeticInvocation && b.debugArithmeticPending || s.ownsSnapshots(b)
-}
 
 func (m *BinaryIntervalManager) AddWithDebugReceipt(a, b, out *BinaryInterval, r *BinaryIntervalDebugInvocationReceipt) error {
 	return m.arithmeticWithDebugReceipt(a, b, out, 0, 0, r)
@@ -118,21 +85,8 @@ func (m *BinaryIntervalManager) CleanupDebugInvocation(r *BinaryIntervalDebugInv
 	if !m.debugPending {
 		return nil
 	}
-	b, s := m.bounds, &m.debugChildren
-	if s.owned != 0 && s.owned == b.toOwnedInvocation && b.toOwnedRationalScope.pending {
-		if e := b.CleanupToOwnedRational(); e != nil {
-			return e
-		}
-	}
-	if s.integer != 0 && s.integer == b.debugIntegerInvocation && b.debugIntegerPending {
-		if e := b.CleanupDebugInteger(); e != nil {
-			return e
-		}
-	}
-	if s.arithmetic != 0 && s.arithmetic == b.debugArithmeticInvocation && b.debugArithmeticPending || s.ownsSnapshots(b) {
-		if e := b.CleanupDebugSnapshots(); e != nil {
-			return e
-		}
+	if e := m.debugChildren.cleanup(m.bounds); e != nil {
+		return e
 	}
 	m.debugPending = false
 	return nil

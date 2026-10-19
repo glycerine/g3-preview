@@ -10,7 +10,7 @@ func (m *BinaryRationalManager) matchesConvertInvocation(r *BinaryConvertInvocat
 	return m != nil && m.self == m && r != nil && r.owner == m && r.invocation != 0 && r.invocation == m.convertInvocation
 }
 func (m *BinaryRationalManager) ConvertInvocationPending(r *BinaryConvertInvocationReceipt) bool {
-	return m.matchesConvertInvocation(r) && (m.convertImportedPending || m.convertDebugPending)
+	return m.matchesConvertInvocation(r) && (m.convertImportedPending || m.convertDebugPending && m.convertDebugChildren.pending(m))
 }
 func (m *BinaryRationalManager) ConvertInvocationSourceCause(r *BinaryConvertInvocationReceipt) error {
 	if m.matchesConvertInvocation(r) {
@@ -26,13 +26,7 @@ func (m *BinaryRationalManager) CleanupConvertInvocation(r *BinaryConvertInvocat
 		return ErrBinaryConvertPending
 	}
 	if m.convertDebugPending {
-		if e := m.CleanupToOwnedRational(); e != nil {
-			return e
-		}
-		if e := m.CleanupDebugInteger(); e != nil {
-			return e
-		}
-		if e := m.CleanupDebugSnapshots(); e != nil {
+		if e := m.convertDebugChildren.cleanup(m); e != nil {
 			return e
 		}
 		m.convertDebugPending = false

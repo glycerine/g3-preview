@@ -17,7 +17,7 @@ func (m *BinaryRationalManager) matchesRefineInvocation(r *BinaryRefineInvocatio
 	return m != nil && m.self == m && r != nil && r.owner == m && r.invocation != 0 && r.invocation == m.refineInvocation
 }
 func (m *BinaryRationalManager) RefineInvocationPending(r *BinaryRefineInvocationReceipt) bool {
-	return m.matchesRefineInvocation(r) && (m.refinePending || m.refineImportedPending || m.refineDebugPending)
+	return m.matchesRefineInvocation(r) && (m.refinePending || m.refineImportedPending || m.refineDebugPending && m.refineDebugChildren.pending(m))
 }
 func (m *BinaryRationalManager) RefineInvocationSourceCause(r *BinaryRefineInvocationReceipt) error {
 	if m.matchesRefineInvocation(r) {
@@ -36,13 +36,7 @@ func (m *BinaryRationalManager) CleanupRefineInvocation(r *BinaryRefineInvocatio
 		return ErrBinaryRefinePending
 	}
 	if m.refineDebugPending {
-		if e := m.CleanupToOwnedRational(); e != nil {
-			return e
-		}
-		if e := m.CleanupDebugInteger(); e != nil {
-			return e
-		}
-		if e := m.CleanupDebugSnapshots(); e != nil {
+		if e := m.refineDebugChildren.cleanup(m); e != nil {
 			return e
 		}
 		m.refineDebugPending = false

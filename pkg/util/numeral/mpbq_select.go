@@ -562,6 +562,7 @@ func (m *BinaryRationalManager) refineWithReceipt(qm *RationalManager, q *Ration
 			}
 		}
 		m.refineDebugPending = m.toOwnedRationalScope.pending || m.debugIntegerPending || m.debugArithmeticPending || len(m.debugSnapshotQueue) != 0
+		m.refineDebugChildren.capture(m)
 		if m.refineSourceCause == nil {
 			m.refineSourceCause = m.toOwnedRationalScope.sourceCause
 		}

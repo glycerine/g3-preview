@@ -74,6 +74,8 @@ func (m *AlgebraicRootCore) dispatchUnary(a *Algebraic, k uint32, out *Algebraic
 }
 
 type algebraicBasicRootScope struct {
+	adjust           unumeral.BinaryIntegerDebugInvocationReceipt
+	convert          unumeral.BinaryConvertInvocationReceipt
 	root             unumeral.RationalRootInvocation
 	qConstructed     bool
 	polynomialCaller *polynomialAlgebraicEvaluationScope
@@ -83,6 +85,10 @@ type algebraicBasicRootScope struct {
 	bounds           [2]unumeral.BinaryRational
 	constructed      uint8
 	active, running  bool
+}
+
+func (s *algebraicBasicRootScope) pending(m *AlgebraicRootCore) bool {
+	return m.rootTracePending() || s.root.Pending() || m.config.Binary.ConvertInvocationPending(&s.convert) || m.config.Binary.IntegerDebugInvocationPending(&s.adjust)
 }
 
 func (m *AlgebraicRootCore) cleanupBasicRoot() error {
@@ -96,6 +102,12 @@ func (m *AlgebraicRootCore) cleanupBasicRoot() error {
 	if e := m.cleanupRootTrace(); e != nil {
 		return e
 	}
+	if e := m.config.Binary.CleanupIntegerDebugInvocation(&s.adjust); e != nil {
+		return e
+	}
+	if e := m.config.Binary.CleanupConvertInvocation(&s.convert); e != nil {
+		return e
+	}
 	if e := s.root.Cleanup(false); e != nil {
 		return e
 	}
@@ -105,11 +117,21 @@ func (m *AlgebraicRootCore) cleanupBasicRoot() error {
 	if e := s.root.Cleanup(true); e != nil {
 		return e
 	}
-	s.active = m.rootTracePending() || s.root.Pending()
+	s.active = s.pending(m)
 	return nil
 }
 func (m *AlgebraicRootCore) finishBasicRootSource() error {
 	s := &m.basicRootScope
+	if m.config.Binary.IntegerDebugInvocationPending(&s.adjust) {
+		if e := m.config.Binary.IntegerDebugInvocationSourceCause(&s.adjust); e != nil {
+			return e
+		}
+	}
+	if m.config.Binary.ConvertInvocationPending(&s.convert) {
+		if e := m.config.Binary.ConvertInvocationSourceCause(&s.convert); e != nil {
+			return e
+		}
+	}
 	if e := s.root.SourceCause(); e != nil {
 		return e
 	}
@@ -145,7 +167,7 @@ func (m *AlgebraicRootCore) finishBasicRootLocals() error {
 		}
 		s.qConstructed = false
 	}
-	s.active = m.rootTracePending() || s.root.Pending()
+	s.active = s.pending(m)
 	return nil
 }
 func (m *AlgebraicRootCore) basicRoot(value *unumeral.Rational, k uint32, out *Algebraic) (cause error) {
@@ -237,7 +259,7 @@ func (m *AlgebraicRootCore) basicRoot(value *unumeral.Rational, k uint32, out *A
 	if negative {
 		bound = &s.bounds[0]
 	}
-	exact, e = b.FromRational(q, value, bound)
+	exact, e = b.FromRationalWithReceipt(q, value, bound, &s.convert)
 	if e != nil {
 		return e
 	}
@@ -248,9 +270,9 @@ func (m *AlgebraicRootCore) basicRoot(value *unumeral.Rational, k uint32, out *A
 	}
 	one := unumeral.NewInt(1)
 	if negative {
-		e = b.SubInteger(bound, &one, bound)
+		e = b.SubIntegerWithDebugReceipt(bound, &one, bound, &s.adjust)
 	} else {
-		e = b.AddInteger(bound, &one, bound)
+		e = b.AddIntegerWithDebugReceipt(bound, &one, bound, &s.adjust)
 	}
 	if e != nil {
 		return e
