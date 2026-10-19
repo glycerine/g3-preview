@@ -52,22 +52,34 @@ func (m *AlgebraicRootCore) isolateMultivariateRootsEntry(pm *MultivariatePolyno
 	return m.isolateMultivariateRoots(pm, p, values, roots, false)
 }
 func (m *AlgebraicRootCore) isolateMultivariateRoots(pm *MultivariatePolynomialManager, p Polynomial, values PolynomialAlgebraicEvaluation, roots *AlgebraicVector, nested bool) (cause error) {
+	if e := m.traceMultivariateIsolationPolynomial(pm, p, 2288, "isolating roots of: "); e != nil {
+		return e
+	}
 	if e := algebraicIsolationAssert(len(roots.values) == 0, 2289, "roots.empty()"); e != nil {
 		return e
 	}
 	zero, e := pm.core.IsZero(p)
-	if e != nil || zero {
+	if e != nil {
 		return e
 	}
-	constant, e := pm.core.IsConstant(p)
-	if e != nil || constant {
-		return e
+	constant := false
+	if !zero {
+		constant, e = pm.core.IsConstant(p)
+		if e != nil {
+			return e
+		}
+	}
+	if zero || constant {
+		return m.traceMultivariateIsolationLiteral(2292, "p is zero or the constant polynomial\n")
 	}
 	univariate, e := pm.core.IsUnivariate(p)
 	if e != nil {
 		return e
 	}
 	if univariate {
+		if e = m.traceMultivariateIsolationLiteral(2297, "p is univariate, using univariate procedure\n"); e != nil {
+			return e
+		}
 		return m.isolatePolynomialRootsForMultivariate(pm, p, roots, nil)
 	}
 	s, e := m.newMultivariateIsolationFrame(pm)
@@ -90,13 +102,22 @@ func (m *AlgebraicRootCore) isolateMultivariateRoots(pm *MultivariatePolynomialM
 	if e = s.substitution.prime.Assign(prime); e != nil {
 		return e
 	}
-	zero, e = pm.core.IsZero(prime)
-	if e != nil || zero {
+	if e = m.traceMultivariateIsolationPolynomial(pm, prime, 2306, "p after applying (rational fragment of) x2v:\n"); e != nil {
 		return e
 	}
-	constant, e = pm.core.IsConstant(prime)
-	if e != nil || constant {
+	zero, e = pm.core.IsZero(prime)
+	if e != nil {
 		return e
+	}
+	constant = false
+	if !zero {
+		constant, e = pm.core.IsConstant(prime)
+		if e != nil {
+			return e
+		}
+	}
+	if zero || constant {
+		return m.traceMultivariateIsolationLiteral(2309, "p is zero or the constant polynomial after applying (rational fragment of) x2v\n")
 	}
 	univariate, e = pm.core.IsUnivariate(prime)
 	if e != nil {
@@ -109,6 +130,9 @@ func (m *AlgebraicRootCore) isolateMultivariateRoots(pm *MultivariatePolynomialM
 		}
 		assigned, e := values.Contains(x)
 		if e != nil || assigned {
+			return e
+		}
+		if e = m.traceMultivariateIsolationLiteral(2320, "p is univariate after applying (rational fragment of) x2v... using univariate procedure\n"); e != nil {
 			return e
 		}
 		return m.isolatePolynomialRootsForMultivariate(pm, prime, roots, s)
@@ -147,6 +171,9 @@ func (m *AlgebraicRootCore) isolateMultivariateRoots(pm *MultivariatePolynomialM
 	}
 	if len(xs.values) == 0 {
 		return arena.ErrBounds
+	}
+	if e = m.traceMultivariateIsolationVariableCount(uint32(len(xs.values) - 1)); e != nil {
+		return e
 	}
 	x := xs.values[len(xs.values)-1]
 	assigned, e := values.Contains(x)
@@ -214,6 +241,9 @@ func (m *AlgebraicRootCore) isolateMultivariateRoots(pm *MultivariatePolynomialM
 		if e = pm.resultantWithReceipt(s.refs[0].root.value, py, y, &s.refs[0].root, &s.resultant); e != nil {
 			return e
 		}
+		if e = m.traceMultivariateIsolationResultant(pm, uint32(i), y, py, s.refs[0].root.value); e != nil {
+			return e
+		}
 		zero, e = pm.core.IsZero(s.refs[0].root.value)
 		if e != nil {
 			return e
@@ -231,11 +261,17 @@ func (m *AlgebraicRootCore) isolateMultivariateRoots(pm *MultivariatePolynomialM
 		return e
 	}
 	if zero {
+		if e = m.traceMultivariateIsolationLiteral(2369, "q vanished\n"); e != nil {
+			return e
+		}
 		return m.isolateVanishedResultant(s, prime, values, x, roots, nested)
 	}
 	constant, e = pm.core.IsConstant(q)
-	if e != nil || constant {
+	if e != nil {
 		return e
+	}
+	if constant {
+		return m.traceMultivariateIsolationLiteral(2443, "q is the constant polynomial, so p does not contain any roots at x2v\n")
 	}
 	d, enabled, e := algebraicAssertionSwitch()
 	if e != nil {
@@ -295,6 +331,9 @@ func (m *AlgebraicRootCore) isolateVanishedResultant(s *algebraicMultivariateIso
 		return e
 	}
 	if n == 1 {
+		if e = m.traceMultivariateIsolationLiteral(2380, "p is linear after applying (rational fragment) of x2v\n"); e != nil {
+			return e
+		}
 		s.constructRef(2, pm)
 		s.constructRef(3, pm)
 		c0, e := pm.core.coeffWithReceipts(prime, x, 0, &s.coefficient, &s.append, &s.factory)
@@ -320,8 +359,11 @@ func (m *AlgebraicRootCore) isolateVanishedResultant(s *algebraicMultivariateIso
 			return e
 		}
 		zero, e := m.IsZero(&s.values[1])
-		if e != nil || zero {
+		if e != nil {
 			return e
+		}
+		if zero {
+			return m.traceMultivariateIsolationLiteral(2391, "coefficient of degree 1 vanished, so p does not have roots at x2v\n")
 		}
 		root := Algebraic{}
 		if e = roots.pushTake(&root); e != nil {
@@ -360,7 +402,7 @@ func (m *AlgebraicRootCore) isolateVanishedResultant(s *algebraicMultivariateIso
 		}
 	}
 	if i == 0 {
-		return nil
+		return m.traceMultivariateIsolationLiteral(2413, "all coefficients vanished... polynomial does not have roots\n")
 	}
 	d, enabled, e := algebraicAssertionSwitch()
 	if e != nil {

@@ -38388,7 +38388,9 @@
         "pkg/math/polynomial/algebraic_basic_power_source_test.go",
         "pkg/util/numeral/mpbq_root_invocation.go",
         "pkg/util/numeral/mpbq_root_invocation_test.go",
-        "pkg/math/polynomial/algebraic_unary_root_source_test.go"
+        "pkg/math/polynomial/algebraic_unary_root_source_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_trace.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38561,7 +38563,11 @@
         "TestRationalPowerInvocationExecutingTransportGuards",
         "TestAlgebraicUnaryRootTraceMultiwordReservationPrefixes",
         "TestBinaryRootInvocationEveryReservationAndEnclosures",
-        "TestBinaryRootInvocationRejectsLaterIntegerCall"
+        "TestBinaryRootInvocationRejectsLaterIntegerCall",
+        "TestAlgebraicMultivariateIsolationTraceResultantFrontier",
+        "TestAlgebraicMultivariateIsolationTraceBranchRecords",
+        "TestAlgebraicMultivariateIsolationTraceDisabledSkipsOperands",
+        "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay"
       ],
       "conditionals": [
         {
@@ -39317,7 +39323,7 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:2268-2451,2879-2881 multivariate root isolation including both vanished-resultant recovery branches; full failure/TRACE audit pending",
+          "name": "algebraic_numbers.cpp:2268-2451,2879-2881 multivariate root isolation including both vanished-resultant recovery branches and tracked entry/rational-substitution/resultant/branch TRACE records; root-output/recovery/filter diagnostics and full failure audit remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation_multivariate.go",
           "tests": [
@@ -39327,7 +39333,11 @@
             "TestAlgebraicMultivariateIsolationEveryReachedCheckpoint",
             "TestAlgebraicMultivariateIsolationPreservesOlderFactorInvocation",
             "TestAlgebraicMultivariateIsolationExecutingOwnerRefusals",
-            "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals"
+            "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals",
+            "TestAlgebraicMultivariateIsolationTraceResultantFrontier",
+            "TestAlgebraicMultivariateIsolationTraceBranchRecords",
+            "TestAlgebraicMultivariateIsolationTraceDisabledSkipsOperands",
+            "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay"
           ]
         },
         {
@@ -39608,7 +39618,9 @@
         "pkg/math/polynomial/algebraic_basic_power_source_test.go",
         "pkg/util/numeral/mpbq_root_invocation.go",
         "pkg/util/numeral/mpbq_root_invocation_test.go",
-        "pkg/math/polynomial/algebraic_unary_root_source_test.go"
+        "pkg/math/polynomial/algebraic_unary_root_source_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_trace.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39778,7 +39790,11 @@
         "TestRationalPowerInvocationExecutingTransportGuards",
         "TestAlgebraicUnaryRootTraceMultiwordReservationPrefixes",
         "TestBinaryRootInvocationEveryReservationAndEnclosures",
-        "TestBinaryRootInvocationRejectsLaterIntegerCall"
+        "TestBinaryRootInvocationRejectsLaterIntegerCall",
+        "TestAlgebraicMultivariateIsolationTraceResultantFrontier",
+        "TestAlgebraicMultivariateIsolationTraceBranchRecords",
+        "TestAlgebraicMultivariateIsolationTraceDisabledSkipsOperands",
+        "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay"
       ],
       "conditionals": [
         {
@@ -40115,7 +40131,7 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:2268-2451,2879-2881 multivariate root isolation including both vanished-resultant recovery branches; full failure/TRACE audit pending",
+          "name": "algebraic_numbers.cpp:2268-2451,2879-2881 multivariate root isolation including both vanished-resultant recovery branches and tracked entry/rational-substitution/resultant/branch TRACE records; root-output/recovery/filter diagnostics and full failure audit remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation_multivariate.go",
           "tests": [
@@ -40125,7 +40141,11 @@
             "TestAlgebraicMultivariateIsolationEveryReachedCheckpoint",
             "TestAlgebraicMultivariateIsolationPreservesOlderFactorInvocation",
             "TestAlgebraicMultivariateIsolationExecutingOwnerRefusals",
-            "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals"
+            "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals",
+            "TestAlgebraicMultivariateIsolationTraceResultantFrontier",
+            "TestAlgebraicMultivariateIsolationTraceBranchRecords",
+            "TestAlgebraicMultivariateIsolationTraceDisabledSkipsOperands",
+            "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay"
           ]
         },
         {
