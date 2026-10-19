@@ -140,7 +140,7 @@ func algebraicOwnedRationalDestructorStopOperation(t *testing.T, globalDestructo
 				t.Fatal("wrapper owning cleanup consumed caller assignment prefix")
 			}
 			serviceMust(t, global.CleanupValue(&out))
-			contextTLSFinish(t, rawRuntime, func() error { return c.Del(&input) })
+			contextTLSFinish(t, rawRuntime, func() error { return c.CleanupValue(&input) })
 			contextTLSFinish(t, rawRuntime, func() error { return q.Del(&value) })
 			if lane != (umemory.Block{}) {
 				contextTLSFinish(t, poisonedRuntime, func() error {

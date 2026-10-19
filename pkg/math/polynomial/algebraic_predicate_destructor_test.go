@@ -100,7 +100,7 @@ func TestAlgebraicPredicateOwnDestructorJoinsBodyAndRetainsOlderValues(t *testin
 	if s.active || s.stage != 1 || s.ownStage != 5 || s.savedSourceCursor != 0 || s.savedOwnCursor != 2 || s.sourceStop == nil {
 		t.Fatal("owning cleanup moved source predicate cursor")
 	}
-	contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
+	contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&root) })
 	for _, block := range []*umemory.Block{&lane, &pad} {
 		contextTLSFinish(t, runtime, func() error {
 			if *block == (umemory.Block{}) {

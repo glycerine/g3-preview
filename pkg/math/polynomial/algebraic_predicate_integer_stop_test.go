@@ -83,7 +83,7 @@ func TestAlgebraicPredicateIntegerHornerStopRetainsCandidate(t *testing.T) {
 			if reached && (s.active || s.stage != 0 || s.ownStage != 5 || p.integerEvaluation.active) {
 				t.Fatal("integer owning cleanup changed source cursor")
 			}
-			contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
+			contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&root) })
 			for _, block := range []*umemory.Block{&lane, &pad} {
 				contextTLSFinish(t, runtime, func() error {
 					if *block == (umemory.Block{}) {
@@ -182,7 +182,7 @@ func TestAlgebraicPredicateIntegerSetterSourceStopRetainsCandidate(t *testing.T)
 			if reached && (s.active || s.sourceCursor != 0 || s.ownCursor != 2 || c.predicate.active || c.predicate.stage != 0) {
 				t.Fatal("setter owning cleanup changed source cursor")
 			}
-			contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
+			contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&root) })
 			for _, block := range []*umemory.Block{&lane, &pad} {
 				contextTLSFinish(t, runtime, func() error {
 					if *block == (umemory.Block{}) {

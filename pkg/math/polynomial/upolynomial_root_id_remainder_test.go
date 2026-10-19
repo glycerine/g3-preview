@@ -163,7 +163,7 @@ func TestUPolynomialRootIDRemainderScalarActualReleaseGuard(t *testing.T) {
 	if q.active || s.constructed || s.sourceCursor != 0 || s.ownCursor != 1 || q.sourceCursor != ([3]uint32{}) {
 		t.Fatal("own scalar cleanup changed source cursors")
 	}
-	contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
+	contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&root) })
 	contextTLSFinish(t, runtime, func() error {
 		if lane == (umemory.Block{}) {
 			return nil
@@ -261,7 +261,7 @@ func TestUPolynomialRootIDRemainderSubMulFailureRetainsUnjoinedTemporary(t *test
 			if reached && (q.active || s.constructed || s.sourceCursor != 0 || s.ownCursor != 1 || q.sourceCursor != ([3]uint32{})) {
 				t.Fatal("SubMul owning cleanup advanced scalar/vector source cursors")
 			}
-			contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
+			contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&root) })
 			for _, block := range []*umemory.Block{&lane, &pad} {
 				contextTLSFinish(t, runtime, func() error {
 					if *block == (umemory.Block{}) {
@@ -373,7 +373,7 @@ func TestUPolynomialRootIDRemainderSubMulEndStopProtectsScalar(t *testing.T) {
 	if q.active || s.constructed || s.sourceCursor != 0 || s.ownCursor != 1 || q.sourceCursor != ([3]uint32{}) {
 		t.Fatal("SubMul END own acknowledgement changed source cursors")
 	}
-	contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
+	contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&root) })
 	contextTLSFinish(t, runtime, func() error {
 		if lane == (umemory.Block{}) {
 			return nil

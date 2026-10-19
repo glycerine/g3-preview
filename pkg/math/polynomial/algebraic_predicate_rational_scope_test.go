@@ -224,7 +224,7 @@ func TestAlgebraicPredicateRationalCandidateSignedHostDestructor(t *testing.T) {
 	if s.active || s.sourceCursor != 0 || s.ownCursor != 2 || s.sourceStop == nil || c.predicate.active {
 		t.Fatal("source/own rational cursors conflated")
 	}
-	contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
+	contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&root) })
 	contextTLSFinish(t, runtime, func() error {
 		if lane == (umemory.Block{}) {
 			return nil

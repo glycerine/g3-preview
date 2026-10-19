@@ -240,7 +240,7 @@ func TestAlgebraicPromotionConverterEndStopPrecedesScopedRational(t *testing.T) 
 	if c.refinementQ.active || c.localActive || c.refinementQ.ownCursor != 2 || c.refinementQ.sourceCursor != 0 {
 		t.Fatal("owning cleanup lost source END cursor")
 	}
-	contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
+	contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&root) })
 	contextTLSFinish(t, runtime, func() error {
 		if lane == (umemory.Block{}) {
 			return nil

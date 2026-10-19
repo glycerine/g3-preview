@@ -134,10 +134,9 @@ func (s *SimpleAlgebraicValues) Close() error {
 	return nil
 }
 
-// CleanupRetained is an explicit owning acknowledgement of the actual failed
-// copy destination. It releases only that issued cell's constructed prefix;
-// it does not repair the source destructor or clean unrelated manager work.
-// Finish the core's retained numeric work before releasing this destination.
+// CleanupRetained owns a failed copy destination or values of a stopped Close.
+// It follows actual slot frontiers without repairing source destruction or
+// cleaning unrelated manager work. Finish the core's numeric children first.
 func (s *SimpleAlgebraicValues) CleanupRetained() error {
 	if s == nil || s.self != s {
 		return ErrAlgebraicOwner
@@ -147,6 +146,13 @@ func (s *SimpleAlgebraicValues) CleanupRetained() error {
 	}
 	if s.running {
 		return ErrAlgebraicPending
+	}
+	if s.closing {
+		if e := s.values.CleanupRetained(); e != nil {
+			return e
+		}
+		s.failedCopy = false
+		return nil
 	}
 	if !s.failedCopy {
 		return nil

@@ -119,7 +119,7 @@ func TestAlgebraicNegActualTransportOwnerAndTupleRefusal(t *testing.T) {
 		serviceMust(t, rt.SetMaxSize(0))
 		r := algebraicNegInvocationReceipt{c, &c.negation, c.negation.invocation}
 		contextTLSFinish(t, rt, func() error { return c.cleanupNegation(&r, false) })
-		contextTLSFinish(t, rt, func() error { return c.Del(&a) })
+		contextTLSFinish(t, rt, func() error { return c.CleanupValue(&a) })
 		contextTLSFinish(t, rt, func() error { return c.cleanupNegation(&r, true) })
 		contextTLSFinish(t, rt, func() error { return s.Manager.Del(&n) })
 		contextTLSFinish(t, rt, func() error { return rt.Deallocate(&held) })

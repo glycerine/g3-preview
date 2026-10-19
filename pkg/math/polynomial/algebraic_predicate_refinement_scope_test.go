@@ -132,7 +132,7 @@ func algebraicPredicateRefinementStopCase(t *testing.T, predicateFirst, ownedWra
 				}
 				serviceMust(t, global.Del(&out))
 			}
-			contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
+			contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&root) })
 			for _, block := range []*umemory.Block{&lane, &pad} {
 				contextTLSFinish(t, runtime, func() error {
 					if *block == (umemory.Block{}) {

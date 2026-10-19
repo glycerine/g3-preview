@@ -15,6 +15,7 @@ type AlgebraicVector struct {
 	values          []Algebraic
 	header          uint64
 	closed, closing bool
+	resetPending    bool
 }
 
 func (v *AlgebraicVector) isolationOutputExecuting() bool {
@@ -116,10 +117,12 @@ func (v *AlgebraicVector) Reset() error {
 	}
 	for i := uint32(0); i < uint32(len(v.values)); i++ {
 		if e := v.core.Del(&v.values[i]); e != nil {
+			v.resetPending = true
 			return e
 		}
 	}
 	v.values = v.values[:0]
+	v.resetPending = false
 	return nil
 }
 func (v *AlgebraicVector) Close() error {
@@ -129,13 +132,28 @@ func (v *AlgebraicVector) Close() error {
 	if v.isolationOutputExecuting() || v.core != nil && (v.core.isolationSigns.traceRunning || v.core.rootTrace.running || v.core.rootTracePending() || v.core.rootDisplay.active || v.core.coefficientNormalizationPending()) {
 		return ErrAlgebraicPending
 	}
+	return v.closeValues(false)
+}
+
+// The retained core owns its root-selection scratch vector. Its owning Close
+// uses this continuation, while public Close executes literal source deletion.
+func (v *AlgebraicVector) closeValues(owning bool) error {
+	if v == nil || v.self != v {
+		return ErrAlgebraicOwner
+	}
 	if v.closed {
 		return nil
 	}
 	v.closing = true
 	for i := uint32(0); i < uint32(len(v.values)); i++ {
 		var e error
-		if v.core.closing {
+		if owning {
+			var l *algebraicLocation
+			l, e = v.core.locationCleanup(&v.values[i])
+			if e == nil && l != nil {
+				e = v.core.destroyCell(&v.values[i], l, true)
+			}
+		} else if v.core.closing {
 			e = v.core.delClosing(&v.values[i])
 		} else {
 			e = v.core.Del(&v.values[i])
@@ -181,4 +199,33 @@ func (v *AlgebraicVector) IsRational(i uint32) (bool, error) {
 		return false, arena.ErrBounds
 	}
 	return v.core.IsRational(&v.values[i])
+}
+
+// CleanupRetained acknowledges values left by a stopped Reset or Close. Finish
+// the core's retained numerical children first. Healthy vectors are unchanged;
+// Close still owns the final vector header release.
+func (v *AlgebraicVector) CleanupRetained() error {
+	if v == nil || v.self != v {
+		return ErrAlgebraicOwner
+	}
+	if v.closed {
+		return nil
+	}
+	if v.isolationOutputExecuting() {
+		return ErrAlgebraicPending
+	}
+	if !v.closing && !v.resetPending {
+		return nil
+	}
+	if e := v.core.check(); e != nil {
+		return e
+	}
+	for i := range v.values {
+		if e := v.core.CleanupValue(&v.values[i]); e != nil {
+			return e
+		}
+	}
+	v.values = v.values[:0]
+	v.resetPending = false
+	return nil
 }

@@ -151,7 +151,7 @@ func TestAlgebraicSavedIntervalRestoreAccessorBeforeMemberRead(t *testing.T) {
 	a = original
 	restored := saved.restored
 	serviceMust(t, c.finishSavedInterval(&saved, true))
-	serviceMust(t, c.Del(&a))
+	serviceMust(t, c.CleanupValue(&a))
 	if !errors.Is(body, arena.ErrClosed) || !restored {
 		t.Fatal("restore read members before accessor switch or missed flag publication", body)
 	}
@@ -175,7 +175,7 @@ func TestAlgebraicSavedIntervalRestoreSkipsAccessorAfterBasicPromotion(t *testin
 		t.Fatal("basic early return missed restore flag")
 	}
 	serviceMust(t, c.finishSavedInterval(&saved, true))
-	serviceMust(t, c.Del(&a))
+	serviceMust(t, c.CleanupValue(&a))
 }
 
 func TestAlgebraicSavedIntervalSelectionOwnsPartialConstructorAbort(t *testing.T) {

@@ -211,7 +211,7 @@ func TestUPolynomialRootIDHornerStopProtectsOlderSequence(t *testing.T) {
 			if reached && (q.active || q.sourceCursor[2] != 0 || q.ownCursor[2] != count || q.childStop == nil || p.binaryEvaluation.active) {
 				t.Fatal("own cleanup failed child-first order or moved source cursor")
 			}
-			contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
+			contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&root) })
 			for _, block := range []*umemory.Block{&lane, &pad} {
 				contextTLSFinish(t, runtime, func() error {
 					if *block == (umemory.Block{}) {

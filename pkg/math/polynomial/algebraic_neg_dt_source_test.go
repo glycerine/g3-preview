@@ -112,7 +112,7 @@ func algebraicNegDTCase(t *testing.T, closeCore bool) {
 				if !c.closed {
 					r := algebraicNegInvocationReceipt{c, &c.negation, c.negation.invocation}
 					contextTLSFinish(t, rt, func() error { return c.cleanupNegation(&r, false) })
-					contextTLSFinish(t, rt, func() error { return c.Del(&a) })
+					contextTLSFinish(t, rt, func() error { return c.CleanupValue(&a) })
 					contextTLSFinish(t, rt, func() error { return c.cleanupNegation(&r, true) })
 				}
 				if lane != (umemory.Block{}) {
@@ -188,7 +188,7 @@ func algebraicNegDTCase(t *testing.T, closeCore bool) {
 				}
 			}
 			contextTLSFinish(t, rt, func() error { return c.cleanupNegation(&r, false) })
-			contextTLSFinish(t, rt, func() error { return c.Del(&a) })
+			contextTLSFinish(t, rt, func() error { return c.CleanupValue(&a) })
 			if closeCore {
 				oldHeader, oldHistory := c.header, len(c.negationHistory)
 				oldSource := q.sourceCause

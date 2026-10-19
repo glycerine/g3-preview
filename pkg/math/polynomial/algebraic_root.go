@@ -460,6 +460,9 @@ func (m *AlgebraicRootCore) Del(a *Algebraic) error {
 	if e != nil || l == nil {
 		return e
 	}
+	if e = algebraicQueryTagAssertionSwitch(); e != nil {
+		return e
+	}
 	return m.destroyCell(a, l, false)
 }
 
@@ -473,6 +476,9 @@ func (m *AlgebraicRootCore) delClosing(a *Algebraic) error {
 	if e != nil || l == nil {
 		return e
 	}
+	if e = algebraicQueryTagAssertionSwitch(); e != nil {
+		return e
+	}
 	return m.destroyCell(a, l, false)
 }
 
@@ -480,6 +486,11 @@ func (m *AlgebraicRootCore) delClosing(a *Algebraic) error {
 // Owning abort skips only source-unconstructed slots; source Del preserves the
 // endangered read and its guard history, without rebuilding an array.
 func (m *AlgebraicRootCore) destroyCell(a *Algebraic, l *algebraicLocation, owning bool) error {
+	if !owning && !l.initialized {
+		l.sourceGuard = true
+		return arena.ErrInvalidSlot
+	}
+
 	if l.initialized {
 		r, e := m.load(l)
 		if e != nil {
@@ -492,7 +503,7 @@ func (m *AlgebraicRootCore) destroyCell(a *Algebraic, l *algebraicLocation, owni
 				if l.stage == 1 {
 					n = &(*r.value.BorrowDenominator())
 				}
-				e = z.Del(n)
+				e = deleteAlgebraicCellInteger(z, n, owning)
 				if e = m.save(l, &r, e); e != nil {
 					return e
 				}
@@ -510,7 +521,7 @@ func (m *AlgebraicRootCore) destroyCell(a *Algebraic, l *algebraicLocation, owni
 				if l.stage == 2 {
 					n = &(*(*r.interval.BorrowUpper()).BorrowNumerator())
 				}
-				e = z.Del(n)
+				e = deleteAlgebraicCellInteger(z, n, owning)
 				if e = m.save(l, &r, e); e != nil {
 					return e
 				}
@@ -563,7 +574,7 @@ func (m *AlgebraicRootCore) destroyPolynomial(l *algebraicLocation, r *algebraic
 			l.sourceGuard = true
 			return e
 		}
-		if e = p.config.Integer.Del(a); e != nil {
+		if e = deleteAlgebraicCellInteger(p.config.Integer, a, owning); e != nil {
 			return e
 		}
 		l.coefficientCursor++
@@ -1504,7 +1515,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 		return e
 	}
 	if m.rootSelection != nil {
-		if e := m.rootSelection.Close(); e != nil {
+		if e := m.rootSelection.closeValues(true); e != nil {
 			return e
 		}
 		m.rootSelection = nil

@@ -58,8 +58,14 @@ func TestAlgebraicIsolationSignsActualSampleDestructorStop(t *testing.T) {
 			}
 			return runtime.Deallocate(&values.lane)
 		})
-		contextTLSFinish(t, runtime, roots.Close)
-		contextTLSFinish(t, runtime, func() error { return c.Del(&values.values[0]) })
+		if e := roots.Close(); e != nil {
+			if !errors.Is(e, arena.ErrBounds) {
+				t.Fatal("source vector close frontier", e)
+			}
+			contextTLSFinish(t, runtime, roots.CleanupRetained)
+			serviceMust(t, roots.Close())
+		}
+		contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&values.values[0]) })
 		// Take the fixture's real caller INC into an owning reference so a
 		// stopped polynomial destructor resumes instead of repeating DEC.
 		reference := polynomialReference{value: p}

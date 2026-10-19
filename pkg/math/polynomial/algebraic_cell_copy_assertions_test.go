@@ -84,8 +84,8 @@ func TestAlgebraicCellCopyBranchSwitchBeforeDestruction(t *testing.T) {
 					t.Error("branch switch failure followed destination mutation")
 				}
 				serviceMust(t, c.CleanupRetained())
-				serviceMust(t, c.Del(&dst))
-				serviceMust(t, c.Del(&src))
+				serviceMust(t, c.CleanupValue(&dst))
+				serviceMust(t, c.CleanupValue(&src))
 			})
 		}
 	}
@@ -106,7 +106,7 @@ func TestAlgebraicCellCopySelfSkipsAssertionsAndPayload(t *testing.T) {
 	}
 	serviceMust(t, c.Copy(&a, &a))
 	l.initialized = initialized
-	serviceMust(t, c.Del(&a))
+	serviceMust(t, c.CleanupValue(&a))
 }
 
 func TestAlgebraicCellCopyPolynomialAssertionActions(t *testing.T) {
@@ -152,7 +152,12 @@ func TestAlgebraicCellCopyAssertionDisabledOperandsAndResetOrder(t *testing.T) {
 	a := algebraicTinyBinaryBoundsRoot(t, c)
 	serviceMust(t, diagnostic.BorrowProcessDebugContext().Close())
 	q := unumeral.NewRational()
+	original := a
+	if e := c.SetTake(&a, &q); !errors.Is(e, arena.ErrClosed) || a != original {
+		t.Fatal("zero setter skipped deletion's established tag switch", e, a)
+	}
+	serviceMust(t, c.CleanupValue(&a))
 	if e := c.SetTake(&a, &q); !errors.Is(e, arena.ErrClosed) || a != (Algebraic{}) {
-		t.Fatal("mutable zero assertion preceded reset", e, a)
+		t.Fatal("zero setter omitted the post-reset assertion switch", e, a)
 	}
 }

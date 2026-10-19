@@ -38422,7 +38422,9 @@
         "pkg/math/polynomial/algebraic_cell_copy_assertions.go",
         "pkg/math/polynomial/algebraic_cell_copy_assertions_test.go",
         "pkg/math/polynomial/algebraic_copy_call.go",
-        "pkg/math/polynomial/algebraic_copy_call_test.go"
+        "pkg/math/polynomial/algebraic_copy_call_test.go",
+        "pkg/math/polynomial/algebraic_cell_deletion_test.go",
+        "pkg/math/polynomial/algebraic_cell_deletion.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38687,7 +38689,15 @@
         "TestAlgebraicCopyCallActualTransport",
         "TestAlgebraicCopyCallActualReservationMatrix",
         "TestAlgebraicCopyCallActualBoundReceipt",
-        "TestAlgebraicCopyCallPreservesOlderNumericAllocation"
+        "TestAlgebraicCopyCallPreservesOlderNumericAllocation",
+        "TestAlgebraicCellDeletionMappingOwningContinuation",
+        "TestAlgebraicCellDeletionReleasedHeaderSourceGuard",
+        "TestAlgebraicCellDeletionReleasedNumeralSourceGuard",
+        "TestAlgebraicCellDeletionTagSwitchBeforeMembers",
+        "TestAlgebraicCellDeletionZeroSkipsTagSwitch",
+        "TestAlgebraicCellDeletionPolynomialNUMSourceGuard",
+        "TestAlgebraicCellDeletionVectorOwningContinuation",
+        "TestAlgebraicCellDeletionCoreOwnsSelectionContinuation"
       ],
       "conditionals": [
         {
@@ -39675,7 +39685,8 @@
         "The polynomial setter now emits its actual cpp:505 algebraic/set record after both assignment branches and after the linear scoped_mpq destructor. The separate mk_algebraic_cell consumer emits no setter record or setter postcondition. Formatting uses the shared numeric/UP trace borrow and accepted root-display receipt; numerical/source-destructor stops retain the already published caller, and a true nested display source stop preserves the mixed-addition caller's older bound/rational locals. Literal fresh/reused/basic/root records, disabled operand erasure, stream callback owner/graph preservation and actual numerical reservation prefixes through success cover this concrete call. The old setter restored alone in an exact overlay fails the literal-record regression (/mnt/oldrog/tmp/g3-cell-setter-trace-baseline/log). This is one retained setter diagnostic increment, not a whole polynomial/AST or constructor/member audit completion claim.",
         "normalize_coeffs cpp:395-397 now has a concrete, self-bound and generation-stamped owner for the actual negative-leading coefficient negation call. It passes NumericAllocationContext into the existing shared concrete UP coefficient loop, retains only accepted physical allocation prefixes, and borrows actual UP/modular/integer/natural owners during execution. Core/manager lifecycle and caller mutation refuse synchronous allocator/NUM-trace reentry; owning cleanup acknowledges matching numerical roots before older cell destruction. A direct retained negation component vector reaches real INT_MIN allocator transport and proves guarded owner/NUM lifetime with unchanged callers and physical state; it claims no completed constructor at this component boundary. A separate actual SetRoot reservation campaign reaches a negation refusal and success, preserving unpublished construction on failure and independently checking all normalized coefficients and lower-sign flip. Older pending copy allocations remain untouched by refused negation and algebraic cleanup; replaced contexts and copied scope identities refuse authority. Restoring the old plain NegViewInPlace call in an exact overlay admits owning cleanup during the real callback (/mnt/oldrog/tmp/g3-cell-negative-normalization-baseline/log). These vectors do not claim a retained physical token at every allocation refusal or whole polynomial/AST audit completion.",
         "Same-core set(numeral&,numeral const&) cpp:509-539 now dispatches before decoding source payloads and queries its selected branch SASSERT before destination destruction. The root-to-basic route deletes the old root before basic_value and the const-mpq temporary, matching cpp:528-530; an actual temporary-copy allocation refusal leaves the old destination deleted and the caller zero. Basic/root established accessors query their actual gates at the reached boundaries. copy_poly cpp:445-446 has independent pointer/count assertion switches and source Throw/Continue behavior; direct mk_algebraic_cell retains its inline coefficient-copy loop without acquiring copy_poly gates. Mutable rational zero setting reaches cpp:427 after reset. Closed-debug-context actual branch vectors preserve callers and allocation graphs before destruction, self-copy skips payload/assertion reads after Go handle admission, disabled assertion operands remain unread, and actual zero reset precedes its closed-switch refusal. Restoring the old Copy alone fails the real root-to-basic allocation/publication regression (/mnt/oldrog/tmp/g3-cell-copy-source-baseline/log). Broad cell/copy/basic/binary/unary/isolation/selector/manager checks pass all four profiles on CPUs 8-16; numerical-child/callback/member-read and whole polynomial/AST audits remain open. No unit is promoted.",
-        "The same-core Copy caller cpp:463-474,509-539 now has a concrete generation-bound execution/numerical-child scope. Actual running/owning cleanup borrows the existing UP/modular/integer/natural services; allocator callbacks refuse core and numeric/UP lifecycle, source/destination deletion, public factory admission and numeric service lifetime, preserving callers and physical state. Coefficient receipts are retained only when that actual SET issues a new key; the legacy core key remains the same accepted alias. Interval copy uses the existing source-ordered tracked same-owner path, retaining accepted comparison/bound-copy and allocation children. Qualified private UP factory entry is available only to this actual bound copy_poly continuation. Owning cleanup acknowledges exact bound/coefficient/numerical children, while ordinary source destructors still reach their original unconstructed-field guards. Real same-core transport proves prior owning cleanup admission and actual interval SET; the exact old path restored in /mnt/oldrog/tmp/g3-cell-copy-call/baseline-overlay.json fails the final regression (baseline-final.log). A zero/basic/BIG-coefficient/BIG-bound source by destination matrix sweeps actual reservations through success without global numeric cleanup or scratch repair; retained simple mappings reach an actual bound-copy receipt, and an unrelated older numeric allocation remains unchanged by refused copy and core cleanup. Applied copy/parent checks pass all four profiles; AST arithmetic and concrete algebraic evaluation pass native and combined. The full native d412365e checkpoint excludes this later increment. Broader copy member/destructor/callback composition and whole polynomial/AST completion remain unproven; no unit is promoted."
+        "The same-core Copy caller cpp:463-474,509-539 now has a concrete generation-bound execution/numerical-child scope. Actual running/owning cleanup borrows the existing UP/modular/integer/natural services; allocator callbacks refuse core and numeric/UP lifecycle, source/destination deletion, public factory admission and numeric service lifetime, preserving callers and physical state. Coefficient receipts are retained only when that actual SET issues a new key; the legacy core key remains the same accepted alias. Interval copy uses the existing source-ordered tracked same-owner path, retaining accepted comparison/bound-copy and allocation children. Qualified private UP factory entry is available only to this actual bound copy_poly continuation. Owning cleanup acknowledges exact bound/coefficient/numerical children, while ordinary source destructors still reach their original unconstructed-field guards. Real same-core transport proves prior owning cleanup admission and actual interval SET; the exact old path restored in /mnt/oldrog/tmp/g3-cell-copy-call/baseline-overlay.json fails the final regression (baseline-final.log). A zero/basic/BIG-coefficient/BIG-bound source by destination matrix sweeps actual reservations through success without global numeric cleanup or scratch repair; retained simple mappings reach an actual bound-copy receipt, and an unrelated older numeric allocation remains unchanged by refused copy and core cleanup. Applied copy/parent checks pass all four profiles; AST arithmetic and concrete algebraic evaluation pass native and combined. The full native d412365e checkpoint excludes this later increment. Broader copy member/destructor/callback composition and whole polynomial/AST completion remain unproven; no unit is promoted.",
+        "Cell deletion cpp:180-216 now distinguishes literal destruction from owning acknowledgement. Basic NUM/DEN, root bounds and polynomial coefficients use SourceIntegerDel on source paths, preserving the actual capacity/read guard after a physical free reports failure; owning paths retain Del and their exact release cursors. A consumed or unconstructed cell header is rejected by source deletion instead of silently consuming caller ownership. Del and delClosing query the established header tag assertion after the zero shortcut and before members. AlgebraicVector has explicit owning acknowledgement for stopped Reset/Close; simple mappings delegate stopped Close acknowledgement to actual stored elements. The retained root-selection scratch vector uses owning continuation from core Close. Public signed-host TLS operations produce actual release-then-error frontiers for basic headers, basic NUMs and root coefficients, with repeated source calls preserving pointer/cursor/budget/physical state and explicit cleanup releasing only owned resources. Actual vector reset/close, mapping and core-close continuations are checked. Closed-context source tag assertions precede members, while zero deletion skips them. Restoring the old root implementation fails all three real release-guard regressions (/mnt/oldrog/tmp/g3-cell-deletion-baseline/log). Deallocation domain errors return directly rather than invoking allocation transport; no imaginary callback or fabricated release flag is used. Existing teardown loops now use explicit owning APIs; source-stop assertions remain. Broader ownership/member/destructor and whole polynomial/AST audits remain open; no unit is promoted."
       ]
     },
     {
@@ -50926,7 +50937,8 @@
         "pkg/math/polynomial/polynomial_algebraic_values_test.go",
         "pkg/math/polynomial/algebraic_vector.go",
         "pkg/math/polynomial/polynomial_algebraic_values.go",
-        "pkg/math/polynomial/algebraic_cell_allocation.go"
+        "pkg/math/polynomial/algebraic_cell_allocation.go",
+        "pkg/math/polynomial/algebraic_cell_deletion_test.go"
       ],
       "tests": [
         "TestSimpleAlgebraicValuesConstructorRollbackAndCopiedOwner",
@@ -50934,7 +50946,8 @@
         "TestSimpleAlgebraicValuesMissingAndFailedPushPrefix",
         "TestSimpleAlgebraicValuesCopyReservationPrefixes",
         "TestAlgebraicCleanupPreservesOlderIntegerCopyReceipt",
-        "TestAlgebraicCellAllocationExactPendingCleanupAndRetry"
+        "TestAlgebraicCellAllocationExactPendingCleanupAndRetry",
+        "TestAlgebraicCellDeletionMappingOwningContinuation"
       ],
       "conditionals": [
         {
@@ -51007,7 +51020,8 @@
       ],
       "deviations": [
         "Only simple_var2value<algebraic_numbers::manager> is required by retained production consumers (polynomial_cmds.cpp:93) and retained algebraic tests. The rational instantiation in src/test/polynomial.cpp:1345 belongs to tst_eval(), whose call at1826 is after the source driver return at1825; it is not newly ported as an unused template.",
-        "The header has no arithmetic, TRACE body or custom stream formatting algorithm. Native Go storage and explicit error/owning continuation preserve its project lookup/publication/lifetime behavior; C++ standard-library internals are not ported. This unit completion covers the concrete wrapper, not all algorithms of its borrowed algebraic core or downstream command packages. Historical broader-core audit caveats above remain scoped to those separate units."
+        "The header has no arithmetic, TRACE body or custom stream formatting algorithm. Native Go storage and explicit error/owning continuation preserve its project lookup/publication/lifetime behavior; C++ standard-library internals are not ported. This unit completion covers the concrete wrapper, not all algorithms of its borrowed algebraic core or downstream command packages. Historical broader-core audit caveats above remain scoped to those separate units.",
+        "A stopped simple algebraic mapping Close now acknowledges its actual stored values through the vector owning continuation before completing source Close. Its failed-copy-only cleanup remains separate when Close has not started. Real signed-host TLS release-then-error vectors prove that repeated literal Close stops at the consumed NUM while explicit CleanupRetained completes actual element ownership, without root discovery, global numeric acknowledgement or scratch repair. The underlying cell source deletion now preserves released-storage guards; this is dependency integration evidence, not a promotion of remaining polynomial or AST units."
       ]
     },
     {

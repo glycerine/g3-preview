@@ -93,7 +93,7 @@ func TestAlgebraicPredicateRationalHornerStopRetainsCandidate(t *testing.T) {
 			if reached && (s.active || s.sourceCursor != 0 || s.ownCursor != 2 || s.childStop == nil || p.rationalEvaluation.active) {
 				t.Fatal("own cleanup replayed source or left child active")
 			}
-			contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
+			contextTLSFinish(t, runtime, func() error { return c.CleanupValue(&root) })
 			for _, block := range []*umemory.Block{&lane, &pad} {
 				contextTLSFinish(t, runtime, func() error {
 					if *block == (umemory.Block{}) {
