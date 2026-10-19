@@ -44933,8 +44933,8 @@
           ]
         },
         {
-          "name": "Selected scalar/integer content cpp3343-3359/3384-3428 and borrowed indexed construction; GlexMonic cpp6843-6862/7388-7390 is complete with source assertion actions",
-          "status": "partial",
+          "name": "Complete scalar/integer content cpp3343-3359/3384-3430, borrowed indexed construction, and GlexMonic cpp6843-6862/7388-7390 with source assertion actions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
           "tests": [
             "TestPolynomialSparseBigFieldInterpolationEveryNumericPrefix",
@@ -45121,8 +45121,8 @@
           ]
         },
         {
-          "name": "IC both overloads cpp3344-3359/3405-3430: m_manager is mpzzp_manager; actual modular SET/GCD/Div guards, field inverse scratch and mode-switch normalization; explicit m().m() arithmetic remains raw",
-          "status": "partial",
+          "name": "Complete IC overloads cpp3344-3359/3405-3430 using the actual mpzzp_manager SET/GCD/Div engines, field inverse scratch and mode-switch normalization",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_content.go",
           "tests": [
             "TestPolynomialContentModeSwitchSourceSet",
@@ -45627,7 +45627,7 @@
         },
         {
           "name": "polynomial.cpp:3405-3430 ic: actual zero/constant/GCD/cheap reset/ai/Div/add_reset/mk source order with direct guarded numeric child receipts; no numeral construction on erased branches.",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_content.go",
           "tests": [
             "TestPolynomialContentBeforeAIActualGCDPrelude",
@@ -49167,8 +49167,8 @@
           ]
         },
         {
-          "name": "Selected scalar/integer content cpp3343-3359/3384-3428 and borrowed indexed construction; GlexMonic cpp6843-6862/7388-7390 is complete with source assertion actions",
-          "status": "partial",
+          "name": "Complete scalar/integer content cpp3343-3359/3384-3430, borrowed indexed construction, and GlexMonic cpp6843-6862/7388-7390 with source assertion actions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
           "tests": [
             "TestPolynomialSparseBigFieldInterpolationEveryNumericPrefix",
@@ -174825,7 +174825,7 @@
         },
         {
           "name": "mpz.cpp:730-817,845-922,924-985 actual Content GCD/array GCD/ExtendedGCD direct invocation transport; source arithmetic and end-only RAW DEL unchanged.",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_content_allocation_context.go",
           "tests": [
             "TestPolynomialContentBeforeAIActualGCDPrelude",
@@ -177960,7 +177960,7 @@
         },
         {
           "name": "mpzzp.h:58-68,111-114,217-220 actual Content modular receiver, Copy/PN/GCDMany/Div context and immutable invocation binding.",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_content_allocation_context.go",
           "tests": [
             "TestPolynomialContentBeforeAIActualGCDPrelude",
