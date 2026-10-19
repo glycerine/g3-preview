@@ -9,7 +9,6 @@ import (
 
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
-	"testing"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
