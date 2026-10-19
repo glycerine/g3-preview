@@ -44929,7 +44929,7 @@
           ]
         },
         {
-          "name": "Selected scalar/integer content cpp3343-3359/3384-3428, GlexMonic6843-6862/7388-7390 and borrowed indexed construction",
+          "name": "Selected scalar/integer content cpp3343-3359/3384-3428 and borrowed indexed construction; GlexMonic cpp6843-6862/7388-7390 is complete with source assertion actions",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
           "tests": [
@@ -44949,6 +44949,7 @@
             "TestPolynomialGlexMonicActualFieldAndIndependentCoefficients",
             "TestPolynomialGlexMonicBigFieldEveryNumericPrefix",
             "TestPolynomialGlexMonicEveryActualReservationPrefix",
+            "TestPolynomialGlexMonicSourceAssertionActions",
             "TestPolynomialIntegerContentCompletedLocalActualDanglingGuard",
             "TestPolynomialIntegerContentEveryActualReservationPrefix",
             "TestPolynomialIntegerContentIndependentSignedBranches",
@@ -49154,7 +49155,7 @@
           ]
         },
         {
-          "name": "Selected scalar/integer content cpp3343-3359/3384-3428, GlexMonic6843-6862/7388-7390 and borrowed indexed construction",
+          "name": "Selected scalar/integer content cpp3343-3359/3384-3428 and borrowed indexed construction; GlexMonic cpp6843-6862/7388-7390 is complete with source assertion actions",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
           "tests": [
@@ -49174,6 +49175,7 @@
             "TestPolynomialGlexMonicActualFieldAndIndependentCoefficients",
             "TestPolynomialGlexMonicBigFieldEveryNumericPrefix",
             "TestPolynomialGlexMonicEveryActualReservationPrefix",
+            "TestPolynomialGlexMonicSourceAssertionActions",
             "TestPolynomialIntegerContentCompletedLocalActualDanglingGuard",
             "TestPolynomialIntegerContentEveryActualReservationPrefix",
             "TestPolynomialIntegerContentIndependentSignedBranches",

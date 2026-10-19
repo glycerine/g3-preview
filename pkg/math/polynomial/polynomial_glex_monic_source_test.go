@@ -10,6 +10,7 @@ import (
 )
 
 func TestPolynomialGlexMonicActualFieldAndIndependentCoefficients(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	full := polynomialPSCFullFixture(t)
 	m := full.core
 	if polynomialSourceDebug {

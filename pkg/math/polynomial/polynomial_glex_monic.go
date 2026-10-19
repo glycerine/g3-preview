@@ -90,14 +90,11 @@ func (m *MultivariatePolynomialManager) glexMonicWithReceipt(p Polynomial, recei
 		return Polynomial{}, e
 	}
 	c := m.core
-	if polynomialSourceDebug {
+	if e := polynomialGlexMonicSourceAssert(6844, "m_manager.field()", func() (bool, error) {
 		field, e := c.modular.Field()
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if !field {
-			return Polynomial{}, ErrPolynomialAssertion
-		}
+		return field, e
+	}); e != nil {
+		return Polynomial{}, e
 	}
 	zero, e := c.IsZero(p)
 	if e != nil {
