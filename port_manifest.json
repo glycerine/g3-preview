@@ -44784,8 +44784,8 @@
           ]
         },
         {
-          "name": "Selected recursive lex_sort polynomial.cpp:1315-1366,1440-1460,7022-7024: native unsigned bucket/permutation storage and original coefficient/monomial cycle algorithm",
-          "status": "partial",
+          "name": "Complete recursive lex_sort polynomial.cpp:1315-1366,1440-1460,7022-7024 with native unsigned bucket/permutation storage, original coefficient/monomial cycles and source assertion actions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_lex_sort.go",
           "tests": [
             "TestPolynomialLexSortIndependentRecursiveOrder",
@@ -44797,7 +44797,8 @@
             "TestPolynomialTranslateImpEveryReservationAndLexSort",
             "TestPolynomialLexSortNativeScratchGrowthAndReuse",
             "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
-            "TestPolynomialLexNativeMappingCyclesPreserveTermPairs"
+            "TestPolynomialLexNativeMappingCyclesPreserveTermPairs",
+            "TestPolynomialLexSortSourceAssertionActions"
           ]
         },
         {
@@ -49016,8 +49017,8 @@
           ]
         },
         {
-          "name": "Selected recursive lex_sort1315-1366 and1440-1460, public7022-7024: actual unsigned buckets and raw numeral/monomial permutation cycles",
-          "status": "partial",
+          "name": "Complete recursive lex_sort cpp1315-1366 and1440-1460, public7022-7024 with actual unsigned buckets, raw numeral/monomial permutation cycles and source assertion actions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_lex_sort.go",
           "tests": [
             "TestPolynomialLexSortIndependentRecursiveOrder",
@@ -49026,7 +49027,8 @@
             "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
             "TestPolynomialLexSortWrappedDegreeReachedBucket",
             "TestPolynomialLexSortActualBigCoefficientOwnership",
-            "TestPolynomialTranslateImpEveryReservationAndLexSort"
+            "TestPolynomialTranslateImpEveryReservationAndLexSort",
+            "TestPolynomialLexSortSourceAssertionActions"
           ]
         },
         {

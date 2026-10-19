@@ -28,8 +28,10 @@ func (m *MultivariatePolynomialManager) lexMaximumBelow(p Polynomial, start, end
 	return max, nil
 }
 func (m *MultivariatePolynomialManager) lexRange(p Polynomial, start, end, x uint32) error {
-	if polynomialSourceDebug && end <= start {
-		return ErrPolynomialAssertion
+	if e := polynomialLexSortSourceAssert(1316, "end > start", func() (bool, error) {
+		return end > start, nil
+	}); e != nil {
+		return e
 	}
 	c := m.core
 	ms, e := c.captureMonomialPointer(p, 0)
@@ -68,8 +70,10 @@ func (m *MultivariatePolynomialManager) lexRange(p Polynomial, start, end, x uin
 		m.lexBuckets[i] = m.lexBuckets[i][:0]
 	}
 	n := uint32(len(m.lexPermutation))
-	if polynomialSourceDebug && n != end-start {
-		return ErrPolynomialAssertion
+	if e = polynomialLexSortSourceAssert(1333, "p.size() == end - start", func() (bool, error) {
+		return n == end-start, nil
+	}); e != nil {
+		return e
 	}
 	if e = m.lexApplyPermutation(p, start, n, true); e != nil {
 		return e
@@ -106,25 +110,30 @@ func (m *MultivariatePolynomialManager) lexRange(p Polynomial, start, end, x uin
 			if e != nil {
 				return e
 			}
-			if polynomialSourceDebug && next > d {
-				return ErrPolynomialAssertion
+			if e = polynomialLexSortSourceAssert(1352, "d_j <= d", func() (bool, error) {
+				return next <= d, nil
+			}); e != nil {
+				return e
 			}
 			if next < d {
 				break
 			}
 		}
-		if polynomialSourceDebug && j != end {
+		if e = polynomialLexSortSourceAssert(1356, "j == end || m_ms[j]->degree_of(x) < d", func() (bool, error) {
+			if j == end {
+				return true, nil
+			}
 			a, e := ms.read(j)
 			if e != nil {
-				return e
+				return false, e
 			}
 			next, e := c.monomials.DegreeOf(a, x)
 			if e != nil {
-				return e
+				return false, e
 			}
-			if next >= d {
-				return ErrPolynomialAssertion
-			}
+			return next < d, nil
+		}); e != nil {
+			return e
 		}
 		if j > i+1 {
 			y, e := m.lexMaximumBelow(p, i, j, x)
@@ -202,12 +211,11 @@ func (m *MultivariatePolynomialManager) lexSortForAlgebraic(p Polynomial, caller
 			if e != nil {
 				return e
 			}
-			order, e := m.core.monomials.Lex(a, b)
-			if e != nil {
+			if e = polynomialLexSortSourceAssert(1453, "lex_compare(m_ms[i], m_ms[i+1]) > 0", func() (bool, error) {
+				order, e := m.core.monomials.Lex(a, b)
+				return order > 0, e
+			}); e != nil {
 				return e
-			}
-			if order <= 0 {
-				return ErrPolynomialAssertion
 			}
 		}
 	}
