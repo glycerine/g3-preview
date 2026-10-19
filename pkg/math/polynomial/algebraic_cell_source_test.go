@@ -460,6 +460,7 @@ func TestAlgebraicCellSourceCopyDoesNotNormalize(t *testing.T) {
 
 func TestAlgebraicCellSourceDebugSignBeforeFlagPublication(t *testing.T) {
 	c, p := algebraicCellSourceFixture(t)
+	polynomialAssertionActionsFixture(t, "TT")
 	poly, e := p.NewPolynomial()
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, p.DelPolynomial(&poly)) })
@@ -509,6 +510,7 @@ func TestAlgebraicCellSourceDebugSignBeforeFlagPublication(t *testing.T) {
 
 func TestAlgebraicCellSourceDebugUpperReadPrecedesSignPublication(t *testing.T) {
 	c, p := algebraicCellSourceFixture(t)
+	polynomialAssertionActionsFixture(t, "TT")
 	poly, e := p.NewPolynomial()
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, p.DelPolynomial(&poly)) })

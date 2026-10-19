@@ -49,6 +49,8 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	cellEvaluation                                             [3]upolyBinaryEvaluationInvocationReceipt
+	cellEvaluationRunning                                      bool
 	isolationSquareFree                                        upolySquareFreeCallReceipt
 	factorExecuting                                            bool
 	coefficientNormalization                                   upolyDefaultNormalizeReceipt
@@ -204,6 +206,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && m.cellEvaluationPending() {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.config.Polynomials != nil && m.config.Polynomials.squareFreeCallReceiptPending(&m.isolationSquareFree) {
 		return ErrAlgebraicPending
 	}
@@ -213,7 +218,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m != nil && m.self == m && !m.binary.running && m.binary.conversion.pending(m) {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting) {
+	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning) {
 		return ErrAlgebraicPending
 	}
 
@@ -771,33 +776,30 @@ func (m *AlgebraicRootCore) deletePolynomial(l *algebraicLocation, r *algebraicR
 	return m.destroyPolynomial(l, r, false)
 }
 func (m *AlgebraicRootCore) updateSign(l *algebraicLocation, r *algebraicRecord) error {
-	v, e := m.config.Polynomials.wholeView(r.poly)
+	v, e := m.sourcePolynomial(r)
 	if e != nil {
 		return e
 	}
-	s, e := m.config.Polynomials.EvalSignBinary(v, &(*r.interval.BorrowLower()))
+	sl, e := m.evalCellSign(v, r.interval.BorrowLower(), 0)
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
-		if s == 0 {
-			return ErrUPolynomialAssertion
-		}
-		u, e := m.config.Polynomials.EvalSignBinary(v, &(*r.interval.BorrowUpper()))
-		if e != nil {
-			return e
-		}
-		if u != -s {
-			return ErrUPolynomialAssertion
-		}
+	if e = m.assertCellLowerSign(sl); e != nil {
+		return e
+	}
+	if e = m.assertCellUpperSign(v, r.interval.BorrowUpper(), sl); e != nil {
+		return e
 	}
 	r.flags &^= 2
-	if s < 0 {
+	if sl < 0 {
 		r.flags |= 2
 	}
 	return m.store(l, r)
 }
 func (m *AlgebraicRootCore) normalizeCoefficients(l *algebraicLocation, r *algebraicRecord) error {
+	if e := m.assertCellNormalizeDegree(r); e != nil {
+		return e
+	}
 	v, e := m.sourcePolynomial(r)
 	if e != nil {
 		return e
@@ -837,7 +839,7 @@ func (m *AlgebraicRootCore) mkAlgebraicCell(p UPolynomialView, lower, upper *unu
 		return a, e
 	}
 	if enabled && p.count <= 2 {
-		if e = m.predicateAssertionFailure(403, "sz > 2"); e != nil {
+		if e = m.cellAssertionFailure(402, "sz > 2"); e != nil {
 			return a, e
 		}
 	}
@@ -845,12 +847,17 @@ func (m *AlgebraicRootCore) mkAlgebraicCell(p UPolynomialView, lower, upper *unu
 	return a, e
 }
 func (m *AlgebraicRootCore) setRoot(a *Algebraic, p UPolynomialView, lower, upper *unumeral.BinaryRational, minimal, verifyAssignment bool) (err error) {
-	l, err := m.location(a)
-	if err != nil {
+	if err = m.check(); err != nil {
 		return err
 	}
-	if polynomialSourceDebug && p.count <= 1 {
-		return ErrUPolynomialAssertion
+	if verifyAssignment {
+		if err = m.assertCellDegree(p.count, 477, "sz > 1", 1); err != nil {
+			return err
+		}
+	}
+	l, err := m.locationCleanup(a)
+	if err != nil {
+		return err
 	}
 	if p.count < 2 {
 		return arena.ErrBounds
@@ -884,6 +891,11 @@ func (m *AlgebraicRootCore) setRoot(a *Algebraic, p UPolynomialView, lower, uppe
 		if m.pending.slot != 0 {
 			return ErrAlgebraicPending
 		}
+		if verifyAssignment {
+			if err = m.assertCellDegree(p.count, 402, "sz > 2", 2); err != nil {
+				return err
+			}
+		}
 		next, e := m.allocate(1)
 		if next.slot != 0 && m.locations[next.slot-1].live {
 			m.pending = next
@@ -892,6 +904,14 @@ func (m *AlgebraicRootCore) setRoot(a *Algebraic, p UPolynomialView, lower, uppe
 			return e
 		}
 		l = &m.locations[next.slot-1]
+	}
+	if existing {
+		if err = m.assertCellDegree(p.count, 491, "sz > 2", 2); err != nil {
+			return err
+		}
+		if err = algebraicQueryTagAssertionSwitch(); err != nil {
+			return err
+		}
 	}
 	r, err := m.load(l)
 	if err != nil {
@@ -926,10 +946,19 @@ func (m *AlgebraicRootCore) setRoot(a *Algebraic, p UPolynomialView, lower, uppe
 	if !existing {
 		r.flags &= 2
 		if minimal {
-			r.flags |= 5
+			r.flags |= 1
 		}
 		if err = m.store(l, &r); err != nil {
 			return err
+		}
+		if err = m.assertNewCellFlags(&r); err != nil {
+			return err
+		}
+		if minimal {
+			r.flags |= 4
+			if err = m.store(l, &r); err != nil {
+				return err
+			}
 		}
 	}
 	if err = m.normalizeCoefficients(l, &r); err != nil {
@@ -938,21 +967,9 @@ func (m *AlgebraicRootCore) setRoot(a *Algebraic, p UPolynomialView, lower, uppe
 	if !existing {
 		m.publish(a, m.pending)
 	}
-	if verifyAssignment && polynomialSourceDebug {
-		v, e := m.config.Polynomials.wholeView(r.poly)
-		if e != nil {
-			return e
-		}
-		s, e := m.config.Polynomials.EvalSignBinary(v, &(*r.interval.BorrowLower()))
-		if e != nil {
-			return e
-		}
-		want := 1
-		if r.flags&2 != 0 {
-			want = -1
-		}
-		if s != want {
-			return ErrUPolynomialAssertion
+	if verifyAssignment {
+		if err = m.assertAssignedCellSign(&r); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -1047,7 +1064,7 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
-	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting) {
+	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning) {
 		return ErrAlgebraicPending
 	}
 
@@ -1138,6 +1155,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return ErrAlgebraicOwner
 	}
 	if e := m.cleanupRootTrace(); e != nil {
+		return e
+	}
+	if e := m.cleanupCellEvaluations(); e != nil {
 		return e
 	}
 	if p := m.config.Polynomials; p != nil {
@@ -1286,7 +1306,7 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
-	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting) {
+	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning) {
 		return ErrAlgebraicPending
 	}
 
