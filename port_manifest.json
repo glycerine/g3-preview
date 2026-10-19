@@ -55790,7 +55790,8 @@
       "path": "src/math/polynomial/upolynomial_factorization.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
+      "go_target": "pkg/math/polynomial/upolynomial_factor_field.go",
       "go_targets": [
         "pkg/math/polynomial/upolynomial_factor_field.go",
         "pkg/math/polynomial/upolynomial_factor_hensel.go",
@@ -55814,68 +55815,68 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "upolynomial_factorization.h:39 zp_square_free_factor -> UPolynomialManager.SquareFreeFactorZP; full failure/callback/TRACE completion remains unaudited",
-          "status": "partial",
+          "name": "upolynomial_factorization.h:39 zp_square_free_factor -> UPolynomialManager.SquareFreeFactorZP",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_field.go",
           "tests": [
             "TestUPolynomialFactorFiniteFieldSquareFreeAndBerlekamp"
           ]
         },
         {
-          "name": "upolynomial_factorization.h:45 zp_factor_square_free -> FactorZPSquareFree (false randomized argument as cpp:404-406); full failure/callback/TRACE completion remains unaudited",
-          "status": "partial",
+          "name": "upolynomial_factorization.h:45 zp_factor_square_free -> FactorZPSquareFree (false randomized argument as cpp:404-406)",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_field.go",
           "tests": [
             "TestUPolynomialFactorBerlekampAppendAndIrreducibleReturn"
           ]
         },
         {
-          "name": "upolynomial_factorization.h:55 zp_factor_square_free_berlekamp -> FactorZPSquareFreeBerlekamp; source body ignores randomized; full failure/callback/TRACE completion remains unaudited",
-          "status": "partial",
+          "name": "upolynomial_factorization.h:55 zp_factor_square_free_berlekamp -> FactorZPSquareFreeBerlekamp; source body ignores randomized",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_field.go",
           "tests": [
             "TestUPolynomialFactorBerlekampAppendAndIrreducibleReturn"
           ]
         },
         {
-          "name": "upolynomial_factorization.h:61 zp_factor -> FactorZP; full failure/callback/TRACE completion remains unaudited",
-          "status": "partial",
+          "name": "upolynomial_factorization.h:61 zp_factor -> FactorZP",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_field.go",
           "tests": [
             "TestUPolynomialFactorFiniteFieldSquareFreeAndBerlekamp"
           ]
         },
         {
-          "name": "upolynomial_factorization.h:75-77 hensel_lift pair -> UPolynomialFactorizationService.HenselLiftPair; full failure/callback/TRACE completion remains unaudited",
-          "status": "partial",
+          "name": "upolynomial_factorization.h:75-77 hensel_lift pair -> UPolynomialFactorizationService.HenselLiftPair",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_hensel.go",
           "tests": [
             "TestUPolynomialHenselPairExactSourceActions"
           ]
         },
         {
-          "name": "upolynomial_factorization.h:82 hensel_lift factors -> HenselLiftFactors; full failure/callback/TRACE completion remains unaudited",
-          "status": "partial",
+          "name": "upolynomial_factorization.h:82 hensel_lift factors -> HenselLiftFactors",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_hensel.go",
           "tests": [
             "TestUPolynomialHenselMultipleFactorsAndActualModulus"
           ]
         },
         {
-          "name": "upolynomial_factorization.h:88 factor_square_free default multiplicity -> FactorSquareFreeDefault; direct public-entry test verifies multiplicity one and exact linear factors; full failure/callback/TRACE completion remains unaudited",
-          "status": "partial",
+          "name": "upolynomial_factorization.h:88 factor_square_free default multiplicity -> FactorSquareFreeDefault; direct public-entry test verifies multiplicity one and exact linear factors",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_recombine.go",
           "tests": [
             "TestUPolynomialFactorSquareFreeExactInvocationPrefixes"
           ]
         },
         {
-          "name": "upolynomial_factorization.h:93 factor_square_free explicit multiplicity -> FactorSquareFree; full failure/callback/TRACE completion remains unaudited",
-          "status": "partial",
+          "name": "upolynomial_factorization.h:93 factor_square_free explicit multiplicity -> FactorSquareFree",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_recombine.go",
           "tests": [
             "TestUPolynomialFactorSquareFreeExactInvocationPrefixes"
@@ -55883,7 +55884,7 @@
         }
       ],
       "ownership": [
-        "Header declaration inventory reconciled against existing concrete Go implementations: finite-field squarefree decomposition, deterministic Berlekamp, general finite-field factorization, pair/multiple Hensel lifting, and integer squarefree factorization with default/explicit multiplicity all have implementations. Focused tests independently reconstruct finite-field products, check append/irreducible return behavior, verify lifted coefficients/modulus, and exercise exact integer-squarefree reservation prefixes. The default-multiplicity public method is directly tested on x^2+x-6, independently requiring the two monic factors x-2 and x+3 with multiplicity one. The params-ignoring inline overload at h:47-49 has no retained callsite in the source-wide zp_factor_square_free search and needs no unused Go adapter. This corrects the stale wholly-unported header classification; it does not complete its source implementation unit or full allocation/destructor/callback/TRACE audit. Ordinary and checked/debug/trace focused checks run on CPUs 8-16."
+        "Complete header declaration inventory reconciled against concrete Go implementations: finite-field squarefree decomposition, deterministic Berlekamp, general finite-field factorization, pair/multiple Hensel lifting, and integer squarefree factorization with default/explicit multiplicity all have typed interfaces. Focused tests independently reconstruct finite-field products, check append/irreducible return behavior, verify lifted coefficients/modulus, and exercise exact integer-squarefree reservation prefixes. The default-multiplicity public method is directly tested on x^2+x-6, independently requiring the two monic factors x-2 and x+3 with multiplicity one. The params-ignoring inline overload at h:47-49 has no retained callsite in the source-wide zp_factor_square_free search and needs no unused Go adapter. The implementation unit upolynomial_factorization.cpp remains independently partial."
       ],
       "deviations": []
     },
