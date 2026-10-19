@@ -185,7 +185,16 @@ func (m *AlgebraicRootCore) finishBounds(owning bool) error {
 		}
 	}
 	for s.remaining != 0 {
-		if e := m.config.Binary.Del(&s.values[s.remaining-1]); e != nil {
+		value := &s.values[s.remaining-1]
+		var e error
+		if owning {
+			e = m.config.Binary.Del(value)
+		} else {
+			// mpbq.h:78 deletes NUM only. Literal source destruction must
+			// retain the capacity guard after a consumed physical release.
+			e = unumeral.SourceBinaryDel(m.config.Binary, value)
+		}
+		if e != nil {
 			return e
 		}
 		s.remaining--

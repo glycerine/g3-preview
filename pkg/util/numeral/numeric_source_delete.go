@@ -35,6 +35,15 @@ func SourceRationalDel(q *RationalManager, a *Rational) error {
 	return SourceIntegerDel(q.Integers(), &a.Den)
 }
 
+// SourceBinaryDel follows mpbq.h:78 while preserving manager admission.
+// Literal NUM destruction cannot acknowledge a consumed physical release.
+func SourceBinaryDel(m *BinaryRationalManager, a *BinaryRational) error {
+	if e := m.checkCleanup(a); e != nil {
+		return e
+	}
+	return SourceIntegerDel(m.Z, &a.Num)
+}
+
 // SourceBinaryIntervalDel follows basic_interval.h:94-97 and mpbq.h:78.
 // Literal lower/upper destruction cannot acknowledge a consumed NUM release.
 func SourceBinaryIntervalDel(m *BinaryIntervalManager, a *BinaryInterval) error {
