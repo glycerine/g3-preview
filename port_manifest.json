@@ -55920,7 +55920,8 @@
       "path": "src/math/polynomial/upolynomial_factorization_int.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
+      "go_target": "pkg/math/polynomial/upolynomial_factor_combination.go",
       "go_targets": [
         "pkg/math/polynomial/upolynomial_factor_hensel.go",
         "pkg/math/polynomial/upolynomial_prime_trial_invocation.go",
@@ -55931,7 +55932,10 @@
         "pkg/math/polynomial/upolynomial_factor_degree_source_test.go",
         "pkg/math/polynomial/upolynomial_factor_degree.go",
         "pkg/math/polynomial/upolynomial_factors.go",
-        "pkg/math/polynomial/upolynomial_native_factor_storage_test.go"
+        "pkg/math/polynomial/upolynomial_native_factor_storage_test.go",
+        "pkg/math/polynomial/upolynomial_factor_degree_display.go",
+        "pkg/math/polynomial/upolynomial_factor_degree_display_test.go",
+        "pkg/math/polynomial/upolynomial_hensel_check_invocation.go"
       ],
       "tests": [
         "TestUPolynomialPrimeTrialToZPRawEveryPrefix",
@@ -55941,7 +55945,13 @@
         "TestUPolynomialBerlekampNativePivotResize",
         "TestUPolynomialFactorCombinationExactOrderRemovalAndProducts",
         "TestUPolynomialNativeDegreeSubsetOracle",
-        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews"
+        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews",
+        "TestUPolynomialFactorDegreeDisplayLogicalBitsAndSourceZeroPrefix",
+        "TestUPolynomialFactorDegreeDisplayCallbackProtectsNativeOwner",
+        "TestUPolynomialFactorDegreeDisplayOutputRefusalReleasesBorrow",
+        "TestUPolynomialFactorCombinationConstructorAssertionActions",
+        "TestUPolynomialFactorCombinationSelectionAssertionActions",
+        "TestUPolynomialHenselConditionalVerificationEveryReachedPrefix"
       ],
       "conditionals": [
         {
@@ -55995,12 +56005,12 @@
           "text": "SASSERT(m_factors.get_degree(current) == 1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "factorization_degree_set::display logical subset list and descending bit representation (h:112-120; bit_vector.cpp:188-201) with retained production TRACE consumers",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_degree_display.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_degree.go",
@@ -56011,7 +56021,29 @@
             "TestUPolynomialFactorDegreeDisplayCallbackProtectsNativeOwner",
             "TestUPolynomialFactorDegreeDisplayOutputRefusalReleasesBorrow"
           ],
-          "notes": "Ports the retained logical formatter over native []bool: literal [0 prefix, ascending included degrees from one, ] represented by , then descending logical bits with no trailing newline. No packed bit-vector storage, shifts, STL capacity or container failure machinery is recreated. Tests construct actual factor collections for empty, even-degree and 32/64-boundary subsets; removing bit zero changes the bit text while retaining the literal source zero prefix. Runtime reservations remain disabled during display, with no charged or packed-word storage acquisition. A concrete public display borrow blocks Remove/Intersect/Swap/Close and recursive Display during actual writer callbacks while permitting read-only queries, and ends after normal/error/short/nil-writer return. Direct io.Writer output uses the cold default-decimal Go adapter. The actual factor-display dependency and whole production records at cpp1141,1155,1192 are now wired with exact accepted display-child ownership, source endl flushes and whole-record callback borrows. Other trace records and the broader source-unit audit remain open; no whole-unit completion credit."
+          "notes": "Ports the retained logical formatter over native []bool: literal [0 prefix, ascending included degrees from one, ] represented by , then descending logical bits with no trailing newline. No packed bit-vector storage, shifts, STL capacity or container failure machinery is recreated. Tests construct actual factor collections for empty, even-degree and 32/64-boundary subsets; removing bit zero changes the bit text while retaining the literal source zero prefix. Runtime reservations remain disabled during display, with no charged or packed-word storage acquisition. A concrete public display borrow blocks Remove/Intersect/Swap/Close and recursive Display during actual writer callbacks while permitting read-only queries, and ends after normal/error/short/nil-writer return. Direct io.Writer output uses the cold default-decimal Go adapter. The actual factor-display dependency and whole production records at cpp1141,1155,1192 are now wired with exact accepted display-child ownership, source endl flushes and whole-record callback borrows. The retained production records use the same formatter and exact accepted display-child ownership."
+        },
+        {
+          "name": "factorization_degree_set construction, queries, swap, removal and intersection (h:61-110)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_degree.go",
+          "tests": [
+            "TestUPolynomialFactorDegreeSetEmptyConstructorAndIntersections",
+            "TestUPolynomialFactorDegreeSetFinalAssertionActions",
+            "TestUPolynomialNativeDegreeSubsetOracle"
+          ],
+          "notes": "The concrete degree set uses native []bool and descending subset-sum updates for every factor multiplicity. It preserves bit zero, maximum degree, triviality, query, removal, swap, intersection and the final source assertion. Packed bit-vector storage and its C++ container operations are intentionally absent."
+        },
+        {
+          "name": "Concrete ufactorization_combination_iterator enumeration, filtering, removal and cardinalities (h:129-343)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_combination.go",
+          "tests": [
+            "TestUPolynomialFactorCombinationExactOrderRemovalAndProducts",
+            "TestUPolynomialFactorCombinationConstructorAssertionActions",
+            "TestUPolynomialFactorCombinationSelectionAssertionActions"
+          ],
+          "notes": "The retained concrete univariate instantiation preserves enabled-factor traversal, increasing selections, size growth, degree-set filtering, remove-current behavior and left/right sizes. The template-only iterator display has no retained source consumer and no Go adapter."
         },
         {
           "name": "Project degree-set/combination assertions at h:84,170-171,202,205,210,347,377,389,403 honor runtime enablement and source debugger actions",
@@ -56032,30 +56064,40 @@
           "notes": "Fixed compile-debug-only early Go errors that ignored the source runtime assertion switch and debugger Continue. Actual project assertions now preserve default_exception assertion-violation classification for Throw while errors.Is retains the Go assertion class; Continue executes the literal body and disabled/erased sites skip source failure handling. Right-tail/right-polynomial multiplicity operands are read only after the runtime gate. The final degree-set compound assertion preserves short-circuit order. Tests prove constructor Throw/Continue/erasure, selection assertion before independent native bounds protection, skipped multiplicity-vector access under disabled assertions, reset/copy prefixes before multiplicity Throw and source multiplication after Continue, and continued degree-set construction after its final assertion. Malformed metadata/extent fixtures are explicitly source-precondition/read-order tests, restored for teardown, not allocation-refusal evidence. Native container bounds remain separate Go guards; no STL assertions or container internals are introduced. Whole internal header/frontends and polynomial/AST completion remain partial."
         },
         {
-          "name": "upolynomial_factorization_int.h:42-52 selected actual prime-trial RAW SET and move publication",
-          "status": "partial",
+          "name": "upolynomial_factorization_int.h:33-52 both retained in-place and copy to_zp_manager overloads",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_hensel.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_prime_trial_invocation.go",
+            "pkg/math/polynomial/upolynomial_hensel_check_invocation.go",
+            "pkg/math/polynomial/upolynomial_factor_hensel_debug.go"
+          ],
           "tests": [
             "TestUPolynomialPrimeTrialToZPRawEveryPrefix",
-            "TestUPolynomialPrimeToZPNativePushAndPublishedRaw"
-          ]
+            "TestUPolynomialPrimeToZPNativePushAndPublishedRaw",
+            "TestUPolynomialHenselConditionalVerificationEveryReachedPrefix"
+          ],
+          "notes": "Both retained overloads use concrete typed engines. In-place conversion normalizes each reached coefficient then trims; copy conversion resets the target, binds the actual RAW p_i transport only after SET, moves it exactly once into the output, and trims after the loop. Prime-trial and conditional Hensel owners retain unfinished numeric children and the unpublished transport at their exact source frontiers; successful publication clears transport ownership. All retained C++ callers in upolynomial_factorization.cpp route through these engines."
         },
         {
           "name": "upolynomial_factorization_int.h:345-413 same concrete iterator tail/materialization engines with direct trial child transport",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_combination.go",
           "tests": [
             "TestUPolynomialRecombinationTrialEveryActualBranchPrefix",
-            "TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix"
-          ]
+            "TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix",
+            "TestUPolynomialFactorCombinationExactOrderRemovalAndProducts",
+            "TestUPolynomialFactorCombinationRightMultiplicityAssertionPrefixes"
+          ],
+          "notes": "The concrete univariate iterator preserves source selection order, removal, degree filtering, left/right cardinalities, selected and complement polynomial products, and tail-coefficient multiplication. Native []bool and []int32 replace the C++ svectors without porting their storage mechanics. Recombination uses the same engines with exact direct numeric child transport and retained source/owning cleanup."
         }
       ],
       "ownership": [
         "Actual RAW p_i remains source-unjoined on SET/push refusal; move clears transport only at real vector publication.",
-        "upolynomial_factorization_int.h:345-413: source dynamic index/header reads and scalar/vector operation order remain in the same engines; erased divisibility branch materializes no trial vector. Iterator topology outside the selected caller remains partial."
+        "upolynomial_factorization_int.h:345-413: source dynamic index/header reads and scalar/vector operation order remain in the same concrete univariate engines; erased divisibility branches materialize no trial vector.",
+        "All retained calls to both to_zp_manager overloads, factorization_degree_set, and ufactorization_combination_iterator are reconciled against the completed upolynomial_factorization.cpp consumer inventory; the unused template-general surface has no Go adapter."
       ],
       "deviations": [
-        "Only the actual prime receipt route is closed; generic nil helper and pair-Hensel lexical lifetime remain open.",
         "Berlekamp pivot row/column indices and factor-combination enabled/current indices now use native Go slices. C++ vector growth arithmetic and container-only allocation faults/reservations are removed; actual iterator owner allocation, sentinel initialization, combination traversal/removal and numeric product operations remain.",
         "Factor owner records now grow with native Go append; relocation clears the old owning records while preserving inner coefficient backing/view bindings. Degree subsets use native []bool and a descending subset-sum update, removing bit-vector word growth/clone/shift/OR machinery and cross-budget capacity transfer. Native factor and degree storage contributes no Runtime buffer charges; real cold owners and numeric lifetimes remain explicit."
       ]
