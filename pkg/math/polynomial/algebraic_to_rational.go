@@ -38,20 +38,18 @@ func (m *AlgebraicRootCore) ToRational(a *Algebraic, out *unumeral.Rational) err
 	if e != nil {
 		return e
 	}
-	value := m.zero
 	if l != nil {
 		if l.kind != 0 {
 			return ErrAlgebraicOwner
 		}
-		record, e := m.load(l)
-		if e != nil {
+		if e = algebraicQueryTagAssertionSwitch(); e != nil {
 			return e
 		}
-		value = record.value
 	}
+	value := algebraicBasicValueView{source: m, cell: l, zero: &m.zero}
 	m.toRationalRunning = true
 	defer func() { m.toRationalRunning = false }()
-	return q.CopyWithAllocationReceipt(out, &value, &m.toRationalCopy)
+	return value.copyTo(m, out, &m.toRationalCopy)
 }
 func (m *AlgebraicRootCore) toRationalVerifyFailure() error {
 	m.predicateDiagnosticRunning = true

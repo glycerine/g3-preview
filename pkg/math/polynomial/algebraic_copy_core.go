@@ -204,18 +204,14 @@ func (m *AlgebraicRootCore) CopyFromCore(dst *Algebraic, source *AlgebraicRootCo
 	return m.store(dl, &out)
 }
 
-func (m *AlgebraicRootCore) copyForeignBasic(dst *Algebraic, dl *algebraicLocation, source *AlgebraicRootCore, q *unumeral.Rational) (err error) {
+func (m *AlgebraicRootCore) copyForeignBasic(dst *Algebraic, dl *algebraicLocation, source *AlgebraicRootCore, q algebraicBasicValueView) (err error) {
 	if err = m.beginConstQ(); err != nil {
 		return err
 	}
 	defer func() { m.constQ.running = false; err = m.finishConstQ(err) }()
 	s := &m.constQ
 	s.executing = true
-	z := m.config.Rationals.Integers()
-	err = z.CopyFromOwnerWithReceipt(m.localQ.BorrowNumerator(), source.config.Rationals.Integers(), q.BorrowNumerator(), &s.copy)
-	if err == nil {
-		err = z.CopyFromOwnerWithReceipt(m.localQ.BorrowDenominator(), source.config.Rationals.Integers(), q.BorrowDenominator(), &s.copy)
-	}
+	err = q.copyTo(m, &m.localQ, &s.copy)
 	s.executing = false
 	m.rationalCopy = s.copy
 	if err != nil {

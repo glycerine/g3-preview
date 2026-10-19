@@ -1,23 +1,16 @@
 // Source: algebraic_numbers.cpp:235-240,427,445-446,509-539.
 package polynomial
 
-import unumeral "github.com/glycerine/g3/pkg/util/numeral"
-
-func (m *AlgebraicRootCore) copySourceBasicValue(source *AlgebraicRootCore, l *algebraicLocation) (*unumeral.Rational, error) {
+func (m *AlgebraicRootCore) copySourceBasicValue(source *AlgebraicRootCore, l *algebraicLocation) (algebraicBasicValueView, error) {
 	if _, _, e := algebraicAssertionSwitch(); e != nil {
-		return nil, e
-	} // cpp:236
-	if l == nil {
-		return &m.zero, nil
+		return algebraicBasicValueView{}, e
 	}
-	if e := algebraicQueryTagAssertionSwitch(); e != nil {
-		return nil, e
-	} // h:372
-	r, e := source.load(l)
-	if e != nil {
-		return nil, e
+	if l != nil {
+		if e := algebraicQueryTagAssertionSwitch(); e != nil {
+			return algebraicBasicValueView{}, e
+		}
 	}
-	return &r.value, nil
+	return algebraicBasicValueView{source: source, cell: l, zero: &m.zero}, nil
 }
 func (m *AlgebraicRootCore) assertCellCopyPolynomialEmpty(r *algebraicRecord) error {
 	_, enabled, e := algebraicAssertionSwitch()

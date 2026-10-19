@@ -1069,7 +1069,7 @@ func (m *AlgebraicRootCore) copyCellValue(dst, src *Algebraic) error {
 		if e != nil {
 			return e
 		}
-		return m.SetRational(dst, q)
+		return m.setRationalFromCell(dst, q)
 	}
 	if targetBasic {
 		if e = m.Del(dst); e != nil {
