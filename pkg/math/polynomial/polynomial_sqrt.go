@@ -346,6 +346,9 @@ func (m *MultivariatePolynomialManager) sqrtWithReceipt(p Polynomial, r *Polynom
 		return false, e
 	}
 	defer func() { cause = m.finishSquareRoot(cause) }()
+	if e := m.traceSqrtEntry(p); e != nil {
+		return false, e
+	}
 	min, e := c.gradedLexMinPosition(p)
 	if e != nil {
 		return false, e
@@ -416,6 +419,9 @@ func (m *MultivariatePolynomialManager) sqrtWithReceipt(p Polynomial, r *Polynom
 		e = c.checkpoint()
 		s.executing = true
 		if e != nil {
+			return false, e
+		}
+		if e := m.traceSqrtBuffers(); e != nil {
 			return false, e
 		}
 		pos, e := C.gradedLexMaxPosition()

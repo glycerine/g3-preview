@@ -41407,6 +41407,7 @@
         "TestProcessRandBorrowedDrawsShareSrand",
         "TestGLibc31DrawsAllocateNoStorage",
         "TestPolynomialSqrtDormantOriginal",
+            "TestPolynomialSqrtSourceTraceAndZeroRoute",
         "TestPolynomialSqrtIndependentSmallSquares",
         "TestPolynomialSqrtEveryReservation",
         "TestPolynomialSqrtQuickBranchesAndCancel",
@@ -45001,6 +45002,7 @@
           "go_target": "pkg/math/polynomial/polynomial_sqrt.go",
           "tests": [
             "TestPolynomialSqrtDormantOriginal",
+            "TestPolynomialSqrtSourceTraceAndZeroRoute",
             "TestPolynomialSqrtIndependentSmallSquares",
             "TestPolynomialSqrtEveryReservation",
             "TestPolynomialSqrtQuickBranchesAndCancel",
@@ -123671,6 +123673,7 @@
         "TestPolynomialCompositionReciprocalAndVariableOrders",
         "TestPolynomialCompositionIndependentFiniteAndAliases",
         "TestPolynomialSqrtDormantOriginal",
+            "TestPolynomialSqrtSourceTraceAndZeroRoute",
         "TestPolynomialSqrtIndependentSmallSquares",
         "TestPolynomialSqrtEveryReservation",
         "TestPolynomialSqrtQuickBranchesAndCancel",
@@ -124172,6 +124175,7 @@
           "go_target": "pkg/math/polynomial/polynomial_sqrt.go",
           "tests": [
             "TestPolynomialSqrtDormantOriginal",
+            "TestPolynomialSqrtSourceTraceAndZeroRoute",
             "TestPolynomialSqrtIndependentSmallSquares",
             "TestPolynomialSqrtEveryReservation",
             "TestPolynomialSqrtQuickBranchesAndCancel",
