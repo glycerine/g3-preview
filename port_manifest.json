@@ -45377,8 +45377,8 @@
           ]
         },
         {
-          "name": "internSourceTempCreated src/math/polynomial/polynomial.cpp:852-869: Actual source table insert then raw allocation then ID then placement/publication order preserved; direct outcome replaces before/after PendingRoots inference.",
-          "status": "partial",
+          "name": "complete internSourceTempCreated publication frame polynomial.cpp:852-869: table insert, raw allocation, ID, placement construction, runtime table postconditions and concrete outcome receipt",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
             "TestMonomialFactoryAllocatorActualPhysicalPrefix",
@@ -49258,8 +49258,8 @@
           ]
         },
         {
-          "name": "internSourceTempCreated src/math/polynomial/polynomial.cpp:852-869: Actual source table insert then raw allocation then ID then placement/publication order preserved; direct outcome replaces before/after PendingRoots inference.",
-          "status": "partial",
+          "name": "complete internSourceTempCreated publication frame polynomial.cpp:852-869: table insert, raw allocation, ID, placement construction, runtime table postconditions and concrete outcome receipt",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
             "TestMonomialFactoryAllocatorActualPhysicalPrefix",
