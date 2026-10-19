@@ -29,8 +29,7 @@ type polynomialSquareRootScope struct {
 	drain                                uint32
 	perfectSquare                        unumeral.IntegerPerfectSquareInvocationReceipt
 	factoryGeneration, calleeGeneration  uint64
-	numericPending                       umemory.ObjectRef
-	integerRaw, monomialRaw              [3]umemory.Block
+	monomialRaw                          [3]umemory.Block
 	freshResult                          Polynomial
 	bodyCause, sourceCause, cleanupCause error
 }
@@ -172,46 +171,24 @@ func (m *MultivariatePolynomialManager) squareRootNumeral(op uint8, a, b, out *u
 	c := m.core
 	z := c.integer
 	s := &m.squareRoot
-	if op >= 1 && op <= 4 {
-		context := integerAllocationInvocationContext{squareRoot: &s.receipt, squareRootInvocation: s.invocation}
-		if context.roots(z) == nil {
-			return false, ErrPolynomialOwner
-		}
-		arithmetic := c.modular.WithAllocationContext(context.utility(z))
-		switch op {
-		case 1:
-			return true, arithmetic.SetInt32(out, 2)
-		case 2:
-			return true, arithmetic.Mul(a, b, out)
-		case 3:
-			return true, arithmetic.Neg(out)
-		case 4:
-			return true, arithmetic.Div(a, b, out)
-		}
+	context := integerAllocationInvocationContext{squareRoot: &s.receipt, squareRootInvocation: s.invocation}
+	if context.roots(z) == nil {
+		return false, ErrPolynomialOwner
 	}
-	pending := z.PendingAllocationObject()
-	raw, e := z.SourceAllocator().PendingRoots()
-	if e != nil {
-		return false, e
-	}
-	ok := true
+	arithmetic := c.modular.WithAllocationContext(context.utility(z))
 	switch op {
 	case 0:
-		ok, e = c.modular.IsPerfectSquareWithReceipt(a, out, &s.perfectSquare)
+		return arithmetic.IsPerfectSquare(a, out)
+	case 1:
+		return true, arithmetic.SetInt32(out, 2)
+	case 2:
+		return true, arithmetic.Mul(a, b, out)
+	case 3:
+		return true, arithmetic.Neg(out)
+	case 4:
+		return true, arithmetic.Div(a, b, out)
 	}
-	if pending == (umemory.ObjectRef{}) && z.PendingAllocationObject() != (umemory.ObjectRef{}) {
-		s.numericPending = z.PendingAllocationObject()
-	}
-	if raw == ([3]umemory.Block{}) {
-		after, x := z.SourceAllocator().PendingRoots()
-		if after != ([3]umemory.Block{}) {
-			s.integerRaw = after
-		}
-		if x != nil {
-			return ok, errors.Join(e, x)
-		}
-	}
-	return ok, e
+	return false, ErrPolynomialAssertion
 }
 
 // The actual persistent buffer keeps its own coefficient fields. Only a newly
@@ -287,7 +264,7 @@ func (m *MultivariatePolynomialManager) finishSquareRoot(cause error) error {
 		}
 		s.stage++
 	}
-	if cause == nil && s.freshResult == (Polynomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (umemory.ObjectRef{}) && s.integerRaw == ([3]umemory.Block{}) && s.monomialRaw == ([3]umemory.Block{}) && !polynomialNegNumericPending(&s.numeric) && !z.MatchesRawInvocation(&s.divisionRaw) {
+	if cause == nil && s.freshResult == (Polynomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.monomialRaw == ([3]umemory.Block{}) && !polynomialNegNumericPending(&s.numeric) && !z.MatchesRawInvocation(&s.divisionRaw) {
 		s.active = false
 	}
 	return cause
@@ -645,23 +622,9 @@ func (m *MultivariatePolynomialManager) cleanupSqrtModeOwned(abort bool, invocat
 		s.cleanupCause = e
 		return e
 	}
-	if s.numericPending != (umemory.ObjectRef{}) {
-		if c.integer.PendingAllocationObject() == s.numericPending {
-			if e := c.integer.CleanupPendingAllocation(); e != nil {
-				s.cleanupCause = e
-				return e
-			}
-		}
-		s.numericPending = umemory.ObjectRef{}
-	}
-	for i, allocator := range [2]*umemory.SmallAllocator{c.integer.SourceAllocator(), c.monomials.allocator} {
-		receipt := &s.integerRaw
-		if i == 1 {
-			receipt = &s.monomialRaw
-		}
-		if *receipt == ([3]umemory.Block{}) {
-			continue
-		}
+	if s.monomialRaw != ([3]umemory.Block{}) {
+		allocator := c.monomials.allocator
+		receipt := &s.monomialRaw
 		now, e := allocator.PendingRoots()
 		if e != nil {
 			return e

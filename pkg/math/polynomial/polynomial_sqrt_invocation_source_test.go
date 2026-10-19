@@ -256,7 +256,7 @@ func TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare(t
 	serviceMust(t, rt.SetMaxSize(1))
 	_, cause := m.sqrtWithReceipt(p, out, &receipt)
 	child := q.Integers().PerfectSquare
-	if !numericPhysicalReservationRefusal(cause) || !child.Active || child.EndEntered || child.Raw[0] == (umemory.Block{}) || m.squareRoot.perfectSquare.Invocation != child.Generation {
+	if !numericPhysicalReservationRefusal(cause) || !child.Active || child.EndEntered || child.Numeric.PendingAllocatorBlocks()[0] == (umemory.Block{}) || m.squareRoot.perfectSquare.Invocation != child.Generation {
 		t.Fatal("actual unentered raw child", cause, child)
 	}
 	polynomialSqrtPhysicalAudit(t, m, []Polynomial{p, out.root.value, out.root.incoming}, nil, out.header)
@@ -315,7 +315,7 @@ func TestPolynomialSqrtInvocationPreservesLaterForeignPerfectSquare(t *testing.T
 	serviceMust(t, rt.SetMaxSize(1))
 	_, cause := m.sqrtWithReceipt(p, out, &receipt)
 	child := q.Integers().PerfectSquare
-	if !numericPhysicalReservationRefusal(cause) || !child.Active || child.EndEntered || child.Raw[0] == (umemory.Block{}) || m.squareRoot.perfectSquare.Invocation != child.Generation {
+	if !numericPhysicalReservationRefusal(cause) || !child.Active || child.EndEntered || child.Numeric.PendingAllocatorBlocks()[0] == (umemory.Block{}) || m.squareRoot.perfectSquare.Invocation != child.Generation {
 		t.Fatal("actual unentered raw child", cause, child)
 	}
 	polynomialSqrtPhysicalAudit(t, m, []Polynomial{p, out.root.value, out.root.incoming}, nil, out.header)

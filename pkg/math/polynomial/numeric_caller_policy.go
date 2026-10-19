@@ -162,6 +162,9 @@ func (r *polynomialNumericRoots) NumericRecord(z *unumeral.IntegerManager, event
 		return
 	}
 	if receipt.PerfectSquare != nil {
+		if q := c.squareRoot; q != nil && z.MatchesPerfectSquareInvocation(receipt.PerfectSquare) {
+			q.frame.perfectSquare = *receipt.PerfectSquare
+		}
 		if q := c.factorFrontend; q != nil {
 			q.perfectSquare = *receipt.PerfectSquare
 		}

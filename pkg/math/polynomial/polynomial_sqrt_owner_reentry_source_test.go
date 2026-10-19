@@ -123,6 +123,9 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 		_, body = full.sqrtWithReceipt(p, out, &receipt)
 	}
 	active = false
+	if mode == 0 && !c.integer.MatchesPerfectSquareInvocation(&full.squareRoot.perfectSquare) {
+		t.Fatal("actual perfect-square child absent from invocation", body)
+	}
 	if calls != 1 || !numericPhysicalReservationRefusal(body) {
 		t.Fatal("actual square-root allocation transport not reached", calls, body)
 	}

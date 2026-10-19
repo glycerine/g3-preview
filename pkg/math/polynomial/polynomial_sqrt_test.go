@@ -397,8 +397,8 @@ func TestPolynomialSqrtPostphysicalIntegerRawReceipt(t *testing.T) {
 			_, cause := m.Sqrt(p, r)
 			roots, e := q.Integers().Allocator.PendingRoots()
 			serviceMust(t, e)
-			if !numericPhysicalReservationRefusal(cause) || roots[0] == (umemory.Block{}) || m.squareRoot.integerRaw != roots || q.Integers().PerfectSquare.Raw != roots || m.squareRoot.perfectSquare.Invocation != q.Integers().PerfectSquareGeneration {
-				t.Fatal("actual reached hi Copy physical raw acquisition", cause, roots, m.squareRoot.integerRaw)
+			if !numericPhysicalReservationRefusal(cause) || roots[0] == (umemory.Block{}) || q.Integers().PerfectSquare.Numeric.PendingAllocatorBlocks() != roots || m.squareRoot.perfectSquare.Invocation != q.Integers().PerfectSquareGeneration {
+				t.Fatal("actual reached hi Copy physical raw acquisition", cause, roots, m.squareRoot.perfectSquare)
 			}
 			polynomialSqrtPhysicalAudit(t, m, []Polynomial{p, r.root.value, r.root.incoming}, nil, r.header)
 			if mode == "foreign" {
@@ -704,7 +704,7 @@ func TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned(t *testing.T)
 	if !numericPhysicalReservationRefusal(cause) || !invoked || foreign == (Monomial{}) || roots[0] == (umemory.Block{}) || r.root.incoming == (Polynomial{}) {
 		t.Fatal("actual foreign callback work after caller incoming publication", cause, foreign, roots)
 	}
-	if m.squareRoot.integerRaw != ([3]umemory.Block{}) || m.squareRoot.numericPending != (umemory.ObjectRef{}) {
+	if polynomialNegNumericPending(&m.squareRoot.numeric) {
 		t.Fatal("callback work acquired invocation authority")
 	}
 	polynomialSqrtPhysicalAudit(t, m, []Polynomial{p, square, r.root.value, r.root.incoming}, []*unumeral.Int{&input, &out}, r.header+h.header, foreign)
