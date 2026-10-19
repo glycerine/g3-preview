@@ -69,39 +69,34 @@ func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveUnivariateWithR
 		cause = errors.Join(cause, m.finishFactorUnivariateSource(&direct))
 	}()
 	c := m.core
-	if polynomialSourceDebug {
-		yes, e := c.IsUnivariate(p)
-		if e != nil {
-			return e
-		}
-		if !yes {
-			return ErrPolynomialAssertion
-		}
+	if e := polynomialFactorSourceAssert(6685, "is_univariate(p)", func() (bool, error) {
+		return c.IsUnivariate(p)
+	}); e != nil {
+		return e
+	}
+	if e := polynomialFactorSourceAssert(6686, "is_square_free(p, max_var(p))", func() (bool, error) {
 		x, e := c.MaxVariable(p)
 		if e != nil {
-			return e
+			return false, e
 		}
-		yes, e = m.isSquareFreeWithReceipt(p, x, true, &s.predicateSquareFree)
+		return m.isSquareFreeWithReceipt(p, x, true, &s.predicateSquareFree)
+	}); e != nil {
+		return e
+	}
+	if e := polynomialFactorSourceAssert(6687, "is_primitive(p, max_var(p))", func() (bool, error) {
+		x, e := c.MaxVariable(p)
 		if e != nil {
-			return e
+			return false, e
 		}
-		if !yes {
-			return ErrPolynomialAssertion
-		}
-		yes, e = m.isPrimitiveWithReceipt(p, x, &s.predicatePrimitive)
-		if e != nil {
-			return e
-		}
-		if !yes {
-			return ErrPolynomialAssertion
-		}
+		return m.isPrimitiveWithReceipt(p, x, &s.predicatePrimitive)
+	}); e != nil {
+		return e
+	}
+	if e := polynomialFactorSourceAssert(6688, "!is_zero(p)", func() (bool, error) {
 		zero, e := c.IsZero(p)
-		if e != nil {
-			return e
-		}
-		if zero {
-			return ErrPolynomialAssertion
-		}
+		return !zero, e
+	}); e != nil {
+		return e
 	}
 	x, e := c.MaxVariable(p)
 	if e != nil {
@@ -129,18 +124,14 @@ func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveUnivariateWithR
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	if e = polynomialFactorSourceAssert(6699, "m().is_one(fs.get_constant()) || m().is_minus_one(fs.get_constant())", func() (bool, error) {
 		one, e := c.modular.IsOne(&s.fs.constant)
-		if e != nil {
-			return e
+		if e != nil || one {
+			return one, e
 		}
-		minus, e := c.modular.IsMinusOne(&s.fs.constant)
-		if e != nil {
-			return e
-		}
-		if !one && !minus {
-			return ErrPolynomialAssertion
-		}
+		return c.modular.IsMinusOne(&s.fs.constant)
+	}); e != nil {
+		return e
 	}
 	if s.fs.count == 1 && s.fs.degrees[0] == 1 {
 		return r.Push(p, k)
@@ -164,16 +155,18 @@ func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveUnivariateWithR
 			return e
 		}
 	}
-	one, e := c.modular.IsOne(&s.fs.constant)
-	if e != nil {
+	if e = polynomialFactorSourceAssert(6721, "m().is_one(fs.get_constant()) || m().is_minus_one(fs.get_constant())", func() (bool, error) {
+		one, e := c.modular.IsOne(&s.fs.constant)
+		if e != nil || one {
+			return one, e
+		}
+		return c.modular.IsMinusOne(&s.fs.constant)
+	}); e != nil {
 		return e
 	}
 	minus, e := c.modular.IsMinusOne(&s.fs.constant)
 	if e != nil {
 		return e
-	}
-	if polynomialSourceDebug && !one && !minus {
-		return ErrPolynomialAssertion
 	}
 	if minus && k%2 == 1 {
 		return m.flipFactorSignWithReceipt(r, &s.constant)

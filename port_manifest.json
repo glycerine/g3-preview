@@ -46232,7 +46232,7 @@
           "tests": ["TestMonomialMultiplySourceTraceBeforeAndAfterIntern"]
         },
         {
-          "name": "polynomial.cpp:6558-6830 Factor family: strict minimum-degree selector, direct AccConstant/FlipSign, original-p UP converter, borrowed bound square-free backend, literal degree dispatcher, recursive FactorCore and accumulating Factor including erased zero/constant paths.",
+          "name": "polynomial.cpp:6558-6830 Factor family: source assertion actions, strict minimum-degree selector, direct AccConstant/FlipSign, original-p UP converter, borrowed bound square-free backend, literal degree dispatcher, recursive FactorCore and accumulating Factor including erased zero/constant paths.",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factor_core.go",
           "tests": [
@@ -46288,7 +46288,8 @@
             "TestPolynomialFactorResetSETOneEveryFieldReservationPrefix",
             "TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody",
             "TestPolynomialFactorMinimumVariableLiteralEncounterTie",
-            "TestPolynomialFactorMinimumVariableEveryActualConstructorPrefix"
+            "TestPolynomialFactorMinimumVariableEveryActualConstructorPrefix",
+            "TestPolynomialFactorSourceAssertionActions"
           ]
         }
       ],
@@ -49582,7 +49583,7 @@
           "tests": ["TestMonomialMultiplySourceTraceBeforeAndAfterIntern"]
         },
         {
-          "name": "polynomial.cpp:6558-6830 Factor family: strict minimum-degree selector, direct AccConstant/FlipSign, original-p UP converter, borrowed bound square-free backend, literal degree dispatcher, recursive FactorCore and accumulating Factor including erased zero/constant paths.",
+          "name": "polynomial.cpp:6558-6830 Factor family: source assertion actions, strict minimum-degree selector, direct AccConstant/FlipSign, original-p UP converter, borrowed bound square-free backend, literal degree dispatcher, recursive FactorCore and accumulating Factor including erased zero/constant paths.",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factor_core.go",
           "tests": [
@@ -49638,7 +49639,8 @@
             "TestPolynomialFactorResetSETOneEveryFieldReservationPrefix",
             "TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody",
             "TestPolynomialFactorMinimumVariableLiteralEncounterTie",
-            "TestPolynomialFactorMinimumVariableEveryActualConstructorPrefix"
+            "TestPolynomialFactorMinimumVariableEveryActualConstructorPrefix",
+            "TestPolynomialFactorSourceAssertionActions"
           ]
         }
       ],
