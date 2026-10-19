@@ -89,30 +89,26 @@ func (m *MultivariatePolynomialCore) Degree(p Polynomial, x uint32) (uint32, err
 	return result, nil
 }
 func (m *MultivariatePolynomialCore) coefficientAssertions(x uint32, reduct bool) error {
-	if !polynomialSourceDebug {
-		return nil
+	line := int32(3265)
+	if reduct {
+		line = 3298
 	}
-	valid, e := m.monomials.IsValidVar(x)
-	if e != nil {
+	if e := polynomialCoefficientSourceAssert(line, "is_valid(x)", func() (bool, error) { return m.monomials.IsValidVar(x) }); e != nil {
 		return e
 	}
-	if !valid {
-		return ErrPolynomialAssertion
-	}
-	n, e := m.cheap.ms.size(m)
-	if e != nil {
+	line++
+	if e := polynomialCoefficientSourceAssert(line, "m_cheap_som_buffer.empty()", func() (bool, error) {
+		n, x := m.cheap.ms.size(m)
+		return n == 0, x
+	}); e != nil {
 		return e
-	}
-	if n != 0 {
-		return ErrPolynomialAssertion
 	}
 	if reduct {
-		n, e = m.cheap2.ms.size(m)
-		if e != nil {
+		if e := polynomialCoefficientSourceAssert(3300, "m_cheap_som_buffer2.empty()", func() (bool, error) {
+			n, x := m.cheap2.ms.size(m)
+			return n == 0, x
+		}); e != nil {
 			return e
-		}
-		if n != 0 {
-			return ErrPolynomialAssertion
 		}
 	}
 	return nil
@@ -269,14 +265,8 @@ func (m *MultivariatePolynomialCore) constantCoefficientWithReceipt(p Polynomial
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug {
-		valid, e := m.monomials.IsValidVar(x)
-		if e != nil {
-			return false, e
-		}
-		if !valid {
-			return false, ErrPolynomialAssertion
-		}
+	if e := polynomialCoefficientSourceAssert(3319, "is_valid(x)", func() (bool, error) { return m.monomials.IsValidVar(x) }); e != nil {
+		return false, e
 	}
 	var frame *polynomialConstantCoefficientScope
 	if receipt != nil {

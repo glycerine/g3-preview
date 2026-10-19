@@ -44347,10 +44347,12 @@
           ]
         },
         {
-          "name": "coeff and coeff with reduct, constant_coeff, lc (cpp3264-3338,3551-3553)",
+          "name": "Complete coeff and coeff-with-reduct, constant_coeff and lc bodies cpp3264-3338,3551-3553 with source assertion actions",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_degree_coefficient.go",
           "tests": [
+            "TestPolynomialCoefficientVariableAssertionActions",
+            "TestPolynomialCoefficientBufferAssertionActions",
             "TestPolynomialQueryCoefficientIndependentMaps",
             "TestPolynomialQueryPowerLinearIndependentOracle",
             "TestPolynomialQueryEqualSourceOrderAndPermutation",
@@ -48589,10 +48591,12 @@
           ]
         },
         {
-          "name": "coeff and coeff with reduct, constant_coeff, lc (cpp3264-3338,3551-3553)",
+          "name": "Complete coeff and coeff-with-reduct, constant_coeff and lc bodies cpp3264-3338,3551-3553 with source assertion actions",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_degree_coefficient.go",
           "tests": [
+            "TestPolynomialCoefficientVariableAssertionActions",
+            "TestPolynomialCoefficientBufferAssertionActions",
             "TestPolynomialQueryCoefficientIndependentMaps",
             "TestPolynomialQueryPowerLinearIndependentOracle",
             "TestPolynomialQueryEqualSourceOrderAndPermutation",

@@ -46205,3 +46205,13 @@ their predicates and honor Throw or Continue; disabled assertions skip the
 predicate. All sparse-focused tests pass in native, checked, debug and combined
 checked/debug/trace profiles on CPUs 8-16. The sparse method row is ported;
 scalar/integer content and GlexMonic remain separate partial algorithms.
+
+Polynomial coefficient assertion completion: the retained plain and
+reduct-producing `coeff` bodies and `const_coeff` at
+`polynomial.cpp:3264-3338` now evaluate their variable and scratch-buffer
+`SASSERT` sites through the process assertion switch. Throw stops at the exact
+source gate, Continue reaches the following coefficient or later dirty-buffer
+guard, and disabled assertions skip predicate reads. The existing coefficient
+algorithms, TRACE path, two-buffer ownership and constant numeral-copy receipts
+remain intact. Focused tests pass in native, checked, debug and combined
+checked/debug/trace profiles on CPUs 8-16.
