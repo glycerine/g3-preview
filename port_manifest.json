@@ -38372,7 +38372,13 @@
         "pkg/math/polynomial/upolynomial.go",
         "pkg/math/polynomial/upolynomial_source_finalize.go",
         "pkg/math/polynomial/algebraic_unary_trace.go",
-        "pkg/math/polynomial/algebraic_unary_trace_test.go"
+        "pkg/math/polynomial/algebraic_unary_trace_test.go",
+        "pkg/math/polynomial/algebraic_basic_root_trace.go",
+        "pkg/math/polynomial/algebraic_basic_root_trace_test.go",
+        "pkg/util/numeral/mpq_display_source.go",
+        "pkg/util/numeral/mpq_display_source_test.go",
+        "pkg/util/numeral/mpq_root_invocation.go",
+        "pkg/util/numeral/mpq_root_invocation_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38531,7 +38537,12 @@
         "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix",
         "TestAlgebraicUnaryIntervalTraceSourceFrontier",
         "TestAlgebraicUnaryIntervalTraceDisabledDoesNotRead",
-        "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes"
+        "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes",
+        "TestAlgebraicBasicRootTraceExactAndPolynomialBranches",
+        "TestAlgebraicBasicRootTraceDisabledDoesNotRead",
+        "TestAlgebraicBasicRootTraceCallbackBeforePublication",
+        "TestAlgebraicBasicRootPolynomialTraceOwnsStoppedDisplay",
+        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
       ],
       "conditionals": [
         {
@@ -39347,7 +39358,7 @@
           ]
         },
         {
-          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; source interval diagnostic at 1123, actual interval-power debug children; root_core diagnostics and complete child audit remain open",
+          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; interval and root_core diagnostics, accepted integer-root children for exact rational construction; bound/power child failure audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_unary.go",
           "go_targets": [
@@ -39365,7 +39376,12 @@
             "TestAlgebraicUnaryResultantEveryCheckpointRetry",
             "TestAlgebraicUnaryIntervalTraceSourceFrontier",
             "TestAlgebraicUnaryIntervalTraceDisabledDoesNotRead",
-            "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes"
+            "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes",
+            "TestAlgebraicBasicRootTraceExactAndPolynomialBranches",
+            "TestAlgebraicBasicRootTraceDisabledDoesNotRead",
+            "TestAlgebraicBasicRootTraceCallbackBeforePublication",
+            "TestAlgebraicBasicRootPolynomialTraceOwnsStoppedDisplay",
+            "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
           ]
         }
       ],
@@ -39546,7 +39562,13 @@
         "pkg/math/polynomial/upolynomial.go",
         "pkg/math/polynomial/upolynomial_source_finalize.go",
         "pkg/math/polynomial/algebraic_unary_trace.go",
-        "pkg/math/polynomial/algebraic_unary_trace_test.go"
+        "pkg/math/polynomial/algebraic_unary_trace_test.go",
+        "pkg/math/polynomial/algebraic_basic_root_trace.go",
+        "pkg/math/polynomial/algebraic_basic_root_trace_test.go",
+        "pkg/util/numeral/mpq_display_source.go",
+        "pkg/util/numeral/mpq_display_source_test.go",
+        "pkg/util/numeral/mpq_root_invocation.go",
+        "pkg/util/numeral/mpq_root_invocation_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39702,7 +39724,12 @@
         "TestAlgebraicInverseConversionEntryActualSourceStop",
         "TestAlgebraicUnaryIntervalTraceSourceFrontier",
         "TestAlgebraicUnaryIntervalTraceDisabledDoesNotRead",
-        "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes"
+        "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes",
+        "TestAlgebraicBasicRootTraceExactAndPolynomialBranches",
+        "TestAlgebraicBasicRootTraceDisabledDoesNotRead",
+        "TestAlgebraicBasicRootTraceCallbackBeforePublication",
+        "TestAlgebraicBasicRootPolynomialTraceOwnsStoppedDisplay",
+        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
       ],
       "conditionals": [
         {
@@ -40099,7 +40126,7 @@
           ]
         },
         {
-          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; source interval diagnostic at 1123, actual interval-power debug children; root_core diagnostics and complete child audit remain open",
+          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; interval and root_core diagnostics, accepted integer-root children for exact rational construction; bound/power child failure audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_unary.go",
           "go_targets": [
@@ -40117,7 +40144,12 @@
             "TestAlgebraicUnaryResultantEveryCheckpointRetry",
             "TestAlgebraicUnaryIntervalTraceSourceFrontier",
             "TestAlgebraicUnaryIntervalTraceDisabledDoesNotRead",
-            "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes"
+            "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes",
+            "TestAlgebraicBasicRootTraceExactAndPolynomialBranches",
+            "TestAlgebraicBasicRootTraceDisabledDoesNotRead",
+            "TestAlgebraicBasicRootTraceCallbackBeforePublication",
+            "TestAlgebraicBasicRootPolynomialTraceOwnsStoppedDisplay",
+            "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
           ]
         }
       ],
@@ -169821,7 +169853,12 @@
         "pkg/util/numeral/mpq_parse_trace.go",
         "pkg/math/polynomial/polynomial_linear_display.go",
         "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
-        "pkg/math/polynomial/polynomial_linear_display_test.go"
+        "pkg/math/polynomial/polynomial_linear_display_test.go",
+        "pkg/util/numeral/mpq_display_source.go",
+        "pkg/util/numeral/mpq_display_source_test.go",
+        "pkg/util/numeral/mpq_root_invocation.go",
+        "pkg/util/numeral/mpq_root_invocation_test.go",
+        "pkg/math/polynomial/algebraic_basic_root_trace_test.go"
       ],
       "tests": [
         "TestRationalCompareSourceSignAssertionSites",
@@ -170028,7 +170065,10 @@
         "TestRationalSetStringRetainedTraceBranches",
         "TestLinearRationalDisplayReceivingNumericFlags",
         "TestLinearModularDisplayReceivingNumericFlags",
-        "TestLinearNumericInsertionCallbackBorrowsActualOwners"
+        "TestLinearNumericInsertionCallbackBorrowsActualOwners",
+        "TestRationalRawDisplayLiteralAndLateDenominatorRead",
+        "TestRationalRootInvocationActualRAWAndLaterIntegerCall",
+        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
       ],
       "assertions": [
         {
@@ -170874,7 +170914,12 @@
         "pkg/math/polynomial/algebraic_const_rational_scope_test.go",
         "pkg/math/polynomial/polynomial_linear_display.go",
         "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
-        "pkg/math/polynomial/polynomial_linear_display_test.go"
+        "pkg/math/polynomial/polynomial_linear_display_test.go",
+        "pkg/util/numeral/mpq_display_source.go",
+        "pkg/util/numeral/mpq_display_source_test.go",
+        "pkg/util/numeral/mpq_root_invocation.go",
+        "pkg/util/numeral/mpq_root_invocation_test.go",
+        "pkg/math/polynomial/algebraic_basic_root_trace_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -171174,7 +171219,10 @@
         "TestRationalSetStringRetainedTraceBranches",
         "TestLinearRationalDisplayReceivingNumericFlags",
         "TestLinearModularDisplayReceivingNumericFlags",
-        "TestLinearNumericInsertionCallbackBorrowsActualOwners"
+        "TestLinearNumericInsertionCallbackBorrowsActualOwners",
+        "TestRationalRawDisplayLiteralAndLateDenominatorRead",
+        "TestRationalRootInvocationActualRAWAndLaterIntegerCall",
+        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
       ],
       "conditionals": [
         {

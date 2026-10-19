@@ -4,9 +4,12 @@ package polynomial
 import (
 	"io"
 	"strconv"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type algebraicRootTraceScope struct {
+	insertions [2]unumeral.NumeralInsertionReceipt
 	running    bool
 	borrow     upolyFactorTraceBorrow
 	polynomial *MultivariatePolynomialCore
@@ -16,10 +19,22 @@ type algebraicRootTraceScope struct {
 
 func (m *AlgebraicRootCore) rootTracePending() bool {
 	s := &m.rootTrace
+	for i := range s.insertions {
+		if s.insertions[i].Active() {
+			return true
+		}
+	}
 	return s.polynomial != nil && s.polynomial.displayReceiptPending(&s.poly) || m.config.Polynomials != nil && m.config.Polynomials.displayReceiptPending(&s.univariate)
 }
 func (m *AlgebraicRootCore) rootTraceSourceCause() error {
 	s := &m.rootTrace
+	for i := range s.insertions {
+		if s.insertions[i].Active() {
+			if e := s.insertions[i].SourceCause(); e != nil {
+				return e
+			}
+		}
+	}
 	if s.polynomial != nil {
 		if e := s.polynomial.displayReceiptSourceCause(&s.poly); e != nil {
 			return e
@@ -32,6 +47,14 @@ func (m *AlgebraicRootCore) cleanupRootTrace() error {
 	if s.running {
 		return ErrAlgebraicPending
 	}
+	for i := len(s.insertions) - 1; i >= 0; i-- {
+		if !s.insertions[i].Active() {
+			continue
+		}
+		if e := m.config.Rationals.CleanupSourceDisplay(&s.insertions[i]); e != nil {
+			return e
+		}
+	}
 	if s.polynomial != nil {
 		if e := s.polynomial.cleanupDisplayReceipt(&s.poly); e != nil {
 			return e
@@ -41,6 +64,7 @@ func (m *AlgebraicRootCore) cleanupRootTrace() error {
 		return e
 	}
 	s.polynomial = nil
+	s.insertions = [2]unumeral.NumeralInsertionReceipt{}
 	s.poly = polynomialDisplayInvocationReceipt{}
 	s.univariate = upolyDisplayInvocationReceipt{}
 	return nil
@@ -58,6 +82,7 @@ func (m *AlgebraicRootCore) emitRootTraceTag(tag, function string, line int, bod
 	if s.running || m.rootTracePending() {
 		return ErrAlgebraicPending
 	}
+	s.insertions = [2]unumeral.NumeralInsertionReceipt{}
 	s.polynomial = nil
 	s.poly = polynomialDisplayInvocationReceipt{}
 	s.univariate = upolyDisplayInvocationReceipt{}

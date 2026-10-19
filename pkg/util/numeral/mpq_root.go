@@ -8,20 +8,36 @@ import "github.com/glycerine/g3/pkg/util/diagnostic"
 // leaves the old output denominator untouched; a failing call keeps its actual
 // integer publication prefix, including when input and output alias.
 func (m *RationalManager) Root(a *Rational, n uint32, out *Rational) (bool, error) {
+	return m.RootWithInvocation(a, n, out, nil)
+}
+func (m *RationalManager) RootWithInvocation(a *Rational, n uint32, out *Rational, receipt *RationalRootInvocation) (bool, error) {
+	if receipt != nil && receipt.Pending() {
+		return false, ErrRootPending
+	}
 	if e := m.check(a); e != nil {
 		return false, e
 	}
 	if e := m.check(out); e != nil {
 		return false, e
 	}
-	exact, e := m.Z.Root(&a.Num, n, &out.Num)
+	var exact bool
+	var e error
+	if receipt == nil {
+		exact, e = m.Z.Root(&a.Num, n, &out.Num)
+	} else {
+		*receipt = RationalRootInvocation{manager: m}
+		exact, e = m.Z.rootWithAllocationContext(&a.Num, n, &out.Num, &receipt.copies[0], &receipt.roots[0], integerAllocationInvocationContext{})
+	}
 	if e != nil {
 		return false, e
 	}
 	if !exact {
 		return false, nil
 	}
-	return m.Z.Root(&a.Den, n, &out.Den)
+	if receipt == nil {
+		return m.Z.Root(&a.Den, n, &out.Den)
+	}
+	return m.Z.rootWithAllocationContext(&a.Den, n, &out.Den, &receipt.copies[1], &receipt.roots[1], integerAllocationInvocationContext{})
 }
 
 // IsPerfectSquare writes directly to the caller's rational in source order.

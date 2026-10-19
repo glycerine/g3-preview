@@ -74,6 +74,8 @@ func (m *AlgebraicRootCore) dispatchUnary(a *Algebraic, k uint32, out *Algebraic
 }
 
 type algebraicBasicRootScope struct {
+	root             unumeral.RationalRootInvocation
+	qConstructed     bool
 	polynomialCaller *polynomialAlgebraicEvaluationScope
 	sourceStop       error
 	q                unumeral.Rational
@@ -91,6 +93,41 @@ func (m *AlgebraicRootCore) cleanupBasicRoot() error {
 	if !s.active {
 		return nil
 	}
+	if e := m.cleanupRootTrace(); e != nil {
+		return e
+	}
+	if e := s.root.Cleanup(false); e != nil {
+		return e
+	}
+	if e := m.finishBasicRootLocals(); e != nil {
+		return e
+	}
+	if e := s.root.Cleanup(true); e != nil {
+		return e
+	}
+	s.active = m.rootTracePending() || s.root.Pending()
+	return nil
+}
+func (m *AlgebraicRootCore) finishBasicRootSource() error {
+	s := &m.basicRootScope
+	if e := s.root.SourceCause(); e != nil {
+		return e
+	}
+	p := m.config.Polynomials
+	if p.defaultNormalizationReceiptPending(&m.coefficientNormalization) {
+		if e := p.defaultNormalization.sourceCause; e != nil {
+			return e
+		}
+		p.defaultNormalization.parentSourceExecuting = true
+		defer func() { p.defaultNormalization.parentSourceExecuting = false }()
+	}
+	if e := m.rootTraceSourceCause(); e != nil {
+		return e
+	}
+	return m.finishBasicRootLocals()
+}
+func (m *AlgebraicRootCore) finishBasicRootLocals() error {
+	s := &m.basicRootScope
 	for s.constructed != 0 {
 		if e := m.config.Binary.Del(&s.bounds[s.constructed-1]); e != nil {
 			return e
@@ -102,10 +139,13 @@ func (m *AlgebraicRootCore) cleanupBasicRoot() error {
 			return e
 		}
 	}
-	if e := m.config.Rationals.Del(&s.q); e != nil {
-		return e
+	if s.qConstructed {
+		if e := m.config.Rationals.Del(&s.q); e != nil {
+			return e
+		}
+		s.qConstructed = false
 	}
-	s.active = false
+	s.active = m.rootTracePending() || s.root.Pending()
 	return nil
 }
 func (m *AlgebraicRootCore) basicRoot(value *unumeral.Rational, k uint32, out *Algebraic) (cause error) {
@@ -137,21 +177,24 @@ func (m *AlgebraicRootCore) basicRoot(value *unumeral.Rational, k uint32, out *A
 			return e
 		}
 	}
-	*s = algebraicBasicRootScope{polynomialCaller: m.polynomialCaller, q: unumeral.NewRational(), active: true, running: true}
+	*s = algebraicBasicRootScope{polynomialCaller: m.polynomialCaller, q: unumeral.NewRational(), qConstructed: true, active: true, running: true}
 	defer func() {
 		s.running = false
-		cleanup := m.cleanupBasicRoot()
+		cleanup := m.finishBasicRootSource()
 		if cleanup != nil {
 			s.sourceStop = cleanup
 		}
 		cause = errors.Join(cause, cleanup)
 	}()
 	q, p, b := m.config.Rationals, m.config.Polynomials, m.config.Binary
-	exact, e := q.Root(value, k, &s.q)
+	exact, e := q.RootWithInvocation(value, k, &s.q, &s.root)
 	if e != nil {
 		return e
 	}
 	if exact {
+		if e = m.traceBasicRootRational(value); e != nil {
+			return e
+		}
 		return m.SetRational(out, &s.q)
 	}
 	s.p, e = p.NewPolynomial()
@@ -231,6 +274,9 @@ func (m *AlgebraicRootCore) basicRoot(value *unumeral.Rational, k uint32, out *A
 	if e != nil {
 		return e
 	}
+	if e = m.traceBasicRootPolynomial(v); e != nil {
+		return e
+	}
 	return m.SetRoot(out, v, &s.bounds[0], &s.bounds[1], false)
 }
 
@@ -239,10 +285,10 @@ func (m *AlgebraicRootCore) basicPower(value *unumeral.Rational, k uint32, out *
 	if s.active {
 		return ErrAlgebraicPending
 	}
-	*s = algebraicBasicRootScope{polynomialCaller: m.polynomialCaller, q: unumeral.NewRational(), active: true, running: true}
+	*s = algebraicBasicRootScope{polynomialCaller: m.polynomialCaller, q: unumeral.NewRational(), qConstructed: true, active: true, running: true}
 	defer func() {
 		s.running = false
-		cleanup := m.cleanupBasicRoot()
+		cleanup := m.finishBasicRootSource()
 		if cleanup != nil {
 			s.sourceStop = cleanup
 		}
