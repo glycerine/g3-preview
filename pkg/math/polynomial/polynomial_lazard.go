@@ -197,8 +197,15 @@ func (m *MultivariatePolynomialCore) seLazardWithReceipt(d uint32, y, sd1 Polyno
 	for v := n; v > 1; v >>= 1 {
 		a <<= 1
 	}
-	if polynomialSourceDebug && !(a <= n && n < 2*a) {
-		return ErrPolynomialAssertion
+	if e := polynomialPSCSourceAssert(5672, "a <= n", func() (bool, error) {
+		return a <= n, nil
+	}); e != nil {
+		return e
+	}
+	if e := polynomialPSCSourceAssert(5673, "n < 2*a", func() (bool, error) {
+		return n < 2*a, nil
+	}); e != nil {
+		return e
 	}
 	s.constructed = 2
 	if e = s.c.assign(m, s.x.value); e != nil {

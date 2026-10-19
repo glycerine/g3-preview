@@ -117,6 +117,7 @@ func TestPolynomialPSCFullOwnerPendingLocalClosePrefix(t *testing.T) {
 }
 
 func TestPolynomialPSCSourceAssertionBeforeOutputReset(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m := polynomialCellFixture(t)
 	S, e := NewPolynomialRefVector(m)
 	serviceMust(t, e)

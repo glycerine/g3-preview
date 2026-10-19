@@ -123,21 +123,17 @@ func (m *MultivariatePolynomialCore) pscChainWithReceipt(p, q Polynomial, x uint
 	if e := S.open(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	if e := polynomialPSCSourceAssert(5805, "degree(P, x) > 0", func() (bool, error) {
 		d, e := m.Degree(p, x)
-		if e != nil {
-			return e
-		}
-		if d == 0 {
-			return ErrPolynomialAssertion
-		}
-		d, e = m.Degree(q, x)
-		if e != nil {
-			return e
-		}
-		if d == 0 {
-			return ErrPolynomialAssertion
-		}
+		return d > 0, e
+	}); e != nil {
+		return e
+	}
+	if e := polynomialPSCSourceAssert(5806, "degree(Q, x) > 0", func() (bool, error) {
+		d, e := m.Degree(q, x)
+		return d > 0, e
+	}); e != nil {
+		return e
 	}
 	if e := S.Reset(); e != nil {
 		return e
@@ -196,8 +192,10 @@ func (m *MultivariatePolynomialCore) pscOptimizedCoreWithReceipt(p, q Polynomial
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug && dp < dq {
-		return ErrPolynomialAssertion
+	if e := polynomialPSCSourceAssert(5755, "degP >= degQ", func() (bool, error) {
+		return dp >= dq, nil
+	}); e != nil {
+		return e
 	}
 	sc, e := m.beginPSCInvocation(receipt)
 	if e != nil {
@@ -291,8 +289,10 @@ func (m *MultivariatePolynomialCore) pscOptimizedCoreWithReceipt(p, q Polynomial
 				}
 			}
 		} else {
-			if polynomialSourceDebug && delta != 0 && delta != 1 {
-				return ErrPolynomialAssertion
+			if e := polynomialPSCSourceAssert(5790, "delta == 0 || delta == 1", func() (bool, error) {
+				return delta == 0 || delta == 1, nil
+			}); e != nil {
+				return e
 			}
 			if e = c.assign(m, b.value); e != nil {
 				return e

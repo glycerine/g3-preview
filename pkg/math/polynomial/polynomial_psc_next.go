@@ -127,21 +127,17 @@ func (m *MultivariatePolynomialCore) optimizedSe1(d, e uint32, a, sd1, se, den P
 	return m.optimizedSe1WithReceipt(d, e, a, sd1, se, den, x, out, nil)
 }
 func (m *MultivariatePolynomialCore) optimizedSe1WithReceipt(d, e uint32, a, sd1, se, den Polynomial, x uint32, out *polynomialReference, receipt *polynomialPSCNextInvocationReceipt) (err error) {
-	if polynomialSourceDebug {
-		v, z := m.Degree(a, x)
-		if z != nil {
-			return z
-		}
-		if v != d {
-			return ErrPolynomialAssertion
-		}
-		v, z = m.Degree(sd1, x)
-		if z != nil {
-			return z
-		}
-		if v != e {
-			return ErrPolynomialAssertion
-		}
+	if err := polynomialPSCSourceAssert(5699, "d == degree(A, x)", func() (bool, error) {
+		v, err := m.Degree(a, x)
+		return d == v, err
+	}); err != nil {
+		return err
+	}
+	if err := polynomialPSCSourceAssert(5700, "e == degree(S_d_1, x)", func() (bool, error) {
+		v, err := m.Degree(sd1, x)
+		return e == v, err
+	}); err != nil {
+		return err
 	}
 	s, eBegin := m.beginPSCNextInvocation(receipt)
 	if eBegin != nil {
@@ -195,8 +191,10 @@ func (m *MultivariatePolynomialCore) optimizedSe1WithReceipt(d, e uint32, a, sd1
 			return z
 		}
 	}
-	if polynomialSourceDebug && uint32(len(h.values)) != e {
-		return ErrPolynomialAssertion
+	if err := polynomialPSCSourceAssert(5711, "H.size() == e", func() (bool, error) {
+		return uint32(len(h.values)) == e, nil
+	}); err != nil {
+		return err
 	}
 	p, z = m.pscNextVariable(s, x, e)
 	if z != nil {
@@ -219,8 +217,10 @@ func (m *MultivariatePolynomialCore) optimizedSe1WithReceipt(d, e uint32, a, sd1
 	if z = h.pushWithNextReceipt(m, p, &s.directReceipt); z != nil {
 		return z
 	}
-	if polynomialSourceDebug && uint32(len(h.values)) != e+1 {
-		return ErrPolynomialAssertion
+	if err := polynomialPSCSourceAssert(5716, "H.size() == e+1", func() (bool, error) {
+		return uint32(len(h.values)) == e+1, nil
+	}); err != nil {
+		return err
 	}
 	s.constructed = 7
 	xpol, xh, xhe := &s.refs[4], &s.refs[5], &s.refs[6]
@@ -272,8 +272,10 @@ func (m *MultivariatePolynomialCore) optimizedSe1WithReceipt(d, e uint32, a, sd1
 			return z
 		}
 	}
-	if polynomialSourceDebug && uint32(len(h.values)) != d {
-		return ErrPolynomialAssertion
+	if err := polynomialPSCSourceAssert(5727, "H.size() == d", func() (bool, error) {
+		return uint32(len(h.values)) == d, nil
+	}); err != nil {
+		return err
 	}
 	s.constructed = 8
 	D := &s.refs[7]

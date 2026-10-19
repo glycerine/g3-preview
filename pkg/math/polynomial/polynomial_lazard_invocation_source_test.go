@@ -105,6 +105,7 @@ func TestPolynomialLazardActualBigChildrenEveryReservationPrefix(t *testing.T) {
 // Only the compiled unsigned assertion domain is tested here: literal 2*a
 // wraps at uint32 width, after X construction and before C construction.
 func TestPolynomialLazardUnsignedAssertionBeforeCConstruction(t *testing.T) {
+	polynomialAssertionActionsFixture(t, "TT")
 	if !polynomialSourceDebug {
 		return
 	}
