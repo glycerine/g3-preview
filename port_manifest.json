@@ -55674,7 +55674,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:1030-1050 actual pre-parent DEBUG content and conditional odd-negative content preparation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_preparation_invocation.go",
           "tests": [
             "TestUPolynomialFactorPreparationActualCopyTransport",
