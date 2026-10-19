@@ -239,7 +239,7 @@ func TestAlgebraicIrrationalBoundAssertionActions(t *testing.T) {
 					serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
 				}
 				var zero Algebraic
-				_, e := c.irrationalBoundRecord(&zero, upper)
+				_, e := c.irrationalBoundView(&zero, upper)
 				if polynomialSourceDebug && action == "T" {
 					if !errors.Is(e, ErrAlgebraicAssertion) || !linearThrownAssertion(e) {
 						t.Fatal("bound assertion did not honor Throw", e)

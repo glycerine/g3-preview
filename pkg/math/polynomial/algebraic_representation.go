@@ -91,20 +91,20 @@ func (m *AlgebraicRootCore) GetLower(a *Algebraic, out *unumeral.BinaryRational)
 func (m *AlgebraicRootCore) GetUpper(a *Algebraic, out *unumeral.BinaryRational) error {
 	return m.copyBinaryBound(a, out, true)
 }
-func (m *AlgebraicRootCore) irrationalBoundRecord(a *Algebraic, upper bool) (algebraicRecord, error) {
+func (m *AlgebraicRootCore) irrationalBoundView(a *Algebraic, upper bool) (algebraicBinaryBoundView, error) {
 	if e := m.check(); e != nil {
-		return algebraicRecord{}, e
+		return algebraicBinaryBoundView{}, e
 	}
 	if polynomialSourceDebug {
 		d := diagnostic.BorrowProcessDebugContext()
 		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
-			return algebraicRecord{}, e
+			return algebraicBinaryBoundView{}, e
 		}
 		if enabled {
 			rational, e := m.IsRational(a)
 			if e != nil {
-				return algebraicRecord{}, e
+				return algebraicBinaryBoundView{}, e
 			}
 			if rational {
 				line := int32(2988)
@@ -112,19 +112,22 @@ func (m *AlgebraicRootCore) irrationalBoundRecord(a *Algebraic, upper bool) (alg
 					line = 3015
 				}
 				if e = m.predicateAssertionFailure(line, "!is_rational(a)"); e != nil {
-					return algebraicRecord{}, e
+					return algebraicBinaryBoundView{}, e
 				}
 			}
 		}
 	}
 	l, e := m.location(a)
 	if e != nil {
-		return algebraicRecord{}, e
+		return algebraicBinaryBoundView{}, e
 	}
 	if l == nil || l.kind != 1 {
-		return algebraicRecord{}, ErrAlgebraicOwner
+		return algebraicBinaryBoundView{}, ErrAlgebraicOwner
 	}
-	return m.load(l)
+	if e = algebraicQueryTagAssertionSwitch(); e != nil {
+		return algebraicBinaryBoundView{}, e
+	}
+	return algebraicBinaryBoundView{core: m, cell: l, upper: upper}, nil
 }
 func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRational, upper bool) error {
 	if e := m.check(); e != nil {
@@ -133,17 +136,13 @@ func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRa
 	if m.bounds.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.bounds.copy) || m.bounds.conversion.pending(m) || m.bounds.evaluationPending(m) || m.bounds.refinement.pending(m) {
 		return ErrAlgebraicPending
 	}
-	r, e := m.irrationalBoundRecord(a, upper)
+	bound, e := m.irrationalBoundView(a, upper)
 	if e != nil {
 		return e
 	}
-	bound := r.interval.BorrowLower()
-	if upper {
-		bound = r.interval.BorrowUpper()
-	}
 	m.bounds.executing = true
 	defer func() { m.bounds.executing = false }()
-	return m.config.Binary.CopyWithAllocationReceipt(out, bound, &m.bounds.copy)
+	return bound.copyTo(out, &m.bounds.copy)
 }
 
 type algebraicBoundScope struct {
@@ -222,13 +221,9 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 		s.invocation++
 	}
 	s.refinement.evaluation = upolyBinaryEvaluationInvocationReceipt{}
-	r := algebraicRecord{value: unumeral.NewRational()}
-	if refine {
-		if l != nil {
-			r, e = m.load(l)
-		}
-	} else {
-		r, e = m.irrationalBoundRecord(a, upper)
+	var bound algebraicBinaryBoundView
+	if !refine {
+		bound, e = m.irrationalBoundView(a, upper)
 	}
 	if e != nil {
 		return e
@@ -243,22 +238,21 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 		cause = errors.Join(cause, cleanup)
 	}()
 	if refine && (l == nil || l.kind == 0) {
-		return m.config.Rationals.CopyWithAllocationReceipt(out, &r.value, &s.copy)
+		value, e := m.copySourceBasicValue(m, l)
+		if e != nil {
+			return e
+		}
+		return value.copyTo(m, out, &s.copy)
 	}
-	b := m.config.Binary
 	s.values = [2]unumeral.BinaryRational{}
 	s.remaining = 1
 	if refine {
 		s.remaining = 2
-		if _, e = m.intervalAtPrecisionWithReceipt(&r, &s.values[0], &s.values[1], precision, &s.copy, &s.refinement.evaluation); e != nil {
+		if _, e = m.copyIntervalAtPrecisionFromCell(l, &s.values[0], &s.values[1], precision, &s.copy); e != nil {
 			return e
 		}
 	} else {
-		bound := r.interval.BorrowLower()
-		if upper {
-			bound = r.interval.BorrowUpper()
-		}
-		if e = b.CopyWithAllocationReceipt(&s.values[0], bound, &s.copy); e != nil {
+		if e = bound.copyTo(&s.values[0], &s.copy); e != nil {
 			return e
 		}
 	}
