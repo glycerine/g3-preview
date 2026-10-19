@@ -201,6 +201,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && m.division.cleaning {
+		return ErrAlgebraicPending
+	}
 	if m.inverseRefinementEvaluationPending() || m.inverseRefinementCopyPending() {
 		return ErrAlgebraicPending
 	}
@@ -1070,7 +1073,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && m.basicRootScope.running {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.division.running {
+	if m != nil && m.self == m && (m.division.running || m.division.cleaning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.binary.running || m.binary.cleaning) {
@@ -1295,7 +1298,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && m.basicRootScope.running {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.division.running {
+	if m != nil && m.self == m && (m.division.running || m.division.cleaning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.binary.running || m.binary.cleaning) {

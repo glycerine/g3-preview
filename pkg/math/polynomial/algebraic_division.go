@@ -10,24 +10,38 @@ import (
 // The scoped inverse belongs to the division invocation, including when a
 // nested multiplication retains borrowed inputs pending owning cleanup.
 type algebraicDivisionScope struct {
-	polynomialCaller *polynomialAlgebraicEvaluationScope
-	sourceStop       error
-	inverse          Algebraic
-	active, running  bool
+	polynomialCaller          *polynomialAlgebraicEvaluationScope
+	sourceStop                error
+	inverse                   Algebraic
+	active, running, cleaning bool
 }
 
 func (m *AlgebraicRootCore) cleanupDivision() error {
+	return m.finishDivision(true)
+}
+
+func (m *AlgebraicRootCore) finishDivision(owning bool) error {
 	s := &m.division
-	if s.running {
+	if s.running || s.cleaning {
 		return ErrAlgebraicPending
 	}
 	if !s.active {
 		return nil
 	}
-	if e := m.Del(&s.inverse); e != nil {
+	s.cleaning = true
+	defer func() { s.cleaning = false }()
+	// Only this invocation's private scoped value is destroyed here. Public
+	// admission remains blocked by younger unjoined work and during callbacks.
+	l, e := m.locationCleanup(&s.inverse)
+	if e != nil {
 		return e
 	}
-	*s = algebraicDivisionScope{}
+	if l != nil {
+		if e = m.destroyCell(&s.inverse, l, owning); e != nil {
+			return e
+		}
+	}
+	*s = algebraicDivisionScope{sourceStop: s.sourceStop, cleaning: true}
 	return nil
 }
 
@@ -51,13 +65,16 @@ func (m *AlgebraicRootCore) Div(a, b, out *Algebraic) (cause error) {
 		}
 		return ErrAlgebraicDivisionByZero
 	}
-	s.active, s.running = true, true
-	s.polynomialCaller = m.polynomialCaller
+	*s = algebraicDivisionScope{active: true, running: true, polynomialCaller: m.polynomialCaller}
 	defer func() {
 		s.running = false
+		if stop := m.rootTraceSourceCause(); stop != nil {
+			s.sourceStop = stop
+			return
+		}
 		// The binary selector borrows the inverse until its local scope ends.
 		if !m.binary.active && m.inversion.remaining == 0 {
-			cleanup := m.cleanupDivision()
+			cleanup := m.finishDivision(false)
 			if cleanup != nil {
 				s.sourceStop = cleanup
 			}
