@@ -49366,8 +49366,8 @@
           ]
         },
         {
-          "name": "Selected GCD/ICCP/CRA/Resultant/Normalize manager declarations and scoped_set_zp; source-native/global bindings remain partial",
-          "status": "partial",
+          "name": "Retained GCD/ICCP/CRA/Resultant/Normalize manager declarations and numeral scoped_set_zp with concrete borrowed Go owners",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_imp.go",
           "tests": [
             "TestPolynomialDividesIndependentFiniteAndZeroReadMask",
@@ -49440,7 +49440,13 @@
             "TestPolynomialSparseEmbeddedNativeOutputConstruction",
             "TestPolynomialContentModeSwitchSourceSet",
             "TestPolynomialIntegerContentFieldEveryActualReservationPrefix",
-            "TestPolynomialICCPZPXModeSwitchSourceSet"
+            "TestPolynomialICCPZPXModeSwitchSourceSet",
+            "TestPolynomialImpBorrowedMonomialConstructorHierarchy",
+            "TestPolynomialImpBorrowedAllocatorConstructorHierarchy",
+            "TestPolynomialImpAllocatorAndDefaultConstructorEveryReservation"
+          ],
+          "deviations": [
+            "The retained scoped_set_zp callers at polynomial.cpp:3807,4290 pass scoped numerals; their saved prime, mode restoration, failed constructor and member destruction are implemented by polynomial_scoped_zp.go. The unused uint64 overload adds no retained consumer obligation. Manager constructors bind the actual supplied numeral Runtime, monomial manager or allocator, with default allocation using that same Runtime. This is a Go owner binding, not a claim of native C++ ABI or generated process singleton equivalence. Whole-unit method and ownership audits remain open."
           ]
         },
         {
