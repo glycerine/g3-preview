@@ -48651,8 +48651,8 @@
           ]
         },
         {
-          "name": "Selected complete incremental Newton ctor/reset/const-input/count/Add/Mk and whole-method lexical owner; persistent owner-vector lazy At/SetOwner/Flush; explicit owning cleanup distinct from source destruction; vector SourceFinalize/full imp/TRACE remain open",
-          "status": "partial",
+          "name": "Complete retained incremental Newton methods, lexical owners, native lazy vector source finalization, trace records and assertion actions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_newton.go",
           "tests": [
             "TestPolynomialNewtonSourceInterpolation",
@@ -178950,8 +178950,8 @@
           "status": "unported"
         },
         {
-          "name": "Concrete selected polynomial owning ref/reference-vector methods for actual Newton consumers; completed DEC and unjoined INC retain separate source versus owning phases",
-          "status": "partial",
+          "name": "Complete concrete polynomial owning ref/reference-vector methods for retained Newton consumers with separate completed DEC and unjoined INC cleanup phases",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_ref.go",
           "tests": [
             "TestPolynomialNewtonSourceInterpolation",
