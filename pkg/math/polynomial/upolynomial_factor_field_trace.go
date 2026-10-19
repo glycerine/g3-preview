@@ -9,7 +9,7 @@ import (
 
 // Source: upolynomial_factorization.cpp:256,375. These records precede every
 // lexical object in the corresponding finite-field factorization body.
-func (m *UPolynomialManager) traceFactorFieldEntry(f UPolynomialView, p uint32, line int) error {
+func (m *UPolynomialManager) traceFactorFieldEntry(q *upolyFactorFieldScope, f UPolynomialView, p uint32, line int) error {
 	tags := m.modular.BorrowTraceTags()
 	if !tags.ShouldTrace("polynomial::factorization") {
 		return nil
@@ -28,7 +28,7 @@ func (m *UPolynomialManager) traceFactorFieldEntry(f UPolynomialView, p uint32, 
 		func() bool { return true }, func(raw io.Writer) error {
 			out := factorizationTraceWriter{raw}
 			_ = linearWriteText(out, caption)
-			if e := m.traceFactorFieldPolynomial(out, f); e != nil {
+			if e := m.traceFactorFieldPolynomial(out, f, &q.polynomial); e != nil {
 				computation = e
 				return e
 			}
@@ -39,18 +39,13 @@ func (m *UPolynomialManager) traceFactorFieldEntry(f UPolynomialView, p uint32, 
 	return computation
 }
 
-func (m *UPolynomialManager) traceFactorFieldPolynomial(out io.Writer, f UPolynomialView) error {
-	var issued upolyDisplayInvocationReceipt
-	e := m.displayIntoWithReceipt(f, factorizationTraceStream{out}, "x", false, &issued)
-	if m.matchesDisplayReceipt(&issued) && m.displayReceiptPending(&issued) {
-		m.pendingFactorCoreTrace = &issued
-	}
-	return e
+func (m *UPolynomialManager) traceFactorFieldPolynomial(out io.Writer, f UPolynomialView, receipt *upolyDisplayInvocationReceipt) error {
+	return m.displayIntoWithReceipt(f, factorizationTraceStream{out}, "x", false, receipt)
 }
 
 // Source: upolynomial_factorization.cpp:268-273. The factor constant has
 // already been published and T_0 has already been made monic.
-func (m *UPolynomialManager) traceSquareFreeInitial(fs *UPolynomialFactors, t0 UPolynomialView, p uint32) error {
+func (m *UPolynomialManager) traceSquareFreeInitial(q *upolyFactorFieldScope, fs *UPolynomialFactors, t0 UPolynomialView, p uint32) error {
 	tags := m.modular.BorrowTraceTags()
 	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
 		return nil
@@ -65,7 +60,7 @@ func (m *UPolynomialManager) traceSquareFreeInitial(fs *UPolynomialFactors, t0 U
 		func() bool { return true }, func(raw io.Writer) error {
 			out := factorizationTraceWriter{raw}
 			_ = linearWriteText(out, "Initial factors: ")
-			if e := fs.DisplayInto(factorizationTraceStream{out}); e != nil {
+			if e := fs.displayIntoWithReceipt(factorizationTraceStream{out}, &q.factors); e != nil {
 				computation = e
 				return e
 			}
@@ -75,7 +70,7 @@ func (m *UPolynomialManager) traceSquareFreeInitial(fs *UPolynomialFactors, t0 U
 			_ = linearWriteText(out, ")['x']")
 			_ = diagnostic.WriteTraceEndl(out)
 			_ = linearWriteText(out, "T_0 = ")
-			if e := m.traceFactorFieldPolynomial(out, t0); e != nil {
+			if e := m.traceFactorFieldPolynomial(out, t0, &q.polynomial); e != nil {
 				computation = e
 				return e
 			}
@@ -86,7 +81,7 @@ func (m *UPolynomialManager) traceSquareFreeInitial(fs *UPolynomialFactors, t0 U
 
 // Source: upolynomial_factorization.cpp:285-366. Each call receives the
 // polynomial state from the exact source point following its computation.
-func (m *UPolynomialManager) traceSquareFreeState(line int, first, second string, value UPolynomialView) error {
+func (m *UPolynomialManager) traceSquareFreeState(q *upolyFactorFieldScope, line int, first, second string, value UPolynomialView) error {
 	tags := m.modular.BorrowTraceTags()
 	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
 		return nil
@@ -105,7 +100,7 @@ func (m *UPolynomialManager) traceSquareFreeState(line int, first, second string
 				_ = diagnostic.WriteTraceEndl(out)
 			}
 			_ = linearWriteText(out, second)
-			if e := m.traceFactorFieldPolynomial(out, value); e != nil {
+			if e := m.traceFactorFieldPolynomial(out, value, &q.polynomial); e != nil {
 				computation = e
 				return e
 			}
@@ -133,7 +128,7 @@ func (m *UPolynomialManager) traceSquareFreeKZero() error {
 	return nil
 }
 
-func (m *UPolynomialManager) traceSquareFreeFactor(value UPolynomialView, multiplicity uint32) error {
+func (m *UPolynomialManager) traceSquareFreeFactor(q *upolyFactorFieldScope, value UPolynomialView, multiplicity uint32) error {
 	tags := m.modular.BorrowTraceTags()
 	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
 		return nil
@@ -148,7 +143,7 @@ func (m *UPolynomialManager) traceSquareFreeFactor(value UPolynomialView, multip
 		func() bool { return true }, func(raw io.Writer) error {
 			out := factorizationTraceWriter{raw}
 			_ = linearWriteText(out, "Factor: (")
-			if e := m.traceFactorFieldPolynomial(out, value); e != nil {
+			if e := m.traceFactorFieldPolynomial(out, value, &q.polynomial); e != nil {
 				computation = e
 				return e
 			}
@@ -161,7 +156,7 @@ func (m *UPolynomialManager) traceSquareFreeFactor(value UPolynomialView, multip
 
 // Source: upolynomial_factorization.cpp:369,399. Both result records observe
 // the caller's fully published factor collection.
-func (m *UPolynomialManager) traceFactorFieldOutcome(f UPolynomialView, fs *UPolynomialFactors, line int) error {
+func (m *UPolynomialManager) traceFactorFieldOutcome(q *upolyFactorFieldScope, f UPolynomialView, fs *UPolynomialFactors, line int) error {
 	tags := m.modular.BorrowTraceTags()
 	if !tags.ShouldTrace("polynomial::factorization") {
 		return nil
@@ -180,12 +175,12 @@ func (m *UPolynomialManager) traceFactorFieldOutcome(f UPolynomialView, fs *UPol
 		func() bool { return true }, func(raw io.Writer) error {
 			out := factorizationTraceWriter{raw}
 			_ = linearWriteText(out, caption)
-			if e := m.traceFactorFieldPolynomial(out, f); e != nil {
+			if e := m.traceFactorFieldPolynomial(out, f, &q.polynomial); e != nil {
 				computation = e
 				return e
 			}
 			_ = linearWriteText(out, ") => ")
-			if e := fs.DisplayInto(factorizationTraceStream{out}); e != nil {
+			if e := fs.displayIntoWithReceipt(factorizationTraceStream{out}, &q.factors); e != nil {
 				computation = e
 				return e
 			}

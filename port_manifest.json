@@ -54559,7 +54559,8 @@
       "path": "src/math/polynomial/upolynomial_factorization.cpp",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
+      "go_target": "pkg/math/polynomial/upolynomial_factor_field.go",
       "go_targets": [
         "pkg/util/numeral/integer_allocation_invocation_context.go",
         "pkg/util/numeral/mpz_power_shift.go",
@@ -54713,7 +54714,10 @@
         "pkg/math/polynomial/upolynomial_berlekamp_vector_numeric_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_division_am_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_monic.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go",
+        "pkg/math/polynomial/upolynomial_factor_field_scope.go",
+        "pkg/math/polynomial/upolynomial_factor_field_trace.go",
+        "pkg/math/polynomial/upolynomial_factor_field_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -54888,7 +54892,10 @@
         "TestUPolynomialBerlekampDivisionAMSourceStopAndOwningCleanup",
         "TestUPolynomialBerlekampDivisionAMSuccessfulSourceEnd",
         "TestUPolynomialBerlekampMonicRawBodyFailureAndExplicitEnds",
-        "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd"
+        "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd",
+        "TestUPolynomialFiniteFieldSquareFreeOutcomeRetainsOlderSource",
+        "TestUPolynomialFiniteFieldFactorOutcomeRetainsLocalFactors",
+        "TestUPolynomialFiniteFieldFactorRetainsNestedSquareFreeSource"
       ],
       "conditionals": [
         {
@@ -54998,12 +55005,13 @@
           "text": "SASSERT(f_pp.size() == 1 && nm.is_one(f_pp.back()));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete Berlekamp division a_m scoped NUM and mk_monic raw lc/lc_inv source ends (upolynomial.cpp:460; upolynomial.h:363)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_division.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_division.go",
             "pkg/math/polynomial/upolynomial_gcd.go",
@@ -55024,6 +55032,7 @@
         {
           "name": "Berlekamp live nonempty GCD and quotient helper caller-context propagation (upolynomial_factorization.cpp:474,480)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
             "pkg/math/polynomial/numeric_utility_aliases.go",
@@ -55040,6 +55049,7 @@
         {
           "name": "Berlekamp splitting records and actual reverse local-vector source/owning destruction (upolynomial_factorization.cpp:432-440,443-448,482-486,498)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_berlekamp_split_scope.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_berlekamp_split_scope.go",
             "pkg/math/polynomial/upolynomial_berlekamp_split_trace.go",
@@ -55057,6 +55067,7 @@
         {
           "name": "Irreducible Berlekamp outcome TRACE with exact polynomial/factor-display ownership (upolynomial_factorization.cpp:428)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace.go",
             "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace_test.go",
@@ -55072,6 +55083,7 @@
         {
           "name": "Public finite-field Berlekamp entry TRACE before monic assertion and matrix construction (upolynomial_factorization.cpp:414)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_berlekamp_display.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_berlekamp_display.go",
             "pkg/math/polynomial/upolynomial_factor_field.go",
@@ -55088,6 +55100,7 @@
         {
           "name": "Concrete Berlekamp constructor/diagonalization scalar allocation caller and accepted child receipts (upolynomial_factorization.cpp:125-139,176-189)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_field.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_field.go",
             "pkg/math/polynomial/upolynomial_berlekamp_cleanup.go",
@@ -55104,6 +55117,7 @@
         {
           "name": "Constructor tmp and diagonalization multiplier scoped NUM destructor frontiers (upolynomial_factorization.cpp:110,160)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_field.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_field.go",
             "pkg/math/polynomial/upolynomial_berlekamp_scoped_numeral.go",
@@ -55118,6 +55132,7 @@
         {
           "name": "Berlekamp ascending matrix destructor prefix and exact retained owning cleanup (upolynomial_factorization.cpp:148-152)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_field.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_field.go",
             "pkg/math/polynomial/upolynomial_berlekamp_cleanup.go",
@@ -55134,6 +55149,7 @@
         {
           "name": "Berlekamp constructor entry TRACE before matrix coefficients and scoped tmp (upolynomial_factorization.cpp:97)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_berlekamp_display.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_berlekamp_display.go",
             "pkg/math/polynomial/upolynomial_factor_field.go",
@@ -55151,6 +55167,7 @@
         {
           "name": "Primitive-content and final constant-remainder SASSERT runtime gates and debugger actions (upolynomial_factorization.cpp:1033,1291)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_preparation_invocation.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_preparation_invocation.go",
             "pkg/math/polynomial/upolynomial_factor_recombine.go",
@@ -55506,17 +55523,21 @@
         },
         {
           "name": "Finite-field square-free/factor TRACE records and exact outcome child/destructor frontier (256,268-369,375,399)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_field_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_factor_field_scope.go",
             "pkg/math/polynomial/upolynomial_factor_field_trace_test.go"
           ],
           "tests": [
             "TestUPolynomialFiniteFieldSquareFreeTraceRecords",
-            "TestUPolynomialFiniteFieldFactorEntryAndOutcomeTrace"
+            "TestUPolynomialFiniteFieldFactorEntryAndOutcomeTrace",
+            "TestUPolynomialFiniteFieldSquareFreeOutcomeRetainsOlderSource",
+            "TestUPolynomialFiniteFieldFactorOutcomeRetainsLocalFactors",
+            "TestUPolynomialFiniteFieldFactorRetainsNestedSquareFreeSource"
           ],
-          "notes": "All live records and operands are emitted at their source positions and the successful-path order is covered. Exact retained ownership for a stopped polynomial/factor display at the final records, before older square-free vectors or the local factor collection destruct, remains open; no whole source-unit completion credit."
+          "notes": "The exact source TRACE records at 256,268-369,375 and399 use accepted polynomial/factor-display receipts owned by concrete finite-field call frames. Square-free frames retain div_tmp,T_0,constant,T_0_d,T,V,W,A_ek at their literal declaration frontiers and destroy them in source reverse order. FactorZP retains its local square-free factor collection below a nested square-free frame. Real descriptor exhaustion at either outcome record proves the older source objects remain live, SourceFinalize reports the pending child, manager reuse is refused, and explicit owning cleanup releases inner then outer frames. The two maximum live frames are embedded in the already charged manager header; g3trace and checked+g3trace cover direct and nested stops."
         },
         {
           "name": "upolynomial_factorization.cpp:979-1017 mignotte_bound literal direct numeric body and reverse tmp/bound/norm source destruction",
@@ -55772,30 +55793,23 @@
         "upolynomial.cpp:33-54: actual constructed best/lifted factors have separate strict source row/column and explicit owning cursors. Source reset SET1 stops retain first cause and unread suffix; owning rescue consumes exact remaining class members without replaying SET1 against a failed modulus. Child false acknowledgment precedes older class/NUM destruction and true unjoined abort follows it. Actual stopped body/source/own histories remain immutable through acknowledgment.",
         "upolynomial_factorization.cpp:1153-1175: actual source-completed Hensel children permit older lexical class/NUM destruction even when owning retention remains; only an actual sticky younger source stop protects that suffix. Cold header retention follows older source completion, with child false acknowledgment before older own fields and true abort afterward.",
         "upolynomial_factorization.cpp:1030-1034,1019-1299: actual DEBUG guarded begin issues a distinct charged diagnostic history; actual later square-free scope issues its exact full receipt tuple. Live authority requires the actual service member and captured nonwrapping invocation; retired histories retain real cold charges until service Close and grant no acquisition or later-child cleanup. Complete tuple matching rejects old-scope/later-diagnostic splice before mutation.",
-        "upolynomial_factorization.cpp:1019-1299: actual automatic defer is source-only. Exact false cleanup completes callee child and lexical suffix before older multivariate caller declarations; true abort then consumes only captured unjoined children. First body/source/own causes remain immutable through own cleanup, scope retirement and actual later invocation. Shared CleanupRetained reuses the same callee phase engine while preserving independent public service cleanup."
+        "upolynomial_factorization.cpp:1019-1299: actual automatic defer is source-only. Exact false cleanup completes callee child and lexical suffix before older multivariate caller declarations; true abort then consumes only captured unjoined children. First body/source/own causes remain immutable through own cleanup, scope retirement and actual later invocation. Shared CleanupRetained reuses the same callee phase engine while preserving independent public service cleanup.",
+        "upolynomial_factorization.cpp:256-399: two concrete finite-field call frames are embedded in the charged UPolynomialManager header. Exact accepted display receipts stop source destruction before older square-free vectors/constant or the outer FactorZP local factor collection; nested cleanup consumes the younger square-free frame before its outer factor frame. Successful calls perform the same source reverse destruction and return both frames for reuse."
       ],
       "deviations": [
-        "Selected Mignotte helper, enclosing epilogue and literal prime-trial lexical scope/RAW transport are closed. Pair-Hensel and generic nil to_zp helper scope closure remain open. No full factor_square_free completion or original registered driver assertion credit.",
         "Signed-host TLS and destroyed-pointer profiles qualify source guard/owning behavior, not ordinary supported mathematical failure reachability. Source unsigned exponent doubling is retained without Go overflow refusal.",
         "Destroyed-old source guard is owner-primitive/dangling checked domain, not ordinary mathematical OOM.",
         "Runtime signed-TLS transport owner proof uses actual returning ErrorTransport callback.",
-        "The nil toZPCopy adapter retains historical eager deletion and is outside the corrected actual Prime receipt route; pair-Hensel closure remains open.",
         "Dormant original registered source driver assertions receive zero credit.",
         "Conditional Go profile uses FactorizationDebugTag with checked build; source CASSERT factorizatio::bughunt typo differs from TRACE factorization::bughunt. These actual reached profiles do not claim source-global tag equivalence.",
         "Source signed-TLS destructor stop and destroyed-pointer guard proofs are owner-primitive guarded profiles, not ordinary mathematical OOM. Invalid copied/stale/callback context fixtures prove guard authority only.",
-        "No whole factorization class or dormant registered driver completion. Direct exported HenselLiftFactors is closed through its actual charged caller adapter; helpers outside the selected concrete caller remain separate.",
         "Actual public cold-adapter charge shifts the independently proved checked setup_p lower destroyed-Copy frontier 158 to159; all original InvalidSlot, one caller SetZ, named physical and retry assertions remain. Direct helper whole-finish fixture first proves executing rejection, then marks actual helper return before source completion; it is a helper/guard profile, not a nested source driver.",
         "upolynomial_factorization.cpp:1213-1240: supported Go ErrorTransport reentry tests protect actual lower acquisition; no C++ allocator-callback equivalence is claimed. Signed-host TLS destructor/compiled-child composition tests are guarded owner-primitive profiles, not ordinary mathematical allocation failure reachability.",
-        "upolynomial_factorization.cpp:1213-1240: actual reflected cold header contains the typed helper and related caller pointers; no per-call ticket, substitute INC/Copy, or native C++ malloc geometry claim. This closes the selected trial helper only; enclosing factorization and dormant registered drivers remain partial.",
         "upolynomial_factorization.cpp:1238-1292: signed-host TLS destructor tests compose actual compiled child and real release under the qualified guarded owner-primitive profile, not ordinary mathematical OOM reachability. ErrorTransport tests are supported Go callback semantics, not C++ malloc callback equivalence.",
-        "upolynomial_factorization.cpp:1238-1292: actual reflected cold parent/header storage carries the concrete adapter/receipts; no per-call reservation ticket or native malloc geometry claim. Remaining factorization/recombination topology outside this selected source block remains partial.",
         "upolynomial_factorization.cpp:1030-1050: explicit reflected Go adapter storage is charged once in actual enclosing service header; no C++ malloc geometry equivalence or whole factorization completion claim.",
         "upolynomial_factorization.cpp:1030-1050: signed-host TLS destructor proofs use the qualified compiled owner-primitive domain; actual ErrorTransport callback proofs are Go callback behavior, not a fabricated C++ malloc callback.",
         "upolynomial_factorization.cpp:1066: preserve prior concrete degree_set(zp_upm) adaptation through the actual already-created empty zp_fs; no new source NUM, INC or allocation parity claim.",
-        "upolynomial_factorization.cpp:1058-1094: explicit adapter storage is charged once in reflected parent header; no whole Factor/finite-field factorization completion claim. TLS release proofs are qualified signed-host owner-primitive guard profiles; foreign descriptor proof uses genuine held NUMs consuming source-recycled descriptor slots.",
-        "upolynomial_factorization.cpp:1153-1175: compiled eligible GF7 caller profile validates every actual helper reservation and independent lifted product; qualified signed-host TLS/compiled checker profiles test exact source destruction stops. These profiles do not claim a new ordinary allocation seam between publication actions. The source constant DEL follows successful SET1 and its valid output is inline; no fabricated BIG constant DEL failure is introduced. Whole factorization/recombination topology remains partial.",
         "upolynomial_factorization.cpp:1153-1175: CapturedCheckerSourceStop is an explicitly compiled/seeded retirement-engine transport proof. ActualHelperCheckerSourceStop separately invokes prepareFactorLift with eligible uint32 GF7 and BIG primitive square-free input, literal Mignotte exponent32, actual captured debug checker and signed TLS source stop. The release profile erases that conditional checker and constructs no checker NUM. RetainedLexicalCleanup preserves original unmatched core/SetZ assertions and counts only actual returned InvalidSlot, stopped class cursor, live core.SetZ with identical graph and immutable tuple/cause after new exact owning rescue.",
-        "upolynomial_factorization.cpp:1019-1299: additional reflected Go lifetime headers/nonwrapping tokens and charged diagnostic history model exception retention; native malloc count parity is not claimed. Literal conditional checker uses the existing selected debug/tag profile. Actual whole-input checker and owning release proof uses the qualified signed TLS accounting guard, not ordinary malloc failure. Whole factorization unit and multivariate parent remain partial.",
         "Berlekamp pivot row/column indices and factor-combination enabled/current indices now use native Go slices. C++ vector growth arithmetic and container-only allocation faults/reservations are removed; actual iterator owner allocation, sentinel initialization, combination traversal/removal and numeric product operations remain.",
         "Factor owner records now grow with native Go append; relocation clears the old owning records while preserving inner coefficient backing/view bindings. Degree subsets use native []bool and a descending subset-sum update, removing bit-vector word growth/clone/shift/OR machinery and cross-budget capacity transfer. Native factor and degree storage contributes no Runtime buffer charges; real cold owners and numeric lifetimes remain explicit."
       ]

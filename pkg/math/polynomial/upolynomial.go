@@ -86,6 +86,8 @@ type UPolynomialManager struct {
 	squareFreeCaller             *upolyFactorSquareFreeScope
 	self                         *UPolynomialManager
 	pendingBerlekamp             *upolyBerlekampMatrix
+	factorField                  *upolyFactorFieldScope
+	factorFieldFrames            [2]upolyFactorFieldScope
 	craTrace                     upolyCRATrace
 	craValues                    [12]unumeral.Int
 	pendingCRATrace              *upolyCRATrace
@@ -168,6 +170,9 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
+	if m != nil && m.self == m && m.factorField != nil && !m.factorField.executing && !m.factorField.sourceExecuting && !m.factorField.ownExecuting {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.intervalBounds.active && (!m.intervalBounds.executing || m.intervalBounds.borrow.callback()) && !m.intervalBounds.sourceExecuting {
 		return ErrUPolynomialCleanupPending
 	}
@@ -372,6 +377,11 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.factorField != nil {
+		if e := m.CleanupFactorFieldFactorization(); e != nil {
+			return e
+		}
+	}
 	if m != nil && m.intervalBounds.active {
 		if e := m.CleanupIntervalConversion(); e != nil {
 			return e
