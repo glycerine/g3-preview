@@ -6,9 +6,8 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-// This partial receipt covers actual SET allocation. The original finite-field
-// PNormalize engine remains unchanged; allocating normalization needs its own
-// actual allocation-leaf receipt before the parent can claim that mode complete.
+// This receipt covers both actual SET allocation and the reached finite-field
+// normalization leaf, so either source child remains attributable to this call.
 type polynomialConstantCoefficientScope struct {
 	invocation        uint64
 	active, executing bool

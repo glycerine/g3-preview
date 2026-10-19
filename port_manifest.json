@@ -45418,8 +45418,8 @@
           ]
         },
         {
-          "name": "const_coeff cpp3318-3338 same guarded Reset/iteration/degree/size/SET source loop; optional concrete frame retains exact actual allocating SET child; unchanged finite-field PNormalize allocating leaf is explicitly still open",
-          "status": "partial",
+          "name": "Complete const_coeff cpp3318-3338 guarded Reset/iteration/degree/size/SET source loop with exact actual SET and finite-field PNormalize children",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_constant_coefficient_receipt.go",
           "tests": [
             "TestPolynomialConstantCoefficientReceiptActualSETLateTLSLeaf"
@@ -45437,8 +45437,8 @@
           ]
         },
         {
-          "name": "const_coeff3318-3338 same SET then reached field PNormalize: exact younger lexical DT acknowledgment before older caller NUM; explicit unjoined cleanup after caller declarations",
-          "status": "partial",
+          "name": "Complete const_coeff cpp3318-3338 SET and reached field PNormalize ownership with exact younger lexical cleanup before caller NUM",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_constant_coefficient_receipt.go",
           "tests": [
             "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
