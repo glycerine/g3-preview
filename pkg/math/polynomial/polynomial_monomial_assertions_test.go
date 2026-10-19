@@ -93,6 +93,87 @@ func TestMonomialSMT2PositiveDegreeAssertionActions(t *testing.T) {
 	}
 }
 
+func TestMonomialConstructorSourceAssertionActions(t *testing.T) {
+	for _, tc := range []struct {
+		name, choices string
+		powers        []MonomialPower
+		throws        bool
+	}{
+		{"order-throw", "CT", []MonomialPower{{1, 2}, {1, 3}}, true},
+		{"order-continue", "CC", []MonomialPower{{1, 2}, {1, 3}}, false},
+		{"degree-throw", "T", []MonomialPower{{1, 0}}, true},
+		{"degree-continue", "C", []MonomialPower{{1, 0}}, false},
+		{"assertions-disabled", "TT", []MonomialPower{{1, 2}, {1, 3}}, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			m := monomialFixture(t)
+			for i := 0; i < 2; i++ {
+				_, e := m.MkVar()
+				serviceMust(t, e)
+			}
+			polynomialAssertionActionsFixture(t, tc.choices)
+			if polynomialSourceDebug && tc.name == "assertions-disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			a, e := m.MkMonomial(tc.powers)
+			if polynomialSourceDebug && tc.throws {
+				if !errors.Is(e, ErrMonomialAssertion) || m.creation.stage != 5 {
+					t.Fatal("constructor assertion did not stop after physical power publication", e, m.creation.stage)
+				}
+				serviceMust(t, m.CleanupCreation())
+			} else {
+				serviceMust(t, e)
+				info, e := m.Info(a)
+				serviceMust(t, e)
+				var total uint32
+				for _, p := range tc.powers {
+					total += p.Degree
+				}
+				if info.TotalDegree != total {
+					t.Fatal("constructor did not reread published degrees", info, total)
+				}
+				serviceMust(t, m.CleanupValue(&a))
+			}
+			monomialPhysicalAudit(t, m)
+		})
+	}
+}
+
+func TestMonomialDecrementSourceAssertionActions(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			_, e := m.MkVar()
+			serviceMust(t, e)
+			a, e := m.MkVariable(0, 1)
+			serviceMust(t, e)
+			action := choice
+			if choice == "disabled" {
+				action = "T"
+			}
+			polynomialAssertionActionsFixture(t, action)
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			e = m.DecRef(a)
+			info, ie := m.Info(a)
+			serviceMust(t, ie)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) || info.RefCount != 0 {
+					t.Fatal("zero-reference decrement did not stop before mutation", e, info)
+				}
+			} else {
+				serviceMust(t, e)
+				if info.RefCount != ^uint32(0) {
+					t.Fatal("Continue/disabled/release lost source unsigned decrement", info)
+				}
+			}
+			serviceMust(t, m.CleanupValue(&a))
+			monomialPhysicalAudit(t, m)
+		})
+	}
+}
+
 func TestMonomialPredecessorSourceAssertionActions(t *testing.T) {
 	for _, choice := range []string{"T", "C", "disabled"} {
 		t.Run(choice, func(t *testing.T) {

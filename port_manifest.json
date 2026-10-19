@@ -43630,8 +43630,8 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
-          "status": "partial",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43640,6 +43640,9 @@
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
             "TestMonomialSourceRefcountAndExponentWidth",
+            "TestMonomialConstructorSourceAssertionActions",
+            "TestMonomialDecrementSourceAssertionActions",
+            "TestMonomialPowerSourceAssertionActions",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
             "TestMonomialSourceInternTemporaryPublicationBeforeStorage",
@@ -43668,8 +43671,8 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
-          "status": "partial",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43678,6 +43681,9 @@
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
             "TestMonomialSourceRefcountAndExponentWidth",
+            "TestMonomialConstructorSourceAssertionActions",
+            "TestMonomialDecrementSourceAssertionActions",
+            "TestMonomialPowerSourceAssertionActions",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
             "TestMonomialSourceInternTemporaryPublicationBeforeStorage",
@@ -43706,8 +43712,8 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
-          "status": "partial",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_table.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43716,6 +43722,9 @@
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
             "TestMonomialSourceRefcountAndExponentWidth",
+            "TestMonomialConstructorSourceAssertionActions",
+            "TestMonomialDecrementSourceAssertionActions",
+            "TestMonomialPowerSourceAssertionActions",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
             "TestMonomialSourceInternTemporaryPublicationBeforeStorage",
@@ -47817,8 +47826,8 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
-          "status": "partial",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -47827,6 +47836,9 @@
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
             "TestMonomialSourceRefcountAndExponentWidth",
+            "TestMonomialConstructorSourceAssertionActions",
+            "TestMonomialDecrementSourceAssertionActions",
+            "TestMonomialPowerSourceAssertionActions",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
             "TestMonomialSourceInternTemporaryPublicationBeforeStorage",
@@ -47855,8 +47867,8 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
-          "status": "partial",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -47865,6 +47877,9 @@
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
             "TestMonomialSourceRefcountAndExponentWidth",
+            "TestMonomialConstructorSourceAssertionActions",
+            "TestMonomialDecrementSourceAssertionActions",
+            "TestMonomialPowerSourceAssertionActions",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
             "TestMonomialSourceInternTemporaryPublicationBeforeStorage",
@@ -47893,8 +47908,8 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
-          "status": "partial",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_table.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -47903,6 +47918,9 @@
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
             "TestMonomialSourceRefcountAndExponentWidth",
+            "TestMonomialConstructorSourceAssertionActions",
+            "TestMonomialDecrementSourceAssertionActions",
+            "TestMonomialPowerSourceAssertionActions",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
             "TestMonomialSourceInternTemporaryPublicationBeforeStorage",

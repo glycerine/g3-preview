@@ -453,8 +453,8 @@ func (m *MonomialManager) decRefCoreOutcome(a Monomial, out *monomialDecrementOu
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug && n == 0 {
-		return ErrMonomialAssertion
+	if e = m.sourceScalarAssert(216, "m_ref_count > 0", n > 0); e != nil {
+		return e
 	}
 	n--
 	if e = m.allocator.WriteUint32(l.raw, 0, n); e != nil {

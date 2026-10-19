@@ -79,8 +79,8 @@ func (m *MonomialManager) mkMonomialCreated(p []MonomialPower, outcome *monomial
 	if e := m.check(); e != nil {
 		return Monomial{}, e
 	}
-	if polynomialSourceDebug && !validMonomialPowers(p) {
-		return Monomial{}, ErrMonomialAssertion
+	if e := m.sourceScalarAssert(867, "is_valid_power_product(sz, pws)", validMonomialPowers(p)); e != nil {
+		return Monomial{}, e
 	}
 	if m.creation.stage != 0 {
 		return Monomial{}, ErrMonomialPending
@@ -212,7 +212,7 @@ func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialK
 	l.headerInitialized = true
 	m.creation.stage = 5
 	total := uint32(0)
-	var previous uint32
+	a := Monomial{m.origin, slot, l.generation}
 	for i := uint32(0); i < n; i++ {
 		p, e := m.tempPower(t, i)
 		if e != nil {
@@ -224,14 +224,20 @@ func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialK
 		if e = m.allocator.WriteUint32(object, 24+uint64(i)*8, p.Degree); e != nil {
 			return Monomial{}, e
 		}
-		if polynomialSourceDebug && (i != 0 && p.Var <= previous || p.Degree == 0) {
-			return Monomial{}, ErrMonomialAssertion
+		if e = m.constructorOrderAssert(a, i); e != nil {
+			return Monomial{}, e
 		}
-		total += p.Degree
+		if e = m.constructorDegreeAssert(a, i); e != nil {
+			return Monomial{}, e
+		}
+		degree, e := m.degreeAtCore(a, i)
+		if e != nil {
+			return Monomial{}, e
+		}
+		total += degree
 		if e = m.allocator.WriteUint32(object, 8, total); e != nil {
 			return Monomial{}, e
 		}
-		previous = p.Var
 	}
 	if e = m.table.setKey(pos, monomialKey{monomialObjectKey, slot}); e != nil {
 		return Monomial{}, e

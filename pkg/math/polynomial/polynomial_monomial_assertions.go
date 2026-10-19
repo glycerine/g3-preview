@@ -35,6 +35,34 @@ func (m *MonomialManager) powerSourceIndexAssert(a Monomial, i uint32) error {
 	return m.sourceAssertionFailure(228, "idx < size()")
 }
 
+func (m *MonomialManager) constructorOrderAssert(a Monomial, i uint32) error {
+	enabled, e := monomialSourceAssertionsEnabled()
+	if e != nil || !enabled || i == 0 {
+		return e
+	}
+	current, e := m.varCore(a, i)
+	if e != nil {
+		return e
+	}
+	previous, e := m.varCore(a, i-1)
+	if e != nil || current > previous {
+		return e
+	}
+	return m.sourceAssertionFailure(204, "i == 0 || get_var(i) > get_var(i-1)")
+}
+
+func (m *MonomialManager) constructorDegreeAssert(a Monomial, i uint32) error {
+	enabled, e := monomialSourceAssertionsEnabled()
+	if e != nil || !enabled {
+		return e
+	}
+	degree, e := m.degreeAtCore(a, i)
+	if e != nil || degree > 0 {
+		return e
+	}
+	return m.sourceAssertionFailure(205, "degree(i) > 0")
+}
+
 // The condition uses only already-loaded scalar locals. Assertions containing
 // source object reads use concrete helpers below, after the runtime switch.
 func (m *MonomialManager) sourceScalarAssert(line int32, expression string, condition bool) error {
