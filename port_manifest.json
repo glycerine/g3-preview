@@ -55702,7 +55702,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:1153-1175 saved modulus, Mignotte and actual lifting constructors/caller",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_saved_prime.go",
           "tests": [
             "TestUPolynomialFactorLiftPreparationSavedModulusCallerTransport",
