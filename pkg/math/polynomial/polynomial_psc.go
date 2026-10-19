@@ -184,6 +184,9 @@ func (m *MultivariatePolynomialCore) pscOptimizedCore(p, q Polynomial, x uint32,
 	return m.pscOptimizedCoreWithReceipt(p, q, x, S, nil)
 }
 func (m *MultivariatePolynomialCore) pscOptimizedCoreWithReceipt(p, q Polynomial, x uint32, S *PolynomialRefVector, receipt *polynomialPSCInvocationReceipt) (err error) {
+	if e := m.tracePSCEntry(p, q); e != nil {
+		return e
+	}
 	dp, e := m.Degree(p, x)
 	if e != nil {
 		return e
@@ -250,6 +253,9 @@ func (m *MultivariatePolynomialCore) pscOptimizedCoreWithReceipt(p, q Polynomial
 		}
 		if zero {
 			return nil
+		}
+		if e := m.tracePSCIteration(a.value, b.value, s.value, d, degree); e != nil {
+			return e
 		}
 		t, e = m.pscCoefficient(sc, b.value, x, d-1)
 		if e != nil {
