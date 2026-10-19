@@ -53460,7 +53460,7 @@
         },
         {
           "name": "upolynomial.cpp:1734-1764 public binary eval_sign_at direct lexical scope and source/own lifetimes",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_eval.go",
           "tests": [
             "TestUPolynomialEvalSignBinaryPublicBodyAndNumeralDT",
@@ -53471,7 +53471,7 @@
         },
         {
           "name": "upolynomial.cpp:1767-1797 public rational eval_sign_at direct d_i/r/ak scope and source/own lifetimes",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_eval.go",
           "tests": [
             "TestUPolynomialEvalSignRationalPublicBodyAndNumeralDT",
@@ -53482,7 +53482,7 @@
         },
         {
           "name": "upolynomial.cpp:1801-1820 public integer eval_sign_at direct single-r lexical source/own lifetime",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_eval.go",
           "tests": [
             "TestUPolynomialEvalSignIntPublicBodyAndNumeralDT",
