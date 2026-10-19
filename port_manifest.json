@@ -45937,8 +45937,8 @@
           ]
         },
         {
-          "name": "polynomial.cpp:5356-5480 guarded Resultant invocation receipt plus actual owning-directory frame-address validation for existing GCD tuple",
-          "status": "partial",
+          "name": "Complete guarded Resultant invocation receipt and owning-directory GCD frame-address validation cpp5356-5480",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_invocation_receipts.go",
           "tests": [
             "TestPolynomialResultantReceiptRejectsCopiedActualFrame"
@@ -46100,8 +46100,8 @@
           ]
         },
         {
-          "name": "GCD recursive Normalize child retention at polynomial.cpp:3867-4350: actual pending tuple and inactive history survive source and owning retirement",
-          "status": "partial",
+          "name": "Complete GCD recursive Normalize child retention cpp3867-4350 with exact pending invocation and inactive history through source and owning retirement",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_scope.go",
           "tests": [
             "TestPolynomialNormalizeGCDParentRetainsActualStoppedChild"
