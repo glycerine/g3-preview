@@ -46156,3 +46156,14 @@ reservation and stopped-child campaigns plus new trace/switch/reentry fixtures
 pass in native, checked, debug and combined checked/debug/trace profiles on
 CPUs8-16. The constructor, destructor and standalone SOM generated-continuation
 rows are ported; wider `polynomial.cpp` algorithms remain partial.
+
+Polynomial cell-factory completion: `mk_polynomial_core` at
+`polynomial.cpp:2481-2492` already carried the actual allocation, ID creation,
+placement construction, directory reserve/publication and exact optional owning
+receipt. Its line2489 directory-slot `SASSERT` now reads the process assertion
+switch at the reached site and honors Throw or Continue; Continue performs the
+following source assignment. The constructor-prefix, owning-result and new
+assertion-action fixtures pass in native, checked, debug and combined
+checked/debug/trace profiles on CPUs8-16. The base `mk_cell` method row is
+ported; its separately tracked lower allocation and mixed-buffer receipt
+refinements remain partial.

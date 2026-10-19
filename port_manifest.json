@@ -45257,12 +45257,13 @@
         },
         {
           "name": "manager::imp::mk_cell actual optional factory owning receipt cpp2481-2495",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factory_receipt.go",
           "tests": [
             "TestPolynomialFactoryReceiptActualConstructorPrefixes",
             "TestPolynomialFactoryOwningCloseRetainedActualResult",
-            "TestPolynomialFactoryOwningConstructionActualPrefixes"
+            "TestPolynomialFactoryOwningConstructionActualPrefixes",
+            "TestPolynomialFactoryDirectoryAssertionActions"
           ]
         },
         {

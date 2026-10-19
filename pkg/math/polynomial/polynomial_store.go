@@ -110,8 +110,8 @@ func (m *MultivariatePolynomialCore) publishDirectory(p Polynomial, id uint32) e
 	for uint64(len(m.polynomials)) <= uint64(id) {
 		m.polynomials = append(m.polynomials, Polynomial{})
 	}
-	if polynomialSourceDebug && m.polynomials[id] != (Polynomial{}) {
-		return ErrPolynomialAssertion
+	if e := m.directorySlotSourceAssert(id); e != nil {
+		return e
 	}
 	m.polynomials[id] = p
 	return nil
