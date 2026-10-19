@@ -46287,3 +46287,14 @@ disabled execution. Existing source/owning cleanup preserves exact arithmetic,
 append and factory children. All CRA-focused tests pass in native, checked,
 debug and combined checked/debug/trace profiles on CPUs 8-16. The CRA method
 row is ported.
+
+Univariate modular-GCD completion: `uni_mod_gcd` at
+`polynomial.cpp:3769-3865` preserves integer content and primitive parts,
+leading-coefficient GCD, literal big-prime iteration, scoped finite-field mode,
+bad-prime rejection, monic image scaling, image replacement/CRA combination,
+primitive candidate validation, sign normalization and final PRS fallback. Its
+four entry invariants now read the process assertion switch before their lazy
+predicates and honor Throw, Continue, and disabled execution. Focused prime,
+CRA, fallback, ownership and assertion tests pass in native, checked, debug and
+combined checked/debug/trace profiles on CPUs 8-16. The method row is ported;
+separately tracked child refinements remain open.

@@ -82,46 +82,34 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 	if err = m.traceUniModGCDPolynomials(3770, "univ_modular_gcd\nu: ", u, v); err != nil {
 		return err
 	}
-	if polynomialSourceDebug {
-		field, e := c.modular.Modular()
-		if e != nil {
-			return e
+	if e := polynomialUniModGCDSourceAssert(3771, "!m().modular()", func() (bool, error) {
+		field, x := c.modular.Modular()
+		return !field, x
+	}); e != nil {
+		return e
+	}
+	if e := polynomialUniModGCDSourceAssert(3772, "is_univariate(u)", func() (bool, error) { return c.IsUnivariate(u) }); e != nil {
+		return e
+	}
+	if e := polynomialUniModGCDSourceAssert(3773, "!is_const(u) && !is_const(v)", func() (bool, error) {
+		constant, x := c.IsConstant(u)
+		if x != nil || constant {
+			return false, x
 		}
-		if field {
-			return ErrPolynomialAssertion
+		constant, x = c.IsConstant(v)
+		return !constant, x
+	}); e != nil {
+		return e
+	}
+	if e := polynomialUniModGCDSourceAssert(3774, "max_var(u) == max_var(v)", func() (bool, error) {
+		ux, xerr := c.MaxVariable(u)
+		if xerr != nil {
+			return false, xerr
 		}
-		one, e := c.IsUnivariate(u)
-		if e != nil {
-			return e
-		}
-		if !one {
-			return ErrPolynomialAssertion
-		}
-		constant, e := c.IsConstant(u)
-		if e != nil {
-			return e
-		}
-		if constant {
-			return ErrPolynomialAssertion
-		}
-		constant, e = c.IsConstant(v)
-		if e != nil {
-			return e
-		}
-		if constant {
-			return ErrPolynomialAssertion
-		}
-		ux, e := c.MaxVariable(u)
-		if e != nil {
-			return e
-		}
-		vx, e := c.MaxVariable(v)
-		if e != nil {
-			return e
-		}
-		if ux != vx {
-			return ErrPolynomialAssertion
-		}
+		vx, xerr := c.MaxVariable(v)
+		return ux == vx, xerr
+	}); e != nil {
+		return e
 	}
 	x, e := c.MaxVariable(u)
 	if e != nil {

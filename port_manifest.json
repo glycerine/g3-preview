@@ -45175,10 +45175,11 @@
           ]
         },
         {
-          "name": "uni_mod_gcd cpp3769-3865: integer primitive/content reconstruction, real prime iteration and scoped Zp restoration",
-          "status": "partial",
+          "name": "Complete uni_mod_gcd cpp3769-3865: runtime assertion actions, integer content/primitive reconstruction, real prime iteration, scoped Zp restoration, CRA validation and PRS fallback",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_univariate_modular.go",
           "tests": [
+            "TestPolynomialUniModGCDSourceAssertionActions",
             "TestPolynomialGCDDefaultIntegerIndependentCommonFactors",
             "TestPolynomialGCDDefaultIntegerEveryReservationPrefix",
             "TestPolynomialGCDDefaultIntegerCRAReconstruction",
