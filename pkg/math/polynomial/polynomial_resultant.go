@@ -183,8 +183,10 @@ func (m *MultivariatePolynomialManager) resultantWithReceipt(p, q Polynomial, x 
 		if e != nil {
 			return e
 		}
-		if polynomialSourceDebug && degA < degB {
-			return ErrPolynomialAssertion
+		if e = polynomialResultantSourceAssert(5427, "degA >= degB", func() (bool, error) {
+			return degA >= degB, nil
+		}); e != nil {
+			return e
 		}
 		delta := degA - degB
 		if degA%2 == 1 && degB%2 == 1 {

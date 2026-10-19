@@ -45267,8 +45267,8 @@
           ]
         },
         {
-          "name": "Resultant cpp5358-5480: zero/constant/degree guards, ICCP factors, literal subresultant recurrence and degree/sign restoration",
-          "status": "partial",
+          "name": "Complete Resultant cpp5358-5480: zero/constant/degree guards, ICCP factors, literal subresultant recurrence, degree/sign restoration and source assertion action",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_resultant.go",
           "tests": [
             "TestPolynomialResultantIndependentLinearAndQuadraticIdentity",
@@ -45277,7 +45277,8 @@
             "TestPolynomialResultantEveryReservationPrefix",
             "TestPolynomialResultantBigNumeralEveryReservationPrefix",
             "TestPolynomialResultantAllEightOriginalPSCAssertions",
-            "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals"
+            "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals",
+            "TestPolynomialResultantSourceAssertionActions"
           ]
         },
         {
