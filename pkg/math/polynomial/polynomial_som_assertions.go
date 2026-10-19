@@ -57,3 +57,20 @@ func (b *polynomialSOM) assertUniqueMonomial(term Monomial, line int32) error {
 		return true, nil
 	})
 }
+
+func (b *polynomialSOM) assertCompactionMonomial(i uint32, term Monomial) error {
+	return polynomialSOMPredicateSourceAssert(1910, "m_tmp_ms[j] != m", func() (bool, error) {
+		old, e := b.ms.monomial(b.owner, i)
+		return old != term, e
+	})
+}
+
+func (b *polynomialSOM) assertDiscardedCoefficientZero(i uint32) error {
+	return polynomialSOMPredicateSourceAssert(1919, "mng.is_zero(m_tmp_as[i])", func() (bool, error) {
+		a, e := b.as.coefficient(b.owner, i)
+		if e != nil {
+			return false, e
+		}
+		return b.owner.modular.IsZero(&a)
+	})
+}

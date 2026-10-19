@@ -44659,6 +44659,7 @@
             "TestPolynomialSOMNormalizePositiveGCDAssertionActions",
             "TestPolynomialSOMRemoveZerosSizeAssertionActions",
             "TestPolynomialSOMRemoveZerosDuplicateAssertionActions",
+            "TestPolynomialSOMDisabledCompactionAssertionsSkipSlotReads",
             "TestPolynomialSOMDisplaySizeAssertionActions"
           ]
         },

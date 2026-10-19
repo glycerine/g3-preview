@@ -10,6 +10,30 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
+func TestPolynomialSOMDisabledCompactionAssertionsSkipSlotReads(t *testing.T) {
+	for _, enabled := range []bool{false, true} {
+		t.Run(fmt.Sprint(enabled), func(t *testing.T) {
+			m := polynomialCellFixture(t)
+			polynomialThrowAssertionFixture(t)
+			if polynomialSourceDebug {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(enabled))
+			}
+			for _, e := range []error{
+				m.som.assertCompactionMonomial(17, m.monomials.unit),
+				m.som.assertDiscardedCoefficientZero(17),
+			} {
+				if polynomialSourceDebug && enabled {
+					if e == nil {
+						t.Fatal("enabled assertion omitted unreadable slot")
+					}
+				} else {
+					serviceMust(t, e)
+				}
+			}
+		})
+	}
+}
+
 func TestPolynomialCheapAppendDuplicateAssertionActions(t *testing.T) {
 	for _, mode := range []string{"copy", "take", "multiply"} {
 		for _, action := range []string{"T", "C", "disabled"} {

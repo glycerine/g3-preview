@@ -735,14 +735,8 @@ func (b *polynomialSOM) removeZeros(normalize bool) error {
 			b.removeSuffix = i + 1
 		} else {
 			if i != j {
-				if polynomialSourceDebug {
-					old, e := b.ms.monomial(m, j)
-					if e != nil {
-						return e
-					}
-					if e = polynomialSOMSourceAssert(1910, "m_tmp_ms[j] != m", old != term); e != nil {
-						return e
-					}
+				if e := b.assertCompactionMonomial(j, term); e != nil {
+					return e
 				}
 				if e = b.ms.putMonomial(m, j, term); e != nil {
 					return e
@@ -782,15 +776,7 @@ func (b *polynomialSOM) removeZeros(normalize bool) error {
 	}
 	if polynomialSourceDebug {
 		for i := j; i < n; i++ {
-			a, e := b.as.coefficient(m, i)
-			if e != nil {
-				return e
-			}
-			zero, e := m.modular.IsZero(&a)
-			if e != nil {
-				return e
-			}
-			if e = polynomialSOMSourceAssert(1919, "mng.is_zero(m_tmp_as[i])", zero); e != nil {
+			if e := b.assertDiscardedCoefficientZero(i); e != nil {
 				return e
 			}
 		}
