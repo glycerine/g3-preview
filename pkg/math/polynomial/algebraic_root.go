@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	coefficientNormalization                                   upolyDefaultNormalizeReceipt
 	univariateIsolationRunning                                 bool
 	univariateIsolationOutput                                  *AlgebraicVector
 	rootTrace                                                  algebraicRootTraceScope
@@ -200,6 +201,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m.coefficientNormalizationPending() {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.rootTrace.running || m.rootTracePending()) {
 		return ErrAlgebraicPending
 	}
@@ -254,6 +258,9 @@ func (m *AlgebraicRootCore) check() error {
 		return arena.ErrClosed
 	}
 	return m.config.Rationals.CheckOwnerReady()
+}
+func (m *AlgebraicRootCore) coefficientNormalizationPending() bool {
+	return m != nil && m.self == m && m.config.Polynomials != nil && m.config.Polynomials.defaultNormalizationReceiptPending(&m.coefficientNormalization)
 }
 func (m *AlgebraicRootCore) location(a *Algebraic) (*algebraicLocation, error) {
 	if e := m.check(); e != nil {
@@ -767,7 +774,7 @@ func (m *AlgebraicRootCore) normalizeCoefficients(l *algebraicLocation, r *algeb
 	if e != nil {
 		return e
 	}
-	if e = m.config.Polynomials.NormalizeView(v); e != nil {
+	if e = m.config.Polynomials.normalizeViewWithReceipt(v, &m.coefficientNormalization); e != nil {
 		return e
 	}
 	if r.size == 0 {
@@ -1079,6 +1086,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return ErrAlgebraicOwner
 	}
 	if e := m.cleanupRootTrace(); e != nil {
+		return e
+	}
+	if e := m.config.Polynomials.cleanupDefaultNormalizationReceipt(&m.coefficientNormalization); e != nil {
 		return e
 	}
 	for _, r := range []*upolyRefinableInvocationReceipt{&m.isolateRefinable, &m.isolationConversion.refinable, &m.rootConstruction.conversion.refinable, &m.binary.refinable} {

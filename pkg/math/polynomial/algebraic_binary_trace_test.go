@@ -13,12 +13,26 @@ import (
 )
 
 func TestAlgebraicBinaryNamedTraceEveryReservationPrefix(t *testing.T) {
+	algebraicBinaryNamedTraceReservations(t, false)
+}
+
+func TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix(t *testing.T) {
+	algebraicBinaryNamedTraceReservations(t, true)
+}
+
+func algebraicBinaryNamedTraceReservations(t *testing.T, big bool) {
+	t.Helper()
 	succeeded, refused := false, false
-	for prefix := int64(0); prefix < 4096 && !succeeded; prefix++ {
+	intervalRAWUnwind, normalizationRAWUnwind := false, false
+	for prefix := int64(0); prefix < 8192 && !succeeded; prefix++ {
 		if !t.Run(strconv.FormatInt(prefix, 10), func(t *testing.T) {
 			c, up, _ := algebraicCompareFixtureProfile(t, true)
 			c.factor = false
 			a, b := algebraicResultantInputs(t, c, up)
+			if big {
+				serviceMust(t, c.Del(&a))
+				a = algebraicLargeDyadicPromotionRoot(t, c)
+			}
 			var out Algebraic
 			tags := diagnostic.NewTraceTagsWithWriter(io.Discard)
 			tags.Enable("anum_mk_binary")
@@ -29,7 +43,11 @@ func TestAlgebraicBinaryNamedTraceEveryReservationPrefix(t *testing.T) {
 			budget.FailAfter(-1)
 			if body == nil {
 				succeeded = true
-				algebraicExpectBetween(t, c, &out, 3, 4)
+				if big {
+					algebraicExpectBetween(t, c, &out, 2, 3)
+				} else {
+					algebraicExpectBetween(t, c, &out, 3, 4)
+				}
 			} else {
 				refused = true
 				if !numericPhysicalReservationRefusal(body) {
@@ -37,8 +55,24 @@ func TestAlgebraicBinaryNamedTraceEveryReservationPrefix(t *testing.T) {
 				}
 			}
 			serviceMust(t, c.config.Rationals.BindTrace(nil))
+			intervalRAW := c.config.Intervals.DebugInvocationPending(&c.binary.intervalDebug) && c.config.Intervals.DebugInvocationSourceCause(&c.binary.intervalDebug) == nil
+			normalizationRAW := c.coefficientNormalizationPending() && up.defaultNormalization.sourceCause == nil
+			if intervalRAW || normalizationRAW {
+				intervalRAWUnwind = intervalRAWUnwind || intervalRAW
+				normalizationRAWUnwind = normalizationRAWUnwind || normalizationRAW
+				if c.binary.sourceStop != nil || c.binary.intervalConstructed || c.binary.saved[0].owned || c.binary.saved[1].owned || c.binary.p.slot != 0 || c.binary.f.slot != 0 || c.binary.factors != nil {
+					t.Fatal("completed child source destructors did not permit older binary unwind", body, c.binary.sourceStop)
+				}
+				if normalizationRAW {
+					if e := c.Neg(&a); !errors.Is(e, ErrAlgebraicPending) {
+						t.Fatal("pending normalization accepted a new caller operation", e)
+					}
+				}
+			}
 			serviceMust(t, c.config.Rationals.Integers().CleanupPendingAllocation())
-			serviceMust(t, c.CleanupRetained())
+			if e := c.CleanupRetained(); e != nil {
+				t.Fatalf("owning cleanup: %v; operation: %v", e, body)
+			}
 			if c.binary.active || c.binary.traceRootPending || c.rootDisplay.active || c.rootTracePending() {
 				t.Fatal("binary diagnostic child or locals survived owning cleanup")
 			}
@@ -51,6 +85,9 @@ func TestAlgebraicBinaryNamedTraceEveryReservationPrefix(t *testing.T) {
 	}
 	if !succeeded || !refused {
 		t.Fatal("binary diagnostic reservation frontier did not reach refusal and success", succeeded, refused)
+	}
+	if big && (!normalizationRAWUnwind || polynomialSourceDebug && !intervalRAWUnwind) {
+		t.Fatal("multiword sweep did not reach completed source destruction with unjoined RAW", intervalRAWUnwind, normalizationRAWUnwind)
 	}
 }
 

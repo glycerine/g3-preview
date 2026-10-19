@@ -58,6 +58,10 @@ func (m *BinaryRationalManager) debugInteger(a *Int) (out OwnedRational, err err
 	if e := m.open(); e != nil {
 		return OwnedRational{}, e
 	}
+	if m.debugIntegerInvocation == ^uint64(0) {
+		return OwnedRational{}, ErrBinaryDebugIntegerPending
+	}
+	m.debugIntegerInvocation++
 	s := m.Diagnostics
 	m.debugIntegerValue = OwnedRational{}
 	m.debugIntegerPending = true
@@ -130,6 +134,10 @@ func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *Binary
 		}
 	}()
 	var want OwnedRational
+	if m.debugArithmeticInvocation == ^uint64(0) {
+		return ErrBinaryDebugSnapshotPending
+	}
+	m.debugArithmeticInvocation++
 	m.debugArithmeticCall = RationalServiceInvocation{}
 	m.debugArithmeticPending = true
 	m.debugArithmeticExecuting = true

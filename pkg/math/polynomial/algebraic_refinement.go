@@ -34,15 +34,30 @@ type algebraicPredicateScope struct {
 }
 
 func (m *AlgebraicRootCore) magnitude(l, u *unumeral.BinaryRational) (int32, error) {
+	return m.magnitudeWithCleanup(l, u, false)
+}
+func (m *AlgebraicRootCore) magnitudeForCleanup(l, u *unumeral.BinaryRational) (int32, error) {
+	return m.magnitudeWithCleanup(l, u, true)
+}
+func (m *AlgebraicRootCore) magnitudeWithCleanup(l, u *unumeral.BinaryRational, cleanup bool) (int32, error) {
 	b := m.config.Binary
 	z := m.config.Rationals.Integers()
-	if e := m.magnitudeSignAssert(l, u); e != nil {
+	if e := m.magnitudeSignAssertWithCleanup(l, u, cleanup); e != nil {
 		return 0, e
 	}
 	if l.K() == u.K() {
+		if cleanup {
+			return b.MagnitudeUpperForCleanup(l)
+		}
 		return b.MagnitudeUpper(l)
 	}
-	positive, e := b.IsNonNeg(l)
+	var positive bool
+	var e error
+	if cleanup {
+		positive, e = b.IsNonNegForCleanup(l)
+	} else {
+		positive, e = b.IsNonNeg(l)
+	}
 	if e != nil {
 		return 0, e
 	}

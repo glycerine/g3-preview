@@ -376,7 +376,7 @@ func (m *AlgebraicRootCore) mkRootWithConstruction(v UPolynomialView, index uint
 
 // CleanupIsolation retries only explicitly retained source lexical/vector roots.
 func (m *AlgebraicRootCore) CleanupIsolation() error {
-	if m != nil && m.self == m && (m.comparisonTraceRunning || m.rootTrace.running || m.rootTracePending() || m.rootDisplay.active || m.univariateIsolationRunning) {
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.rootTrace.running || m.rootTracePending() || m.rootDisplay.active || m.coefficientNormalizationPending() || m.univariateIsolationRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.manager != nil && (m.manager.constructing || m.manager.finishing) {

@@ -16,6 +16,7 @@ type algebraicSavedInterval struct {
 	owned, constructed, restored bool
 }
 type algebraicBinaryScope struct {
+	intervalDebug                        unumeral.BinaryIntervalDebugInvocationReceipt
 	traceRootPending                     bool
 	traceRootStop                        error
 	refinable                            upolyRefinableInvocationReceipt
@@ -112,7 +113,7 @@ func (m *AlgebraicRootCore) dispatchBinary(a, b, out *Algebraic, kind uint8) err
 
 func (m *AlgebraicRootCore) restoreBinaryInterval(saved *algebraicSavedInterval) error {
 	saved.restored = true
-	l, e := m.location(saved.target)
+	l, e := m.locationCleanup(saved.target)
 	if e != nil || l == nil || l.kind == 0 {
 		return e
 	}
@@ -120,20 +121,32 @@ func (m *AlgebraicRootCore) restoreBinaryInterval(saved *algebraicSavedInterval)
 	if e != nil {
 		return e
 	}
-	magnitude, e := m.magnitude(r.interval.BorrowLower(), r.interval.BorrowUpper())
+	magnitude, e := m.magnitudeForCleanup(r.interval.BorrowLower(), r.interval.BorrowUpper())
 	if e != nil {
 		return e
 	}
 	if magnitude >= m.minMagnitude {
 		return nil
 	}
-	e = m.config.Intervals.Swap(&r.interval, &saved.value)
+	e = m.config.Intervals.SwapForCleanup(&r.interval, &saved.value)
 	return m.save(l, &r, e)
 }
 
 func (m *AlgebraicRootCore) finishBinaryLocals() error {
 	s := &m.binary
 	p := m.config.Polynomials
+	if p.defaultNormalizationReceiptPending(&m.coefficientNormalization) {
+		if e := p.defaultNormalization.sourceCause; e != nil {
+			return e
+		}
+		p.defaultNormalization.parentSourceExecuting = true
+		defer func() { p.defaultNormalization.parentSourceExecuting = false }()
+	}
+	if m.config.Intervals.DebugInvocationPending(&s.intervalDebug) {
+		if e := m.config.Intervals.DebugInvocationSourceCause(&s.intervalDebug); e != nil {
+			return e
+		}
+	}
 	if s.traceRootPending && s.traceRootStop != nil {
 		return s.traceRootStop
 	}
@@ -213,6 +226,9 @@ func (m *AlgebraicRootCore) cleanupBinary() error {
 	}
 	s.cleaning = true
 	defer func() { s.cleaning = false }()
+	if e := m.config.Intervals.CleanupDebugInvocation(&s.intervalDebug); e != nil {
+		return e
+	}
 	if s.traceRootPending {
 		if e := m.cleanupRootDisplay(); e != nil {
 			return e
@@ -394,11 +410,11 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 		s.executing = true
 		switch kind {
 		case 0:
-			e = im.Add(&ra.interval, &rb.interval, &s.interval)
+			e = im.AddWithDebugReceipt(&ra.interval, &rb.interval, &s.interval, &s.intervalDebug)
 		case 1:
-			e = im.Sub(&ra.interval, &rb.interval, &s.interval)
+			e = im.SubWithDebugReceipt(&ra.interval, &rb.interval, &s.interval, &s.intervalDebug)
 		case 2:
-			e = im.Mul(&ra.interval, &rb.interval, &s.interval)
+			e = im.MulWithDebugReceipt(&ra.interval, &rb.interval, &s.interval, &s.intervalDebug)
 		}
 		s.executing = false
 		if e != nil {

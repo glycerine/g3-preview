@@ -17,6 +17,11 @@ func NewBinaryInterval() BinaryInterval { return BinaryInterval{} }
 // BinaryIntervalManager borrows bounds; all values/scopes must die before
 // Close, and Close must precede closing bounds. Owner-confined, not concurrent.
 type BinaryIntervalManager struct {
+	debugInvocation         uint64
+	debugExecuting          bool
+	debugPending            bool
+	debugSourceCause        error
+	debugChildren           binaryIntervalDebugChildren
 	bounds                  *BinaryRationalManager
 	self                    *BinaryIntervalManager
 	MulCurr, MulMax, MulMin BinaryRational

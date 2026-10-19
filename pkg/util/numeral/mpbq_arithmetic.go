@@ -531,6 +531,9 @@ func (m *BinaryRationalManager) MagnitudeUpper(a *BinaryRational) (int32, error)
 	if e := m.check(a); e != nil {
 		return 0, e
 	}
+	return m.magnitudeUpper(a)
+}
+func (m *BinaryRationalManager) magnitudeUpper(a *BinaryRational) (int32, error) {
 	if a.Num.Val == 0 {
 		return 0, nil
 	}

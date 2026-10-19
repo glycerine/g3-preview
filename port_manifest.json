@@ -38525,7 +38525,8 @@
         "TestAlgebraicDefiningNegationPreservesOlderNumericAllocation",
         "TestAlgebraicBinaryBoundCopyActualReservationAndExponentPublication",
         "TestAlgebraicPrecisionBasicBoundCopyActualRetention",
-        "TestAlgebraicInverseConversionEntryActualSourceStop"
+        "TestAlgebraicInverseConversionEntryActualSourceStop",
+        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix"
       ],
       "conditionals": [
         {
@@ -39105,7 +39106,8 @@
             "TestAlgebraicBinaryIntervalTraceBeforeCandidateSelection",
             "TestAlgebraicBinaryNamedTraceSourceFrontiers",
             "TestAlgebraicBinaryNamedTraceActualDisplayStops",
-            "TestAlgebraicBinaryNamedTraceEveryReservationPrefix"
+            "TestAlgebraicBinaryNamedTraceEveryReservationPrefix",
+            "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix"
           ]
         },
         {
@@ -51432,7 +51434,8 @@
         "pkg/util/numeral/mpbq_display_source.go",
         "pkg/util/numeral/mpbq_display_source_test.go",
         "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
-        "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go"
+        "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go",
+        "pkg/math/polynomial/algebraic_binary_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51800,7 +51803,8 @@
         "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
         "TestUPolynomialConvertBoundsActualReadStops",
         "TestAlgebraicInverseBoundsTraceActualSourceStop",
-        "TestUPolynomialPublicGCDAllPrimeFallbackUsesDefaultNormalization"
+        "TestUPolynomialPublicGCDAllPrimeFallbackUsesDefaultNormalization",
+        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix"
       ],
       "conditionals": [
         {
@@ -127977,7 +127981,10 @@
         "pkg/util/numeral/mpbqi.go",
         "pkg/util/numeral/mpbqi_format.go",
         "pkg/util/numeral/scoped_binary_interval.go",
-        "pkg/util/numeral/mpbqi_stream_test.go"
+        "pkg/util/numeral/mpbqi_stream_test.go",
+        "pkg/util/numeral/mpbqi_debug_invocation.go",
+        "pkg/util/numeral/mpbqi_debug_invocation_test.go",
+        "pkg/math/polynomial/algebraic_binary_trace_test.go"
       ],
       "tests": [
         "TestBinaryIntervalQueriesAndScalarRoutes",
@@ -127990,7 +127997,9 @@
         "TestBinaryIntervalPredicateShortCircuits",
         "TestBinaryIntervalOwnerAndScope",
         "TestBinaryIntervalRetainedProductsAndDeepCopies",
-        "TestBinaryIntervalSourceStreamOrderAndRefusalPrefixes"
+        "TestBinaryIntervalSourceStreamOrderAndRefusalPrefixes",
+        "TestBinaryIntervalDebugReceiptActualRAWAndCleanupReads",
+        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix"
       ],
       "conditionals": [
         {
@@ -162451,7 +162460,10 @@
         "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
         "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go",
         "pkg/util/numeral/mpbq_refine_invocation.go",
-        "pkg/util/numeral/mpbq_convert_invocation.go"
+        "pkg/util/numeral/mpbq_convert_invocation.go",
+        "pkg/util/numeral/mpbq_cleanup_observe.go",
+        "pkg/util/numeral/mpbqi_debug_invocation_test.go",
+        "pkg/math/polynomial/algebraic_binary_trace_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -162494,7 +162506,9 @@
         "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
         "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
         "TestUPolynomialConvertBoundsActualReadStops",
-        "TestAlgebraicInverseBoundsTraceActualSourceStop"
+        "TestAlgebraicInverseBoundsTraceActualSourceStop",
+        "TestBinaryIntervalDebugReceiptActualRAWAndCleanupReads",
+        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix"
       ],
       "conditionals": [
         {
@@ -163507,7 +163521,11 @@
         "pkg/util/numeral/mpbqi_format.go",
         "pkg/util/numeral/scoped_binary_interval.go",
         "pkg/util/numeral/mpbqi_stream_test.go",
-        "pkg/math/polynomial/algebraic_display_interval_test.go"
+        "pkg/math/polynomial/algebraic_display_interval_test.go",
+        "pkg/util/numeral/mpbqi_debug_invocation.go",
+        "pkg/util/numeral/mpbqi_debug_invocation_test.go",
+        "pkg/util/numeral/mpbq_cleanup_observe.go",
+        "pkg/math/polynomial/algebraic_binary_trace_test.go"
       ],
       "tests": [
         "TestBinaryIntervalQueriesAndScalarRoutes",
@@ -163521,7 +163539,9 @@
         "TestBinaryIntervalOwnerAndScope",
         "TestBinaryIntervalRetainedProductsAndDeepCopies",
         "TestBinaryIntervalSourceStreamOrderAndRefusalPrefixes",
-        "TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes"
+        "TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes",
+        "TestBinaryIntervalDebugReceiptActualRAWAndCleanupReads",
+        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix"
       ],
       "conditionals": [
         {

@@ -182,7 +182,7 @@ func (m *UPolynomialManager) check() error {
 	if m != nil && m.self == m && m.refinable.active && (!m.refinable.executing || m.refinable.borrow.callback()) && !m.refinable.sourceReadAllowed() {
 		return ErrUPolynomialCleanupPending
 	}
-	if m != nil && m.self == m && m.defaultNormalization.active && (!m.defaultNormalization.executing || m.defaultNormalization.borrow.callback()) && !m.defaultNormalization.sourceExecuting {
+	if m != nil && m.self == m && m.defaultNormalization.active && (!m.defaultNormalization.executing || m.defaultNormalization.borrow.callback()) && !m.defaultNormalization.sourceReadAllowed() {
 		return ErrUPolynomialCleanupPending
 	}
 	if m != nil && m.pendingFactorScalarTrace != nil && m.pendingFactorScalarTrace.scalarTracePending() && !m.pendingFactorScalarTrace.scalarTraceSourceReadAllowed() {

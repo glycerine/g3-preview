@@ -329,6 +329,10 @@ func (m *BinaryRationalManager) ToOwnedRational(s *RationalService, a *BinaryRat
 	if s == nil {
 		return OwnedRational{}, ErrBinaryOwner
 	}
+	if m.toOwnedInvocation == ^uint64(0) {
+		return OwnedRational{}, ErrBinaryOwnedRationalPending
+	}
+	m.toOwnedInvocation++
 	scope := &m.toOwnedRationalScope
 	*scope = binaryOwnedRationalScope{service: s, pending: true, executing: true}
 	stopped := false

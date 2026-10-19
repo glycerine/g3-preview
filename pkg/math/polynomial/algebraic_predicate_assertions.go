@@ -68,15 +68,28 @@ func (m *AlgebraicRootCore) predicateUpperAssert(upper *unumeral.BinaryRational,
 
 // Source cpp704: preserve the || operand boundary and debugger action.
 func (m *AlgebraicRootCore) magnitudeSignAssert(lower, upper *unumeral.BinaryRational) error {
+	return m.magnitudeSignAssertWithCleanup(lower, upper, false)
+}
+func (m *AlgebraicRootCore) magnitudeSignAssertWithCleanup(lower, upper *unumeral.BinaryRational, cleanup bool) error {
 	enabled, e := predicateAssertionsEnabled()
 	if e != nil || !enabled {
 		return e
 	}
-	nonnegative, e := m.config.Binary.IsNonNeg(lower)
+	var nonnegative bool
+	if cleanup {
+		nonnegative, e = m.config.Binary.IsNonNegForCleanup(lower)
+	} else {
+		nonnegative, e = m.config.Binary.IsNonNeg(lower)
+	}
 	if e != nil || nonnegative {
 		return e
 	}
-	nonpositive, e := m.config.Binary.IsNonPos(upper)
+	var nonpositive bool
+	if cleanup {
+		nonpositive, e = m.config.Binary.IsNonPosForCleanup(upper)
+	} else {
+		nonpositive, e = m.config.Binary.IsNonPos(upper)
+	}
 	if e != nil || nonpositive {
 		return e
 	}

@@ -10,6 +10,7 @@ import (
 // Actual default-call locals, retained only while their source or numerical
 // children are incomplete. Direct coefficient calls do not construct a GCD.
 type upolyDefaultNormalizeScope struct {
+	parentSourceExecuting                      bool
 	ownCoefficientRemaining                    uint8
 	ownG                                       bool
 	owner                                      *UPolynomialManager
@@ -26,6 +27,10 @@ type upolyDefaultNormalizeScope struct {
 	hooks                                      unumeral.NumericInvocationHooks
 	borrow                                     upolyFactorTraceBorrow
 	bodyCause, sourceCause                     error
+}
+
+func (q *upolyDefaultNormalizeScope) sourceReadAllowed() bool {
+	return q.valid() && (q.sourceExecuting || q.parentSourceExecuting) && q.owner.callbackDepth == 0 && !q.owner.config.Integer.RuntimeOwner().FailureTransportActive() && !q.owner.modular.BorrowTraceTags().OutputCallbackActive()
 }
 
 func (q *upolyDefaultNormalizeScope) valid() bool {

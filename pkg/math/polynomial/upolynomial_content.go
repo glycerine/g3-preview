@@ -303,10 +303,13 @@ func (m *UPolynomialManager) normalizeCoefficientWithSourceContext(v UPolynomial
 	return nil
 }
 func (m *UPolynomialManager) NormalizeView(v UPolynomialView) error {
+	return m.normalizeViewWithReceipt(v, nil)
+}
+func (m *UPolynomialManager) normalizeViewWithReceipt(v UPolynomialView, receipt *upolyDefaultNormalizeReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	return m.normalize(v)
+	return m.normalizeDefaultViewWithReceipt(v, receipt)
 }
 func (m *UPolynomialManager) Normalize(p UPolynomial) error {
 	v, e := m.wholeView(p)
