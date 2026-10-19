@@ -128646,8 +128646,8 @@
           ]
         },
         {
-          "name": "Native typed polynomial ICCP counters/degree list and GCD power/variable slices; source arithmetic and owned element lifetimes retained",
-          "status": "partial",
+          "name": "Complete native typed polynomial ICCP counters/degree list and GCD power/variable slices with source arithmetic and owned element lifetimes",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_iccp.go",
           "tests": [
             "TestPolynomialICCPNativeHighDegreeFilters",
@@ -128655,8 +128655,8 @@
           ]
         },
         {
-          "name": "Native typed polynomial ICCP counters/degree list and GCD power/variable slices; source arithmetic and owned element lifetimes retained",
-          "status": "partial",
+          "name": "Complete native typed polynomial ICCP counters/degree list and GCD power/variable slices with source arithmetic and owned element lifetimes",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_power_buffer.go",
           "tests": [
             "TestPolynomialGCDPowerSortIndependentUnsignedPairs",
@@ -178937,8 +178937,8 @@
           ]
         },
         {
-          "name": "Concrete source result-reference move/temporary, exact INC before old DEC and matched source/owning cleanup",
-          "status": "partial",
+          "name": "Complete source result-reference move/temporary, exact INC before old DEC and matched source/owning cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_prs.go",
           "tests": [
             "TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment",
@@ -197347,8 +197347,8 @@
           ]
         },
         {
-          "name": "Reached zero-range pointer resize using existing expansion and source size/default-null publication (vector.h:422-433)",
-          "status": "partial",
+          "name": "Complete reached zero-range pointer resize using existing expansion and source size/default-null publication (vector.h:422-433)",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_ref_vector_set.go",
           "tests": [
             "TestPolynomialSubresultantChainResetCallbackBeforeLocalConstructorsRefusesOwnerClose",
