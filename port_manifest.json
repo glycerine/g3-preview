@@ -53285,7 +53285,7 @@
         },
         {
           "name": "DRS and Sturm root isolation, square-free dispatch, refinable/precision intervals and rational-to-binary conversion",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_isolation_source_test.go",
           "tests": [
             "TestUPolynomialIsolationRegisteredTwentyFourDatasets",
@@ -53308,7 +53308,7 @@
         },
         {
           "name": "binary output vectors and packed DRS/owning Sturm frame storage",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
           "tests": [
             "TestUPolynomialIsolationPackedFrameFields",
@@ -53318,7 +53318,7 @@
         },
         {
           "name": "Related polynomial cores share physical coefficient buffers; constructor refusal, lifetime and source EGCD view provenance",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_coefficient_store_lifetime_test.go",
           "tests": [
             "TestUPolynomialStoreRelatedConstructorFailureUnwinds",
@@ -53333,7 +53333,7 @@
         },
         {
           "name": "Charged concrete shared coefficient store, retain bound and cold layout",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_coefficient_store.go",
           "tests": [
             "TestUPolynomialCoefficientStoreCounterAndColdLayout"
@@ -53341,7 +53341,7 @@
         },
         {
           "name": "Independent coefficient-store buffer adoption and inherited related-core bindings (same actual IntegerManager)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_coefficient_store_adoption_test.go",
           "tests": [
             "TestUPolynomialStoreIndependentAdoptionTransferAndOldPhysicalViews",
@@ -54422,7 +54422,7 @@
         },
         {
           "name": "DRS and Sturm root isolation, square-free dispatch, refinable/precision intervals and rational-to-binary conversion",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_isolation_source_test.go",
           "tests": [
             "TestUPolynomialIsolationRegisteredTwentyFourDatasets",
@@ -54445,7 +54445,7 @@
         },
         {
           "name": "binary output vectors and packed DRS/owning Sturm frame storage",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
           "tests": [
             "TestUPolynomialIsolationPackedFrameFields",
@@ -54455,7 +54455,7 @@
         },
         {
           "name": "Related polynomial cores share physical coefficient buffers; constructor refusal, lifetime and source EGCD view provenance",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_coefficient_store_lifetime_test.go",
           "tests": [
             "TestUPolynomialStoreRelatedConstructorFailureUnwinds",
@@ -54470,7 +54470,7 @@
         },
         {
           "name": "Charged concrete shared coefficient store, retain bound and cold layout",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_coefficient_store.go",
           "tests": [
             "TestUPolynomialCoefficientStoreCounterAndColdLayout"
@@ -54478,7 +54478,7 @@
         },
         {
           "name": "Independent coefficient-store buffer adoption and inherited related-core bindings (same actual IntegerManager)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_coefficient_store_adoption_test.go",
           "tests": [
             "TestUPolynomialStoreIndependentAdoptionTransferAndOldPhysicalViews",
