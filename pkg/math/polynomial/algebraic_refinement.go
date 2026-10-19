@@ -173,6 +173,9 @@ func (m *AlgebraicRootCore) restoreSaved() error {
 	if l == nil || l.kind == 0 {
 		return nil
 	}
+	if e = algebraicQueryTagAssertionSwitch(); e != nil {
+		return e
+	}
 	r, e := m.load(l)
 	if e != nil {
 		return e

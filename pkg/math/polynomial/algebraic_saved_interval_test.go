@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -127,4 +129,94 @@ func TestAlgebraicSavedIntervalCompletedSourceDestructor(t *testing.T) {
 	}
 	serviceMust(t, c.finishSavedInterval(&saved, true))
 	serviceMust(t, c.Del(&a))
+}
+
+// A completed save_intervals holds a reference to the caller's numeral. The
+// numeral may change before restoration; an allocated object prefix below has
+// no completed algebraic-cell constructor and proves accessor read order only.
+func TestAlgebraicSavedIntervalRestoreAccessorBeforeMemberRead(t *testing.T) {
+	if !polynomialSourceDebug {
+		t.Skip("accessor assertion erased")
+	}
+	c, _, _ := algebraicCompareFixtureProfile(t, true)
+	a := algebraicBigBinaryBoundsRoot(t, c)
+	var saved algebraicSavedInterval
+	serviceMust(t, c.beginSavedInterval(&saved, &a))
+	original := a
+	raw := algebraicQueryRawCell(t, c, 1)
+	a = raw
+	polynomialAssertionActionsFixture(t, "")
+	serviceMust(t, diagnostic.BorrowProcessDebugContext().Close())
+	body := c.restoreBinaryInterval(&saved)
+	a = original
+	restored := saved.restored
+	serviceMust(t, c.finishSavedInterval(&saved, true))
+	serviceMust(t, c.Del(&a))
+	if !errors.Is(body, arena.ErrClosed) || !restored {
+		t.Fatal("restore read members before accessor switch or missed flag publication", body)
+	}
+}
+
+func TestAlgebraicSavedIntervalRestoreSkipsAccessorAfterBasicPromotion(t *testing.T) {
+	c, _, _ := algebraicCompareFixtureProfile(t, true)
+	a := algebraicBigBinaryBoundsRoot(t, c)
+	var saved algebraicSavedInterval
+	serviceMust(t, c.beginSavedInterval(&saved, &a))
+	original := a
+	a = Algebraic{}
+	polynomialAssertionActionsFixture(t, "")
+	if polynomialSourceDebug {
+		serviceMust(t, diagnostic.BorrowProcessDebugContext().Close())
+	}
+	body := c.restoreBinaryInterval(&saved)
+	a = original
+	serviceMust(t, body)
+	if !saved.restored {
+		t.Fatal("basic early return missed restore flag")
+	}
+	serviceMust(t, c.finishSavedInterval(&saved, true))
+	serviceMust(t, c.Del(&a))
+}
+
+func TestAlgebraicSavedIntervalSelectionOwnsPartialConstructorAbort(t *testing.T) {
+	reached := false
+	for prefix := int64(0); prefix < 1024 && !reached; prefix++ {
+		if !t.Run(fmt.Sprint(prefix), func(t *testing.T) {
+			c, _, _ := algebraicCompareFixtureProfile(t, true)
+			c.factor = false
+			a := algebraicBigBinaryBoundsRoot(t, c)
+			b := algebraicBigBinaryBoundsRoot(t, c)
+			z := c.config.Rationals.Integers()
+			var out Algebraic
+			z.Budget().FailAfter(prefix)
+			body := c.Add(&a, &b, &out)
+			z.Budget().FailAfter(-1)
+			for i := range c.binary.saved {
+				saved := &c.binary.saved[i]
+				if saved.owned && !saved.constructed && saved.value.BorrowLower().BorrowNumerator().Val != 0 {
+					reached = true
+					if body == nil || saved.constructed || !saved.owned {
+						t.Fatal("selector lost failed constructor frontier", body)
+					}
+				}
+			}
+			if !reached {
+				// Earlier project operations have independent allocation ownership. This
+				// vector makes no new lifetime claim for their already retained suffixes.
+				serviceMust(t, z.CleanupPendingAllocation())
+			}
+			serviceMust(t, c.CleanupRetained())
+			if c.binary.active {
+				t.Fatal("selector owning abort retained source scope")
+			}
+			serviceMust(t, c.Del(&out))
+			serviceMust(t, c.Del(&b))
+			serviceMust(t, c.Del(&a))
+		}) {
+			return
+		}
+	}
+	if !reached {
+		t.Fatal("selection sweep did not retain a partially copied saved interval")
+	}
 }

@@ -119,6 +119,9 @@ func (m *AlgebraicRootCore) restoreBinaryInterval(saved *algebraicSavedInterval)
 	if e != nil || l == nil || l.kind == 0 {
 		return e
 	}
+	if e = algebraicQueryTagAssertionSwitch(); e != nil {
+		return e
+	}
 	r, e := m.load(l)
 	if e != nil {
 		return e
