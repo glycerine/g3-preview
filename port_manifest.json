@@ -52924,7 +52924,7 @@
         },
         {
           "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial_arithmetic.go",
           "go_targets": [
             "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go",
@@ -52942,7 +52942,7 @@
         },
         {
           "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_ops.go",
@@ -52959,7 +52959,7 @@
         },
         {
           "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_rational_input.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_ops.go",
@@ -54050,7 +54050,7 @@
         },
         {
           "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial_arithmetic.go",
           "go_targets": [
             "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go",
@@ -54068,7 +54068,7 @@
         },
         {
           "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_ops.go",
@@ -54085,7 +54085,7 @@
         },
         {
           "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_rational_input.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_ops.go",
