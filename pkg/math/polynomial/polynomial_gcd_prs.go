@@ -143,18 +143,15 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 	}
 	counter := uint32(0)
 	for {
-		if polynomialSourceDebug {
-			du, e := c.Degree(pu.value, x)
-			if e != nil {
-				return e
+		if e = polynomialGCDPRSSourceAssert(func() (bool, error) {
+			du, xerr := c.Degree(pu.value, x)
+			if xerr != nil {
+				return false, xerr
 			}
-			dv, e := c.Degree(pv.value, x)
-			if e != nil {
-				return e
-			}
-			if du < dv {
-				return ErrPolynomialAssertion
-			}
+			dv, xerr := c.Degree(pv.value, x)
+			return du >= dv, xerr
+		}); e != nil {
+			return e
 		}
 		du, e := c.Degree(pu.value, x)
 		if e != nil {

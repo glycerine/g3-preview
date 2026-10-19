@@ -45135,10 +45135,13 @@
           ]
         },
         {
-          "name": "pp/is_primitive/gcd_content/gcd_prs cpp3536-3636: source returned-reference temporary finishes helper c/i before caller assignment, then temporary destructor",
-          "status": "partial",
+          "name": "Complete retained pp/is_primitive/gcd_content/gcd_prs base bodies cpp3536-3636 with returned-reference lifetime, native PRS loop and runtime assertion actions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_prs.go",
           "tests": [
+            "TestPolynomialGCDPRSInvariantAssertionActions",
+            "TestPolynomialPublicPrimitivePartLiteralContent",
+            "TestPolynomialPrimitivePredicateLiteralCoefficientContent",
             "TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment",
             "TestPolynomialGCDSourceZeroIdentityAndConstantContent",
             "TestPolynomialGCDPRSIndependentFactorTable",
@@ -45333,7 +45336,7 @@
           ]
         },
         {
-          "name": "PrimitivePart/IsPrimitive cpp3536-3549,7212-7214; SquareFree and IsSquareFree general/variable cpp4529-4598,7232-7246",
+          "name": "SquareFree and IsSquareFree general/variable cpp4529-4598,7232-7246; PrimitivePart/IsPrimitive cpp3536-3549,7212-7214 are complete in the separate gcd_prs ledger",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_square_free.go",
           "tests": [
@@ -49330,7 +49333,7 @@
           ]
         },
         {
-          "name": "PrimitivePart/IsPrimitive cpp3536-3549,7212-7214; SquareFree and IsSquareFree general/variable cpp4529-4598,7232-7246",
+          "name": "SquareFree and IsSquareFree general/variable cpp4529-4598,7232-7246; PrimitivePart/IsPrimitive cpp3536-3549,7212-7214 are complete in the separate gcd_prs ledger",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_square_free.go",
           "tests": [

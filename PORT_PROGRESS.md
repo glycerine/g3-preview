@@ -46255,3 +46255,14 @@ foreign receipts. Reservation-prefix and callback fixtures cover constant,
 quick-filter, multi-coefficient, sign, and exact-division paths. The unused
 four-argument `max_var` wrapper at cpp3532-3534 has no retained C++ caller and
 is intentionally omitted. The ICCP body and invoked-child rows are now ported.
+
+Primitive/PRS base completion: retained `pp`, `is_primitive`, `gcd_content`,
+and `gcd_prs` at `polynomial.cpp:3536-3636` preserve the source declaration
+stack, ICCP calls, content GCD, PRS recurrence, zero/constant exits, leading-sign
+normalization, primitive reconstruction, and returned-reference temporary that
+dies after caller assignment. The cpp3589 degree invariant now reads the
+process assertion switch before either degree and honors Throw, Continue, and
+disabled execution. Primitive and PRS-focused tests pass in native, checked,
+debug and combined checked/debug/trace profiles on CPUs 8-16. The base row is
+ported; separately listed GCD arithmetic-child callback refinements remain
+partial, as do the following square-free algorithms.
