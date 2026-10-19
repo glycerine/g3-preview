@@ -45541,8 +45541,8 @@
           ]
         },
         {
-          "name": "src/math/polynomial/polynomial.cpp:2217-2255,2280-2299 addConsumedScalarDivEngine/reset/close: Literal source append/reset preserved; explicit owning exact-cohort retirement and started-phase close resumption.",
-          "status": "partial",
+          "name": "Complete src/math/polynomial/polynomial.cpp:2217-2255,2280-2299 addConsumedScalarDivEngine/reset/close: Literal source append/reset preserved; explicit owning exact-cohort retirement and started-phase close resumption.",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_som.go",
           "tests": [
             "TestPolynomialCheapMatchedRootRowRetirementPreservesForeign",
@@ -45587,8 +45587,8 @@
           ]
         },
         {
-          "name": "src/math/polynomial/polynomial.cpp:2217-2255 cleanupTaggedAppendInvocation: Go owning adaptation: exact tags/remaining phases and foreign-preserving compaction; never literal Reset/destructor credit.",
-          "status": "partial",
+          "name": "Complete src/math/polynomial/polynomial.cpp:2217-2255 cleanupTaggedAppendInvocation: Go owning adaptation: exact tags/remaining phases and foreign-preserving compaction; never literal Reset/destructor credit.",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_som_cohort_tags.go",
           "tests": [
             "TestPolynomialCheapMatchedRootRowRetirementPreservesForeign",
@@ -45664,8 +45664,8 @@
           ]
         },
         {
-          "name": "src/math/polynomial/polynomial.cpp:1885-2156,2217-2300 regular/cheap actual add/addMul/addPolynomial/reset/removeZeros ownership",
-          "status": "partial",
+          "name": "Complete src/math/polynomial/polynomial.cpp:1885-2156,2217-2300 regular/cheap actual add/addMul/addPolynomial/reset/removeZeros ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_som.go",
           "tests": [
             "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
@@ -45691,8 +45691,8 @@
           ]
         },
         {
-          "name": "src/math/polynomial/polynomial.cpp:1885-2156,2217-2300 exact source buffer/frame invocation and mixed-row owning retirement",
-          "status": "partial",
+          "name": "Complete src/math/polynomial/polynomial.cpp:1885-2156,2217-2300 exact source buffer/frame invocation and mixed-row owning retirement",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_arithmetic_invocation.go",
           "tests": [
             "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
@@ -49470,8 +49470,8 @@
           ]
         },
         {
-          "name": "Concrete polynomial_ref_vector specialization for internal subresultant_chain (polynomial.h:109; polynomial.cpp:5499-5572)",
-          "status": "partial",
+          "name": "Reference-only source obligation outside retained consumers; existing Go regression coverage: Concrete polynomial_ref_vector specialization for internal subresultant_chain (polynomial.h:109; polynomial.cpp:5499-5572)",
+          "status": "reference_only",
           "go_target": "pkg/math/polynomial/polynomial_subresultant_chain.go",
           "tests": [
             "TestPolynomialSubresultantChainResetCallbackBeforeLocalConstructorsRefusesOwnerClose",
@@ -124043,8 +124043,8 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Dormant tst_lex source21cases84 adapted monomial comparator conditions (cpp1740\u20131790); source registered driver returns before tst_lex",
-          "status": "partial",
+          "name": "Reference-only source obligation outside retained consumers; existing Go regression coverage: Dormant tst_lex source21cases84 adapted monomial comparator conditions (cpp1740\u20131790); source registered driver returns before tst_lex",
+          "status": "reference_only",
           "go_target": "pkg/math/polynomial/polynomial_monomial_order_test.go",
           "tests": [
             "TestMonomialOrderSourceLexAssertions",
@@ -124060,8 +124060,8 @@
           "tests": []
         },
         {
-          "name": "Dormant monomial manager identity/conversion inputs plus source-body and independent bounded/fault fixtures; registered tst_polynomial runs PSC then returns, no active ENSURE completion credit",
-          "status": "partial",
+          "name": "Reference-only source obligation outside retained consumers; existing Go regression coverage: Dormant monomial manager identity/conversion inputs plus source-body and independent bounded/fault fixtures; registered tst_polynomial runs PSC then returns, no active ENSURE completion credit",
+          "status": "reference_only",
           "go_target": "pkg/math/polynomial/polynomial_monomial_test.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -124108,8 +124108,8 @@
           ]
         },
         {
-          "name": "Dormant cpp1340-1387 twenty rational evaluation expectations and independent domain/read/lifetime/failure tests",
-          "status": "partial",
+          "name": "Reference-only source obligation outside retained consumers; existing Go regression coverage: Dormant cpp1340-1387 twenty rational evaluation expectations and independent domain/read/lifetime/failure tests",
+          "status": "reference_only",
           "go_target": "pkg/math/polynomial/polynomial_evaluation_oracle_test.go",
           "tests": [
             "TestPolynomialEvaluationLiveAliasSource",
