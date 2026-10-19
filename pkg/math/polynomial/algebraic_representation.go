@@ -146,6 +146,7 @@ func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRa
 }
 
 type algebraicBoundScope struct {
+	sourceStop error
 	invocation uint64 // actual entered raw bound call; owning wrapper identity
 	refinement algebraicRefinementScope
 	conversion algebraicConversionScope
@@ -214,6 +215,7 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 	if s.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&s.copy) || s.conversion.pending(m) || s.evaluationPending(m) || s.refinement.pending(m) {
 		return ErrAlgebraicPending
 	}
+	s.sourceStop = nil
 	s.invocation++
 	if s.invocation == 0 {
 		s.invocation++
@@ -233,7 +235,11 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 	s.executing = true
 	defer func() {
 		s.executing = false
-		cause = errors.Join(cause, m.finishBounds(false))
+		cleanup := m.finishBounds(false)
+		if cleanup != nil {
+			s.sourceStop = cleanup
+		}
+		cause = errors.Join(cause, cleanup)
 	}()
 	if refine && (l == nil || l.kind == 0) {
 		return m.config.Rationals.CopyWithAllocationReceipt(out, &r.value, &s.copy)

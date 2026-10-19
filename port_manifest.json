@@ -38394,7 +38394,8 @@
         "pkg/math/polynomial/algebraic_filter_roots_trace.go",
         "pkg/math/polynomial/algebraic_filter_roots_trace_test.go",
         "pkg/math/polynomial/algebraic_root_display_invocation.go",
-        "pkg/math/polynomial/algebraic_root_display_invocation_test.go"
+        "pkg/math/polynomial/algebraic_root_display_invocation_test.go",
+        "pkg/math/polynomial/algebraic_owned_bound_child_source_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38577,7 +38578,9 @@
         "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector",
         "TestAlgebraicRootTraceDisplayReceiptRejectsLaterInvocation",
         "TestAlgebraicMultivariateIsolationRecoveryRootTraceRecords",
-        "TestAlgebraicMultivariateIsolationRecoveryTraceRetainsRootDisplay"
+        "TestAlgebraicMultivariateIsolationRecoveryTraceRetainsRootDisplay",
+        "TestAlgebraicOwnedBoundBodyFailureFinishesOlderTemporary",
+        "TestAlgebraicOwnedBoundChildSourceStopProtectsOuterTemporary"
       ],
       "conditionals": [
         {
@@ -39079,7 +39082,7 @@
           "notes": "A real first-insertion callback previously deleted the root input successfully. Public core access now rejects reentry while the existing rootDisplay.running span borrows input records and coefficient views. Regression exercises Del, CleanupValue, Swap and Copy in all three displays and checks exact original output and unchanged identities. Interval and decimal displays now likewise protect their actual full call spans, including deferred local destruction; writer regressions exercise root and basic values through both Write and WriteString. A stopped active display now also excludes ordinary core access until owning cleanup releases its exact root-ID child. Actual TLS allocation failure after polynomial output exercises Del/CleanupValue/Reset refusal and cleanup without reconstructing the source multiplication scratch hole; a fresh owner displays the same polynomial successfully. Broader display source/owning suffix, scalar assertion and stream audit remains open."
         },
         {
-          "name": "Global rational bound overloads cpp2998-3012,3025-3039 retained by api_arith and purify_arith_tactic; raw/global local sequence and exact raw-bound cleanup binding",
+          "name": "Global rational bound overloads cpp2998-3012,3025-3039 retained by api_arith and purify_arith_tactic; raw/global source local sequence, exact raw-bound cleanup identity and accepted nested source-stop propagation",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_to_owned_rational.go",
           "go_targets": [
@@ -39087,7 +39090,8 @@
             "pkg/math/polynomial/algebraic_to_owned_rational_destructor_test.go",
             "pkg/math/polynomial/algebraic_to_owned_rational.go",
             "pkg/math/polynomial/algebraic_representation.go",
-            "pkg/math/polynomial/algebraic_owned_bound_test.go"
+            "pkg/math/polynomial/algebraic_owned_bound_test.go",
+            "pkg/math/polynomial/algebraic_owned_bound_child_source_test.go"
           ],
           "tests": [
             "TestAlgebraicOwnedBoundReturningTransportGuards",
@@ -39097,9 +39101,11 @@
             "TestAlgebraicOwnedBoundsDistinctGlobalOwner",
             "TestAlgebraicOwnedBoundGlobalReservationPrefixes",
             "TestAlgebraicOwnedBoundRefusalPreservesOlderRawBound",
-            "TestAlgebraicOwnedBoundCleansAcceptedRawStop"
+            "TestAlgebraicOwnedBoundCleansAcceptedRawStop",
+            "TestAlgebraicOwnedBoundBodyFailureFinishesOlderTemporary",
+            "TestAlgebraicOwnedBoundChildSourceStopProtectsOuterTemporary"
           ],
-          "notes": "All four concrete global-rational wrappers now execute the raw bound child, construct a distinct rational temporary and assign caller output before reverse source destruction. Entered raw bounds have actual invocation identity; rejected wrappers do not own older raw calls, and owning cleanup cannot consume a replacement call. Focused cross-owner mathematical, global reservation and older raw continuation tests. Both precision-bound wrappers also reach actual global/raw numerator/denominator destructor stops with real runtime operations, retain reverse source order and assignment provenance, and preserve caller output through owning cleanup. A stopped wrapper rejects public replacement raw calls before entering a new invocation. Broader raw/global callback and source TRACE audits remain open."
+          "notes": "All four concrete global-rational wrappers now execute the raw bound child, construct a distinct rational temporary and assign caller output before reverse source destruction. Entered raw bounds have actual invocation identity; rejected wrappers do not own older raw calls, and owning cleanup cannot consume a replacement call. Focused cross-owner mathematical, global reservation and older raw continuation tests. Both precision-bound wrappers also reach actual global/raw numerator/denominator destructor stops with real runtime operations, retain reverse source order and assignment provenance, and preserve caller output through owning cleanup. A stopped wrapper rejects public replacement raw calls before entering a new invocation. Broader raw/global callback and source TRACE audits remain open. The matched raw bound records its actual source cleanup stop. The wrapper checks accepted assignment/constructor source readiness and its exact raw-bound invocation before destroying older global/raw temporaries. A reached MPQ power END requested-size guard proves older raw temporary protection; a distinct RAW body failure still executes its source destructor. This preserves failure-stage semantics without adopting older or replacement calls."
         },
         {
           "name": "Raw mpq to_rational overload always evaluates VERIFY(is_rational), then both basic assertions and NUM/DEN copy from the reached basic/zero value (cpp:235-241,337-341,2831-2833)",
@@ -39642,7 +39648,8 @@
         "pkg/math/polynomial/algebraic_filter_roots_trace.go",
         "pkg/math/polynomial/algebraic_filter_roots_trace_test.go",
         "pkg/math/polynomial/algebraic_root_display_invocation.go",
-        "pkg/math/polynomial/algebraic_root_display_invocation_test.go"
+        "pkg/math/polynomial/algebraic_root_display_invocation_test.go",
+        "pkg/math/polynomial/algebraic_owned_bound_child_source_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39822,7 +39829,9 @@
         "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector",
         "TestAlgebraicRootTraceDisplayReceiptRejectsLaterInvocation",
         "TestAlgebraicMultivariateIsolationRecoveryRootTraceRecords",
-        "TestAlgebraicMultivariateIsolationRecoveryTraceRetainsRootDisplay"
+        "TestAlgebraicMultivariateIsolationRecoveryTraceRetainsRootDisplay",
+        "TestAlgebraicOwnedBoundBodyFailureFinishesOlderTemporary",
+        "TestAlgebraicOwnedBoundChildSourceStopProtectsOuterTemporary"
       ],
       "conditionals": [
         {
@@ -39943,7 +39952,7 @@
           "notes": "A real first-insertion callback previously deleted the root input successfully. Public core access now rejects reentry while the existing rootDisplay.running span borrows input records and coefficient views. Regression exercises Del, CleanupValue, Swap and Copy in all three displays and checks exact original output and unchanged identities. Interval and decimal displays now likewise protect their actual full call spans, including deferred local destruction; writer regressions exercise root and basic values through both Write and WriteString. A stopped active display now also excludes ordinary core access until owning cleanup releases its exact root-ID child. Actual TLS allocation failure after polynomial output exercises Del/CleanupValue/Reset refusal and cleanup without reconstructing the source multiplication scratch hole; a fresh owner displays the same polynomial successfully. Broader display source/owning suffix, scalar assertion and stream audit remains open."
         },
         {
-          "name": "Global rational bound overloads cpp2998-3012,3025-3039 retained by api_arith and purify_arith_tactic; raw/global local sequence and exact raw-bound cleanup binding",
+          "name": "Global rational bound overloads cpp2998-3012,3025-3039 retained by api_arith and purify_arith_tactic; raw/global source local sequence, exact raw-bound cleanup identity and accepted nested source-stop propagation",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_to_owned_rational.go",
           "go_targets": [
@@ -39951,7 +39960,8 @@
             "pkg/math/polynomial/algebraic_to_owned_rational_destructor_test.go",
             "pkg/math/polynomial/algebraic_to_owned_rational.go",
             "pkg/math/polynomial/algebraic_representation.go",
-            "pkg/math/polynomial/algebraic_owned_bound_test.go"
+            "pkg/math/polynomial/algebraic_owned_bound_test.go",
+            "pkg/math/polynomial/algebraic_owned_bound_child_source_test.go"
           ],
           "tests": [
             "TestAlgebraicOwnedBoundReturningTransportGuards",
@@ -39961,9 +39971,11 @@
             "TestAlgebraicOwnedBoundsDistinctGlobalOwner",
             "TestAlgebraicOwnedBoundGlobalReservationPrefixes",
             "TestAlgebraicOwnedBoundRefusalPreservesOlderRawBound",
-            "TestAlgebraicOwnedBoundCleansAcceptedRawStop"
+            "TestAlgebraicOwnedBoundCleansAcceptedRawStop",
+            "TestAlgebraicOwnedBoundBodyFailureFinishesOlderTemporary",
+            "TestAlgebraicOwnedBoundChildSourceStopProtectsOuterTemporary"
           ],
-          "notes": "All four concrete global-rational wrappers now execute the raw bound child, construct a distinct rational temporary and assign caller output before reverse source destruction. Entered raw bounds have actual invocation identity; rejected wrappers do not own older raw calls, and owning cleanup cannot consume a replacement call. Focused cross-owner mathematical, global reservation and older raw continuation tests. Both precision-bound wrappers also reach actual global/raw numerator/denominator destructor stops with real runtime operations, retain reverse source order and assignment provenance, and preserve caller output through owning cleanup. A stopped wrapper rejects public replacement raw calls before entering a new invocation. Broader raw/global callback and source TRACE audits remain open."
+          "notes": "All four concrete global-rational wrappers now execute the raw bound child, construct a distinct rational temporary and assign caller output before reverse source destruction. Entered raw bounds have actual invocation identity; rejected wrappers do not own older raw calls, and owning cleanup cannot consume a replacement call. Focused cross-owner mathematical, global reservation and older raw continuation tests. Both precision-bound wrappers also reach actual global/raw numerator/denominator destructor stops with real runtime operations, retain reverse source order and assignment provenance, and preserve caller output through owning cleanup. A stopped wrapper rejects public replacement raw calls before entering a new invocation. Broader raw/global callback and source TRACE audits remain open. The matched raw bound records its actual source cleanup stop. The wrapper checks accepted assignment/constructor source readiness and its exact raw-bound invocation before destroying older global/raw temporaries. A reached MPQ power END requested-size guard proves older raw temporary protection; a distinct RAW body failure still executes its source destructor. This preserves failure-stage semantics without adopting older or replacement calls."
         },
         {
           "name": "Raw mpq to_rational overload always evaluates VERIFY(is_rational), then both basic assertions and NUM/DEN copy from the reached basic/zero value (cpp:235-241,337-341,2831-2833)",
@@ -205538,13 +205550,13 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "17ecadb7",
-    "started_utc": "2026-10-12 12:10:46 UTC",
-    "completed_utc": "2026-10-12 12:34:47 UTC",
+    "commit": "b7552f5b",
+    "command": "cd pkg && go test ./... -count=1 -timeout=30m",
+    "started_utc": "2026-10-19 12:46:20 UTC",
+    "completed_utc": "2026-10-19 12:58:38 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-lp-current-native.log",
-    "event_log": "/mnt/oldrog/tmp/g3-lp-current-native.json",
-    "profile": "/mnt/oldrog/tmp/g3-lp-current-native.cover",
+    "log": "/mnt/oldrog/tmp/g3-native-b7552f5b.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-b7552f5b.exit",
     "cpu_affinity": [
       8,
       9,
@@ -205556,20 +205568,17 @@
       15,
       16
     ],
-    "GOMAXPROCS": 9,
-    "package_parallelism": 2,
+    "GOMAXPROCS": 4,
     "package_timeout": "30m",
-    "packages": 64,
-    "passed_packages": 63,
-    "skipped_packages": 1,
-    "packages_with_tests": 51,
-    "lp_seconds": 1392.052,
-    "lp_covered_statements": 30177,
-    "lp_statements": 34898,
-    "module_covered_statements": 129239,
-    "module_statements": 170244,
-    "session_id": 69692,
-    "scope_warning": "Full native module checkpoint17ecadb7 exited0 at2026-10-12 12:34:47UTC:64 package paths,63pass/1skip/51with named tests; LP1392.052s and30177/34898 statements(86.5%), module129239/170244(75.9%). The run used CPUs8-16/GOMAXPROCS9, two package jobs and a30m per-package timeout. Subsequent commits through ab9379e8 changed only ledgers/documentation, so the checkpoint validates current Go code. Focused checked runs remain separate; LP source audit is not complete."
+    "packages_with_ok_result": 68,
+    "packages_without_test_files": 11,
+    "ast_seconds": 11.867,
+    "polynomial_seconds": 100.67,
+    "lp_seconds": 705.657,
+    "numeral_seconds": 57.339,
+    "session_id": 26851,
+    "checkout_held_unchanged": true,
+    "scope_warning": "Full native module checkpoint b7552f5b passed on CPUs 8-16 with the checkout held unchanged. The subsequent owned-bound source-stop correction was prepared and verified separately through a Go overlay, then applied after this checkpoint completed; it has focused four-profile evidence and is not included in this full native result. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

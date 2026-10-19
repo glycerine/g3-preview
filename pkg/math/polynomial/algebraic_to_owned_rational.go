@@ -113,6 +113,13 @@ func (m *AlgebraicRootCore) ownedRationalResult(a *Algebraic, service *unumeral.
 		}
 	}
 	s.bodyCause = e
+	if stop := m.ownedRationalChildSourceCause(s); stop != nil {
+		s.sourceCause = stop
+		if errors.Is(e, stop) {
+			return e
+		}
+		return errors.Join(e, stop)
+	}
 	// Constructed locals receive source destruction in reverse declaration
 	// order even when the body failed. A stopped suffix is never replayed.
 	s.executing = true
@@ -216,5 +223,20 @@ func (m *AlgebraicRootCore) cleanupToOwnedRational() error {
 		s.constructorEnded = true
 	}
 	complete = true
+	return nil
+}
+
+// A stopped accepted child precedes the wrapper's older global/raw locals.
+// Body failures with no source stop still execute those source destructors.
+func (m *AlgebraicRootCore) ownedRationalChildSourceCause(s *algebraicOwnedRationalScope) error {
+	if e := s.assignment.SourceReady(); e != nil {
+		return e
+	}
+	if e := s.constructor.SourceReady(); e != nil {
+		return e
+	}
+	if s.boundInvocation != 0 && s.boundInvocation == m.bounds.invocation {
+		return m.bounds.sourceStop
+	}
 	return nil
 }
