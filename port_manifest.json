@@ -55546,7 +55546,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:583-674 actual pair-Hensel source lexical frames and exact lower acquisition",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_hensel.go",
           "tests": [
             "TestUPolynomialHenselQuadraticTransportCannotRetireRelatedCaller",
@@ -55579,7 +55579,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:677-700,703-801,805-977 actual quadratic/enclosing Hensel caller and conditional checker declaration frontiers",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_hensel_debug.go",
           "tests": [
             "TestUPolynomialHenselActualConditionalCheckerDeclarations",
@@ -55596,7 +55596,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:583-977 pair and direct exported Hensel caller exact source/own history and actual guarded public adapter",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_hensel.go",
           "tests": [
             "TestUPolynomialHenselSourceContinuationCannotReenterExecutingPair",
@@ -55609,7 +55609,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:583-977 exported Hensel wrapper imported binding, actual lower frontier and caller ownership evidence (upolynomial_hensel_binding_source_test.go)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_hensel_binding_source_test.go",
           "tests": [
             "TestUPolynomialHenselNativeBindingsBeforeOwnerFailure",
@@ -55619,7 +55619,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:583-977 exported Hensel wrapper imported binding, actual lower frontier and caller ownership evidence (upolynomial_hensel_lower_frontier_source_test.go)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_hensel_lower_frontier_source_test.go",
           "tests": [
             "TestUPolynomialHenselActualLowerCopyFrontierDiagnostic"
@@ -55627,7 +55627,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:583-977 exported Hensel wrapper imported binding, actual lower frontier and caller ownership evidence (upolynomial_hensel_physical_source_test.go)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_hensel_physical_source_test.go",
           "tests": [
             "TestUPolynomialHenselImportedBigModulusPhysicalFailureRoots",
@@ -55636,7 +55636,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:583-977 exported Hensel wrapper imported binding, actual lower frontier and caller ownership evidence (upolynomial_hensel_vector_owner_source_test.go)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_hensel_vector_owner_source_test.go",
           "tests": [
             "TestUPolynomialHenselConcreteVectorOwnerCensus"
