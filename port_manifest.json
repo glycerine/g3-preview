@@ -39184,7 +39184,8 @@
             "TestAlgebraicSquareFreeFactorResetBeforeInputRead",
             "TestAlgebraicIsolationDisabledScratchAssertionsDoNotRead",
             "TestAlgebraicIsolationScratchAssertionActions",
-            "TestAlgebraicIsolationCooperationKeepsExecutingOwners"
+            "TestAlgebraicIsolationCooperationKeepsExecutingOwners",
+            "TestAlgebraicIsolationPolynomialTraceStopsBeforeScratchCleanup"
           ]
         },
         {

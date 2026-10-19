@@ -235,3 +235,50 @@ func TestAlgebraicRootPolynomialTraceOwnsActualStoppedDisplay(t *testing.T) {
 		t.Fatal("owning acknowledgement changed actual source-stop history")
 	}
 }
+
+func TestAlgebraicIsolationPolynomialTraceStopsBeforeScratchCleanup(t *testing.T) {
+	c, _, _ := algebraicCompareFixtureProfile(t, true)
+	pm, _, _ := polynomialEvalFixtureWithRationals(t, c.config.Rationals, nil)
+	serviceMust(t, c.ensureIsolation())
+	one := unumeral.NewBinaryInt(1)
+	serviceMust(t, c.roots.Resize(1))
+	serviceMust(t, c.roots.Set(0, &one))
+	n := unumeral.NewInt(0)
+	z := c.config.Rationals.Integers()
+	serviceMust(t, z.SetString(&n, "18446744073709551619"))
+	p, e := pm.core.MkConstantTake(&n)
+	serviceMust(t, e)
+	p = polynomialCaller(t, pm.core, p)
+	roots, e := c.NewVector()
+	serviceMust(t, e)
+	output := &algebraicRootTraceNumeralStop{core: c}
+	tags := diagnostic.NewTraceTagsWithWriter(output)
+	tags.Enable("algebraic")
+	serviceMust(t, c.config.Rationals.BindTrace(tags))
+	body := c.IsolatePolynomialRoots(pm, p, roots)
+	var stopped *polynomialDisplayFrame
+	var sourceStop error
+	if tags.ShouldTrace("algebraic") {
+		// The real display's NUM hits a qualified requested-size guard.
+		if output.ref == 0 || !errors.Is(body, arena.ErrBounds) || !c.rootTracePending() || c.isolationConversion.active || c.isolateTmp1.slot != 0 {
+			t.Fatal("isolation input display stop frontier", output.ref, body)
+		}
+		stopped = c.rootTrace.poly.frame
+		sourceStop = stopped.sourceCause
+		if e = c.CleanupIsolation(); !errors.Is(e, ErrAlgebraicPending) || c.roots.state.size != 1 || c.roots.state.dropPending {
+			t.Fatal("older isolation scratch changed before pending display", e)
+		}
+		z.Store(output.ref, output.original)
+	} else {
+		serviceMust(t, body)
+		if output.ref != 0 || c.roots.state.size != 1 {
+			t.Fatal("erased input display touched actual formatter or scratch")
+		}
+	}
+	serviceMust(t, c.config.Rationals.BindTrace(nil))
+	serviceMust(t, c.CleanupRetained())
+	serviceMust(t, roots.Close())
+	if c.rootTracePending() || stopped != nil && (stopped.active || stopped.sourceCause != sourceStop || !errors.Is(body, sourceStop)) {
+		t.Fatal("owning display cleanup changed source-stop history")
+	}
+}
