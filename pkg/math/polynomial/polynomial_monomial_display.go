@@ -34,6 +34,9 @@ func (m *MonomialManager) DisplayInto(a Monomial, out MonomialTextSink, star boo
 	if e := m.check(); e != nil {
 		return e
 	}
+	return m.displayIntoCore(a, out, star)
+}
+func (m *MonomialManager) displayIntoCore(a Monomial, out MonomialTextSink, star bool) error {
 	n, e := m.sizeCore(a)
 	if e != nil {
 		return e

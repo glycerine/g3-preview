@@ -1,7 +1,10 @@
 // Source: src/math/polynomial/polynomial.cpp:236-544.
 package polynomial
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
 
 func TestMonomialNativeTableGrowthRenameAndOrder(t *testing.T) {
 	m := monomialFixture(t)
@@ -159,6 +162,7 @@ func TestMonomialNativeTableCollisionsAndTemporaryPublication(t *testing.T) {
 }
 
 func TestMonomialNativeTableSourceCleanupPendingCreation(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m := monomialFixture(t)
 	powers := make([]MonomialPower, 129)
 	for i := range powers {
@@ -172,7 +176,7 @@ func TestMonomialNativeTableSourceCleanupPendingCreation(t *testing.T) {
 	}
 	e = m.SourceFinalize()
 	if polynomialSourceDebug {
-		if e != ErrMonomialAssertion || m.sourceStage != 1 {
+		if !errors.Is(e, ErrMonomialAssertion) || m.sourceStage != 1 {
 			t.Fatal("live table assertion", e, m.sourceStage)
 		}
 	} else {

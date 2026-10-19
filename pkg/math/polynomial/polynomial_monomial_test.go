@@ -475,6 +475,7 @@ func TestMonomialCompletedSourceDestructorReverseMembers(t *testing.T) {
 func TestMonomialSourceFinalizeCallerLifetime(t *testing.T) {
 	for _, direct := range []bool{false, true} {
 		t.Run(strconv.FormatBool(direct), func(t *testing.T) {
+			polynomialThrowAssertionFixture(t)
 			b := arena.NewBudget(1 << 20)
 			r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 			serviceMust(t, e)

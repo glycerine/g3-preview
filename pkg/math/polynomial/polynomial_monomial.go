@@ -76,6 +76,7 @@ type monomialCreation struct {
 type MonomialManager struct {
 	assertionRunning                                                          bool
 	queryTraceRunning                                                         bool
+	managerTraceRunning                                                       bool
 	allocatorInvocation                                                       monomialAllocatorScope
 	unitDropConsumed                                                          bool
 	unitDropCause                                                             error
@@ -238,7 +239,7 @@ func (m *MonomialManager) CleanupCause() error {
 	return m.cleanupCause
 }
 func (m *MonomialManager) check() error {
-	if m != nil && m.self == m && m.assertionRunning {
+	if m != nil && m.self == m && (m.assertionRunning || m.managerTraceRunning) {
 		return ErrMonomialPending
 	}
 	if m == nil || m.self != m {

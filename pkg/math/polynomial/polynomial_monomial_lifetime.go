@@ -32,7 +32,7 @@ func (m *MonomialManager) externalEntries() bool {
 // SourceFinalize executes the completed source destructor body, then reverse
 // member destruction. It never manufactures destruction of caller monomials.
 func (m *MonomialManager) SourceFinalize() error {
-	if m != nil && m.self == m && (m.assertionRunning || m.queryTraceRunning) {
+	if m != nil && m.self == m && (m.assertionRunning || m.queryTraceRunning || m.managerTraceRunning) {
 		return ErrMonomialPending
 	}
 	if m == nil || m.self != m {
@@ -65,8 +65,11 @@ func (m *MonomialManager) SourceFinalize() error {
 		m.sourceStage++
 	}
 	if m.sourceStage == 1 {
-		if polynomialSourceDebug && m.table.entries.Len() != 0 {
-			return ErrMonomialAssertion
+		if e := m.traceLeakedMonomials(); e != nil {
+			return e
+		}
+		if e := m.sourceScalarAssert(801, "m_monomials.empty()", m.table.entries.Len() == 0); e != nil {
+			return e
 		}
 
 		m.sourceStage++
@@ -113,7 +116,7 @@ func (m *MonomialManager) SourceFinalize() error {
 // CleanupValue is an explicit owning abort of a caller-supplied value after a
 // partial source mutation. It removes its actual table edge; no locator sweep.
 func (m *MonomialManager) CleanupValue(a *Monomial) error {
-	if m != nil && m.self == m && (m.assertionRunning || m.queryTraceRunning) {
+	if m != nil && m.self == m && (m.assertionRunning || m.queryTraceRunning || m.managerTraceRunning) {
 		return ErrMonomialPending
 	}
 	if m == nil || m.self != m || m.closed {
@@ -190,7 +193,7 @@ func (m *MonomialManager) CleanupValue(a *Monomial) error {
 	return nil
 }
 func (m *MonomialManager) CloseChecked() error {
-	if m != nil && m.self == m && (m.assertionRunning || m.queryTraceRunning) {
+	if m != nil && m.self == m && (m.assertionRunning || m.queryTraceRunning || m.managerTraceRunning) {
 		return ErrMonomialPending
 	}
 	if m == nil {
@@ -305,8 +308,8 @@ func (m *MonomialManager) DecManagerRef() error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && m.managerRefs == 0 {
-		return ErrMonomialAssertion
+	if e := m.sourceScalarAssert(811, "m_ref_count > 0", m.managerRefs > 0); e != nil {
+		return e
 	}
 	m.managerRefs--
 	if m.managerRefs == 0 {
