@@ -44565,10 +44565,14 @@
           ]
         },
         {
-          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, native typed entry/power/original slices and borrowed sorting scratch, actual monomial INC/DEC and failed constructor retained references; native []*PolynomialSkeleton operations with actual published child owning history; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
-          "status": "partial",
+          "name": "Complete polynomial skeleton cpp2958\u20133068 canonical grouping, native typed entry/power/original slices and borrowed sorting scratch, actual monomial INC/DEC, failed-constructor retained references, TRACE and assertion actions; native []*PolynomialSkeleton operations with published child owning history",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_skeleton.go",
           "tests": [
+            "TestPolynomialSkeletonSourceTraceOfGroupedPowers",
+            "TestPolynomialSkeletonLexComparatorTraceUsesLiveGoSortCalls",
+            "TestPolynomialSkeletonPowerAssertionActions",
+            "TestPolynomialSkeletonVectorBoundsAssertionActions",
             "TestPolynomialSkeletonSourceGroupsAndLifetime",
             "TestPolynomialSkeletonConstructorEveryReservation",
             "TestPolynomialSkeletonSourceDisplay",
@@ -48791,10 +48795,14 @@
           ]
         },
         {
-          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, native typed entry/power/original slices and borrowed sorting scratch, actual monomial INC/DEC and failed constructor retained references; native []*PolynomialSkeleton operations with actual published child owning history; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
-          "status": "partial",
+          "name": "Complete polynomial skeleton cpp2958\u20133068 canonical grouping, native typed entry/power/original slices and borrowed sorting scratch, actual monomial INC/DEC, failed-constructor retained references, TRACE and assertion actions; native []*PolynomialSkeleton operations with published child owning history",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_skeleton.go",
           "tests": [
+            "TestPolynomialSkeletonSourceTraceOfGroupedPowers",
+            "TestPolynomialSkeletonLexComparatorTraceUsesLiveGoSortCalls",
+            "TestPolynomialSkeletonPowerAssertionActions",
+            "TestPolynomialSkeletonVectorBoundsAssertionActions",
             "TestPolynomialSkeletonSourceGroupsAndLifetime",
             "TestPolynomialSkeletonConstructorEveryReservation",
             "TestPolynomialSkeletonSourceDisplay",
@@ -197087,10 +197095,14 @@
           ]
         },
         {
-          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, native typed entry/power/original slices and borrowed sorting scratch, actual monomial INC/DEC and failed constructor retained references; native []*PolynomialSkeleton operations with actual published child owning history; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
-          "status": "partial",
+          "name": "Complete polynomial skeleton cpp2958\u20133068 canonical grouping, native typed entry/power/original slices and borrowed sorting scratch, actual monomial INC/DEC, failed-constructor retained references, TRACE and assertion actions; native []*PolynomialSkeleton operations with published child owning history",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_skeleton.go",
           "tests": [
+            "TestPolynomialSkeletonSourceTraceOfGroupedPowers",
+            "TestPolynomialSkeletonLexComparatorTraceUsesLiveGoSortCalls",
+            "TestPolynomialSkeletonPowerAssertionActions",
+            "TestPolynomialSkeletonVectorBoundsAssertionActions",
             "TestPolynomialSkeletonSourceGroupsAndLifetime",
             "TestPolynomialSkeletonConstructorEveryReservation",
             "TestPolynomialSkeletonSourceDisplay",

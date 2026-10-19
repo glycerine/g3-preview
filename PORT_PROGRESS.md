@@ -46180,3 +46180,15 @@ Newton TRACE sequences, native numeral growth, stopped cleanup and allocation
 campaigns plus new Throw/Continue cases pass in native, checked, debug and
 combined checked/debug/trace profiles on CPUs8-16. The Newton method row is
 ported; later polynomial algorithms remain partial.
+
+Polynomial skeleton completion: `skeleton` at `polynomial.cpp:2958-3068` now
+has complete canonical grouping, native entry/power/original storage, borrowed
+sorting scratch, monomial reference ownership, failed-constructor cleanup,
+source destruction, display and exact `skeleton`/`lex_bug` trace transport.
+Constructor ordering, `ith_power`, `ith_orig_monomial`, native `vector.h`
+indexing and empty `scoped_ptr_vector::pop_back` assertions now honor the
+process debugger actions. Continue reaches the following wrapped index or Go
+bounds boundary without recreating C++ vector storage. Skeleton/vector tests
+pass in native, checked, debug and combined checked/debug/trace profiles on
+CPUs 8-16. The skeleton method row is ported; sparse interpolation and recursive
+GCD consumers remain separate partial blocks.

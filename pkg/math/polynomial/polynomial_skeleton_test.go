@@ -252,6 +252,7 @@ func TestPolynomialSkeletonNativePurePowerGrowth(t *testing.T) {
 // the Go bounds error rather than exposing unused vector capacity.
 func TestPolynomialSkeletonNativePayloadBounds(t *testing.T) {
 	m := polynomialCellFixture(t)
+	polynomialAssertionActionsFixture(t, "TTT")
 	p, originals := polynomialSkeletonInput(t, m)
 	s, e := NewPolynomialSkeleton(m, p, 0)
 	serviceMust(t, e)

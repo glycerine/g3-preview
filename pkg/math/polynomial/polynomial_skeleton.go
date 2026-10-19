@@ -147,12 +147,12 @@ func newPolynomialSkeleton(m *MultivariatePolynomialCore, p Polynomial, x uint32
 	}
 	if polynomialSourceDebug {
 		for i := 1; i < len(s.entries); i++ {
-			v, e := m.monomials.Lex(s.entries[i-1].Monomial, s.entries[i].Monomial)
-			if e != nil {
+			left, right := s.entries[i-1].Monomial, s.entries[i].Monomial
+			if e := polynomialSkeletonSourceAssert("src/math/polynomial/polynomial.cpp", 3020, "lex_compare(m_entries[i-1].m_monomial, m_entries[i].m_monomial) < 0", func() (bool, error) {
+				v, x := m.monomials.Lex(left, right)
+				return v < 0, x
+			}); e != nil {
 				return fail(e)
-			}
-			if v >= 0 {
-				return fail(ErrPolynomialAssertion)
 			}
 		}
 	}
@@ -177,15 +177,13 @@ func (s *PolynomialSkeleton) ready() error {
 	}
 	return s.owner.check()
 }
-func skeletonIndex(i uint32, n int) error {
+func skeletonNativeIndex(i uint32, n int) error {
 	if uint64(i) < uint64(n) {
 		return nil
 	}
-	if polynomialSourceDebug {
-		return ErrPolynomialAssertion
-	}
 	return arena.ErrBounds
 }
+func skeletonIndex(i uint32, n int) error { return polynomialSkeletonVectorIndex(i, n) }
 func (s *PolynomialSkeleton) entryMonomialCore(i uint32) (Monomial, error) {
 	if e := skeletonIndex(i, len(s.entries)); e != nil {
 		return Monomial{}, e
@@ -228,8 +226,8 @@ func (s *PolynomialSkeleton) Power(a PolynomialSkeletonEntry, i uint32) (uint32,
 	if e := s.ready(); e != nil {
 		return 0, e
 	}
-	if polynomialSourceDebug && i >= a.NumPowers {
-		return 0, ErrPolynomialAssertion
+	if e := polynomialSkeletonScalarAssert("src/math/polynomial/polynomial.cpp", 3049, "i < e.m_num_powers", i < a.NumPowers); e != nil {
+		return 0, e
 	}
 	index := a.FirstPower + i
 	if e := skeletonIndex(index, len(s.powers)); e != nil {
@@ -241,8 +239,8 @@ func (s *PolynomialSkeleton) Original(a PolynomialSkeletonEntry, i uint32) (Mono
 	if e := s.ready(); e != nil {
 		return Monomial{}, e
 	}
-	if polynomialSourceDebug && i >= a.NumPowers {
-		return Monomial{}, ErrPolynomialAssertion
+	if e := polynomialSkeletonScalarAssert("src/math/polynomial/polynomial.cpp", 3051, "i < e.m_num_powers", i < a.NumPowers); e != nil {
+		return Monomial{}, e
 	}
 	index := a.FirstPower + i
 	if e := skeletonIndex(index, len(s.originals)); e != nil {

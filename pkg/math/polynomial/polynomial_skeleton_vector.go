@@ -51,11 +51,8 @@ func (v *PolynomialSkeletonVector) Size() (uint32, error) {
 	return uint32(len(v.data)), nil
 }
 func (v *PolynomialSkeletonVector) pointer(i uint32) (*PolynomialSkeleton, error) {
-	if uint64(i) >= uint64(len(v.data)) {
-		if polynomialSourceDebug {
-			return nil, ErrPolynomialAssertion
-		}
-		return nil, arena.ErrBounds
+	if e := polynomialSkeletonVectorIndex(i, len(v.data)); e != nil {
+		return nil, e
 	}
 	return v.data[i], nil
 }
@@ -137,8 +134,8 @@ func (v *PolynomialSkeletonVector) Pop() error {
 	}
 	n := uint32(len(v.data))
 	if n == 0 {
-		if polynomialSourceDebug {
-			return ErrPolynomialAssertion
+		if e := polynomialSkeletonScalarAssert("src/util/scoped_ptr_vector.h", 33, "!empty()", false); e != nil {
+			return e
 		}
 		return arena.ErrBounds
 	}
