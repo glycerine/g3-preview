@@ -24,6 +24,9 @@ func (m *MultivariatePolynomialCore) quadraticTraceCallback() bool {
 	return rt != nil && rt.FailureTransportActive()
 }
 func (m *MultivariatePolynomialManager) emitQuadraticTrace(target *PolynomialFactors, line int, body func(*polynomialTraceSink) error) error {
+	return m.emitFactorTrace(target, "factor_2_sqf_pp", line, body)
+}
+func (m *MultivariatePolynomialManager) emitFactorTrace(target *PolynomialFactors, function string, line int, body func(*polynomialTraceSink) error) error {
 	c := m.core
 	tags := c.monomials.monomialTraceTags()
 	if !tags.ShouldTrace("factor") {
@@ -33,7 +36,7 @@ func (m *MultivariatePolynomialManager) emitQuadraticTrace(target *PolynomialFac
 	c.quadraticTrace = &polynomialQuadraticTraceBorrow{tags: tags, target: target}
 	defer func() { c.quadraticTrace = previous }()
 	var computation error
-	_ = tags.EmitConditional("factor", "factor_2_sqf_pp", "src/math/polynomial/polynomial.cpp", line, func() bool { return true }, func(w io.Writer) error {
+	_ = tags.EmitConditional("factor", function, "src/math/polynomial/polynomial.cpp", line, func() bool { return true }, func(w io.Writer) error {
 		computation = body(&polynomialTraceSink{writer: w})
 		return computation
 	})

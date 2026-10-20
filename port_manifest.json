@@ -47443,7 +47443,7 @@
           "5772 PSC iteration references"
         ],
         "verification": "Real zero polynomial cells distinguish direct display from the public consistency scope with a closed Go-adapter reservation gate. Controls retain public checks. Existing trace output, refusal, callback and display tests cover reached nonzero terms and cleanup.",
-        "remaining_trace_audit": "Other live source TRACE records remain unverified or absent, including evaluation cpp6438 and factor records outside quadratic cpp6604-6672. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit. This audit is limited to the implemented call sites listed above."
+        "remaining_trace_audit": "Other live source TRACE records remain unverified or absent, including evaluation cpp6438 and factor records outside linear cpp6595, quadratic cpp6604-6672 and higher-degree cpp6731. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit. This audit is limited to the implemented call sites listed above."
       },
       "public_content_and_quadratic_trace_audit": {
         "source": "polynomial.cpp:7199-7210 and 6604-6672",
@@ -47466,6 +47466,17 @@
       "dormant_psc_reachability_audit": {
         "source_search": "All src C++ headers/translation units: subresultant_chain only defined at cpp5499 and called by psc_chain1 at cpp5575. psc_chain1 only defined at cpp5574; dispatcher cpp5898 is commented out and cpp5901 selects psc_chain_optimized.",
         "disposition": "Existing Go compatibility implementations retained as reference_only. No additional dormant TRACE port or retained-consumer completion credit."
+      },
+      "linear_higher_factor_trace_audit": {
+        "source": "polynomial.cpp:6595,6731",
+        "go_target": "pkg/math/polynomial/polynomial_factor_leaf_trace.go",
+        "status": "ported live TRACE increment; whole source unit remains partial",
+        "behavior": "Linear and higher-degree helpers display p directly before Push, without source reference/numeral locals. Disabled tags do not enter a diagnostic scope. An accepted GCD invocation captures exact formatting generation and is carried by the existing mutually exclusive square-free helper body receipt in factor_core, including last-child source/owning cleanup. Writer borrow protects the exact factors target. Source higher-degree TODO remains unchanged.",
+        "tests": [
+          "TestPolynomialLeafFactorTracePublicDispatchAndStreamRefusal",
+          "TestPolynomialLinearFactorTraceExactEntryReceiptBeforePush",
+          "TestPolynomialHigherFactorTraceExactEntryReceiptBeforePush"
+        ]
       }
     },
     {

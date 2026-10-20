@@ -347,6 +347,9 @@ func (m *MultivariatePolynomialManager) factorLinearSquareFreePrimitive(p Polyno
 	return m.factorLinearSquareFreePrimitiveWithReceipts(p, r, x, k, nil, nil)
 }
 func (m *MultivariatePolynomialManager) factorLinearSquareFreePrimitiveWithReceipts(p Polynomial, r *PolynomialFactors, x, k uint32, guards *[2]polynomialGCDInvocationReceipt, phase *uint8) error {
+	return m.factorLinearSquareFreePrimitiveWithTraceReceipt(p, r, x, k, guards, phase, nil)
+}
+func (m *MultivariatePolynomialManager) factorLinearSquareFreePrimitiveWithTraceReceipt(p Polynomial, r *PolynomialFactors, x, k uint32, guards *[2]polynomialGCDInvocationReceipt, phase *uint8, trace *polynomialGCDInvocationReceipt) error {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -384,6 +387,12 @@ func (m *MultivariatePolynomialManager) factorLinearSquareFreePrimitiveWithRecei
 		}
 		return m.isSquareFreeWithReceipt(p, x, true, guard)
 	}); e != nil {
+		return e
+	}
+	if phase != nil {
+		*phase = 12
+	}
+	if e := m.traceFactorLeaf(p, r, "factor_1_sqf_pp", 6595, "factor square free (degree == 1):\n", trace); e != nil {
 		return e
 	}
 	return r.Push(p, k)

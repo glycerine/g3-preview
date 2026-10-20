@@ -355,7 +355,7 @@ func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveDispatch(p Poly
 		return e
 	}
 	if degree == 1 {
-		return m.factorLinearSquareFreePrimitiveWithReceipts(p, r, x, k, &s.helperPredicates, &s.lastCall)
+		return m.factorLinearSquareFreePrimitiveWithTraceReceipt(p, r, x, k, &s.helperPredicates, &s.lastCall, &s.quadratic)
 	}
 	univariate, e := c.IsUnivariate(p)
 	if e != nil {
@@ -375,7 +375,7 @@ func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveDispatch(p Poly
 	if degree == 2 {
 		return m.factorQuadraticSquareFreePrimitiveWithReceipts(p, r, x, k, &s.helperPredicates, &s.quadratic, &s.lastCall)
 	}
-	return m.factorHigherSquareFreePrimitiveWithReceipts(p, r, x, k, &s.helperPredicates, &s.lastCall)
+	return m.factorHigherSquareFreePrimitiveWithTraceReceipt(p, r, x, k, &s.helperPredicates, &s.lastCall, &s.quadratic)
 }
 
 func (m *MultivariatePolynomialManager) Factor(p Polynomial, r *PolynomialFactors, params UPolynomialFactorParams) error {
