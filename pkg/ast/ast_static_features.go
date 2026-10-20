@@ -3,6 +3,7 @@
 package ast
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -37,6 +38,7 @@ type StaticFeatures struct {
 	HasRational, HasInt, HasReal, HasBitVector, HasFloatingPoint                  bool
 	HasString, HasNonStringSequence, HasArrays                                    bool
 	ArithKSum                                                                     unumeral.OwnedRational
+	arithScratch                                                                  unumeral.OwnedRational
 	NumArithTerms, NumArithEqualities, NumArithInequalities                       uint32
 	NumDiffTerms, NumDiffEqualities, NumDiffInequalities                          uint32
 	NumSimpleEqualities, NumSimpleInequalities, NumNonLinear                      uint32
@@ -89,7 +91,13 @@ func NewStaticFeatures(m *ASTManager) (*StaticFeatures, error) {
 	if err != nil {
 		return nil, err
 	}
+	f.arithScratch, err = m.numerals.NewValue()
+	if err != nil {
+		_ = m.numerals.Del(&f.ArithKSum)
+		return nil, err
+	}
 	if err = f.Reset(); err != nil {
+		_ = m.numerals.Del(&f.arithScratch)
 		_ = m.numerals.Del(&f.ArithKSum)
 		return nil, err
 	}
@@ -136,6 +144,9 @@ func (f *StaticFeatures) Reset() error {
 	if err := f.manager.numerals.Reset(&f.ArithKSum); err != nil {
 		return err
 	}
+	if err := f.manager.numerals.Reset(&f.arithScratch); err != nil {
+		return err
+	}
 	f.NumArithTerms, f.NumArithEqualities, f.NumArithInequalities = 0, 0, 0
 	f.NumDiffTerms, f.NumDiffEqualities, f.NumDiffInequalities = 0, 0, 0
 	f.NumSimpleEqualities, f.NumSimpleInequalities, f.NumNonLinear = 0, 0, 0
@@ -163,6 +174,13 @@ func (f *StaticFeatures) NumTheories() uint32 {
 		n++
 	}
 	return n
+}
+
+func (f *StaticFeatures) ArithKSumIsSmall() (bool, error) {
+	if err := f.open(); err != nil {
+		return false, err
+	}
+	return f.manager.numerals.LessInt(&f.ArithKSum, 2147483647/8)
 }
 
 func (f *StaticFeatures) internalFamily(s usymbol.Symbol) bool {
@@ -307,7 +325,7 @@ func (f *StaticFeatures) Close() error {
 	if f.closed {
 		return nil
 	}
-	err := f.manager.numerals.Del(&f.ArithKSum)
+	err := errors.Join(f.manager.numerals.Del(&f.arithScratch), f.manager.numerals.Del(&f.ArithKSum))
 	f.closed = true
 	f.visited, f.orAndDepth, f.iteDepth, f.formulaDepth = nil, nil, nil, nil
 	return err

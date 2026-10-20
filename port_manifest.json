@@ -33195,11 +33195,12 @@
       "path": "src/ast/static_features.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_static_features.go",
         "pkg/ast/ast_static_features_test.go",
         "pkg/ast/ast_static_features_collect.go",
+        "pkg/ast/ast_static_features_arith.go",
         "pkg/ast/ast_static_features_theory.go",
         "pkg/ast/ast_static_features_collect_test.go"
       ],
@@ -33207,7 +33208,10 @@
         "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay",
         "TestStaticFeaturesBooleanTraversalClausesSharingAndDepth",
         "TestStaticFeaturesTermITEIsNotAFormulaTree",
-        "TestStaticFeaturesTheoryFamiliesSortsEqualitiesAndAliens"
+        "TestStaticFeaturesTheoryFamiliesSortsEqualitiesAndAliens",
+        "TestStaticFeaturesArithmeticDifferenceAndNonlinearAccounting",
+        "TestStaticFeaturesArrayParametersContributeSortFeatures",
+        "TestStaticFeaturesBitVectorFloatingPointAndSequenceSortFlags"
       ],
       "assertions": [
         {
@@ -33219,8 +33223,8 @@
           "text": "SASSERT(!_is_le_ge);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "constructor, reset, flush_cache, internal_family, has_uf, theory counts, primitive/derived displays and empty feature vector (static_features.cpp:22-112,537-649)",
@@ -33232,7 +33236,7 @@
         },
         {
           "name": "Boolean/uninterpreted update_core, gate recognition, recursive process/process_root and collect with clause, sharing and tree-depth accounting (static_features.cpp:153-244,380-536)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_static_features_collect.go",
           "tests": [
             "TestStaticFeaturesBooleanTraversalClausesSharingAndDepth",
@@ -33244,26 +33248,37 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_static_features_theory.go",
           "tests": [
-            "TestStaticFeaturesTheoryFamiliesSortsEqualitiesAndAliens"
+            "TestStaticFeaturesTheoryFamiliesSortsEqualitiesAndAliens",
+            "TestStaticFeaturesArrayParametersContributeSortFeatures",
+            "TestStaticFeaturesBitVectorFloatingPointAndSequenceSortFlags"
+          ]
+        },
+        {
+          "name": "arithmetic numeral accumulation, difference terms/atoms, simple constraints, term-ITE arithmetic and nonlinear classification (static_features.cpp:103-152,211-216,246-272,282-296,313-325,346-361)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_static_features_arith.go",
+          "tests": [
+            "TestStaticFeaturesArithmeticDifferenceAndNonlinearAccounting"
           ]
         }
       ],
       "ownership": [
-        "StaticFeatures borrows its AST manager, owns one ArithKSum rational and native counter/cache slices and maps, and releases the rational explicitly in Close."
+        "StaticFeatures borrows its AST manager, owns ArithKSum plus one reusable exact-rational scratch value and native counter/cache slices and maps, and releases both rationals explicitly in Close."
       ],
       "deviations": [
-        "Native Go maps replace ast_mark/u_map and the source expression/declaration-ID vectors because Go AST expression and declaration IDs deliberately occupy sparse high ranges. Arithmetic numeral, difference-logic and nonlinearity classification remain open, so the source unit stays partial."
+        "Native Go maps replace ast_mark/u_map and the source expression/declaration-ID vectors because Go AST expression and declaration IDs deliberately occupy sparse high ranges; one owned rational scratch value replaces source stack-local rational temporaries."
       ]
     },
     {
       "path": "src/ast/static_features.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_static_features.go",
         "pkg/ast/ast_static_features_test.go",
         "pkg/ast/ast_static_features_collect.go",
+        "pkg/ast/ast_static_features_arith.go",
         "pkg/ast/ast_static_features_theory.go",
         "pkg/ast/ast_static_features_collect_test.go"
       ],
@@ -33271,7 +33286,10 @@
         "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay",
         "TestStaticFeaturesBooleanTraversalClausesSharingAndDepth",
         "TestStaticFeaturesTermITEIsNotAFormulaTree",
-        "TestStaticFeaturesTheoryFamiliesSortsEqualitiesAndAliens"
+        "TestStaticFeaturesTheoryFamiliesSortsEqualitiesAndAliens",
+        "TestStaticFeaturesArithmeticDifferenceAndNonlinearAccounting",
+        "TestStaticFeaturesArrayParametersContributeSortFeatures",
+        "TestStaticFeaturesBitVectorFloatingPointAndSequenceSortFlags"
       ],
       "conditionals": [
         {
@@ -33283,12 +33301,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "static feature state, cache reset, display/query declarations and exact default maximum traversal depth (static_features.h:27-179)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_static_features.go",
           "tests": [
             "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay"
@@ -33296,10 +33314,10 @@
         }
       ],
       "ownership": [
-        "The concrete Go owner exposes source counters directly and owns its rational and native collections; AST handles and the manager remain borrowed."
+        "The concrete Go owner exposes source counters directly and owns its accumulator, reusable rational scratch value and native collections; AST handles and the manager remain borrowed."
       ],
       "deviations": [
-        "Go uses explicit Reset, FlushCache and Close methods. Sparse native maps replace ID-indexed vectors for expression depths and application counts; arithmetic numeral and difference-logic collection helpers remain open."
+        "Go uses explicit Reset, FlushCache and Close methods. Sparse native maps replace ID-indexed vectors for expression depths and application counts, and the source stack-local rational temporaries share one owned scratch value."
       ]
     },
     {

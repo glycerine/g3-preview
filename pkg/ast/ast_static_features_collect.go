@@ -96,6 +96,9 @@ func (f *StaticFeatures) updateCore(h ASTHandle) error {
 				f.NumITEFormulas++
 			} else {
 				f.NumITETerms++
+				if err = f.accountTermITE(h); err != nil {
+					return err
+				}
 			}
 		case ASTOpAnd:
 			f.NumANDs++
@@ -124,6 +127,9 @@ func (f *StaticFeatures) updateCore(h ASTHandle) error {
 		isEquality = op == ASTOpEq
 	}
 	if err = f.accountEquality(h, isEquality); err != nil {
+		return err
+	}
+	if err = f.accountArithmetic(h, isEquality); err != nil {
 		return err
 	}
 	if kind == ASTQuantifier {
@@ -191,7 +197,7 @@ func (f *StaticFeatures) updateCore(h ASTHandle) error {
 			}
 		}
 	}
-	return f.accountApplicationTheory(h, fid, resultFID, isBool, isEquality, gate, args)
+	return f.accountApplicationTheory(h, sort, fid, resultFID, isBool, isEquality, gate, args)
 }
 
 func (f *StaticFeatures) process(h ASTHandle, formContext, orAndContext, iteContext bool, stackDepth uint32) error {
