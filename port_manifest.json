@@ -47443,7 +47443,7 @@
           "5772 PSC iteration references"
         ],
         "verification": "Real zero polynomial cells distinguish direct display from the public consistency scope with a closed Go-adapter reservation gate. Controls retain public checks. Existing trace output, refusal, callback and display tests cover reached nonzero terms and cleanup.",
-        "remaining_trace_audit": "Other live source TRACE records remain unverified or absent, including evaluation cpp6438 and factor records outside linear cpp6595, quadratic cpp6604-6672 higher-degree cpp6731 and univariate cpp6689/6707-6720. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit. This audit is limited to the implemented call sites listed above."
+        "remaining_trace_audit": "Other live source TRACE records remain unverified or absent, including evaluation cpp6438, factor_core entry records cpp6755/6756 and factor wrapper cpp6829. Implemented factor records include acc_constant cpp6578, linear cpp6595, quadratic cpp6604-6672, univariate cpp6689/6707-6720, higher-degree cpp6731 and factor_core cpp6769/6795/6807. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit. Per-increment audits below describe the implemented sites and their verification limits."
       },
       "public_content_and_quadratic_trace_audit": {
         "source": "polynomial.cpp:7199-7210 and 6604-6672",
