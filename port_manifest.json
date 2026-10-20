@@ -13146,9 +13146,14 @@
       "path": "src/ast/ast_smt_pp.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_smt_renaming.go",
+        "pkg/ast/ast_smt_renaming_test.go"
+      ],
+      "tests": [
+        "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions"
+      ],
       "conditionals": [
         {
           "line": 955,
@@ -13175,17 +13180,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "smt_renaming predefined names, legacy legality checks, SMT2 quoting and collision-free bidirectional translation (ast_smt_pp.cpp:24-124)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_renaming.go",
+          "tests": [
+            "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; translated spellings are interned by the borrowed manager."
+      ],
+      "deviations": [
+        "Native Go maps replace the source symbol maps. The legacy smt_printer traversal and benchmark wrapper remain open."
+      ]
     },
     {
       "path": "src/ast/ast_smt_pp.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_smt_renaming.go",
+        "pkg/ast/ast_smt_renaming_test.go"
+      ],
+      "tests": [
+        "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -13198,9 +13221,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "smt_renaming constructor and symbol translation interface (ast_smt_pp.h:24-37)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_renaming.go",
+          "tests": [
+            "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete renaming owner borrows the source symbol manager and owns its native translation maps."
+      ],
+      "deviations": [
+        "The ast_smt_pp printer interface and mk_smt_pp stream wrapper remain open."
+      ]
     },
     {
       "path": "src/ast/ast_trail.h",
