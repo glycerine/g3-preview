@@ -33077,9 +33077,9 @@
       "path": "src/ast/substitution/substitution_tree.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
-      "go_targets": ["pkg/ast/substitution/substitution_tree_compile.go"],
-      "tests": ["TestSubstitutionTreeSourceCompilerInsertDuplicateEraseAndReset", "TestSubstitutionTreeVariableIndexAndOwnerGuards"],
+      "status": "ported",
+      "go_targets": ["pkg/ast/substitution/substitution_tree_compile.go", "pkg/ast/substitution/substitution_tree_visit.go"],
+      "tests": ["TestSubstitutionTreeSourceCompilerInsertDuplicateEraseAndReset", "TestSubstitutionTreeVariableIndexAndOwnerGuards", "TestSubstitutionTreeRetainedUnifyBacktrackingBindingsAndStop", "TestSubstitutionTreeVariableCandidatesAndOffsetGuards"],
       "conditionals": [
         {
           "line": 172,
@@ -33204,19 +33204,22 @@
           "text": "SASSERT(is_var(e));"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "register allocation, linearization, compatibility selection, insertion, erasure, node compression and reset", "status": "ported", "go_target": "pkg/ast/substitution/substitution_tree_compile.go", "tests": ["TestSubstitutionTreeSourceCompilerInsertDuplicateEraseAndReset", "TestSubstitutionTreeVariableIndexAndOwnerGuards"]}],
+      "methods": [
+        {"name": "register allocation, linearization, compatibility selection, insertion, erasure, node compression and reset", "status": "ported", "go_target": "pkg/ast/substitution/substitution_tree_compile.go", "tests": ["TestSubstitutionTreeSourceCompilerInsertDuplicateEraseAndReset", "TestSubstitutionTreeVariableIndexAndOwnerGuards"]},
+        {"name": "retained STV_UNIF binding, instruction matching, variable candidates, acyclicity filtering, sibling backtracking and visitor traversal", "status": "ported", "go_target": "pkg/ast/substitution/substitution_tree_visit.go", "tests": ["TestSubstitutionTreeRetainedUnifyBacktrackingBindingsAndStop", "TestSubstitutionTreeVariableCandidatesAndOffsetGuards"]}
+      ],
       "ownership": ["Every compiled substitution instruction owns its register and value ASTRefs; leaf nodes own indexed expressions. Splits transfer instruction/reference ownership, compression transfers surviving child ownership, and erase/reset release removed subtrees."],
-      "deviations": ["The retained unify traversal remains open. Native maps index declaration and sort handles while preserving source sibling order, register linearization and compatibility selection."]
+      "deviations": ["Native maps index declaration and sort handles while preserving source sibling order, register linearization and compatibility selection. STV_INST, STV_GEN and diagnostic display have no retained source consumer and are omitted rather than porting unused template instantiations."]
     },
     {
       "path": "src/ast/substitution/substitution_tree.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
-      "go_targets": ["pkg/ast/substitution/substitution_tree_compile.go"],
-      "tests": ["TestSubstitutionTreeSourceCompilerInsertDuplicateEraseAndReset", "TestSubstitutionTreeVariableIndexAndOwnerGuards"],
+      "status": "ported",
+      "go_targets": ["pkg/ast/substitution/substitution_tree_compile.go", "pkg/ast/substitution/substitution_tree_visit.go"],
+      "tests": ["TestSubstitutionTreeSourceCompilerInsertDuplicateEraseAndReset", "TestSubstitutionTreeVariableIndexAndOwnerGuards", "TestSubstitutionTreeRetainedUnifyBacktrackingBindingsAndStop", "TestSubstitutionTreeVariableCandidatesAndOffsetGuards"],
       "conditionals": [
         {
           "line": 19,
@@ -33227,11 +33230,14 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "constructor, insert, erase, reset, empty and approximate-register public compiler surface", "status": "ported", "go_target": "pkg/ast/substitution/substitution_tree_compile.go", "tests": ["TestSubstitutionTreeSourceCompilerInsertDuplicateEraseAndReset", "TestSubstitutionTreeVariableIndexAndOwnerGuards"]}],
+      "methods": [
+        {"name": "constructor, insert, erase, reset, empty and approximate-register public compiler surface", "status": "ported", "go_target": "pkg/ast/substitution/substitution_tree_compile.go", "tests": ["TestSubstitutionTreeSourceCompilerInsertDuplicateEraseAndReset", "TestSubstitutionTreeVariableIndexAndOwnerGuards"]},
+        {"name": "st_visitor and retained unify public traversal surface", "status": "ported", "go_target": "pkg/ast/substitution/substitution_tree_visit.go", "tests": ["TestSubstitutionTreeRetainedUnifyBacktrackingBindingsAndStop", "TestSubstitutionTreeVariableCandidatesAndOffsetGuards"]}
+      ],
       "ownership": ["SubstitutionTree is a noncopyable checked Go owner that borrows its AST manager and owns all indexed expressions and compiled node instructions."],
-      "deviations": ["The retained visitor and unify surface remains open; inst/gen are currently unported pending the retained-consumer audit."]
+      "deviations": ["TreeVisitor replaces the C++ virtual visitor with a concrete Go interface. The unreferenced inst/gen overloads and diagnostic display are omitted under the retained-consumer rule."]
     },
     {
       "path": "src/ast/substitution/unifier.cpp",

@@ -771,12 +771,6 @@ func (t *SubstitutionTree) Empty() (bool, error) {
 	}
 	return t.size == 0, nil
 }
-func (t *SubstitutionTree) Size() (uint32, error) {
-	if e := t.open(); e != nil {
-		return 0, e
-	}
-	return t.size, nil
-}
 func (t *SubstitutionTree) ApproxRegisters() (uint32, error) {
 	if e := t.open(); e != nil {
 		return 0, e

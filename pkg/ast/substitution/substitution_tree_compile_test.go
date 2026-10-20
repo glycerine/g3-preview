@@ -58,8 +58,8 @@ func TestSubstitutionTreeSourceCompilerInsertDuplicateEraseAndReset(t *testing.T
 			t.Fatal("insert", e)
 		}
 	}
-	if n, e := tree.Size(); e != nil || n != 3 {
-		t.Fatal("duplicate size", n, e)
+	if tree.size != 3 {
+		t.Fatal("duplicate size", tree.size)
 	}
 	if regs, e := tree.ApproxRegisters(); e != nil || regs < 3 {
 		t.Fatal("register compilation", regs, e)
@@ -67,8 +67,8 @@ func TestSubstitutionTreeSourceCompilerInsertDuplicateEraseAndReset(t *testing.T
 	if e = tree.Erase(two); e != nil {
 		t.Fatal(e)
 	}
-	if n, e := tree.Size(); e != nil || n != 2 {
-		t.Fatal("erase branch", n, e)
+	if tree.size != 2 {
+		t.Fatal("erase branch", tree.size)
 	}
 	if e = tree.Erase(two); e != nil {
 		t.Fatal("missing erase", e)
