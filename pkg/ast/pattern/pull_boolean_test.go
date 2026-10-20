@@ -2,6 +2,7 @@ package pattern
 
 import (
 	"bytes"
+	"errors"
 	"strings"
 	"testing"
 
@@ -10,6 +11,57 @@ import (
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestPatternPullNoProofIdentityAndSourcePreconditionGuards(t *testing.T) {
+	m := patternManager(t)
+	pin := func(h ast.ASTHandle) ast.ASTHandle {
+		t.Helper()
+		patternMust(t, m.IncRef(h))
+		t.Cleanup(func() { patternMust(t, m.DecRef(h)) })
+		return h
+	}
+	b, err := m.MkBoolSort()
+	patternMust(t, err)
+	truth, err := m.MkTrue()
+	patternMust(t, err)
+	pin(truth)
+	c, err := newPatternCandidates(m, 0, nil, false)
+	patternMust(t, err)
+	t.Cleanup(func() { patternMust(t, c.close()) })
+
+	identity, err := c.pullNoProof(truth)
+	patternMust(t, err)
+	got, err := m.RefGet(identity)
+	patternMust(t, err)
+	if got != truth {
+		t.Fatal("quantifier-free expression lost source identity", got, truth)
+	}
+	patternMust(t, m.DelRef(&identity))
+
+	name := symbol.Numerical(970)
+	forall, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []symbol.Symbol{name}, Body: truth})
+	patternMust(t, err)
+	pin(forall)
+	exists, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: false, Sorts: []ast.ASTHandle{b}, Names: []symbol.Symbol{name}, Body: truth})
+	patternMust(t, err)
+	pin(exists)
+	mixed, err := m.MkFamilyApp(m.BasicFamilyID(), ast.ASTOpAnd, nil, []ast.ASTHandle{forall, exists})
+	patternMust(t, err)
+	pin(mixed)
+	if _, err = c.pullNoProof(mixed); !errors.Is(err, ast.ErrASTPending) {
+		t.Fatal("mixed quantifier polarities must reject the violated SNF precondition", err)
+	}
+
+	outerExists, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: false, Sorts: []ast.ASTHandle{b}, Names: []symbol.Symbol{name}, Body: forall})
+	patternMust(t, err)
+	pin(outerExists)
+	if _, err = c.pullNoProof(outerExists); !errors.Is(err, ast.ErrASTPending) {
+		t.Fatal("nested non-universal quantifier must reject the source universal precondition", err)
+	}
+	if len(c.pendingPatternRefs) != 0 {
+		t.Fatal("failed pulls retained temporary references", len(c.pendingPatternRefs))
+	}
+}
 
 func TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames(t *testing.T) {
 	m := patternManager(t)

@@ -19157,9 +19157,9 @@
       "path": "src/ast/normal_forms/pull_quant.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/ast/pattern/pull_direct.go", "pkg/ast/pattern/pull_boolean.go", "pkg/ast/pattern/reduce_quantifier.go"],
-      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"],
+      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern", "TestPatternPullNoProofIdentityAndSourcePreconditionGuards"],
       "assertions": [
         {
           "line": 47,
@@ -19198,8 +19198,8 @@
           "text": "SASSERT(!is_quantifier(new_expr));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "pull_quant1_core direct nested forall/forall binder concatenation and minimum weight for retained pattern inference (pull_quant.cpp:173-189)",
@@ -19223,20 +19223,28 @@
         },
         {
           "name": "proof generation, pull_quant2 and pull_nested_quant other consumers",
-          "status": "unported",
+          "status": "reference_only",
           "tests": []
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "The retained no-proof transformer borrows its input AST handle and manager. Every recursive result is held by an ASTRef until its parent publishes or rejects it, and the returned ASTRef independently owns the final result pin.",
+        "Each pull invocation owns and closes its VarShifter. Temporary shifted-child references are released on success and error; native Go slices own the temporary declaration, name, child and reference buffers.",
+        "Declaration sorts and symbols are borrowed from the AST and symbol managers. Duplicate binder spellings are freshly interned in the manager-owned symbol table."
+      ],
+      "deviations": [
+        "The retained pattern-inference caller rejects proof-enabled operation before invoking this transform, so pull_quant2 and proof construction remain reference-only.",
+        "pull_nested_quant is used by unretained C++ SMT consumers; no unused universal Go adapter is added.",
+        "Violated SNF polarity and nested-universal preconditions return ast.ErrASTPending instead of continuing after source debug assertions."
+      ]
     },
     {
       "path": "src/ast/normal_forms/pull_quant.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/ast/pattern/pull_direct.go", "pkg/ast/pattern/pull_boolean.go", "pkg/ast/pattern/reduce_quantifier.go"],
-      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"],
+      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern", "TestPatternPullNoProofIdentityAndSourcePreconditionGuards"],
       "conditionals": [
         {
           "line": 19,
@@ -19247,8 +19255,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "pull_quant retained direct nested universal quantifier branch",
@@ -19264,12 +19272,18 @@
         },
         {
           "name": "proof and other pull_nested_quant interfaces",
-          "status": "unported",
+          "status": "reference_only",
           "tests": []
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "The concrete retained interface borrows its manager and input handles and returns an independently owned ASTRef; internal ASTRefs keep recursive results alive until assembly and are closed on every exit.",
+        "The VarShifter and all native Go temporary slices are invocation-owned. Symbols and declaration sorts remain manager-owned borrowed values."
+      ],
+      "deviations": [
+        "Only the no-proof pattern-inference interface is retained. Proof APIs and pull_nested_quant declarations have no retained Go consumer and remain reference-only.",
+        "Source assertion preconditions are represented by typed Go errors."
+      ]
     },
     {
       "path": "src/ast/num_occurs.cpp",

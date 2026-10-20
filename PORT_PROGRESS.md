@@ -47323,3 +47323,17 @@ free-variable traversal behavior; the raw overloads have no retained external
 consumer. Native slices/maps replace pointer containers, and typed debug errors
 replace source debug actions. Portcheck reports 2103 units, 677 APIs: 269
 ported, 299 partial, 1478 unported and 11 dead/deleted.
+
+Quantifier-pulling whole-unit closure:
+`src/ast/normal_forms/pull_quant.cpp` and `.h` are promoted to ported for their
+retained pattern-inference consumer. The concrete no-proof transform covers
+recursive applications and quantifiers, NOT polarity inversion, AND/OR binder
+collection, exact de Bruijn shifts, duplicate-name freshening, weights, QIDs,
+direct nested universal concatenation and all three TRACE records. Focused
+guards now cover identity and the source SNF/universal preconditions. The
+proof-enabled APIs and `pull_nested_quant` serve only unretained C++ SMT
+consumers and are recorded reference-only. Temporary ASTRefs and the VarShifter
+have audited lexical cleanup; native slices replace source pointer buffers.
+All four focused profiles and the full native pattern package pass on CPUs
+8-16. Portcheck reports 2103 units, 677 APIs: 271 ported, 297 partial, 1478
+unported and 11 dead/deleted.
