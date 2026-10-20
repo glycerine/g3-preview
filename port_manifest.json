@@ -14586,9 +14586,19 @@
       "path": "src/ast/expr2polynomial.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_expr2polynomial.go",
+        "pkg/ast/ast_expr2polynomial_test.go",
+        "pkg/math/polynomial/polynomial_expr_translation_binding.go"
+      ],
+      "tests": [
+        "TestExpr2PolynomialForwardRationalArithmeticCacheAndOwnership",
+        "TestExpr2PolynomialForwardRefusalCancelAndVarIndexMode",
+        "TestExpr2PolynomialSourceOperatorBranchesAndAtomicInvalidPower",
+        "TestExpr2PolynomialSourceFrameTraceOrder",
+        "TestPolynomialExprTranslationBorrowedBindings"
+      ],
       "assertions": [
         {
           "line": 115,
@@ -14679,19 +14689,74 @@
           "text": "SASSERT(!m_imp->m_use_var_idxs);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "imp/default owner construction, borrowed AST/polynomial accessors, concrete variable allocation/kind policy, cancellation and destruction (cpp37-109,466-518)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr2polynomial.go",
+          "tests": [
+            "TestExpr2PolynomialForwardRefusalCancelAndVarIndexMode"
+          ]
+        },
+        {
+          "name": "iterative to_polynomial traversal, shared-node cache, exact numerator/denominator normalization and all arithmetic/atomic branches (cpp111-389)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr2polynomial.go",
+          "tests": [
+            "TestExpr2PolynomialForwardRationalArithmeticCacheAndOwnership",
+            "TestExpr2PolynomialForwardRefusalCancelAndVarIndexMode",
+            "TestExpr2PolynomialSourceOperatorBranchesAndAtomicInvalidPower"
+          ]
+        },
+        {
+          "name": "to_polynomial frame TRACE at cpp372 after checkpoint and before child traversal",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr2polynomial.go",
+          "tests": ["TestExpr2PolynomialSourceFrameTraceOrder"]
+        },
+        {
+          "name": "is_int_poly and to_expr coefficient, variable/coercion, power/repeated-factor, product, sum and zero reconstruction (cpp391-453)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr2polynomial.go",
+          "tests": [
+            "TestExpr2PolynomialForwardRationalArithmeticCacheAndOwnership",
+            "TestExpr2PolynomialForwardRefusalCancelAndVarIndexMode",
+            "TestExpr2PolynomialSourceOperatorBranchesAndAtomicInvalidPower"
+          ]
+        },
+        {
+          "name": "is_var/get_mapping retained mapping facade and private cache reset lifecycle (cpp89-94,489-498)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr2polynomial.go",
+          "tests": ["TestExpr2PolynomialForwardRationalArithmeticCacheAndOwnership"]
+        }
+      ],
+      "ownership": [
+        "Expr2Polynomial borrows the AST and polynomial managers and an optional external Expr2Var. The default form owns and closes its concrete Expr2Var. Variable-to-expression entries and cached domains own ASTRefs; cached numerator polynomials and denominator integers own independent references.",
+        "ToPolynomial transfers an owning PolynomialRef and ScopedInt denominator to the caller. ToExpr transfers one owning ASTRef. Iterative frame arguments own temporary polynomial/integer pairs until their parent operation publishes or failure cleanup completes."
+      ],
+      "deviations": [
+        "Native slices and maps replace source vectors and obj_map. The abstract C++ mk_var/is_int virtual pair is a concrete typed ExprPolynomialVariables interface for the retained nlsat specialization; the default path directly uses the polynomial manager and its bool slice policy.",
+        "Go returns typed errors for source assertions and exceptions and returns owning result objects rather than mutating caller-created reference wrappers. Standard-library string parsing transports exact numerals between the independent AST and polynomial numeral owners."
+      ]
     },
     {
       "path": "src/ast/expr2polynomial.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_expr2polynomial.go",
+        "pkg/ast/ast_expr2polynomial_test.go"
+      ],
+      "tests": [
+        "TestExpr2PolynomialForwardRationalArithmeticCacheAndOwnership",
+        "TestExpr2PolynomialForwardRefusalCancelAndVarIndexMode",
+        "TestExpr2PolynomialSourceOperatorBranchesAndAtomicInvalidPower",
+        "TestExpr2PolynomialSourceFrameTraceOrder"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -14702,11 +14767,27 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete expr2polynomial/default_expr2polynomial public surface: constructors, managers, forward/reverse conversion, mapping queries, cancellation and typed variable policy",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr2polynomial.go",
+          "tests": [
+            "TestExpr2PolynomialForwardRationalArithmeticCacheAndOwnership",
+            "TestExpr2PolynomialForwardRefusalCancelAndVarIndexMode",
+            "TestExpr2PolynomialSourceOperatorBranchesAndAtomicInvalidPower",
+            "TestExpr2PolynomialSourceFrameTraceOrder"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go owner rejects shallow copies, borrows manager/configuration owners, conditionally owns its default Expr2Var, owns cache and inverse-map references, and transfers explicit owning forward/reverse results to callers."
+      ],
+      "deviations": [
+        "The source virtual specialization is represented by the typed ExprPolynomialVariables interface for actual uint32 polynomial variables. Native collections replace source pointer/reference vectors, and invalid use returns typed errors."
+      ]
     },
     {
       "path": "src/ast/expr2var.cpp",

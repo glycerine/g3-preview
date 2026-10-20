@@ -47434,3 +47434,18 @@ replace the source containers, and typed guards cover invalid scope, duplicate,
 copied and closed use. All four focused profiles pass on CPUs 8-16. Portcheck
 reports 2103 units, 677 APIs: 285 ported, 283 partial, 1478 unported and 11
 dead/deleted.
+
+Expression/polynomial bridge whole-unit closure:
+`src/ast/expr2polynomial.cpp` and `.h` are promoted to ported after completing
+the concrete bidirectional bridge. Forward conversion preserves the iterative
+frame traversal, checkpoint and exact TRACE order, shared-expression cache,
+integer/real and free-variable-index policies, atomic fallback, all reached
+arithmetic branches and exact common-denominator normalization. Reverse
+conversion preserves integer-polynomial detection, integer-to-real coercions,
+coefficient and monomial order, power versus repeated-factor construction, and
+zero/product/sum shortcuts. Cache domains and inverse variables own AST pins;
+cached and returned polynomial/integer pairs have audited independent ownership.
+The typed variable-policy surface supports the retained nlsat specialization
+without an any-valued adapter. All four focused profiles pass on CPUs 8-16.
+Portcheck reports 2103 units, 677 APIs: 287 ported, 283 partial, 1476 unported
+and 11 dead/deleted.
