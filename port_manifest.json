@@ -44348,8 +44348,8 @@
           "tests": ["TestPolynomialNewtonVectorChildMemoryWrappers"]
         },
         {
-          "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609\u2013764), source reference guards, size/variable reads and reached-only degree reads",
-          "status": "ported",
+          "name": "Retained monomial Lex, LexWithMinimum and GradedLex algorithms cpp609-704 with native field ordering; runtime assertion-callsite closure pending",
+          "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_order.go",
           "tests": [
             "TestMonomialOrderSourceLexAssertions",
@@ -44358,7 +44358,14 @@
             "TestMonomialOrderWarmNoAllocation",
             "TestMonomialOrderSourceSignedSizeBoundary",
             "TestMonomialOrderSourceDegreeShortCircuit"
-          ]
+          ],
+          "notes": "Ordinary lex is retained by sorted verification, CRA and graded comparisons; lex_compare2 is retained by actual Newton lex_lt2 sorting cpp2985. Direct current-code inspection finds orderPowerLocation and lexCore tail assertions still use DebugBuild-only hard errors instead of runtime process assertion gates/actions at228,629-630,674. Existing native algorithms and finite-model/read-order tests remain; they do not prove those missing source assertion protocols. Source reverse-lex variants have no retained callers and are qualified separately."
+        },
+        {
+          "name": "Dormant reverse-lex range, ReverseLex and GradedReverseLex helpers cpp706-756",
+          "status": "reference_only",
+          "go_target": "pkg/math/polynomial/polynomial_monomial_order.go",
+          "notes": "Whole-src word search finds only source definitions, header declarations and internal calls within the reverse-lex family; no retained source root calls it. Existing Go compatibility APIs/tests remain. Do not port its707-729 assertions merely because scalar continuation counterexamples are easy; retained ordinary/minimum-variable comparators have separate unfinished work."
         },
         {
           "name": "Complete polynomial manager, arithmetic, PRS/resultant and source owning wrappers",
