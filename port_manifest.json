@@ -4,27 +4,68 @@
       "path": "CMakeLists.txt",
       "component": "CMakeLists.txt",
       "role": "reference_tool",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/push_app_ite.go"],
+      "tests": [
+        "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
+        "TestPushAppITERefusesBooleanITEAndITEDeclaration",
+        "TestNGPushAppITERequiresNongroundArgument",
+        "TestPushAppITEConfigurationProofAndOwnerGuards"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "has_ite_arg, push_app_ite_cfg::is_target/reduce_app, and ng_push_app_ite_cfg::is_target",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/push_app_ite.go",
+          "tests": [
+            "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
+            "TestPushAppITERefusesBooleanITEAndITEDeclaration",
+            "TestNGPushAppITERequiresNongroundArgument",
+            "TestPushAppITEConfigurationProofAndOwnerGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Configuration borrows the AST manager and application arguments. Each reduction copies the mutable argument pointer view into native Go handle storage, publishes its result and optional proof through caller-owned AST references, and retains no per-call AST nodes. The wrapper owns its charged traversal/configuration representation and releases it idempotently."
+      ],
+      "deviations": [
+        "The proof-enabled wrapper publishes one valid root rewrite (or reflexivity) proof after the exact no-proof traversal instead of preserving the source traversal's internal congruence/transitivity proof-tree shape."
+      ]
     },
     {
       "path": "LICENSE.txt",
       "component": "LICENSE.txt",
       "role": "reference_tool",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/push_app_ite.go"],
+      "tests": [
+        "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
+        "TestPushAppITERefusesBooleanITEAndITEDeclaration",
+        "TestNGPushAppITERequiresNongroundArgument",
+        "TestPushAppITEConfigurationProofAndOwnerGuards"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "push_app_ite_cfg, ng_push_app_ite_cfg, push_app_ite_rw, and ng_push_app_ite_rw declarations and constructors",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/push_app_ite.go",
+          "tests": [
+            "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
+            "TestNGPushAppITERequiresNongroundArgument",
+            "TestPushAppITEConfigurationProofAndOwnerGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Public configuration and wrapper constructors preserve conservative/full and nonground variants. The wrapper owns the traversal, borrows the manager, rejects copied/closed use, and supports reset and idempotent close."
+      ],
+      "deviations": [
+        "Go exposes explicit constructors and error returns; native inheritance, layout, pointer mutation, assertion, and exception ABI are not claimed."
+      ]
     },
     {
       "path": "cmake/Z3Config.cmake.in",
