@@ -30319,8 +30319,9 @@
       "path": "src/ast/rewriter/rewriter_params.hpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/ast/rewriter/rewriter_params.go",
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
@@ -30331,7 +30332,8 @@
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestRewriterParamsDefaultsSnapshotAndLocalPrecedence"
       ],
       "conditionals": [
         {
@@ -30343,11 +30345,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/gparams_catalog_collectors.go",
           "tests": [
@@ -30360,10 +30362,19 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "generated constructor, owned rewriter module snapshot and all ten typed local-module-literal accessors (src/ast/rewriter/rewriter_params.hpp:5-37)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/rewriter_params.go",
+          "tests": [
+            "TestRewriterParamsDefaultsSnapshotAndLocalPrecedence"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md.",
+        "The facade borrows its caller ParamsRef and owns the constructor-time rewriter module ParamsRef snapshot. Close performs the tracked source decrement and can resume a stopped decrement without repeating it. Nil local input uses the context-owned empty value; copied, closed, foreign and expired facades are rejected."
       ],
       "deviations": []
     },

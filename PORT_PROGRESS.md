@@ -47149,3 +47149,14 @@ is linked only by the external integration test, preserving the production
 package dependency boundary. Focused tests pass native, checked, debug and
 combined profiles on CPUs 8-16; portcheck reports 251 ported and 315 partial
 units.
+
+Core rewriter generated parameter facade closure:
+`src/ast/rewriter/rewriter_params.hpp` is promoted to ported. The concrete Go
+facade owns the constructor-time `rewriter` module snapshot and implements all
+ten generated uint/bool accessors with exact local/module/literal precedence:
+memory and step limits, flattening, ITE push/pull controls, BV inequality
+threshold, caching and pattern controls. Tests exercise every literal default
+and every module value, then local overrides, snapshot stability and
+copied/closed-owner rejection. Focused tests pass native, checked, debug and
+combined profiles on CPUs 8-16; portcheck reports 252 ported and 314 partial
+units.
