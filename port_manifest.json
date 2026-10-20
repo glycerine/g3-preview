@@ -16066,16 +16066,21 @@
       "path": "src/ast/format.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/ast/ast_format.go",
         "pkg/ast/ast_format_flat.go",
         "pkg/ast/ast_format_source_test.go",
         "pkg/ast/ast_format_seq1.go",
+        "pkg/ast/ast_format_seq3.go",
         "pkg/ast/ast_format_seq5.go"
       ],
       "tests": [
+        "TestASTFormatSourcePluginAndLiteralPrimitives",
         "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation",
         "TestASTFormatSeq1SourceGroupingAndNilTail",
+        "TestASTFormatSeq3SourceSplitAndNilDocuments",
+        "TestASTSMT2QuantifierRootSourceFormat",
         "TestASTSMT2FunctionDeclarationSourceFormatsAndRecursiveReference"
       ],
       "conditionals": [
@@ -16094,9 +16099,17 @@
           "text": "SASSERT(i >= 1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "Format aliases, operation kinds, manager selection and fixed primitive factory declarations (format.h:25-67)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_format.go",
+          "tests": [
+            "TestASTFormatSourcePluginAndLiteralPrimitives"
+          ]
+        },
         {
           "name": "Concrete format-pointer mk_seq4/mk_seq5 grouped parenthesized signature sequence (format.h:164-195)",
           "status": "ported",
@@ -16112,12 +16125,28 @@
           "tests": [
             "TestASTFormatSeq1SourceGroupingAndNilTail"
           ]
+        },
+        {
+          "name": "Concrete format-pointer mk_seq3 split header layout used by the retained SMT2 quantifier printer (format.h:132-162)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_format_seq3.go",
+          "tests": [
+            "TestASTFormatSeq3SourceSplitAndNilDocuments",
+            "TestASTSMT2QuantifierRootSourceFormat"
+          ]
+        },
+        {
+          "name": "mk_seq2 concrete template (format.h:110-129)",
+          "status": "dead",
+          "reason": "No source consumer instantiates mk_seq2 anywhere in the retained tree."
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Concrete Go sequence helpers borrow caller format handles and construct ordinary manager-owned format AST nodes through the existing factories. Temporary Go slices own only traversal order; returned AST handles follow the manager's existing reference contract."
+      ],
       "deviations": [
         "Retained format flat recursion now borrows native []astNodeRef todo, []ASTHandle transformed arguments and a lookup-only map[astNodeRef]astNodeRef cache. Stack and child iteration preserve source order; the cache never iterates. Removed cache capacity/probing/rehash/pending-growth and vector backing/refusal emulation, plus unused IgnorePatterns=true results2 storage and obsolete AppArguments format-vector representation. Actual recursion header, AST construction, source UNREACHABLE guards and failed-frame history through enclosing teardown remain. A deep shared graph with 129 distinct leaves grows native storage with only the actual frame reservation in release; exact leaf reference counts and original CHOICE arg0 behavior remain. Original allocation campaign now covers actual frame/factory reservations, and history test stops at real line-break-to-string construction. Shared arithmetic/BV cache storage remains separately pending; no generic container, STL or whole-unit completion credit is added.",
-        "The concrete format-pointer mk_seq1 path now constructs source grouped and indented header documents, including empty argument lists and nil tail filtering, for retained SMT2 indexed declarations and sort applications. The concrete mk_seq5 signature path also preserves source grouping and nil-tail filtering. Other format.h templates remain open."
+        "The retained concrete format-pointer instantiations are FormatSeq1, FormatSeq3 and FormatSeq5. They preserve source grouping, indentation, split placement and nil-tail filtering. The identity f2f adapter is direct ASTHandle use; mk_seq2 has no source instantiation and is dead. No universal iterator or callback adapter is introduced."
       ]
     },
     {

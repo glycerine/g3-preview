@@ -203,44 +203,12 @@ func (m *ASTManager) smt2PPQuantifierRootWithInfoAt(q ASTHandle, outer []usymbol
 	if forall {
 		header = "forall"
 	}
-	left, err := m.FormatString("(" + header)
-	if err != nil {
-		return ASTHandle{}, err
-	}
-	space, err := m.FormatString(" ")
-	if err != nil {
-		return ASTHandle{}, err
-	}
-	first, err := m.FormatCompose([]ASTHandle{space, printedDecls})
-	if err != nil {
-		return ASTHandle{}, err
-	}
-	first, err = m.FormatIndent(uint32(len(header)+2), first)
-	if err != nil {
-		return ASTHandle{}, err
-	}
-	first, err = m.FormatGroup(first)
-	if err != nil {
-		return ASTHandle{}, err
-	}
-	tail, err := m.smt2FormatTail([]ASTHandle{printedBody})
-	if err != nil {
-		return ASTHandle{}, err
-	}
-	tail, err = m.FormatIndent(2, tail)
-	if err != nil {
-		return ASTHandle{}, err
-	}
-	right, err := m.FormatString(")")
-	if err != nil {
-		return ASTHandle{}, err
-	}
-	whole, err := m.FormatCompose([]ASTHandle{left, first, tail, right})
+	whole, err := m.FormatSeq3(header, []ASTHandle{printedDecls, printedBody}, 1, 2)
 	if err != nil {
 		return ASTHandle{}, err
 	}
 	if info != nil {
 		*info = smt2PPInfo{weight: bodyInfo.weight + 2*count + 8*bodyInfo.lets, depth: bodyInfo.depth + 1}
 	}
-	return m.FormatGroup(whole)
+	return whole, nil
 }
