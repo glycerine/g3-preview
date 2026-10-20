@@ -13158,7 +13158,8 @@
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
         "TestLegacySMTPrinterSortParametersAndRenaming",
-        "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals"
+        "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals",
+        "TestLegacySMTPrinterBitVectorAndLabelLiterals"
       ],
       "conditionals": [
         {
@@ -13208,7 +13209,8 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_smt_legacy_expr.go",
           "tests": [
-            "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals"
+            "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals",
+            "TestLegacySMTPrinterBitVectorAndLabelLiterals"
           ]
         }
       ],
@@ -13216,7 +13218,7 @@
         "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. Declaration parameters, bit-vector/string/floating-point literals, labels, distinct regrouping, implication simplification, let insertion, quantifiers, datatype-special paths and the benchmark wrapper remain open."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. Declaration parameters, string/floating-point literals, bit2bool, distinct regrouping, implication simplification, let insertion, quantifiers, datatype-special paths and the benchmark wrapper remain open."
       ]
     },
     {
@@ -13235,7 +13237,8 @@
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
         "TestLegacySMTPrinterSortParametersAndRenaming",
-        "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals"
+        "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals",
+        "TestLegacySMTPrinterBitVectorAndLabelLiterals"
       ],
       "conditionals": [
         {

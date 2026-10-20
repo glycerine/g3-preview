@@ -2,9 +2,30 @@
 package ast
 
 import (
+	"errors"
 	"io"
 	"strings"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func (p *LegacySMTPrinter) bitVectorNumeralText(h ASTHandle) (text string, matched bool, result error) {
+	value, err := p.manager.numerals.NewValue()
+	if err != nil {
+		return "", false, err
+	}
+	defer func() { result = errors.Join(result, p.manager.numerals.Del(&value)) }()
+	var width uint32
+	matched, result = p.manager.BitVectorNumeralValue(h, &value, &width)
+	if result != nil || !matched {
+		return "", matched, result
+	}
+	valueText, err := p.manager.numerals.String(&value)
+	if err != nil {
+		return "", false, err
+	}
+	return "(_ bv" + valueText + " " + uintText(width) + ")", true, nil
+}
 
 func legacySMTRational(text string, integerSort bool) string {
 	negative := strings.HasPrefix(text, "-")
@@ -89,6 +110,44 @@ func (p *LegacySMTPrinter) exprText(h ASTHandle, variableNames []string) (string
 		return "", e
 	} else if matched {
 		return legacySMTRational(value, integer), nil
+	}
+	if value, matched, e := p.bitVectorNumeralText(h); e != nil {
+		return "", e
+	} else if matched {
+		return value, nil
+	}
+	var labels []usymbol.Symbol
+	positive := false
+	if matched, e := p.manager.IsLabel(h, &positive, &labels); e != nil {
+		return "", e
+	} else if matched && len(labels) > 0 {
+		body, e := p.manager.GetArg(h, 0)
+		if e != nil {
+			return "", e
+		}
+		bodyText, e := p.exprText(body, variableNames)
+		if e != nil {
+			return "", e
+		}
+		label, e := p.renamedText(labels[0])
+		if e != nil {
+			return "", e
+		}
+		attribute := ":lblneg"
+		if positive {
+			attribute = ":lblpos"
+		}
+		return "(! " + bodyText + attribute + " " + label + ")", nil
+	}
+	labels = labels[:0]
+	if matched, e := p.manager.IsLabelLit(h, &labels); e != nil {
+		return "", e
+	} else if matched && len(labels) > 0 {
+		label, e := p.renamedText(labels[0])
+		if e != nil {
+			return "", e
+		}
+		return "(! true :lblpos " + label + ")", nil
 	}
 	decl, err := p.manager.GetDecl(h)
 	if err != nil {

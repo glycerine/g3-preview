@@ -3,6 +3,8 @@ package ast
 import (
 	"strings"
 	"testing"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals(t *testing.T) {
@@ -62,6 +64,41 @@ func TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals(t *testing.T) {
 		astTestMust(t, printer.DisplayExpr(&out, tc.expr, tc.names))
 		if out.String() != tc.want {
 			t.Fatal("legacy SMT expression", out.String(), tc.want)
+		}
+	}
+}
+
+func TestLegacySMTPrinterBitVectorAndLabelLiterals(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	printer, err := NewLegacySMTPrinter(m)
+	astTestMust(t, err)
+	bv, err := m.BitVectorNumeralUnsigned(13, 8)
+	astTestMust(t, err)
+	astTestPin(t, m, bv)
+	boolSort, err := m.MkBoolSort()
+	astTestMust(t, err)
+	a, err := m.MkConst(astTestSymbol(t, m, "legacy-label-body"), boolSort)
+	astTestMust(t, err)
+	astTestPin(t, m, a)
+	labelName := astTestSymbol(t, m, "legacy label")
+	label, err := m.MkLabel(true, []usymbol.Symbol{labelName}, a)
+	astTestMust(t, err)
+	astTestPin(t, m, label)
+	literal, err := m.MkLabelLit([]usymbol.Symbol{labelName})
+	astTestMust(t, err)
+	astTestPin(t, m, literal)
+	for _, tc := range []struct {
+		expr ASTHandle
+		want string
+	}{{bv, "(_ bv13 8)"}, {label, "(! legacy-label-body:lblpos |legacy label|)"}, {literal, "(! true :lblpos |legacy label|)"}} {
+		var out strings.Builder
+		astTestMust(t, printer.DisplayExpr(&out, tc.expr, nil))
+		if out.String() != tc.want {
+			t.Fatal("legacy SMT specialized expression", out.String(), tc.want)
 		}
 	}
 }
