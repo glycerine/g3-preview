@@ -20041,7 +20041,7 @@
       "path": "src/ast/pattern/pattern_inference_params.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_pattern_inference_params.go",
         "pkg/smtcore/util_smt_pattern_inference_params_source_test.go",
@@ -20057,12 +20057,12 @@
         "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestPatternInferenceParamsBindRewriterAndRefresh"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Actual pi helper, eight ordered getter publications and ten separate endl chains (src/ast/pattern/pattern_inference_params.cpp:22-47)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_pattern_inference_params.go",
           "tests": [
             "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
@@ -20075,7 +20075,7 @@
         },
         {
           "name": "Concrete pi option snapshot and refresh into pattern inference traversal, preserving full unsigned arithmetic mode",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/pattern_inference_rewriter.go",
           "tests": [
             "TestPatternInferenceParamsBindRewriterAndRefresh"
@@ -20086,14 +20086,15 @@
         "Ten actual scalar source fields are embedded once in the reflected standalone wrapper. Only two explicit initializers run before mandatory update; each of eight returned RHS values publishes its field and initialized bit in order. Actual pi module reference is acquired at the returned leaf in the existing concrete helper frame, with lexical source DT before return and distinct matched owning continuation. Local/global/context remain borrowed; no duplicate header charge for embedded helper metadata."
       ],
       "deviations": [
-        "No preprocessor/smt parent, real SMT context/driver, global/locale/boolalpha or whole generated descriptor-registration credit. Actual pattern constructor initializes only nopat_weight and avoid_skolems before module pi declaration; Initialized metadata distinguishes those source-reached fields from uninitialized diagnostic Go storage. Incomplete constructors remain diagnostic owners and ordinary Update/Display reject them. Enumeration valid0/1/2 cases are distinct from native out-of-domain casts."
+        "Actual pattern construction initializes only nopat_weight and avoid_skolems before the pi module lookup; Initialized metadata distinguishes source-reached fields from zeroed diagnostic Go storage. Incomplete constructors remain diagnostic owners and ordinary Update/Display reject them.",
+        "Arithmetic retains the full unsigned source cast domain rather than restricting values to the three named enumerators. NumericTextStream integer output replaces ostream locale/boolalpha behavior for the retained deterministic display."
       ]
     },
     {
       "path": "src/ast/pattern/pattern_inference_params.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_pattern_inference_params.go",
         "pkg/smtcore/util_smt_pattern_inference_params_source_test.go",
@@ -20123,12 +20124,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Ten declared fields, two explicit initializers then mandatory update (src/ast/pattern/pattern_inference_params.h:30-50)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_pattern_inference_params.go",
           "tests": [
             "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
@@ -20141,7 +20142,7 @@
         },
         {
           "name": "Same-engine standalone or embedded pattern construction with literal default-empty implicit base (src/ast/pattern/pattern_inference_params.h:30-50)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_pattern_inference_params.go",
           "tests": [
             "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
@@ -20151,7 +20152,7 @@
         },
         {
           "name": "Concrete pi option snapshot and refresh into pattern inference traversal, preserving full unsigned arithmetic mode",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/pattern_inference_rewriter.go",
           "tests": [
             "TestPatternInferenceParamsBindRewriterAndRefresh"
@@ -20163,8 +20164,8 @@
         "Actual implicit pattern base uses default empty ParamsRef, followed by inline bit base, nineteen local initializers, then five local smt getter publications. Update completes pattern before local helper; Display preserves pattern ten, bit two, then nineteen separate local endl chains. Parent reflected header charges embedded metadata once; returned helper references use actual shared leaf receipts, strict source stops and separate owning cleanup before older bases."
       ],
       "deviations": [
-        "No preprocessor/smt parent, real SMT context/driver, global/locale/boolalpha or whole generated descriptor-registration credit. Actual pattern constructor initializes only nopat_weight and avoid_skolems before module pi declaration; Initialized metadata distinguishes those source-reached fields from uninitialized diagnostic Go storage. Incomplete constructors remain diagnostic owners and ordinary Update/Display reject them. Enumeration valid0/1/2 cases are distinct from native out-of-domain casts.",
-        "Source scalar State inspection after incomplete construction is diagnostic; ordinary Update and Display reject it. Guarded TLS destruction fixture reaches the real smt helper and public SourceReset, without a source callback claim. Compiler-generated parent copies, real SMT context/driver, native ABI, global ostream locale/boolalpha and full process binding remain open."
+        "Actual pattern construction initializes only nopat_weight and avoid_skolems before the pi module lookup; Initialized metadata distinguishes source-reached fields from zeroed diagnostic Go storage. Incomplete constructors remain diagnostic owners and ordinary Update/Display reject them.",
+        "Checked standalone and embedded owners replace compiler-generated object copying. Arithmetic retains out-of-domain unsigned casts, and NumericTextStream provides deterministic integer Boolean/enum display."
       ]
     },
     {

@@ -47397,3 +47397,15 @@ visited-mark overloads occur only in unretained proof/SMT units and are
 reference-only; the source-disabled family-name branch stays disabled. All four
 focused profiles pass on CPUs 8-16. Portcheck reports 2103 units, 677 APIs: 280
 ported, 288 partial, 1478 unported and 11 dead/deleted.
+
+Pattern-inference parameter whole-unit closure:
+`src/ast/pattern/pattern_inference_params.cpp` and `.h` are promoted to ported.
+The concrete owner preserves all ten fields, the two literal initializers,
+eight ordered pi-module lookups, local/global fallback, ten display lines,
+constructor failure prefixes and default-empty embedded preprocessor base.
+Full unsigned arithmetic values and constructor-fixed loop/AP_NO policy reach
+the retained rewriter; refreshable values, including avoid-skolems, update its
+live traversal state. Helper references and containing owners have audited
+lexical and retrying cleanup. All four focused smtcore profiles pass on CPUs
+8-16. Portcheck reports 2103 units, 677 APIs: 282 ported, 286 partial, 1478
+unported and 11 dead/deleted.
