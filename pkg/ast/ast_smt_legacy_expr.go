@@ -4,6 +4,7 @@ package ast
 import (
 	"errors"
 	"io"
+	"strconv"
 	"strings"
 
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -49,7 +50,97 @@ func legacySMTRational(text string, integerSort bool) string {
 	return formatted
 }
 
-func (p *LegacySMTPrinter) declarationText(decl ASTHandle) (string, error) {
+type legacySMTParameterView struct {
+	kind     ASTParameterKind
+	integer  int32
+	ast      ASTHandle
+	astKind  ASTKind
+	astID    uint32
+	symbol   usymbol.Symbol
+	rational string
+	double   float64
+	external uint32
+}
+
+func (m *ASTManager) legacySMTDeclParameters(decl ASTHandle) (private bool, views []legacySMTParameterView, err error) {
+	if err = m.lock(); err != nil {
+		return false, nil, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireKind(decl, ASTFuncDecl)
+	if err != nil {
+		return false, nil, err
+	}
+	infoToken := m.declAt(r.slot).info
+	if infoToken == (ASTFuncDeclInfo{}) {
+		return false, nil, nil
+	}
+	info, err := m.funcInfo(infoToken)
+	if err != nil {
+		return false, nil, err
+	}
+	views = make([]legacySMTParameterView, 0, info.count)
+	for i := uint32(0); i < info.count; i++ {
+		parameter, e := m.infoParameter(info, i)
+		if e != nil {
+			return false, nil, e
+		}
+		raw, e := m.parameter(parameter)
+		if e != nil {
+			return false, nil, e
+		}
+		view := legacySMTParameterView{kind: raw.Kind, integer: raw.integer, symbol: raw.symbol, double: raw.double, external: raw.external}
+		switch raw.Kind {
+		case ASTParameterAST:
+			if e = m.validNode(raw.ast); e != nil {
+				return false, nil, e
+			}
+			view.ast = m.external(raw.ast)
+			view.astKind = m.nodeAt(raw.ast.slot).kind
+			view.astID = m.nodeAt(raw.ast.slot).id
+		case ASTParameterRational:
+			view.rational, e = m.numerals.String(&raw.Rational)
+			if e != nil {
+				return false, nil, e
+			}
+		case ASTParameterInt, ASTParameterSymbol, ASTParameterDouble, ASTParameterExternal:
+		default:
+			return false, nil, ErrASTDomain
+		}
+		views = append(views, view)
+	}
+	return info.private, views, nil
+}
+
+func (p *LegacySMTPrinter) parameterText(parameter legacySMTParameterView, ctx *legacySMTExprContext) (string, error) {
+	switch parameter.kind {
+	case ASTParameterInt:
+		return strconv.FormatInt(int64(parameter.integer), 10), nil
+	case ASTParameterSymbol:
+		return p.manager.Symbols.Display(parameter.symbol)
+	case ASTParameterRational:
+		return parameter.rational, nil
+	case ASTParameterDouble:
+		return strconv.FormatFloat(parameter.double, 'g', 6, 64), nil
+	case ASTParameterExternal:
+		return "@" + uintText(parameter.external), nil
+	case ASTParameterAST:
+		switch parameter.astKind {
+		case ASTSort:
+			return p.sortText(parameter.ast)
+		case ASTApp, ASTVar, ASTQuantifier:
+			return p.exprTextContext(parameter.ast, ctx)
+		case ASTFuncDecl:
+			text, err := p.declarationText(parameter.ast, ctx, true)
+			return text + " ", err
+		default:
+			return "#" + uintText(parameter.astID), nil
+		}
+	}
+	return "", ErrASTDomain
+}
+
+func (p *LegacySMTPrinter) declarationText(decl ASTHandle, ctx *legacySMTExprContext, includePrivate bool) (string, error) {
 	family, err := p.manager.GetFamilyID(decl)
 	if err != nil {
 		return "", err
@@ -75,7 +166,37 @@ func (p *LegacySMTPrinter) declarationText(decl ASTHandle) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return p.renamedText(name)
+	nameText, err := p.renamedText(name)
+	if err != nil {
+		return "", err
+	}
+	private, parameters, err := p.manager.legacySMTDeclParameters(decl)
+	if err != nil {
+		return "", err
+	}
+	if len(parameters) == 0 || private && !includePrivate {
+		return nameText, nil
+	}
+	var out strings.Builder
+	if len(parameters) == 1 && parameters[0].kind == ASTParameterAST && parameters[0].astKind == ASTSort {
+		out.WriteString("(as ")
+	} else {
+		out.WriteString("(_ ")
+	}
+	out.WriteString(nameText)
+	out.WriteByte(' ')
+	for i, parameter := range parameters {
+		if i != 0 {
+			out.WriteByte(' ')
+		}
+		text, e := p.parameterText(parameter, ctx)
+		if e != nil {
+			return "", e
+		}
+		out.WriteString(text)
+	}
+	out.WriteByte(')')
+	return out.String(), nil
 }
 
 func (m *ASTManager) arithmeticPluginFamily() FamilyID {
@@ -317,11 +438,11 @@ func (p *LegacySMTPrinter) exprTextContext(h ASTHandle, ctx *legacySMTExprContex
 	if err != nil {
 		return "", err
 	}
-	name, err := p.declarationText(decl)
+	n, err := p.manager.GetNumArgs(h)
 	if err != nil {
 		return "", err
 	}
-	n, err := p.manager.GetNumArgs(h)
+	name, err := p.declarationText(decl, ctx, n != 0)
 	if err != nil {
 		return "", err
 	}

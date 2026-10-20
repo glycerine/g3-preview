@@ -13160,7 +13160,8 @@
         "TestLegacySMTPrinterSortParametersAndRenaming",
         "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals",
         "TestLegacySMTPrinterBitVectorAndLabelLiterals",
-        "TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables"
+        "TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables",
+        "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants"
       ],
       "conditionals": [
         {
@@ -13214,13 +13215,21 @@
             "TestLegacySMTPrinterBitVectorAndLabelLiterals",
             "TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables"
           ]
+        },
+        {
+          "name": "smt_printer indexed, sort-qualified, recursive AST and private declaration parameter rendering (ast_smt_pp.cpp:175-254,399-414)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_legacy_expr.go",
+          "tests": [
+            "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants"
+          ]
         }
       ],
       "ownership": [
         "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. Declaration parameters, string/floating-point literals, bit2bool, distinct regrouping, implication simplification, let insertion, datatype-special paths and the benchmark wrapper remain open."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String/floating-point literals, bit2bool, distinct regrouping, implication simplification, let insertion, datatype-special paths and the benchmark wrapper remain open."
       ]
     },
     {
@@ -13241,7 +13250,8 @@
         "TestLegacySMTPrinterSortParametersAndRenaming",
         "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals",
         "TestLegacySMTPrinterBitVectorAndLabelLiterals",
-        "TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables"
+        "TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables",
+        "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants"
       ],
       "conditionals": [
         {

@@ -182,3 +182,98 @@ func TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables(t *testing.T) {
 		t.Fatalf("legacy SMT skipped skolem-hack pattern %q, want %q", out.String(), want)
 	}
 }
+
+func TestLegacySMTPrinterDeclarationParametersAndPrivateConstants(t *testing.T) {
+	m := astTestManager(t)
+	printer, err := NewLegacySMTPrinter(m)
+	astTestMust(t, err)
+	boolSort, err := m.MkBoolSort()
+	astTestMust(t, err)
+	a, err := m.MkConst(astTestSymbol(t, m, "legacy-a"), boolSort)
+	astTestMust(t, err)
+	astTestPin(t, m, a)
+	nested, err := m.MkFuncDecl(astTestSymbol(t, m, "legacy-nested"), nil, boolSort, ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	astTestPin(t, m, nested)
+
+	integer, err := m.NewParameterInt(-7)
+	astTestMust(t, err)
+	symbol, err := m.NewParameterString("legacy index")
+	astTestMust(t, err)
+	rationalValue, err := m.numerals.NewValue()
+	astTestMust(t, err)
+	astTestMust(t, m.numerals.SetString(&rationalValue, "7/3"))
+	rational, err := m.NewParameterRational(&rationalValue)
+	astTestMust(t, err)
+	astTestMust(t, m.numerals.Del(&rationalValue))
+	double, err := m.NewParameterDouble(1.25)
+	astTestMust(t, err)
+	external, err := m.NewParameterExternal(9)
+	astTestMust(t, err)
+	sortParameter, err := m.NewParameterAST(boolSort)
+	astTestMust(t, err)
+	expressionParameter, err := m.NewParameterAST(a)
+	astTestMust(t, err)
+	declarationParameter, err := m.NewParameterAST(nested)
+	astTestMust(t, err)
+	parameters := []ASTParameter{integer, symbol, rational, double, external, sortParameter, expressionParameter, declarationParameter}
+	t.Cleanup(func() {
+		for i := range parameters {
+			astTestMust(t, m.DelParameter(&parameters[i]))
+		}
+	})
+
+	info, err := m.NewFuncDeclInfo(NullFamilyID, 701, parameters, ASTFuncFlags{}, false)
+	astTestMust(t, err)
+	decl, err := m.MkFuncDeclWithInfo(astTestSymbol(t, m, "legacy-params"), nil, boolSort, info)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, m.DelFuncDeclInfo(&info)) })
+	constant, err := m.MkApp(decl, nil)
+	astTestMust(t, err)
+	astTestPin(t, m, constant)
+
+	typedInfo, err := m.NewFuncDeclInfo(NullFamilyID, 702, []ASTParameter{sortParameter}, ASTFuncFlags{}, false)
+	astTestMust(t, err)
+	typedDecl, err := m.MkFuncDeclWithInfo(astTestSymbol(t, m, "legacy-typed"), nil, boolSort, typedInfo)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, m.DelFuncDeclInfo(&typedInfo)) })
+	typed, err := m.MkApp(typedDecl, nil)
+	astTestMust(t, err)
+	astTestPin(t, m, typed)
+
+	privateParameter, err := m.NewParameterInt(4)
+	astTestMust(t, err)
+	parameters = append(parameters, privateParameter)
+	privateInfo, err := m.NewFuncDeclInfo(NullFamilyID, 703, []ASTParameter{privateParameter}, ASTFuncFlags{}, true)
+	astTestMust(t, err)
+	privateDecl, err := m.MkFuncDeclWithInfo(astTestSymbol(t, m, "legacy-private"), nil, boolSort, privateInfo)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, m.DelFuncDeclInfo(&privateInfo)) })
+	privateConstant, err := m.MkApp(privateDecl, nil)
+	astTestMust(t, err)
+	astTestPin(t, m, privateConstant)
+	privateAppInfo, err := m.NewFuncDeclInfo(NullFamilyID, 704, []ASTParameter{privateParameter}, ASTFuncFlags{}, true)
+	astTestMust(t, err)
+	privateAppDecl, err := m.MkFuncDeclWithInfo(astTestSymbol(t, m, "legacy-private-app"), []ASTHandle{boolSort}, boolSort, privateAppInfo)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, m.DelFuncDeclInfo(&privateAppInfo)) })
+	privateApplication, err := m.MkApp(privateAppDecl, []ASTHandle{a})
+	astTestMust(t, err)
+	astTestPin(t, m, privateApplication)
+
+	for _, tc := range []struct {
+		expr ASTHandle
+		want string
+	}{
+		{constant, "(_ legacy-params -7 legacy index 7/3 1.25 @9 Bool legacy-a legacy-nested )"},
+		{typed, "(as legacy-typed Bool)"},
+		{privateConstant, "legacy-private"},
+		{privateApplication, "((_ legacy-private-app 4) legacy-a)"},
+	} {
+		var out strings.Builder
+		astTestMust(t, printer.DisplayExpr(&out, tc.expr, nil))
+		if out.String() != tc.want {
+			t.Fatalf("legacy SMT declaration parameters %q, want %q", out.String(), tc.want)
+		}
+	}
+}
