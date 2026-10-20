@@ -39424,8 +39424,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:1490-1563 concrete basic/rational and root/rational multiplication, three source TRACE records, accepted debug/diagnostic Horner children, shared m_add_tmp composition and negative-factor interval reversal; broader two-root/resultant and complete child failure audits remain open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:1490-1563 basic/root rational multiplication with TRACE, Horner ownership, shared composition and interval reversal",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_rational_multiply.go",
           "tests": [
             "TestAlgebraicRationalMultiplyRootsSignsAndAlias",
@@ -39440,8 +39440,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:685-697,1378-1494 concrete basic/rational and root/rational addition/subtraction, three source TRACE records with accepted formatter/Horner children, persistent translated polynomial and result interval normalization; broader two-root/resultant and complete child failure audits remain open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:685-697,1378-1494 basic/root rational addition/subtraction with TRACE, translation and interval normalization",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_rational_arithmetic.go",
           "tests": [
             "TestAlgebraicRationalTranslationBinaryNonbinaryAndAlias",
@@ -40621,8 +40621,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:1490-1563 concrete basic/rational and root/rational multiplication, three source TRACE records, accepted debug/diagnostic Horner children, shared m_add_tmp composition and negative-factor interval reversal; broader two-root/resultant and complete child failure audits remain open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:1490-1563 basic/root rational multiplication with TRACE, Horner ownership, shared composition and interval reversal",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_rational_multiply.go",
           "tests": [
             "TestAlgebraicRationalMultiplyRootsSignsAndAlias",
@@ -40637,8 +40637,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:685-697,1378-1494 concrete basic/rational and root/rational addition/subtraction, three source TRACE records with accepted formatter/Horner children, persistent translated polynomial and result interval normalization; broader two-root/resultant and complete child failure audits remain open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:685-697,1378-1494 basic/root rational addition/subtraction with TRACE, translation and interval normalization",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_rational_arithmetic.go",
           "tests": [
             "TestAlgebraicRationalTranslationBinaryNonbinaryAndAlias",

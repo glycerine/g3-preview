@@ -47032,3 +47032,13 @@ redispatch, every checkpoint/allocation prefix, assertions, callbacks and all
 binary TRACE children are covered. Tests pass native 5.272s, checked 5.367s,
 debug 8.438s and combined 8.752s on CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-binary-audit.txt`.
+
+Algebraic mixed rational-arithmetic closure:
+the duplicate add/subtract and multiply rows for cpp685-697/cpp1378-1563 are
+promoted to ported. Basic/root dispatch, aliases, zero normalization,
+translation/composition, rational and binary interval updates, negative-factor
+reversal, BIG scalars, cancellation, persistent publication, exact
+formatter/display/Horner ownership, every TRACE record and callback exclusion
+are covered. Tests pass native 0.058s, checked 0.057s, debug 0.488s and combined
+1.368s on CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-mixed-rational-arithmetic-audit.txt`.
