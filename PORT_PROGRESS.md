@@ -47191,3 +47191,14 @@ consumer increments and publishes both borrowed key/value references. Native
 map storage replaces `obj_map`; neither interface promises traversal order.
 AST map and API transfer tests pass native, checked, debug and combined
 profiles on CPUs 8-16; portcheck reports 256 ported and 310 partial units.
+
+Used-variable collector whole-unit closure:
+`src/ast/used_vars.cpp` and `.h` are promoted to ported. A generic
+`ASTUsedVars` now implements operator-style clear-and-process, accumulating
+`process`, reset, maximum-index, indexed/contains sort access and all/any/count
+queries. Traversal visits application arguments, quantifier bodies, patterns
+and no-patterns with exact binder deltas; the shared-node cache keys on both
+node identity and delta. Sorts remain borrowed and native slices/maps replace
+the source containers. Out-of-range `get` is a defined Go domain error instead
+of unchecked vector access. Generic and existing UFBV-focused tests pass all
+four profiles on CPUs 8-16; portcheck reports 258 ported and 308 partial units.

@@ -32129,42 +32129,53 @@
       "path": "src/ast/used_vars.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/ast/rewriter/used_vars_ufbv.go"
+        "pkg/ast/ast_used_vars.go",
+        "pkg/ast/ast_used_vars_test.go",
+        "pkg/ast/rewriter/used_vars_ufbv.go",
+        "pkg/ast/rewriter/used_vars_ufbv_test.go"
       ],
       "tests": [
-        "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+        "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations",
+        "TestASTUsedVarsCompleteTraversalAndQueries",
+        "TestASTUsedVarsSharedNodeCacheIncludesBinderDepth"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "concrete UFBV used_vars process/reset, quantifier-depth free-variable collection and presence/count predicates",
-          "status": "partial",
-          "go_target": "pkg/ast/rewriter/used_vars_ufbv.go",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_used_vars.go",
           "tests": [
-            "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+            "TestASTUsedVarsCompleteTraversalAndQueries",
+            "TestASTUsedVarsSharedNodeCacheIncludesBinderDepth"
           ]
         }
       ],
       "ownership": [
-        "The UFBV collector borrows AST expressions and sorts; native slices and expression-depth map own only membership and traversal state."
+        "The generic and UFBV collectors borrow AST expressions and sorts; native slices and expression-depth maps own only membership and traversal state. Each Process call clears its cache/worklist while preserving the found-sort vector, and Collect/operator() clears found sorts first."
       ],
       "deviations": [
-        "A native Go map keys by expression and binder depth instead of the source shared-node hashtable; other used_vars consumers remain open."
+        "A native Go map keys shared expressions by node identity and binder depth instead of the source hashtable. Native slices replace ptr_vector/svector storage; no generic C++ container credit is claimed."
       ]
     },
     {
       "path": "src/ast/used_vars.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/ast/rewriter/used_vars_ufbv.go"
+        "pkg/ast/ast_used_vars.go",
+        "pkg/ast/ast_used_vars_test.go",
+        "pkg/ast/rewriter/used_vars_ufbv.go",
+        "pkg/ast/rewriter/used_vars_ufbv_test.go"
       ],
       "tests": [
-        "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+        "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations",
+        "TestASTUsedVarsCompleteTraversalAndQueries",
+        "TestASTUsedVarsSharedNodeCacheIncludesBinderDepth"
       ],
       "conditionals": [
         {
@@ -32176,23 +32187,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "concrete UFBV used_vars found sorts, reset/process and uses_all/uses_a/count",
-          "status": "partial",
-          "go_target": "pkg/ast/rewriter/used_vars_ufbv.go",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_used_vars.go",
           "tests": [
-            "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+            "TestASTUsedVarsCompleteTraversalAndQueries",
+            "TestASTUsedVarsSharedNodeCacheIncludesBinderDepth"
           ]
         }
       ],
       "ownership": [
-        "Found sort handles are borrowed from the AST manager; native slice storage is owned by the collector."
+        "Found sort handles are borrowed from the AST manager; native found/work slices and the per-call expression-depth map are owned by the collector."
       ],
       "deviations": [
-        "Only the UFBV elim_unused_vars consumer is credited; other source callers remain open."
+        "Native Go slices/maps replace ptr_vector/svector/hashtable storage. Get rejects an out-of-range index instead of performing the source's unchecked vector access; valid-domain behavior is unchanged."
       ]
     },
     {
