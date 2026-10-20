@@ -23672,12 +23672,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_bv_bit_blaster.go",
-        "pkg/ast/rewriter/bit_blaster/rewriter_core.go"
+        "pkg/ast/rewriter/bit_blaster/rewriter_core.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_reduce.go"
       ],
       "tests": [
         "TestASTBitBlasterBitFactories",
         "TestBitBlasterRewriterGetBitsAndAssemble",
-        "TestBitBlasterRewriterConstantCacheScopes"
+        "TestBitBlasterRewriterConstantCacheScopes",
+        "TestBitBlasterRewriterCircuitReductions"
       ],
       "conditionals": [
         {
@@ -23844,7 +23846,15 @@
           "go_target": "pkg/ast/rewriter/bit_blaster/rewriter_core.go"
         },
         {
-          "name": "operation reductions and reduce_app dispatcher",
+          "name": "circuit operation reduction helpers",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/rewriter_reduce.go",
+          "tests": [
+            "TestBitBlasterRewriterCircuitReductions"
+          ]
+        },
+        {
+          "name": "numeral reduction and reduce_app dispatcher",
           "status": "unported",
           "reason": "Next integration layer over the completed circuit engine."
         },
