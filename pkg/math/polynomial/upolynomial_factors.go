@@ -11,19 +11,28 @@ import (
 )
 
 type UPolynomialFactors struct {
-	displayScope              upolyFactorsDisplayScope
-	factorUnivariateCaller    *MultivariatePolynomialManager
-	self                      *UPolynomialFactors
-	manager                   *UPolynomialManager
-	factors                   []upolyVectorState
-	count                     uint32
-	degrees                   []uint32
-	constant                  unumeral.Int
-	totalFactors, totalDegree uint32
-	header                    uint64
-	closed                    bool
-	closing                   bool
-	closeCleared              bool
+	displayScope                                  upolyFactorsDisplayScope
+	factorUnivariateCaller                        *MultivariatePolynomialManager
+	self                                          *UPolynomialFactors
+	manager                                       *UPolynomialManager
+	factors                                       []upolyVectorState
+	count                                         uint32
+	degrees                                       []uint32
+	constant                                      unumeral.Int
+	totalFactors, totalDegree                     uint32
+	header                                        uint64
+	closed                                        bool
+	closing                                       bool
+	closeCleared                                  bool
+	sourceStarted, sourceFinalized, sourceRunning bool
+	sourceCleanupRunning                          bool
+	sourceBindings                                [3]unumeral.NumericCallerBinding
+	sourceBound                                   uint8
+	sourcePrevious                                *UPolynomialFactors
+	sourceResetAdmitted                           bool
+	sourcePhase                                   uint8
+	sourceFactor, sourceIndex                     uint32
+	sourceCause                                   error
 }
 type UPolynomialFactorsStats struct {
 	OwnerBytes, OuterBytes, MultiplicityBytes, TotalBytes, ManagerBackingBytes  uint64
@@ -51,14 +60,17 @@ func (m *UPolynomialManager) NewFactors() (*UPolynomialFactors, error) {
 	m.liveFactors++
 	return fs, nil
 }
-func (fs *UPolynomialFactors) checkCleanup() error {
+func (fs *UPolynomialFactors) checkCleanupExecution() error {
+	if fs != nil && fs.self == fs && (fs.sourceRunning || fs.sourceCleanupRunning) {
+		return ErrUPolynomialCleanupPending
+	}
 	if fs != nil && fs.self == fs && fs.displayScope.active {
 		return ErrUPolynomialCleanupPending
 	}
 	if fs.factorFrontendExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
-	if fs == nil || fs.self != fs || fs.manager == nil {
+	if fs == nil || fs.self != fs || fs.manager == nil || fs.manager.self != fs.manager || fs.manager.config.Integer == nil {
 		return ErrUPolynomialOwner
 	}
 	if m := fs.factorUnivariateCaller; m != nil && m.self == m && m.upm == fs.manager && m.factorUnivariate.fs == fs && (m.factorUnivariate.executing || m.factorUnivariate.finishing) {
@@ -66,6 +78,12 @@ func (fs *UPolynomialFactors) checkCleanup() error {
 	}
 	if fs.closed {
 		return arena.ErrClosed
+	}
+	return nil
+}
+func (fs *UPolynomialFactors) checkCleanup() error {
+	if e := fs.checkCleanupExecution(); e != nil {
+		return e
 	}
 	return fs.manager.check()
 }
@@ -356,6 +374,9 @@ func (fs *UPolynomialFactors) clearBody() error {
 }
 func (fs *UPolynomialFactors) Reset() error { return fs.Clear() }
 func (fs *UPolynomialFactors) Close() error {
+	if fs != nil && fs.self == fs && fs.sourceStarted {
+		return fs.closeAfterSource()
+	}
 	if e := fs.checkCleanup(); e != nil {
 		return e
 	}

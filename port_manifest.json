@@ -52394,6 +52394,8 @@
       "status": "ported",
       "go_target": "pkg/math/polynomial/upolynomial.go",
       "go_targets": [
+        "pkg/math/polynomial/upolynomial_factors_source.go",
+        "pkg/math/polynomial/upolynomial_factors_destructor_source_test.go",
         "pkg/math/polynomial/algebraic_sign.go",
         "pkg/math/polynomial/algebraic_sign_resultant.go",
         "pkg/math/polynomial/algebraic_sign_test.go",
@@ -53644,6 +53646,19 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "factors source destructor cpp40-55 and reset cpp174-189; algebraic member prerequisite",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factors_source.go",
+          "notes": "SourceFinalize performs actual ascending inner factor resets, independently consults the true cpp177 assertion gate before each reset, destroys inner backings during outer reset, clears degrees, SETs constant1, then resets statistics, source-deletes the constant and destroys degrees/factors members in reverse declaration order. First refusal preserves exact factor/coefficient/phase and cause; no older member executes or physical release is replayed. Source lifetime bindings exclude UP/numeric-owner destruction while executing. Close after source start owns only this factors object\u2019s actual fields and retires its Go header/liveFactors retain; it stays usable after the borrowed UP modular source destructor without reviving that owner or changing source history. Tests cover success, every one of six coefficient stops in two actual copied factors, real failure replacing a large constant, closed assertion-owner refusal before reset, and independent owning-only history. Public TLS operations induce physical release errors; no allocation descriptor, NUM, counter or constructor bit is rewritten. An attempted failure-transport callback test was removed because signed-host release ErrBounds does not invoke that callback; no reached callback coverage is claimed. Whole algebraic source composition and AST remain open.",
+          "tests": [
+            "TestUPolynomialFactorsSourceSuccessThenManagerSource",
+            "TestUPolynomialFactorsSourceEveryStoppedCoefficient",
+            "TestUPolynomialFactorsSourceStoppedConstantSet",
+            "TestUPolynomialFactorsSourceResetReadsAssertionOwner",
+            "TestUPolynomialFactorsOwningCloseDoesNotAdvanceSource"
+          ]
+        },
         {
           "name": "Remaining conversion bound trace records and concrete lower/upper scope (upolynomial.cpp:2828-2916; trace2830,2841)",
           "status": "ported",
@@ -55311,6 +55326,8 @@
       "status": "ported",
       "go_target": "pkg/math/polynomial/upolynomial.go",
       "go_targets": [
+        "pkg/math/polynomial/upolynomial_factors_source.go",
+        "pkg/math/polynomial/upolynomial_factors_destructor_source_test.go",
         "pkg/math/polynomial/algebraic_sign.go",
         "pkg/math/polynomial/algebraic_sign_resultant.go",
         "pkg/math/polynomial/algebraic_sign_test.go",
@@ -55590,6 +55607,19 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "factors source destructor cpp40-55 and reset cpp174-189; algebraic member prerequisite",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factors_source.go",
+          "notes": "SourceFinalize performs actual ascending inner factor resets, independently consults the true cpp177 assertion gate before each reset, destroys inner backings during outer reset, clears degrees, SETs constant1, then resets statistics, source-deletes the constant and destroys degrees/factors members in reverse declaration order. First refusal preserves exact factor/coefficient/phase and cause; no older member executes or physical release is replayed. Source lifetime bindings exclude UP/numeric-owner destruction while executing. Close after source start owns only this factors object\u2019s actual fields and retires its Go header/liveFactors retain; it stays usable after the borrowed UP modular source destructor without reviving that owner or changing source history. Tests cover success, every one of six coefficient stops in two actual copied factors, real failure replacing a large constant, closed assertion-owner refusal before reset, and independent owning-only history. Public TLS operations induce physical release errors; no allocation descriptor, NUM, counter or constructor bit is rewritten. An attempted failure-transport callback test was removed because signed-host release ErrBounds does not invoke that callback; no reached callback coverage is claimed. Whole algebraic source composition and AST remain open.",
+          "tests": [
+            "TestUPolynomialFactorsSourceSuccessThenManagerSource",
+            "TestUPolynomialFactorsSourceEveryStoppedCoefficient",
+            "TestUPolynomialFactorsSourceStoppedConstantSet",
+            "TestUPolynomialFactorsSourceResetReadsAssertionOwner",
+            "TestUPolynomialFactorsOwningCloseDoesNotAdvanceSource"
+          ]
+        },
         {
           "name": "Remaining conversion bound trace records and concrete lower/upper scope (upolynomial.cpp:2828-2916; trace2830,2841)",
           "status": "ported",
