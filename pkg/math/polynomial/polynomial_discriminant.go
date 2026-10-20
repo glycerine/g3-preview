@@ -70,6 +70,9 @@ func (m *MultivariatePolynomialManager) Discriminant(p Polynomial, x uint32, r *
 		return e
 	}
 	sign := uint64(degree)*uint64(degree-1)%4 != 0
+	if e = m.traceDiscriminantSign(sign); e != nil {
+		return e
+	}
 	s.stack[s.depth], s.depth = 1, s.depth+1
 	constant, e := c.constantCoefficientWithReceipt(p, x, degree, &s.lc, &s.constant)
 	if e != nil {

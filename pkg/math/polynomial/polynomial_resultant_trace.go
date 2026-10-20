@@ -1,0 +1,69 @@
+// Source: src/math/polynomial/polynomial.cpp:5362,5402-5403,5483.
+package polynomial
+
+import unumeral "github.com/glycerine/g3/pkg/util/numeral"
+
+type polynomialResultantTraceBorrow struct{ executing bool }
+
+func (b *polynomialResultantTraceBorrow) NumericExecuting() bool { return b.executing }
+
+func (m *MultivariatePolynomialManager) emitResultantTrace(function string, line int, body func(*polynomialTraceSink) error) error {
+	if !m.core.monomials.monomialTraceTags().ShouldTrace("resultant") {
+		return nil
+	}
+	borrow := polynomialResultantTraceBorrow{executing: true}
+	var integer, natural unumeral.NumericCallerBinding
+	if e := m.core.integer.BindCaller(&integer, &borrow, 0); e != nil {
+		return e
+	}
+	defer func() {
+		if e := integer.Unbind(); e != nil {
+			panic(e)
+		}
+	}()
+	if e := m.core.integer.Natural.BindCaller(&natural, &borrow, 0); e != nil {
+		return e
+	}
+	defer func() {
+		if e := natural.Unbind(); e != nil {
+			panic(e)
+		}
+	}()
+	return m.emitFactorTraceTag(nil, "resultant", function, line, body)
+}
+
+func (m *MultivariatePolynomialManager) traceResultant(s *polynomialGCDFunctionScope, x uint32, normalized bool) error {
+	line, prefix := 5362, "resultant(A, B, x)\nA: "
+	if normalized {
+		line, prefix = 5402, "resultant(A, B, x) after normalization\nA: "
+	}
+	return m.emitResultantTrace("resultant", line, func(out *polynomialTraceSink) error {
+		if e := m.quadraticTracePolynomial(out, s, prefix, s.refs[0].root.value, false); e != nil {
+			return e
+		}
+		if e := m.quadraticTracePolynomial(out, s, "\nB: ", s.refs[1].root.value, false); e != nil {
+			return e
+		}
+		_ = out.WriteLiteral("\nx: ")
+		_ = out.WriteUnsigned(x)
+		if normalized {
+			if e := m.quadraticTracePolynomial(out, s, "\nt: ", s.refs[6].root.value, false); e != nil {
+				return e
+			}
+		}
+		return out.WriteLiteral("\n")
+	})
+}
+
+// cpp5483 precedes scoped_numeral lc, after the actual resultant returned.
+func (m *MultivariatePolynomialManager) traceDiscriminantSign(sign bool) error {
+	return m.emitResultantTrace("discriminant", 5483, func(out *polynomialTraceSink) error {
+		_ = out.WriteLiteral("discriminant sign: ")
+		value := uint32(0)
+		if sign {
+			value = 1
+		}
+		_ = out.WriteUnsigned(value)
+		return out.WriteLiteral("\n")
+	})
+}

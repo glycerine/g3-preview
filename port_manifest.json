@@ -47649,6 +47649,21 @@
           "TestRationalDecimalInvocationOldReceiptCannotAcquireReplacement"
         ],
         "evidence": "Five value spellings include 2/3, a negative BIG integer, binary interval fractions, rational algebraic default decimal and sqrt(2) decimal. Output callbacks observe a live auxiliary. The actual decimal refusal sweep arms the real budget at a result header, proves accepted pending driver ownership and copied-scope refusal, then reaches success. Independent omitted-results and omitted-decimal-receipt controls fail. Fast checks pass four profiles; long precision20 evidence is recorded separately in PORT_PROGRESS.md."
+      },
+      "resultant_and_discriminant_trace_audit": {
+        "source": "polynomial.cpp:5362,5402-5403,5483",
+        "go_target": "pkg/math/polynomial/polynomial_resultant_trace.go",
+        "behavior": "Resultant entry follows actual A/B assignment and precedes zero/constant exits; normalized A/B/x/t output precedes the sign/degree/later reference declarations. The existing actual GCD frame traceDisplay captures each accepted reference formatter, preserves stopped source children before older locals and cleans only that invocation. Executing records bind both numerical managers and the existing polynomial callback guard through header/body/footer. Discriminant prints its 0/1 sign after resultant returns and before lc construction. Sticky writer failure still executes project formatting.",
+        "tests": [
+          "TestPolynomialResultantTraceLiteralNormalizationAndLifetimes",
+          "TestPolynomialResultantTraceZeroAndConstantEarlyExits",
+          "TestPolynomialResultantTraceActualEntryTLSRefusal",
+          "TestPolynomialResultantTraceRefusingStreamStillFormats",
+          "TestPolynomialResultantTraceEveryReservation",
+          "TestPolynomialDiscriminantTraceSignBeforeLeadingNumeral"
+        ],
+        "verification": "Literal normalized coefficients/factor and independent resultant126; entry source depth2 versus normalized depth9; exact TLS BIG Copy allocator tuple with matched GCD cleanup and zero final budget; actual budget prefixes through success with physical audits; no normalized record on zero/constant exits; degrees0-4 independent discriminants and sign record before leading numeral. Broader profiles and independent omission controls are recorded in PORT_PROGRESS.md.",
+        "limits": "Whole polynomial/algebraic/AST algorithms, retained consumer and source failure audits remain partial."
       }
     },
     {

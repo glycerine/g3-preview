@@ -44,6 +44,9 @@ func (m *MultivariatePolynomialManager) resultantWithReceipt(p, q Polynomial, x 
 	if e = B.assign(c, q); e != nil {
 		return e
 	}
+	if e = m.traceResultant(s, x, false); e != nil {
+		return e
+	}
 	zero, e := c.IsZero(A.value)
 	if e != nil {
 		return e
@@ -147,6 +150,9 @@ func (m *MultivariatePolynomialManager) resultantWithReceipt(p, q Polynomial, x 
 		return e
 	}
 	if e = B.assign(c, ppB.value); e != nil {
+		return e
+	}
+	if e = m.traceResultant(s, x, true); e != nil {
 		return e
 	}
 	sign := int32(1)
