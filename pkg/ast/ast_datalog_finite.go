@@ -112,6 +112,15 @@ func (m *ASTManager) MkDatalogLT(left, right ASTHandle) (ASTHandle, error) {
 	return m.MkFamilyApp(family, DatalogOpLT, nil, []ASTHandle{left, right})
 }
 
+// MkDatalogLE preserves dl_decl_util::mk_le: !(right < left).
+func (m *ASTManager) MkDatalogLE(left, right ASTHandle) (ASTHandle, error) {
+	less, e := m.MkDatalogLT(right, left)
+	if e != nil {
+		return ASTHandle{}, e
+	}
+	return m.MkNot(less)
+}
+
 func (m *ASTManager) datalogSort(fid FamilyID, kind int32, ps []ASTParameter) (astNodeRef, error) {
 	if kind == DatalogRelationSortKind {
 		return m.datalogRelationSort(fid, ps)
@@ -169,7 +178,14 @@ func (m *ASTManager) datalogSort(fid FamilyID, kind int32, ps []ASTParameter) (a
 }
 
 func (m *ASTManager) datalogDecl(kind int32, ps []ASTParameter, domain []ASTHandle) (astNodeRef, error) {
-	if kind == DatalogOpLT {
+	switch kind {
+	case DatalogOpStore, DatalogOpSelect:
+		return m.datalogStoreSelectDecl(kind, ps, domain)
+	case DatalogOpEmpty:
+		return m.datalogEmptyDecl(ps, domain)
+	case DatalogOpIsEmpty, DatalogOpUnion, DatalogOpWiden, DatalogOpComplement, DatalogOpClone:
+		return m.datalogSimpleRelationDecl(kind, ps, domain)
+	case DatalogOpLT:
 		if len(ps) != 0 || len(domain) != 2 || domain[0] != domain[1] {
 			return astNodeRef{}, ErrASTDomain
 		}

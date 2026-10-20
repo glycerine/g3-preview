@@ -153,7 +153,7 @@ func (m *ASTManager) DatalogRelationColumns(h ASTHandle) ([]ASTHandle, error) {
 			return nil, e
 		}
 		value, e := m.parameter(parameter)
-		if e != nil || value.Kind != ASTParameterAST || m.nodeAt(value.ast.slot).kind != ASTSort {
+		if e != nil || value.Kind != ASTParameterAST || m.validNode(value.ast) != nil || m.nodeAt(value.ast.slot).kind != ASTSort {
 			return nil, ErrASTDomain
 		}
 		result[i] = m.external(value.ast)

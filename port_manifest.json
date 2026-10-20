@@ -15056,6 +15056,8 @@
         "pkg/ast/ast_datalog_finite.go",
         "pkg/ast/ast_datalog_sorts.go",
         "pkg/ast/ast_datalog_sorts_test.go",
+        "pkg/ast/ast_datalog_relation_simple.go",
+        "pkg/ast/ast_datalog_relation_simple_test.go",
         "pkg/api/api_numeral_string_test.go",
         "pkg/ast/rewriter/dl_rewriter.go"
       ],
@@ -15064,6 +15066,8 @@
         "TestASTAuxiliaryPluginEveryConstructorPrefix",
         "TestASTDatalogOriginalRelationAndRuleSorts",
         "TestASTDatalogOriginalRelationCardinalityAndFiniteSize",
+        "TestASTDatalogOriginalSimpleRelationDeclarations",
+        "TestASTDatalogOriginalLessEqualAndDeclarationGuards",
         "TestAPINumeralStringArithmeticFPAAndRefusal",
         "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
         "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
@@ -15137,6 +15141,18 @@
             "TestASTDatalogOriginalRelationAndRuleSorts",
             "TestASTDatalogOriginalRelationCardinalityAndFiniteSize"
           ]
+        },
+        {
+          "name": "store/select, empty/is-empty, union/widen, complement, clone, finite comparison and <= utility declarations (dl_decl_plugin.cpp:166-208,252-264,404-410,447-492,494-604,746-754)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datalog_relation_simple.go",
+          "go_targets": [
+            "pkg/ast/ast_datalog_finite.go"
+          ],
+          "tests": [
+            "TestASTDatalogOriginalSimpleRelationDeclarations",
+            "TestASTDatalogOriginalLessEqualAndDeclarationGuards"
+          ]
         }
       ],
       "ownership": [
@@ -15156,6 +15172,8 @@
         "pkg/ast/ast_datalog_finite.go",
         "pkg/ast/ast_datalog_sorts.go",
         "pkg/ast/ast_datalog_sorts_test.go",
+        "pkg/ast/ast_datalog_relation_simple.go",
+        "pkg/ast/ast_datalog_relation_simple_test.go",
         "pkg/ast/rewriter/dl_rewriter.go"
       ],
       "tests": [
@@ -15163,7 +15181,9 @@
         "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
         "TestDLRewriterFamilyArityAndOwnerGuards",
         "TestASTDatalogOriginalRelationAndRuleSorts",
-        "TestASTDatalogOriginalRelationCardinalityAndFiniteSize"
+        "TestASTDatalogOriginalRelationCardinalityAndFiniteSize",
+        "TestASTDatalogOriginalSimpleRelationDeclarations",
+        "TestASTDatalogOriginalLessEqualAndDeclarationGuards"
       ],
       "conditionals": [
         {
@@ -15197,6 +15217,18 @@
           "tests": [
             "TestASTDatalogOriginalRelationAndRuleSorts",
             "TestASTDatalogOriginalRelationCardinalityAndFiniteSize"
+          ]
+        },
+        {
+          "name": "retained simple relation factories and <= complement utility (src/ast/dl_decl_plugin.h:153-190)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datalog_relation_simple.go",
+          "go_targets": [
+            "pkg/ast/ast_datalog_finite.go"
+          ],
+          "tests": [
+            "TestASTDatalogOriginalSimpleRelationDeclarations",
+            "TestASTDatalogOriginalLessEqualAndDeclarationGuards"
           ]
         }
       ],
