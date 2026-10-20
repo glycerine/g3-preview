@@ -11217,6 +11217,14 @@
           ]
         },
         {
+          "name": "mk_pattern and is_pattern concrete pattern-plugin construction and recognition (src/ast/ast.cpp:2312-2327)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_pattern.go",
+          "tests": [
+            "TestSimplifyInjectivityAxiomBuildsInverseAndPattern"
+          ]
+        },
+        {
           "name": "mk_distinct_expanded TRACE after conjunction construction and before temporary disequality release",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_distinct_trace.go",
@@ -12224,6 +12232,14 @@
           "tests": [
             "TestASTLabelConcreteSymbolBufferAndRecognition",
             "TestASTLabelTemporaryParametersOnReservationFailure"
+          ]
+        },
+        {
+          "name": "retained mk_pattern overloads and is_pattern recognizer (src/ast/ast.h:1867-1874)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_pattern.go",
+          "tests": [
+            "TestSimplifyInjectivityAxiomBuildsInverseAndPattern"
           ]
         },
         {
@@ -28995,9 +29011,15 @@
       "path": "src/ast/rewriter/inj_axiom.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/inj_axiom.go",
+        "pkg/ast/ast_pattern.go"
+      ],
+      "tests": [
+        "TestSimplifyInjectivityAxiomBuildsInverseAndPattern",
+        "TestSimplifyInjectivityAxiomRefusesNonshapeWithoutChangingOutput"
+      ],
       "assertions": [
         {
           "line": 105,
@@ -29012,19 +29034,38 @@
           "text": "SASSERT(is_well_sorted(m, result));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete simplify_inj_axiom recognizer, single varying-position validation, inverse-function axiom construction, pattern trigger, trace sites and debug well-sorted assertion (src/ast/rewriter/inj_axiom.cpp:25-136)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/inj_axiom.go",
+          "tests": [
+            "TestSimplifyInjectivityAxiomBuildsInverseAndPattern",
+            "TestSimplifyInjectivityAxiomRefusesNonshapeWithoutChangingOutput"
+          ]
+        }
+      ],
+      "ownership": [
+        "The caller owns the result ASTRef. Successful construction pins each new variable, application, fresh inverse declaration, projection, equality and pattern until the final quantifier has acquired its children and output publication completes; temporary references are then released in reverse order. Refusal leaves the output unchanged."
+      ],
+      "deviations": [
+        "Native ptr_buffer and sort/name buffers use borrowed Go slices. Source debug assertions return typed AST errors; retained candidate/result traces use the ported low-level and SMT2 printers."
+      ]
     },
     {
       "path": "src/ast/rewriter/inj_axiom.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/inj_axiom.go"
+      ],
+      "tests": [
+        "TestSimplifyInjectivityAxiomBuildsInverseAndPattern",
+        "TestSimplifyInjectivityAxiomRefusesNonshapeWithoutChangingOutput"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -29035,10 +29076,22 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete simplify_inj_axiom public function (src/ast/rewriter/inj_axiom.h:22-24)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/inj_axiom.go",
+          "tests": [
+            "TestSimplifyInjectivityAxiomBuildsInverseAndPattern",
+            "TestSimplifyInjectivityAxiomRefusesNonshapeWithoutChangingOutput"
+          ]
+        }
+      ],
+      "ownership": [
+        "The function borrows its manager and quantifier handle and publishes only through the caller-owned ASTRef when the source recognizer succeeds."
+      ],
       "deviations": []
     },
     {
