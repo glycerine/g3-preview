@@ -2,13 +2,97 @@
 package ast
 
 import (
+	"errors"
 	"strconv"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 const (
 	astDatalogFiniteSortKind int32 = 1
 	astDatalogConstantKind   int32 = 13
+	DatalogOpLT              int32 = 14
 )
+
+// MkDatalogFiniteSort is dl_decl_util::mk_sort's retained finite-domain path.
+func (m *ASTManager) MkDatalogFiniteSort(name usymbol.Symbol, size uint64) (result ASTHandle, err error) {
+	if size == 0 {
+		return ASTHandle{}, ErrASTDomain
+	}
+	family, err := m.RegisterDatalogPlugin()
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	value, err := m.numerals.NewValue()
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	defer func() { err = errors.Join(err, m.numerals.Del(&value)) }()
+	if err = m.numerals.SetUint64(&value, size); err != nil {
+		return ASTHandle{}, err
+	}
+	nameParameter, err := m.NewParameterSymbol(name)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	defer func() { err = errors.Join(err, m.DelParameter(&nameParameter)) }()
+	sizeParameter, err := m.NewParameterRational(&value)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	defer func() { err = errors.Join(err, m.DelParameter(&sizeParameter)) }()
+	return m.MkFamilySort(family, astDatalogFiniteSortKind, []ASTParameter{nameParameter, sizeParameter})
+}
+
+// MkDatalogNumeral constructs the finite-domain specialization of
+// dl_decl_util::mk_numeral and rejects values outside the declared domain.
+func (m *ASTManager) MkDatalogNumeral(value uint64, sort ASTHandle) (result ASTHandle, err error) {
+	family, err := m.RegisterDatalogPlugin()
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	size, err := m.GetSortSize(sort)
+	if err != nil || !size.IsFinite() {
+		if err == nil {
+			err = ErrASTDomain
+		}
+		return ASTHandle{}, err
+	}
+	bound, err := size.Size()
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	if value >= bound {
+		return ASTHandle{}, ErrASTDomain
+	}
+	numeral, err := m.numerals.NewValue()
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	defer func() { err = errors.Join(err, m.numerals.Del(&numeral)) }()
+	if err = m.numerals.SetUint64(&numeral, value); err != nil {
+		return ASTHandle{}, err
+	}
+	valueParameter, err := m.NewParameterRational(&numeral)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	defer func() { err = errors.Join(err, m.DelParameter(&valueParameter)) }()
+	sortParameter, err := m.NewParameterAST(sort)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	defer func() { err = errors.Join(err, m.DelParameter(&sortParameter)) }()
+	return m.MkFamilyApp(family, astDatalogConstantKind, []ASTParameter{valueParameter, sortParameter}, nil)
+}
+
+func (m *ASTManager) MkDatalogLT(left, right ASTHandle) (ASTHandle, error) {
+	family, err := m.RegisterDatalogPlugin()
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	return m.MkFamilyApp(family, DatalogOpLT, nil, []ASTHandle{left, right})
+}
 
 func (m *ASTManager) datalogSort(fid FamilyID, kind int32, ps []ASTParameter) (astNodeRef, error) {
 	if kind != astDatalogFiniteSortKind || len(ps) != 2 {
@@ -49,6 +133,20 @@ func (m *ASTManager) datalogSort(fid FamilyID, kind int32, ps []ASTParameter) (a
 }
 
 func (m *ASTManager) datalogDecl(kind int32, ps []ASTParameter, domain []ASTHandle) (astNodeRef, error) {
+	if kind == DatalogOpLT {
+		if len(ps) != 0 || len(domain) != 2 || domain[0] != domain[1] {
+			return astNodeRef{}, ErrASTDomain
+		}
+		s, err := m.requireKind(domain[0], ASTSort)
+		if err != nil || !m.isDatalogFiniteSort(s) {
+			return astNodeRef{}, ErrASTDomain
+		}
+		p := m.auxiliaryPlugin(astDatalogPlugin)
+		if p == nil {
+			return astNodeRef{}, ErrASTDomain
+		}
+		return m.pluginDecl(p.symbols[DatalogOpLT], p.family, kind, nil, domain, m.boolSort, ASTFuncFlags{}, false)
+	}
 	if kind != astDatalogConstantKind || len(ps) != 2 || len(domain) != 0 {
 		return astNodeRef{}, ErrASTDomain
 	}
@@ -100,9 +198,8 @@ func (m *ASTManager) isDatalogFiniteSort(s astNodeRef) bool {
 	return p != nil && i.family == p.family
 }
 
-// DatalogNumeralText is the finite-domain probe in Z3_get_numeral_rational.
-// The source converts the stored uint64 to a rational before printing it.
-func (m *ASTManager) DatalogNumeralText(h ASTHandle) (value string, matched bool, err error) {
+// DatalogNumeralValue is dl_decl_util::is_numeral's concrete uint64 reader.
+func (m *ASTManager) DatalogNumeralValue(h ASTHandle) (value uint64, matched bool, err error) {
 	if err = m.lock(); err != nil {
 		return
 	}
@@ -147,9 +244,19 @@ func (m *ASTManager) DatalogNumeralText(h ASTHandle) (value string, matched bool
 		err = ErrASTDomain
 		return
 	}
-	n, err := m.numerals.Uint64(&param.Rational)
+	value, err = m.numerals.Uint64(&param.Rational)
 	if err != nil {
 		return
+	}
+	return value, true, nil
+}
+
+// DatalogNumeralText is the finite-domain probe in Z3_get_numeral_rational.
+// The source converts the stored uint64 to a rational before printing it.
+func (m *ASTManager) DatalogNumeralText(h ASTHandle) (value string, matched bool, err error) {
+	n, matched, err := m.DatalogNumeralValue(h)
+	if err != nil || !matched {
+		return "", matched, err
 	}
 	return strconv.FormatUint(n, 10), true, nil
 }

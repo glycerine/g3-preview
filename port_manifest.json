@@ -14644,12 +14644,16 @@
         "pkg/ast/ast_auxiliary_plugins.go",
         "pkg/ast/ast_auxiliary_plugins_source_test.go",
         "pkg/ast/ast_datalog_finite.go",
-        "pkg/api/api_numeral_string_test.go"
+        "pkg/api/api_numeral_string_test.go",
+        "pkg/ast/rewriter/dl_rewriter.go"
       ],
       "tests": [
         "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
         "TestASTAuxiliaryPluginEveryConstructorPrefix",
-        "TestAPINumeralStringArithmeticFPAAndRefusal"
+        "TestAPINumeralStringArithmeticFPAAndRefusal",
+        "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
+        "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
+        "TestDLRewriterFamilyArityAndOwnerGuards"
       ],
       "assertions": [
         {
@@ -14698,11 +14702,18 @@
           ]
         },
         {
-          "name": "Selected DL_FINITE_SORT and OP_DL_CONSTANT construction and uint64 numeral read for retained API consumer (dl_decl_plugin.cpp:98-114,453-469,655-690)",
+          "name": "Selected DL_FINITE_SORT, OP_DL_CONSTANT and OP_DL_LT construction plus dl_decl_util finite/BV/Boolean uint64 numeral read for retained API and rewriter consumers (dl_decl_plugin.cpp:98-114,453-477,597-604,639-718,739-750)",
           "status": "partial",
           "go_target": "pkg/ast/ast_datalog_finite.go",
-          "go_targets": ["pkg/api/api_numeral_string_test.go"],
-          "tests": ["TestAPINumeralStringArithmeticFPAAndRefusal"]
+          "go_targets": [
+            "pkg/api/api_numeral_string_test.go",
+            "pkg/ast/rewriter/dl_rewriter.go"
+          ],
+          "tests": [
+            "TestAPINumeralStringArithmeticFPAAndRefusal",
+            "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
+            "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary"
+          ]
         }
       ],
       "ownership": [
@@ -14716,9 +14727,16 @@
       "path": "src/ast/dl_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_datalog_finite.go",
+        "pkg/ast/rewriter/dl_rewriter.go"
+      ],
+      "tests": [
+        "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
+        "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
+        "TestDLRewriterFamilyArityAndOwnerGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -14731,9 +14749,26 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained dl_decl_util constructor/get_family_id, finite-domain mk_sort/mk_numeral/mk_lt, is_numeral and finite/BV/Boolean is_numeral_ext interface (src/ast/dl_decl_plugin.h:141-190)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_datalog_finite.go",
+          "go_targets": [
+            "pkg/ast/rewriter/dl_rewriter.go"
+          ],
+          "tests": [
+            "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
+            "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete finite-domain constructors copy symbol/rational/sort parameters into registered AST declarations and retire temporary parameter and rational owners after factory publication. DLRewriter borrows the manager and uses invocation-local owned numeral storage for BV reads."
+      ],
+      "deviations": [
+        "Only the concrete dl_decl_util surface reached by retained AST rewriter and numeral API consumers is included here. Relation-algebra declarations and rule constructors remain open, so the header remains partial."
+      ]
     },
     {
       "path": "src/ast/expr2polynomial.cpp",
@@ -27862,22 +27897,49 @@
       "path": "src/ast/rewriter/dl_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/dl_rewriter.go"
+      ],
+      "tests": [
+        "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
+        "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
+        "TestDLRewriterFamilyArityAndOwnerGuards"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete mk_app_core OP_DL_LT numeral comparison, identical-term and right-zero reductions including the source-unreachable repeated-right-operand branch (src/ast/rewriter/dl_rewriter.cpp:24-55)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/dl_rewriter.go",
+          "tests": [
+            "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
+            "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
+            "TestDLRewriterFamilyArityAndOwnerGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "RewriteApp borrows the declaration and AppArguments, publishes through the caller-owned ASTRef only for BR_DONE, and closes its invocation-local BV numeral value after each probe."
+      ],
+      "deviations": [
+        "Malformed direct callback arity returns ErrASTDomain instead of performing native invalid pointer access. The original second zero-rule probes args[1] again and therefore remains unreachable after x<0; it is deliberately not corrected."
+      ]
     },
     {
       "path": "src/ast/rewriter/dl_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/dl_rewriter.go"
+      ],
+      "tests": [
+        "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
+        "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
+        "TestDLRewriterFamilyArityAndOwnerGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -27888,10 +27950,23 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete dl_rewriter constructor, get_fid and mk_app_core interface (src/ast/rewriter/dl_rewriter.h:24-30)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/dl_rewriter.go",
+          "tests": [
+            "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
+            "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
+            "TestDLRewriterFamilyArityAndOwnerGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "DLRewriter is a checked noncopyable manager borrower. Its constructor performs the source declaration-plugin registration sequence before retaining the Datalog family identifier."
+      ],
       "deviations": []
     },
     {
