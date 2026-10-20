@@ -20435,8 +20435,10 @@
       "path": "src/ast/pp_params.hpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/ast/pp_params.go",
+        "pkg/ast/pp_params_source_test.go",
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/gparams_catalog_collectors.go",
@@ -20447,7 +20449,8 @@
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestPPParamsAllGettersDefaultsSnapshotAndLocalPrecedence"
       ],
       "conditionals": [
         {
@@ -20459,11 +20462,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and full catalog registration order",
           "status": "ported",
           "go_target": "pkg/ast/gparams_catalog_collectors.go",
           "tests": [
@@ -20476,12 +20479,23 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "constructor-time pp module snapshot and all seventeen generated typed accessors with local/module/default precedence",
+          "status": "ported",
+          "go_target": "pkg/ast/pp_params.go",
+          "tests": [
+            "TestPPParamsAllGettersDefaultsSnapshotAndLocalPrecedence"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "The generated PPParams facade borrows its caller ParamsRef and owns the constructor-time pp module snapshot. Close performs a tracked decrement with retryable completion; copied and stale owners are rejected.",
+        "Descriptor registration owns its merged catalog rows and borrows catalog-owned description bytes; source global temporary cleanup and unpublished descriptor pending roots remain preserved."
       ],
-      "deviations": []
+      "deviations": [
+        "Go methods return typed values and errors instead of implicit C++ scalar conversions. The seventeen keys, literal defaults and local/module precedence are unchanged."
+      ]
     },
     {
       "path": "src/ast/pp_params.pyg",

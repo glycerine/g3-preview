@@ -47409,3 +47409,14 @@ live traversal state. Helper references and containing owners have audited
 lexical and retrying cleanup. All four focused smtcore profiles pass on CPUs
 8-16. Portcheck reports 2103 units, 677 APIs: 282 ported, 286 partial, 1478
 unported and 11 dead/deleted.
+
+Pretty-printer parameter facade closure:
+`src/ast/pp_params.hpp` is promoted to ported after adding the concrete
+seventeen-getter `PPParams` facade alongside its already complete descriptor
+registration. The facade owns the constructor-time `pp` module snapshot,
+borrows local parameters, preserves every literal default and local/module
+precedence, and rejects copied, stale and closed owners. Close uses the tracked
+retryable decrement path. Focused tests exercise every default and every module
+override plus snapshot and local precedence in all four profiles on CPUs 8-16.
+Portcheck reports 2103 units, 677 APIs: 283 ported, 285 partial, 1478 unported
+and 11 dead/deleted.
