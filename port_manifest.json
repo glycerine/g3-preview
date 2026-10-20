@@ -15611,7 +15611,7 @@
       "path": "src/ast/for_each_ast.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/model2expr_fresh_name.go",
         "pkg/ast/ast_low_level_printer.go",
@@ -15637,8 +15637,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "get_num_nodes default visitor wrapper and distinct AST count (for_each_ast.h:42-134)",
@@ -15658,21 +15658,27 @@
         },
         {
           "name": "Actual trace LL visitor LIFO/mark-after-proc order (src/ast/for_each_ast.h:27-125)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_low_level_printer.go",
           "tests": [
             "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
             "TestASTLowLevelPrinterNativeDeclarationIdentityMarks",
             "TestASTLowLevelPrinterNativeWideAndDeepPostorder"
           ]
+        },
+        {
+          "name": "recurse_ast template and additional template instantiations with no retained source consumer",
+          "status": "reference_only",
+          "tests": []
         }
       ],
       "ownership": [
-        "The inline lexical frame borrows AST nodes in a native []astNodeRef stack and map[astNodeRef]struct{} identity marks. Only its acquired numeral and tracked numeral insertion own numerical values. Actual numeral cleanup/ACK precedes dropping stack and marks. No container backing reservation, pending expansion block, dense declaration/expression bitmap or simulated storage-failure event remains. Actual output stream remains borrowed. Bounded/root overloads and AST_LL_PP_SHOW_FAMILY_NAME remain separate."
+        "Every retained concrete visitor borrows the reached AST graph. Native stacks, identity maps and symbol sets own only Go scalar identities; the low-level printer's acquired numerals remain owned until cleanup/ACK before its traversal state is dropped.",
+        "Caller-provided visited state and output streams remain borrowed for the invocation. No visitor retains an AST handle after returning."
       ],
       "deviations": [
-        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
-        "Native traversal collections preserve the source LIFO order, declaration/domain/range and parameter visitation, mark-after-process behavior and exact compact output. Independent literal output checks cover 257 shared variables with duplicate arguments and 257 nested quantifiers with reservations disabled, plus unchanged reference counts and lexical reuse. Erased container allocation faults add no C++ vector or bitmap implementation credit."
+        "Native traversal collections preserve source LIFO order, declaration/domain/range and AST-parameter visitation, mark-after-process behavior and exact compact output. Erased container allocation faults add no C++ vector or bitmap implementation credit.",
+        "The unused recurse_ast template and instantiations reachable only from unretained source units are reference-only. Concrete typed Go walks implement every retained consumer without a universal callback adapter."
       ]
     },
     {

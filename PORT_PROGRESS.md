@@ -47373,3 +47373,15 @@ helper is called only by the preserved C++ unit test and is reference-only;
 checked scalar owner identities replace implicit object copying. All four
 focused profiles pass on CPUs 8-16. Portcheck reports 2103 units, 677 APIs: 277
 ported, 291 partial, 1478 unported and 11 dead/deleted.
+
+AST visitor-header closure:
+`src/ast/for_each_ast.h` is promoted to ported for every retained concrete
+instantiation. Node counting, model2expr symbol collection and low-level
+printing preserve source LIFO scheduling, declaration domain/range traversal,
+AST-valued parameters, quantifier annotations and mark-after-callback order.
+Their native stacks, maps and symbol sets borrow AST identities; low-level
+printer numeral ownership retains its exact cleanup order. `recurse_ast` has no
+source consumer, and instantiations in unretained units are reference-only, so
+no universal callback adapter is added. All four focused AST and model profiles
+pass on CPUs 8-16. Portcheck reports 2103 units, 677 APIs: 278 ported, 290
+partial, 1478 unported and 11 dead/deleted.
