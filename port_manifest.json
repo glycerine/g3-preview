@@ -20164,12 +20164,16 @@
       "path": "src/ast/pattern/pattern_inference_params_helper.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_pattern_inference_params.go",
-        "pkg/smtcore/util_smt_pattern_inference_params_source_test.go"
+        "pkg/smtcore/util_smt_pattern_inference_params_source_test.go",
+        "pkg/smtcore/gparams_catalog_collectors.go",
+        "pkg/util/params/util_gparams_catalog_test.go"
       ],
       "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
         "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
         "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
@@ -20177,12 +20181,12 @@
         "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
         "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "Eight concrete pattern getter defaults and pi module (src/ast/pattern/pattern_inference_params_helper.pyg:1-12)",
-          "status": "partial",
+          "name": "complete pi module declaration, eight exported typed options, defaults, descriptions and generated facade",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_pattern_inference_params.go",
           "tests": [
             "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
@@ -20190,15 +20194,21 @@
             "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
             "TestSMTPatternTenDisplayChainsGoBufferSignedEnumAndBool",
             "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
-            "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
+            "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation",
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse"
+          ],
+          "go_targets": [
+            "pkg/smtcore/gparams_catalog_collectors.go",
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
       "ownership": [
-        "Ten actual scalar source fields are embedded once in the reflected standalone wrapper. Only two explicit initializers run before mandatory update; each of eight returned RHS values publishes its field and initialized bit in order. Actual pi module reference is acquired at the returned leaf in the existing concrete helper frame, with lexical source DT before return and distinct matched owning continuation. Local/global/context remain borrowed; no duplicate header charge for embedded helper metadata."
+        "The retained concrete consumer embeds the generated fields once, borrows caller local/global/context state and owns the pi-module snapshot through all eight ordered getter publications. Catalog descriptions are copied into the owning descriptor table and exposed as borrowed bytes for its lifetime."
       ],
       "deviations": [
-        "No preprocessor/smt parent, real SMT context/driver, global/locale/boolalpha or whole generated descriptor-registration credit. Actual pattern constructor initializes only nopat_weight and avoid_skolems before module pi declaration; Initialized metadata distinguishes those source-reached fields from uninitialized diagnostic Go storage. Incomplete constructors remain diagnostic owners and ordinary Update/Display reject them. Enumeration valid0/1/2 cases are distinct from native out-of-domain casts."
+        "The retained SMTPatternInferenceParams consumer also carries the two handwritten fields from pattern_inference_params.cpp; initialized-field metadata makes stopped-constructor state explicit in Go."
       ]
     },
     {

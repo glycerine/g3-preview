@@ -47224,3 +47224,12 @@ and cancellation failures. Focused tests pass native, checked, debug and
 combined profiles, and the full native AST rewriter package passes on CPUs
 8-16. Portcheck reports 2103 units, 677 APIs: 260 ported, 306 partial, 1480
 unported and 11 dead/deleted.
+
+Pattern-inference generator-input closure:
+`src/ast/pattern/pattern_inference_params_helper.pyg` is promoted to ported
+after matching all eight exported option declarations, types, defaults and
+descriptions to the retained `SMTPatternInferenceParams` facade and the `pi`
+catalog collector. The concrete consumer owns its module snapshot and borrows
+the caller parameter state; the descriptor table owns the catalog strings.
+Focused facade and catalog checks pass native, checked, debug and combined
+profiles on CPUs 8-16. Portcheck reports 261 ported and 305 partial units.
