@@ -47262,3 +47262,14 @@ snapshot; descriptor tables own catalog strings. Focused facade and catalog
 checks pass native, checked, debug and combined profiles on CPUs 8-16.
 Portcheck reports 2103 units, 677 APIs: 265 ported, 303 partial, 1478 unported
 and 11 dead/deleted.
+
+Expression abstraction whole-unit closure:
+`src/ast/expr_abstract.cpp` and `.h` are promoted to ported after a complete
+method, assertion, consumer and ownership audit. The iterative application
+rewrite, recursive quantifier body/pattern handling, reversed de Bruijn
+indices, forall/exists wrappers, zero-bound shortcut and both trace sites are
+covered. Generated temporaries remain owned until publication and cleanup or
+a retrying explicit Close; copied owners are rejected. The source debug root
+reference gate and final-result verification use defined Go domain errors.
+Focused tests pass native, checked, debug and combined profiles on CPUs 8-16.
+Portcheck reports 267 ported and 301 partial units.

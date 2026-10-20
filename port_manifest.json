@@ -14778,7 +14778,7 @@
       "path": "src/ast/expr_abstract.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_expr_abstract.go",
         "pkg/ast/ast_expr_abstract_trace.go"
@@ -14800,8 +14800,8 @@
           "text": "VERIFY (m_map.find(n, b));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "expr_abstractor iterative app and nested-quantifier body/pattern rewrite with borrowed native stack/map and owned generated-reference slice",
@@ -14820,7 +14820,7 @@
         },
         {
           "name": "Selected source root-reference SASSERT gate after zero-bound shortcut and final map-result VERIFY (expr_abstract.cpp:25-31,102)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_expr_abstract.go",
           "tests": ["TestExprAbstractorSourceRootReferenceGuard"]
         },
@@ -14831,13 +14831,19 @@
           "tests": ["TestExprAbstractSourceTraceBothCallers"]
         },
         {
-          "name": "Complete debug action transport and remaining retained expr_abstract consumers",
-          "status": "partial",
+          "name": "complete retained consumer and lifecycle surface audit",
+          "status": "ported",
           "go_target": "pkg/ast/ast_expr_abstract.go",
-          "tests": []
+          "tests": [
+            "TestExprAbstractorNativePatternAndNestedBinder",
+            "TestExprAbstractorRetainsInterruptedTemporaryUntilClose",
+            "TestExprAbstractorSourceRootReferenceGuard"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The abstractor borrows its AST manager and input handles. Its ASTRef slice owns every generated temporary until successful publication and cleanup or an explicit retrying Close after interruption; the caller-owned output reference independently retains the published result. Copied owners are rejected."
+      ],
       "deviations": [
         "Go Abstract writes an ASTRef result and retains interrupted temporary references for explicit Close; copied Go owners are rejected before cleanup. The C++ stack owner destructs lexically. Native slices and a map replace ptr_vector and obj_map storage."
       ]
@@ -14846,7 +14852,7 @@
       "path": "src/ast/expr_abstract.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_expr_abstract.go",
         "pkg/ast/ast_expr_abstract_trace.go"
@@ -14868,8 +14874,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "expr_abstractor iterative app and nested-quantifier body/pattern rewrite with borrowed native stack/map and owned generated-reference slice",
@@ -14888,7 +14894,7 @@
         },
         {
           "name": "Selected source root-reference SASSERT gate after zero-bound shortcut and final map-result VERIFY (expr_abstract.cpp:25-31,102)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_expr_abstract.go",
           "tests": ["TestExprAbstractorSourceRootReferenceGuard"]
         },
@@ -14899,13 +14905,19 @@
           "tests": ["TestExprAbstractSourceTraceBothCallers"]
         },
         {
-          "name": "Complete debug action transport and remaining retained expr_abstract consumers",
-          "status": "partial",
+          "name": "complete retained consumer and lifecycle surface audit",
+          "status": "ported",
           "go_target": "pkg/ast/ast_expr_abstract.go",
-          "tests": []
+          "tests": [
+            "TestExprAbstractorNativePatternAndNestedBinder",
+            "TestExprAbstractorRetainsInterruptedTemporaryUntilClose",
+            "TestExprAbstractorSourceRootReferenceGuard"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The abstractor borrows its AST manager and input handles. Its ASTRef slice owns every generated temporary until successful publication and cleanup or an explicit retrying Close after interruption; the caller-owned output reference independently retains the published result. Copied owners are rejected."
+      ],
       "deviations": [
         "Go Abstract writes an ASTRef result and retains interrupted temporary references for explicit Close; copied Go owners are rejected before cleanup. The C++ stack owner destructs lexically. Native slices and a map replace ptr_vector and obj_map storage."
       ]
