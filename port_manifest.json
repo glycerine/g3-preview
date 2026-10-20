@@ -29316,9 +29316,16 @@
       "path": "src/ast/rewriter/elim_bounds.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/elim_bounds.go"
+      ],
+      "tests": [
+        "TestElimBoundsRecognizesSourceDifferenceBounds",
+        "TestElimBoundsRemovesOnlyOneSidedUnusedVariables",
+        "TestElimBoundsRetainsTwoSidedAndExistentialBounds",
+        "TestElimBoundsProofProducingEntry"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -29329,19 +29336,43 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "elim_bounds_cfg constructor, bound recognition and universal-quantifier reduction",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/elim_bounds.go",
+          "tests": [
+            "TestElimBoundsRecognizesSourceDifferenceBounds",
+            "TestElimBoundsRemovesOnlyOneSidedUnusedVariables",
+            "TestElimBoundsRetainsTwoSidedAndExistentialBounds",
+            "TestElimBoundsProofProducingEntry"
+          ]
+        }
+      ],
+      "ownership": [
+        "Bound and candidate sets use borrowed AST handles while the source quantifier owns every scanned atom. Updated quantifiers and unused-variable elimination results are held by lexical ASTRef owners until publication."
+      ],
+      "deviations": [
+        "Source ptr buffers and object hash sets are native Go slices and maps.",
+        "The proof-producing public entry emits an equivalent root rewrite or reflexivity proof around the completed no-proof traversal; internal congruence and quantifier proof chaining remains centralized in the separate rewriter traversal audit."
+      ]
     },
     {
       "path": "src/ast/rewriter/elim_bounds.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/elim_bounds.go"
+      ],
+      "tests": [
+        "TestElimBoundsRecognizesSourceDifferenceBounds",
+        "TestElimBoundsRemovesOnlyOneSidedUnusedVariables",
+        "TestElimBoundsRetainsTwoSidedAndExistentialBounds",
+        "TestElimBoundsProofProducingEntry"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -29352,11 +29383,27 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete elim_bounds_cfg and elim_bounds_rw declarations",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/elim_bounds.go",
+          "tests": [
+            "TestElimBoundsRecognizesSourceDifferenceBounds",
+            "TestElimBoundsRemovesOnlyOneSidedUnusedVariables",
+            "TestElimBoundsRetainsTwoSidedAndExistentialBounds",
+            "TestElimBoundsProofProducingEntry"
+          ]
+        }
+      ],
+      "ownership": [
+        "ElimBounds owns its configuration and no-proof Traversal; both borrow the AST manager and are closed in traversal-before-configuration order."
+      ],
+      "deviations": [
+        "The proof-producing public entry emits an equivalent root rewrite or reflexivity proof around the completed no-proof traversal."
+      ]
     },
     {
       "path": "src/ast/rewriter/enum2bv_rewriter.cpp",
