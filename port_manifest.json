@@ -12509,27 +12509,61 @@
       "path": "src/ast/ast_pp_dot.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/ast/ast_pp_dot.go"],
+      "tests": [
+        "TestASTProofDOTSourceTraversalAndSpelling",
+        "TestASTProofDOTEscapeAndGuards"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "escape_dot, proof DFS/ID assignment, atomic and fact-bearing node rendering, parent edge rendering, and pp_ast_dot_step trace",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_pp_dot.go",
+          "tests": [
+            "TestASTProofDOTSourceTraversalAndSpelling",
+            "TestASTProofDOTEscapeAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "WriteProofDOT borrows the manager, proof graph and output writer for the call; its ID map, printed set, traversal stack and formatted labels use native Go storage and retain no AST references afterward."
+      ],
+      "deviations": [
+        "Concrete Go maps and a slice replace source obj_map, obj_hashtable and svector storage. The method returns writer, formatter and invalid-domain errors explicitly while preserving source output bytes, rule order and LIFO traversal."
+      ]
     },
     {
       "path": "src/ast/ast_pp_dot.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/ast/ast_pp_dot.go"],
+      "tests": [
+        "TestASTProofDOTSourceTraversalAndSpelling",
+        "TestASTProofDOTEscapeAndGuards"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "borrowed proof/manager construction, pp, manager access and stream insertion surface",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_pp_dot.go",
+          "tests": [
+            "TestASTProofDOTSourceTraversalAndSpelling",
+            "TestASTProofDOTEscapeAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager-bound Go method has the same borrowed proof and manager lifetime as the temporary source ast_pp_dot wrapper."
+      ],
+      "deviations": [
+        "One manager method replaces the temporary C++ stream-wrapper class and operator overload; io.Writer supplies the retained output abstraction."
+      ]
     },
     {
       "path": "src/ast/ast_pp_util.cpp",
