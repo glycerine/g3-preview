@@ -7,6 +7,51 @@ import (
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
+func TestElimUnusedVarsSourceParameterControlsGroundPatternScan(t *testing.T) {
+	m := astTestManager(t)
+	b, e := m.MkBoolSort()
+	satOK(t, e)
+	v0, e := m.MkVar(0, b)
+	satOK(t, e)
+	truth, e := m.MkTrue()
+	satOK(t, e)
+	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true,
+		Sorts:  []ast.ASTHandle{b, b}, Names: []symbol.Symbol{symbol.Numerical(1), symbol.Numerical(2)},
+		Body: truth, NoPatterns: []ast.ASTHandle{v0},
+	})
+	satOK(t, e)
+	c, _, _ := paramsTestOwner(t)
+	p, e := c.NewValue()
+	paramsMust(t, e)
+	t.Cleanup(func() { paramsMust(t, c.Del(&p)) })
+	out, e := ElimUnusedVarsWithParams(m, q, c, &p)
+	satOK(t, e)
+	got, e := m.RefGet(out)
+	satOK(t, e)
+	if got != truth {
+		t.Fatal("true default did not bypass ground annotations", got)
+	}
+	satOK(t, m.DelRef(&out))
+	key := "ignore_patterns_on_ground_qbody"
+	paramsMust(t, c.SetBoolName(&p, &key, false))
+	out, e = ElimUnusedVarsWithParams(m, q, c, &p)
+	satOK(t, e)
+	got, e = m.RefGet(out)
+	satOK(t, e)
+	count, e := m.GetNumDeclarations(got)
+	satOK(t, e)
+	if count != 1 {
+		t.Fatal("false parameter did not retain annotation variable", count)
+	}
+	noPatterns, e := m.GetNumNoPatterns(got)
+	satOK(t, e)
+	if noPatterns != 1 {
+		t.Fatal("rewritten annotation count", noPatterns)
+	}
+	satOK(t, m.DelRef(&out))
+}
+
 func TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers(t *testing.T) {
 	m := astTestManager(t)
 	b, e := m.MkBoolSort()
@@ -53,6 +98,9 @@ func TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers(t *testing.T) {
 	if got != allUsed {
 		t.Fatal("all-used quantifier identity", got, allUsed)
 	}
+	if may, e := m.QuantifierMayHaveUnusedVars(allUsed); e != nil || may {
+		t.Fatal("all-used memo flag", may, e)
+	}
 	satOK(t, m.DelRef(&out))
 
 	oneUsed := makeQ(twoSorts, twoNames, v[0], nil)
@@ -65,6 +113,9 @@ func TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers(t *testing.T) {
 	satOK(t, e)
 	if got != wantOne {
 		t.Fatal("unused outer declaration must be removed with source reverse declaration order", got, wantOne)
+	}
+	if may, e := m.QuantifierMayHaveUnusedVars(got); e != nil || may {
+		t.Fatal("rebuilt quantifier memo flag", may, e)
 	}
 	satOK(t, m.DelRef(&out))
 	afterMapping, e := m.GetRefCount(v[0])

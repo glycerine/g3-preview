@@ -47299,3 +47299,27 @@ and substitution owner. Focused tests pass native, checked, debug and combined
 profiles, and the full native AST rewriter package passes on CPUs 8-16. The
 source pair remains partial for nondefault unused-variable elimination and
 remaining operator diagnostic profiles; manifest counts are unchanged.
+
+Parameterized unused-variable elimination:
+The retained `unused_vars_eliminator` path now supports both values of
+`ignore_patterns_on_ground_qbody`. `ElimUnusedVarsWithParams` owns a lexical
+copy of the caller's `ParamsRef`, reads the source true-default option, and
+releases that snapshot after rewriting. A false override scans body patterns
+and no-patterns even for a ground body, retaining and remapping declarations
+used only by annotations; the existing UFBV wrapper keeps its true-default
+shortcut. Focused tests pass all four profiles and the full native AST rewriter
+package passes on CPUs 8-16. The all-used identity and rebuilt-quantifier paths
+now clear the source `may_have_unused_vars` memo bit, and entry/final
+well-sorted assertions are wired through the debug action adapter.
+
+Variable-substitution whole-unit closure:
+`src/ast/rewriter/var_subst.cpp` and `.h` are promoted to ported after the
+completed substitution, unused-variable elimination, instantiation and
+free-variable collector work. The core operator covers normal/inverse binding
+order, reset, beta traversal, pre/post well-sorted assertions and TRACE output.
+The eliminator covers both parameter values, memo flags, body and annotation
+remapping, and metadata retention. `ExprFreeVars` covers the live standalone
+free-variable traversal behavior; the raw overloads have no retained external
+consumer. Native slices/maps replace pointer containers, and typed debug errors
+replace source debug actions. Portcheck reports 2103 units, 677 APIs: 269
+ported, 299 partial, 1478 unported and 11 dead/deleted.

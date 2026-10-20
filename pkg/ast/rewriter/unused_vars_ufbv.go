@@ -6,14 +6,43 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // ElimUnusedVarsUFBV owns its result independently of q. The caller must
 // release the returned ASTRef through the manager.
 func ElimUnusedVarsUFBV(m *ast.ASTManager, q ast.ASTHandle) (_ ast.ASTRef, result error) {
+	return elimUnusedVars(m, q, true)
+}
+
+// ElimUnusedVarsWithParams retains the source params_ref snapshot for the
+// lexical eliminator lifetime and reads ignore_patterns_on_ground_qbody with
+// its true default before performing the rewrite.
+func ElimUnusedVarsWithParams(m *ast.ASTManager, q ast.ASTHandle, c *uparams.ParamsContext, p *uparams.ParamsRef) (_ ast.ASTRef, result error) {
+	if c == nil || p == nil {
+		return ast.ASTRef{}, uparams.ErrParamsOwner
+	}
+	owned := c.EmptyValue()
+	if e := c.Copy(&owned, p); e != nil {
+		return ast.ASTRef{}, e
+	}
+	defer func() { result = errors.Join(result, c.Del(&owned)) }()
+	key := "ignore_patterns_on_ground_qbody"
+	ignore, e := c.GetBoolName(&owned, &key, true)
+	if e != nil {
+		return ast.ASTRef{}, e
+	}
+	return elimUnusedVars(m, q, ignore)
+}
+
+func elimUnusedVars(m *ast.ASTManager, q ast.ASTHandle, ignorePatternsOnGroundBody bool) (_ ast.ASTRef, result error) {
 	if m == nil {
 		return ast.ASTRef{}, ast.ErrASTHandle
+	}
+	if e := assertUnusedVarsWellSorted(m, q, 49); e != nil {
+		return ast.ASTRef{}, e
 	}
 	body, e := m.GetQuantifierBody(q)
 	if e != nil {
@@ -23,8 +52,15 @@ func ElimUnusedVarsUFBV(m *ast.ASTManager, q ast.ASTHandle) (_ ast.ASTRef, resul
 	if e != nil {
 		return ast.ASTRef{}, e
 	}
-	if ground {
+	if ignorePatternsOnGroundBody && ground {
 		return m.NewRef(body)
+	}
+	mayHaveUnused, e := m.QuantifierMayHaveUnusedVars(q)
+	if e != nil {
+		return ast.ASTRef{}, e
+	}
+	if !mayHaveUnused {
+		return m.NewRef(q)
 	}
 	used, e := newUFBVUsedVars(m)
 	if e != nil {
@@ -64,6 +100,9 @@ func ElimUnusedVarsUFBV(m *ast.ASTManager, q ast.ASTHandle) (_ ast.ASTRef, resul
 		return ast.ASTRef{}, e
 	}
 	if used.usesAll(n) {
+		if e = m.SetQuantifierNoUnusedVars(q); e != nil {
+			return ast.ASTRef{}, e
+		}
 		return m.NewRef(q)
 	}
 	sorts := make([]ast.ASTHandle, 0, n)
@@ -233,5 +272,24 @@ func ElimUnusedVarsUFBV(m *ast.ASTManager, q ast.ASTHandle) (_ ast.ASTRef, resul
 	if e != nil {
 		return ast.ASTRef{}, e
 	}
+	if e = m.SetQuantifierNoUnusedVars(updated); e != nil {
+		return ast.ASTRef{}, e
+	}
+	if e = assertUnusedVarsWellSorted(m, updated, 152); e != nil {
+		return ast.ASTRef{}, e
+	}
 	return m.NewRef(updated)
+}
+
+func assertUnusedVarsWellSorted(m *ast.ASTManager, h ast.ASTHandle, line int32) error {
+	debug := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(debug)
+	if e != nil || !enabled {
+		return e
+	}
+	good, e := m.IsWellSorted(h, nil)
+	if e != nil || good {
+		return e
+	}
+	return diagnostic.DebugAssertionFailure(debug, "src/ast/rewriter/var_subst.cpp", line, "is_well_sorted(m, q)")
 }

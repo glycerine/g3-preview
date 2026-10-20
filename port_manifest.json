@@ -30956,11 +30956,12 @@
       "path": "src/ast/rewriter/var_subst.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/var_substitution.go",
         "pkg/ast/rewriter/var_substitution_test.go",
         "pkg/ast/rewriter/unused_vars_ufbv.go",
+        "pkg/ast/ast_quantifier_unused_vars.go",
         "pkg/ast/rewriter/expr_free_vars.go",
         "pkg/ast/rewriter/expr_free_vars_test.go",
         "pkg/ast/rewriter/instantiate.go",
@@ -30978,6 +30979,7 @@
         "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
         "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset",
         "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers",
+        "TestElimUnusedVarsSourceParameterControlsGroundPatternScan",
         "TestExprFreeVarsSourceCollectAccumulateDefaultsAndReverse",
         "TestExprFreeVarsSourceQuantifierOffsetAndBodyOnly",
         "TestInstantiateQuantifierSourceOrderAndArity",
@@ -31020,12 +31022,12 @@
           "text": "SASSERT(m_todo.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained var_subst operator pre/post is_well_sorted SASSERT switch at var_subst.cpp:27,34 before reset and TRACE",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/var_substitution_assert.go",
           "tests": [
             "TestVarSubstitutionSourceWellSortedAssertionSites"
@@ -31033,7 +31035,7 @@
         },
         {
           "name": "selected live var_subst operator post-rewrite var_subst_bug TRACE with binding order and result (var_subst.cpp:35-40)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/var_substitution_trace.go",
           "tests": [
             "TestVarSubstitutionResultSourceTrace"
@@ -31054,7 +31056,7 @@
         },
         {
           "name": "Original var_subst operator reset then normal/inverse bindings and beta traversal (var_subst.cpp:26-40)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/var_substitution.go",
           "tests": [
             "TestVarSubstitutionOriginalRegisteredIdentities",
@@ -31066,11 +31068,12 @@
           ]
         },
         {
-          "name": "UFBV default elim_unused_vars ground-body bypass, used-declaration selection and variable/annotation remapping",
-          "status": "partial",
+          "name": "unused_vars_eliminator parameter snapshot, ground-body option, memo flag, used-declaration selection, variable/annotation remapping and well-sorted assertions",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/unused_vars_ufbv.go",
           "tests": [
-            "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
+            "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers",
+            "TestElimUnusedVarsSourceParameterControlsGroundPatternScan"
           ]
         },
         {
@@ -31098,21 +31101,22 @@
       ],
       "ownership": [
         "Complete enclosing header charged once; beta_reducer and its original engine/shifter/cache/ref members constructed in place. Partial construction returns the actual owner for Close; constructor-refusal tests warm the AST manager retained ref directory before measuring independent empty member constructions. Borrowed caller bindings retain the original engine protocol; output is an owning ASTRef.",
-        "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path. The UFBV unused-variable caller now pins every constructed variable mapping until substitution and result publication finish, then releases those pins after its younger substitution/result owners."
+        "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path. The unused-variable caller pins every constructed variable mapping until substitution and result publication finish, owns a lexical ParamsRef snapshot, and releases those values after its younger substitution/result owners. ExprFreeVars borrows collected sort handles; InstantiateQuantifier owns its intermediate reference and inverse shifter through publication."
       ],
       "deviations": [
-        "The live operator now evaluates source debug-gated pre/post is_well_sorted assertions around reset/rewrite and before TRACE; invalid input preserves prior bindings/output. The post site is exercised directly; a rewritten ill-sorted output and interactive C/T action profile remain open. The selected post-rewrite TRACE is covered for a live Boolean binding, while wider expression/stream profiles remain open. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path, expr_free_vars collector and instantiate helper are concrete; nondefault parameters and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
+        "Source assertions use the repository's typed debug-action error transport, and native slices/maps replace source pointer buffers and sparse marks. The standalone get_free_vars overloads have no retained external consumer; their traversal is the shared implementation of the complete ExprFreeVars surface."
       ]
     },
     {
       "path": "src/ast/rewriter/var_subst.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/var_substitution.go",
         "pkg/ast/rewriter/var_substitution_test.go",
         "pkg/ast/rewriter/unused_vars_ufbv.go",
+        "pkg/ast/ast_quantifier_unused_vars.go",
         "pkg/ast/rewriter/expr_free_vars.go",
         "pkg/ast/rewriter/expr_free_vars_test.go",
         "pkg/ast/rewriter/instantiate.go",
@@ -31128,6 +31132,7 @@
         "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
         "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset",
         "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers",
+        "TestElimUnusedVarsSourceParameterControlsGroundPatternScan",
         "TestExprFreeVarsSourceCollectAccumulateDefaultsAndReverse",
         "TestExprFreeVarsSourceQuantifierOffsetAndBodyOnly",
         "TestInstantiateQuantifierSourceOrderAndArity",
@@ -31144,8 +31149,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Original var_subst constructor, std_order and reset with embedded beta_reducer (var_subst.h:35-53)",
@@ -31162,7 +31167,7 @@
         },
         {
           "name": "Original var_subst operator reset then normal/inverse bindings and beta traversal (var_subst.cpp:26-40)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/var_substitution.go",
           "tests": [
             "TestVarSubstitutionOriginalRegisteredIdentities",
@@ -31174,11 +31179,12 @@
           ]
         },
         {
-          "name": "UFBV default unused_vars_eliminator over concrete used-vars collection and var_subst",
-          "status": "partial",
+          "name": "complete unused_vars_eliminator over concrete used-vars collection, parameter option, memo flag and var_subst",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/unused_vars_ufbv.go",
           "tests": [
-            "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
+            "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers",
+            "TestElimUnusedVarsSourceParameterControlsGroundPatternScan"
           ]
         },
         {
@@ -31206,10 +31212,10 @@
       ],
       "ownership": [
         "Complete enclosing header charged once; beta_reducer and its original engine/shifter/cache/ref members constructed in place. Partial construction returns the actual owner for Close; constructor-refusal tests warm the AST manager retained ref directory before measuring independent empty member constructions. Borrowed caller bindings retain the original engine protocol; output is an owning ASTRef.",
-        "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path."
+        "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path. The eliminator owns its lexical ParamsRef snapshot and temporary AST references, ExprFreeVars borrows sort handles, and InstantiateQuantifier owns its intermediate result and inverse shifter."
       ],
       "deviations": [
-        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path, expr_free_vars collector and instantiate helper are concrete; nondefault parameters and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
+        "Source assertions use the repository's typed debug-action error transport, and native slices/maps replace source pointer buffers and sparse marks. Only concrete live numeral/value specializations are retained; no universal template adapter is introduced."
       ]
     },
     {
