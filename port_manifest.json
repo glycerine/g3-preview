@@ -44348,8 +44348,8 @@
           "tests": ["TestPolynomialNewtonVectorChildMemoryWrappers"]
         },
         {
-          "name": "Retained monomial Lex, LexWithMinimum and GradedLex algorithms cpp609-704 with native field ordering; runtime assertion-callsite closure pending",
-          "status": "partial",
+          "name": "Retained monomial Lex, LexWithMinimum and GradedLex cpp609-704 with process assertion gates and source actions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_order.go",
           "tests": [
             "TestMonomialOrderSourceLexAssertions",
@@ -44357,9 +44357,11 @@
             "TestMonomialOrderSourceRangesAndReadGuards",
             "TestMonomialOrderWarmNoAllocation",
             "TestMonomialOrderSourceSignedSizeBoundary",
-            "TestMonomialOrderSourceDegreeShortCircuit"
+            "TestMonomialOrderSourceDegreeShortCircuit",
+            "TestMonomialOrderAssertionReadPaths",
+            "TestMonomialOrderTailAssertionActions"
           ],
-          "notes": "Ordinary lex is retained by sorted verification, CRA and graded comparisons; lex_compare2 is retained by actual Newton lex_lt2 sorting cpp2985. Direct current-code inspection finds orderPowerLocation and lexCore tail assertions still use DebugBuild-only hard errors instead of runtime process assertion gates/actions at228,629-630,674. Existing native algorithms and finite-model/read-order tests remain; they do not prove those missing source assertion protocols. Source reverse-lex variants have no retained callers and are qualified separately."
+          "notes": "Ordinary lex is retained by sorted verification, CRA and graded comparisons; lex_compare2 is retained by actual Newton lex_lt2 sorting cpp2985. get_power228 and tail629-630/674 use process assertion gates and actual source Throw/Continue actions. Actual interned unit/x/x^2 values under a closed assertion owner distinguish power/tail reads from pointer-equality and unequal minimum-tail shortcuts. Defined scalar tail states test Throw, Continue and disabled assertions; these do not claim canonical monomials naturally violate uniqueness. Existing bounded-model, signed-size, no-allocation and partial-field read-order coverage remains. Reverse-lex compatibility routines share get_power but have no retained source callers; their separate tail assertions remain reference-only."
         },
         {
           "name": "Dormant reverse-lex range, ReverseLex and GradedReverseLex helpers cpp706-756",

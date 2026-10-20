@@ -22,14 +22,8 @@ func (m *MonomialManager) orderPowerLocation(a Monomial, i uint32) (*monomialLoc
 	if e != nil {
 		return nil, e
 	}
-	if polynomialSourceDebug {
-		n, e := m.allocator.ReadUint32(l.raw, 12)
-		if e != nil {
-			return nil, e
-		}
-		if i >= n {
-			return nil, ErrMonomialAssertion
-		}
+	if e = m.powerSourceIndexAssert(a, i); e != nil {
+		return nil, e
 	}
 	return l, nil
 }
@@ -138,16 +132,18 @@ func (m *MonomialManager) lexCore(a, b Monomial, minimum bool, minVar uint32) (i
 
 	if minimum {
 		if i == j {
-			if polynomialSourceDebug && d1 == d2 {
-				return 0, ErrMonomialAssertion
+			if e = m.lexMinimumEndAssert(d1, d2); e != nil {
+				return 0, e
 			}
 			if d1 < d2 {
 				return -1, nil
 			}
 			return 1, nil
 		}
-	} else if polynomialSourceDebug && (!(i >= 0 || j >= 0) || !(i < 0 || j < 0)) {
-		return 0, ErrMonomialAssertion
+	} else {
+		if e = m.lexDistinctEndAssert(i, j); e != nil {
+			return 0, e
+		}
 	}
 	if i < 0 {
 		return -1, nil

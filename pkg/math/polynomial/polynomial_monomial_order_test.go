@@ -394,6 +394,7 @@ func TestMonomialOrderSourceDegreeShortCircuit(t *testing.T) {
 		}
 	})
 	t.Run("both reference guards before fields", func(t *testing.T) {
+		polynomialThrowAssertionFixture(t)
 		m := orderFixture(t)
 		a := orderPartialValue(t, m, 1, nil)
 		b := orderPartialValue(t, m, 2, nil)
