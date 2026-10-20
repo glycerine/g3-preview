@@ -39507,8 +39507,8 @@
           ]
         },
         {
-          "name": "selected cell construction/copy/source destruction cpp180\u2013218/360\u2013539; unfinished construction guards and distinct owning abort",
-          "status": "partial",
+          "name": "Complete cell construction, copy, source destruction and distinct owning abort cpp180\u2013218/360\u2013539",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_root.go",
           "tests": [
             "TestAlgebraicNullZeroAndRationalCells",
@@ -40691,8 +40691,8 @@
           ]
         },
         {
-          "name": "selected cell construction/copy/source destruction cpp180\u2013218/360\u2013539; unfinished construction guards and distinct owning abort",
-          "status": "partial",
+          "name": "Complete cell construction, copy, source destruction and distinct owning abort cpp180\u2013218/360\u2013539",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_root.go",
           "tests": [
             "TestAlgebraicNullZeroAndRationalCells",

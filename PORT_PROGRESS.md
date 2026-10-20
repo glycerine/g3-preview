@@ -47042,3 +47042,13 @@ formatter/display/Horner ownership, every TRACE record and callback exclusion
 are covered. Tests pass native 0.058s, checked 0.057s, debug 0.488s and combined
 1.368s on CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-mixed-rational-arithmetic-audit.txt`.
+
+Algebraic cell-lifecycle closure:
+the duplicate cpp180-218/cpp360-539 rows are promoted to ported. Null, basic
+and root construction, mutable/const inputs, coefficient/bound receipts,
+normalization, packed publication, all copy branches and field order,
+construction prefixes, assertions, TRACE, callbacks, literal source
+destruction and explicit owning abort through vector/mapping/selection
+continuations are covered. Tests pass native 0.107s, checked 0.108s, debug
+0.321s and combined 0.360s on CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-cell-lifecycle-audit.txt`.
