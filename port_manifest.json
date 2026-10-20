@@ -13161,7 +13161,8 @@
         "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals",
         "TestLegacySMTPrinterBitVectorAndLabelLiterals",
         "TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables",
-        "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants"
+        "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants",
+        "TestLegacySMTPrinterBit2BoolExpansion"
       ],
       "conditionals": [
         {
@@ -13223,13 +13224,21 @@
           "tests": [
             "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants"
           ]
+        },
+        {
+          "name": "smt_printer bit2bool extraction and equality expansion (ast_smt_pp.cpp:389-394)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_legacy_expr.go",
+          "tests": [
+            "TestLegacySMTPrinterBit2BoolExpansion"
+          ]
         }
       ],
       "ownership": [
         "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String/floating-point literals, bit2bool, distinct regrouping, implication simplification, let insertion, datatype-special paths and the benchmark wrapper remain open."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String/floating-point literals, distinct regrouping, implication simplification, let insertion, datatype-special paths and the benchmark wrapper remain open."
       ]
     },
     {
@@ -13251,7 +13260,8 @@
         "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals",
         "TestLegacySMTPrinterBitVectorAndLabelLiterals",
         "TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables",
-        "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants"
+        "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants",
+        "TestLegacySMTPrinterBit2BoolExpansion"
       ],
       "conditionals": [
         {

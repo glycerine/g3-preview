@@ -112,6 +112,40 @@ func (m *ASTManager) legacySMTDeclParameters(decl ASTHandle) (private bool, view
 	return info.private, views, nil
 }
 
+func (m *ASTManager) legacySMTBit2BoolIndex(decl ASTHandle) (index uint32, matched bool, err error) {
+	if err = m.lock(); err != nil {
+		return 0, false, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireKind(decl, ASTFuncDecl)
+	if err != nil {
+		return 0, false, err
+	}
+	if m.bitVectorPlugin == nil {
+		return 0, false, nil
+	}
+	family, kind, err := m.declIdentity(r)
+	if err != nil || family != m.bitVectorPlugin.family || kind != 55 {
+		return 0, false, err
+	}
+	info, err := m.funcInfo(m.declAt(r.slot).info)
+	if err != nil || info.count != 1 {
+		return 0, false, err
+	}
+	parameter, err := m.infoParameter(info, 0)
+	if err != nil {
+		return 0, false, err
+	}
+	raw, err := m.parameter(parameter)
+	if err != nil {
+		return 0, false, err
+	}
+	if raw.Kind != ASTParameterInt || raw.integer < 0 {
+		return 0, false, ErrASTDomain
+	}
+	return uint32(raw.integer), true, nil
+}
+
 func (p *LegacySMTPrinter) parameterText(parameter legacySMTParameterView, ctx *legacySMTExprContext) (string, error) {
 	switch parameter.kind {
 	case ASTParameterInt:
@@ -401,6 +435,24 @@ func (p *LegacySMTPrinter) exprTextContext(h ASTHandle, ctx *legacySMTExprContex
 	} else if matched {
 		return value, nil
 	}
+	decl, err := p.manager.GetDecl(h)
+	if err != nil {
+		return "", err
+	}
+	if bit, matched, e := p.manager.legacySMTBit2BoolIndex(decl); e != nil {
+		return "", e
+	} else if matched {
+		arg, e := p.manager.GetArg(h, 0)
+		if e != nil {
+			return "", e
+		}
+		argText, e := p.exprTextContext(arg, ctx)
+		if e != nil {
+			return "", e
+		}
+		bitText := uintText(bit)
+		return "(= ((_ extract " + bitText + " " + bitText + ") " + argText + ") (_ bv1 1))", nil
+	}
 	var labels []usymbol.Symbol
 	positive := false
 	if matched, e := p.manager.IsLabel(h, &positive, &labels); e != nil {
@@ -433,10 +485,6 @@ func (p *LegacySMTPrinter) exprTextContext(h ASTHandle, ctx *legacySMTExprContex
 			return "", e
 		}
 		return "(! true :lblpos " + label + ")", nil
-	}
-	decl, err := p.manager.GetDecl(h)
-	if err != nil {
-		return "", err
 	}
 	n, err := p.manager.GetNumArgs(h)
 	if err != nil {

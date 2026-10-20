@@ -277,3 +277,30 @@ func TestLegacySMTPrinterDeclarationParametersAndPrivateConstants(t *testing.T) 
 		}
 	}
 }
+
+func TestLegacySMTPrinterBit2BoolExpansion(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	family, err := m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	printer, err := NewLegacySMTPrinter(m)
+	astTestMust(t, err)
+	sort, err := m.BitVectorSort(8)
+	astTestMust(t, err)
+	value, err := m.MkConst(astTestSymbol(t, m, "legacy-bv"), sort)
+	astTestMust(t, err)
+	astTestPin(t, m, value)
+	index, err := m.NewParameterInt(3)
+	astTestMust(t, err)
+	bit, err := m.MkFamilyApp(family, 55, []ASTParameter{index}, []ASTHandle{value})
+	astTestMust(t, err)
+	astTestMust(t, m.DelParameter(&index))
+	astTestPin(t, m, bit)
+	var out strings.Builder
+	astTestMust(t, printer.DisplayExpr(&out, bit, nil))
+	want := "(= ((_ extract 3 3) legacy-bv) (_ bv1 1))"
+	if out.String() != want {
+		t.Fatalf("legacy SMT bit2bool expression %q, want %q", out.String(), want)
+	}
+}
