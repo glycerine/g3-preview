@@ -47136,3 +47136,16 @@ source `_TRACE` compile gate, so standalone `g3debug` correctly expects no
 records. Focused AST/rewriter tests pass native, checked, debug and combined
 profiles on CPUs 8-16. Portcheck reports 2103 units, 677 APIs: 250 ported, 316
 partial, 1480 unported and 11 dead/deleted.
+
+NNF generated parameter facade closure:
+`src/ast/normal_forms/nnf_params.hpp` is promoted to ported. The new concrete
+Go facade borrows the caller parameter reference, owns the constructor-time
+`nnf` module snapshot, and implements `max_memory`, `sk_hack`, `mode`,
+`ignore_labels` and `skolemize` with exact local/module/literal precedence.
+The symbol default is constructed before lookup as in the generated C++.
+Tracked destruction, nil-local empty value handling and copied/closed-owner
+guards follow the established parameter-owner contract. The complete catalog
+is linked only by the external integration test, preserving the production
+package dependency boundary. Focused tests pass native, checked, debug and
+combined profiles on CPUs 8-16; portcheck reports 251 ported and 315 partial
+units.
