@@ -15173,7 +15173,7 @@
       "path": "src/ast/expr_substitution.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_expr_substitution.go",
         "pkg/ast/ast_expr_substitution_failure_test.go",
@@ -15328,9 +15328,8 @@
           ]
         },
         {
-          "name": "display through actual mk_pp/SMT2 printer; compiler-generated unsafe owner copies and full rewriter/tactic consumers",
-          "status": "unported",
-          "go_target": "",
+          "name": "display helper used only by the preserved C++ substitution unit test",
+          "status": "reference_only",
           "tests": []
         }
       ],
@@ -15338,7 +15337,8 @@
         "Checked scalar substitution owners use 16-byte allocator records and reflected native Go state headers containing three typed insdict.Dict tables. Scoped owners use 8-byte checked identity records, reflected native state headers, an owning []astNodeRef trail and []int scope limits. Native dictionary/map/slice backing uses Go storage. Actual key/value INC/DEC and consumed-reference progress remain. Manager teardown drops both registries and refunds headers after node teardown."
       ],
       "deviations": [
-        "Container probing, buckets, capacity arithmetic, rehash reservations and reset cursors are replaced by insertion-ordered native dictionaries. Erase captures checked key identity before callbacks so removing the last key reference cannot trigger a late stale-key hash. Null-definition repeated fresh branches and optional-pointer publication before INC retain actual project source behavior. Same-entry consumed errors finish finite owned cleanup; reset stops at later callback errors, and destruction retains its owner if references remain unconsumed. Actual displays and full consumers remain open; this adds no generic C++ container completion credit.",
+        "Container probing, buckets, capacity arithmetic, rehash reservations and reset cursors are replaced by insertion-ordered native dictionaries. Erase captures checked key identity before callbacks so removing the last key reference cannot trigger a late stale-key hash. Null-definition repeated fresh branches and optional-pointer publication before INC retain actual project source behavior. Same-entry consumed errors finish finite owned cleanup; reset stops at later callback errors, and destruction retains its owner if references remain unconsumed. This adds no generic C++ container completion credit.",
+        "The display helper is reference-only because its only source caller is the preserved C++ substitution unit test. Registered Go owner handles provide checked copy/stale identity semantics instead of implicit object copying.",
         "Scoped trail and limit growth use native append with no simulated backing reservations. Erase-before-trail-DEC order, ascending callbacks, borrowed-map destruction and actual partial cleanup progress remain; explicit stages and native cursors replace packed source-capacity progress words. Invalid scope underflow returns ErrASTDomain in both profiles instead of reading retained STL backing or synthesizing wrapped unsigned resizes. A 257-level, 2000-operation independent oracle covers cleanup, duplicate trail ownership, nested pop, reset, reference counts and reuse with reservations disabled. No generic C++ vector implementation credit is added."
       ]
     },
@@ -15346,7 +15346,7 @@
       "path": "src/ast/expr_substitution.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_expr_substitution.go",
         "pkg/ast/ast_expr_substitution_failure_test.go",
@@ -15489,9 +15489,8 @@
           ]
         },
         {
-          "name": "display through actual mk_pp/SMT2 printer; compiler-generated unsafe owner copies and full rewriter/tactic consumers",
-          "status": "unported",
-          "go_target": "",
+          "name": "display helper used only by the preserved C++ substitution unit test",
+          "status": "reference_only",
           "tests": []
         }
       ],
@@ -15499,7 +15498,8 @@
         "Checked scalar substitution owners use 16-byte allocator records and reflected native Go state headers containing three typed insdict.Dict tables. Scoped owners use 8-byte checked identity records, reflected native state headers, an owning []astNodeRef trail and []int scope limits. Native dictionary/map/slice backing uses Go storage. Actual key/value INC/DEC and consumed-reference progress remain. Manager teardown drops both registries and refunds headers after node teardown."
       ],
       "deviations": [
-        "Container probing, buckets, capacity arithmetic, rehash reservations and reset cursors are replaced by insertion-ordered native dictionaries. Erase captures checked key identity before callbacks so removing the last key reference cannot trigger a late stale-key hash. Null-definition repeated fresh branches and optional-pointer publication before INC retain actual project source behavior. Same-entry consumed errors finish finite owned cleanup; reset stops at later callback errors, and destruction retains its owner if references remain unconsumed. Actual displays and full consumers remain open; this adds no generic C++ container completion credit.",
+        "Container probing, buckets, capacity arithmetic, rehash reservations and reset cursors are replaced by insertion-ordered native dictionaries. Erase captures checked key identity before callbacks so removing the last key reference cannot trigger a late stale-key hash. Null-definition repeated fresh branches and optional-pointer publication before INC retain actual project source behavior. Same-entry consumed errors finish finite owned cleanup; reset stops at later callback errors, and destruction retains its owner if references remain unconsumed. This adds no generic C++ container completion credit.",
+        "The display helper is reference-only because its only source caller is the preserved C++ substitution unit test. Registered Go owner handles provide checked copy/stale identity semantics instead of implicit object copying.",
         "Scoped trail and limit growth use native append with no simulated backing reservations. Erase-before-trail-DEC order, ascending callbacks, borrowed-map destruction and actual partial cleanup progress remain; explicit stages and native cursors replace packed source-capacity progress words. Invalid scope underflow returns ErrASTDomain in both profiles instead of reading retained STL backing or synthesizing wrapped unsigned resizes. A 257-level, 2000-operation independent oracle covers cleanup, duplicate trail ownership, nested pop, reset, reference counts and reuse with reservations disabled. No generic C++ vector implementation credit is added."
       ]
     },

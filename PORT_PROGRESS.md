@@ -47361,3 +47361,15 @@ low-level application, sort and function-declaration rendering. Traversal state
 is invocation-owned; managers, expressions and diagnostic services are borrowed.
 All four focused profiles pass on CPUs 8-16. Portcheck reports 2103 units, 677
 APIs: 275 ported, 293 partial, 1478 unported and 11 dead/deleted.
+
+Expression-substitution whole-unit closure:
+`src/ast/expr_substitution.cpp` and `.h` are promoted to ported after confirming
+the existing concrete Go owner covers all retained constructors, proof/core
+policies, insert and replacement order, lookup outputs, erase, reset, cleanup,
+destruction, and the complete scoped trail/limit interface. The checked owner
+registries, three insertion-ordered tables, reference pins, dependency roots,
+retryable consumed progress and manager teardown are fully audited. The display
+helper is called only by the preserved C++ unit test and is reference-only;
+checked scalar owner identities replace implicit object copying. All four
+focused profiles pass on CPUs 8-16. Portcheck reports 2103 units, 677 APIs: 277
+ported, 291 partial, 1478 unported and 11 dead/deleted.
