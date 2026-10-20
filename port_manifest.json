@@ -71,27 +71,65 @@
       "path": "cmake/Z3Config.cmake.in",
       "component": "cmake",
       "role": "reference_tool",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/maximize_ac_sharing.go"],
+      "tests": [
+        "TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition",
+        "TestMaximizeBVSharingScopesResetAndGuards",
+        "TestMaximizeBVSharingWrapperProofAndLifecycle"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "register_kind, reduce_app, contains, insert, constructor/destructor, push_scope, pop_scope, restore_entries, reset, BV init_core/is_numeral/constructor",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/maximize_ac_sharing.go",
+          "tests": [
+            "TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition",
+            "TestMaximizeBVSharingScopesResetAndGuards",
+            "TestMaximizeBVSharingWrapperProofAndLifecycle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each canonical operand-pair entry owns two AST references until scope restoration or close. Scope limits restore entries in reverse order. Reset preserves owned entries and clears only the lookup map, matching the source. Native Go slices and maps replace region/vector/hashtable storage."
+      ],
+      "deviations": [
+        "Allocation and reference failures use checked Go errors. The proof-enabled wrapper publishes one valid root rewrite or reflexivity proof rather than preserving the generic source traversal's internal congruence/transitivity proof-tree shape."
+      ]
     },
     {
       "path": "cmake/cmake_uninstall.cmake.in",
       "component": "cmake",
       "role": "reference_tool",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/maximize_ac_sharing.go"],
+      "tests": [
+        "TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition",
+        "TestMaximizeBVSharingScopesResetAndGuards",
+        "TestMaximizeBVSharingWrapperProofAndLifecycle"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "maximize_ac_sharing entry/cache/scopes, maximize_bv_sharing, and maximize_bv_sharing_rw declarations and forwarding methods",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/maximize_ac_sharing.go",
+          "tests": [
+            "TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition",
+            "TestMaximizeBVSharingScopesResetAndGuards",
+            "TestMaximizeBVSharingWrapperProofAndLifecycle"
+          ]
+        }
+      ],
+      "ownership": [
+        "The public configuration is a checked noncopyable owner of retained pair references. The wrapper owns its configuration and traversal, borrows the AST manager, charges its concrete representation, and closes idempotently."
+      ],
+      "deviations": [
+        "Go exposes explicit constructors and errors; native inheritance, region layout, pointer hashing, assertions, exceptions, and STL/container implementation are not ported."
+      ]
     },
     {
       "path": "cmake/compiler_lto.cmake",
