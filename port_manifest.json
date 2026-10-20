@@ -19597,12 +19597,13 @@
       "path": "src/ast/normal_forms/nnf.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/normal_forms/gparams_catalog_collectors.go",
         "pkg/ast/normal_forms/skolemizer.go",
+        "pkg/ast/normal_forms/nnf.go",
         "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
@@ -19612,7 +19613,14 @@
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
         "TestGlobalParamsCatalogDispatcherFaultRoots",
         "TestSkolemizerFreeVariablesProofAndCache",
-        "TestSkolemizerHackPatternAugmentsExistentialBody"
+        "TestSkolemizerHackPatternAugmentsExistentialBody",
+        "TestNNFFullConnectivesAndProof",
+        "TestNNFModesIffXorITEAndGroundSkip",
+        "TestNNFQuantifierRetentionFlippingAndSkolemization",
+        "TestNNFLabelsAndIntroducedDefinitions",
+        "TestNNFMemoryLimitAndOptionGuards",
+        "TestNNFDeepTraversalCacheResetAndOwnerGuards",
+        "TestNNFGeneratedParameterConstruction"
       ],
       "assertions": [
         {
@@ -19720,8 +19728,8 @@
           "text": "SASSERT(!m_frame_stack.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "skolemizer::process/operator()/set_sk_hack/is_sk_hack",
@@ -19730,7 +19738,7 @@
           "evidence": "Concrete Skolemizer preserves sparse free-variable arguments, reverse binder substitution, optional sk_hack pattern augmentation, Skolemization proofs and cached identities."
         },
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order",
           "status": "ported",
           "go_target": "pkg/ast/normal_forms/gparams_catalog_collectors.go",
           "tests": [
@@ -19743,11 +19751,18 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "nnf::imp polarity traversal, connective/label/default/quantifier processing, proof construction, caching, reset and parameter update",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/nnf.go",
+          "evidence": "NNF implements all retained modes and Boolean branches, Skolemization, delayed named definitions, source proof rules, four context caches, limits, options and generated-parameter construction."
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
-        "Skolemizer cache keys, results and optional proofs have independent ASTRef roots; Reset and Close retain deletion progress for retry."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md.",
+        "Skolemizer cache keys, results and optional proofs have independent ASTRef roots; Reset and Close retain deletion progress for retry.",
+        "NNF call scratch, delayed definitions, persistent values and proofs use explicit ASTRef roots; output definition references transfer independently to callers."
       ],
       "deviations": []
     },
@@ -19755,11 +19770,12 @@
       "path": "src/ast/normal_forms/nnf.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/normal_forms/gparams_catalog_collectors.go",
+        "pkg/ast/normal_forms/nnf.go",
         "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
@@ -19767,7 +19783,14 @@
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestNNFFullConnectivesAndProof",
+        "TestNNFModesIffXorITEAndGroundSkip",
+        "TestNNFQuantifierRetentionFlippingAndSkolemization",
+        "TestNNFLabelsAndIntroducedDefinitions",
+        "TestNNFMemoryLimitAndOptionGuards",
+        "TestNNFDeepTraversalCacheResetAndOwnerGuards",
+        "TestNNFGeneratedParameterConstruction"
       ],
       "conditionals": [
         {
@@ -19779,11 +19802,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order",
           "status": "ported",
           "go_target": "pkg/ast/normal_forms/gparams_catalog_collectors.go",
           "tests": [
@@ -19796,10 +19819,17 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "nnf constructor/destructor, operator(), updt_params, get_param_descrs, reset and reset_cache",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/nnf.go",
+          "evidence": "NNF exposes construction from explicit options or generated parameters, Transform, UpdateOptions, Reset, ResetCache and Close."
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md.",
+        "NNF is a noncopyable explicit owner; Close releases traversal caches, expression namers and the Skolemizer with retryable progress."
       ],
       "deviations": []
     },
