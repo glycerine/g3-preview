@@ -1,0 +1,103 @@
+package rewriter
+
+import (
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
+
+func TestDefaultExprReplacerNestedSubstitutionAndScopedApply(t *testing.T) {
+	m := astTestManager(t)
+	a := goalTestAtom(t, m, "replace-a")
+	b := goalTestAtom(t, m, "replace-b")
+	f := rewriterTestDecl(t, m, "replace-f")
+	term := rewriterTestApp(t, m, f, a)
+	want := rewriterTestApp(t, m, f, b)
+
+	s, err := m.NewExprSubstitution()
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, m.DelExprSubstitution(&s)) })
+	satOK(t, m.ExprSubstitutionInsert(s, a, b, ast.ASTHandle{}, ast.ASTDependency{}))
+	r, err := NewDefaultExprReplacer(m)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, r.Close()) })
+	satOK(t, r.SetSubstitution(&s))
+	out := astTestPin(t, m, ast.ASTHandle{})
+	satOK(t, r.Rewrite(term, out))
+	got, err := m.RefGet(out)
+	satOK(t, err)
+	if got != want {
+		t.Fatal("nested substitution", got, want)
+	}
+	steps, err := r.NumSteps()
+	satOK(t, err)
+	if steps == 0 {
+		t.Fatal("source traversal did not count steps")
+	}
+
+	satOK(t, r.SetSubstitution(nil))
+	satOK(t, m.SetRef(out, term))
+	satOK(t, r.ApplySubstitution(a, b, ast.ASTHandle{}, out))
+	got, err = m.RefGet(out)
+	satOK(t, err)
+	if got != want {
+		t.Fatal("scoped substitution", got, want)
+	}
+	// scoped_set_subst clears the substitution after the call.
+	satOK(t, m.SetRef(out, term))
+	satOK(t, r.Rewrite(term, out))
+	got, err = m.RefGet(out)
+	satOK(t, err)
+	if got != term {
+		t.Fatal("scoped substitution remained installed", got, term)
+	}
+}
+
+func TestDefaultExprReplacerCollectsUsedDependencies(t *testing.T) {
+	m := astTestManager(t)
+	a := goalTestAtom(t, m, "dependency-a")
+	b := goalTestAtom(t, m, "dependency-b")
+	x := goalTestAtom(t, m, "dependency-x")
+	y := goalTestAtom(t, m, "dependency-y")
+	and, err := m.MkAnd(a, b)
+	satOK(t, err)
+	astTestPin(t, m, and)
+	want, err := m.MkAnd(x, y)
+	satOK(t, err)
+	astTestPin(t, m, want)
+
+	dx, err := m.DependencyLeaf(x)
+	satOK(t, err)
+	dy, err := m.DependencyLeaf(y)
+	satOK(t, err)
+	satOK(t, m.DependencyInc(dx))
+	satOK(t, m.DependencyInc(dy))
+	t.Cleanup(func() { satOK(t, m.DependencyDec(dx)); satOK(t, m.DependencyDec(dy)) })
+	s, err := m.NewExprSubstitutionPolicy(true, false)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, m.DelExprSubstitution(&s)) })
+	satOK(t, m.ExprSubstitutionInsert(s, a, x, ast.ASTHandle{}, dx))
+	satOK(t, m.ExprSubstitutionInsert(s, b, y, ast.ASTHandle{}, dy))
+
+	r, err := NewDefaultExprReplacer(m)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, r.Close()) })
+	satOK(t, r.SetSubstitution(&s))
+	out := astTestPin(t, m, ast.ASTHandle{})
+	used, err := r.RewriteWithDependency(and, out)
+	satOK(t, err)
+	if used.IsNull() {
+		t.Fatal("missing accumulated dependency")
+	}
+	defer func() { satOK(t, m.DependencyDec(used)) }()
+	got, err := m.RefGet(out)
+	satOK(t, err)
+	if got != want {
+		t.Fatal("dependency rewrite", got, want)
+	}
+	leaves, err := m.DependencyLinearize(used, nil)
+	satOK(t, err)
+	if len(leaves) != 2 || leaves[0] != x || leaves[1] != y {
+		t.Fatal("source dependency join order", leaves)
+	}
+}

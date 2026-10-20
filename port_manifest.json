@@ -28408,22 +28408,48 @@
       "path": "src/ast/rewriter/expr_replacer.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/expr_replacer.go",
+        "pkg/ast/rewriter/expr_replacer_test.go"
+      ],
+      "tests": [
+        "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
+        "TestDefaultExprReplacerCollectsUsedDependencies"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "default_expr_replacer substitution lookup, iterative rewriting, step count, cache cleanup/reset, scoped one-entry apply and used-dependency transfer (expr_replacer.cpp:24-112)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/expr_replacer.go",
+          "tests": [
+            "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
+            "TestDefaultExprReplacerCollectsUsedDependencies"
+          ]
+        }
+      ],
+      "ownership": [
+        "DefaultExprReplacer borrows its selected ASTExprSubstitution, owns the rewriter traversal/cache and one accumulated ASTDependency reference, and transfers a nonnull dependency result to the caller. ApplySubstitution owns and destroys its temporary substitution after clearing the borrowed pointer."
+      ],
+      "deviations": [
+        "The available rewriter engine is the retained no-proof specialization, so result proof construction and the th_rewriter simplifying adapter remain open. Dependency results use an explicit owning return that callers release with DependencyDec."
+      ]
     },
     {
       "path": "src/ast/rewriter/expr_replacer.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/expr_replacer.go",
+        "pkg/ast/rewriter/expr_replacer_test.go"
+      ],
+      "tests": [
+        "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
+        "TestDefaultExprReplacerCollectsUsedDependencies"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -28436,9 +28462,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete default replacer manager/substitution/rewrite/reset/step/apply interface (expr_replacer.h:27-56)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/expr_replacer.go",
+          "tests": [
+            "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
+            "TestDefaultExprReplacerCollectsUsedDependencies"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go owner has an explicit Close method; its expression substitution remains borrowed and its dependency output has documented caller ownership."
+      ],
+      "deviations": [
+        "Go uses named methods in place of C++ operator overloads. The abstract proof-output overload and simplifying th_rewriter factory remain open with the proof-generating traversal and theory rewriter."
+      ]
     },
     {
       "path": "src/ast/rewriter/expr_safe_replace.cpp",
