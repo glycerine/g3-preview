@@ -46871,3 +46871,17 @@ the principal package times were polynomial 107.495s, LP 700.843s, numeral
 58.216s and AST 12.028s. Log:
 `/mnt/oldrog/tmp/g3-native-polynomial-whole-e305da79.log`. Algebraic numbers and
 AST remain partial.
+
+Algebraic inverse whole-method closure:
+the duplicate `algebraic_numbers.cpp/.h` rows for cpp1582-1647 and the manager
+facade at cpp2937-2939 are promoted to ported. The retained caller scan covers
+the arithmetic rewriter, API RCF path and division's scoped inverse. The Go
+implementation covers basic and root inversion, zero-endpoint halving, exact
+rational-root discovery, reciprocal polynomial and interval construction, all
+three TRACE children, cached root-index publication, conversion receipts,
+literal reverse scoped-rational source destruction, callback exclusion and
+exact numeric allocation roots. The complete inverse family passes native
+0.116s, checked 0.114s, debug 58.439s and combined checked/debug/trace 61.817s
+on CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-inverse-source-audit.txt`. Other algebraic
+operations and manager construction remain partial.
