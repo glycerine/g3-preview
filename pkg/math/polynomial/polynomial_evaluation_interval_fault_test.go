@@ -9,10 +9,8 @@ import (
 	"testing"
 )
 
-func polynomialEvaluationIntervalAudit(t *testing.T, m *MultivariatePolynomialManager, s *unumeral.RationalService, vm *unumeral.BinaryIntervalManager, p Polynomial, values *polynomialEvalIntervalMap, out *unumeral.BinaryInterval) {
+func polynomialEvaluationIntervalAudit(t *testing.T, m *MultivariatePolynomialManager, s *unumeral.RationalService, vm *unumeral.BinaryIntervalManager, b *unumeral.BinaryRationalManager, p Polynomial, values *polynomialEvalIntervalMap, out *unumeral.BinaryInterval) {
 	t.Helper()
-	b, e := vm.Bounds()
-	serviceMust(t, e)
 	inputs := []*unumeral.Int{&(*(*values.value.BorrowLower()).BorrowNumerator()), &(*(*values.value.BorrowUpper()).BorrowNumerator()), &(*(*out.BorrowLower()).BorrowNumerator()), &(*(*out.BorrowUpper()).BorrowNumerator()), &vm.MulCurr.Num, &vm.MulMax.Num, &vm.MulMin.Num, &b.Tmp, &b.Tmp2, &b.AddMulTmp.Num, &b.SelectIntTmp1, &b.SelectIntTmp2, &b.SelectSmallTmp, &b.SelectSmallTmp1.Num, &b.SelectSmallTmp2.Num, &b.DivTmp1, &b.DivTmp2, &b.DivTmp3}
 	for i := range b.Display.Values {
 		inputs = append(inputs, &b.Display.Values[i])
@@ -47,7 +45,7 @@ func TestPolynomialEvaluationIntervalEveryReservation(t *testing.T) {
 			out := unumeral.NewBinaryInterval()
 			q.BudgetField.FailAfter(ordinal)
 			e = m.EvaluateInterval(p, &values, &out)
-			polynomialEvaluationIntervalAudit(t, m, s, vm, p, &values, &out)
+			polynomialEvaluationIntervalAudit(t, m, s, vm, bounds, p, &values, &out)
 			if e == nil {
 				success = true
 			} else {
@@ -58,7 +56,7 @@ func TestPolynomialEvaluationIntervalEveryReservation(t *testing.T) {
 			}
 			q.BudgetField.FailAfter(-1)
 			serviceMust(t, m.CleanupEvaluation())
-			polynomialEvaluationIntervalAudit(t, m, s, vm, p, &values, &out)
+			polynomialEvaluationIntervalAudit(t, m, s, vm, bounds, p, &values, &out)
 			if e == nil {
 				base := binaryRat(t, bounds, &(*values.value.BorrowLower()))
 				base.Add(base, new(big.Rat).SetInt64(1))

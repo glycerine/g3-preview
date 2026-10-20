@@ -41,7 +41,7 @@ func TestPolynomialEvaluationEarlyRoutesLeaveRetainedInvocationUntouched(t *test
 		}
 		serviceMust(t, q.Del(&output))
 	}()
-	polynomialEvaluationIntervalAudit(t, m, s, vm, p, &iv, &io)
+	polynomialEvaluationIntervalAudit(t, m, s, vm, bounds, p, &iv, &io)
 	q.BudgetField.FailAfter(-1)
 	if e == nil || !m.evaluation.active || !m.lexPending || m.evaluation.lexGeneration == 0 {
 		t.Fatal("native bounds fixture did not retain evaluation", e)
