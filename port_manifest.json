@@ -9549,6 +9549,7 @@
         "pkg/ast/ast_array_set.go",
         "pkg/ast/ast_array_default_ext.go",
         "pkg/ast/ast_array_callbacks.go",
+        "pkg/ast/ast_array_names.go",
         "pkg/model/model_array_callbacks_test.go"
       ],
       "tests": [
@@ -9566,6 +9567,8 @@
         "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
         "TestASTArrayDeclarationLexicalSpillRefusalAndReuse",
         "TestASTArrayUtilFamilyAndBorrowedApplications",
+        "TestASTArrayOriginalNameCallbacks",
+        "TestASTArrayOriginalAsArrayTree",
         "TestASTArrayAsArrayOriginalDeclarationsAndRecognizer",
         "TestASTArrayAsArrayRejectsOriginalInvalidParameters",
         "TestASTArrayAsArrayParameterVectorRefusalAndReuse",
@@ -9714,6 +9717,15 @@
           "tests": [
             "TestModelOriginalRecursiveArrayRangeUniverseAndCompletion"
           ]
+        },
+        {
+          "name": "array sort/operator builtin-name callbacks and ITE/as-array tree recognizer (src/ast/array_decl_plugin.cpp:518-541,566-587)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_array_names.go",
+          "tests": [
+            "TestASTArrayOriginalNameCallbacks",
+            "TestASTArrayOriginalAsArrayTree"
+          ]
         }
       ],
       "ownership": [
@@ -9745,6 +9757,7 @@
         "pkg/ast/ast_array_set.go",
         "pkg/ast/ast_array_default_ext.go",
         "pkg/ast/ast_array_callbacks.go",
+        "pkg/ast/ast_array_names.go",
         "pkg/model/model_array_callbacks_test.go"
       ],
       "tests": [
@@ -9753,6 +9766,8 @@
         "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
         "TestASTArrayDeclarationLexicalSpillRefusalAndReuse",
         "TestASTArrayUtilFamilyAndBorrowedApplications",
+        "TestASTArrayOriginalNameCallbacks",
+        "TestASTArrayOriginalAsArrayTree",
         "TestASTArrayAsArrayOriginalDeclarationsAndRecognizer",
         "TestASTArrayAsArrayRejectsOriginalInvalidParameters",
         "TestASTArrayAsArrayParameterVectorRefusalAndReuse",
@@ -9861,6 +9876,15 @@
           "go_target": "pkg/model/model_array_callbacks_test.go",
           "tests": [
             "TestModelOriginalRecursiveArrayRangeUniverseAndCompletion"
+          ]
+        },
+        {
+          "name": "array builtin-name callback declarations and is_as_array_tree utility interface (src/ast/array_decl_plugin.h:124-126,161)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_array_names.go",
+          "tests": [
+            "TestASTArrayOriginalNameCallbacks",
+            "TestASTArrayOriginalAsArrayTree"
           ]
         }
       ],
