@@ -23859,9 +23859,14 @@
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_tpl.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go"
+      ],
+      "tests": [
+        "TestBitBlasterArithmeticExhaustiveConstants",
+        "TestBitBlasterNumeralAndArithmeticDomains"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -23872,19 +23877,41 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete template specialization, numeral recognition/conversion, half/full adders, negation, addition, and subtraction",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go"
+        },
+        {
+          "name": "Multiplication, division/remainder, mux/abs, rotations/extensions, equality/shifts/comparisons, bitwise/reductions, and overflow checks",
+          "status": "unported",
+          "reason": "Remaining concrete bit-vector circuit methods are being ported incrementally."
+        }
+      ],
+      "ownership": [
+        {
+          "subject": "expr_ref_vector arithmetic results",
+          "status": "ported",
+          "detail": "Go returns caller-owned ASTRef slices and cleans all partial outputs on failure."
+        }
+      ],
       "deviations": []
     },
     {
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_tpl_def.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go"
+      ],
+      "tests": [
+        "TestBitBlasterArithmeticExhaustiveConstants",
+        "TestBitBlasterNumeralAndArithmeticDomains"
+      ],
       "conditionals": [
         {
           "line": 137,
@@ -24089,10 +24116,33 @@
           "text": "SASSERT(out_bits.size() == sz);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_numeral, is_minus_one, num2bits, mk_half_adder, mk_full_adder, mk_neg, mk_adder, mk_subtracter",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go"
+        },
+        {
+          "name": "checkpoint",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_manager.go",
+          "reason": "The Go AST manager enforces its arena budget and cancellation at manager operation boundaries."
+        },
+        {
+          "name": "mk_multiplier through mk_const_multiplier and remaining circuit builders",
+          "status": "unported",
+          "reason": "Remaining concrete circuit algorithms are still required by the retained bit-blaster consumers."
+        }
+      ],
+      "ownership": [
+        {
+          "subject": "Temporary and output expr_ref values",
+          "status": "ported",
+          "detail": "Each temporary is scoped as an ASTRef; returned slices and subtraction carry transfer ownership to the caller."
+        }
+      ],
       "deviations": []
     },
     {
