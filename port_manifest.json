@@ -21489,9 +21489,11 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_decl_parameter_access.go",
         "pkg/ast/proofs/hypotheses.go",
         "pkg/ast/proofs/hypotheses_memory.go",
         "pkg/ast/proofs/is_closed.go",
+        "pkg/ast/proofs/permute_unit_resolution.go",
         "pkg/ast/proofs/post_order.go",
         "pkg/ast/ast_proof_utils_trace.go",
         "pkg/ast/proofs/push_instantiations.go",
@@ -21502,6 +21504,8 @@
         "TestProofHypothesisSetMemoryWrappers",
         "TestProofLemmaEmptyHypothesisSetImmediateDeallocation",
         "TestProofIsClosedLemmaLiteralsAndScopeReset",
+        "TestPermuteUnitResolutionIntoTheoryLemma",
+        "TestPermuteUnitResolutionOrdinaryProofIdentity",
         "TestProofPostOrderParentOrderSharingAndExhaustion",
         "TestProofPostOrderRejectsNonProofAndClosedManager",
         "TestPushInstantiationsUpHyperPremiseAndResetSubstitution",
@@ -21588,6 +21592,12 @@
           "tests": ["TestPushInstantiationsUpHyperPremiseAndResetSubstitution", "TestPushInstantiationsUpThroughQuantifiedModusPonens"]
         },
         {
+          "name": "proof_utils::permute_unit_resolution recursive cache, ordinary proof reconstruction and unit-resolution/theory-lemma permutation (proof_utils.cpp:823-916)",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/permute_unit_resolution.go",
+          "tests": ["TestPermuteUnitResolutionIntoTheoryLemma", "TestPermuteUnitResolutionOrdinaryProofIdentity"]
+        },
+        {
           "name": "reduce_hypotheses0 add_hypotheses concrete expr-set union with inherited first-parent copy-on-write (proof_utils.cpp:394-421; container_util.h:48-52)",
           "status": "ported",
           "go_target": "pkg/ast/proofs/hypotheses.go",
@@ -21629,14 +21639,18 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_decl_parameter_access.go",
         "pkg/ast/ast_proof_utils_trace.go",
         "pkg/ast/proofs/is_closed.go",
+        "pkg/ast/proofs/permute_unit_resolution.go",
         "pkg/ast/proofs/post_order.go",
         "pkg/ast/proofs/push_instantiations.go",
         "pkg/ast/proofs/reduce_hypotheses.go"
       ],
       "tests": [
         "TestProofIsClosedLemmaLiteralsAndScopeReset",
+        "TestPermuteUnitResolutionIntoTheoryLemma",
+        "TestPermuteUnitResolutionOrdinaryProofIdentity",
         "TestProofPostOrderParentOrderSharingAndExhaustion",
         "TestProofPostOrderRejectsNonProofAndClosedManager",
         "TestPushInstantiationsUpHyperPremiseAndResetSubstitution",
@@ -21699,6 +21713,12 @@
           "status": "ported",
           "go_target": "pkg/ast/proofs/push_instantiations.go",
           "tests": ["TestPushInstantiationsUpHyperPremiseAndResetSubstitution", "TestPushInstantiationsUpThroughQuantifiedModusPonens"]
+        },
+        {
+          "name": "proof_utils::permute_unit_resolution declaration and concrete theory-lemma permutation",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/permute_unit_resolution.go",
+          "tests": ["TestPermuteUnitResolutionIntoTheoryLemma", "TestPermuteUnitResolutionOrdinaryProofIdentity"]
         },
         {
           "name": "proof_is_closed scoped-lemma literal and shared-visited proof traversal (proof_utils.cpp:751-814)",
