@@ -13,16 +13,16 @@ import (
 // Config is the concrete bit_blaster_cfg gate layer. The arithmetic bit-vector
 // template is a separate source unit; this value borrows its AST manager.
 type Config struct {
-	manager  *ast.ASTManager
-	family   ast.FamilyID
-	extGates bool
+	manager *ast.ASTManager
+	family  ast.FamilyID
+	params  SMTBitBlasterParams
 }
 
 func NewConfig(m *ast.ASTManager, family ast.FamilyID, params SMTBitBlasterParams) (*Config, error) {
 	if m == nil {
 		return nil, ast.ErrASTHandle
 	}
-	return &Config{manager: m, family: family, extGates: params.ExtGates}, nil
+	return &Config{manager: m, family: family, params: params}, nil
 }
 
 func (c *Config) sorted(a, b, d ast.ASTHandle) ([3]ast.ASTHandle, error) {
@@ -58,7 +58,7 @@ func (c *Config) MkXor3(a, b, d ast.ASTHandle, out ast.ASTRef) (result error) {
 		return err
 	}
 	a, b, d = v[0], v[1], v[2]
-	if !c.extGates {
+	if !c.params.ExtGates {
 		tmp, err := c.manager.NewRef(ast.ASTHandle{})
 		if err != nil {
 			return err
@@ -138,7 +138,7 @@ func (c *Config) MkCarry(a, b, d ast.ASTHandle, out ast.ASTRef) (result error) {
 		return err
 	}
 	a, b, d = v[0], v[1], v[2]
-	if !c.extGates {
+	if !c.params.ExtGates {
 		pairs := [3][2]ast.ASTHandle{{a, b}, {a, d}, {b, d}}
 		terms := make([]ast.ASTHandle, 3)
 		refs := make([]ast.ASTRef, 3)
