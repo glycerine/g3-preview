@@ -23030,7 +23030,7 @@
       "path": "src/ast/rewriter/bool_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/model2expr_entry_condition.go",
         "pkg/ast/rewriter/bool_rewriter_default_and.go",
@@ -23092,8 +23092,8 @@
           "text": "SASSERT(!m_elim_and);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Stack-local default bool_rewriter::mk_and flat/simplified result and raw-AND fallback for model2expr (bool_rewriter.h:81,135-140)",
@@ -23104,7 +23104,7 @@
         },
         {
           "name": "private AND/OR core declarations and borrowed inline state fragment",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bool_rewriter.go",
           "tests": [
             "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
@@ -23146,7 +23146,7 @@
         },
         {
           "name": "constructor / updt_params / reset_local_ctx_cost / mk_app fallback",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bool_rewriter_config.go",
           "tests": [
             "TestBoolRewriterConstructorDefaultsFallbackAndCostRetention",
@@ -23184,7 +23184,7 @@
         "Borrowed scratch uses native Go slices; output assignment retains AST ownership. Boolean membership maps are local and independent of AST mark planes. Owning context/AND rows retain actual AST references and stopped cleanup on the rewriter."
       ],
       "deviations": [
-        "Boolean callbacks now integrate with the original no-proof bool_rewriter_star iterative engine through actual borrowed result-stack arguments. Default pattern skipping, associative flattening and source family dispatch are preserved. Whole-class method/ownership audits and exhaustive failure campaigns remain incomplete. Go guards reject invalid short arrays outside the source defined domain; family assertion is debug-only. No whole Boolean source unit, model evaluator or public API completion is credited.",
+        "Boolean callbacks integrate with the original no-proof bool_rewriter_star iterative engine through actual borrowed result-stack arguments. Default pattern skipping, associative flattening and source family dispatch are preserved. Go guards reject invalid short arrays outside the source defined domain; family assertion is debug-only. Model evaluator and public API consumers remain separate source units.",
         "The exported BoolRewriter names the existing concrete reducer without another owner allocation or duplicated algorithm. NewBoolRewriter uses its existing constructor; Flat, SetFlat and MkAppCore expose the original evaluator dependency with configured-owner guards. This does not credit theory-aware model evaluation or remaining Boolean source methods.",
         "Native Boolean collections: AND/OR flattening, nested NOT/OR and DISTINCT scratch use []ASTHandle; positive/negative/visited membership uses local map[ASTHandle]bool instead of shared AST planes. Local-context owning old/new rows and recursive AND-as-OR argument rows use native slices with explicit INC/consumed-DEC cleanup, retained on the real rewriter if lexical destruction stops. Completed rows retire before later cleanup; Close drains retained younger rows before older owners. Alternating forward/backward passes, reversal, survivor order, source unsigned cost/entry-limit behavior, raw nested ITE construction and actual AST construction failures remain. Shared foreign marks are neither read nor changed. Removed vector/ref-buffer codecs, emulated backing growth and mark-owner/trail allocation events at these callers. Prior inline/doubling/fast-mark storage claims are superseded; no generic C++ container/STL implementation credit is added."
       ]
