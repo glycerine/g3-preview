@@ -41385,6 +41385,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_cell_assertions.go",
         "pkg/math/polynomial/polynomial_divides_trace.go",
         "pkg/math/polynomial/polynomial_divides_trace_test.go",
         "pkg/math/polynomial/polynomial_gcd_entry_trace.go",
@@ -44048,6 +44049,20 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained cell DEC1371, leading-term comparator1391, constructor1415 and indexed const-access1508/1511 source assertion protocols",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cell_assertions.go",
+          "tests": [
+            "TestPolynomialCellDecrementAssertionActions",
+            "TestPolynomialCellIndexAssertionActions",
+            "TestPolynomialCellClosedAssertionOwnerPaths",
+            "TestPolynomialCellConstructorAssertionReadOrder",
+            "TestPolynomialCellSourceTakeAndFirstMaximum",
+            "TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard"
+          ],
+          "notes": "Source process gates precede predicates. Throw/Continue/disabled actions preserve decrement and actual initialized-field ownership. Constructor coefficient move precedes independently gated refcount read and fresh monomial publication. po_gt repeats the actual max-var reads for its ordered comparisons and equality assertion. Out-of-range coefficient/monomial access after Continue still reaches the Go initialized-field guard. Coefficient codec no longer reads logical SIZE when its source assertion is erased; monomial codec still requires SIZE for its physical coefficient-array offset. The mutable coefficient overload diagnostic1512 is not separately credited pending retained call-site audit."
+        },
+        {
           "name": "Concrete polynomial hash child reads only monomial hash and follows composite child visitation (polynomial.cpp:210,2468-2480)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_hash.go",
@@ -45149,8 +45164,8 @@
           ]
         },
         {
-          "name": "Complete retained polynomial cell, accessors, native SOM, construction, arithmetic and deletion callbacks with full manager lifecycle and optimized PSC composition",
-          "status": "ported",
+          "name": "Retained polynomial cell, accessors, native SOM, construction, arithmetic and deletion callbacks with full manager lifecycle and optimized PSC composition; source accessor overload audit remains open",
+          "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
             "TestPolynomialCellSourceTakeAndFirstMaximum",
@@ -45193,7 +45208,8 @@
             "TestPolynomialUnivariateGeneratedFailurePrefixes",
             "TestPolynomialSoleRetainCalleeConstructionCleanup",
             "TestPolynomialPreexistingCalleeCreationRemainsBorrowed"
-          ]
+          ],
+          "notes": "The cpp1371/1391/1415/1508/1511 assertion protocols and fresh leading-variable reads now have a separate scoped entry. The complete cell claim remains partial pending retained call-site classification of const versus mutable coefficient access (cpp1511/1512); no whole polynomial-unit closure is inferred from focused tests."
         },
         {
           "name": "Complete incremental Newton ctor/reset/const-input/count/Add/Mk and whole-method lexical owner; persistent owner-vector lazy At/SetOwner/Flush/SourceFinalize, exact TRACE and assertion actions; explicit owning cleanup distinct from source destruction",

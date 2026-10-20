@@ -308,26 +308,19 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []unumeral.
 		if appendScope != nil {
 			appendScope.transferredCoefficients = i + 1
 		}
-		var term Monomial
-		if buffer != nil {
-			term, e = buffer.ms.monomial(m, i)
+		if e = m.cellSourceAssert(1415, "ms[i]->ref_count() > 0", func() (bool, error) {
+			term, e := m.constructorMonomial(buffer, ms, i)
 			if e != nil {
-				return Polynomial{}, e
+				return false, e
 			}
-		} else {
-			if uint64(i) >= uint64(len(ms)) {
-				return Polynomial{}, arena.ErrBounds
-			}
-			term = ms[i]
-		}
-		if polynomialSourceDebug {
 			r, e := m.monomialRefCount(term)
-			if e != nil {
-				return Polynomial{}, e
-			}
-			if r == 0 {
-				return Polynomial{}, ErrPolynomialAssertion
-			}
+			return r > 0, e
+		}); e != nil {
+			return Polynomial{}, e
+		}
+		term, e := m.constructorMonomial(buffer, ms, i)
+		if e != nil {
+			return Polynomial{}, e
 		}
 		if e = m.writeMonomial(p, i, term); e != nil {
 			return Polynomial{}, e

@@ -419,6 +419,7 @@ func TestPolynomialCheapNativePrecompactionPreservesLaterForeignAppend(t *testin
 // only after the immediate stopped graph; the actual initialized old INC is
 // then retired through the matched owning receipt.
 func TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	if !polynomialSourceDebug {
 		t.Skip("source constructor SASSERT profile")
 	}

@@ -77,12 +77,8 @@ func (m *MultivariatePolynomialCore) write64(p Polynomial, o, v uint64) error {
 	return m.writeWord(p, o+4, uint32(v>>32))
 }
 func (m *MultivariatePolynomialCore) coefficientCore(p Polynomial, i uint32) (unumeral.Int, error) {
-	n, e := m.readWord(p, 8)
-	if e != nil {
+	if e := m.cellIndexAssert(p, i, 1511); e != nil {
 		return unumeral.Int{}, e
-	}
-	if polynomialSourceDebug && i >= n {
-		return unumeral.Int{}, ErrPolynomialAssertion
 	}
 	l, e := m.polynomialLocation(p)
 	if e != nil {
@@ -107,12 +103,12 @@ func (m *MultivariatePolynomialCore) writeCoefficient(p Polynomial, i uint32, a 
 	return m.write64(p, o+4, uint64(a.NativeCellToken()))
 }
 func (m *MultivariatePolynomialCore) monomialCore(p Polynomial, i uint32) (Monomial, error) {
+	if e := m.cellIndexAssert(p, i, 1508); e != nil {
+		return Monomial{}, e
+	}
 	n, e := m.readWord(p, 8)
 	if e != nil {
 		return Monomial{}, e
-	}
-	if polynomialSourceDebug && i >= n {
-		return Monomial{}, ErrPolynomialAssertion
 	}
 	l, e := m.polynomialLocation(p)
 	if e != nil {
@@ -200,12 +196,15 @@ func (m *MultivariatePolynomialCore) decRefCoreOutcome(p Polynomial, out *polyno
 	if l.deletionStarted {
 		return ErrPolynomialPending
 	}
+	if e = m.cellSourceAssert(1371, "m_ref_count > 0", func() (bool, error) {
+		r, e := m.readWord(p, 0)
+		return r > 0, e
+	}); e != nil {
+		return e
+	}
 	r, e := m.readWord(p, 0)
 	if e != nil {
 		return e
-	}
-	if polynomialSourceDebug && r == 0 {
-		return ErrPolynomialAssertion
 	}
 	r--
 	if e = m.writeWord(p, 0, r); e != nil {
@@ -274,8 +273,29 @@ func (m *MultivariatePolynomialCore) firstGreater(a, b Monomial) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	if av != bv {
-		return av > bv, nil
+	if av < bv {
+		return false, nil
+	}
+	av, e = m.monomials.MaxVariable(a)
+	if e != nil {
+		return false, e
+	}
+	bv, e = m.monomials.MaxVariable(b)
+	if e != nil {
+		return false, e
+	}
+	if av > bv {
+		return true, nil
+	}
+	if e = m.cellSourceAssert(1391, "m1->max_var() == m2->max_var()", func() (bool, error) {
+		av, e := m.monomials.MaxVariable(a)
+		if e != nil {
+			return false, e
+		}
+		bv, e := m.monomials.MaxVariable(b)
+		return av == bv, e
+	}); e != nil {
+		return false, e
 	}
 	ad, e := m.monomials.MaxVariableDegree(a)
 	if e != nil {
