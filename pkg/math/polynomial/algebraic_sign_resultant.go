@@ -91,6 +91,12 @@ func (m *AlgebraicRootCore) finishSignResultant(owning bool) (cause error) {
 	if !s.active {
 		return nil
 	}
+	if !owning {
+		if e := m.rootTraceSourceCause(); e != nil {
+			s.sourceStop = e
+			return e
+		}
+	}
 	if !owning && s.sourceStop != nil {
 		return s.sourceStop
 	}
@@ -355,6 +361,9 @@ func (m *AlgebraicRootCore) exactSignResultant(pm *MultivariatePolynomialManager
 	if e != nil {
 		return 0, false, e
 	}
+	if e = m.traceSignResultant(k); e != nil {
+		return 0, false, e
+	}
 	s.limitsConstructed = 2
 	b := m.config.Binary
 	if e = b.SetInt32(&s.limits[0], -1); e != nil {
@@ -394,6 +403,9 @@ func (m *AlgebraicRootCore) exactSignResultant(pm *MultivariatePolynomialManager
 		if e = pm.evaluateIntervalForAlgebraic(p, &mapping, &m.signInterval.interval, &m.signInterval); e != nil {
 			return 0, false, e
 		}
+		if e = m.traceSignInterval(true); e != nil {
+			return 0, false, e
+		}
 		contains, e := m.config.Intervals.ContainsZero(&m.signInterval.interval)
 		if e != nil {
 			return 0, false, e
@@ -426,6 +438,9 @@ func (m *AlgebraicRootCore) exactSignResultant(pm *MultivariatePolynomialManager
 			}
 			if !refinable {
 				return 0, true, nil
+			}
+			if e = m.traceSignLiteral(2182, "refined algebraic interval\n"); e != nil {
+				return 0, false, e
 			}
 			if e = m.assertBinaryRoot(a, 2183, "!v.is_basic()"); e != nil {
 				return 0, false, e

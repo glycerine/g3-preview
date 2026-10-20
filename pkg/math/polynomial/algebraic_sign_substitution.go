@@ -83,6 +83,15 @@ func (m *AlgebraicRootCore) finishBasicSubstitution(s *algebraicSignSubstitution
 	if !s.active {
 		return nil
 	}
+	if !owning && s.sourceStop != nil {
+		return s.sourceStop
+	}
+	if !owning {
+		if e := m.rootTraceSourceCause(); e != nil {
+			s.sourceStop = e
+			return e
+		}
+	}
 	defer func() {
 		if !owning && cause != nil && s.sourceStop == nil {
 			s.sourceStop = cause
@@ -150,6 +159,9 @@ func (m *AlgebraicRootCore) prepareSignPolynomial(pm *MultivariatePolynomialMana
 		return result, 0, false, e
 	}
 	if e = s.prime.Assign(substituted); e != nil {
+		return result, 0, false, e
+	}
+	if e = m.traceSignPolynomial(pm, s.prime.root.value, 2000, "p after eliminating rationals: "); e != nil {
 		return result, 0, false, e
 	}
 	result = s.prime.root.value

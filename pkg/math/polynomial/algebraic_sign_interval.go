@@ -76,6 +76,15 @@ func (m *AlgebraicRootCore) finishSignInterval(owning bool) (cause error) {
 	if !s.active {
 		return nil
 	}
+	if !owning && s.sourceStop != nil {
+		return s.sourceStop
+	}
+	if !owning {
+		if e := m.rootTraceSourceCause(); e != nil {
+			s.sourceStop = e
+			return e
+		}
+	}
 	defer func() {
 		if !owning && cause != nil && s.sourceStop == nil {
 			s.sourceStop = cause
@@ -149,6 +158,9 @@ func (m *AlgebraicRootCore) intervalSignPrefix(pm *MultivariatePolynomialManager
 		if e = pm.evaluateIntervalForAlgebraic(p, &mapping, &s.interval, s); e != nil {
 			return 0, false, false, e
 		}
+		if e = m.traceSignInterval(false); e != nil {
+			return 0, false, false, e
+		}
 		contains, e := m.config.Intervals.ContainsZero(&s.interval)
 		if e != nil {
 			return 0, false, false, e
@@ -208,7 +220,13 @@ func (m *AlgebraicRootCore) intervalSignPrefix(pm *MultivariatePolynomialManager
 					return 0, false, false, e
 				}
 				if !refinable {
+					if e = m.traceSignLiteral(2057, "restarting some algebraic_cell became basic\n"); e != nil {
+						return 0, false, false, e
+					}
 					return 0, false, true, nil
+				}
+				if e = m.traceSignLiteral(2043, "refined algebraic interval\n"); e != nil {
+					return 0, false, false, e
 				}
 				if e = m.assertBinaryRoot(a, 2044, "!v.is_basic()"); e != nil {
 					return 0, false, false, e

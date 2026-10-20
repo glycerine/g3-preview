@@ -39842,6 +39842,20 @@
           "TestAlgebraicSelectTraceEveryReservation"
         ],
         "limits": "Whole polynomial/algebraic/AST consumer and failure audits remain partial."
+      },
+      "sign_evaluation_trace_audit": {
+        "source": "algebraic_numbers.cpp:1981,1989,2000,2024,2043,2057,2135,2163,2182",
+        "go_target": "pkg/math/polynomial/algebraic_sign_trace.go",
+        "behavior": "All nine active anum_eval_sign records are emitted at their source sites. Polynomial displays capture actual accepted display receipts; rational and interval/binary formatters capture actual insertion receipts. Executing records borrow the external polynomial manager even after its numerical evaluator returns. Entry precedes sign locals; rational output precedes scoped rational destruction; resultant/root bound/interval output precedes construction of mL and L; exact interval output includes the already constructed L. Younger diagnostic source stops preserve active older rational, substituted reference, interval and resultant scopes until explicit owning cleanup. Disabled #if0 algebraic evaluation is excluded.",
+        "tests": [
+          "TestAlgebraicEvalSignTraceRationalAndExactPhases",
+          "TestAlgebraicEvalSignTraceBorrowBeforeLocals",
+          "TestAlgebraicEvalSignTraceActualEntryTLSRefusal",
+          "TestAlgebraicEvalSignTraceResultNativeScratchAndLifetime",
+          "TestAlgebraicEvalSignTraceRefusingWriter",
+          "TestAlgebraicEvalSignTraceRationalRestart"
+        ],
+        "limits": "The separate var2basic mapping getter record at cpp1957 remains unported. Full source failure/consumer and polynomial/AST audits remain partial."
       }
     },
     {

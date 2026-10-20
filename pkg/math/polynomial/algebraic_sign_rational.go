@@ -79,6 +79,15 @@ func (m *AlgebraicRootCore) finishRationalSign(owning bool) (cause error) {
 	if !s.active {
 		return nil
 	}
+	if !owning && s.sourceStop != nil {
+		return s.sourceStop
+	}
+	if !owning {
+		if e := m.rootTraceSourceCause(); e != nil {
+			s.sourceStop = e
+			return e
+		}
+	}
 	defer func() {
 		if !owning && cause != nil && s.sourceStop == nil {
 			s.sourceStop = cause
@@ -133,6 +142,9 @@ func (m *AlgebraicRootCore) tryRationalSign(pm *MultivariatePolynomialManager, p
 		return 0, false, nil
 	}
 	if e != nil {
+		return 0, false, e
+	}
+	if e = m.traceSignRational(); e != nil {
 		return 0, false, e
 	}
 	valueSign, e := m.config.Rationals.Sign(&s.value)

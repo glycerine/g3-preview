@@ -107,6 +107,7 @@ type AlgebraicRootCore struct {
 	isolationConversion                                        algebraicIsolationConversionScope
 	isolateTmp1                                                UPolynomial
 	filterRootsRunning                                         bool
+	signEvaluationManager                                      *MultivariatePolynomialManager
 	signEvaluationRunning                                      bool
 	signResultant                                              algebraicSignResultantScope
 	evalSignTmp                                                UPolynomial

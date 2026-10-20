@@ -24,6 +24,14 @@ func (m *AlgebraicRootCore) evalSignForIsolationSigns(pm *MultivariatePolynomial
 	if m.signEvaluationRunning || m.signResultant.active || m.signInterval.active || m.signSubstitution.active || m.rationalSign.active {
 		return 0, ErrAlgebraicPending
 	}
+	if e := pm.ready(); e != nil {
+		return 0, e
+	}
+	m.signEvaluationManager = pm
+	defer func() { m.signEvaluationManager = nil }()
+	if e := m.traceSignPolynomial(pm, p, 1981, "evaluating sign of: "); e != nil {
+		return 0, e
+	}
 	m.signEvaluationCaller = caller
 	m.signEvaluationRunning = true
 	defer func() { m.signEvaluationRunning = false }()
