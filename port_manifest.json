@@ -13218,9 +13218,21 @@
       "path": "src/ast/ast_translation.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_translation.go",
+        "pkg/ast/ast_fpa_translation.go",
+        "pkg/util/numeral/mpf_value_copy_owner.go"
+      ],
+      "tests": [
+        "TestASTTranslationIterativeQuantifierAndPersistentSharedCache",
+        "TestASTTranslationCopiesEveryOrdinaryParameterKind",
+        "TestASTTranslationUsesAnExplicitStackForDeepTerms",
+        "TestASTTranslationCopiesFloatingPointExternalParameters",
+        "TestASTTranslationLinearizesAndRebuildsDependencies",
+        "TestTranslateASTNonpersistentHelperLeavesSharedRootLive",
+        "TestArbitraryFloatDirectCopyFromExplicitForeignOwner"
+      ],
       "assertions": [
         {
           "line": 48,
@@ -13271,19 +13283,62 @@
           "text": "SASSERT(sz >= 1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "iterative AST_SORT, AST_FUNC_DECL, AST_VAR, AST_APP and AST_QUANTIFIER translation with nested AST parameters and shared-node cache",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_translation.go",
+          "tests": [
+            "TestASTTranslationIterativeQuantifierAndPersistentSharedCache",
+            "TestASTTranslationCopiesEveryOrdinaryParameterKind",
+            "TestASTTranslationUsesAnExplicitStackForDeepTerms",
+            "TestTranslateASTNonpersistentHelperLeavesSharedRootLive"
+          ]
+        },
+        {
+          "name": "ordinary, arithmetic algebraic and floating-point external parameter translation",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_translation.go",
+          "go_targets": [
+            "pkg/ast/ast_fpa_translation.go",
+            "pkg/util/numeral/mpf_value_copy_owner.go"
+          ],
+          "tests": [
+            "TestASTTranslationCopiesEveryOrdinaryParameterKind",
+            "TestASTArithmeticAlgebraicExternalTranslationOwnsDistinctValue",
+            "TestASTTranslationCopiesFloatingPointExternalParameters",
+            "TestArbitraryFloatDirectCopyFromExplicitForeignOwner"
+          ]
+        },
+        {
+          "name": "expression-dependency translation through unique source linearization and target join rebuilding",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_translation.go",
+          "tests": ["TestASTTranslationLinearizesAndRebuildsDependencies"]
+        }
+      ],
+      "ownership": [
+        "ASTTranslation owns persistent source and target pins only for source nodes whose reference count exceeds one. ResetCache and Close release both sides; per-call traversal snapshots and result tables are native Go storage. Temporary translated parameters and declaration metadata are destroyed after node factories copy and attach them.",
+        "Rational parameters use RationalService.CopyFrom across independent owners. Arithmetic algebraic and floating-point external parameters allocate values in the target plugin's own tables. Dependency results retain the existing RC0 return contract and require the caller to acquire a dependency reference."
+      ],
+      "deviations": [
+        "Native slices and maps replace source vector and obj_map storage, so cleanup drops those containers without separate finalize actions. Traversal remains iterative and preserves source child order; a per-call result map also records unshared nodes until the call returns, while only source-refcount-greater-than-one nodes enter a long-lived translator's persistent pinned cache. The TranslateAST convenience path uses only its per-call cache so its returned RC0 handle remains live after temporary translator teardown. Go error returns replace C++ exceptions."
+      ]
     },
     {
       "path": "src/ast/ast_translation.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/ast_translation.go"],
+      "tests": [
+        "TestASTTranslationIterativeQuantifierAndPersistentSharedCache",
+        "TestASTTranslationUsesAnExplicitStackForDeepTerms",
+        "TestASTTranslationLinearizesAndRebuildsDependencies",
+        "TestTranslateASTNonpersistentHelperLeavesSharedRootLive"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -13304,11 +13359,32 @@
           "text": "SASSERT((!n && !r) || to().contains(const_cast<ast*>(r)));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "ASTTranslation construction, From, To, Translate, ResetCache, Close and nonpersistent TranslateAST helper",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_translation.go",
+          "tests": [
+            "TestASTTranslationIterativeQuantifierAndPersistentSharedCache",
+            "TestASTTranslationUsesAnExplicitStackForDeepTerms",
+            "TestTranslateASTNonpersistentHelperLeavesSharedRootLive"
+          ]
+        },
+        {
+          "name": "expression dependency translator",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_translation.go",
+          "tests": ["TestASTTranslationLinearizesAndRebuildsDependencies"]
+        }
+      ],
+      "ownership": [
+        "The translator borrows both managers, owns its cache pins until ResetCache or Close, and becomes unusable after Close. Callers that need a translated node beyond translator teardown acquire their own target ASTRef, matching the surrounding explicit Go ownership model."
+      ],
+      "deviations": [
+        "The C++ template call operator is represented by the concrete ASTHandle Translate method because retained Go consumers use one manager-bound handle type. Native Go containers need no separate cleanup/finalize phase beyond dropping storage in Close."
+      ]
     },
     {
       "path": "src/ast/ast_util.cpp",
@@ -18167,7 +18243,9 @@
         "pkg/ast/ast_fpa_to_fp_arithmetic_test.go",
         "pkg/ast/ast_fpa_to_fp_ieee_bv_test.go",
         "pkg/ast/rewriter/fpa_bv_wrap_test.go",
-        "pkg/model/model_evaluator_fpa_test.go"
+        "pkg/model/model_evaluator_fpa_test.go",
+        "pkg/ast/ast_fpa_translation.go",
+        "pkg/util/numeral/mpf_value_copy_owner.go"
       ],
       "tests": [
         "TestASTFPABV2RMDeclarationSortsAndImplicitRange",
@@ -18212,7 +18290,9 @@
         "TestASTFPAToFPSignedBVSourceNormalizationAndRounding",
         "TestASTFPAToFPFormatRoundingSpecialsAndRefusals",
         "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals",
-        "TestASTFPAToFPIEEEBVExactFieldsAndRefusals"
+        "TestASTFPAToFPIEEEBVExactFieldsAndRefusals",
+        "TestASTTranslationCopiesFloatingPointExternalParameters",
+        "TestArbitraryFloatDirectCopyFromExplicitForeignOwner"
       ],
       "assertions": [
         {
@@ -18526,13 +18606,24 @@
           "tests": [
             "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches"
           ]
+        },
+        {
+          "name": "fpa_decl_plugin::translate cross-manager external numeral value-table copy (fpa_decl_plugin.cpp:176-180)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_translation.go",
+          "go_targets": ["pkg/util/numeral/mpf_value_copy_owner.go"],
+          "tests": [
+            "TestASTTranslationCopiesFloatingPointExternalParameters",
+            "TestArbitraryFloatDirectCopyFromExplicitForeignOwner"
+          ]
         }
       ],
       "ownership": [
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "External translation copies the exact MPF scalar and significand through the target numeric manager, interns it in the target plugin table, and publishes a target-owned external parameter. The temporary target MPF is destroyed after table insertion."
       ]
     },
     {
@@ -167281,7 +167372,9 @@
         "pkg/util/numeral/mpq_signed_fraction_source.go",
         "pkg/util/text/owned_string_capture.go",
         "pkg/util/numeral/mpf_sqrt_trace.go",
-        "pkg/util/numeral/mpf_sqrt_trace_test.go"
+        "pkg/util/numeral/mpf_sqrt_trace_test.go",
+        "pkg/util/numeral/mpf_value_copy_owner.go",
+        "pkg/util/numeral/mpf_value_copy_owner_test.go"
       ],
       "tests": [
         "TestArbitraryFloatPartialRemainderScalarTraceOrder",
@@ -167596,7 +167689,8 @@
         "TestArbitraryFloatSignedFractionInlineChildKeepsOlderHistory",
         "TestArbitraryFloatSignedFractionYoungerSourceStop",
         "TestNumericStreamNativeCountedTextAndOwnedInput",
-        "TestMyMPZSqrtRetainedShortTraceBranches"
+        "TestMyMPZSqrtRetainedShortTraceBranches",
+        "TestArbitraryFloatDirectCopyFromExplicitForeignOwner"
       ],
       "conditionals": [
         {
@@ -168734,6 +168828,12 @@
           "tests": [
             "TestMyMPZSqrtRetainedShortTraceBranches"
           ]
+        },
+        {
+          "name": "direct cross-owner MPF SET used by fpa_decl_plugin::translate (mpf.cpp:327-333)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_value_copy_owner.go",
+          "tests": ["TestArbitraryFloatDirectCopyFromExplicitForeignOwner"]
         }
       ],
       "ownership": [
