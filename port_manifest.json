@@ -30447,9 +30447,13 @@
       "path": "src/ast/rewriter/quant_hoist.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/quant_hoist.go"],
+      "tests": [
+        "TestQuantifierHoisterPolarityCompatibilityAndBooleanRewrite",
+        "TestQuantifierHoisterIndexedTopChainAndNestedExtraction",
+        "TestQuantifierHoisterImplicationPolarityRewriteFlagAndInaccessibleTerm"
+      ],
       "assertions": [
         {
           "line": 50,
@@ -30472,19 +30476,43 @@
           "text": "case Q_exists_neg: SASSERT(is_forall); break;"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "quantifier polarity state, compatibility, extraction, connective recursion and qe_verbose traces",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/quant_hoist.go",
+          "tests": [
+            "TestQuantifierHoisterPolarityCompatibilityAndBooleanRewrite",
+            "TestQuantifierHoisterImplicationPolarityRewriteFlagAndInaccessibleTerm"
+          ]
+        },
+        {
+          "name": "existential/universal pull wrappers and indexed sort/name/de-Bruijn result conversion",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/quant_hoist.go",
+          "tests": ["TestQuantifierHoisterIndexedTopChainAndNestedExtraction"]
+        }
+      ],
+      "ownership": [
+        "QuantifierHoister owns its configured Boolean rewriter. QuantifierHoistResult owns its formula and each extracted fresh/named constant ASTRef. Lexical rebuilt expressions remain owned until result publication; indexed results borrow sort and symbol identities while retaining the formula and extracted variables."
+      ],
+      "deviations": [
+        "Explicit result owners and errors replace output-reference parameters and exceptions. The constructor accepts the already ported parameter services required by the concrete Go Boolean rewriter; algorithms, source polarity mutation, declaration order and optional fresh naming remain unchanged."
+      ]
     },
     {
       "path": "src/ast/rewriter/quant_hoist.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/quant_hoist.go"],
+      "tests": [
+        "TestQuantifierHoisterPolarityCompatibilityAndBooleanRewrite",
+        "TestQuantifierHoisterIndexedTopChainAndNestedExtraction",
+        "TestQuantifierHoisterImplicationPolarityRewriteFlagAndInaccessibleTerm"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -30495,11 +30523,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor/destructor, operator(), pull_exists and both pull_quantifier overloads",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/quant_hoist.go",
+          "tests": [
+            "TestQuantifierHoisterPolarityCompatibilityAndBooleanRewrite",
+            "TestQuantifierHoisterIndexedTopChainAndNestedExtraction",
+            "TestQuantifierHoisterImplicationPolarityRewriteFlagAndInaccessibleTerm"
+          ]
+        }
+      ],
+      "ownership": [
+        "Close replaces deterministic destruction of the implementation and embedded Boolean rewriter; result owners make source app_ref_vector and expr_ref ownership explicit."
+      ],
+      "deviations": [
+        "Named Go methods replace overloaded call operators. QuantifierIndexedResult carries the source index, optional names/sorts and rewritten owning expression as one concrete result."
+      ]
     },
     {
       "path": "src/ast/rewriter/rewriter.cpp",
