@@ -360,3 +360,47 @@ func TestLegacySMTPrinterDistinctGroupsBySort(t *testing.T) {
 		t.Fatalf("legacy SMT singleton-sort distinct %q", out.String())
 	}
 }
+
+func TestLegacySMTPrinterImplicationChainSimplification(t *testing.T) {
+	m := astTestManager(t)
+	printer, err := NewLegacySMTPrinter(m)
+	astTestMust(t, err)
+	boolSort, err := m.MkBoolSort()
+	astTestMust(t, err)
+	constant := func(name string) ASTHandle {
+		h, e := m.MkConst(astTestSymbol(t, m, name), boolSort)
+		astTestMust(t, e)
+		astTestPin(t, m, h)
+		return h
+	}
+	a, b, c, d := constant("legacy-ia"), constant("legacy-ib"), constant("legacy-ic"), constant("legacy-id")
+	inner, err := m.MkImplies(c, d)
+	astTestMust(t, err)
+	astTestPin(t, m, inner)
+	middle, err := m.MkImplies(b, inner)
+	astTestMust(t, err)
+	astTestPin(t, m, middle)
+	outer, err := m.MkImplies(a, middle)
+	astTestMust(t, err)
+	astTestPin(t, m, outer)
+	var out strings.Builder
+	astTestMust(t, printer.DisplayExpr(&out, outer, nil))
+	if out.String() != "(=> (and legacy-ia legacy-ib legacy-ic) legacy-id)" {
+		t.Fatalf("legacy SMT simplified implication chain %q", out.String())
+	}
+	astTestMust(t, printer.SetSimplifyImplies(false))
+	out.Reset()
+	astTestMust(t, printer.DisplayExpr(&out, outer, nil))
+	if out.String() != "(=> legacy-ia (=> legacy-ib (=> legacy-ic legacy-id)))" {
+		t.Fatalf("legacy SMT unsimplified implication chain %q", out.String())
+	}
+	astTestMust(t, printer.SetSimplifyImplies(true))
+	single, err := m.MkImplies(a, b)
+	astTestMust(t, err)
+	astTestPin(t, m, single)
+	out.Reset()
+	astTestMust(t, printer.DisplayExpr(&out, single, nil))
+	if out.String() != "(=> legacy-ia legacy-ib)" {
+		t.Fatalf("legacy SMT single implication %q", out.String())
+	}
+}

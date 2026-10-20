@@ -13163,7 +13163,8 @@
         "TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables",
         "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants",
         "TestLegacySMTPrinterBit2BoolExpansion",
-        "TestLegacySMTPrinterDistinctGroupsBySort"
+        "TestLegacySMTPrinterDistinctGroupsBySort",
+        "TestLegacySMTPrinterImplicationChainSimplification"
       ],
       "conditionals": [
         {
@@ -13241,13 +13242,21 @@
           "tests": [
             "TestLegacySMTPrinterDistinctGroupsBySort"
           ]
+        },
+        {
+          "name": "smt_printer configurable right-nested implication-chain simplification (ast_smt_pp.cpp:414-429, ast_smt_pp.h:60,75)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_legacy_expr.go",
+          "tests": [
+            "TestLegacySMTPrinterImplicationChainSimplification"
+          ]
         }
       ],
       "ownership": [
         "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String/floating-point literals, implication simplification, let insertion, datatype-special paths and the benchmark wrapper remain open."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String/floating-point literals, let insertion, datatype-special paths and the benchmark wrapper remain open."
       ]
     },
     {
@@ -13271,7 +13280,8 @@
         "TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables",
         "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants",
         "TestLegacySMTPrinterBit2BoolExpansion",
-        "TestLegacySMTPrinterDistinctGroupsBySort"
+        "TestLegacySMTPrinterDistinctGroupsBySort",
+        "TestLegacySMTPrinterImplicationChainSimplification"
       ],
       "conditionals": [
         {

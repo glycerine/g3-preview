@@ -345,6 +345,55 @@ func (p *LegacySMTPrinter) distinctText(h ASTHandle, ctx *legacySMTExprContext) 
 	return out.String(), nil
 }
 
+func (p *LegacySMTPrinter) isImplies(h ASTHandle) (bool, error) {
+	kind, err := p.manager.GetKind(h)
+	if err != nil || kind != ASTApp {
+		return false, err
+	}
+	decl, err := p.manager.GetDecl(h)
+	if err != nil {
+		return false, err
+	}
+	family, err := p.manager.GetFamilyID(decl)
+	if err != nil || family != p.manager.BasicFamilyID() {
+		return false, err
+	}
+	op, err := p.manager.GetDeclKind(decl)
+	return op == ASTOpImplies, err
+}
+
+func (p *LegacySMTPrinter) simplifiedImpliesText(h ASTHandle, ctx *legacySMTExprContext) (string, error) {
+	var antecedents []string
+	current := h
+	for {
+		implies, err := p.isImplies(current)
+		if err != nil {
+			return "", err
+		}
+		if !implies {
+			break
+		}
+		antecedent, err := p.manager.GetArg(current, 0)
+		if err != nil {
+			return "", err
+		}
+		text, err := p.exprTextContext(antecedent, ctx)
+		if err != nil {
+			return "", err
+		}
+		antecedents = append(antecedents, text)
+		current, err = p.manager.GetArg(current, 1)
+		if err != nil {
+			return "", err
+		}
+	}
+	consequent, err := p.exprTextContext(current, ctx)
+	if err != nil {
+		return "", err
+	}
+	return "(=> (and " + strings.Join(antecedents, " ") + ") " + consequent + ")", nil
+}
+
 func (p *LegacySMTPrinter) quantifierText(q ASTHandle, ctx *legacySMTExprContext) (string, error) {
 	forall, err := p.manager.IsForall(q)
 	if err != nil {
@@ -547,6 +596,19 @@ func (p *LegacySMTPrinter) exprTextContext(h ASTHandle, ctx *legacySMTExprContex
 	}
 	if family == p.manager.BasicFamilyID() && op == ASTOpDistinct {
 		return p.distinctText(h, ctx)
+	}
+	if p.simplifyImplies && family == p.manager.BasicFamilyID() && op == ASTOpImplies {
+		right, e := p.manager.GetArg(h, 1)
+		if e != nil {
+			return "", e
+		}
+		nested, e := p.isImplies(right)
+		if e != nil {
+			return "", e
+		}
+		if nested {
+			return p.simplifiedImpliesText(h, ctx)
+		}
 	}
 	n, err := p.manager.GetNumArgs(h)
 	if err != nil {

@@ -12,8 +12,9 @@ import (
 // LegacySMTPrinter owns the state shared by the SMT benchmark printer phases.
 // The AST manager is borrowed; renaming maps are owned by the printer.
 type LegacySMTPrinter struct {
-	manager  *ASTManager
-	renaming *SMTRenaming
+	manager         *ASTManager
+	renaming        *SMTRenaming
+	simplifyImplies bool
 }
 
 func NewLegacySMTPrinter(manager *ASTManager) (*LegacySMTPrinter, error) {
@@ -24,7 +25,15 @@ func NewLegacySMTPrinter(manager *ASTManager) (*LegacySMTPrinter, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &LegacySMTPrinter{manager: manager, renaming: r}, nil
+	return &LegacySMTPrinter{manager: manager, renaming: r, simplifyImplies: true}, nil
+}
+
+func (p *LegacySMTPrinter) SetSimplifyImplies(enabled bool) error {
+	if p == nil || p.manager == nil || p.renaming == nil {
+		return ErrASTHandle
+	}
+	p.simplifyImplies = enabled
+	return nil
 }
 
 func (p *LegacySMTPrinter) renamedText(s usymbol.Symbol) (string, error) {
