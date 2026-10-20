@@ -15049,7 +15049,7 @@
       "path": "src/ast/dl_decl_plugin.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_auxiliary_plugins.go",
         "pkg/ast/ast_auxiliary_plugins_source_test.go",
@@ -15062,6 +15062,9 @@
         "pkg/ast/ast_datalog_relation_indexed_test.go",
         "pkg/ast/ast_datalog_filter_rule.go",
         "pkg/ast/ast_datalog_filter_rule_test.go",
+        "pkg/ast/ast_datalog_recognizers.go",
+        "pkg/ast/ast_datalog_numeral_dispatch_test.go",
+        "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/api/api_numeral_string_test.go",
         "pkg/ast/rewriter/dl_rewriter.go"
       ],
@@ -15076,6 +15079,8 @@
         "TestASTDatalogOriginalIndexedRelationGuards",
         "TestASTDatalogOriginalFilterTraversalAndGuards",
         "TestASTDatalogOriginalRuleRepAndAbs",
+        "TestASTDatalogOriginalNumeralSortDispatchAndValueClassification",
+        "TestASTDatalogOriginalRecognizersAndEmptyBuiltinNames",
         "TestAPINumeralStringArithmeticFPAAndRefusal",
         "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
         "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
@@ -15115,12 +15120,12 @@
           "text": "SASSERT(val.is_uint64());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "ast_auxiliary_plugins concrete reached source counterpart (dl_decl_plugin.cpp:31-48)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_auxiliary_plugins.go",
           "tests": [
             "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
@@ -15128,14 +15133,18 @@
           ]
         },
         {
-          "name": "Selected DL_FINITE_SORT, OP_DL_CONSTANT and OP_DL_LT construction plus dl_decl_util finite/BV/Boolean uint64 numeral read for retained API and rewriter consumers (dl_decl_plugin.cpp:98-114,453-477,597-604,639-718,739-750)",
-          "status": "partial",
+          "name": "DL_FINITE_SORT, OP_DL_CONSTANT and OP_DL_LT construction; utility registration, finite/arithmetic/BV/Boolean numeral creation and retained numeral readers (dl_decl_plugin.cpp:98-114,453-477,597-604,639-750)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_datalog_finite.go",
           "go_targets": [
+            "pkg/ast/ast_datalog_recognizers.go",
+            "pkg/ast/ast_builtin_plugins_values.go",
             "pkg/api/api_numeral_string_test.go",
             "pkg/ast/rewriter/dl_rewriter.go"
           ],
           "tests": [
+            "TestASTDatalogOriginalNumeralSortDispatchAndValueClassification",
+            "TestASTDatalogOriginalRecognizersAndEmptyBuiltinNames",
             "TestAPINumeralStringArithmeticFPAAndRefusal",
             "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
             "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary"
@@ -15179,21 +15188,34 @@
             "TestASTDatalogOriginalFilterTraversalAndGuards",
             "TestASTDatalogOriginalRuleRepAndAbs"
           ]
+        },
+        {
+          "name": "empty builtin-name publication and OP_DL_CONSTANT value/unique-value classification (dl_decl_plugin.cpp:631-637; dl_decl_plugin.h:132-133)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datalog_recognizers.go",
+          "go_targets": [
+            "pkg/ast/ast_builtin_plugins_values.go"
+          ],
+          "tests": [
+            "TestASTDatalogOriginalNumeralSortDispatchAndValueClassification",
+            "TestASTDatalogOriginalRecognizersAndEmptyBuiltinNames"
+          ]
         }
       ],
       "ownership": [
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
-        "Relation factories borrow column handles while canonical sort information owns copied AST parameters. Relation-column queries return borrowed handles in a caller-owned Go slice."
+        "Relation factories borrow column handles while canonical sort information owns copied AST parameters. Relation-column queries return borrowed handles in a caller-owned Go slice.",
+        "Numeral factories borrow sort handles, own temporary rational values through publication, and release those temporaries after the target plugin copies them."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Typed Go errors replace declaration-plugin exceptions. OP_RA_SELECT preserves the source implementation's observable relation-sort refusal after it changes the checked local result to Bool. The two is_numeral_ext overloads are represented at their retained API and DLRewriter consumers rather than by an any-valued adapter."
       ]
     },
     {
       "path": "src/ast/dl_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_datalog_finite.go",
         "pkg/ast/ast_datalog_sorts.go",
@@ -15204,6 +15226,8 @@
         "pkg/ast/ast_datalog_relation_indexed_test.go",
         "pkg/ast/ast_datalog_filter_rule.go",
         "pkg/ast/ast_datalog_filter_rule_test.go",
+        "pkg/ast/ast_datalog_recognizers.go",
+        "pkg/ast/ast_datalog_numeral_dispatch_test.go",
         "pkg/ast/rewriter/dl_rewriter.go"
       ],
       "tests": [
@@ -15217,7 +15241,9 @@
         "TestASTDatalogOriginalProjectRenameJoinAndNegationFilter",
         "TestASTDatalogOriginalIndexedRelationGuards",
         "TestASTDatalogOriginalFilterTraversalAndGuards",
-        "TestASTDatalogOriginalRuleRepAndAbs"
+        "TestASTDatalogOriginalRuleRepAndAbs",
+        "TestASTDatalogOriginalNumeralSortDispatchAndValueClassification",
+        "TestASTDatalogOriginalRecognizersAndEmptyBuiltinNames"
       ],
       "conditionals": [
         {
@@ -15229,17 +15255,20 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "retained dl_decl_util constructor/get_family_id, finite-domain mk_sort/mk_numeral/mk_lt, is_numeral and finite/BV/Boolean is_numeral_ext interface (src/ast/dl_decl_plugin.h:141-190)",
-          "status": "partial",
+          "name": "dl_decl_util constructor/get_family_id, numeral/sort/comparison factories and retained numeral recognizer interfaces (src/ast/dl_decl_plugin.h:141-190)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_datalog_finite.go",
           "go_targets": [
+            "pkg/ast/ast_datalog_recognizers.go",
             "pkg/ast/rewriter/dl_rewriter.go"
           ],
           "tests": [
+            "TestASTDatalogOriginalNumeralSortDispatchAndValueClassification",
+            "TestASTDatalogOriginalRecognizersAndEmptyBuiltinNames",
             "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
             "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary"
           ]
@@ -15288,7 +15317,7 @@
         "Concrete finite-domain constructors copy symbol/rational/sort parameters into registered AST declarations and retire temporary parameter and rational owners after factory publication. Relation factories likewise copy borrowed column-sort parameters; relation-column queries return borrowed handles in a caller-owned slice. DLRewriter borrows the manager and uses invocation-local owned numeral storage for BV reads."
       ],
       "deviations": [
-        "Only the concrete dl_decl_util surface reached by retained AST rewriter and numeral API consumers is included here. Relation-algebra declarations and rule constructors remain open, so the header remains partial."
+        "Concrete typed Go factories replace pointer-array overloads. Retained numeral-extension consumers use their concrete finite, arithmetic, bit-vector and Boolean result types."
       ]
     },
     {

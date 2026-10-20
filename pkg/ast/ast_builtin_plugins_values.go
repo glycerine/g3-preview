@@ -19,6 +19,10 @@ func (m *ASTManager) pluginValue(fid FamilyID, r astNodeRef) (bool, error) {
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArithmeticPlugin {
 		return m.arithmeticValue(fid, r, false)
 	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astDatalogPlugin {
+		family, kind, e := m.declIdentity(decl)
+		return family == fid && kind == astDatalogConstantKind, e
+	}
 	return false, nil
 }
 func (m *ASTManager) isValue(r astNodeRef) (bool, error) {

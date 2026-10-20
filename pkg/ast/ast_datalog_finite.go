@@ -65,13 +65,75 @@ func (m *ASTManager) MkDatalogFiniteSort(name usymbol.Symbol, size uint64) (resu
 	return m.MkFamilySort(family, astDatalogFiniteSortKind, []ASTParameter{nameParameter, sizeParameter})
 }
 
-// MkDatalogNumeral constructs the finite-domain specialization of
-// dl_decl_util::mk_numeral and rejects values outside the declared domain.
+// MkDatalogNumeral implements dl_decl_util::mk_numeral for finite-domain,
+// arithmetic, bit-vector and Boolean sorts.
 func (m *ASTManager) MkDatalogNumeral(value uint64, sort ASTHandle) (result ASTHandle, err error) {
-	family, err := m.RegisterDatalogPlugin()
+	family, err := m.datalogUtilityFamilyID()
 	if err != nil {
 		return ASTHandle{}, err
 	}
+	finite, err := m.IsDatalogFiniteSort(sort)
+	if err != nil {
+		return result, err
+	}
+	if !finite {
+		boolSort, e := m.MkBoolSort()
+		if e != nil {
+			return result, e
+		}
+		if sort == boolSort {
+			if value == 0 {
+				return m.MkFalse()
+			}
+			if value == 1 {
+				return m.MkTrue()
+			}
+			return result, ErrASTDomain
+		}
+		integer, arithmetic, e := m.datalogArithmeticSort(sort)
+		if e != nil {
+			return result, e
+		}
+		if arithmetic {
+			numeral, e := m.numerals.NewValue()
+			if e != nil {
+				return result, e
+			}
+			defer func() { err = errors.Join(err, m.numerals.Del(&numeral)) }()
+			if e = m.numerals.SetUint64(&numeral, value); e != nil {
+				return result, e
+			}
+			return m.ArithmeticNumeral(&numeral, integer)
+		}
+		bitVector, e := m.IsBitVectorSort(sort)
+		if e != nil {
+			return result, e
+		}
+		if bitVector {
+			width, e := m.BitVectorSize(sort)
+			if e != nil {
+				return result, e
+			}
+			return m.BitVectorNumeralUint64(value, width)
+		}
+		return result, ErrASTDomain
+	}
+	return m.mkDatalogFiniteNumeral(family, value, sort)
+}
+
+func (m *ASTManager) datalogUtilityFamilyID() (FamilyID, error) {
+	// dl_decl_util::ast_plugin_registrator installs these dependencies before
+	// constructing its arithmetic and bit-vector utility members.
+	if _, e := m.RegisterArithmeticPlugin(); e != nil {
+		return NullFamilyID, e
+	}
+	if _, e := m.RegisterBitVectorPlugin(); e != nil {
+		return NullFamilyID, e
+	}
+	return m.RegisterDatalogPlugin()
+}
+
+func (m *ASTManager) mkDatalogFiniteNumeral(family FamilyID, value uint64, sort ASTHandle) (result ASTHandle, err error) {
 	size, err := m.GetSortSize(sort)
 	if err != nil || !size.IsFinite() {
 		if err == nil {

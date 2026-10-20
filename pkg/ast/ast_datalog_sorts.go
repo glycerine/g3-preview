@@ -93,6 +93,9 @@ func (m *ASTManager) datalogSortKind(h ASTHandle) (astNodeRef, int32, bool, erro
 	if e != nil {
 		return astNodeRef{}, 0, false, e
 	}
+	if m.arithmeticPlugin != nil && (r == m.arithmeticPlugin.fields[0] || r == m.arithmeticPlugin.fields[1]) {
+		return r, 0, false, nil
+	}
 	info := m.sortAt(r.slot).info
 	if info == (ASTSortInfo{}) {
 		return r, 0, false, nil
