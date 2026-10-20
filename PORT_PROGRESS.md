@@ -47385,3 +47385,15 @@ source consumer, and instantiations in unretained units are reference-only, so
 no universal callback adapter is added. All four focused AST and model profiles
 pass on CPUs 8-16. Portcheck reports 2103 units, 677 APIs: 278 ported, 290
 partial, 1478 unported and 11 dead/deleted.
+
+Low-level AST printer whole-unit closure:
+`src/ast/ast_ll_pp.cpp` and `.h` are promoted to ported for all retained
+callers. The complete ordinary and bounded printers cover postorder AST and
+parameter traversal, declarations, variables, applications, proofs,
+quantifiers, compact/noncompact flags, arithmetic numerals and bounded-depth
+cutoffs. Their lexical frame borrows AST identities and streams while owning
+only temporary numeral state with audited cleanup/ACK order. Caller-supplied
+visited-mark overloads occur only in unretained proof/SMT units and are
+reference-only; the source-disabled family-name branch stays disabled. All four
+focused profiles pass on CPUs 8-16. Portcheck reports 2103 units, 677 APIs: 280
+ported, 288 partial, 1478 unported and 11 dead/deleted.

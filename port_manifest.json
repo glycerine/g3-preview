@@ -12283,7 +12283,7 @@
       "path": "src/ast/ast_ll_pp.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_low_level_printer.go",
         "pkg/ast/ast_low_level_bounded.go"
@@ -12305,8 +12305,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Reached depth-three ast_ll_bounded_pp expression/variable/reference printer for deletion diagnostics (ast_ll_pp.cpp:274-328)",
@@ -12316,7 +12316,7 @@
         },
         {
           "name": "Actual trace overload low-level postorder and separate insertion chains (src/ast/ast_ll_pp.cpp:21-320)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_low_level_printer.go",
           "tests": [
             "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
@@ -12326,27 +12326,35 @@
         },
         {
           "name": "Exact younger numeral source-value ACK then older lexical DT then unjoined owning ACK (src/ast/ast_ll_pp.cpp:292-297; src/util/mpz.cpp:1385-1410)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_low_level_printer.go",
           "tests": [
             "TestASTLowLevelPrinterNativeLargeNumeralFormatting"
           ]
+        },
+        {
+          "name": "caller-supplied visited-mark ast_ll_pp and ast_def_ll_pp overloads used only by unretained proof/SMT source units",
+          "status": "reference_only",
+          "tests": []
         }
       ],
       "ownership": [
-        "The inline lexical frame borrows AST nodes in a native []astNodeRef stack and map[astNodeRef]struct{} identity marks. Only its acquired numeral and tracked numeral insertion own numerical values. Actual numeral cleanup/ACK precedes dropping stack and marks. No container backing reservation, pending expansion block, dense declaration/expression bitmap or simulated storage-failure event remains. Actual output stream remains borrowed. The reached bounded deletion printer shares this lexical frame; other root overloads and AST_LL_PP_SHOW_FAMILY_NAME remain separate."
+        "The inline lexical frame borrows AST nodes in a native []astNodeRef stack and map[astNodeRef]struct{} identity marks; the output stream and caller handle remain borrowed.",
+        "Only the acquired numeral and tracked numeral insertion own numerical state. Numeral cleanup/ACK precedes dropping traversal storage, and retryable owning cleanup preserves unfinished state in the manager frame.",
+        "The bounded printer shares the same checked lexical frame and borrows every recursively displayed node."
       ],
       "deviations": [
-        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
+        "The caller-supplied visited-mark overloads are reference-only because their consumers are unretained proof and SMT source units. Every retained caller uses DisplayLowLevel or DisplayBoundedLowLevel.",
         "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised.",
-        "Native traversal collections preserve the source LIFO order, declaration/domain/range and parameter visitation, mark-after-process behavior and exact compact output. Independent literal output checks cover 257 shared variables with duplicate arguments and 257 nested quantifiers with reservations disabled, plus unchanged reference counts and lexical reuse. Erased container allocation faults add no C++ vector or bitmap implementation credit."
+        "Native traversal collections preserve the source LIFO order, declaration/domain/range and parameter visitation, mark-after-process behavior and exact compact output. Independent literal output checks cover 257 shared variables with duplicate arguments and 257 nested quantifiers with reservations disabled, plus unchanged reference counts and lexical reuse. Erased container allocation faults add no C++ vector or bitmap implementation credit.",
+        "AST_LL_PP_SHOW_FAMILY_NAME is disabled in the preserved source and remains absent from the Go build."
       ]
     },
     {
       "path": "src/ast/ast_ll_pp.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/ast/ast_low_level_printer.go", "pkg/ast/ast_low_level_bounded.go"],
       "tests": ["TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags", "TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds"],
       "conditionals": [
@@ -12359,8 +12367,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Reached mk_ll_pp and mk_bounded_pp printer declarations used by AST traces",
@@ -12368,10 +12376,19 @@
           "go_target": "pkg/ast/ast_low_level_bounded.go",
           "go_targets": ["pkg/ast/ast_low_level_printer.go"],
           "tests": ["TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags", "TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds"]
+        },
+        {
+          "name": "caller-supplied visited-mark ast_ll_pp and ast_def_ll_pp declarations with no retained consumer",
+          "status": "reference_only",
+          "tests": []
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "DisplayLowLevel and DisplayBoundedLowLevel borrow the manager, AST handle and NumericTextStream. Their manager-owned lexical frame owns only temporary traversal and numeral state until cleanup."
+      ],
+      "deviations": [
+        "Go methods replace the source stream-wrapper structs for retained callers; visited-mark overloads used only by unretained units are reference-only."
+      ]
     },
     {
       "path": "src/ast/ast_lt.cpp",
