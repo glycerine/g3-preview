@@ -32812,9 +32812,9 @@
       "path": "src/ast/substitution/expr_offset.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/substitution/offset.go"],
+      "tests": ["TestExprOffsetIdentityHashAndConcreteMaps"],
       "conditionals": [
         {
           "line": 24,
@@ -32825,19 +32825,30 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "expression/offset construction, access, equality and source hash",
+          "status": "ported",
+          "go_target": "pkg/ast/substitution/offset.go",
+          "tests": ["TestExprOffsetIdentityHashAndConcreteMaps"]
+        }
+      ],
+      "ownership": [
+        "ExprOffset is a pointer-free borrowed AST handle and offset value; owners that persist it retain the expression separately."
+      ],
+      "deviations": [
+        "Hash returns a checked error for a null expression instead of reaching the source null dereference."
+      ]
     },
     {
       "path": "src/ast/substitution/expr_offset_map.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/substitution/offset.go"],
+      "tests": ["TestExprOffsetIdentityHashAndConcreteMaps"],
       "conditionals": [
         {
           "line": 19,
@@ -32848,11 +32859,22 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "contains, find, insert and reset for retained expression-offset value kinds",
+          "status": "ported",
+          "go_target": "pkg/ast/substitution/offset.go",
+          "tests": ["TestExprOffsetIdentityHashAndConcreteMaps"]
+        }
+      ],
+      "ownership": [
+        "Concrete maps borrow expression handles; enclosing substitution and unifier owners retain stored expressions."
+      ],
+      "deviations": [
+        "Native Go maps replace timestamped sparse vectors. Separate concrete maps cover only the retained expression, ExprOffset and uint32 instantiations."
+      ]
     },
     {
       "path": "src/ast/substitution/matcher.cpp",
@@ -33261,9 +33283,9 @@
       "path": "src/ast/substitution/var_offset_map.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/substitution/offset.go"],
+      "tests": ["TestExprOffsetIdentityHashAndConcreteMaps"],
       "conditionals": [
         {
           "line": 19,
@@ -33308,11 +33330,22 @@
           "text": "SASSERT(offset < m_num_offsets);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "capacity reservation, reset, insertion, lookup and erasure for ExprOffset bindings",
+          "status": "ported",
+          "go_target": "pkg/ast/substitution/offset.go",
+          "tests": ["TestExprOffsetIdentityHashAndConcreteMaps"]
+        }
+      ],
+      "ownership": [
+        "The concrete variable-offset map borrows ExprOffset values; the enclosing substitution owner retains every range expression."
+      ],
+      "deviations": [
+        "The retained ExprOffset instantiation uses a native Go map and explicit checked capacity errors instead of porting the C++ vector template."
+      ]
     },
     {
       "path": "src/ast/used_symbols.h",
