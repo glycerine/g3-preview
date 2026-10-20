@@ -304,3 +304,59 @@ func TestLegacySMTPrinterBit2BoolExpansion(t *testing.T) {
 		t.Fatalf("legacy SMT bit2bool expression %q, want %q", out.String(), want)
 	}
 }
+
+func TestLegacySMTPrinterDistinctGroupsBySort(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	printer, err := NewLegacySMTPrinter(m)
+	astTestMust(t, err)
+	boolSort, err := m.MkBoolSort()
+	astTestMust(t, err)
+	bvSort, err := m.BitVectorSort(8)
+	astTestMust(t, err)
+	intSort := m.external(m.arithmeticPlugin.fields[1])
+	constant := func(name string, sort ASTHandle) ASTHandle {
+		h, e := m.MkConst(astTestSymbol(t, m, name), sort)
+		astTestMust(t, e)
+		astTestPin(t, m, h)
+		return h
+	}
+	a := constant("legacy-da", boolSort)
+	x := constant("legacy-dx", bvSort)
+	i := constant("legacy-di", intSort)
+	b := constant("legacy-db", boolSort)
+	y := constant("legacy-dy", bvSort)
+	makeDistinct := func(args []ASTHandle) ASTHandle {
+		domain := make([]ASTHandle, len(args))
+		for j := range args {
+			domain[j], err = m.GetSort(args[j])
+			astTestMust(t, err)
+		}
+		info, e := m.NewFuncDeclInfo(m.BasicFamilyID(), ASTOpDistinct, nil, ASTFuncFlags{}, false)
+		astTestMust(t, e)
+		decl, e := m.MkFuncDeclWithInfo(astTestSymbol(t, m, "distinct"), domain, boolSort, info)
+		astTestMust(t, e)
+		astTestMust(t, m.DelFuncDeclInfo(&info))
+		result, e := m.MkApp(decl, args)
+		astTestMust(t, e)
+		astTestPin(t, m, result)
+		return result
+	}
+	distinct := makeDistinct([]ASTHandle{a, x, i, b, y})
+	var out strings.Builder
+	astTestMust(t, printer.DisplayExpr(&out, distinct, nil))
+	want := "(and (distinct legacy-da legacy-db) (distinct legacy-dx legacy-dy) true)"
+	if out.String() != want {
+		t.Fatalf("legacy SMT heterogeneous distinct %q, want %q", out.String(), want)
+	}
+
+	singletons := makeDistinct([]ASTHandle{a, x, i})
+	out.Reset()
+	astTestMust(t, printer.DisplayExpr(&out, singletons, nil))
+	if out.String() != "(and true)" {
+		t.Fatalf("legacy SMT singleton-sort distinct %q", out.String())
+	}
+}

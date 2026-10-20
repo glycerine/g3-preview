@@ -294,6 +294,57 @@ func (p *LegacySMTPrinter) isLegacySkolemHackPattern(pattern ASTHandle) (bool, e
 	return present && text == "sk_hack", err
 }
 
+func (p *LegacySMTPrinter) distinctText(h ASTHandle, ctx *legacySMTExprContext) (string, error) {
+	n, err := p.manager.GetNumArgs(h)
+	if err != nil {
+		return "", err
+	}
+	args := make([]ASTHandle, n)
+	sorts := make([]ASTHandle, n)
+	remaining := make([]bool, n)
+	for i := uint32(0); i < n; i++ {
+		args[i], err = p.manager.GetArg(h, i)
+		if err != nil {
+			return "", err
+		}
+		sorts[i], err = p.manager.GetSort(args[i])
+		if err != nil {
+			return "", err
+		}
+		remaining[i] = true
+	}
+	var out strings.Builder
+	out.WriteString("(and")
+	for i := 0; i < len(args); i++ {
+		if !remaining[i] {
+			continue
+		}
+		next := i + 1
+		for next < len(args) && (!remaining[next] || sorts[next] != sorts[i]) {
+			next++
+		}
+		if next == len(args) {
+			remaining[i] = false
+			continue
+		}
+		out.WriteString(" (distinct")
+		for j := i; j < len(args); j++ {
+			if remaining[j] && sorts[j] == sorts[i] {
+				text, e := p.exprTextContext(args[j], ctx)
+				if e != nil {
+					return "", e
+				}
+				out.WriteByte(' ')
+				out.WriteString(text)
+				remaining[j] = false
+			}
+		}
+		out.WriteByte(')')
+	}
+	out.WriteString(" true)")
+	return out.String(), nil
+}
+
 func (p *LegacySMTPrinter) quantifierText(q ASTHandle, ctx *legacySMTExprContext) (string, error) {
 	forall, err := p.manager.IsForall(q)
 	if err != nil {
@@ -485,6 +536,17 @@ func (p *LegacySMTPrinter) exprTextContext(h ASTHandle, ctx *legacySMTExprContex
 			return "", e
 		}
 		return "(! true :lblpos " + label + ")", nil
+	}
+	family, err := p.manager.GetFamilyID(decl)
+	if err != nil {
+		return "", err
+	}
+	op, err := p.manager.GetDeclKind(decl)
+	if err != nil {
+		return "", err
+	}
+	if family == p.manager.BasicFamilyID() && op == ASTOpDistinct {
+		return p.distinctText(h, ctx)
 	}
 	n, err := p.manager.GetNumArgs(h)
 	if err != nil {

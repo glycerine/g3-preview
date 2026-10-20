@@ -13162,7 +13162,8 @@
         "TestLegacySMTPrinterBitVectorAndLabelLiterals",
         "TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables",
         "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants",
-        "TestLegacySMTPrinterBit2BoolExpansion"
+        "TestLegacySMTPrinterBit2BoolExpansion",
+        "TestLegacySMTPrinterDistinctGroupsBySort"
       ],
       "conditionals": [
         {
@@ -13232,13 +13233,21 @@
           "tests": [
             "TestLegacySMTPrinterBit2BoolExpansion"
           ]
+        },
+        {
+          "name": "smt_printer heterogeneous distinct regrouping by sort with singleton elimination (ast_smt_pp.cpp:430-459)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_legacy_expr.go",
+          "tests": [
+            "TestLegacySMTPrinterDistinctGroupsBySort"
+          ]
         }
       ],
       "ownership": [
         "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String/floating-point literals, distinct regrouping, implication simplification, let insertion, datatype-special paths and the benchmark wrapper remain open."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String/floating-point literals, implication simplification, let insertion, datatype-special paths and the benchmark wrapper remain open."
       ]
     },
     {
@@ -13261,7 +13270,8 @@
         "TestLegacySMTPrinterBitVectorAndLabelLiterals",
         "TestLegacySMTPrinterQuantifiersPatternsAndNestedVariables",
         "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants",
-        "TestLegacySMTPrinterBit2BoolExpansion"
+        "TestLegacySMTPrinterBit2BoolExpansion",
+        "TestLegacySMTPrinterDistinctGroupsBySort"
       ],
       "conditionals": [
         {
