@@ -15267,28 +15267,59 @@
       "path": "src/ast/expr_functors.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/expr_functors.go"],
+      "tests": [
+        "TestASTCheckPredicateMemoizedDAGAndReset",
+        "TestASTContainsAppSlicesOwnershipAndGuards",
+        "TestASTMapProcReconstructQuantifierAndReset"
+      ],
       "assertions": [
         {
           "line": 32,
           "text": "SASSERT(m_visited.is_marked(e));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "check_pred memoized postorder visit and query",
+          "status": "ported",
+          "go_target": "pkg/ast/expr_functors.go",
+          "tests": ["TestASTCheckPredicateMemoizedDAGAndReset"]
+        },
+        {
+          "name": "contains_app expression and vector queries",
+          "status": "ported",
+          "go_target": "pkg/ast/expr_functors.go",
+          "tests": ["TestASTContainsAppSlicesOwnershipAndGuards"]
+        },
+        {
+          "name": "map_proc variable visit, application reconstruction, quantifier visit, mapped lookup and reset",
+          "status": "ported",
+          "go_target": "pkg/ast/expr_functors.go",
+          "tests": ["TestASTMapProcReconstructQuantifierAndReset"]
+        }
+      ],
+      "ownership": [
+        "CheckPredicate owns one ASTRef for each independently queried uncached root. ContainsApp additionally owns its target application and destroys the memoizer before that target. ASTMapProc delegates owning key/value references to ASTExprMap and borrows returned handles."
+      ],
+      "deviations": [
+        "Typed Go functions replace the two virtual predicate interfaces, and native maps/slices replace ast_mark and pointer vectors. Callback and invalid traversal failures are returned explicitly; the source visit order, DAG memoization, result propagation and bottom-up reconstruction remain."
+      ]
     },
     {
       "path": "src/ast/expr_functors.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/expr_functors.go"],
+      "tests": [
+        "TestASTCheckPredicateMemoizedDAGAndReset",
+        "TestASTContainsAppSlicesOwnershipAndGuards",
+        "TestASTMapProcReconstructQuantifierAndReset"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -15299,11 +15330,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "i_expr_pred, i_sort_pred retained predicate surface, check_pred, contains_app and map_proc declarations and inline methods",
+          "status": "ported",
+          "go_target": "pkg/ast/expr_functors.go",
+          "tests": [
+            "TestASTCheckPredicateMemoizedDAGAndReset",
+            "TestASTContainsAppSlicesOwnershipAndGuards",
+            "TestASTMapProcReconstructQuantifierAndReset"
+          ]
+        }
+      ],
+      "ownership": [
+        "Explicit constructors and Close methods preserve the source member ownership and destruction order for retained concrete consumers."
+      ],
+      "deviations": [
+        "The unused standalone sort-predicate base has no Go object; retained consumers express sort predicates directly as typed functions. ASTMapProc exposes protected source map insertion as a checked method for concrete derived-consumer ports."
+      ]
     },
     {
       "path": "src/ast/expr_map.cpp",
