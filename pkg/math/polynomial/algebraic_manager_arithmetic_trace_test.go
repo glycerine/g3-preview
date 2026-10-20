@@ -369,7 +369,7 @@ func (w *managerDetailOwnerProbe) Write(p []byte) (int, error) {
 	z := m.config.Numerals.Integers()
 	used, physical, cause := z.Budget().Used(), z.RuntimeOwner().Stats(), m.cleanupCause
 	var zero, out Algebraic
-	for _, call := range []func() error{m.Close, m.CleanupRetained, func() error { return m.Add(&zero, &zero, &out) }, func() error { return m.Power(&zero, 1, &out) }, func() error { return m.AddInteger(&zero, &z.Two64, &out) }} {
+	for _, call := range []func() error{m.Close, m.SourceFinalize, m.CleanupRetained, func() error { return m.Add(&zero, &zero, &out) }, func() error { return m.Power(&zero, 1, &out) }, func() error { return m.AddInteger(&zero, &z.Two64, &out) }} {
 		if e := call(); !errors.Is(e, ErrAlgebraicPending) {
 			w.t.Error("public detail callback acquired algebraic owner", e)
 		}
@@ -381,7 +381,7 @@ func (w *managerDetailOwnerProbe) Write(p []byte) (int, error) {
 	if !errors.Is(e, ErrUPolynomialCleanupPending) || poly.slot != 0 {
 		w.t.Error("public detail callback constructed UP workspace", e)
 	}
-	if !c.rootTrace.running || m.univariate.factorTrace != &c.rootTrace.borrow || m.finishing || m.closed || m.cleanupCause != cause || out.slot != 0 || used != z.Budget().Used() || physical != z.RuntimeOwner().Stats() {
+	if !c.rootTrace.running || m.univariate.factorTrace != &c.rootTrace.borrow || m.finishing || m.closed || m.sourceStarted || m.cleanupCause != cause || out.slot != 0 || used != z.Budget().Used() || physical != z.RuntimeOwner().Stats() {
 		w.t.Error("public detail callback changed source owner or physical graph")
 	}
 	return len(p), nil

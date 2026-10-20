@@ -11,7 +11,7 @@ import (
 
 // Close is the explicit Go owning abort/release path. It cannot stand in for
 // source ~imp member destruction: the polynomial member has distinct source
-// cursors and failure semantics. Keep that distinction when adding the source
+// cursors and failure semantics. Keep that distinction from the separate SourceFinalize
 // algebraic-manager destructor, rather than relabeling owning cleanup.
 func TestAlgebraicManagerOwningCloseDoesNotAdvancePolynomialSource(t *testing.T) {
 	cfg, _, _ := algebraicManagerFixture(t)

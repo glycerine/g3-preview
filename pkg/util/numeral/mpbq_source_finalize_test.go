@@ -156,6 +156,7 @@ func TestBinaryIntervalSourceDestructorSuccess(t *testing.T) {
 	}
 	serviceMust(t, b.Open())
 	serviceMust(t, m.SourceFinalize())
+	serviceMust(t, b.SourceFinalize())
 	serviceMust(t, m.CloseChecked())
 	if !m.closed || !m.sourceFinalized || m.sourceStage != 3 {
 		t.Fatal("owning boundary")

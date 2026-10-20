@@ -301,7 +301,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m == nil || m.self != m {
 		return ErrAlgebraicOwner
 	}
-	if m.closed || m.closing || m.manager != nil && !m.manager.completed {
+	if m.closed || m.closing || m.manager != nil && (!m.manager.completed || m.manager.sourceStarted) {
 		return arena.ErrClosed
 	}
 	return m.config.Rationals.CheckOwnerReady()
@@ -1426,7 +1426,7 @@ func (m *AlgebraicRootCore) Close() error {
 	}
 	return m.closeCoreMembers()
 }
-func (m *AlgebraicRootCore) closeCoreMembers() error {
+func (m *AlgebraicRootCore) checkDestructorExecution() error {
 	if m != nil && m.self == m && (m.copyCall.running || m.copyCall.cleaning || m.cellBoundsCall.running || m.cellBoundsCall.cleaning || m.cellCoefficientCopy.running || m.basicCellCopyRunning) {
 		return ErrAlgebraicPending
 	}
@@ -1455,7 +1455,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && (m.multivariateIsolationRunning || m.univariateIsolationRunning) {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.polynomialEvaluationBorrowers != 0 {
+	if m != nil && m.self == m && (m.polynomialEvaluationBorrowers != 0 || m.polynomialEvaluationRunning != 0) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running || m.integerAdd.cleaning || m.constQ.running) {
@@ -1514,6 +1514,15 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	}
 	if m == nil || m.self != m {
 		return ErrAlgebraicOwner
+	}
+	if m.manager != nil && m.manager.sourceRunning {
+		return ErrAlgebraicPending
+	}
+	return nil
+}
+func (m *AlgebraicRootCore) closeCoreMembers() error {
+	if e := m.checkDestructorExecution(); e != nil {
+		return e
 	}
 	if m.closed {
 		return nil

@@ -35,6 +35,11 @@ type AlgebraicManagerConfig struct {
 // its unfinished cleanup and must precede release of the borrowed services.
 type AlgebraicManager struct {
 	*AlgebraicRootCore
+	sourceStarted, sourceFinalized, sourceRunning                                       bool
+	sourceStage                                                                         uint8
+	sourceIndex                                                                         uint32
+	sourceBindings                                                                      [2]unumeral.NumericCallerBinding
+	sourceBound                                                                         uint8
 	self                                                                                *AlgebraicManager
 	config                                                                              AlgebraicManagerConfig
 	params                                                                              uparams.ModuleParamsOwner
@@ -190,7 +195,7 @@ func (m *AlgebraicManager) ready() error {
 	if m == nil || m.self != m {
 		return ErrAlgebraicOwner
 	}
-	if !m.completed || m.closed || m.finishing || m.constructing {
+	if m.sourceStarted || !m.completed || m.closed || m.finishing || m.constructing {
 		return arena.ErrClosed
 	}
 	return m.AlgebraicRootCore.check()
@@ -202,7 +207,7 @@ func (m *AlgebraicManager) UpdateParams(*uparams.ParamsRef) error {
 	if m == nil || m.self != m {
 		return ErrAlgebraicOwner
 	}
-	if m.closed || !m.completed {
+	if m.sourceStarted || m.closed || !m.completed {
 		return arena.ErrClosed
 	}
 	return nil
@@ -239,7 +244,7 @@ func (m *AlgebraicManager) Close() error {
 	if m.AlgebraicRootCore != nil && (m.foreignCopyBorrowers != 0 || m.foreignCopy.running || m.foreignCopy.cleaning) {
 		return ErrAlgebraicPending
 	}
-	if m.constructing || m.finishing || m.AlgebraicRootCore != nil && (m.univariateIsolationRunning || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running || m.copyCall.running || m.copyCall.cleaning || m.cellBoundsCall.running || m.cellBoundsCall.cleaning || m.cellCoefficientCopy.running || m.basicCellCopyRunning || m.savedIntervalExecuting != nil || m.AlgebraicRootCore.binary.running || m.AlgebraicRootCore.binary.cleaning || m.division.cleaning || m.integerAdd.cleaning || m.rootTrace.running || m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.running || m.toOwnedRational.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.running || m.integerSet.finishing || m.constQ.running || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
+	if m.sourceRunning || m.constructing || m.finishing || m.AlgebraicRootCore != nil && (m.univariateIsolationRunning || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running || m.copyCall.running || m.copyCall.cleaning || m.cellBoundsCall.running || m.cellBoundsCall.cleaning || m.cellCoefficientCopy.running || m.basicCellCopyRunning || m.savedIntervalExecuting != nil || m.AlgebraicRootCore.binary.running || m.AlgebraicRootCore.binary.cleaning || m.division.cleaning || m.integerAdd.cleaning || m.rootTrace.running || m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.running || m.toOwnedRational.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.running || m.integerSet.finishing || m.constQ.running || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
 	e := m.finish(true)
@@ -263,7 +268,13 @@ func (m *AlgebraicManager) finish(owning bool) error {
 		}
 	}
 	if m.coreMembersReady && !m.privateFinalized {
-		if e := m.AlgebraicRootCore.closeCoreMembers(); e != nil {
+		var e error
+		if m.sourceStarted {
+			e = m.cleanupSourceMembers()
+		} else {
+			e = m.AlgebraicRootCore.closeCoreMembers()
+		}
+		if e != nil {
 			return e
 		}
 		m.privateFinalized = true
@@ -336,7 +347,7 @@ func (m *AlgebraicManager) RationalManager() (*unumeral.RationalManager, error) 
 	if m == nil || m.self != m {
 		return nil, ErrAlgebraicOwner
 	}
-	if !m.completed || m.closed || m.finishing {
+	if m.sourceStarted || !m.completed || m.closed || m.finishing {
 		return nil, arena.ErrClosed
 	}
 	return m.config.Numerals, nil
@@ -345,7 +356,7 @@ func (m *AlgebraicManager) BinaryRationalManager() (*unumeral.BinaryRationalMana
 	if m == nil || m.self != m {
 		return nil, ErrAlgebraicOwner
 	}
-	if !m.completed || m.closed || m.finishing {
+	if m.sourceStarted || !m.completed || m.closed || m.finishing {
 		return nil, arena.ErrClosed
 	}
 	return m.binary, nil

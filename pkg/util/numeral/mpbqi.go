@@ -14,8 +14,9 @@ type BinaryInterval struct{ lower, upper BinaryRational }
 
 func NewBinaryInterval() BinaryInterval { return BinaryInterval{} }
 
-// BinaryIntervalManager borrows bounds; all values/scopes must die before
-// Close, and Close must precede closing bounds. Owner-confined, not concurrent.
+// BinaryIntervalManager borrows bounds; caller values/scopes die before source
+// destruction. Owning cleanup may follow bounds source destruction; the integer
+// owner outlives both. Owner-confined, not concurrent.
 type BinaryIntervalManager struct {
 	debugInvocation                               uint64
 	debugExecuting                                bool
@@ -137,7 +138,15 @@ func (m *BinaryIntervalManager) CloseChecked() error {
 	m.closing = true
 	roots := [3]*BinaryRational{&m.MulCurr, &m.MulMax, &m.MulMin}
 	for m.cleanupStage < 3 {
-		if e := m.bounds.Del(roots[m.cleanupStage]); e != nil {
+		var e error
+		if m.sourceStarted {
+			// The borrowed binary manager may already have completed its
+			// later source destructor. Own only these actual NUM fields.
+			e = m.bounds.Z.Del(&roots[m.cleanupStage].Num)
+		} else {
+			e = m.bounds.Del(roots[m.cleanupStage])
+		}
+		if e != nil {
 			return e
 		}
 		m.cleanupStage++
