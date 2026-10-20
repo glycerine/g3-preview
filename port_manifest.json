@@ -41877,7 +41877,10 @@
         "pkg/math/polynomial/polynomial_substitution_trace.go",
         "pkg/math/polynomial/polynomial_substitution_trace_test.go",
         "pkg/math/polynomial/polynomial_resultant_trace.go",
-        "pkg/math/polynomial/polynomial_resultant_trace_test.go"
+        "pkg/math/polynomial/polynomial_resultant_trace_test.go",
+        "pkg/math/polynomial/polynomial_pseudo_trace.go",
+        "pkg/math/polynomial/polynomial_pseudo_trace_test.go",
+        "pkg/math/polynomial/polynomial_pseudo_verification_trace_test.go"
       ],
       "tests": [
         "TestPolynomialDividesTraceZeroKeepsOlderAlgorithmReceipt",
@@ -47677,18 +47680,25 @@
         "reachability_correction": "The newly added discriminant cpp5483 record was found to have only dormant test consumers and is removed. Retained resultant records remain implemented; no complete polynomial credit comes from dormant API compatibility."
       },
       "pseudo_division_trace_audit": {
-        "source": "polynomial.cpp:4909-4911,4955-4962,4973",
+        "source": "polynomial.cpp:4909-4911,4955-4962,4973,5011-5013,5071-5078; pseudo_remainder retained by nlsat/nlsat_explain.cpp:1100",
         "go_target": "pkg/math/polynomial/polynomial_pseudo_trace.go",
-        "behavior": "Entry follows assertions and precedes degree reads and core locals. Each loop state record follows the actual checkpoint, before the degree test, printing direct A/B/leading/reduct/quotient/remainder polynomials and d. The exact-degree correction record prints its actual live l_B_e reference before multiplying outputs. A traceDisplay receipt belongs to the actual pseudo invocation; stopped source children protect older locals, body failures retain pending display ownership after ordinary unwind, and matched owning cleanup retires that child before the existing arithmetic/creation cleanup. Numerical bindings and the existing polynomial callback guard protect executing records.",
+        "behavior": "Entry follows assertions and precedes degree reads and core locals. Each loop state record follows the actual checkpoint, before the degree test, printing direct A/B/leading/reduct/quotient/remainder polynomials and d. The exact-degree correction record prints its actual live l_B_e reference before multiplying outputs. A traceDisplay receipt belongs to the actual pseudo invocation; stopped source children protect older locals, body failures retain pending display ownership after ordinary unwind, and matched owning cleanup retires that child before the existing arithmetic/creation cleanup. Numerical bindings and the existing polynomial callback guard protect executing records. The conditional reduced-monomial record follows actual m_prime reference assignment and precedes source assertions and add/copy operations; tag gating precedes the fresh original-monomial degree read and the literal unsigned comparison. The debug wrapper computes source bool is_eq eagerly before the final pseudo_remainder record, independently of the process assertion switch. That record inserts direct old_p/old_q and reference Q/R/ld/lhs/rhs through the same actual invocation display receipt, then SASSERT reads the already computed bool.",
         "tests": [
           "TestPolynomialPseudoTraceExactCorrectionAndSourceLifetimes",
           "TestPolynomialPseudoTraceActualEntryTLSRefusal",
           "TestPolynomialPseudoTraceEarlyExitAndRemainderOnly",
           "TestPolynomialPseudoTraceEveryReservation",
-          "TestPolynomialPseudoExecutingCleanupRefusalDoesNotBecomeSourceCause"
+          "TestPolynomialPseudoExecutingCleanupRefusalDoesNotBecomeSourceCause",
+          "TestPolynomialPseudoReducedTraceTagAndPredicateReadOrder",
+          "TestPolynomialPseudoRemainderEqualityRunsWithAssertionsDisabled",
+          "TestPolynomialPseudoRemainderVerificationTraceLiteralAndLifetime",
+          "TestPolynomialPseudoRemainderVerificationFailedStreamStillFormats",
+          "TestPolynomialPseudoRemainderVerificationEveryReservation",
+          "TestPolynomialPseudoRemainderVerificationActualTLSCopyRefusal"
         ],
         "cleanup_fix": "CleanupPseudoDivision now rejects an executing call before writing cleanupCause. A real checkpoint callback previously converted the refusal into a false source cleanup failure; the direct trace-disabled checkpoint test covers that admission rule.",
-        "limits": "Whole polynomial/algebraic/AST and broader source consumer/failure audits remain partial."
+        "limits": "Whole polynomial/algebraic/AST and broader source consumer/failure audits remain partial.",
+        "verification": "Source conditional literal x0^3 -> x0^2; disabled/false predicates skip unused operands, while enabled malformed degree reads propagate. With assertions and tracing disabled, actual m_m2pos population/reset proves eager equality for distinct lhs/rhs objects. Independent p=x^2+1,q=2*x+1 gives d2,Q=2*x-1,R5 and lhs=rhs=4*x^2+4. Verification header observes seven live source references after Eq. Sticky writer refusal still runs twelve term formatters and five enabled public consistency checks. Real caller-owned TLS boundary allocation forces an accepted 64-limb formatter Copy refusal; physical audits include both raw roots, stale/copied pseudo receipts cannot retire it, matching cleanup does, and the caller remainder2^2018+13 survives. Every reservation prefix through success is audited. Broader groups pass four profiles; four independent omission controls fail their intended assertions."
       },
       "derivative_term_trace_audit": {
         "source": "polynomial.cpp:4518; retained by nlsat/tactic/goal2nlsat.cpp:100 -> factor_core cpp6777",

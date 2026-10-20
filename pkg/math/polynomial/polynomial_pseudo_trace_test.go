@@ -17,6 +17,8 @@ type pseudoTraceWriter struct {
 	t               *testing.T
 	c               *MultivariatePolynomialCore
 	entry, adjusted bool
+	verification    bool
+	reduced         int
 }
 
 func (w *pseudoTraceWriter) WriteString(s string) (int, error) { return w.Write([]byte(s)) }
@@ -33,6 +35,18 @@ func (w *pseudoTraceWriter) Write(p []byte) (int, error) {
 		w.adjusted = true
 		if s.depth != 4 || s.refs[pseudoAdjusted].value == (Polynomial{}) {
 			w.t.Fatal("correction local ended before its record", s.depth)
+		}
+	}
+	if strings.Count(w.String(), ":5011 ") > w.reduced {
+		w.reduced++
+		if s.monomial.value == (Monomial{}) || w.c.generatedActive {
+			w.t.Fatal("reduced trace preceded actual reference assignment")
+		}
+	}
+	if !w.verification && strings.Contains(w.String(), ":5072 ") {
+		w.verification = true
+		if s.depth != 7 || s.constructed != 127 || len(w.c.queryPositions.values) == 0 {
+			w.t.Fatal("verification preceded equality or crossed source lifetime", s.depth, s.constructed)
 		}
 	}
 	for _, action := range []func() error{w.c.CloseChecked, w.c.CleanupPseudoDivision} {
@@ -59,12 +73,12 @@ func TestPolynomialPseudoTraceExactCorrectionAndSourceLifetimes(t *testing.T) {
 	polynomialQueryExpect(t, c, q.root.value, map[[3]uint32]int64{{2, 0, 0}: 4})
 	polynomialQueryExpect(t, c, r.root.value, map[[3]uint32]int64{})
 	if tags.ShouldTrace("polynomial") {
-		for _, text := range []string{"pseudo_division\np: x0^3\nq: 2 x0\nx: 0\n", "A: x0^3\nB: 2 x0\nl_B: 2\nr_B: 0\nQ: 0\nR: x0^3\nd: 0\n", "Q: x0^2\nR: 0\nd: 1\n", "l_B_e: 4\n"} {
+		for _, text := range []string{"pseudo_division\np: x0^3\nq: 2 x0\nx: 0\n", "A: x0^3\nB: 2 x0\nl_B: 2\nr_B: 0\nQ: 0\nR: x0^3\nd: 0\n", "Q: x0^2\nR: 0\nd: 1\n", "l_B_e: 4\n", "deg_R: 3, deg_B: 1, x: 0\nx0^3, x0^2\n"} {
 			if !strings.Contains(w.String(), text) {
 				t.Fatal("source pseudo record", text, w.String())
 			}
 		}
-		if !w.entry || !w.adjusted || strings.Count(w.String(), ":4955 ") != 2 || !strings.Contains(w.String(), "pseudo_division_core src/math/polynomial/polynomial.cpp:4909 ") {
+		if !w.entry || !w.adjusted || w.reduced != 1 || strings.Count(w.String(), ":4955 ") != 2 || !strings.Contains(w.String(), "pseudo_division_core src/math/polynomial/polynomial.cpp:4909 ") {
 			t.Fatal("source record sites", w.String())
 		}
 	} else if w.Len() != 0 {

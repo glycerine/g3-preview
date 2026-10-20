@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp:4909,4955-4962,4973.
+// Source: src/math/polynomial/polynomial.cpp:4909,4955-4962,4973,5011-5013,5072-5077.
 package polynomial
 
 import (
@@ -10,8 +10,11 @@ type polynomialPseudoTraceBorrow struct{ executing bool }
 
 func (b *polynomialPseudoTraceBorrow) NumericExecuting() bool { return b.executing }
 func (m *MultivariatePolynomialCore) emitPseudoTrace(line int, body func(*polynomialTraceSink) error) error {
+	return m.emitPseudoConditionalTrace("polynomial", "pseudo_division_core", line, nil, body)
+}
+func (m *MultivariatePolynomialCore) emitPseudoConditionalTrace(tag, function string, line int, predicate func() (bool, error), body func(*polynomialTraceSink) error) error {
 	tags := m.monomials.monomialTraceTags()
-	if !tags.ShouldTrace("polynomial") {
+	if !tags.ShouldTrace(tag) {
 		return nil
 	}
 	borrow := polynomialPseudoTraceBorrow{executing: true}
@@ -36,7 +39,14 @@ func (m *MultivariatePolynomialCore) emitPseudoTrace(line int, body func(*polyno
 	m.quadraticTrace = &polynomialQuadraticTraceBorrow{tags: tags}
 	defer func() { m.quadraticTrace = previous }()
 	var computation error
-	_ = tags.EmitConditional("polynomial", "pseudo_division_core", "src/math/polynomial/polynomial.cpp", line, func() bool { return true }, func(w io.Writer) error { computation = body(&polynomialTraceSink{writer: w}); return computation })
+	_ = tags.EmitConditional(tag, function, "src/math/polynomial/polynomial.cpp", line, func() bool {
+		if predicate == nil {
+			return true
+		}
+		ok, e := predicate()
+		computation = e
+		return e == nil && ok
+	}, func(w io.Writer) error { computation = body(&polynomialTraceSink{writer: w}); return computation })
 	return computation
 }
 func (m *MultivariatePolynomialCore) pseudoTracePolynomial(out *polynomialTraceSink, label string, p Polynomial, direct bool) error {
@@ -102,4 +112,54 @@ func (m *MultivariatePolynomialCore) tracePseudoAdjusted() error {
 func (m *MultivariatePolynomialCore) pseudoTraceReference(out *polynomialTraceSink, label string, r *polynomialReference, direct bool) error {
 	_ = out.WriteLiteral(label)
 	return m.pseudoTracePolynomial(out, "", r.value, direct)
+}
+
+func (m *MultivariatePolynomialCore) tracePseudoReducedMonomial(term Monomial, x, degR, degB uint32) error {
+	return m.emitPseudoConditionalTrace("polynomial", "pseudo_division_core", 5011, func() (bool, error) {
+		degree, e := m.monomials.DegreeOf(term, x)
+		return degree != degR-degB, e
+	}, func(out *polynomialTraceSink) error {
+		_ = out.WriteLiteral("deg_R: ")
+		_ = out.WriteUnsigned(degR)
+		_ = out.WriteLiteral(", deg_B: ")
+		_ = out.WriteUnsigned(degB)
+		_ = out.WriteLiteral(", x: ")
+		_ = out.WriteUnsigned(x)
+		_ = out.WriteLiteral("\n")
+		if e := m.monomials.DisplayInto(term, out, false); e != nil {
+			return e
+		}
+		_ = out.WriteLiteral(", ")
+		if e := m.monomials.DisplayInto(m.pseudoDivision.monomial.value, out, false); e != nil {
+			return e
+		}
+		return out.WriteLiteral("\n")
+	})
+}
+func (m *MultivariatePolynomialCore) tracePseudoRemainderVerification(R *polynomialReference) error {
+	return m.emitPseudoConditionalTrace("pseudo_remainder", "pseudo_remainder", 5072, nil, func(out *polynomialTraceSink) error {
+		s := &m.pseudoDivision
+		if e := m.pseudoTraceReference(out, "pseudo_division bug\np:   ", &s.refs[pseudoOldP], true); e != nil {
+			return e
+		}
+		if e := m.pseudoTraceReference(out, "\nq:   ", &s.refs[pseudoOldQ], true); e != nil {
+			return e
+		}
+		if e := m.pseudoTraceReference(out, "\nQ:   ", &s.refs[pseudoQuotient], false); e != nil {
+			return e
+		}
+		if e := m.pseudoTraceReference(out, "\nR:   ", R, false); e != nil {
+			return e
+		}
+		if e := m.pseudoTraceReference(out, "\nl^d: ", &s.refs[pseudoPowered], false); e != nil {
+			return e
+		}
+		if e := m.pseudoTraceReference(out, "\nlhs: ", &s.refs[pseudoLeft], false); e != nil {
+			return e
+		}
+		if e := m.pseudoTraceReference(out, "\nrhs: ", &s.refs[pseudoRight], false); e != nil {
+			return e
+		}
+		return out.WriteLiteral("\n")
+	})
 }

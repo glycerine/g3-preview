@@ -427,9 +427,14 @@ func (m *MultivariatePolynomialCore) pseudoRemainderWithReceipt(p, q Polynomial,
 	if e = s.refs[pseudoRight].assign(m, rhs); e != nil {
 		return e
 	}
-	return polynomialPseudoSourceAssert(5078, "is_eq", func() (bool, error) {
-		return m.Equal(s.refs[pseudoLeft].value, s.refs[pseudoRight].value)
-	})
+	isEqual, e := m.Equal(s.refs[pseudoLeft].value, s.refs[pseudoRight].value)
+	if e != nil {
+		return e
+	}
+	if e = m.tracePseudoRemainderVerification(&R.root); e != nil {
+		return e
+	}
+	return polynomialPseudoSourceAssert(5078, "is_eq", func() (bool, error) { return isEqual, nil })
 }
 func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *uint32, Q, R *polynomialReference, exact, quotient, modulo bool, bounds *PolynomialVariableDegrees) (err error) {
 	s := &m.pseudoDivision
@@ -678,6 +683,9 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 					return e
 				}
 				if e = s.monomial.assign(m, prime); e != nil {
+					return e
+				}
+				if e = m.tracePseudoReducedMonomial(term, x, degR, degB); e != nil {
 					return e
 				}
 				if e = polynomialPseudoSourceAssert(5014, "m->degree_of(x) == deg_R", func() (bool, error) {
