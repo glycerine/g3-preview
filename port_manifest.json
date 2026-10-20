@@ -21492,6 +21492,7 @@
         "pkg/ast/proofs/hypotheses.go",
         "pkg/ast/proofs/hypotheses_memory.go",
         "pkg/ast/proofs/is_closed.go",
+        "pkg/ast/proofs/post_order.go",
         "pkg/ast/proofs/reduce_hypotheses.go"
       ],
       "tests": [
@@ -21499,6 +21500,8 @@
         "TestProofHypothesisSetMemoryWrappers",
         "TestProofLemmaEmptyHypothesisSetImmediateDeallocation",
         "TestProofIsClosedLemmaLiteralsAndScopeReset",
+        "TestProofPostOrderParentOrderSharingAndExhaustion",
+        "TestProofPostOrderRejectsNonProofAndClosedManager",
         "TestProofReduceHypothesesLemmaAndResolution",
         "TestProofReduceUnitResolutionLiteralAndClauseBranches",
         "TestProofReduceOrdinaryParentsReachConcreteUnion"
@@ -21569,6 +21572,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "proof_post_order constructor, hasNext and iterative proof-DAG DFS next (proof_utils.cpp:27-72)",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/post_order.go",
+          "tests": ["TestProofPostOrderParentOrderSharingAndExhaustion", "TestProofPostOrderRejectsNonProofAndClosedManager"]
+        },
+        {
           "name": "reduce_hypotheses0 add_hypotheses concrete expr-set union with inherited first-parent copy-on-write (proof_utils.cpp:394-421; container_util.h:48-52)",
           "status": "ported",
           "go_target": "pkg/ast/proofs/hypotheses.go",
@@ -21611,10 +21620,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/proofs/is_closed.go",
+        "pkg/ast/proofs/post_order.go",
         "pkg/ast/proofs/reduce_hypotheses.go"
       ],
       "tests": [
         "TestProofIsClosedLemmaLiteralsAndScopeReset",
+        "TestProofPostOrderParentOrderSharingAndExhaustion",
+        "TestProofPostOrderRejectsNonProofAndClosedManager",
         "TestProofReduceHypothesesLemmaAndResolution",
         "TestProofReduceUnitResolutionLiteralAndClauseBranches",
         "TestProofReduceOrdinaryParentsReachConcreteUnion"
@@ -21662,6 +21674,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "proof_post_order declaration and borrowed proof-DAG iterator state",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/post_order.go",
+          "tests": ["TestProofPostOrderParentOrderSharingAndExhaustion", "TestProofPostOrderRejectsNonProofAndClosedManager"]
+        },
         {
           "name": "proof_is_closed scoped-lemma literal and shared-visited proof traversal (proof_utils.cpp:751-814)",
           "status": "ported",
