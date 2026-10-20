@@ -164,3 +164,50 @@ func TestBit2IntArithmeticReductions(t *testing.T) {
 		t.Fatal("product doubled width", width, err)
 	}
 }
+
+func TestBit2IntPolynomialDecomposition(t *testing.T) {
+	m, _ := bvAddFixture(t)
+	b, err := NewBit2Int(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, b.Close()) })
+	x := bvAddNum(t, m, 2, 3)
+	y := bvAddNum(t, m, 6, 3)
+	bx, err := m.MkBitVectorToInt(x)
+	astTestMust(t, err)
+	astTestPin(t, m, bx)
+	by, err := m.MkBitVectorToInt(y)
+	astTestMust(t, err)
+	astTestPin(t, m, by)
+	minusOne := bit2IntArithmeticNumeral(t, m, "-1")
+	negativeY, err := m.MkFamilyApp(b.arithFamily, 9, nil, []ast.ASTHandle{minusOne, by})
+	astTestMust(t, err)
+	astTestPin(t, m, negativeY)
+	four := bit2IntArithmeticNumeral(t, m, "4")
+	minusThree := bit2IntArithmeticNumeral(t, m, "-3")
+	sum, err := m.MkFamilyApp(b.arithFamily, 6, nil, []ast.ASTHandle{bx, negativeY, four, minusThree})
+	astTestMust(t, err)
+	astTestPin(t, m, sum)
+
+	call := bit2IntCall{owner: b}
+	defer func() { astTestMust(t, call.close()) }()
+	pos, neg, matched, err := b.isBVPoly(&call, sum)
+	astTestMust(t, err)
+	if !matched {
+		t.Fatal("polynomial decomposition declined")
+	}
+	for name, term := range map[string]ast.ASTHandle{"positive": pos, "negative": neg} {
+		if yes, err := m.IsBitVectorOperation(term, 58); err != nil || !yes {
+			t.Fatal(name, "side is not bv2int", yes, err)
+		}
+	}
+
+	two := bit2IntArithmeticNumeral(t, m, "2")
+	unsupported, err := m.MkFamilyApp(b.arithFamily, 9, nil, []ast.ASTHandle{two, bx})
+	astTestMust(t, err)
+	astTestPin(t, m, unsupported)
+	_, _, matched, err = b.isBVPoly(&call, unsupported)
+	astTestMust(t, err)
+	if matched {
+		t.Fatal("non-minus-one coefficient accepted")
+	}
+}

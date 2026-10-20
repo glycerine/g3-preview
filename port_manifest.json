@@ -23477,11 +23477,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/bit2int.go",
-        "pkg/ast/rewriter/bit2int_reduce.go"
+        "pkg/ast/rewriter/bit2int_reduce.go",
+        "pkg/ast/rewriter/bit2int_poly.go"
       ],
       "tests": [
         "TestBit2IntExtractionAlignmentAndCacheFoundation",
-        "TestBit2IntArithmeticReductions"
+        "TestBit2IntArithmeticReductions",
+        "TestBit2IntPolynomialDecomposition"
       ],
       "assertions": [
         {
@@ -23530,8 +23532,11 @@
         },
         {
           "name": "is_bv_poly decomposition",
-          "status": "unported",
-          "reason": "Depends on the arithmetic-to-BV reduction helpers."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit2int_poly.go",
+          "tests": [
+            "TestBit2IntPolynomialDecomposition"
+          ]
         },
         {
           "name": "application/quantifier visits and complete post-order rewrite operator",
