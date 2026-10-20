@@ -15060,6 +15060,8 @@
         "pkg/ast/ast_datalog_relation_simple_test.go",
         "pkg/ast/ast_datalog_relation_indexed.go",
         "pkg/ast/ast_datalog_relation_indexed_test.go",
+        "pkg/ast/ast_datalog_filter_rule.go",
+        "pkg/ast/ast_datalog_filter_rule_test.go",
         "pkg/api/api_numeral_string_test.go",
         "pkg/ast/rewriter/dl_rewriter.go"
       ],
@@ -15072,6 +15074,8 @@
         "TestASTDatalogOriginalLessEqualAndDeclarationGuards",
         "TestASTDatalogOriginalProjectRenameJoinAndNegationFilter",
         "TestASTDatalogOriginalIndexedRelationGuards",
+        "TestASTDatalogOriginalFilterTraversalAndGuards",
+        "TestASTDatalogOriginalRuleRepAndAbs",
         "TestAPINumeralStringArithmeticFPAAndRefusal",
         "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
         "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
@@ -15166,6 +15170,15 @@
             "TestASTDatalogOriginalProjectRenameJoinAndNegationFilter",
             "TestASTDatalogOriginalIndexedRelationGuards"
           ]
+        },
+        {
+          "name": "filter traversal and validation, rep/abs declarations and rule construction (dl_decl_plugin.cpp:266-320,605-625,760-768)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datalog_filter_rule.go",
+          "tests": [
+            "TestASTDatalogOriginalFilterTraversalAndGuards",
+            "TestASTDatalogOriginalRuleRepAndAbs"
+          ]
         }
       ],
       "ownership": [
@@ -15189,6 +15202,8 @@
         "pkg/ast/ast_datalog_relation_simple_test.go",
         "pkg/ast/ast_datalog_relation_indexed.go",
         "pkg/ast/ast_datalog_relation_indexed_test.go",
+        "pkg/ast/ast_datalog_filter_rule.go",
+        "pkg/ast/ast_datalog_filter_rule_test.go",
         "pkg/ast/rewriter/dl_rewriter.go"
       ],
       "tests": [
@@ -15200,7 +15215,9 @@
         "TestASTDatalogOriginalSimpleRelationDeclarations",
         "TestASTDatalogOriginalLessEqualAndDeclarationGuards",
         "TestASTDatalogOriginalProjectRenameJoinAndNegationFilter",
-        "TestASTDatalogOriginalIndexedRelationGuards"
+        "TestASTDatalogOriginalIndexedRelationGuards",
+        "TestASTDatalogOriginalFilterTraversalAndGuards",
+        "TestASTDatalogOriginalRuleRepAndAbs"
       ],
       "conditionals": [
         {
@@ -15255,6 +15272,15 @@
           "tests": [
             "TestASTDatalogOriginalProjectRenameJoinAndNegationFilter",
             "TestASTDatalogOriginalIndexedRelationGuards"
+          ]
+        },
+        {
+          "name": "filter traversal, rule applications and rep/abs declaration surface (src/ast/dl_decl_plugin.h:58-78,205-209)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datalog_filter_rule.go",
+          "tests": [
+            "TestASTDatalogOriginalFilterTraversalAndGuards",
+            "TestASTDatalogOriginalRuleRepAndAbs"
           ]
         }
       ],

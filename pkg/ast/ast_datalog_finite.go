@@ -37,6 +37,9 @@ const (
 
 // MkDatalogFiniteSort is dl_decl_util::mk_sort's retained finite-domain path.
 func (m *ASTManager) MkDatalogFiniteSort(name usymbol.Symbol, size uint64) (result ASTHandle, err error) {
+	if size == 0 {
+		return ASTHandle{}, ErrASTDomain
+	}
 	family, err := m.RegisterDatalogPlugin()
 	if err != nil {
 		return ASTHandle{}, err
@@ -177,7 +180,7 @@ func (m *ASTManager) datalogSort(fid FamilyID, kind int32, ps []ASTParameter) (a
 	return m.mkSort(sym, ASTSortInfo{m.origin, slot, generation})
 }
 
-func (m *ASTManager) datalogDecl(kind int32, ps []ASTParameter, domain []ASTHandle) (astNodeRef, error) {
+func (m *ASTManager) datalogDecl(kind int32, ps []ASTParameter, domain []ASTHandle, rangeSort ASTHandle) (astNodeRef, error) {
 	switch kind {
 	case DatalogOpStore, DatalogOpSelect:
 		return m.datalogStoreSelectDecl(kind, ps, domain)
@@ -187,6 +190,10 @@ func (m *ASTManager) datalogDecl(kind int32, ps []ASTParameter, domain []ASTHand
 		return m.datalogSimpleRelationDecl(kind, ps, domain)
 	case DatalogOpProject, DatalogOpRename, DatalogOpJoin, DatalogOpNegationFilter:
 		return m.datalogIndexedRelationDecl(kind, ps, domain)
+	case DatalogOpFilter:
+		return m.datalogFilterDecl(ps, domain)
+	case DatalogOpRep, DatalogOpAbs:
+		return m.datalogConversionDecl(kind, ps, domain, rangeSort)
 	case DatalogOpLT:
 		if len(ps) != 0 || len(domain) != 2 || domain[0] != domain[1] {
 			return astNodeRef{}, ErrASTDomain

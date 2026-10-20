@@ -220,7 +220,7 @@ func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTP
 	} else if m.pluginAt(fid).kind == astFormatPlugin {
 		decl, e = m.formatDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astDatalogPlugin {
-		decl, e = m.datalogDecl(k, ps, domain)
+		decl, e = m.datalogDecl(k, ps, domain, ASTHandle{})
 	} else if m.pluginAt(fid).kind == astPseudoBooleanPlugin {
 		decl, e = m.pseudoBooleanDecl(k, ps, domain)
 	} else {
@@ -309,7 +309,7 @@ func (m *ASTManager) mkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 	} else if m.pluginAt(fid).kind == astFormatPlugin {
 		r, e = m.formatDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astDatalogPlugin {
-		r, e = m.datalogDecl(k, ps, domain)
+		r, e = m.datalogDecl(k, ps, domain, rangeSort)
 	} else if m.pluginAt(fid).kind == astPseudoBooleanPlugin {
 		r, e = m.pseudoBooleanDecl(k, ps, domain)
 	} else {

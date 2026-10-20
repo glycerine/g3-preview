@@ -54,14 +54,8 @@ func TestASTDatalogOriginalRelationAndRuleSorts(t *testing.T) {
 func TestASTDatalogOriginalRelationCardinalityAndFiniteSize(t *testing.T) {
 	m := astTestManager(t)
 	name := astTestSymbol(t, m, "DL-zero")
-	zero, e := m.MkDatalogFiniteSort(name, 0)
-	astTestMust(t, e)
-	astTestPin(t, m, zero)
-	if n, matched, e := m.DatalogFiniteSortSize(zero); e != nil || !matched || n != 0 {
-		t.Fatal("zero finite sort", n, matched, e)
-	}
-	if _, e = m.MkDatalogNumeral(0, zero); !errors.Is(e, ErrASTDomain) {
-		t.Fatal("empty finite sort numeral", e)
+	if _, e := m.MkDatalogFiniteSort(name, 0); !errors.Is(e, ErrASTDomain) {
+		t.Fatal("utility empty finite sort guard", e)
 	}
 	large := astArrayFiniteTestSort(t, m, math.MaxUint64, "dl-max")
 	two := astArrayFiniteTestSort(t, m, 2, "dl-two")
