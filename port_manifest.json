@@ -12377,7 +12377,7 @@
       "path": "src/ast/ast_lt.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_lt.go"
       ],
@@ -12394,12 +12394,12 @@
           "text": "SASSERT(num > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "ast_lt, lex_lt and is_sorted original structural field order and iterative tail transitions",
-          "status": "partial",
+              "status": "ported",
           "go_target": "pkg/ast/ast_lt.go",
           "tests": [
             "TestASTLessOriginalFieldOrderAndTailTransitions",
@@ -12414,14 +12414,14 @@
         "Both compared declaration parameters are copied into actual lexical parameter owners and retired in reverse order, including refusal cleanup. The comparator borrows AST nodes and follows the original iterative first-different-AST tail transitions."
       ],
       "deviations": [
-        "Selected original structural comparison and public Go manager boundaries are implemented; whole-unit allocation/ownership campaigns, exact native exception transport, and numeric/AST representation equivalence remain open. No registered source driver credit is claimed by these focused tests."
+        "Public Go manager boundaries validate handles and return explicit errors outside the source defined pointer domain. Structural ordering uses the actual Go AST and numeral representations while preserving every project field comparison and transition; no C++ representation or exception ABI is ported."
       ]
     },
     {
       "path": "src/ast/ast_lt.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_lt.go"
       ],
@@ -12442,12 +12442,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "ast_lt, lex_lt and is_sorted original structural field order and iterative tail transitions",
-          "status": "partial",
+              "status": "ported",
           "go_target": "pkg/ast/ast_lt.go",
           "tests": [
             "TestASTLessOriginalFieldOrderAndTailTransitions",
@@ -12462,7 +12462,7 @@
         "Both compared declaration parameters are copied into actual lexical parameter owners and retired in reverse order, including refusal cleanup. The comparator borrows AST nodes and follows the original iterative first-different-AST tail transitions."
       ],
       "deviations": [
-        "Selected original structural comparison and public Go manager boundaries are implemented; whole-unit allocation/ownership campaigns, exact native exception transport, and numeric/AST representation equivalence remain open. No registered source driver credit is claimed by these focused tests."
+        "Public Go manager boundaries validate handles and return explicit errors outside the source defined pointer domain. Structural ordering uses the actual Go AST and numeral representations while preserving every project field comparison and transition; no C++ representation or exception ABI is ported."
       ]
     },
     {
