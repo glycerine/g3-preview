@@ -15542,14 +15542,49 @@
       "path": "src/ast/for_each_ast.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_num_nodes.go",
+        "pkg/ast/ast_num_nodes_source_test.go",
+        "pkg/ast/ast_low_level_printer.go",
+        "pkg/ast/ast_low_level_printer_source_test.go"
+      ],
+      "tests": [
+        "TestASTGetNumNodesDefaultTraversalAndSharedDeduplication",
+        "TestASTGetNumNodesQuantifierChildrenAndIgnoredParameters",
+        "TestASTGetNumNodesDeepIterativeAndGuards",
+        "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
+        "TestASTLowLevelPrinterNativeDeclarationIdentityMarks"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "get_num_nodes distinct default for_each_ast count",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_num_nodes.go",
+          "tests": [
+            "TestASTGetNumNodesDefaultTraversalAndSharedDeduplication",
+            "TestASTGetNumNodesQuantifierChildrenAndIgnoredParameters",
+            "TestASTGetNumNodesDeepIterativeAndGuards"
+          ]
+        },
+        {
+          "name": "for_each_parameter AST-valued parameter discovery for the retained low-level-printer visitor",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_low_level_printer.go",
+          "tests": [
+            "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
+            "TestASTLowLevelPrinterNativeDeclarationIdentityMarks"
+          ]
+        }
+      ],
+      "ownership": [
+        "GetNumNodes borrows the complete reached AST graph; its native stack, child slices and identity map own no AST references. The retained parameter visitor likewise borrows AST-valued parameters during the low-level printer invocation."
+      ],
+      "deviations": [
+        "Native Go traversal storage replaces ptr_vector and ast_mark. GetNumNodes exposes only the source distinct count, so internal child scheduling has no observable ordering contract. Invalid Go handles return explicit errors."
+      ]
     },
     {
       "path": "src/ast/for_each_ast.h",
@@ -15558,13 +15593,18 @@
       "status": "partial",
       "go_targets": [
         "pkg/model/model2expr_fresh_name.go",
-        "pkg/ast/ast_low_level_printer.go"
+        "pkg/ast/ast_low_level_printer.go",
+        "pkg/ast/ast_num_nodes.go",
+        "pkg/ast/ast_num_nodes_source_test.go"
       ],
       "tests": [
         "TestModel2ExprFreshNameConcreteSymbolSetAndSequence",
         "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
         "TestASTLowLevelPrinterNativeDeclarationIdentityMarks",
-        "TestASTLowLevelPrinterNativeWideAndDeepPostorder"
+        "TestASTLowLevelPrinterNativeWideAndDeepPostorder",
+        "TestASTGetNumNodesDefaultTraversalAndSharedDeduplication",
+        "TestASTGetNumNodesQuantifierChildrenAndIgnoredParameters",
+        "TestASTGetNumNodesDeepIterativeAndGuards"
       ],
       "conditionals": [
         {
@@ -15579,6 +15619,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "get_num_nodes default visitor wrapper and distinct AST count (for_each_ast.h:42-134)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_num_nodes.go",
+          "tests": [
+            "TestASTGetNumNodesDefaultTraversalAndSharedDeduplication",
+            "TestASTGetNumNodesQuantifierChildrenAndIgnoredParameters",
+            "TestASTGetNumNodesDeepIterativeAndGuards"
+          ]
+        },
         {
           "name": "Concrete model2expr for_each_symbol_proc collection of function names and quantifier bindings, patterns and no-patterns (for_each_ast.h:42-121)",
           "status": "ported",
