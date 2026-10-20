@@ -61,6 +61,20 @@ func TestASTFormatSourcePluginAndLiteralPrimitives(t *testing.T) {
 	if text2 != text {
 		t.Fatal("source hash-consed string", text, text2)
 	}
+	signed, e := m.FormatInt(-1 << 31)
+	astTestMust(t, e)
+	signedText, e := m.FormatString("-2147483648")
+	astTestMust(t, e)
+	if signed != signedText {
+		t.Fatal("source signed decimal formatting", signed, signedText)
+	}
+	unsigned, e := m.FormatUnsigned(^uint32(0))
+	astTestMust(t, e)
+	unsignedText, e := m.FormatString("4294967295")
+	astTestMust(t, e)
+	if unsigned != unsignedText {
+		t.Fatal("source unsigned decimal formatting", unsigned, unsignedText)
+	}
 }
 
 func TestASTFormatSourceEveryLazyPluginAndStringReservation(t *testing.T) {
