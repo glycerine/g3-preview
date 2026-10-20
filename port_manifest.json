@@ -29040,12 +29040,22 @@
       "methods": [
         {
           "name": "default_expr_replacer substitution lookup, iterative rewriting, step count, cache cleanup/reset, scoped one-entry apply and used-dependency transfer (expr_replacer.cpp:24-112)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/expr_replacer.go",
           "tests": [
             "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
             "TestDefaultExprReplacerCollectsUsedDependencies"
           ]
+        },
+        {
+          "name": "expr_replacer proof-output overloads through proof-generating rewriter traversal (expr_replacer.cpp:24-31,104-112)",
+          "status": "unported",
+          "reason": "Depends on the still-unported proof-generating rewriter_tpl specialization."
+        },
+        {
+          "name": "th_rewriter2expr_replacer simplifying adapter and mk_expr_simp_replacer factory (expr_replacer.cpp:124-158)",
+          "status": "unported",
+          "reason": "Depends on the still-unported th_rewriter source unit."
         }
       ],
       "ownership": [
@@ -29083,12 +29093,17 @@
       "methods": [
         {
           "name": "Concrete default replacer manager/substitution/rewrite/reset/step/apply interface (expr_replacer.h:27-56)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/expr_replacer.go",
           "tests": [
             "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
             "TestDefaultExprReplacerCollectsUsedDependencies"
           ]
+        },
+        {
+          "name": "Abstract proof-output overload and simplifying replacer factory declarations (expr_replacer.h:35-38,57)",
+          "status": "unported",
+          "reason": "Retained declarations await proof-generating rewriter traversal and th_rewriter."
         }
       ],
       "ownership": [
