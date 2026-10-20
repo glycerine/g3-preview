@@ -80,3 +80,87 @@ func TestBit2IntExtractionAlignmentAndCacheFoundation(t *testing.T) {
 		t.Fatal("cache flush", len(b.cache), len(b.keys))
 	}
 }
+
+func TestBit2IntArithmeticReductions(t *testing.T) {
+	m, _ := bvAddFixture(t)
+	b, err := NewBit2Int(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, b.Close()) })
+	call := bit2IntCall{owner: b}
+	defer func() { astTestMust(t, call.close()) }()
+	three := bvAddNum(t, m, 3, 3)
+	five := bvAddNum(t, m, 5, 4)
+	zero := bvAddNum(t, m, 0, 3)
+	b3, err := m.MkBitVectorToInt(three)
+	astTestMust(t, err)
+	astTestPin(t, m, b3)
+	b5, err := m.MkBitVectorToInt(five)
+	astTestMust(t, err)
+	astTestPin(t, m, b5)
+	b0, err := m.MkBitVectorToInt(zero)
+	astTestMust(t, err)
+	astTestPin(t, m, b0)
+
+	if result, ok, err := b.mkAdd(&call, b0, b5); err != nil || !ok || result != b5 {
+		t.Fatal("zero addition", result, ok, err)
+	}
+	sum, ok, err := b.mkAdd(&call, b3, b5)
+	astTestMust(t, err)
+	if !ok {
+		t.Fatal("addition declined")
+	}
+	if yes, err := m.IsBitVectorOperation(sum, 58); err != nil || !yes {
+		t.Fatal("addition bv2int", yes, err)
+	}
+	sumBits, err := m.GetArg(sum, 0)
+	astTestMust(t, err)
+	if yes, err := m.IsBitVectorOperation(sumBits, 4); err != nil || !yes {
+		t.Fatal("addition BV add", yes, err)
+	}
+	if width, err := m.BitVectorSize(sumBits); err != nil || width != 5 {
+		t.Fatal("addition carry width", width, err)
+	}
+
+	for _, row := range []struct {
+		mode bit2IntComparison
+		kind int32
+	}{
+		{bit2IntLT, ast.ASTOpNot},
+		{bit2IntLE, 22},
+		{bit2IntEQ, ast.ASTOpEq},
+	} {
+		result, ok, err := b.mkComp(&call, row.mode, b3, b5)
+		astTestMust(t, err)
+		if !ok {
+			t.Fatal("comparison declined", row.mode)
+		}
+		kind, err := m.GetDeclKind(result)
+		astTestMust(t, err)
+		if kind != row.kind {
+			t.Fatal("comparison kind", row.mode, kind, row.kind)
+		}
+	}
+
+	minusTwo := bit2IntArithmeticNumeral(t, m, "-2")
+	product, ok, err := b.mkMul(&call, minusTwo, b3)
+	astTestMust(t, err)
+	if !ok {
+		t.Fatal("multiplication declined")
+	}
+	if family, err := m.GetFamilyID(product); err != nil || family != b.arithFamily {
+		t.Fatal("negative product family", family, err)
+	}
+	if kind, err := m.GetDeclKind(product); err != nil || kind != 8 {
+		t.Fatal("negative product sign", kind, err)
+	}
+	unsigned, err := m.GetArg(product, 0)
+	astTestMust(t, err)
+	bits, err := m.GetArg(unsigned, 0)
+	astTestMust(t, err)
+	if yes, err := m.IsBitVectorOperation(bits, 6); err != nil || !yes {
+		t.Fatal("product BV multiply", yes, err)
+	}
+	if width, err := m.BitVectorSize(bits); err != nil || width != 6 {
+		t.Fatal("product doubled width", width, err)
+	}
+}

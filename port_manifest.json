@@ -23476,10 +23476,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/rewriter/bit2int.go"
+        "pkg/ast/rewriter/bit2int.go",
+        "pkg/ast/rewriter/bit2int_reduce.go"
       ],
       "tests": [
-        "TestBit2IntExtractionAlignmentAndCacheFoundation"
+        "TestBit2IntExtractionAlignmentAndCacheFoundation",
+        "TestBit2IntArithmeticReductions"
       ],
       "assertions": [
         {
@@ -23520,8 +23522,11 @@
         },
         {
           "name": "mk_add, mk_comp and mk_mul arithmetic-to-BV reductions",
-          "status": "unported",
-          "reason": "Next focused algorithm slice."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit2int_reduce.go",
+          "tests": [
+            "TestBit2IntArithmeticReductions"
+          ]
         },
         {
           "name": "is_bv_poly decomposition",
