@@ -133,7 +133,7 @@ func TestAlgebraicBasicRootTraceExactAndPolynomialBranches(t *testing.T) {
 					want := "-------- [" + tc.tag + "] root_core src/math/polynomial/algebraic_numbers.cpp:" + tc.line + " ---------\n" + tc.body + "------------------------------------------------\n"
 					if tc.setter != "" {
 						// cpp:1323 calls the polynomial setter after the root_core record.
-						want += "-------- [algebraic] set src/math/polynomial/algebraic_numbers.cpp:505 ---------\n" + tc.setter + "------------------------------------------------\n"
+						want += "-------- [algebraic] set src/math/polynomial/algebraic_numbers.cpp:506 ---------\n" + tc.setter + "------------------------------------------------\n"
 					}
 					if fail {
 						if broken.calls != 1 {

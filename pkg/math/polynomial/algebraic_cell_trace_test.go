@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/algebraic_numbers.cpp:476-505,1479-1493.
+// Source: src/math/polynomial/algebraic_numbers.cpp:476-506,1479-1493.
 package polynomial
 
 import (
@@ -38,7 +38,7 @@ func TestAlgebraicCellSetterTraceLiteralAndConstructorBoundary(t *testing.T) {
 		}
 		serviceMust(t, c.SetRoot(&a, v, &lo, &hi, true))
 		if tags.ShouldTrace("algebraic") {
-			expected := "-------- [algebraic] set src/math/polynomial/algebraic_numbers.cpp:505 ---------\n" + want + "------------------------------------------------\n"
+			expected := "-------- [algebraic] set src/math/polynomial/algebraic_numbers.cpp:506 ---------\n" + want + "------------------------------------------------\n"
 			if text.String() != expected {
 				t.Fatal("setter source record", text.String(), expected)
 			}
@@ -113,7 +113,7 @@ func TestAlgebraicCellSetterTraceSourceStopKeepsPublishedCaller(t *testing.T) {
 				v, e = p.wholeView(poly)
 				serviceMust(t, e)
 			}
-			writer := &algebraicBinaryDisplayStopWriter{core: c, marker: ":505 "}
+			writer := &algebraicBinaryDisplayStopWriter{core: c, marker: ":506 "}
 			tags := diagnostic.NewTraceTagsWithWriter(writer)
 			tags.Enable("algebraic")
 			serviceMust(t, c.config.Rationals.BindTrace(tags))

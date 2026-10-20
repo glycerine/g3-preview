@@ -115,7 +115,7 @@ func TestAlgebraicBinarySetCoreSourceTraces(t *testing.T) {
 					last = "-------- [algebraic] set_core src/math/polynomial/algebraic_numbers.cpp:951 ---------\nreseting\nresult: (#, 1)\n------------------------------------------------\n"
 				} else {
 					// cpp:985 invokes set; its final record follows set_core's record.
-					last += "-------- [algebraic] set src/math/polynomial/algebraic_numbers.cpp:505 ---------\na: (#^4 - 10 #^2 + 1, 4)\n------------------------------------------------\n"
+					last += "-------- [algebraic] set src/math/polynomial/algebraic_numbers.cpp:506 ---------\na: (#^4 - 10 #^2 + 1, 4)\n------------------------------------------------\n"
 				}
 				if strings.Count(output.String(), input) != 1 || !strings.HasSuffix(output.String(), last) {
 					t.Fatal("set_core source records", output.String())
