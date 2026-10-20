@@ -13230,6 +13230,7 @@
       "go_targets": [
         "pkg/ast/ast_util_clauses.go",
         "pkg/ast/ast_util_boolean.go",
+        "pkg/ast/ast_util_flatten.go",
         "pkg/ast/ast_core_boolean_factories.go",
         "pkg/ast/ast_core_boolean_factories_source_test.go",
         "pkg/ast/ast_core_span_factories.go",
@@ -13240,6 +13241,7 @@
       "tests": [
         "TestASTUtilAtomsLiteralsAndClauses",
         "TestASTUtilBooleanFactoriesAndPushNot",
+        "TestASTUtilFlattenAndOrSourceReprocessing",
         "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap",
         "TestASTOrSpanSourceZeroSingletonAndInitializedSpare",
         "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
@@ -13360,6 +13362,14 @@
           "tests": [
             "TestASTUtilBooleanFactoriesAndPushNot"
           ]
+        },
+        {
+          "name": "flatten_and and flatten_or in-place worklist rewriting, De Morgan, implication and constant branches (src/ast/ast_util.cpp:254-366)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_util_flatten.go",
+          "tests": [
+            "TestASTUtilFlattenAndOrSourceReprocessing"
+          ]
         }
       ],
       "ownership": [
@@ -13378,7 +13388,8 @@
       "go_targets": [
         "pkg/ast/ast_dependency_traversal.go",
         "pkg/ast/ast_util_clauses.go",
-        "pkg/ast/ast_util_boolean.go"
+        "pkg/ast/ast_util_boolean.go",
+        "pkg/ast/ast_util_flatten.go"
       ],
       "tests": [
         "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -13397,7 +13408,8 @@
         "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
         "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix",
         "TestASTUtilAtomsLiteralsAndClauses",
-        "TestASTUtilBooleanFactoriesAndPushNot"
+        "TestASTUtilBooleanFactoriesAndPushNot",
+        "TestASTUtilFlattenAndOrSourceReprocessing"
       ],
       "conditionals": [
         {
@@ -13448,6 +13460,14 @@
           "go_target": "pkg/ast/ast_util_boolean.go",
           "tests": [
             "TestASTUtilBooleanFactoriesAndPushNot"
+          ]
+        },
+        {
+          "name": "flatten_and and flatten_or declarations with caller-owned native slices (src/ast/ast_util.h:146-153)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_util_flatten.go",
+          "tests": [
+            "TestASTUtilFlattenAndOrSourceReprocessing"
           ]
         }
       ],
