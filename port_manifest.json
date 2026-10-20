@@ -18164,28 +18164,54 @@
       "path": "src/ast/has_free_vars.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_has_free_vars.go",
+        "pkg/ast/ast_has_free_vars_source_test.go"
+      ],
+      "tests": [
+        "TestASTHasFreeVarsBinderDepthSharedNodesAndAnnotations",
+        "TestASTHasFreeVarsDeepIterativeTraversalAndGuards"
+      ],
       "assertions": [
         {
           "line": 84,
           "text": "SASSERT(!m_contains);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "has_free_vars and its private default-range contains_vars worklist traversal",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_has_free_vars.go",
+          "tests": [
+            "TestASTHasFreeVarsBinderDepthSharedNodesAndAnnotations",
+            "TestASTHasFreeVarsDeepIterativeTraversalAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The traversal borrows the root and all reached AST nodes. Native Go worklist and cache storage own no AST references and disappear at return; cache identity includes both node and binder delta."
+      ],
+      "deviations": [
+        "Only the live default begin=0/end=UINT_MAX invocation is exposed. The private range-capable helper has no source consumer outside this translation unit. Native Go slice/map storage replaces the C++ vector/hashtable internals."
+      ]
     },
     {
       "path": "src/ast/has_free_vars.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_has_free_vars.go",
+        "pkg/ast/ast_has_free_vars_source_test.go"
+      ],
+      "tests": [
+        "TestASTHasFreeVarsBinderDepthSharedNodesAndAnnotations",
+        "TestASTHasFreeVarsDeepIterativeTraversalAndGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -18196,11 +18222,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "has_free_vars public predicate",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_has_free_vars.go",
+          "tests": [
+            "TestASTHasFreeVarsBinderDepthSharedNodesAndAnnotations",
+            "TestASTHasFreeVarsDeepIterativeTraversalAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The public predicate borrows its expression and manager-owned graph for the duration of the checked call."
+      ],
+      "deviations": [
+        "The Go method is manager-bound so it can validate handle identity; invalid or non-expression handles return explicit errors outside the source pointer domain."
+      ]
     },
     {
       "path": "src/ast/justified_expr.h",
