@@ -21493,6 +21493,8 @@
         "pkg/ast/proofs/hypotheses_memory.go",
         "pkg/ast/proofs/is_closed.go",
         "pkg/ast/proofs/post_order.go",
+        "pkg/ast/ast_proof_utils_trace.go",
+        "pkg/ast/proofs/push_instantiations.go",
         "pkg/ast/proofs/reduce_hypotheses.go"
       ],
       "tests": [
@@ -21502,6 +21504,8 @@
         "TestProofIsClosedLemmaLiteralsAndScopeReset",
         "TestProofPostOrderParentOrderSharingAndExhaustion",
         "TestProofPostOrderRejectsNonProofAndClosedManager",
+        "TestPushInstantiationsUpHyperPremiseAndResetSubstitution",
+        "TestPushInstantiationsUpThroughQuantifiedModusPonens",
         "TestProofReduceHypothesesLemmaAndResolution",
         "TestProofReduceUnitResolutionLiteralAndClauseBranches",
         "TestProofReduceOrdinaryParentsReachConcreteUnion"
@@ -21578,6 +21582,12 @@
           "tests": ["TestProofPostOrderParentOrderSharingAndExhaustion", "TestProofPostOrderRejectsNonProofAndClosedManager"]
         },
         {
+          "name": "push_instantiations_up_cl hyper-resolution recursion, substitution composition, quantifier instantiation, modus-ponens rewrite path and leaf wrapping (proof_utils.cpp:918-1006)",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/push_instantiations.go",
+          "tests": ["TestPushInstantiationsUpHyperPremiseAndResetSubstitution", "TestPushInstantiationsUpThroughQuantifiedModusPonens"]
+        },
+        {
           "name": "reduce_hypotheses0 add_hypotheses concrete expr-set union with inherited first-parent copy-on-write (proof_utils.cpp:394-421; container_util.h:48-52)",
           "status": "ported",
           "go_target": "pkg/ast/proofs/hypotheses.go",
@@ -21610,8 +21620,8 @@
           ]
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": ["ProofPostOrder borrows its root proof DAG and owns native Go work and visited storage. PushInstantiationsUp borrows the caller's owning proof reference, retains every newly built intermediate through temporary AST references, and releases reader-acquired hyper-resolution premises, substitutions, scratch output, and variable-substitution state in source lifetime order."],
+      "deviations": ["Checked Go errors replace source assertions and exception transport. The quantifier-arity mismatch branch preserves the source no-rewrite result and emits its proof_utils TRACE through an AST-manager bridge."]
     },
     {
       "path": "src/ast/proofs/proof_utils.h",
@@ -21619,14 +21629,18 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_proof_utils_trace.go",
         "pkg/ast/proofs/is_closed.go",
         "pkg/ast/proofs/post_order.go",
+        "pkg/ast/proofs/push_instantiations.go",
         "pkg/ast/proofs/reduce_hypotheses.go"
       ],
       "tests": [
         "TestProofIsClosedLemmaLiteralsAndScopeReset",
         "TestProofPostOrderParentOrderSharingAndExhaustion",
         "TestProofPostOrderRejectsNonProofAndClosedManager",
+        "TestPushInstantiationsUpHyperPremiseAndResetSubstitution",
+        "TestPushInstantiationsUpThroughQuantifiedModusPonens",
         "TestProofReduceHypothesesLemmaAndResolution",
         "TestProofReduceUnitResolutionLiteralAndClauseBranches",
         "TestProofReduceOrdinaryParentsReachConcreteUnion"
@@ -21681,6 +21695,12 @@
           "tests": ["TestProofPostOrderParentOrderSharingAndExhaustion", "TestProofPostOrderRejectsNonProofAndClosedManager"]
         },
         {
+          "name": "proof_utils::push_instantiations_up declaration and retained concrete proof transformation",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/push_instantiations.go",
+          "tests": ["TestPushInstantiationsUpHyperPremiseAndResetSubstitution", "TestPushInstantiationsUpThroughQuantifiedModusPonens"]
+        },
+        {
           "name": "proof_is_closed scoped-lemma literal and shared-visited proof traversal (proof_utils.cpp:751-814)",
           "status": "ported",
           "go_target": "pkg/ast/proofs/is_closed.go",
@@ -21699,8 +21719,8 @@
           ]
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": ["The concrete postorder iterator owns native Go traversal state and borrows the proof graph. The instantiation transformation owns checked scratch references and publishes through the caller-owned ASTRef."],
+      "deviations": ["Explicit Go constructors, output references, checked errors, and native slices/maps replace C++ reference parameters and container templates."]
     },
     {
       "path": "src/ast/recurse_expr.h",
