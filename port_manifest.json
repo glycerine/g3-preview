@@ -39830,6 +39830,18 @@
         "behavior": "Actual decimal-display generation captures a caller receipt only after incoming guards and acceptance. Basic calls issue an exact rational decimal invocation key before component copies. Root calls retain existing copied-bound/refinement/binary-display receipts. Matching cleanup handles only the issued basic/root formatter, so a prior receipt cannot acquire replacement work. Existing source component-read and local destruction order remains unchanged.",
         "retained_consumer": "polynomial.cpp:6505 t_eval_core<anum_manager> result TRACE uses decimal precision10",
         "verification": "Fast decimal/read-order/destructor/callback tests in all four profiles plus actual result-budget failures; long precision20 sweep is separate. Whole algebraic/AST ownership and consumer audit remains partial."
+      },
+      "selection_entry_trace_audit": {
+        "source": "algebraic_numbers.cpp:2523-2525",
+        "go_target": "pkg/math/polynomial/algebraic_select_trace.go",
+        "behavior": "The algebraic_select entry record displays prev and curr in source order before ordered assertions, separation and scoped binary/rational construction. The actual root diagnostic owns accepted interval insertion receipts and guards owner mutation during header/body/footer callbacks. Completed interval insertions reuse the same two slots; a failed child stops before the next operand. Stream failure remains sticky while project formatting executes.",
+        "tests": [
+          "TestAlgebraicSelectTraceLiteralAndPreLocalBorrow",
+          "TestAlgebraicSelectTraceBasicAndRootIntervals",
+          "TestAlgebraicSelectTraceRefusingWriterStillFormats",
+          "TestAlgebraicSelectTraceEveryReservation"
+        ],
+        "limits": "Whole polynomial/algebraic/AST consumer and failure audits remain partial."
       }
     },
     {

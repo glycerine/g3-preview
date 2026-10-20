@@ -211,6 +211,9 @@ func (m *AlgebraicRootCore) Select(prev, curr, out *Algebraic) (cause error) {
 	if s.active {
 		return ErrAlgebraicPending
 	}
+	if e := m.traceSelect(prev, curr); e != nil {
+		return e
+	}
 	// Both source assertions and separation precede the scoped binary value.
 	if e := m.assertOrdered(prev, curr, 2526); e != nil {
 		return e
