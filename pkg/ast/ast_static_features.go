@@ -20,34 +20,35 @@ type StaticFeatures struct {
 	labelFID, arrayFID                FamilyID
 	labelSym, patternSym, exprListSym usymbol.Symbol
 
-	visited                                                                          map[ASTHandle]struct{}
-	CNF                                                                              bool
-	NumExprs, NumRoots, MaxDepth                                                     uint32
-	NumQuantifiers, NumQuantifiersWithPatterns, NumQuantifiersWithMultiPatterns      uint32
-	NumClauses, NumBinClauses, NumUnits, SumClauseSize                               uint32
-	NumNestedFormulas, NumBoolExprs, NumBoolConstants                                uint32
-	NumFormulaTrees, MaxFormulaDepth, SumFormulaDepth                                uint32
-	NumOrAndTrees, MaxOrAndTreeDepth, SumOrAndTreeDepth                              uint32
-	NumITETrees, MaxITETreeDepth, SumITETreeDepth                                    uint32
-	NumANDs, NumORs, NumIFFs, NumITEFormulas, NumITETerms, NumSharing                uint32
-	NumInterpretedExprs, NumUninterpretedExprs                                       uint32
-	NumInterpretedConstants, NumUninterpretedConstants, NumUninterpretedFunctions    uint32
-	NumEqualities                                                                    uint32
-	HasRational, HasInt, HasReal, HasBitVector, HasFloatingPoint                     bool
-	HasString, HasNonStringSequence, HasArrays                                       bool
-	ArithKSum                                                                        unumeral.OwnedRational
-	NumArithTerms, NumArithEqualities, NumArithInequalities                          uint32
-	NumDiffTerms, NumDiffEqualities, NumDiffInequalities                             uint32
-	NumSimpleEqualities, NumSimpleInequalities, NumNonLinear                         uint32
-	NumApps, NumTheoryTerms, NumTheoryAtoms, NumTheoryConstants, NumTheoryEqualities []uint32
-	NumAliens                                                                        uint32
-	NumAliensPerFamily                                                               []uint32
-	exprDepth                                                                        []uint32
-	orAndDepth, iteDepth, formulaDepth                                               map[uint32]uint32
-	NumMarkedTheories                                                                uint32
-	theories                                                                         []bool
-	MaxStackDepth                                                                    uint32
-	closed                                                                           bool
+	visited                                                                       map[ASTHandle]struct{}
+	CNF                                                                           bool
+	NumExprs, NumRoots, MaxDepth                                                  uint32
+	NumQuantifiers, NumQuantifiersWithPatterns, NumQuantifiersWithMultiPatterns   uint32
+	NumClauses, NumBinClauses, NumUnits, SumClauseSize                            uint32
+	NumNestedFormulas, NumBoolExprs, NumBoolConstants                             uint32
+	NumFormulaTrees, MaxFormulaDepth, SumFormulaDepth                             uint32
+	NumOrAndTrees, MaxOrAndTreeDepth, SumOrAndTreeDepth                           uint32
+	NumITETrees, MaxITETreeDepth, SumITETreeDepth                                 uint32
+	NumANDs, NumORs, NumIFFs, NumITEFormulas, NumITETerms, NumSharing             uint32
+	NumInterpretedExprs, NumUninterpretedExprs                                    uint32
+	NumInterpretedConstants, NumUninterpretedConstants, NumUninterpretedFunctions uint32
+	NumEqualities                                                                 uint32
+	HasRational, HasInt, HasReal, HasBitVector, HasFloatingPoint                  bool
+	HasString, HasNonStringSequence, HasArrays                                    bool
+	ArithKSum                                                                     unumeral.OwnedRational
+	NumArithTerms, NumArithEqualities, NumArithInequalities                       uint32
+	NumDiffTerms, NumDiffEqualities, NumDiffInequalities                          uint32
+	NumSimpleEqualities, NumSimpleInequalities, NumNonLinear                      uint32
+	NumApps                                                                       map[uint32]uint32
+	NumTheoryTerms, NumTheoryAtoms, NumTheoryConstants, NumTheoryEqualities       []uint32
+	NumAliens                                                                     uint32
+	NumAliensPerFamily                                                            []uint32
+	exprDepth                                                                     map[uint32]uint32
+	orAndDepth, iteDepth, formulaDepth                                            map[uint32]uint32
+	NumMarkedTheories                                                             uint32
+	theories                                                                      []bool
+	MaxStackDepth                                                                 uint32
+	closed                                                                        bool
 }
 
 func NewStaticFeatures(m *ASTManager) (*StaticFeatures, error) {
@@ -104,7 +105,7 @@ func (f *StaticFeatures) FlushCache() error {
 	if err := f.open(); err != nil {
 		return err
 	}
-	f.exprDepth = nil
+	f.exprDepth = make(map[uint32]uint32)
 	f.orAndDepth = make(map[uint32]uint32)
 	f.iteDepth = make(map[uint32]uint32)
 	f.formulaDepth = make(map[uint32]uint32)
@@ -136,7 +137,7 @@ func (f *StaticFeatures) Reset() error {
 	f.NumArithTerms, f.NumArithEqualities, f.NumArithInequalities = 0, 0, 0
 	f.NumDiffTerms, f.NumDiffEqualities, f.NumDiffInequalities = 0, 0, 0
 	f.NumSimpleEqualities, f.NumSimpleInequalities, f.NumNonLinear = 0, 0, 0
-	f.NumApps, f.NumTheoryTerms, f.NumTheoryAtoms = nil, nil, nil
+	f.NumApps, f.NumTheoryTerms, f.NumTheoryAtoms = make(map[uint32]uint32), nil, nil
 	f.NumTheoryConstants, f.NumTheoryEqualities = nil, nil
 	f.NumAliens, f.NumAliensPerFamily = 0, nil
 	f.NumMarkedTheories, f.theories = 0, nil

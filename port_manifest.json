@@ -33198,10 +33198,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_static_features.go",
-        "pkg/ast/ast_static_features_test.go"
+        "pkg/ast/ast_static_features_test.go",
+        "pkg/ast/ast_static_features_collect.go",
+        "pkg/ast/ast_static_features_collect_test.go"
       ],
       "tests": [
-        "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay"
+        "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay",
+        "TestStaticFeaturesBooleanTraversalClausesSharingAndDepth",
+        "TestStaticFeaturesTermITEIsNotAFormulaTree"
       ],
       "assertions": [
         {
@@ -33223,13 +33227,22 @@
           "tests": [
             "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay"
           ]
+        },
+        {
+          "name": "Boolean/uninterpreted update_core, gate recognition, recursive process/process_root and collect with clause, sharing and tree-depth accounting (static_features.cpp:153-244,380-536)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_static_features_collect.go",
+          "tests": [
+            "TestStaticFeaturesBooleanTraversalClausesSharingAndDepth",
+            "TestStaticFeaturesTermITEIsNotAFormulaTree"
+          ]
         }
       ],
       "ownership": [
         "StaticFeatures borrows its AST manager, owns one ArithKSum rational and native counter/cache slices and maps, and releases the rational explicitly in Close."
       ],
       "deviations": [
-        "Native Go maps and slices replace ast_mark, u_map and unsigned_vector. Collection, arithmetic classification and traversal remain open, so the source unit stays partial."
+        "Native Go maps replace ast_mark/u_map and the source expression/declaration-ID vectors because Go AST expression and declaration IDs deliberately occupy sparse high ranges. Arithmetic, theory-specific sort classification and alien accounting remain open, so the source unit stays partial."
       ]
     },
     {
@@ -33239,10 +33252,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_static_features.go",
-        "pkg/ast/ast_static_features_test.go"
+        "pkg/ast/ast_static_features_test.go",
+        "pkg/ast/ast_static_features_collect.go",
+        "pkg/ast/ast_static_features_collect_test.go"
       ],
       "tests": [
-        "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay"
+        "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay",
+        "TestStaticFeaturesBooleanTraversalClausesSharingAndDepth",
+        "TestStaticFeaturesTermITEIsNotAFormulaTree"
       ],
       "conditionals": [
         {
@@ -33270,7 +33287,7 @@
         "The concrete Go owner exposes source counters directly and owns its rational and native collections; AST handles and the manager remain borrowed."
       ],
       "deviations": [
-        "Go uses explicit Reset, FlushCache and Close methods. Collection helpers and their recognizer-dependent fields remain open."
+        "Go uses explicit Reset, FlushCache and Close methods. Sparse native maps replace ID-indexed vectors for expression depths and application counts; arithmetic and theory-specific collection helpers remain open."
       ]
     },
     {
