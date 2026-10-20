@@ -18667,6 +18667,8 @@
         "pkg/ast/ast_fpa_bv2rm_decl_test.go",
         "pkg/ast/ast_fpa_bv_wrap_decl.go",
         "pkg/ast/ast_fpa_fp_decl.go",
+        "pkg/ast/ast_fpa_names.go",
+        "pkg/ast/ast_fpa_names_test.go",
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_fpa_some_value.go",
@@ -18712,6 +18714,7 @@
         "TestASTFPABV2RMDeclarationSortsAndImplicitRange",
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestASTFPAFPComponentsNumeralsAndTrace",
+        "TestASTFloatingPointOriginalBuiltinNames",
         "TestASTFloatingPointSomeValueSourceDefaults",
         "TestASTFloatingPointSomeValueRefusedMPFConstruction",
         "TestModelEvaluatorFPACompletionUsesPluginValues",
@@ -19077,6 +19080,14 @@
             "TestASTTranslationCopiesFloatingPointExternalParameters",
             "TestArbitraryFloatDirectCopyFromExplicitForeignOwner"
           ]
+        },
+        {
+          "name": "complete logic-independent floating-point operation and sort builtin-name publication (fpa_decl_plugin.cpp:786-854)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_names.go",
+          "tests": [
+            "TestASTFloatingPointOriginalBuiltinNames"
+          ]
         }
       ],
       "ownership": [
@@ -19097,6 +19108,8 @@
         "pkg/ast/ast_fpa_bv2rm_decl_test.go",
         "pkg/ast/ast_fpa_bv_wrap_decl.go",
         "pkg/ast/ast_fpa_fp_decl.go",
+        "pkg/ast/ast_fpa_names.go",
+        "pkg/ast/ast_fpa_names_test.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_fpa_some_value.go",
         "pkg/ast/ast_fpa_some_value_test.go",
@@ -19112,6 +19125,7 @@
         "TestASTFPABV2RMDeclarationSortsAndImplicitRange",
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestASTFPAFPComponentsNumeralsAndTrace",
+        "TestASTFloatingPointOriginalBuiltinNames",
         "TestASTFloatingPointSomeValueSourceDefaults",
         "TestASTFloatingPointSomeValueRefusedMPFConstruction",
         "TestModelEvaluatorFPACompletionUsesPluginValues",
@@ -19271,6 +19285,14 @@
           "go_target": "pkg/ast/ast_fpa_rounding_read.go",
           "tests": [
             "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup"
+          ]
+        },
+        {
+          "name": "floating-point operation and sort builtin-name interface (fpa_decl_plugin.h:176-178)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_names.go",
+          "tests": [
+            "TestASTFloatingPointOriginalBuiltinNames"
           ]
         }
       ],
