@@ -23864,7 +23864,8 @@
         "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go",
         "pkg/ast/rewriter/bit_blaster/engine_logic.go",
         "pkg/ast/rewriter/bit_blaster/engine_compare.go",
-        "pkg/ast/rewriter/bit_blaster/engine_shift.go"
+        "pkg/ast/rewriter/bit_blaster/engine_shift.go",
+        "pkg/ast/rewriter/bit_blaster/engine_division.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
@@ -23873,7 +23874,9 @@
         "TestBitBlasterMultiplexerRetainsSymbolicITE",
         "TestBitBlasterComparisonsExhaustiveConstants",
         "TestBitBlasterShiftsExhaustiveConstantAmounts",
-        "TestBitBlasterSymbolicShiftUsesSourceBarrelStage"
+        "TestBitBlasterSymbolicShiftUsesSourceBarrelStage",
+        "TestBitBlasterUnsignedDivisionExhaustiveConstants",
+        "TestBitBlasterUnsignedDivisionWrappersOwnOnlyTheirResult"
       ],
       "conditionals": [
         {
@@ -23909,7 +23912,12 @@
           "go_target": "pkg/ast/rewriter/bit_blaster/engine_shift.go"
         },
         {
-          "name": "Multiplication, division/remainder, variable rotations, and overflow checks",
+          "name": "Unsigned division and remainder",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_division.go"
+        },
+        {
+          "name": "Multiplication, signed division/remainder/modulo, variable rotations, and overflow checks",
           "status": "unported",
           "reason": "Remaining concrete bit-vector circuit methods are being ported incrementally."
         }
@@ -23932,7 +23940,8 @@
         "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go",
         "pkg/ast/rewriter/bit_blaster/engine_logic.go",
         "pkg/ast/rewriter/bit_blaster/engine_compare.go",
-        "pkg/ast/rewriter/bit_blaster/engine_shift.go"
+        "pkg/ast/rewriter/bit_blaster/engine_shift.go",
+        "pkg/ast/rewriter/bit_blaster/engine_division.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
@@ -23941,7 +23950,9 @@
         "TestBitBlasterMultiplexerRetainsSymbolicITE",
         "TestBitBlasterComparisonsExhaustiveConstants",
         "TestBitBlasterShiftsExhaustiveConstantAmounts",
-        "TestBitBlasterSymbolicShiftUsesSourceBarrelStage"
+        "TestBitBlasterSymbolicShiftUsesSourceBarrelStage",
+        "TestBitBlasterUnsignedDivisionExhaustiveConstants",
+        "TestBitBlasterUnsignedDivisionWrappersOwnOnlyTheirResult"
       ],
       "conditionals": [
         {
@@ -24171,13 +24182,18 @@
           "go_target": "pkg/ast/rewriter/bit_blaster/engine_shift.go"
         },
         {
+          "name": "mk_udiv_urem, mk_udiv, mk_urem",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_division.go"
+        },
+        {
           "name": "checkpoint",
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_manager.go",
           "reason": "The Go AST manager enforces its arena budget and cancellation at manager operation boundaries."
         },
         {
-          "name": "multiplication/division, variable rotations, and overflow circuit builders",
+          "name": "multiplication, signed division/remainder/modulo, variable rotations, and overflow circuit builders",
           "status": "unported",
           "reason": "Remaining concrete circuit algorithms are still required by the retained bit-blaster consumers."
         }

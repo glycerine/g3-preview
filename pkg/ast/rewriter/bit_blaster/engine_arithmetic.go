@@ -25,7 +25,9 @@ func NewEngine(config *Config) (*Engine, error) {
 
 func releaseRefs(m *ast.ASTManager, refs []ast.ASTRef) (result error) {
 	for i := range refs {
-		result = errors.Join(result, m.DelRef(&refs[i]))
+		if refs[i] != (ast.ASTRef{}) {
+			result = errors.Join(result, m.DelRef(&refs[i]))
+		}
 	}
 	return result
 }
