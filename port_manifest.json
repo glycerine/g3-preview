@@ -206632,13 +206632,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "55b5c19a",
+    "commit": "21b83ab2ec380c6464d2e054fa7dbc990e5963a9",
     "command": "cd pkg && go test ./... -count=1 -timeout=30m",
-    "started_utc": "2026-10-19 23:11:19 UTC",
-    "completed_utc": "2026-10-19 23:23:48 UTC",
+    "started_utc": "2026-10-20 05:21:18 UTC",
+    "completed_utc": "2026-10-20 05:33:45 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-55b5c19a.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-55b5c19a.exit",
+    "log": "/mnt/oldrog/tmp/g3-native-21b83ab2.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-21b83ab2.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-21b83ab2.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -206654,13 +206655,13 @@
     "package_timeout": "30m",
     "packages_with_ok_result": 68,
     "packages_without_test_files": 11,
-    "ast_seconds": 12.017,
-    "polynomial_seconds": 108.547,
-    "lp_seconds": 716.295,
-    "numeral_seconds": 57.697,
-    "session_id": 68323,
+    "ast_seconds": 12.507,
+    "polynomial_seconds": 108.589,
+    "lp_seconds": 703.054,
+    "numeral_seconds": 56.361,
+    "session_id": 96425,
     "checkout_held_unchanged": true,
-    "scope_warning": "Full native module checkpoint55b5c19a passed on CPUs8-16 with the clean checkout held unchanged. It includes the stored basic decimal, polynomial rename TRACE, root and basic interval display, and direct/reference TRACE display-dispatch increments through55b5c19a. Main GCD entry TRACE work remained exclusively in overlays during this run and is excluded. No source statement coverage or whole polynomial/AST completion is claimed."
+    "scope_warning": "Full native module checkpoint21b83ab2 passed with exact matching start/end/current HEAD and empty start/end/current git status. Includes all polynomial increments through21b83ab2, including lex-sort, cell/coefficient access, constructor, source-private decrement and monomial-position protocols. This is a native module test checkpoint, not proof of source statement/ownership coverage or whole polynomial/algebraic/AST completion."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
