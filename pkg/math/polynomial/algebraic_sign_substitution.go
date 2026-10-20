@@ -45,6 +45,9 @@ func (v *algebraicBasicRationals) Rational(x uint32) (*unumeral.Rational, error)
 	if l != nil && l.kind != 0 {
 		return nil, ErrAlgebraicOwner
 	}
+	if e = v.owner.traceBasicRationalLookup(x, l); e != nil {
+		return nil, e
+	}
 	// Borrow this reached value without performing a second virtual lookup.
 	if v.borrowed == nil {
 		v.borrowed = make(map[uint32]*algebraicRecord)

@@ -39855,7 +39855,20 @@
           "TestAlgebraicEvalSignTraceRefusingWriter",
           "TestAlgebraicEvalSignTraceRationalRestart"
         ],
-        "limits": "The separate var2basic mapping getter record at cpp1957 remains unported. Full source failure/consumer and polynomial/AST audits remain partial."
+        "limits": "The separate var2basic mapping getter record at cpp1957 is now covered by basic_lookup_trace_audit. Full source failure/consumer and polynomial/AST audits remain partial."
+      },
+      "basic_lookup_trace_audit": {
+        "source": "algebraic_numbers.cpp:1953-1958, retained by sign substitution and multivariate root isolation",
+        "go_target": "pkg/math/polynomial/algebraic_basic_lookup_trace.go",
+        "behavior": "var2basic emits its variable and actual basic value before the return expression reaches basic_value again. The existing interval basic-value reader preserves zero/stored rational source reads; tracked NUM/DEN formatting completes into a Go strings.Builder before string insertion. The mapping performs only its original virtual assignment lookup. Root diagnostic receipts retain actual body read failures, executing callbacks protect owners, and sticky stream refusal does not suppress project formatting. Native character/formatting scratch destructors cannot refuse; no artificial runtime allocation or caller destructor-stop adapter is added.",
+        "tests": [
+          "TestAlgebraicBasicLookupTraceLiteralAndSecondGetter",
+          "TestAlgebraicBasicLookupTraceRefusingStreamStillFormats",
+          "TestAlgebraicBasicLookupTraceActualSubstitutionCharacterGuard",
+          "TestAlgebraicBasicLookupTraceRetainedIsolationConsumer"
+        ],
+        "verification": "Four-profile focused getter/sign substitution/evaluation/isolation checks pass; independent omitted-record and omitted-receipt controls fail as expected. An actual completed formatter C-string span guard verifies its body-error receipt, completed inner source unwind and separate outer callee owning acknowledgment, with original input intact. Exhaustive combined isolation cancellation sweep is recorded separately when terminal.",
+        "limits": "Whole polynomial/algebraic/AST source consumer and failure audits remain partial."
       }
     },
     {
