@@ -47242,3 +47242,12 @@ metadata. The facade owns its module snapshot and borrows local parameters;
 the catalog owns descriptor strings. Focused cross-package checks pass native,
 checked, debug and combined profiles on CPUs 8-16. Portcheck reports 262
 ported and 304 partial units.
+
+Bit-vector-rewriter generator-input closure:
+`src/ast/rewriter/bv_rewriter_params.pyg` is promoted to ported after matching
+all fifteen Boolean declarations, defaults and descriptions to the retained BV
+configuration, its combined SMT consumer and exact `rewriter` catalog rows.
+The consumers own their module snapshots and borrow caller parameter state;
+the descriptor table owns catalog strings. Focused cross-package checks pass
+native, checked, debug and combined profiles on CPUs 8-16. Portcheck reports
+263 ported and 303 partial units.

@@ -26481,13 +26481,22 @@
       "path": "src/ast/rewriter/bv_rewriter_params.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/ast/rewriter/bv_rewriter_config.go",
+        "pkg/ast/rewriter/bv_rewriter_config_test.go",
+        "pkg/ast/rewriter/gparams_catalog_collectors.go",
+        "pkg/util/params/util_gparams_catalog_test.go",
         "pkg/smtcore/util_smt_bv_params.go",
         "pkg/smtcore/util_smt_bv_params_source_test.go",
         "pkg/util/params/util_module_params_source.go"
       ],
       "tests": [
+        "TestBVRewriterConfigurationDefaultsAndLocalOnlyOption",
+        "TestBVRewriterConfigurationModuleFallbackAndSorting",
+        "TestBVRewriterConfigurationAllocationFreeSnapshotAndStoppedOwner",
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
         "TestSMTBVSevenDefaultsThenActualUpdate",
         "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
@@ -26499,14 +26508,19 @@
         "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
         "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "Actual rewriter-module hi_div0 accessor and true default (src/ast/rewriter/bv_rewriter_params.pyg:1-9; scripts/mk_genfile_common.py:895-939)",
-          "status": "partial",
-          "go_target": "pkg/smtcore/util_smt_bv_params.go",
+          "name": "complete rewriter module declaration, fifteen exported Boolean options, defaults, descriptions and retained generated behavior",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_config.go",
           "tests": [
+            "TestBVRewriterConfigurationDefaultsAndLocalOnlyOption",
+            "TestBVRewriterConfigurationModuleFallbackAndSorting",
+            "TestBVRewriterConfigurationAllocationFreeSnapshotAndStoppedOwner",
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
             "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
             "TestSMTBVSevenDefaultsThenActualUpdate",
             "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
@@ -26517,15 +26531,18 @@
             "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
             "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
             "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
+          ],
+          "go_targets": [
+            "pkg/ast/rewriter/gparams_catalog_collectors.go",
+            "pkg/smtcore/util_smt_bv_params.go",
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
       "ownership": [
-        "Two actual generated helpers are acquired in declaration order smt then rewriter; the borrowed local ParamsRef is read at each getter, and an older live helper remains readable while the younger helper exists. Exact returned module references are the only acquisition authority. Source destruction runs rewriter then smt; the first younger stopped destructor protects the unread older frame, retains immutable body/source history and exact decrement receipt, and is distinct from explicit owning Close. Embedded common fields are charged once in enclosing reflected wrappers; actual lexical frame cold allocations have no native stack-allocation credit."
+        "The retained BV configuration borrows its caller ParamsRef and owns the rewriter-module snapshot through all fifteen generated lookups. The combined SMT consumer owns its smt and rewriter helper snapshots in declaration order and destroys them in reverse order; catalog descriptions are owned by the descriptor table."
       ],
-      "deviations": [
-        "No registered SMT context/kernel driver or whole generated helper/generator/global/locale/boolalpha completion credit. The seven literal defaults are followed by mandatory update, including source constructor false hi_div0 replaced by generated rewriter true. Invalid/cross-owner or incomplete-object, signed TLS overflow and native global-null lifetime conditions are explicitly guarded Go domains, not valid native OOM/undefined-behavior equivalence. Numeric test collector callbacks are unreachable configuration anchors, not injected source failure leaves."
-      ]
+      "deviations": []
     },
     {
       "path": "src/ast/rewriter/bv_trailing.cpp",
