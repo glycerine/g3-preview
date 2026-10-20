@@ -14712,12 +14712,17 @@
       "path": "src/ast/expr2var.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/ast/ast_expr2var.go",
+        "pkg/ast/ast_expr2var_test.go",
         "pkg/sat/tactic/sat_goal_to_sat.go",
         "pkg/sat/tactic/sat_goal_to_sat_trace.go"
       ],
       "tests": [
+        "TestExpr2VarSourceMappingOwnershipInverseAndReset",
+        "TestExpr2VarSourceRecentScopesAndCopiedOwnerGuards",
+        "TestExpr2VarSourceInterpretedTraceAndDisplay",
         "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
         "TestSATGoalTranslatorAtomMapGrowthAndModel",
         "TestSATGoalInterpretedAtomExpr2VarTrace"
@@ -14728,32 +14733,68 @@
           "text": "SASSERT(m_mapping.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "Retained interpreted Boolean atom expr2var::insert TRACE before AST key pin and map publication (cpp27-34)",
+          "name": "constructor/destructor, insert, to_var/is_var, interpreted_vars, manager and complete borrowed mapping iteration (cpp27-49; h45-64)",
           "status": "ported",
-          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "go_target": "pkg/ast/ast_expr2var.go",
           "tests": [
-            "TestSATGoalInterpretedAtomExpr2VarTrace"
+            "TestExpr2VarSourceMappingOwnershipInverseAndReset",
+            "TestExpr2VarSourceRecentScopesAndCopiedOwnerGuards"
+          ]
+        },
+        {
+          "name": "display and mk_inv sparse owning expression vector (cpp52-70)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr2var.go",
+          "tests": [
+            "TestExpr2VarSourceMappingOwnershipInverseAndReset",
+            "TestExpr2VarSourceInterpretedTraceAndDisplay"
+          ]
+        },
+        {
+          "name": "reset, reset_recent, recent insertion range and nested push/pop rollback (cpp72-92; h66-75)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr2var.go",
+          "tests": [
+            "TestExpr2VarSourceMappingOwnershipInverseAndReset",
+            "TestExpr2VarSourceRecentScopesAndCopiedOwnerGuards"
+          ]
+        },
+        {
+          "name": "interpreted expression insert TRACE before AST key pin and map publication (cpp27-34)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr2var.go",
+          "tests": [
+            "TestExpr2VarSourceInterpretedTraceAndDisplay"
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Expr2Var borrows its AST manager and owns exactly one AST reference per mapped expression. Insert pins before publication; Pop, Reset and Close use consumed-reference progress so interrupted cleanup can be retried without double decrement.",
+        "Recent and Entries return borrowed handle snapshots. Inverse returns a sparse slice of owning ASTRefs which callers release with ASTManager.DelRef. Display and tracing borrow writers and the bound process-global pretty-print service."
+      ],
       "deviations": [
-        "Only translator atom insertion, lookup and retained key retirement are integrated; general expr2var scope push/pop/reset and recent-expression bookkeeping remain unported."
+        "Native Go maps and slices replace obj_map and pointer/unsigned vectors. Entries replaces begin/end iterators with an unspecified-order borrowed snapshot; Recent preserves insertion order.",
+        "Go rejects duplicate insertion, scope underflow, reset_recent during an active scope, copied owners and operations after close with typed errors instead of relying on source preconditions or debug assertions."
       ]
     },
     {
       "path": "src/ast/expr2var.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/ast/ast_expr2var.go",
+        "pkg/ast/ast_expr2var_test.go",
         "pkg/sat/tactic/sat_goal_to_sat.go"
       ],
       "tests": [
+        "TestExpr2VarSourceMappingOwnershipInverseAndReset",
+        "TestExpr2VarSourceRecentScopesAndCopiedOwnerGuards",
+        "TestExpr2VarSourceInterpretedTraceAndDisplay",
         "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
         "TestSATGoalInterpretedAtomExpr2VarTrace"
       ],
@@ -14773,22 +14814,25 @@
           "text": "void reset_recent() { SASSERT(m_recent_lim.empty()); m_recent_exprs.reset(); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "Retained SAT atom map insert, lookup, interpreted flag and key retirement; general scope/recent/display/inversion facade remains open",
-          "status": "partial",
-          "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
+          "name": "complete concrete uint32 variable facade: manager, insert, lookup/membership, display, inverse, interpreted flag, mapping/recent iteration, reset and scopes",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr2var.go",
           "tests": [
-            "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
-            "TestSATGoalInterpretedAtomExpr2VarTrace"
+            "TestExpr2VarSourceMappingOwnershipInverseAndReset",
+            "TestExpr2VarSourceRecentScopesAndCopiedOwnerGuards",
+            "TestExpr2VarSourceInterpretedTraceAndDisplay"
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The facade borrows its manager, owns one pin per expression key, returns borrowed snapshots from mapping/recent iteration, and transfers owning references in the sparse inverse result. Reset, Pop and Close retain retryable cleanup state until every owned pin is consumed."
+      ],
       "deviations": [
-        "The SAT goal translator owns a concrete atom map and interpreted references; unrelated expr2var scope/recent/display/inverse operations remain unported."
+        "The concrete source unsigned specialization is uint32. Native maps and slices replace obj_map and source vectors; iterator pairs become borrowed snapshots. Typed errors guard invalid scope use, duplicate insertion, copied owners and closed owners."
       ]
     },
     {

@@ -47420,3 +47420,17 @@ retryable decrement path. Focused tests exercise every default and every module
 override plus snapshot and local precedence in all four profiles on CPUs 8-16.
 Portcheck reports 2103 units, 677 APIs: 283 ported, 285 partial, 1478 unported
 and 11 dead/deleted.
+
+Expression-to-variable whole-unit closure:
+`src/ast/expr2var.cpp` and `.h` are promoted to ported with a reusable concrete
+`uint32` mapping owner. It covers manager access, insertion and lookup,
+membership including the `UINT_MAX` sentinel value, interpreted-term tracking
+and exact TRACE ordering, unspecified-order mapping snapshots, insertion-order
+recent snapshots, nested scope rollback, reset, SMT2 display and sparse owning
+inverse construction. Each key has one audited AST pin; rollback, reset and
+close retain retryable consumed-reference progress, while inverse results
+transfer independent owning references to callers. Native maps and slices
+replace the source containers, and typed guards cover invalid scope, duplicate,
+copied and closed use. All four focused profiles pass on CPUs 8-16. Portcheck
+reports 2103 units, 677 APIs: 285 ported, 283 partial, 1478 unported and 11
+dead/deleted.
