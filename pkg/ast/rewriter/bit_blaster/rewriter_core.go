@@ -6,29 +6,35 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	parent "github.com/glycerine/g3/pkg/ast/rewriter"
 )
 
 type RewriterParams struct {
-	MaxSteps   uint32
-	BlastMul   bool
-	BlastAdd   bool
-	BlastQuant bool
-	BlastFull  bool
+	MaxSteps    uint32
+	MaxMemoryMB uint32
+	BlastMul    bool
+	BlastAdd    bool
+	BlastQuant  bool
+	BlastFull   bool
 }
 
 func DefaultRewriterParams() RewriterParams {
-	return RewriterParams{MaxSteps: ^uint32(0), BlastMul: true, BlastAdd: true}
+	return RewriterParams{MaxSteps: ^uint32(0), MaxMemoryMB: ^uint32(0), BlastMul: true, BlastAdd: true}
 }
 
 type BitBlasterRewriter struct {
-	manager *ast.ASTManager
-	family  ast.FamilyID
-	blaster *Engine
-	params  RewriterParams
-	cache   map[ast.ASTHandle]ast.ASTRef
-	keys    []ast.ASTHandle
-	limits  []int
-	closed  bool
+	self      *BitBlasterRewriter
+	manager   *ast.ASTManager
+	family    ast.FamilyID
+	blaster   *Engine
+	params    RewriterParams
+	config    bitBlasterTraversalConfiguration
+	traversal *parent.Traversal
+	cache     map[ast.ASTHandle]ast.ASTRef
+	keys      []ast.ASTHandle
+	limits    []int
+	bindings  []ast.ASTRef
+	closed    bool
 }
 
 func NewBitBlasterRewriter(m *ast.ASTManager, params *RewriterParams) (*BitBlasterRewriter, error) {
@@ -43,7 +49,7 @@ func NewBitBlasterRewriter(m *ast.ASTManager, params *RewriterParams) (*BitBlast
 	if err != nil {
 		return nil, err
 	}
-	config, err := NewConfig(m, family, SMTBitBlasterParams{})
+	config, err := newRewriterConfig(m, family)
 	if err != nil {
 		return nil, err
 	}
@@ -55,17 +61,29 @@ func NewBitBlasterRewriter(m *ast.ASTManager, params *RewriterParams) (*BitBlast
 	if params != nil {
 		actual = *params
 	}
-	return &BitBlasterRewriter{
+	if err = engine.SetMaxMemoryMB(actual.MaxMemoryMB); err != nil {
+		return nil, err
+	}
+	r := &BitBlasterRewriter{
 		manager: m,
 		family:  family,
 		blaster: engine,
 		params:  actual,
 		cache:   make(map[ast.ASTHandle]ast.ASTRef),
-	}, nil
+	}
+	r.self, r.config.owner = r, r
+	r.traversal, err = parent.NewTraversal(m, &r.config)
+	if err != nil {
+		if r.traversal != nil {
+			err = errors.Join(err, r.traversal.Close())
+		}
+		return r, err
+	}
+	return r, nil
 }
 
 func (r *BitBlasterRewriter) open() error {
-	if r == nil || r.closed || r.manager == nil || r.blaster == nil {
+	if r == nil || r.self != r || r.closed || r.manager == nil || r.blaster == nil || r.traversal == nil {
 		return ast.ErrASTHandle
 	}
 	return nil
@@ -76,7 +94,14 @@ func (r *BitBlasterRewriter) UpdateParams(params RewriterParams) error {
 		return err
 	}
 	r.params = params
-	return nil
+	return r.blaster.SetMaxMemoryMB(params.MaxMemoryMB)
+}
+
+func (r *BitBlasterRewriter) Manager() (*ast.ASTManager, error) {
+	if err := r.open(); err != nil {
+		return nil, err
+	}
+	return r.manager, nil
 }
 
 func (r *BitBlasterRewriter) Push() error {
@@ -242,9 +267,16 @@ func (r *BitBlasterRewriter) makeConstant(decl ast.ASTHandle, out ast.ASTRef) (r
 }
 
 func (r *BitBlasterRewriter) Close() (result error) {
-	if err := r.open(); err != nil {
-		return err
+	if r == nil || r.self != r || r.manager == nil {
+		return ast.ErrASTHandle
 	}
+	if r.closed {
+		return nil
+	}
+	if r.traversal != nil {
+		result = errors.Join(result, r.traversal.Close())
+	}
+	result = errors.Join(result, r.releaseBindings(0))
 	for _, key := range r.keys {
 		ref := r.cache[key]
 		result = errors.Join(result, r.manager.DelRef(&ref))
@@ -252,6 +284,7 @@ func (r *BitBlasterRewriter) Close() (result error) {
 	r.cache = nil
 	r.keys = nil
 	r.limits = nil
+	r.bindings = nil
 	r.closed = true
 	return result
 }

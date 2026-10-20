@@ -7,20 +7,49 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/memory"
+	"github.com/glycerine/g3/pkg/util/messages"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Engine is the concrete AST specialization of bit_blaster_tpl. Inputs borrow
 // their handles. Returned reference slices own their expressions and must be
 // released by the caller.
 type Engine struct {
-	config *Config
+	config    *Config
+	maxMemory uint64
 }
 
 func NewEngine(config *Config) (*Engine, error) {
 	if config == nil || config.manager == nil {
 		return nil, ast.ErrASTHandle
 	}
-	return &Engine{config: config}, nil
+	return &Engine{config: config, maxMemory: ^uint64(0)}, nil
+}
+
+func (e *Engine) SetMaxMemoryMB(megabytes uint32) error {
+	if e == nil || e.config == nil || e.config.manager == nil {
+		return ast.ErrASTHandle
+	}
+	e.maxMemory = memory.MegabytesToBytes(megabytes)
+	return nil
+}
+
+func (e *Engine) checkpoint() error {
+	if e == nil || e.config == nil || e.config.manager == nil {
+		return ast.ErrASTHandle
+	}
+	if e.config.manager.Budget().Used() > e.maxMemory {
+		return z3exception.NewDefaultException(messages.MaxMemory)
+	}
+	canceled, err := e.config.manager.Canceled()
+	if err != nil {
+		return err
+	}
+	if canceled {
+		return z3exception.NewDefaultException(messages.Canceled)
+	}
+	return nil
 }
 
 func releaseRefs(m *ast.ASTManager, refs []ast.ASTRef) (result error) {

@@ -54,6 +54,9 @@ func (e *Engine) extendedRotate(left bool, bits, amountBits []ast.ASTHandle) (ou
 		return nil, err
 	}
 	for index := range bits {
+		if err := e.checkpoint(); err != nil {
+			return nil, err
+		}
 		current, err := m.NewRef(bits[index])
 		if err != nil {
 			return nil, err

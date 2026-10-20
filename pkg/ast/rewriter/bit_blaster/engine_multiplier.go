@@ -48,6 +48,9 @@ func (e *Engine) MkMultiplier(a, b []ast.ASTHandle) (out []ast.ASTRef, result er
 	}
 	out = append(out, low)
 	for row := 1; row < width; row++ {
+		if err := e.checkpoint(); err != nil {
+			return nil, err
+		}
 		left, err := e.gateRef(ast.ASTOpAnd, a[0], b[row])
 		if err != nil {
 			return nil, err

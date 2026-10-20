@@ -39,6 +39,9 @@ func (e *Engine) MkUnsignedDivRem(a, b []ast.ASTHandle) (quotient, remainder []a
 	}
 
 	for stage := 0; stage < width; stage++ {
+		if err := e.checkpoint(); err != nil {
+			return nil, nil, err
+		}
 		partialBits, err := e.handles(partial)
 		if err != nil {
 			return nil, nil, err

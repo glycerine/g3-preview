@@ -23669,17 +23669,26 @@
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_bv_bit_blaster.go",
         "pkg/ast/rewriter/bit_blaster/rewriter_core.go",
-        "pkg/ast/rewriter/bit_blaster/rewriter_reduce.go"
+        "pkg/ast/rewriter/bit_blaster/rewriter_reduce.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_dispatch.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go",
+        "pkg/ast/rewriter/bit_blaster/gates.go",
+        "pkg/ast/rewriter/bool_rewriter_public.go"
       ],
       "tests": [
         "TestASTBitBlasterBitFactories",
         "TestBitBlasterRewriterGetBitsAndAssemble",
         "TestBitBlasterRewriterConstantCacheScopes",
-        "TestBitBlasterRewriterCircuitReductions"
+        "TestBitBlasterRewriterCircuitReductions",
+        "TestBitBlasterRewriterApplicationDispatcher",
+        "TestBitBlasterRewriterDispatcherDivisionPolicy",
+        "TestBitBlasterRewriterTraversalAndStepAccounting",
+        "TestBitBlasterRewriterBlastFullVariable",
+        "TestBitBlasterRewriterQuantifierExpansion"
       ],
       "conditionals": [
         {
@@ -23855,30 +23864,44 @@
         },
         {
           "name": "numeral reduction and reduce_app dispatcher",
-          "status": "unported",
-          "reason": "Next integration layer over the completed circuit engine."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/rewriter_dispatch.go",
+          "tests": [
+            "TestBitBlasterRewriterApplicationDispatcher",
+            "TestBitBlasterRewriterDispatcherDivisionPolicy"
+          ]
         },
         {
           "name": "full-term fallback, quantifier binding rewrite, traversal operator, cleanup and step accounting",
-          "status": "unported",
-          "reason": "Depends on the rewriter configuration callbacks still being integrated."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go",
+          "tests": [
+            "TestBitBlasterRewriterTraversalAndStepAccounting",
+            "TestBitBlasterRewriterBlastFullVariable",
+            "TestBitBlasterRewriterQuantifierExpansion"
+          ]
         }
       ],
       "ownership": [
-        "Bit vectors use owning ASTRef slices. Constant-cache entries own one assembled mkbv reference and release entries in reverse insertion order on pop or close."
+        "Bit vectors use owning ASTRef slices. Constant-cache entries own one assembled mkbv reference and release entries in reverse insertion order on pop or close. Quantifier replacement bindings own AST references through the matching reduce-quantifier callback and are also retired by cleanup or close after interrupted traversal."
       ],
-      "deviations": []
+      "deviations": [
+        "The concrete Go traversal is the existing no-proof specialization; all source callbacks produce null proofs. The private source Boolean reducer's flat=false and elim_and=true shape is retained by the configured gate adapter."
+      ]
     },
     {
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/ast/rewriter/bit_blaster/rewriter_core.go"
+        "pkg/ast/rewriter/bit_blaster/rewriter_core.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go"
       ],
       "tests": [
-        "TestBitBlasterRewriterConstantCacheScopes"
+        "TestBitBlasterRewriterConstantCacheScopes",
+        "TestBitBlasterRewriterGetBitsAndAssemble",
+        "TestBitBlasterRewriterTraversalAndStepAccounting"
       ],
       "conditionals": [
         {
@@ -23900,8 +23923,12 @@
         },
         {
           "name": "manager/step access, cleanup and rewrite operator",
-          "status": "unported",
-          "reason": "Traversal integration remains open."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go",
+          "tests": [
+            "TestBitBlasterRewriterGetBitsAndAssemble",
+            "TestBitBlasterRewriterTraversalAndStepAccounting"
+          ]
         }
       ],
       "ownership": [
@@ -23942,6 +23969,7 @@
         "TestBitBlasterMultiplierExhaustiveSymbolicCircuit",
         "TestBitBlasterMultiplierNumeralAndMinusOnePaths",
         "TestBitBlasterReachedDiscardedConstantCaseCircuit",
+        "TestBitBlasterLoopCheckpointMemoryLimit",
         "TestBitBlasterMultiplicationBoundsExhaustiveConstants"
       ],
       "conditionals": [
@@ -24055,6 +24083,7 @@
         "TestBitBlasterMultiplierExhaustiveSymbolicCircuit",
         "TestBitBlasterMultiplierNumeralAndMinusOnePaths",
         "TestBitBlasterReachedDiscardedConstantCaseCircuit",
+        "TestBitBlasterLoopCheckpointMemoryLimit",
         "TestBitBlasterMultiplicationBoundsExhaustiveConstants"
       ],
       "conditionals": [
@@ -24306,9 +24335,11 @@
         },
         {
           "name": "checkpoint",
-          "status": "platform_replacement",
-          "go_target": "pkg/ast/ast_manager.go",
-          "reason": "The Go AST manager enforces its arena budget and cancellation at manager operation boundaries."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go",
+          "tests": [
+            "TestBitBlasterLoopCheckpointMemoryLimit"
+          ]
         },
         {
           "name": "mk_multiplier default ripple path, mk_const_case_multiplier reached path, mk_const_multiplier retained wrapper behavior",

@@ -4,8 +4,29 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/messages"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestBitBlasterLoopCheckpointMemoryLimit(t *testing.T) {
+	m, engine := arithmeticEngine(t)
+	boolSort, err := m.MkBoolSort()
+	paramsMust(t, err)
+	a := make([]ast.ASTHandle, 2)
+	b := make([]ast.ASTHandle, 2)
+	for i := range a {
+		a[i], err = m.MkConst(usymbol.Numerical(uint32(880+i)), boolSort)
+		paramsMust(t, err)
+		gatePin(t, m, a[i])
+		b[i], err = m.MkConst(usymbol.Numerical(uint32(890+i)), boolSort)
+		paramsMust(t, err)
+		gatePin(t, m, b[i])
+	}
+	paramsMust(t, engine.SetMaxMemoryMB(0))
+	if _, err = engine.MkMultiplier(a, b); err == nil || err.Error() != messages.MaxMemory {
+		t.Fatal("checkpoint memory limit", err)
+	}
+}
 
 func TestBitBlasterMultiplierExhaustiveSymbolicCircuit(t *testing.T) {
 	m, engine := arithmeticEngine(t)

@@ -16,13 +16,23 @@ type Config struct {
 	manager *ast.ASTManager
 	family  ast.FamilyID
 	params  SMTBitBlasterParams
+	flat    bool
+	elimAnd bool
 }
 
 func NewConfig(m *ast.ASTManager, family ast.FamilyID, params SMTBitBlasterParams) (*Config, error) {
 	if m == nil {
 		return nil, ast.ErrASTHandle
 	}
-	return &Config{manager: m, family: family, params: params}, nil
+	return &Config{manager: m, family: family, params: params, flat: true}, nil
+}
+
+func newRewriterConfig(m *ast.ASTManager, family ast.FamilyID) (*Config, error) {
+	c, err := NewConfig(m, family, SMTBitBlasterParams{})
+	if err == nil {
+		c.flat, c.elimAnd = false, true
+	}
+	return c, err
 }
 
 func (c *Config) sorted(a, b, d ast.ASTHandle) ([3]ast.ASTHandle, error) {
@@ -49,7 +59,7 @@ func (c *Config) complement(a, b ast.ASTHandle) (bool, error) {
 }
 
 func (c *Config) simplify(op int32, out ast.ASTRef, args ...ast.ASTHandle) error {
-	return rewriter.SimplifyBooleanGateDefault(c.manager, op, args, out)
+	return rewriter.SimplifyBooleanGateConfigured(c.manager, op, args, out, c.flat, c.elimAnd)
 }
 
 func (c *Config) MkXor3(a, b, d ast.ASTHandle, out ast.ASTRef) (result error) {

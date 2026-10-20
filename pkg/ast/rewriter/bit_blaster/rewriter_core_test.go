@@ -22,6 +22,20 @@ func rewriterFixture(t *testing.T) (*ast.ASTManager, *BitBlasterRewriter) {
 
 func TestBitBlasterRewriterGetBitsAndAssemble(t *testing.T) {
 	m, r := rewriterFixture(t)
+	if got, err := r.Manager(); err != nil || got != m {
+		t.Fatal("manager accessor", got, err)
+	}
+	defaults := DefaultRewriterParams()
+	if defaults.MaxSteps != ^uint32(0) || defaults.MaxMemoryMB != ^uint32(0) || !defaults.BlastAdd || !defaults.BlastMul || defaults.BlastFull || defaults.BlastQuant {
+		t.Fatal("rewriter defaults", defaults)
+	}
+	limited := defaults
+	limited.MaxMemoryMB = 0
+	paramsMust(t, r.UpdateParams(limited))
+	if r.blaster.maxMemory != 0 {
+		t.Fatal("rewriter memory update", r.blaster.maxMemory)
+	}
+	paramsMust(t, r.UpdateParams(defaults))
 	sort, err := m.BitVectorSort(4)
 	paramsMust(t, err)
 	value, err := m.MkConst(usymbol.Numerical(1101), sort)

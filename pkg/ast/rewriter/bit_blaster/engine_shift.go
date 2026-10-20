@@ -77,6 +77,9 @@ func (e *Engine) shift(bits, amountBits []ast.ASTHandle, direction shiftDirectio
 	stage := 0
 	shift := 1
 	for stage < len(bits) && shift < len(bits) {
+		if err := e.checkpoint(); err != nil {
+			return nil, err
+		}
 		current, err := e.handles(out)
 		if err != nil {
 			return nil, err

@@ -58,10 +58,16 @@ func SimplifyBooleanApplicationDefault(m *ast.ASTManager, d ast.ASTHandle, args 
 // by bit_blaster_cfg. The result reference owns the selected or constructed
 // expression exactly as expr_ref does in the source configuration.
 func SimplifyBooleanGateDefault(m *ast.ASTManager, operation int32, args []ast.ASTHandle, result ast.ASTRef) error {
+	return SimplifyBooleanGateConfigured(m, operation, args, result, true, false)
+}
+
+// SimplifyBooleanGateConfigured exposes the two source gate-shape switches
+// used by the bit-blaster rewriter's private Boolean reducer.
+func SimplifyBooleanGateConfigured(m *ast.ASTManager, operation int32, args []ast.ASTHandle, result ast.ASTRef, flat, elimAnd bool) error {
 	if m == nil {
 		return ast.ErrASTHandle
 	}
-	rw := boolRewriter{manager: m, flat: true, localContextLimit: ^uint32(0)}
+	rw := boolRewriter{manager: m, flat: flat, elimAnd: elimAnd, localContextLimit: ^uint32(0)}
 	switch operation {
 	case ast.ASTOpNot:
 		if len(args) != 1 {
