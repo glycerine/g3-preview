@@ -9009,15 +9009,18 @@
       "path": "src/ast/act_cache.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/ast/ast_activity_cache.go"
+        "pkg/ast/ast_activity_cache.go",
+        "pkg/ast/rewriter/rewriter_core.go",
+        "pkg/ast/rewriter/rewriter_cache_memory_trace.go"
       ],
       "tests": [
         "TestASTActivityCacheSourceOwnershipReplacementAndReset",
         "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
         "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
-        "TestASTActivityCacheNativeGrowthOrderAndOwnership"
+        "TestASTActivityCacheNativeGrowthOrderAndOwnership",
+        "TestRewriterCacheMemoryWrapperSourceSites"
       ],
       "conditionals": [
         {
@@ -9087,11 +9090,11 @@
           "text": "SASSERT(GET_TAG(v) == 1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "constructor overloads / compress_queue / init / dec_refs / del_unused / insert / find / reset / cleanup / destructor / size / capacity / empty / check_invariant",
+          "name": "constructor overloads / compress_queue / init / dec_refs / del_unused / insert / find / reset / cleanup / destructor / size / empty / check_invariant",
           "status": "ported",
           "go_target": "pkg/ast/ast_activity_cache.go",
           "tests": [
@@ -9100,28 +9103,36 @@
             "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
             "TestASTActivityCacheNativeGrowthOrderAndOwnership"
           ]
+        },
+        {
+          "name": "capacity accessor at act_cache.h:50 has no retained source or Go consumer",
+          "status": "reference_only",
+          "tests": []
         }
       ],
       "ownership": [
-        "Each live map entry retains its key and untagged value; null proof values retain only the key. Queue handles borrow map ownership. Replacement increments incoming value before decrementing old value and publishing. Eviction erases before releasing key then value; whole-map teardown follows source bucket/chain order. Reached Go failures retain explicit incoming/evicted roots for Close. Full allocation-failure/ownership campaigns remain deferred."
+        "Each live map entry retains its key and untagged value; null proof values retain only the key. Queue handles borrow map ownership. Replacement increments incoming value before decrementing old value and publishing. Eviction erases before releasing key then value. Reached Go failures retain explicit incoming/evicted roots for Close. Focused ownership tests cover replacement, eviction, reset, cleanup, close, null proof values and recursive-rewriter cache allocation/deallocation."
       ],
       "deviations": [
-        "Source activity flags use explicit fields rather than tagged addresses; concrete pointer-free handle cells preserve the original chaining algorithm and deterministic iteration. Immutable AST hash values are cached. Replacing an accessed entry preserves the original missing unused-counter increment and queue append; subsequent native lookup can underflow exactly as source, while debug lookup reports the reached assertion. Checked owner/handle guards and retained failed roots adapt fatal source failures to Go errors. Whole-class ownership auditing remains incomplete; recursive rewriter integration remains required."
+        "Source activity flags use explicit fields rather than tagged addresses. Native insdict.Dict and Go slice storage replace the source hash-table and vector internals; project cache ordering, activity, eviction and ownership behavior remain. Replacing an accessed entry preserves the original missing unused-counter increment and queue append; subsequent native lookup can underflow exactly as source, while debug lookup reports the reached assertion. Checked owner/handle guards and retained failed roots adapt fatal source failures to Go errors. The unused capacity introspection accessor is reference-only."
       ]
     },
     {
       "path": "src/ast/act_cache.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/ast/ast_activity_cache.go"
+        "pkg/ast/ast_activity_cache.go",
+        "pkg/ast/rewriter/rewriter_core.go",
+        "pkg/ast/rewriter/rewriter_cache_memory_trace.go"
       ],
       "tests": [
         "TestASTActivityCacheSourceOwnershipReplacementAndReset",
         "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
         "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
-        "TestASTActivityCacheNativeGrowthOrderAndOwnership"
+        "TestASTActivityCacheNativeGrowthOrderAndOwnership",
+        "TestRewriterCacheMemoryWrapperSourceSites"
       ],
       "conditionals": [
         {
@@ -9133,11 +9144,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "constructor overloads / compress_queue / init / dec_refs / del_unused / insert / find / reset / cleanup / destructor / size / capacity / empty / check_invariant",
+          "name": "constructor overloads / compress_queue / init / dec_refs / del_unused / insert / find / reset / cleanup / destructor / size / empty / check_invariant",
           "status": "ported",
           "go_target": "pkg/ast/ast_activity_cache.go",
           "tests": [
@@ -9146,13 +9157,18 @@
             "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
             "TestASTActivityCacheNativeGrowthOrderAndOwnership"
           ]
+        },
+        {
+          "name": "capacity accessor at act_cache.h:50 has no retained source or Go consumer",
+          "status": "reference_only",
+          "tests": []
         }
       ],
       "ownership": [
-        "Each live map entry retains its key and untagged value; null proof values retain only the key. Queue handles borrow map ownership. Replacement increments incoming value before decrementing old value and publishing. Eviction erases before releasing key then value; whole-map teardown follows source bucket/chain order. Reached Go failures retain explicit incoming/evicted roots for Close. Full allocation-failure/ownership campaigns remain deferred."
+        "Each live map entry retains its key and untagged value; null proof values retain only the key. Queue handles borrow map ownership. Replacement increments incoming value before decrementing old value and publishing. Eviction erases before releasing key then value. Reached Go failures retain explicit incoming/evicted roots for Close. Focused ownership tests cover replacement, eviction, reset, cleanup, close, null proof values and recursive-rewriter cache allocation/deallocation."
       ],
       "deviations": [
-        "Source activity flags use explicit fields rather than tagged addresses; concrete pointer-free handle cells preserve the original chaining algorithm and deterministic iteration. Immutable AST hash values are cached. Replacing an accessed entry preserves the original missing unused-counter increment and queue append; subsequent native lookup can underflow exactly as source, while debug lookup reports the reached assertion. Checked owner/handle guards and retained failed roots adapt fatal source failures to Go errors. Whole-class ownership auditing remains incomplete; recursive rewriter integration remains required."
+        "Source activity flags use explicit fields rather than tagged addresses. Native insdict.Dict and Go slice storage replace the source hash-table and vector internals; project cache ordering, activity, eviction and ownership behavior remain. Replacing an accessed entry preserves the original missing unused-counter increment and queue append; subsequent native lookup can underflow exactly as source, while debug lookup reports the reached assertion. Checked owner/handle guards and retained failed roots adapt fatal source failures to Go errors. The unused capacity introspection accessor is reference-only."
       ]
     },
     {

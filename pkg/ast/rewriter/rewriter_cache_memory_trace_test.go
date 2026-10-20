@@ -33,7 +33,7 @@ func TestRewriterCacheMemoryWrapperSourceSites(t *testing.T) {
 	lines := []int{25, 29, 99, 101}
 	astTestMust(t, c.Close())
 	astTestMust(t, c.Close())
-	if !diagnostic.DebugBuild {
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		if output.Len() != 0 {
 			t.Fatal("source Z3DEBUG memory wrappers must erase", output.String())
 		}
