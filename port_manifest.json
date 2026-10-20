@@ -19162,22 +19162,48 @@
       "path": "src/ast/occurs.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_occurs.go",
+        "pkg/ast/ast_occurs_source_test.go"
+      ],
+      "tests": [
+        "TestASTOccursExpressionDeclarationAndQuantifierAnnotations",
+        "TestASTOccursDeepPostorderAndGuards"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "expression occurrence and function-declaration occurrence quick postorder traversals",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_occurs.go",
+          "tests": [
+            "TestASTOccursExpressionDeclarationAndQuantifierAnnotations",
+            "TestASTOccursDeepPostorderAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Both predicates borrow their needles, root and all reached graph nodes. Native stack and visited-map storage owns no AST references and is discarded at return."
+      ],
+      "deviations": [
+        "A native Go visited map replaces expr_fast_mark1 and therefore does not mutate the manager mark plane. Boolean traversal and early-return semantics remain; explicit errors replace invalid source pointer domains and the internal found exception."
+      ]
     },
     {
       "path": "src/ast/occurs.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_occurs.go",
+        "pkg/ast/ast_occurs_source_test.go"
+      ],
+      "tests": [
+        "TestASTOccursExpressionDeclarationAndQuantifierAnnotations",
+        "TestASTOccursDeepPostorderAndGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -19188,11 +19214,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "occurs(expr*, expr*) and occurs(func_decl*, expr*) public predicates",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_occurs.go",
+          "tests": [
+            "TestASTOccursExpressionDeclarationAndQuantifierAnnotations",
+            "TestASTOccursDeepPostorderAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The public manager-bound predicates borrow all input handles during their checked calls."
+      ],
+      "deviations": [
+        "Separate typed Go methods replace the C++ overloads and reject foreign, stale or wrong-kind handles explicitly."
+      ]
     },
     {
       "path": "src/ast/pattern/CMakeLists.txt",
