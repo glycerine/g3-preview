@@ -33237,9 +33237,13 @@
       "path": "src/ast/substitution/unifier.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/substitution/unifier.go"],
+      "tests": [
+        "TestUnifierBanksExistingBindingsAndRepeatedReverse",
+        "TestUnifierApplicationsMismatchMultipleAndOccursCheck",
+        "TestUnifierQuantifierAndOwnerGuards"
+      ],
       "conditionals": [
         {
           "line": 147,
@@ -33280,19 +33284,38 @@
           "text": "SASSERT(num_exprs > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "reset, path-compressed find, weighted union, existing-binding reconstruction, pair and array unification, and occurs check",
+          "status": "ported",
+          "go_target": "pkg/ast/substitution/unifier.go",
+          "tests": [
+            "TestUnifierBanksExistingBindingsAndRepeatedReverse",
+            "TestUnifierApplicationsMismatchMultipleAndOccursCheck",
+            "TestUnifierQuantifierAndOwnerGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Unifier borrows the target Substitution for each call and roots reconstructed variable nodes until reset or close. The Substitution owns every binding inserted by union operations."
+      ],
+      "deviations": [
+        "Checked bool/error results replace source assertions; native concrete maps replace the already-audited expression-offset template maps."
+      ]
     },
     {
       "path": "src/ast/substitution/unifier.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/substitution/unifier.go"],
+      "tests": [
+        "TestUnifierBanksExistingBindingsAndRepeatedReverse",
+        "TestUnifierApplicationsMismatchMultipleAndOccursCheck",
+        "TestUnifierQuantifierAndOwnerGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -33303,11 +33326,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor and two-expression/multiple-expression unification overloads",
+          "status": "ported",
+          "go_target": "pkg/ast/substitution/unifier.go",
+          "tests": [
+            "TestUnifierBanksExistingBindingsAndRepeatedReverse",
+            "TestUnifierApplicationsMismatchMultipleAndOccursCheck",
+            "TestUnifierQuantifierAndOwnerGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Unifier is a noncopyable checked Go owner that borrows its AST manager and each call's Substitution."
+      ],
+      "deviations": [
+        "Unify and UnifyPair expose the two retained overloads without reproducing C++ operator overloading."
+      ]
     },
     {
       "path": "src/ast/substitution/var_offset_map.h",
@@ -129359,14 +129397,38 @@
       "path": "src/test/substitution.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/substitution/substitution_test.go",
+        "pkg/ast/substitution/unifier_test.go"
+      ],
+      "tests": [
+        "TestSubstitutionApplyOffsetsScopesAndCacheInvalidation",
+        "TestSubstitutionQuantifierShiftModuloAndCycles",
+        "TestUnifierBanksExistingBindingsAndRepeatedReverse",
+        "TestUnifierApplicationsMismatchMultipleAndOccursCheck"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst_substitution unification, application and quantified shifting exercises",
+          "status": "ported",
+          "go_target": "pkg/ast/substitution/substitution_test.go",
+          "tests": [
+            "TestSubstitutionApplyOffsetsScopesAndCacheInvalidation",
+            "TestSubstitutionQuantifierShiftModuloAndCycles",
+            "TestUnifierBanksExistingBindingsAndRepeatedReverse",
+            "TestUnifierApplicationsMismatchMultipleAndOccursCheck"
+          ]
+        }
+      ],
+      "ownership": [
+        "Tests pin all source expressions, own output references, and close Unifier and Substitution before manager teardown."
+      ],
+      "deviations": [
+        "Assertions replace the source test's stdout and trace-only observations and add bank, mismatch, occurs-check and owner coverage."
+      ]
     },
     {
       "path": "src/test/symbol.cpp",
