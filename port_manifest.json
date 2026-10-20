@@ -29045,28 +29045,63 @@
       "path": "src/ast/rewriter/label_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/label_rewriter.go"
+      ],
+      "tests": [
+        "TestLabelRewriterRemovesNestedLabelsAndPreservesNonlabels",
+        "TestLabelRewriterAdvancesExistingProof",
+        "TestLabelRewriterDebugArityAndOwnerGuards"
+      ],
       "assertions": [
         {
           "line": 35,
           "text": "SASSERT(num == 1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor/destructor and OP_LABEL reduce_app identity rewrite through the no-proof generic rewriter (src/ast/rewriter/label_rewriter.cpp:28-41)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/label_rewriter.go",
+          "tests": [
+            "TestLabelRewriterRemovesNestedLabelsAndPreservesNonlabels",
+            "TestLabelRewriterDebugArityAndOwnerGuards"
+          ]
+        },
+        {
+          "name": "remove_labels formula replacement and conditional rewrite/modus-ponens proof advancement (src/ast/rewriter/label_rewriter.cpp:43-51)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/label_rewriter.go",
+          "tests": [
+            "TestLabelRewriterRemovesNestedLabelsAndPreservesNonlabels",
+            "TestLabelRewriterAdvancesExistingProof"
+          ]
+        }
+      ],
+      "ownership": [
+        "LabelRewriter owns its generic Traversal. RemoveLabels borrows the caller's formula and proof references, pins the traversal result and intermediate rewrite proof through final publication, and releases both scratch references on return."
+      ],
+      "deviations": [
+        "The source label family identifier has the retained concrete value 1. Native SASSERT arity failure returns ErrASTDomain in g3debug."
+      ]
     },
     {
       "path": "src/ast/rewriter/label_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/label_rewriter.go"
+      ],
+      "tests": [
+        "TestLabelRewriterRemovesNestedLabelsAndPreservesNonlabels",
+        "TestLabelRewriterAdvancesExistingProof",
+        "TestLabelRewriterDebugArityAndOwnerGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -29077,10 +29112,23 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete label_rewriter public constructor, destructor, reduce_app and remove_labels interface (src/ast/rewriter/label_rewriter.h:25-38)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/label_rewriter.go",
+          "tests": [
+            "TestLabelRewriterRemovesNestedLabelsAndPreservesNonlabels",
+            "TestLabelRewriterAdvancesExistingProof",
+            "TestLabelRewriterDebugArityAndOwnerGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "LabelRewriter is a checked noncopyable owner of its configured traversal and closes it exactly once. Formula and proof ASTRef arguments remain caller-owned."
+      ],
       "deviations": []
     },
     {
