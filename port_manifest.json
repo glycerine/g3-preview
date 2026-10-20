@@ -15054,12 +15054,16 @@
         "pkg/ast/ast_auxiliary_plugins.go",
         "pkg/ast/ast_auxiliary_plugins_source_test.go",
         "pkg/ast/ast_datalog_finite.go",
+        "pkg/ast/ast_datalog_sorts.go",
+        "pkg/ast/ast_datalog_sorts_test.go",
         "pkg/api/api_numeral_string_test.go",
         "pkg/ast/rewriter/dl_rewriter.go"
       ],
       "tests": [
         "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
         "TestASTAuxiliaryPluginEveryConstructorPrefix",
+        "TestASTDatalogOriginalRelationAndRuleSorts",
+        "TestASTDatalogOriginalRelationCardinalityAndFiniteSize",
         "TestAPINumeralStringArithmeticFPAAndRefusal",
         "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
         "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
@@ -15124,10 +15128,20 @@
             "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
             "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary"
           ]
+        },
+        {
+          "name": "DL_RELATION_SORT and DL_RULE_SORT construction, relation-column validation/cardinality, sort recognizers and finite-size query (dl_decl_plugin.cpp:69-164,727-744,756-768)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datalog_sorts.go",
+          "tests": [
+            "TestASTDatalogOriginalRelationAndRuleSorts",
+            "TestASTDatalogOriginalRelationCardinalityAndFiniteSize"
+          ]
         }
       ],
       "ownership": [
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
+        "Relation factories borrow column handles while canonical sort information owns copied AST parameters. Relation-column queries return borrowed handles in a caller-owned Go slice."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
@@ -15140,12 +15154,16 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_datalog_finite.go",
+        "pkg/ast/ast_datalog_sorts.go",
+        "pkg/ast/ast_datalog_sorts_test.go",
         "pkg/ast/rewriter/dl_rewriter.go"
       ],
       "tests": [
         "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
         "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
-        "TestDLRewriterFamilyArityAndOwnerGuards"
+        "TestDLRewriterFamilyArityAndOwnerGuards",
+        "TestASTDatalogOriginalRelationAndRuleSorts",
+        "TestASTDatalogOriginalRelationCardinalityAndFiniteSize"
       ],
       "conditionals": [
         {
@@ -15171,10 +15189,19 @@
             "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
             "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary"
           ]
+        },
+        {
+          "name": "relation/rule sort construction, finite-size query and relation/finite/rule sort recognizers (src/ast/dl_decl_plugin.h:84-138,191-216)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datalog_sorts.go",
+          "tests": [
+            "TestASTDatalogOriginalRelationAndRuleSorts",
+            "TestASTDatalogOriginalRelationCardinalityAndFiniteSize"
+          ]
         }
       ],
       "ownership": [
-        "Concrete finite-domain constructors copy symbol/rational/sort parameters into registered AST declarations and retire temporary parameter and rational owners after factory publication. DLRewriter borrows the manager and uses invocation-local owned numeral storage for BV reads."
+        "Concrete finite-domain constructors copy symbol/rational/sort parameters into registered AST declarations and retire temporary parameter and rational owners after factory publication. Relation factories likewise copy borrowed column-sort parameters; relation-column queries return borrowed handles in a caller-owned slice. DLRewriter borrows the manager and uses invocation-local owned numeral storage for BV reads."
       ],
       "deviations": [
         "Only the concrete dl_decl_util surface reached by retained AST rewriter and numeral API consumers is included here. Relation-algebra declarations and rule constructors remain open, so the header remains partial."

@@ -9,16 +9,34 @@ import (
 )
 
 const (
-	astDatalogFiniteSortKind int32 = 1
-	astDatalogConstantKind   int32 = 13
-	DatalogOpLT              int32 = 14
+	DatalogRelationSortKind int32 = iota
+	astDatalogFiniteSortKind
+	DatalogRuleSortKind
+)
+
+const (
+	DatalogOpStore int32 = iota
+	DatalogOpEmpty
+	DatalogOpIsEmpty
+	DatalogOpJoin
+	DatalogOpUnion
+	DatalogOpWiden
+	DatalogOpProject
+	DatalogOpFilter
+	DatalogOpNegationFilter
+	DatalogOpRename
+	DatalogOpComplement
+	DatalogOpSelect
+	DatalogOpClone
+	astDatalogConstantKind
+	DatalogOpLT
+	DatalogOpRep
+	DatalogOpAbs
+	DatalogLastOp
 )
 
 // MkDatalogFiniteSort is dl_decl_util::mk_sort's retained finite-domain path.
 func (m *ASTManager) MkDatalogFiniteSort(name usymbol.Symbol, size uint64) (result ASTHandle, err error) {
-	if size == 0 {
-		return ASTHandle{}, ErrASTDomain
-	}
 	family, err := m.RegisterDatalogPlugin()
 	if err != nil {
 		return ASTHandle{}, err
@@ -95,6 +113,24 @@ func (m *ASTManager) MkDatalogLT(left, right ASTHandle) (ASTHandle, error) {
 }
 
 func (m *ASTManager) datalogSort(fid FamilyID, kind int32, ps []ASTParameter) (astNodeRef, error) {
+	if kind == DatalogRelationSortKind {
+		return m.datalogRelationSort(fid, ps)
+	}
+	if kind == DatalogRuleSortKind {
+		if len(ps) != 0 {
+			return astNodeRef{}, ErrASTDomain
+		}
+		p := m.auxiliaryPlugin(astDatalogPlugin)
+		if p == nil || p.family != fid {
+			return astNodeRef{}, ErrASTDomain
+		}
+		slot, generation, e := m.newInfo(true, fid, kind, nil, InfiniteSortSize(), ASTFuncFlags{}, false)
+		if e != nil {
+			return astNodeRef{}, e
+		}
+		defer m.dropInfoStorage(slot, generation)
+		return m.mkSort(p.symbols[16], ASTSortInfo{m.origin, slot, generation})
+	}
 	if kind != astDatalogFiniteSortKind || len(ps) != 2 {
 		return astNodeRef{}, ErrASTDomain
 	}
