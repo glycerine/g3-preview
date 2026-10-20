@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp:5362,5402-5403.
+// Source: src/math/polynomial/polynomial.cpp:5362,5402-5403,5424.
 package polynomial
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
@@ -50,6 +50,18 @@ func (m *MultivariatePolynomialManager) traceResultant(s *polynomialGCDFunctionS
 			if e := m.quadraticTracePolynomial(out, s, "\nt: ", s.refs[6].root.value, false); e != nil {
 				return e
 			}
+		}
+		return out.WriteLiteral("\n")
+	})
+}
+
+func (m *MultivariatePolynomialManager) traceResultantIteration(s *polynomialGCDFunctionScope) error {
+	return m.emitResultantTrace("resultant", 5424, func(out *polynomialTraceSink) error {
+		if e := m.quadraticTracePolynomial(out, s, "A: ", s.refs[0].root.value, false); e != nil {
+			return e
+		}
+		if e := m.quadraticTracePolynomial(out, s, "\nB: ", s.refs[1].root.value, false); e != nil {
+			return e
 		}
 		return out.WriteLiteral("\n")
 	})

@@ -17,6 +17,8 @@ type resultantTraceWriter struct {
 	t                 *testing.T
 	m                 *MultivariatePolynomialManager
 	entry, normalized bool
+	iteration         int
+	onIteration       func()
 }
 
 func (w *resultantTraceWriter) WriteString(s string) (int, error) { return w.Write([]byte(s)) }
@@ -34,6 +36,21 @@ func (w *resultantTraceWriter) Write(p []byte) (int, error) {
 		s := w.m.gcdFrames[w.m.gcdDepth-1]
 		if s.depth != 9 {
 			w.t.Fatal("normalization crossed later lexical declarations", s.depth)
+		}
+	}
+	if strings.Count(w.String(), ":5424 ") > w.iteration {
+		w.iteration++
+		if w.onIteration != nil {
+			w.onIteration()
+		}
+		s := w.m.gcdFrames[w.m.gcdDepth-1]
+		if s.depth != 13 {
+			w.t.Fatal("loop source declaration depth", s.depth)
+		}
+		for _, i := range []int{8, 9} {
+			if w.iteration == 1 && s.refs[i].root.value != w.m.core.unit {
+				w.t.Fatal("loop preceded g/h assignment", i)
+			}
 		}
 	}
 	for _, action := range []func() error{w.m.CloseChecked, w.m.SourceFinalize, w.m.CleanupGCD} {
@@ -64,7 +81,8 @@ func TestPolynomialResultantTraceLiteralNormalizationAndLifetimes(t *testing.T) 
 	if tags.ShouldTrace("resultant") {
 		want := "-------- [resultant] resultant src/math/polynomial/polynomial.cpp:5362 ---------\nresultant(A, B, x)\nA: 2 x0^2 - 4\nB: 3 x0 - 9\nx: 0\n------------------------------------------------\n" +
 			"-------- [resultant] resultant src/math/polynomial/polynomial.cpp:5402 ---------\nresultant(A, B, x) after normalization\nA: x0^2 - 2\nB: x0 - 3\nx: 0\nt: 18\n------------------------------------------------\n"
-		if !w.entry || !w.normalized || w.String() != want {
+		want += "-------- [resultant] resultant src/math/polynomial/polynomial.cpp:5424 ---------\nA: x0^2 - 2\nB: x0 - 3\n------------------------------------------------\n"
+		if !w.entry || !w.normalized || w.iteration != 1 || w.String() != want {
 			t.Fatal("literal normalized records", w.String())
 		}
 	} else if w.Len() != 0 {
@@ -96,7 +114,7 @@ func TestPolynomialResultantTraceZeroAndConstantEarlyExits(t *testing.T) {
 			expected[[3]uint32{}] = want
 		}
 		polynomialQueryExpect(t, c, out.root.value, expected)
-		if tags.ShouldTrace("resultant") && (strings.Count(text.String(), ":5362 ") != 1 || strings.Contains(text.String(), ":5402 ")) {
+		if tags.ShouldTrace("resultant") && (strings.Count(text.String(), ":5362 ") != 1 || (strings.Contains(text.String(), ":5402 ") || strings.Contains(text.String(), ":5424 "))) {
 			t.Fatal("source early exit records", text.String())
 		}
 	}
@@ -182,7 +200,16 @@ func TestPolynomialResultantTraceRefusingStreamStillFormats(t *testing.T) {
 	before := c.display.next
 	serviceMust(t, m.Resultant(a, b, 0, out))
 	polynomialQueryExpect(t, c, out.root.value, map[[3]uint32]int64{{}: 7})
-	if tags.ShouldTrace("resultant") && (w.calls != 1 || c.display.next < before+5) {
+	// Seven source polynomial insertions visit thirteen actual terms.
+	wantDisplays := uint64(13)
+	if polynomialSourceDebug {
+		enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+		serviceMust(t, e)
+		if enabled {
+			wantDisplays += 7
+		}
+	}
+	if tags.ShouldTrace("resultant") && (w.calls != 1 || c.display.next != before+wantDisplays) {
 		t.Fatal("stream refusal suppressed project formatting", w.calls, c.display.next-before)
 	}
 }
@@ -227,4 +254,142 @@ func TestPolynomialResultantTraceEveryReservation(t *testing.T) {
 	if !success || !refused {
 		t.Fatal("reservation endpoints", success, refused)
 	}
+}
+
+func TestPolynomialResultantTraceRepeatedLoopAndDegreeSwap(t *testing.T) {
+	for _, swap := range []bool{false, true} {
+		m := polynomialPSCFullFixture(t)
+		c := m.core
+		a := polynomialQueryTerms(t, c, []int32{1, -2}, [][]MonomialPower{{{0, 3}}, nil})
+		b := polynomialQueryTerms(t, c, []int32{1, -3}, [][]MonomialPower{{{0, 2}}, nil})
+		out, e := NewPolynomialRef(c)
+		serviceMust(t, e)
+		defer func() { serviceMust(t, out.Close()) }()
+		w := &resultantTraceWriter{t: t, m: m}
+		tags := diagnostic.NewTraceTagsWithWriter(w)
+		tags.Enable("resultant")
+		c.monomials.config.Trace = tags
+		defer tags.Finalize()
+		if swap {
+			a, b = b, a
+		}
+		serviceMust(t, m.Resultant(a, b, 0, out))
+		// At the roots +/-sqrt(3) of x^2-3, x^3-2 is +/-3*sqrt(3)-2.
+		// Their product is 4-27; the swapped degree product is even.
+		polynomialQueryExpect(t, c, out.root.value, map[[3]uint32]int64{{}: -23})
+		if tags.ShouldTrace("resultant") {
+			first := "-------- [resultant] resultant src/math/polynomial/polynomial.cpp:5424 ---------\nA: x0^3 - 2\nB: x0^2 - 3\n------------------------------------------------\n"
+			second := "-------- [resultant] resultant src/math/polynomial/polynomial.cpp:5424 ---------\nA: x0^2 - 3\nB: 3 x0 - 2\n------------------------------------------------\n"
+			if w.iteration != 2 || !strings.Contains(w.String(), first+second) {
+				t.Fatal("literal successive loop state", w.iteration, w.String())
+			}
+		}
+	}
+}
+
+func TestPolynomialResultantTraceLoopActualCopyRefusal(t *testing.T) {
+	if !polynomialTraceEnabledForTest() {
+		t.Skip("trace erased")
+	}
+	// A real caller-owned runtime block places the TLS lane at its actual
+	// accounting threshold; the next actual Copy allocation crosses it.
+	m, qm, rt, budget := polynomialDisplayTLSOwner(t)
+	m.core.config.Checkpoint = func() bool { return true }
+	m.core.config.Cooperation = func() error { return nil }
+	c := m.core
+	z := qm.Integers()
+	var external []umemory.Block
+	t.Cleanup(func() {
+		serviceMust(t, m.CloseChecked())
+		serviceMust(t, qm.CloseChecked())
+		serviceMust(t, rt.Close())
+		if budget.Used() != 0 {
+			t.Fatal("loop owner refund", budget.Used())
+		}
+	})
+	var big unumeral.Int
+	t.Cleanup(func() { serviceMust(t, z.Del(&big)) })
+	digits := make([]uint32, 64)
+	digits[0], digits[63] = 3, 1
+	serviceMust(t, z.SetLimbs(&big, digits))
+	_, e := c.monomials.MkVar()
+	serviceMust(t, e)
+	cube, e := c.monomials.MkMonomial([]MonomialPower{{0, 3}})
+	serviceMust(t, e)
+	unit, e := c.monomials.MkMonomial(nil)
+	serviceMust(t, e)
+	a, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(1), big}, []Monomial{cube, unit})
+	serviceMust(t, e)
+	a = polynomialCaller(t, c, a)
+	b := polynomialQueryTerms(t, c, []int32{1, -3}, [][]MonomialPower{{{0, 2}}, nil})
+	out, e := NewPolynomialRef(c)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, out.Close()) })
+	t.Cleanup(func() {
+		serviceMust(t, rt.SetMaxSize(0))
+		serviceMust(t, m.CleanupGCD())
+		for i := range external {
+			serviceMust(t, rt.Deallocate(&external[i]))
+		}
+	})
+	armed := false
+	w := &resultantTraceWriter{t: t, m: m, onIteration: func() {
+		if !armed {
+			armed = true
+			remaining := int64(100000) - rt.State().LocalSize - 8
+			if remaining < 0 {
+				block, e := rt.Allocate(0)
+				serviceMust(t, e)
+				external = append(external, block)
+				remaining = int64(100000) - rt.State().LocalSize - 8
+			}
+			if remaining < 0 {
+				t.Fatal("actual TLS lane has no bounded allocation prefix", rt.Stats())
+			}
+			block, e := rt.Allocate(uint64(remaining))
+			serviceMust(t, e)
+			external = append(external, block)
+			if rt.State().LocalSize != 100000 {
+				t.Fatal("real caller allocation did not reach boundary", rt.Stats())
+			}
+			serviceMust(t, rt.SetMaxSize(1))
+		}
+	}}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("resultant")
+	c.monomials.config.Trace = tags
+	defer tags.Finalize()
+	var receipt polynomialGCDInvocationReceipt
+	body := m.resultantWithReceipt(a, b, 0, &out.root, &receipt)
+	serviceMust(t, rt.SetMaxSize(0))
+	if !armed || !numericPhysicalReservationRefusal(body) {
+		t.Fatal("loop real copy refusal", body, armed)
+	}
+	frame := receipt.frame
+	formatter := frame.traceDisplay
+	if !c.displayReceiptPending(&formatter) {
+		t.Fatal("accepted loop formatter lost", body)
+	}
+	objects := formatter.frame.numeric.PendingObject()
+	blocks := formatter.frame.numeric.PendingAllocatorBlocks()
+	if objects == (umemory.ObjectRef{}) && blocks == ([3]umemory.Block{}) {
+		t.Fatal("no actual pending formatter allocation", body)
+	}
+	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{a, b, out.root.value}, []*unumeral.Int{&big}, out.header, external)
+	stale := receipt
+	stale.invocation++
+	serviceMust(t, m.cleanupGCDInvocation(&stale, true))
+	copied := receipt
+	copyFrame := *frame
+	copied.frame = &copyFrame
+	serviceMust(t, m.cleanupGCDInvocation(&copied, true))
+	if formatter.frame.numeric.PendingObject() != objects || formatter.frame.numeric.PendingAllocatorBlocks() != blocks || !c.displayReceiptPending(&formatter) {
+		t.Fatal("stale/copy acquired formatter")
+	}
+	serviceMust(t, m.cleanupGCDInvocation(&receipt, false))
+	serviceMust(t, m.cleanupGCDInvocation(&receipt, true))
+	if c.displayReceiptPending(&formatter) || formatter.frame.numeric.PendingObject() != (umemory.ObjectRef{}) || formatter.frame.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) {
+		t.Fatal("matched loop formatter cleanup incomplete")
+	}
+	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{a, b, out.root.value}, []*unumeral.Int{&big}, out.header, external)
 }

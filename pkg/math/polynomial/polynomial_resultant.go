@@ -181,6 +181,9 @@ func (m *MultivariatePolynomialManager) resultantWithReceipt(p, q Polynomial, x 
 		return e
 	}
 	for {
+		if e = m.traceResultantIteration(s); e != nil {
+			return e
+		}
 		degA, e = c.Degree(A.value, x)
 		if e != nil {
 			return e

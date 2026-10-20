@@ -41875,7 +41875,9 @@
         "pkg/math/polynomial/polynomial_exact_div_trace.go",
         "pkg/math/polynomial/polynomial_exact_div_trace_test.go",
         "pkg/math/polynomial/polynomial_substitution_trace.go",
-        "pkg/math/polynomial/polynomial_substitution_trace_test.go"
+        "pkg/math/polynomial/polynomial_substitution_trace_test.go",
+        "pkg/math/polynomial/polynomial_resultant_trace.go",
+        "pkg/math/polynomial/polynomial_resultant_trace_test.go"
       ],
       "tests": [
         "TestPolynomialDividesTraceZeroKeepsOlderAlgorithmReceipt",
@@ -47658,17 +47660,19 @@
         "evidence": "Five value spellings include 2/3, a negative BIG integer, binary interval fractions, rational algebraic default decimal and sqrt(2) decimal. Output callbacks observe a live auxiliary. The actual decimal refusal sweep arms the real budget at a result header, proves accepted pending driver ownership and copied-scope refusal, then reaches success. Independent omitted-results and omitted-decimal-receipt controls fail. Fast checks pass four profiles; long precision20 evidence is recorded separately in PORT_PROGRESS.md."
       },
       "resultant_trace_audit": {
-        "source": "polynomial.cpp:5362,5402-5403",
+        "source": "polynomial.cpp:5362,5402-5403,5424; retained by algebraic_numbers.cpp:811,836,1186,1239,2128,2359",
         "go_target": "pkg/math/polynomial/polynomial_resultant_trace.go",
-        "behavior": "Resultant entry follows actual A/B assignment and precedes zero/constant exits; normalized A/B/x/t output precedes the sign/degree/later reference declarations. The existing actual GCD frame traceDisplay captures each accepted reference formatter, preserves stopped source children before older locals and cleans only that invocation. Executing records bind both numerical managers and the existing polynomial callback guard through header/body/footer. Sticky writer failure still executes project formatting.",
+        "behavior": "Resultant entry follows actual A/B assignment and precedes zero/constant exits; normalized A/B/x/t output precedes the sign/degree/later reference declarations. The existing actual GCD frame traceDisplay captures each accepted reference formatter, preserves stopped source children before older locals and cleans only that invocation. Executing records bind both numerical managers and the existing polynomial callback guard through header/body/footer. Sticky writer failure still executes project formatting. Each loop record follows actual R/g/h/new_h construction and unit assignment, after the optional degree swap and before fresh degree reads. Both A and B use the source reference-display entry, including its consistency assertion, through the same exact GCD traceDisplay receipt.",
         "tests": [
           "TestPolynomialResultantTraceLiteralNormalizationAndLifetimes",
           "TestPolynomialResultantTraceZeroAndConstantEarlyExits",
           "TestPolynomialResultantTraceActualEntryTLSRefusal",
           "TestPolynomialResultantTraceRefusingStreamStillFormats",
-          "TestPolynomialResultantTraceEveryReservation"
+          "TestPolynomialResultantTraceEveryReservation",
+          "TestPolynomialResultantTraceRepeatedLoopAndDegreeSwap",
+          "TestPolynomialResultantTraceLoopActualCopyRefusal"
         ],
-        "verification": "Literal normalized coefficients/factor and independent resultant126; entry source depth2 versus normalized depth9; exact TLS BIG Copy allocator tuple with matched GCD cleanup and zero final budget; actual budget prefixes through success with physical audits; no normalized record on zero/constant exits. Broader profiles and independent omission controls are recorded in PORT_PROGRESS.md.",
+        "verification": "Literal normalized coefficients/factor and independent resultant126; entry source depth2 versus normalized depth9; exact TLS BIG Copy allocator tuple with matched GCD cleanup and zero final budget; actual budget prefixes through success with physical audits; no normalized record on zero/constant exits. Broader profiles and independent omission controls are recorded in PORT_PROGRESS.md. Loop depth13 and initial g/h unit roots; two literal successive states and degree-swapped operands give independent resultant -23. Sticky output refusal still executes thirteen term formatters and, when enabled, all seven public consistency checks. A live caller-owned raw block brings the real TLS accounting lane to its threshold without editing counters; the next real 64-limb Copy acquires a raw block before the source memory-limit refusal. Physical audits include that external block and the accepted formatter; stale/copied GCD receipts cannot release it, and matching cleanup refunds all owners. Independent missing-loop, missing-loop-receipt and direct-instead-of-reference controls fail their intended assertions.",
         "limits": "Whole polynomial/algebraic/AST algorithms, retained consumer and source failure audits remain partial.",
         "reachability_correction": "The newly added discriminant cpp5483 record was found to have only dormant test consumers and is removed. Retained resultant records remain implemented; no complete polynomial credit comes from dormant API compatibility."
       },
