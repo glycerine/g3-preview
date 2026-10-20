@@ -13097,9 +13097,12 @@
       "path": "src/ast/ast_trail.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/ast_sort_app_trail.go"],
+      "tests": [
+        "TestASTSortAppTrailMapLIFOOwnershipAndUndo",
+        "TestASTSortAppTrailMapDuplicateAndTypeGuards"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -13120,11 +13123,31 @@
           "text": "SASSERT(!m_domain.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete ast2ast_trailmap<sort,app> construction, find, insert, and LIFO pop",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_sort_app_trail.go",
+          "tests": [
+            "TestASTSortAppTrailMapLIFOOwnershipAndUndo",
+            "TestASTSortAppTrailMapDuplicateAndTypeGuards"
+          ]
+        },
+        {
+          "name": "concrete ast2ast_trail array-theory insertion and undo",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_sort_app_trail.go",
+          "tests": ["TestASTSortAppTrailMapLIFOOwnershipAndUndo"]
+        }
+      ],
+      "ownership": [
+        "Every mapping independently pins its sort and app. Pop removes the lookup entry before releasing the domain and then range pins, retaining exact retry progress after a stopped release."
+      ],
+      "deviations": [
+        "Only the live sort-to-app instantiation used by theory_array is ported. Native typed maps and slices replace the unused template/container machinery; the context argument to undo is absent because the concrete source undo does not read it."
+      ]
     },
     {
       "path": "src/ast/ast_translation.cpp",
