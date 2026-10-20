@@ -14,10 +14,10 @@ func polynomialThrowAssertionFixture(t *testing.T) {
 	polynomialAssertionActionsFixture(t, "T")
 }
 
-func polynomialAssertionActionsFixture(t *testing.T, choices string) {
+func polynomialAssertionActionsFixture(t *testing.T, choices string) *os.File {
 	t.Helper()
 	if !polynomialSourceDebug {
-		return
+		return nil
 	}
 	budget := arena.NewBudget(1 << 20)
 	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: budget}})
@@ -53,4 +53,5 @@ func polynomialAssertionActionsFixture(t *testing.T, choices string) {
 		serviceMust(t, debug.Close())
 		serviceMust(t, region.Close())
 	})
+	return outputFile
 }

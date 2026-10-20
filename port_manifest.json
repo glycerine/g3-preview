@@ -44049,6 +44049,19 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained const/mutable coefficient overload selection1511/1512, raw swap fields and owning-abort codecs",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cell.go",
+          "tests": [
+            "TestPolynomialCoefficientOverloadDiagnostics",
+            "TestPolynomialRawSwapErasesAccessorAssertions",
+            "TestPolynomialPendingCoefficientOwningCodec",
+            "TestPolynomialEvaluationAlgebraicRationalGrid",
+            "TestPolynomialCellSourceTakeAndFirstMaximum"
+          ],
+          "notes": "Explicit mutable accessor selected at confirmed retained pointer/reference consumers; no read-only-result heuristic substitutes for C++ overload resolution. obj_ref::operator-> returns T* even when its wrapper is const. Public coeff, CRA const inputs, flip_sign_if_lm_neg_core and outer univ_eval constant branch remain const. Raw array swaps and explicit pending-placement cleanup decode physical fields without inventing source indexed-access assertions. Factor6809 short-circuits with fresh mutable reads inside its source predicate and reads again independently at6810. The dormant scalar div helper is excluded."
+        },
+        {
           "name": "Retained cell DEC1371, leading-term comparator1391, constructor1415 and indexed const-access1508/1511 source assertion protocols",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_cell_assertions.go",
@@ -45164,7 +45177,7 @@
           ]
         },
         {
-          "name": "Retained polynomial cell, accessors, native SOM, construction, arithmetic and deletion callbacks with full manager lifecycle and optimized PSC composition; source accessor overload audit remains open",
+          "name": "Retained polynomial cell, accessors, native SOM, construction, arithmetic and deletion callbacks with full manager lifecycle and optimized PSC composition; whole source closure still unproven",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
@@ -45209,7 +45222,7 @@
             "TestPolynomialSoleRetainCalleeConstructionCleanup",
             "TestPolynomialPreexistingCalleeCreationRemainsBorrowed"
           ],
-          "notes": "The cpp1371/1391/1415/1508/1511 assertion protocols and fresh leading-variable reads now have a separate scoped entry. The complete cell claim remains partial pending retained call-site classification of const versus mutable coefficient access (cpp1511/1512); no whole polynomial-unit closure is inferred from focused tests."
+          "notes": "Scoped coefficient-access audit now separates const1511, mutable1512 and raw array/owning codecs. Retained mutable consumers include deletion2433, ICCP-ZpX3982, modular-GCD4273/4274/4336, pseudo5007/5036, concrete evaluation6445/6471/6493/6517, quadratic6618 and factor6809/6810. This broad row stays partial: these selected protocols and green tests do not prove the entire cell/arithmetic/owner inventory."
         },
         {
           "name": "Complete incremental Newton ctor/reset/const-input/count/Add/Mk and whole-method lexical owner; persistent owner-vector lazy At/SetOwner/Flush/SourceFinalize, exact TRACE and assertion actions; explicit owning cleanup distinct from source destruction",
@@ -46244,14 +46257,15 @@
         },
         {
           "name": "Complete manager::imp::div scalar NUM scope cpp2757-2768 with source assertion action and exact source/owning cleanup",
-          "status": "ported",
+          "status": "reference_only",
           "go_target": "pkg/math/polynomial/polynomial_scalar_div.go",
           "tests": [
             "TestPolynomialScalarDivLiteralIntegerAndFieldValues",
             "TestPolynomialScalarDivEmptyDoesNotReadDivisor",
             "TestPolynomialScalarDivEveryActualReservationPrefix",
             "TestPolynomialArithmeticSourceAssertionActions"
-          ]
+          ],
+          "notes": "Only source caller of the polynomial-pointer div overload2757 is discriminant5488, already excluded from retained roots. Other div occurrences are monomial/numeral overloads. Go ScalarDiv compatibility implementation/tests remain; no retained completion credit or mutable-access port is added for this dormant routine."
         },
         {
           "name": "manager::imp::mk_cell actual optional factory owning receipt cpp2481-2495",
@@ -46318,12 +46332,13 @@
           ]
         },
         {
-          "name": "Neg and scalar div optional parent append/factory receipts cpp2757-2768,5940-5951",
+          "name": "Retained Neg optional parent append/factory receipts cpp5940-5951; scalar div2757-2768 remains dormant compatibility",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_scalar_div.go",
           "tests": [
             "TestPolynomialParentFactoryHelpersEveryActualPrefix"
-          ]
+          ],
+          "notes": "Retained completion credit here covers Neg. The source scalar polynomial-div overload is reached only by dormant discriminant5488 and is classified separately as reference_only."
         },
         {
           "name": "Complete retained sqrt invocation ownership cpp5964-6068 with exact numeric, perfect-square, RAW division, monomial allocator and final polynomial factory receipts",
@@ -46436,14 +46451,15 @@
         },
         {
           "name": "polynomial.cpp:2757-2768 selected ScalarDiv direct argument allocation/Natural/RAW transport through the same literal engines; source end-only RAW DEL versus exact owning abort",
-          "status": "ported",
+          "status": "reference_only",
           "go_target": "pkg/math/polynomial/polynomial_scalar_div.go",
           "tests": [
             "TestScalarDivDirectNumericNilContextSourceMath",
             "TestScalarDivDirectBigActualAllocationPrefixes",
             "TestScalarDivDirectCopiedRawChildRefusesWithoutMutation",
             "TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation"
-          ]
+          ],
+          "notes": "Only source caller of the polynomial-pointer div overload2757 is discriminant5488, already excluded from retained roots. Other div occurrences are monomial/numeral overloads. Go ScalarDiv compatibility implementation/tests remain; no retained completion credit or mutable-access port is added for this dormant routine."
         },
         {
           "name": "Complete src/math/polynomial/polynomial.cpp:2217-2255,2280-2299 addConsumedScalarDivEngine/reset/close: Literal source append/reset preserved; explicit owning exact-cohort retirement and started-phase close resumption.",

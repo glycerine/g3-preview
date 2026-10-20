@@ -247,7 +247,7 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 		if e != nil {
 			return e
 		}
-		a, e := c.coefficientCore(pp.value, i)
+		a, e := c.mutableCoefficientCore(pp.value, i)
 		if e != nil {
 			return e
 		}

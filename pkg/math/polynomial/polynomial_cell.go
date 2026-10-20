@@ -80,6 +80,20 @@ func (m *MultivariatePolynomialCore) coefficientCore(p Polynomial, i uint32) (un
 	if e := m.cellIndexAssert(p, i, 1511); e != nil {
 		return unumeral.Int{}, e
 	}
+	return m.coefficientFieldCore(p, i)
+}
+
+// Source mutable polynomial::a selects its own diagnostic callsite.
+func (m *MultivariatePolynomialCore) mutableCoefficientCore(p Polynomial, i uint32) (unumeral.Int, error) {
+	if e := m.cellIndexAssert(p, i, 1512); e != nil {
+		return unumeral.Int{}, e
+	}
+	return m.coefficientFieldCore(p, i)
+}
+
+// Physical field decoding has no source a(idx) assertion. Raw source array
+// operations and explicit owning aborts use this concrete codec directly.
+func (m *MultivariatePolynomialCore) coefficientFieldCore(p Polynomial, i uint32) (unumeral.Int, error) {
 	l, e := m.polynomialLocation(p)
 	if e != nil {
 		return unumeral.Int{}, e
@@ -106,6 +120,9 @@ func (m *MultivariatePolynomialCore) monomialCore(p Polynomial, i uint32) (Monom
 	if e := m.cellIndexAssert(p, i, 1508); e != nil {
 		return Monomial{}, e
 	}
+	return m.monomialFieldCore(p, i)
+}
+func (m *MultivariatePolynomialCore) monomialFieldCore(p Polynomial, i uint32) (Monomial, error) {
 	n, e := m.readWord(p, 8)
 	if e != nil {
 		return Monomial{}, e
@@ -223,11 +240,11 @@ func (m *MultivariatePolynomialCore) swapTerms(p Polynomial, i, j uint32) error 
 	if i == j {
 		return nil
 	}
-	a, e := m.coefficientCore(p, i)
+	a, e := m.coefficientFieldCore(p, i)
 	if e != nil {
 		return e
 	}
-	b, e := m.coefficientCore(p, j)
+	b, e := m.coefficientFieldCore(p, j)
 	if e != nil {
 		return e
 	}
@@ -237,11 +254,11 @@ func (m *MultivariatePolynomialCore) swapTerms(p Polynomial, i, j uint32) error 
 	if e = m.writeCoefficient(p, j, a); e != nil {
 		return e
 	}
-	x, e := m.monomialCore(p, i)
+	x, e := m.monomialFieldCore(p, i)
 	if e != nil {
 		return e
 	}
-	y, e := m.monomialCore(p, j)
+	y, e := m.monomialFieldCore(p, j)
 	if e != nil {
 		return e
 	}
@@ -353,7 +370,13 @@ func (m *MultivariatePolynomialCore) deleteCoreMode(p Polynomial, owning bool) e
 		}
 		for l.deleteIndex < n {
 			i := l.deleteIndex
-			a, e := m.coefficientCore(p, i)
+			var a unumeral.Int
+			var e error
+			if owning {
+				a, e = m.coefficientFieldCore(p, i)
+			} else {
+				a, e = m.mutableCoefficientCore(p, i)
+			}
 			if e != nil {
 				return e
 			}
@@ -364,7 +387,12 @@ func (m *MultivariatePolynomialCore) deleteCoreMode(p Polynomial, owning bool) e
 			if e != nil {
 				return e
 			}
-			b, e := m.monomialCore(p, i)
+			var b Monomial
+			if owning {
+				b, e = m.monomialFieldCore(p, i)
+			} else {
+				b, e = m.monomialCore(p, i)
+			}
 			if e != nil {
 				return e
 			}

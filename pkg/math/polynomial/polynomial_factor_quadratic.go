@@ -152,7 +152,7 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 	}); e != nil {
 		return e
 	}
-	leading, e := c.coefficientCore(s.refs[0].root.value, pos)
+	leading, e := c.mutableCoefficientCore(s.refs[0].root.value, pos)
 	if e != nil {
 		return e
 	}

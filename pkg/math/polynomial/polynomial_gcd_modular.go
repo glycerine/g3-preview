@@ -195,14 +195,14 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 	}
 	s.constructNumeral(3)
 	s.constructNumeral(4)
-	a, e := c.coefficientCore(s.refs[0].root.value, pu)
+	a, e := c.mutableCoefficientCore(s.refs[0].root.value, pu)
 	if e != nil {
 		return e
 	}
 	if e = m.gcdCopyNumeral(s, &a, &s.nums[3]); e != nil {
 		return e
 	}
-	a, e = c.coefficientCore(s.refs[1].root.value, pv)
+	a, e = c.mutableCoefficientCore(s.refs[1].root.value, pv)
 	if e != nil {
 		return e
 	}
@@ -322,7 +322,7 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 		if e != nil {
 			return e
 		}
-		coeff, e := c.coefficientCore(s.refs[6].root.value, pos)
+		coeff, e := c.mutableCoefficientCore(s.refs[6].root.value, pos)
 		if e != nil {
 			return e
 		}

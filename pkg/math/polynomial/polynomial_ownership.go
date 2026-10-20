@@ -76,7 +76,7 @@ func (m *MultivariatePolynomialCore) cleanupPendingCreation() error {
 		for l.deleteIndex < l.initializedCoefficients || l.deleteIndex < l.initializedMonomials {
 			i := l.deleteIndex
 			if i < l.initializedCoefficients {
-				a, e := m.coefficientCore(p.value, i)
+				a, e := m.coefficientFieldCore(p.value, i)
 				if e != nil {
 					return e
 				}
@@ -89,7 +89,7 @@ func (m *MultivariatePolynomialCore) cleanupPendingCreation() error {
 				}
 			}
 			if i < l.initializedMonomials {
-				a, e := m.monomialCore(p.value, i)
+				a, e := m.monomialFieldCore(p.value, i)
 				if e != nil {
 					return e
 				}

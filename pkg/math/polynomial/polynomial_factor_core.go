@@ -299,17 +299,25 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 			}); e != nil {
 				return e
 			}
-			coefficient, e := c.coefficientCore(s.refs[2].value, 0)
-			if e != nil {
-				return e
-			}
 			if e = polynomialFactorSourceAssert(6809, "m_manager.is_one(C->a(0)) || m_manager.is_minus_one(C->a(0))", func() (bool, error) {
+				coefficient, e := c.mutableCoefficientCore(s.refs[2].value, 0)
+				if e != nil {
+					return false, e
+				}
 				one, e := c.modular.IsOne(&coefficient)
 				if e != nil || one {
 					return one, e
 				}
+				coefficient, e = c.mutableCoefficientCore(s.refs[2].value, 0)
+				if e != nil {
+					return false, e
+				}
 				return c.modular.IsMinusOne(&coefficient)
 			}); e != nil {
+				return e
+			}
+			coefficient, e := c.mutableCoefficientCore(s.refs[2].value, 0)
+			if e != nil {
 				return e
 			}
 			minus, e := c.modular.IsMinusOne(&coefficient)

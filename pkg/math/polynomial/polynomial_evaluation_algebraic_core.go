@@ -68,7 +68,7 @@ func (m *MultivariatePolynomialManager) evaluationAlgebraicCore(p Polynomial, v 
 
 	aux := &f.aux
 	if end == start+1 {
-		n, e := m.core.coefficientCore(p, start)
+		n, e := m.core.mutableCoefficientCore(p, start)
 		if e != nil {
 			return e
 		}
@@ -175,7 +175,7 @@ func (m *MultivariatePolynomialManager) evaluationAlgebraicCore(p Polynomial, v 
 				if enabled && end != i+1 {
 					return diagnostic.DebugAssertionFailure(debugOwner, "src/math/polynomial/polynomial.cpp", 6470, "end == i+1")
 				}
-				n, e := m.core.coefficientCore(p, i)
+				n, e := m.core.mutableCoefficientCore(p, i)
 				if e != nil {
 					return e
 				}
@@ -229,7 +229,7 @@ func (m *MultivariatePolynomialManager) evaluationAlgebraicCore(p Polynomial, v 
 			if enabled && j != i+1 {
 				return diagnostic.DebugAssertionFailure(debugOwner, "src/math/polynomial/polynomial.cpp", 6492, "j == i+1")
 			}
-			n, e := m.core.coefficientCore(p, i)
+			n, e := m.core.mutableCoefficientCore(p, i)
 			if e != nil {
 				return e
 			}

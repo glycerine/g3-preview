@@ -132,7 +132,7 @@ func (m *MultivariatePolynomialManager) evaluateAlgebraicForIsolation(p Polynomi
 				return diagnostic.DebugAssertionFailure(debugOwner, "src/math/polynomial/polynomial.cpp", 6516, "size(p)==1")
 			}
 		}
-		n, e := m.core.coefficientCore(p, 0)
+		n, e := m.core.mutableCoefficientCore(p, 0)
 		if e != nil {
 			return e
 		}

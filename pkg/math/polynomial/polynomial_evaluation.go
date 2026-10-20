@@ -211,7 +211,7 @@ func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v P
 
 	aux := &f.aux
 	if end == start+1 {
-		n, e := m.core.coefficientCore(p, start)
+		n, e := m.core.mutableCoefficientCore(p, start)
 		if e != nil {
 			return e
 		}
@@ -293,7 +293,7 @@ func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v P
 				}); e != nil {
 					return e
 				}
-				n, e := m.core.coefficientCore(p, i)
+				n, e := m.core.mutableCoefficientCore(p, i)
 				if e != nil {
 					return e
 				}
@@ -339,7 +339,7 @@ func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v P
 			}); e != nil {
 				return e
 			}
-			n, e := m.core.coefficientCore(p, i)
+			n, e := m.core.mutableCoefficientCore(p, i)
 			if e != nil {
 				return e
 			}
@@ -397,7 +397,7 @@ func (m *MultivariatePolynomialManager) evaluateRationalForAlgebraic(p Polynomia
 		if e = m.evaluationConstantSourceAssert(p); e != nil {
 			return e
 		}
-		n, e := m.core.coefficientCore(p, 0)
+		n, e := m.core.mutableCoefficientCore(p, 0)
 		if e != nil {
 			return e
 		}
@@ -698,7 +698,7 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *p
 
 	aux := &f.aux
 	if end == start+1 {
-		n, e := m.core.coefficientCore(p, start)
+		n, e := m.core.mutableCoefficientCore(p, start)
 		if e != nil {
 			return e
 		}
@@ -780,7 +780,7 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *p
 				}); e != nil {
 					return e
 				}
-				n, e := m.core.coefficientCore(p, i)
+				n, e := m.core.mutableCoefficientCore(p, i)
 				if e != nil {
 					return e
 				}
@@ -826,7 +826,7 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *p
 			}); e != nil {
 				return e
 			}
-			n, e := m.core.coefficientCore(p, i)
+			n, e := m.core.mutableCoefficientCore(p, i)
 			if e != nil {
 				return e
 			}
@@ -937,7 +937,7 @@ func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v P
 
 	aux := &f.aux
 	if end == start+1 {
-		n, e := m.core.coefficientCore(p, start)
+		n, e := m.core.mutableCoefficientCore(p, start)
 		if e != nil {
 			return e
 		}
@@ -1019,7 +1019,7 @@ func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v P
 				}); e != nil {
 					return e
 				}
-				n, e := m.core.coefficientCore(p, i)
+				n, e := m.core.mutableCoefficientCore(p, i)
 				if e != nil {
 					return e
 				}
@@ -1065,7 +1065,7 @@ func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v P
 			}); e != nil {
 				return e
 			}
-			n, e := m.core.coefficientCore(p, i)
+			n, e := m.core.mutableCoefficientCore(p, i)
 			if e != nil {
 				return e
 			}
@@ -1227,7 +1227,10 @@ func (m *MultivariatePolynomialManager) UnivariateEvaluate(p Polynomial, x uint3
 		return e
 	}
 	if constant {
-		n, e := m.core.coefficientCore(p, 0)
+		if e = m.evaluationConstantSourceAssert(p); e != nil {
+			return e
+		}
+		n, e := m.core.mutableCoefficientCore(p, 0)
 		if e != nil {
 			return e
 		}
@@ -1281,7 +1284,7 @@ func (m *MultivariatePolynomialManager) evaluateIntervalForAlgebraic(p Polynomia
 		if e = m.evaluationConstantSourceAssert(p); e != nil {
 			return e
 		}
-		n, e := m.core.coefficientCore(p, 0)
+		n, e := m.core.mutableCoefficientCore(p, 0)
 		if e != nil {
 			return e
 		}

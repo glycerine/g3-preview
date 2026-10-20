@@ -668,7 +668,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 			if e != nil {
 				return e
 			}
-			a, e := m.coefficientCore(R.value, i)
+			a, e := m.mutableCoefficientCore(R.value, i)
 			if e != nil {
 				return e
 			}
@@ -744,7 +744,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 				return e
 			}
 			for i := uint32(0); i < size; i++ {
-				a, e := m.coefficientCore(Q.value, i)
+				a, e := m.mutableCoefficientCore(Q.value, i)
 				if e != nil {
 					return e
 				}
