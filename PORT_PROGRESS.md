@@ -47202,3 +47202,13 @@ node identity and delta. Sorts remain borrowed and native slices/maps replace
 the source containers. Out-of-range `get` is a defined Go domain error instead
 of unchecked vector access. Generic and existing UFBV-focused tests pass all
 four profiles on CPUs 8-16; portcheck reports 258 ported and 308 partial units.
+
+Pattern-inference generated helper audit:
+`src/ast/pattern/pattern_inference_params_helper.hpp` is promoted to ported
+through the retained `SMTPatternInferenceParams` consumer. Its constructor and
+update path own the `pi` module helper snapshot across all eight ordered
+generated lookups and publish the exact uint/bool defaults and overrides.
+Existing tests independently cover every fallback, untouched explicit fields,
+constructor allocation prefixes and stopped helper cleanup. The focused SMT
+pattern suite passes native, checked, debug and combined profiles on CPUs
+8-16; portcheck reports 259 ported and 307 partial units.

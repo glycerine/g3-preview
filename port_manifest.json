@@ -20096,8 +20096,10 @@
       "path": "src/ast/pattern/pattern_inference_params_helper.hpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/smtcore/util_smt_pattern_inference_params.go",
+        "pkg/smtcore/util_smt_pattern_inference_params_source_test.go",
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/smtcore/gparams_catalog_collectors.go",
@@ -20108,7 +20110,10 @@
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
+        "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
+        "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix"
       ],
       "conditionals": [
         {
@@ -20120,11 +20125,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order",
           "status": "ported",
           "go_target": "pkg/smtcore/gparams_catalog_collectors.go",
           "tests": [
@@ -20137,10 +20142,21 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "generated constructor-time pi module snapshot and all eight typed local-module-literal accessors through the retained SMT pattern parameter consumer (src/ast/pattern/pattern_inference_params_helper.hpp:5-33)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/util_smt_pattern_inference_params.go",
+          "tests": [
+            "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
+            "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
+            "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md.",
+        "The retained SMTPatternInferenceParams consumer borrows the caller ParamsRef and owns each generated pi-module helper snapshot through all eight ordered getter publications. Constructor and update failure retain exact helper/destructor prefixes; owning Close resumes them without inventing uninitialized fields."
       ],
       "deviations": []
     },
