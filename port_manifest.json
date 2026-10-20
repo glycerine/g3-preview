@@ -18661,7 +18661,7 @@
       "path": "src/ast/fpa_decl_plugin.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_fpa_bv2rm_decl.go",
         "pkg/ast/ast_fpa_bv2rm_decl_test.go",
@@ -18671,6 +18671,8 @@
         "pkg/ast/ast_fpa_names_test.go",
         "pkg/ast/ast_fpa_values.go",
         "pkg/ast/ast_fpa_values_test.go",
+        "pkg/ast/ast_fpa_contains.go",
+        "pkg/ast/ast_fpa_contains_test.go",
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_fpa_some_value.go",
@@ -18718,6 +18720,7 @@
         "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFloatingPointOriginalBuiltinNames",
         "TestASTFloatingPointOriginalValueAndUniqueValueClassification",
+        "TestASTContainsFloatingPointTraversesEverySourceNodeShape",
         "TestASTFloatingPointSomeValueSourceDefaults",
         "TestASTFloatingPointSomeValueRefusedMPFConstruction",
         "TestModelEvaluatorFPACompletionUsesPluginValues",
@@ -18823,8 +18826,8 @@
           "text": "SASSERT(is_float(s));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "bv_wrap declaration accepts FP or RM sort and derives BV result width (fpa_decl_plugin.cpp:689-710)",
@@ -18867,7 +18870,7 @@
         },
         {
           "name": "ast_fpa_plugin concrete reached source counterpart (fpa_decl_plugin.cpp:23-49,182-231)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_fpa_plugin.go",
           "tests": [
             "TestASTFloatingPointActualConstructorRegistrationAndSorts",
@@ -18877,7 +18880,7 @@
         },
         {
           "name": "ast_fpa_numeral concrete reached source counterpart (fpa_decl_plugin.cpp:64-95)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_fpa_numeral.go",
           "tests": [
             "TestASTFloatingPointNumeralLiteralDeclarationsAndExternalDeletion",
@@ -18889,7 +18892,7 @@
         },
         {
           "name": "ast_fpa_value_binding concrete reached source counterpart (fpa_decl_plugin.cpp:64-95)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_fpa_value_binding.go",
           "tests": [
             "TestASTFloatingPointValueTableUsesActualMPFHashAndEquality",
@@ -19057,7 +19060,7 @@
         },
         {
           "name": "Reached fpa_decl_plugin::get_some_value FloatingPoint NaN and RoundingMode toward-zero defaults (fpa_decl_plugin.cpp:856-870), with MPF construction, numeral registration and local deletion in source order",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_fpa_some_value.go",
           "go_targets": ["pkg/model/model_evaluator_fpa_test.go"],
           "tests": [
@@ -19102,13 +19105,21 @@
           "tests": [
             "TestASTFloatingPointOriginalValueAndUniqueValueClassification"
           ]
+        },
+        {
+          "name": "fpa_util::contains_floats traversal across expressions, binders, signatures, and AST-valued parameters (fpa_decl_plugin.cpp:980-1037)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_contains.go",
+          "tests": [
+            "TestASTContainsFloatingPointTraversesEverySourceNodeShape"
+          ]
         }
       ],
       "ownership": [
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "The source utility facade maps to typed ASTManager operations and the common family application/declaration APIs; it is not reproduced as a stateful Go wrapper. Default SMT2 environment dispatch and well_sorted callers are separate source-unit obligations. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
         "External translation copies the exact MPF scalar and significand through the target numeric manager, interns it in the target plugin table, and publishes a target-owned external parameter. The temporary target MPF is destroyed after table insertion."
       ]
     },
@@ -19116,7 +19127,7 @@
       "path": "src/ast/fpa_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_fpa_bv2rm_decl.go",
         "pkg/ast/ast_fpa_bv2rm_decl_test.go",
@@ -19126,6 +19137,8 @@
         "pkg/ast/ast_fpa_names_test.go",
         "pkg/ast/ast_fpa_values.go",
         "pkg/ast/ast_fpa_values_test.go",
+        "pkg/ast/ast_fpa_contains.go",
+        "pkg/ast/ast_fpa_contains_test.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_fpa_some_value.go",
         "pkg/ast/ast_fpa_some_value_test.go",
@@ -19143,6 +19156,7 @@
         "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFloatingPointOriginalBuiltinNames",
         "TestASTFloatingPointOriginalValueAndUniqueValueClassification",
+        "TestASTContainsFloatingPointTraversesEverySourceNodeShape",
         "TestASTFloatingPointSomeValueSourceDefaults",
         "TestASTFloatingPointSomeValueRefusedMPFConstruction",
         "TestModelEvaluatorFPACompletionUsesPluginValues",
@@ -19206,8 +19220,8 @@
           "text": "SASSERT(m_bv_util.is_bv(bv3) && m_bv_util.get_bv_size(bv3) == 3);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "bv_wrap retained declaration kind and FP/RM domain (fpa_decl_plugin.h:89,159; fpa_decl_plugin.cpp:689-710)",
@@ -19230,7 +19244,7 @@
         },
         {
           "name": "Reached fpa_decl_plugin::get_some_value declaration and two source sort defaults (fpa_decl_plugin.h:183; fpa_decl_plugin.cpp:856-870)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_fpa_some_value.go",
           "go_targets": ["pkg/model/model_evaluator_fpa_test.go"],
           "tests": [
@@ -19241,7 +19255,7 @@
         },
         {
           "name": "ast_fpa_scoped_values concrete reached source counterpart (fpa_decl_plugin.h:109-122)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_fpa_scoped_values.go",
           "tests": [
             "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
@@ -19322,13 +19336,28 @@
           "tests": [
             "TestASTFloatingPointOriginalValueAndUniqueValueClassification"
           ]
+        },
+        {
+          "name": "fpa_util retained utility surface, including contains_floats declaration and traversal (fpa_decl_plugin.h:204-358; fpa_decl_plugin.cpp:924-1037)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_contains.go",
+          "go_targets": [
+            "pkg/ast/ast_core_plugin_dispatch.go",
+            "pkg/ast/ast_fpa_nan_sort.go",
+            "pkg/ast/ast_fpa_numeral_probe.go"
+          ],
+          "tests": [
+            "TestASTContainsFloatingPointTraversesEverySourceNodeShape",
+            "TestASTFloatingPointSpecialConstructorsScopedValue",
+            "TestASTFloatingPointSignedZeroSortOverloads"
+          ]
         }
       ],
       "ownership": [
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end. Scoped float values use a concrete Go slice; ascending numerical destruction and exact copy allocation receipts remain, while Go backing is outside arena accounting."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Go slice storage replaces scoped-vector Runtime row serialization and source vector allocation failures. Reflected cold headers remain explicit Go representations, not native ABI equivalence."
+        "The source utility facade maps to typed ASTManager operations and the common family application/declaration APIs; it is not reproduced as a stateful Go wrapper. Default SMT2 environment dispatch and well_sorted callers are separate source-unit obligations. Go slice storage replaces scoped-vector Runtime row serialization and source vector allocation failures. Reflected cold headers remain explicit Go representations, not native ABI equivalence."
       ]
     },
     {
