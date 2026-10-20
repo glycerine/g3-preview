@@ -18521,9 +18521,12 @@
       "path": "src/ast/func_decl_dependencies.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/ast_func_decl_dependencies.go"],
+      "tests": [
+        "TestASTCollectFuncDeclsConcreteTraversalAndNonGroundFilter",
+        "TestASTFuncDeclDependenciesCyclesOwnershipAndErase"
+      ],
       "assertions": [
         {
           "line": 157,
@@ -18534,19 +18537,44 @@
           "text": "SASSERT(m_todo.back() == cf);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "uninterpreted positive-arity declaration collection with optional non-ground filtering",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_func_decl_dependencies.go",
+          "tests": ["TestASTCollectFuncDeclsConcreteTraversalAndNonGroundFilter"]
+        },
+        {
+          "name": "dependency insertion, duplicate and cycle refusal, lookup, erase, and reset",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_func_decl_dependencies.go",
+          "tests": ["TestASTFuncDeclDependenciesCyclesOwnershipAndErase"]
+        },
+        {
+          "name": "empty TODO display body",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Successful entries independently pin their declaration and every dependency through ASTRef values. Erase and reset release the key first and then the dependency references while retaining retry state after a stopped release."
+      ],
+      "deviations": [
+        "Native typed maps and slices replace obj_map, obj_hashtable, and the top-sort work vectors. The source sets expose no iteration-order contract; cycle results and owned AST identities are preserved."
+      ]
     },
     {
       "path": "src/ast/func_decl_dependencies.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/ast_func_decl_dependencies.go"],
+      "tests": [
+        "TestASTCollectFuncDeclsConcreteTraversalAndNonGroundFilter",
+        "TestASTFuncDeclDependenciesCyclesOwnershipAndErase"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -18557,11 +18585,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete function-declaration set and complete dependency-manager public interface",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_func_decl_dependencies.go",
+          "tests": [
+            "TestASTCollectFuncDeclsConcreteTraversalAndNonGroundFilter",
+            "TestASTFuncDeclDependenciesCyclesOwnershipAndErase"
+          ]
+        }
+      ],
+      "ownership": [
+        "Caller-created FuncDeclSet values borrow handles; successful Insert copies the set and acquires independent manager-owned pins until Erase, Reset, or Close."
+      ],
+      "deviations": [
+        "Concrete Go methods replace the template-free C++ public interface. Display remains reference-only because its source body is empty."
+      ]
     },
     {
       "path": "src/ast/has_free_vars.cpp",
