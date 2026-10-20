@@ -78,3 +78,14 @@ func (m *RationalManager) DisplayToTracked(w io.Writer, a *Rational, receipt *Nu
 	}
 	return m.Z.DisplayToTracked(w, &a.Den, receipt)
 }
+
+// CleanupSourceDisplay acknowledges only the insertion issued to this owner.
+func (m *IntegerManager) CleanupSourceDisplay(receipt *NumeralInsertionReceipt) error {
+	if m == nil || m.self != m {
+		return ErrNumericOwner
+	}
+	if receipt == nil || !receipt.Active() {
+		return nil
+	}
+	return cleanupOwnedNumeralInsertion(receipt, m.Naturals())
+}

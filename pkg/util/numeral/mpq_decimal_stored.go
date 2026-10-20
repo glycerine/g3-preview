@@ -8,13 +8,16 @@ import umemory "github.com/glycerine/g3/pkg/util/memory"
 // Reads occur at the actual get_numerator/get_denominator/is_neg statements.
 // The view owns no header, numerator, denominator or numerical cleanup.
 func (m *RationalManager) DisplayDecimalStoredInto(out RationalSourceStream, allocator *umemory.SmallAllocator, object umemory.ObjectRef, precision uint32, truncate bool) (cause error) {
+	return m.DisplayDecimalStoredIntoWithInvocation(out, allocator, object, precision, truncate, nil)
+}
+func (m *RationalManager) DisplayDecimalStoredIntoWithInvocation(out RationalSourceStream, allocator *umemory.SmallAllocator, object umemory.ObjectRef, precision uint32, truncate bool, receipt *RationalDecimalInvocationReceipt) (cause error) {
 	if e := m.checkOwnerReady(); e != nil {
 		return e
 	}
 	if allocator == nil {
 		return umemory.ErrAllocatorOwner
 	}
-	s, e := m.beginDecimalStream(out)
+	s, e := m.beginDecimalStreamWithInvocation(out, receipt)
 	if e != nil {
 		return e
 	}

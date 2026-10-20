@@ -29,6 +29,9 @@ func (w algebraicDecimalWriter) AppendNumeralText(s string) error {
 // bound and accepted display/refinement continuations also have core owning
 // cleanup through CleanupRetained; stopped source destruction is not replayed.
 func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision uint32) (err error) {
+	return m.displayDecimalWithReceipt(w, a, precision, nil)
+}
+func (m *AlgebraicRootCore) displayDecimalWithReceipt(w io.Writer, a *Algebraic, precision uint32, receipt *algebraicDecimalDisplayInvocationReceipt) (err error) {
 	if w == nil {
 		return arena.ErrInvalidSlot
 	}
@@ -39,6 +42,16 @@ func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision 
 	if m.decimalDisplay.pending(m) {
 		return ErrAlgebraicPending
 	}
+	if m.decimalDisplay.invocation == ^uint64(0) {
+		return arena.ErrBounds
+	}
+	m.decimalDisplay.invocation++
+	m.decimalDisplay.basic = unumeral.RationalDecimalInvocationReceipt{}
+	m.decimalDisplay.sourceStop = nil
+	m.decimalDisplay.displayStop = nil
+	if receipt != nil {
+		*receipt = algebraicDecimalDisplayInvocationReceipt{m, m.decimalDisplay.invocation}
+	}
 	m.decimalDisplayRunning = true
 	defer func() { m.decimalDisplayRunning = false }()
 	if l == nil || l.kind == 0 {
@@ -47,9 +60,9 @@ func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision 
 			return e
 		}
 		if value.cell == nil {
-			return m.config.Rationals.DisplayDecimalInto(algebraicDecimalWriter{w}, value.zero, precision, false)
+			return m.config.Rationals.DisplayDecimalIntoWithInvocation(algebraicDecimalWriter{w}, value.zero, precision, false, &m.decimalDisplay.basic)
 		}
-		return m.config.Rationals.DisplayDecimalStoredInto(algebraicDecimalWriter{w}, value.source.config.Allocator, value.cell.raw, precision, false)
+		return m.config.Rationals.DisplayDecimalStoredIntoWithInvocation(algebraicDecimalWriter{w}, value.source.config.Allocator, value.cell.raw, precision, false, &m.decimalDisplay.basic)
 	}
 
 	s := &m.decimalDisplay

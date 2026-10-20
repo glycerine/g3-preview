@@ -39823,7 +39823,14 @@
         "Root decimal display cpp2736-2746 now declares concrete owning l/u fields and copies selected source bounds before polynomial argument reads through the shared get_interval continuation. It reads no packed root flags or whole-record constructor eligibility. Its actual refinement/evaluation, scalar copy and binary-display invocation receipts retain stopped children; source destruction stops before older upper/lower locals, while explicit core owning cleanup releases only issued children and consumed NUM descriptors. Every new display retires its prior completed evaluation key before any new bound copy, preventing a missing-exponent guard from adopting an old Horner stop. The old untracked interval helper and independent ordinary-owning defers are removed. Binary display now stamps a nonwrapping actual invocation, exposes a concrete tracked decimal entry and source-END cause, and rejects cleanup/close/deletion while its writer callback is executing. A body error still skips the raw mpz END label and destroys the algebraic scoped bounds; a genuine failed source END protects both bounds. An old receipt cannot acquire a replacement numeric display. All added invocation/running/cursor state records actual entered calls or declarations; no fabricated constructor/numeral ownership masks, generic adapters, source-scratch repair or STL port is introduced. Actual public Runtime returning OOM and signed-host release frontiers cover Horner retention, raw display END failure, upper-before-lower scoped destruction and consumed-release replay. A raw non-owning header with real polynomial/bound fields and uninitialized flags proves the source field phase without claiming construction or member ownership. Reuse after owning cleanup proves the old evaluator cause cannot protect a new failed copy. Existing independent interval/decimal values, writer errors and callbacks remain covered. New and existing selected decimal checks pass native/checked/debug/combined (0.021s/0.020s/0.053s/0.052s); broad display/bound/in-place/predicate/inversion/selector/copy/core groups pass (1.789s/1.531s/63.902s/66.662s); native/checked/debug/combined binary numeral regressions pass (0.419s/0.404s/3.992s/4.248s). The combined checked/debug/trace precision20 sweep passed all10730 ordinals0-10729 through success in 321.515s, from2026-10-19 22:05:39 to22:11:01 UTC, with all11 changed Go files held byte-for-byte unchanged. An initial incorrectly short three-minute invocation timed out after ordinals0-8028 passed; this completed long-timeout run supersedes it. The broad/full-new-scope code remained uncommitted during that run. Six expected-red overlays isolate old whole-record decoding, missing Horner/display propagation, owning source DEL, stale display generation and retired evaluator adoption under /mnt/oldrog/tmp/g3-decimal-scope. Remaining basic decimal value-reference/accessor sequencing and deeper raw formatter/primitive failure composition still need source audit. Full native checkpoint c19bb8d7 predates this and the subsequent bound/predicate/numeric-context increments; no new full suite or whole polynomial/AST completion is claimed and no unit is promoted.",
         "Basic decimal display cpp2731-2734 now evaluates the actual basic_value/accessor gates and passes a concrete stored-mpq reference to the numerical decimal driver. Canonical zero uses the receiving core zero. The driver declares its existing RAW n1,d1,v1 before reading source fields, copies NUM before reading/copying DEN, then reads only the original NUM sign word before the shared decimal loop. Pointer-backed rational callers retain their direct component references and share only the copied-value loop and existing begin/finish lifecycle. Stored views own no header or numeral, introduce no numerical owner or generic/any/callback reader, and use the actual two three-word project numeral records. Six signed non-owning raw input prefixes cover missing NUM, missing DEN after a real BIG NUM copy, and complete positive/negative values. A pending driver after failed reads proves RAW declaration entry; the extra live NUM cell proves copy-before-DEN, and explicit CleanupDecimalStream disposes it without source repair or construction/ownership flags. Completed 2^64+1 divided by3 independently yields +/-6148914691236517205.6?. Restoring the old whole-record caller fails the six cases; an isolated early DEN read fails precisely the two missing-DEN NUM-copy prefixes (signed-baseline.log and signed-early-den.log with baseline.json/early-den.json under /mnt/oldrog/tmp/g3-basic-decimal). Applied decimal/core checks pass native/checked/debug/combined (0.064s/0.048s/0.065s/0.063s), as do rational decimal source, assertion, allocation/insertion failure and callback groups (0.108s/0.113s/0.119s/0.116s). AST arithmetic regressions pass native0.022s/combined0.045s; they do not complete the owning AST algebraic wrapper/translation consumer. Full native checkpoint14fa0836, recorded by216d61bd, predates this increment; these changes remained overlays until that unchanged checkout run completed. Deeper primitive/formatter source-failure composition and whole polynomial/AST completion remain open; no unit is promoted.",
         "The retained decimal caller path has been reconciled through C++ API/header/public wrappers, get_interval and exact/approximate selection. Binary decimal power always has base2 and uses its direct specialization; abs(v1), positive two_k and nonnegative n1 keep division off the negative-numerator RAW branch. Multiplication/division borrow manager scratch; formatter word/text buffers remain native Go storage. Generic power/negative-division RAW wrappers are not added for unreachable decimal instantiations. The actual nonbasic exact-root case now asserts output18446744073709551617, distinguishing selected lower from old upper18446744073709551618; the irrational release case asserts1.?. Selection/body-failure/signed basic reference regression groups pass native/checked/debug/combined (0.008s/0.009s/0.015s/0.016s), logged at /mnt/oldrog/tmp/g3-decimal-scope/selection-{profile}.log. This closes the specific inner generic-RAW reachability question, without treating other numeric consumers, malformed-source domains or the unfinished AST/API consumer as audited. Unit status remains partial and methods_audited remains false."
-      ]
+      ],
+      "evaluation_decimal_display_receipt_audit": {
+        "source": "algebraic_numbers.cpp:2731-2746; algebraic_numbers.h:353",
+        "go_target": "pkg/math/polynomial/algebraic_decimal_display_invocation.go",
+        "behavior": "Actual decimal-display generation captures a caller receipt only after incoming guards and acceptance. Basic calls issue an exact rational decimal invocation key before component copies. Root calls retain existing copied-bound/refinement/binary-display receipts. Matching cleanup handles only the issued basic/root formatter, so a prior receipt cannot acquire replacement work. Existing source component-read and local destruction order remains unchanged.",
+        "retained_consumer": "polynomial.cpp:6505 t_eval_core<anum_manager> result TRACE uses decimal precision10",
+        "verification": "Fast decimal/read-order/destructor/callback tests in all four profiles plus actual result-budget failures; long precision20 sweep is separate. Whole algebraic/AST ownership and consumer audit remains partial."
+      }
     },
     {
       "path": "src/math/polynomial/algebraic_numbers.h",
@@ -40791,7 +40798,14 @@
         "The missing inner root comparison record at algebraic_numbers.cpp:1738-1743 now follows interval disjointness and polynomial equality exits and precedes refinement/Sturm work. It displays actual source polynomials, open binary intervals and minimal flags through accepted formatter receipts. The outer record at 1861 now uses tracked basic MPQ and root MPBQ display insertions through the same numeric/UP trace borrow. Exact records cover minimal/nonminimal and equal/disjoint branches; a real UP numeral destructor guard stops before algorithm advancement. Native Go formatting buffers do not consume the numerical allocation budget: a nested actual mpn_to_string result callback instead guards the completed character span before its reached C-string read, verifying accepted child retention, source completion, acknowledgement and unchanged input. Erased records do not read operands. Literal tests fail against the old compareCore dispatch in an exact Go overlay. Whole comparison/polynomial/AST source audits remain partial.",
         "Public AlgebraicManager arithmetic now explicitly surrounds actual core power/add/sub/mul calls with the source anum_detail records. Internal imp/core operations remain direct. The retained integer overload calls the public addition wrapper after constructing its real scoped algebraic integer; an actual display source-END stop protects that temporary, while completed formatting source work with pending acknowledgement does not delay its private source destructor. Cleanup pins refuse callback owner mutation. Literal records/aliases cover all wrappers and the integer overload, before/after display stops preserve arithmetic publication boundaries, failed bodies omit result records, cached input root indices publish before power, and full-stream callbacks preserve algebraic/numeric/UP owners and allocation graphs. Actual qualified formatter and character-read guards verify integer temporary history and acknowledgement; disabled records do not read operands or break zero multiplication short circuit. A direct-core-forwarding overlay fails the public power record regression. Focused polynomial and retained AST arithmetic consumers pass all four profiles; complete polynomial/AST and callee failure audits remain open.",
         "Root/root comparison dispatch now reaches compare_core entry SASSERT and the two established to_algebraic assertion switches before decoding algebraic cell members (cpp1710, h373). The entry compound predicate preserves short circuit. Post-refinement SASSERT statements at cpp1761-1762 separately query the dynamic source switch and use the existing guarded assertion-action path, preserving the legacy Go marker alongside actual source Throw exceptions and allowing Continue or disabled assertions. Tests cover both real rational-promotion failure sites after both refinements and counter advancement, T/C/disabled actions, gate requery, disabled operand erasure, and ended-context priority over an uninitialized object-prefix member read. Baseline overlays fail the concrete-throw and entry-read-order regressions. The object-prefix vector claims no completed C++ placement constructor. Whole comparison/polynomial/AST and numeric-child audits remain open."
-      ]
+      ],
+      "evaluation_decimal_display_receipt_audit": {
+        "source": "algebraic_numbers.cpp:2731-2746; algebraic_numbers.h:353",
+        "go_target": "pkg/math/polynomial/algebraic_decimal_display_invocation.go",
+        "behavior": "Actual decimal-display generation captures a caller receipt only after incoming guards and acceptance. Basic calls issue an exact rational decimal invocation key before component copies. Root calls retain existing copied-bound/refinement/binary-display receipts. Matching cleanup handles only the issued basic/root formatter, so a prior receipt cannot acquire replacement work. Existing source component-read and local destruction order remains unchanged.",
+        "retained_consumer": "polynomial.cpp:6505 t_eval_core<anum_manager> result TRACE uses decimal precision10",
+        "verification": "Fast decimal/read-order/destructor/callback tests in all four profiles plus actual result-budget failures; long precision20 sweep is separate. Whole algebraic/AST ownership and consumer audit remains partial."
+      }
     },
     {
       "path": "src/math/polynomial/algebraic_params.hpp",
@@ -47450,7 +47464,7 @@
           "6795 factor-core A/B and 6807 constant C"
         ],
         "verification": "Real zero polynomial cells distinguish direct display from the public consistency scope with a closed Go-adapter reservation gate. Controls retain public checks. Existing trace output, refusal, callback and display tests cover reached nonzero terms and cleanup.",
-        "remaining_trace_audit": "The evaluation entry TRACE cpp6438-6439 is implemented for the four retained concrete evaluators. Result TRACE cpp6504-6505 remains unported/unverified. All factor TRACE call sites cpp6578-6829 have implementations; per-increment audits describe source dispatch and verification limits. Broader retained-consumer, numeric failure and whole-unit ownership audits remain open. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit."
+        "remaining_trace_audit": "The evaluation entry TRACE cpp6438-6439 is implemented for the four retained concrete evaluators. Result TRACE cpp6504-6505 is now implemented for the four retained concrete evaluators. Whole-unit statement, retained-consumer and failure audits remain open. All factor TRACE call sites cpp6578-6829 have implementations; per-increment audits describe source dispatch and verification limits. Broader retained-consumer, numeric failure and whole-unit ownership audits remain open. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit."
       },
       "public_content_and_quadratic_trace_audit": {
         "source": "polynomial.cpp:7199-7210 and 6604-6672",
@@ -47548,7 +47562,7 @@
       "evaluation_entry_trace_audit": {
         "source": "polynomial.cpp:6438-6439, before assertions and lexical aux construction",
         "go_target": "pkg/math/polynomial/polynomial_evaluation_trace.go",
-        "status": "ported entry diagnostic; result record cpp6504-6505 and broader audits remain open",
+        "status": "ported entry diagnostic; result record is mapped by evaluation_result_trace_audit; broader audits remain open",
         "retained_instantiations": [
           "unsynch_mpq_manager rational",
           "refined imp numeral_manager = mpzzp_manager integer (cpp1823)",
@@ -47564,6 +47578,25 @@
         ],
         "evidence": "All four concrete evaluators have value/entry-output checks. Real TLS BIG Copy refusal before aux frame construction captures exact allocator roots; matched CleanupEvaluation releases them and copied scope cannot acquire them. Refusing stream still executes polynomial formatting. Broader evaluation/factor/imp checks pass four profiles. Independent omitted-entry and omitted-receipt overlays fail intended assertions under /mnt/oldrog/tmp/g3-evaluation-entry.",
         "type_alias_correction": "The imp typedef at cpp1823 refines the public raw numeral_manager to mpzzp_manager; its univariate factor conversion m().to_string is now routed through existing Modular SourceStringTracked, with no receipt for the nonallocating retained +/-1 case. Earlier raw-String wording is superseded."
+      },
+      "evaluation_result_trace_audit": {
+        "source": "polynomial.cpp:6504-6505, before lexical auxiliary destruction",
+        "go_target": "pkg/math/polynomial/polynomial_evaluation_result_trace.go",
+        "status": "ported four concrete result formatter paths; whole polynomial/AST audits remain open",
+        "dispatch": {
+          "rational": "RationalManager.DisplayToTracked source fraction output",
+          "integer": "IntegerManager.DisplayToTracked, matching mpzzp::display forwarding",
+          "interval": "BinaryIntervalManager.DisplayTracked, source bound to_string calls in order",
+          "algebraic": "AlgebraicRootCore.displayDecimalWithReceipt at default precision10 (algebraic_numbers.h:353)"
+        },
+        "ownership": "A successful-body defer runs before the actual auxiliary destructor, including early-return paths. Failed bodies skip result output. The actual root diagnostic captures numeral insertion and algebraic decimal invocation keys, propagates stopped source children before older auxiliary destruction and cleans only matching children. Algebraic whole-display keys include a separately matched basic rational decimal driver, preventing stale cleanup from acquiring later displays. Native Go buffers replace source standard-library storage.",
+        "tests": [
+          "TestPolynomialEvaluationResultTraceConcreteFormatters",
+          "TestPolynomialEvaluationResultTraceActualDecimalReservationPrefixes",
+          "TestPolynomialEvaluationResultTraceSkippedAfterBodyError",
+          "TestRationalDecimalInvocationOldReceiptCannotAcquireReplacement"
+        ],
+        "evidence": "Five value spellings include 2/3, a negative BIG integer, binary interval fractions, rational algebraic default decimal and sqrt(2) decimal. Output callbacks observe a live auxiliary. The actual decimal refusal sweep arms the real budget at a result header, proves accepted pending driver ownership and copied-scope refusal, then reaches success. Independent omitted-results and omitted-decimal-receipt controls fail. Fast checks pass four profiles; long precision20 evidence is recorded separately in PORT_PROGRESS.md."
       }
     },
     {
@@ -164586,7 +164619,23 @@
       ],
       "deviations": [
         "Whole-header audit: mpbqi.h adds only the concrete MPBQ/open manager constructor, inherited interval operations, four set overloads, two add overloads and scoped aliases; those routes are represented by BinaryIntervalManager and its scoped owner. It defines no display override. The inherited basic_interval display writer and the algebraic display_interval caller are already covered; realclosure.cpp defines its own local mpbqi_manager alias over basic_interval and uses its separate Go realclosure interval owner. C++ ostream state is standard-library behavior, not a project algorithm."
-      ]
+      ],
+      "retained_evaluation_formatter_receipt_audit": {
+        "source": "mpq.cpp:156-185; basic_interval.h:358-360",
+        "go_targets": [
+          "pkg/util/numeral/mpq_decimal_invocation.go",
+          "pkg/util/numeral/mpq_decimal_stream.go",
+          "pkg/util/numeral/mpq_decimal_stored.go",
+          "pkg/util/numeral/mpbqi_format.go",
+          "pkg/util/numeral/mp_display_stream.go"
+        ],
+        "behavior": "Concrete optional receipts expose accepted rational decimal invocations and existing numeral insertions to retained evaluation diagnostics. Old and stored decimal entries share the same driver and source declaration/read order. Interval display uses source bound strings and exposes both actual insertion receipts. Cleanup checks exact owner/generation and does not sweep later work. No generic numeral or standard-library adapter is added.",
+        "tests": [
+          "TestRationalDecimalInvocationOldReceiptCannotAcquireReplacement",
+          "TestPolynomialEvaluationResultTraceConcreteFormatters",
+          "TestPolynomialEvaluationResultTraceActualDecimalReservationPrefixes"
+        ]
+      }
     },
     {
       "path": "src/util/mpf.cpp",
@@ -171729,7 +171778,23 @@
         "Native numerical text construction, assignment, CString append and prefix concatenation now take Go strings directly rather than ParamsStringView. Invalid numeric text owners/destinations use ErrOwnedStringOwner independently of parameter types. Existing checked numerical result/borrow lifetimes, first-NUL input semantics, counted output copies and actual numeric cleanup remain. This removes numeric-to-parameter dependencies without STL implementation or whole-unit credit.",
         "Native numeral output migration: RationalSourceStream accepts string text. The numerical producer validates its completed character invocation and copies first-NUL text before calling output. The checked numeral view is private to util; callback strings survive source cleanup and nested display. Actual character-scope cleanup, insertion receipts and source destructor failures remain. This supersedes output-facing borrowed-view claims; it adds no STL or generic template implementation credit.",
         "The retained algebraic basic decimal caller now borrows the existing concrete RationalSourceStream service through an io.Writer bridge. It preserves integer/dot/digit insertion boundaries and requires explicit CleanupDecimalStream after a refused writer; no C++ ostream implementation is added."
-      ]
+      ],
+      "retained_evaluation_formatter_receipt_audit": {
+        "source": "mpq.cpp:156-185; basic_interval.h:358-360",
+        "go_targets": [
+          "pkg/util/numeral/mpq_decimal_invocation.go",
+          "pkg/util/numeral/mpq_decimal_stream.go",
+          "pkg/util/numeral/mpq_decimal_stored.go",
+          "pkg/util/numeral/mpbqi_format.go",
+          "pkg/util/numeral/mp_display_stream.go"
+        ],
+        "behavior": "Concrete optional receipts expose accepted rational decimal invocations and existing numeral insertions to retained evaluation diagnostics. Old and stored decimal entries share the same driver and source declaration/read order. Interval display uses source bound strings and exposes both actual insertion receipts. Cleanup checks exact owner/generation and does not sweep later work. No generic numeral or standard-library adapter is added.",
+        "tests": [
+          "TestRationalDecimalInvocationOldReceiptCannotAcquireReplacement",
+          "TestPolynomialEvaluationResultTraceConcreteFormatters",
+          "TestPolynomialEvaluationResultTraceActualDecimalReservationPrefixes"
+        ]
+      }
     },
     {
       "path": "src/util/mpq.h",

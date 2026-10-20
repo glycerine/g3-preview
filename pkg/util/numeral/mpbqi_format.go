@@ -18,6 +18,10 @@ func writeBinaryIntervalPart(w io.Writer, text string) error {
 // Display follows basic_interval_manager<mpbq_manager,false>::display:
 // each delimiter and completed bound string is inserted in source order.
 func (m *BinaryIntervalManager) Display(w io.Writer, a *BinaryInterval) error {
+	return m.DisplayTracked(w, a, nil, nil)
+}
+
+func (m *BinaryIntervalManager) DisplayTracked(w io.Writer, a *BinaryInterval, lowerReceipt, upperReceipt *NumeralInsertionReceipt) error {
 	if w == nil {
 		return arena.ErrInvalidSlot
 	}
@@ -27,7 +31,7 @@ func (m *BinaryIntervalManager) Display(w io.Writer, a *BinaryInterval) error {
 	if err := writeBinaryIntervalPart(w, "("); err != nil {
 		return err
 	}
-	lower, err := m.bounds.String(&a.lower)
+	lower, err := m.bounds.SourceStringTracked(&a.lower, lowerReceipt)
 	if err != nil {
 		return err
 	}
@@ -37,7 +41,7 @@ func (m *BinaryIntervalManager) Display(w io.Writer, a *BinaryInterval) error {
 	if err := writeBinaryIntervalPart(w, ", "); err != nil {
 		return err
 	}
-	upper, err := m.bounds.String(&a.upper)
+	upper, err := m.bounds.SourceStringTracked(&a.upper, upperReceipt)
 	if err != nil {
 		return err
 	}

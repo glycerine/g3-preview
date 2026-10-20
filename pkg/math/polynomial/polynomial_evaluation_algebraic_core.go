@@ -60,6 +60,12 @@ func (m *MultivariatePolynomialManager) evaluationAlgebraicCore(p Polynomial, v 
 			cause = errors.Join(cause, e)
 		}
 	}()
+	defer func() {
+		if cause == nil {
+			cause = m.traceEvaluationAlgebraicResult(start, end, x, out)
+		}
+	}()
+
 	aux := &f.aux
 	if end == start+1 {
 		n, e := m.core.coefficientCore(p, start)

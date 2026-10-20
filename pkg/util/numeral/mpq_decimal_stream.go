@@ -10,10 +10,14 @@ import (
 // DisplayDecimalInto borrows the caller stream and follows the original
 // unrounded Div/display/Rem loop. CleanupDecimalStream joins a failed body.
 func (m *RationalManager) DisplayDecimalInto(out RationalSourceStream, a *Rational, precision uint32, truncate bool) (cause error) {
+	return m.DisplayDecimalIntoWithInvocation(out, a, precision, truncate, nil)
+}
+
+func (m *RationalManager) DisplayDecimalIntoWithInvocation(out RationalSourceStream, a *Rational, precision uint32, truncate bool, receipt *RationalDecimalInvocationReceipt) (cause error) {
 	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
-	s, e := m.beginDecimalStream(out)
+	s, e := m.beginDecimalStreamWithInvocation(out, receipt)
 	if e != nil {
 		return e
 	}
@@ -21,7 +25,7 @@ func (m *RationalManager) DisplayDecimalInto(out RationalSourceStream, a *Ration
 	return s.run(out, a, precision, truncate)
 }
 
-func (m *RationalManager) beginDecimalStream(out RationalSourceStream) (*rationalDecimalStreamScope, error) {
+func (m *RationalManager) beginDecimalStreamWithInvocation(out RationalSourceStream, receipt *RationalDecimalInvocationReceipt) (*rationalDecimalStreamScope, error) {
 	s := &m.decimalStream
 	if s.active {
 		return nil, ErrNumericPending
@@ -34,6 +38,9 @@ func (m *RationalManager) beginDecimalStream(out RationalSourceStream) (*rationa
 	}
 	// Literal n1,d1,v1 declarations precede the first component access.
 	*s = rationalDecimalStreamScope{manager: m, invocation: s.invocation + 1, count: 3, active: true, executing: true}
+	if receipt != nil {
+		*receipt = RationalDecimalInvocationReceipt{m, s.invocation}
+	}
 	s.hooks.Policy = s
 	if e := s.bind(); e != nil {
 		s.executing = false

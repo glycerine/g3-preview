@@ -26,7 +26,7 @@ func polynomialEvaluationTraceOutput(t *testing.T, m *MultivariatePolynomialMana
 	if algebraic {
 		s = &m.algebraicEvaluation.trace
 	}
-	if !m.evaluationTraceActual(s) || s.display.frame == nil || s.active {
+	if !m.evaluationTraceActual(s) || s.invocation == 0 || s.active {
 		t.Fatal("actual completed evaluation diagnostic not retained")
 	}
 }
@@ -174,11 +174,12 @@ func TestPolynomialEvaluationTraceFailedStreamAndOwnerBorrow(t *testing.T) {
 		serviceMust(t, m.CleanupEvaluation())
 		serviceMust(t, m.core.integer.Del(&out))
 	}()
+	beforeDisplay := m.core.display.next
 	serviceMust(t, m.UnivariateEvaluate(p, 0, &value, &out))
 	if out != unumeral.NewInt(5) {
 		t.Fatal("refused stream changed evaluation", out)
 	}
-	if tags.ShouldTrace("eval_bug") && (writer.calls == 0 || m.evaluation.trace.display.frame == nil) {
+	if tags.ShouldTrace("eval_bug") && (writer.calls == 0 || m.core.display.next <= beforeDisplay) {
 		t.Fatal("refused writer suppressed actual polynomial formatting")
 	}
 }

@@ -203,6 +203,12 @@ func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v P
 			cause = errors.Join(cause, e)
 		}
 	}()
+	defer func() {
+		if cause == nil {
+			cause = m.traceEvaluationRationalResult(start, end, x, out)
+		}
+	}()
+
 	aux := &f.aux
 	if end == start+1 {
 		n, e := m.core.coefficientCore(p, start)
@@ -684,6 +690,12 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *p
 			cause = errors.Join(cause, e)
 		}
 	}()
+	defer func() {
+		if cause == nil {
+			cause = m.traceEvaluationIntegerResult(start, end, x, out)
+		}
+	}()
+
 	aux := &f.aux
 	if end == start+1 {
 		n, e := m.core.coefficientCore(p, start)
@@ -917,6 +929,12 @@ func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v P
 			cause = errors.Join(cause, e)
 		}
 	}()
+	defer func() {
+		if cause == nil {
+			cause = m.traceEvaluationIntervalResult(start, end, x, out)
+		}
+	}()
+
 	aux := &f.aux
 	if end == start+1 {
 		n, e := m.core.coefficientCore(p, start)
