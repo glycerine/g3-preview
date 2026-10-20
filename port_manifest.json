@@ -12517,9 +12517,14 @@
       "path": "src/ast/ast_pp.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_printer.go",
+        "pkg/ast/ast_printer_test.go"
+      ],
+      "tests": [
+        "TestASTPrinterDefaultIDsAndSimpleSMT2Context"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -12530,11 +12535,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_pp constructor aliases to the official SMT2 printer with optional formatting parameters",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_printer.go",
+          "tests": [
+            "TestASTPrinterDefaultIDsAndSimpleSMT2Context"
+          ]
+        }
+      ],
+      "ownership": [
+        "SimpleASTPrinterContext borrows its AST manager and writers, matching the source mk_pp temporary's borrowed manager and AST lifetimes."
+      ],
+      "deviations": [
+        "The source type adds no behavior beyond inheriting mk_ismt2_pp constructors, so Go callers use the existing concrete SMT2 printer context directly instead of a redundant alias adapter."
+      ]
     },
     {
       "path": "src/ast/ast_pp_dot.cpp",
@@ -12600,22 +12618,45 @@
       "path": "src/ast/ast_pp_util.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_pp_util.go",
+        "pkg/ast/ast_pp_util_test.go"
+      ],
+      "tests": [
+        "TestASTPPUtilCollectRemoveDeclarationsAndAssertions"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "ast_pp_util collect overloads, declaration removal, dependency-ordered declaration display and neat/legacy assertion display",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_pp_util.go",
+          "tests": [
+            "TestASTPPUtilCollectRemoveDeclarationsAndAssertions"
+          ]
+        }
+      ],
+      "ownership": [
+        "ASTPPUtil borrows its manager and collected AST handles for its lifetime and owns native collector visitation state plus its removed-declaration map. Output writers and formula slices are borrowed only for each synchronous call."
+      ],
+      "deviations": [
+        "Native Go maps replace obj_hashtable storage. The retained non-datatype path uses the ported collector and modern/legacy printers; datatype traversal remains outside this unit until its source plugin is ported."
+      ]
     },
     {
       "path": "src/ast/ast_pp_util.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_pp_util.go",
+        "pkg/ast/ast_pp_util_test.go"
+      ],
+      "tests": [
+        "TestASTPPUtilCollectRemoveDeclarationsAndAssertions"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -12626,11 +12667,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "ast_pp_util construction and collect/remove/display public interface",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_pp_util.go",
+          "tests": [
+            "TestASTPPUtilCollectRemoveDeclarationsAndAssertions"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go utility owns its native removed set and collector state while borrowing the manager, matching the source member ownership without porting C++ containers."
+      ],
+      "deviations": [
+        "Slice-based CollectAll replaces the two source vector/pointer overloads."
+      ]
     },
     {
       "path": "src/ast/ast_printer.cpp",
