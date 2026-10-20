@@ -76,12 +76,15 @@ func (m *MultivariatePolynomialCore) SourceFinalizePrefix() error {
 func (m *MultivariatePolynomialCore) sourcePrivateDEC(i uint32) error {
 	p := [2]Polynomial{m.zero, m.unit}[i]
 	if !m.sourceDecDone[i] {
+		if e := m.cellSourceAssert(1371, "m_ref_count > 0", func() (bool, error) {
+			r, e := m.readWord(p, 0)
+			return r > 0, e
+		}); e != nil {
+			return e
+		}
 		r, e := m.readWord(p, 0)
 		if e != nil {
 			return e
-		}
-		if polynomialSourceDebug && r == 0 {
-			return ErrPolynomialAssertion
 		}
 		r--
 		if e = m.writeWord(p, 0, r); e != nil {

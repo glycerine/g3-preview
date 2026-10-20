@@ -214,14 +214,8 @@ func (m *MultivariatePolynomialCore) dividesWithReceipt(q, p Polynomial, receipt
 	if e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug {
-		n, e := m.readWord(q, 8)
-		if e != nil {
-			return false, e
-		}
-		if maxQ >= n {
-			return false, ErrPolynomialAssertion
-		}
+	if e = m.cellIndexAssert(q, maxQ, 1511); e != nil {
+		return false, e
 	}
 	aq := unumeral.IntegerArrayView{Allocator: m.monomials.allocator, Object: ql.raw, Count: 1, Offset: 12 + uint64(maxQ)*12, Stride: 12}
 	// Exact source declaration order: monomial_ref, then scoped numeral.

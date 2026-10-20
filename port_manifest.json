@@ -44050,6 +44050,28 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained private zero/unit destructor decrement1371 before source cursor publication",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_source_prefix.go",
+          "tests": [
+            "TestPolynomialPrivateDestructorDecrementAssertionGate",
+            "TestPolynomialImpSourceDestructorSeparateOwningClose"
+          ],
+          "notes": "The private engine shared by full SourceFinalize stages0/1 and selected SourceFinalizePrefix now independently gates1371 and freshly reads the decrement operand. sourceDecDone/sourceDeleteNeeded remain published only after actual count write, preserving source deletion and owning cleanup cursors. Fully constructed manager under a closed borrowed process assertion owner stops at bodyStage0 with both private counts1 and no deletion publication; the old engine instead advances to stage1 with both DEC flags committed. Native source destruction completes. No source counts/descriptors or constructor eligibility are repaired."
+        },
+        {
+          "name": "Retained divides const coefficient reference1511 before scoped locals at cpp5166",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_divides.go",
+          "tests": [
+            "TestPolynomialDividesIndependentFiniteAndZeroReadMask",
+            "TestPolynomialDividesEveryActualReservationPrefix",
+            "TestPolynomialDividesBIGActualEveryReservationPrefix",
+            "TestPolynomialDividesActualMatchedInvocationEveryPrefix"
+          ],
+          "notes": "The q->a(max_q) source assertion uses the existing process gate/action helper before forming the concrete IntegerArrayView alias. The code keeps the actual coefficient storage reference instead of introducing an eager numeral copy; monomial/NUM local declaration order and direct numeric receipts remain. The later SOM coefficient bounds check is a native-vector guard for som_buffer::a1956, not polynomial accessor1511."
+        },
+        {
           "name": "Retained rational/linear/variable constructor assertion protocols cpp2531,2539,2558,2560,2569,2605-2606,2626,2631",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_constructor_assertions.go",
