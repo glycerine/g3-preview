@@ -21421,18 +21421,25 @@
       "path": "src/ast/pb_decl_plugin.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_auxiliary_plugins.go",
         "pkg/ast/ast_auxiliary_plugins_source_test.go",
         "pkg/ast/ast_pb_decl.go",
-        "pkg/ast/ast_pb_decl_test.go"
+        "pkg/ast/ast_pb_decl_test.go",
+        "pkg/ast/ast_pb_util.go",
+        "pkg/ast/ast_pb_util_test.go",
+        "pkg/ast/ast_pb_recognizers.go",
+        "pkg/ast/ast_pb_recognizers_test.go"
       ],
       "tests": [
         "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
         "TestASTAuxiliaryPluginEveryConstructorPrefix",
         "TestASTPseudoBooleanOriginalDeclarationsAndNames",
-        "TestASTPseudoBooleanOriginalParameterValidationAndConversion"
+        "TestASTPseudoBooleanOriginalParameterValidationAndConversion",
+        "TestASTPseudoBooleanOriginalNormalizationFloorCeilAndEquality",
+        "TestASTPseudoBooleanOriginalCardinalityAndStrictLess",
+        "TestASTPseudoBooleanOriginalRecognizersCoefficientsAndFreshAux"
       ],
       "assertions": [
         {
@@ -21456,8 +21463,8 @@
           "text": "SASSERT(p.is_rational());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "ast_auxiliary_plugins concrete reached source counterpart (pb_decl_plugin.cpp:23-29)",
@@ -21476,27 +21483,52 @@
             "TestASTPseudoBooleanOriginalDeclarationsAndNames",
             "TestASTPseudoBooleanOriginalParameterValidationAndConversion"
           ]
+        },
+        {
+          "name": "pb_util coefficient normalization and <=, >=, =, < and cardinality factories (pb_decl_plugin.cpp:103-217)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_pb_util.go",
+          "tests": [
+            "TestASTPseudoBooleanOriginalNormalizationFloorCeilAndEquality",
+            "TestASTPseudoBooleanOriginalCardinalityAndStrictLess"
+          ]
+        },
+        {
+          "name": "pb_util relation recognizers, bound and coefficient access, unit-coefficient test and fresh auxiliary Boolean (pb_decl_plugin.cpp:219-300)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_pb_recognizers.go",
+          "tests": [
+            "TestASTPseudoBooleanOriginalRecognizersCoefficientsAndFreshAux"
+          ]
         }
       ],
       "ownership": [
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
+        "Factory arguments and input rationals are borrowed. Declaration construction copies temporary parameters before they are released. Bound and coefficient queries return owning rational copies that callers release through the manager rational service."
       ],
       "deviations": [
-        "Declaration construction and builtin-name publication are ported with typed Go errors and owned AST parameters. pb_util normalization, factories and recognizers remain open."
+        "Declaration construction and builtin-name publication use typed Go errors and owned AST parameters. math/big.Rat supplies temporary exact arithmetic for source coefficient normalization; published numerals remain manager-owned values."
       ]
     },
     {
       "path": "src/ast/pb_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_pb_decl.go",
-        "pkg/ast/ast_pb_decl_test.go"
+        "pkg/ast/ast_pb_decl_test.go",
+        "pkg/ast/ast_pb_util.go",
+        "pkg/ast/ast_pb_util_test.go",
+        "pkg/ast/ast_pb_recognizers.go",
+        "pkg/ast/ast_pb_recognizers_test.go"
       ],
       "tests": [
         "TestASTPseudoBooleanOriginalDeclarationsAndNames",
-        "TestASTPseudoBooleanOriginalParameterValidationAndConversion"
+        "TestASTPseudoBooleanOriginalParameterValidationAndConversion",
+        "TestASTPseudoBooleanOriginalNormalizationFloorCeilAndEquality",
+        "TestASTPseudoBooleanOriginalCardinalityAndStrictLess",
+        "TestASTPseudoBooleanOriginalRecognizersCoefficientsAndFreshAux"
       ],
       "conditionals": [
         {
@@ -21508,8 +21540,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "pseudo-Boolean operation enum and declaration-plugin interface",
@@ -21522,15 +21554,23 @@
         },
         {
           "name": "pb_util normalization, construction and recognizer interface",
-          "status": "unported",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/ast/ast_pb_util.go",
+          "go_targets": [
+            "pkg/ast/ast_pb_recognizers.go"
+          ],
+          "tests": [
+            "TestASTPseudoBooleanOriginalNormalizationFloorCeilAndEquality",
+            "TestASTPseudoBooleanOriginalCardinalityAndStrictLess",
+            "TestASTPseudoBooleanOriginalRecognizersCoefficientsAndFreshAux"
+          ]
         }
       ],
       "ownership": [
-        "Declaration construction borrows caller domain handles and parameters; canonical declaration info owns copied parameters after publication. Temporary rational-to-int descriptors are released after the declaration copies them."
+        "Declaration construction borrows caller domain handles and parameters; canonical declaration info owns copied parameters after publication. Temporary rational-to-int descriptors are released after the declaration copies them. Utility factories borrow arguments and rationals, while bound and coefficient queries return caller-owned rational copies."
       ],
       "deviations": [
-        "Concrete typed Go manager methods replace the declaration plugin's pointer-array interface. pb_util remains open."
+        "Concrete typed Go manager methods replace the declaration plugin's pointer-array interface."
       ]
     },
     {
