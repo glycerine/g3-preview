@@ -29281,19 +29281,26 @@
       "path": "src/ast/rewriter/poly_rewriter_params.hpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/ast/rewriter/bv_polynomial_config.go",
+        "pkg/ast/rewriter/bv_polynomial_config_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
+        "TestBVPolynomialConfigurationTypedLocalModuleFallback",
+        "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
+        "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
+        "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
       ],
       "conditionals": [
         {
@@ -29305,11 +29312,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/gparams_catalog_collectors.go",
           "tests": [
@@ -29322,18 +29329,32 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "constructor module snapshot and flat / som / hoist_mul / hoist_cmul / som_blowup local-module-default getters in source update order",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_config.go",
+          "tests": [
+            "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
+            "TestBVPolynomialConfigurationTypedLocalModuleFallback",
+            "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
+            "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
+            "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Descriptor ownership/merges and borrowed catalog-owned description bytes retain the catalog behavior. Each concrete update borrows its local params_ref, owns one rewriter-module snapshot through the exact getter sequence, and retires it with a tracked decrement; stopped prefixes remain owned by the configuration Close path."
       ],
-      "deviations": []
+      "deviations": [
+        "The generated facade is inlined into the retained concrete polynomial configuration consumer. Explicit Go errors replace source fatal/exception transport."
+      ]
     },
     {
       "path": "src/ast/rewriter/poly_rewriter_params.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/bv_polynomial_config.go",
         "pkg/ast/rewriter/bv_polynomial_config_test.go"
@@ -29346,12 +29367,12 @@
         "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
         "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "All five concrete generated getters and literal defaults consumed by polynomial configuration with exact existing descriptor collector (src/ast/rewriter/poly_rewriter_params.pyg; scripts/mk_genfile_common.py:895-921)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_config.go",
           "tests": [
             "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
@@ -29364,9 +29385,11 @@
         }
       ],
       "ownership": [
-        "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited."
+        "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains the reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates return module reference counts to baseline."
       ],
-      "deviations": []
+      "deviations": [
+        "The generated facade is inlined into its retained concrete consumer; explicit Go failures replace source fatal/exception transport and do not claim C++ layout or temporary-elision behavior."
+      ]
     },
     {
       "path": "src/ast/rewriter/push_app_ite.cpp",
