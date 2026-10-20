@@ -9,7 +9,7 @@ func (m *MultivariatePolynomialManager) CleanupGCD() error {
 	if m == nil || m.self != m || m.core == nil {
 		return ErrPolynomialOwner
 	}
-	if m.gcdDepth != 0 {
+	if m.gcdDepth != 0 || m.core.quadraticTraceCallback() {
 		return ErrPolynomialPending
 	}
 	if e := m.cleanupGCDScopes(m.gcdFrames, false); e != nil {

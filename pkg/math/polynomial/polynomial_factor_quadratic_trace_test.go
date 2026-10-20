@@ -51,9 +51,9 @@ type polynomialQuadraticTraceWriter struct {
 
 func (w *polynomialQuadraticTraceWriter) Write(p []byte) (int, error) {
 	w.calls++
-	for _, e := range []error{w.m.CloseChecked(), w.m.SourceFinalize(), w.m.core.CloseChecked(), w.m.core.SourceFinalizePrefix(), w.m.core.CleanupDisplay(), w.m.CleanupGCD(), w.f.CloseChecked(), w.f.Reset(), w.f.Cleanup()} {
+	for index, e := range []error{w.m.CloseChecked(), w.m.SourceFinalize(), w.m.core.CloseChecked(), w.m.core.SourceFinalizePrefix(), w.m.core.CleanupDisplay(), w.m.CleanupGCD(), w.f.CloseChecked(), w.f.Reset(), w.f.Cleanup()} {
 		if !errors.Is(e, ErrPolynomialPending) {
-			w.t.Fatalf("quadratic trace callback acquired owner: %v", e)
+			w.t.Fatalf("factor trace callback acquired owner at check %d: %v", index, e)
 		}
 	}
 	if w.refuse {

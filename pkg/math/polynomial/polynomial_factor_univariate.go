@@ -30,6 +30,8 @@ type polynomialFactorUnivariateScope struct {
 	toPolynomial                            polynomialToPolynomialInvocationReceipt
 	predicatePrimitive, predicateSquareFree polynomialGCDInvocationReceipt
 	traceEntry                              polynomialGCDInvocationReceipt
+	tracePolynomial                         polynomialDisplayInvocationReceipt
+	traceUnivariate                         upolyDisplayInvocationReceipt
 	constant                                polynomialFactorConstantInvocationReceipt
 	bodyCause, sourceCause, cleanupCause    error
 }
@@ -140,6 +142,9 @@ func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveUnivariateWithR
 	if s.fs.count == 1 && s.fs.degrees[0] == 1 {
 		return r.Push(p, k)
 	}
+	if e = m.traceUnivariateFactorStart(s, p); e != nil {
+		return e
+	}
 	s.conditionalReference = true // actual f constructor only in else
 	n := s.fs.count
 	for i := uint32(0); i < n; i++ {
@@ -155,9 +160,15 @@ func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveUnivariateWithR
 		if e = s.f.assign(c, result); e != nil {
 			return e
 		}
+		if e = m.traceUnivariateFactorConverted(s, vector); e != nil {
+			return e
+		}
 		if e = r.Push(s.f.value, k*multiplicity); e != nil {
 			return e
 		}
+	}
+	if e = m.traceUnivariateFactorEnd(s); e != nil {
+		return e
 	}
 	if e = polynomialFactorSourceAssert(6721, "m().is_one(fs.get_constant()) || m().is_minus_one(fs.get_constant())", func() (bool, error) {
 		one, e := c.modular.IsOne(&s.fs.constant)
@@ -178,6 +189,12 @@ func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveUnivariateWithR
 	return nil
 }
 func (m *MultivariatePolynomialManager) factorUnivariateYoungerSource(s *polynomialFactorUnivariateScope) error {
+	if e := m.core.displayReceiptSourceCause(&s.tracePolynomial); e != nil {
+		return e
+	}
+	if e := m.upm.displayReceiptSourceCause(&s.traceUnivariate); e != nil {
+		return e
+	}
 	if e := m.gcdInvocationSourceCause(&s.traceEntry); e != nil {
 		return e
 	}
@@ -281,6 +298,12 @@ func (m *MultivariatePolynomialManager) cleanupFactorUnivariateInvocation(r *pol
 			s.cleanupCause = cause
 		}
 	}()
+	if e := m.core.cleanupDisplayReceipt(&s.tracePolynomial); e != nil {
+		return e
+	}
+	if e := m.upm.cleanupDisplayReceipt(&s.traceUnivariate); e != nil {
+		return e
+	}
 	if e := m.cleanupGCDInvocation(&s.traceEntry, false); e != nil {
 		return e
 	}
@@ -378,13 +401,15 @@ type polynomialFactorUnivariateHistory struct {
 	toPolynomial                            polynomialToPolynomialInvocationReceipt
 	predicatePrimitive, predicateSquareFree polynomialGCDInvocationReceipt
 	traceEntry                              polynomialGCDInvocationReceipt
+	tracePolynomial                         polynomialDisplayInvocationReceipt
+	traceUnivariate                         upolyDisplayInvocationReceipt
 	constant                                polynomialFactorConstantInvocationReceipt
 	bodyCause, sourceCause, cleanupCause    error
 }
 
 func (m *MultivariatePolynomialManager) factorUnivariateHistoryRow() polynomialFactorUnivariateHistory {
 	s := &m.factorUnivariate
-	return polynomialFactorUnivariateHistory{s.invocation, s.constructed, s.sourceCursor, s.ownCursor, s.conditionalReference, s.converter, s.squareFree, s.toPolynomial, s.predicatePrimitive, s.predicateSquareFree, s.traceEntry, s.constant, s.bodyCause, s.sourceCause, s.cleanupCause}
+	return polynomialFactorUnivariateHistory{s.invocation, s.constructed, s.sourceCursor, s.ownCursor, s.conditionalReference, s.converter, s.squareFree, s.toPolynomial, s.predicatePrimitive, s.predicateSquareFree, s.traceEntry, s.tracePolynomial, s.traceUnivariate, s.constant, s.bodyCause, s.sourceCause, s.cleanupCause}
 }
 func (m *MultivariatePolynomialManager) archiveFactorUnivariate() error {
 	s := &m.factorUnivariate

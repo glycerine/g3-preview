@@ -47443,7 +47443,7 @@
           "5772 PSC iteration references"
         ],
         "verification": "Real zero polynomial cells distinguish direct display from the public consistency scope with a closed Go-adapter reservation gate. Controls retain public checks. Existing trace output, refusal, callback and display tests cover reached nonzero terms and cleanup.",
-        "remaining_trace_audit": "Other live source TRACE records remain unverified or absent, including evaluation cpp6438 and factor records outside linear cpp6595, quadratic cpp6604-6672 higher-degree cpp6731 and univariate entry cpp6689. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit. This audit is limited to the implemented call sites listed above."
+        "remaining_trace_audit": "Other live source TRACE records remain unverified or absent, including evaluation cpp6438 and factor records outside linear cpp6595, quadratic cpp6604-6672 higher-degree cpp6731 and univariate cpp6689/6707-6720. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit. This audit is limited to the implemented call sites listed above."
       },
       "public_content_and_quadratic_trace_audit": {
         "source": "polynomial.cpp:7199-7210 and 6604-6672",
@@ -47481,12 +47481,24 @@
       "univariate_factor_entry_trace_audit": {
         "source": "polynomial.cpp:6689 before max_var and p1/p_ref/fs declarations",
         "go_target": "pkg/math/polynomial/polynomial_factor_univariate.go",
-        "status": "ported entry TRACE; remaining factor_bug records cpp6707-6720 still require port/audit",
+        "status": "ported entry TRACE; factor_bug records cpp6707-6720 are covered by univariate_factor_conversion_trace_audit",
         "behavior": "Direct polynomial display uses an accepted diagnostic GCD invocation captured by the actual univariate frame and history. Source destruction checks its stopped child before older locals; owning release and retirement clean only that invocation. No source vector/reference is constructed on entry formatter refusal.",
         "tests": [
           "TestPolynomialUnivariateFactorTracePublicDispatchAndStreamRefusal",
           "TestPolynomialUnivariateFactorTraceExactEntryReceiptBeforeLocals"
         ]
+      },
+      "univariate_factor_conversion_trace_audit": {
+        "source": "polynomial.cpp:6707-6720",
+        "go_target": "pkg/math/polynomial/polynomial_factor_univariate_trace.go",
+        "status": "ported live conversion diagnostics; whole polynomial source unit remains partial",
+        "behavior": "Raw integer String formats the retained backend constant (+/-1 for primitive square-free inputs). Input polynomial displays directly, actual backend factor displays through upolynomial manager, converted polynomial_ref uses public display before Push, and final record precedes the sign assertion/flip. Actual univariate scope/history retain both formatter invocation keys. Both managers are borrowed throughout header/body/footer, and CleanupGCD rejects the active factor TRACE callback even when gcdDepth is zero.",
+        "tests": [
+          "TestPolynomialUnivariateFactorBugTraceConvertedRecordsAndRefusal",
+          "TestPolynomialUnivariateFactorBugEveryReservation",
+          "TestPolynomialUnivariateFactorBugNegativeBackendConstant"
+        ],
+        "limits": "This does not claim arbitrary invalid backend constants or broader raw String instantiations are retained consumers; remaining live factor-core/evaluation diagnostics and broader failure/consumer audits remain open."
       }
     },
     {
