@@ -39537,8 +39537,8 @@
           ]
         },
         {
-          "name": "predicates cpp243\u2013335, magnitude/refinement cpp703\u2013781 and saved interval cpp897\u2013929; IsRational temporary-reference lifetime is explicitly adapted",
-          "status": "partial",
+          "name": "Complete predicates cpp243\u2013335, magnitude/refinement cpp703\u2013781 and saved interval cpp897\u2013929 with explicit IsRational temporary-reference lifetime",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_refinement.go",
           "tests": [
             "TestAlgebraicRefinementRootAccessorBeforeRecord",
@@ -40713,8 +40713,8 @@
           ]
         },
         {
-          "name": "predicates cpp243\u2013335, magnitude/refinement cpp703\u2013781 and saved interval cpp897\u2013929; IsRational temporary-reference lifetime is explicitly adapted",
-          "status": "partial",
+          "name": "Complete predicates cpp243\u2013335, magnitude/refinement cpp703\u2013781 and saved interval cpp897\u2013929 with explicit IsRational temporary-reference lifetime",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_refinement.go",
           "tests": [
             "TestAlgebraicRefinementRootAccessorBeforeRecord",

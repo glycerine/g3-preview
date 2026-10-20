@@ -46961,3 +46961,14 @@ all have concrete coverage. Native and checked pass in 0.403s and 0.383s. The
 debug and combined campaigns pass in 362.462s and 369.954s while sharing CPUs
 8-16 concurrently. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-scalar-query-audit.txt`.
+
+Algebraic predicate/refinement closure:
+the duplicate rows for cpp243-335, cpp703-781 and cpp897-929 are promoted to
+ported. Basic and cached-irrational predicates, integer/rational candidate
+construction, magnitude branches, exact rational promotion, precision
+refinement, Horner/setter/comparison children, every reached allocation prefix,
+TRACE ordering, callback exclusion and saved-interval construction,
+restoration, promotion skip and stopped destruction are covered. Focused tests
+pass native 0.070s, checked 0.074s, debug 0.224s and combined 0.261s on CPUs
+8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-predicate-refinement-audit.txt`.
