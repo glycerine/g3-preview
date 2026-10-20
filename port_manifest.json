@@ -23474,9 +23474,13 @@
       "path": "src/ast/rewriter/bit2int.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/bit2int.go"
+      ],
+      "tests": [
+        "TestBit2IntExtractionAlignmentAndCacheFoundation"
+      ],
       "assertions": [
         {
           "line": 52,
@@ -23503,19 +23507,49 @@
           "text": "SASSERT(!sign_p && !sign_n);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor, get_b2i_size, get_numeral_bits, align_size/align_sizes, extract_bv and cache lifecycle",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit2int.go",
+          "tests": [
+            "TestBit2IntExtractionAlignmentAndCacheFoundation"
+          ]
+        },
+        {
+          "name": "mk_add, mk_comp and mk_mul arithmetic-to-BV reductions",
+          "status": "unported",
+          "reason": "Next focused algorithm slice."
+        },
+        {
+          "name": "is_bv_poly decomposition",
+          "status": "unported",
+          "reason": "Depends on the arithmetic-to-BV reduction helpers."
+        },
+        {
+          "name": "application/quantifier visits and complete post-order rewrite operator",
+          "status": "unported",
+          "reason": "Depends on the reduction helpers and polynomial decomposition."
+        }
+      ],
+      "ownership": [
+        "The owner holds the one-bit zero and cache values as AST references. Per-call extracted and aligned terms are retained by a lexical ASTRef list and released in reverse construction order."
+      ],
       "deviations": []
     },
     {
       "path": "src/ast/rewriter/bit2int.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/bit2int.go"
+      ],
+      "tests": [
+        "TestBit2IntExtractionAlignmentAndCacheFoundation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -23526,10 +23560,27 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete owner, comparison mode, scalar helpers, cache access/reset and destruction",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bit2int.go",
+          "tests": [
+            "TestBit2IntExtractionAlignmentAndCacheFoundation"
+          ],
+          "reason": "The reduction and visitor methods remain open."
+        },
+        {
+          "name": "expr_reduce callbacks and public rewrite operator",
+          "status": "unported",
+          "reason": "Post-order traversal integration remains open."
+        }
+      ],
+      "ownership": [
+        "Go uses a typed handle-to-ASTRef map and ordered keys in place of act_cache, plus an owning ASTRef for m_bit0."
+      ],
       "deviations": []
     },
     {
