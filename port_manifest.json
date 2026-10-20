@@ -32413,39 +32413,45 @@
       "path": "src/ast/well_sorted.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/ast/ast_well_sorted.go", "pkg/ast/ast_well_sorted_warning.go", "pkg/ast/ast_well_sorted_trace.go", "pkg/tactic/tactic_goal.go"],
       "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedSourceMismatchPrinter", "TestASTWellSortedWrongAritySourceTraceBeforeWarning", "TestASTWellSortedSortMismatchSourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "is_well_sorted postorder app/quantifier traversal, sort and arity checks, and non-Boolean quantifier warning",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_well_sorted.go",
           "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches"]
         },
         {
-          "name": "well_sorted_proc app wrong-arity ws TRACE before warning (well_sorted.cpp:49); selected Boolean and uninterpreted-result SMT2 expression profiles",
-          "status": "partial",
+          "name": "well_sorted_proc app wrong-arity ws TRACE before warning (well_sorted.cpp:49) through the retained SMT2 expression printer",
+          "status": "ported",
           "go_target": "pkg/ast/ast_well_sorted_trace.go",
           "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"]
         },
         {
-          "name": "well_sorted_proc sort-mismatch tc TRACE before warning (well_sorted.cpp:59-64); selected Boolean and uninterpreted-result SMT2 expression profiles",
-          "status": "partial",
+          "name": "well_sorted_proc complete sort-mismatch tc TRACE and low-level warning before return (well_sorted.cpp:59-71)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_well_sorted_trace.go",
           "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"]
         }
       ],
-      "ownership": [],
-      "deviations": ["Native Go slice and map replace the source expression-visitor stack and shared-node marks. The quantifier and arity warnings and selected source sort-mismatch diagnostics are present. The ws and tc traces use the selected Boolean and uninterpreted-result SMT2 printer; other non-Boolean app profiles remain open. Direct API/cmd-context callers remain open. Malformed-app branches are tested through temporary internal test-node mutation because public factories refuse them."]
+      "ownership": [
+        "The checker borrows the manager, input expression and optional warning/parameter services. Its traversal frames, shared-node marks and deferred warning descriptors are invocation-owned native Go slices and a map.",
+        "Diagnostic format ASTs and text streams are lexical temporaries owned by their managers; warning and trace services borrow the completed text only for synchronous emission."
+      ],
+      "deviations": [
+        "Native Go slices and a map replace the source for_each_expr stack and AST marks. Checked invalid handles and printer failures return errors.",
+        "Malformed application branches are exercised through temporary internal test-node mutation because public factories reject malformed ASTs."
+      ]
     },
     {
       "path": "src/ast/well_sorted.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/ast/ast_well_sorted.go", "pkg/tactic/tactic_goal.go"],
       "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches"],
       "conditionals": [
@@ -32458,18 +32464,22 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "is_well_sorted borrowed manager and expression call with warning side effect",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_well_sorted.go",
           "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches"]
         }
       ],
-      "ownership": [],
-      "deviations": ["The Go entry returns a checked error for invalid manager/handle state. Detailed sort-mismatch printing and all retained owning callers are not yet complete."]
+      "ownership": [
+        "IsWellSorted borrows the AST manager, expression and warning service. IsWellSortedWithPrinter additionally borrows the caller's parameter owners for exact diagnostics; neither entry retains caller state."
+      ],
+      "deviations": [
+        "The Go entries return a checked error alongside the Boolean result for invalid manager/handle state or diagnostic emission failure."
+      ]
     },
     {
       "path": "src/cmd_context/CMakeLists.txt",

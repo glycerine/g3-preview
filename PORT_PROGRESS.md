@@ -47350,3 +47350,14 @@ covered. The display method has no retained caller and is reference-only.
 Native slices and insdict.Dict replace the source containers. All four focused
 profiles and the full native AST package pass on CPUs 8-16. Portcheck reports
 2103 units, 677 APIs: 273 ported, 295 partial, 1478 unported and 11 dead/deleted.
+
+Well-sorted checker whole-unit closure:
+`src/ast/well_sorted.cpp` and `.h` are promoted to ported after a complete
+algorithm, diagnostic and ownership audit. The iterative postorder traversal
+covers variables, shared applications, quantifier bodies and annotations. It
+checks source associative arity/domain rules, emits the quantifier and arity
+warnings, and preserves the `ws`/`tc` trace-before-warning order with full SMT2,
+low-level application, sort and function-declaration rendering. Traversal state
+is invocation-owned; managers, expressions and diagnostic services are borrowed.
+All four focused profiles pass on CPUs 8-16. Portcheck reports 2103 units, 677
+APIs: 275 ported, 293 partial, 1478 unported and 11 dead/deleted.
