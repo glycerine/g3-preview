@@ -262,10 +262,15 @@ func (m *ASTManager) arithmeticPluginFamily() FamilyID {
 type legacySMTExprContext struct {
 	freeNames   []string
 	quantifiers [][]usymbol.Symbol
+	indent      uint32
 }
 
 func (p *LegacySMTPrinter) exprText(h ASTHandle, variableNames []string) (string, error) {
-	ctx := legacySMTExprContext{freeNames: variableNames}
+	return p.exprTextIndented(h, variableNames, 0)
+}
+
+func (p *LegacySMTPrinter) exprTextIndented(h ASTHandle, variableNames []string, indent uint32) (string, error) {
+	ctx := legacySMTExprContext{freeNames: variableNames, indent: indent}
 	return p.exprTextContext(h, &ctx)
 }
 
@@ -523,6 +528,9 @@ func (p *LegacySMTPrinter) quantifierText(q ASTHandle, ctx *legacySMTExprContext
 		out.WriteByte(')')
 	}
 	out.WriteString(")\n")
+	if ctx.indent != 0 {
+		out.WriteString(strings.Repeat(" ", int(ctx.indent)))
+	}
 	return out.String(), nil
 }
 

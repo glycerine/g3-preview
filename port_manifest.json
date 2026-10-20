@@ -13155,7 +13155,9 @@
         "pkg/ast/ast_smt_legacy_expr.go",
         "pkg/ast/ast_smt_legacy_expr_test.go",
         "pkg/ast/ast_smt_legacy_decl.go",
-        "pkg/ast/ast_smt_legacy_decl_test.go"
+        "pkg/ast/ast_smt_legacy_decl_test.go",
+        "pkg/ast/ast_smt_legacy_benchmark.go",
+        "pkg/ast/ast_smt_legacy_benchmark_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
@@ -13168,7 +13170,9 @@
         "TestLegacySMTPrinterDistinctGroupsBySort",
         "TestLegacySMTPrinterImplicationChainSimplification",
         "TestLegacySMTPrinterFloatingPointNumerals",
-        "TestLegacySMTPrinterSortAndFunctionDeclarations"
+        "TestLegacySMTPrinterSortAndFunctionDeclarations",
+        "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
+        "TestLegacySMTPrinterBenchmarkTrueDefaultStatus"
       ],
       "conditionals": [
         {
@@ -13270,13 +13274,22 @@
           "tests": [
             "TestLegacySMTPrinterSortAndFunctionDeclarations"
           ]
+        },
+        {
+          "name": "ast_smt_pp benchmark metadata, dependency-ordered declarations, assumptions, root assertions, declared filters and check-sat/proof dispatch (ast_smt_pp.cpp:856-1011)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_smt_legacy_benchmark.go",
+          "tests": [
+            "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
+            "TestLegacySMTPrinterBenchmarkTrueDefaultStatus"
+          ]
         }
       ],
       "ownership": [
         "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String literals, let insertion, datatype-special paths and the benchmark wrapper remain open."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String literals, let insertion and datatype-special paths remain open; the benchmark wrapper is otherwise ported over borrowed one-call configuration slices and callbacks."
       ]
     },
     {
@@ -13292,7 +13305,9 @@
         "pkg/ast/ast_smt_legacy_expr.go",
         "pkg/ast/ast_smt_legacy_expr_test.go",
         "pkg/ast/ast_smt_legacy_decl.go",
-        "pkg/ast/ast_smt_legacy_decl_test.go"
+        "pkg/ast/ast_smt_legacy_decl_test.go",
+        "pkg/ast/ast_smt_legacy_benchmark.go",
+        "pkg/ast/ast_smt_legacy_benchmark_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
@@ -13305,7 +13320,9 @@
         "TestLegacySMTPrinterDistinctGroupsBySort",
         "TestLegacySMTPrinterImplicationChainSimplification",
         "TestLegacySMTPrinterFloatingPointNumerals",
-        "TestLegacySMTPrinterSortAndFunctionDeclarations"
+        "TestLegacySMTPrinterSortAndFunctionDeclarations",
+        "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
+        "TestLegacySMTPrinterBenchmarkTrueDefaultStatus"
       ],
       "conditionals": [
         {
@@ -13336,13 +13353,22 @@
             "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals",
             "TestLegacySMTPrinterSortAndFunctionDeclarations"
           ]
+        },
+        {
+          "name": "ast_smt_pp benchmark metadata, assumptions, declared filters and display_smt2 configuration surface (ast_smt_pp.h:39-82)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_smt_legacy_benchmark.go",
+          "tests": [
+            "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
+            "TestLegacySMTPrinterBenchmarkTrueDefaultStatus"
+          ]
         }
       ],
       "ownership": [
         "The concrete renaming owner borrows the source symbol manager and owns its native translation maps."
       ],
       "deviations": [
-        "Generic AST dispatch, indentation-aware display, full benchmark display and the mk_smt_pp stream wrapper remain open."
+        "Generic AST dispatch and the mk_smt_pp convenience wrapper remain open. Benchmark display is ported through one-call configuration; string literals, let insertion and datatype-special paths remain dependencies."
       ]
     },
     {
