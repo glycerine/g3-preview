@@ -46924,3 +46924,16 @@ RAW body failure are covered. Focused tests pass native 0.055s, checked 0.051s,
 debug 0.159s and combined 0.164s on CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-owned-bound-wrapper-audit.txt`. Raw bound
 calculation and predicate/refinement TRACE remain separately partial.
+
+Algebraic root-display and callback closure:
+the duplicate rows covering cpp2626-2706 root/SMT2/Mathematica formatting and
+the executing-display borrow span are promoted to ported. Zero, basic and root
+syntax, BIG coefficient copies, every insertion frontier, cached and cold root
+index lookup, packed-word-only publication, Sturm cancellation order, exact
+polynomial/root-ID child receipts and basic coefficient source continuation are
+covered. Root, interval and decimal writer callbacks cannot mutate, clean,
+close or reenter their borrowed inputs. Root-format tests pass native 0.024s,
+checked 0.022s, debug 0.028s and combined 0.026s; the cross-display callback
+slice passes 0.007s, 0.007s, 0.011s and 0.009s respectively on CPUs 8-16.
+Audit: `/mnt/oldrog/tmp/g3-algebraic-root-display-audit.txt`. Interval/decimal
+body calculation and bound refinement remain separately partial.
