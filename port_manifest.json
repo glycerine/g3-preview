@@ -13157,7 +13157,9 @@
         "pkg/ast/ast_smt_legacy_decl.go",
         "pkg/ast/ast_smt_legacy_decl_test.go",
         "pkg/ast/ast_smt_legacy_benchmark.go",
-        "pkg/ast/ast_smt_legacy_benchmark_test.go"
+        "pkg/ast/ast_smt_legacy_benchmark_test.go",
+        "pkg/ast/ast_smt_legacy_let.go",
+        "pkg/ast/ast_smt_legacy_let_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
@@ -13172,7 +13174,9 @@
         "TestLegacySMTPrinterFloatingPointNumerals",
         "TestLegacySMTPrinterSortAndFunctionDeclarations",
         "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
-        "TestLegacySMTPrinterBenchmarkTrueDefaultStatus"
+        "TestLegacySMTPrinterBenchmarkTrueDefaultStatus",
+        "TestLegacySMTPrinterLetInsertionSharedAndLargeTerms",
+        "TestLegacySMTPrinterQuantifierLocalLetScope"
       ],
       "conditionals": [
         {
@@ -13283,13 +13287,22 @@
             "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
             "TestLegacySMTPrinterBenchmarkTrueDefaultStatus"
           ]
+        },
+        {
+          "name": "smt_printer refcount/size-based let insertion, typed IDs, LIFO postorder and quantifier-local let scopes (ast_smt_pp.cpp:536-735)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_legacy_let.go",
+          "tests": [
+            "TestLegacySMTPrinterLetInsertionSharedAndLargeTerms",
+            "TestLegacySMTPrinterQuantifierLocalLetScope"
+          ]
         }
       ],
       "ownership": [
         "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String literals, let insertion and datatype-special paths remain open; the benchmark wrapper is otherwise ported over borrowed one-call configuration slices and callbacks."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String literals await retained sequence literal construction/value access, and datatype-special paths await the datatype plugin port. The benchmark wrapper uses borrowed one-call configuration slices and callbacks."
       ]
     },
     {
@@ -13307,7 +13320,9 @@
         "pkg/ast/ast_smt_legacy_decl.go",
         "pkg/ast/ast_smt_legacy_decl_test.go",
         "pkg/ast/ast_smt_legacy_benchmark.go",
-        "pkg/ast/ast_smt_legacy_benchmark_test.go"
+        "pkg/ast/ast_smt_legacy_benchmark_test.go",
+        "pkg/ast/ast_smt_legacy_let.go",
+        "pkg/ast/ast_smt_legacy_let_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
@@ -13322,7 +13337,9 @@
         "TestLegacySMTPrinterFloatingPointNumerals",
         "TestLegacySMTPrinterSortAndFunctionDeclarations",
         "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
-        "TestLegacySMTPrinterBenchmarkTrueDefaultStatus"
+        "TestLegacySMTPrinterBenchmarkTrueDefaultStatus",
+        "TestLegacySMTPrinterLetInsertionSharedAndLargeTerms",
+        "TestLegacySMTPrinterQuantifierLocalLetScope"
       ],
       "conditionals": [
         {
@@ -13368,7 +13385,7 @@
         "The concrete renaming owner borrows the source symbol manager and owns its native translation maps."
       ],
       "deviations": [
-        "Generic AST dispatch and the mk_smt_pp convenience wrapper remain open. Benchmark display is ported through one-call configuration; string literals, let insertion and datatype-special paths remain dependencies."
+        "Generic AST dispatch and the mk_smt_pp convenience wrapper remain open. Benchmark display is ported through one-call configuration; string literals await sequence literal support and datatype-special paths await the datatype plugin port."
       ]
     },
     {

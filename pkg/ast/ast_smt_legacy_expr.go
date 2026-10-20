@@ -263,6 +263,8 @@ type legacySMTExprContext struct {
 	freeNames   []string
 	quantifiers [][]usymbol.Symbol
 	indent      uint32
+	aliases     map[ASTHandle]bool
+	defining    ASTHandle
 }
 
 func (p *LegacySMTPrinter) exprText(h ASTHandle, variableNames []string) (string, error) {
@@ -271,7 +273,7 @@ func (p *LegacySMTPrinter) exprText(h ASTHandle, variableNames []string) (string
 
 func (p *LegacySMTPrinter) exprTextIndented(h ASTHandle, variableNames []string, indent uint32) (string, error) {
 	ctx := legacySMTExprContext{freeNames: variableNames, indent: indent}
-	return p.exprTextContext(h, &ctx)
+	return p.exprTextWithLetsContext(h, &ctx)
 }
 
 func (p *LegacySMTPrinter) variableText(index uint32, ctx *legacySMTExprContext) (string, error) {
@@ -480,7 +482,10 @@ func (p *LegacySMTPrinter) quantifierText(q ASTHandle, ctx *legacySMTExprContext
 	if err != nil {
 		return "", err
 	}
-	bodyText, err := p.exprTextContext(body, ctx)
+	bodyContext := *ctx
+	bodyContext.aliases = nil
+	bodyContext.defining = ASTHandle{}
+	bodyText, err := p.exprTextWithLetsContext(body, &bodyContext)
 	if err != nil {
 		return "", err
 	}
@@ -507,7 +512,10 @@ func (p *LegacySMTPrinter) quantifierText(q ASTHandle, ctx *legacySMTExprContext
 			if e != nil {
 				return "", e
 			}
-			argText, e := p.exprTextContext(arg, ctx)
+			patternContext := *ctx
+			patternContext.aliases = nil
+			patternContext.defining = ASTHandle{}
+			argText, e := p.exprTextContext(arg, &patternContext)
 			if e != nil {
 				return "", e
 			}
@@ -535,6 +543,9 @@ func (p *LegacySMTPrinter) quantifierText(q ASTHandle, ctx *legacySMTExprContext
 }
 
 func (p *LegacySMTPrinter) exprTextContext(h ASTHandle, ctx *legacySMTExprContext) (string, error) {
+	if ctx.aliases != nil && ctx.defining != h && ctx.aliases[h] {
+		return p.letIDText(h)
+	}
 	kind, err := p.manager.GetKind(h)
 	if err != nil {
 		return "", err
