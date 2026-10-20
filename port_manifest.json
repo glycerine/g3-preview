@@ -47690,6 +47690,22 @@
           "TestPolynomialDerivativeTermTraceAllSourceBranches"
         ],
         "limits": "Full polynomial/algebraic/AST source consumer and ownership audits remain partial."
+      },
+      "integer_substitution_trace_audit": {
+        "source": "polynomial.cpp:6364-6365,6394-6395; retained integer substitution used by recursive GCD",
+        "go_target": "pkg/math/polynomial/polynomial_substitution_trace.go",
+        "behavior": "Entry precedes variable positions and numeral construction. Term records follow new_m size publication and execute the actual diagnostic monomial factory before the ordinary SOM intern call, even after sticky stream refusal. The actual invocation retains its accepted numeral insertion receipt and newly created raw refcount-zero monomial until consumption, zero-add orphan publication, or matched owning abort. Executing output and failure callbacks borrow numerical and monomial owners.",
+        "tests": [
+          "TestPolynomialIntegerSubstitutionTraceLiteralAndActualFactory",
+          "TestPolynomialIntegerSubstitutionTraceZeroAddRetainsActualRawRoot",
+          "TestPolynomialIntegerSubstitutionTraceEntryActualCharacterGuard",
+          "TestPolynomialIntegerSubstitutionTraceRefusingStreamStillInvokesFactory",
+          "TestPolynomialIntegerSubstitutionTraceEveryFactoryReservation",
+          "TestPolynomialIntegerSubstitutionTraceActualFailureAfterDiagnosticFactory",
+          "TestPolynomialIntegerSubstitutionTraceEmptyInputDoesNotReadArrays"
+        ],
+        "verification": "Focused monomial/substitution/GCD/resultant/pseudo/derivative tests pass native, checked, debug and combined checked/debug/trace. Independent omitted-record, omitted-factory and omitted-receipt overlays fail their intended assertions. Physical root audits cover reservation prefixes and real post-diagnostic NUM copy refusal.",
+        "limits": "Whole polynomial/algebraic/AST completion remains partial; this increment is later than full native checkpoint82537323."
       }
     },
     {

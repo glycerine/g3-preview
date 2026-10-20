@@ -74,6 +74,7 @@ type monomialCreation struct {
 	idConsumed, tableRemoved bool
 }
 type MonomialManager struct {
+	substitutionTrace                                                         *polynomialSubstitutionTraceBorrow
 	assertionRunning                                                          bool
 	queryTraceRunning                                                         bool
 	managerTraceRunning                                                       bool
@@ -239,6 +240,9 @@ func (m *MonomialManager) CleanupCause() error {
 	return m.cleanupCause
 }
 func (m *MonomialManager) check() error {
+	if m.substitutionTraceCallback() {
+		return ErrMonomialPending
+	}
 	if m != nil && m.self == m && (m.assertionRunning || m.managerTraceRunning) {
 		return ErrMonomialPending
 	}

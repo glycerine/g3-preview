@@ -133,6 +133,9 @@ func (m *MonomialManager) Rename(xs []uint32) (err error) {
 	return nil
 }
 func (m *MonomialManager) CleanupRename() error {
+	if m.substitutionTraceCallback() {
+		return ErrMonomialPending
+	}
 	if m == nil || m.self != m || m.closed {
 		return ErrMonomialOwner
 	}

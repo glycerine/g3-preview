@@ -30,7 +30,7 @@ func polynomialSubstitutionPhysicalWithHandlers(t *testing.T, m *MultivariatePol
 		polys = append(polys, m.powerLocal.result.value, m.powerLocal.result.incoming)
 	}
 	polynomialModDNewtonPhysicalWithRaw(t, m, nil, refs, nil, nil, polys, handlers, external, degrees, values...)
-	monos := append([]Monomial{s.monomial.value, s.monomial.incoming}, d.orphans...)
+	monos := append([]Monomial{s.monomial.value, s.monomial.incoming, s.traceMonomial}, d.orphans...)
 	polynomialOperationMonomialAudit(t, m, polys, monos)
 }
 

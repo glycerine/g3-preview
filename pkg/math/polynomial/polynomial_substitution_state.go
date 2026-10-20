@@ -35,6 +35,8 @@ type polynomialSubstitutionState struct {
 	bodyCause, cleanupCause error
 }
 type polynomialSubstitutionScope struct {
+	traceInsertion                                   unumeral.NumeralInsertionReceipt
+	traceMonomial                                    Monomial
 	invocation                                       uint64
 	powerNumeric                                     polynomialSubstitutionPowerNumeric
 	algebraicCaller                                  *algebraicSignSubstitutionScope

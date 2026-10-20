@@ -80,6 +80,15 @@ func (m *MultivariatePolynomialCore) substitutionCleanupPhase(owning, abort bool
 	if !s.active {
 		return nil
 	}
+	if !owning {
+		if cause := s.traceInsertion.SourceCause(); cause != nil {
+			return cause
+		}
+	} else if s.traceInsertion.Active() {
+		if e := m.modular.CleanupSourceString(&s.traceInsertion); e != nil {
+			return e
+		}
+	}
 	if s.cleanupCause != nil && !owning {
 		return s.cleanupCause
 	}
@@ -224,6 +233,14 @@ func (m *MultivariatePolynomialCore) substitutionCleanupPhase(owning, abort bool
 	if !owning && m.hasSOMNormalizeInvocationHistory(&s.som) && s.som.frame.active {
 		return nil
 	}
+	if owning && abort && s.traceMonomial != (Monomial{}) {
+		if e := m.monomials.CleanupValue(&s.traceMonomial); e != nil {
+			return e
+		}
+	}
+	if s.traceInsertion.Active() || s.traceMonomial != (Monomial{}) {
+		return nil
+	}
 	s.active = false
 	s.executing = false
 	m.substitution.array.values = nil
@@ -339,23 +356,41 @@ func (m *MultivariatePolynomialCore) addSubstitutionTerm(a *unumeral.Int, term M
 		m.substitution.generatedReceipt = Monomial{}
 	}
 	if e == nil && !consumed && m.generatedActive && m.generatedMonomial == term {
-		d := &m.substitution
-		l, guard := m.monomials.location(term)
-		if guard != nil {
-			return guard
+		if e := m.retainUnreferencedSubstitutionMonomial(term); e != nil {
+			return e
 		}
-		// Native storage retains the actual unconsumed root after publication.
-		index := uint32(len(d.orphans))
-		old := d.orphans
-		d.orphans = append(d.orphans, term)
-		if len(old) != 0 && &old[0] != &d.orphans[0] {
-			clear(old)
-		}
-		l.unreferencedCohort, l.unreferencedSlot = d, index
 		m.transferGeneratedMonomial()
 		m.substitution.generatedReceipt = Monomial{}
 	}
+	if m.substitution.scope.traceMonomial == term {
+		if consumed {
+			m.substitution.scope.traceMonomial = Monomial{}
+		} else if e == nil {
+			if err := m.retainUnreferencedSubstitutionMonomial(term); err != nil {
+				return err
+			}
+			m.substitution.scope.traceMonomial = Monomial{}
+		}
+	}
+
 	return e
+}
+
+func (m *MultivariatePolynomialCore) retainUnreferencedSubstitutionMonomial(term Monomial) error {
+	d := &m.substitution
+	l, guard := m.monomials.location(term)
+	if guard != nil {
+		return guard
+	}
+	// Native storage retains the actual unconsumed root after publication.
+	index := uint32(len(d.orphans))
+	old := d.orphans
+	d.orphans = append(d.orphans, term)
+	if len(old) != 0 && &old[0] != &d.orphans[0] {
+		clear(old)
+	}
+	l.unreferencedCohort, l.unreferencedSlot = d, index
+	return nil
 }
 
 // Source integer-array and single-value overloads. Raw arrays remain borrowed;
@@ -386,6 +421,9 @@ func (m *MultivariatePolynomialCore) substituteIntegersWithReceipt(p Polynomial,
 	s := &m.substitution.scope
 	if receipt != nil {
 		*receipt = polynomialSubstitutionInvocationReceipt{m, s, s.invocation}
+	}
+	if e := m.traceIntegerSubstitutionEntry(n, xs, values, oneX, oneValue); e != nil {
+		return Polynomial{}, m.finishSubstitution(e)
 	}
 	// The one-scalar header overload has one call-local var address. It cannot
 	// escape this frame. The shared array algorithm reads that pointer directly.
@@ -495,6 +533,9 @@ func (m *MultivariatePolynomialCore) substituteIntegersWithReceipt(p Polynomial,
 			}
 		}
 		if e = m.monomials.tempSetSize(&m.tmp1, newSize); e != nil {
+			return Polynomial{}, e
+		}
+		if e := m.traceIntegerSubstitutionTerm(p, i, term); e != nil {
 			return Polynomial{}, e
 		}
 		mono, e := m.generatedSubstitutionMonomial()
