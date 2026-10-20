@@ -46846,3 +46846,28 @@ remaining algebraic-test calls are intentional foreign-owner controls: copy
 shift explicitly consumes its own first allocation before constructing a
 separately receipted replacement, and refinement promotion preserves an older
 raw-power invocation while proving core cleanup cannot acknowledge it.
+
+Retained multivariate polynomial manager completion candidate:
+`polynomial.cpp` and `polynomial.h` now have no substantive partial method row.
+The cpp inventory contains 174 ported method groups, seven explicit Go platform
+replacements and eleven documented reference-only groups; the header contains
+106 ported groups, one platform replacement and two reference-only groups. The
+former two cpp partial rows and one header partial row were stale umbrella
+placeholders already covered by the specific construction, cell, SOM/Newton,
+arithmetic, substitution/evaluation, content/GCD/CRA/resultant/PSC,
+normalization/square-root/factorization, display/TRACE, facade and ownership
+rows. A repository-wide retained-consumer scan reconfirms that deletion-handler
+registration, the private rational mk_univariate overload, reverse-lex helpers,
+scalar polynomial division, discriminant, classic/subresultant PSC helpers and
+quasi-resultant have no retained production caller. The registered original
+polynomial test driver returns after optimized PSC at line1825; NLSAT's
+similarly named psc_discriminant uses derivative plus retained PSC. Native Go
+slices/maps remain the platform storage replacement; no C++ STL or unused
+template adapter is ported. The unit metadata is promoted to ported with whole
+methods/ownership audit flags. Audit:
+`/mnt/oldrog/tmp/g3-polynomial-whole-source-audit.txt`. The full native suite
+passed on CPUs 8-16 from 2026-10-20 14:23:33 through 14:35:31 UTC in 11m58.039s;
+the principal package times were polynomial 107.495s, LP 700.843s, numeral
+58.216s and AST 12.028s. Log:
+`/mnt/oldrog/tmp/g3-native-polynomial-whole-e305da79.log`. Algebraic numbers and
+AST remain partial.

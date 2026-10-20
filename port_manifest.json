@@ -41507,7 +41507,7 @@
       "path": "src/math/polynomial/polynomial.cpp",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/math/polynomial/polynomial_constructor_assertions.go",
         "pkg/math/polynomial/polynomial_cell_assertions.go",
@@ -44170,8 +44170,8 @@
           "text": "SASSERT(m_imp->consistent_coeffs(p));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained eq_proc get_power228 for internal and borrowed tmp_monomial::get_ptr keys at cpp185-187,853-854",
@@ -44603,8 +44603,9 @@
           "notes": "Whole-src word search finds only source definitions, header declarations and internal calls within the reverse-lex family; no retained source root calls it. Existing Go compatibility APIs/tests remain. Do not port its707-729 assertions merely because scalar continuation counterexamples are easy; retained ordinary/minimum-variable comparators have separate unfinished work."
         },
         {
-          "name": "Complete polynomial manager, arithmetic, PRS/resultant and source owning wrappers",
-          "status": "partial",
+          "name": "Complete retained polynomial manager, arithmetic, PRS/resultant and source owning wrappers",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "go_targets": [
             "pkg/math/polynomial/polynomial_manager.go",
             "pkg/math/polynomial/polynomial_arithmetic.go",
@@ -45396,8 +45397,8 @@
           ]
         },
         {
-          "name": "Retained polynomial cell, accessors, native SOM, construction, arithmetic and optional Go deletion instrumentation with full manager lifecycle and optimized PSC composition; whole source closure still unproven",
-          "status": "partial",
+          "name": "Complete retained polynomial cell, accessors, native SOM, construction, arithmetic and optional Go deletion instrumentation with full manager lifecycle and optimized PSC composition",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
             "TestPolynomialCellSourceTakeAndFirstMaximum",
@@ -45441,7 +45442,7 @@
             "TestPolynomialSoleRetainCalleeConstructionCleanup",
             "TestPolynomialPreexistingCalleeCreationRemainsBorrowed"
           ],
-          "notes": "Scoped coefficient-access audit now separates const1511, mutable1512 and raw array/owning codecs. Retained mutable consumers include deletion2433, ICCP-ZpX3982, modular-GCD4273/4274/4336, pseudo5007/5036, concrete evaluation6445/6471/6493/6517, quadratic6618 and factor6809/6810. This broad row stays partial: these selected protocols and green tests do not prove the entire cell/arithmetic/owner inventory. Deletion handler registration/removal has no retained C++ caller: whole-src uses are definitions/facades and dormant tst_del_eh after tst_polynomial early return. Existing Go test instrumentation is retained without source-consumer completion credit."
+          "notes": "The completed whole-source inventory covers the retained cell/arithmetic/owner protocols through the specific method rows in this unit. Scoped coefficient access separates const1511, mutable1512 and raw array/owning codecs. Retained mutable consumers include deletion2433, ICCP-ZpX3982, modular-GCD4273/4274/4336, pseudo5007/5036, concrete evaluation6445/6471/6493/6517, quadratic6618 and factor6809/6810. Deletion-handler registration/removal has no retained C++ caller: whole-source uses are definitions/facades and dormant tst_del_eh after tst_polynomial returns at1825. Existing Go test instrumentation remains without source-consumer completion credit."
         },
         {
           "name": "Complete incremental Newton ctor/reset/const-input/count/Add/Mk and whole-method lexical owner; persistent owner-vector lazy At/SetOwner/Flush/SourceFinalize, exact TRACE and assertion actions; explicit owning cleanup distinct from source destruction",
@@ -48025,7 +48026,7 @@
       "path": "src/math/polynomial/polynomial.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/math/polynomial/polynomial_factors_assertions.go",
         "pkg/math/polynomial/polynomial_factors_assertions_test.go",
@@ -48980,8 +48981,8 @@
           "text": "SASSERT(k > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete polynomial hash child reads only monomial hash and follows composite child visitation (polynomial.cpp:210,2468-2480)",
@@ -49249,8 +49250,9 @@
           ]
         },
         {
-          "name": "Complete polynomial manager, arithmetic, PRS/resultant and source owning wrappers",
-          "status": "partial",
+          "name": "Complete retained polynomial manager, arithmetic, PRS/resultant and source owning wrappers",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "go_targets": [
             "pkg/math/polynomial/polynomial_manager.go",
             "pkg/math/polynomial/polynomial_arithmetic.go",
