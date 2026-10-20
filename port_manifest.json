@@ -30961,6 +30961,8 @@
         "pkg/ast/rewriter/var_substitution.go",
         "pkg/ast/rewriter/var_substitution_test.go",
         "pkg/ast/rewriter/unused_vars_ufbv.go",
+        "pkg/ast/rewriter/expr_free_vars.go",
+        "pkg/ast/rewriter/expr_free_vars_test.go",
         "pkg/ast/rewriter/var_substitution_trace.go",
         "pkg/ast/rewriter/var_substitution_assert.go"
       ],
@@ -30972,6 +30974,8 @@
         "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
         "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset",
         "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers",
+        "TestExprFreeVarsSourceCollectAccumulateDefaultsAndReverse",
+        "TestExprFreeVarsSourceQuantifierOffsetAndBodyOnly",
         "TestVarSubstitutionResultSourceTrace",
         "TestVarSubstitutionSourceWellSortedAssertionSites"
       ],
@@ -31061,6 +31065,15 @@
           "tests": [
             "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
           ]
+        },
+        {
+          "name": "expr_free_vars reset, collect, accumulate, indexed sort access, default fill and reverse over application and quantifier-body traversal (var_subst.cpp:176-246)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/expr_free_vars.go",
+          "tests": [
+            "TestExprFreeVarsSourceCollectAccumulateDefaultsAndReverse",
+            "TestExprFreeVarsSourceQuantifierOffsetAndBodyOnly"
+          ]
         }
       ],
       "ownership": [
@@ -31068,7 +31081,7 @@
         "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path. The UFBV unused-variable caller now pins every constructed variable mapping until substitution and result publication finish, then releases those pins after its younger substitution/result owners."
       ],
       "deviations": [
-        "The live operator now evaluates source debug-gated pre/post is_well_sorted assertions around reset/rewrite and before TRACE; invalid input preserves prior bindings/output. The post site is exercised directly; a rewritten ill-sorted output and interactive C/T action profile remain open. The selected post-rewrite TRACE is covered for a live Boolean binding, while wider expression/stream profiles remain open. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path is now concrete; nondefault parameters, instantiate, free-variable enumeration and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
+        "The live operator now evaluates source debug-gated pre/post is_well_sorted assertions around reset/rewrite and before TRACE; invalid input preserves prior bindings/output. The post site is exercised directly; a rewritten ill-sorted output and interactive C/T action profile remain open. The selected post-rewrite TRACE is covered for a live Boolean binding, while wider expression/stream profiles remain open. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path and expr_free_vars collector are concrete; nondefault parameters, instantiate and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
       ]
     },
     {
@@ -31079,7 +31092,9 @@
       "go_targets": [
         "pkg/ast/rewriter/var_substitution.go",
         "pkg/ast/rewriter/var_substitution_test.go",
-        "pkg/ast/rewriter/unused_vars_ufbv.go"
+        "pkg/ast/rewriter/unused_vars_ufbv.go",
+        "pkg/ast/rewriter/expr_free_vars.go",
+        "pkg/ast/rewriter/expr_free_vars_test.go"
       ],
       "tests": [
         "TestVarSubstitutionOriginalRegisteredIdentities",
@@ -31088,7 +31103,9 @@
         "TestVarSubstitutionColdConstructionCleanup",
         "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
         "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset",
-        "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
+        "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers",
+        "TestExprFreeVarsSourceCollectAccumulateDefaultsAndReverse",
+        "TestExprFreeVarsSourceQuantifierOffsetAndBodyOnly"
       ],
       "conditionals": [
         {
@@ -31136,6 +31153,15 @@
           "tests": [
             "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
           ]
+        },
+        {
+          "name": "expr_free_vars complete concrete collector surface",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/expr_free_vars.go",
+          "tests": [
+            "TestExprFreeVarsSourceCollectAccumulateDefaultsAndReverse",
+            "TestExprFreeVarsSourceQuantifierOffsetAndBodyOnly"
+          ]
         }
       ],
       "ownership": [
@@ -31143,7 +31169,7 @@
         "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path."
       ],
       "deviations": [
-        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path is now concrete; nondefault parameters, instantiate, free-variable enumeration and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
+        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path and expr_free_vars collector are concrete; nondefault parameters, instantiate and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
       ]
     },
     {

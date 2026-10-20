@@ -47273,3 +47273,16 @@ a retrying explicit Close; copied owners are rejected. The source debug root
 reference gate and final-result verification use defined Go domain errors.
 Focused tests pass native, checked, debug and combined profiles on CPUs 8-16.
 Portcheck reports 267 ported and 301 partial units.
+
+Variable-substitution free-variable collector:
+The complete `expr_free_vars` surface from `src/ast/rewriter/var_subst.cpp/.h`
+is now implemented as the concrete `ExprFreeVars` collector. It preserves
+reset versus accumulating scans, persistent top-level marks, fresh mark scopes
+under each quantifier, binder offsets, sparse indexed sorts, debug sort
+consistency, default-sort filling and reversal. Quantifier annotations remain
+unread as in the source collector. Sort handles are borrowed and native Go
+slices/maps replace the source pointer containers. Focused tests pass native,
+checked, debug and combined profiles, and the full native AST rewriter package
+passes on CPUs 8-16. The source units remain partial for `instantiate`,
+nondefault unused-variable elimination and remaining diagnostics; manifest
+counts therefore remain 267 ported and 301 partial.
