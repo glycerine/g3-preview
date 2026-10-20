@@ -32916,12 +32916,16 @@
       "path": "src/ast/substitution/substitution.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/ast/substitution/substitution.go",
         "pkg/tactic/ufbv/match_subst.go",
         "pkg/tactic/ufbv/match_subst_apply.go"
       ],
       "tests": [
+        "TestSubstitutionApplyOffsetsScopesAndCacheInvalidation",
+        "TestSubstitutionQuantifierShiftModuloAndCycles",
+        "TestSubstitutionBindingAndOwnerGuards",
         "TestMatchSubstConcretePairCacheAndVariableBindings",
         "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
       ],
@@ -32959,12 +32963,22 @@
           "text": "SASSERT(m_todo.back() == p);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
+          "name": "construction, reset, cache reset, scope rollback, general offset application, modulo replacement, quantified shifting, cycle detection and display",
+          "status": "ported",
+          "go_target": "pkg/ast/substitution/substitution.go",
+          "tests": [
+            "TestSubstitutionApplyOffsetsScopesAndCacheInvalidation",
+            "TestSubstitutionQuantifierShiftModuloAndCycles",
+            "TestSubstitutionBindingAndOwnerGuards"
+          ]
+        },
+        {
           "name": "UFBV concrete substitution reset, offset-0 variable lookup and offset-1 target preservation, app/quantifier body and annotation application",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/match_subst_apply.go",
           "tests": [
             "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
@@ -32972,22 +32986,27 @@
         }
       ],
       "ownership": [
+        "The shared Substitution owner retains every range expression and every generated cached expression through ASTRefs. ResetCache, PopScope, Reset and Close release their respective ownership in source order.",
         "UFBV matcher bindings retain each target expression; generated application and quantifier results are rooted by the matcher until reset or close, while the returned ASTRef owns the published result."
       ],
       "deviations": [
-        "Only the UFBV call with two zero-delta offsets is translated. General scoped substitution, nonzero deltas, cycle detection, comparison and other consumers remain open."
+        "Native concrete maps replace source timestamped template maps. Recursive checked application replaces the source explicit worklist while memoizing each expression/offset/depth state. The declared but undefined and unreferenced compare method is omitted under the retained-consumer rule."
       ]
     },
     {
       "path": "src/ast/substitution/substitution.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/ast/substitution/substitution.go",
         "pkg/tactic/ufbv/match_subst.go",
         "pkg/tactic/ufbv/match_subst_apply.go"
       ],
       "tests": [
+        "TestSubstitutionApplyOffsetsScopesAndCacheInvalidation",
+        "TestSubstitutionQuantifierShiftModuloAndCycles",
+        "TestSubstitutionBindingAndOwnerGuards",
         "TestMatchSubstConcretePairCacheAndVariableBindings",
         "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
       ],
@@ -33023,12 +33042,22 @@
           "text": "VERIFY(m_subst.find(var.first, var.second, r));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
+          "name": "reserve, reset, scopes, binding insertion/lookup/inspection, apply overloads, acyclic and display public surface",
+          "status": "ported",
+          "go_target": "pkg/ast/substitution/substitution.go",
+          "tests": [
+            "TestSubstitutionApplyOffsetsScopesAndCacheInvalidation",
+            "TestSubstitutionQuantifierShiftModuloAndCycles",
+            "TestSubstitutionBindingAndOwnerGuards"
+          ]
+        },
+        {
           "name": "UFBV concrete variable binding insertion/find/reset and two-offset zero-delta apply",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/match_subst_apply.go",
           "tests": [
             "TestMatchSubstConcretePairCacheAndVariableBindings",
@@ -33037,10 +33066,11 @@
         }
       ],
       "ownership": [
+        "Substitution is a noncopyable checked Go owner. It borrows its AST manager and owns range and cache ASTRefs until rollback, reset or close.",
         "The UFBV matcher retains each substitution target and holds rewritten AST nodes until reset or close; its returned ASTRef owns the result independently."
       ],
       "deviations": [
-        "Concrete UFBV-only two-offset substitution replaces the source generic offset tables; other retained substitution APIs and callers remain open."
+        "Checked methods and explicit ASTRef outputs replace C++ assertions and expr_ref overloads. The declared but undefined and unreferenced compare method is omitted under the retained-consumer rule."
       ]
     },
     {
