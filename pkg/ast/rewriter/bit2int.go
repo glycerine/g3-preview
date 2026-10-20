@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 type bit2IntTerm struct {
@@ -23,6 +24,14 @@ type bit2IntCall struct {
 
 func (c *bit2IntCall) hold(h ast.ASTHandle) (ast.ASTHandle, error) {
 	ref, err := c.owner.manager.NewRef(h)
+	if err == nil {
+		c.refs = append(c.refs, ref)
+	}
+	return h, err
+}
+
+func (c *bit2IntCall) adopt(ref ast.ASTRef) (ast.ASTHandle, error) {
+	h, err := c.owner.manager.RefGet(ref)
 	if err == nil {
 		c.refs = append(c.refs, ref)
 	}
@@ -46,6 +55,9 @@ type Bit2Int struct {
 	cache                 map[ast.ASTHandle]ast.ASTRef
 	keys                  []ast.ASTHandle
 	bit0                  ast.ASTRef
+	params                *uparams.ParamsContext
+	globals               *uparams.GlobalParams
+	bv                    *BVRewriter
 	header                uint64
 	closed                bool
 }
@@ -74,11 +86,23 @@ func NewBit2Int(m *ast.ASTManager) (*Bit2Int, error) {
 		return b, err
 	}
 	b.bit0, err = m.NewRef(zero)
+	if err != nil {
+		return b, err
+	}
+	b.params, err = uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	if err != nil {
+		return b, err
+	}
+	b.globals, err = uparams.NewGlobalParams(m.Symbols, b.params, uparams.GlobalParamsConfig{Budget: m.Budget(), Register: func(uparams.GlobalParamsRegistrar) error { return nil }})
+	if err != nil {
+		return b, err
+	}
+	b.bv, err = NewBVRewriter(m, b.params, b.globals, nil)
 	return b, err
 }
 
 func (b *Bit2Int) open() error {
-	if b == nil || b.self != b || b.closed || b.manager == nil {
+	if b == nil || b.self != b || b.closed || b.manager == nil || b.bv == nil {
 		return ast.ErrASTHandle
 	}
 	return nil
@@ -161,11 +185,7 @@ func (b *Bit2Int) alignSize(c *bit2IntCall, term ast.ASTHandle, width uint32) (a
 	if actual > width {
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
-	value, err := b.manager.MkBitVectorZeroExtend(width-actual, term)
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
-	return c.hold(value)
+	return b.simplifyZeroExtend(c, width-actual, term)
 }
 
 func (b *Bit2Int) alignSizes(c *bit2IntCall, left, right ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, error) {
@@ -220,6 +240,15 @@ func (b *Bit2Int) Close() (result error) {
 	result = errors.Join(result, b.flushCache())
 	if b.bit0 != (ast.ASTRef{}) {
 		result = errors.Join(result, b.manager.DelRef(&b.bit0))
+	}
+	if b.bv != nil {
+		result = errors.Join(result, b.bv.Close())
+	}
+	if b.globals != nil {
+		result = errors.Join(result, b.globals.Close())
+	}
+	if b.params != nil {
+		result = errors.Join(result, b.params.Close())
 	}
 	b.manager.Budget().Release(b.header)
 	b.header = 0

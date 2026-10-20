@@ -11,6 +11,80 @@ const (
 	bit2IntEQ
 )
 
+func (b *Bit2Int) simplifiedResult(c *bit2IntCall, rewrite func(ast.ASTRef) (RewriteStatus, error), fallback func() (ast.ASTHandle, error)) (ast.ASTHandle, error) {
+	out, err := b.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	status, err := rewrite(out)
+	if err != nil {
+		_ = b.manager.DelRef(&out)
+		return ast.ASTHandle{}, err
+	}
+	if status != RewriteFailed {
+		return c.adopt(out)
+	}
+	if err = b.manager.DelRef(&out); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	h, err := fallback()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return c.hold(h)
+}
+
+func (b *Bit2Int) simplifyZeroExtend(c *bit2IntCall, amount uint32, value ast.ASTHandle) (ast.ASTHandle, error) {
+	return b.simplifiedResult(c, func(out ast.ASTRef) (RewriteStatus, error) {
+		return b.bv.RewriteZeroExtend(amount, value, out)
+	}, func() (ast.ASTHandle, error) {
+		return b.manager.MkBitVectorZeroExtend(amount, value)
+	})
+}
+
+func (b *Bit2Int) simplifyBVAdd(c *bit2IntCall, left, right ast.ASTHandle) (ast.ASTHandle, error) {
+	args := ast.SliceArguments([]ast.ASTHandle{left, right})
+	return b.simplifiedResult(c, func(out ast.ASTRef) (RewriteStatus, error) {
+		return b.bv.RewriteAddition(args, out)
+	}, func() (ast.ASTHandle, error) {
+		return b.manager.MkBitVectorAdd(left, right)
+	})
+}
+
+func (b *Bit2Int) simplifyBVMul(c *bit2IntCall, left, right ast.ASTHandle) (ast.ASTHandle, error) {
+	args := ast.SliceArguments([]ast.ASTHandle{left, right})
+	return b.simplifiedResult(c, func(out ast.ASTRef) (RewriteStatus, error) {
+		return b.bv.RewriteMultiplication(args, out)
+	}, func() (ast.ASTHandle, error) {
+		return b.manager.MkBitVectorMul(left, right)
+	})
+}
+
+func (b *Bit2Int) simplifyBVSub(c *bit2IntCall, left, right ast.ASTHandle) (ast.ASTHandle, error) {
+	args := ast.SliceArguments([]ast.ASTHandle{left, right})
+	return b.simplifiedResult(c, func(out ast.ASTRef) (RewriteStatus, error) {
+		return b.bv.polynomial.RewriteSubtraction(args, out)
+	}, func() (ast.ASTHandle, error) {
+		return b.manager.MkBitVectorSub(left, right)
+	})
+}
+
+func (b *Bit2Int) simplifyBVURem(c *bit2IntCall, left, right ast.ASTHandle) (ast.ASTHandle, error) {
+	return b.simplifiedResult(c, func(out ast.ASTRef) (RewriteStatus, error) {
+		return b.bv.RewriteUnsignedRemainder(left, right, out)
+	}, func() (ast.ASTHandle, error) {
+		return b.manager.MkBitVectorURem(left, right)
+	})
+}
+
+func (b *Bit2Int) simplifyBVULE(c *bit2IntCall, left, right ast.ASTHandle) (ast.ASTHandle, error) {
+	return b.simplifiedResult(c, func(out ast.ASTRef) (RewriteStatus, error) {
+		return b.bv.RewriteULE(left, right, out)
+	}, func() (ast.ASTHandle, error) {
+		return b.manager.MkBitVectorULE(left, right)
+	})
+}
+
 func (b *Bit2Int) holdCall(c *bit2IntCall, h ast.ASTHandle, err error) (ast.ASTHandle, error) {
 	if err != nil {
 		return ast.ASTHandle{}, err
@@ -19,8 +93,11 @@ func (b *Bit2Int) holdCall(c *bit2IntCall, h ast.ASTHandle, err error) (ast.ASTH
 }
 
 func (b *Bit2Int) mkBV2Int(c *bit2IntCall, value ast.ASTHandle) (ast.ASTHandle, error) {
-	h, err := b.manager.MkBitVectorToInt(value)
-	return b.holdCall(c, h, err)
+	return b.simplifiedResult(c, func(out ast.ASTRef) (RewriteStatus, error) {
+		return b.bv.RewriteBV2Int(value, out)
+	}, func() (ast.ASTHandle, error) {
+		return b.manager.MkBitVectorToInt(value)
+	})
 }
 
 func (b *Bit2Int) mkArithmetic(c *bit2IntCall, kind int32, args ...ast.ASTHandle) (ast.ASTHandle, error) {
@@ -67,8 +144,7 @@ func (b *Bit2Int) mkAdd(c *bit2IntCall, left, right ast.ASTHandle) (ast.ASTHandl
 	if err != nil {
 		return ast.ASTHandle{}, false, err
 	}
-	sum, err := b.manager.MkBitVectorAdd(a, d)
-	sum, err = b.holdCall(c, sum, err)
+	sum, err := b.simplifyBVAdd(c, a, d)
 	if err != nil {
 		return ast.ASTHandle{}, false, err
 	}
@@ -92,8 +168,7 @@ func (b *Bit2Int) mkComp(c *bit2IntCall, mode bit2IntComparison, left, right ast
 	var result ast.ASTHandle
 	switch mode {
 	case bit2IntLT:
-		le, err := b.manager.MkBitVectorULE(d, a)
-		le, err = b.holdCall(c, le, err)
+		le, err := b.simplifyBVULE(c, d, a)
 		if err != nil {
 			return ast.ASTHandle{}, false, err
 		}
@@ -103,8 +178,7 @@ func (b *Bit2Int) mkComp(c *bit2IntCall, mode bit2IntComparison, left, right ast
 			return ast.ASTHandle{}, false, err
 		}
 	case bit2IntLE:
-		result, err = b.manager.MkBitVectorULE(a, d)
-		result, err = b.holdCall(c, result, err)
+		result, err = b.simplifyBVULE(c, a, d)
 		if err != nil {
 			return ast.ASTHandle{}, false, err
 		}
@@ -145,8 +219,7 @@ func (b *Bit2Int) mkMul(c *bit2IntCall, left, right ast.ASTHandle) (ast.ASTHandl
 	if err != nil {
 		return ast.ASTHandle{}, false, err
 	}
-	product, err := b.manager.MkBitVectorMul(a, d)
-	product, err = b.holdCall(c, product, err)
+	product, err := b.simplifyBVMul(c, a, d)
 	if err != nil {
 		return ast.ASTHandle{}, false, err
 	}
