@@ -55,6 +55,9 @@ func TestAlgebraicSelectorExactRootConversionReservations(t *testing.T) {
 				t.Fatal("selector left actual reservation path", body)
 			}
 			pending := c.binary.conversion.pending(c)
+			if unumeral.NumericAllocationPending(&c.binary.numericRoots) && (c.binary.owner != c || c.binary.numericHooks.Policy != &c.binary) {
+				t.Fatal("selector allocation lost concrete binary caller identity")
+			}
 			if pending {
 				conversion = true
 				if body == nil {
@@ -69,10 +72,6 @@ func TestAlgebraicSelectorExactRootConversionReservations(t *testing.T) {
 				if e := c.Neg(&a); !errors.Is(e, ErrAlgebraicPending) {
 					t.Fatal("pending selector conversion admitted public mutation", e)
 				}
-			} else {
-				// Earlier numeric leaves have independent retained allocation roots.
-				// No global cleanup runs for a pending selector conversion.
-				serviceMust(t, z.CleanupPendingAllocation())
 			}
 			if e := c.CleanupRetained(); e != nil {
 				t.Fatalf("cleanup: %v body: %v pending conversion: %v conversion owner: %v stop: %v selector stop: %v q: %v refinable: %v", e, body, pending, c.binary.conversion.owner == c, c.binary.conversion.stop, c.binary.sourceStop, c.binary.qConstructed, c.config.Polynomials.refinableReceiptPending(&c.binary.refinable))
@@ -80,6 +79,7 @@ func TestAlgebraicSelectorExactRootConversionReservations(t *testing.T) {
 			if c.binary.active || c.binary.conversion.pending(c) {
 				t.Fatal("selector failed to acknowledge exact conversion children")
 			}
+			algebraicExpectNoPendingAllocation(t, z)
 			if succeeded {
 				if c.binary.conversion.owner != c {
 					t.Fatal("actual rational result bypassed tracked selector conversion")

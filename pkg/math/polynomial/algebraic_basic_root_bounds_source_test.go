@@ -42,10 +42,10 @@ func TestAlgebraicBasicRootNonexactBoundsEveryReservation(t *testing.T) {
 							t.Fatal("nonexact root failed outside actual reservation", body)
 						}
 					}
-					serviceMust(t, c.config.Rationals.Integers().CleanupPendingAllocation())
 					if e := c.CleanupRetained(); e != nil {
 						t.Fatalf("nonexact root cleanup: %v; original: %v", e, body)
 					}
+					algebraicExpectNoPendingAllocation(t, c.config.Rationals.Integers())
 					if c.basicRootScope.active || c.coefficientNormalizationPending() {
 						t.Fatal("nonexact root retained an accepted child")
 					}

@@ -75,8 +75,8 @@ func TestAlgebraicInverseMinimumIntegerReservationPrefixes(t *testing.T) {
 					t.Fatal("minimum integer inverse", text)
 				}
 			}
-			serviceMust(t, qm.Integers().CleanupPendingAllocation())
 			serviceMust(t, c.CleanupRetained())
+			algebraicExpectNoPendingAllocation(t, qm.Integers())
 			serviceMust(t, c.Del(&a))
 			serviceMust(t, qm.Del(&q))
 		})

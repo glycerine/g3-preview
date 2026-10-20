@@ -190,11 +190,10 @@ func TestAlgebraicCellSetterTraceActualReservationPrefixes(t *testing.T) {
 				if e := c.Del(&out); !errors.Is(e, ErrAlgebraicPending) {
 					t.Fatal("setter display allowed caller deletion", e)
 				}
-			} else if !c.cellEvaluationPending() {
-				serviceMust(t, z.CleanupPendingAllocation())
 			}
 			serviceMust(t, c.config.Rationals.BindTrace(nil))
 			serviceMust(t, c.CleanupRetained())
+			algebraicExpectNoPendingAllocation(t, z)
 			if c.rootTracePending() || c.cellEvaluationPending() {
 				t.Fatal("setter acknowledgement retained numerical children")
 			}

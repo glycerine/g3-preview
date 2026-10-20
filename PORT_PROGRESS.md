@@ -46816,3 +46816,21 @@ content, native monomial growth, trace, ownership and assertion tests pass in
 native, checked, debug and combined checked/debug/trace profiles on CPUs 8-16.
 The ICCP/wrapper row is ported; `lc_glex_ZpX` constructor-return and callback
 refinements remain separately partial.
+
+Algebraic caller allocation-prefix ownership audit: ten retained reservation
+sweeps no longer use `IntegerManager.CleanupPendingAllocation` as a global test
+escape hatch. `isolate_roots` now has a concrete generation-bound numeric scope
+covering allocations reached before a narrower square-free/Sturm child is
+accepted; prefix 15 of the quadratic DRS route previously left an unnamed
+13-cell allocation. The enclosing Add/Sub/Mul binary scope now captures its
+complete before/after allocation frontier as well as explicitly contextualized
+children; debug prefix 549 of exact selector conversion previously left an
+unnamed 51-cell allocation outside the conversion child. `CleanupRetained`
+releases both exact owners before older algebraic locals, and tests assert the
+owner/hook identity before cleanup and the absence of pending numeric objects or
+allocator blocks afterward. The same audit proves existing basic-root, inverse,
+rational-translation, cell-Horner, cell-negation, cell-trace, saved-interval,
+selector and square-free owners need no global cleanup. Focused ten-test runs
+pass native 4.503s, checked 4.231s, debug 7.157s and combined
+checked/debug/trace 8.270s on CPUs 8-16. Broader algebraic binary/isolation
+source coverage remains partial.

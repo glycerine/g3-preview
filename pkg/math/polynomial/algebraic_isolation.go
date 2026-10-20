@@ -115,6 +115,10 @@ func (m *AlgebraicRootCore) isolateRootsForPolynomial(v UPolynomialView, out *Al
 	if m.univariateIsolationRunning {
 		return ErrAlgebraicPending
 	}
+	if err = m.beginIsolationNumeric(); err != nil {
+		return err
+	}
+	defer func() { err = m.finishIsolationNumeric(err) }()
 	m.univariateIsolationRunning = true
 	m.univariateIsolationOutput = out
 	defer func() { m.univariateIsolationRunning = false; m.univariateIsolationOutput = nil }()

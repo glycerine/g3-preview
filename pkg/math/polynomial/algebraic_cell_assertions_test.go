@@ -111,10 +111,9 @@ func TestAlgebraicCellHornerActualReservationAndPublication(t *testing.T) {
 				if e := c.Del(&seed); !errors.Is(e, ErrAlgebraicPending) {
 					t.Fatal("pending cell evaluation admitted caller deletion", e)
 				}
-			} else {
-				serviceMust(t, z.CleanupPendingAllocation())
 			}
 			serviceMust(t, c.CleanupRetained())
+			algebraicExpectNoPendingAllocation(t, z)
 			if c.cellEvaluationPending() {
 				t.Fatal("owning cell cleanup retained actual Horner")
 			}

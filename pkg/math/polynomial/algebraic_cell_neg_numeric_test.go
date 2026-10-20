@@ -148,10 +148,9 @@ func TestAlgebraicCellNegativeNormalizationConstructorReservations(t *testing.T)
 				if out.slot != 0 || c.pending.slot == 0 {
 					t.Fatal("normalization refusal crossed constructor publication")
 				}
-			} else if !c.cellEvaluationPending() && !c.coefficientNormalizationPending() && !c.cellNeg.pending() {
-				serviceMust(t, z.CleanupPendingAllocation())
 			}
 			serviceMust(t, c.CleanupRetained())
+			algebraicExpectNoPendingAllocation(t, z)
 			serviceMust(t, c.Del(&out))
 		}) {
 			return

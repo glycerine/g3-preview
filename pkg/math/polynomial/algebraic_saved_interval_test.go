@@ -200,12 +200,8 @@ func TestAlgebraicSavedIntervalSelectionOwnsPartialConstructorAbort(t *testing.T
 					}
 				}
 			}
-			if !reached {
-				// Earlier project operations have independent allocation ownership. This
-				// vector makes no new lifetime claim for their already retained suffixes.
-				serviceMust(t, z.CleanupPendingAllocation())
-			}
 			serviceMust(t, c.CleanupRetained())
+			algebraicExpectNoPendingAllocation(t, z)
 			if c.binary.active {
 				t.Fatal("selector owning abort retained source scope")
 			}

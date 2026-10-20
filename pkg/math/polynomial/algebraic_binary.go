@@ -23,6 +23,7 @@ type algebraicBinaryScope struct {
 	intervalDebug                        unumeral.BinaryIntervalDebugInvocationReceipt
 	owner                                *AlgebraicRootCore
 	numericHooks                         unumeral.NumericInvocationHooks
+	numericBefore                        unumeral.NumericAllocationRoots
 	numericRoots                         unumeral.NumericAllocationRoots
 	traceRootPending                     bool
 	traceRootStop                        error
@@ -344,7 +345,12 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 	if generation == ^uint64(0) {
 		return ErrAlgebraicPending
 	}
+	numericBefore, e := unumeral.CaptureNumericAllocationRoots(m.config.Rationals.Integers())
+	if e != nil {
+		return e
+	}
 	*s = algebraicBinaryScope{polynomialCaller: m.polynomialCaller, owner: m, active: true, running: true}
+	s.numericBefore = numericBefore
 	s.numericHooks = unumeral.NumericInvocationHooks{Generation: generation + 1, Policy: s}
 	defer func() {
 		s.executing = false
@@ -359,14 +365,14 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 		if cleanup != nil {
 			s.sourceStop = cleanup
 		}
-		cause = errors.Join(cause, cleanup)
+		captured := s.numericRoots.After(m.config.Rationals.Integers(), s.numericBefore)
+		cause = errors.Join(cause, cleanup, captured)
 		s.running = false
 		if cause == nil {
 			s.active = false
 		}
 	}()
 	p, im := m.config.Polynomials, m.config.Intervals
-	var e error
 	s.p, e = p.NewPolynomial()
 	if e != nil {
 		return e

@@ -268,8 +268,8 @@ func TestAlgebraicRationalTranslationTraceActualEvaluationReservations(t *testin
 							}
 						}
 					}
-					serviceMust(t, c.config.Rationals.Integers().CleanupPendingAllocation())
 					serviceMust(t, c.CleanupRetained())
+					algebraicExpectNoPendingAllocation(t, c.config.Rationals.Integers())
 					if c.arithmetic.active || c.rootTracePending() || p.binaryEvaluation.active {
 						t.Fatal("actual diagnostic evaluation cleanup remained pending", body)
 					}

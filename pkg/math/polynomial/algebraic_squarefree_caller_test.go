@@ -40,8 +40,6 @@ func TestAlgebraicSquareFreeDefaultChildrenReservationClosure(t *testing.T) {
 				if e := c.Del(&a); !errors.Is(e, ErrAlgebraicPending) {
 					t.Fatal("pending square-free child admitted caller deletion", e)
 				}
-			} else {
-				serviceMust(t, z.CleanupPendingAllocation())
 			}
 			raw := append([]unumeral.IntegerRawInvocationReceipt(nil), pm.squareFreeCall.raw...)
 			divides := append([]unumeral.IntegerDividesNumeralInvocationReceipt(nil), pm.squareFreeCall.divides...)
@@ -64,6 +62,7 @@ func TestAlgebraicSquareFreeDefaultChildrenReservationClosure(t *testing.T) {
 			if unumeral.NumericAllocationPending(&pm.squareFreeCall.numeric) || pm.modular.MatchesPNormalizeInvocation(&pm.squareFreeCall.pn) || pm.defaultNormalizationReceiptPending(&pm.squareFreeCall.normalization) {
 				t.Fatal("actual square-free allocation or normalization child survived acknowledgement")
 			}
+			algebraicExpectNoPendingAllocation(t, z)
 			if succeeded {
 				want := unumeral.NewRational()
 				serviceMust(t, c.config.Rationals.SetString(&want, "1/170141183460469231731687303715884105728"))
@@ -244,7 +243,7 @@ func TestAlgebraicSquareFreeCooperationBorrow(t *testing.T) {
 }
 
 func TestAlgebraicIsolationOwnsStoppedSquareFreeChild(t *testing.T) {
-	succeeded, retained := false, false
+	succeeded, retained, numeric := false, false, false
 	for prefix := int64(0); prefix < 1024 && !succeeded; prefix++ {
 		if !t.Run(fmt.Sprint(prefix), func(t *testing.T) {
 			c, pm, _ := algebraicCompareFixtureProfile(t, true)
@@ -263,6 +262,12 @@ func TestAlgebraicIsolationOwnsStoppedSquareFreeChild(t *testing.T) {
 			body := c.IsolateRoots(v, roots)
 			z.Budget().FailAfter(-1)
 			child := pm.squareFreeCallReceiptPending(&c.isolationSquareFree)
+			if unumeral.NumericAllocationPending(&c.isolationNumeric.roots) {
+				numeric = true
+				if c.isolationNumeric.owner != c || c.isolationNumeric.hooks.Policy != &c.isolationNumeric {
+					t.Fatal("stopped isolation allocation lost concrete caller identity")
+				}
+			}
 			if body == nil {
 				succeeded = true
 			}
@@ -275,14 +280,16 @@ func TestAlgebraicIsolationOwnsStoppedSquareFreeChild(t *testing.T) {
 				if e := c.Del(&a); !errors.Is(e, ErrAlgebraicPending) || a != before {
 					t.Fatal("stopped isolation child admitted caller deletion", e)
 				}
-			} else {
-				serviceMust(t, z.CleanupPendingAllocation())
 			}
 			if e := c.CleanupRetained(); e != nil {
 				t.Fatalf("isolation caller cleanup: %v operation: %v", e, body)
 			}
 			if pm.squareFreeCallReceiptPending(&c.isolationSquareFree) {
 				t.Fatal("isolation retained accepted square-free child")
+			}
+			algebraicExpectNoPendingAllocation(t, z)
+			if c.isolationNumeric.active || unumeral.NumericAllocationPending(&c.isolationNumeric.roots) {
+				t.Fatal("isolation caller cleanup retained its numeric root")
 			}
 			if succeeded && len(roots.values) != 2 {
 				t.Fatal("quadratic isolation lost real roots", len(roots.values))
@@ -293,8 +300,8 @@ func TestAlgebraicIsolationOwnsStoppedSquareFreeChild(t *testing.T) {
 			return
 		}
 	}
-	if !succeeded || !retained {
-		t.Fatal("isolation did not reach success and retained square-free children", succeeded, retained)
+	if !succeeded || !retained || !numeric {
+		t.Fatal("isolation did not reach success and retained numeric/square-free children", succeeded, numeric, retained)
 	}
 }
 

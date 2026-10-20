@@ -57,6 +57,7 @@ type AlgebraicRootCore struct {
 	cellEvaluation                                             [3]upolyBinaryEvaluationInvocationReceipt
 	cellEvaluationRunning                                      bool
 	isolationSquareFree                                        upolySquareFreeCallReceipt
+	isolationNumeric                                           algebraicIsolationNumericScope
 	factorExecuting                                            bool
 	coefficientNormalization                                   upolyDefaultNormalizeReceipt
 	univariateIsolationRunning                                 bool
@@ -1197,7 +1198,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && (m.isolationSigns.running || m.isolationSigns.finishing) {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.multivariateIsolationRunning || m.univariateIsolationRunning) {
+	if m != nil && m.self == m && (m.multivariateIsolationRunning || m.univariateIsolationRunning || m.isolationNumeric.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.polynomialEvaluationRunning != 0 {
@@ -1279,6 +1280,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		if e := p.cleanupSquareFreeCall(&m.isolationSquareFree); e != nil {
 			return e
 		}
+	}
+	if e := m.cleanupIsolationNumeric(); e != nil {
+		return e
 	}
 	if e := m.config.Polynomials.cleanupDefaultNormalizationReceipt(&m.coefficientNormalization); e != nil {
 		return e
