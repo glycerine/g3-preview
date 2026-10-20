@@ -16563,7 +16563,7 @@
       "path": "src/ast/for_each_expr.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_for_each_expr.go",
         "pkg/ast/ast_for_each_expr_source_test.go",
@@ -16594,12 +16594,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete counter and has-skolem iterative source traversal (src/ast/for_each_expr.h:27-105,120-139)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_for_each_expr.go",
           "tests": [
             "TestASTExprVisitorSourceCountSharedAndAllMarks",
@@ -16625,14 +16625,16 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Concrete visitor frames and visited state are invocation-local manager-owned storage with exact source/owning cleanup. Retained native-map traversal borrows AST handles and owns its map and frame slice for the call."
+      ],
       "deviations": [
         "Concrete counter/skolem visitors preserve shared-only versus all-mark schedules, source unsigned associativity arithmetic, body/pattern/no-pattern order, and found early exit. Lexical inline16 pair storage is embedded in the charged manager header; separately owned dynamic entries are 12-byte Go scalar records, not native pointer ABI.",
         "Actual marked-before-fast-trail-append refusal retains the exact unlisted mark action. Source clears only its completed trail; Go archive reservation before lexical frame reuse preserves original mark token, generation, owner and invocation. Release retry observes the old mark; existing checked mark-owner guards remain typed Go source-assertion adapters without bound C/T transport credit.",
-        "Source completed lexical stack/marks cleanup is separate from exact manager-owned pending-mark cleanup. Mark-owner scalar metadata is stamped at actual leaves in both profiles for owning authority; release source reads remain bit-only. No arbitrary proc specialization, IgnorePatterns=true, for_each_expr_args ptr-vector helper, caller asserted_formulas/goal driver or whole source-unit completion credit.",
+        "Source completed lexical stack/marks cleanup is separate from exact manager-owned pending-mark cleanup. Mark-owner scalar metadata is stamped at actual leaves in both profiles for owning authority; release source reads remain bit-only. Arbitrary template/proc adapters, IgnorePatterns=true and for_each_expr_args are omitted because no retained concrete consumer requires them.",
         "Real public AST Close may acknowledge younger lexical marks then stop on an older NUM formatting destructor. Original archived tuples/body/source/first-own causes remain charged and attached after ACK; retries skip the acknowledged leaf without reading later foreign marks. Exact history metadata is refunded only by actual final owning manager storage/header teardown. Current unlisted diagnostics remain in the charged header, and a later call archives source-ended acknowledged diagnostics before overwriting lexical storage. Independent fresh-context ordinal campaigns preserve every original source mark-trail reservation; private child ACK is not represented as enclosing owner end.",
         "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised.",
-        "The retained goal NumExprs caller now uses GetNumExprsWithVisited with a concrete native map[ASTHandle]bool and native traversal frames while reusing visitExprCore/visitExprProc. Root/shared-node deduplication, postorder argument/body/pattern/no-pattern traversal and associative weight remain. Legacy explicit mark overloads and their stopped source ownership remain separate; no universal callback adapter, generic container or whole-unit completion credit is added."
+        "The retained goal NumExprs caller uses GetNumExprsWithVisited with a concrete native map[ASTHandle]bool and native traversal frames while reusing visitExprCore/visitExprProc. Root/shared-node deduplication, postorder argument/body/pattern/no-pattern traversal and associative weight remain. Legacy explicit mark overloads and their stopped source ownership remain separate; no universal callback adapter or generic container is added."
       ]
     },
     {
