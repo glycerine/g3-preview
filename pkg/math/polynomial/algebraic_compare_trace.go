@@ -10,7 +10,7 @@ import (
 // This inner record follows the interval and equal-polynomial exits. Its
 // operands are reached only when the source trace is enabled.
 func (m *AlgebraicRootCore) traceComparisonRoots(a, b *algebraicRecord) error {
-	return m.emitRootTrace("compare", 1738, func(w io.Writer) error {
+	return m.emitRootTrace("compare_core", 1738, func(w io.Writer) error {
 		out := algebraicTranslationTraceStream{algebraicPredicateTraceStream{w}}
 		_ = out.AppendCString("comparing\n")
 		for i, r := range [2]*algebraicRecord{a, b} {

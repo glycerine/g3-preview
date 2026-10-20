@@ -51,7 +51,7 @@ func TestAlgebraicCompareInnerTraceExactRecordsAndEarlyExits(t *testing.T) {
 					flag = "0"
 				}
 				record := "comparing\na: x^2 - 2\n(1, 2)\ncell_a->m_minimal: " + flag + "\nb: x^2 - 3\n(1, 2)\ncell_b->m_minimal: " + flag + "\n"
-				if !strings.Contains(text.String(), record) {
+				if !strings.Contains(text.String(), record) || !strings.Contains(text.String(), "compare_core src/math/polynomial/algebraic_numbers.cpp:1738 ") {
 					t.Fatal("inner comparison literal", text.String(), record)
 				}
 			}

@@ -39869,6 +39869,19 @@
         ],
         "verification": "Four-profile focused getter/sign substitution/evaluation/isolation checks pass; independent omitted-record and omitted-receipt controls fail as expected. An actual completed formatter C-string span guard verifies its body-error receipt, completed inner source unwind and separate outer callee owning acknowledgment, with original input intact. Exhaustive combined isolation cancellation sweep is recorded separately when terminal.",
         "limits": "Whole polynomial/algebraic/AST source consumer and failure audits remain partial."
+      },
+      "sturm_comparison_trace_audit": {
+        "source": "algebraic_numbers.cpp:371-373,1817-1823; compare_core inner record cpp1738",
+        "go_target": "pkg/math/polynomial/algebraic_compare_sturm_trace.go",
+        "behavior": "The actual Sturm sequence remains live after lower/upper sign variation queries while the source interval/V/sign_lower record executes, including V==0. Interval displays retain actual accepted insertion receipts and reuse them only after completion. Packed sign_lower is read at each reached operand, and the post-TRACE branch reads the current right sign rather than an earlier full-record snapshot. Writer callbacks cannot destroy/reenter the borrowed core. The existing cpp1738 and new cpp1817 headers now use the source function name compare_core.",
+        "tests": [
+          "TestAlgebraicCompareSturmTraceLiteralAndLiveSequence",
+          "TestAlgebraicCompareSturmTraceZeroVariationEarlyReturn",
+          "TestAlgebraicCompareSturmTraceActualBoundCharacterGuard",
+          "TestAlgebraicCompareSturmTracePositiveLowerSignsAndRefusingStream",
+          "TestAlgebraicCompareInnerTraceExactRecordsAndEarlyExits"
+        ],
+        "verification": "Forward/reverse and equal roots from different defining polynomials, negative roots with positive lower signs, live actual sequence metadata, callbacks and sticky stream refusal are covered. A BIG bound formatter C-string guard is armed only after the actual Sturm header; its body error retains the accepted child, ends the source sequence without inventing a destructor cause, and matched owning cleanup leaves both inputs usable. Whole source failure and consumer audits remain partial."
       }
     },
     {

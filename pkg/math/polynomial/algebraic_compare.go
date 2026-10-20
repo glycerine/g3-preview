@@ -353,10 +353,17 @@ func (m *AlgebraicRootCore) compareCore(a, b *Algebraic) (_value int, _err error
 		return 0, e
 	}
 	v := int32(lower) - int32(upper)
+	if e = m.traceComparisonSturm(a, b, v); e != nil {
+		return 0, e
+	}
 	if v == 0 {
 		return 0, nil
 	}
-	if (v < 0) == (br.flags&2 != 0) {
+	negative, e := m.comparisonLowerSign(b)
+	if e != nil {
+		return 0, e
+	}
+	if (v < 0) == (negative < 0) {
 		return -1, nil
 	}
 	return 1, nil
