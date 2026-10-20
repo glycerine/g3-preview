@@ -28989,7 +28989,7 @@
       "path": "src/ast/rewriter/fpa_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/fpa_bv2rm.go",
         "pkg/ast/rewriter/fpa_bv2rm_debug_test.go",
@@ -29280,9 +29280,15 @@
           "text": "SASSERT(to_app(arg)->get_num_args() == 3);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "constructor, empty destructor, parameter update and empty parameter-description hook (fpa_rewriter.cpp:24-39)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": ["TestFPAToRealDispatchDefaultAndHardwareUnspecified"]
+        },
         {
           "name": "mk_bvwrap three extracts from one exact-width BV, source accepts overlapping ranges and refuses other inputs (fpa_rewriter.cpp:815-847)",
           "status": "ported",
@@ -29513,16 +29519,21 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_ieee_bv_trace.go",
           "tests": ["TestASTFPAToIEEEBVSourceTrace"]
+        },
+        {
+          "name": "mk_is_nzero and mk_is_pzero standalone helpers (fpa_rewriter.cpp:558-579)",
+          "status": "reference_only",
+          "reason": "Repository-wide source search finds no caller; reached public classification operations use mk_is_zero, mk_is_negative and mk_is_positive directly."
         }
       ],
-      "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
-      "deviations": ["The partial Go FPA rewriter handles selected arithmetic and conversion branches; other to_fp arities, model/theory integration and remaining source cases are unported."]
+      "ownership": ["FPARewriter borrows its AST manager and manager-owned floating-point numeral service. Close invalidates the Go owner; caller-local numeral and rational temporaries retain explicit reverse cleanup through their manager continuations.", "Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
+      "deviations": ["All source-dispatched FPA rewrite branches are implemented. Model and theory integration belongs to their source units; unused standalone signed-zero helpers are omitted under the retained-consumer rule."]
     },
     {
       "path": "src/ast/rewriter/fpa_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/fpa_bv2rm.go",
         "pkg/ast/rewriter/fpa_bv2rm_debug_test.go",
@@ -29560,9 +29571,15 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "concrete FPA rewriter owner, manager/family access, parameter update and application/equality dispatch interface (fpa_rewriter.h:27-49)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": ["TestFPAConstantRewriteReturnsApplication", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal"]
+        },
         {
           "name": "mk_bvwrap dispatch for retained FP constructor input (fpa_rewriter.h; fpa_rewriter.cpp:97,815-847)",
           "status": "ported",
@@ -29692,9 +29709,18 @@
           "tests": [
             "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch"
           ]
+        },
+        {
+          "name": "unused mk_is_nzero, mk_is_pzero, mk_min_i and mk_max_i declarations",
+          "status": "reference_only",
+          "reason": "Repository-wide source search finds no fpa_rewriter caller; mk_min_i and mk_max_i also have no source definition."
         }],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "FPARewriter borrows the AST manager and its registered floating-point numeral service. Close invalidates the owner; output ASTRef values remain caller-owned."
+      ],
+      "deviations": [
+        "Named typed Go methods replace C++ pointer-array overloads. Unused helper declarations are omitted under the retained-consumer rule."
+      ]
     },
     {
       "path": "src/ast/rewriter/fpa_rewriter_params.hpp",
