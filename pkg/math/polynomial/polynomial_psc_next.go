@@ -109,7 +109,7 @@ func (m *MultivariatePolynomialCore) finishPSCNextPhase(owning, abort bool) (err
 			return nil
 		}
 	}
-	if m.matchesFactoryInvocation(&s.factory) || m.matchesCoefficientInvocation(&s.coefficient) || m.matchesArithmeticInvocation(&s.arithmetic) || m.matchesExactDivInvocation(&s.division) || m.matchesVariableInvocation(&s.variable) && s.variable.frame.active {
+	if m.matchesFactoryInvocation(&s.factory) || m.matchesCoefficientInvocation(&s.coefficient) || m.matchesArithmeticInvocation(&s.arithmetic) || m.exactDivInvocationPending(&s.division) || m.matchesVariableInvocation(&s.variable) && s.variable.frame.active {
 		return nil
 	}
 	s.active = false

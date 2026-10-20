@@ -337,7 +337,7 @@ func (m *MonomialManager) convertCreated(source *MonomialManager, a Monomial, ou
 // CleanupCreation is an owning Go abort of the actual named unpublished object
 // and temporary table binding. It does not roll back IDs or allocation counters.
 func (m *MonomialManager) CleanupCreation() error {
-	if m.substitutionTraceCallback() {
+	if m.substitutionTraceCallback() || m.exactDivTraceCallback() {
 		return ErrMonomialPending
 	}
 	if m == nil || m.self != m || m.closed {

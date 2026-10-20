@@ -65,6 +65,7 @@ func (r *polynomialDivisionReference) assign(m *MultivariatePolynomialCore, p Mo
 // Both records are actual method locals embedded in the charged core header.
 // Scalar exact_div's numeral is RAW: no source Del on pre-end exceptions.
 type polynomialExactDivisionScope struct {
+	traceGenerated           Monomial
 	calleeGeneration         uint64
 	invocation               uint64
 	pscOwner                 uint64
@@ -183,7 +184,7 @@ func (m *MultivariatePolynomialCore) exactDivisionCleanupPhase(owning, abort boo
 		}
 		*cursor = 2
 	}
-	pendingNumeric := s.numeric.PendingObject().OwnerID() != 0
+	pendingNumeric := s.traceGenerated != (Monomial{}) || s.numeric.PendingObject().OwnerID() != 0
 	for _, raw := range s.numeric.PendingAllocatorBlocks() {
 		pendingNumeric = pendingNumeric || raw.OwnerID() != 0
 	}
@@ -194,6 +195,14 @@ func (m *MultivariatePolynomialCore) exactDivisionCleanupPhase(owning, abort boo
 		return nil
 	}
 	if abort {
+		if s.traceGenerated != (Monomial{}) {
+			if m.generatedActive && m.generatedMonomial == s.traceGenerated {
+				if e := m.cleanupGeneratedMonomial(); e != nil {
+					return e
+				}
+			}
+			s.traceGenerated = Monomial{}
+		}
 		if s.kind == 1 {
 			if e := numericIntegerManager_cleanupExactDivNumeric(m.integer, &s.directReceipt, true); e != nil {
 				return e
@@ -249,6 +258,12 @@ func (m *MultivariatePolynomialCore) CleanupExactDivision() error {
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
 	}
+	if m.exactDivTrace.running || m.exactDivision.executing {
+		return ErrPolynomialPending
+	}
+	if e := m.cleanupExactDivTrace(&m.exactDivTrace.current); e != nil {
+		return e
+	}
 	e := m.cleanupExactDivInvocation(&m.exactDivision.directReceipt, true)
 	if e == nil && m.exactDivision.kind == 2 {
 		e = m.exactDivisionCleanup(true)
@@ -264,6 +279,16 @@ func (m *MultivariatePolynomialCore) ExactDiv(p, q Polynomial) (Polynomial, erro
 func (m *MultivariatePolynomialCore) exactDivWithReceipt(p, q Polynomial, receipt *polynomialExactDivInvocationReceipt) (result Polynomial, err error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
+	}
+	var entry polynomialExactDivTraceInvocation
+	if e := m.traceExactDivEntry(p, q, &entry); e != nil {
+		if receipt != nil && entry.core != nil {
+			receipt.trace = entry
+		}
+		return Polynomial{}, e
+	}
+	if receipt != nil && entry.core != nil {
+		receipt.trace = entry
 	}
 	zero, e := m.IsZero(p)
 	if e != nil {
@@ -323,7 +348,7 @@ func (m *MultivariatePolynomialCore) exactDivWithReceipt(p, q Polynomial, receip
 	}
 	preludeIdentity := receipt.prelude
 	*s = polynomialExactDivisionScope{active: true, executing: true, kind: 1, pscOwner: m.pscExecutingOwner(), invocation: s.invocation + 1}
-	s.directReceipt = polynomialExactDivInvocationReceipt{core: m, frame: s, invocation: s.invocation, prelude: preludeIdentity}
+	s.directReceipt = polynomialExactDivInvocationReceipt{core: m, frame: s, invocation: s.invocation, prelude: preludeIdentity, trace: entry}
 	*receipt = s.directReceipt
 	defer func() {
 		s.executing = false
@@ -376,6 +401,12 @@ func (m *MultivariatePolynomialCore) exactDivWithReceipt(p, q Polynomial, receip
 		// invokes __builtin_unreachable on false; this is a typed UB guard.
 		if !divides {
 			return Polynomial{}, polynomialExactDivSourceVerifyFailure()
+		}
+		if e = m.traceExactDivMonomials(monomialR, monomialQ, quotient, &s.directReceipt.trace); e != nil {
+			if m.generatedActive && m.generatedMonomial == quotient {
+				s.traceGenerated = quotient
+			}
+			return Polynomial{}, e
 		}
 		if e = s.monomial.assign(m, quotient); e != nil {
 			return Polynomial{}, e

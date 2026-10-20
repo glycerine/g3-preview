@@ -58,7 +58,7 @@ func (m *MultivariatePolynomialCore) pscClassicPending() bool {
 			return true
 		}
 	}
-	return m.matchesExactDivInvocation(&s.division) || m.matchesArithmeticInvocation(&s.arithmetic) || m.matchesPseudoInvocation(&s.pseudo) || m.matchesNegInvocation(&s.neg) || m.matchesPowerInvocation(&s.power) || m.matchesCoefficientInvocation(&s.coefficient) || m.matchesFactoryInvocation(&s.factory)
+	return m.exactDivInvocationPending(&s.division) || m.matchesArithmeticInvocation(&s.arithmetic) || m.matchesPseudoInvocation(&s.pseudo) || m.matchesNegInvocation(&s.neg) || m.matchesPowerInvocation(&s.power) || m.matchesCoefficientInvocation(&s.coefficient) || m.matchesFactoryInvocation(&s.factory)
 }
 func (m *MultivariatePolynomialCore) finishPSCClassicPhase(owning, abort bool) (err error) {
 	if m == nil || m.self != m {

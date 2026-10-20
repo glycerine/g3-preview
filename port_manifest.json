@@ -41871,7 +41871,11 @@
         "pkg/math/polynomial/polynomial_substitution_invocation_test.go",
         "pkg/math/polynomial/polynomial_substitution_numeric_epoch_test.go",
         "pkg/math/polynomial/polynomial_gcd_check.go",
-        "pkg/math/polynomial/polynomial_gcd_check_test.go"
+        "pkg/math/polynomial/polynomial_gcd_check_test.go",
+        "pkg/math/polynomial/polynomial_exact_div_trace.go",
+        "pkg/math/polynomial/polynomial_exact_div_trace_test.go",
+        "pkg/math/polynomial/polynomial_substitution_trace.go",
+        "pkg/math/polynomial/polynomial_substitution_trace_test.go"
       ],
       "tests": [
         "TestPolynomialDividesTraceZeroKeepsOlderAlgorithmReceipt",
@@ -47706,6 +47710,21 @@
         ],
         "verification": "Focused monomial/substitution/GCD/resultant/pseudo/derivative tests pass native, checked, debug and combined checked/debug/trace. Independent omitted-record, omitted-factory and omitted-receipt overlays fail their intended assertions. Physical root audits cover reservation prefixes and real post-diagnostic NUM copy refusal.",
         "limits": "Whole polynomial/algebraic/AST completion remains partial; this increment is later than full native checkpoint82537323."
+      },
+      "exact_division_trace_audit": {
+        "source": "polynomial.cpp:5117,5143-5144; live exact_div used by PRS/resultant, factor_core and PSC",
+        "go_target": "pkg/math/polynomial/polynomial_exact_div_trace.go",
+        "behavior": "Operand record precedes the zero shortcut, divisor assertion, shared-buffer resets and actual NUM/reference declaration. A separate generation-bound diagnostic invocation captures its accepted direct polynomial display. The monomial record follows actual quotient division/VERIFY but precedes reference assignment and numeric division. Sticky writer failure preserves source computations. Numerical bindings, polynomial callback guards and the actual monomial trace borrow reject executing owner destruction and cleanup.",
+        "ownership": "Exact-division receipts include the independent pre-local trace child. Parent GCD/ICCP/Lazard/PSC pending predicates retain it; matching cleanup handles it before the algorithm prelude. Stale and copied trace scopes cannot retire the accepted display allocation. An actual newly generated quotient remains named after a diagnostic read error until explicit owning abort. Public CleanupExactDivision refuses executing calls before writing cleanupCause.",
+        "tests": [
+          "TestPolynomialExactDivisionTraceBeforeZeroShortcut",
+          "TestPolynomialExactDivisionTraceActualQuotientBeforeAssignment",
+          "TestPolynomialExactDivisionTraceExactNumericReceiptBeforeLocals",
+          "TestPolynomialExactDivisionTraceEveryReservation",
+          "TestPolynomialExactDivisionExecutingCleanupRefusalDoesNotMutateCause"
+        ],
+        "verification": "Independent quotient3*x0^2*x1^2, literal entry and monomial text, actual pre-assignment generated token, real TLS BIG-copy refusal before locals, allocator tuple and stale/copy refusal, pooled/direct allocation prefixes with physical audits, and independent trace-disabled executing-cleanup regression. Broader groups pass four build profiles. Omitted-record and omitted-receipt overlays fail their intended assertions.",
+        "limits": "The polynomial source unit and complete polynomial/algebraic/AST ports remain partial."
       }
     },
     {

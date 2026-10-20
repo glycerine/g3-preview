@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -37,7 +38,11 @@ func TestPolynomialExactDivIndependentProductAndScalar(t *testing.T) {
 func polynomialExactDivisionPhysical(t *testing.T, m *MultivariatePolynomialCore, polys []Polynomial, public ...*unumeral.Int) {
 	t.Helper()
 	// Scope roots must be named by the shared census, without caller annotations.
-	polynomialNewtonPhysicalAudit(t, m, nil, nil, nil, nil, polys, nil, public...)
+	for _, f := range m.display.frames {
+		public = append(public, &f.numeral)
+	}
+	headers := uint64(len(m.display.frames)) * uint64(reflect.TypeOf(polynomialDisplayFrame{}).Size())
+	polynomialNewtonPhysicalWithExtra(t, m, nil, nil, nil, nil, polys, nil, nil, headers, public...)
 	polynomialOperationMonomialAudit(t, m, polys, nil)
 }
 func TestPolynomialExactDivCheckpointAfterActualInputCopy(t *testing.T) {

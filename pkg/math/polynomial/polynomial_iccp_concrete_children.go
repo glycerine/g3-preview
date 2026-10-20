@@ -15,7 +15,7 @@ func (m *MultivariatePolynomialManager) iccpConcreteChildrenPending(s *polynomia
 	c := m.core
 	// ExactDiv may finish its lexical suffix while its earlier remainder
 	// buffer prelude still owns rows. Preserve that issued child as well.
-	return c.matchesArithmeticInvocation(&s.division.prelude) || c.matchesExactDivInvocation(&s.division) || c.matchesNegInvocation(&s.neg) || c.matchesCoefficientInvocation(&s.coefficient) || c.matchesFactoryInvocation(&s.coefficientFactory) || c.cheap.matchesAppendInvocation(&s.coefficientAppend)
+	return c.matchesArithmeticInvocation(&s.division.prelude) || c.exactDivInvocationPending(&s.division) || c.matchesNegInvocation(&s.neg) || c.matchesCoefficientInvocation(&s.coefficient) || c.matchesFactoryInvocation(&s.coefficientFactory) || c.cheap.matchesAppendInvocation(&s.coefficientAppend)
 }
 func (m *MultivariatePolynomialManager) cleanupICCPConcreteChildren(s *polynomialICCPScope, abort bool) error {
 	c := m.core

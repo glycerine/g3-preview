@@ -87,7 +87,7 @@ func (m *MultivariatePolynomialCore) lazardChildren(s *polynomialLazardScope, ab
 	return nil
 }
 func (m *MultivariatePolynomialCore) lazardChildrenPending(s *polynomialLazardScope) bool {
-	return s.x.assigning || s.c.assigning || s.x.incoming != (Polynomial{}) || s.c.incoming != (Polynomial{}) || m.matchesExactDivInvocation(&s.division) || m.matchesArithmeticInvocation(&s.arithmetic) || m.matchesCoefficientInvocation(&s.coefficient) || m.matchesFactoryInvocation(&s.factory)
+	return s.x.assigning || s.c.assigning || s.x.incoming != (Polynomial{}) || s.c.incoming != (Polynomial{}) || m.exactDivInvocationPending(&s.division) || m.matchesArithmeticInvocation(&s.arithmetic) || m.matchesCoefficientInvocation(&s.coefficient) || m.matchesFactoryInvocation(&s.factory)
 }
 func (m *MultivariatePolynomialCore) finishLazard(owning bool) error {
 	return m.finishLazardPhase(owning, owning)

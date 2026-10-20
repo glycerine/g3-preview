@@ -322,7 +322,7 @@ func (m *MultivariatePolynomialManager) subresultantChildrenPending() bool {
 			return true
 		}
 	}
-	return (s.vector.matches() && s.vector.frame.setActive) || c.matchesNegInvocation(&s.neg) || c.matchesExactDivInvocation(&s.division) || c.matchesArithmeticInvocation(&s.arithmetic) || c.matchesPseudoInvocation(&s.pseudo) || c.matchesPowerInvocation(&s.power) || c.matchesCoefficientInvocation(&s.coefficient) || c.matchesFactoryInvocation(&s.factory)
+	return (s.vector.matches() && s.vector.frame.setActive) || c.matchesNegInvocation(&s.neg) || c.exactDivInvocationPending(&s.division) || c.matchesArithmeticInvocation(&s.arithmetic) || c.matchesPseudoInvocation(&s.pseudo) || c.matchesPowerInvocation(&s.power) || c.matchesCoefficientInvocation(&s.coefficient) || c.matchesFactoryInvocation(&s.factory)
 }
 func (m *MultivariatePolynomialManager) cleanupSubresultantChildren(abort bool) error {
 	s, c := &m.subresultant, m.core

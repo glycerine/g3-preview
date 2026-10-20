@@ -291,7 +291,7 @@ func (m *MultivariatePolynomialManager) pscChain2ChildrenPending() bool {
 			return true
 		}
 	}
-	return c.matchesNegInvocation(&s.neg) || c.matchesExactDivInvocation(&s.division) || c.matchesArithmeticInvocation(&s.arithmetic) || c.matchesPseudoInvocation(&s.pseudo) || c.matchesPowerInvocation(&s.power) || c.matchesCoefficientInvocation(&s.coefficient) || c.matchesFactoryInvocation(&s.factory)
+	return c.matchesNegInvocation(&s.neg) || c.exactDivInvocationPending(&s.division) || c.matchesArithmeticInvocation(&s.arithmetic) || c.matchesPseudoInvocation(&s.pseudo) || c.matchesPowerInvocation(&s.power) || c.matchesCoefficientInvocation(&s.coefficient) || c.matchesFactoryInvocation(&s.factory)
 }
 func (m *MultivariatePolynomialManager) cleanupPSCChain2Children(abort bool) error {
 	s, c := &m.pscChain2, m.core

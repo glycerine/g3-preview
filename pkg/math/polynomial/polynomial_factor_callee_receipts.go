@@ -11,6 +11,7 @@ type polynomialDerivativeInvocationReceipt struct {
 	invocation  uint64
 }
 type polynomialExactDivInvocationReceipt struct {
+	trace      polynomialExactDivTraceInvocation
 	prelude    polynomialArithmeticInvocationReceipt
 	core       *MultivariatePolynomialCore
 	frame      *polynomialExactDivisionScope
@@ -60,6 +61,9 @@ func (m *MultivariatePolynomialCore) exactDivInvocationSourceCause(r *polynomial
 	if r == nil {
 		return nil
 	}
+	if e := m.exactDivTraceSourceCause(&r.trace); e != nil {
+		return e
+	}
 	if e := m.arithmeticInvocationSourceCause(&r.prelude); e != nil {
 		return e
 	}
@@ -71,6 +75,9 @@ func (m *MultivariatePolynomialCore) exactDivInvocationSourceCause(r *polynomial
 func (m *MultivariatePolynomialCore) cleanupExactDivInvocation(r *polynomialExactDivInvocationReceipt, abort bool) error {
 	if r == nil {
 		return nil
+	}
+	if e := m.cleanupExactDivTrace(&r.trace); e != nil {
+		return e
 	}
 	if e := m.cleanupArithmeticInvocation(&r.prelude, false); e != nil {
 		return e
@@ -84,4 +91,8 @@ func (m *MultivariatePolynomialCore) cleanupExactDivInvocation(r *polynomialExac
 		return m.cleanupArithmeticInvocation(&r.prelude, true)
 	}
 	return nil
+}
+
+func (m *MultivariatePolynomialCore) exactDivInvocationPending(r *polynomialExactDivInvocationReceipt) bool {
+	return r != nil && (m.exactDivTraceInvocationPending(&r.trace) || m.matchesExactDivInvocation(r) || m.matchesArithmeticInvocation(&r.prelude))
 }
