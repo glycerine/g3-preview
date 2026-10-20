@@ -47434,7 +47434,8 @@
           "5972 square-root input",
           "6595/6604/6689/6731 square-free helper inputs",
           "6708 univariate conversion input",
-          "6755 factor_core entry"
+          "6755 factor_core entry",
+          "6438 shared rational/integer/interval/algebraic evaluation entry"
         ],
         "retained_public_reference_records": [
           "2871/2890/2896/2901 Newton references",
@@ -47449,7 +47450,7 @@
           "6795 factor-core A/B and 6807 constant C"
         ],
         "verification": "Real zero polynomial cells distinguish direct display from the public consistency scope with a closed Go-adapter reservation gate. Controls retain public checks. Existing trace output, refusal, callback and display tests cover reached nonzero terms and cleanup.",
-        "remaining_trace_audit": "Live evaluation TRACE cpp6438 remains unverified or absent. All factor TRACE call sites cpp6578-6829 now have Go implementations; per-increment audits below describe their source dispatch and verification limits. Broader retained-consumer, numeric failure and whole-unit ownership audits remain open. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit."
+        "remaining_trace_audit": "The evaluation entry TRACE cpp6438-6439 is implemented for the four retained concrete evaluators. Result TRACE cpp6504-6505 remains unported/unverified. All factor TRACE call sites cpp6578-6829 have implementations; per-increment audits describe source dispatch and verification limits. Broader retained-consumer, numeric failure and whole-unit ownership audits remain open. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit."
       },
       "public_content_and_quadratic_trace_audit": {
         "source": "polynomial.cpp:7199-7210 and 6604-6672",
@@ -47498,7 +47499,7 @@
         "source": "polynomial.cpp:6707-6720",
         "go_target": "pkg/math/polynomial/polynomial_factor_univariate_trace.go",
         "status": "ported live conversion diagnostics; whole polynomial source unit remains partial",
-        "behavior": "Raw integer String formats the retained backend constant (+/-1 for primitive square-free inputs). Input polynomial displays directly, actual backend factor displays through upolynomial manager, converted polynomial_ref uses public display before Push, and final record precedes the sign assertion/flip. Actual univariate scope/history retain both formatter invocation keys. Both managers are borrowed throughout header/body/footer, and CleanupGCD rejects the active factor TRACE callback even when gcdDepth is zero.",
+        "behavior": "Refined imp::m() is mpzzp_manager (cpp1823/2378), so Modular SourceStringTracked preserves its normalization assertion and to_string call. Retained primitive square-free backend constants are +/-1 and have no allocating character child. Input polynomial displays directly, actual backend factor displays through upolynomial manager, converted polynomial_ref uses public display before Push, and final record precedes the sign assertion/flip. Actual univariate scope/history retain both formatter invocation keys. Both managers are borrowed throughout header/body/footer, and CleanupGCD rejects the active factor TRACE callback even when gcdDepth is zero.",
         "tests": [
           "TestPolynomialUnivariateFactorBugTraceConvertedRecordsAndRefusal",
           "TestPolynomialUnivariateFactorBugEveryReservation",
@@ -47543,6 +47544,26 @@
         ],
         "evidence": "Four-profile factor and imp lifetime regressions; real TLS BIG Copy refusal before factor-core frame/local construction, exact allocator tuple and owning cleanup, copied-scope refusal, BIG final-string invocation even after writer failure, recursive ordering, literal counts, actual reservation prefixes through success and older canceled-body preservation. Independent omitted-record, omitted-polynomial-receipt and omitted-string-receipt overlays under /mnt/oldrog/tmp/g3-factor-boundary-trace.",
         "limits": "No whole polynomial/AST completion or exhaustive source allocation/destructor-failure coverage is claimed."
+      },
+      "evaluation_entry_trace_audit": {
+        "source": "polynomial.cpp:6438-6439, before assertions and lexical aux construction",
+        "go_target": "pkg/math/polynomial/polynomial_evaluation_trace.go",
+        "status": "ported entry diagnostic; result record cpp6504-6505 and broader audits remain open",
+        "retained_instantiations": [
+          "unsynch_mpq_manager rational",
+          "refined imp numeral_manager = mpzzp_manager integer (cpp1823)",
+          "mpbqi_manager interval",
+          "anum_manager algebraic"
+        ],
+        "behavior": "One actual entry diagnostic per numerical/algebraic root owner is reused only after its formatter completes. It captures the direct polynomial display invocation and propagates actual source destructor stops into the respective evaluator before older auxiliaries unwind. Explicit cleanup drains only that accepted display, rejects copied scopes and prevents owner destruction during output/failure-transport callbacks. Numerical manager bindings guard actual borrowed numeric owners. No generic ValManager adapter or source scratch repair is introduced.",
+        "tests": [
+          "TestPolynomialEvaluationTraceConcreteConsumers",
+          "TestPolynomialEvaluationTraceFailedStreamAndOwnerBorrow",
+          "TestPolynomialEvaluationTraceEveryReservation",
+          "TestPolynomialEvaluationTraceActualTLSReceiptBeforeAuxiliary"
+        ],
+        "evidence": "All four concrete evaluators have value/entry-output checks. Real TLS BIG Copy refusal before aux frame construction captures exact allocator roots; matched CleanupEvaluation releases them and copied scope cannot acquire them. Refusing stream still executes polynomial formatting. Broader evaluation/factor/imp checks pass four profiles. Independent omitted-entry and omitted-receipt overlays fail intended assertions under /mnt/oldrog/tmp/g3-evaluation-entry.",
+        "type_alias_correction": "The imp typedef at cpp1823 refines the public raw numeral_manager to mpzzp_manager; its univariate factor conversion m().to_string is now routed through existing Modular SourceStringTracked, with no receipt for the nonallocating retained +/-1 case. Earlier raw-String wording is superseded."
       }
     },
     {

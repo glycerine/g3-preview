@@ -18,6 +18,7 @@ type polynomialEvalAlgebraicFrame struct {
 	constructed bool
 }
 type polynomialAlgebraicEvaluationScope struct {
+	trace                       polynomialEvaluationTraceScope
 	isolationCaller             *algebraicMultivariateIsolationFrame
 	frames                      []*polynomialEvalAlgebraicFrame
 	vm                          *AlgebraicRootCore
@@ -69,6 +70,9 @@ func (m *MultivariatePolynomialManager) finishEvaluationAlgebraicFrame(f *polyno
 	return nil
 }
 func (s *polynomialAlgebraicEvaluationScope) pending() bool {
+	if s.trace.active {
+		return true
+	}
 	for _, f := range s.frames {
 		if f.constructed {
 			return true
@@ -250,8 +254,11 @@ func (m *MultivariatePolynomialManager) CleanupAlgebraicEvaluation() error {
 		return e
 	}
 	s := &m.algebraicEvaluation
-	if s.executing {
+	if s.executing || m.core.evaluationTraceCallback() {
 		return ErrPolynomialPending
+	}
+	if e := m.cleanupEvaluationTrace(&s.trace); e != nil {
+		return e
 	}
 	if !s.active {
 		return nil

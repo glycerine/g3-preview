@@ -16,9 +16,10 @@ func (m *MultivariatePolynomialManager) emitUnivariateFactorBug(s *polynomialFac
 func (m *MultivariatePolynomialManager) traceUnivariateFactorStart(s *polynomialFactorUnivariateScope, p Polynomial) error {
 	return m.emitUnivariateFactorBug(s, 6707, func(out *polynomialTraceSink) error {
 		_ = out.WriteLiteral("factoring fs constant: ")
-		// For retained primitive square-free inputs the backend constant is +/-1.
-		// Preserve the source raw-manager to_string call (not modular display).
-		text, e := m.core.integer.String(&s.fs.constant)
+		// imp refines numeral_manager to mpzzp_manager (cpp1823), so m()
+		// preserves its normalization assertion and to_string call. Retained
+		// primitive square-free factors have constant +/-1: no character child.
+		text, e := m.core.modular.SourceStringTracked(&s.fs.constant, nil)
 		if e != nil {
 			return e
 		}

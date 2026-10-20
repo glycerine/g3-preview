@@ -153,6 +153,16 @@ func (v *PolynomialNewtonVector) sourceFinalizeMember() error {
 
 func (m *MultivariatePolynomialManager) SourceFinalize() error {
 	if m != nil && m.self == m {
+		for _, trace := range [2]*polynomialEvaluationTraceScope{&m.evaluation.trace, &m.algebraicEvaluation.trace} {
+			if trace.active || trace.executing {
+				if trace.sourceCause != nil {
+					return trace.sourceCause
+				}
+				return ErrPolynomialPending
+			}
+		}
+	}
+	if m != nil && m.self == m {
 		if m.factorEnd.sourceCause != nil {
 			return m.factorEnd.sourceCause
 		}
@@ -200,7 +210,7 @@ func (m *MultivariatePolynomialManager) SourceFinalize() error {
 	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && (m.core.quasiResultant.active || m.core.variableNumeral.active) {
 		return ErrPolynomialPending
 	}
-	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && (m.core.collectingVariables || m.core.algebraicTraceRunning || m.core.renameTraceRunning || m.core.gcdTraceRunning || m.core.dividesTrace.running || m.core.quadraticTraceCallback()) {
+	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && (m.core.collectingVariables || m.core.algebraicTraceRunning || m.core.renameTraceRunning || m.core.gcdTraceRunning || m.core.dividesTrace.running || m.core.quadraticTraceCallback() || m.core.evaluationTraceCallback()) {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && (m.normalization.active || m.core.normalizationPending()) {

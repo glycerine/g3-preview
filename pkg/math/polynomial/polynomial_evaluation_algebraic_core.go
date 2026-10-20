@@ -7,6 +7,9 @@ import (
 )
 
 func (m *MultivariatePolynomialManager) evaluationAlgebraicCore(p Polynomial, v PolynomialAlgebraicEvaluation, start, end, x uint32, out *Algebraic) (cause error) {
+	if e := m.traceEvaluationEntry(p, start, end, x, &m.algebraicEvaluation.trace, true); e != nil {
+		return e
+	}
 	debugOwner, enabled, e := algebraicAssertionSwitch()
 	if e != nil {
 		return e

@@ -643,6 +643,9 @@ func (m *MultivariatePolynomialManager) CleanupFactor() error {
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
 	}
+	if m.core.evaluationTraceCallback() {
+		return ErrPolynomialPending
+	}
 	if e := m.cleanupFactorDiagnostic(&m.factorEnd); e != nil {
 		return e
 	}

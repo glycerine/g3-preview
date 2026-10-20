@@ -30,6 +30,7 @@ type polynomialEvalRationalFrame struct {
 // remain reachable on a stopped destructor. Their actual headers are charged; the
 // pointer directories use native slices without simulated container charges.
 type polynomialEvaluationScope struct {
+	trace                                polynomialEvaluationTraceScope
 	rationalCaller                       *algebraicRationalSignScope
 	intervalCaller                       *algebraicSignIntervalScope
 	rationalFrames                       []*polynomialEvalRationalFrame
@@ -178,6 +179,9 @@ func (m *MultivariatePolynomialManager) evaluationDegree(p Polynomial, i, x uint
 	return m.core.monomials.DegreeOf(a, x)
 }
 func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v PolynomialRationalEvaluation, start, end, x uint32, out *unumeral.Rational) (cause error) {
+	if e := m.traceEvaluationEntry(p, start, end, x, &m.evaluation.trace, false); e != nil {
+		return e
+	}
 	if e := m.evaluationCoreSourceAssertions(p, start, end, x); e != nil {
 		return e
 	}
@@ -432,6 +436,9 @@ func (m *MultivariatePolynomialManager) evaluateRationalForAlgebraic(p Polynomia
 }
 func (m *MultivariatePolynomialManager) evaluationPending() bool {
 	s := &m.evaluation
+	if s.trace.active {
+		return true
+	}
 	for _, f := range s.rationalFrames {
 		if f.constructed {
 			return true
@@ -454,8 +461,11 @@ func (m *MultivariatePolynomialManager) CleanupEvaluation() error {
 		return e
 	}
 	s := &m.evaluation
-	if s.executing {
+	if s.executing || m.core.evaluationTraceCallback() {
 		return ErrPolynomialPending
+	}
+	if e := m.cleanupEvaluationTrace(&s.trace); e != nil {
+		return e
 	}
 	if s.lexGeneration != 0 {
 		if m.lexPending && m.lexGeneration == s.lexGeneration {
@@ -650,6 +660,9 @@ func (m *MultivariatePolynomialManager) finishEvaluationIntegerFrame(f *polynomi
 }
 
 func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *polynomialEvalIntegerMap, start, end, x uint32, out *unumeral.Int) (cause error) {
+	if e := m.traceEvaluationEntry(p, start, end, x, &m.evaluation.trace, false); e != nil {
+		return e
+	}
 	if e := m.evaluationCoreSourceAssertions(p, start, end, x); e != nil {
 		return e
 	}
@@ -880,6 +893,9 @@ func (m *MultivariatePolynomialManager) finishEvaluationIntervalFrame(f *polynom
 }
 
 func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v PolynomialIntervalEvaluation, start, end, x uint32, out *unumeral.BinaryInterval) (cause error) {
+	if e := m.traceEvaluationEntry(p, start, end, x, &m.evaluation.trace, false); e != nil {
+		return e
+	}
 	if e := m.evaluationCoreSourceAssertions(p, start, end, x); e != nil {
 		return e
 	}
