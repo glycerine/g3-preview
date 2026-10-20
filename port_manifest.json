@@ -13877,7 +13877,7 @@
       "path": "src/ast/ast_util.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_dependency_traversal.go",
         "pkg/ast/ast_util_clauses.go",
@@ -13928,8 +13928,8 @@
           "reason": "Repository-wide source search finds no concrete instantiation."
         },
         {
-          "name": "Retained dependency linearization deduplicates native []ASTHandle output in first-occurrence order with a Go map; general remove_duplicates template remains open",
-          "status": "partial",
+          "name": "Retained dependency linearization remove_duplicates instantiation deduplicates native []ASTHandle output in first-occurrence order with a Go map",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency_traversal.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -13978,7 +13978,7 @@
         "Caller-owned []ASTHandle output borrows expression references and supports native append/reset/reuse. Stable in-place deduplication uses a local Go map and preserves caller AST mark planes. No encoded vector header/payload, cold output owner, reference-vector codec or FastMark reservation remains in this consumer."
       ],
       "deviations": [
-        "Selected dependency linearization consumer only; generic remove_duplicates, other ast_util consumers and full diagnostics remain open. Go slice/map growth does not emulate C++ backing reservations or source FastMark dirty-on-allocation-failure effects. Checked invalid handles preserve completed compaction and the original output length on error."
+        "The retained dependency-vector remove_duplicates instantiation uses a concrete ASTHandle slice and Go map. Uninstantiated templates remain intentionally omitted under the retained-consumer rule. Go slice/map growth does not emulate C++ backing reservations or source FastMark dirty-on-allocation-failure effects. Checked invalid handles preserve completed compaction and the original output length on error."
       ]
     },
     {
@@ -22105,7 +22105,7 @@
       "path": "src/ast/proofs/proof_utils.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_decl_parameter_access.go",
         "pkg/ast/proofs/hypotheses.go",
@@ -22198,12 +22198,12 @@
           "text": "SASSERT(m.get_num_parents(p) == 2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "standalone reduce_hypotheses postorder marking/unit discovery, iterative reduction, lemma compaction, unit-resolution rebuild and publication (proof_utils.cpp:75-337)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/proofs/reduce_hypotheses_legacy.go",
           "tests": ["TestReduceHypothesesLegacyDiscoversClosedUnitAndRebuilds", "TestReduceHypothesesLegacyRebuildsUnitResolution", "TestReduceHypothesesLegacyShortCircuitsReducedFalse"]
         },
@@ -22265,7 +22265,7 @@
       "path": "src/ast/proofs/proof_utils.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_decl_parameter_access.go",
         "pkg/ast/ast_proof_utils_trace.go",
@@ -22336,18 +22336,18 @@
           "text": "SASSERT(pc.check(r, side));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "standalone reduce_hypotheses declaration and retained legacy reducer",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/proofs/reduce_hypotheses_legacy.go",
           "tests": ["TestReduceHypothesesLegacyDiscoversClosedUnitAndRebuilds", "TestReduceHypothesesLegacyRebuildsUnitResolution", "TestReduceHypothesesLegacyShortCircuitsReducedFalse"]
         },
         {
           "name": "elim_aux_assertions matches_fact, mk_or_core, Boolean application rebuild and iterative auxiliary-proof elimination (proof_utils.h:72-235)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/proofs/elim_aux_assertions.go",
           "tests": ["TestEliminateAuxAssertionsCollapsesUnitResolution", "TestEliminateAuxAssertionsPreservesIffShape", "TestEliminateAuxAssertionsUsesDefaultBooleanReducer"]
         },
