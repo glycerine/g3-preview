@@ -13151,11 +13151,14 @@
         "pkg/ast/ast_smt_renaming.go",
         "pkg/ast/ast_smt_renaming_test.go",
         "pkg/ast/ast_smt_legacy_sort.go",
-        "pkg/ast/ast_smt_legacy_sort_test.go"
+        "pkg/ast/ast_smt_legacy_sort_test.go",
+        "pkg/ast/ast_smt_legacy_expr.go",
+        "pkg/ast/ast_smt_legacy_expr_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
-        "TestLegacySMTPrinterSortParametersAndRenaming"
+        "TestLegacySMTPrinterSortParametersAndRenaming",
+        "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals"
       ],
       "conditionals": [
         {
@@ -13199,13 +13202,21 @@
           "tests": [
             "TestLegacySMTPrinterSortParametersAndRenaming"
           ]
+        },
+        {
+          "name": "smt_printer variable lookup, exact arithmetic numeral formatting, built-in declaration aliases and recursive ordinary application rendering (ast_smt_pp.cpp:176-206,292-417,564-607)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_smt_legacy_expr.go",
+          "tests": [
+            "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals"
+          ]
         }
       ],
       "ownership": [
         "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. Datatype-special sort parameters, expression traversal and the benchmark wrapper remain open."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. Declaration parameters, bit-vector/string/floating-point literals, labels, distinct regrouping, implication simplification, let insertion, quantifiers, datatype-special paths and the benchmark wrapper remain open."
       ]
     },
     {
@@ -13217,11 +13228,14 @@
         "pkg/ast/ast_smt_renaming.go",
         "pkg/ast/ast_smt_renaming_test.go",
         "pkg/ast/ast_smt_legacy_sort.go",
-        "pkg/ast/ast_smt_legacy_sort_test.go"
+        "pkg/ast/ast_smt_legacy_sort_test.go",
+        "pkg/ast/ast_smt_legacy_expr.go",
+        "pkg/ast/ast_smt_legacy_expr_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
-        "TestLegacySMTPrinterSortParametersAndRenaming"
+        "TestLegacySMTPrinterSortParametersAndRenaming",
+        "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals"
       ],
       "conditionals": [
         {
