@@ -47286,3 +47286,16 @@ checked, debug and combined profiles, and the full native AST rewriter package
 passes on CPUs 8-16. The source units remain partial for `instantiate`,
 nondefault unused-variable elimination and remaining diagnostics; manifest
 counts therefore remain 267 ported and 301 partial.
+
+Quantifier instantiation port:
+`src/ast/rewriter/var_subst.cpp/.h` now has its complete `instantiate` helper.
+The Go implementation validates the declaration/value count, applies the
+existing standard-order beta substitution, owns the intermediate result,
+inverse-shifts free variables by the eliminated declaration count, publishes
+the caller-owned result, checks the source final well-sorted assertion and
+emits both `var_subst` and `instantiate_bug` TRACE records. Lexical cleanup
+retains source reverse order across the inverse shifter, intermediate ASTRef
+and substitution owner. Focused tests pass native, checked, debug and combined
+profiles, and the full native AST rewriter package passes on CPUs 8-16. The
+source pair remains partial for nondefault unused-variable elimination and
+remaining operator diagnostic profiles; manifest counts are unchanged.
