@@ -23859,7 +23859,7 @@
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_tpl.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go",
         "pkg/ast/rewriter/bit_blaster/engine_logic.go",
@@ -23867,7 +23867,9 @@
         "pkg/ast/rewriter/bit_blaster/engine_shift.go",
         "pkg/ast/rewriter/bit_blaster/engine_division.go",
         "pkg/ast/rewriter/bit_blaster/engine_signed_division.go",
-        "pkg/ast/rewriter/bit_blaster/engine_rotate.go"
+        "pkg/ast/rewriter/bit_blaster/engine_rotate.go",
+        "pkg/ast/rewriter/bit_blaster/engine_multiplier.go",
+        "pkg/ast/rewriter/bit_blaster/engine_overflow.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
@@ -23882,7 +23884,11 @@
         "TestBitBlasterSignedDivisionRemainderModuloExhaustiveConstants",
         "TestBitBlasterSignedOperationsRetainSymbolicSignMuxes",
         "TestBitBlasterExtendedRotationsExhaustiveConstants",
-        "TestBitBlasterExtendedRotationSymbolicModuloCircuit"
+        "TestBitBlasterExtendedRotationSymbolicModuloCircuit",
+        "TestBitBlasterMultiplierExhaustiveSymbolicCircuit",
+        "TestBitBlasterMultiplierNumeralAndMinusOnePaths",
+        "TestBitBlasterReachedDiscardedConstantCaseCircuit",
+        "TestBitBlasterMultiplicationBoundsExhaustiveConstants"
       ],
       "conditionals": [
         {
@@ -23938,9 +23944,19 @@
           "reason": "All retained callers select the active one-divider implementation; the only references are in #if 0 branches."
         },
         {
-          "name": "Multiplication and overflow checks",
-          "status": "unported",
-          "reason": "Remaining concrete bit-vector circuit methods are being ported incrementally."
+          "name": "Default ripple multiplication and reached constant-case decision circuit",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_multiplier.go"
+        },
+        {
+          "name": "Unsigned and signed multiplication overflow predicates",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_overflow.go"
+        },
+        {
+          "name": "Wallace-tree and Booth multiplier modes",
+          "status": "dead_deleted",
+          "reason": "No retained constructor enables m_use_wtm or m_use_bcm; the disabled radix-4 branch is also excluded by #if 1."
         }
       ],
       "ownership": [
@@ -23956,7 +23972,7 @@
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_tpl_def.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go",
         "pkg/ast/rewriter/bit_blaster/engine_logic.go",
@@ -23964,7 +23980,9 @@
         "pkg/ast/rewriter/bit_blaster/engine_shift.go",
         "pkg/ast/rewriter/bit_blaster/engine_division.go",
         "pkg/ast/rewriter/bit_blaster/engine_signed_division.go",
-        "pkg/ast/rewriter/bit_blaster/engine_rotate.go"
+        "pkg/ast/rewriter/bit_blaster/engine_rotate.go",
+        "pkg/ast/rewriter/bit_blaster/engine_multiplier.go",
+        "pkg/ast/rewriter/bit_blaster/engine_overflow.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
@@ -23979,7 +23997,11 @@
         "TestBitBlasterSignedDivisionRemainderModuloExhaustiveConstants",
         "TestBitBlasterSignedOperationsRetainSymbolicSignMuxes",
         "TestBitBlasterExtendedRotationsExhaustiveConstants",
-        "TestBitBlasterExtendedRotationSymbolicModuloCircuit"
+        "TestBitBlasterExtendedRotationSymbolicModuloCircuit",
+        "TestBitBlasterMultiplierExhaustiveSymbolicCircuit",
+        "TestBitBlasterMultiplierNumeralAndMinusOnePaths",
+        "TestBitBlasterReachedDiscardedConstantCaseCircuit",
+        "TestBitBlasterMultiplicationBoundsExhaustiveConstants"
       ],
       "conditionals": [
         {
@@ -24235,9 +24257,19 @@
           "reason": "The Go AST manager enforces its arena budget and cancellation at manager operation boundaries."
         },
         {
-          "name": "multiplication and overflow circuit builders",
-          "status": "unported",
-          "reason": "Remaining concrete circuit algorithms are still required by the retained bit-blaster consumers."
+          "name": "mk_multiplier default ripple path, mk_const_case_multiplier reached path, mk_const_multiplier retained wrapper behavior",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_multiplier.go"
+        },
+        {
+          "name": "mk_umul_no_overflow, mk_smul_no_overflow_core, mk_smul_no_overflow, mk_smul_no_underflow",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_overflow.go"
+        },
+        {
+          "name": "Wallace-tree, Booth, and disabled radix-4 multiplier alternatives",
+          "status": "dead_deleted",
+          "reason": "Retained constructors leave m_use_wtm and m_use_bcm false, and the radix-4 source is under the inactive #else of #if 1."
         }
       ],
       "ownership": [
