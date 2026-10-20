@@ -15018,15 +15018,19 @@
       "path": "src/ast/expr_map.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_expr_map.go",
         "pkg/ast/ast_expr_map_test.go",
-        "pkg/ast/ast_expr_map_replacement_order_test.go"
+        "pkg/ast/ast_expr_map_replacement_order_test.go",
+        "pkg/api/api_ast_map_object_test.go"
       ],
       "tests": [
         "TestASTExprMapConcreteReferenceCleanup",
-        "TestASTExprMapBorrowedPairsForAPITransfer"
+        "TestASTExprMapBorrowedPairsForAPITransfer",
+        "TestASTExprMapReplacementReleasesOldBeforePublishingNew",
+        "TestASTExprMapProofReplacementReleasesOldBeforePublishingNew",
+        "TestAPIASTMapExpressionPairTransfer"
       ],
       "assertions": [
         {
@@ -15039,7 +15043,7 @@
       "methods": [
         {
           "name": "constructor proof-mode snapshot, insert replacement INC-before-DEC, get, erase, reset and flush",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_expr_map.go",
           "tests": [
             "TestASTExprMapConcreteReferenceCleanup"
@@ -15059,21 +15063,26 @@
         "The concrete Go map owns one retained key/value pair and optional proof per entry. Reset decrements all proof values before keys and values; erase removes the entry before releasing value, proof and key. The owning map must close before its AST manager."
       ],
       "deviations": [
-        "Native Go map storage replaces obj_map. Checked cleanup retains unconsumed references for explicit retry. Pairs provides borrowed key/value snapshots for the retained API transfer; API/rewriter/Spacer caller wiring and exact source failure prefixes remain open."
+        "Native Go map storage replaces obj_map. Checked cleanup retains unconsumed references for explicit retry. Pairs provides borrowed key/value snapshots for the retained API transfer. Map traversal order is unspecified in both interfaces; callers outside this unit are tracked by their own source units."
       ]
     },
     {
       "path": "src/ast/expr_map.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_expr_map.go",
-        "pkg/ast/ast_expr_map_test.go"
+        "pkg/ast/ast_expr_map_test.go",
+        "pkg/ast/ast_expr_map_replacement_order_test.go",
+        "pkg/api/api_ast_map_object_test.go"
       ],
       "tests": [
         "TestASTExprMapConcreteReferenceCleanup",
-        "TestASTExprMapBorrowedPairsForAPITransfer"
+        "TestASTExprMapBorrowedPairsForAPITransfer",
+        "TestASTExprMapReplacementReleasesOldBeforePublishingNew",
+        "TestASTExprMapProofReplacementReleasesOldBeforePublishingNew",
+        "TestAPIASTMapExpressionPairTransfer"
       ],
       "conditionals": [
         {
@@ -15090,7 +15099,7 @@
       "methods": [
         {
           "name": "concrete expression map insert/get/contains/erase/reset/flush and set_store_proofs",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_expr_map.go",
           "tests": [
             "TestASTExprMapConcreteReferenceCleanup"
@@ -15098,7 +15107,7 @@
         },
         {
           "name": "begin/end iterator used by retained API quantifier elimination",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_expr_map.go",
           "tests": [
             "TestASTExprMapBorrowedPairsForAPITransfer"
@@ -15109,7 +15118,7 @@
         "ASTExprMap owns references to its expression keys, expression values and optional proofs; it borrows the AST manager and must close before that manager."
       ],
       "deviations": [
-        "Native Go typed map replaces source obj_map. Pairs supplies borrowed key/value snapshots for the retained API quantifier-elimination transfer; the API caller still needs to increment and publish both references. Other retained consumers are not yet bound."
+        "Native Go typed map replaces source obj_map. Pairs supplies borrowed key/value snapshots for the retained API quantifier-elimination transfer; the API caller increments and publishes both references. Map traversal order is unspecified in both interfaces."
       ]
     },
     {

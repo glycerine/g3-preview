@@ -47181,3 +47181,13 @@ local-only `mkbv2num` option remains correctly outside the generated facade.
 This audit avoids adding an unused universal adapter. Existing configuration
 tests pass native, checked, debug and combined profiles on CPUs 8-16;
 portcheck reports 254 ported and 312 partial units.
+
+Expression map whole-unit closure:
+`src/ast/expr_map.cpp` and `.h` are promoted to ported. The existing typed Go
+map covers both proof-mode constructors, insert and replacement with incoming
+INC before old DEC, get/contains, erase, proof-first reset, flush,
+`set_store_proofs` and borrowed iterator snapshots. The retained API map
+consumer increments and publishes both borrowed key/value references. Native
+map storage replaces `obj_map`; neither interface promises traversal order.
+AST map and API transfer tests pass native, checked, debug and combined
+profiles on CPUs 8-16; portcheck reports 256 ported and 310 partial units.
