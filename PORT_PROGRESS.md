@@ -46885,3 +46885,16 @@ exact numeric allocation roots. The complete inverse family passes native
 on CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-inverse-source-audit.txt`. Other algebraic
 operations and manager construction remain partial.
+
+Public algebraic arithmetic facade closure:
+the duplicate `algebraic_numbers.cpp/.h` rows for cpp2899-2927 are promoted to
+ported. Retained callers include API RCF/algebraic entry points, the arithmetic
+rewriter and the scoped algebraic inline power helper. The manager facade keeps
+the source before/body/after `anum_detail` boundary without wrapping internal
+core calls, preserves body-exception publication order and cached root-index
+mutation, protects operands through stream callbacks, and owns the concrete
+integer-add temporary through its stopped source destructor. Underlying unary
+and binary algorithms remain in their separate partial rows. Focused facade
+tests pass native 0.014s, checked 0.014s, debug 0.013s and combined 0.015s on
+CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-manager-arithmetic-audit.txt`.

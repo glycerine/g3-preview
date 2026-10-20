@@ -39776,8 +39776,8 @@
           ]
         },
         {
-          "name": "Public manager power/add/sub/mul wrappers and concrete mpz-add overload at cpp2899-2927, with before/after anum_detail records and exact scoped integer temporary source/owning lifetimes; broader callee and whole-unit failure audit remains open",
-          "status": "partial",
+          "name": "Complete public manager power/add/sub/mul wrappers and concrete mpz-add overload at cpp2899-2927, with before/after anum_detail records and exact scoped integer temporary source/owning lifetimes",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_manager_arithmetic.go",
           "go_targets": [
             "pkg/math/polynomial/algebraic_integer.go"
@@ -40893,8 +40893,8 @@
           ]
         },
         {
-          "name": "Public manager power/add/sub/mul wrappers and concrete mpz-add overload at cpp2899-2927, with before/after anum_detail records and exact scoped integer temporary source/owning lifetimes; broader callee and whole-unit failure audit remains open",
-          "status": "partial",
+          "name": "Complete public manager power/add/sub/mul wrappers and concrete mpz-add overload at cpp2899-2927, with before/after anum_detail records and exact scoped integer temporary source/owning lifetimes",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_manager_arithmetic.go",
           "go_targets": [
             "pkg/math/polynomial/algebraic_integer.go"
