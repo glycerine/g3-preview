@@ -26383,8 +26383,9 @@
       "path": "src/ast/rewriter/bv_rewriter_params.hpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/ast/rewriter/bv_rewriter_config.go",
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
@@ -26395,7 +26396,10 @@
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestBVRewriterConfigurationDefaultsAndLocalOnlyOption",
+        "TestBVRewriterConfigurationModuleFallbackAndSorting",
+        "TestBVRewriterConfigurationAllocationFreeSnapshotAndStoppedOwner"
       ],
       "conditionals": [
         {
@@ -26407,11 +26411,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/gparams_catalog_collectors.go",
           "tests": [
@@ -26424,10 +26428,21 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "all fifteen generated Boolean local-module-literal accessors through the retained BV rewriter configuration consumer (src/ast/rewriter/bv_rewriter_params.hpp:29-45)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_config.go",
+          "tests": [
+            "TestBVRewriterConfigurationDefaultsAndLocalOnlyOption",
+            "TestBVRewriterConfigurationModuleFallbackAndSorting",
+            "TestBVRewriterConfigurationAllocationFreeSnapshotAndStoppedOwner"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md.",
+        "The retained BV rewriter configuration borrows its caller ParamsRef, owns the generated rewriter-module snapshot for the complete update suffix, and releases that snapshot after the last repeated bv_sort_ac lookup. Stopped lookup/destruction prefixes remain on the owning configuration; copied, closed, foreign and expired owners are rejected. No unused universal facade is added."
       ],
       "deviations": []
     },

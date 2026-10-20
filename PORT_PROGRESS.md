@@ -47170,3 +47170,14 @@ remainder transformations. Tests cover every literal default and inverted
 module value, module snapshot stability, local uint/bool overrides and owner
 guards. Focused tests pass native, checked, debug and combined profiles on CPUs
 8-16; portcheck reports 253 ported and 313 partial units.
+
+Bit-vector rewriter generated parameters audit:
+`src/ast/rewriter/bv_rewriter_params.hpp` is promoted to ported through its
+retained concrete consumer, `BVRewriterConfiguration`. The configuration
+already performs all fifteen generated Boolean local/module/literal lookups,
+including the source ordering and later repeated `bv_sort_ac` lookup, while
+owning and retiring the update's `rewriter` module snapshot. The separate
+local-only `mkbv2num` option remains correctly outside the generated facade.
+This audit avoids adding an unused universal adapter. Existing configuration
+tests pass native, checked, debug and combined profiles on CPUs 8-16;
+portcheck reports 254 ported and 312 partial units.
