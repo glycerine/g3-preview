@@ -57,9 +57,9 @@ func TestBVTrailingMemoryWrappersFollowLazyCacheLifetime(t *testing.T) {
 	astTestMust(t, p.Close())
 	astTestMust(t, p.Close())
 	got := output.String()
-	if !diagnostic.DebugBuild {
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		if got != "" {
-			t.Fatal("source Z3DEBUG memory wrappers must erase", got)
+			t.Fatal("source Z3DEBUG/_TRACE memory wrappers must erase", got)
 		}
 		return
 	}

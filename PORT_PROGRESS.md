@@ -47122,3 +47122,17 @@ row is now ported. Arithmetic-focused AST/rewriter/model tests pass native
 8.486s, checked 11.086s, debug 11.553s and combined 11.608s on CPUs 8-16; full
 native AST, rewriter and model packages also pass. Portcheck and diff hygiene
 pass.
+
+Bit-vector trailing-zero utility closure:
+`src/ast/rewriter/bv_trailing.cpp` and `.h` are promoted to ported after a
+whole-source method and ownership audit. The Go implementation covers the
+depth-five count analyzer, numerical division loops, add/mul/concat removal,
+equality reduction, all five lazy reference-owning caches and reset policy,
+constructor/destructor ownership, source assertion domains and all ten retained
+TRACE/CTRACE sites. The audit retains the source's concat over-removal and
+shallow-guard behavior and documents the invalid-pointer/undefined source
+domains at the Go boundary. The memory-wrapper test now also observes the
+source `_TRACE` compile gate, so standalone `g3debug` correctly expects no
+records. Focused AST/rewriter tests pass native, checked, debug and combined
+profiles on CPUs 8-16. Portcheck reports 2103 units, 677 APIs: 250 ported, 316
+partial, 1480 unported and 11 dead/deleted.
