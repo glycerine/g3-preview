@@ -21421,14 +21421,18 @@
       "path": "src/ast/pb_decl_plugin.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/ast_auxiliary_plugins.go",
-        "pkg/ast/ast_auxiliary_plugins_source_test.go"
+        "pkg/ast/ast_auxiliary_plugins_source_test.go",
+        "pkg/ast/ast_pb_decl.go",
+        "pkg/ast/ast_pb_decl_test.go"
       ],
       "tests": [
         "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
-        "TestASTAuxiliaryPluginEveryConstructorPrefix"
+        "TestASTAuxiliaryPluginEveryConstructorPrefix",
+        "TestASTPseudoBooleanOriginalDeclarationsAndNames",
+        "TestASTPseudoBooleanOriginalParameterValidationAndConversion"
       ],
       "assertions": [
         {
@@ -21457,11 +21461,20 @@
       "methods": [
         {
           "name": "ast_auxiliary_plugins concrete reached source counterpart (pb_decl_plugin.cpp:23-29)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_auxiliary_plugins.go",
           "tests": [
             "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
             "TestASTAuxiliaryPluginEveryConstructorPrefix"
+          ]
+        },
+        {
+          "name": "pb_decl_plugin function declaration validation, rational-int32 parameter normalization and logic-gated builtin names (pb_decl_plugin.cpp:31-101)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_pb_decl.go",
+          "tests": [
+            "TestASTPseudoBooleanOriginalDeclarationsAndNames",
+            "TestASTPseudoBooleanOriginalParameterValidationAndConversion"
           ]
         }
       ],
@@ -21469,16 +21482,22 @@
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Declaration construction and builtin-name publication are ported with typed Go errors and owned AST parameters. pb_util normalization, factories and recognizers remain open."
       ]
     },
     {
       "path": "src/ast/pb_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_pb_decl.go",
+        "pkg/ast/ast_pb_decl_test.go"
+      ],
+      "tests": [
+        "TestASTPseudoBooleanOriginalDeclarationsAndNames",
+        "TestASTPseudoBooleanOriginalParameterValidationAndConversion"
+      ],
       "conditionals": [
         {
           "line": 27,
@@ -21491,9 +21510,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "pseudo-Boolean operation enum and declaration-plugin interface",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_pb_decl.go",
+          "tests": [
+            "TestASTPseudoBooleanOriginalDeclarationsAndNames",
+            "TestASTPseudoBooleanOriginalParameterValidationAndConversion"
+          ]
+        },
+        {
+          "name": "pb_util normalization, construction and recognizer interface",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Declaration construction borrows caller domain handles and parameters; canonical declaration info owns copied parameters after publication. Temporary rational-to-int descriptors are released after the declaration copies them."
+      ],
+      "deviations": [
+        "Concrete typed Go manager methods replace the declaration plugin's pointer-array interface. pb_util remains open."
+      ]
     },
     {
       "path": "src/ast/pp.cpp",
