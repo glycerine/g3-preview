@@ -19519,22 +19519,51 @@
       "path": "src/ast/normal_forms/name_exprs.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/normal_forms/name_exprs.go"
+      ],
+      "tests": [
+        "TestNestedFormulaNamerNamesImmediateBasicChildrenWithProof",
+        "TestQuantifierLabelNamerAndReset"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "name_exprs_core::operator()/reset and cfg::get_subst/gen_name_for_expr",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/name_exprs.go",
+          "evidence": "Iterative expression traversal uses DefinedNames substitutions, appends only newly-created definitions, and constructs congruence and quantifier-introduction proofs when proof production is enabled."
+        },
+        {
+          "name": "mk_expr_namer/mk_quantifier_label_namer/mk_nested_formula_namer/del_name_exprs",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/name_exprs.go",
+          "evidence": "Public constructors cover arbitrary predicates, quantifier/label selection and root-aware nested basic-family formulas; Close supplies explicit destruction."
+        }
+      ],
+      "ownership": [
+        {
+          "kind": "rewriter cache and outputs",
+          "status": "ported",
+          "evidence": "Persistent cached values/proofs use ASTRef roots, Reset releases them with retryable progress, and appended definition references transfer to the caller."
+        }
+      ],
       "deviations": []
     },
     {
       "path": "src/ast/normal_forms/name_exprs.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/normal_forms/name_exprs.go"
+      ],
+      "tests": [
+        "TestNestedFormulaNamerNamesImmediateBasicChildrenWithProof",
+        "TestQuantifierLabelNamerAndReset"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -19545,10 +19574,23 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "expr_predicate/name_exprs interfaces and factories",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/name_exprs.go",
+          "evidence": "ExprPredicate and ExprNamer expose the retained source interface with explicit error and ownership results."
+        }
+      ],
+      "ownership": [
+        {
+          "kind": "facade lifetime",
+          "status": "ported",
+          "evidence": "ExprNamer rejects copied or closed owners and releases persistent traversal roots on Reset or Close."
+        }
+      ],
       "deviations": []
     },
     {
