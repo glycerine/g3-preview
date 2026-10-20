@@ -115071,22 +115071,33 @@
       "path": "src/tactic/goal_num_occurs.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/tactic/tactic_goal_num_occurs.go"],
+      "tests": ["TestGoalNumOccursSharesVisitedAcrossFormulas"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "goal_num_occurs formula-order traversal with one shared visited set",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal_num_occurs.go",
+          "tests": ["TestGoalNumOccursSharesVisitedAcrossFormulas"]
+        }
+      ],
+      "ownership": [
+        "GoalNumOccurs borrows the goal, formulas, AST manager, and underlying occurrence counter handles; it retains no AST references."
+      ],
+      "deviations": [
+        "A native typed visited map in ast.NumOccurs replaces expr_fast_mark1 without changing the source formula-order or shared traversal schedule."
+      ]
     },
     {
       "path": "src/tactic/goal_num_occurs.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/tactic/tactic_goal_num_occurs.go"],
+      "tests": ["TestGoalNumOccursSharesVisitedAcrossFormulas"],
       "conditionals": [
         {
           "line": 18,
@@ -115097,10 +115108,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "goal_num_occurs concrete num_occurs specialization and goal invocation",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal_num_occurs.go",
+          "tests": ["TestGoalNumOccursSharesVisitedAcrossFormulas"]
+        }
+      ],
+      "ownership": [
+        "The Go wrapper owns its NumOccurs value, which owns only a typed occurrence map and borrows all AST identities."
+      ],
       "deviations": []
     },
     {
