@@ -20,6 +20,7 @@ type polynomialFactorConstantScope struct {
 	kind, phase                                    uint8
 	numeric                                        polynomialNumericRoots
 	normalize                                      [3]unumeral.IntegerNormalizeInvocationReceipt
+	traceNumeral                                   unumeral.NumeralInsertionReceipt
 	direct                                         polynomialFactorConstantInvocationReceipt
 	bodyCause, sourceCause, cleanupCause           error
 }
@@ -27,6 +28,7 @@ type polynomialFactorConstantHistory struct {
 	invocation                           uint64
 	kind                                 uint8
 	normalize                            [3]unumeral.IntegerNormalizeInvocationReceipt
+	traceNumeral                         unumeral.NumeralInsertionReceipt
 	bodyCause, sourceCause, cleanupCause error
 }
 
@@ -36,7 +38,7 @@ func (f *PolynomialFactors) matchesFactorConstantInvocation(r *polynomialFactorC
 func (f *PolynomialFactors) factorConstantDiagnostic(r *polynomialFactorConstantInvocationReceipt) (polynomialFactorConstantHistory, bool) {
 	if f.matchesFactorConstantInvocation(r) {
 		s := r.frame
-		return polynomialFactorConstantHistory{s.invocation, s.kind, s.normalize, s.bodyCause, s.sourceCause, s.cleanupCause}, true
+		return polynomialFactorConstantHistory{s.invocation, s.kind, s.normalize, s.traceNumeral, s.bodyCause, s.sourceCause, s.cleanupCause}, true
 	}
 	if f == nil || f.self != f || f.manager == nil || f.manager.self != f.manager || f.manager.core == nil || f.manager.core.self != f.manager.core || r == nil || r.manager != f || r.frame != &f.constantInvocation || r.invocation == 0 {
 		return polynomialFactorConstantHistory{}, false
@@ -55,7 +57,7 @@ func (f *PolynomialFactors) archiveFactorConstantHistory() error {
 	}
 	s.historyIndex = len(f.constantHistory)
 	s.historyRecorded = true
-	f.constantHistory = append(f.constantHistory, polynomialFactorConstantHistory{s.invocation, s.kind, s.normalize, s.bodyCause, s.sourceCause, s.cleanupCause})
+	f.constantHistory = append(f.constantHistory, polynomialFactorConstantHistory{s.invocation, s.kind, s.normalize, s.traceNumeral, s.bodyCause, s.sourceCause, s.cleanupCause})
 	return nil
 }
 func (f *PolynomialFactors) beginFactorConstant(kind uint8, r *polynomialFactorConstantInvocationReceipt) (*polynomialFactorConstantScope, error) {
@@ -86,7 +88,7 @@ func (f *PolynomialFactors) factorConstantNumericContext() integerAllocationInvo
 }
 func (f *PolynomialFactors) factorConstantPending() bool {
 	s := &f.constantInvocation
-	if polynomialNegNumericPending(&s.numeric) {
+	if s.traceNumeral.Active() || polynomialNegNumericPending(&s.numeric) {
 		return true
 	}
 	for i := range s.normalize {
@@ -103,6 +105,10 @@ func (f *PolynomialFactors) finishFactorConstantSource() error {
 	}
 	s.finishing = true
 	defer func() { s.finishing = false; f.updateFactorConstantHistory() }()
+	if e := s.traceNumeral.SourceCause(); e != nil {
+		s.sourceCause = e
+		return e
+	}
 	if s.localConstructed {
 		if _, e := upolynomialSourceNumeralDel(f.manager.core.integer, &f.local); e != nil {
 			s.sourceCause = e
@@ -135,6 +141,14 @@ func (f *PolynomialFactors) cleanupFactorConstantInvocation(r *polynomialFactorC
 		}
 		f.updateFactorConstantHistory()
 	}()
+	if s.traceNumeral.Active() {
+		if e := s.traceNumeral.Complete(f.manager.core.integer.Natural, false); e != nil {
+			return e
+		}
+		if e := s.traceNumeral.Complete(f.manager.core.integer.Natural, true); e != nil {
+			return e
+		}
+	}
 	for i := len(s.normalize) - 1; i >= 0; i-- {
 		if e := f.manager.core.modular.CleanupPNormalizeInvocation(&s.normalize[i], false); e != nil {
 			return e
@@ -176,14 +190,17 @@ func (m *MultivariatePolynomialManager) accumulateFactorConstantWithReceipt(f *P
 	if e != nil {
 		return e
 	}
-	f.local = unumeral.Int{}
-	f.localActive = true
-	s.localConstructed = true
 	defer func() {
 		s.executing = false
 		s.bodyCause = cause
 		cause = errors.Join(cause, f.finishFactorConstantSource())
 	}()
+	if e = m.traceAccumulateFactorConstant(f, a, &s.traceNumeral); e != nil {
+		return e
+	}
+	f.local = unumeral.Int{}
+	f.localActive = true
+	s.localConstructed = true
 	return f.invoke(func() error {
 		if e := numericIntegerModularManager_mulWithFactorConstantReceipt(m.core.modular, &f.constant, a, &f.local, &s.direct); e != nil {
 			return e

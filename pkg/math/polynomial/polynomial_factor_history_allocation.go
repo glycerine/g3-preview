@@ -60,7 +60,7 @@ func (c integerAllocationInvocationContext) prepareFactorHistory(z *unumeral.Int
 func (f *PolynomialFactors) updateFactorConstantHistory() {
 	s := &f.constantInvocation
 	if s.historyRecorded {
-		f.constantHistory[s.historyIndex] = polynomialFactorConstantHistory{s.invocation, s.kind, s.normalize, s.bodyCause, s.sourceCause, s.cleanupCause}
+		f.constantHistory[s.historyIndex] = polynomialFactorConstantHistory{s.invocation, s.kind, s.normalize, s.traceNumeral, s.bodyCause, s.sourceCause, s.cleanupCause}
 	}
 }
 func (f *PolynomialFactors) updateFactorMemberSetHistory() {

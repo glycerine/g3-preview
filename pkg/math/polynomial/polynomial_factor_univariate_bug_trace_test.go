@@ -14,8 +14,10 @@ type polynomialUnivariateBugWriter struct {
 }
 
 func (w *polynomialUnivariateBugWriter) Write(p []byte) (int, error) {
-	if e := w.m.upm.Close(); !errors.Is(e, ErrUPolynomialCleanupPending) {
-		w.t.Fatalf("univariate diagnostic callback closed backend: %v", e)
+	if w.m.factorUnivariate.executing {
+		if e := w.m.upm.Close(); !errors.Is(e, ErrUPolynomialCleanupPending) {
+			w.t.Fatalf("univariate diagnostic callback closed backend: %v", e)
+		}
 	}
 	return w.polynomialQuadraticTraceWriter.Write(p)
 }
