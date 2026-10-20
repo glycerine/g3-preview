@@ -18734,9 +18734,12 @@
       "path": "src/ast/justified_expr.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/ast_justified_expr.go"],
+      "tests": [
+        "TestASTJustifiedExprConstructCopyAssignAndOwnership",
+        "TestASTJustifiedExprNullProofAndGuards"
+      ],
       "conditionals": [
         {
           "line": 2,
@@ -18757,11 +18760,25 @@
           "text": "SASSERT(&m == &other.m);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "formula/proof constructor, copy constructor, assignment, accessors, and destructor",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_justified_expr.go",
+          "tests": [
+            "TestASTJustifiedExprConstructCopyAssignAndOwnership",
+            "TestASTJustifiedExprNullProofAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each JustifiedExpr owns independent ASTRef values for its mandatory formula and optional proof. Copy acquires both pins; assignment acquires both incoming pins before releasing the old formula and proof; Close preserves source formula-before-proof release order."
+      ],
+      "deviations": [
+        "Explicit checked ownership and retry state replace implicit C++ copy operations. Invalid formula/proof domains and cross-manager assignment return typed errors."
+      ]
     },
     {
       "path": "src/ast/macro_substitution.cpp",
