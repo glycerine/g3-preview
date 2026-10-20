@@ -13228,6 +13228,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_util_clauses.go",
         "pkg/ast/ast_core_boolean_factories.go",
         "pkg/ast/ast_core_boolean_factories_source_test.go",
         "pkg/ast/ast_core_span_factories.go",
@@ -13236,6 +13237,7 @@
         "pkg/ast/ast_core_basic_convenience_source_test.go"
       ],
       "tests": [
+        "TestASTUtilAtomsLiteralsAndClauses",
         "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap",
         "TestASTOrSpanSourceZeroSingletonAndInitializedSpare",
         "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
@@ -13317,7 +13319,7 @@
       "methods": [
         {
           "name": "ast_util mk_or zero/singleton/multi pointer branches (src/ast/ast_util.cpp:173-180)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_boolean_factories.go",
           "tests": [
             "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
@@ -13325,7 +13327,7 @@
         },
         {
           "name": "Actual mk_or zero/singleton/multi borrowed pointer branches (src/ast/ast_util.cpp:173-180)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_span_factories.go",
           "tests": [
             "TestASTOrSpanSourceZeroSingletonAndInitializedSpare"
@@ -13339,6 +13341,14 @@
             "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
             "TestASTDistinctExpandedFailedPrefixReleasesCompletedPairs",
             "TestASTDistinctExpandedBinaryFailedPrefixReleasesEquality"
+          ]
+        },
+        {
+          "name": "is_atom, is_literal, get_literal_atom_sign, is_clause and checked clause accessors (src/ast/ast_util.cpp:94-158)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_util_clauses.go",
+          "tests": [
+            "TestASTUtilAtomsLiteralsAndClauses"
           ]
         }
       ],
@@ -13356,7 +13366,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/ast_dependency_traversal.go"
+        "pkg/ast/ast_dependency_traversal.go",
+        "pkg/ast/ast_util_clauses.go"
       ],
       "tests": [
         "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -13373,7 +13384,8 @@
         "TestASTDependencyNativeLIFOCallbacksWithReservationsDisabled",
         "TestASTDependencyNativeColdFIFOAndCompleteUnmarking",
         "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
-        "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix"
+        "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix",
+        "TestASTUtilAtomsLiteralsAndClauses"
       ],
       "conditionals": [
         {
@@ -13408,6 +13420,14 @@
             "TestASTDependencyNativeColdFIFOAndCompleteUnmarking",
             "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
             "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix"
+          ]
+        },
+        {
+          "name": "Boolean atom/literal/clause declarations and checked literal accessors (src/ast/ast_util.h:78-93)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_util_clauses.go",
+          "tests": [
+            "TestASTUtilAtomsLiteralsAndClauses"
           ]
         }
       ],
