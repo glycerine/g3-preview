@@ -39689,8 +39689,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:2549-2624,2883-2885 isolate_roots with signs: zero fallback, refinement, exterior/interior samples, incremental signs and accepted polynomial/root/sample diagnostic children with lexical trace-variable lifetime; full source failure audit remains open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:2549-2624,2883-2885 isolate_roots with signs, samples, incremental publication and exact diagnostic child ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_isolation_signs.go",
           "tests": [
             "TestAlgebraicIsolationSignsSourceIntervalsAndAppend",
@@ -40806,8 +40806,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:2549-2624,2883-2885 isolate_roots with signs: zero fallback, refinement, exterior/interior samples, incremental signs and accepted polynomial/root/sample diagnostic children with lexical trace-variable lifetime; full source failure audit remains open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:2549-2624,2883-2885 isolate_roots with signs, samples, incremental publication and exact diagnostic child ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_isolation_signs.go",
           "tests": [
             "TestAlgebraicIsolationSignsSourceIntervalsAndAppend",

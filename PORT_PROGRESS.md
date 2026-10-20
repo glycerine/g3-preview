@@ -46995,3 +46995,12 @@ Tests pass native 0.589s, checked 0.563s, debug 0.811s and combined 0.814s on
 CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-univariate-isolation-audit.txt`. Multivariate
 isolation and isolation with signs remain separate.
+
+Algebraic isolation-with-signs closure:
+the duplicate cpp2549-2624/cpp2883-2885 rows are promoted to ported for the
+retained NLSAT evaluator. Zero fallback, precision-two refinement, exterior and
+interior samples, assignment lookup, selection, incremental sign publication,
+checkpoints, assertions, stopped sample destruction, callback exclusion and all
+polynomial/root/sample TRACE children are covered. Focused tests pass native
+0.652s, checked 0.667s, debug 3.467s and combined 3.498s on CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-isolation-signs-audit.txt`.
