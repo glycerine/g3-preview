@@ -39738,8 +39738,8 @@
           ]
         },
         {
-          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; interval/root_core diagnostics and accepted basic-root conversion/adjustment, integer-root, basic-power numeric and nonbasic bound-root children; broader diagnostic and whole-unit failure audits remain open",
-          "status": "partial",
+          "name": "Complete unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381 with interval/root_core diagnostics and exact numeric child ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_unary.go",
           "go_targets": [
             "pkg/math/polynomial/algebraic_unary_trace.go",
@@ -40855,8 +40855,8 @@
           ]
         },
         {
-          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; interval/root_core diagnostics and accepted basic-root conversion/adjustment, integer-root, basic-power numeric and nonbasic bound-root children; broader diagnostic and whole-unit failure audits remain open",
-          "status": "partial",
+          "name": "Complete unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381 with interval/root_core diagnostics and exact numeric child ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_unary.go",
           "go_targets": [
             "pkg/math/polynomial/algebraic_unary_trace.go",

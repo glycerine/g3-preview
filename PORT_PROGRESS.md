@@ -46937,3 +46937,14 @@ checked 0.022s, debug 0.028s and combined 0.026s; the cross-display callback
 slice passes 0.007s, 0.007s, 0.011s and 0.009s respectively on CPUs 8-16.
 Audit: `/mnt/oldrog/tmp/g3-algebraic-root-display-audit.txt`. Interval/decimal
 body calculation and bound refinement remain separately partial.
+
+Algebraic unary power/root closure:
+the duplicate rows for cpp1086-1157 and cpp1271-1381 are promoted to ported.
+Retained API RCF, API algebraic and arithmetic-rewriter callers are covered.
+The implementation preserves zero/basic/nonbasic dispatch and aliases, exact
+and nonexact rational roots, domain errors, resultant polynomial construction,
+factor/Sturm selection, saved intervals, refinement-to-basic fallback,
+selected-factor publication, all unary TRACE sites and exact conversion,
+integer-root, basic-power and binary-bound child ownership. Focused tests pass
+native 2.989s, checked 2.950s, debug 4.075s and combined 4.517s on CPUs 8-16.
+Audit: `/mnt/oldrog/tmp/g3-algebraic-unary-source-audit.txt`.
