@@ -126,6 +126,9 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 	if m != nil && m.self == m && m.factorInline.manager != nil && m.factorInline.manager.matchesFactorConstantInvocation(&m.factorInline) && m.factorInline.frame.active {
 		return ErrPolynomialPending
 	}
+	if m != nil && m.self == m && (m.factorPrelude.active || m.factorEnd.active) {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.matchesFactorCore(&m.factorRoot) && m.factorRoot.frame.active {
 		return ErrPolynomialPending
 	}

@@ -15,6 +15,7 @@ type polynomialFactorCoreInvocationReceipt struct {
 	invocation uint64
 }
 type polynomialFactorCoreFrame struct {
+	childPrelude                                                 polynomialFactorDiagnosticScope
 	callerBinding                                                unumeral.NumericCallerBinding
 	self                                                         *polynomialFactorCoreFrame
 	manager                                                      *MultivariatePolynomialManager
@@ -92,6 +93,13 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 		parent.childEntering = false
 	} else if m.factorCoreExecuting() {
 		return ErrPolynomialPending
+	}
+	diagnostic := &m.factorPrelude
+	if parent != nil {
+		diagnostic = &parent.childPrelude
+	}
+	if e := m.traceFactorCoreEntry(p, r, diagnostic, parent); e != nil {
+		return e
 	}
 	c := m.core
 	if e := polynomialFactorSourceAssert(6757, "!is_zero(p)", func() (bool, error) {
@@ -416,16 +424,24 @@ func (m *MultivariatePolynomialManager) factorWithReceipt(p Polynomial, r *Polyn
 		value := unumeral.NewInt(0)
 		return r.setConstantWithReceipt(&value, &m.factorInline)
 	}
-	constant, e := m.core.IsConstant(p)
-	if e != nil {
+	if m.matchesFactorCore(&m.factorRoot) && m.factorRoot.frame.active {
+		constant, e := m.core.IsConstant(p)
+		if e != nil {
+			return e
+		}
+		if !constant {
+			return ErrPolynomialPending
+		}
+	}
+	if e = m.factorCoreSource(p, r, params, &m.factorRoot, nil, accepted); e != nil {
 		return e
 	}
-	if !constant && m.matchesFactorCore(&m.factorRoot) && m.factorRoot.frame.active {
-		return ErrPolynomialPending
-	}
-	return m.factorCoreSource(p, r, params, &m.factorRoot, nil, accepted)
+	return m.traceFactorEnd(r)
 }
 func (m *MultivariatePolynomialManager) factorCoreChildSource(s *polynomialFactorCoreFrame) error {
+	if s.childPrelude.sourceCause != nil {
+		return s.childPrelude.sourceCause
+	}
 	if e := s.traceNumeral.SourceCause(); e != nil {
 		return e
 	}
@@ -515,6 +531,9 @@ func (m *MultivariatePolynomialManager) finishFactorCoreSource(r *polynomialFact
 	return nil
 }
 func (m *MultivariatePolynomialManager) cleanupFactorCoreChildren(s *polynomialFactorCoreFrame, abort bool) error {
+	if e := m.cleanupFactorDiagnostic(&s.childPrelude); e != nil {
+		return e
+	}
 	if s.traceNumeral.Active() {
 		if e := s.traceNumeral.Complete(m.core.integer.Natural, false); e != nil {
 			return e
@@ -623,6 +642,12 @@ func (m *MultivariatePolynomialManager) cleanupFactorCoreInvocation(r *polynomia
 func (m *MultivariatePolynomialManager) CleanupFactor() error {
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
+	}
+	if e := m.cleanupFactorDiagnostic(&m.factorEnd); e != nil {
+		return e
+	}
+	if e := m.cleanupFactorDiagnostic(&m.factorPrelude); e != nil {
+		return e
 	}
 	if r := &m.factorInline; r.manager != nil {
 		if e := r.manager.cleanupFactorConstantInvocation(r, false); e != nil {

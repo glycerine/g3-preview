@@ -47431,7 +47431,10 @@
           "4239-4240 modular GCD operands",
           "5661 Lazard entry operands",
           "5752 PSC entry operands",
-          "5972 square-root input"
+          "5972 square-root input",
+          "6595/6604/6689/6731 square-free helper inputs",
+          "6708 univariate conversion input",
+          "6755 factor_core entry"
         ],
         "retained_public_reference_records": [
           "2871/2890/2896/2901 Newton references",
@@ -47440,10 +47443,13 @@
           "4005 content_bug g",
           "4149/4183/4185/4205/4223 recursive modular GCD references",
           "5682/5688/5691 Lazard loop/result references",
-          "5772 PSC iteration references"
+          "5772 PSC iteration references",
+          "6612/6636/6652/6666-6669/6672 quadratic coefficient/discriminant/factor/content references",
+          "6717 converted univariate factor",
+          "6795 factor-core A/B and 6807 constant C"
         ],
         "verification": "Real zero polynomial cells distinguish direct display from the public consistency scope with a closed Go-adapter reservation gate. Controls retain public checks. Existing trace output, refusal, callback and display tests cover reached nonzero terms and cleanup.",
-        "remaining_trace_audit": "Other live source TRACE records remain unverified or absent, including evaluation cpp6438, factor_core entry records cpp6755/6756 and factor wrapper cpp6829. Implemented factor records include acc_constant cpp6578, linear cpp6595, quadratic cpp6604-6672, univariate cpp6689/6707-6720, higher-degree cpp6731 and factor_core cpp6769/6795/6807. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit. Per-increment audits below describe the implemented sites and their verification limits."
+        "remaining_trace_audit": "Live evaluation TRACE cpp6438 remains unverified or absent. All factor TRACE call sites cpp6578-6829 now have Go implementations; per-increment audits below describe their source dispatch and verification limits. Broader retained-consumer, numeric failure and whole-unit ownership audits remain open. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit."
       },
       "public_content_and_quadratic_trace_audit": {
         "source": "polynomial.cpp:7199-7210 and 6604-6672",
@@ -47522,6 +47528,21 @@
           "TestPolynomialFactorConstantTraceEveryReservation"
         ],
         "evidence": "Four-profile constant/core/univariate regressions pass. Tests cover negative BIG output, correct product, actual character invocation, writer refusal, pre-NUM header callbacks and numeric-owner destruction guards. Univariate writer guard is keyed to actual executing univariate scope now that factor_bug also has constant records. Independent omitted-record and omitted-receipt overlays are under /mnt/oldrog/tmp/g3-factor-constant-trace."
+      },
+      "factor_entry_end_trace_audit": {
+        "source": "polynomial.cpp:6755-6756,6829",
+        "go_target": "pkg/math/polynomial/polynomial_factor_boundary_trace.go",
+        "status": "ported source entry/end records; whole polynomial unit remains partial",
+        "behavior": "Root entry and final record have distinct manager-owned diagnostic scopes; recursive entry belongs to the actual parent factor-core frame. Direct polynomial display precedes source assertions/constant query and all lexical locals. Modular SourceStringTracked preserves actual to_string normalization/formatting calls. Numeric owner bindings and exact factors target borrow guard header/body/footer callbacks. Actual diagnostic invocation keys retain formatter children and refuse copied scopes. CleanupFactor drains only these issued children; root algorithm receipt/history remains independent. Zero Factor returns before all boundary records. The wrapper performs its extra constant query only to guard an actually pending root body.",
+        "tests": [
+          "TestPolynomialFactorBoundaryTraceRecursiveOrderAndRefusingWriter",
+          "TestPolynomialFactorBoundaryTraceConstantBIGAndZeroShortcut",
+          "TestPolynomialFactorBoundaryTraceEveryReservation",
+          "TestPolynomialFactorBoundaryTraceActualTLSReceiptBeforeLocals",
+          "TestPolynomialFactorBoundaryTraceConstantPreservesOlderBody"
+        ],
+        "evidence": "Four-profile factor and imp lifetime regressions; real TLS BIG Copy refusal before factor-core frame/local construction, exact allocator tuple and owning cleanup, copied-scope refusal, BIG final-string invocation even after writer failure, recursive ordering, literal counts, actual reservation prefixes through success and older canceled-body preservation. Independent omitted-record, omitted-polynomial-receipt and omitted-string-receipt overlays under /mnt/oldrog/tmp/g3-factor-boundary-trace.",
+        "limits": "No whole polynomial/AST completion or exhaustive source allocation/destructor-failure coverage is claimed."
       }
     },
     {

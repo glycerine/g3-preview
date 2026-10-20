@@ -152,6 +152,17 @@ func (v *PolynomialNewtonVector) sourceFinalizeMember() error {
 }
 
 func (m *MultivariatePolynomialManager) SourceFinalize() error {
+	if m != nil && m.self == m {
+		if m.factorEnd.sourceCause != nil {
+			return m.factorEnd.sourceCause
+		}
+		if m.factorPrelude.sourceCause != nil {
+			return m.factorPrelude.sourceCause
+		}
+		if m.factorEnd.active || m.factorPrelude.active {
+			return ErrPolynomialPending
+		}
+	}
 	if m != nil && m.self == m && m.destructorTraceRunning {
 		return ErrPolynomialPending
 	}

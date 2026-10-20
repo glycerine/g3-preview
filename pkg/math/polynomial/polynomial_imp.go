@@ -25,6 +25,7 @@ type MultivariatePolynomialManagerConfig struct {
 // remaining imp members, not separately initialized arithmetic shadows. Embedded
 // owners are charged by this class header and have no second standalone charge.
 type MultivariatePolynomialManager struct {
+	factorPrelude, factorEnd                                   polynomialFactorDiagnosticScope
 	algebraicIsolationBorrowers                                uint32
 	algebraicEvaluation                                        polynomialAlgebraicEvaluationScope
 	factorInline                                               polynomialFactorConstantInvocationReceipt
