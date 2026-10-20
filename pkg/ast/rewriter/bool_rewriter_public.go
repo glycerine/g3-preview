@@ -38,3 +38,18 @@ func (rw *boolRewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, result
 	}
 	return rw.mkAppCoreArguments(d, args, result)
 }
+
+// SimplifyBooleanApplicationDefault is the concrete default-parameter
+// bool_rewriter used by proof elimination. It owns no persistent parameter
+// snapshot because the source constructs and destroys this reducer within one
+// mk_app call.
+func SimplifyBooleanApplicationDefault(m *ast.ASTManager, d ast.ASTHandle, args []ast.ASTHandle, result ast.ASTRef) error {
+	if m == nil {
+		return ast.ErrASTHandle
+	}
+	if _, err := m.ProofsEnabled(); err != nil {
+		return err
+	}
+	rw := boolRewriter{manager: m, flat: true, localContextLimit: ^uint32(0)}
+	return rw.mkApp(d, args, result)
+}

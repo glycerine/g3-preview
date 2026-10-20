@@ -21641,13 +21641,18 @@
       "go_targets": [
         "pkg/ast/ast_decl_parameter_access.go",
         "pkg/ast/ast_proof_utils_trace.go",
+        "pkg/ast/proofs/elim_aux_assertions.go",
         "pkg/ast/proofs/is_closed.go",
         "pkg/ast/proofs/permute_unit_resolution.go",
         "pkg/ast/proofs/post_order.go",
         "pkg/ast/proofs/push_instantiations.go",
-        "pkg/ast/proofs/reduce_hypotheses.go"
+        "pkg/ast/proofs/reduce_hypotheses.go",
+        "pkg/ast/rewriter/bool_rewriter_public.go"
       ],
       "tests": [
+        "TestEliminateAuxAssertionsCollapsesUnitResolution",
+        "TestEliminateAuxAssertionsPreservesIffShape",
+        "TestEliminateAuxAssertionsUsesDefaultBooleanReducer",
         "TestProofIsClosedLemmaLiteralsAndScopeReset",
         "TestPermuteUnitResolutionIntoTheoryLemma",
         "TestPermuteUnitResolutionOrdinaryProofIdentity",
@@ -21703,6 +21708,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "elim_aux_assertions matches_fact, mk_or_core, Boolean application rebuild and iterative auxiliary-proof elimination (proof_utils.h:72-235)",
+          "status": "partial",
+          "go_target": "pkg/ast/proofs/elim_aux_assertions.go",
+          "tests": ["TestEliminateAuxAssertionsCollapsesUnitResolution", "TestEliminateAuxAssertionsPreservesIffShape", "TestEliminateAuxAssertionsUsesDefaultBooleanReducer"]
+        },
+        {
           "name": "proof_post_order declaration and borrowed proof-DAG iterator state",
           "status": "ported",
           "go_target": "pkg/ast/proofs/post_order.go",
@@ -21739,8 +21750,8 @@
           ]
         }
       ],
-      "ownership": ["The concrete postorder iterator owns native Go traversal state and borrows the proof graph. The instantiation transformation owns checked scratch references and publishes through the caller-owned ASTRef."],
-      "deviations": ["Explicit Go constructors, output references, checked errors, and native slices/maps replace C++ reference parameters and container templates."]
+      "ownership": ["The concrete postorder iterator owns native Go traversal state and borrows the proof graph. The instantiation transformation owns checked scratch references and publishes through the caller-owned ASTRef. Auxiliary elimination owns its auxiliary/not-auxiliary roots, rebuilt application cache, result pins and Boolean-rewriter scratch until output publication."],
+      "deviations": ["Explicit Go constructors, output references, checked errors, and native slices/maps replace C++ reference parameters and container templates. Auxiliary elimination preserves the source root-key cache lookup and concrete rebuild rules; its proof-checker debug guards and virtual/Farkas trace await their owning proof-checker and diagnostic surfaces."]
     },
     {
       "path": "src/ast/recurse_expr.h",
