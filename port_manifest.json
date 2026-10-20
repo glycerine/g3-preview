@@ -21497,7 +21497,8 @@
         "pkg/ast/proofs/post_order.go",
         "pkg/ast/ast_proof_utils_trace.go",
         "pkg/ast/proofs/push_instantiations.go",
-        "pkg/ast/proofs/reduce_hypotheses.go"
+        "pkg/ast/proofs/reduce_hypotheses.go",
+        "pkg/ast/proofs/reduce_hypotheses_legacy.go"
       ],
       "tests": [
         "TestProofHypothesesConcreteUnionAndInheritedCopy",
@@ -21510,6 +21511,9 @@
         "TestProofPostOrderRejectsNonProofAndClosedManager",
         "TestPushInstantiationsUpHyperPremiseAndResetSubstitution",
         "TestPushInstantiationsUpThroughQuantifiedModusPonens",
+        "TestReduceHypothesesLegacyDiscoversClosedUnitAndRebuilds",
+        "TestReduceHypothesesLegacyRebuildsUnitResolution",
+        "TestReduceHypothesesLegacyShortCircuitsReducedFalse",
         "TestProofReduceHypothesesLemmaAndResolution",
         "TestProofReduceUnitResolutionLiteralAndClauseBranches",
         "TestProofReduceOrdinaryParentsReachConcreteUnion"
@@ -21580,6 +21584,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "standalone reduce_hypotheses postorder marking/unit discovery, iterative reduction, lemma compaction, unit-resolution rebuild and publication (proof_utils.cpp:75-337)",
+          "status": "partial",
+          "go_target": "pkg/ast/proofs/reduce_hypotheses_legacy.go",
+          "tests": ["TestReduceHypothesesLegacyDiscoversClosedUnitAndRebuilds", "TestReduceHypothesesLegacyRebuildsUnitResolution", "TestReduceHypothesesLegacyShortCircuitsReducedFalse"]
+        },
+        {
           "name": "proof_post_order constructor, hasNext and iterative proof-DAG DFS next (proof_utils.cpp:27-72)",
           "status": "ported",
           "go_target": "pkg/ast/proofs/post_order.go",
@@ -21630,8 +21640,8 @@
           ]
         }
       ],
-      "ownership": ["ProofPostOrder borrows its root proof DAG and owns native Go work and visited storage. PushInstantiationsUp borrows the caller's owning proof reference, retains every newly built intermediate through temporary AST references, and releases reader-acquired hyper-resolution premises, substitutions, scratch output, and variable-substitution state in source lifetime order."],
-      "deviations": ["Checked Go errors replace source assertions and exception transport. The quantifier-arity mismatch branch preserves the source no-rewrite result and emits its proof_utils TRACE through an AST-manager bridge."]
+      "ownership": ["ProofPostOrder borrows its root proof DAG and owns native Go work and visited storage. PushInstantiationsUp borrows the caller's owning proof reference, retains every newly built intermediate through temporary AST references, and releases reader-acquired hyper-resolution premises, substitutions, scratch output, and variable-substitution state in source lifetime order. The legacy hypothesis reducer borrows its input DAG, owns all rebuilt result pins through publication, and then releases its cache, mark and unit maps."],
+      "deviations": ["Checked Go errors replace source assertions and exception transport. The quantifier-arity mismatch branch preserves the source no-rewrite result and emits its proof_utils TRACE through an AST-manager bridge. Legacy unit reduction uses deterministic first-discovery order beside its native Go map; the source iterates native obj_map bucket order. Its final debug-only proof_checker assertion remains with the proof-checker unit."]
     },
     {
       "path": "src/ast/proofs/proof_utils.h",
@@ -21647,6 +21657,7 @@
         "pkg/ast/proofs/post_order.go",
         "pkg/ast/proofs/push_instantiations.go",
         "pkg/ast/proofs/reduce_hypotheses.go",
+        "pkg/ast/proofs/reduce_hypotheses_legacy.go",
         "pkg/ast/rewriter/bool_rewriter_public.go"
       ],
       "tests": [
@@ -21660,6 +21671,9 @@
         "TestProofPostOrderRejectsNonProofAndClosedManager",
         "TestPushInstantiationsUpHyperPremiseAndResetSubstitution",
         "TestPushInstantiationsUpThroughQuantifiedModusPonens",
+        "TestReduceHypothesesLegacyDiscoversClosedUnitAndRebuilds",
+        "TestReduceHypothesesLegacyRebuildsUnitResolution",
+        "TestReduceHypothesesLegacyShortCircuitsReducedFalse",
         "TestProofReduceHypothesesLemmaAndResolution",
         "TestProofReduceUnitResolutionLiteralAndClauseBranches",
         "TestProofReduceOrdinaryParentsReachConcreteUnion"
@@ -21708,6 +21722,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "standalone reduce_hypotheses declaration and retained legacy reducer",
+          "status": "partial",
+          "go_target": "pkg/ast/proofs/reduce_hypotheses_legacy.go",
+          "tests": ["TestReduceHypothesesLegacyDiscoversClosedUnitAndRebuilds", "TestReduceHypothesesLegacyRebuildsUnitResolution", "TestReduceHypothesesLegacyShortCircuitsReducedFalse"]
+        },
+        {
           "name": "elim_aux_assertions matches_fact, mk_or_core, Boolean application rebuild and iterative auxiliary-proof elimination (proof_utils.h:72-235)",
           "status": "partial",
           "go_target": "pkg/ast/proofs/elim_aux_assertions.go",
@@ -21750,8 +21770,8 @@
           ]
         }
       ],
-      "ownership": ["The concrete postorder iterator owns native Go traversal state and borrows the proof graph. The instantiation transformation owns checked scratch references and publishes through the caller-owned ASTRef. Auxiliary elimination owns its auxiliary/not-auxiliary roots, rebuilt application cache, result pins and Boolean-rewriter scratch until output publication."],
-      "deviations": ["Explicit Go constructors, output references, checked errors, and native slices/maps replace C++ reference parameters and container templates. Auxiliary elimination preserves the source root-key cache lookup and concrete rebuild rules; its proof-checker debug guards and virtual/Farkas trace await their owning proof-checker and diagnostic surfaces."]
+      "ownership": ["The concrete postorder iterator owns native Go traversal state and borrows the proof graph. The instantiation transformation owns checked scratch references and publishes through the caller-owned ASTRef. Auxiliary elimination owns its auxiliary/not-auxiliary roots, rebuilt application cache, result pins and Boolean-rewriter scratch until output publication. The legacy reducer owns its discovered-unit order and temporary rebuilt proof roots until assigning the caller's ASTRef."],
+      "deviations": ["Explicit Go constructors, output references, checked errors, and native slices/maps replace C++ reference parameters and container templates. Auxiliary elimination preserves the source root-key cache lookup and concrete rebuild rules; its proof-checker debug guards and virtual/Farkas trace await their owning proof-checker and diagnostic surfaces. The standalone reducer's final debug-only proof-checker assertion remains open with that unit."]
     },
     {
       "path": "src/ast/recurse_expr.h",
