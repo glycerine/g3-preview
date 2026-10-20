@@ -46911,3 +46911,16 @@ Focused tests pass native 0.041s, checked 0.043s, debug 0.051s and combined
 0.052s on CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-root-construction-audit.txt`. The underlying
 isolation algorithm remains separately partial.
+
+Global rational bound-wrapper closure:
+the duplicate `algebraic_numbers.cpp/.h` rows for cpp2998-3012 and cpp3025-3039
+are promoted to ported. The API arithmetic precision getters and arithmetic
+purification tactic retain these wrappers. Each wrapper owns its exact raw
+bound invocation and distinct global rational temporary, publishes caller
+output before reverse destruction, propagates only accepted child source stops,
+and cannot acquire an older or replacement call. Callback guards, every global
+reservation prefix, actual NUM/DEN destructor stops, MPQ power END refusal and
+RAW body failure are covered. Focused tests pass native 0.055s, checked 0.051s,
+debug 0.159s and combined 0.164s on CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-owned-bound-wrapper-audit.txt`. Raw bound
+calculation and predicate/refinement TRACE remain separately partial.
