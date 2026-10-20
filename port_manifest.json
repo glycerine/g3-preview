@@ -12636,22 +12636,53 @@
       "path": "src/ast/ast_printer.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_printer.go",
+        "pkg/ast/ast_printer_test.go"
+      ],
+      "tests": [
+        "TestASTPrinterDefaultIDsAndSimpleSMT2Context"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "simple_ast_printer_context manager/stream access, SMT2 sort/expression/declaration format construction and display overloads (ast_printer.cpp:20-49)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_printer.go",
+          "tests": [
+            "TestASTPrinterDefaultIDsAndSimpleSMT2Context"
+          ]
+        },
+        {
+          "name": "mk_simple_ast_printer_context factory and source NOT_IMPLEMENTED variable-display overload (ast_printer.cpp:34-52)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_printer.go",
+          "tests": [
+            "TestASTPrinterDefaultIDsAndSimpleSMT2Context"
+          ]
+        }
+      ],
+      "ownership": [
+        "SimpleASTPrinterContext borrows its AST manager and output writers. Each display owns and closes its temporary NumericTextStream; returned format handles remain manager-owned AST handles."
+      ],
+      "deviations": [
+        "Go uses named methods for the C++ overload set and returns ErrorNotImplementedYet for the source NOT_IMPLEMENTED_YET display overload instead of terminating the process. SMT2 output inherits the separately recorded ast_smt2_pp profile coverage."
+      ]
     },
     {
       "path": "src/ast/ast_printer.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_printer.go",
+        "pkg/ast/ast_printer_test.go"
+      ],
+      "tests": [
+        "TestASTPrinterDefaultIDsAndSimpleSMT2Context"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -12662,11 +12693,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "ast_printer default #id display overloads and unreachable pretty-print defaults; ast_printer_context manager and regular/diagnostic stream interface (ast_printer.h:24-54)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_printer.go",
+          "tests": [
+            "TestASTPrinterDefaultIDsAndSimpleSMT2Context"
+          ]
+        }
+      ],
+      "ownership": [
+        "DefaultASTPrinter and SimpleASTPrinterContext borrow the manager. Context stream methods return borrowed io.Writer interfaces."
+      ],
+      "deviations": [
+        "Named Go methods replace C++ overloads and virtual dispatch. Base unreachable pretty-print methods return ErrASTDomain; caller-supplied writers make stream ownership explicit."
+      ]
     },
     {
       "path": "src/ast/ast_smt2_pp.cpp",
