@@ -14914,9 +14914,18 @@
       "path": "src/ast/expr_delta_pair.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_has_free_vars.go",
+        "pkg/ast/ast_has_free_vars_source_test.go",
+        "pkg/ast/rewriter/used_vars_ufbv.go",
+        "pkg/ast/rewriter/used_vars_ufbv_test.go"
+      ],
+      "tests": [
+        "TestASTHasFreeVarsBinderDepthSharedNodesAndAnnotations",
+        "TestASTHasFreeVarsDeepIterativeTraversalAndGuards",
+        "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -14927,11 +14936,41 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "default/value construction and node-plus-delta equality for the two live has_free_vars and used_vars specializations",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_has_free_vars.go",
+          "tests": [
+            "TestASTHasFreeVarsBinderDepthSharedNodesAndAnnotations",
+            "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+          ],
+          "go_targets": [
+            "pkg/ast/rewriter/used_vars_ufbv.go",
+            "pkg/ast/rewriter/used_vars_ufbv_test.go"
+          ]
+        },
+        {
+          "name": "hash() used solely by the replaced C++ hashtable implementation",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_has_free_vars.go",
+          "tests": [
+            "TestASTHasFreeVarsBinderDepthSharedNodesAndAnnotations",
+            "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+          ],
+          "go_targets": [
+            "pkg/ast/rewriter/used_vars_ufbv.go"
+          ]
+        }
+      ],
+      "ownership": [
+        "Both concrete tuple values borrow their AST handle and store only scalar node identity plus unsigned binder depth inside native Go maps/slices."
+      ],
+      "deviations": [
+        "Go comparable structs and runtime map hashing replace hash_u_u and the C++ hashtable. Project equality remains exact on complete checked node identity and binder delta."
+      ]
     },
     {
       "path": "src/ast/expr_functors.cpp",
