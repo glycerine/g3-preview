@@ -39665,8 +39665,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:2234-2451,2879-2881 multivariate isolation and conjugate filtering including both vanished-resultant recovery branches and all source isolation/filter TRACE records with accepted root-display receipts; full source failure audit remains open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:2234-2451,2879-2881 multivariate isolation, vanished-resultant recovery and conjugate filtering with exact TRACE ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_isolation_multivariate.go",
           "tests": [
             "TestAlgebraicMultivariateIsolationConjugateFiltering",
@@ -40782,8 +40782,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:2234-2451,2879-2881 multivariate isolation and conjugate filtering including both vanished-resultant recovery branches and all source isolation/filter TRACE records with accepted root-display receipts; full source failure audit remains open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:2234-2451,2879-2881 multivariate isolation, vanished-resultant recovery and conjugate filtering with exact TRACE ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_isolation_multivariate.go",
           "tests": [
             "TestAlgebraicMultivariateIsolationConjugateFiltering",

@@ -47004,3 +47004,13 @@ checkpoints, assertions, stopped sample destruction, callback exclusion and all
 polynomial/root/sample TRACE children are covered. Focused tests pass native
 0.652s, checked 0.667s, debug 3.467s and combined 3.498s on CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-isolation-signs-audit.txt`.
+
+Algebraic multivariate-isolation closure:
+the duplicate cpp2234-2451/cpp2879-2881 rows are promoted to ported. Retained
+NLSAT and API consumers are covered across rational elimination, resultants,
+ordinary isolation, conjugate filtering, variable disappearance, both
+vanished-resultant recovery branches, every checkpoint, older factor
+preservation, owner guards and all resultant/substitution/filter/recovery TRACE
+children. Tests pass native 66.785s, checked 66.693s, debug 343.557s and
+combined 350.344s on CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-multivariate-isolation-audit.txt`.
