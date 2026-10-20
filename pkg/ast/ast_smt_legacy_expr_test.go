@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -402,5 +403,42 @@ func TestLegacySMTPrinterImplicationChainSimplification(t *testing.T) {
 	astTestMust(t, printer.DisplayExpr(&out, single, nil))
 	if out.String() != "(=> legacy-ia legacy-ib)" {
 		t.Fatalf("legacy SMT single implication %q", out.String())
+	}
+}
+
+func TestLegacySMTPrinterFloatingPointNumerals(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	family, err := m.RegisterFloatingPointPlugin()
+	astTestMust(t, err)
+	printer, err := NewLegacySMTPrinter(m)
+	astTestMust(t, err)
+	floatSort, err := m.MkFamilySort(family, 3, nil)
+	astTestMust(t, err)
+	var value unumeral.ArbitraryFloat
+	astTestMust(t, m.floatingPointPlugin.numeric.SetDouble(&value, 8, 24, 1.5))
+	finiteRef, err := m.floatingPointPlugin.mkNumeral(&value, nil)
+	astTestMust(t, err)
+	astTestMust(t, m.floatingPointPlugin.numeric.Del(&value))
+	finite := m.external(finiteRef)
+	astTestPin(t, m, finite)
+	nan, err := m.MkFPANaNOfSort(floatSort)
+	astTestMust(t, err)
+	astTestPin(t, m, nan)
+	for _, tc := range []struct {
+		expr ASTHandle
+		want string
+	}{
+		{finite, "((_ to_fp 8 24) RTZ 1.5 0)"},
+		{nan, "((_ to_fp 8 24) RTZ NaN)"},
+	} {
+		var out strings.Builder
+		astTestMust(t, printer.DisplayExpr(&out, tc.expr, nil))
+		if out.String() != tc.want || m.floatingPointPlugin.numeralProbeFrames != nil {
+			t.Fatalf("legacy SMT floating-point numeral %q, want %q", out.String(), tc.want)
+		}
 	}
 }

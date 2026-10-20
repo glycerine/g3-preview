@@ -146,6 +146,25 @@ func (m *ASTManager) legacySMTBit2BoolIndex(decl ASTHandle) (index uint32, match
 	return uint32(raw.integer), true, nil
 }
 
+func (m *ASTManager) legacySMTIsFPANumeral(decl ASTHandle) (bool, error) {
+	if err := m.lock(); err != nil {
+		return false, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireKind(decl, ASTFuncDecl)
+	if err != nil {
+		return false, err
+	}
+	if m.floatingPointPlugin == nil {
+		return false, nil
+	}
+	family, kind, err := m.declIdentity(r)
+	if err != nil {
+		return false, err
+	}
+	return family == m.floatingPointPlugin.family && kind >= astFPANum && kind <= astFPAMinusZero, nil
+}
+
 func (p *LegacySMTPrinter) parameterText(parameter legacySMTParameterView, ctx *legacySMTExprContext) (string, error) {
 	switch parameter.kind {
 	case ASTParameterInt:
@@ -538,6 +557,29 @@ func (p *LegacySMTPrinter) exprTextContext(h ASTHandle, ctx *legacySMTExprContex
 	decl, err := p.manager.GetDecl(h)
 	if err != nil {
 		return "", err
+	}
+	if matched, e := p.manager.legacySMTIsFPANumeral(decl); e != nil {
+		return "", e
+	} else if matched {
+		value, found, e := p.manager.FPANumeralString(h)
+		if e != nil {
+			return "", e
+		}
+		if !found {
+			return "", ErrASTDomain
+		}
+		sort, e := p.manager.GetSort(h)
+		if e != nil {
+			return "", e
+		}
+		view, e := p.manager.smt2SortView(sort)
+		if e != nil {
+			return "", e
+		}
+		if !view.floatSort || len(view.params) != 2 || view.params[0].kind != ASTParameterInt || view.params[1].kind != ASTParameterInt {
+			return "", ErrASTDomain
+		}
+		return "((_ to_fp " + uintText(view.params[0].ival) + " " + uintText(view.params[1].ival) + ") RTZ " + value + ")", nil
 	}
 	if bit, matched, e := p.manager.legacySMTBit2BoolIndex(decl); e != nil {
 		return "", e

@@ -13164,7 +13164,8 @@
         "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants",
         "TestLegacySMTPrinterBit2BoolExpansion",
         "TestLegacySMTPrinterDistinctGroupsBySort",
-        "TestLegacySMTPrinterImplicationChainSimplification"
+        "TestLegacySMTPrinterImplicationChainSimplification",
+        "TestLegacySMTPrinterFloatingPointNumerals"
       ],
       "conditionals": [
         {
@@ -13250,13 +13251,21 @@
           "tests": [
             "TestLegacySMTPrinterImplicationChainSimplification"
           ]
+        },
+        {
+          "name": "smt_printer floating-point numeral rendering with source RTZ reconstruction (ast_smt_pp.cpp:383-388)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_legacy_expr.go",
+          "tests": [
+            "TestLegacySMTPrinterFloatingPointNumerals"
+          ]
         }
       ],
       "ownership": [
         "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String/floating-point literals, let insertion, datatype-special paths and the benchmark wrapper remain open."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String literals, let insertion, datatype-special paths and the benchmark wrapper remain open."
       ]
     },
     {
@@ -13281,7 +13290,8 @@
         "TestLegacySMTPrinterDeclarationParametersAndPrivateConstants",
         "TestLegacySMTPrinterBit2BoolExpansion",
         "TestLegacySMTPrinterDistinctGroupsBySort",
-        "TestLegacySMTPrinterImplicationChainSimplification"
+        "TestLegacySMTPrinterImplicationChainSimplification",
+        "TestLegacySMTPrinterFloatingPointNumerals"
       ],
       "conditionals": [
         {
