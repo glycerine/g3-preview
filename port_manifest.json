@@ -27782,19 +27782,22 @@
       "path": "src/ast/rewriter/fpa_rewriter_params.hpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/ast/rewriter/fpa_rewriter_params.go",
+        "pkg/ast/rewriter/fpa_rewriter_params_source_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestFPARewriterParamsConstructorLookupAndLifetime"
       ],
       "conditionals": [
         {
@@ -27806,11 +27809,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/gparams_catalog_collectors.go",
           "tests": [
@@ -27823,24 +27826,56 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "constructor, owned rewriter-module snapshot, borrowed local reference, hi_fp_unspecified local/module/default lookup and destructor",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_rewriter_params.go",
+          "tests": [
+            "TestFPARewriterParamsConstructorLookupAndLifetime"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Descriptor ownership/merges and borrowed catalog-owned description bytes retain the catalog behavior. The value facade borrows its constructor local params_ref, owns the captured rewriter-module params_ref, and decrements that snapshot through the concrete tracked source destructor path."
       ],
-      "deviations": []
+      "deviations": [
+        "Go exposes construction, lookup and destruction errors explicitly and rejects copied/closed facade owners; the source generated value object relies on C++ reference and params_ref invariants."
+      ]
     },
     {
       "path": "src/ast/rewriter/fpa_rewriter_params.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/gparams_catalog_collectors.go",
+        "pkg/ast/rewriter/fpa_rewriter_params.go",
+        "pkg/ast/rewriter/fpa_rewriter_params_source_test.go",
+        "pkg/util/params/util_gparams_catalog_test.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestFPARewriterParamsConstructorLookupAndLifetime"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "single exported rewriter.hi_fp_unspecified Boolean declaration, false default, description and generated facade",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_rewriter_params.go",
+          "tests": [
+            "TestFPARewriterParamsConstructorLookupAndLifetime"
+          ],
+          "go_targets": [
+            "pkg/ast/rewriter/gparams_catalog_collectors.go"
+          ]
+        }
+      ],
+      "ownership": [
+        "The generated declaration maps to the same borrowed-local and owned module-snapshot lifetime as the emitted header facade; catalog description storage remains owned by the global parameter catalog."
+      ],
       "deviations": []
     },
     {
