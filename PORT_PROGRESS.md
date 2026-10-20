@@ -47083,3 +47083,16 @@ without history repair. The focused lifecycle family passes native 0.962s,
 checked 0.948s, debug 1.044s and combined 0.997s on CPUs 8-16. The preceding
 whole native AST/polynomial/numeral package run and all row-specific four-profile
 checks remain green.
+
+Arithmetic declaration plugin closure:
+`src/ast/arith_decl_plugin.cpp` and `.h` are promoted to ported. The final
+semantic gap was irrational algebraic equality/distinctness: AST manager
+dispatch now resolves each external ID through the arithmetic wrapper and
+uses the algebraic manager's value comparison. Separate sqrt(2) declarations
+compare equal; sqrt(2) and sqrt(3) compare distinct. Together with the prior
+wrapper, translation, numeral/cache, declaration, names, finalization,
+recognizer, value, model-completion, utility and bv2int evidence, every retained
+row is now ported. Arithmetic-focused AST/rewriter/model tests pass native
+8.486s, checked 11.086s, debug 11.553s and combined 11.608s on CPUs 8-16; full
+native AST, rewriter and model packages also pass. Portcheck and diff hygiene
+pass.

@@ -86,6 +86,18 @@ func (m *ASTManager) AreEqual(a, b ASTHandle) (bool, error) {
 	if x == y {
 		return true, nil
 	}
+	if m.nodeAt(x.slot).kind == ASTApp && m.nodeAt(y.slot).kind == ASTApp {
+		fid, _, e := m.declIdentity(m.appAt(x.slot).decl)
+		if e != nil {
+			return false, e
+		}
+		if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArithmeticPlugin {
+			equal, matched, e := m.arithmeticAlgebraicEqual(fid, x, y)
+			if e != nil || matched {
+				return equal, e
+			}
+		}
+	}
 	return false, nil
 }
 func (m *ASTManager) AreDistinct(a, b ASTHandle) (bool, error) {
@@ -122,6 +134,12 @@ func (m *ASTManager) AreDistinct(a, b ASTHandle) (bool, error) {
 	}
 	if x == y {
 		return false, nil
+	}
+	if m.pluginAt(fid).kind == astArithmeticPlugin {
+		equal, matched, e := m.arithmeticAlgebraicEqual(fid, x, y)
+		if e != nil || matched {
+			return !equal, e
+		}
 	}
 	first, e := m.pluginUniqueValue(fid, x)
 	if e != nil {

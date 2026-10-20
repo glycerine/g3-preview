@@ -9159,7 +9159,7 @@
       "path": "src/ast/arith_decl_plugin.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_arith_plugin.go",
         "pkg/ast/ast_arith_plugin_source_test.go",
@@ -9184,10 +9184,15 @@
         "pkg/ast/ast_arith_numeral_invocation.go",
         "pkg/ast/ast_arith_numeral_invocation_test.go",
         "pkg/ast/ast_arith_numeral_text.go",
+		"pkg/ast/ast_arith_algebraic.go",
+		"pkg/ast/ast_arith_algebraic_source_test.go",
         "pkg/tactic/arith/polynomial_builder.go"
       ],
       "tests": [
         "TestASTArithmeticSourceRegistrationAndDeclarations",
+		"TestASTArithmeticAlgebraicExternalTranslationOwnsDistinctValue",
+		"TestASTArithmeticAlgebraicNumeralDeletionRecyclesExternalID",
+		"TestASTArithmeticAlgebraicEqualityAndDistinctness",
         "TestASTArithmeticSourceEveryRegistrationReservation",
         "TestASTArithmeticSourceEverySymbolAndMemberAcquisition",
         "TestASTArithmeticSourceFinalizeActualFieldOrderAndSeparateOwnClose",
@@ -9258,12 +9263,12 @@
           "text": "SASSERT(is_irrational_algebraic_numeral(n));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "ast_arith_plugin concrete reached source counterpart (arith_decl_plugin.cpp:115-332)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_arith_plugin.go",
           "tests": [
             "TestASTArithmeticSourceRegistrationAndDeclarations",
@@ -9275,7 +9280,7 @@
         },
         {
           "name": "original mk_numeral and mk_num_decl, small Int/Real cache lookup and INC-before-native-cache publication, fraction guard and conversion-state retained flags (src/ast/arith_decl_plugin.cpp:400-449)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_arith_numeral.go",
           "tests": [
             "TestASTArithmeticOriginalNumeralFactory",
@@ -9287,7 +9292,7 @@
         },
         {
           "name": "original is_value/is_unique_value distinction and zero get_some_value callback, selected manager dispatch (src/ast/arith_decl_plugin.cpp:561-577,627-630)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_arith_values.go",
           "tests": [
             "TestASTArithmeticOriginalValueAndZeroCallbacks"
@@ -9295,7 +9300,7 @@
         },
         {
           "name": "original finalize small_ints then small_reals DEC_ARRAY_REF after existing fields; native cache retirement and actual lexical rational parameter cleanup",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_arith_plugin.go",
           "tests": [
             "TestASTArithmeticNumeralEveryCachePublicationReservation",
@@ -9304,7 +9309,7 @@
         },
         {
           "name": "original Int/Real zero completion through evaluator constant registration",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_arith_values_test.go",
           "tests": [
             "TestModelOriginalArithmeticZeroCompletion"
@@ -9312,7 +9317,7 @@
         },
         {
           "name": "original cached mk_func_decl operator switch, unary SUB fix_kind, use_coercion/has_real_arg and both declaration overloads (src/ast/arith_decl_plugin.cpp:342-382,392-398,451-509)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_arith_decl.go",
           "tests": [
             "TestASTArithmeticOriginalOperatorDeclarationSelection",
@@ -9321,8 +9326,8 @@
           ]
         },
         {
-          "name": "original are_distinct base unique-value priority and four ADD/nonzero-rational offset branches; algebraic comparison branch remains a separate prerequisite (src/ast/arith_decl_plugin.cpp:588-594,602-626)",
-          "status": "partial",
+          "name": "original are_equal/are_distinct algebraic comparison, base unique-value priority and four ADD/nonzero-rational offset branches (src/ast/arith_decl_plugin.cpp:579-630)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_arith_values.go",
           "tests": [
             "TestASTArithmeticOriginalNonzeroOffsetDistinctness"
@@ -9330,7 +9335,7 @@
         },
         {
           "name": "original Boolean equality reducer consumes arithmetic offset distinctness (src/ast/rewriter/bool_rewriter.cpp:650-659)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bool_rewriter_arith_distinct_test.go",
           "tests": [
             "TestBoolRewriterOriginalArithmeticOffsetEquality"
@@ -9338,7 +9343,7 @@
         },
         {
           "name": "original get_sort_names/get_op_names callbacks, persistent nonlinear-real conversion mode, exact aliases/order and null/ALL extended operator guard (src/ast/arith_decl_plugin.cpp:511-559)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_arith_names.go",
           "tests": [
             "TestASTArithmeticOriginalSortNamesAndPersistentConversion",
@@ -9350,7 +9355,7 @@
         },
         {
           "name": "Original arithmetic utility family creation without plugin installation and BV utility repeated family lookup with DEBUG plugin assertion (src/ast/arith_decl_plugin.cpp:641-645; src/ast/bv_decl_plugin.cpp:850-855)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_numeric_util_families.go",
           "tests": [
             "TestASTNumericUtilityFamilyConstruction"
@@ -9358,7 +9363,7 @@
         },
         {
           "name": "Original arith_recognizers::is_numeral copy-before-flag overload with exact scalar invocation and caller arith_util family identity (src/ast/arith_decl_plugin.cpp:632-639; src/ast/arith_decl_plugin.h:233-234)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_arith_numeral_read.go",
           "tests": [
             "TestASTArithmeticNumeralReadStoredFlagAndOrderedCopy"
@@ -9366,7 +9371,7 @@
         },
         {
           "name": "Selected original arithmetic numeral factory exact caller invocation, reached parameter generation and owning cleanup (arith_decl_plugin.cpp:400-449)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_arith_numeral_invocation.go",
           "go_targets": [
             "pkg/ast/ast_arith_numeral.go",
@@ -9415,7 +9420,7 @@
       "path": "src/ast/arith_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_uninterpreted_plugin.go",
         "pkg/ast/ast_uninterpreted_plugin_test.go",
@@ -9426,10 +9431,13 @@
         "pkg/ast/ast_bv_bv2int_numerals.go",
         "pkg/ast/ast_bv_bv2int_numerals_test.go",
         "pkg/ast/ast_arith_numeral_text.go",
+		"pkg/ast/ast_arith_algebraic.go",
+		"pkg/ast/ast_arith_algebraic_source_test.go",
         "pkg/tactic/arith/polynomial_builder.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
+		"TestASTArithmeticAlgebraicEqualityAndDistinctness",
         "TestASTArithmeticNumeralReadStoredFlagAndOrderedCopy",
         "TestBVRewriterBV2IntOriginalBranches",
         "TestBVRewriterBV2IntEveryColdReservationAndPublication",
@@ -9461,12 +9469,12 @@
           "text": "SASSERT(lhs != rhs);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "original is_considered_uninterpreted family/kind predicate and borrowed numeral declaration identity adapter (src/ast/arith_decl_plugin.h:202-217)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_uninterpreted_plugin.go",
           "tests": [
             "TestASTOriginalPluginUninterpretedClassification"
@@ -9474,7 +9482,7 @@
         },
         {
           "name": "Original arith_recognizers::is_numeral copy-before-flag overload with exact scalar invocation and caller arith_util family identity (src/ast/arith_decl_plugin.cpp:632-639; src/ast/arith_decl_plugin.h:233-234)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_arith_numeral_read.go",
           "tests": [
             "TestASTArithmeticNumeralReadStoredFlagAndOrderedCopy"
@@ -9482,7 +9490,7 @@
         },
         {
           "name": "Selected bv2int use of original mk_int zero temporary and singleton app mk_add/mk_mul return shortcuts (arith_decl_plugin.h:359-361,373,381)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_bv2int.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_bv2int_test.go",

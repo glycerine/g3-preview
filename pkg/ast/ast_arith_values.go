@@ -1,6 +1,8 @@
 // Source: src/ast/arith_decl_plugin.cpp:561-577,588-594,602-630.
 package ast
 
+import "github.com/glycerine/g3/pkg/math/polynomial"
+
 func (m *ASTManager) arithmeticValue(fid FamilyID, r astNodeRef, unique bool) (bool, error) {
 	if m.nodeAt(r.slot).kind != ASTApp {
 		return false, nil
@@ -10,6 +12,46 @@ func (m *ASTManager) arithmeticValue(fid FamilyID, r astNodeRef, unique bool) (b
 		return false, e
 	}
 	return kind == 0 || kind == 31 || kind == 32 || !unique && kind == 1, nil
+}
+
+func (m *ASTManager) arithmeticAlgebraicValue(fid FamilyID, r astNodeRef) (*polynomial.Algebraic, bool, error) {
+	if m.nodeAt(r.slot).kind != ASTApp {
+		return nil, false, nil
+	}
+	f, kind, e := m.declIdentity(m.appAt(r.slot).decl)
+	if e != nil || f != fid || kind != 1 {
+		return nil, false, e
+	}
+	if m.arithmeticPlugin == nil || m.arithmeticPlugin.family != fid || m.arithmeticPlugin.algebraic == nil {
+		return nil, false, ErrASTHandle
+	}
+	info, e := m.funcInfo(m.declAt(m.appAt(r.slot).decl.slot).info)
+	if e != nil {
+		return nil, false, e
+	}
+	parameter, e := m.infoParameter(info, 0)
+	if e != nil {
+		return nil, false, e
+	}
+	external, e := m.parameterOfKind(parameter, ASTParameterExternal)
+	if e != nil {
+		return nil, false, e
+	}
+	v, e := m.arithmeticPlugin.algebraic.value(external.external)
+	return v, e == nil, e
+}
+
+func (m *ASTManager) arithmeticAlgebraicEqual(fid FamilyID, a, b astNodeRef) (bool, bool, error) {
+	x, matched, e := m.arithmeticAlgebraicValue(fid, a)
+	if e != nil || !matched {
+		return false, false, e
+	}
+	y, matched, e := m.arithmeticAlgebraicValue(fid, b)
+	if e != nil || !matched {
+		return false, false, e
+	}
+	equal, e := m.arithmeticPlugin.algebraic.manager.Equal(x, y)
+	return equal, true, e
 }
 
 func (m *ASTManager) arithmeticSomeValue(sort astNodeRef) (ASTHandle, error) {

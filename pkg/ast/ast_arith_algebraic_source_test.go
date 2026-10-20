@@ -155,3 +155,61 @@ func TestASTArithmeticAlgebraicNumeralDeletionRecyclesExternalID(t *testing.T) {
 	astTestMust(t, e)
 	astTestMust(t, am.Del(&closeRoot))
 }
+
+func TestASTArithmeticAlgebraicEqualityAndDistinctness(t *testing.T) {
+	sy, q, budget := astTestOwners(t)
+	context, e := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: budget, PageEntries: 2})
+	astTestMust(t, e)
+	catalog, e := uparams.NewGlobalParamsCatalog(sy, catalogTestConfig(budget))
+	astTestMust(t, e)
+	cfg := gparamsTestConfig(budget)
+	cfg.Catalog = catalog
+	globals, e := uparams.NewGlobalParamsService(sy, context, cfg)
+	astTestMust(t, e)
+	astTestMust(t, globals.InitializeSource())
+	previous, e := uparams.BindProcessGlobalParamsService(globals)
+	astTestMust(t, e)
+	defer func() {
+		_, e := uparams.BindProcessGlobalParamsService(previous)
+		astTestMust(t, e)
+		astTestMust(t, globals.Close())
+		astTestMust(t, catalog.Close())
+		astTestMust(t, context.Close())
+	}()
+	m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: budget})
+	astTestMust(t, e)
+	defer func() { astTestMust(t, m.Close()) }()
+	_, e = m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	am, e := m.ArithmeticAlgebraicManager()
+	astTestMust(t, e)
+
+	makeRoot := func(n int32) polynomial.Algebraic {
+		integer := unumeral.NewInt(n)
+		var basic, root polynomial.Algebraic
+		astTestMust(t, am.SetInteger(&basic, &integer))
+		astTestMust(t, am.Root(&basic, 2, &root))
+		astTestMust(t, am.Del(&basic))
+		return root
+	}
+	two, anotherTwo, three := makeRoot(2), makeRoot(2), makeRoot(3)
+	a, e := m.ArithmeticAlgebraicNumeral(&two)
+	astTestMust(t, e)
+	b, e := m.ArithmeticAlgebraicNumeral(&anotherTwo)
+	astTestMust(t, e)
+	c, e := m.ArithmeticAlgebraicNumeral(&three)
+	astTestMust(t, e)
+	astTestMust(t, am.Del(&two))
+	astTestMust(t, am.Del(&anotherTwo))
+	astTestMust(t, am.Del(&three))
+
+	equal, e := m.AreEqual(a, b)
+	astTestMust(t, e)
+	distinctAB, e := m.AreDistinct(a, b)
+	astTestMust(t, e)
+	distinctAC, e := m.AreDistinct(a, c)
+	astTestMust(t, e)
+	if !equal || distinctAB || !distinctAC {
+		t.Fatal("source irrational algebraic equality", equal, distinctAB, distinctAC)
+	}
+}
