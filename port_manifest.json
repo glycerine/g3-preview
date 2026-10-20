@@ -44050,6 +44050,18 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained eq_proc get_power228 for internal and borrowed tmp_monomial::get_ptr keys at cpp185-187,853-854",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
+          "tests": [
+            "TestMonomialTemporaryKeyPowerAssertionActions",
+            "TestMonomialTemporaryKeyClosedAssertionOwner",
+            "TestPolynomialBorrowedTemporaryActualFactoryIdentity",
+            "TestPolynomialBorrowedTemporaryStoppedInsertionLifetime"
+          ],
+          "notes": "Temporary-key branches share the concrete logical-size228 gate before raw temporary capacity access; object keys retain their existing powerCore228 path. Physical spare slots are initialized through source setters before diagnostic-continuation tests, while logical size remains1. Internal/caller temporary tests use actual constructors and source setters; actual borrowed factory identity/failure tests exercise real binding and release. No synthetic borrowed-pointer binding or constructor masks are installed. Go struct equality remains the native replacement for std::pair comparison; STL internals are not ported."
+        },
+        {
           "name": "Retained private zero/unit destructor decrement1371 before source cursor publication",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_source_prefix.go",
@@ -44915,8 +44927,13 @@
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
             "TestPolynomialNativeLocatorGrowthAndGeneration",
-            "TestMonomialNativeRenamePowerSorting"
-          ]
+            "TestMonomialNativeRenamePowerSorting",
+            "TestMonomialTemporaryKeyPowerAssertionActions",
+            "TestMonomialTemporaryKeyClosedAssertionOwner",
+            "TestMonomialTemporaryGrowContinuedSourceBody",
+            "TestMonomialTemporaryZeroCapacityContinuedConstructor"
+          ],
+          "notes": "Source setters preserve literal behavior after Continue: set_size582 publishes logical size without allocating; set_power587 always consults the process switch then reaches a typed physical Go bounds guard instead of inventing reserve/growth. Continued private increase/expand521/528 execute their actual source bodies even for a smaller capacity; preserving copies check physical source/destination spans. A constructed empty native slice represents capacity0 distinctly from an unconstructed nil slice, with no fake constructor bit. Oversized source spans/hash reads and zero-capacity push/write operations return typed bounds errors before the actual undefined memory access and never synthesize capacity. Equality of actual temporary/borrowed-temporary monomial keys now uses logical get_power228 assertion semantics; native tempPower remains a raw capacity-checked getter."
         },
         {
           "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
@@ -49552,8 +49569,13 @@
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
             "TestPolynomialNativeLocatorGrowthAndGeneration",
-            "TestMonomialNativeRenamePowerSorting"
-          ]
+            "TestMonomialNativeRenamePowerSorting",
+            "TestMonomialTemporaryKeyPowerAssertionActions",
+            "TestMonomialTemporaryKeyClosedAssertionOwner",
+            "TestMonomialTemporaryGrowContinuedSourceBody",
+            "TestMonomialTemporaryZeroCapacityContinuedConstructor"
+          ],
+          "notes": "Source setters preserve literal behavior after Continue: set_size582 publishes logical size without allocating; set_power587 always consults the process switch then reaches a typed physical Go bounds guard instead of inventing reserve/growth. Continued private increase/expand521/528 execute their actual source bodies even for a smaller capacity; preserving copies check physical source/destination spans. A constructed empty native slice represents capacity0 distinctly from an unconstructed nil slice, with no fake constructor bit. Oversized source spans/hash reads and zero-capacity push/write operations return typed bounds errors before the actual undefined memory access and never synthesize capacity. Equality of actual temporary/borrowed-temporary monomial keys now uses logical get_power228 assertion semantics; native tempPower remains a raw capacity-checked getter."
         },
         {
           "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",

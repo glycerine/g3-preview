@@ -31,7 +31,7 @@ func (m *MonomialManager) tempConstruct(t *monomialTemp) error {
 	if t == nil {
 		return arena.ErrBounds
 	}
-	if t.capacity != 0 {
+	if t.powers != nil {
 		return nil
 	}
 	t.powers = make([]MonomialPower, int(monomialTempInitialCapacity))
@@ -45,15 +45,15 @@ func (m *MonomialManager) tempGrow(t *monomialTemp, n uint32, preserve bool, lin
 	if e := m.sourceScalarAssert(line, "new_capacity > m_capacity", n > t.capacity); e != nil {
 		return e
 	}
-	if n <= t.capacity {
-		return nil
-	}
 	if uint64(n) > uint64(^uint(0)>>1) {
 		return arena.ErrBounds
 	}
 	var next []MonomialPower
 	if preserve {
 		next = make([]MonomialPower, int(n))
+		if uint64(t.size) > uint64(len(t.powers)) || t.size > n {
+			return arena.ErrBounds
+		}
 		copy(next, t.powers[:t.size])
 	} else {
 		// increase_capacity destroys the old temporary before allocating its
@@ -74,11 +74,6 @@ func (m *MonomialManager) tempSetSize(t *monomialTemp, n uint32) error {
 	if e := m.sourceScalarAssert(582, "sz <= m_capacity", n <= t.capacity); e != nil {
 		return e
 	}
-	if n > t.capacity {
-		if e := m.tempGrow(t, n, true, 528); e != nil {
-			return e
-		}
-	}
 	t.size = n
 	return nil
 }
@@ -95,23 +90,11 @@ func (m *MonomialManager) tempSetPower(t *monomialTemp, i uint32, p MonomialPowe
 	if e := m.tempConstruct(t); e != nil {
 		return e
 	}
-	if i >= t.capacity {
-		if e := m.sourceScalarAssert(587, "idx < m_capacity", false); e != nil {
-			return e
-		}
-		if i == ^uint32(0) {
-			return arena.ErrBounds
-		}
-		if t.capacity > ^uint32(0)/2 {
-			return arena.ErrBounds
-		}
-		n := t.capacity * 2
-		if n <= i {
-			n = i + 1
-		}
-		if e := m.tempGrow(t, n, true, 528); e != nil {
-			return e
-		}
+	if e := m.sourceScalarAssert(587, "idx < m_capacity", i < t.capacity); e != nil {
+		return e
+	}
+	if i >= t.capacity || uint64(i) >= uint64(len(t.powers)) {
+		return arena.ErrBounds
 	}
 	t.powers[i] = p
 	return nil
@@ -127,6 +110,9 @@ func (m *MonomialManager) tempPushBack(t *monomialTemp, p MonomialPower) error {
 		if e := m.tempGrow(t, t.size*2, true, 528); e != nil {
 			return e
 		}
+	}
+	if uint64(t.size) >= uint64(len(t.powers)) {
+		return arena.ErrBounds
 	}
 	t.powers[t.size] = p
 	t.size++
@@ -154,6 +140,9 @@ func (m *MonomialManager) tempReserve(t *monomialTemp, n uint32) error {
 func (m *MonomialManager) tempPowers(t *monomialTemp) ([]MonomialPower, error) {
 	if e := m.tempConstruct(t); e != nil {
 		return nil, e
+	}
+	if uint64(t.size) > uint64(len(t.powers)) {
+		return nil, arena.ErrBounds
 	}
 	return t.powers[:t.size], nil
 }
@@ -184,6 +173,9 @@ func (m *MonomialManager) tempInit(t *monomialTemp, p []MonomialPower) error {
 func (m *MonomialManager) tempHash(t *monomialTemp) (uint32, error) {
 	if e := m.tempConstruct(t); e != nil {
 		return 0, e
+	}
+	if uint64(t.size) > uint64(len(t.powers)) {
+		return 0, arena.ErrBounds
 	}
 	t.hash = uhash.WordReader(t.size*8, 11, func(i uint32) uint32 {
 		p := t.powers[i/2]

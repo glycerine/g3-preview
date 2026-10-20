@@ -95,6 +95,8 @@ func TestMonomialTemporaryCapacityAssertionActions(t *testing.T) {
 			}
 
 			var sizeTemp monomialTemp
+			hashBefore, e := m.tempHash(&sizeTemp)
+			serviceMust(t, e)
 			e = m.tempSetSize(&sizeTemp, monomialTempInitialCapacity+1)
 			if polynomialSourceDebug && choice == "T" {
 				if !errors.Is(e, ErrMonomialAssertion) || sizeTemp.size != 0 || sizeTemp.capacity != monomialTempInitialCapacity {
@@ -102,8 +104,14 @@ func TestMonomialTemporaryCapacityAssertionActions(t *testing.T) {
 				}
 			} else {
 				serviceMust(t, e)
-				if sizeTemp.size != monomialTempInitialCapacity+1 || sizeTemp.capacity != monomialTempInitialCapacity+1 {
-					t.Fatal("safe continued set_size adaptation", sizeTemp.size, sizeTemp.capacity)
+				if sizeTemp.size != monomialTempInitialCapacity+1 || sizeTemp.capacity != monomialTempInitialCapacity {
+					t.Fatal("source set_size preserves capacity", sizeTemp.size, sizeTemp.capacity)
+				}
+				if _, e = m.tempPowers(&sizeTemp); !errors.Is(e, arena.ErrBounds) {
+					t.Fatal("oversized source logical span", e)
+				}
+				if _, e = m.tempHash(&sizeTemp); !errors.Is(e, arena.ErrBounds) || sizeTemp.hash != hashBefore {
+					t.Fatal("oversized hash published a result", e, sizeTemp.hash, hashBefore)
 				}
 			}
 
@@ -114,9 +122,8 @@ func TestMonomialTemporaryCapacityAssertionActions(t *testing.T) {
 					t.Fatal("set_power assertion mutation", e, powerTemp.size, powerTemp.capacity)
 				}
 			} else {
-				serviceMust(t, e)
-				if powerTemp.size != 0 || powerTemp.capacity != 2*monomialTempInitialCapacity || powerTemp.powers[128] != (MonomialPower{9, 7}) {
-					t.Fatal("safe continued set_power adaptation", powerTemp.size, powerTemp.capacity, powerTemp.powers[128])
+				if !errors.Is(e, arena.ErrBounds) || powerTemp.size != 0 || powerTemp.capacity != monomialTempInitialCapacity {
+					t.Fatal("source set_power native boundary without growth", e, powerTemp.size, powerTemp.capacity)
 				}
 			}
 			serviceMust(t, m.tempCleanup(&initTemp))

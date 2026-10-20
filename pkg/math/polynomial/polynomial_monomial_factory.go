@@ -33,19 +33,38 @@ func (m *MonomialManager) keyPower(k monomialKey, index uint32) (MonomialPower, 
 		if m.borrowedTemp == nil || k.slot != 0 {
 			return MonomialPower{}, ErrMonomialPending
 		}
-		return m.tempPower(m.borrowedTemp, index)
+		return m.temporaryKeyPower(m.borrowedTemp, index)
 	}
 	if k.kind == monomialTemporaryKey {
 		if k.slot >= uint32(len(m.temps)) {
 			return MonomialPower{}, arena.ErrBounds
 		}
-		return m.tempPower(&m.temps[k.slot], index)
+		return m.temporaryKeyPower(&m.temps[k.slot], index)
 	}
 	if k.kind != monomialObjectKey || k.slot == 0 || uint64(k.slot) > uint64(len(m.locations)) {
 		return MonomialPower{}, ErrMonomialOwner
 	}
 	return m.powerCore(Monomial{m.origin, k.slot, m.locations[k.slot-1].generation}, index)
 }
+
+// Source eq_proc receives tmp.get_ptr() as a monomial pointer, so its
+// get_power uses logical size228, not just the native temporary capacity.
+func (m *MonomialManager) temporaryKeyPower(t *monomialTemp, i uint32) (MonomialPower, error) {
+	if e := m.tempConstruct(t); e != nil {
+		return MonomialPower{}, e
+	}
+	enabled, e := monomialSourceAssertionsEnabled()
+	if e != nil {
+		return MonomialPower{}, e
+	}
+	if enabled && i >= t.size {
+		if e = m.sourceAssertionFailure(228, "idx < size()"); e != nil {
+			return MonomialPower{}, e
+		}
+	}
+	return m.tempPower(t, i)
+}
+
 func validMonomialPowers(p []MonomialPower) bool {
 	for i := 1; i < len(p); i++ {
 		if p[i-1].Var >= p[i].Var {
