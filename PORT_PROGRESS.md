@@ -46948,3 +46948,16 @@ selected-factor publication, all unary TRACE sites and exact conversion,
 integer-root, basic-power and binary-bound child ownership. Focused tests pass
 native 2.989s, checked 2.950s, debug 4.075s and combined 4.517s on CPUs 8-16.
 Audit: `/mnt/oldrog/tmp/g3-algebraic-unary-source-audit.txt`.
+
+Algebraic scalar-query and bound-body closure:
+the duplicate rows for cpp1905-1924, cpp2708-2769 and cpp2983-3040 are
+promoted to ported. Retained NLSAT, AST pretty-printer, API and arithmetic
+purification consumers are covered. Defining-polynomial reserve/publication and
+copy ownership, interval and decimal field/output frontiers, exact-refinement
+selection, raw and precision bound bodies, predicate preconditions, copied
+interval refinement, width/Horner/conversion children, source destruction,
+callback exclusion, cancellation and replacement/older-invocation isolation
+all have concrete coverage. Native and checked pass in 0.403s and 0.383s. The
+debug and combined campaigns pass in 362.462s and 369.954s while sharing CPUs
+8-16 concurrently. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-scalar-query-audit.txt`.

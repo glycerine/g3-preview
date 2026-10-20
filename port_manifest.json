@@ -39455,8 +39455,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:1905-1924,2721-2730,2748-2769,2983-3040 defining-polynomial copies, binary/rational root bounds and precision getters through actual copied interval refinement; complete child failure composition and source consumers remain open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:1905-1924,2708-2769,2983-3040 defining-polynomial copies, interval/decimal display, binary/rational bounds and precision getters",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_representation.go",
           "tests": [
             "TestAlgebraicDefiningPolynomialAccessorAndReserveOrder",
@@ -39478,7 +39478,7 @@
             "pkg/math/polynomial/algebraic_refinement.go",
             "pkg/math/polynomial/algebraic_predicate_trace.go"
           ],
-          "notes": " Nonprecision raw rational bounds cpp2998-3002,3025-3029 now declare the actual zero scoped_mpbq before the irrationality predicate. The executing precondition prevents private bound cleanup from retiring that local during an actual callback. A concrete private IsRational continuation reports only the source stop from its accepted predicate call, or from a newly accepted phase-zero trace invocation; refused calls cannot adopt older predicate/trace errors. Source bound destruction preserves this younger stop; explicit owning cleanup retains the existing core predicate continuation and does not acquire global children. Entry TRACE cpp290 now retains its actual root-display invocation receipt, propagates that exact child source stop and cleans only its accepted display. An independently acknowledged old display cannot be replaced under an old trace receipt. Default-assertion debug/combined tests reach actual predicate constructor and refinement Runtime failures, physical NUM release guards, raw/global outer-local retention and generation refusal; native/checked builds erase the source predicate assertions. The entry display and replacement tests use public Runtime signed-host release frontiers under actual stream callbacks, with no source-destroyed scratch repair or fabricated numeral/construction/ownership state. A live fixture accounting lane is enlarged through public Reallocate between the two independent display failures; source values and consumed NUMs are never restored. Isolated previous-code overlays reproduce declaration/source-stop errors (baseline.json/baseline.log), missing bound propagation after declaration (missing-stop.json/missing-stop.log), and entry display loss (entry-display-baseline.json/entry-display-baseline-final.log) under /mnt/oldrog/tmp/g3-bound-precondition. Focused broad checks pass native/checked/debug/combined (2.349s/2.303s/68.040s/72.527s), and the verbose combined four-test group passes0.076s. AST arithmetic regressions pass native0.022s/combined0.050s; concrete algebraic evaluation passes0.715s/0.993s. These regressions do not complete the unfinished owning AST algebraic wrapper/translation consumer. Full native checkpoint c19bb8d7 predates this and source-temporary deletion commit52fe1a75. Precision failure composition, other predicate/source/display paths and whole polynomial/AST completion remain open; no unit is promoted."
+          "notes": "Nonprecision raw rational bounds declare the actual zero scoped_mpbq before the irrationality predicate. The executing precondition prevents private bound cleanup from retiring that local during an actual callback. A private IsRational continuation reports only its accepted predicate or phase-zero TRACE source stop; refused calls cannot adopt older predicate/trace errors. Source destruction preserves the younger stop, and owning cleanup does not acquire global children. The entry TRACE retains its exact root-display receipt and cannot acquire a replacement display. Defining-polynomial copies retain per-coefficient receipts and source reserve/publication order. Interval and decimal displays cover reached field reads, every insertion prefix, exact-refinement selection, child source stops and replacement refusal. Precision bounds cover copied interval refinement, width and Horner children, cancellation, every reached reservation and older-allocation preservation. The retained NLSAT, AST pretty-printer, API and tactic callers are audited. The owning AST algebraic wrapper and other algebraic algorithms remain open."
         },
         {
           "name": "algebraic_numbers.cpp:1582-1647,2937-2939 complete nonzero-bound halving and in-place inversion with source TRACE, cached-index publication and multiword conversion ownership",
@@ -40652,8 +40652,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:1905-1924,2721-2730,2748-2769,2983-3040 defining-polynomial copies, binary/rational root bounds and precision getters through actual copied interval refinement; complete child failure composition and source consumers remain open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:1905-1924,2708-2769,2983-3040 defining-polynomial copies, interval/decimal display, binary/rational bounds and precision getters",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_representation.go",
           "tests": [
             "TestAlgebraicDefiningPolynomialAccessorAndReserveOrder",
