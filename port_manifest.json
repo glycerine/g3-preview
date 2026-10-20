@@ -38226,7 +38226,7 @@
       "path": "src/math/polynomial/algebraic_numbers.cpp",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/math/polynomial/algebraic_manager_constructor_unwind.go",
         "pkg/math/polynomial/algebraic_manager_constructor_unwind_test.go",
@@ -39169,12 +39169,12 @@
           "text": "SASSERT(&(x2v.m()) == this);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "algebraic failed-constructor completed-prefix source unwind cpp64-125/2772-2780",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_manager_constructor_unwind.go",
           "notes": "Constructor fail now calls unwindConstructorSource instead of owning finish(false). A separate unwindStarted/unwindFinalized/phase/index/cause records the actual completed prefix without claiming normal destructor execution or completed construction. The concrete source member engine is shared with normal destruction, using actual child pointers and polynomialConstructed/rationalTemporaryConstructed. Failed polynomial children retain their existing constructor unwind cause and never receive SourceFinalize as complete objects. Older source members continue only after that child prefix succeeds. A stopped generated lexical helper is retained before older members; owning CloseHelpers is not a source retry. Outer raw allocator/header retirement is absent from constructor source unwind because outer ~manager is not invoked after constructor failure. C++ ownership assignment precedes allocator construction, including allocation failure; Go now follows that exact order. Source cold child owners and private UP descriptors survive for separate owning Close, which uses the known-field source cleanup path after unwind and preserves body/source histories. Three actual reservation-prefix sweeps cover global numerals, private unsynchronized numerals and borrowed allocator through success; they require failed and completed polynomial children, separate UP, private members and constructor-body entry. Immediate pre-owning child source/cold-header state, allocator survival, no checkpoint consumption, normal API refusal, source idempotency, eventual byte balance and history preservation are checked. Closed actual process assertion context exercises a non-budget constructor failure and restores only that borrowed process binding before owning teardown. No constructor completion bits, NUMs, allocator descriptors or accounting counters are repaired. Not all possible failed-helper/transport/child-destructor stop combinations are witnessed by these sweeps; whole source/ownership coverage remains partial.",
           "tests": [
@@ -39185,8 +39185,8 @@
           ]
         },
         {
-          "name": "algebraic manager normal and constructor-prefix source destruction cpp64-125/2772-2787; broader ownership audit partial",
-          "status": "partial",
+          "name": "algebraic manager normal and constructor-prefix source destruction cpp64-125/2772-2787",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_manager_source_finalize.go",
           "notes": "Full eager constructor and normal source destructor composition now exist. SourceFinalize performs add_tmp, uppers/lowers/roots, factors, eval_sign_tmp, isolate tmp3/tmp2/tmp1, is_rational_tmp, separate UP, multivariate, interval and binary managers, then the outer owned allocator. Bare zero and scalar/reference members acquire no invented destructor. Source phase/index/cause remain sticky after a real release stop; owning Close retires the exact five known UP descriptor roots through CleanupPolynomial and the exact private children without advancing source history. It does not scan a directory for caller ownership or drain retained operation locals during source entry. Admission rejects real callers, executing scopes, retained private resets/displays and known lexical receipts. Fresh and used sqrt/power owners compose successfully, borrowed allocator survives, and 14 NUM-bearing phases plus native/checked pooled allocator phase14 have real public-runtime refusal evidence. C++ debug allocator bypasses chunks, so that pooled-only case is explicitly skipped there. Actual arithmetic stream callbacks now verify source refusal before mutation. An interval owning continuation was fixed to delete its actual three NUM fields after the borrowed binary source owner has ended. No descriptor, NUM, counter, constructor flag or synchronization profile is repaired. Failed-constructor source unwind now has a separate completed-prefix sequence and history; see the dedicated constructor-prefix row. Broader retained/callback combinations and whole algebraic/polynomial/AST source closure remain partial.",
           "tests": [
@@ -39216,6 +39216,7 @@
         {
           "name": "Inverse conversion-entry child and literal scoped-rational destructor frontier (algebraic_numbers.cpp:1582-1647)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
             "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
@@ -39960,7 +39961,7 @@
       "path": "src/math/polynomial/algebraic_numbers.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/math/polynomial/algebraic_manager_constructor_unwind.go",
         "pkg/math/polynomial/algebraic_manager_constructor_unwind_test.go",
@@ -40386,12 +40387,12 @@
           "text": "algebraic_cell * to_algebraic() const { SASSERT(!is_basic()); return UNTAG(algebraic_cell*, m_cell); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "algebraic failed-constructor completed-prefix source unwind cpp64-125/2772-2780",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_manager_constructor_unwind.go",
           "notes": "Constructor fail now calls unwindConstructorSource instead of owning finish(false). A separate unwindStarted/unwindFinalized/phase/index/cause records the actual completed prefix without claiming normal destructor execution or completed construction. The concrete source member engine is shared with normal destruction, using actual child pointers and polynomialConstructed/rationalTemporaryConstructed. Failed polynomial children retain their existing constructor unwind cause and never receive SourceFinalize as complete objects. Older source members continue only after that child prefix succeeds. A stopped generated lexical helper is retained before older members; owning CloseHelpers is not a source retry. Outer raw allocator/header retirement is absent from constructor source unwind because outer ~manager is not invoked after constructor failure. C++ ownership assignment precedes allocator construction, including allocation failure; Go now follows that exact order. Source cold child owners and private UP descriptors survive for separate owning Close, which uses the known-field source cleanup path after unwind and preserves body/source histories. Three actual reservation-prefix sweeps cover global numerals, private unsynchronized numerals and borrowed allocator through success; they require failed and completed polynomial children, separate UP, private members and constructor-body entry. Immediate pre-owning child source/cold-header state, allocator survival, no checkpoint consumption, normal API refusal, source idempotency, eventual byte balance and history preservation are checked. Closed actual process assertion context exercises a non-budget constructor failure and restores only that borrowed process binding before owning teardown. No constructor completion bits, NUMs, allocator descriptors or accounting counters are repaired. Not all possible failed-helper/transport/child-destructor stop combinations are witnessed by these sweeps; whole source/ownership coverage remains partial.",
           "tests": [
@@ -40402,8 +40403,8 @@
           ]
         },
         {
-          "name": "algebraic manager normal and constructor-prefix source destruction cpp64-125/2772-2787; broader ownership audit partial",
-          "status": "partial",
+          "name": "algebraic manager normal and constructor-prefix source destruction cpp64-125/2772-2787",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_manager_source_finalize.go",
           "notes": "Full eager constructor and normal source destructor composition now exist. SourceFinalize performs add_tmp, uppers/lowers/roots, factors, eval_sign_tmp, isolate tmp3/tmp2/tmp1, is_rational_tmp, separate UP, multivariate, interval and binary managers, then the outer owned allocator. Bare zero and scalar/reference members acquire no invented destructor. Source phase/index/cause remain sticky after a real release stop; owning Close retires the exact five known UP descriptor roots through CleanupPolynomial and the exact private children without advancing source history. It does not scan a directory for caller ownership or drain retained operation locals during source entry. Admission rejects real callers, executing scopes, retained private resets/displays and known lexical receipts. Fresh and used sqrt/power owners compose successfully, borrowed allocator survives, and 14 NUM-bearing phases plus native/checked pooled allocator phase14 have real public-runtime refusal evidence. C++ debug allocator bypasses chunks, so that pooled-only case is explicitly skipped there. Actual arithmetic stream callbacks now verify source refusal before mutation. An interval owning continuation was fixed to delete its actual three NUM fields after the borrowed binary source owner has ended. No descriptor, NUM, counter, constructor flag or synchronization profile is repaired. Failed-constructor source unwind now has a separate completed-prefix sequence and history; see the dedicated constructor-prefix row. Broader retained/callback combinations and whole algebraic/polynomial/AST source closure remain partial.",
           "tests": [
@@ -40433,6 +40434,7 @@
         {
           "name": "Inverse conversion-entry child and literal scoped-rational destructor frontier (algebraic_numbers.cpp:1582-1647)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
             "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
@@ -206867,14 +206869,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "309e7fb6a13b54a9c0a0452e627a860b9a3430f7",
-    "command": "cd pkg && go test ./... -count=1 -timeout=30m",
-    "started_utc": "2026-10-20 06:25:16 UTC",
-    "completed_utc": "2026-10-20 06:37:37 UTC",
+    "commit": "ba17ca4ccb7f941e6f65295a38c190ff3a89fa47",
+    "command": "cd pkg && go test ./... -count=1; default 10m deadline reached only in util/lp, then go test ./util/lp -count=1 -timeout=20m",
+    "started_utc": "2026-10-20 15:29:41 UTC",
+    "completed_utc": "2026-10-20 15:52:06 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-309e7fb6.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-309e7fb6.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-309e7fb6.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-polynomial-complete-ba17ca4c.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-lp-polynomial-complete-ba17ca4c.log",
+    "verified_file": "/mnt/oldrog/tmp/g3-algebraic-whole-unit-audit.txt",
     "cpu_affinity": [
       8,
       9,
@@ -206887,16 +206889,16 @@
       16
     ],
     "GOMAXPROCS": 4,
-    "package_timeout": "30m",
+    "package_timeout": "default 10m; util/lp rerun 20m",
     "packages_with_ok_result": 68,
     "packages_without_test_files": 11,
-    "ast_seconds": 12.371,
-    "polynomial_seconds": 108.238,
-    "lp_seconds": 707.702,
-    "numeral_seconds": 58.794,
-    "session_id": 73716,
-    "checkout_held_unchanged": true,
-    "scope_warning": "Full native module checkpoint309e7fb6 passed with matching start/end/current HEAD and empty start/end/current git status. Includes binary/interval source destructor prerequisites and all earlier committed polynomial changes; excludes the factors source destructor staged outside the checkout while this run executed. Native test success does not prove complete polynomial/algebraic/AST source or ownership coverage."
+    "ast_seconds": 12.507,
+    "polynomial_seconds": 108.84,
+    "lp_seconds": 699.725,
+    "numeral_seconds": 58.883,
+    "session_id": 39266,
+    "checkout_held_unchanged": false,
+    "scope_warning": "All native packages passed on the same ba17ca4c Go source state. The initial module command reached only the default 10-minute util/lp package deadline while actively multiplying large integers; the complete LP package then passed unchanged with -timeout=20m. The only uncommitted files were the manifest and progress ledger that do not alter package implementation."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

@@ -47067,3 +47067,19 @@ direction. Focused tests pass all four build profiles on CPUs 8-16. Full native
 AST, polynomial and numeral package tests pass in 1m51.989s; portcheck and diff
 hygiene pass. Only the failed-constructor and normal/source-destructor audit
 rows remain partial in algebraic_numbers.cpp/.h.
+
+Algebraic whole-unit closure:
+the final failed-constructor unwind and normal/source-destructor rows are
+promoted to ported, completing `algebraic_numbers.cpp` and
+`algebraic_numbers.h`. The audit matches the literal reverse member order in
+the C++ `imp` constructor and the wrapper allocator destructor: failed
+construction visits only completed prefixes, while normal source destruction
+visits all private polynomials, vectors, factors, managers and the owned outer
+allocator. Existing reservation sweeps cover global and private numeral
+owners plus borrowed allocators; source-destructor tests cover all 14
+NUM-bearing member phases, pooled allocator release, live caller rejection,
+pending reset/display refusal, callback exclusion and owning continuation
+without history repair. The focused lifecycle family passes native 0.962s,
+checked 0.948s, debug 1.044s and combined 0.997s on CPUs 8-16. The preceding
+whole native AST/polynomial/numeral package run and all row-specific four-profile
+checks remain green.
