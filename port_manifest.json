@@ -47499,6 +47499,18 @@
           "TestPolynomialUnivariateFactorBugNegativeBackendConstant"
         ],
         "limits": "This does not claim arbitrary invalid backend constants or broader raw String instantiations are retained consumers; remaining live factor-core/evaluation diagnostics and broader failure/consumer audits remain open."
+      },
+      "factor_core_integer_loop_trace_audit": {
+        "source": "polynomial.cpp:6769,6795,6807",
+        "go_target": "pkg/math/polynomial/polynomial_factor_core_loop_trace.go",
+        "status": "ported source diagnostics; whole polynomial unit remains partial",
+        "behavior": "After iccp and before acc_constant, scoped i invokes raw integer tracked display, matching mpzzp::display forwarding. After each checkpoint before gcd, j/A/B record uses public polynomial_ref formatting. const C record precedes its source assertions/sign flip. Actual factor-core frame retains polynomial generation and numeric insertion receipts; child source/owning continuations check and release them before older source locals.",
+        "tests": [
+          "TestPolynomialFactorCoreLoopTraceMultiplicityAndRefusingWriter",
+          "TestPolynomialFactorCoreLoopTraceEveryReservation",
+          "TestPolynomialFactorCoreTraceBIGIntegerEveryReservation"
+        ],
+        "evidence": "Temporary dual-root overlays passed four profiles before application. Loop prefixes0-39 and BIG-content prefixes0-51 through success; BIG 2^64*(x+1)^3 exact output, reconstruction and refusing stream computation. Independent omitted output/polynomial receipt/numeric receipt controls fail. Completed display keys may be stale after later leaf frame reuse; captured invocation metadata is retained without acquiring that replacement."
       }
     },
     {

@@ -39,6 +39,8 @@ type polynomialFactorCoreFrame struct {
 	constant                                                     polynomialFactorConstantInvocationReceipt
 	univariate                                                   polynomialFactorUnivariateInvocationReceipt
 	quadratic                                                    polynomialGCDInvocationReceipt
+	traceDisplay                                                 polynomialDisplayInvocationReceipt
+	traceNumeral                                                 unumeral.NumeralInsertionReceipt
 	predicates, dispatchPredicates, helperPredicates             [2]polynomialGCDInvocationReceipt
 	bodyCause, sourceCause, cleanupCause                         error
 }
@@ -168,6 +170,9 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 	if e = m.iccpPartsWithReceipt(p, x, &s.numeral, &s.refs[0], &s.refs[1], &s.iccp); e != nil {
 		return e
 	}
+	if e = m.traceFactorCoreInteger(s); e != nil {
+		return e
+	}
 	s.lastCall = 1
 	if e = m.accumulateFactorConstantWithReceipt(r, &s.numeral, &s.constant); e != nil {
 		return e
@@ -247,6 +252,9 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 		if e = c.checkpoint(); e != nil {
 			return e
 		}
+		if e = m.traceFactorCoreLoop(s, j); e != nil {
+			return e
+		}
 		s.lastCall = 5
 		if e = m.gcdIntoWithReceipt(s.refs[5].value, s.refs[4].value, &s.refs[6], &s.gcd); e != nil {
 			return e
@@ -274,6 +282,9 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 				return e
 			}
 		} else {
+			if e = m.traceFactorCoreConstant(s); e != nil {
+				return e
+			}
 			if e = polynomialFactorSourceAssert(6808, "C->size() == 1", func() (bool, error) {
 				n, e := c.readWord(s.refs[2].value, 8)
 				return n == 1, e
@@ -415,6 +426,12 @@ func (m *MultivariatePolynomialManager) factorWithReceipt(p Polynomial, r *Polyn
 	return m.factorCoreSource(p, r, params, &m.factorRoot, nil, accepted)
 }
 func (m *MultivariatePolynomialManager) factorCoreChildSource(s *polynomialFactorCoreFrame) error {
+	if e := s.traceNumeral.SourceCause(); e != nil {
+		return e
+	}
+	if e := m.core.displayReceiptSourceCause(&s.traceDisplay); e != nil {
+		return e
+	}
 	if e := m.factorLastChildSource(s); e != nil {
 		return e
 	}
@@ -498,6 +515,17 @@ func (m *MultivariatePolynomialManager) finishFactorCoreSource(r *polynomialFact
 	return nil
 }
 func (m *MultivariatePolynomialManager) cleanupFactorCoreChildren(s *polynomialFactorCoreFrame, abort bool) error {
+	if s.traceNumeral.Active() {
+		if e := s.traceNumeral.Complete(m.core.integer.Natural, false); e != nil {
+			return e
+		}
+		if e := s.traceNumeral.Complete(m.core.integer.Natural, true); e != nil {
+			return e
+		}
+	}
+	if e := m.core.cleanupDisplayReceipt(&s.traceDisplay); e != nil {
+		return e
+	}
 	if e := m.cleanupFactorLastChild(s, abort); e != nil {
 		return e
 	}
