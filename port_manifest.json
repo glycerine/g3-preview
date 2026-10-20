@@ -32880,22 +32880,22 @@
       "path": "src/ast/substitution/matcher.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/ast/substitution/matcher.go"],
+      "tests": ["TestMatcherSourceExamplesAndApplication", "TestMatcherRigidVariableAndDeclarationRefusals"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "iterative pattern/instance matching and substitution insertion", "status": "ported", "go_target": "pkg/ast/substitution/matcher.go", "tests": ["TestMatcherSourceExamplesAndApplication", "TestMatcherRigidVariableAndDeclarationRefusals"]}],
+      "ownership": ["Matcher borrows expressions and its supplied Substitution; successful variable bindings are retained by Substitution."],
+      "deviations": ["A native slice replaces the source todo vector; the source's already-disabled pair cache remains absent."]
     },
     {
       "path": "src/ast/substitution/matcher.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/substitution/matcher.go"],
+      "tests": ["TestMatcherSourceExamplesAndApplication", "TestMatcherRigidVariableAndDeclarationRefusals"],
       "conditionals": [
         {
           "line": 19,
@@ -32906,11 +32906,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "matcher construction and application", "status": "ported", "go_target": "pkg/ast/substitution/matcher.go", "tests": ["TestMatcherSourceExamplesAndApplication", "TestMatcherRigidVariableAndDeclarationRefusals"]}],
+      "ownership": ["Matcher contains only borrowed handles and transient work; Substitution owns published bindings."],
+      "deviations": ["Match replaces the C++ call operator with an explicit bool/error method."]
     },
     {
       "path": "src/ast/substitution/substitution.cpp",
@@ -124400,9 +124400,9 @@
       "path": "src/test/matcher.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/substitution/matcher_test.go"],
+      "tests": ["TestMatcherSourceExamplesAndApplication", "TestMatcherRigidVariableAndDeclarationRefusals"],
       "conditionals": [
         {
           "line": 19,
@@ -124417,11 +124417,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "source matcher success, repeated-variable refusal, rigid mismatch and substitution application examples", "status": "ported", "go_target": "pkg/ast/substitution/matcher_test.go", "tests": ["TestMatcherSourceExamplesAndApplication", "TestMatcherRigidVariableAndDeclarationRefusals"]}],
+      "ownership": ["Tests pin source expressions, own apply outputs, and close Substitution before manager teardown."],
+      "deviations": ["Assertions replace the Windows-only source test's stdout diagnostics and run on every supported host."]
     },
     {
       "path": "src/test/mem_initializer.cpp",
