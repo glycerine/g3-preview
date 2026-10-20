@@ -33200,12 +33200,14 @@
         "pkg/ast/ast_static_features.go",
         "pkg/ast/ast_static_features_test.go",
         "pkg/ast/ast_static_features_collect.go",
+        "pkg/ast/ast_static_features_theory.go",
         "pkg/ast/ast_static_features_collect_test.go"
       ],
       "tests": [
         "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay",
         "TestStaticFeaturesBooleanTraversalClausesSharingAndDepth",
-        "TestStaticFeaturesTermITEIsNotAFormulaTree"
+        "TestStaticFeaturesTermITEIsNotAFormulaTree",
+        "TestStaticFeaturesTheoryFamiliesSortsEqualitiesAndAliens"
       ],
       "assertions": [
         {
@@ -33236,13 +33238,21 @@
             "TestStaticFeaturesBooleanTraversalClausesSharingAndDepth",
             "TestStaticFeaturesTermITEIsNotAFormulaTree"
           ]
+        },
+        {
+          "name": "theory family construction and marking, sort flags, equalities, per-family terms/atoms/constants and alien accounting (static_features.cpp:163-168,273-280,285-365; static_features.h:128-145)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_static_features_theory.go",
+          "tests": [
+            "TestStaticFeaturesTheoryFamiliesSortsEqualitiesAndAliens"
+          ]
         }
       ],
       "ownership": [
         "StaticFeatures borrows its AST manager, owns one ArithKSum rational and native counter/cache slices and maps, and releases the rational explicitly in Close."
       ],
       "deviations": [
-        "Native Go maps replace ast_mark/u_map and the source expression/declaration-ID vectors because Go AST expression and declaration IDs deliberately occupy sparse high ranges. Arithmetic, theory-specific sort classification and alien accounting remain open, so the source unit stays partial."
+        "Native Go maps replace ast_mark/u_map and the source expression/declaration-ID vectors because Go AST expression and declaration IDs deliberately occupy sparse high ranges. Arithmetic numeral, difference-logic and nonlinearity classification remain open, so the source unit stays partial."
       ]
     },
     {
@@ -33254,12 +33264,14 @@
         "pkg/ast/ast_static_features.go",
         "pkg/ast/ast_static_features_test.go",
         "pkg/ast/ast_static_features_collect.go",
+        "pkg/ast/ast_static_features_theory.go",
         "pkg/ast/ast_static_features_collect_test.go"
       ],
       "tests": [
         "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay",
         "TestStaticFeaturesBooleanTraversalClausesSharingAndDepth",
-        "TestStaticFeaturesTermITEIsNotAFormulaTree"
+        "TestStaticFeaturesTermITEIsNotAFormulaTree",
+        "TestStaticFeaturesTheoryFamiliesSortsEqualitiesAndAliens"
       ],
       "conditionals": [
         {
@@ -33287,7 +33299,7 @@
         "The concrete Go owner exposes source counters directly and owns its rational and native collections; AST handles and the manager remain borrowed."
       ],
       "deviations": [
-        "Go uses explicit Reset, FlushCache and Close methods. Sparse native maps replace ID-indexed vectors for expression depths and application counts; arithmetic and theory-specific collection helpers remain open."
+        "Go uses explicit Reset, FlushCache and Close methods. Sparse native maps replace ID-indexed vectors for expression depths and application counts; arithmetic numeral and difference-logic collection helpers remain open."
       ]
     },
     {

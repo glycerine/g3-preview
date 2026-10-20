@@ -16,8 +16,9 @@ import (
 // Reset and the query/display surface are complete here.
 type StaticFeatures struct {
 	manager                           *ASTManager
-	basicFID, arithFID                FamilyID
-	labelFID, arrayFID                FamilyID
+	basicFID, arithFID, bitVectorFID  FamilyID
+	labelFID, arrayFID, fpaFID        FamilyID
+	sequenceFID                       FamilyID
 	labelSym, patternSym, exprListSym usymbol.Symbol
 
 	visited                                                                       map[ASTHandle]struct{}
@@ -62,15 +63,15 @@ func NewStaticFeatures(m *ASTManager) (*StaticFeatures, error) {
 		}
 		return m.families.MkID(s)
 	}
-	afid, err := mkFamily("arith")
-	if err != nil {
-		return nil, err
+	families := make([]FamilyID, 5)
+	var err error
+	for i, name := range []string{"arith", "bv", "array", "fpa", "seq"} {
+		families[i], err = mkFamily(name)
+		if err != nil {
+			return nil, err
+		}
 	}
 	lfid, err := mkFamily("label")
-	if err != nil {
-		return nil, err
-	}
-	arrfid, err := mkFamily("array")
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +82,8 @@ func NewStaticFeatures(m *ASTManager) (*StaticFeatures, error) {
 			return nil, err
 		}
 	}
-	f := &StaticFeatures{manager: m, basicFID: m.BasicFamilyID(), arithFID: afid, labelFID: lfid, arrayFID: arrfid,
+	f := &StaticFeatures{manager: m, basicFID: m.BasicFamilyID(), arithFID: families[0], bitVectorFID: families[1],
+		arrayFID: families[2], fpaFID: families[3], sequenceFID: families[4], labelFID: lfid,
 		labelSym: syms[0], patternSym: syms[1], exprListSym: syms[2]}
 	f.ArithKSum, err = m.numerals.NewValue()
 	if err != nil {

@@ -1,6 +1,10 @@
 package ast
 
-import "testing"
+import (
+	"testing"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+)
 
 func TestStaticFeaturesBooleanTraversalClausesSharingAndDepth(t *testing.T) {
 	m := astTestManager(t)
@@ -63,5 +67,61 @@ func TestStaticFeaturesTermITEIsNotAFormulaTree(t *testing.T) {
 	}
 	if f.NumFormulaTrees != 0 || f.MaxFormulaDepth != 0 {
 		t.Fatal("term ITE counted as formula tree", f.NumFormulaTrees, f.MaxFormulaDepth)
+	}
+}
+
+func TestStaticFeaturesTheoryFamiliesSortsEqualitiesAndAliens(t *testing.T) {
+	m := astTestManager(t)
+	f, err := NewStaticFeatures(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, f.Close()) })
+	for i, name := range []string{"arith", "bv", "array", "fpa", "seq"} {
+		sym, e := m.Symbols.Intern(name)
+		astTestMust(t, e)
+		fid, e := m.families.GetID(sym)
+		astTestMust(t, e)
+		if fid != FamilyID(5+i) {
+			t.Fatal("static feature utility family construction order", name, fid)
+		}
+	}
+	arith, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	integerSort := m.external(m.arithmeticPlugin.fields[1])
+	x, err := m.MkConst(astTestSymbol(t, m, "sf-int-x"), integerSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	one, err := m.numerals.NewValue()
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.numerals.Del(&one)) }()
+	astTestMust(t, m.numerals.SetInt64(&one, 1))
+	oneExpr, err := m.ArithmeticNumeral(&one, true)
+	astTestMust(t, err)
+	astTestPin(t, m, oneExpr)
+	eq, err := m.MkEq(x, oneExpr)
+	astTestMust(t, err)
+	astTestPin(t, m, eq)
+	userSort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "sf-theory-result"), nil)
+	astTestMust(t, err)
+	decl, err := m.MkFuncDecl(usymbol.Numerical(8001), []ASTHandle{integerSort}, userSort, ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	astTestPin(t, m, decl)
+	alien, err := m.MkApp(decl, []ASTHandle{oneExpr})
+	astTestMust(t, err)
+	astTestPin(t, m, alien)
+	astTestMust(t, f.Collect(eq, alien))
+	if !f.HasInt || f.NumMarkedTheories != 1 || f.NumEqualities != 1 {
+		t.Fatal("sort and equality accounting", f.HasInt, f.NumMarkedTheories, f.NumEqualities)
+	}
+	if int(arith) >= len(f.NumTheoryEqualities) || f.NumTheoryEqualities[arith] != 1 {
+		t.Fatal("per-theory equality accounting", arith, f.NumTheoryEqualities)
+	}
+	if int(arith) >= len(f.NumTheoryConstants) || f.NumTheoryConstants[arith] != 1 {
+		t.Fatal("uninterpreted arithmetic constant accounting", arith, f.NumTheoryConstants)
+	}
+	if f.NumAliens != 1 || int(arith) >= len(f.NumAliensPerFamily) || f.NumAliensPerFamily[arith] != 1 {
+		t.Fatal("alien accounting", f.NumAliens, f.NumAliensPerFamily)
+	}
+	if int(arith) >= len(f.NumTheoryTerms) || f.NumTheoryTerms[arith] != 1 {
+		t.Fatal("arithmetic numeral theory term", arith, f.NumTheoryTerms)
 	}
 }

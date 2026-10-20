@@ -70,6 +70,14 @@ func (f *StaticFeatures) updateCore(h ASTHandle) error {
 	if err != nil {
 		return err
 	}
+	sort, err := f.manager.GetSort(h)
+	if err != nil {
+		return err
+	}
+	resultFID, err := f.classifySort(sort)
+	if err != nil {
+		return err
+	}
 	gate, err := f.isGate(h)
 	if err != nil {
 		return err
@@ -108,6 +116,15 @@ func (f *StaticFeatures) updateCore(h ASTHandle) error {
 				f.NumBoolConstants++
 			}
 		}
+	}
+	isEquality := false
+	if op, yes, e := f.basicKind(h); e != nil {
+		return e
+	} else if yes {
+		isEquality = op == ASTOpEq
+	}
+	if err = f.accountEquality(h, isEquality); err != nil {
+		return err
 	}
 	if kind == ASTQuantifier {
 		f.NumQuantifiers++
@@ -173,13 +190,8 @@ func (f *StaticFeatures) updateCore(h ASTHandle) error {
 				f.NumUninterpretedFunctions++
 			}
 		}
-	} else if fid != f.basicFID {
-		f.NumInterpretedExprs++
-		if args == 0 {
-			f.NumInterpretedConstants++
-		}
 	}
-	return nil
+	return f.accountApplicationTheory(h, fid, resultFID, isBool, isEquality, gate, args)
 }
 
 func (f *StaticFeatures) process(h ASTHandle, formContext, orAndContext, iteContext bool, stackDepth uint32) error {
