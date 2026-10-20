@@ -1562,6 +1562,15 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	// Reverse declaration order of the selected actual source members.
 	for _, v := range []**BinaryRationalVector{&m.uppers, &m.lowers, &m.roots} {
 		if *v != nil {
+			// These are this owner's actual private vectors. An earlier source
+			// reset/drop may have stopped after consuming a physical NUM block;
+			// owning teardown drains that accepted child before ending its owner.
+			if e := (*v).CleanupManagerReset(); e != nil {
+				return e
+			}
+			if e := (*v).CleanupDrop(); e != nil {
+				return e
+			}
 			if e := (*v).Close(); e != nil {
 				return e
 			}

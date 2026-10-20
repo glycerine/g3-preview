@@ -39168,6 +39168,16 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "algebraic manager private-vector owning teardown; source imp destructor cpp125 and manager destructor cpp2782 remain distinct",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_root.go",
+          "notes": "NewAlgebraicManager already constructs the actual eager multivariate and separate univariate owners. Owning Close now drains CleanupManagerReset/CleanupDrop on each actual private upper/lower/root vector before Close, including when no isolation conversion scope is active. A real large NUM release stops under the public TLS runtime signed-host boundary; retry retires only accepted private children before older members. Owning Close does not advance polynomial source destruction cursors. Full source algebraic imp reverse-member destruction, including source scoped polynomial/vector/factors/NUM destruction followed by separate UP, multivariate, interval and binary owners, is not yet composed; owning Close is not credited as that source destructor. No source descriptor, numeral, constructor flag or counter is repaired.",
+          "tests": [
+            "TestAlgebraicManagerPrivateVectorStoppedDropOwningCleanup",
+            "TestAlgebraicManagerOwningCloseDoesNotAdvancePolynomialSource"
+          ]
+        },
+        {
           "name": "Inverse conversion-entry child and literal scoped-rational destructor frontier (algebraic_numbers.cpp:1582-1647)",
           "status": "partial",
           "go_targets": [
@@ -39458,7 +39468,7 @@
           ]
         },
         {
-          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
+          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite; full eager constructor present, source destructor composition OPEN",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation.go",
           "tests": [
@@ -40313,6 +40323,16 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "algebraic manager private-vector owning teardown; source imp destructor cpp125 and manager destructor cpp2782 remain distinct",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_root.go",
+          "notes": "NewAlgebraicManager already constructs the actual eager multivariate and separate univariate owners. Owning Close now drains CleanupManagerReset/CleanupDrop on each actual private upper/lower/root vector before Close, including when no isolation conversion scope is active. A real large NUM release stops under the public TLS runtime signed-host boundary; retry retires only accepted private children before older members. Owning Close does not advance polynomial source destruction cursors. Full source algebraic imp reverse-member destruction, including source scoped polynomial/vector/factors/NUM destruction followed by separate UP, multivariate, interval and binary owners, is not yet composed; owning Close is not credited as that source destructor. No source descriptor, numeral, constructor flag or counter is repaired.",
+          "tests": [
+            "TestAlgebraicManagerPrivateVectorStoppedDropOwningCleanup",
+            "TestAlgebraicManagerOwningCloseDoesNotAdvancePolynomialSource"
+          ]
+        },
+        {
           "name": "Inverse conversion-entry child and literal scoped-rational destructor frontier (algebraic_numbers.cpp:1582-1647)",
           "status": "partial",
           "go_targets": [
@@ -40580,7 +40600,7 @@
           ]
         },
         {
-          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
+          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite; full eager constructor present, source destructor composition OPEN",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation.go",
           "tests": [
