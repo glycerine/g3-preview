@@ -13176,7 +13176,8 @@
         "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
         "TestLegacySMTPrinterBenchmarkTrueDefaultStatus",
         "TestLegacySMTPrinterLetInsertionSharedAndLargeTerms",
-        "TestLegacySMTPrinterQuantifierLocalLetScope"
+        "TestLegacySMTPrinterQuantifierLocalLetScope",
+        "TestLegacySMTPrinterGenericASTDispatchAndConvenience"
       ],
       "conditionals": [
         {
@@ -13296,6 +13297,14 @@
             "TestLegacySMTPrinterLetInsertionSharedAndLargeTerms",
             "TestLegacySMTPrinterQuantifierLocalLetScope"
           ]
+        },
+        {
+          "name": "ast_smt_pp generic AST display dispatch and mk_smt_pp convenience construction (ast_smt_pp.cpp:869-891, ast_smt_pp.h:84-100)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_legacy_decl.go",
+          "tests": [
+            "TestLegacySMTPrinterGenericASTDispatchAndConvenience"
+          ]
         }
       ],
       "ownership": [
@@ -13309,7 +13318,7 @@
       "path": "src/ast/ast_smt_pp.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_smt_renaming.go",
         "pkg/ast/ast_smt_renaming_test.go",
@@ -13339,7 +13348,8 @@
         "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
         "TestLegacySMTPrinterBenchmarkTrueDefaultStatus",
         "TestLegacySMTPrinterLetInsertionSharedAndLargeTerms",
-        "TestLegacySMTPrinterQuantifierLocalLetScope"
+        "TestLegacySMTPrinterQuantifierLocalLetScope",
+        "TestLegacySMTPrinterGenericASTDispatchAndConvenience"
       ],
       "conditionals": [
         {
@@ -13351,8 +13361,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "smt_renaming constructor and symbol translation interface (ast_smt_pp.h:24-37)",
@@ -13363,17 +13373,18 @@
           ]
         },
         {
-          "name": "ast_smt_pp expression, sort and function-declaration display interface subset (ast_smt_pp.h:69-85)",
-          "status": "partial",
+          "name": "ast_smt_pp expression and generic AST display plus mk_smt_pp convenience interface (ast_smt_pp.h:69-100)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt_legacy_decl.go",
           "tests": [
             "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals",
-            "TestLegacySMTPrinterSortAndFunctionDeclarations"
+            "TestLegacySMTPrinterSortAndFunctionDeclarations",
+            "TestLegacySMTPrinterGenericASTDispatchAndConvenience"
           ]
         },
         {
           "name": "ast_smt_pp benchmark metadata, assumptions, declared filters and display_smt2 configuration surface (ast_smt_pp.h:39-82)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt_legacy_benchmark.go",
           "tests": [
             "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
@@ -13382,10 +13393,10 @@
         }
       ],
       "ownership": [
-        "The concrete renaming owner borrows the source symbol manager and owns its native translation maps."
+        "The concrete renaming owner borrows the source symbol manager and owns its native translation maps. LegacySMTPrinter borrows the AST manager. LegacySMTBenchmarkConfig borrows assumption slices and declared-filter callbacks for one synchronous display call, replacing the source object's persistent expr_ref_vector ownership."
       ],
       "deviations": [
-        "Generic AST dispatch and the mk_smt_pp convenience wrapper remain open. Benchmark display is ported through one-call configuration; string literals await sequence literal support and datatype-special paths await the datatype plugin port."
+        "Benchmark setters are represented by one-call LegacySMTBenchmarkConfig values. This keeps configuration ownership explicit while preserving every retained header operation; implementation branches blocked on sequence literals and datatypes remain tracked on ast_smt_pp.cpp."
       ]
     },
     {

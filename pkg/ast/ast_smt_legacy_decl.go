@@ -95,3 +95,36 @@ func (p *LegacySMTPrinter) DisplayFuncDeclaration(out io.Writer, decl ASTHandle)
 	}
 	return legacySMTWriteText(out, body)
 }
+
+func (p *LegacySMTPrinter) DisplayAST(out io.Writer, node ASTHandle, indent uint32, variableNames []string) error {
+	if p == nil || p.manager == nil || p.renaming == nil {
+		return ErrASTHandle
+	}
+	kind, err := p.manager.GetKind(node)
+	if err != nil {
+		return err
+	}
+	var body string
+	switch kind {
+	case ASTApp, ASTVar, ASTQuantifier:
+		body, err = p.exprTextIndented(node, variableNames, indent)
+	case ASTFuncDecl:
+		body, err = p.funcDeclarationText(node)
+	case ASTSort:
+		body, err = p.sortDeclarationText(node)
+	default:
+		err = ErrASTDomain
+	}
+	if err != nil {
+		return err
+	}
+	return legacySMTWriteText(out, body)
+}
+
+func DisplayLegacySMT(out io.Writer, manager *ASTManager, node ASTHandle, indent uint32, variableNames []string) error {
+	printer, err := NewLegacySMTPrinter(manager)
+	if err != nil {
+		return err
+	}
+	return printer.DisplayAST(out, node, indent, variableNames)
+}

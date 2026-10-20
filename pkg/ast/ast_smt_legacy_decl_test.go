@@ -37,3 +37,37 @@ func TestLegacySMTPrinterSortAndFunctionDeclarations(t *testing.T) {
 		}
 	}
 }
+
+func TestLegacySMTPrinterGenericASTDispatchAndConvenience(t *testing.T) {
+	m := astTestManager(t)
+	printer, err := NewLegacySMTPrinter(m)
+	astTestMust(t, err)
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "legacy-dispatch-sort"), nil)
+	astTestMust(t, err)
+	astTestPin(t, m, sort)
+	decl, err := m.MkFuncDecl(astTestSymbol(t, m, "legacy-dispatch-value"), nil, sort, ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	astTestPin(t, m, decl)
+	value, err := m.MkApp(decl, nil)
+	astTestMust(t, err)
+	astTestPin(t, m, value)
+	for _, tc := range []struct {
+		node ASTHandle
+		want string
+	}{
+		{sort, "(declare-sort legacy-dispatch-sort)\n"},
+		{decl, "(declare-fun legacy-dispatch-value () legacy-dispatch-sort)"},
+		{value, "legacy-dispatch-value"},
+	} {
+		var out strings.Builder
+		astTestMust(t, printer.DisplayAST(&out, tc.node, 0, nil))
+		if out.String() != tc.want {
+			t.Fatalf("legacy SMT AST dispatch %q, want %q", out.String(), tc.want)
+		}
+		out.Reset()
+		astTestMust(t, DisplayLegacySMT(&out, m, tc.node, 0, nil))
+		if out.String() != tc.want {
+			t.Fatalf("legacy SMT convenience display %q, want %q", out.String(), tc.want)
+		}
+	}
+}
