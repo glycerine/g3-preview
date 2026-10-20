@@ -24140,28 +24140,33 @@
       "path": "src/ast/rewriter/bv_elim.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/bv_elim.go"],
+      "tests": ["TestBVElimQuantifierBodyPatternsMetadataAndOrder", "TestBVElimRefusalWrapperProofAndLifecycle"],
       "assertions": [
         {
           "line": 76,
           "text": "SASSERT(_names.size() == _sorts.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{
+        "name": "bv_elim_cfg::reduce_quantifier",
+        "status": "ported",
+        "go_target": "pkg/ast/rewriter/bv_elim.go",
+        "tests": ["TestBVElimQuantifierBodyPatternsMetadataAndOrder", "TestBVElimRefusalWrapperProofAndLifecycle"]
+      }],
+      "ownership": ["The configuration borrows the AST manager. Each reduction retains rewritten body and pattern handles only while constructing the replacement quantifier. Native Go slices hold declaration and substitution vectors. The wrapper owns its configuration and traversal, charges its concrete representation, and closes idempotently."],
+      "deviations": ["Allocation, invalid-handle, and substitution failures use checked Go errors. The proof-enabled wrapper publishes one valid root rewrite or reflexivity proof instead of preserving the generic source traversal's internal proof-tree shape."]
     },
     {
       "path": "src/ast/rewriter/bv_elim.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/bv_elim.go"],
+      "tests": ["TestBVElimQuantifierBodyPatternsMetadataAndOrder", "TestBVElimRefusalWrapperProofAndLifecycle"],
       "conditionals": [
         {
           "line": 20,
@@ -24172,11 +24177,16 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{
+        "name": "bv_elim_cfg constructor/reduce_quantifier and bv_elim_rw constructor",
+        "status": "ported",
+        "go_target": "pkg/ast/rewriter/bv_elim.go",
+        "tests": ["TestBVElimQuantifierBodyPatternsMetadataAndOrder", "TestBVElimRefusalWrapperProofAndLifecycle"]
+      }],
+      "ownership": ["BVElimConfiguration and BVElim are explicit noncopyable Go owners. BVElim owns and closes its traversal and configuration and releases its charged representation exactly once."],
+      "deviations": ["Go exposes explicit construction, reset, close, output-reference, and error APIs in place of C++ inheritance and reference parameters."]
     },
     {
       "path": "src/ast/rewriter/bv_rewriter.cpp",
