@@ -46972,3 +46972,14 @@ restoration, promotion skip and stopped destruction are covered. Focused tests
 pass native 0.070s, checked 0.074s, debug 0.224s and combined 0.261s on CPUs
 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-predicate-refinement-audit.txt`.
+
+Algebraic comparison closure:
+the duplicate rows for cpp1669-1821 and cpp1867-1885 are promoted to ported.
+Retained NLSAT, AST and API RCF consumers are covered. Basic/root/rational
+dispatch, endpoint and equal-polynomial shortcuts, minimal and magnitude
+refinement, rational-promotion redispatch, checkpoint/counter behavior,
+Sturm-Tarski sequence construction and sign selection, sequence ownership,
+dynamic assertion ordering and entry/inner/Sturm TRACE children all have exact
+tests. The complete comparison/relation family passes native 0.018s, checked
+0.018s, debug 0.028s and combined 0.027s on CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-comparison-audit.txt`.

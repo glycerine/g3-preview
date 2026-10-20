@@ -39551,8 +39551,8 @@
           ]
         },
         {
-          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885; inner and outer comparison TRACE records with accepted polynomial/numeral formatting children; complete numeric/source failure audit remains open",
-          "status": "partial",
+          "name": "Complete basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885 with inner and outer TRACE ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_compare.go",
           "tests": [
             "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
@@ -40726,8 +40726,8 @@
           ]
         },
         {
-          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885; inner and outer comparison TRACE records with accepted polynomial/numeral formatting children; complete numeric/source failure audit remains open",
-          "status": "partial",
+          "name": "Complete basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885 with inner and outer TRACE ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_compare.go",
           "tests": [
             "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
