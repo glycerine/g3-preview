@@ -23863,14 +23863,17 @@
       "go_targets": [
         "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go",
         "pkg/ast/rewriter/bit_blaster/engine_logic.go",
-        "pkg/ast/rewriter/bit_blaster/engine_compare.go"
+        "pkg/ast/rewriter/bit_blaster/engine_compare.go",
+        "pkg/ast/rewriter/bit_blaster/engine_shift.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
         "TestBitBlasterNumeralAndArithmeticDomains",
         "TestBitBlasterIndependentLogicCircuits",
         "TestBitBlasterMultiplexerRetainsSymbolicITE",
-        "TestBitBlasterComparisonsExhaustiveConstants"
+        "TestBitBlasterComparisonsExhaustiveConstants",
+        "TestBitBlasterShiftsExhaustiveConstantAmounts",
+        "TestBitBlasterSymbolicShiftUsesSourceBarrelStage"
       ],
       "conditionals": [
         {
@@ -23901,7 +23904,12 @@
           "go_target": "pkg/ast/rewriter/bit_blaster/engine_compare.go"
         },
         {
-          "name": "Multiplication, division/remainder, variable shifts/rotations, and overflow checks",
+          "name": "Constant and symbolic left, logical-right, and arithmetic-right shifts",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_shift.go"
+        },
+        {
+          "name": "Multiplication, division/remainder, variable rotations, and overflow checks",
           "status": "unported",
           "reason": "Remaining concrete bit-vector circuit methods are being ported incrementally."
         }
@@ -23923,14 +23931,17 @@
       "go_targets": [
         "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go",
         "pkg/ast/rewriter/bit_blaster/engine_logic.go",
-        "pkg/ast/rewriter/bit_blaster/engine_compare.go"
+        "pkg/ast/rewriter/bit_blaster/engine_compare.go",
+        "pkg/ast/rewriter/bit_blaster/engine_shift.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
         "TestBitBlasterNumeralAndArithmeticDomains",
         "TestBitBlasterIndependentLogicCircuits",
         "TestBitBlasterMultiplexerRetainsSymbolicITE",
-        "TestBitBlasterComparisonsExhaustiveConstants"
+        "TestBitBlasterComparisonsExhaustiveConstants",
+        "TestBitBlasterShiftsExhaustiveConstantAmounts",
+        "TestBitBlasterSymbolicShiftUsesSourceBarrelStage"
       ],
       "conditionals": [
         {
@@ -24155,13 +24166,18 @@
           "go_target": "pkg/ast/rewriter/bit_blaster/engine_compare.go"
         },
         {
+          "name": "mk_shl, mk_lshr, mk_ashr",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_shift.go"
+        },
+        {
           "name": "checkpoint",
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_manager.go",
           "reason": "The Go AST manager enforces its arena budget and cancellation at manager operation boundaries."
         },
         {
-          "name": "multiplication/division, variable shifts/rotations, and overflow circuit builders",
+          "name": "multiplication/division, variable rotations, and overflow circuit builders",
           "status": "unported",
           "reason": "Remaining concrete circuit algorithms are still required by the retained bit-blaster consumers."
         }
