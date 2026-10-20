@@ -27724,9 +27724,15 @@
       "path": "src/ast/rewriter/distribute_forall.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/distribute_forall.go"
+      ],
+      "tests": [
+        "TestDistributeForallSplitsConjunctionAndEliminatesUnusedVariables",
+        "TestDistributeForallRebuildsParentsAndAppliesBooleanSimplification",
+        "TestDistributeForallNonTargetDebugAndOwnerGuards"
+      ],
       "assertions": [
         {
           "line": 77,
@@ -27753,19 +27759,58 @@
           "text": "SASSERT(r != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "visit, visit_children, reduce1 and reduce1_app iterative DAG traversal with reverse child discovery and conditional application rebuilding (src/ast/rewriter/distribute_forall.cpp:32-99)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/distribute_forall.go",
+          "tests": [
+            "TestDistributeForallRebuildsParentsAndAppliesBooleanSimplification"
+          ]
+        },
+        {
+          "name": "reduce1_quantifier universal distribution, per-branch negation, quantifier update, empty-parameter unused-variable elimination and Boolean conjunction simplification (src/ast/rewriter/distribute_forall.cpp:101-142)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/distribute_forall.go",
+          "tests": [
+            "TestDistributeForallSplitsConjunctionAndEliminatesUnusedVariables",
+            "TestDistributeForallRebuildsParentsAndAppliesBooleanSimplification",
+            "TestDistributeForallNonTargetDebugAndOwnerGuards"
+          ]
+        },
+        {
+          "name": "operator(), owning cache access/publication and distribute_forall low-level trace (src/ast/rewriter/distribute_forall.cpp:144-171)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/distribute_forall.go",
+          "tests": [
+            "TestDistributeForallRebuildsParentsAndAppliesBooleanSimplification",
+            "TestDistributeForallNonTargetDebugAndOwnerGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The transformation cache owns one ASTRef for each source-to-result entry and releases every entry before a subsequent Apply or owner Close. The caller's output ASTRef independently owns the published root.",
+        "Each target quantifier creates the source-equivalent fresh default Boolean rewriter. Negated arguments, unused-variable results and the combined formula remain pinned through cache publication, then are released in reverse owning order before the Boolean rewriter and empty ParamsRef are closed."
+      ],
+      "deviations": [
+        "Native pointer vectors are represented by Go slices and the native act_cache is represented by a Go map whose values are owning ASTRef handles. Debug SASSERT failures return the corresponding Go domain or handle error."
+      ]
     },
     {
       "path": "src/ast/rewriter/distribute_forall.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/distribute_forall.go"
+      ],
+      "tests": [
+        "TestDistributeForallSplitsConjunctionAndEliminatesUnusedVariables",
+        "TestDistributeForallRebuildsParentsAndAppliesBooleanSimplification",
+        "TestDistributeForallNonTargetDebugAndOwnerGuards"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -27776,11 +27821,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete distribute_forall public operation, traversal/reduction helpers and cache interface (src/ast/rewriter/distribute_forall.h:46-77)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/distribute_forall.go",
+          "tests": [
+            "TestDistributeForallSplitsConjunctionAndEliminatesUnusedVariables",
+            "TestDistributeForallRebuildsParentsAndAppliesBooleanSimplification",
+            "TestDistributeForallNonTargetDebugAndOwnerGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "DistributeForall is a checked noncopyable owner. Its cache values own rewritten expressions until cache flush or Close, while traversal and application argument slices borrow handles protected by those cache entries."
+      ],
+      "deviations": [
+        "The Go constructor receives the already ported explicit ParamsContext and GlobalParamsService needed to reproduce the source Boolean rewriter's fresh default-parameter construction without process-global hidden ownership."
+      ]
     },
     {
       "path": "src/ast/rewriter/dl_rewriter.cpp",
