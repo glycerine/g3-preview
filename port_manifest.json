@@ -23669,9 +23669,16 @@
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_bv_bit_blaster.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_core.go"
+      ],
+      "tests": [
+        "TestASTBitBlasterBitFactories",
+        "TestBitBlasterRewriterGetBitsAndAssemble",
+        "TestBitBlasterRewriterConstantCacheScopes"
+      ],
       "conditionals": [
         {
           "line": 52,
@@ -23828,19 +23835,41 @@
           "text": "SASSERT(m_blaster.butil().get_family_id() == m.get_family_id(\"bv\"));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "blaster configuration, get_bits/mk_mkbv, scoped constant cache, constructor parameter defaults and scope wrappers",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/rewriter_core.go"
+        },
+        {
+          "name": "operation reductions and reduce_app dispatcher",
+          "status": "unported",
+          "reason": "Next integration layer over the completed circuit engine."
+        },
+        {
+          "name": "full-term fallback, quantifier binding rewrite, traversal operator, cleanup and step accounting",
+          "status": "unported",
+          "reason": "Depends on the rewriter configuration callbacks still being integrated."
+        }
+      ],
+      "ownership": [
+        "Bit vectors use owning ASTRef slices. Constant-cache entries own one assembled mkbv reference and release entries in reverse insertion order on pop or close."
+      ],
       "deviations": []
     },
     {
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/bit_blaster/rewriter_core.go"
+      ],
+      "tests": [
+        "TestBitBlasterRewriterConstantCacheScopes"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -23851,10 +23880,23 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor, parameter update, push/pop/get_num_scopes, const2bits and destruction",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/rewriter_core.go"
+        },
+        {
+          "name": "manager/step access, cleanup and rewrite operator",
+          "status": "unported",
+          "reason": "Traversal integration remains open."
+        }
+      ],
+      "ownership": [
+        "The Go owner borrows its AST manager and explicitly owns cached AST references until Pop or Close."
+      ],
       "deviations": []
     },
     {
