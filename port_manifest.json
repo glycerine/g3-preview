@@ -28197,9 +28197,13 @@
       "path": "src/ast/rewriter/factor_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/factor_rewriter.go"],
+      "tests": [
+        "TestFactorRewriterEqualitySingleAndCommonFactors",
+        "TestFactorRewriterInequalityParityStrictnessAndReverse",
+        "TestFactorRewriterRefusalZeroDifferenceTraversalAndGuards"
+      ],
       "assertions": [
         {
           "line": 31,
@@ -28242,19 +28246,38 @@
           "text": "SASSERT(m_muls.size() == m_adds.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "application dispatch, additive and multiplicative flattening, common-factor extraction, power collection, equality and inequality reconstruction",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/factor_rewriter.go",
+          "tests": [
+            "TestFactorRewriterEqualitySingleAndCommonFactors",
+            "TestFactorRewriterInequalityParityStrictnessAndReverse",
+            "TestFactorRewriterRefusalZeroDifferenceTraversalAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each reduction call owns every constructed intermediate through ASTRefs until the traversal output acquires the final expression. The explicit FactorRewriter owner borrows its AST manager and closes its no-proof traversal before that manager."
+      ],
+      "deviations": [
+        "Native slices and a handle-indexed map replace source vectors and obj_map while retaining first-seen factor order. Go errors replace source assertions for invalid public calls."
+      ]
     },
     {
       "path": "src/ast/rewriter/factor_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/factor_rewriter.go"],
+      "tests": [
+        "TestFactorRewriterEqualitySingleAndCommonFactors",
+        "TestFactorRewriterInequalityParityStrictnessAndReverse",
+        "TestFactorRewriterRefusalZeroDifferenceTraversalAndGuards"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -28265,11 +28288,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "factor_rewriter, factor_rewriter_cfg and factor_rewriter_star public surfaces",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/factor_rewriter.go",
+          "tests": [
+            "TestFactorRewriterEqualitySingleAndCommonFactors",
+            "TestFactorRewriterInequalityParityStrictnessAndReverse",
+            "TestFactorRewriterRefusalZeroDifferenceTraversalAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "FactorRewriter is a noncopyable checked Go owner. Its embedded configuration is borrowed by the no-proof Traversal and remains valid until Close."
+      ],
+      "deviations": [
+        "RewriteApp and Rewrite expose the concrete retained specialization instead of reproducing C++ template machinery."
+      ]
     },
     {
       "path": "src/ast/rewriter/fpa_rewriter.cpp",
@@ -121108,14 +121146,33 @@
       "path": "src/test/factor_rewriter.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/factor_rewriter_test.go"],
+      "tests": [
+        "TestFactorRewriterEqualitySingleAndCommonFactors",
+        "TestFactorRewriterInequalityParityStrictnessAndReverse",
+        "TestFactorRewriterRefusalZeroDifferenceTraversalAndGuards"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst_factor_rewriter traversal exercise and expanded factor/sign cases",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/factor_rewriter_test.go",
+          "tests": [
+            "TestFactorRewriterEqualitySingleAndCommonFactors",
+            "TestFactorRewriterInequalityParityStrictnessAndReverse",
+            "TestFactorRewriterRefusalZeroDifferenceTraversalAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Tests pin source expressions and output references through the manager test owner and close FactorRewriter before manager teardown."
+      ],
+      "deviations": [
+        "Assertions replace the source test's diagnostic-only stdout and cover equality, strictness, refusal, reverse comparisons and owner guards in addition to its traversal path."
+      ]
     },
     {
       "path": "src/test/fixed_bit_vector.cpp",
