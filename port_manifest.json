@@ -45162,8 +45162,11 @@
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
             "TestPolynomialNativeLocatorGrowthAndGeneration",
-            "TestMonomialNativeRenamePowerSorting"
-          ]
+            "TestMonomialNativeRenamePowerSorting",
+            "TestMonomialRenameLeafRawSortIgnoresAssertionOwner",
+            "TestMonomialRenameUniqueAssertionActions"
+          ],
+          "notes": "The1289 extra contains lookup is wholly gated; mandatory insertion remains independent. Rename uses actual replace-on-equal chashtable::insert client semantics, while factory interning keeps its prior canonical object. Native insertion-ordered traversal determines the last equal key retained after diagnostic Continue on a many-to-one map. New tests use actual caller roots and public variable construction, preserve failed/successful source local-table lifetimes and retire hash-mutated intermediates through explicit owning token cleanup without payload/ID/count repair."
         },
         {
           "name": "Complete retained monomial SIZE/VAR/DEG-only reached queries cpp236\u2013375,423\u2013437 with actual get_power DEBUG reference guards",
@@ -45208,7 +45211,7 @@
           ]
         },
         {
-          "name": "Complete retained monomial rename VAR-only mutation before sort/hash cpp439\u2013445; declared concrete heapsort adaptation preserved",
+          "name": "Complete retained monomial rename VAR-only mutation before raw Go sorting/hash cpp439-445; source sort165 has no get_power228 assertion",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -45225,8 +45228,10 @@
             "TestMonomialReadOrderGCDNoCommonUnchosenDegree",
             "TestMonomialReadOrderSqrtOddBeforeVariable",
             "TestMonomialReadOrderRemovedVariableIgnoresDegree",
-            "TestMonomialReadOrderFinalCallbackReleaseReachedLoop"
-          ]
+            "TestMonomialReadOrderFinalCallbackReleaseReachedLoop",
+            "TestMonomialRenameLeafRawSortIgnoresAssertionOwner"
+          ],
+          "notes": "Go sort.Slice over concrete powers replaces std::sort. Its input copy reads raw variable/degree fields instead of adding get_power228 assertions absent from the source leaf. A real two-power monomial and permutation under a closed process assertion owner verify the sort and published variables without modifying source fields or constructing fake handles. Exact caller-root CleanupValue removes the old-table token using stored metadata; no source hash erase or inverse rename repairs the intermediate."
         },
         {
           "name": "Complete retained raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919\u20131268",

@@ -231,3 +231,17 @@ func (m *MonomialManager) searchResultAssert(a Monomial, i, y uint32) error {
 	}
 	return nil
 }
+
+// Source: polynomial.cpp:1289. The extra uniqueness lookup belongs entirely
+// to SASSERT; insertion performs its own independent lookup afterwards.
+func (m *MonomialManager) renameUniqueAssert(t *monomialTable, k monomialKey) error {
+	enabled, e := monomialSourceAssertionsEnabled()
+	if e != nil || !enabled {
+		return e
+	}
+	_, found, e := t.find(m, k)
+	if e != nil || !found {
+		return e
+	}
+	return m.sourceAssertionFailure(1289, "!new_table.contains(m)")
+}

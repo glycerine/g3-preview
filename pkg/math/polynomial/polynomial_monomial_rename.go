@@ -2,9 +2,10 @@
 package polynomial
 
 import (
+	"sort"
+
 	"github.com/glycerine/g3/pkg/arena"
 	uhash "github.com/glycerine/g3/pkg/util/hash"
-	"sort"
 )
 
 func (m *MonomialManager) writePower(a Monomial, i uint32, p MonomialPower) error {
@@ -41,7 +42,11 @@ func (m *MonomialManager) renameObject(a Monomial, xs []uint32) error {
 	if n > 1 {
 		powers := make([]MonomialPower, n)
 		for i := range powers {
-			powers[i], e = m.powerCore(a, uint32(i))
+			powers[i].Var, e = m.powerFieldCore(a, uint32(i), 0)
+			if e != nil {
+				return e
+			}
+			powers[i].Degree, e = m.powerFieldCore(a, uint32(i), 4)
 			if e != nil {
 				return e
 			}
@@ -115,17 +120,10 @@ func (m *MonomialManager) Rename(xs []uint32) (err error) {
 		if e := m.renameObject(a, xs); e != nil {
 			return e
 		}
-		if polynomialSourceDebug {
-			_, found, e := t.find(m, k)
-			if e != nil {
-				return e
-			}
-			if e := m.sourceScalarAssert(1289, "!new_table.contains(m)", !found); e != nil {
-				return e
-			}
+		if e := m.renameUniqueAssert(t, k); e != nil {
+			return e
 		}
-		_, _, e := t.insert(m, k)
-		if e != nil {
+		if e := t.insertRenamed(m, k); e != nil {
 			return e
 		}
 	}

@@ -103,6 +103,17 @@ func (t *monomialTable) findHashed(m *MonomialManager, k monomialKey, h uint32) 
 	}
 	return 0, false, nil
 }
+
+// Source monomial_manager::rename uses chashtable::insert, which replaces an
+// equal key. Factory interning instead keeps the prior canonical object.
+func (t *monomialTable) insertRenamed(m *MonomialManager, k monomialKey) error {
+	id, inserted, e := t.insert(m, k)
+	if e != nil || inserted {
+		return e
+	}
+	return t.setKey(id, k)
+}
+
 func (t *monomialTable) insert(m *MonomialManager, k monomialKey) (uint32, bool, error) {
 	h, e := m.keyWord(k, 4)
 	if e != nil {
