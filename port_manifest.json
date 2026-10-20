@@ -27954,9 +27954,13 @@
       "path": "src/ast/rewriter/expr_safe_replace.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/expr_safe_replace.go"],
+      "tests": [
+        "TestExprSafeReplaceApplicationsDuplicatesAndReset",
+        "TestExprSafeReplaceShiftsThroughQuantifierAnnotations",
+        "TestExprSafeReplaceApplySubstitutionAndSortGuard"
+      ],
       "assertions": [
         {
           "line": 27,
@@ -27975,19 +27979,38 @@
           "text": "SASSERT(is_quantifier(a));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "insert, expression/ref-vector application, quantifier-safe iterative replacement, reset and apply_substitution",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/expr_safe_replace.go",
+          "tests": [
+            "TestExprSafeReplaceApplicationsDuplicatesAndReset",
+            "TestExprSafeReplaceShiftsThroughQuantifierAnnotations",
+            "TestExprSafeReplaceApplySubstitutionAndSortGuard"
+          ]
+        }
+      ],
+      "ownership": [
+        "ExprSafeReplace owns independent source and destination ASTRefs for every insertion, including superseded duplicate keys. Application owns reconstructed application and quantifier temporaries until the output ASTRef acquires the result. Nested quantifier replacements own shifted substitutions and rewritten annotations for their lexical calls."
+      ],
+      "deviations": [
+        "Native typed maps and slices replace source obj_map and vectors. Explicit ASTRef outputs and Close/Reset transport ownership and cleanup failures; sort mismatches and invalid non-expression domains return typed errors."
+      ]
     },
     {
       "path": "src/ast/rewriter/expr_safe_replace.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/expr_safe_replace.go"],
+      "tests": [
+        "TestExprSafeReplaceApplicationsDuplicatesAndReset",
+        "TestExprSafeReplaceShiftsThroughQuantifierAnnotations",
+        "TestExprSafeReplaceApplySubstitutionAndSortGuard"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -27998,11 +28021,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor, insert, expression/ref-vector operators, apply_substitution, reset and empty",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/expr_safe_replace.go",
+          "tests": [
+            "TestExprSafeReplaceApplicationsDuplicatesAndReset",
+            "TestExprSafeReplaceShiftsThroughQuantifierAnnotations",
+            "TestExprSafeReplaceApplySubstitutionAndSortGuard"
+          ]
+        }
+      ],
+      "ownership": [
+        "The explicit Go owner borrows its AST manager and must close before it; ApplyRef and ApplyRefSlice preserve the source in-place owning-reference interfaces."
+      ],
+      "deviations": [
+        "A checked function API replaces overloaded C++ call operators. ApplyRefSlice is the concrete expr_ref_vector surface; no generic vector or map adapter is introduced."
+      ]
     },
     {
       "path": "src/ast/rewriter/factor_rewriter.cpp",
