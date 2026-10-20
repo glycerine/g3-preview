@@ -206711,14 +206711,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "21b83ab2ec380c6464d2e054fa7dbc990e5963a9",
+    "commit": "309e7fb6a13b54a9c0a0452e627a860b9a3430f7",
     "command": "cd pkg && go test ./... -count=1 -timeout=30m",
-    "started_utc": "2026-10-20 05:21:18 UTC",
-    "completed_utc": "2026-10-20 05:33:45 UTC",
+    "started_utc": "2026-10-20 06:25:16 UTC",
+    "completed_utc": "2026-10-20 06:37:37 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-21b83ab2.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-21b83ab2.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-21b83ab2.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-309e7fb6.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-309e7fb6.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-309e7fb6.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -206734,13 +206734,13 @@
     "package_timeout": "30m",
     "packages_with_ok_result": 68,
     "packages_without_test_files": 11,
-    "ast_seconds": 12.507,
-    "polynomial_seconds": 108.589,
-    "lp_seconds": 703.054,
-    "numeral_seconds": 56.361,
-    "session_id": 96425,
+    "ast_seconds": 12.371,
+    "polynomial_seconds": 108.238,
+    "lp_seconds": 707.702,
+    "numeral_seconds": 58.794,
+    "session_id": 73716,
     "checkout_held_unchanged": true,
-    "scope_warning": "Full native module checkpoint21b83ab2 passed with exact matching start/end/current HEAD and empty start/end/current git status. Includes all polynomial increments through21b83ab2, including lex-sort, cell/coefficient access, constructor, source-private decrement and monomial-position protocols. This is a native module test checkpoint, not proof of source statement/ownership coverage or whole polynomial/algebraic/AST completion."
+    "scope_warning": "Full native module checkpoint309e7fb6 passed with matching start/end/current HEAD and empty start/end/current git status. Includes binary/interval source destructor prerequisites and all earlier committed polynomial changes; excludes the factors source destructor staged outside the checkout while this run executed. Native test success does not prove complete polynomial/algebraic/AST source or ownership coverage."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
