@@ -21397,12 +21397,14 @@
       "path": "src/ast/recurse_expr.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_format_flat.go",
         "pkg/ast/ast_format_source_test.go"
       ],
       "tests": [
+        "TestASTFormatSourceFlatLiteralChoiceAndSharedChildren",
+        "TestASTFormatSourceEveryFlatAllocationAndImmediateGraph",
         "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation"
       ],
       "conditionals": [
@@ -21415,24 +21417,39 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "recurse_expr<format*, flat_visitor, true, true> live specialization: cache lookup/insert, visit, reset/finalize storage and invocation",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_format_flat.go",
+          "tests": [
+            "TestASTFormatSourceFlatLiteralChoiceAndSharedChildren",
+            "TestASTFormatSourceEveryFlatAllocationAndImmediateGraph",
+            "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "The live format specialization borrows format nodes in its cache, traversal stack and child-result slice. Constructed results remain owned by the format AST manager; the lexical recursion frame retains no references after return."
+      ],
       "deviations": [
-        "Retained format flat recursion now borrows native []astNodeRef todo, []ASTHandle transformed arguments and a lookup-only map[astNodeRef]astNodeRef cache. Stack and child iteration preserve source order; the cache never iterates. Removed cache capacity/probing/rehash/pending-growth and vector backing/refusal emulation, plus unused IgnorePatterns=true results2 storage and obsolete AppArguments format-vector representation. Actual recursion header, AST construction, source UNREACHABLE guards and failed-frame history through enclosing teardown remain. A deep shared graph with 129 distinct leaves grows native storage with only the actual frame reservation in release; exact leaf reference counts and original CHOICE arg0 behavior remain. Original allocation campaign now covers actual frame/factory reservations, and history test stops at real line-break-to-string construction. Shared arithmetic/BV cache storage remains separately pending; no generic container, STL or whole-unit completion credit is added."
+        "Retained format flat recursion uses native []astNodeRef todo, []ASTHandle transformed arguments and a lookup-only map[astNodeRef]astNodeRef cache. Stack and child iteration preserve source order; the cache never iterates. The unused IgnorePatterns=true results2 storage is omitted. Header includes in macro_manager and dl_rule do not instantiate recurse_expr; format.cpp is the only retained source instantiation, so no universal Go generic adapter is added."
       ]
     },
     {
       "path": "src/ast/recurse_expr_def.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_format_flat.go",
         "pkg/ast/ast_format_source_test.go"
       ],
       "tests": [
+        "TestASTFormatSourceFlatLiteralChoiceAndSharedChildren",
+        "TestASTFormatSourceEveryFlatAllocationAndImmediateGraph",
         "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation"
       ],
       "conditionals": [
@@ -21445,12 +21462,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "recurse_expr<format*, flat_visitor, true, true> live specialization: visit_children, process and iterative operator() body",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_format_flat.go",
+          "tests": [
+            "TestASTFormatSourceFlatLiteralChoiceAndSharedChildren",
+            "TestASTFormatSourceEveryFlatAllocationAndImmediateGraph",
+            "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete iterative traversal borrows inputs and cached results; its native frame storage is discarded after publishing the manager-owned format result."
+      ],
       "deviations": [
-        "Retained format flat recursion now borrows native []astNodeRef todo, []ASTHandle transformed arguments and a lookup-only map[astNodeRef]astNodeRef cache. Stack and child iteration preserve source order; the cache never iterates. Removed cache capacity/probing/rehash/pending-growth and vector backing/refusal emulation, plus unused IgnorePatterns=true results2 storage and obsolete AppArguments format-vector representation. Actual recursion header, AST construction, source UNREACHABLE guards and failed-frame history through enclosing teardown remain. A deep shared graph with 129 distinct leaves grows native storage with only the actual frame reservation in release; exact leaf reference counts and original CHOICE arg0 behavior remain. Original allocation campaign now covers actual frame/factory reservations, and history test stops at real line-break-to-string construction. Shared arithmetic/BV cache storage remains separately pending; no generic container, STL or whole-unit completion credit is added."
+        "Only the concrete format-pointer/flat-visitor specialization reached by retained source is ported. Native map and slices replace source obj_map and vectors, and no unused template adapter or C++ container behavior is reproduced."
       ]
     },
     {
