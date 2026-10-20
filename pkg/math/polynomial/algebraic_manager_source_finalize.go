@@ -63,7 +63,7 @@ func (m *AlgebraicManager) sourceDestructorAdmission() error {
 	if c.foreignCopy.active || c.toOwnedRational.active || c.rootConstruction.active || c.isolationSigns.active || c.isolationConversion.active || c.binary.active || c.arithmetic.active || c.division.active || c.selection.active || c.basicRootScope.active || c.integerSet.active || c.integerAdd.active || c.constQ.active || c.predicateQ.active || c.refinementQ.active || c.rootDisplay.active || c.predicateTrace.active || c.rationalSign.active || c.signSubstitution.active || c.signInterval.active || c.signResultant.active || c.resultant.active || c.predicate.active || c.negation.active {
 		return ErrAlgebraicPending
 	}
-	if c.multivariateIsolationDepth != 0 || c.copyCall.pending() || c.cellBoundsCall.pending() || c.cellNeg.pending() || c.cellEvaluationPending() || c.decimalDisplay.pending(c) || c.bounds.remaining != 0 || c.bounds.refinement.pending(c) || c.bounds.conversion.pending(c) || c.bounds.evaluationPending(c) || c.refinement.pending(c) || c.refinementConversion.pending(c) || c.inversion.remaining != 0 || c.inversion.sourceRemaining != 0 || c.inversion.traceDisplayPending {
+	if c.multivariateIsolationDepth != 0 || c.copyCall.pending() || c.cellBoundsCall.pending() || c.cellNeg.pending() || c.cellEvaluationPending() || c.decimalDisplay.pending(c) || c.bounds.remaining != 0 || c.bounds.refinement.pending(c) || c.bounds.conversion.pending(c) || c.bounds.evaluationPending(c) || c.refinement.pending(c) || c.refinementConversion.pending(c) || c.inversion.remaining != 0 || c.inversion.sourceRemaining != 0 || c.inversion.numericPending(c) || c.inversion.traceDisplayPending {
 		return ErrAlgebraicPending
 	}
 	for i := range c.inversion.conversions {

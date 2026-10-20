@@ -292,7 +292,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.finishing || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.inversion.executing {
+	if m != nil && m.self == m && (m.inversion.executing || m.inversion.numericPending(m)) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.negationExecuting() {
@@ -1506,7 +1506,7 @@ func (m *AlgebraicRootCore) checkDestructorExecution() error {
 	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.finishing || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.inversion.executing {
+	if m != nil && m.self == m && (m.inversion.executing || m.inversion.numericPending(m)) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.negationExecuting() {

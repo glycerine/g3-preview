@@ -38279,6 +38279,7 @@
         "pkg/math/polynomial/algebraic_representation.go",
         "pkg/math/polynomial/algebraic_representation_test.go",
         "pkg/math/polynomial/algebraic_inverse.go",
+        "pkg/math/polynomial/algebraic_inverse_numeric_owner_source_test.go",
         "pkg/math/polynomial/algebraic_inverse_trace.go",
         "pkg/math/polynomial/algebraic_inverse_trace_test.go",
         "pkg/math/polynomial/algebraic_inverse_test.go",
@@ -39201,6 +39202,18 @@
           ]
         },
         {
+          "name": "In-place inverse rational allocation ownership algebraic_numbers.cpp:1629-1640",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_inverse.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_inverse_numeric_owner_source_test.go"
+          ],
+          "tests": [
+            "TestAlgebraicInverseBasicOwnsEveryNumericAllocationPrefix"
+          ],
+          "notes": "The concrete inverse scope owns exact numeric allocation roots created by the basic receiver inversion and both scoped-rational bound inversions. Ordinary APIs, normal destruction and manager source finalization refuse a pending inverse numeric root; explicit owning CleanupRetained retires it before the older scoped rational locals. The actual INT_MIN basic inversion sweep reaches every allocation prefix through success without global pending-allocation cleanup. Reverting only the three contextual inversion calls leaves the unnamed allocation at prefix 1, so the regression depends on this ownership path. Zero-bound refinement and the wider inverse audit remain partial."
+        },
+        {
           "name": "Inverse conversion-entry child and literal scoped-rational destructor frontier (algebraic_numbers.cpp:1582-1647)",
           "status": "partial",
           "go_targets": [
@@ -39215,9 +39228,10 @@
             "pkg/math/polynomial/algebraic_root.go"
           ],
           "tests": [
-            "TestAlgebraicInverseConversionEntryActualSourceStop"
+            "TestAlgebraicInverseConversionEntryActualSourceStop",
+            "TestAlgebraicInverseBasicOwnsEveryNumericAllocationPrefix"
           ],
-          "notes": "Actual root inversion captures only its callee-issued conversion-entry trace receipt. Stream callbacks cannot close or clean the executing algebraic owner. After the diagnostic body read failure, actual inv_upper NUM/DEN source destruction completes, then inv_lower stops on its actual unreadable numerator: sourceRemaining1 and sourceCursor2. Genuine backing is restored before explicit raw owning cleanup, which leaves the source cursor/cause unchanged. This corrects prior owning RationalManager.Del use in the source destructor. Wider inverse numerical/TRACE/source-lifetime completion remains open."
+          "notes": "Actual root inversion captures only its callee-issued conversion-entry trace receipt. Stream callbacks cannot close or clean the executing algebraic owner. After the diagnostic body read failure, actual inv_upper NUM/DEN source destruction completes, then inv_lower stops on its actual unreadable numerator: sourceRemaining1 and sourceCursor2. Genuine backing is restored before explicit raw owning cleanup, which leaves the source cursor/cause unchanged. This corrects prior owning RationalManager.Del use in the source destructor. The three source qm().inv calls now also bind exact numeric allocation ownership to the inverse scope; the dedicated basic INT_MIN prefix sweep closes that concrete leaf. Zero-bound refinement and wider inverse numerical/TRACE/source-lifetime completion remain open."
         },
         {
           "name": "Retained private unsynchronized qm() owner in manager construction (algebraic_numbers.h:61; algebraic_numbers.cpp:69,100,2772; arith_decl_plugin.cpp:25-35)",
@@ -39471,10 +39485,11 @@
             "TestAlgebraicInverseRefinementAssertionGateBeforeBoundCopy",
             "TestAlgebraicInverseTraceRetainsActualDisplayAndOlderRationals",
             "TestAlgebraicInverseDisplayReceiptDoesNotAcquireReplacement",
-            "TestAlgebraicInverseTraceBorrowCoversEntireStream"
+            "TestAlgebraicInverseTraceBorrowCoversEntireStream",
+            "TestAlgebraicInverseBasicOwnsEveryNumericAllocationPrefix"
           ],
           "deviations": [
-            "All three inversion TRACE sites use the actual source displays and rational strings. The initial display can publish the cached root index; subsequent interval saves retain that mutation. Inversion owns each actual bound-to-rational conversion receipt. Rational-to-binary conversion retains both initial sign-evaluation receipts and its reached binary conversion/refinement receipts, including RAW midpoint and debug rational-service invocations. The direct allocator campaign checks every reached reservation through success, named physical ownership after cleanup and full owner refunds. Full descendant source destructor/callback and eager constructor audits remain open."
+            "All three inversion TRACE sites use the actual source displays and rational strings. The initial display can publish the cached root index; subsequent interval saves retain that mutation. Inversion owns each actual bound-to-rational conversion receipt and each numeric allocation root created by the basic and two scoped rational inversions. Rational-to-binary conversion retains both initial sign-evaluation receipts and its reached binary conversion/refinement receipts, including RAW midpoint and debug rational-service invocations. The direct allocator campaigns check every reached reservation through success, named physical ownership after cleanup and full owner refunds. Zero-bound refinement plus full descendant source destructor/callback and eager constructor audits remain open."
           ]
         },
         {
@@ -39970,6 +39985,7 @@
         "pkg/math/polynomial/algebraic_representation.go",
         "pkg/math/polynomial/algebraic_representation_test.go",
         "pkg/math/polynomial/algebraic_inverse.go",
+        "pkg/math/polynomial/algebraic_inverse_numeric_owner_source_test.go",
         "pkg/math/polynomial/algebraic_inverse_trace.go",
         "pkg/math/polynomial/algebraic_inverse_trace_test.go",
         "pkg/math/polynomial/algebraic_inverse_test.go",
@@ -40379,6 +40395,18 @@
           ]
         },
         {
+          "name": "In-place inverse rational allocation ownership algebraic_numbers.cpp:1629-1640",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_inverse.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_inverse_numeric_owner_source_test.go"
+          ],
+          "tests": [
+            "TestAlgebraicInverseBasicOwnsEveryNumericAllocationPrefix"
+          ],
+          "notes": "The concrete inverse scope owns exact numeric allocation roots created by the basic receiver inversion and both scoped-rational bound inversions. Ordinary APIs, normal destruction and manager source finalization refuse a pending inverse numeric root; explicit owning CleanupRetained retires it before the older scoped rational locals. The actual INT_MIN basic inversion sweep reaches every allocation prefix through success without global pending-allocation cleanup. Reverting only the three contextual inversion calls leaves the unnamed allocation at prefix 1, so the regression depends on this ownership path. Zero-bound refinement and the wider inverse audit remain partial."
+        },
+        {
           "name": "Inverse conversion-entry child and literal scoped-rational destructor frontier (algebraic_numbers.cpp:1582-1647)",
           "status": "partial",
           "go_targets": [
@@ -40393,9 +40421,10 @@
             "pkg/math/polynomial/algebraic_root.go"
           ],
           "tests": [
-            "TestAlgebraicInverseConversionEntryActualSourceStop"
+            "TestAlgebraicInverseConversionEntryActualSourceStop",
+            "TestAlgebraicInverseBasicOwnsEveryNumericAllocationPrefix"
           ],
-          "notes": "Actual root inversion captures only its callee-issued conversion-entry trace receipt. Stream callbacks cannot close or clean the executing algebraic owner. After the diagnostic body read failure, actual inv_upper NUM/DEN source destruction completes, then inv_lower stops on its actual unreadable numerator: sourceRemaining1 and sourceCursor2. Genuine backing is restored before explicit raw owning cleanup, which leaves the source cursor/cause unchanged. This corrects prior owning RationalManager.Del use in the source destructor. Wider inverse numerical/TRACE/source-lifetime completion remains open."
+          "notes": "Actual root inversion captures only its callee-issued conversion-entry trace receipt. Stream callbacks cannot close or clean the executing algebraic owner. After the diagnostic body read failure, actual inv_upper NUM/DEN source destruction completes, then inv_lower stops on its actual unreadable numerator: sourceRemaining1 and sourceCursor2. Genuine backing is restored before explicit raw owning cleanup, which leaves the source cursor/cause unchanged. This corrects prior owning RationalManager.Del use in the source destructor. The three source qm().inv calls now also bind exact numeric allocation ownership to the inverse scope; the dedicated basic INT_MIN prefix sweep closes that concrete leaf. Zero-bound refinement and wider inverse numerical/TRACE/source-lifetime completion remain open."
         },
         {
           "name": "Retained private unsynchronized qm() owner in manager construction (algebraic_numbers.h:61; algebraic_numbers.cpp:69,100,2772; arith_decl_plugin.cpp:25-35)",
@@ -40626,10 +40655,11 @@
             "TestAlgebraicInverseRefinementAssertionGateBeforeBoundCopy",
             "TestAlgebraicInverseTraceRetainsActualDisplayAndOlderRationals",
             "TestAlgebraicInverseDisplayReceiptDoesNotAcquireReplacement",
-            "TestAlgebraicInverseTraceBorrowCoversEntireStream"
+            "TestAlgebraicInverseTraceBorrowCoversEntireStream",
+            "TestAlgebraicInverseBasicOwnsEveryNumericAllocationPrefix"
           ],
           "deviations": [
-            "All three inversion TRACE sites use the actual source displays and rational strings. The initial display can publish the cached root index; subsequent interval saves retain that mutation. Inversion owns each actual bound-to-rational conversion receipt. Rational-to-binary conversion retains both initial sign-evaluation receipts and its reached binary conversion/refinement receipts, including RAW midpoint and debug rational-service invocations. The direct allocator campaign checks every reached reservation through success, named physical ownership after cleanup and full owner refunds. Full descendant source destructor/callback and eager constructor audits remain open."
+            "All three inversion TRACE sites use the actual source displays and rational strings. The initial display can publish the cached root index; subsequent interval saves retain that mutation. Inversion owns each actual bound-to-rational conversion receipt and each numeric allocation root created by the basic and two scoped rational inversions. Rational-to-binary conversion retains both initial sign-evaluation receipts and its reached binary conversion/refinement receipts, including RAW midpoint and debug rational-service invocations. The direct allocator campaigns check every reached reservation through success, named physical ownership after cleanup and full owner refunds. Zero-bound refinement plus full descendant source destructor/callback and eager constructor audits remain open."
           ]
         },
         {

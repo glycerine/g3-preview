@@ -15,6 +15,9 @@ type algebraicInverseScope struct {
 	refineEvaluation              upolyBinaryEvaluationInvocationReceipt
 	refineCopy                    unumeral.IntegerCopyAllocationReceipt
 	conversions                   [2]algebraicConversionScope
+	owner                         *AlgebraicRootCore
+	numericHooks                  unumeral.NumericInvocationHooks
+	numericRoots                  unumeral.NumericAllocationRoots
 	traceDisplayPending           bool
 	traceDisplay                  algebraicRootDisplayInvocationReceipt
 	sourceCursor, sourceRemaining uint8
@@ -24,6 +27,29 @@ type algebraicInverseScope struct {
 	values                        [2]unumeral.Rational // inv_lower, inv_upper
 	remaining                     uint8
 	executing                     bool
+}
+
+func (q *algebraicInverseScope) NumericBound(executing bool) bool {
+	m := q.owner
+	return m != nil && m.self == m && !m.closed && q == &m.inversion && (!executing || q.executing)
+}
+
+func (q *algebraicInverseScope) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
+	if !q.NumericBound(true) || q.owner.config.Rationals.Integers() != z {
+		return nil
+	}
+	if local != nil {
+		return local
+	}
+	return &q.numericRoots
+}
+
+func (q *algebraicInverseScope) numericPending(m *AlgebraicRootCore) bool {
+	return q.owner == m && unumeral.NumericAllocationPending(&q.numericRoots)
+}
+
+func (q *algebraicInverseScope) numericContext() unumeral.NumericAllocationContext {
+	return unumeral.NumericAllocationContext{}.WithCaller(&q.numericHooks)
 }
 
 func (m *AlgebraicRootCore) inverseRefinementEvaluationPending() bool {
@@ -95,6 +121,9 @@ func (m *AlgebraicRootCore) cleanupInverse() error {
 		if e := q.conversions[i].cleanup(); e != nil {
 			return e
 		}
+	}
+	if e := q.numericRoots.Cleanup(m.config.Rationals.Integers()); e != nil {
+		return e
 	}
 	for q.remaining != 0 {
 		value := &q.values[q.remaining-1]
@@ -213,13 +242,16 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 		}
 		return ErrAlgebraicDivisionByZero
 	}
-	if m.inversion.remaining != 0 || m.localActive || m.negation.active {
+	if m.inversion.remaining != 0 || m.inversion.numericPending(m) || m.localActive || m.negation.active {
 		return ErrAlgebraicPending
 	}
 	for i := range m.inversion.conversions {
 		if m.inversion.conversions[i].pending(m) {
 			return ErrAlgebraicPending
 		}
+	}
+	if m.inversion.numericHooks.Generation == ^uint64(0) {
+		return ErrAlgebraicPending
 	}
 	if e = m.refineNonzeroBounds(a); e != nil {
 		return e
@@ -233,6 +265,9 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 		return e
 	}
 	q := &m.inversion
+	q.owner = m
+	q.numericRoots = unumeral.NumericAllocationRoots{}
+	q.numericHooks = unumeral.NumericInvocationHooks{Generation: q.numericHooks.Generation + 1, Policy: q}
 	q.polynomialCaller = m.polynomialCaller
 	q.sourceStop = nil
 	q.traceDisplayPending = false
@@ -253,7 +288,7 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 		cause = errors.Join(cause, cleanup)
 	}()
 	if l.kind == 0 {
-		e = m.config.Rationals.InvInPlace(&r.value)
+		e = m.config.Rationals.WithAllocationContext(q.numericContext()).InvInPlace(&r.value)
 		return m.save(l, &r, e)
 	}
 	p := m.config.Polynomials
@@ -283,10 +318,11 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 	if e = q.conversions[1].run(m, r.interval.BorrowUpper(), &q.values[1]); e != nil {
 		return e
 	}
-	if e = qm.InvInPlace(&q.values[0]); e != nil {
+	qops := qm.WithAllocationContext(q.numericContext())
+	if e = qops.InvInPlace(&q.values[0]); e != nil {
 		return e
 	}
-	if e = qm.InvInPlace(&q.values[1]); e != nil {
+	if e = qops.InvInPlace(&q.values[1]); e != nil {
 		return e
 	}
 	if e = qm.Swap(&q.values[0], &q.values[1]); e != nil {
