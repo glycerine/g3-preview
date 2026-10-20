@@ -85,8 +85,8 @@ func TestAlgebraicInverseRefinementActualHornerAndConversionReservations(t *test
 							conversion = true
 						}
 					}
-					serviceMust(t, c.config.Rationals.Integers().CleanupPendingAllocation())
 					serviceMust(t, c.CleanupRetained())
+					algebraicExpectNoPendingAllocation(t, c.config.Rationals.Integers())
 					if c.inverseRefinementEvaluationPending() || p.binaryEvaluation.active || c.refinementConversion.pending(c) || c.localActive {
 						t.Fatal("owning refinement cleanup left actual child", body)
 					}

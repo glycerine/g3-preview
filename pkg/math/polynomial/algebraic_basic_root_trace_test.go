@@ -48,8 +48,8 @@ func TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation(t *testing.T) 
 					t.Fatal("unjoined integer-root RAW protected a completed older rational destructor")
 				}
 			}
-			serviceMust(t, c.config.Rationals.Integers().CleanupPendingAllocation())
 			serviceMust(t, c.CleanupRetained())
+			algebraicExpectNoPendingAllocation(t, c.config.Rationals.Integers())
 			if c.basicRootScope.active || c.rootTracePending() {
 				t.Fatal("root trace retained a child after owning acknowledgement")
 			}

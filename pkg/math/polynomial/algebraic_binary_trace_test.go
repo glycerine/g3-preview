@@ -69,10 +69,10 @@ func algebraicBinaryNamedTraceReservations(t *testing.T, big bool) {
 					}
 				}
 			}
-			serviceMust(t, c.config.Rationals.Integers().CleanupPendingAllocation())
 			if e := c.CleanupRetained(); e != nil {
 				t.Fatalf("owning cleanup: %v; operation: %v", e, body)
 			}
+			algebraicExpectNoPendingAllocation(t, c.config.Rationals.Integers())
 			if c.binary.active || c.binary.traceRootPending || c.rootDisplay.active || c.rootTracePending() {
 				t.Fatal("binary diagnostic child or locals survived owning cleanup")
 			}

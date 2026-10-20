@@ -167,8 +167,8 @@ func TestAlgebraicRationalMultiplyAssertionActualHornerOwnership(t *testing.T) {
 					}
 				}
 			}
-			serviceMust(t, c.config.Rationals.Integers().CleanupPendingAllocation())
 			serviceMust(t, c.CleanupRetained())
+			algebraicExpectNoPendingAllocation(t, c.config.Rationals.Integers())
 			if c.arithmetic.active || p.binaryEvaluation.active {
 				t.Fatal("actual assertion Horner cleanup pending", body)
 			}

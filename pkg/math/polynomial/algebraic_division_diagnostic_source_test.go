@@ -108,8 +108,8 @@ func TestAlgebraicDivisionInverseDisplayRAWDoesNotStopOlderSourceDestructor(t *t
 				}
 			}
 			serviceMust(t, c.config.Rationals.BindTrace(nil))
-			serviceMust(t, c.config.Rationals.Integers().CleanupPendingAllocation())
 			serviceMust(t, c.CleanupRetained())
+			algebraicExpectNoPendingAllocation(t, c.config.Rationals.Integers())
 			serviceMust(t, c.Del(&out))
 			serviceMust(t, c.Del(&b))
 		}) {

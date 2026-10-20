@@ -21,6 +21,9 @@ type algebraicBinaryScope struct {
 	conversion                           algebraicConversionScope
 	intervalRoots                        [2]unumeral.BinaryRootInvocation
 	intervalDebug                        unumeral.BinaryIntervalDebugInvocationReceipt
+	owner                                *AlgebraicRootCore
+	numericHooks                         unumeral.NumericInvocationHooks
+	numericRoots                         unumeral.NumericAllocationRoots
 	traceRootPending                     bool
 	traceRootStop                        error
 	refinable                            upolyRefinableInvocationReceipt
@@ -38,6 +41,23 @@ type algebraicBinaryScope struct {
 	sequenceCursor                       int
 	active, running, executing, cleaning bool
 	sourceStop                           error
+}
+
+func (s *algebraicBinaryScope) NumericBound(executing bool) bool {
+	m := s.owner
+	return m != nil && m.self == m && !m.closed && s == &m.binary && s.active && (!executing || s.executing)
+}
+func (s *algebraicBinaryScope) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
+	if !s.NumericBound(true) || s.owner.config.Rationals.Integers() != z {
+		return nil
+	}
+	if local != nil {
+		return local
+	}
+	return &s.numericRoots
+}
+func (s *algebraicBinaryScope) numericContext() unumeral.NumericAllocationContext {
+	return unumeral.NumericAllocationContext{}.WithCaller(&s.numericHooks)
 }
 
 // Add, Sub, and Mul follow the source dispatch and root selector. Inputs and
@@ -253,6 +273,9 @@ func (m *AlgebraicRootCore) cleanupBinary() error {
 	if e := m.config.Intervals.CleanupDebugInvocation(&s.intervalDebug); e != nil {
 		return e
 	}
+	if e := s.numericRoots.Cleanup(m.config.Rationals.Integers()); e != nil {
+		return e
+	}
 	if s.traceRootPending {
 		if e := m.cleanupRootDisplay(); e != nil {
 			return e
@@ -317,7 +340,12 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 	if e := algebraicQueryTagAssertionSwitch(); e != nil {
 		return e
 	}
-	*s = algebraicBinaryScope{polynomialCaller: m.polynomialCaller, active: true, running: true}
+	generation := s.numericHooks.Generation
+	if generation == ^uint64(0) {
+		return ErrAlgebraicPending
+	}
+	*s = algebraicBinaryScope{polynomialCaller: m.polynomialCaller, owner: m, active: true, running: true}
+	s.numericHooks = unumeral.NumericInvocationHooks{Generation: generation + 1, Policy: s}
 	defer func() {
 		s.executing = false
 		var cleanup error
@@ -495,7 +523,10 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 			if e != nil {
 				return e
 			}
-			if e = p.SetView(s.f, factor); e != nil {
+			s.executing = true
+			e = p.setViewWithAllocationContext(s.f, factor, s.numericContext())
+			s.executing = false
+			if e != nil {
 				return e
 			}
 			return m.setBinaryCore(out, s.sequences[target], targetLower, targetUpper, fullFactorization)

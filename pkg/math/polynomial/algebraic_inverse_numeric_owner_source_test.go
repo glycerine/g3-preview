@@ -11,7 +11,7 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func algebraicInverseExpectNoPendingAllocation(t *testing.T, z *unumeral.IntegerManager) {
+func algebraicExpectNoPendingAllocation(t *testing.T, z *unumeral.IntegerManager) {
 	t.Helper()
 	blocks, e := z.SourceAllocator().PendingRoots()
 	serviceMust(t, e)
@@ -50,7 +50,7 @@ func TestAlgebraicInverseBasicOwnsEveryNumericAllocationPrefix(t *testing.T) {
 			if c.inversion.numericPending(c) {
 				t.Fatal("inverse owning cleanup retained its numeric root")
 			}
-			algebraicInverseExpectNoPendingAllocation(t, qm.Integers())
+			algebraicExpectNoPendingAllocation(t, qm.Integers())
 			serviceMust(t, c.Del(&a))
 			serviceMust(t, qm.Del(&q))
 		})

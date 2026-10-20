@@ -101,8 +101,8 @@ func TestAlgebraicInverseTraceEveryReservationPrefix(t *testing.T) {
 				algebraicExpectBetween(t, c, &a, 0, 1)
 			}
 			serviceMust(t, c.config.Rationals.BindTrace(nil))
-			serviceMust(t, c.config.Rationals.Integers().CleanupPendingAllocation())
 			serviceMust(t, c.CleanupRetained())
+			algebraicExpectNoPendingAllocation(t, c.config.Rationals.Integers())
 			if c.inversion.remaining != 0 || c.inversion.traceDisplayPending || c.rootDisplay.active {
 				t.Fatal("trace child or older inverse locals retained after owning cleanup")
 			}

@@ -309,6 +309,37 @@ func (m *UPolynomialManager) SetView(p UPolynomial, v UPolynomialView) error {
 	}
 	return m.setView(&d.state, v)
 }
+func (m *UPolynomialManager) setViewWithAllocationContext(p UPolynomial, v UPolynomialView, context unumeral.NumericAllocationContext) error {
+	d, e := m.descriptor(p)
+	if e != nil {
+		return e
+	}
+	s := &d.state
+	if m.alias(v, s) {
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled && s.size != v.count {
+			return m.scalarDivisionAssertionFailure(194, "buffer.size() == sz")
+		}
+		return nil
+	}
+	if e = m.reserve(s, v.count); e != nil {
+		return e
+	}
+	ops := m.modular.WithAllocationContext(context)
+	for i := uint32(0); i < v.count; i++ {
+		a, e := m.read(v, i)
+		if e != nil {
+			return e
+		}
+		if e = ops.Copy(&m.values(s)[i], a); e != nil {
+			return e
+		}
+	}
+	return m.setSize(s, v.count)
+}
 func (m *UPolynomialManager) alias(v UPolynomialView, s *upolyVectorState) bool {
 	return s.backing != 0 && v.backing == s.backing && v.generation == s.generation && v.start == 0 && v.origin == m.stateOrigin(s)
 }

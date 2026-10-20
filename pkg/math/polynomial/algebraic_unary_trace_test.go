@@ -94,8 +94,8 @@ func TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes(t *testing.T) {
 				}
 			}
 			serviceMust(t, c.config.Rationals.BindTrace(nil))
-			serviceMust(t, c.config.Rationals.Integers().CleanupPendingAllocation())
 			serviceMust(t, c.CleanupRetained())
+			algebraicExpectNoPendingAllocation(t, c.config.Rationals.Integers())
 			if c.binary.active || c.rootTracePending() || c.coefficientNormalizationPending() {
 				t.Fatal("power cleanup retained an accepted child")
 			}
