@@ -23865,7 +23865,8 @@
         "pkg/ast/rewriter/bit_blaster/engine_logic.go",
         "pkg/ast/rewriter/bit_blaster/engine_compare.go",
         "pkg/ast/rewriter/bit_blaster/engine_shift.go",
-        "pkg/ast/rewriter/bit_blaster/engine_division.go"
+        "pkg/ast/rewriter/bit_blaster/engine_division.go",
+        "pkg/ast/rewriter/bit_blaster/engine_signed_division.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
@@ -23876,7 +23877,9 @@
         "TestBitBlasterShiftsExhaustiveConstantAmounts",
         "TestBitBlasterSymbolicShiftUsesSourceBarrelStage",
         "TestBitBlasterUnsignedDivisionExhaustiveConstants",
-        "TestBitBlasterUnsignedDivisionWrappersOwnOnlyTheirResult"
+        "TestBitBlasterUnsignedDivisionWrappersOwnOnlyTheirResult",
+        "TestBitBlasterSignedDivisionRemainderModuloExhaustiveConstants",
+        "TestBitBlasterSignedOperationsRetainSymbolicSignMuxes"
       ],
       "conditionals": [
         {
@@ -23917,7 +23920,17 @@
           "go_target": "pkg/ast/rewriter/bit_blaster/engine_division.go"
         },
         {
-          "name": "Multiplication, signed division/remainder/modulo, variable rotations, and overflow checks",
+          "name": "Signed division, remainder, and modulo",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_signed_division.go"
+        },
+        {
+          "name": "Disabled four-divider mk_sdiv_srem_smod alternative",
+          "status": "dead_deleted",
+          "reason": "All retained callers select the active one-divider implementation; the only references are in #if 0 branches."
+        },
+        {
+          "name": "Multiplication, variable rotations, and overflow checks",
           "status": "unported",
           "reason": "Remaining concrete bit-vector circuit methods are being ported incrementally."
         }
@@ -23941,7 +23954,8 @@
         "pkg/ast/rewriter/bit_blaster/engine_logic.go",
         "pkg/ast/rewriter/bit_blaster/engine_compare.go",
         "pkg/ast/rewriter/bit_blaster/engine_shift.go",
-        "pkg/ast/rewriter/bit_blaster/engine_division.go"
+        "pkg/ast/rewriter/bit_blaster/engine_division.go",
+        "pkg/ast/rewriter/bit_blaster/engine_signed_division.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
@@ -23952,7 +23966,9 @@
         "TestBitBlasterShiftsExhaustiveConstantAmounts",
         "TestBitBlasterSymbolicShiftUsesSourceBarrelStage",
         "TestBitBlasterUnsignedDivisionExhaustiveConstants",
-        "TestBitBlasterUnsignedDivisionWrappersOwnOnlyTheirResult"
+        "TestBitBlasterUnsignedDivisionWrappersOwnOnlyTheirResult",
+        "TestBitBlasterSignedDivisionRemainderModuloExhaustiveConstants",
+        "TestBitBlasterSignedOperationsRetainSymbolicSignMuxes"
       ],
       "conditionals": [
         {
@@ -24187,13 +24203,23 @@
           "go_target": "pkg/ast/rewriter/bit_blaster/engine_division.go"
         },
         {
+          "name": "mk_sdiv, mk_srem, mk_smod",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_signed_division.go"
+        },
+        {
+          "name": "mk_sdiv_srem_smod four-divider alternative",
+          "status": "dead_deleted",
+          "reason": "It is referenced only from disabled #if 0 alternatives; retained builds use the one-divider bodies."
+        },
+        {
           "name": "checkpoint",
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_manager.go",
           "reason": "The Go AST manager enforces its arena budget and cancellation at manager operation boundaries."
         },
         {
-          "name": "multiplication, signed division/remainder/modulo, variable rotations, and overflow circuit builders",
+          "name": "multiplication, variable rotations, and overflow circuit builders",
           "status": "unported",
           "reason": "Remaining concrete circuit algorithms are still required by the retained bit-blaster consumers."
         }
