@@ -53,3 +53,36 @@ func SimplifyBooleanApplicationDefault(m *ast.ASTManager, d ast.ASTHandle, args 
 	rw := boolRewriter{manager: m, flat: true, localContextLimit: ^uint32(0)}
 	return rw.mkApp(d, args, result)
 }
+
+// SimplifyBooleanGateDefault exposes the concrete Boolean operations borrowed
+// by bit_blaster_cfg. The result reference owns the selected or constructed
+// expression exactly as expr_ref does in the source configuration.
+func SimplifyBooleanGateDefault(m *ast.ASTManager, operation int32, args []ast.ASTHandle, result ast.ASTRef) error {
+	if m == nil {
+		return ast.ErrASTHandle
+	}
+	rw := boolRewriter{manager: m, flat: true, localContextLimit: ^uint32(0)}
+	switch operation {
+	case ast.ASTOpNot:
+		if len(args) != 1 {
+			return ast.ErrASTDomain
+		}
+		return rw.mkNot(args[0], result)
+	case ast.ASTOpXor:
+		if len(args) != 2 {
+			return ast.ErrASTDomain
+		}
+		return rw.mkXor(args[0], args[1], result)
+	case ast.ASTOpIff:
+		if len(args) != 2 {
+			return ast.ErrASTDomain
+		}
+		return rw.mkEq(args[0], args[1], result)
+	case ast.ASTOpAnd:
+		return rw.mkAnd(args, result)
+	case ast.ASTOpOr:
+		return rw.mkOr(args, result)
+	default:
+		return ast.ErrASTDomain
+	}
+}

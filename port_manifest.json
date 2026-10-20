@@ -23555,22 +23555,34 @@
       "path": "src/ast/rewriter/bit_blaster/bit_blaster.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": ["pkg/ast/rewriter/bit_blaster/gates.go", "pkg/ast/rewriter/bool_rewriter_public.go"],
+      "tests": ["TestBitBlasterSourceXor3AndCarryBranches"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "bit_blaster_cfg constructor, total AST-ID argument ordering, xor3 and carry extended/expanded gate construction (bit_blaster.cpp:24-116)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/gates.go",
+          "tests": ["TestBitBlasterSourceXor3AndCarryBranches"]
+        },
+        {
+          "name": "bit_blaster template instantiation and concrete arithmetic engine constructor (bit_blaster.cpp:118-123)",
+          "status": "unported",
+          "reason": "Depends on the separate unported bit_blaster_tpl implementation."
+        }
+      ],
+      "ownership": ["The gate configuration borrows its AST manager and family. Caller-owned ASTRef outputs retain constructed or selected Boolean gates; expanded temporary references are released in source expression order."],
+      "deviations": ["Go sort.Slice replaces the three-element std::sort while preserving the total AST-ID order. The arithmetic bit-blaster template remains a separate open source unit."]
     },
     {
       "path": "src/ast/rewriter/bit_blaster/bit_blaster.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/ast/rewriter/bit_blaster/gates.go"],
+      "tests": ["TestBitBlasterSourceXor3AndCarryBranches"],
       "conditionals": [
         {
           "line": 19,
@@ -23581,11 +23593,23 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "bit_blaster_cfg retained Boolean gate interface and borrowed manager/parameter state (bit_blaster.h:24-50)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/gates.go",
+          "tests": ["TestBitBlasterSourceXor3AndCarryBranches"]
+        },
+        {
+          "name": "bit_blaster derived arithmetic template interface (bit_blaster.h:52-60)",
+          "status": "unported",
+          "reason": "Depends on the separate unported bit_blaster_tpl implementation."
+        }
+      ],
+      "ownership": ["Config borrows AST manager state and writes through caller-owned AST references."],
+      "deviations": ["The Go configuration stores the reached ExtGates scalar and concrete family ID instead of retaining a broader parameter wrapper and bv_util facade."]
     },
     {
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_params.h",
