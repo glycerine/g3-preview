@@ -19106,13 +19106,39 @@
       "path": "src/ast/normal_forms/nnf_params.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/normal_forms/nnf_params.go",
+        "pkg/ast/normal_forms/nnf_params_source_test.go",
+        "pkg/ast/normal_forms/gparams_catalog_collectors.go",
+        "pkg/util/params/util_gparams_catalog_test.go"
+      ],
+      "tests": [
+        "TestNNFParamsDefaultsSnapshotAndLocalPrecedence",
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete nnf module declaration, five exported typed options, defaults, descriptions and generated facade",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/nnf_params.go",
+          "tests": [
+            "TestNNFParamsDefaultsSnapshotAndLocalPrecedence",
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse"
+          ],
+          "go_targets": [
+            "pkg/ast/normal_forms/gparams_catalog_collectors.go",
+            "pkg/util/params/util_gparams_catalog_test.go"
+          ]
+        }
+      ],
+      "ownership": [
+        "The complete facade borrows its caller ParamsRef and owns the constructor-time nnf module snapshot through all five typed lookups. Catalog descriptions are owned by the descriptor table."
+      ],
       "deviations": []
     },
     {
@@ -30456,13 +30482,39 @@
       "path": "src/ast/rewriter/rewriter_params.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/rewriter_params.go",
+        "pkg/ast/rewriter/rewriter_params_source_test.go",
+        "pkg/ast/rewriter/gparams_catalog_collectors.go",
+        "pkg/util/params/util_gparams_catalog_test.go"
+      ],
+      "tests": [
+        "TestRewriterParamsDefaultsSnapshotAndLocalPrecedence",
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete rewriter module declaration, ten exported typed options, defaults, descriptions and generated facade",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/rewriter_params.go",
+          "tests": [
+            "TestRewriterParamsDefaultsSnapshotAndLocalPrecedence",
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse"
+          ],
+          "go_targets": [
+            "pkg/ast/rewriter/gparams_catalog_collectors.go",
+            "pkg/util/params/util_gparams_catalog_test.go"
+          ]
+        }
+      ],
+      "ownership": [
+        "The complete facade borrows its caller ParamsRef and owns the constructor-time rewriter module snapshot through all ten typed lookups. Catalog descriptions are owned by the descriptor table."
+      ],
       "deviations": []
     },
     {

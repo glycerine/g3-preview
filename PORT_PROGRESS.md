@@ -47251,3 +47251,14 @@ The consumers own their module snapshots and borrow caller parameter state;
 the descriptor table owns catalog strings. Focused cross-package checks pass
 native, checked, debug and combined profiles on CPUs 8-16. Portcheck reports
 263 ported and 303 partial units.
+
+Core-rewriter and NNF generator-input closure:
+`src/ast/rewriter/rewriter_params.pyg` and
+`src/ast/normal_forms/nnf_params.pyg` are promoted from unported to ported.
+Their ten and five declarations respectively match the complete typed facades,
+literal defaults, module lookup precedence and exact catalog descriptions.
+Each facade borrows local parameters and owns its constructor-time module
+snapshot; descriptor tables own catalog strings. Focused facade and catalog
+checks pass native, checked, debug and combined profiles on CPUs 8-16.
+Portcheck reports 2103 units, 677 APIs: 265 ported, 303 partial, 1478 unported
+and 11 dead/deleted.
