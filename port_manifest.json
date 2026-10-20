@@ -19398,9 +19398,14 @@
       "path": "src/ast/normal_forms/defined_names.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/normal_forms/defined_names.go"
+      ],
+      "tests": [
+        "TestDefinedNamesFreeVariablesProofsAndCache",
+        "TestDefinedNamesPositiveScopesOrderingAndTermITE"
+      ],
       "assertions": [
         {
           "line": 141,
@@ -19439,19 +19444,48 @@
           "text": "SASSERT(i < get_num_names());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "defined_names::impl::gen_name/cache_new_name/cache_new_name_intro_proof/bound_vars/mk_definition/mk_name/push_scope/pop_scope/reset/get_num_names/get_name_decl",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/defined_names.go",
+          "evidence": "Concrete ASTHandle maps with owned ASTRef roots preserve fresh-name generation, sparse free-variable closure, proof caching and retryable scoped release."
+        },
+        {
+          "name": "defined_names::pos_impl::mk_definition and defined_names public facade",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/defined_names.go",
+          "evidence": "Separate ordinary and positive caches implement paired scopes, combined enumeration and positive-occurrence definitions."
+        }
+      ],
+      "ownership": [
+        {
+          "kind": "cache roots",
+          "status": "ported",
+          "evidence": "Each cached expression, name and optional apply-def proof has an independent ASTRef; release progress is retained across deletion failures."
+        },
+        {
+          "kind": "temporary expressions",
+          "status": "ported",
+          "evidence": "Fresh declarations, variables, definitions, triggers, quantifiers and proofs remain rooted through construction and output publication."
+        }
+      ],
       "deviations": []
     },
     {
       "path": "src/ast/normal_forms/defined_names.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/normal_forms/defined_names.go"
+      ],
+      "tests": [
+        "TestDefinedNamesFreeVariablesProofsAndCache",
+        "TestDefinedNamesPositiveScopesOrderingAndTermITE"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -19462,10 +19496,23 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "defined_names public API",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/defined_names.go",
+          "evidence": "DefinedNames exposes ordinary and positive naming, paired push/pop/reset, combined counts and declaration lookup."
+        }
+      ],
+      "ownership": [
+        {
+          "kind": "object lifetime",
+          "status": "ported",
+          "evidence": "Close rejects copied owners, is idempotent after success, and retains state for retry if rooted AST release stops."
+        }
+      ],
       "deviations": []
     },
     {
