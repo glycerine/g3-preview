@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp:5362,5402-5403,5483.
+// Source: src/math/polynomial/polynomial.cpp:5362,5402-5403.
 package polynomial
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
@@ -51,19 +51,6 @@ func (m *MultivariatePolynomialManager) traceResultant(s *polynomialGCDFunctionS
 				return e
 			}
 		}
-		return out.WriteLiteral("\n")
-	})
-}
-
-// cpp5483 precedes scoped_numeral lc, after the actual resultant returned.
-func (m *MultivariatePolynomialManager) traceDiscriminantSign(sign bool) error {
-	return m.emitResultantTrace("discriminant", 5483, func(out *polynomialTraceSink) error {
-		_ = out.WriteLiteral("discriminant sign: ")
-		value := uint32(0)
-		if sign {
-			value = 1
-		}
-		_ = out.WriteUnsigned(value)
 		return out.WriteLiteral("\n")
 	})
 }

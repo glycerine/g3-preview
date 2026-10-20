@@ -45763,7 +45763,7 @@
           ]
         },
         {
-          "name": "Complete reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition cpp4655-4872 with assertion actions and matched younger constant destructor/source-owning result cleanup",
+          "name": "Complete reciprocal/homogenization/variable/parity/general Horner/x±y composition cpp4655-4872 with assertion actions and matched younger constant destructor/source-owning result cleanup",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
@@ -45789,7 +45789,8 @@
             "TestPolynomialCompositionNativeDegreeCacheNoRuntimeGrowth",
             "TestPolynomialCompositionNativeDegreeCacheSparseHornerReuse",
             "TestPolynomialCompositionSourceAssertionActions"
-          ]
+          ],
+          "notes": "This completion credit excludes mk_x_minus_c/compose_x_minus_c cpp4859-4883. No source caller uses them beyond definitions, manager forwarding and the header helper. Existing Go ComposeXMinusConstant compatibility coverage remains; cpp4865 TRACE is not extended. Other retained composition methods keep their own prior verification."
         },
         {
           "name": "Complete flip_sign_if_lm_neg_core and reference wrapper cpp3433-3447 with graded-lex leading selection, conditional negation and source assertion actions",
@@ -46814,7 +46815,7 @@
         },
         {
           "name": "discriminant polynomial.cpp:5473-5500: p_prime before degree guard, caller Resultant publication, uint64 sign, constant/polynomial leading coefficient suffix and ordered lexical destruction",
-          "status": "ported",
+          "status": "reference_only",
           "go_target": "pkg/math/polynomial/polynomial_discriminant.go",
           "tests": [
             "TestPolynomialDiscriminantYoungerCoefficientRefStopBeforeLeadingAndPrime",
@@ -46828,7 +46829,8 @@
             "TestPolynomialDiscriminantResultantReceiptRejectsCopiedActualFrame",
             "TestPolynomialDiscriminantAllOriginalDormantAssertions",
             "TestPolynomialDiscriminantIndependentDegreeZeroThroughFour"
-          ]
+          ],
+          "notes": "Only the dormant src/test/polynomial.cpp:344 helper calls this manager API; registered tst_polynomial returns after tst_psc at1825. Existing Go Discriminant compatibility API/tests remain, outside retained-source completion. The newly added cpp5483 TRACE hook/helper/test is removed; no new dormant source behavior is ported."
         },
         {
           "name": "subresultant_chain polynomial.cpp:5499-5572 literal regular/defective algorithm and ordered three-reference source suffix",
@@ -46998,8 +47000,8 @@
           ]
         },
         {
-          "name": "Complete quasi_resultant cpp5193-5272,7320-7322: assertion actions and literal three-reference pseudo-remainder chain",
-          "status": "ported",
+          "name": "Dormant quasi_resultant compatibility implementation cpp5193-5272,7320-7322: assertion actions and literal three-reference pseudo-remainder chain",
+          "status": "reference_only",
           "go_target": "pkg/math/polynomial/polynomial_quasi_resultant.go",
           "tests": [
             "TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory",
@@ -47011,7 +47013,8 @@
             "TestPolynomialQuasiResultantActualDestructorReentry",
             "TestPolynomialQuasiResultantBIGEveryReservationAndOwnedRetry",
             "TestPolynomialQuasiResultantActualCallerPublicationCallback"
-          ]
+          ],
+          "notes": "All C++ callers are static helpers in src/test/polynomial.cpp; registered tst_polynomial calls tst_psc then returns at1825 before those helper entry points. Definitions and forwarding headers do not establish a retained source consumer. Existing Go API/tests remain compatibility coverage, outside required retained-source completion; cpp5256 TRACE is not extended."
         },
         {
           "name": "is_var(monomial), is_var(polynomial), is_var_num polynomial.cpp:6970-6980: literal short-circuit variable publication and caller NUM SET",
@@ -47650,20 +47653,20 @@
         ],
         "evidence": "Five value spellings include 2/3, a negative BIG integer, binary interval fractions, rational algebraic default decimal and sqrt(2) decimal. Output callbacks observe a live auxiliary. The actual decimal refusal sweep arms the real budget at a result header, proves accepted pending driver ownership and copied-scope refusal, then reaches success. Independent omitted-results and omitted-decimal-receipt controls fail. Fast checks pass four profiles; long precision20 evidence is recorded separately in PORT_PROGRESS.md."
       },
-      "resultant_and_discriminant_trace_audit": {
-        "source": "polynomial.cpp:5362,5402-5403,5483",
+      "resultant_trace_audit": {
+        "source": "polynomial.cpp:5362,5402-5403",
         "go_target": "pkg/math/polynomial/polynomial_resultant_trace.go",
-        "behavior": "Resultant entry follows actual A/B assignment and precedes zero/constant exits; normalized A/B/x/t output precedes the sign/degree/later reference declarations. The existing actual GCD frame traceDisplay captures each accepted reference formatter, preserves stopped source children before older locals and cleans only that invocation. Executing records bind both numerical managers and the existing polynomial callback guard through header/body/footer. Discriminant prints its 0/1 sign after resultant returns and before lc construction. Sticky writer failure still executes project formatting.",
+        "behavior": "Resultant entry follows actual A/B assignment and precedes zero/constant exits; normalized A/B/x/t output precedes the sign/degree/later reference declarations. The existing actual GCD frame traceDisplay captures each accepted reference formatter, preserves stopped source children before older locals and cleans only that invocation. Executing records bind both numerical managers and the existing polynomial callback guard through header/body/footer. Sticky writer failure still executes project formatting.",
         "tests": [
           "TestPolynomialResultantTraceLiteralNormalizationAndLifetimes",
           "TestPolynomialResultantTraceZeroAndConstantEarlyExits",
           "TestPolynomialResultantTraceActualEntryTLSRefusal",
           "TestPolynomialResultantTraceRefusingStreamStillFormats",
-          "TestPolynomialResultantTraceEveryReservation",
-          "TestPolynomialDiscriminantTraceSignBeforeLeadingNumeral"
+          "TestPolynomialResultantTraceEveryReservation"
         ],
-        "verification": "Literal normalized coefficients/factor and independent resultant126; entry source depth2 versus normalized depth9; exact TLS BIG Copy allocator tuple with matched GCD cleanup and zero final budget; actual budget prefixes through success with physical audits; no normalized record on zero/constant exits; degrees0-4 independent discriminants and sign record before leading numeral. Broader profiles and independent omission controls are recorded in PORT_PROGRESS.md.",
-        "limits": "Whole polynomial/algebraic/AST algorithms, retained consumer and source failure audits remain partial."
+        "verification": "Literal normalized coefficients/factor and independent resultant126; entry source depth2 versus normalized depth9; exact TLS BIG Copy allocator tuple with matched GCD cleanup and zero final budget; actual budget prefixes through success with physical audits; no normalized record on zero/constant exits. Broader profiles and independent omission controls are recorded in PORT_PROGRESS.md.",
+        "limits": "Whole polynomial/algebraic/AST algorithms, retained consumer and source failure audits remain partial.",
+        "reachability_correction": "The newly added discriminant cpp5483 record was found to have only dormant test consumers and is removed. Retained resultant records remain implemented; no complete polynomial credit comes from dormant API compatibility."
       },
       "pseudo_division_trace_audit": {
         "source": "polynomial.cpp:4909-4911,4955-4962,4973",
@@ -47678,6 +47681,15 @@
         ],
         "cleanup_fix": "CleanupPseudoDivision now rejects an executing call before writing cleanupCause. A real checkpoint callback previously converted the refusal into a false source cleanup failure; the direct trace-disabled checkpoint test covers that admission rule.",
         "limits": "Whole polynomial/algebraic/AST and broader source consumer/failure audits remain partial."
+      },
+      "derivative_term_trace_audit": {
+        "source": "polynomial.cpp:4518; retained by nlsat/tactic/goal2nlsat.cpp:100 -> factor_core cpp6777",
+        "go_target": "pkg/math/polynomial/polynomial_derivative.go",
+        "behavior": "Each actual source monomial prints with its previously computed degree before the degree-zero branch and before n/a construction. The existing monomial source formatter performs its actual reached field reads. No owning numeral, Runtime allocation or formatting receipt is invented for this read-only record. Integer/Natural bindings and the polynomial callback guard protect the actual source owner.",
+        "tests": [
+          "TestPolynomialDerivativeTermTraceAllSourceBranches"
+        ],
+        "limits": "Full polynomial/algebraic/AST source consumer and ownership audits remain partial."
       }
     },
     {
@@ -50244,7 +50256,7 @@
           ]
         },
         {
-          "name": "Complete reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition cpp4655-4872 with assertion actions and matched younger constant destructor/source-owning result cleanup",
+          "name": "Complete reciprocal/homogenization/variable/parity/general Horner/x±y composition cpp4655-4872 with assertion actions and matched younger constant destructor/source-owning result cleanup",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
@@ -50268,7 +50280,8 @@
             "TestPolynomialCompositionReciprocalAndVariableOrders",
             "TestPolynomialCompositionIndependentFiniteAndAliases",
             "TestPolynomialCompositionSourceAssertionActions"
-          ]
+          ],
+          "notes": "This completion credit excludes mk_x_minus_c/compose_x_minus_c cpp4859-4883. No source caller uses them beyond definitions, manager forwarding and the header helper. Existing Go ComposeXMinusConstant compatibility coverage remains; cpp4865 TRACE is not extended. Other retained composition methods keep their own prior verification."
         },
         {
           "name": "Complete flip_sign_if_lm_neg_core and reference wrapper cpp3433-3447 with graded-lex leading selection, conditional negation and source assertion actions",
@@ -50596,8 +50609,8 @@
           ]
         },
         {
-          "name": "Complete quasi_resultant cpp5193-5272,7320-7322: assertion actions and literal three-reference pseudo-remainder chain",
-          "status": "ported",
+          "name": "Dormant quasi_resultant compatibility implementation cpp5193-5272,7320-7322: assertion actions and literal three-reference pseudo-remainder chain",
+          "status": "reference_only",
           "go_target": "pkg/math/polynomial/polynomial_quasi_resultant.go",
           "tests": [
             "TestPolynomialQuasiResultantSuccessfulChildOlderNUMStopAndLaterHistory",
@@ -50609,7 +50622,8 @@
             "TestPolynomialQuasiResultantActualDestructorReentry",
             "TestPolynomialQuasiResultantBIGEveryReservationAndOwnedRetry",
             "TestPolynomialQuasiResultantActualCallerPublicationCallback"
-          ]
+          ],
+          "notes": "All C++ callers are static helpers in src/test/polynomial.cpp; registered tst_polynomial calls tst_psc then returns at1825 before those helper entry points. Definitions and forwarding headers do not establish a retained source consumer. Existing Go API/tests remain compatibility coverage, outside required retained-source completion; cpp5256 TRACE is not extended."
         },
         {
           "name": "is_var(monomial), is_var(polynomial), is_var_num polynomial.cpp:6970-6980: literal short-circuit variable publication and caller NUM SET",

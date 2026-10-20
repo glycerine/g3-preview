@@ -5,6 +5,8 @@ package polynomial
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -556,4 +558,71 @@ func TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation(t *testin
 
 		})
 	}
+}
+
+func TestPolynomialDerivativeTermTraceAllSourceBranches(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c := m.core
+	p := polynomialQueryTerms(t, c, []int32{3, 5, 7}, [][]MonomialPower{{{0, 2}, {1, 1}}, {{1, 1}}, nil})
+	t.Cleanup(func() { c.integer.Budget().FailAfter(-1); serviceMust(t, m.CleanupDerivative()) })
+	var output strings.Builder
+	w := &derivativeTermTraceWriter{t: t, m: m, output: &output}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("polynomial")
+	c.monomials.config.Trace = tags
+	defer tags.Finalize()
+	d, e := m.Derivative(p, 0)
+	serviceMust(t, e)
+	d = polynomialCaller(t, c, d)
+	polynomialQueryExpect(t, c, d, map[[3]uint32]int64{{1, 1, 0}: 6})
+	if tags.ShouldTrace("polynomial") {
+		for _, text := range []string{"x0^2 x1 degree_of x0: 2\n", "x1 degree_of x0: 0\n", "1 degree_of x0: 0\n"} {
+			if !strings.Contains(output.String(), text) {
+				t.Fatal("literal monomial degree", text, output.String())
+			}
+		}
+		if strings.Count(output.String(), ":4518 ") != 3 || w.calls == 0 || w.records != 3 || w.gate {
+			t.Fatal("term records", output.String(), w.calls)
+		}
+	} else if output.Len() != 0 || w.calls != 0 {
+		t.Fatal("erased derivative diagnostic executed")
+	}
+}
+
+type derivativeTermTraceWriter struct {
+	t       *testing.T
+	m       *MultivariatePolynomialManager
+	output  *strings.Builder
+	calls   int
+	gate    bool
+	records int
+}
+
+func (w *derivativeTermTraceWriter) Write(p []byte) (int, error) {
+	n, e := w.output.Write(p)
+	// Test only this source record, not older polynomial creation/deletion tags.
+	if w.m.core.quadraticTrace != nil && w.m.core.quadraticTrace.tags.OutputCallbackActive() {
+		if !w.gate {
+			w.gate = true
+			w.records++
+			w.m.core.integer.Budget().FailAfter(0)
+		}
+		w.calls++
+		if w.m.derivative.constructed != 0 {
+			w.t.Fatal("term record crossed numeral construction", w.m.derivative.constructed)
+		}
+		for _, action := range []func() error{w.m.CloseChecked, w.m.SourceFinalize, w.m.CleanupDerivative} {
+			if e := action(); !errors.Is(e, ErrPolynomialPending) {
+				w.t.Fatal("executing term diagnostic owner", e)
+			}
+		}
+		if e := w.m.core.integer.CloseChecked(); e == nil {
+			w.t.Fatal("term output released numeral manager")
+		}
+	}
+	if w.gate && strings.Contains(string(p), "------------------------------------------------") {
+		w.gate = false
+		w.m.core.integer.Budget().FailAfter(-1)
+	}
+	return n, e
 }

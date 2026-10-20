@@ -181,6 +181,9 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 		if e != nil {
 			return Polynomial{}, e
 		}
+		if e = m.traceDerivativeTerm(term, x, d); e != nil {
+			return Polynomial{}, e
+		}
 		if d == 0 {
 			continue
 		}
@@ -390,4 +393,43 @@ func (m *MultivariatePolynomialManager) derivativeInvocationHasOrphans(r *polyno
 		}
 	}
 	return false
+}
+
+// Source: polynomial.cpp:4518, before the d>0 branch and its two numerals.
+type polynomialDerivativeTraceBorrow struct{ executing bool }
+
+func (b *polynomialDerivativeTraceBorrow) NumericExecuting() bool { return b.executing }
+func (m *MultivariatePolynomialManager) traceDerivativeTerm(term Monomial, x, d uint32) error {
+	c := m.core
+	if !c.monomials.monomialTraceTags().ShouldTrace("polynomial") {
+		return nil
+	}
+	borrow := polynomialDerivativeTraceBorrow{executing: true}
+	var integer, natural unumeral.NumericCallerBinding
+	if e := c.integer.BindCaller(&integer, &borrow, 0); e != nil {
+		return e
+	}
+	defer func() {
+		if e := integer.Unbind(); e != nil {
+			panic(e)
+		}
+	}()
+	if e := c.integer.Natural.BindCaller(&natural, &borrow, 0); e != nil {
+		return e
+	}
+	defer func() {
+		if e := natural.Unbind(); e != nil {
+			panic(e)
+		}
+	}()
+	return m.emitFactorTraceTag(nil, "polynomial", "derivative", 4518, func(out *polynomialTraceSink) error {
+		if e := c.monomials.displayIntoCore(term, out, false); e != nil {
+			return e
+		}
+		_ = out.WriteLiteral(" degree_of x")
+		_ = out.WriteUnsigned(x)
+		_ = out.WriteLiteral(": ")
+		_ = out.WriteUnsigned(d)
+		return out.WriteLiteral("\n")
+	})
 }

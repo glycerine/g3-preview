@@ -187,69 +187,6 @@ func TestPolynomialResultantTraceRefusingStreamStillFormats(t *testing.T) {
 	}
 }
 
-type discriminantSignTraceWriter struct {
-	strings.Builder
-	t        *testing.T
-	m        *MultivariatePolynomialManager
-	observed bool
-}
-
-func (w *discriminantSignTraceWriter) WriteString(s string) (int, error) { return w.Write([]byte(s)) }
-func (w *discriminantSignTraceWriter) Write(p []byte) (int, error) {
-	n, e := w.Builder.Write(p)
-	if !w.observed && strings.Contains(w.String(), ":5483 ") {
-		w.observed = true
-		if w.m.discriminant.depth != 1 || w.m.gcdDepth != 0 {
-			w.t.Fatal("sign record crossed lc construction or resultant return", w.m.discriminant.depth, w.m.gcdDepth)
-		}
-		for _, action := range []func() error{w.m.CloseChecked, w.m.SourceFinalize, w.m.CleanupGCD, w.m.CleanupDiscriminant} {
-			if e := action(); !errors.Is(e, ErrPolynomialPending) {
-				w.t.Fatal("executing sign record owner", e)
-			}
-		}
-		if e := w.m.core.integer.CloseChecked(); e == nil {
-			w.t.Fatal("sign record released numerical owner")
-		}
-	}
-	return n, e
-}
-func TestPolynomialDiscriminantTraceSignBeforeLeadingNumeral(t *testing.T) {
-	for _, tc := range []struct {
-		degree uint32
-		want   int64
-		sign   string
-	}{{0, 0, ""}, {1, 1, "0"}, {2, 8, "1"}, {3, -108, "1"}, {4, -2048, "0"}} {
-		m := polynomialPSCFullFixture(t)
-		c := m.core
-		var p Polynomial
-		if tc.degree == 0 {
-			p = polynomialQueryTerms(t, c, []int32{2}, [][]MonomialPower{nil})
-		} else {
-			p = polynomialQueryTerms(t, c, []int32{1, -2}, [][]MonomialPower{{{0, tc.degree}}, nil})
-		}
-		out, e := NewPolynomialRef(c)
-		serviceMust(t, e)
-		w := &discriminantSignTraceWriter{t: t, m: m}
-		tags := diagnostic.NewTraceTagsWithWriter(w)
-		tags.Enable("resultant")
-		c.monomials.config.Trace = tags
-		t.Cleanup(func() { tags.Finalize(); serviceMust(t, m.CleanupDiscriminant()); serviceMust(t, out.Close()) })
-		serviceMust(t, m.Discriminant(p, 0, out))
-		expected := map[[3]uint32]int64{}
-		if tc.want != 0 {
-			expected[[3]uint32{}] = tc.want
-		}
-		polynomialQueryExpect(t, c, out.root.value, expected)
-		if tags.ShouldTrace("resultant") && tc.degree != 0 {
-			if !w.observed || !strings.Contains(w.String(), "discriminant src/math/polynomial/polynomial.cpp:5483 ") || !strings.Contains(w.String(), "discriminant sign: "+tc.sign+"\n") {
-				t.Fatal("sign record", tc.degree, w.String())
-			}
-		} else if w.observed {
-			t.Fatal("unreached source record executed", tc.degree)
-		}
-	}
-}
-
 func TestPolynomialResultantTraceEveryReservation(t *testing.T) {
 	if !polynomialTraceEnabledForTest() {
 		t.Skip("trace erased")
