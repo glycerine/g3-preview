@@ -39235,22 +39235,30 @@
         },
         {
           "name": "Retained private unsynchronized qm() owner in manager construction (algebraic_numbers.h:61; algebraic_numbers.cpp:69,100,2772; arith_decl_plugin.cpp:25-35)",
-          "status": "partial",
-          "go_target": "pkg/math/polynomial/algebraic_manager.go",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_arith_algebraic.go",
           "go_targets": [
+			"pkg/util/numeral/rational_private_manager.go",
+			"pkg/ast/ast_arith_plugin.go",
+			"pkg/ast/ast_arith_algebraic_source_test.go",
             "pkg/math/polynomial/algebraic_manager_private_test.go"
           ],
           "tests": [
+			"TestASTArithmeticAlgebraicExternalTranslationOwnsDistinctValue",
+			"TestASTArithmeticAlgebraicNumeralDeletionRecyclesExternalID",
             "TestAlgebraicManagerPrivateUnsynchronizedNumeralOwners",
             "TestAlgebraicManagerPrivateNumeralConstructorReservations"
           ],
-          "notes": "AlgebraicManagerConfig.Numerals borrows a concrete RationalManager, defaulting to the existing service manager when absent. Explicit private owners supply the actual core, binary, univariate, multivariate, allocator/runtime and header budget; the global RationalService remains the distinct diagnostic owner. qm() returns the selected owner. Construction preserves the existing service-borrow route for the default owner and uses the typed univariate constructor for a distinct raw owner. Two real unsynchronized managers copy sqrt(2), close the source algebraic and numeral owners, then square the receiving value back to 2. Every reached private-manager constructor reservation prefix is tested through success and cleanup leaves both borrowed numeral owners ready. No source synchronization flag is overwritten. Whole constructor/member ownership composition and the owning AST lazy wrapper remain partial. The existing owning AlgebraicManager eagerly creates binary, interval, multivariate and univariate members, scratch and x/y. Its injected core alone does not establish a constructor gap. TestAlgebraicManagerStoppedYoungestMemberProtectsOlderOwners now uses a real large-coefficient TLS release refusal through public runtime operations; older members remain usable and owning cleanup completes without rewriting allocation extents or source numerals."
+          "notes": "The arithmetic plugin now lazily constructs its concrete algebraic_numbers_wrapper with a private unsynchronized RationalManager in the AST RationalService runtime, a full AlgebraicManager, source-order ID recycling and an owned algebraic value vector. The wrapper owns and closes its Go support services after deleting every live value; the global RationalService and global parameter reference remain borrowed. AlgebraicManagerConfig.Numerals continues to select the concrete private qm() throughout binary, interval, univariate and multivariate members. Focused tests create irrational values through that actual wrapper, verify independent source/target owners, source ID recycling and AST-close cleanup. Existing constructor-reservation and stopped-youngest-member suites cover the full AlgebraicManager prefix. Ordinary, checked, debug and combined debug/trace focused profiles pass on CPUs 8-16."
         },
         {
           "name": "Retained arith_decl_plugin::translate cross-manager numeral set (arith_decl_plugin.cpp:104-111; algebraic_numbers.cpp:509-539)",
-          "status": "partial",
-          "go_target": "pkg/math/polynomial/algebraic_copy_core.go",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_arith_algebraic.go",
           "go_targets": [
+			"pkg/ast/ast_arith_plugin.go",
+			"pkg/ast/ast_core_delete.go",
+			"pkg/ast/ast_arith_algebraic_source_test.go",
             "pkg/math/polynomial/algebraic_root.go",
             "pkg/math/polynomial/algebraic_manager.go",
             "pkg/math/polynomial/upolynomial.go",
@@ -39260,6 +39268,8 @@
             "pkg/math/polynomial/algebraic_copy_destructor_test.go"
           ],
           "tests": [
+			"TestASTArithmeticAlgebraicExternalTranslationOwnsDistinctValue",
+			"TestASTArithmeticAlgebraicNumeralDeletionRecyclesExternalID",
             "TestAlgebraicCopyFromCoreBranches",
             "TestAlgebraicCopyFromCoreReservationPrefixes",
             "TestAlgebraicCopyFromCoreAllocationCallback",
@@ -39269,7 +39279,7 @@
             "TestAlgebraicCopyFromCoreBoundShiftPhysicalRefusal",
             "TestAlgebraicCopyFromCoreSourceDestructorAndOwningStop"
           ],
-          "notes": "CopyFromCore now implements the concrete distinct-core zero/basic/root set branches, including root-to-basic deletion before the const scoped-mpq construction, NUM then DEN cross-owner SET, original destination allocation/publication order, recorded coefficient extent, receiving interval assertion/lower/upper SET, and packed flag copying without normalization. Source core and both univariate owners remain borrowed across stopped invocations until exact receiving copy/shift/cell allocation and scoped-rational cleanup completes. Synchronous integer/natural bindings exclude numeral owner destruction during actual allocation/cleanup callbacks. Nine branch combinations, independent BIG coefficients/basic NUM/DEN, every reached reservation prefix through success, actual TLS allocation callback refusal, and full owning-source manager lifetime are covered. The owning-source manager closes successfully after copy and the receiving value remains readable. Same-core calls delegate existing Copy. The integrated checked interval assertion now has a real descriptor-after-physical shift refusal with a full eight-cell receiver: all coefficients finish, no interval endpoint is assigned, source borrow stays live, and owning cleanup releases the exact shift backing. An independent replacement allocation and its issued copy receipt remain untouched by algebraic cleanup. The ordinary profile verifies assertion erasure and no exponent-alignment scratch use. A qualified LP64 public-realloc TLS fixture now reaches a mutable destination SET refusal after both foreign local-q fields copied, then a stopped literal NUM destructor and a separate owning cleanup stop. Both core lifetimes remain excluded in the SET callback; the source borrow survives the owning stop, synchronous bindings leave on every return, retries release the actual physical prefix, and stopped source cursor/body/destructor causes remain unchanged. Owning manager construction now also accepts an explicit private unsynchronized RationalManager distinct from global diagnostics, matching the AST wrapper numeral owner. Remaining work includes broader callback/failure composition and the owning AST algebraic wrapper/ID translation consumer. This partial method does not claim that arith_decl_plugin translation or the whole algebraic/polynomial/AST port is complete."
+          "notes": "arith_decl_plugin translation now reads the source external ID from its live wrapper, constructs the target wrapper lazily, copies the irrational value with AlgebraicRootCore.CopyFromCore, and publishes a new target external parameter. Source and target have distinct private rational and algebraic owners. Recycling or reusing the source ID leaves the target value unchanged. Irrational numeral declarations attach the external parameter to the arithmetic family, and actual node deletion dispatches arith_decl_plugin::del to delete the value and recycle its ID. CopyFromCore retains its complete zero/basic/root, reservation, callback, stopped-destructor and owning-source coverage. Ordinary, checked, debug and combined debug/trace focused profiles pass on CPUs 8-16."
         },
         {
           "name": "Complete root/SMT2/Mathematica displays cpp2626-2706 with cached m_i lookup, packed-word publication, exact invocation receipts and basic coefficient source continuation",
@@ -40442,22 +40452,30 @@
         },
         {
           "name": "Retained private unsynchronized qm() owner in manager construction (algebraic_numbers.h:61; algebraic_numbers.cpp:69,100,2772; arith_decl_plugin.cpp:25-35)",
-          "status": "partial",
-          "go_target": "pkg/math/polynomial/algebraic_manager.go",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_arith_algebraic.go",
           "go_targets": [
+			"pkg/util/numeral/rational_private_manager.go",
+			"pkg/ast/ast_arith_plugin.go",
+			"pkg/ast/ast_arith_algebraic_source_test.go",
             "pkg/math/polynomial/algebraic_manager_private_test.go"
           ],
           "tests": [
+			"TestASTArithmeticAlgebraicExternalTranslationOwnsDistinctValue",
+			"TestASTArithmeticAlgebraicNumeralDeletionRecyclesExternalID",
             "TestAlgebraicManagerPrivateUnsynchronizedNumeralOwners",
             "TestAlgebraicManagerPrivateNumeralConstructorReservations"
           ],
-          "notes": "AlgebraicManagerConfig.Numerals borrows a concrete RationalManager, defaulting to the existing service manager when absent. Explicit private owners supply the actual core, binary, univariate, multivariate, allocator/runtime and header budget; the global RationalService remains the distinct diagnostic owner. qm() returns the selected owner. Construction preserves the existing service-borrow route for the default owner and uses the typed univariate constructor for a distinct raw owner. Two real unsynchronized managers copy sqrt(2), close the source algebraic and numeral owners, then square the receiving value back to 2. Every reached private-manager constructor reservation prefix is tested through success and cleanup leaves both borrowed numeral owners ready. No source synchronization flag is overwritten. Whole constructor/member ownership composition and the owning AST lazy wrapper remain partial."
+          "notes": "The arithmetic plugin now lazily constructs its concrete algebraic_numbers_wrapper with a private unsynchronized RationalManager in the AST RationalService runtime, a full AlgebraicManager, source-order ID recycling and an owned algebraic value vector. The wrapper owns and closes its Go support services after deleting every live value; the global RationalService and global parameter reference remain borrowed. AlgebraicManagerConfig.Numerals continues to select the concrete private qm() throughout binary, interval, univariate and multivariate members. Focused tests create irrational values through that actual wrapper, verify independent source/target owners, source ID recycling and AST-close cleanup. Existing constructor-reservation and stopped-youngest-member suites cover the full AlgebraicManager prefix. Ordinary, checked, debug and combined debug/trace focused profiles pass on CPUs 8-16."
         },
         {
           "name": "Retained arith_decl_plugin::translate cross-manager numeral set (arith_decl_plugin.cpp:104-111; algebraic_numbers.cpp:509-539)",
-          "status": "partial",
-          "go_target": "pkg/math/polynomial/algebraic_copy_core.go",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_arith_algebraic.go",
           "go_targets": [
+			"pkg/ast/ast_arith_plugin.go",
+			"pkg/ast/ast_core_delete.go",
+			"pkg/ast/ast_arith_algebraic_source_test.go",
             "pkg/math/polynomial/algebraic_root.go",
             "pkg/math/polynomial/algebraic_manager.go",
             "pkg/math/polynomial/upolynomial.go",
@@ -40467,6 +40485,8 @@
             "pkg/math/polynomial/algebraic_copy_destructor_test.go"
           ],
           "tests": [
+			"TestASTArithmeticAlgebraicExternalTranslationOwnsDistinctValue",
+			"TestASTArithmeticAlgebraicNumeralDeletionRecyclesExternalID",
             "TestAlgebraicCopyFromCoreBranches",
             "TestAlgebraicCopyFromCoreReservationPrefixes",
             "TestAlgebraicCopyFromCoreAllocationCallback",
@@ -40476,7 +40496,7 @@
             "TestAlgebraicCopyFromCoreBoundShiftPhysicalRefusal",
             "TestAlgebraicCopyFromCoreSourceDestructorAndOwningStop"
           ],
-          "notes": "CopyFromCore now implements the concrete distinct-core zero/basic/root set branches, including root-to-basic deletion before the const scoped-mpq construction, NUM then DEN cross-owner SET, original destination allocation/publication order, recorded coefficient extent, receiving interval assertion/lower/upper SET, and packed flag copying without normalization. Source core and both univariate owners remain borrowed across stopped invocations until exact receiving copy/shift/cell allocation and scoped-rational cleanup completes. Synchronous integer/natural bindings exclude numeral owner destruction during actual allocation/cleanup callbacks. Nine branch combinations, independent BIG coefficients/basic NUM/DEN, every reached reservation prefix through success, actual TLS allocation callback refusal, and full owning-source manager lifetime are covered. The owning-source manager closes successfully after copy and the receiving value remains readable. Same-core calls delegate existing Copy. The integrated checked interval assertion now has a real descriptor-after-physical shift refusal with a full eight-cell receiver: all coefficients finish, no interval endpoint is assigned, source borrow stays live, and owning cleanup releases the exact shift backing. An independent replacement allocation and its issued copy receipt remain untouched by algebraic cleanup. The ordinary profile verifies assertion erasure and no exponent-alignment scratch use. A qualified LP64 public-realloc TLS fixture now reaches a mutable destination SET refusal after both foreign local-q fields copied, then a stopped literal NUM destructor and a separate owning cleanup stop. Both core lifetimes remain excluded in the SET callback; the source borrow survives the owning stop, synchronous bindings leave on every return, retries release the actual physical prefix, and stopped source cursor/body/destructor causes remain unchanged. Owning manager construction now also accepts an explicit private unsynchronized RationalManager distinct from global diagnostics, matching the AST wrapper numeral owner. Remaining work includes broader callback/failure composition and the owning AST algebraic wrapper/ID translation consumer. This partial method does not claim that arith_decl_plugin translation or the whole algebraic/polynomial/AST port is complete."
+          "notes": "arith_decl_plugin translation now reads the source external ID from its live wrapper, constructs the target wrapper lazily, copies the irrational value with AlgebraicRootCore.CopyFromCore, and publishes a new target external parameter. Source and target have distinct private rational and algebraic owners. Recycling or reusing the source ID leaves the target value unchanged. Irrational numeral declarations attach the external parameter to the arithmetic family, and actual node deletion dispatches arith_decl_plugin::del to delete the value and recycle its ID. CopyFromCore retains its complete zero/basic/root, reservation, callback, stopped-destructor and owning-source coverage. Ordinary, checked, debug and combined debug/trace focused profiles pass on CPUs 8-16."
         },
         {
           "name": "Complete root/SMT2/Mathematica displays cpp2626-2706 with cached m_i lookup, packed-word publication, exact invocation receipts and basic coefficient source continuation",

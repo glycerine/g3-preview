@@ -105,12 +105,22 @@ func (m *ASTManager) deleteNode(first astNodeRef) error {
 					_, e = m.decNode(v.ast)
 					note(e)
 				}
-				if v.Kind == ASTParameterExternal && info.family >= 0 && m.pluginAt(info.family).kind == astFloatingPointPlugin && m.pluginAt(info.family).present {
-					if m.floatingPointPlugin == nil || m.floatingPointPlugin.family != info.family {
-						return ErrASTHandle
-					}
-					if e = m.floatingPointPlugin.recycledValueID(v.external); e != nil {
-						return e
+				if v.Kind == ASTParameterExternal && info.family >= 0 && m.pluginAt(info.family).present {
+					switch m.pluginAt(info.family).kind {
+					case astFloatingPointPlugin:
+						if m.floatingPointPlugin == nil || m.floatingPointPlugin.family != info.family {
+							return ErrASTHandle
+						}
+						if e = m.floatingPointPlugin.recycledValueID(v.external); e != nil {
+							return e
+						}
+					case astArithmeticPlugin:
+						if m.arithmeticPlugin == nil || m.arithmeticPlugin.family != info.family || m.arithmeticPlugin.algebraic == nil {
+							return ErrASTHandle
+						}
+						if e = m.arithmeticPlugin.algebraic.recycle(v.external); e != nil {
+							return e
+						}
 					}
 				}
 				// The original eager plugins inherit default external del(),

@@ -47052,3 +47052,18 @@ destruction and explicit owning abort through vector/mapping/selection
 continuations are covered. Tests pass native 0.107s, checked 0.108s, debug
 0.321s and combined 0.360s on CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-cell-lifecycle-audit.txt`.
+
+Algebraic AST-wrapper and translation closure:
+the duplicate private-qm and arith_decl_plugin translation rows are promoted
+to ported. The arithmetic plugin now lazily owns its private unsynchronized
+rational manager, full algebraic manager, ID recycler and algebraic value
+vector. Irrational declarations attach external IDs to the arithmetic family;
+real node deletion deletes the value and recycles the ID. Cross-manager
+translation copies through the concrete distinct-core CopyFromCore path, and
+source deletion plus ID reuse leaves the target value unchanged. The new
+ast-to-polynomial production edge exposed an unused reverse test-only AST hook
+in polynomial; removing that dead hook restores the source dependency
+direction. Focused tests pass all four build profiles on CPUs 8-16. Full native
+AST, polynomial and numeral package tests pass in 1m51.989s; portcheck and diff
+hygiene pass. Only the failed-constructor and normal/source-destructor audit
+rows remain partial in algebraic_numbers.cpp/.h.

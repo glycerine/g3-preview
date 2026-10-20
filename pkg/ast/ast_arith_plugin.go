@@ -13,6 +13,7 @@ import (
 
 type astArithmeticPluginOwner struct {
 	numeral                    astArithNumeralFrame
+	algebraic                  *astAlgebraicNumbersWrapper
 	numeralSerial              uint64
 	small                      [2][]astNodeRef // owning Int, Real numeral caches
 	convertIntNumerals         bool
@@ -42,7 +43,7 @@ func (m *ASTManager) arithmeticPluginBytes() uint64 {
 }
 func (m *ASTManager) releaseArithmeticPluginHeaders() {
 	if p := m.arithmeticPlugin; p != nil {
-		if p.numeral.active {
+		if p.numeral.active || p.algebraic != nil {
 			return
 		}
 		p.small[1] = nil
@@ -105,6 +106,12 @@ func (m *ASTManager) finalizeArithmeticPlugin() error {
 				return e
 			}
 		}
+	}
+	if p.algebraic != nil {
+		if e := p.algebraic.close(); e != nil {
+			return e
+		}
+		p.algebraic = nil
 	}
 	return nil
 }

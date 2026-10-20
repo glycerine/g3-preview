@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/ast"
-
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
@@ -28,7 +26,6 @@ type paramsPhysicalRationalOwner struct {
 
 type upolyPhysicalExtraOwners struct {
 	CallerBlocks         []umemory.Block // actual directly returned caller allocations only
-	ASTManagers          []*ast.ASTManager
 	DebugContexts        []*udiag.DebugContext
 	ParamsRationalValues []paramsPhysicalRationalOwner
 	ParamsValues         []paramsPhysicalValueOwner
@@ -79,38 +76,6 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 			}
 			if testFieldBySourceName(raw, "normActive").Bool() {
 				addInt(testFieldBySourceName(raw, "norm"))
-			}
-		}
-		// Only the explicitly supplied owner supplies roots. Its initialized
-		// placement records and acquired lexical value are concrete acquisition
-		// fields, never discoveries from the numeric allocator directory.
-		for _, owner := range x.ASTManagers {
-			if owner == nil || owner.Self != owner || owner.Closed {
-				panic(ast.ErrASTHandle)
-			}
-			for _, page := range owner.Parameters {
-				if page == nil {
-					continue
-				}
-				for i := range page {
-					value := &page[i]
-					if value.Live && value.Kind == ast.ASTParameterRational {
-						addRat(testFieldBySourceName(reflect.ValueOf(&value.Rational).Elem(), "raw"))
-					}
-				}
-			}
-			for f := owner.ArrayCardinality; f != nil; f = f.Next {
-				if f.Self != f || f.Owner != owner || f.Invocation == 0 {
-					panic(ast.ErrASTHandle)
-				}
-				for i, owned := range f.Acquired {
-					if owned {
-						addRat(testFieldBySourceName(reflect.ValueOf(&f.Values[i]).Elem(), "raw"))
-					}
-				}
-			}
-			if owner.LowLevel.Active && owner.LowLevel.NumeralAcquired {
-				addRat(testFieldBySourceName(reflect.ValueOf(&owner.LowLevel.Numeral).Elem(), "raw"))
 			}
 		}
 		for _, owner := range x.ParamsRationalValues {
