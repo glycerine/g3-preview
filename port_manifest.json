@@ -129239,6 +129239,8 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/util/numeral/mpbq_source_finalize.go",
+        "pkg/util/numeral/mpbq_source_finalize_test.go",
         "pkg/util/numeral/mpbqi.go",
         "pkg/util/numeral/mpbqi_format.go",
         "pkg/util/numeral/scoped_binary_interval.go",
@@ -129325,6 +129327,20 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "literal binary scratch-manager source destruction and separate owning acknowledgement",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_source_finalize.go",
+          "notes": "Concrete mpbq destructor cpp45-57 and basic_interval destructor h83-86 now have SourceFinalize paths distinct from CloseChecked. Exact source member order, sticky first release error/cursor, no older-member execution on refusal, no pending display/debug-operation cleanup, and retained Go headers for explicit owning teardown. CloseChecked can acknowledge consumed physical releases without changing source cause/stage. Tests populate actual named scratch members through their real integer/binary owners and induce signed-host TLS release refusals using public runtime operations; no numeric descriptor, counter, synchronization flag or constructor bit is repaired. These are prerequisites for the still-uncomposed algebraic manager source destructor, not credit for full algebraic or AST destruction.",
+          "tests": [
+            "TestBinaryManagerSourceDestructorSuccessAndOwningBoundary",
+            "TestBinaryManagerSourceDestructorEveryStoppedMember",
+            "TestBinaryIntervalSourceDestructorEveryStoppedMember",
+            "TestBinaryIntervalSourceDestructorSuccess",
+            "TestBinaryManagerSourceDestructorRefusesActualRetainedDisplay",
+            "TestBinaryManagersOwningCloseDoesNotAdvanceSource"
+          ]
+        },
         {
           "name": "Concrete foreign-owner MPBQ comparison and interval SET for algebraic-manager translation, with receiver scaling scratch and exact caller transport",
           "status": "ported",
@@ -163692,6 +163708,8 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/util/numeral/mpbq_source_finalize.go",
+        "pkg/util/numeral/mpbq_source_finalize_test.go",
         "pkg/util/numeral/mpbq.go",
         "pkg/util/numeral/mpbq_arithmetic.go",
         "pkg/util/numeral/mpbq_root.go",
@@ -164080,6 +164098,20 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "literal binary scratch-manager source destruction and separate owning acknowledgement",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_source_finalize.go",
+          "notes": "Concrete mpbq destructor cpp45-57 and basic_interval destructor h83-86 now have SourceFinalize paths distinct from CloseChecked. Exact source member order, sticky first release error/cursor, no older-member execution on refusal, no pending display/debug-operation cleanup, and retained Go headers for explicit owning teardown. CloseChecked can acknowledge consumed physical releases without changing source cause/stage. Tests populate actual named scratch members through their real integer/binary owners and induce signed-host TLS release refusals using public runtime operations; no numeric descriptor, counter, synchronization flag or constructor bit is repaired. These are prerequisites for the still-uncomposed algebraic manager source destructor, not credit for full algebraic or AST destruction.",
+          "tests": [
+            "TestBinaryManagerSourceDestructorSuccessAndOwningBoundary",
+            "TestBinaryManagerSourceDestructorEveryStoppedMember",
+            "TestBinaryIntervalSourceDestructorEveryStoppedMember",
+            "TestBinaryIntervalSourceDestructorSuccess",
+            "TestBinaryManagerSourceDestructorRefusesActualRetainedDisplay",
+            "TestBinaryManagersOwningCloseDoesNotAdvanceSource"
+          ]
+        },
         {
           "name": "Retained tracked binary display and scoped stream dispatch (mpbq.cpp:394-401; scoped_numeral.h:186-189)",
           "status": "ported",

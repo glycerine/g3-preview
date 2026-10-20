@@ -85,6 +85,9 @@ type BinaryRationalManager struct {
 	closed                                         bool
 	closing                                        bool
 	cleanupStage                                   uint8
+	sourceStarted, sourceFinalized, sourceRunning  bool
+	sourceStage                                    uint8
+	sourceCause                                    error
 	Display                                        binaryDisplayScope
 	selectIntTemporary                             Int
 	selectIntOwner                                 *RationalManager
@@ -224,7 +227,7 @@ func (m *BinaryRationalManager) triple(a, b, r *BinaryRational) error {
 }
 func (m *BinaryRationalManager) Precise() bool { return true }
 func (m *BinaryRationalManager) Field() bool   { return false }
-func (m *BinaryRationalManager) CloseChecked() error {
+func (m *BinaryRationalManager) checkDestructorExecution() error {
 	if m == nil || m.self != m {
 		return ErrBinaryOwner
 	}
@@ -261,6 +264,15 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	}
 	if m.debugIntegerExecuting {
 		return ErrBinaryDebugIntegerPending
+	}
+	if m.sourceRunning {
+		return ErrNumericPending
+	}
+	return nil
+}
+func (m *BinaryRationalManager) CloseChecked() error {
+	if e := m.checkDestructorExecution(); e != nil {
+		return e
 	}
 	if m.closed {
 		return nil

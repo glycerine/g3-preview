@@ -17,18 +17,21 @@ func NewBinaryInterval() BinaryInterval { return BinaryInterval{} }
 // BinaryIntervalManager borrows bounds; all values/scopes must die before
 // Close, and Close must precede closing bounds. Owner-confined, not concurrent.
 type BinaryIntervalManager struct {
-	debugInvocation         uint64
-	debugExecuting          bool
-	debugPending            bool
-	debugSourceCause        error
-	debugChildren           binaryDebugChildren
-	bounds                  *BinaryRationalManager
-	self                    *BinaryIntervalManager
-	MulCurr, MulMax, MulMin BinaryRational
-	HeaderBytes             uint64
-	closed                  bool
-	closing                 bool
-	cleanupStage            uint8
+	debugInvocation                               uint64
+	debugExecuting                                bool
+	debugPending                                  bool
+	debugSourceCause                              error
+	debugChildren                                 binaryDebugChildren
+	bounds                                        *BinaryRationalManager
+	self                                          *BinaryIntervalManager
+	MulCurr, MulMax, MulMin                       BinaryRational
+	HeaderBytes                                   uint64
+	closed                                        bool
+	closing                                       bool
+	cleanupStage                                  uint8
+	sourceStarted, sourceFinalized, sourceRunning bool
+	sourceStage                                   uint8
+	sourceCause                                   error
 }
 type BinaryIntervalStats struct {
 	HeaderBytes           uint64
@@ -119,11 +122,14 @@ func (m *BinaryIntervalManager) Close() {
 	}
 }
 
-// CloseChecked resumes the source destructor at its first unfinished scratch
-// bound: current, maximum, then minimum.
+// CloseChecked owns interrupted scratch releases and the Go header.
+// SourceFinalize preserves the separate literal source destructor history.
 func (m *BinaryIntervalManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return ErrBinaryOwner
+	}
+	if m.sourceRunning {
+		return ErrNumericPending
 	}
 	if m.closed {
 		return nil
