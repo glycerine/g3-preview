@@ -9978,7 +9978,8 @@
         "pkg/ast/ast_info_memory_trace.go",
         "pkg/ast/ast_info_memory_trace_debug_test.go",
         "pkg/ast/ast_core_quantifier_pattern_trace.go",
-        "pkg/ast/ast_core_distinct_trace.go"
+        "pkg/ast/ast_core_distinct_trace.go",
+        "pkg/ast/ast_translation_plugins.go"
       ],
       "tests": [
         "TestASTFuncDeclInfoSourceText",
@@ -10132,7 +10133,10 @@
         "TestASTInfoMemoryWrapperRegisteredSortAndDecl",
         "TestASTInfoMemoryWrapperDebugRetainsSourceAllocation",
         "TestASTQuantifierPatternSourceTraceBeforeRegistration",
-        "TestASTExpandedDistinctSourceTraceAfterConjunction"
+        "TestASTExpandedDistinctSourceTraceAfterConjunction",
+        "TestASTCopyFamiliesPluginsPreservesOrderAndConcreteKinds",
+        "TestASTCopyFamiliesPluginsRejectsDivergentFamilyOrder",
+        "TestASTCopyFamiliesPluginsCopiesFormatPlugin"
       ],
       "conditionals": [
         {
@@ -11231,6 +11235,16 @@
           "tests": [
             "TestASTExpandedDistinctSourceTraceAfterConjunction"
           ]
+        },
+        {
+          "name": "ast_manager::copy_families_plugins two-pass family-ID preservation and fresh concrete plugin installation (src/ast/ast.cpp:1520-1561)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_translation_plugins.go",
+          "tests": [
+            "TestASTCopyFamiliesPluginsPreservesOrderAndConcreteKinds",
+            "TestASTCopyFamiliesPluginsRejectsDivergentFamilyOrder",
+            "TestASTCopyFamiliesPluginsCopiesFormatPlugin"
+          ]
         }
       ],
       "ownership": [
@@ -11284,7 +11298,8 @@
         "Removed unused Go ASTDependencyRef scalar/vector/buffer adapters and their physical borrows, growth/copy/lifecycle tests and cleanup codecs. Caller audit found these APIs exclusively within their bridge implementations/tests after retained consumers migrated to concrete native ownership. Source expr_dependency_ref uses are not classified as dead: actual Go dependency DAG and goal ownership callbacks remain. The separate ASTManager vectorAllocator had no remaining production payload consumer and is removed from construction/statistics/teardown; its old diagnostic bit position is reserved to avoid renumbering remaining constructor bits. The live substitution dependency pointer conversion remains as a concrete substitution helper. Live substitution tests retain actual allocator/ownership/refcount checks and drop only observations of the unrelated empty adapter allocator. No generic template/container or whole-unit completion credit is added.",
         "The retained goal native-slice owner uses DependencyDecConsumed to observe whether a real root decrement occurred before a subsequent destruction error. DependencyDec delegates to the same existing decrement path; source counter/debug and destruction order remain. No generic container credit is added.",
         "Removed unused Go ASTExprArray/ASTDependencyArray persistent-array bridges, encoded layouts, reroot scratch, embedded manager members and bridge-only tests after the last retained goal consumer migrated to native owning slices. The real dependency DAG owner remains eagerly bound and preserves its constructor bit position. Substitution cleanup invokes the actual dependency decrement consumption transport directly. Source generic parray and standalone stress tests are not claimed as ported; retained Boolean interning assertions and native goal snapshot/reference tests remain. Earlier array-specific ownership descriptions are superseded by this removal; no whole-unit or dead-source credit is added.",
-        "Hash algorithms now live in independent util/hash. Retained numerical, AST and polynomial consumers import that package directly; runtime-backed checked readers use its MixState operation while remaining at their actual storage owner. AST and symbol duplicate mixing/string-hash bodies are replaced by the shared implementation. Hash golden tests and source_hash.json moved with the package. Algorithms, signed tails, callback visit order and concrete storage ownership are unchanged; this is package separation, not new port completion credit."
+        "Hash algorithms now live in independent util/hash. Retained numerical, AST and polynomial consumers import that package directly; runtime-backed checked readers use its MixState operation while remaining at their actual storage owner. AST and symbol duplicate mixing/string-hash bodies are replaced by the shared implementation. Hash golden tests and source_hash.json moved with the package. Algorithms, signed tails, callback visit order and concrete storage ownership are unchanged; this is package separation, not new port completion credit.",
+        "CopyFamiliesPlugins snapshots source family names and concrete plugin kinds, re-interns string names in the target symbol owner, reserves the complete family sequence before constructors run, and rejects pre-existing ID/name divergence. Fresh Go plugin owners are constructed through their concrete registration paths; built-in plugins are constructor-present. Datatype definition inheritance remains outside the retained datatype port because those definitions and utilities are not yet implemented."
       ]
     },
     {
