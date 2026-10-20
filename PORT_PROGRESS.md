@@ -46898,3 +46898,16 @@ and binary algorithms remain in their separate partial rows. Focused facade
 tests pass native 0.014s, checked 0.014s, debug 0.013s and combined 0.015s on
 CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-manager-arithmetic-audit.txt`.
+
+Algebraic root-construction overload closure:
+the duplicate `algebraic_numbers.cpp/.h` rows for cpp645-680 and public facades
+at cpp2887-2893 are promoted to ported. The retained production caller is
+`arith_decl_plugin.cpp:95-98`. Polynomial and S-expression conversion use the
+persistent isolation buffer, preserve assertion and error ordering, own only
+accepted parser/conversion/factor/vector children, reject callback reentry and
+leave older factor work untouched. All source TRACE frontiers, stopped display
+ownership, disabled-trace reads and output/publication behavior are covered.
+Focused tests pass native 0.041s, checked 0.043s, debug 0.051s and combined
+0.052s on CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-root-construction-audit.txt`. The underlying
+isolation algorithm remains separately partial.
