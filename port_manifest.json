@@ -22620,7 +22620,7 @@
       "path": "src/ast/rewriter/bool_rewriter_params.hpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
@@ -22653,11 +22653,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/gparams_catalog_collectors.go",
           "tests": [
@@ -22672,7 +22672,7 @@
           ]
         },
         {
-          "name": "captured global/local/default lookup for seven Boolean rewriter parameters",
+          "name": "constructor module snapshot and exact flat / elim_and / local_ctx / local_ctx_limit / blast_distinct / blast_distinct_threshold / ite_extra_rules local-module-default lookup sequence",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bool_rewriter_config.go",
           "tests": [
@@ -22682,24 +22682,50 @@
         }
       ],
       "ownership": [
-        "Static descriptor/catalog evidence is preserved. Generated runtime lookup uses actual retained local parameter references and captured global module references through the existing lexical helper owner; reached constructor failures retain an explicitly closable owner. Broader facade/ownership auditing remains incomplete."
+        "Static descriptor/catalog evidence is preserved. Generated runtime lookup borrows the local parameter reference and owns the captured global module reference through the existing lexical helper owner; reached constructor failures retain an explicitly closeable owner, and completed helpers release the snapshot before returning."
       ],
       "deviations": [
-        "Local-context OR simplification now uses the original forward/backward rounds, unsigned cost arithmetic, owning vectors and mark reset order. Nested ITE construction uses raw manager operations to prevent recursion. The complete recursive Boolean rewrite engine and whole-class method/ownership audits remain incomplete. Go guards reject invalid short argument arrays outside the source defined domain; the family assertion is debug-only. No whole Boolean rewriter, evaluator or public API completion is credited."
+        "The generated facade is inlined into the retained Boolean rewriter update consumer. Explicit Go lookup and cleanup errors replace source fatal/exception transport; broader Boolean rewrite algorithms remain separate units."
       ]
     },
     {
       "path": "src/ast/rewriter/bool_rewriter_params.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/gparams_catalog_collectors.go",
+        "pkg/ast/rewriter/bool_rewriter_config.go",
+        "pkg/ast/rewriter/bool_rewriter_config_test.go",
+        "pkg/util/params/util_gparams_catalog_test.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestBoolRewriterConstructorDefaultsFallbackAndCostRetention",
+        "TestBoolRewriterConstructorHelperRefusalRetiresReachedHeader"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "seven exported rewriter Boolean/unsigned declarations, literal defaults, descriptions and generated getter behavior",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bool_rewriter_config.go",
+          "tests": [
+            "TestBoolRewriterConstructorDefaultsFallbackAndCostRetention",
+            "TestBoolRewriterConstructorHelperRefusalRetiresReachedHeader"
+          ],
+          "go_targets": [
+            "pkg/ast/rewriter/gparams_catalog_collectors.go"
+          ]
+        }
+      ],
+      "ownership": [
+        "The declarations map to the retained consumer's borrowed local reference and owned lexical module snapshot; catalog description storage remains owned by the global parameter catalog."
+      ],
+      "deviations": [
+        "The concrete generated behavior is inlined at the retained bool_rewriter update call site."
+      ]
     },
     {
       "path": "src/ast/rewriter/bv_bounds.cpp",
