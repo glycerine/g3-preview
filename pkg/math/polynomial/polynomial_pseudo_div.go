@@ -30,6 +30,7 @@ const (
 // Nested Power has its own existing result record. The candidate slots are a
 // charged Go continuation representation, not the C++ stack allocation geometry.
 type polynomialPseudoDivisionScope struct {
+	traceDisplay                          polynomialDisplayInvocationReceipt
 	modD                                  polynomialArithmeticInvocationReceipt
 	operation                             polynomialArithmeticInvocationReceipt
 	generated                             Monomial
@@ -119,6 +120,14 @@ func (m *MultivariatePolynomialCore) pseudoCleanupPhase(owning, abort bool) erro
 	}
 	if !owning && s.sourceCause != nil {
 		return s.sourceCause
+	}
+	if owning {
+		if e := m.cleanupDisplayReceipt(&s.traceDisplay); e != nil {
+			return e
+		}
+	} else if cause := m.displayReceiptSourceCause(&s.traceDisplay); cause != nil {
+		s.sourceCause = cause
+		return cause
 	}
 	for _, child := range []*polynomialArithmeticInvocationReceipt{&s.modD, &s.operation, &s.quotientBuffer, &s.remainderBuffer} {
 		if !owning {
@@ -211,12 +220,18 @@ func (m *MultivariatePolynomialCore) pseudoCleanupPhase(owning, abort bool) erro
 	if polynomialNegNumericPending(&s.numeric) || m.modular.MatchesPNormalizeInvocation(&s.normalize) {
 		return nil
 	}
-	*s = polynomialPseudoDivisionScope{invocation: s.invocation, sourceCause: s.sourceCause, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, numeralCause: s.numeralCause, directReceipt: s.directReceipt, monomialAllocator: s.monomialAllocator, coefficientAppend: s.coefficientAppend, coefficientFactory: s.coefficientFactory, power: s.power, coefficient: s.coefficient, normalize: s.normalize, remainderBuffer: s.remainderBuffer, quotientBuffer: s.quotientBuffer, operation: s.operation, modD: s.modD}
+	if m.displayReceiptPending(&s.traceDisplay) {
+		return nil
+	}
+	*s = polynomialPseudoDivisionScope{traceDisplay: s.traceDisplay, invocation: s.invocation, sourceCause: s.sourceCause, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, numeralCause: s.numeralCause, directReceipt: s.directReceipt, monomialAllocator: s.monomialAllocator, coefficientAppend: s.coefficientAppend, coefficientFactory: s.coefficientFactory, power: s.power, coefficient: s.coefficient, normalize: s.normalize, remainderBuffer: s.remainderBuffer, quotientBuffer: s.quotientBuffer, operation: s.operation, modD: s.modD}
 	return nil
 }
 func (m *MultivariatePolynomialCore) CleanupPseudoDivision() error {
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
+	}
+	if m.pseudoDivision.executing {
+		return ErrPolynomialPending
 	}
 	e := m.pseudoCleanup(true)
 	if e != nil {
@@ -423,6 +438,11 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 		if s.cleanupCause != nil {
 			return
 		}
+		if cause := m.displayReceiptSourceCause(&s.traceDisplay); cause != nil {
+			s.sourceCause, s.cleanupCause = cause, cause
+			err = errors.Join(err, cause)
+			return
+		}
 		for _, child := range []*polynomialArithmeticInvocationReceipt{&s.modD, &s.operation, &s.quotientBuffer, &s.remainderBuffer} {
 			if cause := m.arithmeticInvocationSourceCause(child); cause != nil {
 				s.cleanupCause = cause
@@ -481,6 +501,9 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 	if e := polynomialPseudoSourceAssert(4908, "!ModD || x2d != 0", func() (bool, error) {
 		return !modulo || bounds != nil, nil
 	}); e != nil {
+		return e
+	}
+	if e := m.tracePseudoEntry(p, q, x); e != nil {
 		return e
 	}
 	degA, e := m.Degree(p, x)
@@ -556,6 +579,9 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 		if e = m.checkpoint(); e != nil {
 			return e
 		}
+		if e := m.tracePseudoIteration(p, q, Q, R, d); e != nil {
+			return e
+		}
 		degR, e := m.Degree(R.value, x)
 		if e != nil {
 			return e
@@ -571,6 +597,9 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 				if *d < exactD {
 					s.construct(pseudoAdjusted)
 					if e = m.powerIntoWithReceipt(s.refs[pseudoLeadB].value, exactD-*d, &s.refs[pseudoAdjusted], &s.power); e != nil {
+						return e
+					}
+					if e = m.tracePseudoAdjusted(); e != nil {
 						return e
 					}
 					if quotient {

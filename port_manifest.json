@@ -47664,6 +47664,20 @@
         ],
         "verification": "Literal normalized coefficients/factor and independent resultant126; entry source depth2 versus normalized depth9; exact TLS BIG Copy allocator tuple with matched GCD cleanup and zero final budget; actual budget prefixes through success with physical audits; no normalized record on zero/constant exits; degrees0-4 independent discriminants and sign record before leading numeral. Broader profiles and independent omission controls are recorded in PORT_PROGRESS.md.",
         "limits": "Whole polynomial/algebraic/AST algorithms, retained consumer and source failure audits remain partial."
+      },
+      "pseudo_division_trace_audit": {
+        "source": "polynomial.cpp:4909-4911,4955-4962,4973",
+        "go_target": "pkg/math/polynomial/polynomial_pseudo_trace.go",
+        "behavior": "Entry follows assertions and precedes degree reads and core locals. Each loop state record follows the actual checkpoint, before the degree test, printing direct A/B/leading/reduct/quotient/remainder polynomials and d. The exact-degree correction record prints its actual live l_B_e reference before multiplying outputs. A traceDisplay receipt belongs to the actual pseudo invocation; stopped source children protect older locals, body failures retain pending display ownership after ordinary unwind, and matched owning cleanup retires that child before the existing arithmetic/creation cleanup. Numerical bindings and the existing polynomial callback guard protect executing records.",
+        "tests": [
+          "TestPolynomialPseudoTraceExactCorrectionAndSourceLifetimes",
+          "TestPolynomialPseudoTraceActualEntryTLSRefusal",
+          "TestPolynomialPseudoTraceEarlyExitAndRemainderOnly",
+          "TestPolynomialPseudoTraceEveryReservation",
+          "TestPolynomialPseudoExecutingCleanupRefusalDoesNotBecomeSourceCause"
+        ],
+        "cleanup_fix": "CleanupPseudoDivision now rejects an executing call before writing cleanupCause. A real checkpoint callback previously converted the refusal into a false source cleanup failure; the direct trace-disabled checkpoint test covers that admission rule.",
+        "limits": "Whole polynomial/algebraic/AST and broader source consumer/failure audits remain partial."
       }
     },
     {
