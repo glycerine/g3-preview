@@ -13229,6 +13229,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_util_clauses.go",
+        "pkg/ast/ast_util_boolean.go",
         "pkg/ast/ast_core_boolean_factories.go",
         "pkg/ast/ast_core_boolean_factories_source_test.go",
         "pkg/ast/ast_core_span_factories.go",
@@ -13238,6 +13239,7 @@
       ],
       "tests": [
         "TestASTUtilAtomsLiteralsAndClauses",
+        "TestASTUtilBooleanFactoriesAndPushNot",
         "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap",
         "TestASTOrSpanSourceZeroSingletonAndInitializedSpare",
         "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
@@ -13350,6 +13352,14 @@
           "tests": [
             "TestASTUtilAtomsLiteralsAndClauses"
           ]
+        },
+        {
+          "name": "mk_and/mk_or arity shortcuts, simplified mk_not, recursive push_not and simplified mk_distinct (src/ast/ast_util.cpp:160-225,248-252)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_util_boolean.go",
+          "tests": [
+            "TestASTUtilBooleanFactoriesAndPushNot"
+          ]
         }
       ],
       "ownership": [
@@ -13367,7 +13377,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_dependency_traversal.go",
-        "pkg/ast/ast_util_clauses.go"
+        "pkg/ast/ast_util_clauses.go",
+        "pkg/ast/ast_util_boolean.go"
       ],
       "tests": [
         "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -13385,7 +13396,8 @@
         "TestASTDependencyNativeColdFIFOAndCompleteUnmarking",
         "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
         "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix",
-        "TestASTUtilAtomsLiteralsAndClauses"
+        "TestASTUtilAtomsLiteralsAndClauses",
+        "TestASTUtilBooleanFactoriesAndPushNot"
       ],
       "conditionals": [
         {
@@ -13428,6 +13440,14 @@
           "go_target": "pkg/ast/ast_util_clauses.go",
           "tests": [
             "TestASTUtilAtomsLiteralsAndClauses"
+          ]
+        },
+        {
+          "name": "Boolean factory, push_not and simplified distinct declarations and concrete slice overloads (src/ast/ast_util.h:99-140)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_util_boolean.go",
+          "tests": [
+            "TestASTUtilBooleanFactoriesAndPushNot"
           ]
         }
       ],
