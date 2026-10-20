@@ -31389,7 +31389,7 @@
       "path": "src/ast/shared_occs.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_shared_occs.go",
         "pkg/ast/ast_shared_occs_iterator.go",
@@ -31438,8 +31438,8 @@
           "text": "SASSERT(m_stack.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "shared_occs constructor/default configuration, insert/process and both traversal operators",
@@ -31527,8 +31527,7 @@
         },
         {
           "name": "shared_occs::display via real mk_ismt2_pp",
-          "status": "unported",
-          "go_target": "",
+          "status": "reference_only",
           "tests": []
         },
         {
@@ -31541,17 +31540,20 @@
         }
       ],
       "ownership": [
-        "Sparse marks use a native Go map of borrowed slot/generation identities. Shared occurrences use insdict.Dict with one owned reference per key and discovery-order iteration/destruction. Visitation and traversal use native slices; actual cold headers and node shared flags remain. See PORT_PROGRESS.md#native-sparse-marks-and-shared-occurrence-collections."
+        "Sparse marks borrow slot/generation identities without retaining nodes and reset the manager-owned shared bit before closing. Shared occurrences use insdict.Dict with exactly one owned AST reference per published key and discovery-order destruction.",
+        "Traversal frames and visitation lists are invocation-owned native Go slices. Iterators borrow an immutable discovery-order view that is invalidated before collection mutation, reset or close.",
+        "A source-order publication whose following INC fails remains explicitly non-owning, so reset removes the raw entry without decrementing a reference it never acquired."
       ],
       "deviations": [
-        "Container probing, tombstones, capacity arithmetic, simulated storage failures and backing-only epochs are replaced by native Go collections. Iterators borrow an insertion-order view invalidated by key changes/reset/close. Consumed cleanup keys are removed before returning callback errors. SMT2 display remains open; these consumers add no C++ generic container implementation credit. See PORT_PROGRESS.md#native-sparse-marks-and-shared-occurrence-collections."
+        "Container probing, tombstones, capacity arithmetic, simulated storage failures and backing-only epochs are replaced by native Go collections. Consumed cleanup keys are removed before returning callback errors.",
+        "shared_occs::display has no retained source caller: its only reference is an unused wrapper in the unretained goal_shared_occs header. Retained SMT2 printing consumes the collector semantics through the concrete Go printer and does not require this debug display facade."
       ]
     },
     {
       "path": "src/ast/shared_occs.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_shared_occs.go",
         "pkg/ast/ast_shared_occs_iterator.go",
@@ -31592,8 +31594,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "shared_occs constructor/default configuration, insert/process and both traversal operators",
@@ -31681,8 +31683,7 @@
         },
         {
           "name": "shared_occs::display via real mk_ismt2_pp",
-          "status": "unported",
-          "go_target": "",
+          "status": "reference_only",
           "tests": []
         },
         {
@@ -31723,10 +31724,13 @@
         }
       ],
       "ownership": [
-        "Sparse marks use a native Go map of borrowed slot/generation identities. Shared occurrences use insdict.Dict with one owned reference per key and discovery-order iteration/destruction. Visitation and traversal use native slices; actual cold headers and node shared flags remain. See PORT_PROGRESS.md#native-sparse-marks-and-shared-occurrence-collections."
+        "ASTSharedOccurrencesMark borrows node identities and owns its reset list and header; Close clears the manager-owned shared bits before releasing the owner header.",
+        "ASTSharedOccurrences owns one AST pin per successfully published shared expression. Reset, Cleanup and Close retire pins in discovery order with retryable consumed progress.",
+        "BeginShared and EndShared iterators borrow the collector's current immutable view and reject use after any key mutation, reset or close."
       ],
       "deviations": [
-        "Container probing, tombstones, capacity arithmetic, simulated storage failures and backing-only epochs are replaced by native Go collections. Iterators borrow an insertion-order view invalidated by key changes/reset/close. Consumed cleanup keys are removed before returning callback errors. SMT2 display remains open; these consumers add no C++ generic container implementation credit. See PORT_PROGRESS.md#native-sparse-marks-and-shared-occurrence-collections."
+        "Native Go slices and insdict.Dict replace the source pointer buffer, small vector and object hash set; insdict preserves required discovery-order iteration.",
+        "The display declaration is reference-only because it has no retained consumer; the unused goal_shared_occs wrapper is its sole source reference."
       ]
     },
     {

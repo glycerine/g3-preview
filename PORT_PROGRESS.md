@@ -47337,3 +47337,16 @@ have audited lexical cleanup; native slices replace source pointer buffers.
 All four focused profiles and the full native pattern package pass on CPUs
 8-16. Portcheck reports 2103 units, 677 APIs: 271 ported, 297 partial, 1478
 unported and 11 dead/deleted.
+
+Shared-occurrence whole-unit closure:
+`src/ast/shared_occs.cpp` and `.h` are promoted to ported after auditing the
+complete retained traversal and ownership surface. The Go collector covers
+all atomic/quantifier/pattern policies, persistent external marks, both collect
+operators, source debug stack guards, shared lookup/count, discovery-order
+iterators, reset, cleanup and close. It owns exactly one AST pin per published
+key; mark state borrows identities, and iterators borrow an invalidated-on-change
+view. Source-order publication before INC and retryable consumed cleanup remain
+covered. The display method has no retained caller and is reference-only.
+Native slices and insdict.Dict replace the source containers. All four focused
+profiles and the full native AST package pass on CPUs 8-16. Portcheck reports
+2103 units, 677 APIs: 273 ported, 295 partial, 1478 unported and 11 dead/deleted.
