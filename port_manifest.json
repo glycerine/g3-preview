@@ -23866,7 +23866,8 @@
         "pkg/ast/rewriter/bit_blaster/engine_compare.go",
         "pkg/ast/rewriter/bit_blaster/engine_shift.go",
         "pkg/ast/rewriter/bit_blaster/engine_division.go",
-        "pkg/ast/rewriter/bit_blaster/engine_signed_division.go"
+        "pkg/ast/rewriter/bit_blaster/engine_signed_division.go",
+        "pkg/ast/rewriter/bit_blaster/engine_rotate.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
@@ -23879,7 +23880,9 @@
         "TestBitBlasterUnsignedDivisionExhaustiveConstants",
         "TestBitBlasterUnsignedDivisionWrappersOwnOnlyTheirResult",
         "TestBitBlasterSignedDivisionRemainderModuloExhaustiveConstants",
-        "TestBitBlasterSignedOperationsRetainSymbolicSignMuxes"
+        "TestBitBlasterSignedOperationsRetainSymbolicSignMuxes",
+        "TestBitBlasterExtendedRotationsExhaustiveConstants",
+        "TestBitBlasterExtendedRotationSymbolicModuloCircuit"
       ],
       "conditionals": [
         {
@@ -23925,12 +23928,17 @@
           "go_target": "pkg/ast/rewriter/bit_blaster/engine_signed_division.go"
         },
         {
+          "name": "Constant and symbolic extended rotations",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_rotate.go"
+        },
+        {
           "name": "Disabled four-divider mk_sdiv_srem_smod alternative",
           "status": "dead_deleted",
           "reason": "All retained callers select the active one-divider implementation; the only references are in #if 0 branches."
         },
         {
-          "name": "Multiplication, variable rotations, and overflow checks",
+          "name": "Multiplication and overflow checks",
           "status": "unported",
           "reason": "Remaining concrete bit-vector circuit methods are being ported incrementally."
         }
@@ -23955,7 +23963,8 @@
         "pkg/ast/rewriter/bit_blaster/engine_compare.go",
         "pkg/ast/rewriter/bit_blaster/engine_shift.go",
         "pkg/ast/rewriter/bit_blaster/engine_division.go",
-        "pkg/ast/rewriter/bit_blaster/engine_signed_division.go"
+        "pkg/ast/rewriter/bit_blaster/engine_signed_division.go",
+        "pkg/ast/rewriter/bit_blaster/engine_rotate.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
@@ -23968,7 +23977,9 @@
         "TestBitBlasterUnsignedDivisionExhaustiveConstants",
         "TestBitBlasterUnsignedDivisionWrappersOwnOnlyTheirResult",
         "TestBitBlasterSignedDivisionRemainderModuloExhaustiveConstants",
-        "TestBitBlasterSignedOperationsRetainSymbolicSignMuxes"
+        "TestBitBlasterSignedOperationsRetainSymbolicSignMuxes",
+        "TestBitBlasterExtendedRotationsExhaustiveConstants",
+        "TestBitBlasterExtendedRotationSymbolicModuloCircuit"
       ],
       "conditionals": [
         {
@@ -24208,6 +24219,11 @@
           "go_target": "pkg/ast/rewriter/bit_blaster/engine_signed_division.go"
         },
         {
+          "name": "mk_ext_rotate_left_right, mk_ext_rotate_left, mk_ext_rotate_right",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_rotate.go"
+        },
+        {
           "name": "mk_sdiv_srem_smod four-divider alternative",
           "status": "dead_deleted",
           "reason": "It is referenced only from disabled #if 0 alternatives; retained builds use the one-divider bodies."
@@ -24219,7 +24235,7 @@
           "reason": "The Go AST manager enforces its arena budget and cancellation at manager operation boundaries."
         },
         {
-          "name": "multiplication, variable rotations, and overflow circuit builders",
+          "name": "multiplication and overflow circuit builders",
           "status": "unported",
           "reason": "Remaining concrete circuit algorithms are still required by the retained bit-blaster consumers."
         }
