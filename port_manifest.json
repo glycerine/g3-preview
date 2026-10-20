@@ -32671,9 +32671,9 @@
       "path": "src/ast/used_symbols.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/ast_used_symbols.go"],
+      "tests": ["TestASTUsedSymbolsApplicationsQuantifiersAndCoreOperations"],
       "conditionals": [
         {
           "line": 19,
@@ -32684,11 +32684,22 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "default identity-renamer used_symbols collection, membership, insertion, and erasure",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_used_symbols.go",
+          "tests": ["TestASTUsedSymbolsApplicationsQuantifiersAndCoreOperations"]
+        }
+      ],
+      "ownership": [
+        "UsedSymbols borrows its manager and AST graph and owns native typed symbol and visited maps plus an invocation-local work slice."
+      ],
+      "deviations": [
+        "All retained source instantiations use do_nothing_rename_proc, so the Go port is the concrete identity-renaming implementation. Native maps replace source hashtables; neither interface promises iteration order."
+      ]
     },
     {
       "path": "src/ast/used_vars.cpp",
