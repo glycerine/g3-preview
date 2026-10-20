@@ -82,6 +82,11 @@ func SimplifyBooleanGateDefault(m *ast.ASTManager, operation int32, args []ast.A
 		return rw.mkAnd(args, result)
 	case ast.ASTOpOr:
 		return rw.mkOr(args, result)
+	case ast.ASTOpIte:
+		if len(args) != 3 {
+			return ast.ErrASTDomain
+		}
+		return rw.mkITE(args[0], args[1], args[2], result)
 	default:
 		return ast.ErrASTDomain
 	}
