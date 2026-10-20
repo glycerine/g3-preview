@@ -298,7 +298,7 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 					return e
 				}
 			} else {
-				if e = m.gcdCRA(s.refs[5].root.value, &s.nums[7], s.refs[4].root.value, &s.nums[6], &s.refs[4]); e != nil {
+				if e = m.gcdCRAWithLexReceipt(s.refs[5].root.value, &s.nums[7], s.refs[4].root.value, &s.nums[6], &s.refs[4], &s.lexSort); e != nil {
 					return e
 				}
 				if e = m.traceModGCDPolynomials("mgcd", 4330, "new combined:\n", s.refs[4].root.value); e != nil {

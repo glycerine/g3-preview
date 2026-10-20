@@ -254,7 +254,7 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 					return e
 				}
 			} else {
-				if e = m.gcdCRA(s.refs[5].root.value, &s.nums[7], s.refs[4].root.value, &s.nums[6], &s.refs[4]); e != nil {
+				if e = m.gcdCRAWithLexReceipt(s.refs[5].root.value, &s.nums[7], s.refs[4].root.value, &s.nums[6], &s.refs[4], &s.lexSort); e != nil {
 					return e
 				}
 				if e = m.traceUniModGCDPolynomials(3847, "new combined:\n", s.refs[4].root.value); e != nil {

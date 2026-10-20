@@ -152,6 +152,11 @@ func (v *PolynomialNewtonVector) sourceFinalizeMember() error {
 }
 
 func (m *MultivariatePolynomialManager) SourceFinalize() error {
+	if m != nil && m.self == m && m.core != nil {
+		if e := m.core.pendingLexSortCause(); e != nil {
+			return e
+		}
+	}
 	if m != nil && m.self == m {
 		for _, trace := range [2]*polynomialEvaluationTraceScope{&m.evaluation.trace, &m.algebraicEvaluation.trace} {
 			if trace.active || trace.executing {

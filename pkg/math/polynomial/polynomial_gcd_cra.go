@@ -53,8 +53,14 @@ func (m *MultivariatePolynomialManager) cleanupCRACompleted() error {
 	return nil
 }
 func (m *MultivariatePolynomialManager) CleanupCRA() error {
+	if m != nil && m.self == m && m.core != nil && m.core.quadraticTraceCallback() {
+		return ErrPolynomialPending
+	}
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
+	}
+	if e := m.cleanupLexSortInvocation(&m.craLex); e != nil {
+		return e
 	}
 	s := &m.cra
 	if !s.active {
@@ -153,7 +159,10 @@ func (m *MultivariatePolynomialManager) craAdd(a Polynomial, ai uint32, b Polyno
 	}
 	return c.cheap.addWithAppendReceipt(&n[8], term, false, &m.cra.append)
 }
-func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b Polynomial, b2 *unumeral.Int, out *PolynomialRef) (err error) {
+func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b Polynomial, b2 *unumeral.Int, out *PolynomialRef) error {
+	return m.gcdCRAWithLexReceipt(a, b1, b, b2, out, &m.craLex)
+}
+func (m *MultivariatePolynomialManager) gcdCRAWithLexReceipt(a Polynomial, b1 *unumeral.Int, b Polynomial, b2 *unumeral.Int, out *PolynomialRef, lex *polynomialLexSortInvocationReceipt) (err error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -164,10 +173,10 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 		return e
 	}
 	c := m.core
-	if e := m.LexSort(a); e != nil {
+	if e := m.lexSortWithReceipt(a, nil, lex); e != nil {
 		return e
 	}
-	if e := m.LexSort(b); e != nil {
+	if e := m.lexSortWithReceipt(b, nil, lex); e != nil {
 		return e
 	}
 	if e := m.traceCRAImages(a, b); e != nil {

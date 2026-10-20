@@ -25,6 +25,9 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 			if !s.active {
 				continue
 			}
+			if e := m.cleanupLexSortInvocation(&s.lexSort); e != nil {
+				return e
+			}
 			if e := c.cleanupDisplayReceipt(&s.traceDisplay); e != nil {
 				return e
 			}

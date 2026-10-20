@@ -11,6 +11,7 @@ import (
 // PolynomialCache owns canonical representatives and memoized results used by
 // the retained NLSAT cache.
 type PolynomialCache struct {
+	hashLex        polynomialLexSortInvocationReceipt
 	nextPending    *PolynomialCache
 	pendingBound   bool
 	pendingCause   error
@@ -187,6 +188,9 @@ func (c *PolynomialCache) CleanupFactor() error {
 	return c.cleanupFactor()
 }
 func (c *PolynomialCache) cleanupFactor() error {
+	if e := c.manager.cleanupLexSortInvocation(&c.hashLex); e != nil {
+		return e
+	}
 	if c.pendingFactors == nil {
 		return nil
 	}
@@ -234,6 +238,9 @@ func (c *PolynomialCache) CleanupPSC() error {
 	return c.cleanupPSC()
 }
 func (c *PolynomialCache) cleanupPSC() error {
+	if e := c.manager.cleanupLexSortInvocation(&c.hashLex); e != nil {
+		return e
+	}
 	if !c.pendingPSC {
 		return nil
 	}
@@ -323,6 +330,9 @@ func (c *PolynomialCache) ready() error {
 	if c.resetting {
 		return ErrPolynomialPending
 	}
+	if c.manager.matchesLexSortInvocation(&c.hashLex) {
+		return ErrPolynomialPending
+	}
 	if c.pendingFactors != nil {
 		return ErrPolynomialPending
 	}
@@ -356,7 +366,7 @@ func (c *PolynomialCache) mkUnique(p Polynomial) (Polynomial, error) {
 	if c.ids[id] {
 		return p, nil
 	}
-	h, e := c.manager.Hash(p)
+	h, e := c.manager.hashWithLexReceipt(p, &c.hashLex)
 	if e != nil {
 		return Polynomial{}, e
 	}
@@ -529,9 +539,12 @@ func (m *MultivariatePolynomialCore) cacheExecuting() bool {
 }
 
 func (c *PolynomialCache) hasPendingWork() bool {
-	return !c.closed && (c.pendingFactors != nil || c.pendingPSC || c.resetting || c.closing)
+	return !c.closed && (c.manager.matchesLexSortInvocation(&c.hashLex) || c.pendingFactors != nil || c.pendingPSC || c.resetting || c.closing)
 }
 func (c *PolynomialCache) currentPendingCause() error {
+	if e := c.manager.lexSortInvocationSourceCause(&c.hashLex); e != nil {
+		return e
+	}
 	if c.pendingFactors != nil {
 		if c.pendingFactors.sourceCause != nil {
 			return c.pendingFactors.sourceCause

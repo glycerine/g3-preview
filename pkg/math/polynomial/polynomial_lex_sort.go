@@ -154,8 +154,14 @@ func (m *MultivariatePolynomialManager) LexSort(p Polynomial) error {
 	return m.lexSortForAlgebraic(p, nil)
 }
 func (m *MultivariatePolynomialManager) lexSortForAlgebraic(p Polynomial, caller *polynomialAlgebraicEvaluationScope) error {
+	return m.lexSortWithReceipt(p, caller, nil)
+}
+func (m *MultivariatePolynomialManager) lexSortWithReceipt(p Polynomial, caller *polynomialAlgebraicEvaluationScope, receipt *polynomialLexSortInvocationReceipt) error {
 	if e := m.ready(); e != nil {
 		return e
+	}
+	if m.lexTracePending() {
+		return ErrPolynomialPending
 	}
 	flags, e := m.core.readWord(p, 4)
 	if e != nil {
@@ -186,6 +192,9 @@ func (m *MultivariatePolynomialManager) lexSortForAlgebraic(p Polynomial, caller
 		return ErrPolynomialPending
 	}
 	m.lexGeneration++
+	if receipt != nil {
+		*receipt = polynomialLexSortInvocationReceipt{m, m.lexGeneration}
+	}
 	if caller != nil {
 		caller.lexGeneration = m.lexGeneration
 	}
@@ -198,25 +207,12 @@ func (m *MultivariatePolynomialManager) lexSortForAlgebraic(p Polynomial, caller
 		return e
 	}
 	if polynomialSourceDebug {
-		ms, e := m.core.captureMonomialPointer(p, 0)
-		if e != nil {
+		if e = m.lexDebugCheck(p); e != nil {
+			if m.lexTracePending() {
+				m.lexPending = true
+				m.lexCause = e
+			}
 			return e
-		}
-		for i := uint32(0); i < n-1; i++ {
-			a, e := ms.read(i)
-			if e != nil {
-				return e
-			}
-			b, e := ms.read(i + 1)
-			if e != nil {
-				return e
-			}
-			if e = polynomialLexSortSourceAssert(1453, "lex_compare(m_ms[i], m_ms[i+1]) > 0", func() (bool, error) {
-				order, e := m.core.monomials.Lex(a, b)
-				return order > 0, e
-			}); e != nil {
-				return e
-			}
 		}
 	}
 	return nil
@@ -225,12 +221,32 @@ func (m *MultivariatePolynomialManager) lexSortForAlgebraic(p Polynomial, caller
 // CleanupLexSort releases native scratch retained by a stopped invocation.
 // It does not undo polynomial publications or reexecute the stopped source call.
 func (m *MultivariatePolynomialManager) CleanupLexSort() error {
-	if e := m.ready(); e != nil {
+	if e := m.identity(); e != nil {
 		return e
+	}
+	if m.core.quadraticTraceCallback() {
+		return ErrPolynomialPending
+	}
+	if !m.lexTracePending() {
+		if e := m.ready(); e != nil {
+			return e
+		}
 	}
 	return m.cleanupLexSort()
 }
 func (m *MultivariatePolynomialManager) cleanupLexSort() error {
+	if m.core.quadraticTraceCallback() {
+		return ErrPolynomialPending
+	}
+	if m.lexTraceGeneration == m.lexGeneration {
+		if e := m.core.cleanupDisplayReceipt(&m.lexTraceDisplay); e != nil {
+			return e
+		}
+		m.lexTraceGeneration = 0
+		if m.core.pendingLexSort == m {
+			m.core.pendingLexSort = nil
+		}
+	}
 	if !m.lexPending {
 		return nil
 	}

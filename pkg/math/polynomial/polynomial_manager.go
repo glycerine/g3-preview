@@ -46,6 +46,7 @@ type polynomialCreation struct {
 	buffer            *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	pendingLexSort                                                                             *MultivariatePolynomialManager
 	exactDivTrace                                                                              polynomialExactDivTraceScope
 	quadraticTrace                                                                             *polynomialQuadraticTraceBorrow
 	evaluationTrace                                                                            *polynomialEvaluationTraceScope

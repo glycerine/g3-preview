@@ -77,6 +77,9 @@ type MultivariatePolynomialManager struct {
 	derivative                                                 polynomialDerivativeScope
 	evaluation                                                 polynomialEvaluationScope
 	composition                                                polynomialCompositionScope
+	craLex                                                     polynomialLexSortInvocationReceipt
+	lexTraceDisplay                                            polynomialDisplayInvocationReceipt
+	lexTraceGeneration                                         uint64
 	lexPending                                                 bool
 	lexGeneration                                              uint64
 	lexCause                                                   error

@@ -41880,7 +41880,9 @@
         "pkg/math/polynomial/polynomial_resultant_trace_test.go",
         "pkg/math/polynomial/polynomial_pseudo_trace.go",
         "pkg/math/polynomial/polynomial_pseudo_trace_test.go",
-        "pkg/math/polynomial/polynomial_pseudo_verification_trace_test.go"
+        "pkg/math/polynomial/polynomial_pseudo_verification_trace_test.go",
+        "pkg/math/polynomial/polynomial_lex_sort_trace.go",
+        "pkg/math/polynomial/polynomial_lex_sort_trace_test.go"
       ],
       "tests": [
         "TestPolynomialDividesTraceZeroKeepsOlderAlgorithmReceipt",
@@ -47741,6 +47743,22 @@
         ],
         "verification": "Independent quotient3*x0^2*x1^2, literal entry and monomial text, actual pre-assignment generated token, real TLS BIG-copy refusal before locals, allocator tuple and stale/copy refusal, pooled/direct allocation prefixes with physical audits, and independent trace-disabled executing-cleanup regression. Broader groups pass four build profiles. Omitted-record and omitted-receipt overlays fail their intended assertions.",
         "limits": "The polynomial source unit and complete polynomial/algebraic/AST ports remain partial."
+      },
+      "lex_sort_conditional_trace_audit": {
+        "source": "polynomial.cpp:1450-1454; retained via hash2475-2480, CRA3676-3677 and evaluation6520",
+        "go_target": "pkg/math/polynomial/polynomial_lex_sort_trace.go",
+        "behavior": "After actual sorting and sorted-flag publication, each debug iteration reads the source size and runs the poly_bug conditional before the independent1453 assertion. Each predicate performs its own fresh pointer/comparator reads only after its actual tag/assertion gate. A true record prints i and direct polynomial display. Failed ostream output still runs project formatters; no public consistency assertion is introduced.",
+        "ownership": "The exact nontrivial sort generation issues a concrete receipt; only its accepted formatter binds pendingLexSort. Matching cleanup retires that child without undoing sorted publication. Core/full source destructors refuse actual pending formatter work. Executing output/failure callbacks borrow polynomial, Integer/Natural and monomial owners. Existing evaluators retain their exact lex generation; cache hash and CRA/GCD callers now capture the actually accepted sort receipt before their later source locals.",
+        "tests": [
+          "TestPolynomialLexDebugMacrosEraseActualUnplacedOperands",
+          "TestPolynomialLexConditionalLiteralAndAssertionActions",
+          "TestPolynomialLexTraceActualTLSCopyAndCallerCleanup",
+          "TestPolynomialLexTraceFalseConditionKeepsFormatterUnconstructed",
+          "TestPolynomialLexTraceFailedStreamStillUsesDirectDisplay",
+          "TestPolynomialLexTraceEveryReservation"
+        ],
+        "verification": "A real failed placement leaves SIZE2 and missing monomial fields, proving both erased macros skip operands and either enabled predicate reaches the guard without descriptor repair. Repeated raw source monomials trigger literal records and Throw/Continue/disabled actions after sorted publication. Real caller-owned TLS boundary allocations force accepted64-limb Copy failures through sort/hash/evaluation/cache/CRA; physical audits enumerate both roots, stale/copied receipts cannot release them, exact caller cleanup does, and no sorted suffix is replayed. Every reservation prefix reaches success. Six independent omission/read-order/dispatch/caller controls fail their intended assertions.",
+        "limits": "Complete polynomial/algebraic/AST source-consumer, assertion and failure audits remain partial; source-line candidate scans are only locators, not completion proof."
       }
     },
     {
@@ -51226,7 +51244,21 @@
       "deviations": [
         "Native Go hash buckets/maps and slices replace chashtable, svector and raw pointer-result storage. Container allocations have Go runtime semantics rather than synthetic C++ capacity/failure states. A separately charged real Go imp owner preserves the retained cache wrapper replacement and memory-trace lifetime. Borrowed scalar handles carry no additional numeral ownership.",
         "Source-invalid prefixes that would access unwritten slots or uninitialized/dangling C++ storage stop with guarded Go errors. Raw-prefix tests explicitly restore genuine owning records before destruction. Such guards do not normalize source data, invent constructor completion, roll back committed cache publication, or infer cleanup authority from unrelated manager activity."
-      ]
+      ],
+      "hash_sort_diagnostic_child_audit": {
+        "source": "polynomial_cache.cpp:141-146 canonicalization hash; polynomial.cpp:2475-2480 ->1451-1452",
+        "go_targets": [
+          "pkg/math/polynomial/polynomial_cache.go",
+          "pkg/math/polynomial/polynomial_hash.go",
+          "pkg/math/polynomial/polynomial_lex_sort_trace.go"
+        ],
+        "behavior": "Canonicalization captures only its actual accepted sort generation before table publication. A stopped diagnostic binds the cache pending borrow; class Close and factor/PSC owning cleanup retire only that hash child. Refused or stale calls grant no authority over a foreign sort. Empty/sorted hash paths do not manufacture sort receipts.",
+        "tests": [
+          "TestPolynomialLexTraceActualTLSCopyAndCallerCleanup/cache",
+          "TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"
+        ],
+        "verification": "Actual hash Copy refusal leaves the cache prepublication, binds its exact hashLex receipt and pending borrower, and Cache.Close releases the formatter and private cache owner. Omitting the cache receipt fails the actual child-binding assertion. Existing memory-wrapper test now checks DebugBuild and ShouldTrace(memory), correctly expecting empty output in debug-only builds with erased tracing. Four focused profiles pass."
+      }
     },
     {
       "path": "src/math/polynomial/polynomial_cache.h",

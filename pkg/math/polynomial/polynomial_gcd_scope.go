@@ -15,6 +15,7 @@ import (
 // PRS has nine references and three numerals. The dispatcher instead begins
 // with its two actual sbuffer<power,32> objects.
 type polynomialGCDFunctionScope struct {
+	lexSort             polynomialLexSortInvocationReceipt
 	traceDisplay        polynomialDisplayInvocationReceipt
 	directSubstitution  polynomialSubstitutionInvocationReceipt
 	directMonic         polynomialMonicInvocationReceipt
@@ -136,6 +137,10 @@ func (m *MultivariatePolynomialManager) beginGCDFunction() (*polynomialGCDFuncti
 	return s, nil
 }
 func (m *MultivariatePolynomialManager) gcdYoungerSourceStop(s *polynomialGCDFunctionScope) error {
+	if e := m.lexSortInvocationSourceCause(&s.lexSort); e != nil {
+		s.cleanupCause = e
+		return e
+	}
 	if e := m.core.displayReceiptSourceCause(&s.traceDisplay); e != nil {
 		s.cleanupCause = e
 		return e
@@ -273,7 +278,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	if frontier != 0 {
 		return nil
 	}
-	pending := m.core.displayReceiptPending(&s.traceDisplay) || m.gcdZPXMonomialPending(s) || m.gcdDirectChildrenPending(s) || (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.topOwner && m.core.pscPendingForGeneration(s.generation)
+	pending := m.matchesLexSortInvocation(&s.lexSort) || m.core.displayReceiptPending(&s.traceDisplay) || m.gcdZPXMonomialPending(s) || m.gcdDirectChildrenPending(s) || (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.topOwner && m.core.pscPendingForGeneration(s.generation)
 	pending = pending || m.core.matchesArithmeticInvocation(&s.product)
 	pending = pending || m.matchesNormalizeInvocation(&s.normalizeInvocation)
 	pending = pending || (m.matchesDerivativeInvocation(&s.derivativeInvocation) || m.derivativeInvocationHasOrphans(&s.derivativeInvocation)) || m.core.exactDivInvocationPending(&s.divisionInvocation) || m.core.dividesInvocationPending(&s.dividesInvocation)

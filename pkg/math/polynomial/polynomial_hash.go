@@ -6,6 +6,9 @@ import uhash "github.com/glycerine/g3/pkg/util/hash"
 // Hash computes the source polynomial hash after lexicographically sorting its
 // terms. The source cache uses this value to bucket structurally equal values.
 func (m *MultivariatePolynomialManager) Hash(p Polynomial) (uint32, error) {
+	return m.hashWithLexReceipt(p, nil)
+}
+func (m *MultivariatePolynomialManager) hashWithLexReceipt(p Polynomial, r *polynomialLexSortInvocationReceipt) (uint32, error) {
 	if e := m.ready(); e != nil {
 		return 0, e
 	}
@@ -16,7 +19,7 @@ func (m *MultivariatePolynomialManager) Hash(p Polynomial) (uint32, error) {
 	if size == 0 {
 		return 31, nil
 	}
-	if e = m.LexSort(p); e != nil {
+	if e = m.lexSortWithReceipt(p, nil, r); e != nil {
 		return 0, e
 	}
 	size, e = m.core.readWord(p, 8)

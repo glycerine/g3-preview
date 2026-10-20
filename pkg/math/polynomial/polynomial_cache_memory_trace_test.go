@@ -15,6 +15,7 @@ func TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	var output bytes.Buffer
 	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	defer tags.Finalize()
 	m.core.monomials.config.Trace = tags
 	tags.Enable("memory")
 	c, err := NewPolynomialCache(m)
@@ -42,9 +43,9 @@ func TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal(t *testing.T) {
 	}
 	serviceMust(t, c.Close())
 	got := output.String()
-	if !diagnostic.DebugBuild {
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		if got != "" {
-			t.Fatal("ordinary build emitted debug memory records", got)
+			t.Fatal("erased memory trace emitted records", got)
 		}
 		return
 	}

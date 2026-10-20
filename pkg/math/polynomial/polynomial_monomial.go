@@ -74,6 +74,7 @@ type monomialCreation struct {
 	idConsumed, tableRemoved bool
 }
 type MonomialManager struct {
+	lexTraceBorrow                                                            *polynomialLexTraceBorrow
 	exactDivTrace                                                             *polynomialExactDivTraceScope
 	substitutionTrace                                                         *polynomialSubstitutionTraceBorrow
 	assertionRunning                                                          bool
@@ -241,7 +242,7 @@ func (m *MonomialManager) CleanupCause() error {
 	return m.cleanupCause
 }
 func (m *MonomialManager) check() error {
-	if m.substitutionTraceCallback() || m.exactDivTraceCallback() {
+	if m.substitutionTraceCallback() || (m.exactDivTraceCallback() || m.lexTraceCallback()) {
 		return ErrMonomialPending
 	}
 	if m != nil && m.self == m && (m.assertionRunning || m.managerTraceRunning) {
