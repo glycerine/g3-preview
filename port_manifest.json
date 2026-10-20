@@ -20116,11 +20116,23 @@
         },
         {
           "name": "Concrete pi option snapshot and refresh into pattern inference traversal, preserving full unsigned arithmetic mode",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/pattern_inference_rewriter.go",
           "tests": [
             "TestPatternInferenceParamsBindRewriterAndRefresh"
           ]
+        },
+        {
+          "name": "pattern_inference_cfg database-backed quantifier matching and database weight publication (cpp:590-613)",
+          "status": "partial",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": []
+        },
+        {
+          "name": "pattern_inference_cfg proof-producing quantifier introduction and pulled-quantifier transitivity (cpp:666-700)",
+          "status": "partial",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": []
         },
         {
           "name": "pattern_inference_cfg constructor caches AP_NO forbidden family and block-loop policy while subsequent borrowed scalar reads remain live (cpp:104-119,624-658)",
@@ -20134,7 +20146,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The larger-pattern filter searches a native visited-handle map and work slice. Unary and multi-pattern results use independently owning ASTRef values; the source stable weight sort uses Go's sort.SliceStable. The remaining pattern_inference_cfg collector, preferred-pattern selection and quantifier rewrite are not ported."
+        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The larger-pattern filter searches a native visited-handle map and work slice. Unary and multi-pattern results use independently owning ASTRef values; the source stable weight sort uses Go's sort.SliceStable. Collection, preferred selection, ordinary quantifier rewriting, nested no-proof pulling, and the complete parameter bridge are ported. Database-backed matching and proof-producing reduction remain explicit ErrASTPending paths."
       ]
     },
     {
