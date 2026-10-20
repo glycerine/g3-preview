@@ -13226,7 +13226,7 @@
       "path": "src/ast/ast_util.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_util_clauses.go",
         "pkg/ast/ast_util_boolean.go",
@@ -13318,9 +13318,19 @@
           "text": "SASSERT(result.get_manager().is_bool(fml));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "mk_list_assoc_app declaration and family overload (src/ast/ast_util.cpp:21-45)",
+          "status": "reference_only",
+          "reason": "Repository-wide source search finds no caller outside ast_util.cpp/.h; no unused Go associative-list adapter is introduced."
+        },
+        {
+          "name": "is_well_formed_vars recursive binder validation (src/ast/ast_util.cpp:47-91)",
+          "status": "reference_only",
+          "reason": "Repository-wide source search finds no retained caller outside ast_util.cpp/.h."
+        },
         {
           "name": "ast_util mk_or zero/singleton/multi pointer branches (src/ast/ast_util.cpp:173-180)",
           "status": "ported",
@@ -13421,9 +13431,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "Unused mk_list_assoc_app, is_well_formed_vars, args_are_vars and depth_leq_one declarations (src/ast/ast_util.h:44-64)",
+          "status": "reference_only",
+          "reason": "Repository-wide source search finds no consumer outside ast_util.cpp/.h."
+        },
+        {
+          "name": "Unused obj_hashtable inc_ref/dec_ref templates (src/ast/ast_util.h:66-84)",
+          "status": "reference_only",
+          "reason": "Repository-wide source search finds no concrete instantiation."
+        },
         {
           "name": "Retained dependency linearization deduplicates native []ASTHandle output in first-occurrence order with a Go map; general remove_duplicates template remains open",
           "status": "partial",
