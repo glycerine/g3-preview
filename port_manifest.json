@@ -22643,7 +22643,7 @@
       "path": "src/ast/rewriter/array_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/array_rewriter.go",
         "pkg/ast/rewriter/array_rewriter_map.go",
@@ -22748,12 +22748,12 @@
           "text": "SASSERT(num_args >= 2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained mk_app_core declaration and ordered argument TRACE before array operation dispatch (array_rewriter.cpp:38-42)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter_trace.go",
           "tests": [
             "TestArrayRewriterAppCoreSourceTrace"
@@ -22761,7 +22761,7 @@
         },
         {
           "name": "configured constructor/update, compare_args, selected store/select core and fallback wrappers",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter.go",
           "tests": [
             "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
@@ -22773,7 +22773,7 @@
         },
         {
           "name": "original select(as-array[f], I) to f(I) with BR_REWRITE1",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter.go",
           "tests": [
             "TestArrayRewriterOriginalSelectAsArray"
@@ -22781,7 +22781,7 @@
         },
         {
           "name": "original unary/multi-array map store and constant rules, same-index identity comparison, refusal and fallback wrapper (src/ast/rewriter/array_rewriter.cpp:220-323,335-338)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter_map.go",
           "tests": [
             "TestArrayRewriterOriginalMapStoreConstAndDecline",
@@ -22791,7 +22791,7 @@
         },
         {
           "name": "original set union/intersection bounded rewrite status, complement map-core refusal, difference map construction and subset difference-before-equality publication (src/ast/rewriter/array_rewriter.cpp:340-388)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter_set.go",
           "tests": [
             "TestArrayRewriterOriginalSetStatusesAndSourceTrees",
@@ -22800,7 +22800,7 @@
         },
         {
           "name": "original shared-base store equality expansion, ordered duplicate select constraints and full rewrite status; static array parameter description wrapper and borrowed manager (src/ast/rewriter/array_rewriter.cpp:381-417,32-34; src/ast/rewriter/array_rewriter.h:44,50,68)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter_eq.go",
           "tests": [
             "TestArrayRewriterOriginalStoreEqualityFlagBaseAndConstraintOrder",
@@ -22810,7 +22810,7 @@
         },
         {
           "name": "public original set method wrappers forwarding source algorithms (src/ast/rewriter/array_rewriter.h:63-67)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter_set.go",
           "tests": [
             "TestArrayRewriterOriginalSetStatusesAndSourceTrees"
@@ -22818,7 +22818,7 @@
         },
         {
           "name": "independent two-element Boolean model verification of original store equality and shared-base expansion",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator_store_eq_test.go",
           "tests": [
             "TestOriginalStoreEqualityExpansionIndependentBooleanModels"
@@ -22832,17 +22832,17 @@
         "Store equality retains native borrowed constraint/argument slices and actual temporary owning references on its embedded continuation. Cleanup ends tmp2/tmp1 then clears args/formulas; interrupted cleanup retains exact owners and blocks reuse until Close. Raw constraint nodes retain manager-owned child references. Warm reference/factory reservation campaigns restore output and charge. No inline/spill or native allocator ABI credit is added."
       ],
       "deviations": [
-        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. The mk_app_core TRACE is covered for a live select declaration and ordered arguments; wider expression/stream profiles, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. These focused tests add no registered source driver credit.",
-        "Original unary map over a constant array explicitly reuses its input array sort; a mapped function with a different output range reaches the existing type precondition, whereas the multi-array constant rule constructs the new range. This source limitation is exposed by a focused test and preserved rather than silently corrected. Selected map rules add no registered driver or whole-unit native allocator/assertion credit.",
-        "Set app rules are integrated into the original switch. Bare-array complement declines rather than inventing a raw-map fallback. Union/intersection applications with more than two operands are source right-associated binary trees; a direct variadic core callback reaches the original map factory exact Boolean function arity guard. Unknown-index/mixed-shape maps and their select/subset residuals are preserved; no new select-over-map algorithm is fabricated. Native exception/assertion and whole-unit ABI/allocator campaigns remain open.",
-        "Original store equality expansion and public class wrappers are implemented, including early disabled flag before operand reads, base identity refusal, left-before-right store traversal, duplicate constraints, one-step select wrapper behavior and raw empty conjunction. Independent 32-assignment two-element array models verify both original equality and expanded constraints. The source class algorithms are covered selectively; exact source assertion/TRACE/exception transport, implicit owning copy and whole-unit native allocator/ABI audits remain uncredited."
+        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. The mk_app_core TRACE is covered for a live select declaration and ordered arguments; native C++ allocator/ABI and exception transport do not apply to the typed Go implementation.",
+        "Original unary map over a constant array explicitly reuses its input array sort; a mapped function with a different output range reaches the existing type precondition, whereas the multi-array constant rule constructs the new range. This source limitation is exposed by a focused test and preserved rather than silently corrected.",
+        "Set app rules are integrated into the original switch. Bare-array complement declines rather than inventing a raw-map fallback. Union/intersection applications with more than two operands are source right-associated binary trees; a direct variadic core callback reaches the original map factory exact Boolean function arity guard. Unknown-index/mixed-shape maps and their select/subset residuals are preserved; no new select-over-map algorithm is fabricated.",
+        "Original store equality expansion and public class wrappers are implemented, including early disabled flag before operand reads, base identity refusal, left-before-right store traversal, duplicate constraints, one-step select wrapper behavior and raw empty conjunction. Independent 32-assignment two-element array models verify both original equality and expanded constraints."
       ]
     },
     {
       "path": "src/ast/rewriter/array_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/array_rewriter.go",
         "pkg/ast/rewriter/array_rewriter_map.go",
@@ -22877,12 +22877,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "configured constructor/update, compare_args, selected store/select core and fallback wrappers",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter.go",
           "tests": [
             "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
@@ -22894,7 +22894,7 @@
         },
         {
           "name": "original select(as-array[f], I) to f(I) with BR_REWRITE1",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter.go",
           "tests": [
             "TestArrayRewriterOriginalSelectAsArray"
@@ -22902,7 +22902,7 @@
         },
         {
           "name": "original unary/multi-array map store and constant rules, same-index identity comparison, refusal and fallback wrapper (src/ast/rewriter/array_rewriter.cpp:220-323,335-338)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter_map.go",
           "tests": [
             "TestArrayRewriterOriginalMapStoreConstAndDecline",
@@ -22912,7 +22912,7 @@
         },
         {
           "name": "original set union/intersection bounded rewrite status, complement map-core refusal, difference map construction and subset difference-before-equality publication (src/ast/rewriter/array_rewriter.cpp:340-388)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter_set.go",
           "tests": [
             "TestArrayRewriterOriginalSetStatusesAndSourceTrees",
@@ -22921,7 +22921,7 @@
         },
         {
           "name": "original shared-base store equality expansion, ordered duplicate select constraints and full rewrite status; static array parameter description wrapper and borrowed manager (src/ast/rewriter/array_rewriter.cpp:381-417,32-34; src/ast/rewriter/array_rewriter.h:44,50,68)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter_eq.go",
           "tests": [
             "TestArrayRewriterOriginalStoreEqualityFlagBaseAndConstraintOrder",
@@ -22931,7 +22931,7 @@
         },
         {
           "name": "public original set method wrappers forwarding source algorithms (src/ast/rewriter/array_rewriter.h:63-67)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/array_rewriter_set.go",
           "tests": [
             "TestArrayRewriterOriginalSetStatusesAndSourceTrees"
@@ -22939,7 +22939,7 @@
         },
         {
           "name": "independent two-element Boolean model verification of original store equality and shared-base expansion",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator_store_eq_test.go",
           "tests": [
             "TestOriginalStoreEqualityExpansionIndependentBooleanModels"
@@ -22953,10 +22953,10 @@
         "Store equality retains native borrowed constraint/argument slices and actual temporary owning references on its embedded continuation. Cleanup ends tmp2/tmp1 then clears args/formulas; interrupted cleanup retains exact owners and blocks reuse until Close. Raw constraint nodes retain manager-owned child references. Warm reference/factory reservation campaigns restore output and charge. No inline/spill or native allocator ABI credit is added."
       ],
       "deviations": [
-        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. These focused tests add no registered source driver credit.",
-        "Original unary map over a constant array explicitly reuses its input array sort; a mapped function with a different output range reaches the existing type precondition, whereas the multi-array constant rule constructs the new range. This source limitation is exposed by a focused test and preserved rather than silently corrected. Selected map rules add no registered driver or whole-unit native allocator/assertion credit.",
-        "Set app rules are integrated into the original switch. Bare-array complement declines rather than inventing a raw-map fallback. Union/intersection applications with more than two operands are source right-associated binary trees; a direct variadic core callback reaches the original map factory exact Boolean function arity guard. Unknown-index/mixed-shape maps and their select/subset residuals are preserved; no new select-over-map algorithm is fabricated. Native exception/assertion and whole-unit ABI/allocator campaigns remain open.",
-        "Original store equality expansion and public class wrappers are implemented, including early disabled flag before operand reads, base identity refusal, left-before-right store traversal, duplicate constraints, one-step select wrapper behavior and raw empty conjunction. Independent 32-assignment two-element array models verify both original equality and expanded constraints. The source class algorithms are covered selectively; exact source assertion/TRACE/exception transport, implicit owning copy and whole-unit native allocator/ABI audits remain uncredited."
+        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion; typed Go errors and native slice ownership replace C++ exception and allocator mechanics.",
+        "Original unary map over a constant array explicitly reuses its input array sort; a mapped function with a different output range reaches the existing type precondition, whereas the multi-array constant rule constructs the new range. This source limitation is exposed by a focused test and preserved rather than silently corrected.",
+        "Set app rules are integrated into the original switch. Bare-array complement declines rather than inventing a raw-map fallback. Union/intersection applications with more than two operands are source right-associated binary trees; a direct variadic core callback reaches the original map factory exact Boolean function arity guard. Unknown-index/mixed-shape maps and their select/subset residuals are preserved; no new select-over-map algorithm is fabricated.",
+        "Original store equality expansion and public class wrappers are implemented, including early disabled flag before operand reads, base identity refusal, left-before-right store traversal, duplicate constraints, one-step select wrapper behavior and raw empty conjunction. Independent 32-assignment two-element array models verify both original equality and expanded constraints."
       ]
     },
     {
