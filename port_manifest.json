@@ -15359,20 +15359,28 @@
       "path": "src/ast/expr_stat.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "get_expr_stat and get_symbol_count unused tree-statistics helpers",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The only external source mention is an unused include in smt_internalizer.cpp; no retained source consumer calls either helper."
+      ]
     },
     {
       "path": "src/ast/expr_stat.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -15385,11 +15393,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "expr_stat record and unused statistics declarations",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The header is included but none of its declarations are used by a retained source consumer."
+      ]
     },
     {
       "path": "src/ast/expr_substitution.cpp",
@@ -19564,22 +19580,46 @@
       "path": "src/ast/num_occurs.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_num_occurs.go"
+      ],
+      "tests": [
+        "TestASTNumOccursSharedEdgesRootsAndReset",
+        "TestASTNumOccursRefCountAndQuantifierModes"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "num_occurs process, single-root and shared-visited multi-root traversal",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_num_occurs.go",
+          "tests": [
+            "TestASTNumOccursSharedEdgesRootsAndReset",
+            "TestASTNumOccursRefCountAndQuantifierModes"
+          ]
+        }
+      ],
+      "ownership": [
+        "NumOccurs borrows its AST manager and every counted handle. Its typed Go occurrence map, visited map, and work slice own no AST references."
+      ],
+      "deviations": [
+        "A native map[ASTHandle]struct{} replaces the temporary expr_fast_mark1 without mutating the manager mark plane. Source incoming-edge counting, shared-child traversal suppression, reference-count filtering, and optional quantifier-body exclusion are preserved."
+      ]
     },
     {
       "path": "src/ast/num_occurs.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_num_occurs.go"
+      ],
+      "tests": [
+        "TestASTNumOccursSharedEdgesRootsAndReset",
+        "TestASTNumOccursRefCountAndQuantifierModes"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -19590,11 +19630,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "num_occurs constructor options, reset, invocation overloads, and occurrence lookup",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_num_occurs.go",
+          "tests": [
+            "TestASTNumOccursSharedEdgesRootsAndReset",
+            "TestASTNumOccursRefCountAndQuantifierModes"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete Go owner borrows its manager and AST handles and owns only native typed maps and invocation-local slices."
+      ],
+      "deviations": [
+        "Count and CountAll are the typed Go equivalents of the two operator() overloads; GetNumOccurrences replaces get_num_occs."
+      ]
     },
     {
       "path": "src/ast/occurs.cpp",
