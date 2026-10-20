@@ -44489,7 +44489,8 @@
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_positions.go",
           "go_targets": [
-            "pkg/math/polynomial/polynomial_equal.go"
+            "pkg/math/polynomial/polynomial_equal.go",
+            "pkg/math/polynomial/polynomial_monomial_positions_assertions.go"
           ],
           "tests": [
             "TestMonomialPositionsSourceMapping",
@@ -44498,8 +44499,11 @@
             "TestMonomialPositionsColdChargeAndWarm",
             "TestMonomialPositionsScalarIDOnlyAndRejectedWrap",
             "TestPolynomialQueryEqualSourceOrderAndPermutation",
-            "TestPolynomialQueryEqualNativeScratch"
-          ]
+            "TestPolynomialQueryEqualNativeScratch",
+            "TestMonomialPositionsSourceAssertionActions",
+            "TestMonomialPositionsClosedAssertionOwnerPaths"
+          ],
+          "notes": "Actual467/474 process gates/source Throw/Continue actions replace hard DebugBuild checks. Reset reads ID before its gated size condition, then reaches the physical native-slice guard after Continue/disabled. Set reads ID and publishes reserve(id+1,UINT_MAX) before consulting its independent gate, and lazily reads the existing slot only if enabled. Actual duplicate Set3->Set5 preserves3 on Throw and overwrites5 on Continue/disabled. Fully constructed real monomials and both reserved/empty maps under a closed process owner distinguish erased operands, Get without an assertion, and native growth before the failed gate. No source IDs/counts or monomial descriptors are modified in these new tests; the legacy malformed-ID boundary test remains separate."
         },
         {
           "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",

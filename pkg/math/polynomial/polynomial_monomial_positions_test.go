@@ -63,6 +63,7 @@ func TestMonomialPositionsSourceMapping(t *testing.T) {
 	}
 }
 func TestMonomialPositionsAssertionsAndOwners(t *testing.T) {
+	polynomialAssertionActionsFixture(t, "TT")
 	_, p, xs := positionFixture(t)
 	e := p.Reset(xs[0])
 	if polynomialSourceDebug {

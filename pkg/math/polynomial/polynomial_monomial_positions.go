@@ -109,10 +109,10 @@ func (p *MonomialPositions) Reset(a Monomial) error {
 	if e != nil {
 		return e
 	}
+	if e = p.resetIndexAssert(id); e != nil {
+		return e
+	}
 	if uint64(id) >= uint64(len(p.values)) {
-		if polynomialSourceDebug {
-			return ErrMonomialAssertion
-		}
 		return arena.ErrBounds
 	}
 	p.values[id] = ^uint32(0)
@@ -129,14 +129,11 @@ func (p *MonomialPositions) Set(a Monomial, pos uint32) error {
 	if e = p.reserve(id + 1); e != nil {
 		return e
 	}
-	if uint64(id) >= uint64(len(p.values)) {
-		if polynomialSourceDebug {
-			return ErrMonomialAssertion
-		}
-		return arena.ErrBounds
+	if e = p.setEmptyAssert(id); e != nil {
+		return e
 	}
-	if polynomialSourceDebug && p.values[id] != ^uint32(0) {
-		return ErrMonomialAssertion
+	if uint64(id) >= uint64(len(p.values)) {
+		return arena.ErrBounds
 	}
 	p.values[id] = pos
 	return nil
