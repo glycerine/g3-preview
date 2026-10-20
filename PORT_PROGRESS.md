@@ -47160,3 +47160,13 @@ and every module value, then local overrides, snapshot stability and
 copied/closed-owner rejection. Focused tests pass native, checked, debug and
 combined profiles on CPUs 8-16; portcheck reports 252 ported and 314 partial
 units.
+
+Arithmetic rewriter generated parameter facade closure:
+`src/ast/rewriter/arith_rewriter_params.hpp` is promoted to ported. The new
+facade owns the constructor-time `rewriter` module snapshot and implements all
+thirteen generated accessors for algebraic evaluation, power/tangent rewrites,
+degree bounds, sum ordering, GCD rounding, arithmetic normalization and real/
+remainder transformations. Tests cover every literal default and inverted
+module value, module snapshot stability, local uint/bool overrides and owner
+guards. Focused tests pass native, checked, debug and combined profiles on CPUs
+8-16; portcheck reports 253 ported and 313 partial units.
