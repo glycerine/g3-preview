@@ -21419,19 +21419,24 @@
       "path": "src/ast/rewriter/array_rewriter_params.hpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/rewriter/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/ast/rewriter/array_rewriter.go",
+        "pkg/ast/rewriter/array_rewriter_test.go",
+        "pkg/ast/rewriter/array_rewriter_eq_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestArrayRewriterConstructorRefusalsAndParameterFallback",
+        "TestArrayRewriterOriginalParameterDescriptionWrapper"
       ],
       "conditionals": [
         {
@@ -21443,11 +21448,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/gparams_catalog_collectors.go",
           "tests": [
@@ -21460,25 +21465,63 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "constructor module snapshot and expand_select_store / expand_store_eq / sort_store local-module-default getters in source update order",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/array_rewriter.go",
+          "tests": [
+            "TestArrayRewriterConstructorRefusalsAndParameterFallback",
+            "TestArrayRewriterOriginalParameterDescriptionWrapper"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Descriptor ownership/merges and borrowed catalog-owned description bytes retain the catalog behavior. Each concrete update borrows its local params_ref, acquires one rewriter-module params_ref through ModuleParamsOwner, reads all three getters and releases that snapshot through the tracked helper destructor; stopped construction remains closeable by the ArrayRewriter owner."
       ],
-      "deviations": []
+      "deviations": [
+        "The generated facade is inlined into the sole retained ArrayRewriter update consumer instead of adding a duplicate standalone Go type. Go exposes lookup and cleanup failures explicitly."
+      ]
     },
     {
       "path": "src/ast/rewriter/array_rewriter_params.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/gparams_catalog_collectors.go",
+        "pkg/ast/rewriter/array_rewriter.go",
+        "pkg/ast/rewriter/array_rewriter_test.go",
+        "pkg/ast/rewriter/array_rewriter_eq_test.go",
+        "pkg/util/params/util_gparams_catalog_test.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestArrayRewriterConstructorRefusalsAndParameterFallback",
+        "TestArrayRewriterOriginalParameterDescriptionWrapper"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "three exported false-default rewriter Boolean declarations, descriptions and generated getter behavior",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/array_rewriter.go",
+          "tests": [
+            "TestArrayRewriterConstructorRefusalsAndParameterFallback",
+            "TestArrayRewriterOriginalParameterDescriptionWrapper"
+          ],
+          "go_targets": [
+            "pkg/ast/rewriter/gparams_catalog_collectors.go"
+          ]
+        }
+      ],
+      "ownership": [
+        "The declarations map to the sole retained consumer's borrowed local reference and owned lexical module snapshot; catalog description storage remains owned by the global parameter catalog."
+      ],
+      "deviations": [
+        "The concrete generated behavior is inlined at the retained ArrayRewriter update call site."
+      ]
     },
     {
       "path": "src/ast/rewriter/ast_counter.cpp",
