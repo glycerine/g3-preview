@@ -47023,3 +47023,12 @@ cancellation cleanup/retry are covered. Focused tests pass native 0.012s and
 checked/debug/combined 0.010s on CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-resultant-polynomial-audit.txt`. Binary selection
 and diagnostics remain in the separate caller row.
+
+Algebraic shared binary-algorithm closure:
+the duplicate cpp844-889/cpp897-1084/cpp1440-1563 rows are promoted to ported.
+Add/Sub/Mul dispatch, result-factor/Sturm selection, interval arithmetic, saved
+intervals, exact-root conversion, set_core, rational fallback, refinement
+redispatch, every checkpoint/allocation prefix, assertions, callbacks and all
+binary TRACE children are covered. Tests pass native 5.272s, checked 5.367s,
+debug 8.438s and combined 8.752s on CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-binary-audit.txt`.

@@ -39392,8 +39392,8 @@
           "notes": "The selected factor is copied into the already constructed scoped f through the concrete binary invocation's numeric allocation context. A failed coefficient copy remains owned by that exact binary generation; normal admission remains closed by the active binary scope and CleanupRetained consumes the numeric prefix before older binary locals. The multiword reservation sweep now uses no global pending-allocation cleanup and proves no pending numeric object or allocator block remains. Restoring the context-free SetView fails at prefix 422 with an unnamed 59-cell allocation. Broader binary selection remains partial."
         },
         {
-          "name": "algebraic_numbers.cpp:844-889,897-1084,1440-1563 concrete Add/Sub/Mul dispatch, factor/Sturm binary root selection, saved intervals, set_core zero handling and rational fallback; the enclosing binary generation now owns allocation prefixes outside narrower accepted children; complete fault/callback and TRACE coverage remain open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:844-889,897-1084,1440-1563 Add/Sub/Mul dispatch, factor/Sturm selection, saved intervals, set_core and rational fallback",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_binary.go",
           "tests": [
             "TestAlgebraicBinaryRootArithmeticAndAliases",
@@ -40598,8 +40598,8 @@
           "notes": "The selected factor is copied into the already constructed scoped f through the concrete binary invocation's numeric allocation context. A failed coefficient copy remains owned by that exact binary generation; normal admission remains closed by the active binary scope and CleanupRetained consumes the numeric prefix before older binary locals. The multiword reservation sweep now uses no global pending-allocation cleanup and proves no pending numeric object or allocator block remains. Restoring the context-free SetView fails at prefix 422 with an unnamed 59-cell allocation. Broader binary selection remains partial."
         },
         {
-          "name": "algebraic_numbers.cpp:844-889,897-1084,1440-1563 concrete Add/Sub/Mul dispatch, factor/Sturm binary root selection, saved intervals, set_core zero handling and rational fallback; the enclosing binary generation now owns allocation prefixes outside narrower accepted children; complete fault/callback and TRACE coverage remain open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:844-889,897-1084,1440-1563 Add/Sub/Mul dispatch, factor/Sturm selection, saved intervals, set_core and rational fallback",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_binary.go",
           "tests": [
             "TestAlgebraicBinaryRootArithmeticAndAliases",
