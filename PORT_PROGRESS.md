@@ -47212,3 +47212,15 @@ Existing tests independently cover every fallback, untouched explicit fields,
 constructor allocation prefixes and stopped helper cleanup. The focused SMT
 pattern suite passes native, checked, debug and combined profiles on CPUs
 8-16; portcheck reports 259 ported and 307 partial units.
+
+Rewriter shared-types closure:
+`src/ast/rewriter/rewriter_types.h` is promoted to ported. The six rewrite
+statuses and bounded-to-unbounded depth conversion were already live; the
+engine's plain string error is now the concrete `rewriter_exception` adapter
+over `DefaultException`. It preserves both concrete rewrite-exception matching
+and source base-class matching through `errors.As`, including the source
+C-string message boundary. The engine uses the adapter for frame, scope, step
+and cancellation failures. Focused tests pass native, checked, debug and
+combined profiles, and the full native AST rewriter package passes on CPUs
+8-16. Portcheck reports 2103 units, 677 APIs: 260 ported, 306 partial, 1480
+unported and 11 dead/deleted.

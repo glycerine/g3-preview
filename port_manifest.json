@@ -30446,11 +30446,12 @@
       "path": "src/ast/rewriter/rewriter_types.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/rewriter_types.go"
       ],
       "tests": [
+        "TestRewriterTypesSourceStatusesAndExceptionHierarchy",
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
         "TestBoolRewriterACOneLevelFlatteningAndSpill",
         "TestBoolRewriterACIndependentAssignmentsThroughCDCL"
@@ -30483,8 +30484,8 @@
           "text": "SASSERT((u >= 3) == (r == BR_REWRITE_FULL));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "br_status and unsigned2br_status",
@@ -30493,12 +30494,20 @@
           "tests": [
             "TestBoolRewriterACOneLevelFlatteningAndSpill"
           ]
+        },
+        {
+          "name": "rewriter_exception",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/rewriter_types.go",
+          "tests": [
+            "TestRewriterTypesSourceStatusesAndExceptionHierarchy"
+          ]
         }
       ],
-      "ownership": [],
-      "deviations": [
-        "The source rewriter_exception wrapper remains unported; all six status codes and bounded/unbounded depth conversion are translated."
-      ]
+      "ownership": [
+        "Rewrite statuses and the unbounded-depth sentinel are values. rewriterException owns the immutable Go copy held by its embedded DefaultException; Unwrap preserves source base-class catches."
+      ],
+      "deviations": []
     },
     {
       "path": "src/ast/rewriter/seq_rewriter.cpp",

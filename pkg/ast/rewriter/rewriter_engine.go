@@ -10,10 +10,6 @@ import (
 	"github.com/glycerine/g3/pkg/util/messages"
 )
 
-type rewriterException struct{ message string }
-
-func (e rewriterException) Error() string { return e.message }
-
 // The no-proof source specialization retains the original iterative states,
 // scopes, bounded revisit depths and borrowed binding vectors. Proof-generating
 // traversal remains a separate port obligation.
@@ -197,13 +193,13 @@ func (r *rewriterEngine) Close() error {
 }
 func (r *rewriterEngine) pushFrame(t ast.ASTHandle, cache bool, depth uint32) error {
 	if r.cfg.maxFramesExceeded(uint32(len(r.core.frames))) {
-		return rewriterException{messages.MaxFrames}
+		return newRewriterException(messages.MaxFrames)
 	}
 	return r.core.pushFrameCore(t, cache, 0, depth)
 }
 func (r *rewriterEngine) beginScope() error {
 	if r.cfg.maxScopesExceeded(uint32(len(r.core.scopes))) {
-		return rewriterException{messages.MaxScopes}
+		return newRewriterException(messages.MaxScopes)
 	}
 	return r.core.beginScope()
 }
@@ -920,7 +916,7 @@ func (r *rewriterEngine) checkCancel() error {
 	if e = r.Reset(); e != nil {
 		return e
 	}
-	return rewriterException{message}
+	return newRewriterException(message)
 }
 func (r *rewriterEngine) Rewrite(t ast.ASTHandle, out ast.ASTRef) error {
 	if e := r.open(); e != nil {
@@ -964,7 +960,7 @@ func (r *rewriterEngine) Resume(out ast.ASTRef) error {
 			return err
 		}
 		if exceeded {
-			return rewriterException{messages.MaxSteps}
+			return newRewriterException(messages.MaxSteps)
 		}
 		fr := c.frames[len(c.frames)-1]
 		t := fr.curr

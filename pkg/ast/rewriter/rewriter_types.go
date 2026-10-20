@@ -1,6 +1,8 @@
 // Source: src/ast/rewriter/rewriter_types.h:29-49.
 package rewriter
 
+import "github.com/glycerine/g3/pkg/util/z3exception"
+
 type brStatus uint32
 
 const (
@@ -12,9 +14,21 @@ const (
 	brFailed
 )
 
+const rwUnboundedDepth uint32 = 3
+
 func unsignedToBRStatus(u uint32) brStatus {
-	if u >= 3 {
+	if u >= rwUnboundedDepth {
 		return brRewriteFull
 	}
 	return brStatus(u)
 }
+
+// rewriterException retains the source rewriter_exception identity while
+// preserving catches of its default_exception base through errors.As.
+type rewriterException struct{ z3exception.DefaultException }
+
+func newRewriterException(message string) rewriterException {
+	return rewriterException{z3exception.NewDefaultException(message)}
+}
+
+func (e rewriterException) Unwrap() error { return e.DefaultException }
