@@ -21178,7 +21178,7 @@
       "path": "src/ast/pp.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_format_pp.go",
         "pkg/ast/ast_format_pp_source_test.go"
@@ -21197,12 +21197,12 @@
           "text": "SASSERT(f->get_family_id() == fm(m).get_family_id(\"format\"));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "ast_format_pp concrete reached source counterpart (pp.cpp:22-132)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_format_pp.go",
           "tests": [
             "TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine",
@@ -21214,16 +21214,16 @@
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "The native format worklist is represented by a Go slice and explicit checked failures. Pointer-free runtime codecs and reflected cold headers are Go representations rather than native ABI equivalence. Default SMT2 environment dispatch and well-sorted callers remain separate source-unit obligations."
       ]
     },
     {
       "path": "src/ast/pp.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/ast_format_pp.go"],
+      "tests": ["TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine", "TestASTFormatPrettyEveryGetterStackAndOutputReservation", "TestASTFormatPrettyNativeWorklistGrowth", "TestASTFormatDefaultPrinterStoppedFrameOwningCleanup"],
       "conditionals": [
         {
           "line": 19,
@@ -21234,11 +21234,16 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{
+        "name": "pp output entry point declaration and default parameter contract",
+        "status": "ported",
+        "go_target": "pkg/ast/ast_format_pp.go",
+        "tests": ["TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine", "TestASTFormatDefaultPrinterStoppedFrameOwningCleanup"]
+      }],
+      "ownership": ["PrintFormat borrows the output stream, format handle, and optional parameter services. Its invocation frame owns the temporary space format and parameter helper until source-order cleanup."],
+      "deviations": ["Go returns checked errors instead of native stream state, assertions, or exceptions and exposes explicit service arguments in place of the C++ default params_ref temporary."]
     },
     {
       "path": "src/ast/pp_params.hpp",
