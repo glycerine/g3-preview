@@ -148,8 +148,8 @@ func (m *MultivariatePolynomialCore) constantFromRationalScope() (Polynomial, er
 }
 func (m *MultivariatePolynomialCore) constantFromRationalScopeWithArithmeticReceipt(receipt *polynomialArithmeticInvocationReceipt) (Polynomial, error) {
 	s := &m.constantScope
-	if polynomialSourceDebug && !unumeral.IsIntegerRational(&s.rational) {
-		return Polynomial{}, m.finishConstantScope(ErrPolynomialAssertion)
+	if e := m.cellSourceAssert(2531, "a.is_int()", func() (bool, error) { return unumeral.IsIntegerRational(&s.rational), nil }); e != nil {
+		return Polynomial{}, m.finishConstantScope(e)
 	}
 	s.numeral = unumeral.Int{}
 	s.numeralCompleted = true

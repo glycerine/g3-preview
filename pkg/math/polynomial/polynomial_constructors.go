@@ -7,19 +7,21 @@ import (
 )
 
 func (m *MultivariatePolynomialCore) rational2Numeral(as []unumeral.Rational, n uint32) error {
-	size, e := m.rationalTerms.size(m)
-	if e != nil {
+	if e := m.cellSourceAssert(2558, "m_rat2numeral.empty()", func() (bool, error) {
+		n, e := m.rationalTerms.size(m)
+		return n == 0, e
+	}); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && size != 0 {
-		return ErrPolynomialAssertion
-	}
+	var e error
 	for i := uint32(0); i < n; i++ {
-		if uint64(i) >= uint64(len(as)) {
-			return arena.ErrBounds
-		}
-		if polynomialSourceDebug && !unumeral.IsIntegerRational(&as[i]) {
-			return ErrPolynomialAssertion
+		if e = m.cellSourceAssert(2560, "as[i].is_int()", func() (bool, error) {
+			if uint64(i) >= uint64(len(as)) {
+				return false, arena.ErrBounds
+			}
+			return unumeral.IsIntegerRational(&as[i]), nil
+		}); e != nil {
+			return e
 		}
 		if e = m.rationalTerms.appendCoefficient(m, unumeral.Int{}); e != nil {
 			return e
@@ -31,6 +33,9 @@ func (m *MultivariatePolynomialCore) rational2Numeral(as []unumeral.Rational, n 
 		a, e := m.rationalTerms.coefficient(m, pos-1)
 		if e != nil {
 			return e
+		}
+		if uint64(i) >= uint64(len(as)) {
+			return arena.ErrBounds
 		}
 		e = m.modular.Copy(&a, &(*as[i].BorrowNumerator()))
 		if w := m.rationalTerms.putCoefficient(m, pos-1, a); w != nil {
@@ -44,21 +49,22 @@ func (m *MultivariatePolynomialCore) rational2Numeral(as []unumeral.Rational, n 
 }
 func (m *MultivariatePolynomialCore) resetRationalTerms() error {
 	if polynomialSourceDebug {
-		n, e := m.rationalTerms.size(m)
-		if e != nil {
-			return e
-		}
-		for i := uint32(0); i < n; i++ {
-			a, e := m.rationalTerms.coefficient(m, i)
+		for i := uint32(0); ; i++ {
+			n, e := m.rationalTerms.size(m)
 			if e != nil {
 				return e
 			}
-			zero, e := m.modular.IsZero(&a)
-			if e != nil {
-				return e
+			if i >= n {
+				break
 			}
-			if !zero {
-				return ErrPolynomialAssertion
+			if e = m.cellSourceAssert(2569, "m_manager.is_zero(m_rat2numeral[i])", func() (bool, error) {
+				a, e := m.rationalTerms.coefficient(m, i)
+				if e != nil {
+					return false, e
+				}
+				return m.modular.IsZero(&a)
+			}); e != nil {
+				return e
 			}
 		}
 	}
@@ -157,13 +163,8 @@ func (m *MultivariatePolynomialCore) MkLinearTake(as []unumeral.Int, xs []uint32
 	if m.overloadResult != (Polynomial{}) {
 		return Polynomial{}, ErrPolynomialPending
 	}
-	an, e := m.linearTerms.size(m)
-	if e != nil {
+	if e := m.linearConstructorEmptyAssertions(); e != nil {
 		return Polynomial{}, e
-	}
-	mn := uint32(len(m.linearMonomials))
-	if polynomialSourceDebug && (an != 0 || mn != 0) {
-		return Polynomial{}, ErrPolynomialAssertion
 	}
 	return m.mkLinearInput(as, uint32(len(as)), xs, c)
 }
@@ -267,8 +268,8 @@ func (m *MultivariatePolynomialCore) MkRationalLinear(as []unumeral.Rational, xs
 	if c == nil {
 		return Polynomial{}, arena.ErrBounds
 	}
-	if polynomialSourceDebug && !unumeral.IsIntegerRational(c) {
-		return Polynomial{}, ErrPolynomialAssertion
+	if e := m.cellSourceAssert(2626, "c.is_int()", func() (bool, error) { return unumeral.IsIntegerRational(c), nil }); e != nil {
+		return Polynomial{}, e
 	}
 	if m.overloadResult != (Polynomial{}) || m.linearConstantActive {
 		return Polynomial{}, ErrPolynomialPending
@@ -284,27 +285,16 @@ func (m *MultivariatePolynomialCore) MkRationalLinear(as []unumeral.Rational, xs
 	if e := m.modular.Copy(&m.linearConstant, &(*c.BorrowNumerator())); e != nil {
 		return Polynomial{}, e
 	}
-	an, e := m.linearTerms.size(m)
-	if e != nil {
+	if e := m.linearConstructorEmptyAssertions(); e != nil {
 		return Polynomial{}, e
-	}
-	mn := uint32(len(m.linearMonomials))
-	if polynomialSourceDebug && (an != 0 || mn != 0) {
-		return Polynomial{}, ErrPolynomialAssertion
 	}
 	p, e := m.mkLinearInput(m.rationalTerms.values, uint32(len(as)), xs, &m.linearConstant)
 	if e != nil {
 		return Polynomial{}, e
 	}
 	m.overloadResult = p
-	if polynomialSourceDebug {
-		zero, e := m.modular.IsZero(&m.linearConstant)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if !zero {
-			return Polynomial{}, ErrPolynomialAssertion
-		}
+	if e = m.cellSourceAssert(2631, "m_manager.is_zero(tmp_c)", func() (bool, error) { return m.modular.IsZero(&m.linearConstant) }); e != nil {
+		return Polynomial{}, e
 	}
 	if e = m.resetRationalTerms(); e != nil {
 		return Polynomial{}, e

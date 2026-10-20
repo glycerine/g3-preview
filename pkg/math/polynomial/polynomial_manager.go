@@ -376,8 +376,8 @@ func (m *MultivariatePolynomialCore) mkVariableWithReceipt(v, k uint32, receipt 
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
-	if polynomialSourceDebug && v >= m.monomials.nextVar {
-		return Polynomial{}, ErrPolynomialAssertion
+	if e := m.cellSourceAssert(2539, "is_valid(x)", func() (bool, error) { return m.monomials.IsValidVar(v) }); e != nil {
+		return Polynomial{}, e
 	}
 	if m.singletonReference {
 		return Polynomial{}, ErrPolynomialPending

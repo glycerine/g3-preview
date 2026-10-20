@@ -2,11 +2,13 @@
 package polynomial
 
 import (
+	"errors"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
 )
 
 func TestPolynomialRationalArraySourceResetAssertionAndRetainedTail(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m := polynomialCellFixture(t)
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
@@ -14,7 +16,7 @@ func TestPolynomialRationalArraySourceResetAssertionAndRetainedTail(t *testing.T
 	serviceMust(t, m.config.Rationals.SetInt64(&a, 4))
 	p, e := m.MkRationalTerms([]unumeral.Rational{a}, []Monomial{u})
 	if polynomialSourceDebug {
-		if e != ErrPolynomialAssertion || p != (Polynomial{}) || m.overloadResult == (Polynomial{}) {
+		if !errors.Is(e, ErrPolynomialAssertion) || p != (Polynomial{}) || m.overloadResult == (Polynomial{}) {
 			t.Fatal("source nonzero rational-array tail assertion before return", p, e)
 		}
 	} else {

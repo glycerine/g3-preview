@@ -304,6 +304,7 @@ func TestPolynomialVariableHelperImplicitCopyMoveAndScopedCopies(t *testing.T) {
 }
 
 func TestPolynomialVariableHelperScopedReachedResetPrefix(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	r, b := degreeCopyRuntime(t)
 	d, e := NewPolynomialVariablePositions(r)
 	serviceMust(t, e)

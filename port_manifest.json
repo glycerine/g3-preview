@@ -41385,6 +41385,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_constructor_assertions.go",
         "pkg/math/polynomial/polynomial_cell_assertions.go",
         "pkg/math/polynomial/polynomial_divides_trace.go",
         "pkg/math/polynomial/polynomial_divides_trace_test.go",
@@ -44049,6 +44050,31 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained rational/linear/variable constructor assertion protocols cpp2531,2539,2558,2560,2569,2605-2606,2626,2631",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_constructor_assertions.go",
+          "tests": [
+            "TestPolynomialVariableConstructorAssertionActions",
+            "TestPolynomialConstructorClosedAssertionOwnerPaths",
+            "TestPolynomialRationalConstructorAssertionActions",
+            "TestPolynomialRationalArraySourceResetAssertionAndRetainedTail",
+            "TestPolynomialRationalLinearSourceConsumesCopiedFieldsOnly"
+          ],
+          "notes": "NLSAT solver1294/1297 retains rational linear construction; NLSAT explain1737 retains rational constant and polynomial algorithms retain variable/numeral linear construction. Each source statement independently gates its actual predicate and honors source Throw/Continue; rational reset preserves its DEBUG_CODE loop but erases asserted operands when disabled. Variable k0 gives a defined unit continuation after2539 Continue. Actual fraction3/2 caller inputs at2560/2626 retain their rational payload while Continue copies source numerator3; this is assertion-continuation coverage, not a correct integer conversion of fractions. Native erased2560 defers Go argument bounds to the actual numerator read after zero-slot publication."
+        },
+        {
+          "name": "Dormant add_del_eh/remove_del_eh registration cpp2396-2418 and public facades6986-6992",
+          "status": "reference_only",
+          "go_target": "pkg/math/polynomial/polynomial_callbacks.go",
+          "notes": "Whole-src word search finds only declarations, definitions/facades and tst_del_eh calls1443/1447/1452/1458. The registered tst_polynomial calls tst_psc then returns1825 before tst_del_eh1842. Production Go has no Add/RemoveDeletionHandler consumers beyond their definitions; Go test hooks remain useful owning/lifetime instrumentation. Do not port2402/2403/2416 solely to extend this dormant API. This does not exclude live polynomial deletion, TRACE2421 or reference retirement."
+        },
+        {
+          "name": "Dormant private rational mk_univariate cpp2596-2602",
+          "status": "reference_only",
+          "go_target": "pkg/math/polynomial/polynomial_constructors.go",
+          "notes": "No caller reaches the rational overload; the public facade exposes the numeral overload2582 and passes numeral*. Existing Go MkRationalUnivariate compatibility API/tests remain. Shared rational2numeral/reset behavior is retained through NLSAT rational linear construction, but no separate2597 assertion completion credit is added."
+        },
+        {
           "name": "Retained consistent_coeffs const getter and inner1854 assertion with outer7426 exception propagation",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_display.go",
@@ -45198,7 +45224,7 @@
           ]
         },
         {
-          "name": "Retained polynomial cell, accessors, native SOM, construction, arithmetic and deletion callbacks with full manager lifecycle and optimized PSC composition; whole source closure still unproven",
+          "name": "Retained polynomial cell, accessors, native SOM, construction, arithmetic and optional Go deletion instrumentation with full manager lifecycle and optimized PSC composition; whole source closure still unproven",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
@@ -45243,7 +45269,7 @@
             "TestPolynomialSoleRetainCalleeConstructionCleanup",
             "TestPolynomialPreexistingCalleeCreationRemainsBorrowed"
           ],
-          "notes": "Scoped coefficient-access audit now separates const1511, mutable1512 and raw array/owning codecs. Retained mutable consumers include deletion2433, ICCP-ZpX3982, modular-GCD4273/4274/4336, pseudo5007/5036, concrete evaluation6445/6471/6493/6517, quadratic6618 and factor6809/6810. This broad row stays partial: these selected protocols and green tests do not prove the entire cell/arithmetic/owner inventory."
+          "notes": "Scoped coefficient-access audit now separates const1511, mutable1512 and raw array/owning codecs. Retained mutable consumers include deletion2433, ICCP-ZpX3982, modular-GCD4273/4274/4336, pseudo5007/5036, concrete evaluation6445/6471/6493/6517, quadratic6618 and factor6809/6810. This broad row stays partial: these selected protocols and green tests do not prove the entire cell/arithmetic/owner inventory. Deletion handler registration/removal has no retained C++ caller: whole-src uses are definitions/facades and dormant tst_del_eh after tst_polynomial early return. Existing Go test instrumentation is retained without source-consumer completion credit."
         },
         {
           "name": "Complete incremental Newton ctor/reset/const-input/count/Add/Mk and whole-method lexical owner; persistent owner-vector lazy At/SetOwner/Flush/SourceFinalize, exact TRACE and assertion actions; explicit owning cleanup distinct from source destruction",
