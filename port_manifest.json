@@ -21262,14 +21262,21 @@
       "path": "src/ast/rewriter/arith_rewriter_params.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/ast/rewriter/arith_rewriter_params.go",
+        "pkg/ast/rewriter/arith_rewriter_params_source_test.go",
+        "pkg/ast/rewriter/gparams_catalog_collectors.go",
+        "pkg/util/params/util_gparams_catalog_test.go",
         "pkg/smtcore/util_smt_arith_params.go",
         "pkg/smtcore/util_smt_arith_params_source_test.go",
         "pkg/ast/rewriter/bv_polynomial_config.go",
         "pkg/ast/rewriter/bv_polynomial_config_test.go"
       ],
       "tests": [
+        "TestArithRewriterParamsDefaultsSnapshotAndLocalPrecedence",
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestSMTArithAllFortySixLiteralDefaults",
         "TestSMTArithSixteenGettersIndependentLocalModuleLiteralPaths",
         "TestSMTArithSecondDeclarationRefusalKeepsFifteenFieldPrefix",
@@ -21284,44 +21291,33 @@
         "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
         "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "Concrete rewriter module eq2ineq accessor and false default (src/ast/rewriter/arith_rewriter_params.pyg:1-15; scripts/mk_genfile_common.py:895-939)",
-          "status": "partial",
-          "go_target": "pkg/smtcore/util_smt_arith_params.go",
+          "name": "complete rewriter module declaration, thirteen exported typed options, defaults, descriptions and generated facade",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_rewriter_params.go",
           "tests": [
-            "TestSMTArithAllFortySixLiteralDefaults",
+            "TestArithRewriterParamsDefaultsSnapshotAndLocalPrecedence",
+            "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+            "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
             "TestSMTArithSixteenGettersIndependentLocalModuleLiteralPaths",
-            "TestSMTArithSecondDeclarationRefusalKeepsFifteenFieldPrefix",
-            "TestSMTArithEveryWarmConstructorReservation",
-            "TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags",
-            "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
-            "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
-          ]
-        },
-        {
-          "name": "Concrete arith_ineq_lhs=false getter consumed by polynomial AST-order configuration; separate owning rewriter module snapshot (src/ast/rewriter/arith_rewriter_params.pyg; scripts/mk_genfile_common.py:895-921)",
-          "status": "partial",
-          "go_target": "pkg/ast/rewriter/bv_polynomial_config.go",
-          "tests": [
             "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
-            "TestBVPolynomialConfigurationTypedLocalModuleFallback",
-            "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
-            "TestBVPolynomialConfigurationFeedsMultiplicationCaller",
-            "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
-            "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
+            "TestBVPolynomialConfigurationTypedLocalModuleFallback"
+          ],
+          "go_targets": [
+            "pkg/ast/rewriter/gparams_catalog_collectors.go",
+            "pkg/smtcore/util_smt_arith_params.go",
+            "pkg/ast/rewriter/bv_polynomial_config.go",
+            "pkg/util/params/util_gparams_catalog_test.go"
           ]
         }
       ],
       "ownership": [
-        "Forty-six scalar members use exact declaration/default/display order. The actual smt helper is acquired before fifteen RHS/publications; the actual rewriter helper is acquired only after those complete, followed by eq2ineq. Each returned module ParamsRef stamps acquisition in the existing concrete shared helper engine; lexical reverse source destruction and exact stopped-child owning continuation remain separate. Reflected standalone wrapper/frame cold charges are Go lifetime representation, not native scalar/stack allocations; caller local/context/global owners remain borrowed.",
-        "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited."
+        "The complete facade borrows its caller ParamsRef and owns the constructor-time rewriter module snapshot through all thirteen typed lookups. Retained SMT and polynomial consumers use the same concrete module values; catalog descriptions are owned by the descriptor table."
       ],
-      "deviations": [
-        "No complete smt_params/context/kernel, registered SMT driver, whole generated helper/generator or native global/locale/boolalpha completion credit. Incomplete constructors return an explicitly diagnostic owner; Display/Update refuse before output/body while State can inspect actual initialized/published prefix. Cross-owner/null-global/closed/copy guards are precise Go domain evidence, not native null dereference equivalence. Source enum casts use fixed-width representation and signed ostream insertion; valid-enumerator oracle cases are distinct from out-of-domain conversion profiles."
-      ]
+      "deviations": []
     },
     {
       "path": "src/ast/rewriter/array_rewriter.cpp",

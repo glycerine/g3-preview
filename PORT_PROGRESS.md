@@ -47233,3 +47233,12 @@ catalog collector. The concrete consumer owns its module snapshot and borrows
 the caller parameter state; the descriptor table owns the catalog strings.
 Focused facade and catalog checks pass native, checked, debug and combined
 profiles on CPUs 8-16. Portcheck reports 261 ported and 305 partial units.
+
+Arithmetic-rewriter generator-input closure:
+`src/ast/rewriter/arith_rewriter_params.pyg` is promoted to ported after all
+thirteen Boolean/unsigned declarations were matched to the complete AST
+facade, retained SMT and polynomial consumers, and exact `rewriter` catalog
+metadata. The facade owns its module snapshot and borrows local parameters;
+the catalog owns descriptor strings. Focused cross-package checks pass native,
+checked, debug and combined profiles on CPUs 8-16. Portcheck reports 262
+ported and 304 partial units.
