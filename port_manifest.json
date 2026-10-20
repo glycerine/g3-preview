@@ -15745,28 +15745,51 @@
       "path": "src/ast/factor_equivs.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/ast_factor_equivs.go"],
+      "tests": [
+        "TestASTFactorEqualitiesArithmeticNormalizationAndRemainder",
+        "TestASTExprEquivClassEmissionAndOwnership"
+      ],
       "assertions": [
         {
           "line": 84,
           "text": "SASSERT(rep);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "factor_eqs conjunction flattening, equality removal, zero swapping, and y + -1*x normalization",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_factor_equivs.go",
+          "tests": ["TestASTFactorEqualitiesArithmeticNormalizationAndRemainder"]
+        },
+        {
+          "name": "equiv_to_expr non-value representative equalities and equiv_to_expr_full pairwise closure",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_factor_equivs.go",
+          "tests": ["TestASTExprEquivClassEmissionAndOwnership"]
+        }
+      ],
+      "ownership": [
+        "Factoring borrows the caller expression slice and compacts it in place. Emitted equalities are returned as independently owning ASTRef values."
+      ],
+      "deviations": [
+        "Concrete typed Go slices and the existing BasicUnionFind replace source vectors and iterator facades. Arithmetic numeral matching reads the retained exact numeral text and does not port rational or STL internals."
+      ]
     },
     {
       "path": "src/ast/factor_equivs.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/ast_factor_equivs.go"],
+      "tests": [
+        "TestASTFactorEqualitiesArithmeticNormalizationAndRemainder",
+        "TestASTExprEquivClassEmissionAndOwnership"
+      ],
       "conditionals": [
         {
           "line": 28,
@@ -15791,11 +15814,31 @@
           "text": "SASSERT(&m_ouf == &o.m_ouf);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete expr_equiv_class add, merge, reset, equivalence query, and class iteration",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_factor_equivs.go",
+          "tests": ["TestASTExprEquivClassEmissionAndOwnership"]
+        },
+        {
+          "name": "factor and equality-emission public declarations",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_factor_equivs.go",
+          "tests": [
+            "TestASTFactorEqualitiesArithmeticNormalizationAndRemainder",
+            "TestASTExprEquivClassEmissionAndOwnership"
+          ]
+        }
+      ],
+      "ownership": [
+        "ExprEquivClass owns one ASTRef per distinct inserted expression. Its identity map and object slice borrow those pinned handles; Reset and Close retain a cursor for stopped-release retry."
+      ],
+      "deviations": [
+        "Only the live expr/AST-manager specialization is ported, as required by retained consumers. No universal Go template adapter is introduced."
+      ]
     },
     {
       "path": "src/ast/for_each_ast.cpp",
