@@ -19602,6 +19602,7 @@
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/ast/normal_forms/gparams_catalog_collectors.go",
+        "pkg/ast/normal_forms/skolemizer.go",
         "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
@@ -19609,7 +19610,9 @@
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestSkolemizerFreeVariablesProofAndCache",
+        "TestSkolemizerHackPatternAugmentsExistentialBody"
       ],
       "assertions": [
         {
@@ -19721,6 +19724,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "skolemizer::process/operator()/set_sk_hack/is_sk_hack",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/skolemizer.go",
+          "evidence": "Concrete Skolemizer preserves sparse free-variable arguments, reverse binder substitution, optional sk_hack pattern augmentation, Skolemization proofs and cached identities."
+        },
+        {
           "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
           "status": "ported",
           "go_target": "pkg/ast/normal_forms/gparams_catalog_collectors.go",
@@ -19737,7 +19746,8 @@
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
+        "Skolemizer cache keys, results and optional proofs have independent ASTRef roots; Reset and Close retain deletion progress for retry."
       ],
       "deviations": []
     },
