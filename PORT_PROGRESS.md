@@ -47014,3 +47014,12 @@ preservation, owner guards and all resultant/substitution/filter/recovery TRACE
 children. Tests pass native 66.785s, checked 66.693s, debug 343.557s and
 combined 350.344s on CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-multivariate-isolation-audit.txt`.
+
+Algebraic binary resultant-polynomial closure:
+the duplicate cpp794-839 functor rows are promoted to ported. Add/subtract
+composition, multiplicative x/y composition, real resultant construction,
+four source reference lifetimes, caller-owned dense conversion and
+cancellation cleanup/retry are covered. Focused tests pass native 0.012s and
+checked/debug/combined 0.010s on CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-resultant-polynomial-audit.txt`. Binary selection
+and diagnostics remain in the separate caller row.

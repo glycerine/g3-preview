@@ -39415,8 +39415,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:794-839 retained mk_add_polynomial<true/false> and mk_mul_polynomial through real multivariate composition/resultants and caller-owned dense conversion; mk_binary mathematical selection has separate evidence; complete failure and TRACE integration remain open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:794-839 retained add/sub/mul resultant-polynomial functors through composition, resultant and caller-owned dense conversion",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_resultant_polynomial.go",
           "tests": [
             "TestAlgebraicResultantSumDifferenceAndProductPolynomials",
@@ -40612,8 +40612,8 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:794-839 retained mk_add_polynomial<true/false> and mk_mul_polynomial through real multivariate composition/resultants and caller-owned dense conversion; mk_binary mathematical selection has separate evidence; complete failure and TRACE integration remain open",
-          "status": "partial",
+          "name": "Complete algebraic_numbers.cpp:794-839 retained add/sub/mul resultant-polynomial functors through composition, resultant and caller-owned dense conversion",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_resultant_polynomial.go",
           "tests": [
             "TestAlgebraicResultantSumDifferenceAndProductPolynomials",
