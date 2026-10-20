@@ -33195,9 +33195,14 @@
       "path": "src/ast/static_features.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_static_features.go",
+        "pkg/ast/ast_static_features_test.go"
+      ],
+      "tests": [
+        "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay"
+      ],
       "assertions": [
         {
           "line": 131,
@@ -33210,17 +33215,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constructor, reset, flush_cache, internal_family, has_uf, theory counts, primitive/derived displays and empty feature vector (static_features.cpp:22-112,537-649)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_static_features.go",
+          "tests": [
+            "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay"
+          ]
+        }
+      ],
+      "ownership": [
+        "StaticFeatures borrows its AST manager, owns one ArithKSum rational and native counter/cache slices and maps, and releases the rational explicitly in Close."
+      ],
+      "deviations": [
+        "Native Go maps and slices replace ast_mark, u_map and unsigned_vector. Collection, arithmetic classification and traversal remain open, so the source unit stays partial."
+      ]
     },
     {
       "path": "src/ast/static_features.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_static_features.go",
+        "pkg/ast/ast_static_features_test.go"
+      ],
+      "tests": [
+        "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -33233,9 +33256,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "static feature state, cache reset, display/query declarations and exact default maximum traversal depth (static_features.h:27-179)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_static_features.go",
+          "tests": [
+            "TestStaticFeaturesSourceResetQueriesAndPrimitiveDisplay"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete Go owner exposes source counters directly and owns its rational and native collections; AST handles and the manager remain borrowed."
+      ],
+      "deviations": [
+        "Go uses explicit Reset, FlushCache and Close methods. Collection helpers and their recognizer-dependent fields remain open."
+      ]
     },
     {
       "path": "src/ast/substitution/CMakeLists.txt",
