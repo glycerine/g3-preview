@@ -22394,28 +22394,53 @@
       "path": "src/ast/rewriter/ast_counter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/ast_counter.go"],
+      "tests": [
+        "TestASTCounterScalarOperations",
+        "TestASTVarCounterArgumentsAndQuantifierDepth",
+        "TestASTIdentityCounter"
+      ],
       "assertions": [
         {
           "line": 73,
           "text": "VERIFY(get_max_positive(max_pos));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "counter update/get/count, positive collection/count/maximum and maximum counter value",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/ast_counter.go",
+          "tests": ["TestASTCounterScalarOperations"]
+        },
+        {
+          "name": "var_counter argument counting and binder-adjusted maximum/next free variable",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/ast_counter.go",
+          "tests": ["TestASTVarCounterArgumentsAndQuantifierDepth"]
+        }
+      ],
+      "ownership": [
+        "Counters own only native Go scalar maps and traversal slices. VarCounter borrows its AST manager and all expression/sort handles; ExprFreeVars also retains only borrowed sort handles."
+      ],
+      "deviations": [
+        "Native typed maps and slices replace u_map, obj_map, uint_set and source vectors. The assertion-bearing empty maximum overload returns ErrASTDomain, and assignable C++ get references are represented by explicit Get and Set methods."
+      ]
     },
     {
       "path": "src/ast/rewriter/ast_counter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/ast_counter.go"],
+      "tests": [
+        "TestASTCounterScalarOperations",
+        "TestASTVarCounterArgumentsAndQuantifierDepth",
+        "TestASTIdentityCounter"
+      ],
       "conditionals": [
         {
           "line": 24,
@@ -22426,11 +22451,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "counter, var_counter and ast_counter complete declarations and inline operations",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/ast_counter.go",
+          "tests": [
+            "TestASTCounterScalarOperations",
+            "TestASTVarCounterArgumentsAndQuantifierDepth",
+            "TestASTIdentityCounter"
+          ]
+        }
+      ],
+      "ownership": [
+        "All three concrete counters use value keys and signed scalar counts; no map entry owns an AST reference."
+      ],
+      "deviations": [
+        "Entries returns a native map snapshot for the one retained counter iterator consumer. ASTCounter Set represents mutation through the source int-reference accessor without exposing Go interior map references."
+      ]
     },
     {
       "path": "src/ast/rewriter/bit2int.cpp",
