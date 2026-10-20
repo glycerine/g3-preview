@@ -4,132 +4,53 @@
       "path": "CMakeLists.txt",
       "component": "CMakeLists.txt",
       "role": "reference_tool",
-      "status": "ported",
-      "go_targets": ["pkg/ast/rewriter/push_app_ite.go"],
-      "tests": [
-        "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
-        "TestPushAppITERefusesBooleanITEAndITEDeclaration",
-        "TestNGPushAppITERequiresNongroundArgument",
-        "TestPushAppITEConfigurationProofAndOwnerGuards"
-      ],
-      "methods_audited": true,
-      "ownership_audited": true,
-      "methods": [
-        {
-          "name": "has_ite_arg, push_app_ite_cfg::is_target/reduce_app, and ng_push_app_ite_cfg::is_target",
-          "status": "ported",
-          "go_target": "pkg/ast/rewriter/push_app_ite.go",
-          "tests": [
-            "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
-            "TestPushAppITERefusesBooleanITEAndITEDeclaration",
-            "TestNGPushAppITERequiresNongroundArgument",
-            "TestPushAppITEConfigurationProofAndOwnerGuards"
-          ]
-        }
-      ],
-      "ownership": [
-        "Configuration borrows the AST manager and application arguments. Each reduction copies the mutable argument pointer view into native Go handle storage, publishes its result and optional proof through caller-owned AST references, and retains no per-call AST nodes. The wrapper owns its charged traversal/configuration representation and releases it idempotently."
-      ],
-      "deviations": [
-        "The proof-enabled wrapper publishes one valid root rewrite (or reflexivity) proof after the exact no-proof traversal instead of preserving the source traversal's internal congruence/transitivity proof-tree shape."
-      ]
+      "status": "unported",
+      "go_targets": [],
+      "tests": [],
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [],
+      "ownership": [],
+      "deviations": []
     },
     {
       "path": "LICENSE.txt",
       "component": "LICENSE.txt",
       "role": "reference_tool",
-      "status": "ported",
-      "go_targets": ["pkg/ast/rewriter/push_app_ite.go"],
-      "tests": [
-        "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
-        "TestPushAppITERefusesBooleanITEAndITEDeclaration",
-        "TestNGPushAppITERequiresNongroundArgument",
-        "TestPushAppITEConfigurationProofAndOwnerGuards"
-      ],
-      "methods_audited": true,
-      "ownership_audited": true,
-      "methods": [
-        {
-          "name": "push_app_ite_cfg, ng_push_app_ite_cfg, push_app_ite_rw, and ng_push_app_ite_rw declarations and constructors",
-          "status": "ported",
-          "go_target": "pkg/ast/rewriter/push_app_ite.go",
-          "tests": [
-            "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
-            "TestNGPushAppITERequiresNongroundArgument",
-            "TestPushAppITEConfigurationProofAndOwnerGuards"
-          ]
-        }
-      ],
-      "ownership": [
-        "Public configuration and wrapper constructors preserve conservative/full and nonground variants. The wrapper owns the traversal, borrows the manager, rejects copied/closed use, and supports reset and idempotent close."
-      ],
-      "deviations": [
-        "Go exposes explicit constructors and error returns; native inheritance, layout, pointer mutation, assertion, and exception ABI are not claimed."
-      ]
+      "status": "unported",
+      "go_targets": [],
+      "tests": [],
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [],
+      "ownership": [],
+      "deviations": []
     },
     {
       "path": "cmake/Z3Config.cmake.in",
       "component": "cmake",
       "role": "reference_tool",
-      "status": "ported",
-      "go_targets": ["pkg/ast/rewriter/maximize_ac_sharing.go"],
-      "tests": [
-        "TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition",
-        "TestMaximizeBVSharingScopesResetAndGuards",
-        "TestMaximizeBVSharingWrapperProofAndLifecycle"
-      ],
-      "methods_audited": true,
-      "ownership_audited": true,
-      "methods": [
-        {
-          "name": "register_kind, reduce_app, contains, insert, constructor/destructor, push_scope, pop_scope, restore_entries, reset, BV init_core/is_numeral/constructor",
-          "status": "ported",
-          "go_target": "pkg/ast/rewriter/maximize_ac_sharing.go",
-          "tests": [
-            "TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition",
-            "TestMaximizeBVSharingScopesResetAndGuards",
-            "TestMaximizeBVSharingWrapperProofAndLifecycle"
-          ]
-        }
-      ],
-      "ownership": [
-        "Each canonical operand-pair entry owns two AST references until scope restoration or close. Scope limits restore entries in reverse order. Reset preserves owned entries and clears only the lookup map, matching the source. Native Go slices and maps replace region/vector/hashtable storage."
-      ],
-      "deviations": [
-        "Allocation and reference failures use checked Go errors. The proof-enabled wrapper publishes one valid root rewrite or reflexivity proof rather than preserving the generic source traversal's internal congruence/transitivity proof-tree shape."
-      ]
+      "status": "unported",
+      "go_targets": [],
+      "tests": [],
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [],
+      "ownership": [],
+      "deviations": []
     },
     {
       "path": "cmake/cmake_uninstall.cmake.in",
       "component": "cmake",
       "role": "reference_tool",
-      "status": "ported",
-      "go_targets": ["pkg/ast/rewriter/maximize_ac_sharing.go"],
-      "tests": [
-        "TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition",
-        "TestMaximizeBVSharingScopesResetAndGuards",
-        "TestMaximizeBVSharingWrapperProofAndLifecycle"
-      ],
-      "methods_audited": true,
-      "ownership_audited": true,
-      "methods": [
-        {
-          "name": "maximize_ac_sharing entry/cache/scopes, maximize_bv_sharing, and maximize_bv_sharing_rw declarations and forwarding methods",
-          "status": "ported",
-          "go_target": "pkg/ast/rewriter/maximize_ac_sharing.go",
-          "tests": [
-            "TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition",
-            "TestMaximizeBVSharingScopesResetAndGuards",
-            "TestMaximizeBVSharingWrapperProofAndLifecycle"
-          ]
-        }
-      ],
-      "ownership": [
-        "The public configuration is a checked noncopyable owner of retained pair references. The wrapper owns its configuration and traversal, borrows the AST manager, charges its concrete representation, and closes idempotently."
-      ],
-      "deviations": [
-        "Go exposes explicit constructors and errors; native inheritance, region layout, pointer hashing, assertions, exceptions, and STL/container implementation are not ported."
-      ]
+      "status": "unported",
+      "go_targets": [],
+      "tests": [],
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [],
+      "ownership": [],
+      "deviations": []
     },
     {
       "path": "cmake/compiler_lto.cmake",
@@ -29615,9 +29536,9 @@
       "path": "src/ast/rewriter/maximize_ac_sharing.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/maximize_ac_sharing.go"],
+      "tests": ["TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition", "TestMaximizeBVSharingScopesResetAndGuards", "TestMaximizeBVSharingWrapperProofAndLifecycle"],
       "assertions": [
         {
           "line": 62,
@@ -29628,19 +29549,24 @@
           "text": "SASSERT(num_scopes <= m_scopes.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{
+        "name": "register_kind, reduce_app, contains, insert, constructor/destructor, push_scope, pop_scope, restore_entries, reset, BV init_core/is_numeral/constructor",
+        "status": "ported",
+        "go_target": "pkg/ast/rewriter/maximize_ac_sharing.go",
+        "tests": ["TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition", "TestMaximizeBVSharingScopesResetAndGuards", "TestMaximizeBVSharingWrapperProofAndLifecycle"]
+      }],
+      "ownership": ["Each canonical operand-pair entry owns two AST references until scope restoration or close. Scope limits restore entries in reverse order. Reset preserves owned entries and clears only the lookup map. Native Go slices and maps replace region/vector/hashtable storage."],
+      "deviations": ["Allocation and reference failures use checked Go errors. The proof-enabled wrapper publishes one valid root rewrite or reflexivity proof instead of preserving the generic source traversal's internal proof-tree shape."]
     },
     {
       "path": "src/ast/rewriter/maximize_ac_sharing.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/maximize_ac_sharing.go"],
+      "tests": ["TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition", "TestMaximizeBVSharingScopesResetAndGuards", "TestMaximizeBVSharingWrapperProofAndLifecycle"],
       "conditionals": [
         {
           "line": 19,
@@ -29657,11 +29583,16 @@
           "text": "SASSERT((d == 0 && arg1 == 0 && arg2 == 0) || (d != 0 && arg1 != 0 && arg2 != 0));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{
+        "name": "maximize_ac_sharing entry/cache/scopes, maximize_bv_sharing, and maximize_bv_sharing_rw declarations and forwarding methods",
+        "status": "ported",
+        "go_target": "pkg/ast/rewriter/maximize_ac_sharing.go",
+        "tests": ["TestMaximizeBVSharingBalancedTreesReuseAndNumeralPosition", "TestMaximizeBVSharingScopesResetAndGuards", "TestMaximizeBVSharingWrapperProofAndLifecycle"]
+      }],
+      "ownership": ["The public configuration is a checked noncopyable owner of retained pair references. The wrapper owns its configuration and traversal, borrows the AST manager, charges its concrete representation, and closes idempotently."],
+      "deviations": ["Go exposes explicit constructors and errors; native inheritance, region layout, pointer hashing, assertions, exceptions, and STL/container implementation are not ported."]
     },
     {
       "path": "src/ast/rewriter/mk_extract_proc.cpp",
@@ -30993,28 +30924,38 @@
       "path": "src/ast/rewriter/push_app_ite.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/push_app_ite.go"],
+      "tests": [
+        "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
+        "TestPushAppITERefusesBooleanITEAndITEDeclaration",
+        "TestNGPushAppITERequiresNongroundArgument",
+        "TestPushAppITEConfigurationProofAndOwnerGuards"
+      ],
       "assertions": [
         {
           "line": 67,
           "text": "VERIFY(m.is_ite(ite, c, t, e));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{
+        "name": "has_ite_arg, push_app_ite_cfg::is_target/reduce_app, and ng_push_app_ite_cfg::is_target",
+        "status": "ported",
+        "go_target": "pkg/ast/rewriter/push_app_ite.go",
+        "tests": ["TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode", "TestPushAppITERefusesBooleanITEAndITEDeclaration", "TestNGPushAppITERequiresNongroundArgument", "TestPushAppITEConfigurationProofAndOwnerGuards"]
+      }],
+      "ownership": ["Configuration borrows the AST manager and application arguments. Each reduction uses native Go handle storage and retains no per-call AST nodes. The wrapper owns its charged traversal/configuration representation and releases it idempotently."],
+      "deviations": ["The proof-enabled wrapper publishes one valid root rewrite or reflexivity proof after the exact no-proof traversal instead of preserving the source traversal's internal proof-tree shape."]
     },
     {
       "path": "src/ast/rewriter/push_app_ite.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/rewriter/push_app_ite.go"],
+      "tests": ["TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode", "TestPushAppITERefusesBooleanITEAndITEDeclaration", "TestNGPushAppITERequiresNongroundArgument", "TestPushAppITEConfigurationProofAndOwnerGuards"],
       "conditionals": [
         {
           "line": 19,
@@ -31025,11 +30966,16 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{
+        "name": "push_app_ite_cfg, ng_push_app_ite_cfg, push_app_ite_rw, and ng_push_app_ite_rw declarations and constructors",
+        "status": "ported",
+        "go_target": "pkg/ast/rewriter/push_app_ite.go",
+        "tests": ["TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode", "TestNGPushAppITERequiresNongroundArgument", "TestPushAppITEConfigurationProofAndOwnerGuards"]
+      }],
+      "ownership": ["Public configuration and wrapper constructors preserve conservative/full and nonground variants. The wrapper owns the traversal, borrows the manager, rejects copied/closed use, and supports reset and idempotent close."],
+      "deviations": ["Go exposes explicit constructors and error returns; native inheritance, layout, pointer mutation, assertion, and exception ABI are not claimed."]
     },
     {
       "path": "src/ast/rewriter/quant_hoist.cpp",
