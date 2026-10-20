@@ -23,6 +23,9 @@ func (m *ASTManager) pluginValue(fid FamilyID, r astNodeRef) (bool, error) {
 		family, kind, e := m.declIdentity(decl)
 		return family == fid && kind == astDatalogConstantKind, e
 	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astFloatingPointPlugin {
+		return m.floatingPointValue(fid, r, false)
+	}
 	return false, nil
 }
 func (m *ASTManager) isValue(r astNodeRef) (bool, error) {
@@ -54,7 +57,21 @@ func (m *ASTManager) pluginUniqueValue(fid FamilyID, r astNodeRef) (bool, error)
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArithmeticPlugin {
 		return m.arithmeticValue(fid, r, true)
 	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astFloatingPointPlugin {
+		return m.floatingPointValue(fid, r, true)
+	}
 	return m.pluginValue(fid, r)
+}
+
+func (m *ASTManager) isUniqueValue(r astNodeRef) (bool, error) {
+	if m.nodeAt(r.slot).kind != ASTApp {
+		return false, nil
+	}
+	fid, _, e := m.declIdentity(m.appAt(r.slot).decl)
+	if e != nil || fid < 0 || !m.pluginAt(fid).present {
+		return false, e
+	}
+	return m.pluginUniqueValue(fid, r)
 }
 func (m *ASTManager) IsUniqueValue(h ASTHandle) (bool, error) {
 	if e := m.lock(); e != nil {

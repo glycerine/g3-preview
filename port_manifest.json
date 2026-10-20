@@ -18669,6 +18669,8 @@
         "pkg/ast/ast_fpa_fp_decl.go",
         "pkg/ast/ast_fpa_names.go",
         "pkg/ast/ast_fpa_names_test.go",
+        "pkg/ast/ast_fpa_values.go",
+        "pkg/ast/ast_fpa_values_test.go",
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_fpa_some_value.go",
@@ -18715,6 +18717,7 @@
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFloatingPointOriginalBuiltinNames",
+        "TestASTFloatingPointOriginalValueAndUniqueValueClassification",
         "TestASTFloatingPointSomeValueSourceDefaults",
         "TestASTFloatingPointSomeValueRefusedMPFConstruction",
         "TestModelEvaluatorFPACompletionUsesPluginValues",
@@ -19088,6 +19091,17 @@
           "tests": [
             "TestASTFloatingPointOriginalBuiltinNames"
           ]
+        },
+        {
+          "name": "floating-point and rounding-mode value/unique-value classification, including recursive fp component classification (fpa_decl_plugin.cpp:873-933)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_values.go",
+          "go_targets": [
+            "pkg/ast/ast_builtin_plugins_values.go"
+          ],
+          "tests": [
+            "TestASTFloatingPointOriginalValueAndUniqueValueClassification"
+          ]
         }
       ],
       "ownership": [
@@ -19110,6 +19124,8 @@
         "pkg/ast/ast_fpa_fp_decl.go",
         "pkg/ast/ast_fpa_names.go",
         "pkg/ast/ast_fpa_names_test.go",
+        "pkg/ast/ast_fpa_values.go",
+        "pkg/ast/ast_fpa_values_test.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_fpa_some_value.go",
         "pkg/ast/ast_fpa_some_value_test.go",
@@ -19126,6 +19142,7 @@
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFloatingPointOriginalBuiltinNames",
+        "TestASTFloatingPointOriginalValueAndUniqueValueClassification",
         "TestASTFloatingPointSomeValueSourceDefaults",
         "TestASTFloatingPointSomeValueRefusedMPFConstruction",
         "TestModelEvaluatorFPACompletionUsesPluginValues",
@@ -19293,6 +19310,17 @@
           "go_target": "pkg/ast/ast_fpa_names.go",
           "tests": [
             "TestASTFloatingPointOriginalBuiltinNames"
+          ]
+        },
+        {
+          "name": "floating-point value and unique-value plugin interface (fpa_decl_plugin.h:180-181)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_values.go",
+          "go_targets": [
+            "pkg/ast/ast_builtin_plugins_values.go"
+          ],
+          "tests": [
+            "TestASTFloatingPointOriginalValueAndUniqueValueClassification"
           ]
         }
       ],
