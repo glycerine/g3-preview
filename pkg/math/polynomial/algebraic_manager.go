@@ -35,6 +35,10 @@ type AlgebraicManagerConfig struct {
 // its unfinished cleanup and must precede release of the borrowed services.
 type AlgebraicManager struct {
 	*AlgebraicRootCore
+	unwindStarted, unwindFinalized                                                      bool
+	unwindStage                                                                         uint8
+	unwindIndex                                                                         uint32
+	unwindCause                                                                         error
 	sourceStarted, sourceFinalized, sourceRunning                                       bool
 	sourceStage                                                                         uint8
 	sourceIndex                                                                         uint32
@@ -86,17 +90,17 @@ func NewAlgebraicManager(c AlgebraicManagerConfig) (*AlgebraicManager, error) {
 	fail := func(e error) (*AlgebraicManager, error) {
 		m.originalCause = e
 		m.constructing = false
-		m.sourceCause = m.finish(false)
+		m.sourceCause = m.unwindConstructorSource()
 		return m, m
 	}
 	var e error
 	m.allocator = c.Allocator
 	if m.allocator == nil {
+		m.ownAllocator = true // source assignment precedes allocator construction
 		m.allocator, e = umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: c.Numerals.Integers().RuntimeOwner(), Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: polynomialSourceDebug}})
 		if e != nil {
 			return fail(e)
 		}
-		m.ownAllocator = true
 	} else if m.allocator.RuntimeOwner() != c.Numerals.Integers().RuntimeOwner() {
 		return fail(arena.ErrConfig)
 	}
@@ -247,29 +251,26 @@ func (m *AlgebraicManager) Close() error {
 	if m.sourceRunning || m.constructing || m.finishing || m.AlgebraicRootCore != nil && (m.univariateIsolationRunning || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running || m.copyCall.running || m.copyCall.cleaning || m.cellBoundsCall.running || m.cellBoundsCall.cleaning || m.cellCoefficientCopy.running || m.basicCellCopyRunning || m.savedIntervalExecuting != nil || m.AlgebraicRootCore.binary.running || m.AlgebraicRootCore.binary.cleaning || m.division.cleaning || m.integerAdd.cleaning || m.rootTrace.running || m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.running || m.toOwnedRational.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.running || m.integerSet.finishing || m.constQ.running || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
-	e := m.finish(true)
+	e := m.closeOwners()
 	if e != nil {
 		m.cleanupCause = e
 	}
 	return e
 }
-func (m *AlgebraicManager) finish(owning bool) error {
+func (m *AlgebraicManager) closeOwners() error {
 	if m.finishing {
 		return ErrAlgebraicPending
 	}
 	m.finishing = true
 	defer func() { m.finishing = false }()
 	if m.params.Helpers != nil {
-		if !owning {
-			return m.params.DestructorCause
-		}
 		if e := m.params.CloseHelpers(); e != nil {
 			return e
 		}
 	}
 	if m.coreMembersReady && !m.privateFinalized {
 		var e error
-		if m.sourceStarted {
+		if m.sourceStarted || m.unwindStarted {
 			e = m.cleanupSourceMembers()
 		} else {
 			e = m.AlgebraicRootCore.closeCoreMembers()
@@ -292,20 +293,12 @@ func (m *AlgebraicManager) finish(owning bool) error {
 		m.univariate = nil
 	}
 	if m.polynomial != nil {
-		if !m.polynomialConstructed && !owning {
-			// The failed child already unwound its completed declarations. Its
-			// unjoined constructor/header roots require explicit owning cleanup.
-			if m.polynomial.unwindCause != nil {
-				return m.polynomial.unwindCause
-			}
-		} else {
-			if e := m.polynomial.CloseChecked(); e != nil {
-				return e
-			}
-			m.polynomial = nil
-			if m.AlgebraicRootCore != nil {
-				m.AlgebraicRootCore.multivariate = nil
-			}
+		if e := m.polynomial.CloseChecked(); e != nil {
+			return e
+		}
+		m.polynomial = nil
+		if m.AlgebraicRootCore != nil {
+			m.AlgebraicRootCore.multivariate = nil
 		}
 	}
 	if m.intervals != nil {
@@ -319,9 +312,6 @@ func (m *AlgebraicManager) finish(owning bool) error {
 			return e
 		}
 		m.binary = nil
-	}
-	if !owning {
-		return nil
 	}
 	if m.AlgebraicRootCore != nil {
 		if e := m.AlgebraicRootCore.releaseCoreStorage(); e != nil {

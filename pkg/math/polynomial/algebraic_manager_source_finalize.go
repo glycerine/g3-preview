@@ -123,46 +123,13 @@ func (m *AlgebraicManager) SourceFinalize() error {
 		return e
 	}
 	defer m.unbindSourceDestructor()
-	c := m.AlgebraicRootCore
 	fail := func(e error) error { m.sourceCause = e; return e }
 	for m.sourceStage < 15 {
 		var e error
-		switch m.sourceStage {
-		case 0:
-			e = m.sourceScopedPolynomial(&c.addTmp)
-		case 1, 2, 3:
-			vectors := []**BinaryRationalVector{&c.uppers, &c.lowers, &c.roots}
-			v := vectors[m.sourceStage-1]
-			if *v != nil {
-				e = (*v).Close()
-				if e == nil {
-					*v = nil
-				}
-			}
-		case 4:
-			e = c.factors.SourceFinalize()
-		case 5:
-			e = m.sourceScopedPolynomial(&c.evalSignTmp)
-		case 6:
-			e = m.sourceScopedPolynomial(&c.tmp3)
-		case 7:
-			e = m.sourceScopedPolynomial(&c.tmp2)
-		case 8:
-			e = m.sourceScopedPolynomial(&c.isolateTmp1)
-		case 9:
-			e = unumeral.SourceIntegerDel(m.config.Numerals.Integers(), &c.isRationalTmp)
-		case 10:
-			e = m.univariate.SourceFinalize()
-		case 11:
-			e = m.polynomial.SourceFinalize()
-		case 12:
-			e = m.intervals.SourceFinalize()
-		case 13:
-			e = m.binary.SourceFinalize()
-		case 14:
-			if m.ownAllocator {
-				e = m.allocator.Close()
-			}
+		if m.sourceStage < 14 {
+			e = m.sourceMember(m.sourceStage, &m.sourceIndex, false)
+		} else if m.ownAllocator {
+			e = m.allocator.Close()
 		}
 		if e != nil {
 			return fail(e)
@@ -173,7 +140,7 @@ func (m *AlgebraicManager) SourceFinalize() error {
 	m.sourceFinalized = true
 	return nil
 }
-func (m *AlgebraicManager) sourceScopedPolynomial(p *UPolynomial) error {
+func (m *AlgebraicManager) sourceScopedPolynomial(p *UPolynomial, index *uint32) error {
 	if p.slot == 0 {
 		return nil
 	}
@@ -181,7 +148,7 @@ func (m *AlgebraicManager) sourceScopedPolynomial(p *UPolynomial) error {
 	if e != nil {
 		return e
 	}
-	return upolynomialScopedVectorSourceDel(m.univariate, &d.state, &m.sourceIndex)
+	return upolynomialScopedVectorSourceDel(m.univariate, &d.state, index)
 }
 
 // These are the five actual scoped parent fields, never caller polynomials.
@@ -216,5 +183,12 @@ func (m *AlgebraicManager) cleanupSourceMembers() error {
 			return e
 		}
 	}
-	return m.config.Numerals.Integers().Del(&c.isRationalTmp)
+	if m.rationalTemporaryConstructed {
+		return m.config.Numerals.Integers().Del(&c.isRationalTmp)
+	}
+	return nil
+}
+
+func (m *AlgebraicManager) sourceRationalTemporary() error {
+	return unumeral.SourceIntegerDel(m.config.Numerals.Integers(), &m.AlgebraicRootCore.isRationalTmp)
 }

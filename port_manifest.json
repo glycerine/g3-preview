@@ -38228,6 +38228,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_manager_constructor_unwind.go",
+        "pkg/math/polynomial/algebraic_manager_constructor_unwind_test.go",
         "pkg/math/polynomial/algebraic_manager_source_finalize.go",
         "pkg/math/polynomial/algebraic_manager_destructor_source_test.go",
         "pkg/math/polynomial/algebraic_display_interval_basic_test.go",
@@ -39170,10 +39172,22 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "algebraic manager source reverse-member destruction cpp64-125/2782-2787 and exact owning continuation; constructor unwind audit OPEN",
+          "name": "algebraic failed-constructor completed-prefix source unwind cpp64-125/2772-2780",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_manager_constructor_unwind.go",
+          "notes": "Constructor fail now calls unwindConstructorSource instead of owning finish(false). A separate unwindStarted/unwindFinalized/phase/index/cause records the actual completed prefix without claiming normal destructor execution or completed construction. The concrete source member engine is shared with normal destruction, using actual child pointers and polynomialConstructed/rationalTemporaryConstructed. Failed polynomial children retain their existing constructor unwind cause and never receive SourceFinalize as complete objects. Older source members continue only after that child prefix succeeds. A stopped generated lexical helper is retained before older members; owning CloseHelpers is not a source retry. Outer raw allocator/header retirement is absent from constructor source unwind because outer ~manager is not invoked after constructor failure. C++ ownership assignment precedes allocator construction, including allocation failure; Go now follows that exact order. Source cold child owners and private UP descriptors survive for separate owning Close, which uses the known-field source cleanup path after unwind and preserves body/source histories. Three actual reservation-prefix sweeps cover global numerals, private unsynchronized numerals and borrowed allocator through success; they require failed and completed polynomial children, separate UP, private members and constructor-body entry. Immediate pre-owning child source/cold-header state, allocator survival, no checkpoint consumption, normal API refusal, source idempotency, eventual byte balance and history preservation are checked. Closed actual process assertion context exercises a non-budget constructor failure and restores only that borrowed process binding before owning teardown. No constructor completion bits, NUMs, allocator descriptors or accounting counters are repaired. Not all possible failed-helper/transport/child-destructor stop combinations are witnessed by these sweeps; whole source/ownership coverage remains partial.",
+          "tests": [
+            "TestAlgebraicManagerConstructorSourceEveryActualPrefix",
+            "TestAlgebraicManagerConstructorSourceClosedAssertionOwner",
+            "TestAlgebraicManagerEveryConstructorReservationAndCleanup",
+            "TestAlgebraicManagerPrivateNumeralConstructorReservations"
+          ]
+        },
+        {
+          "name": "algebraic manager normal and constructor-prefix source destruction cpp64-125/2772-2787; broader ownership audit partial",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_manager_source_finalize.go",
-          "notes": "Full eager constructor and normal source destructor composition now exist. SourceFinalize performs add_tmp, uppers/lowers/roots, factors, eval_sign_tmp, isolate tmp3/tmp2/tmp1, is_rational_tmp, separate UP, multivariate, interval and binary managers, then the outer owned allocator. Bare zero and scalar/reference members acquire no invented destructor. Source phase/index/cause remain sticky after a real release stop; owning Close retires the exact five known UP descriptor roots through CleanupPolynomial and the exact private children without advancing source history. It does not scan a directory for caller ownership or drain retained operation locals during source entry. Admission rejects real callers, executing scopes, retained private resets/displays and known lexical receipts. Fresh and used sqrt/power owners compose successfully, borrowed allocator survives, and 14 NUM-bearing phases plus native/checked pooled allocator phase14 have real public-runtime refusal evidence. C++ debug allocator bypasses chunks, so that pooled-only case is explicitly skipped there. Actual arithmetic stream callbacks now verify source refusal before mutation. An interval owning continuation was fixed to delete its actual three NUM fields after the borrowed binary source owner has ended. No descriptor, NUM, counter, constructor flag or synchronization profile is repaired. Failed-constructor source unwind still uses the previous path and remains to be audited; broader retained/callback combinations and whole algebraic/polynomial/AST source closure remain partial.",
+          "notes": "Full eager constructor and normal source destructor composition now exist. SourceFinalize performs add_tmp, uppers/lowers/roots, factors, eval_sign_tmp, isolate tmp3/tmp2/tmp1, is_rational_tmp, separate UP, multivariate, interval and binary managers, then the outer owned allocator. Bare zero and scalar/reference members acquire no invented destructor. Source phase/index/cause remain sticky after a real release stop; owning Close retires the exact five known UP descriptor roots through CleanupPolynomial and the exact private children without advancing source history. It does not scan a directory for caller ownership or drain retained operation locals during source entry. Admission rejects real callers, executing scopes, retained private resets/displays and known lexical receipts. Fresh and used sqrt/power owners compose successfully, borrowed allocator survives, and 14 NUM-bearing phases plus native/checked pooled allocator phase14 have real public-runtime refusal evidence. C++ debug allocator bypasses chunks, so that pooled-only case is explicitly skipped there. Actual arithmetic stream callbacks now verify source refusal before mutation. An interval owning continuation was fixed to delete its actual three NUM fields after the borrowed binary source owner has ended. No descriptor, NUM, counter, constructor flag or synchronization profile is repaired. Failed-constructor source unwind now has a separate completed-prefix sequence and history; see the dedicated constructor-prefix row. Broader retained/callback combinations and whole algebraic/polynomial/AST source closure remain partial.",
           "tests": [
             "TestAlgebraicManagerSourceDestructorSuccessAndUsedOwner",
             "TestAlgebraicManagerSourceDestructorEveryPrivateNUMStop",
@@ -39477,7 +39491,7 @@
           ]
         },
         {
-          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite; full eager constructor/source destructor present, constructor unwind audit OPEN",
+          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite; full eager constructor/normal and failed-prefix destruction present, broader audit OPEN",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation.go",
           "tests": [
@@ -39909,6 +39923,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_manager_constructor_unwind.go",
+        "pkg/math/polynomial/algebraic_manager_constructor_unwind_test.go",
         "pkg/math/polynomial/algebraic_manager_source_finalize.go",
         "pkg/math/polynomial/algebraic_manager_destructor_source_test.go",
         "pkg/math/polynomial/algebraic_degree_read_order_test.go",
@@ -40334,10 +40350,22 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "algebraic manager source reverse-member destruction cpp64-125/2782-2787 and exact owning continuation; constructor unwind audit OPEN",
+          "name": "algebraic failed-constructor completed-prefix source unwind cpp64-125/2772-2780",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_manager_constructor_unwind.go",
+          "notes": "Constructor fail now calls unwindConstructorSource instead of owning finish(false). A separate unwindStarted/unwindFinalized/phase/index/cause records the actual completed prefix without claiming normal destructor execution or completed construction. The concrete source member engine is shared with normal destruction, using actual child pointers and polynomialConstructed/rationalTemporaryConstructed. Failed polynomial children retain their existing constructor unwind cause and never receive SourceFinalize as complete objects. Older source members continue only after that child prefix succeeds. A stopped generated lexical helper is retained before older members; owning CloseHelpers is not a source retry. Outer raw allocator/header retirement is absent from constructor source unwind because outer ~manager is not invoked after constructor failure. C++ ownership assignment precedes allocator construction, including allocation failure; Go now follows that exact order. Source cold child owners and private UP descriptors survive for separate owning Close, which uses the known-field source cleanup path after unwind and preserves body/source histories. Three actual reservation-prefix sweeps cover global numerals, private unsynchronized numerals and borrowed allocator through success; they require failed and completed polynomial children, separate UP, private members and constructor-body entry. Immediate pre-owning child source/cold-header state, allocator survival, no checkpoint consumption, normal API refusal, source idempotency, eventual byte balance and history preservation are checked. Closed actual process assertion context exercises a non-budget constructor failure and restores only that borrowed process binding before owning teardown. No constructor completion bits, NUMs, allocator descriptors or accounting counters are repaired. Not all possible failed-helper/transport/child-destructor stop combinations are witnessed by these sweeps; whole source/ownership coverage remains partial.",
+          "tests": [
+            "TestAlgebraicManagerConstructorSourceEveryActualPrefix",
+            "TestAlgebraicManagerConstructorSourceClosedAssertionOwner",
+            "TestAlgebraicManagerEveryConstructorReservationAndCleanup",
+            "TestAlgebraicManagerPrivateNumeralConstructorReservations"
+          ]
+        },
+        {
+          "name": "algebraic manager normal and constructor-prefix source destruction cpp64-125/2772-2787; broader ownership audit partial",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_manager_source_finalize.go",
-          "notes": "Full eager constructor and normal source destructor composition now exist. SourceFinalize performs add_tmp, uppers/lowers/roots, factors, eval_sign_tmp, isolate tmp3/tmp2/tmp1, is_rational_tmp, separate UP, multivariate, interval and binary managers, then the outer owned allocator. Bare zero and scalar/reference members acquire no invented destructor. Source phase/index/cause remain sticky after a real release stop; owning Close retires the exact five known UP descriptor roots through CleanupPolynomial and the exact private children without advancing source history. It does not scan a directory for caller ownership or drain retained operation locals during source entry. Admission rejects real callers, executing scopes, retained private resets/displays and known lexical receipts. Fresh and used sqrt/power owners compose successfully, borrowed allocator survives, and 14 NUM-bearing phases plus native/checked pooled allocator phase14 have real public-runtime refusal evidence. C++ debug allocator bypasses chunks, so that pooled-only case is explicitly skipped there. Actual arithmetic stream callbacks now verify source refusal before mutation. An interval owning continuation was fixed to delete its actual three NUM fields after the borrowed binary source owner has ended. No descriptor, NUM, counter, constructor flag or synchronization profile is repaired. Failed-constructor source unwind still uses the previous path and remains to be audited; broader retained/callback combinations and whole algebraic/polynomial/AST source closure remain partial.",
+          "notes": "Full eager constructor and normal source destructor composition now exist. SourceFinalize performs add_tmp, uppers/lowers/roots, factors, eval_sign_tmp, isolate tmp3/tmp2/tmp1, is_rational_tmp, separate UP, multivariate, interval and binary managers, then the outer owned allocator. Bare zero and scalar/reference members acquire no invented destructor. Source phase/index/cause remain sticky after a real release stop; owning Close retires the exact five known UP descriptor roots through CleanupPolynomial and the exact private children without advancing source history. It does not scan a directory for caller ownership or drain retained operation locals during source entry. Admission rejects real callers, executing scopes, retained private resets/displays and known lexical receipts. Fresh and used sqrt/power owners compose successfully, borrowed allocator survives, and 14 NUM-bearing phases plus native/checked pooled allocator phase14 have real public-runtime refusal evidence. C++ debug allocator bypasses chunks, so that pooled-only case is explicitly skipped there. Actual arithmetic stream callbacks now verify source refusal before mutation. An interval owning continuation was fixed to delete its actual three NUM fields after the borrowed binary source owner has ended. No descriptor, NUM, counter, constructor flag or synchronization profile is repaired. Failed-constructor source unwind now has a separate completed-prefix sequence and history; see the dedicated constructor-prefix row. Broader retained/callback combinations and whole algebraic/polynomial/AST source closure remain partial.",
           "tests": [
             "TestAlgebraicManagerSourceDestructorSuccessAndUsedOwner",
             "TestAlgebraicManagerSourceDestructorEveryPrivateNUMStop",
@@ -40618,7 +40646,7 @@
           ]
         },
         {
-          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite; full eager constructor/source destructor present, constructor unwind audit OPEN",
+          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite; full eager constructor/normal and failed-prefix destruction present, broader audit OPEN",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation.go",
           "tests": [
