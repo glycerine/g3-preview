@@ -185,6 +185,8 @@ func (m *ASTManager) datalogDecl(kind int32, ps []ASTParameter, domain []ASTHand
 		return m.datalogEmptyDecl(ps, domain)
 	case DatalogOpIsEmpty, DatalogOpUnion, DatalogOpWiden, DatalogOpComplement, DatalogOpClone:
 		return m.datalogSimpleRelationDecl(kind, ps, domain)
+	case DatalogOpProject, DatalogOpRename, DatalogOpJoin, DatalogOpNegationFilter:
+		return m.datalogIndexedRelationDecl(kind, ps, domain)
 	case DatalogOpLT:
 		if len(ps) != 0 || len(domain) != 2 || domain[0] != domain[1] {
 			return astNodeRef{}, ErrASTDomain

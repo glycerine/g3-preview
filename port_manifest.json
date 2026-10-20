@@ -15058,6 +15058,8 @@
         "pkg/ast/ast_datalog_sorts_test.go",
         "pkg/ast/ast_datalog_relation_simple.go",
         "pkg/ast/ast_datalog_relation_simple_test.go",
+        "pkg/ast/ast_datalog_relation_indexed.go",
+        "pkg/ast/ast_datalog_relation_indexed_test.go",
         "pkg/api/api_numeral_string_test.go",
         "pkg/ast/rewriter/dl_rewriter.go"
       ],
@@ -15068,6 +15070,8 @@
         "TestASTDatalogOriginalRelationCardinalityAndFiniteSize",
         "TestASTDatalogOriginalSimpleRelationDeclarations",
         "TestASTDatalogOriginalLessEqualAndDeclarationGuards",
+        "TestASTDatalogOriginalProjectRenameJoinAndNegationFilter",
+        "TestASTDatalogOriginalIndexedRelationGuards",
         "TestAPINumeralStringArithmeticFPAAndRefusal",
         "TestDLRewriterFiniteNumeralsIdentityZeroAndRetainedZeroLeftRefusal",
         "TestDLRewriterExtendedBVBooleanNumeralsAndWidthBoundary",
@@ -15153,6 +15157,15 @@
             "TestASTDatalogOriginalSimpleRelationDeclarations",
             "TestASTDatalogOriginalLessEqualAndDeclarationGuards"
           ]
+        },
+        {
+          "name": "project, rename, join and negation-filter indexed relation declarations (dl_decl_plugin.cpp:210-250,322-402,412-445,506-583)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datalog_relation_indexed.go",
+          "tests": [
+            "TestASTDatalogOriginalProjectRenameJoinAndNegationFilter",
+            "TestASTDatalogOriginalIndexedRelationGuards"
+          ]
         }
       ],
       "ownership": [
@@ -15174,6 +15187,8 @@
         "pkg/ast/ast_datalog_sorts_test.go",
         "pkg/ast/ast_datalog_relation_simple.go",
         "pkg/ast/ast_datalog_relation_simple_test.go",
+        "pkg/ast/ast_datalog_relation_indexed.go",
+        "pkg/ast/ast_datalog_relation_indexed_test.go",
         "pkg/ast/rewriter/dl_rewriter.go"
       ],
       "tests": [
@@ -15183,7 +15198,9 @@
         "TestASTDatalogOriginalRelationAndRuleSorts",
         "TestASTDatalogOriginalRelationCardinalityAndFiniteSize",
         "TestASTDatalogOriginalSimpleRelationDeclarations",
-        "TestASTDatalogOriginalLessEqualAndDeclarationGuards"
+        "TestASTDatalogOriginalLessEqualAndDeclarationGuards",
+        "TestASTDatalogOriginalProjectRenameJoinAndNegationFilter",
+        "TestASTDatalogOriginalIndexedRelationGuards"
       ],
       "conditionals": [
         {
@@ -15229,6 +15246,15 @@
           "tests": [
             "TestASTDatalogOriginalSimpleRelationDeclarations",
             "TestASTDatalogOriginalLessEqualAndDeclarationGuards"
+          ]
+        },
+        {
+          "name": "indexed project, rename, join and negation-filter relation factories (src/ast/dl_decl_plugin.h:49-76,103-112)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datalog_relation_indexed.go",
+          "tests": [
+            "TestASTDatalogOriginalProjectRenameJoinAndNegationFilter",
+            "TestASTDatalogOriginalIndexedRelationGuards"
           ]
         }
       ],
