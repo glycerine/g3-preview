@@ -46983,3 +46983,15 @@ dynamic assertion ordering and entry/inner/Sturm TRACE children all have exact
 tests. The complete comparison/relation family passes native 0.018s, checked
 0.018s, debug 0.028s and combined 0.027s on CPUs 8-16. Audit:
 `/mnt/oldrog/tmp/g3-algebraic-comparison-audit.txt`.
+
+Algebraic univariate-isolation closure:
+the duplicate cpp541-684 rows are promoted to ported. Retained API RCF,
+root-construction and dense specialization consumers are covered. Zero-root
+extraction, factor and square-free modes, constant/linear/exact/nonbasic roots,
+scratch vector pairing, refinable conversion, stable sorting, one-based
+selection, persistent dense conversion, assertions, every failure prefix,
+cooperation callbacks and exact TRACE/child ownership have focused evidence.
+Tests pass native 0.589s, checked 0.563s, debug 0.811s and combined 0.814s on
+CPUs 8-16. Audit:
+`/mnt/oldrog/tmp/g3-algebraic-univariate-isolation-audit.txt`. Multivariate
+isolation and isolation with signs remain separate.

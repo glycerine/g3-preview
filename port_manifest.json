@@ -39520,8 +39520,8 @@
           ]
         },
         {
-          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite; full eager constructor/normal and failed-prefix destruction present, broader audit OPEN",
-          "status": "partial",
+          "name": "Complete univariate factor/isolate/sort/index selection cpp541\u2013684 with dense-input conversion and exact child ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_isolation.go",
           "tests": [
             "TestAlgebraicSourceRootCounts",
@@ -40704,8 +40704,8 @@
           ]
         },
         {
-          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite; full eager constructor/normal and failed-prefix destruction present, broader audit OPEN",
-          "status": "partial",
+          "name": "Complete univariate factor/isolate/sort/index selection cpp541\u2013684 with dense-input conversion and exact child ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_isolation.go",
           "tests": [
             "TestAlgebraicSourceRootCounts",
