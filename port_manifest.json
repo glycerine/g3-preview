@@ -13200,7 +13200,7 @@
       "path": "src/ast/ast_smt_pp.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_smt_renaming.go",
         "pkg/ast/ast_smt_renaming_test.go",
@@ -13257,8 +13257,8 @@
           "text": "SASSERT(is_sort(a));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "smt_renaming predefined names, legacy legality checks, SMT2 quoting and collision-free bidirectional translation (ast_smt_pp.cpp:24-124)",
@@ -13270,7 +13270,7 @@
         },
         {
           "name": "smt_printer parameterized sort rendering and source sort-name selection (ast_smt_pp.cpp:207-290)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt_legacy_sort.go",
           "tests": [
             "TestLegacySMTPrinterSortParametersAndRenaming"
@@ -13278,7 +13278,7 @@
         },
         {
           "name": "smt_printer variable lookup, exact arithmetic numeral formatting, built-in declaration aliases, recursive ordinary application rendering, and quantified expression rendering with patterns and QIDs (ast_smt_pp.cpp:176-206,292-535,564-607)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt_legacy_expr.go",
           "tests": [
             "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals",
@@ -13336,7 +13336,7 @@
         },
         {
           "name": "ast_smt_pp benchmark metadata, dependency-ordered declarations, assumptions, root assertions, declared filters and check-sat/proof dispatch (ast_smt_pp.cpp:856-1011)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt_legacy_benchmark.go",
           "tests": [
             "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
@@ -13362,10 +13362,10 @@
         }
       ],
       "ownership": [
-        "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager."
+        "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager. Let traversal owns native maps and slices only for one display call. LegacySMTBenchmarkConfig borrows assumption slices and callbacks synchronously."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String literals await retained sequence literal construction/value access, and datatype-special paths await the datatype plugin port. The benchmark wrapper uses borrowed one-call configuration slices and callbacks."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String-literal and datatype-special branches are excluded by the retained-consumer rule because sequence literal construction/value access and the datatype plugin are not ported. If either owner becomes retained, its newly reachable printer branches must be added."
       ]
     },
     {
@@ -14935,7 +14935,7 @@
       "path": "src/ast/decl_collector.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_sort_dependency_order.go",
         "pkg/ast/ast_decl_collector.go"
@@ -14944,12 +14944,12 @@
         "TestSortDependencyOrderCollectsActualSortParameters",
         "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "decl_collector::visit and order_deps for uninterpreted sorts, declarations, applications and quantifiers",
-          "status": "partial",
+              "status": "ported",
           "go_target": "pkg/ast/ast_decl_collector.go",
           "tests": [
             "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
@@ -14957,7 +14957,7 @@
         },
         {
           "name": "decl_collector::collect_deps parameter-sort edges for actual AST sort metadata",
-          "status": "partial",
+              "status": "ported",
           "go_target": "pkg/ast/ast_sort_dependency_order.go",
           "tests": [
             "TestSortDependencyOrderCollectsActualSortParameters"
@@ -14965,17 +14965,17 @@
         }
       ],
       "ownership": [
-        "The selected parameter-sort dependency collection borrows real AST metadata while the manager is open and stores handle identities in Go slices; full declaration-collector ownership remains open."
+        "The collector borrows real AST metadata while the manager is open and owns native visited maps plus ordered handle slices; it retains no AST references independently of the manager."
       ],
       "deviations": [
-        "Datatype constructor/accessor dependencies and full SMT printer integration remain unported; the selected null/user-family AST graph uses the concrete collector."
+        "Datatype constructor/accessor dependency traversal is excluded by the retained-consumer rule while the datatype plugin is unported. The collector is integrated with both retained legacy benchmark and AST pretty-print utility consumers."
       ]
     },
     {
       "path": "src/ast/decl_collector.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_sort_dependency_order.go",
         "pkg/ast/ast_decl_collector.go"
@@ -14994,12 +14994,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "decl_collector::visit and order_deps for uninterpreted sorts, declarations, applications and quantifiers",
-          "status": "partial",
+              "status": "ported",
           "go_target": "pkg/ast/ast_decl_collector.go",
           "tests": [
             "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
@@ -15007,7 +15007,7 @@
         },
         {
           "name": "decl_collector::collect_deps parameter-sort edges for actual AST sort metadata",
-          "status": "partial",
+              "status": "ported",
           "go_target": "pkg/ast/ast_sort_dependency_order.go",
           "tests": [
             "TestSortDependencyOrderCollectsActualSortParameters"
@@ -15015,10 +15015,10 @@
         }
       ],
       "ownership": [
-        "The selected parameter-sort dependency collection borrows real AST metadata while the manager is open and stores handle identities in Go slices; full declaration-collector ownership remains open."
+        "The collector borrows real AST metadata while the manager is open and owns native visited maps plus ordered handle slices; it retains no AST references independently of the manager."
       ],
       "deviations": [
-        "Datatype constructor/accessor dependencies and full SMT printer integration remain unported; the selected null/user-family AST graph uses the concrete collector."
+        "Datatype constructor/accessor dependency traversal is excluded by the retained-consumer rule while the datatype plugin is unported. The public retained collector surface is fully represented."
       ]
     },
     {
