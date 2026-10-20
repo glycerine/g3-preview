@@ -13153,7 +13153,9 @@
         "pkg/ast/ast_smt_legacy_sort.go",
         "pkg/ast/ast_smt_legacy_sort_test.go",
         "pkg/ast/ast_smt_legacy_expr.go",
-        "pkg/ast/ast_smt_legacy_expr_test.go"
+        "pkg/ast/ast_smt_legacy_expr_test.go",
+        "pkg/ast/ast_smt_legacy_decl.go",
+        "pkg/ast/ast_smt_legacy_decl_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
@@ -13165,7 +13167,8 @@
         "TestLegacySMTPrinterBit2BoolExpansion",
         "TestLegacySMTPrinterDistinctGroupsBySort",
         "TestLegacySMTPrinterImplicationChainSimplification",
-        "TestLegacySMTPrinterFloatingPointNumerals"
+        "TestLegacySMTPrinterFloatingPointNumerals",
+        "TestLegacySMTPrinterSortAndFunctionDeclarations"
       ],
       "conditionals": [
         {
@@ -13259,6 +13262,14 @@
           "tests": [
             "TestLegacySMTPrinterFloatingPointNumerals"
           ]
+        },
+        {
+          "name": "smt_printer non-datatype sort declarations and function declarations (ast_smt_pp.cpp:756-850)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_legacy_decl.go",
+          "tests": [
+            "TestLegacySMTPrinterSortAndFunctionDeclarations"
+          ]
         }
       ],
       "ownership": [
@@ -13279,7 +13290,9 @@
         "pkg/ast/ast_smt_legacy_sort.go",
         "pkg/ast/ast_smt_legacy_sort_test.go",
         "pkg/ast/ast_smt_legacy_expr.go",
-        "pkg/ast/ast_smt_legacy_expr_test.go"
+        "pkg/ast/ast_smt_legacy_expr_test.go",
+        "pkg/ast/ast_smt_legacy_decl.go",
+        "pkg/ast/ast_smt_legacy_decl_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
@@ -13291,7 +13304,8 @@
         "TestLegacySMTPrinterBit2BoolExpansion",
         "TestLegacySMTPrinterDistinctGroupsBySort",
         "TestLegacySMTPrinterImplicationChainSimplification",
-        "TestLegacySMTPrinterFloatingPointNumerals"
+        "TestLegacySMTPrinterFloatingPointNumerals",
+        "TestLegacySMTPrinterSortAndFunctionDeclarations"
       ],
       "conditionals": [
         {
@@ -13313,13 +13327,22 @@
           "tests": [
             "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions"
           ]
+        },
+        {
+          "name": "ast_smt_pp expression, sort and function-declaration display interface subset (ast_smt_pp.h:69-85)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_smt_legacy_decl.go",
+          "tests": [
+            "TestLegacySMTPrinterBasicAppsVariablesAndArithmeticNumerals",
+            "TestLegacySMTPrinterSortAndFunctionDeclarations"
+          ]
         }
       ],
       "ownership": [
         "The concrete renaming owner borrows the source symbol manager and owns its native translation maps."
       ],
       "deviations": [
-        "The remaining ast_smt_pp expression, AST and benchmark display interfaces plus the mk_smt_pp stream wrapper remain open."
+        "Generic AST dispatch, indentation-aware display, full benchmark display and the mk_smt_pp stream wrapper remain open."
       ]
     },
     {
