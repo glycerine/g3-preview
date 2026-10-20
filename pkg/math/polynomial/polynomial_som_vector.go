@@ -71,8 +71,10 @@ func (v *PolynomialSOMVector) SetOwner(m *MultivariatePolynomialCore) error {
 	if m != v.storage {
 		return ErrPolynomialOwner
 	}
-	if polynomialSourceDebug && v.owner != nil && v.owner != m {
-		return ErrPolynomialAssertion
+	if e := polynomialSOMPredicateSourceAssert(2187, "m_owner == owner || m_owner == 0", func() (bool, error) {
+		return v.owner == m || v.owner == nil, nil
+	}); e != nil {
+		return e
 	}
 	if v.owner == nil {
 		v.owner = m
@@ -115,8 +117,10 @@ func (v *PolynomialSOMVector) At(i uint32) (*PolynomialSOMBuffer, error) {
 		v.pending = nil
 		n = uint32(len(v.children))
 	}
-	if polynomialSourceDebug && n < requested {
-		return nil, ErrPolynomialAssertion
+	if e := polynomialSOMPredicateSourceAssert(2171, "m_buffers.size() >= sz", func() (bool, error) {
+		return uint32(len(v.children)) >= requested, nil
+	}); e != nil {
+		return nil, e
 	}
 	return v.child(i)
 }

@@ -3,7 +3,6 @@
 package polynomial
 
 import (
-	"errors"
 	"reflect"
 	"strings"
 
@@ -423,31 +422,30 @@ func (m *MultivariatePolynomialCore) displayConsistent(p Polynomial, sink Polyno
 		return e
 	}
 	for i := uint32(0); i < n; i++ {
-		a, e := m.displayCoefficient(p, i)
+		a, e := m.coefficientCore(p, i)
 		if e != nil {
 			return e
 		}
 		if e = f.numericCall(0, &a); e != nil {
 			return e
 		}
-		a, e = m.displayCoefficient(p, i)
-		if e != nil {
+		if e = polynomialDisplaySourceAssert(1854, "m_manager.eq(a, p->a(i))", func() (bool, error) {
+			a, e := m.coefficientCore(p, i)
+			if e != nil {
+				return false, e
+			}
+			before, e := polynomialNumericBefore(m.integer)
+			if e != nil {
+				return false, e
+			}
+			equal, e := m.modular.Equal(&f.numeral, &a)
+			after := f.numeric.after(m.integer, before)
+			if e != nil {
+				return false, e
+			}
+			return equal, after
+		}); e != nil {
 			return e
-		}
-		before, e := polynomialNumericBefore(m.integer)
-		if e != nil {
-			return e
-		}
-		eq, e := m.modular.Equal(&f.numeral, &a)
-		x := f.numeric.after(m.integer, before)
-		if e != nil {
-			return e
-		}
-		if x != nil {
-			return x
-		}
-		if !eq {
-			return ErrPolynomialAssertion
 		}
 	}
 	return nil
@@ -465,9 +463,6 @@ func (m *MultivariatePolynomialCore) displayIntoCore(p Polynomial, sink Polynomi
 	}
 	if e := polynomialDisplaySourceAssert(7426, "m_imp->consistent_coeffs(p)", func() (bool, error) {
 		e := m.displayConsistent(p, sink)
-		if errors.Is(e, ErrPolynomialAssertion) {
-			return false, nil
-		}
 		return e == nil, e
 	}); e != nil {
 		return e

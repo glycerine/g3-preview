@@ -44049,6 +44049,27 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained consistent_coeffs const getter and inner1854 assertion with outer7426 exception propagation",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_display.go",
+          "tests": [
+            "TestPolynomialConsistencyInnerAssertionActions",
+            "TestPolynomialTraceDirectDisplayOmitsPublicCheck",
+            "TestPolynomialTraceReferenceDisplayRetainsPublicCheck"
+          ],
+          "notes": "First source SET reads const a1511; inner1854 independently gates a fresh const a1511 and Equal with the actual display frame numeric ownership capture. Continue returns to consistent_coeffs true; Throw and nested numeral errors propagate through outer7426 without being converted into a new false predicate/report. Actual Z-created coefficient7 followed by public Z5 mode change reaches normalization assertion mpzzp140, then1854 after Continue. This deliberately inconsistent-mode guard fixture does not claim source-valid normalized arithmetic. Direct polynomial printing retains raw field reads."
+        },
+        {
+          "name": "Retained som_buffer_vector post-capacity2171 and set_owner2187 process assertion gates",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_som_vector.go",
+          "tests": [
+            "TestPolynomialSOMVectorClosedAssertionOwnerPaths",
+            "TestPolynomialSOMVectorDefaultOwnerAndSourceMembers"
+          ],
+          "notes": "Runtime process assertion gates replace hard DebugBuild errors. Capacity predicate freshly reads actual published child length after source allocation/owner-binding/push order. Existing native storage-owner admission remains. A real already-bound vector and existing child under a separately owned closed process context distinguish both gates without constructing foreign owners or modifying payloads. Native builds erase the gates and return the same child; no new physical roots or authority are created."
+        },
+        {
           "name": "Retained const/mutable coefficient overload selection1511/1512, raw swap fields and owning-abort codecs",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_cell.go",
