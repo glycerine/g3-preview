@@ -31758,9 +31758,12 @@
       "path": "src/ast/scoped_proof.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/scoped_proof.go"],
+      "tests": [
+        "TestASTScopedProofModesNestAndRestore",
+        "TestASTScopedRestoreProofAndGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -31771,11 +31774,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "scoped_proof_mode construction/destruction and scoped_proof, scoped_no_proof, scoped_restore_proof concrete constructors",
+          "status": "ported",
+          "go_target": "pkg/ast/scoped_proof.go",
+          "tests": [
+            "TestASTScopedProofModesNestAndRestore",
+            "TestASTScopedRestoreProofAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "ScopedProofMode borrows its AST manager, stores the prior scalar proof mode and restores it on Close; it owns no AST references or manager lifetime."
+      ],
+      "deviations": [
+        "Explicit Close replaces deterministic C++ scope destruction. Constructors and Close return typed manager, mode and copied-owner errors; successful repeated Close is idempotent."
+      ]
     },
     {
       "path": "src/ast/seq_decl_plugin.cpp",
