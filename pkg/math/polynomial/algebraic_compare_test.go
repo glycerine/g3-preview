@@ -447,7 +447,8 @@ func TestAlgebraicCompareSequenceReservationPrefixes(t *testing.T) {
 			t.Fatal("source comparison modified input roots", prefix)
 		}
 		budget.FailAfter(-1)
-		serviceMust(t, c.config.Rationals.Integers().CleanupPendingAllocation())
+		serviceMust(t, c.CleanupRetained())
+		algebraicExpectNoPendingAllocation(t, c.config.Rationals.Integers())
 		serviceMust(t, c.Del(&a))
 		serviceMust(t, c.Del(&b))
 		serviceMust(t, c.Close())

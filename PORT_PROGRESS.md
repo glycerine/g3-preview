@@ -46834,3 +46834,15 @@ selector and square-free owners need no global cleanup. Focused ten-test runs
 pass native 4.503s, checked 4.231s, debug 7.157s and combined
 checked/debug/trace 8.270s on CPUs 8-16. Broader algebraic binary/isolation
 source coverage remains partial.
+
+Remaining algebraic global-cleanup audit: the comparison sequence reservation
+sweep did not produce an unnamed numeric allocation in native, checked, debug,
+or combined builds. Its unconditional `CleanupPendingAllocation` call was a
+redundant no-op and is removed; the test now runs normal core owning cleanup and
+asserts that no numeric object or allocator block remains. A provisional
+comparison allocation scope was exercised across all four profiles, acquired no
+root, and was removed rather than porting unused ownership machinery. The two
+remaining algebraic-test calls are intentional foreign-owner controls: copy
+shift explicitly consumes its own first allocation before constructing a
+separately receipted replacement, and refinement promotion preserves an older
+raw-power invocation while proving core cleanup cannot acknowledge it.
