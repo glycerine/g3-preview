@@ -22596,7 +22596,8 @@
         "TestArithRewriterStructuralScalarRules",
         "TestArithRewriterSymbolicModRemAndCasts",
         "TestArithRewriterPolynomialAddMulSubAndNegation",
-        "TestArithRewriterPolynomialCancellation"
+        "TestArithRewriterPolynomialCancellation",
+        "TestArithRewriterCoefficientAndModuloBounds"
       ],
       "assertions": [
         {
@@ -22848,7 +22849,15 @@
           ]
         },
         {
-          "name": "advanced SOM/hoisting modes, arithmetic bound/GCD/power reductions, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
+          "name": "integer coefficient isolation with floor/ceiling rounding and exact modulo range bounds",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_polynomial.go",
+          "tests": [
+            "TestArithRewriterCoefficientAndModuloBounds"
+          ]
+        },
+        {
+          "name": "advanced SOM/hoisting modes, polynomial GCD and power reductions, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
           "status": "unported",
           "reason": "The exact rational scalar core is connected first; the remaining paths require the concrete arithmetic specialization of poly_rewriter and broader algebraic-expression integration."
         }
@@ -22872,7 +22881,8 @@
         "TestArithRewriterStructuralScalarRules",
         "TestArithRewriterSymbolicModRemAndCasts",
         "TestArithRewriterPolynomialAddMulSubAndNegation",
-        "TestArithRewriterPolynomialCancellation"
+        "TestArithRewriterPolynomialCancellation",
+        "TestArithRewriterCoefficientAndModuloBounds"
       ],
       "conditionals": [
         {

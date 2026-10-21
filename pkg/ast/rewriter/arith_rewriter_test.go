@@ -464,3 +464,68 @@ func TestArithRewriterPolynomialCancellation(t *testing.T) {
 	}
 	arithRewriterWantNumeral(t, m, negativeY[0], "-1", true)
 }
+
+func TestArithRewriterCoefficientAndModuloBounds(t *testing.T) {
+	m, c, g, local := boolRewriterConfigFixture(t)
+	r, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	iSort, err := m.MkFamilySort(r.family, 1, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "arith-bound-x"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	i0 := arithRewriterNumeral(t, m, "0", true)
+	i2 := arithRewriterNumeral(t, m, "2", true)
+	i4 := arithRewriterNumeral(t, m, "4", true)
+	i5 := arithRewriterNumeral(t, m, "5", true)
+	iNeg2 := arithRewriterNumeral(t, m, "-2", true)
+	iNeg3 := arithRewriterNumeral(t, m, "-3", true)
+	twice, err := r.app(arithOpMul, i2, x)
+	astTestMust(t, err)
+	astTestPin(t, m, twice)
+
+	status, result := arithRewriterCore(t, r, arithOpLE, twice, i5)
+	if status != RewriteDone {
+		t.Fatal("positive coefficient bound status", status)
+	}
+	arithRewriterWantOperation(t, r, result, arithOpLE, x, i2)
+
+	negativeTwice, err := r.app(arithOpMul, iNeg2, x)
+	astTestMust(t, err)
+	astTestPin(t, m, negativeTwice)
+	status, result = arithRewriterCore(t, r, arithOpGE, negativeTwice, i5)
+	if status != RewriteDone {
+		t.Fatal("negative coefficient bound status", status)
+	}
+	arithRewriterWantOperation(t, r, result, arithOpLE, x, iNeg3)
+
+	equalityOut := astTestPin(t, m, twice)
+	status, err = r.MkEqCore(twice, i5, equalityOut)
+	astTestMust(t, err)
+	result, err = m.RefGet(equalityOut)
+	astTestMust(t, err)
+	if status != RewriteDone || !m.IsFalse(result) {
+		t.Fatal("non-integral coefficient equality", status, result)
+	}
+
+	mod, err := r.app(arithOpMod, x, i5)
+	astTestMust(t, err)
+	astTestPin(t, m, mod)
+	status, result = arithRewriterCore(t, r, arithOpLE, mod, i4)
+	if status != RewriteDone || !m.IsTrue(result) {
+		t.Fatal("modulo upper bound", status, result)
+	}
+	status, result = arithRewriterCore(t, r, arithOpGE, mod, i0)
+	if status != RewriteDone || !m.IsTrue(result) {
+		t.Fatal("modulo lower bound", status, result)
+	}
+	equalityOut = astTestPin(t, m, mod)
+	status, err = r.MkEqCore(mod, i5, equalityOut)
+	astTestMust(t, err)
+	result, err = m.RefGet(equalityOut)
+	astTestMust(t, err)
+	if status != RewriteDone || !m.IsFalse(result) {
+		t.Fatal("modulo excluded equality", status, result)
+	}
+}

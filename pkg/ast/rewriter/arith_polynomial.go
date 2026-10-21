@@ -9,6 +9,8 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
+const arithRelationEq int32 = -1
+
 func (r *ArithRewriter) integerTerm(h ast.ASTHandle) (bool, error) {
 	s, err := r.manager.GetSort(h)
 	if err != nil {
@@ -542,4 +544,109 @@ func (r *ArithRewriter) cancelMonomials(left, right ast.ASTHandle, move bool) (a
 		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
 	}
 	return newLeft, newRight, newLeft != left || newRight != right, nil
+}
+
+func invertArithmeticRelation(kind int32) int32 {
+	if kind == arithOpLE {
+		return arithOpGE
+	}
+	if kind == arithOpGE {
+		return arithOpLE
+	}
+	return kind
+}
+
+func (r *ArithRewriter) rewriteBound(left, right ast.ASTHandle, kind int32, out ast.ASTRef) (bool, error) {
+	_, _, add, err := r.operation(left, arithOpAdd)
+	if err != nil {
+		return false, err
+	}
+	_, _, mod, err := r.operation(left, arithOpMod)
+	if err != nil {
+		return false, err
+	}
+	bound, _, rightNumeral, err := r.numeral(right)
+	if err != nil {
+		return false, err
+	}
+	if !add && !mod && rightNumeral {
+		coefficient, product, e := r.monomial(left)
+		if e != nil {
+			return false, e
+		}
+		relation := kind
+		changed := false
+		if coefficient.Sign() < 0 {
+			coefficient.Neg(coefficient)
+			bound.Neg(bound)
+			relation = invertArithmeticRelation(relation)
+			changed = true
+		}
+		if coefficient.Cmp(big.NewRat(1, 1)) != 0 {
+			bound.Quo(bound, coefficient)
+			changed = true
+		}
+		if changed {
+			integer, e := r.integerTerm(left)
+			if e != nil {
+				return false, e
+			}
+			if integer && !bound.IsInt() {
+				switch relation {
+				case arithOpLE:
+					bound.SetInt(arithFloor(bound))
+				case arithOpGE:
+					floor := arithFloor(bound)
+					floor.Add(floor, big.NewInt(1))
+					bound.SetInt(floor)
+				default:
+					return true, r.setBool(out, false)
+				}
+			}
+			value, e := r.makeNumeral(bound, integer)
+			if e != nil {
+				return false, e
+			}
+			var result ast.ASTHandle
+			if relation == arithRelationEq {
+				result, e = r.manager.MkEq(product, value)
+			} else {
+				result, e = r.app(relation, product, value)
+			}
+			if e != nil {
+				return false, e
+			}
+			return true, r.manager.SetRef(out, result)
+		}
+	}
+	if !rightNumeral {
+		return false, nil
+	}
+	_, modArgs, mod, err := r.operation(left, arithOpMod)
+	if err != nil || !mod || len(modArgs) != 2 {
+		return false, err
+	}
+	modulus, integer, numeral, err := r.numeral(modArgs[1])
+	if err != nil || !numeral || !integer || modulus.Sign() == 0 {
+		return false, err
+	}
+	truth, decided := false, false
+	if bound.Sign() < 0 {
+		decided = true
+		truth = kind == arithOpGE
+	} else if bound.Sign() == 0 && kind == arithOpGE {
+		decided, truth = true, true
+	} else {
+		absolute := new(big.Rat).Abs(modulus)
+		if bound.Sign() > 0 && bound.Cmp(absolute) >= 0 {
+			decided = true
+			truth = kind == arithOpLE
+		} else if kind == arithOpLE && new(big.Rat).Add(bound, big.NewRat(1, 1)).Cmp(absolute) == 0 {
+			decided, truth = true, true
+		}
+	}
+	if !decided {
+		return false, nil
+	}
+	return true, r.setBool(out, truth)
 }

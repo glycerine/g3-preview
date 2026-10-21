@@ -262,6 +262,20 @@ func (r *ArithRewriter) rewriteComparison(kind int32, left, right ast.ASTHandle,
 	}
 	rv, _, rn, err := r.numeral(right)
 	if err != nil || !ln || !rn {
+		if err == nil {
+			if decided, e := r.rewriteBound(left, right, kind, out); e != nil || decided {
+				if e != nil {
+					return RewriteFailed, e
+				}
+				return RewriteDone, nil
+			}
+			if decided, e := r.rewriteBound(right, left, invertArithmeticRelation(kind), out); e != nil || decided {
+				if e != nil {
+					return RewriteFailed, e
+				}
+				return RewriteDone, nil
+			}
+		}
 		if changed && err == nil {
 			result, e := r.app(kind, left, right)
 			if e != nil {
@@ -792,9 +806,14 @@ func (r *ArithRewriter) MkEqCore(left, right ast.ASTHandle, out ast.ASTRef) (Rew
 	}
 	changed := false
 	if r.arithLHS || leftArithmetic || rightArithmetic {
-		left, right, changed, err = r.cancelMonomials(left, right, r.arithLHS)
+		newLeft, newRight, cancelled, e := r.cancelMonomials(left, right, r.arithLHS)
+		err = e
 		if err != nil {
 			return RewriteFailed, err
+		}
+		changed = cancelled
+		if changed {
+			left, right = newLeft, newRight
 		}
 	}
 	lv, _, ln, err := r.numeral(left)
@@ -803,6 +822,20 @@ func (r *ArithRewriter) MkEqCore(left, right ast.ASTHandle, out ast.ASTRef) (Rew
 	}
 	rv, _, rn, err := r.numeral(right)
 	if err != nil || !ln || !rn {
+		if err == nil {
+			if decided, e := r.rewriteBound(left, right, arithRelationEq, out); e != nil || decided {
+				if e != nil {
+					return RewriteFailed, e
+				}
+				return RewriteDone, nil
+			}
+			if decided, e := r.rewriteBound(right, left, arithRelationEq, out); e != nil || decided {
+				if e != nil {
+					return RewriteFailed, e
+				}
+				return RewriteDone, nil
+			}
+		}
 		if changed && err == nil {
 			result, e := r.manager.MkEq(left, right)
 			if e != nil {
