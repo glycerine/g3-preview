@@ -216,3 +216,27 @@ func (m *ASTManager) SequenceIntToStringArgument(h ASTHandle) (ASTHandle, bool, 
 	argument, err := m.readInternal(a.args, 0)
 	return m.external(argument), err == nil, err
 }
+
+func (m *ASTManager) IsRegexEpsilon(h ASTHandle) (bool, error) {
+	if err := m.lock(); err != nil {
+		return false, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireExpr(h)
+	if err != nil {
+		return false, err
+	}
+	if m.nodeAt(r.slot).kind != ASTApp || m.sequencePlugin == nil {
+		return false, nil
+	}
+	a := m.appAt(r.slot)
+	family, kind, err := m.declIdentity(a.decl)
+	if err != nil || family != m.sequencePlugin.family || kind != ASTSequenceOpToRegex || a.count != 1 {
+		return false, err
+	}
+	argument, err := m.readInternal(a.args, 0)
+	if err != nil {
+		return false, err
+	}
+	return m.isSequenceEmptyRef(argument)
+}

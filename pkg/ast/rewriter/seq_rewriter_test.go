@@ -432,3 +432,79 @@ func TestSequenceRewriterIntegerStringConversions(t *testing.T) {
 		t.Fatalf("stoi(itos(x)): status=%d kind=%d error=%v", status, kind, e)
 	}
 }
+
+func TestSequenceRewriterRegexAlgebraicBranches(t *testing.T) {
+	m := astTestManager(t)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	astTestPin(t, m, a)
+	emptyString, err := m.MkString("")
+	astTestMust(t, err)
+	astTestPin(t, m, emptyString)
+	ra, err := m.MkSequenceToRegex(a)
+	astTestMust(t, err)
+	astTestPin(t, m, ra)
+	epsilon, err := m.MkSequenceToRegex(emptyString)
+	astTestMust(t, err)
+	astTestPin(t, m, epsilon)
+	regexSort, err := m.GetSort(ra)
+	astTestMust(t, err)
+	empty, err := m.MkRegexEmpty(regexSort)
+	astTestMust(t, err)
+	astTestPin(t, m, empty)
+	full, err := m.MkRegexFull(regexSort)
+	astTestMust(t, err)
+	astTestPin(t, m, full)
+	check := func(name string, call func(ast.ASTHandle, ast.ASTHandle, ast.ASTRef) (RewriteStatus, error), left, right, want ast.ASTHandle) {
+		t.Helper()
+		status, e := call(left, right, out)
+		astTestMust(t, e)
+		result, e := m.RefGet(out)
+		astTestMust(t, e)
+		if status != RewriteDone || result != want {
+			t.Fatalf("%s: status=%d result=%v want=%v", name, status, result, want)
+		}
+	}
+	check("concat-left-empty", rw.RewriteRegexConcat, empty, ra, empty)
+	check("concat-epsilon", rw.RewriteRegexConcat, epsilon, ra, ra)
+	check("union-empty", rw.RewriteRegexUnion, empty, ra, ra)
+	check("union-full", rw.RewriteRegexUnion, ra, full, full)
+	check("intersection-full", rw.RewriteRegexIntersect, full, ra, ra)
+	check("intersection-empty", rw.RewriteRegexIntersect, ra, empty, empty)
+
+	status, err := rw.RewriteRegexPlus(ra, out)
+	astTestMust(t, err)
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	if status != Rewrite2 {
+		t.Fatalf("regex plus expansion status: %d", status)
+	}
+	if yes, e := m.IsSequenceOperation(result, 17); e != nil || !yes {
+		t.Fatalf("regex plus expansion: concat=%v error=%v", yes, e)
+	}
+	star, err := m.MkRegexStar(ra)
+	astTestMust(t, err)
+	astTestPin(t, m, star)
+	status, err = rw.RewriteRegexPlus(star, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteDone || result != star {
+		t.Fatalf("star plus identity: status=%d result=%v", status, result)
+	}
+	status, err = rw.RewriteRegexOptional(ra, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if status != Rewrite1 {
+		t.Fatalf("regex optional status: %d", status)
+	}
+	if yes, e := m.IsSequenceOperation(result, 18); e != nil || !yes {
+		t.Fatalf("regex optional: union=%v error=%v", yes, e)
+	}
+}

@@ -33511,7 +33511,8 @@
         "TestSequenceRewriterConstantPredicates",
         "TestSequenceRewriterReplaceSourceBranches",
         "TestSequenceRewriterConstantLengthExtractAtAndIndex",
-        "TestSequenceRewriterIntegerStringConversions"
+        "TestSequenceRewriterIntegerStringConversions",
+        "TestSequenceRewriterRegexAlgebraicBranches"
       ],
       "assertions": [
         {
@@ -33796,6 +33797,22 @@
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",
           "tests": [
             "TestSequenceRewriterIntegerStringConversions"
+          ]
+        },
+        {
+          "name": "seq_rewriter regex concat, union and intersection algebraic identities including epsilon, empty, full and star cases (seq_rewriter.cpp:1330-1388,1420-1441)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterRegexAlgebraicBranches"
+          ]
+        },
+        {
+          "name": "seq_rewriter regex plus identities/fallback expansion and optional epsilon-union expansion (seq_rewriter.cpp:1524-1560)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterRegexAlgebraicBranches"
           ]
         }
       ],
@@ -34476,7 +34493,8 @@
         "TestASTSequenceParameterizedLoopAndSkolem",
         "TestASTSequenceUtilitySortAndExpressionRecognizers",
         "TestASTSequenceConcatUtilitiesAndRegexLoopRecognition",
-        "TestSequenceRewriterIntegerStringConversions"
+        "TestSequenceRewriterIntegerStringConversions",
+        "TestSequenceRewriterRegexAlgebraicBranches"
       ],
       "conditionals": [
         {
@@ -34559,6 +34577,14 @@
           "go_target": "pkg/ast/ast_seq_utility.go",
           "tests": [
             "TestSequenceRewriterIntegerStringConversions"
+          ]
+        },
+        {
+          "name": "seq_util regex epsilon recognition through to-regex of an empty sequence value (seq_decl_plugin.h:294,310)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_utility.go",
+          "tests": [
+            "TestSequenceRewriterRegexAlgebraicBranches"
           ]
         }
       ],

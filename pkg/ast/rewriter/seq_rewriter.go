@@ -490,6 +490,210 @@ func (r *SequenceRewriter) RewriteStringToInt(a ast.ASTHandle, out ast.ASTRef) (
 	return RewriteDone, nil
 }
 
+func (r *SequenceRewriter) sequenceOperation(h ast.ASTHandle, kind int32) (bool, error) {
+	return r.manager.IsSequenceOperation(h, kind)
+}
+
+func (r *SequenceRewriter) makeRegexEpsilon(regex ast.ASTHandle) (result ast.ASTHandle, err error) {
+	regexSort, err := r.manager.GetSort(regex)
+	if err != nil {
+		return result, err
+	}
+	sequenceSort, matched, err := r.manager.RegexSequenceSort(regexSort)
+	if err != nil || !matched {
+		if err == nil {
+			err = ast.ErrASTDomain
+		}
+		return result, err
+	}
+	empty, err := r.manager.MkSequenceEmpty(sequenceSort)
+	if err != nil {
+		return result, err
+	}
+	emptyRef, err := r.manager.NewRef(empty)
+	if err != nil {
+		return result, err
+	}
+	defer func() { err = errors.Join(err, r.manager.DelRef(&emptyRef)) }()
+	return r.manager.MkSequenceToRegex(empty)
+}
+
+func (r *SequenceRewriter) RewriteRegexConcat(a, b ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if err := r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	fullA, err := r.sequenceOperation(a, 23)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	fullB, err := r.sequenceOperation(b, 23)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if fullA && fullB {
+		return RewriteDone, r.manager.SetRef(out, a)
+	}
+	emptyA, err := r.sequenceOperation(a, 22)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if emptyA {
+		return RewriteDone, r.manager.SetRef(out, a)
+	}
+	emptyB, err := r.sequenceOperation(b, 22)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if emptyB {
+		return RewriteDone, r.manager.SetRef(out, b)
+	}
+	epsilonA, err := r.manager.IsRegexEpsilon(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if epsilonA {
+		return RewriteDone, r.manager.SetRef(out, b)
+	}
+	epsilonB, err := r.manager.IsRegexEpsilon(b)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if epsilonB {
+		return RewriteDone, r.manager.SetRef(out, a)
+	}
+	return RewriteFailed, nil
+}
+
+func (r *SequenceRewriter) RewriteRegexUnion(a, b ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if err := r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	if a == b {
+		return RewriteDone, r.manager.SetRef(out, a)
+	}
+	for _, row := range []struct {
+		h    ast.ASTHandle
+		kind int32
+		out  ast.ASTHandle
+	}{{a, 22, b}, {b, 22, a}, {a, 23, a}, {b, 23, b}} {
+		matched, err := r.sequenceOperation(row.h, row.kind)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		if matched {
+			return RewriteDone, r.manager.SetRef(out, row.out)
+		}
+	}
+	starA, err := r.sequenceOperation(a, 14)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	epsilonB, err := r.manager.IsRegexEpsilon(b)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if starA && epsilonB {
+		return RewriteDone, r.manager.SetRef(out, a)
+	}
+	starB, err := r.sequenceOperation(b, 14)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	epsilonA, err := r.manager.IsRegexEpsilon(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if starB && epsilonA {
+		return RewriteDone, r.manager.SetRef(out, b)
+	}
+	return RewriteFailed, nil
+}
+
+func (r *SequenceRewriter) RewriteRegexIntersect(a, b ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if err := r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	if a == b {
+		return RewriteDone, r.manager.SetRef(out, a)
+	}
+	for _, row := range []struct {
+		h    ast.ASTHandle
+		kind int32
+		out  ast.ASTHandle
+	}{{a, 22, a}, {b, 22, b}, {a, 23, b}, {b, 23, a}} {
+		matched, err := r.sequenceOperation(row.h, row.kind)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		if matched {
+			return RewriteDone, r.manager.SetRef(out, row.out)
+		}
+	}
+	return RewriteFailed, nil
+}
+
+func (r *SequenceRewriter) RewriteRegexPlus(a ast.ASTHandle, out ast.ASTRef) (status RewriteStatus, err error) {
+	if err = r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	for _, kind := range []int32{22, 23, 13, 14} {
+		matched, e := r.sequenceOperation(a, kind)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if matched {
+			return RewriteDone, r.manager.SetRef(out, a)
+		}
+	}
+	epsilon, err := r.manager.IsRegexEpsilon(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if epsilon {
+		return RewriteDone, r.manager.SetRef(out, a)
+	}
+	star, err := r.manager.MkRegexStar(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	starRef, err := r.manager.NewRef(star)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	defer func() { err = errors.Join(err, r.manager.DelRef(&starRef)) }()
+	result, err := r.manager.MkRegexConcat(a, star)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if err = r.manager.SetRef(out, result); err != nil {
+		return RewriteFailed, err
+	}
+	return Rewrite2, nil
+}
+
+func (r *SequenceRewriter) RewriteRegexOptional(a ast.ASTHandle, out ast.ASTRef) (status RewriteStatus, err error) {
+	if err = r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	epsilon, err := r.makeRegexEpsilon(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	epsilonRef, err := r.manager.NewRef(epsilon)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	defer func() { err = errors.Join(err, r.manager.DelRef(&epsilonRef)) }()
+	result, err := r.manager.MkRegexUnion(epsilon, a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if err = r.manager.SetRef(out, result); err != nil {
+		return RewriteFailed, err
+	}
+	return Rewrite1, nil
+}
+
 func (r *SequenceRewriter) RewriteContains(a, b ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
 	if err := r.open(); err != nil {
 		return RewriteFailed, err
