@@ -225,6 +225,8 @@ func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTP
 		decl, e = m.pseudoBooleanDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astSequencePlugin {
 		decl, e = m.sequenceDecl(k, ps, domain, ASTHandle{})
+	} else if m.pluginAt(fid).kind == astDatatypePlugin {
+		decl, e = m.datatypeDecl(k, ps, domain, ASTHandle{})
 	} else {
 		decl, e = m.builtinDecl(fid, k, ps, domain)
 	}
@@ -316,6 +318,8 @@ func (m *ASTManager) mkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 		r, e = m.pseudoBooleanDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astSequencePlugin {
 		r, e = m.sequenceDecl(k, ps, domain, rangeSort)
+	} else if m.pluginAt(fid).kind == astDatatypePlugin {
+		r, e = m.datatypeDecl(k, ps, domain, rangeSort)
 	} else {
 		r, e = m.builtinDecl(fid, k, ps, domain)
 	}
@@ -380,6 +384,10 @@ func (m *ASTManager) mkFamilySort(fid FamilyID, k int32, ps []ASTParameter) (AST
 		m.formatExecuting = true
 		defer func() { m.formatExecuting = false }()
 		r, e = m.arraySort(k, ps)
+		return m.external(r), e
+	}
+	if m.pluginAt(fid).kind == astDatatypePlugin {
+		r, e = m.datatypeSort(k, ps)
 		return m.external(r), e
 	}
 	if m.pluginAt(fid).kind == astArithmeticPlugin {
