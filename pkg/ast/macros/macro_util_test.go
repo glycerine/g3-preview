@@ -538,3 +538,56 @@ func TestMacroManagerExpandProofChain(t *testing.T) {
 		t.Fatal("expanded proof fact", fact, want)
 	}
 }
+
+func TestMacroFinderInstallsAndExpandsSimpleMacros(t *testing.T) {
+	m := fixture(t)
+	manager, err := macros.NewManager(m)
+	must(t, err)
+	t.Cleanup(func() { must(t, manager.Close()) })
+	finder, err := macros.NewFinder(m, manager)
+	must(t, err)
+	b, err := m.MkBoolSort()
+	must(t, err)
+	v, err := m.MkVar(0, b)
+	must(t, err)
+	f := declaration(t, m, "finder-f", []ast.ASTHandle{b}, b)
+	notV, err := m.MkNot(v)
+	must(t, err)
+	macro := quantifiedMacro(t, m, f, notV, b)
+	a, err := m.MkConst(mustSymbol(t, m, "finder-a"), b)
+	must(t, err)
+	application, err := m.MkApp(f, []ast.ASTHandle{a})
+	must(t, err)
+	macroDependencyValue, err := m.MkConst(mustSymbol(t, m, "finder-macro-dep"), b)
+	must(t, err)
+	inputDependencyValue, err := m.MkConst(mustSymbol(t, m, "finder-input-dep"), b)
+	must(t, err)
+	macroDependency, err := m.DependencyLeaf(macroDependencyValue)
+	must(t, err)
+	inputDependency, err := m.DependencyLeaf(inputDependencyValue)
+	must(t, err)
+	result, err := finder.Apply([]macros.Formula{{Expression: macro, Dependency: macroDependency}, {Expression: application, Dependency: inputDependency}})
+	must(t, err)
+	t.Cleanup(func() { must(t, result.Close()) })
+	if result.Len() != 1 || manager.NumMacros() != 1 {
+		t.Fatal("finder result sizes", result.Len(), manager.NumMacros())
+	}
+	row, err := result.At(0)
+	must(t, err)
+	want, err := m.MkNot(a)
+	must(t, err)
+	if row.Expression != want {
+		t.Fatal("finder expansion", row.Expression, want)
+	}
+	dependencies, err := m.DependencyLinearize(row.Dependency, nil)
+	must(t, err)
+	wantDependencies := map[ast.ASTHandle]bool{macroDependencyValue: true, inputDependencyValue: true}
+	if len(dependencies) != len(wantDependencies) {
+		t.Fatal("finder dependencies", dependencies)
+	}
+	for _, dependency := range dependencies {
+		if !wantDependencies[dependency] {
+			t.Fatal("finder dependency", dependency)
+		}
+	}
+}

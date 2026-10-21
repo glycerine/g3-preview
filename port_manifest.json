@@ -19805,9 +19805,14 @@
       "path": "src/ast/macros/macro_finder.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/macros/macro_finder.go",
+        "pkg/ast/macros/macro_util_test.go"
+      ],
+      "tests": [
+        "TestMacroFinderInstallsAndExpandsSimpleMacros"
+      ],
       "assertions": [
         {
           "line": 315,
@@ -19828,17 +19833,41 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "simple macro recognition, owning formula batches, macro expansion and fixed-point driver",
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_finder.go",
+          "tests": [
+            "TestMacroFinderInstallsAndExpandsSimpleMacros"
+          ]
+        },
+        {
+          "name": "arithmetic inequality and pseudo-predicate splitting",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "FormulaBatch owns expression, optional proof and dependency references per row. Each fixed-point pass transfers expanded rows into a new batch and retires the previous batch."
+      ],
+      "deviations": [
+        "Partial checkpoint pending arithmetic inequality and pseudo-predicate splitting."
+      ]
     },
     {
       "path": "src/ast/macros/macro_finder.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/macros/macro_finder.go",
+        "pkg/ast/macros/macro_util_test.go"
+      ],
+      "tests": [
+        "TestMacroFinderInstallsAndExpandsSimpleMacros"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -19851,9 +19880,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "simple macro fixed-point application surface",
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_finder.go",
+          "tests": [
+            "TestMacroFinderInstallsAndExpandsSimpleMacros"
+          ]
+        },
+        {
+          "name": "arithmetic and pseudo-predicate transformations",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Finder borrows ASTManager and Manager; returned FormulaBatch is an explicit caller-owned result."
+      ],
+      "deviations": [
+        "Partial checkpoint pending the remaining transformation paths."
+      ]
     },
     {
       "path": "src/ast/macros/macro_manager.cpp",
