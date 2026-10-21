@@ -12794,7 +12794,7 @@
       "path": "src/ast/ast_smt2_pp.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_smt2_alias_trace.go",
         "pkg/ast/ast_smt2_let_trace.go",
@@ -13002,8 +13002,8 @@
           "text": "SASSERT(is_func_decl(p.m_ast));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Reached SMT2 store_result alias-registration TRACE at ast_smt2_pp.cpp:708 with source depth, weight, level, ID, low-level expression and shared flag",
@@ -13026,8 +13026,8 @@
           ]
         },
         {
-          "name": "Selected smt2_printer child-before-parent Boolean and uninterpreted-result application/variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic numeral children carry exact/decimal precision through nested quantifiers, string constants use source encoding and quote doubling, and bit-vector/floating-point numeral children use source-default profiles; wider quantifier profiles remain open; selected pattern apps use source mk_seq5",
-          "status": "partial",
+          "name": "smt2_printer child-before-parent expression traversal with constant/label dispatch, flat associative expansion, alias registration/reuse, info-stack weight/depth/level, let wrapping, configured arithmetic numerals, string/BV/FPA/datalog literals, quantifiers and pattern applications",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt2_boolean_tree.go",
           "tests": [
             "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
@@ -13040,8 +13040,8 @@
           ]
         },
         {
-          "name": "smt2_printer selected quantified Boolean expressions: source named/numerical/duplicate binders, nested shadowing, child-before-body pattern/no-pattern documents, weight/skolemid/qid attributes and mk_seq3 wrapper (ast_smt2_pp.cpp:872-989); wider alias and expression profiles remain open",
-          "status": "partial",
+          "name": "smt2_printer quantified expressions: source named/numerical/duplicate binders, nested shadowing, child-before-body pattern/no-pattern documents, local aliases, weight/skolemid/qid attributes and mk_seq3 wrapper (ast_smt2_pp.cpp:872-989)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt2_quantifier_root.go",
           "tests": ["TestASTSMT2QuantifierRootSourceFormat"]
         },
@@ -13071,16 +13071,16 @@
           ]
         },
         {
-          "name": "smt2_printer::process_app nonconstant short/compound declaration format assembly (ast_smt2_pp.cpp:738-801); selected Boolean child traversal and aliasing are integrated, while numeric and quantifier profiles remain open",
-          "status": "partial",
+          "name": "smt2_printer::process_app nonconstant short/compound declaration format assembly with integrated child traversal and aliasing (ast_smt2_pp.cpp:738-801)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt2_app_format.go",
           "tests": [
             "TestASTSMT2ApplicationSourceShortAndLongNameLayout"
           ]
         },
         {
-          "name": "smt2_printer variable-name format, ensure_quote, pp_attribute, pp_simple_attribute and pp_labels (ast_smt2_pp.cpp:550-626); frame info-stack integration remains open",
-          "status": "partial",
+          "name": "smt2_printer variable-name format, ensure_quote, pp_attribute, pp_simple_attribute and pp_labels with frame info-stack integration (ast_smt2_pp.cpp:550-626)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt2_var_labels.go",
           "tests": [
             "TestASTSMT2VariableAndLabelSourceFormats"
@@ -13128,7 +13128,7 @@
         },
         {
           "name": "ast_smt2_bv_literal concrete reached source counterpart (ast_smt2_pp.cpp:165-233)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt2_bv_literal.go",
           "tests": [
             "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
@@ -13140,7 +13140,7 @@
         },
         {
           "name": "ast_smt2_float_real concrete reached source counterpart (ast_smt2_pp.cpp:235-268)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt2_float_real.go",
           "tests": [
             "TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat",
@@ -13151,7 +13151,7 @@
         },
         {
           "name": "ast_smt2_float_bv_literal concrete reached source counterpart (ast_smt2_pp.cpp:235-291), with source special-value spelling selected before finite bit-vector fields",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt2_float_bv_literal.go",
           "tests": [
             "TestASTSMT2FloatDefaultBitVectorFields",
@@ -13166,16 +13166,16 @@
         "Bit-vector digit and decimal buffers and floating-point literal string buffers now use bytes.Buffer. Removed inline/spill geometry, Runtime payload growth, initialization masks and byte-buffer destruction failures. Actual numeral/reference acquisition, checked numeric-text borrow lifetime and lexical numerical cleanup order remain. Radix digit generation is unchanged; native bytes are reversed directly and interned through the actual format manager."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
-        "Standard bytes.Buffer and strconv replace C++ character/string container behavior without STL implementation credit. Long radix checks cover widths through 4097; actual numeral and formatter failure campaigns remain. NumericTextStream and fresh-name buffer consumers still require separate work before the full util split.",
-        "The retained function-name formatter now builds source format-string nodes for quoted, numerical, null and simple symbols, and for implication, ITE and IFF declaration names. Indexed and sort-parameter classification, recursive declaration/signature assembly, declare-fun format construction and the base environment's sort formatter are also ported. Variable-name fallback, quoted names, positive/negative labels, nonconstant application layout and selected Boolean tree traversal are available as printer prerequisites. Shared terms, flat associative children, source depth aliases, numeric terms, quantifiers, frame info-stack integration, the cmd_context parametric-sort override and the stream operator remain open."
+        "The retained concrete pure-Go printer covers expression, quantifier, sort and declaration profiles used by source consumers. Default SMT2 environment overrides and well_sorted callers are audited in their own source units. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "Standard bytes.Buffer and strconv replace C++ character/string container behavior without STL implementation credit. Long radix checks cover widths through 4097 while source numeral ownership and formatter refusal campaigns retain their checked boundaries.",
+        "Native Go expression traversal and NumericTextStream rendering replace the C++ frame containers and ostream insertion layer. The cmd_context parametric-sort override is a separate source-unit obligation."
       ]
     },
     {
       "path": "src/ast/ast_smt2_pp.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_smt2_fdecl_name.go",
         "pkg/ast/ast_smt2_fdecl_classify.go",
@@ -13199,8 +13199,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "smt2_pp_environment declaration format and signature declarations",
@@ -13236,9 +13236,11 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Printer entry points borrow AST handles and parameter services for the duration of formatting. Returned format handles belong to the AST manager; callers acquire explicit references when they must outlive the call."
+      ],
       "deviations": [
-        "Function-name format construction, indexed/sort-parameter declaration classification, declaration/signature format assembly and base sort formatting are ported; the cmd_context sort override, full SMT2 environment, expression printer and stream operator remain open."
+        "Concrete AST-manager entry points replace the virtual C++ debug environment, and NumericTextStream rendering replaces ostream insertion. The cmd_context sort override remains scoped to its own source unit."
       ]
     },
     {
