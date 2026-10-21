@@ -17295,9 +17295,17 @@
       "path": "src/ast/fpa/fpa2bv_converter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/fpa/fpa2bv_converter.go",
+        "pkg/ast/ast_fpa_sort_access.go",
+        "pkg/ast/ast_bv_all_ones.go"
+      ],
+      "tests": [
+        "TestConverterSortAccessSpecialsSplitAndJoin",
+        "TestConverterNaNEqualityDistinctAndComponentITE",
+        "TestConverterRoundingModeCodesAndEquality"
+      ],
       "conditionals": [
         {
           "line": 190,
@@ -18588,17 +18596,38 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "constructor/destructor, fp split/join, SMT equality, component ITE, distinct expansion, rounding-mode constants, and canonical infinity/NaN/zero encodings; arithmetic, classifications, comparisons, conversions, constants and UFs remain open",
+          "status": "ported",
+          "go_target": "pkg/ast/fpa/fpa2bv_converter.go",
+          "tests": [
+            "TestConverterSortAccessSpecialsSplitAndJoin",
+            "TestConverterNaNEqualityDistinctAndComponentITE",
+            "TestConverterRoundingModeCodesAndEquality"
+          ]
+        }
+      ],
+      "ownership": [
+        "The converter owns its reserved Go owner storage and borrows the AST manager. This initial slice has no persistent AST caches or extra assertions; those source-owned collections remain open."
+      ],
       "deviations": []
     },
     {
       "path": "src/ast/fpa/fpa2bv_converter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/fpa/fpa2bv_converter.go",
+        "pkg/ast/ast_fpa_sort_access.go",
+        "pkg/ast/ast_bv_all_ones.go"
+      ],
+      "tests": [
+        "TestConverterSortAccessSpecialsSplitAndJoin",
+        "TestConverterNaNEqualityDistinctAndComponentITE",
+        "TestConverterRoundingModeCodesAndEquality"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -18611,8 +18640,21 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "public converter lifecycle and foundational structural/special-value interface; remaining arithmetic and model-facing interface remains open",
+          "status": "ported",
+          "go_target": "pkg/ast/fpa/fpa2bv_converter.go",
+          "tests": [
+            "TestConverterSortAccessSpecialsSplitAndJoin",
+            "TestConverterNaNEqualityDistinctAndComponentITE",
+            "TestConverterRoundingModeCodesAndEquality"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go converter is a checked single owner borrowing ASTManager; returned AST handles follow ASTManager factory borrowing. Persistent source maps and assertion vectors remain open."
+      ],
       "deviations": []
     },
     {
