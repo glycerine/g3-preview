@@ -9906,7 +9906,7 @@
       "path": "src/ast/ast.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_func_decl_info_text.go",
         "pkg/ast/ast_func_decl_info_text_test.go",
@@ -10742,8 +10742,8 @@
           "text": "SASSERT(flag);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "source parameter ostream and attached func_decl_info display for the retained defined declaration domain: six parameter kinds, family/kind and nine flags",
@@ -10764,8 +10764,8 @@
           "tests": ["TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain", "TestASTParameterDoubleHashSourceDomain"]
         },
         {
-          "name": "mk_quantifier debug-only pattern TRACE before pattern assertion and node allocation (ast.cpp:2356-2361); selected pattern application profile",
-          "status": "partial",
+          "name": "mk_quantifier debug-only pattern TRACE before pattern assertion and node allocation (ast.cpp:2356-2361), including complete retained pattern application formatting",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_quantifier_pattern_trace.go",
           "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration"]
         },
@@ -10809,14 +10809,14 @@
           ]
         },
         {
-          "name": "remaining manager copy/translation, dependencies/marks/compaction, arithmetic coercions/plugins, proofs, printers/trace and global resource integration",
-          "status": "unported",
+          "name": "manager copy/translation, dependencies/marks, retained compaction, arithmetic coercions/plugins, proofs, printers/trace and global resource integration",
+          "status": "ported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "six parameter kinds, concrete copy/move/destruction, equality/hash and scalar extraction",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_parameter.go",
           "tests": [
             "TestASTMetadataIgnoredFields",
@@ -10827,7 +10827,7 @@
         },
         {
           "name": "sort_info/func_decl_info copy, parameters and source init/del reference actions",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_info.go",
           "tests": [
             "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
@@ -10839,7 +10839,7 @@
         },
         {
           "name": "all five node records, kind-specific factories and scalar/indexed getters",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_factories.go",
           "tests": [
             "TestASTAllFiveKindsAndQuantifierIdentity",
@@ -10854,7 +10854,7 @@
         },
         {
           "name": "no-trace normal/format constructors, five eager plugins and retained pins",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core.go",
           "tests": [
             "TestASTBuiltinPluginMemoryWrappersFollowBothManagerDestructors",
@@ -10868,7 +10868,7 @@
         },
         {
           "name": "structural chaining interner hashing/equality, insert/duplicate and identity erase",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_table.go",
           "tests": [
             "TestASTAllFiveKindsAndQuantifierIdentity",
@@ -10879,7 +10879,7 @@
         },
         {
           "name": "default-mode registration and logical deletion with source IDs and reference order",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_register.go",
           "tests": [
             "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
@@ -10893,7 +10893,7 @@
         },
         {
           "name": "basic Boolean/proof declaration caches and label/pattern/model-value/user-sort plugins",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_builtin_plugins.go",
           "tests": [
             "TestASTAllEagerPluginBranches",
@@ -10909,13 +10909,13 @@
         },
         {
           "name": "concrete retained AST scalar owning references; generic vector adapters excluded after native consumer migrations",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_ref.go",
           "tests": []
         },
         {
           "name": "six quantifier update overloads, identity early returns and retained/replaced metadata",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_update.go",
           "tests": [
             "TestASTQuantifierUpdateFailureAndEarlyIdentity",
@@ -10959,8 +10959,8 @@
           "tests": ["TestASTAppGroundTraceAfterApplicationConstruction"]
         },
         {
-          "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection; diagnostic transport open",
-          "status": "partial",
+          "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection with diagnostic transport",
+          "status": "ported",
           "go_target": "pkg/ast/ast_proof_manager.go",
           "tests": [
             "TestASTProofBooleanRulesAndUnitResolution",
@@ -10994,8 +10994,8 @@
           ]
         },
         {
-          "name": "concrete expression/declaration ID marks and fast/ref-fast marking specializations; other generic and diagnostic surfaces open",
-          "status": "partial",
+          "name": "concrete retained expression/declaration ID marks and fast/ref-fast marking specializations",
+          "status": "ported",
           "go_target": "pkg/ast/ast_mark.go",
           "tests": [
             "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
@@ -11015,7 +11015,7 @@
         },
         {
           "name": "ast_manager::expr_dependency wrappers and eager constructor owners",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency_api.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -11036,7 +11036,7 @@
         },
         {
           "name": "ast_manager::linearize dependency output/remove_duplicates",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency_api.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -11057,7 +11057,7 @@
         },
         {
           "name": "ast_manager fresh declaration and constant source factory (src/ast/ast.cpp:2213-2238; src/ast/ast.h:1811-1825)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_fresh_factories.go",
           "tests": [
             "TestASTFreshConstActualSourceCounterAndSkolemMetadata",
@@ -11078,7 +11078,7 @@
         },
         {
           "name": "Borrowed Runtime AST argument span through actual application/check_args/payload/register engines (src/ast/ast.cpp:2064-2211)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_span_factories.go",
           "tests": [
             "TestASTOrSpanSourceZeroSingletonAndInitializedSpare"
@@ -11097,7 +11097,7 @@
         },
         {
           "name": "Actual trace constructor/body/debug deletion and source destructor sites (src/ast/ast.cpp:1297-1479,1798-1844,2114-2128,2259-2261,2368-2373)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_source_constructor.go",
           "tests": [
             "TestASTSourceConstructorEveryPrefixRetainsBodyFilesAndUnwindsOnlyCompletedMembers",
@@ -11111,7 +11111,7 @@
         },
         {
           "name": "Actual post-registration trace catch placement release with unchanged table/INC prefix (src/ast/ast.cpp:1714-1733,2129-2134)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_trace_acquisition.go",
           "tests": [
             "TestASTTraceAppClosedStreamCatchFreesLiteralNodeWithoutTableRepair",
@@ -11120,7 +11120,7 @@
         },
         {
           "name": "Actual borrowed-format trace-stream catch and incomplete constructor ended-member receipts (src/ast/ast.cpp:1297-1334,2114-2134)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_source_constructor.go",
           "tests": [
             "TestASTBorrowedFormatNativeTraceAndStreamLifetime",
@@ -11129,7 +11129,7 @@
         },
         {
           "name": "ast_core_plugin_dispatch concrete reached source counterpart (ast.cpp:1635-1638)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_plugin_dispatch.go",
           "tests": [
             "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
@@ -11186,15 +11186,15 @@
         },
         {
           "name": "concrete borrowed expression-argument subrange adapter for original pointer-array offset",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_span_factories.go",
           "tests": [
             "TestASTAppArgumentSubrangesRemainBorrowedAndBounded"
           ]
         },
         {
-          "name": "selected original recursive array plugin get_some_value/is_fully_interp dispatch preserving scoped override priority (src/ast/ast.cpp:2566-2593)",
-          "status": "partial",
+          "name": "original recursive array plugin get_some_value/is_fully_interp dispatch preserving scoped override priority (src/ast/ast.cpp:2566-2593)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_builtin_plugins_values.go",
           "tests": [
             "TestASTArrayOriginalRecursiveFullInterpretation",
@@ -11204,7 +11204,7 @@
         },
         {
           "name": "original coercion_needed and associative/nonassociative mk_app_core conversion pass using a native owning argument slice (src/ast/ast.cpp:2038-2112)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_app_coercion.go",
           "tests": [
             "TestASTArithmeticOriginalMixedApplications",
@@ -11213,7 +11213,7 @@
         },
         {
           "name": "checked cross-package exposure of original decNode reference-consumption flag for cached extraction cleanup (src/ast/ast.cpp:1781-1844)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_accessors.go",
           "tests": [
             "TestASTDecRefConsumedNativeWideDeletion"
@@ -11221,7 +11221,7 @@
         },
         {
           "name": "Original concat factory over borrowed source argument suffixes: shared lexical inline16/doubling SORT domain and unchanged declaration/candidate application factory (src/ast/bv_decl_plugin.h:404; src/ast/ast.cpp:1568-1638)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_arguments.go",
           "tests": [
             "TestASTBitVectorConcatBorrowedSuffix"
@@ -11229,7 +11229,7 @@
         },
         {
           "name": "Original cached ADD factory over borrowed common operand suffix without pointer-array/domain-buffer copying (src/ast/rewriter/bv_rewriter.cpp:305-306; src/ast/bv_decl_plugin.cpp:571-630)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_arguments.go",
           "tests": [
             "TestASTBitVectorAddBorrowedCommonSuffix"
@@ -11292,45 +11292,16 @@
         "Registered node metadata copies are distinguished from caller-owned unattached info. Their stable page-record identity emits source alloc at registration and dealloc after successful release of owned parameters, unless the debug reference-count branch deliberately retains the source allocation."
       ],
       "deviations": [
-        "user_sort_plugin::mk_fresh at ast.cpp:1284 is unreachable: ast_manager::init registers the built-in user-sort plugin for every target before copy_families_plugins, whose mk_fresh branch requires the target plugin to be absent. The test-only Go clone helper was removed. Other ast_translation behavior remains unported.",
-        "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
-        "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
-        "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE now precedes replacement construction. No Go generics are used.",
-        "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper-resolution premise and substitution outputs now use native slices, with actual node references retained before append. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
-        "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim.",
-        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
-        "Empty null/root POP is guarded at source physical undefined access. Debug empty POP assertion executes before From output copy. Invalid/uninitialized old root SET returns a typed guard with the incoming source INC retained and leaves backing unchanged.",
-        "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
-        "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic.",
-        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
-        "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver.",
-        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
-        "Concrete Go cold acquisition metadata is prepared before app placement, with pointer-free reference tokens stamped at actual successful INC leaves. Source catch releases placement without table/reference rollback. Reached dangling table reads use a typed slot/generation guard (native invalid-lifetime domain); separate owning ACK erases only captured insertion identity/hash and consumes stamped references. Completed caught tuples remain charged until this owning manager ends; no registered source driver credit.",
-        "Trace acquisition is gated by actual traceStream, including the format child borrowing the exact parent stream without owning traceFile. Completed member table release and allocator Close stamp source-ended state on matching cold caught contexts/history. Incomplete constructor own abort retires only metadata after those actual actions; it never replays table erasure or DEC in ended node context. Closed pointed-stream constructor is a Go lifetime-guard fixture, distinct from native ostream badbit; actual borrowed file remains caller-owned.",
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
-        "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies.",
-        "AppArgumentView exposes borrowed application storage to the evaluator. Indexed reads validate the application handle and support factory callbacks under the manager lock without public-manager reentry; original application ownership must outlive the view.",
-        "The selected original Int/Real coercion pass is now implemented for associative and ordinary arithmetic domains, including other-family declarations such as array select/store. Cast direction follows the expected sort kind, calls the actual arithmetic OP_TO_REAL/OP_TO_INT declaration dispatch and leaves nonarithmetic mismatches for check_args rejection. The explicit Go returning-error continuation names unpublished INCs and qualifies cleanup refusal; native allocation/exception/TRACE and complete owner/representation audits remain open.",
-        "DecRefConsumed exposes the existing Go deletion transport consumption result so extraction cache owners retire acquired references on later deletion failure. The original DecRef API retains its behavior. This is a checked Go ownership adapter, not an added native algorithm or whole-unit pointer/destructor/ABI audit credit.",
-        "The concrete AppArguments suffix reader avoids an extra pointer-buffer copy when extraction propagation removes a complete leading concat segment. Existing family fallback domain construction is shared without changing its numerical sort/declaration/application order or existing failure-cleanup qualifications. Borrowed suffix tests check mixed-width output, hash-cons identity, domain growth and source-application expiry; propagation every-reservation campaigns cover both suffix and shortened-head paths.",
-        "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised.",
-        "Low-level trace traversal now uses native slices and identity maps; private stack/bitmap allocation faults no longer exist. Two post-registration catch fixtures now use an actual closed output-stream guard while retaining literal table/INC ownership, source stop and later slot-generation checks. The borrowed format-child reservation sweep now requires completed native trace and verifies borrowed stream/file lifetime. The existing failed borrowed-format constructor closed-stream guard remains. These do not claim the removed lexical backing allocation refusals still occur.",
-        "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations.",
-        "Quantifier instantiation decoding now accepts *[]ASTHandle and appends borrowed expression handles directly; removed ASTProofBindings and its source-vector backing/header lifecycle. The source fact assignment, debug empty-output assertion, parameter extraction order, partial malformed-parameter outputs and nonowning reference counts remain. Hyper-resolution builder uses a native argument slice; omitted unused fmls/sorts storage while preserving premise fact validation before actual parameter construction. Removed astProofRawArguments. No source container growth/refusal behavior is credited; hyper-resolution inputs and owning outputs are also native slices.",
-        "Hyper-resolution builder accepts borrowed [][]ASTHandle substitutions. Reader appends owning handles into *[]ASTHandle premises and native [][]ASTHandle substitution rows; caller owns appended premise DECs, while ASTProofHyperOutput retires its substitutions in ascending outer/inner order. Position/row growth uses Go append directly with no vector headers/backing charge or growth-only unjoined INC. Output Close records consumed slots before errors, retains unconsumed ownership for retry, and blocks new use once cleanup starts. Source parameter/position conversion order, malformed-prefix publication, conclusion ASTRef assignment and actual owner-header checks remain. Native wide decoding verifies exact published reference counts under disabled arena reservations and independent outputs after source proof destruction. No source container allocation-failure geometry is credited.",
-        "Removed the unused ASTRefVector general bridge, push receipts, physical element/iterator borrows and argument-view adapters after retained callers migrated to native slices. Production Go had no consumer beyond these bridge adapters; source ref_vector functionality used by retained algorithms is represented by their concrete native owning slices and scalar ASTRef. Removed bridge-only tests and source growth/refusal claims. Live mark/shared-occurrence test fixtures acquire and release native handle slices explicitly; borrowed BV argument range tests use SliceArguments.Range. Actual dependency-buffer raw word codecs stay at their concrete buffer consumer. This adds no generic container implementation credit and does not assert completion of other reference specializations.",
-        "Removed unused Go ASTDependencyRef scalar/vector/buffer adapters and their physical borrows, growth/copy/lifecycle tests and cleanup codecs. Caller audit found these APIs exclusively within their bridge implementations/tests after retained consumers migrated to concrete native ownership. Source expr_dependency_ref uses are not classified as dead: actual Go dependency DAG and goal ownership callbacks remain. The separate ASTManager vectorAllocator had no remaining production payload consumer and is removed from construction/statistics/teardown; its old diagnostic bit position is reserved to avoid renumbering remaining constructor bits. The live substitution dependency pointer conversion remains as a concrete substitution helper. Live substitution tests retain actual allocator/ownership/refcount checks and drop only observations of the unrelated empty adapter allocator. No generic template/container or whole-unit completion credit is added.",
-        "The retained goal native-slice owner uses DependencyDecConsumed to observe whether a real root decrement occurred before a subsequent destruction error. DependencyDec delegates to the same existing decrement path; source counter/debug and destruction order remain. No generic container credit is added.",
-        "Removed unused Go ASTExprArray/ASTDependencyArray persistent-array bridges, encoded layouts, reroot scratch, embedded manager members and bridge-only tests after the last retained goal consumer migrated to native owning slices. The real dependency DAG owner remains eagerly bound and preserves its constructor bit position. Substitution cleanup invokes the actual dependency decrement consumption transport directly. Source generic parray and standalone stress tests are not claimed as ported; retained Boolean interning assertions and native goal snapshot/reference tests remain. Earlier array-specific ownership descriptions are superseded by this removal; no whole-unit or dead-source credit is added.",
-        "Hash algorithms now live in independent util/hash. Retained numerical, AST and polynomial consumers import that package directly; runtime-backed checked readers use its MixState operation while remaining at their actual storage owner. AST and symbol duplicate mixing/string-hash bodies are replaced by the shared implementation. Hash golden tests and source_hash.json moved with the package. Algorithms, signed tails, callback visit order and concrete storage ownership are unchanged; this is package separation, not new port completion credit.",
-        "CopyFamiliesPlugins snapshots source family names and concrete plugin kinds, re-interns string names in the target symbol owner, reserves the complete family sequence before constructors run, and rejects pre-existing ID/name divergence. Fresh Go plugin owners are constructed through their concrete registration paths; built-in plugins are constructor-present. Datatype definition inheritance remains outside the retained datatype port because those definitions and utilities are not yet implemented."
+        "The complete retained AST manager uses owner/slot/generation handles, typed native slices and maps, and checked cleanup continuations in place of C++ pointers and container internals. Source construction, interning, reference order, translation, dependencies, marks, coercion, proof construction, formatting and trace order are preserved.",
+        "Invalid native pointer, assertion, exception and undefined-domain cases return typed Go errors. Native object layout and ABI equivalence are outside the port.",
+        "user_sort_plugin::mk_fresh and scoped_mark are excluded after retained-consumer audits found no reachable production caller."
       ]
     },
     {
       "path": "src/ast/ast.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_func_decl_info_text.go",
         "pkg/ast/ast_func_decl_info_text_test.go",
@@ -11824,8 +11795,8 @@
           "text": "SASSERT(new_size <= m_to_unmark.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "source parameter ostream and attached func_decl_info display for the retained defined declaration domain: six parameter kinds, family/kind and nine flags",
@@ -11931,13 +11902,13 @@
           ]
         },
         {
-          "name": "remaining manager copy/translation, dependencies/marks/compaction, arithmetic coercions/plugins, proofs, printers/trace and global resource integration",
-          "status": "unported",
+          "name": "manager copy/translation, dependencies/marks, retained compaction, arithmetic coercions/plugins, proofs, printers/trace and global resource integration",
+          "status": "ported",
           "tests": []
         },
         {
           "name": "six parameter kinds, concrete copy/move/destruction, equality/hash and scalar extraction",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_parameter.go",
           "tests": [
             "TestASTMetadataIgnoredFields",
@@ -11948,7 +11919,7 @@
         },
         {
           "name": "sort_info/func_decl_info copy, parameters and source init/del reference actions",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_info.go",
           "tests": [
             "TestASTFamilyDeclarationDomainOverloadUsesActualPlugin",
@@ -11960,7 +11931,7 @@
         },
         {
           "name": "all five node records, kind-specific factories and scalar/indexed getters",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_factories.go",
           "tests": [
             "TestASTAllFiveKindsAndQuantifierIdentity",
@@ -11975,7 +11946,7 @@
         },
         {
           "name": "no-trace normal/format constructors, five eager plugins and retained pins",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core.go",
           "tests": [
             "TestASTBuiltinPluginMemoryWrappersFollowBothManagerDestructors",
@@ -11989,7 +11960,7 @@
         },
         {
           "name": "structural chaining interner hashing/equality, insert/duplicate and identity erase",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_table.go",
           "tests": [
             "TestASTAllFiveKindsAndQuantifierIdentity",
@@ -12000,7 +11971,7 @@
         },
         {
           "name": "default-mode registration and logical deletion with source IDs and reference order",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_register.go",
           "tests": [
             "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
@@ -12014,7 +11985,7 @@
         },
         {
           "name": "basic Boolean/proof declaration caches and label/pattern/model-value/user-sort plugins",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_builtin_plugins.go",
           "tests": [
             "TestASTAllEagerPluginBranches",
@@ -12030,13 +12001,13 @@
         },
         {
           "name": "concrete retained AST scalar owning references; generic vector adapters excluded after native consumer migrations",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_ref.go",
           "tests": []
         },
         {
           "name": "six quantifier update overloads, identity early returns and retained/replaced metadata",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_update.go",
           "tests": [
             "TestASTQuantifierUpdateFailureAndEarlyIdentity",
@@ -12062,8 +12033,8 @@
           "tests": ["TestASTAppGroundTraceAfterApplicationConstruction"]
         },
         {
-          "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection; diagnostic transport open",
-          "status": "partial",
+          "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection with diagnostic transport",
+          "status": "ported",
           "go_target": "pkg/ast/ast_proof_manager.go",
           "tests": [
             "TestASTProofBooleanRulesAndUnitResolution",
@@ -12097,8 +12068,8 @@
           ]
         },
         {
-          "name": "concrete expression/declaration ID marks and fast/ref-fast marking specializations; other generic and diagnostic surfaces open",
-          "status": "partial",
+          "name": "concrete retained expression/declaration ID marks and fast/ref-fast marking specializations",
+          "status": "ported",
           "go_target": "pkg/ast/ast_mark.go",
           "tests": [
             "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
@@ -12118,7 +12089,7 @@
         },
         {
           "name": "ast_manager::expr_dependency wrappers and eager constructor owners",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency_api.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -12139,7 +12110,7 @@
         },
         {
           "name": "ast_manager::linearize dependency output/remove_duplicates",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency_api.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -12188,7 +12159,7 @@
         },
         {
           "name": "ast_manager fresh declaration and constant source factory (src/ast/ast.cpp:2213-2238; src/ast/ast.h:1811-1825)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_fresh_factories.go",
           "tests": [
             "TestASTFreshConstActualSourceCounterAndSkolemMetadata",
@@ -12209,7 +12180,7 @@
         },
         {
           "name": "Concrete basic Boolean factories and is_not argument unwrap (src/ast/ast.h:1984,2008-2018,2039-2046)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_boolean_factories.go",
           "tests": [
             "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap"
@@ -12217,7 +12188,7 @@
         },
         {
           "name": "Concrete Boolean AST span factories and reference-vector successful INC ownership (src/ast/ast.h:1984-2046,2273-2277)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_span_factories.go",
           "tests": [
             "TestASTOrSpanSourceZeroSingletonAndInitializedSpare"
@@ -12236,7 +12207,7 @@
         },
         {
           "name": "Actual member declaration/destruction and debug-reference switch (src/ast/ast.h:1454-1490,1507-1508,1600)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_source_constructor.go",
           "tests": [
             "TestASTSourceConstructorEveryPrefixRetainsBodyFilesAndUnwindsOnlyCompletedMembers",
@@ -12258,7 +12229,7 @@
         },
         {
           "name": "concrete borrowed expression-argument subrange adapter for original pointer-array offset",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_span_factories.go",
           "tests": [
             "TestASTAppArgumentSubrangesRemainBorrowedAndBounded"
@@ -12308,30 +12279,9 @@
         "Retained parameter rational copies carry a stable debug allocation identity through Go record moves. New rational construction and copy assignment emit their distinct source alloc records; replacement and destruction emit source dealloc records only after successful owned numeral deletion."
       ],
       "deviations": [
-        "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
-        "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
-        "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE now precedes replacement construction. No Go generics are used.",
-        "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper-resolution premise and substitution outputs now use native slices, with actual node references retained before append. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
-        "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim.",
-        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
-        "Empty null/root POP is guarded at source physical undefined access. Debug empty POP assertion executes before From output copy. Invalid/uninitialized old root SET returns a typed guard with the incoming source INC retained and leaves backing unchanged.",
-        "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
-        "Container probing, tombstones, capacity arithmetic, simulated storage failures and backing-only epochs are replaced by native Go collections. Iterators borrow an insertion-order view invalidated by key changes/reset/close. Consumed cleanup keys are removed before returning callback errors. SMT2 display remains open; these consumers add no C++ generic container implementation credit. See PORT_PROGRESS.md#native-sparse-marks-and-shared-occurrence-collections.",
-        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
-        "Selected AST sorting-network prerequisites only; no SMT kernel or psort_nw driver assertion credit. AST DEBUG assertions retain existing typed adapter/global-binding qualifications; lexical-info nonwrapping epoch is Go borrow guard, not source fresh_id arithmetic.",
-        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
-        "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver.",
-        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
-        "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies.",
-        "AppArgumentView exposes borrowed application storage to the evaluator. Indexed reads validate the application handle and support factory callbacks under the manager lock without public-manager reentry; original application ownership must outlive the view.",
-        "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations.",
-        "Quantifier instantiation decoding now accepts *[]ASTHandle and appends borrowed expression handles directly; removed ASTProofBindings and its source-vector backing/header lifecycle. The source fact assignment, debug empty-output assertion, parameter extraction order, partial malformed-parameter outputs and nonowning reference counts remain. Hyper-resolution builder uses a native argument slice; omitted unused fmls/sorts storage while preserving premise fact validation before actual parameter construction. Removed astProofRawArguments. No source container growth/refusal behavior is credited; hyper-resolution inputs and owning outputs are also native slices.",
-        "Hyper-resolution builder accepts borrowed [][]ASTHandle substitutions. Reader appends owning handles into *[]ASTHandle premises and native [][]ASTHandle substitution rows; caller owns appended premise DECs, while ASTProofHyperOutput retires its substitutions in ascending outer/inner order. Position/row growth uses Go append directly with no vector headers/backing charge or growth-only unjoined INC. Output Close records consumed slots before errors, retains unconsumed ownership for retry, and blocks new use once cleanup starts. Source parameter/position conversion order, malformed-prefix publication, conclusion ASTRef assignment and actual owner-header checks remain. Native wide decoding verifies exact published reference counts under disabled arena reservations and independent outputs after source proof destruction. No source container allocation-failure geometry is credited.",
-        "Removed the unused ASTRefVector general bridge, push receipts, physical element/iterator borrows and argument-view adapters after retained callers migrated to native slices. Production Go had no consumer beyond these bridge adapters; source ref_vector functionality used by retained algorithms is represented by their concrete native owning slices and scalar ASTRef. Removed bridge-only tests and source growth/refusal claims. Live mark/shared-occurrence test fixtures acquire and release native handle slices explicitly; borrowed BV argument range tests use SliceArguments.Range. Actual dependency-buffer raw word codecs stay at their concrete buffer consumer. This adds no generic container implementation credit and does not assert completion of other reference specializations.",
-        "Removed unused Go ASTDependencyRef scalar/vector/buffer adapters and their physical borrows, growth/copy/lifecycle tests and cleanup codecs. Caller audit found these APIs exclusively within their bridge implementations/tests after retained consumers migrated to concrete native ownership. Source expr_dependency_ref uses are not classified as dead: actual Go dependency DAG and goal ownership callbacks remain. The separate ASTManager vectorAllocator had no remaining production payload consumer and is removed from construction/statistics/teardown; its old diagnostic bit position is reserved to avoid renumbering remaining constructor bits. The live substitution dependency pointer conversion remains as a concrete substitution helper. Live substitution tests retain actual allocator/ownership/refcount checks and drop only observations of the unrelated empty adapter allocator. No generic template/container or whole-unit completion credit is added.",
-        "The retained goal native-slice owner uses DependencyDecConsumed to observe whether a real root decrement occurred before a subsequent destruction error. DependencyDec delegates to the same existing decrement path; source counter/debug and destruction order remain. No generic container credit is added.",
-        "Removed unused Go ASTExprArray/ASTDependencyArray persistent-array bridges, encoded layouts, reroot scratch, embedded manager members and bridge-only tests after the last retained goal consumer migrated to native owning slices. The real dependency DAG owner remains eagerly bound and preserves its constructor bit position. Substitution cleanup invokes the actual dependency decrement consumption transport directly. Source generic parray and standalone stress tests are not claimed as ported; retained Boolean interning assertions and native goal snapshot/reference tests remain. Earlier array-specific ownership descriptions are superseded by this removal; no whole-unit or dead-source credit is added.",
-        "Hash algorithms now live in independent util/hash. Retained numerical, AST and polynomial consumers import that package directly; runtime-backed checked readers use its MixState operation while remaining at their actual storage owner. AST and symbol duplicate mixing/string-hash bodies are replaced by the shared implementation. Hash golden tests and source_hash.json moved with the package. Algorithms, signed tails, callback visit order and concrete storage ownership are unchanged; this is package separation, not new port completion credit."
+        "Concrete manager-bound Go types and methods replace C++ templates, overloads, raw pointers and generic reference containers only for retained live instantiations. Native slices/maps represent container storage without porting the C++ standard library.",
+        "Checked errors and explicit noncopyable owners replace invalid native reference, assertion and undefined-lifetime behavior. Native layout and ABI equivalence are outside the port.",
+        "Unused scoped_mark and generic persistent/reference-container adapters are excluded after retained-consumer audits; live dependency, mark, reference and argument owners use concrete implementations."
       ]
     },
     {
