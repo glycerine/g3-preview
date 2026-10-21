@@ -8,6 +8,127 @@ import (
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
+func patternDatabaseStoreQuantifier(t *testing.T, m *ast.ASTManager, annotated bool) (ast.ASTHandle, ast.ASTHandle, ast.ASTHandle) {
+	t.Helper()
+	arith, err := m.RegisterArithmeticPlugin()
+	patternMust(t, err)
+	integer, err := m.MkFamilySort(arith, 1, nil)
+	patternMust(t, err)
+	decl := func(name string, arity int) ast.ASTHandle {
+		t.Helper()
+		s, e := m.Symbols.Intern(name)
+		patternMust(t, e)
+		domain := make([]ast.ASTHandle, arity)
+		for i := range domain {
+			domain[i] = integer
+		}
+		d, e := m.MkFuncDecl(s, domain, integer, ast.ASTFuncDeclInfo{})
+		patternMust(t, e)
+		patternMust(t, m.IncRef(d))
+		t.Cleanup(func() { patternMust(t, m.DecRef(d)) })
+		return d
+	}
+	store, selectDecl := decl("actual-store", 3), decl("actual-select", 2)
+	variables := make([]ast.ASTHandle, 3)
+	for i := range variables {
+		variables[i], err = m.MkVar(uint32(2-i), integer)
+		patternMust(t, err)
+	}
+	stored, err := m.MkApp(store, variables)
+	patternMust(t, err)
+	selected, err := m.MkApp(selectDecl, []ast.ASTHandle{stored, variables[1]})
+	patternMust(t, err)
+	body, err := m.MkEq(selected, variables[2])
+	patternMust(t, err)
+	var patterns []ast.ASTHandle
+	var originalPattern ast.ASTHandle
+	if annotated {
+		originalPattern, err = m.MkPattern([]ast.ASTHandle{selected})
+		patternMust(t, err)
+		patterns = []ast.ASTHandle{originalPattern}
+	}
+	q, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{integer, integer, integer},
+		Names: []symbol.Symbol{symbol.Numerical(901), symbol.Numerical(902), symbol.Numerical(903)},
+		Body:  body, Weight: 8, Patterns: patterns,
+	})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(q))
+	t.Cleanup(func() { patternMust(t, m.DecRef(q)) })
+	return q, stored, originalPattern
+}
+
+func TestPatternInferenceDatabaseTraversal(t *testing.T) {
+	for _, proofs := range []bool{false, true} {
+		t.Run(map[bool]string{false: "plain", true: "proof"}[proofs], func(t *testing.T) {
+			m := patternManager(t)
+			if proofs {
+				patternMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+			}
+			q, stored, _ := patternDatabaseStoreQuantifier(t, m, false)
+			opts := DefaultInferenceOptions()
+			opts.UseDatabase = true
+			r, err := NewInferenceRewriterWithOptions(m, opts)
+			patternMust(t, err)
+			t.Cleanup(func() { patternMust(t, r.Close()) })
+			out, err := m.NewRef(ast.ASTHandle{})
+			patternMust(t, err)
+			t.Cleanup(func() { patternMust(t, m.DelRef(&out)) })
+			var proof ast.ASTRef
+			if proofs {
+				proof, err = m.NewRef(ast.ASTHandle{})
+				patternMust(t, err)
+				t.Cleanup(func() { patternMust(t, m.DelRef(&proof)) })
+				patternMust(t, r.RewriteWithProof(q, out, proof))
+			} else {
+				patternMust(t, r.Rewrite(q, out))
+			}
+			got, err := m.RefGet(out)
+			patternMust(t, err)
+			weight, err := m.GetQuantifierWeight(got)
+			patternMust(t, err)
+			p, err := m.GetPattern(got, 0)
+			patternMust(t, err)
+			term, err := m.GetArg(p, 0)
+			patternMust(t, err)
+			if weight != 0 || term != stored {
+				t.Fatal("database trigger and weight", term, stored, weight)
+			}
+			if proofs {
+				pr, e := m.RefGet(proof)
+				patternMust(t, e)
+				fact, e := m.GetProofFact(pr)
+				patternMust(t, e)
+				want, e := m.MkIff(q, got)
+				patternMust(t, e)
+				if fact != want {
+					t.Fatal("database rewrite proof", fact, want)
+				}
+			}
+		})
+	}
+	m := patternManager(t)
+	q, _, original := patternDatabaseStoreQuantifier(t, m, true)
+	opts := DefaultInferenceOptions()
+	opts.UseDatabase = true
+	r, err := NewInferenceRewriterWithOptions(m, opts)
+	patternMust(t, err)
+	t.Cleanup(func() { patternMust(t, r.Close()) })
+	out, err := m.NewRef(ast.ASTHandle{})
+	patternMust(t, err)
+	t.Cleanup(func() { patternMust(t, m.DelRef(&out)) })
+	patternMust(t, r.Rewrite(q, out))
+	got, err := m.RefGet(out)
+	patternMust(t, err)
+	p, err := m.GetPattern(got, 0)
+	patternMust(t, err)
+	weight, err := m.GetQuantifierWeight(got)
+	patternMust(t, err)
+	if p != original || weight != 0 {
+		t.Fatal("database weight-only update", p, original, weight)
+	}
+}
+
 func TestPatternInferenceActualRewriterTraversalAndOwnership(t *testing.T) {
 	m := patternManager(t)
 	b, err := m.MkBoolSort()

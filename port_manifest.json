@@ -20983,35 +20983,45 @@
       "path": "src/ast/pattern/database.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/ast/pattern/pattern_database.smt2", "pkg/ast/pattern/pattern_database_loader.go"],
+      "tests": ["TestExprPatternMatcherEmbeddedDatabase", "TestPatternInferenceDatabaseTraversal"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{
+        "name": "complete retained 65-declaration, 46-assertion pattern database",
+        "status": "ported",
+        "go_target": "pkg/ast/pattern/pattern_database.smt2",
+        "tests": ["TestExprPatternMatcherEmbeddedDatabase"]
+      }],
+      "ownership": ["The database is immutable embedded text; parsed declarations are temporarily owned until compiled quantifiers acquire their complete AST graphs."],
+      "deviations": ["The extracted SMT2 asset replaces the C++ concatenated string literal without changing its declarations or assertions."]
     },
     {
       "path": "src/ast/pattern/database.smt2",
       "component": "ast",
       "role": "reference_support",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/pattern/pattern_database.smt2"],
+      "tests": ["TestExprPatternMatcherEmbeddedDatabase"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{
+        "name": "retained SMT2 database text",
+        "status": "ported",
+        "go_target": "pkg/ast/pattern/pattern_database.smt2",
+        "tests": ["TestExprPatternMatcherEmbeddedDatabase"]
+      }],
+      "ownership": ["The embedded asset has static process lifetime."],
       "deviations": []
     },
     {
       "path": "src/ast/pattern/expr_pattern_match.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/pattern/expr_pattern_match.go", "pkg/ast/pattern/pattern_database_loader.go"],
+      "tests": ["TestExprPatternMatcherCompiledDeclarationAndBoundInstantiation", "TestExprPatternMatcherAssociativeCommutativeBacktracking", "TestExprPatternMatcherEmbeddedDatabase"],
       "assertions": [
         {
           "line": 88,
@@ -21038,19 +21048,29 @@
           "text": "VERIFY(parse_smt2_commands(ctx, is));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{
+        "name": "quantifier compilation, declaration variables, bound-variable bijection, ordinary/commutative/AC instruction matching and backtracking",
+        "status": "ported",
+        "go_target": "pkg/ast/pattern/expr_pattern_match.go",
+        "tests": ["TestExprPatternMatcherCompiledDeclarationAndBoundInstantiation", "TestExprPatternMatcherAssociativeCommutativeBacktracking"]
+      }, {
+        "name": "matched trigger instantiation and database initialization",
+        "status": "ported",
+        "go_target": "pkg/ast/pattern/pattern_database_loader.go",
+        "tests": ["TestExprPatternMatcherEmbeddedDatabase"]
+      }],
+      "ownership": ["The matcher owns one reference to every compiled template quantifier and returns independently owning trigger references. Registers, substitutions, bound mappings and instructions borrow identities while each call is active."],
+      "deviations": ["A purpose-built Go S-expression loader parses only the retained embedded database grammar instead of depending on the unretained general C++ command context and SMT2 parser."]
     },
     {
       "path": "src/ast/pattern/expr_pattern_match.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/pattern/expr_pattern_match.go"],
+      "tests": ["TestExprPatternMatcherCompiledDeclarationAndBoundInstantiation", "TestExprPatternMatcherAssociativeCommutativeBacktracking", "TestExprPatternMatcherEmbeddedDatabase"],
       "conditionals": [
         {
           "line": 20,
@@ -21067,17 +21087,22 @@
           "text": "SASSERT(arg);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{
+        "name": "complete concrete expr_pattern_match state, instruction set, compiler, matcher and instantiator",
+        "status": "ported",
+        "go_target": "pkg/ast/pattern/expr_pattern_match.go",
+        "tests": ["TestExprPatternMatcherCompiledDeclarationAndBoundInstantiation", "TestExprPatternMatcherAssociativeCommutativeBacktracking", "TestExprPatternMatcherEmbeddedDatabase"]
+      }],
+      "ownership": ["Checked noncopyable Go owner semantics replace the C++ manager-bound class; Close releases compiled quantifiers in reverse order."],
+      "deviations": ["Concrete typed slices and maps replace C++ vectors and object maps."]
     },
     {
       "path": "src/ast/pattern/pattern_inference.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/pattern/collect_memory_trace.go",
         "pkg/ast/pattern/multi_pattern_memory_trace.go",
@@ -21093,6 +21118,9 @@
         "pkg/ast/pattern/collect.go",
         "pkg/ast/pattern/infer.go",
         "pkg/ast/pattern/reduce_quantifier.go",
+        "pkg/ast/pattern/reduce_quantifier_database.go",
+        "pkg/ast/pattern/expr_pattern_match.go",
+        "pkg/ast/pattern/pattern_database_loader.go",
         "pkg/ast/pattern/pull_direct.go",
         "pkg/ast/pattern/pull_boolean.go",
         "pkg/ast/pattern/rewriter.go",
@@ -21122,6 +21150,7 @@
         "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames",
         "TestPatternInferencePullsBooleanApplicationThenFindsPattern",
         "TestPatternInferenceActualRewriterTraversalAndOwnership",
+        "TestPatternInferenceDatabaseTraversal",
         "TestPatternInferenceActualRewriterPendingPullAndResume",
         "TestPatternInferenceParamsBindRewriterAndRefresh",
         "TestPatternInferenceConstructorSnapshotsArithmeticBanAndLoopPolicy"
@@ -21206,8 +21235,8 @@
           "text": "SASSERT(q->get_num_patterns() == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Ground application is not forbidden in pattern collection (pattern_inference.cpp:485-489), preserving constant children when forming non-ground candidates",
@@ -21408,9 +21437,9 @@
         },
         {
           "name": "pattern_inference_cfg database-backed quantifier matching and database weight publication (cpp:590-613)",
-          "status": "partial",
-          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier_database.go",
+          "tests": ["TestPatternInferenceDatabaseTraversal"]
         },
         {
           "name": "pattern_inference_cfg proof-producing ordinary quantifier introduction (cpp:666-669)",
@@ -21441,16 +21470,18 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The configuration owns its reusable candidate state and compiled database matcher. Candidate and compiled-template references are released by the checked owner Close paths; inferred and database triggers use independently owning ASTRef values until publication or cleanup."
+      ],
       "deviations": [
-        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The larger-pattern filter searches a native visited-handle map and work slice. Unary and multi-pattern results use independently owning ASTRef values; the source stable weight sort uses Go's sort.SliceStable. Collection, preferred selection, proof/no-proof quantifier rewriting, nested pulling, and the complete parameter bridge are ported. Until the separate pull_quant proof owner is ported, the pulled intermediate uses a generic rewrite certificate with the same endpoints before the source quantifier-introduction transitivity step. Database-backed matching remains the explicit ErrASTPending path."
+        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The larger-pattern filter searches a native visited-handle map and work slice. Unary and multi-pattern results use independently owning ASTRef values; the source stable weight sort uses Go's sort.SliceStable. Collection, preferred selection, proof/no-proof quantifier rewriting, nested pulling, database matching, and the complete parameter bridge are ported. Until the separate pull_quant proof owner is ported, the pulled intermediate uses a generic rewrite certificate with the same endpoints before the source quantifier-introduction transitivity step."
       ]
     },
     {
       "path": "src/ast/pattern/pattern_inference.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/pattern/smaller_pattern.go",
         "pkg/ast/pattern/candidates.go",
@@ -21462,6 +21493,8 @@
         "pkg/ast/pattern/collect.go",
         "pkg/ast/pattern/infer.go",
         "pkg/ast/pattern/reduce_quantifier.go",
+        "pkg/ast/pattern/reduce_quantifier_database.go",
+        "pkg/ast/pattern/expr_pattern_match.go",
         "pkg/ast/pattern/rewriter.go"
       ],
       "tests": [
@@ -21479,6 +21512,7 @@
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
         "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
         "TestPatternInferenceActualRewriterTraversalAndOwnership",
+        "TestPatternInferenceDatabaseTraversal",
         "TestPatternInferenceActualRewriterPendingPullAndResume"
       ],
       "conditionals": [
@@ -21497,8 +21531,8 @@
           "text": "SASSERT(fid != m_bfid);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "smaller_pattern borrowed AST manager, concrete expression-pair cache, worklist and external-variable matching",
@@ -21593,9 +21627,11 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The matcher owns AST references for compiled database templates; candidate vectors and returned trigger references retain the source ownership boundaries through explicit checked Go owners."
+      ],
       "deviations": [
-        "The matcher borrows AST handles from its manager and owns only native Go pair-map and worklist storage. The candidate vector owns app handles while its metadata and visited maps borrow those identities; unary and multi-pattern ASTRef values own their results independently. The enclosing pattern inference class remains open."
+        "The candidate vector owns app handles while its metadata and visited maps borrow those identities; unary, multi-pattern and database ASTRef values own their results independently. Concrete typed Go slices and maps replace the C++ container members."
       ]
     },
     {

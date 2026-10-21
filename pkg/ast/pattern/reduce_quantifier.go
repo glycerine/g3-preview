@@ -1,5 +1,4 @@
-// Source: src/ast/pattern/pattern_inference.cpp:576-721, excluding the
-// database, nested pull_quant rewriting and proof branches.
+// Source: src/ast/pattern/pattern_inference.cpp:576-721.
 package pattern
 
 import (
@@ -116,9 +115,9 @@ func (c *patternCandidates) releasePendingPatternRefs() error {
 	return nil
 }
 
-// reduceQuantifierNoDatabase applies the source inference/retry sequence for a
-// universal quantifier without the separately unported database. The result
-// reference is independently owned.
+// reduceQuantifierNoDatabase retains its historical Go name while applying the
+// complete source inference/retry sequence, including the optional database.
+// The result reference is independently owned.
 func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle, newNoPatterns []ast.ASTHandle, opts quantifierInferenceOptions) (out ast.ASTRef, changed bool, err error) {
 	return c.reduceQuantifierNoDatabaseCore(q, newBody, newNoPatterns, opts, ast.ASTRef{})
 }
@@ -144,9 +143,6 @@ func (c *patternCandidates) reduceQuantifierNoDatabaseCore(q, newBody ast.ASTHan
 	if err != nil || !forall {
 		return out, false, err
 	}
-	if opts.useDatabase {
-		return out, false, ast.ErrASTPending
-	}
 	proofs, err := c.manager.ProofsEnabled()
 	if err != nil {
 		return out, false, err
@@ -156,6 +152,12 @@ func (c *patternCandidates) reduceQuantifierNoDatabaseCore(q, newBody ast.ASTHan
 	}
 	if !proofs && proofOut != (ast.ASTRef{}) {
 		return out, false, ast.ErrASTDomain
+	}
+	if opts.useDatabase {
+		out, matched, err := c.reduceQuantifierDatabase(q, proofOut, proofs)
+		if err != nil || matched {
+			return out, matched, err
+		}
 	}
 	oldPatterns, err := c.manager.GetNumPatterns(q)
 	if err != nil || oldPatterns != 0 {

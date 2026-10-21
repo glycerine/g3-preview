@@ -261,8 +261,8 @@ func TestPatternInferenceQuantifierNoPatternReturnAndGuards(t *testing.T) {
 	}
 	opts.pullQuantifiers = false
 	opts.useDatabase = true
-	if _, _, e := c.reduceQuantifierNoDatabase(q, body, nil, opts); !errors.Is(e, ast.ErrASTPending) {
-		t.Fatal("unported database path must be explicit", e)
+	if ref, changed, e := c.reduceQuantifierNoDatabase(q, body, nil, opts); e != nil || changed || ref != (ast.ASTRef{}) {
+		t.Fatal("database miss must continue ordinary inference", ref, changed, e)
 	}
 	opts.useDatabase = false
 	qExists := makeQ(false, nil)

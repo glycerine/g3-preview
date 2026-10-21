@@ -17,6 +17,7 @@ type candidateInfo struct {
 type patternCandidates struct {
 	manager            *ast.ASTManager
 	matcher            *smallerPattern
+	database           *exprPatternMatcher
 	candidates         []ast.ASTHandle
 	info               map[ast.ASTHandle]candidateInfo
 	preferred          map[ast.ASTHandle]struct{}
@@ -39,8 +40,12 @@ func newPatternCandidates(m *ast.ASTManager, numBindings uint32, noPatterns []as
 	if err != nil {
 		return nil, err
 	}
+	database, err := newExprPatternMatcher(m)
+	if err != nil {
+		return nil, err
+	}
 	return &patternCandidates{
-		manager: m, matcher: matcher, info: make(map[ast.ASTHandle]candidateInfo), preferred: make(map[ast.ASTHandle]struct{}), visited: make(map[ast.ASTHandle]struct{}),
+		manager: m, matcher: matcher, database: database, info: make(map[ast.ASTHandle]candidateInfo), preferred: make(map[ast.ASTHandle]struct{}), visited: make(map[ast.ASTHandle]struct{}),
 		noPatterns: noPatterns, numBindings: numBindings, blockLoops: blockLoops,
 		avoidSkolems: true, nestedArithOnly: true, forbiddenFamilies: make(map[ast.FamilyID]struct{}),
 	}, nil
@@ -181,6 +186,12 @@ func (c *patternCandidates) close() error {
 	}
 	if err := c.resetCandidates(); err != nil {
 		return err
+	}
+	if c.database != nil {
+		if err := c.database.Close(); err != nil {
+			return err
+		}
+		c.database = nil
 	}
 	clear(c.preferred)
 	c.closed = true
