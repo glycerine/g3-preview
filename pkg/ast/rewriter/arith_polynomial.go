@@ -64,6 +64,32 @@ func (r *ArithRewriter) makeMul(args []ast.ASTHandle, term ast.ASTHandle) (ast.A
 	}
 }
 
+// powerBody is the arithmetic specialization of get_power_body. Only an
+// integer exponent greater than one participates in adjacent-factor folding.
+func (r *ArithRewriter) powerBody(h ast.ASTHandle) (ast.ASTHandle, *big.Rat, error) {
+	kind, err := r.manager.GetKind(h)
+	if err != nil {
+		return ast.ASTHandle{}, nil, err
+	}
+	if kind != ast.ASTApp {
+		return h, big.NewRat(1, 1), nil
+	}
+	_, args, power, err := r.operation(h, arithOpPower)
+	if err != nil {
+		return ast.ASTHandle{}, nil, err
+	}
+	if power && len(args) == 2 {
+		exponent, _, numeral, e := r.numeral(args[1])
+		if e != nil {
+			return ast.ASTHandle{}, nil, e
+		}
+		if numeral && exponent.IsInt() && exponent.Cmp(big.NewRat(1, 1)) > 0 {
+			return args[0], exponent, nil
+		}
+	}
+	return h, big.NewRat(1, 1), nil
+}
+
 func (r *ArithRewriter) sameArguments(args ast.AppArguments, values []ast.ASTHandle) (bool, error) {
 	if uint32(len(values)) != args.Count() {
 		return false, nil
@@ -778,25 +804,41 @@ func (r *ArithRewriter) rewriteMul(args ast.AppArguments, out ast.ASTRef) (Rewri
 		}
 		combined = append(combined, n)
 	}
-	for i := 0; i < len(factors); {
-		j := i + 1
-		for j < len(factors) && factors[j] == factors[i] {
-			j++
-		}
-		if j-i == 1 || !r.mulToPower || r.expandPower {
-			combined = append(combined, factors[i:j]...)
-		} else {
-			exponent, e := r.numeralForTerm(new(big.Rat).SetInt64(int64(j-i)), first)
+	if r.mulToPower && !r.expandPower {
+		for i := 0; i < len(factors); {
+			body, exponent, e := r.powerBody(factors[i])
 			if e != nil {
 				return RewriteFailed, e
 			}
-			power, e := r.app(arithOpPower, factors[i], exponent)
-			if e != nil {
-				return RewriteFailed, e
+			j := i + 1
+			for j < len(factors) {
+				nextBody, nextExponent, e := r.powerBody(factors[j])
+				if e != nil {
+					return RewriteFailed, e
+				}
+				if nextBody != body {
+					break
+				}
+				exponent.Add(exponent, nextExponent)
+				j++
 			}
-			combined = append(combined, power)
+			if exponent.Cmp(big.NewRat(1, 1)) == 0 {
+				combined = append(combined, body)
+			} else {
+				exponentNode, e := r.numeralForTerm(exponent, first)
+				if e != nil {
+					return RewriteFailed, e
+				}
+				power, e := r.app(arithOpPower, body, exponentNode)
+				if e != nil {
+					return RewriteFailed, e
+				}
+				combined = append(combined, power)
+			}
+			i = j
 		}
-		i = j
+	} else {
+		combined = append(combined, factors...)
 	}
 	result, err := r.makeMul(combined, first)
 	if err != nil {

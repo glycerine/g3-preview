@@ -150,6 +150,13 @@ func (r *ArithRewriter) Close() error {
 }
 
 func (r *ArithRewriter) numeral(h ast.ASTHandle) (*big.Rat, bool, bool, error) {
+	kind, err := r.manager.GetKind(h)
+	if err != nil {
+		return nil, false, false, err
+	}
+	if kind != ast.ASTApp {
+		return nil, false, false, nil
+	}
 	text, integer, matched, err := r.manager.ArithmeticNumeralText(h)
 	if err != nil || !matched {
 		return nil, integer, matched, err
@@ -182,6 +189,13 @@ func (r *ArithRewriter) app(kind int32, args ...ast.ASTHandle) (ast.ASTHandle, e
 }
 
 func (r *ArithRewriter) operation(h ast.ASTHandle, kinds ...int32) (int32, []ast.ASTHandle, bool, error) {
+	nodeKind, err := r.manager.GetKind(h)
+	if err != nil {
+		return 0, nil, false, err
+	}
+	if nodeKind != ast.ASTApp {
+		return 0, nil, false, nil
+	}
 	family, err := r.manager.GetFamilyID(h)
 	if err != nil || family != r.family {
 		return 0, nil, false, err

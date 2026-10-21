@@ -10,12 +10,16 @@ import (
 )
 
 func (r *ArithRewriter) algebraicNumeralSyntax(h ast.ASTHandle) (bool, error) {
+	kind, err := r.manager.GetKind(h)
+	if err != nil || kind != ast.ASTApp {
+		return false, err
+	}
 	family, err := r.manager.GetFamilyID(h)
 	if err != nil || family != r.family {
 		return false, err
 	}
-	kind, err := r.manager.GetDeclKind(h)
-	return err == nil && kind == 1, err
+	declKind, err := r.manager.GetDeclKind(h)
+	return err == nil && declKind == 1, err
 }
 
 func (r *ArithRewriter) algebraicOperand(h ast.ASTHandle, manager *polynomial.AlgebraicManager) (value polynomial.Algebraic, irrational, matched bool, err error) {
