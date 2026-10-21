@@ -4,7 +4,18 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
+
+type sequenceAutomatonTestSolver struct {
+	answer lbool.LBool
+	calls  int
+}
+
+func (s *sequenceAutomatonTestSolver) CheckSatisfiable(ast.ASTHandle) (lbool.LBool, error) {
+	s.calls++
+	return s.answer, nil
+}
 
 func TestSequenceRewriterAutomatonMembership(t *testing.T) {
 	m := astTestManager(t)
@@ -89,5 +100,91 @@ func TestSequenceRewriterAutomatonMembership(t *testing.T) {
 	astTestMust(t, err)
 	if kind, e := m.GetDeclKind(result); e != nil || status != RewriteFull || kind != ast.ASTOpAnd {
 		t.Fatalf("symbolic range: status=%d kind=%d error=%v", status, kind, e)
+	}
+}
+
+func TestSequenceRewriterAutomatonIntersectionSolver(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	solver := &sequenceAutomatonTestSolver{answer: lbool.True}
+	astTestMust(t, rw.SetSolver(solver))
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	pin := func(h ast.ASTHandle, err error) ast.ASTHandle {
+		t.Helper()
+		astTestMust(t, err)
+		astTestPin(t, m, h)
+		return h
+	}
+	str := func(text string) ast.ASTHandle { return pin(m.MkString(text)) }
+	leftRange := pin(m.MkRegexRange(str("a"), str("m")))
+	rightRange := pin(m.MkRegexRange(str("h"), str("z")))
+	intersection := pin(m.MkRegexIntersect(leftRange, rightRange))
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	falsehood, err := m.MkFalse()
+	astTestMust(t, err)
+	for _, tc := range []struct {
+		input string
+		want  ast.ASTHandle
+	}{{"i", truth}, {"a", falsehood}, {"z", falsehood}} {
+		status, e := rw.RewriteStringInRegex(str(tc.input), intersection, out)
+		astTestMust(t, e)
+		result, e := m.RefGet(out)
+		astTestMust(t, e)
+		if status != RewriteFull || result != tc.want {
+			t.Fatalf("range intersection %q: status=%d result=%v want=%v", tc.input, status, result, tc.want)
+		}
+	}
+	if solver.calls != 0 {
+		t.Fatalf("concrete range intersection used solver %d times", solver.calls)
+	}
+	toA := pin(m.MkSequenceToRegex(str("a")))
+	complement := pin(m.MkRegexComplement(toA))
+	for _, tc := range []struct {
+		input string
+		want  ast.ASTHandle
+	}{{"a", falsehood}, {"", truth}, {"b", truth}, {"aa", truth}} {
+		status, e := rw.RewriteStringInRegex(str(tc.input), complement, out)
+		astTestMust(t, e)
+		result, e := m.RefGet(out)
+		astTestMust(t, e)
+		if status != RewriteFull || result != tc.want {
+			t.Fatalf("complement %q: status=%d result=%v want=%v", tc.input, status, result, tc.want)
+		}
+	}
+	if solver.calls != 0 {
+		t.Fatalf("concrete complement used solver %d times", solver.calls)
+	}
+
+	byteZero := pin(m.BitVectorNumeralUnsigned(0, 8))
+	byteSort, err := m.GetSort(byteZero)
+	astTestMust(t, err)
+	x := pin(m.MkConst(astTestSymbol(t, m, "intersection-x"), byteSort))
+	y := pin(m.MkConst(astTestSymbol(t, m, "intersection-y"), byteSort))
+	unitX := pin(m.MkSequenceUnit(x))
+	unitY := pin(m.MkSequenceUnit(y))
+	reX := pin(m.MkSequenceToRegex(unitX))
+	reY := pin(m.MkSequenceToRegex(unitY))
+	symbolicIntersection := pin(m.MkRegexIntersect(reX, reY))
+	status, err := rw.RewriteStringInRegex(unitX, symbolicIntersection, out)
+	astTestMust(t, err)
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteFull || solver.calls == 0 {
+		t.Fatalf("symbolic intersection: status=%d solver calls=%d result=%v", status, solver.calls, result)
+	}
+
+	solver.answer = lbool.Undef
+	status, err = rw.RewriteStringInRegex(unitX, symbolicIntersection, out)
+	astTestMust(t, err)
+	if status != RewriteFailed {
+		t.Fatalf("undefined symbolic intersection status: %d", status)
 	}
 }

@@ -16,6 +16,7 @@ import (
 type SequenceRewriter struct {
 	manager *ast.ASTManager
 	family  ast.FamilyID
+	solver  SequenceExpressionSolver
 }
 
 func NewSequenceRewriter(m *ast.ASTManager) (*SequenceRewriter, error) {
