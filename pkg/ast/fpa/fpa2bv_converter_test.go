@@ -495,6 +495,56 @@ func TestConverterSquareRootSpecialCasesAndSymbolicShape(t *testing.T) {
 	}
 }
 
+func TestConverterFMASpecialCasesAndSymbolicShape(t *testing.T) {
+	m, c := fixture(t)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	rne, err := c.MkRoundingMode(ast.FPAOpRMNearestEven)
+	must(t, err)
+	rtn, err := c.MkRoundingMode(ast.FPAOpRMTowardNegative)
+	must(t, err)
+	values := make(map[fpa.SpecialValue]ast.ASTHandle)
+	for _, kind := range []fpa.SpecialValue{fpa.NaN, fpa.PositiveInfinity, fpa.NegativeInfinity, fpa.PositiveZero, fpa.NegativeZero} {
+		values[kind], err = c.MkSpecial(sort, kind)
+		must(t, err)
+	}
+	for _, tc := range []struct {
+		mode    ast.ASTHandle
+		x, y, z fpa.SpecialValue
+		want    fpa.SpecialValue
+	}{
+		{rne, fpa.NaN, fpa.PositiveInfinity, fpa.PositiveZero, fpa.NaN},
+		{rne, fpa.PositiveInfinity, fpa.PositiveZero, fpa.PositiveZero, fpa.NaN},
+		{rne, fpa.PositiveInfinity, fpa.PositiveInfinity, fpa.NegativeInfinity, fpa.NaN},
+		{rne, fpa.PositiveInfinity, fpa.NegativeInfinity, fpa.NegativeInfinity, fpa.NegativeInfinity},
+		{rne, fpa.PositiveZero, fpa.PositiveZero, fpa.NegativeZero, fpa.PositiveZero},
+		{rtn, fpa.PositiveZero, fpa.PositiveZero, fpa.NegativeZero, fpa.NegativeZero},
+		{rne, fpa.PositiveZero, fpa.PositiveZero, fpa.PositiveInfinity, fpa.PositiveInfinity},
+	} {
+		got, e := c.FMA(tc.mode, values[tc.x], values[tc.y], values[tc.z])
+		must(t, e)
+		if got != values[tc.want] {
+			t.Fatal("FMA special", tc, got, values[tc.want])
+		}
+	}
+	x, err := c.MkConst(declaration(t, m, "fma-x", nil, sort))
+	must(t, err)
+	y, err := c.MkConst(declaration(t, m, "fma-y", nil, sort))
+	must(t, err)
+	z, err := c.MkConst(declaration(t, m, "fma-z", nil, sort))
+	must(t, err)
+	result, err := c.FMA(rne, x, y, z)
+	must(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("symbolic FMA encoding", kind, e)
+	}
+	resultSort, err := m.GetSort(result)
+	must(t, err)
+	if resultSort != sort {
+		t.Fatal("symbolic FMA sort", resultSort, sort)
+	}
+}
+
 func fixture(t *testing.T) (*ast.ASTManager, *fpa.Converter) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)

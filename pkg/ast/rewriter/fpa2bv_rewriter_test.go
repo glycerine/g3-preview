@@ -176,6 +176,14 @@ func TestFPA2BVRewriterArithmeticDispatch(t *testing.T) {
 	if !f.m.IsTrue(isNaN) {
 		t.Fatal("negative-infinity square root did not lower to NaN", got, isNaN)
 	}
+	fused, err := f.m.MkFamilyApp(f.family, ast.FPAOpFMA, nil, []ast.ASTHandle{rounding, positive, positive, negative})
+	astTestMust(t, err)
+	got = f.rewrite(t, fused)
+	isNaN, err = f.converter.Classify(got, ast.FPAIsNaN)
+	astTestMust(t, err)
+	if !f.m.IsTrue(isNaN) {
+		t.Fatal("opposed infinite FMA did not lower to NaN", got, isNaN)
+	}
 
 	left := astTestSymbol(t, f.m, "add-x")
 	right := astTestSymbol(t, f.m, "add-y")

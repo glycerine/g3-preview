@@ -17308,6 +17308,7 @@
         "pkg/ast/fpa/fpa2bv_rem.go",
         "pkg/ast/fpa/fpa2bv_integral.go",
         "pkg/ast/fpa/fpa2bv_sqrt.go",
+        "pkg/ast/fpa/fpa2bv_fma.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
@@ -17329,6 +17330,7 @@
         "TestConverterRemainderSpecialCasesAndSymbolicShape",
         "TestConverterRoundToIntegralSpecialCasesAndSymbolicShape",
         "TestConverterSquareRootSpecialCasesAndSymbolicShape",
+        "TestConverterFMASpecialCasesAndSymbolicShape",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18697,6 +18699,7 @@
         "pkg/ast/fpa/fpa2bv_rem.go",
         "pkg/ast/fpa/fpa2bv_integral.go",
         "pkg/ast/fpa/fpa2bv_sqrt.go",
+        "pkg/ast/fpa/fpa2bv_fma.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
@@ -18718,6 +18721,7 @@
         "TestConverterRemainderSpecialCasesAndSymbolicShape",
         "TestConverterRoundToIntegralSpecialCasesAndSymbolicShape",
         "TestConverterSquareRootSpecialCasesAndSymbolicShape",
+        "TestConverterFMASpecialCasesAndSymbolicShape",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18812,7 +18816,7 @@
           ]
         },
         {
-          "name": "floating-point addition, subtraction, multiplication, division, remainder, square root, and round-to-integral dispatch through component-wise FP selection and the shared normalization rounder",
+          "name": "floating-point addition, subtraction, multiplication, division, remainder, fused multiply-add, square root, and round-to-integral dispatch through component-wise FP selection and the shared normalization rounder",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
           "tests": [
@@ -18822,6 +18826,7 @@
             "TestConverterRemainderSpecialCasesAndSymbolicShape",
             "TestConverterRoundToIntegralSpecialCasesAndSymbolicShape",
             "TestConverterSquareRootSpecialCasesAndSymbolicShape",
+            "TestConverterFMASpecialCasesAndSymbolicShape",
             "TestFPA2BVRewriterArithmeticDispatch"
           ]
         }
@@ -18861,7 +18866,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "fpa2bv configuration and traversal wrapper with addition, subtraction, multiplication, division, remainder, square root, round-to-integral, and partial converter dispatch; remaining fused arithmetic and format-conversion dispatch remains open",
+          "name": "fpa2bv configuration and traversal wrapper with addition, subtraction, multiplication, division, remainder, fused multiply-add, square root, round-to-integral, and partial converter dispatch; remaining format-conversion dispatch remains open",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
           "tests": [
