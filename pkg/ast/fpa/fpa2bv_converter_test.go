@@ -450,6 +450,51 @@ func TestConverterRoundToIntegralSpecialCasesAndSymbolicShape(t *testing.T) {
 	}
 }
 
+func TestConverterSquareRootSpecialCasesAndSymbolicShape(t *testing.T) {
+	m, c := fixture(t)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	mode, err := c.MkRoundingMode(ast.FPAOpRMNearestEven)
+	must(t, err)
+	nan, err := c.MkSpecial(sort, fpa.NaN)
+	must(t, err)
+	positiveInfinity, err := c.MkSpecial(sort, fpa.PositiveInfinity)
+	must(t, err)
+	negativeInfinity, err := c.MkSpecial(sort, fpa.NegativeInfinity)
+	must(t, err)
+	positiveZero, err := c.MkSpecial(sort, fpa.PositiveZero)
+	must(t, err)
+	negativeZero, err := c.MkSpecial(sort, fpa.NegativeZero)
+	must(t, err)
+	for _, tc := range []struct {
+		value, want ast.ASTHandle
+	}{
+		{nan, nan},
+		{positiveInfinity, positiveInfinity},
+		{negativeInfinity, nan},
+		{positiveZero, positiveZero},
+		{negativeZero, negativeZero},
+	} {
+		got, e := c.Sqrt(mode, tc.value)
+		must(t, e)
+		if got != tc.want {
+			t.Fatal("square-root special", got, tc.want)
+		}
+	}
+	value, err := c.MkConst(declaration(t, m, "sqrt-value", nil, sort))
+	must(t, err)
+	result, err := c.Sqrt(mode, value)
+	must(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("symbolic square-root encoding", kind, e)
+	}
+	resultSort, err := m.GetSort(result)
+	must(t, err)
+	if resultSort != sort {
+		t.Fatal("symbolic square-root sort", resultSort, sort)
+	}
+}
+
 func fixture(t *testing.T) (*ast.ASTManager, *fpa.Converter) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)

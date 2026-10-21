@@ -168,6 +168,14 @@ func TestFPA2BVRewriterArithmeticDispatch(t *testing.T) {
 	if got = f.rewrite(t, integral); got != wantNegativeZero {
 		t.Fatal("round-to-integral did not preserve negative zero", got, wantNegativeZero)
 	}
+	squareRoot, err := f.m.MkFamilyApp(f.family, ast.FPAOpSqrt, nil, []ast.ASTHandle{rounding, negative})
+	astTestMust(t, err)
+	got = f.rewrite(t, squareRoot)
+	isNaN, err := f.converter.Classify(got, ast.FPAIsNaN)
+	astTestMust(t, err)
+	if !f.m.IsTrue(isNaN) {
+		t.Fatal("negative-infinity square root did not lower to NaN", got, isNaN)
+	}
 
 	left := astTestSymbol(t, f.m, "add-x")
 	right := astTestSymbol(t, f.m, "add-y")
