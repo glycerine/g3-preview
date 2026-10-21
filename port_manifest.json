@@ -31613,9 +31613,20 @@
       "path": "src/ast/rewriter/pb2bv_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/pb2bv_rewriter.go",
+        "pkg/ast/util_psort_ast_context.go"
+      ],
+      "tests": [
+        "TestPB2BVCardinalityTraversalAndOrShortcut",
+        "TestPB2BVWeightedConversionAndScopeGuards",
+        "TestPB2BVArithmeticBooleanITERecognition",
+        "TestPB2BVCleanupReconstructsImplementation",
+        "TestPB2BVCloseGuards",
+        "TestPsortASTContextRetainedConsumerTransfers",
+        "TestPsortASTNetworkFiniteCardinalityClauseSemantics"
+      ],
       "assertions": [
         {
           "line": 110,
@@ -31650,19 +31661,77 @@
           "text": "SASSERT(num_scopes <= m_fresh_lim.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "card2bv_rewriter overflow-aware mk_le_ge pair/tree circuit, weighted mk_bv dualization and simplified Boolean ITE construction (src/ast/rewriter/pb2bv_rewriter.cpp:54-225)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/pb2bv_rewriter.go",
+          "tests": [
+            "TestPB2BVWeightedConversionAndScopeGuards"
+          ]
+        },
+        {
+          "name": "card2bv_rewriter application dispatch and arithmetic pseudo-Boolean recognition (src/ast/rewriter/pb2bv_rewriter.cpp:244-350)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/pb2bv_rewriter.go",
+          "tests": [
+            "TestPB2BVCardinalityTraversalAndOrShortcut",
+            "TestPB2BVArithmeticBooleanITERecognition"
+          ]
+        },
+        {
+          "name": "cardinality sorting-network selection and literal adapter operations (src/ast/rewriter/pb2bv_rewriter.cpp:352-398)",
+          "status": "ported",
+          "go_target": "pkg/ast/util_psort_ast_context.go",
+          "tests": [
+            "TestPsortASTContextRetainedConsumerTransfers",
+            "TestPsortASTNetworkFiniteCardinalityClauseSemantics"
+          ]
+        },
+        {
+          "name": "no-proof traversal configuration and imp construction, rewrite, scopes, side constraints and statistics (src/ast/rewriter/pb2bv_rewriter.cpp:401-458)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/pb2bv_rewriter.go",
+          "tests": [
+            "TestPB2BVCardinalityTraversalAndOrShortcut",
+            "TestPB2BVWeightedConversionAndScopeGuards",
+            "TestPB2BVCleanupReconstructsImplementation"
+          ]
+        },
+        {
+          "name": "pb2bv_rewriter public forwarding surface, cleanup reconstruction and destruction (src/ast/rewriter/pb2bv_rewriter.cpp:463-477)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/pb2bv_rewriter.go",
+          "tests": [
+            "TestPB2BVCleanupReconstructsImplementation",
+            "TestPB2BVCloseGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "PB2BVRewriter owns its traversal, concrete sorting network context/runtime, fresh declaration references, scope limits and pending side-constraint references. Sorting-network fresh applications remain owned by the context trail while the fresh declaration vector independently increments each declaration. FlushSideConstraints transfers clause references to the caller without decrementing them; Pop decrements declarations beyond the restored scope only after clauses have been flushed. Cleanup destroys and reconstructs the complete implementation graph while preserving the borrowed AST manager and outer owner."
+      ],
+      "deviations": [
+        "The source's process-global sorting allocation state is represented by an owned util/memory Runtime bound to the AST budget. The no-proof Go Traversal makes the always-null proof output implicit. The source parameter update is empty and its saved initial params_ref affects only reconstruction, so Go omits that behavior-free snapshot. Source assertions for positive integral bounds, nonnegative coefficients, flushed lemmas and scope depth are checked errors. Arbitrary C++ rationals are represented by math/big.Rat and concrete numeral-service values."
+      ]
     },
     {
       "path": "src/ast/rewriter/pb2bv_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/pb2bv_rewriter.go"
+      ],
+      "tests": [
+        "TestPB2BVCardinalityTraversalAndOrShortcut",
+        "TestPB2BVWeightedConversionAndScopeGuards",
+        "TestPB2BVArithmeticBooleanITERecognition",
+        "TestPB2BVCleanupReconstructsImplementation",
+        "TestPB2BVCloseGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -31673,11 +31742,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "pb2bv_rewriter constructor, destructor, parameter, manager, step, cleanup, fresh-constant, rewrite, scope, side-constraint, count and statistics surface (src/ast/rewriter/pb2bv_rewriter.h:26-43)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/pb2bv_rewriter.go",
+          "tests": [
+            "TestPB2BVCardinalityTraversalAndOrShortcut",
+            "TestPB2BVWeightedConversionAndScopeGuards",
+            "TestPB2BVArithmeticBooleanITERecognition",
+            "TestPB2BVCleanupReconstructsImplementation",
+            "TestPB2BVCloseGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The exported Go owner preserves the header's single owning implementation object, borrowed manager, scoped fresh declarations and transferred side-constraint contract with checked handles and explicit Close."
+      ],
+      "deviations": [
+        "Go exposes Rewrite without a proof output because this source specialization disables proofs, returns statistics as concrete structs, and returns transferred side constraints as an owning handle slice."
+      ]
     },
     {
       "path": "src/ast/rewriter/pb_rewriter.cpp",
