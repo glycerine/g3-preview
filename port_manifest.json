@@ -33278,11 +33278,12 @@
       "path": "src/ast/rewriter/rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/rewriter_core.go",
         "pkg/ast/rewriter/var_shifter.go",
         "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/rewriter_engine_proof.go",
         "pkg/ast/rewriter/rewriter_configuration.go",
         "pkg/ast/rewriter/rewriter_roots.go",
         "pkg/ast/rewriter/rewriter_roots_test.go"
@@ -33305,6 +33306,7 @@
         "TestRewriterEngineOriginalMacroExpansionUnderBinder",
         "TestBetaReducerOriginalPatternAndNoPatternReplacement",
         "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
+        "TestTraversalProofCongruenceRewriteAndReflexivity",
         "TestRewriterNativeResultAndProofRootsGrowth",
         "TestRewriterNativeRootOnlyReferenceAliasReplacement",
         "TestRewriterNativeFrameAndScopeGrowth",
@@ -33426,12 +33428,12 @@
           "text": "SASSERT(vidx >= m_num_qvars + m_shift);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "Selected Boolean and quantified non-proof rewriter_core::cache_result TRACE at cpp52 before sort assertion and cache insertion; failed ostream continues with sticky state; wider expression profiles remain open",
-          "status": "partial",
+          "name": "rewriter_core::cache_result TRACE at cpp52 before sort assertion and cache insertion across retained SMT2 expression profiles; failed output continues with sticky state",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/rewriter_core_cache_trace.go",
           "tests": [
             "TestRewriterCacheResultSourceTraceBeforeInsert",
@@ -33468,10 +33470,10 @@
         }
       ],
       "ownership": [
-        "Concrete iterative frames/scopes and borrowed scalar binding/shift arrays use native slices and retain algorithm state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
+        "Concrete iterative frames/scopes and borrowed scalar binding/shift arrays use native slices and retain algorithm state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r through interruption and cleanup."
       ],
       "deviations": [
-        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited.",
+        "Original base rewriting infrastructure, forward/inverse shifting, no-proof and proof-generating traversal/configuration, and cache tracing are translated. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. Model evaluation and external public APIs remain separate source-unit obligations.",
         "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added.",
         "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit."
       ]
