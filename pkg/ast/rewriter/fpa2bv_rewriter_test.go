@@ -154,6 +154,11 @@ func TestFPA2BVRewriterArithmeticDispatch(t *testing.T) {
 	if got = f.rewrite(t, division); got != want {
 		t.Fatal("zero divided by zero did not lower to NaN", got, want)
 	}
+	remainder, err := f.m.MkFamilyApp(f.family, ast.FPAOpRem, nil, []ast.ASTHandle{positive, negative})
+	astTestMust(t, err)
+	if got = f.rewrite(t, remainder); got != want {
+		t.Fatal("infinity remainder did not lower to NaN", got, want)
+	}
 
 	left := astTestSymbol(t, f.m, "add-x")
 	right := astTestSymbol(t, f.m, "add-y")
@@ -164,7 +169,7 @@ func TestFPA2BVRewriterArithmeticDispatch(t *testing.T) {
 	addition, err = f.m.MkFamilyApp(f.family, ast.FPAOpAdd, nil, []ast.ASTHandle{rounding, leftValue, rightValue})
 	astTestMust(t, err)
 	got = f.rewrite(t, addition)
-	if family, e := f.m.GetFamilyID(got); e != nil || family == f.family {
-		t.Fatal("symbolic addition retained FPA arithmetic root", family, e)
+	if kind, e := f.m.GetDeclKind(got); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("symbolic addition did not lower to FP components", kind, e)
 	}
 }

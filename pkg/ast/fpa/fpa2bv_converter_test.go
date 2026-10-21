@@ -279,6 +279,9 @@ func TestConverterAddSubtractSpecialCasesAndSymbolicShape(t *testing.T) {
 	must(t, err)
 	result, err := c.Add(rne, left, right)
 	must(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("symbolic addition encoding", kind, e)
+	}
 	resultSort, err := m.GetSort(result)
 	must(t, err)
 	if resultSort != sort {
@@ -320,6 +323,9 @@ func TestConverterMultiplySpecialCasesAndSymbolicShape(t *testing.T) {
 	must(t, err)
 	result, err := c.Mul(mode, left, right)
 	must(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("symbolic multiplication encoding", kind, e)
+	}
 	resultSort, err := m.GetSort(result)
 	must(t, err)
 	if resultSort != sort {
@@ -361,10 +367,57 @@ func TestConverterDivideSpecialCasesAndSymbolicShape(t *testing.T) {
 	must(t, err)
 	result, err := c.Div(mode, left, right)
 	must(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("symbolic division encoding", kind, e)
+	}
 	resultSort, err := m.GetSort(result)
 	must(t, err)
 	if resultSort != sort {
 		t.Fatal("symbolic division sort", resultSort, sort)
+	}
+}
+
+func TestConverterRemainderSpecialCasesAndSymbolicShape(t *testing.T) {
+	m, c := fixture(t)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	values := make(map[fpa.SpecialValue]ast.ASTHandle)
+	for _, kind := range []fpa.SpecialValue{fpa.NaN, fpa.PositiveInfinity, fpa.NegativeInfinity, fpa.PositiveZero, fpa.NegativeZero} {
+		values[kind], err = c.MkSpecial(sort, kind)
+		must(t, err)
+	}
+	for _, tc := range []struct {
+		left, right fpa.SpecialValue
+		want        fpa.SpecialValue
+	}{
+		{fpa.PositiveInfinity, fpa.PositiveInfinity, fpa.NaN},
+		{fpa.PositiveZero, fpa.PositiveInfinity, fpa.PositiveZero},
+		{fpa.NegativeZero, fpa.PositiveInfinity, fpa.NegativeZero},
+		{fpa.PositiveInfinity, fpa.PositiveZero, fpa.NaN},
+		{fpa.PositiveZero, fpa.PositiveZero, fpa.NaN},
+		{fpa.NaN, fpa.PositiveInfinity, fpa.NaN},
+	} {
+		got, e := c.Rem(values[tc.left], values[tc.right])
+		if e != nil {
+			t.Fatalf("special remainder %v: %v", tc, e)
+		}
+		if got != values[tc.want] {
+			t.Fatal("special remainder", tc, got, values[tc.want])
+		}
+	}
+	left, err := c.MkConst(declaration(t, m, "rem-left", nil, sort))
+	must(t, err)
+	right, err := c.MkConst(declaration(t, m, "rem-right", nil, sort))
+	must(t, err)
+	result, err := c.Rem(left, right)
+	must(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("symbolic remainder encoding", kind, e)
+	}
+	resultSort, err := m.GetSort(result)
+	must(t, err)
+	if resultSort != sort {
+		t.Fatal("symbolic remainder sort", resultSort, sort)
 	}
 }
 

@@ -84,13 +84,13 @@ func (c *Converter) addBits(sort, rm, left, right ast.ASTHandle) (ast.ASTHandle,
 
 	condition1 := b.or(leftNaN, rightNaN)
 	signsXor := b.xor(leftNegative, rightNegative)
-	value2 := b.ite(b.and(rightInfinite, signsXor), nan, left)
-	value3 := b.ite(b.and(leftInfinite, signsXor), nan, right)
+	value2 := b.fpITE(b.and(rightInfinite, signsXor), nan, left)
+	value3 := b.fpITE(b.and(leftInfinite, signsXor), nan, right)
 	condition4 := b.and(leftZero, rightZero)
 	roundTowardNegative := b.mode(rm, 3)
 	negativeCondition := b.or(b.and(leftNegative, rightNegative), b.and(roundTowardNegative, signsXor))
-	value4 := b.ite(negativeCondition, negativeZero, positiveZero)
-	value4 = b.ite(b.and(leftNegative, rightNegative), left, value4)
+	value4 := b.fpITE(negativeCondition, negativeZero, positiveZero)
+	value4 = b.fpITE(b.and(leftNegative, rightNegative), left, value4)
 
 	a, e := c.Unpack(left, false)
 	if e != nil {
@@ -122,7 +122,7 @@ func (c *Converter) addBits(sort, rm, left, right ast.ASTHandle) (ast.ASTHandle,
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	zeroCase, err := c.boolITE(roundTowardNegative, negativeZero, positiveZero)
+	zeroCase, err := c.MkITE(roundTowardNegative, negativeZero, positiveZero)
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
@@ -130,7 +130,7 @@ func (c *Converter) addBits(sort, rm, left, right ast.ASTHandle) (ast.ASTHandle,
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	result, err := c.boolITE(isZeroSignificand, zeroCase, rounded)
+	result, err := c.MkITE(isZeroSignificand, zeroCase, rounded)
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
@@ -145,7 +145,7 @@ func (c *Converter) addBits(sort, rm, left, right ast.ASTHandle) (ast.ASTHandle,
 		{leftInfinite, value2},
 		{condition1, nan},
 	} {
-		result, err = c.boolITE(choice.condition, choice.value, result)
+		result, err = c.MkITE(choice.condition, choice.value, result)
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}

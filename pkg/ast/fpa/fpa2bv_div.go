@@ -30,14 +30,14 @@ func (c *Converter) divBits(sort, rm, left, right ast.ASTHandle) (ast.ASTHandle,
 	leftNegativeInfinity := b.and(leftInfinite, b.not(leftPositive))
 	rightNegativeInfinity := b.and(rightInfinite, b.not(rightPositive))
 	condition1 := b.or(leftNaN, rightNaN)
-	value2 := b.ite(rightInfinite, nan, b.ite(rightPositive, positiveInfinity, negativeInfinity))
+	value2 := b.fpITE(rightInfinite, nan, b.fpITE(rightPositive, positiveInfinity, negativeInfinity))
 	signsXor := b.xor(leftPositive, rightPositive)
-	signedZero := b.ite(signsXor, negativeZero, positiveZero)
-	value3 := b.ite(leftInfinite, nan, signedZero)
-	value4 := b.ite(rightInfinite, nan, b.ite(rightPositive, negativeInfinity, positiveInfinity))
-	value5 := b.ite(leftInfinite, nan, signedZero)
-	signedInfinity := b.ite(signsXor, negativeInfinity, positiveInfinity)
-	value6 := b.ite(leftZero, nan, signedInfinity)
+	signedZero := b.fpITE(signsXor, negativeZero, positiveZero)
+	value3 := b.fpITE(leftInfinite, nan, signedZero)
+	value4 := b.fpITE(rightInfinite, nan, b.fpITE(rightPositive, negativeInfinity, positiveInfinity))
+	value5 := b.fpITE(leftInfinite, nan, signedZero)
+	signedInfinity := b.fpITE(signsXor, negativeInfinity, positiveInfinity)
+	value6 := b.fpITE(leftZero, nan, signedInfinity)
 	value7 := signedZero
 	if b.err != nil {
 		return ast.ASTHandle{}, b.err
@@ -90,7 +90,7 @@ func (c *Converter) divBits(sort, rm, left, right ast.ASTHandle) (ast.ASTHandle,
 		{leftPositiveInfinity, value2},
 		{condition1, nan},
 	} {
-		result, err = c.boolITE(choice.condition, choice.value, result)
+		result, err = c.MkITE(choice.condition, choice.value, result)
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}

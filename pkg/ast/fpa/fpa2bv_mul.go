@@ -30,12 +30,12 @@ func (c *Converter) mulBits(sort, rm, left, right ast.ASTHandle) (ast.ASTHandle,
 	leftNegativeInfinity := b.and(leftInfinite, b.not(leftPositive))
 	rightNegativeInfinity := b.and(rightInfinite, b.not(rightPositive))
 	condition1 := b.or(leftNaN, rightNaN)
-	value2 := b.ite(rightZero, nan, b.ite(rightPositive, positiveInfinity, negativeInfinity))
-	value3 := b.ite(leftZero, nan, b.ite(leftPositive, positiveInfinity, negativeInfinity))
-	value4 := b.ite(rightZero, nan, b.ite(rightPositive, negativeInfinity, positiveInfinity))
-	value5 := b.ite(leftZero, nan, b.ite(leftPositive, negativeInfinity, positiveInfinity))
+	value2 := b.fpITE(rightZero, nan, b.fpITE(rightPositive, positiveInfinity, negativeInfinity))
+	value3 := b.fpITE(leftZero, nan, b.fpITE(leftPositive, positiveInfinity, negativeInfinity))
+	value4 := b.fpITE(rightZero, nan, b.fpITE(rightPositive, negativeInfinity, positiveInfinity))
+	value5 := b.fpITE(leftZero, nan, b.fpITE(leftPositive, negativeInfinity, positiveInfinity))
 	condition6 := b.or(leftZero, rightZero)
-	value6 := b.ite(b.xor(leftPositive, rightPositive), negativeZero, positiveZero)
+	value6 := b.fpITE(b.xor(leftPositive, rightPositive), negativeZero, positiveZero)
 	if b.err != nil {
 		return ast.ASTHandle{}, b.err
 	}
@@ -86,7 +86,7 @@ func (c *Converter) mulBits(sort, rm, left, right ast.ASTHandle) (ast.ASTHandle,
 		{leftPositiveInfinity, value2},
 		{condition1, nan},
 	} {
-		result, err = c.boolITE(choice.condition, choice.value, result)
+		result, err = c.MkITE(choice.condition, choice.value, result)
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}

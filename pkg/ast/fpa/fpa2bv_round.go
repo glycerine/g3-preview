@@ -193,6 +193,15 @@ func (b *roundBuilder) shl(a, c ast.ASTHandle) ast.ASTHandle {
 func (b *roundBuilder) lshr(a, c ast.ASTHandle) ast.ASTHandle {
 	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkBitVectorLSHR(a, c) })
 }
+func (b *roundBuilder) ashr(a, c ast.ASTHandle) ast.ASTHandle {
+	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkBitVectorASHR(a, c) })
+}
+func (b *roundBuilder) urem(a, c ast.ASTHandle) ast.ASTHandle {
+	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkBitVectorURem(a, c) })
+}
+func (b *roundBuilder) ult(a, c ast.ASTHandle) ast.ASTHandle {
+	return b.call(func() (ast.ASTHandle, error) { return b.c.unsignedLT(a, c) })
+}
 func (b *roundBuilder) reductionOr(v ast.ASTHandle) ast.ASTHandle {
 	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkBitVectorReductionOr(v) })
 }
@@ -216,6 +225,9 @@ func (b *roundBuilder) not(v ast.ASTHandle) ast.ASTHandle {
 }
 func (b *roundBuilder) ite(condition, yes, no ast.ASTHandle) ast.ASTHandle {
 	return b.call(func() (ast.ASTHandle, error) { return b.c.boolITE(condition, yes, no) })
+}
+func (b *roundBuilder) fpITE(condition, yes, no ast.ASTHandle) ast.ASTHandle {
+	return b.call(func() (ast.ASTHandle, error) { return b.c.MkITE(condition, yes, no) })
 }
 func (b *roundBuilder) leading(v ast.ASTHandle, n uint32) ast.ASTHandle {
 	return b.call(func() (ast.ASTHandle, error) { return b.c.LeadingZeros(v, n) })
