@@ -3,9 +3,93 @@ package ast
 import (
 	"testing"
 
+	"github.com/glycerine/g3/pkg/math/polynomial"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
+
+func TestASTSMT2ArithmeticLiteralDecimalAndAlgebraicProfiles(t *testing.T) {
+	c, g, p, budget := dynAckSourceFixture(t)
+	previous, err := uparams.BindProcessGlobalParamsService(g)
+	paramsMust(t, err)
+	defer func() {
+		_, e := uparams.BindProcessGlobalParamsService(previous)
+		paramsMust(t, e)
+	}()
+	m, err := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: budget})
+	paramsMust(t, err)
+	defer func() { paramsMust(t, m.Close()) }()
+	_, err = m.RegisterArithmeticPlugin()
+	paramsMust(t, err)
+	truth, err := m.MkTrue()
+	paramsMust(t, err)
+	if _, matched, e := m.SMT2PPArithLiteral(truth, false, 10); e != nil || matched {
+		t.Fatalf("non-arithmetic constant: matched=%v error=%v", matched, e)
+	}
+	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: budget})
+	paramsMust(t, err)
+	defer func() { paramsMust(t, out.Close()) }()
+	render := func(h ASTHandle, decimal bool, precision uint32) string {
+		format, matched, e := m.SMT2PPArithLiteral(h, decimal, precision)
+		paramsMust(t, e)
+		if !matched {
+			t.Fatal("arithmetic literal was not recognized")
+		}
+		paramsMust(t, m.PrintFormat(out, format, c, p, g))
+		text, e := out.String()
+		paramsMust(t, e)
+		paramsMust(t, out.ResetText())
+		return text
+	}
+
+	value, err := c.NumeralsField.NewValue()
+	paramsMust(t, err)
+	defer func() { paramsMust(t, c.NumeralsField.CleanupValue(&value)) }()
+	for _, tc := range []struct {
+		value string
+		want  string
+	}{
+		{"1/3", "0.333?"},
+		{"-1/3", "(- 0.333?)"},
+		{"1/2", "0.5"},
+	} {
+		paramsMust(t, c.NumeralsField.SetString(&value, tc.value))
+		h, e := m.ArithmeticNumeral(&value, false)
+		paramsMust(t, e)
+		if got := render(h, true, 3); got != tc.want {
+			t.Fatalf("decimal %s: %q, want %q", tc.value, got, tc.want)
+		}
+	}
+
+	am, err := m.ArithmeticAlgebraicManager()
+	paramsMust(t, err)
+	two := unumeral.NewInt(2)
+	var basic, root polynomial.Algebraic
+	paramsMust(t, am.SetInteger(&basic, &two))
+	paramsMust(t, am.Root(&basic, 2, &root))
+	paramsMust(t, am.Del(&basic))
+	positive, err := m.ArithmeticAlgebraicNumeral(&root)
+	paramsMust(t, err)
+	paramsMust(t, am.Neg(&root))
+	negative, err := m.ArithmeticAlgebraicNumeral(&root)
+	paramsMust(t, err)
+	paramsMust(t, am.Del(&root))
+	for _, tc := range []struct {
+		handle             ASTHandle
+		exact, approximate string
+	}{
+		{positive, "(root-obj (+ (^ x 2) (- 2)) 2)", "1.4142?"},
+		{negative, "(root-obj (+ (^ x 2) (- 2)) 1)", "(- 1.4142?)"},
+	} {
+		if got := render(tc.handle, false, 4); got != tc.exact {
+			t.Fatalf("exact algebraic: %q, want %q", got, tc.exact)
+		}
+		if got := render(tc.handle, true, 4); got != tc.approximate {
+			t.Fatalf("decimal algebraic: %q, want %q", got, tc.approximate)
+		}
+	}
+}
 
 func TestASTSMT2BooleanComparisonsWithArithmeticLiterals(t *testing.T) {
 	c, g, p, budget := dynAckSourceFixture(t)

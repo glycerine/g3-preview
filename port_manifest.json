@@ -13042,11 +13042,12 @@
           "tests": ["TestASTSMT2QuantifierRootSourceFormat"]
         },
         {
-          "name": "smt2_pp_environment::pp_arith_literal default exact integer and rational paths (ast_smt2_pp.cpp:311-345); decimal and irrational algebraic profiles remain open",
-          "status": "partial",
+          "name": "smt2_pp_environment::pp_arith_literal exact and decimal integer, rational and irrational algebraic profiles (ast_smt2_pp.cpp:296-368)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt2_arith_literal.go",
           "tests": [
-            "TestASTSMT2BooleanComparisonsWithArithmeticLiterals"
+            "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
+            "TestASTSMT2ArithmeticLiteralDecimalAndAlgebraicProfiles"
           ]
         },
         {
