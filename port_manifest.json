@@ -33508,7 +33508,8 @@
       "tests": [
         "TestSequenceRewriterConcatSourceBranches",
         "TestSequenceRewriterByteUnit",
-        "TestSequenceRewriterConstantPredicates"
+        "TestSequenceRewriterConstantPredicates",
+        "TestSequenceRewriterReplaceSourceBranches"
       ],
       "assertions": [
         {
@@ -33753,6 +33754,14 @@
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",
           "tests": [
             "TestSequenceRewriterConstantPredicates"
+          ]
+        },
+        {
+          "name": "seq_rewriter::mk_seq_replace first-occurrence constant folding, identity, empty-pattern prepend and empty-base branches (seq_rewriter.cpp:847-867)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterReplaceSourceBranches"
           ]
         }
       ],

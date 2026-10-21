@@ -136,6 +136,45 @@ func (r *SequenceRewriter) RewriteSuffix(a, b ast.ASTHandle, out ast.ASTRef) (st
 	return r.assignBoolean(strings.HasSuffix(right, left), out)
 }
 
+func (r *SequenceRewriter) RewriteReplace(a, b, replacement ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if err := r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	base, baseString, err := r.manager.SequenceStringValue(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	pattern, patternString, err := r.manager.SequenceStringValue(b)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	insert, replacementString, err := r.manager.SequenceStringValue(replacement)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if baseString && patternString && replacementString {
+		result, err := r.manager.MkString(strings.Replace(base, pattern, insert, 1))
+		if err != nil {
+			return RewriteFailed, err
+		}
+		return RewriteDone, r.manager.SetRef(out, result)
+	}
+	if b == replacement {
+		return RewriteDone, r.manager.SetRef(out, a)
+	}
+	if patternString && pattern == "" {
+		result, err := r.manager.MkSequenceConcat(replacement, a)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		return Rewrite1, r.manager.SetRef(out, result)
+	}
+	if baseString && base == "" {
+		return RewriteDone, r.manager.SetRef(out, a)
+	}
+	return RewriteFailed, nil
+}
+
 // RewriteUnit ports the byte-valued branch of seq_rewriter::mk_seq_unit.
 func (r *SequenceRewriter) RewriteUnit(element ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
 	if err := r.open(); err != nil {

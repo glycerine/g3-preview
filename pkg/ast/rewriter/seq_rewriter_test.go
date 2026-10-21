@@ -176,3 +176,59 @@ func TestSequenceRewriterConstantPredicates(t *testing.T) {
 		t.Fatalf("empty target suffix: status=%d kind=%d error=%v", status, kind, e)
 	}
 }
+
+func TestSequenceRewriterReplaceSourceBranches(t *testing.T) {
+	m := astTestManager(t)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	str := func(text string) ast.ASTHandle {
+		h, e := m.MkString(text)
+		astTestMust(t, e)
+		astTestPin(t, m, h)
+		return h
+	}
+	base, pattern, replacement := str("ababa"), str("ba"), str("X")
+	status, err := rw.RewriteReplace(base, pattern, replacement, out)
+	astTestMust(t, err)
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	text, matched, err := m.SequenceStringValue(result)
+	astTestMust(t, err)
+	if status != RewriteDone || !matched || text != "aXba" {
+		t.Fatalf("constant replace: status=%d text=%q matched=%v", status, text, matched)
+	}
+
+	status, err = rw.RewriteReplace(base, pattern, pattern, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteDone || result != base {
+		t.Fatalf("identity replace: status=%d result=%v", status, result)
+	}
+
+	empty := str("")
+	stringSort, err := m.GetSort(base)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "replace-x"), stringSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	status, err = rw.RewriteReplace(base, empty, x, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	left, right, concat, err := m.SequenceConcatParts(result)
+	astTestMust(t, err)
+	if status != Rewrite1 || !concat || left != x || right != base {
+		t.Fatalf("empty-pattern replace: status=%d concat=%v left=%v right=%v", status, concat, left, right)
+	}
+	status, err = rw.RewriteReplace(empty, pattern, x, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteDone || result != empty {
+		t.Fatalf("empty-base replace: status=%d result=%v", status, result)
+	}
+}
