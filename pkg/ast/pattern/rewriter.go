@@ -14,7 +14,7 @@ type inferenceConfiguration struct {
 	owner *InferenceRewriter
 }
 
-func (c *inferenceConfiguration) ReduceQuantifier(q, body ast.ASTHandle, _ ast.AppArguments, noPatterns ast.AppArguments, out, _ ast.ASTRef) (bool, error) {
+func (c *inferenceConfiguration) ReduceQuantifier(q, body ast.ASTHandle, _ ast.AppArguments, noPatterns ast.AppArguments, out, proof ast.ASTRef) (bool, error) {
 	r := c.owner
 	if r == nil || r.closed {
 		return false, ast.ErrASTHandle
@@ -27,7 +27,17 @@ func (c *inferenceConfiguration) ReduceQuantifier(q, body ast.ASTHandle, _ ast.A
 		}
 		exclusions[i] = h
 	}
-	result, changed, err := r.candidates.reduceQuantifierNoDatabase(q, body, exclusions, r.options)
+	proofs, err := r.manager.ProofsEnabled()
+	if err != nil {
+		return false, err
+	}
+	var result ast.ASTRef
+	var changed bool
+	if proofs {
+		result, changed, err = r.candidates.reduceQuantifierNoDatabaseWithProof(q, body, exclusions, r.options, proof)
+	} else {
+		result, changed, err = r.candidates.reduceQuantifierNoDatabase(q, body, exclusions, r.options)
+	}
 	if err != nil || !changed {
 		return false, err
 	}
@@ -45,7 +55,7 @@ func (c *inferenceConfiguration) ReduceQuantifier(q, body ast.ASTHandle, _ ast.A
 }
 
 // InferenceRewriter owns the source pattern-inference configuration and its
-// AST rewriter traversal. The current no-proof path uses the source defaults.
+// AST rewriter traversal.
 type InferenceRewriter struct {
 	self       *InferenceRewriter
 	manager    *ast.ASTManager
@@ -68,9 +78,6 @@ func NewInferenceRewriterWithOptions(m *ast.ASTManager, options InferenceOptions
 	if err != nil {
 		return nil, err
 	}
-	if proofs {
-		return nil, ast.ErrASTPending
-	}
 	arith, err := m.ArithmeticFamilyID()
 	if err != nil {
 		return nil, err
@@ -89,7 +96,11 @@ func NewInferenceRewriterWithOptions(m *ast.ASTManager, options InferenceOptions
 	}
 	r.self = r
 	r.config.owner = r
-	r.traversal, err = rewriter.NewTraversal(m, &r.config)
+	if proofs {
+		r.traversal, err = rewriter.NewProofTraversal(m, &r.config)
+	} else {
+		r.traversal, err = rewriter.NewTraversal(m, &r.config)
+	}
 	if err != nil {
 		return r, err
 	}
@@ -112,6 +123,13 @@ func (r *InferenceRewriter) Rewrite(body ast.ASTHandle, out ast.ASTRef) error {
 		return ast.ErrASTHandle
 	}
 	return r.traversal.Rewrite(body, out)
+}
+
+func (r *InferenceRewriter) RewriteWithProof(body ast.ASTHandle, out, proof ast.ASTRef) error {
+	if r == nil || r.self != r || r.closed || r.traversal == nil {
+		return ast.ErrASTHandle
+	}
+	return r.traversal.RewriteWithProof(body, out, proof)
 }
 
 func (r *InferenceRewriter) Resume(out ast.ASTRef) error {

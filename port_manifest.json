@@ -21413,7 +21413,18 @@
           "tests": []
         },
         {
-          "name": "pattern_inference_cfg proof-producing quantifier introduction and pulled-quantifier transitivity (cpp:666-700)",
+          "name": "pattern_inference_cfg proof-producing ordinary quantifier introduction (cpp:666-669)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "go_targets": [
+            "pkg/ast/pattern/rewriter.go"
+          ],
+          "tests": [
+            "TestPatternInferenceProofProducingTraversal"
+          ]
+        },
+        {
+          "name": "pattern_inference_cfg pulled-quantifier proof transitivity (cpp:679-700)",
           "status": "partial",
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
           "tests": []
@@ -21430,7 +21441,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The larger-pattern filter searches a native visited-handle map and work slice. Unary and multi-pattern results use independently owning ASTRef values; the source stable weight sort uses Go's sort.SliceStable. Collection, preferred selection, ordinary quantifier rewriting, nested no-proof pulling, and the complete parameter bridge are ported. Database-backed matching and proof-producing reduction remain explicit ErrASTPending paths."
+        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The larger-pattern filter searches a native visited-handle map and work slice. Unary and multi-pattern results use independently owning ASTRef values; the source stable weight sort uses Go's sort.SliceStable. Collection, preferred selection, ordinary proof/no-proof quantifier rewriting, nested no-proof pulling, and the complete parameter bridge are ported. Database-backed matching and pulled-quantifier proof composition remain explicit ErrASTPending paths."
       ]
     },
     {

@@ -97,6 +97,53 @@ func TestPatternInferenceActualRewriterTraversalAndOwnership(t *testing.T) {
 	}
 }
 
+func TestPatternInferenceProofProducingTraversal(t *testing.T) {
+	m := patternManager(t)
+	patternMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	b, err := m.MkBoolSort()
+	patternMust(t, err)
+	x, err := m.MkVar(0, b)
+	patternMust(t, err)
+	d, err := m.MkFuncDecl(symbol.Numerical(864), []ast.ASTHandle{b}, b, ast.ASTFuncDeclInfo{})
+	patternMust(t, err)
+	fx, err := m.MkApp(d, []ast.ASTHandle{x})
+	patternMust(t, err)
+	q, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{b}, Names: []symbol.Symbol{symbol.Numerical(865)}, Body: fx,
+	})
+	patternMust(t, err)
+	for _, h := range []ast.ASTHandle{d, fx, q} {
+		patternMust(t, m.IncRef(h))
+		h := h
+		t.Cleanup(func() { patternMust(t, m.DecRef(h)) })
+	}
+	r, err := NewInferenceRewriter(m)
+	patternMust(t, err)
+	t.Cleanup(func() { patternMust(t, r.Close()) })
+	out, err := m.NewRef(ast.ASTHandle{})
+	patternMust(t, err)
+	proof, err := m.NewRef(ast.ASTHandle{})
+	patternMust(t, err)
+	t.Cleanup(func() { patternMust(t, m.DelRef(&proof)); patternMust(t, m.DelRef(&out)) })
+	patternMust(t, r.RewriteWithProof(q, out, proof))
+	got, err := m.RefGet(out)
+	patternMust(t, err)
+	count, err := m.GetNumPatterns(got)
+	patternMust(t, err)
+	if count != 1 {
+		t.Fatal("proof inference pattern count", count)
+	}
+	p, err := m.RefGet(proof)
+	patternMust(t, err)
+	fact, err := m.GetProofFact(p)
+	patternMust(t, err)
+	want, err := m.MkIff(q, got)
+	patternMust(t, err)
+	if fact != want {
+		t.Fatal("proof inference fact", fact, want)
+	}
+}
+
 func TestPatternInferenceActualRewriterPendingPullAndResume(t *testing.T) {
 	m := patternManager(t)
 	b, err := m.MkBoolSort()

@@ -117,10 +117,20 @@ func (c *patternCandidates) releasePendingPatternRefs() error {
 }
 
 // reduceQuantifierNoDatabase applies the source inference/retry sequence for a
-// universal quantifier without the separately unported database, nested
-// pull_quant rewriting and proof paths. The result reference is independently
-// owned.
+// universal quantifier without the separately unported database. The result
+// reference is independently owned.
 func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle, newNoPatterns []ast.ASTHandle, opts quantifierInferenceOptions) (out ast.ASTRef, changed bool, err error) {
+	return c.reduceQuantifierNoDatabaseCore(q, newBody, newNoPatterns, opts, ast.ASTRef{})
+}
+
+func (c *patternCandidates) reduceQuantifierNoDatabaseWithProof(q, newBody ast.ASTHandle, newNoPatterns []ast.ASTHandle, opts quantifierInferenceOptions, proof ast.ASTRef) (out ast.ASTRef, changed bool, err error) {
+	if proof == (ast.ASTRef{}) {
+		return out, false, ast.ErrASTHandle
+	}
+	return c.reduceQuantifierNoDatabaseCore(q, newBody, newNoPatterns, opts, proof)
+}
+
+func (c *patternCandidates) reduceQuantifierNoDatabaseCore(q, newBody ast.ASTHandle, newNoPatterns []ast.ASTHandle, opts quantifierInferenceOptions, proofOut ast.ASTRef) (out ast.ASTRef, changed bool, err error) {
 	if c == nil || c.closed {
 		return out, false, ast.ErrASTHandle
 	}
@@ -141,8 +151,11 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 	if err != nil {
 		return out, false, err
 	}
-	if proofs {
+	if proofs && proofOut == (ast.ASTRef{}) {
 		return out, false, ast.ErrASTPending
+	}
+	if !proofs && proofOut != (ast.ASTRef{}) {
+		return out, false, ast.ErrASTDomain
 	}
 	oldPatterns, err := c.manager.GetNumPatterns(q)
 	if err != nil || oldPatterns != 0 {
@@ -246,6 +259,11 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 			return out, false, e
 		}
 		if contained {
+			if proofs {
+				// The ordinary proof branch is complete below. The source's
+				// pulled-quantifier proof chain remains a separate obligation.
+				return out, false, ast.ErrASTPending
+			}
 			preliminary, e := c.manager.UpdateQuantifierPatterns(q, nil, newBody)
 			if e != nil {
 				return out, false, e
@@ -365,6 +383,26 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 				err = errors.Join(err, cleanup)
 			}
 			return ast.ASTRef{}, false, err
+		}
+	}
+	if proofs {
+		failProof := func(primary error) (ast.ASTRef, bool, error) {
+			cleanup := c.manager.DelRef(&out)
+			if cleanup != nil && out != (ast.ASTRef{}) {
+				c.pendingPatternRefs = append(c.pendingPatternRefs, out)
+			}
+			return ast.ASTRef{}, false, errors.Join(primary, cleanup)
+		}
+		bodyProof, e := c.manager.MkProofReflexivity(newBody)
+		if e != nil {
+			return failProof(e)
+		}
+		proof, e := c.manager.MkProofQuantIntro(q, updated, bodyProof)
+		if e != nil {
+			return failProof(e)
+		}
+		if e = c.manager.SetRef(proofOut, proof); e != nil {
+			return failProof(e)
 		}
 	}
 	return out, true, nil
