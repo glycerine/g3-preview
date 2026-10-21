@@ -85,6 +85,20 @@ func (r *FPA2BVRewriter) Rewrite(root ast.ASTHandle, out ast.ASTRef) error {
 	return r.traversal.Rewrite(root, out)
 }
 
+func (r *FPA2BVRewriter) RewriteWithProof(root ast.ASTHandle, out, proof ast.ASTRef) error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	return r.traversal.RewriteWithProof(root, out, proof)
+}
+
+func (r *FPA2BVRewriter) NumSteps() (uint32, error) {
+	if err := r.open(); err != nil {
+		return 0, err
+	}
+	return r.traversal.NumSteps()
+}
+
 func (r *FPA2BVRewriter) Reset() error {
 	if err := r.open(); err != nil {
 		return err

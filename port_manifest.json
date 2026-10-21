@@ -119226,9 +119226,15 @@
       "path": "src/tactic/fpa/fpa2bv_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/fpa/fpa2bv_tactic.go",
+        "pkg/ast/rewriter/fpa2bv_rewriter.go",
+        "pkg/tactic/tactic_package_boundary.go"
+      ],
+      "tests": [
+        "TestFPA2BVTacticRewritesGoalAndPublishesSingleResult"
+      ],
       "assertions": [
         {
           "line": 54,
@@ -119239,19 +119245,36 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete FPA-to-BV goal pass with parameter updates, rewrite/proof traversal, dependency-preserving updates, auxiliary assertions, optional model converter, depth/result publication, translation, cleanup, and destruction",
+          "status": "ported",
+          "go_target": "pkg/tactic/fpa/fpa2bv_tactic.go",
+          "tests": [
+            "TestFPA2BVTacticRewritesGoalAndPublishesSingleResult"
+          ]
+        }
+      ],
+      "ownership": [
+        "Pass owns its parameter value, converter, and rewriter in source member order. Apply returns an independently retained goal and transfers any model converter to the caller. Temporary rewritten expressions and proofs use ASTRef owners through Goal.Update."
+      ],
+      "deviations": [
+        "The post-rewrite OP_FPA_IS_NAN auxiliary-lemma branch is unreachable for the retained rewriter: classification applications are reduced to Boolean/BV expressions before publication. The converter's canonical NaN encoding already fixes the three fields, so no dead adapter is added."
+      ]
     },
     {
       "path": "src/tactic/fpa/fpa2bv_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/fpa/fpa2bv_tactic.go"
+      ],
+      "tests": [
+        "TestFPA2BVTacticRewritesGoalAndPublishesSingleResult"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -119262,10 +119285,21 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "FPA-to-BV tactic factory surface represented by NewPass and its concrete single-goal Result",
+          "status": "ported",
+          "go_target": "pkg/tactic/fpa/fpa2bv_tactic.go",
+          "tests": [
+            "TestFPA2BVTacticRewritesGoalAndPublishesSingleResult"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go factory returns a concrete Pass owner; the caller closes it explicitly instead of relying on C++ clean wrapper allocation."
+      ],
       "deviations": []
     },
     {

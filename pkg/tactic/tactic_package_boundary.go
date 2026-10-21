@@ -7,6 +7,12 @@ import (
 
 func (g *Goal) Manager() *ast.ASTManager { return g.manager }
 func (g *Goal) CheckOwner() error        { return g.open() }
+func (g *Goal) Inconsistent() (bool, error) {
+	if e := g.open(); e != nil {
+		return false, e
+	}
+	return g.inconsistent, nil
+}
 func (g *Goal) ModelsEnabled() (bool, error) {
 	if e := g.open(); e != nil {
 		return false, e
