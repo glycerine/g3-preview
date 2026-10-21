@@ -159,6 +159,15 @@ func TestFPA2BVRewriterArithmeticDispatch(t *testing.T) {
 	if got = f.rewrite(t, remainder); got != want {
 		t.Fatal("infinity remainder did not lower to NaN", got, want)
 	}
+	negativeZero, err := f.m.MkFPAZeroOfSort(f.sort, true)
+	astTestMust(t, err)
+	integral, err := f.m.MkFamilyApp(f.family, ast.FPAOpRoundToIntegral, nil, []ast.ASTHandle{rounding, negativeZero})
+	astTestMust(t, err)
+	wantNegativeZero, err := f.converter.MkSpecial(f.sort, astfpa.NegativeZero)
+	astTestMust(t, err)
+	if got = f.rewrite(t, integral); got != wantNegativeZero {
+		t.Fatal("round-to-integral did not preserve negative zero", got, wantNegativeZero)
+	}
 
 	left := astTestSymbol(t, f.m, "add-x")
 	right := astTestSymbol(t, f.m, "add-y")

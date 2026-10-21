@@ -421,6 +421,35 @@ func TestConverterRemainderSpecialCasesAndSymbolicShape(t *testing.T) {
 	}
 }
 
+func TestConverterRoundToIntegralSpecialCasesAndSymbolicShape(t *testing.T) {
+	m, c := fixture(t)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	mode, err := c.MkRoundingMode(ast.FPAOpRMNearestEven)
+	must(t, err)
+	for _, kind := range []fpa.SpecialValue{fpa.NaN, fpa.PositiveInfinity, fpa.NegativeInfinity, fpa.PositiveZero, fpa.NegativeZero} {
+		value, e := c.MkSpecial(sort, kind)
+		must(t, e)
+		got, e := c.RoundToIntegral(mode, value)
+		must(t, e)
+		if got != value {
+			t.Fatal("round-to-integral special", kind, got, value)
+		}
+	}
+	value, err := c.MkConst(declaration(t, m, "integral-value", nil, sort))
+	must(t, err)
+	result, err := c.RoundToIntegral(mode, value)
+	must(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("symbolic round-to-integral encoding", kind, e)
+	}
+	resultSort, err := m.GetSort(result)
+	must(t, err)
+	if resultSort != sort {
+		t.Fatal("symbolic round-to-integral sort", resultSort, sort)
+	}
+}
+
 func fixture(t *testing.T) (*ast.ASTManager, *fpa.Converter) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)
