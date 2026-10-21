@@ -19929,9 +19929,15 @@
       "path": "src/ast/macros/macro_util.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/macros/macro_util.go",
+        "pkg/ast/macros/macro_util_test.go"
+      ],
+      "tests": [
+        "TestMacroUtilHeadsSimpleMacrosAndForbiddenDeclarations",
+        "TestMacroUtilQuasiHeadNormalizationAndCandidates"
+      ],
       "assertions": [
         {
           "line": 417,
@@ -19976,17 +19982,43 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "macro_candidates ownership/reset/insert/access; is_macro_head, left/right/simple macro, is_quasi_macro_head and normalize_expr",
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_util.go",
+          "tests": [
+            "TestMacroUtilHeadsSimpleMacrosAndForbiddenDeclarations",
+            "TestMacroUtilQuasiHeadNormalizationAndCandidates"
+          ]
+        },
+        {
+          "name": "arithmetic, bit-vector, pseudo-predicate, hint, quasi-head conversion and clause-wide candidate collection",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Candidate rows own declaration, definition and condition AST references and retire them in reverse row order. Util borrows its AST manager and forbidden declaration identities; normalization owns and closes its variable-substitution scratch."
+      ],
+      "deviations": [
+        "This checkpoint covers the dependency-free structural front of macro_util. Arithmetic and bit-vector normalization and the full quantified/clause candidate collector remain open, so the source unit remains partial."
+      ]
     },
     {
       "path": "src/ast/macros/macro_util.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/macros/macro_util.go",
+        "pkg/ast/macros/macro_util_test.go"
+      ],
+      "tests": [
+        "TestMacroUtilHeadsSimpleMacrosAndForbiddenDeclarations",
+        "TestMacroUtilQuasiHeadNormalizationAndCandidates"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -19999,9 +20031,29 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "macro_candidates and structural macro head/simple/quasi/normalization public surface",
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_util.go",
+          "tests": [
+            "TestMacroUtilHeadsSimpleMacrosAndForbiddenDeclarations",
+            "TestMacroUtilQuasiHeadNormalizationAndCandidates"
+          ]
+        },
+        {
+          "name": "remaining arithmetic, bit-vector, pseudo-predicate and full candidate collection public surface",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Candidates is a noncopyable owning Go value over native rows; Util is a borrowed manager-local helper."
+      ],
+      "deviations": [
+        "Partial structural checkpoint; remaining header operations track the open cpp implementation."
+      ]
     },
     {
       "path": "src/ast/macros/quasi_macros.cpp",
