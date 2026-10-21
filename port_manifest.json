@@ -33500,9 +33500,14 @@
       "path": "src/ast/rewriter/seq_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/seq_rewriter.go",
+        "pkg/ast/rewriter/seq_rewriter_test.go"
+      ],
+      "tests": [
+        "TestSequenceRewriterConcatSourceBranches"
+      ],
       "assertions": [
         {
           "line": 43,
@@ -33723,9 +33728,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "seq_rewriter::mk_seq_concat constant folding, right association, empty identities and adjacent String folding (seq_rewriter.cpp:483-519)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterConcatSourceBranches"
+          ]
+        }
+      ],
+      "ownership": [
+        "SequenceRewriter borrows its AST manager. RewriteConcat uses temporary owning AST references across nested public factory calls and joins their release errors into the result."
+      ],
+      "deviations": [
+        "The Go reducer exposes the theory operation directly; integration into the general rewriter traversal remains open with the other sequence reductions. Standard Go strings replace zstring storage for the reached constant-concatenation algorithm."
+      ]
     },
     {
       "path": "src/ast/rewriter/seq_rewriter.h",
