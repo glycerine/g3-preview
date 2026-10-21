@@ -31506,28 +31506,78 @@
       "path": "src/ast/rewriter/mk_simplified_app.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/mk_simplified_app.go"
+      ],
+      "tests": [
+        "TestSimplifiedAppTheoryApplicationAndEqualityDispatch",
+        "TestSimplifiedAppMakeClearsOutputAndFallsBack",
+        "TestSimplifiedAppBooleanFallbackAndCloseGuards"
+      ],
       "assertions": [
         {
           "line": 55,
           "text": "SASSERT(num == 2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_simplified_app::imp constructor and member destruction (src/ast/rewriter/mk_simplified_app.cpp:27-44)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/mk_simplified_app.go",
+          "tests": [
+            "TestSimplifiedAppBooleanFallbackAndCloseGuards"
+          ]
+        },
+        {
+          "name": "mk_simplified_app::imp::mk_core family and equality dispatch (src/ast/rewriter/mk_simplified_app.cpp:46-84)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/mk_simplified_app.go",
+          "tests": [
+            "TestSimplifiedAppTheoryApplicationAndEqualityDispatch",
+            "TestSimplifiedAppBooleanFallbackAndCloseGuards"
+          ]
+        },
+        {
+          "name": "mk_simplified_app constructor and destructor (src/ast/rewriter/mk_simplified_app.cpp:88-94)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/mk_simplified_app.go",
+          "tests": [
+            "TestSimplifiedAppBooleanFallbackAndCloseGuards"
+          ]
+        },
+        {
+          "name": "mk_simplified_app::mk_core and operator() raw-application fallback (src/ast/rewriter/mk_simplified_app.cpp:96-107)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/mk_simplified_app.go",
+          "tests": [
+            "TestSimplifiedAppMakeClearsOutputAndFallsBack"
+          ]
+        }
+      ],
+      "ownership": [
+        "SimplifiedApp owns its Boolean, arithmetic, bit-vector, array and floating-point rewriters and destroys them in reverse declaration order; the datatype rewriter and AST/parameter services are borrowed. Its charged header represents the source heap-allocated imp object, and partial construction returns an explicitly closable owner."
+      ],
+      "deviations": [
+        "The Go constructor receives the concrete parameter context and global service needed by the already-ported rewriter constructors; the source params_ref is represented by ParamsRef. The source equality arity assertion is a checked ErrASTDomain result. C++ pointer ABI, allocation macros and implicit destructor unwinding are not ported."
+      ]
     },
     {
       "path": "src/ast/rewriter/mk_simplified_app.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/mk_simplified_app.go"
+      ],
+      "tests": [
+        "TestSimplifiedAppTheoryApplicationAndEqualityDispatch",
+        "TestSimplifiedAppMakeClearsOutputAndFallsBack",
+        "TestSimplifiedAppBooleanFallbackAndCloseGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -31538,11 +31588,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_simplified_app public constructor, destructor, mk_core and operator() surface (src/ast/rewriter/mk_simplified_app.h:26-35)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/mk_simplified_app.go",
+          "tests": [
+            "TestSimplifiedAppTheoryApplicationAndEqualityDispatch",
+            "TestSimplifiedAppMakeClearsOutputAndFallsBack",
+            "TestSimplifiedAppBooleanFallbackAndCloseGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The exported Go owner preserves the header's single owning implementation object and borrowed argument/result contracts with checked handles and an explicit idempotent Close method."
+      ],
+      "deviations": [
+        "Go names the callable operator Make and represents the argument pointer/count pair as the borrowed ast.AppArguments view."
+      ]
     },
     {
       "path": "src/ast/rewriter/pb2bv_rewriter.cpp",
