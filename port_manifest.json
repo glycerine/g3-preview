@@ -25531,6 +25531,8 @@
       "role": "production",
       "status": "unported",
       "go_targets": [
+        "pkg/ast/rewriter/bv_rewriter_dispatch.go",
+        "pkg/ast/rewriter/bv_rewriter_dispatch_test.go",
         "pkg/ast/rewriter/bv_rewriter_bitwise.go",
         "pkg/ast/rewriter/bv_rewriter_bitwise_test.go",
         "pkg/ast/rewriter/bv_rewriter_rotate.go",
@@ -25715,6 +25717,8 @@
         "pkg/ast/ast_bv_sign_extension_numerals_test.go"
       ],
       "tests": [
+        "TestBVRewriterDispatchesOriginalDeclarationFamilies",
+        "TestBVRewriterDispatchRefusalsPreserveOutput",
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
         "TestBVRewriterNANDWarmNativeBufferIgnoresBudgetFailure",
         "TestBVRewriterBitwiseEveryColdReservation",
@@ -26375,6 +26379,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "mk_app_core declaration dispatch across constants, arithmetic, division variants, comparisons, bitwise operations, indexed operators, shifts, rotations, bounds and conversions (src/ast/rewriter/bv_rewriter.cpp:52-208; src/ast/rewriter/bv_rewriter.h:179-183)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_dispatch.go",
+          "tests": [
+            "TestBVRewriterDispatchesOriginalDeclarationFamilies",
+            "TestBVRewriterDispatchRefusalsPreserveOutput"
+          ]
+        },
         {
           "name": "original mk_bv_nand/mk_bv_nor/mk_bv_xnor algorithms and BR_REWRITE2 publication (src/ast/rewriter/bv_rewriter.cpp:1981-2002; src/util/buffer.h:25-48,98-104,250-258)",
           "status": "partial",
