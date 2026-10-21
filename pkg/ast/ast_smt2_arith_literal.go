@@ -26,11 +26,6 @@ func (s *smt2AlgebraicText) AppendNumeralText(value string) error {
 	return err
 }
 
-// smt2PPArithLiteralDefault selects the source printer's exact profile.
-func (m *ASTManager) smt2PPArithLiteralDefault(h ASTHandle) (format ASTHandle, matched bool, err error) {
-	return m.smt2PPArithLiteral(h, false, 10)
-}
-
 // SMT2PPArithLiteral formats the concrete arithmetic numeral branches used by
 // the SMT-LIB printer. matched is false for non-arithmetic constants.
 func (m *ASTManager) SMT2PPArithLiteral(h ASTHandle, decimal bool, precision uint32) (format ASTHandle, matched bool, err error) {

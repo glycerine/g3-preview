@@ -6,6 +6,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	uparams "github.com/glycerine/g3/pkg/util/params"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -61,6 +62,40 @@ func TestASTSMT2ArithmeticLiteralDecimalAndAlgebraicProfiles(t *testing.T) {
 			t.Fatalf("decimal %s: %q, want %q", tc.value, got, tc.want)
 		}
 	}
+	paramsMust(t, c.NumeralsField.SetString(&value, "-1/3"))
+	literal, err := m.ArithmeticNumeral(&value, false)
+	paramsMust(t, err)
+	format, err := m.SMT2PPExprTreeWithConfig(literal, nil, SMT2PPExprConfig{Decimal: true, DecimalPrecision: 3})
+	paramsMust(t, err)
+	paramsMust(t, m.PrintFormat(out, format, c, p, g))
+	printed, err := out.String()
+	paramsMust(t, err)
+	if printed != "(- 0.333?)" {
+		t.Fatalf("configured expression decimal: %q", printed)
+	}
+	paramsMust(t, out.ResetText())
+	realSort, err := m.GetSort(literal)
+	paramsMust(t, err)
+	variable, err := m.MkVar(0, realSort)
+	paramsMust(t, err)
+	equality, err := m.MkEq(variable, literal)
+	paramsMust(t, err)
+	quantifier, err := m.MkQuantifier(ASTQuantifierSpec{
+		Forall: true,
+		Sorts:  []ASTHandle{realSort},
+		Names:  []usymbol.Symbol{astTestSymbol(t, m, "x")},
+		Body:   equality,
+	})
+	paramsMust(t, err)
+	format, err = m.SMT2PPBooleanTreeWithConfig(quantifier, nil, SMT2PPExprConfig{Decimal: true, DecimalPrecision: 3})
+	paramsMust(t, err)
+	paramsMust(t, m.PrintFormat(out, format, c, p, g))
+	printed, err = out.String()
+	paramsMust(t, err)
+	if printed != "(forall ((x Real)) (= x (- 0.333?)))" {
+		t.Fatalf("configured quantified decimal: %q", printed)
+	}
+	paramsMust(t, out.ResetText())
 
 	am, err := m.ArithmeticAlgebraicManager()
 	paramsMust(t, err)

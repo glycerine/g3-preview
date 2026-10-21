@@ -37,6 +37,18 @@ func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (
 	return m.smt2PPExprTree(root, names, true)
 }
 
+// SMT2PPExprConfig selects source SMT2 expression-printer numeral profiles.
+type SMT2PPExprConfig struct {
+	Decimal          bool
+	DecimalPrecision uint32
+}
+
+// SMT2PPBooleanTreeWithConfig prints a Boolean tree with the requested
+// arithmetic numeral profile.
+func (m *ASTManager) SMT2PPBooleanTreeWithConfig(root ASTHandle, names []usymbol.Symbol, config SMT2PPExprConfig) (ASTHandle, error) {
+	return m.smt2PPExprTreeProfile(root, names, true, config)
+}
+
 // SMT2PPExprTree also accepts non-Boolean application roots reached by the
 // well-sorted diagnostics. Pattern apps and quantifiers use their source
 // document branches.
@@ -44,17 +56,31 @@ func (m *ASTManager) SMT2PPExprTree(root ASTHandle, names []usymbol.Symbol) (AST
 	return m.smt2PPExprTree(root, names, false)
 }
 
+// SMT2PPExprTreeWithConfig prints an expression tree with the requested
+// arithmetic numeral profile.
+func (m *ASTManager) SMT2PPExprTreeWithConfig(root ASTHandle, names []usymbol.Symbol, config SMT2PPExprConfig) (ASTHandle, error) {
+	return m.smt2PPExprTreeProfile(root, names, false, config)
+}
+
 type smt2PPInfo struct{ weight, depth, lets uint32 }
 
 func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requireBool bool) (ASTHandle, error) {
-	return m.smt2PPExprTreeWithInfo(root, names, requireBool, nil)
+	return m.smt2PPExprTreeProfile(root, names, requireBool, SMT2PPExprConfig{DecimalPrecision: 10})
+}
+
+func (m *ASTManager) smt2PPExprTreeProfile(root ASTHandle, names []usymbol.Symbol, requireBool bool, config SMT2PPExprConfig) (ASTHandle, error) {
+	return m.smt2PPExprTreeWithInfoProfile(root, names, requireBool, nil, config)
 }
 
 func (m *ASTManager) smt2PPExprTreeWithInfo(root ASTHandle, names []usymbol.Symbol, requireBool bool, info *smt2PPInfo) (ASTHandle, error) {
-	return m.smt2PPExprTreeWithInfoAt(root, names, requireBool, info, 0, true)
+	return m.smt2PPExprTreeWithInfoProfile(root, names, requireBool, info, SMT2PPExprConfig{DecimalPrecision: 10})
 }
 
-func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Symbol, requireBool bool, info *smt2PPInfo, enclosingAliases int, allowAliases bool) (ASTHandle, error) {
+func (m *ASTManager) smt2PPExprTreeWithInfoProfile(root ASTHandle, names []usymbol.Symbol, requireBool bool, info *smt2PPInfo, config SMT2PPExprConfig) (ASTHandle, error) {
+	return m.smt2PPExprTreeWithInfoAt(root, names, requireBool, info, 0, true, config)
+}
+
+func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Symbol, requireBool bool, info *smt2PPInfo, enclosingAliases int, allowAliases bool, config SMT2PPExprConfig) (ASTHandle, error) {
 	boolSort, err := m.MkBoolSort()
 	if err != nil {
 		return ASTHandle{}, err
@@ -64,7 +90,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 		return ASTHandle{}, err
 	}
 	if rootKind == ASTQuantifier {
-		format, err := m.smt2PPQuantifierRootWithInfoAt(root, names, info, enclosingAliases, allowAliases)
+		format, err := m.smt2PPQuantifierRootWithInfoAt(root, names, info, enclosingAliases, allowAliases, config)
 		if err != nil || !allowAliases {
 			return format, err
 		}
@@ -166,7 +192,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 		}
 		if kind == ASTQuantifier {
 			var childInfo smt2PPInfo
-			format, e := m.smt2PPQuantifierRootWithInfoAt(h, names, &childInfo, enclosingAliases+len(bindings), allowAliases)
+			format, e := m.smt2PPQuantifierRootWithInfoAt(h, names, &childInfo, enclosingAliases+len(bindings), allowAliases, config)
 			if e != nil {
 				return result{}, e
 			}
@@ -199,7 +225,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 		}
 		if count == 0 {
 			if sort != boolSort {
-				format, matched, e := m.smt2PPArithLiteralDefault(h)
+				format, matched, e := m.smt2PPArithLiteral(h, config.Decimal, config.DecimalPrecision)
 				if e != nil {
 					return result{}, e
 				}

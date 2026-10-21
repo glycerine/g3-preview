@@ -10,10 +10,10 @@ import (
 
 // smt2PPQuantifierRoot prints source binder names, children and annotations.
 func (m *ASTManager) smt2PPQuantifierRootWithInfo(q ASTHandle, outer []usymbol.Symbol, info *smt2PPInfo) (ASTHandle, error) {
-	return m.smt2PPQuantifierRootWithInfoAt(q, outer, info, 0, true)
+	return m.smt2PPQuantifierRootWithInfoAt(q, outer, info, 0, true, SMT2PPExprConfig{DecimalPrecision: 10})
 }
 
-func (m *ASTManager) smt2PPQuantifierRootWithInfoAt(q ASTHandle, outer []usymbol.Symbol, info *smt2PPInfo, enclosingAliases int, allowAliases bool) (ASTHandle, error) {
+func (m *ASTManager) smt2PPQuantifierRootWithInfoAt(q ASTHandle, outer []usymbol.Symbol, info *smt2PPInfo, enclosingAliases int, allowAliases bool, config SMT2PPExprConfig) (ASTHandle, error) {
 	count, err := m.GetNumDeclarations(q)
 	if err != nil || count == 0 {
 		return ASTHandle{}, ErrASTDomain
@@ -102,7 +102,7 @@ func (m *ASTManager) smt2PPQuantifierRootWithInfoAt(q ASTHandle, outer []usymbol
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		printed, e := m.smt2PPExprTreeWithInfoAt(pattern, scopedNames, false, nil, enclosingAliases, false)
+		printed, e := m.smt2PPExprTreeWithInfoAt(pattern, scopedNames, false, nil, enclosingAliases, false, config)
 		if e != nil {
 			return ASTHandle{}, e
 		}
@@ -114,7 +114,7 @@ func (m *ASTManager) smt2PPQuantifierRootWithInfoAt(q ASTHandle, outer []usymbol
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		printed, e := m.smt2PPExprTreeWithInfoAt(pattern, scopedNames, false, nil, enclosingAliases, false)
+		printed, e := m.smt2PPExprTreeWithInfoAt(pattern, scopedNames, false, nil, enclosingAliases, false, config)
 		if e != nil {
 			return ASTHandle{}, e
 		}
@@ -125,7 +125,7 @@ func (m *ASTManager) smt2PPQuantifierRootWithInfoAt(q ASTHandle, outer []usymbol
 		return ASTHandle{}, err
 	}
 	var bodyInfo smt2PPInfo
-	printedBody, err := m.smt2PPExprTreeWithInfoAt(body, scopedNames, false, &bodyInfo, enclosingAliases, allowAliases)
+	printedBody, err := m.smt2PPExprTreeWithInfoAt(body, scopedNames, false, &bodyInfo, enclosingAliases, allowAliases, config)
 	if err != nil {
 		return ASTHandle{}, err
 	}
