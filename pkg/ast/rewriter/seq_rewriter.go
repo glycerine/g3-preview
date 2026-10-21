@@ -61,19 +61,7 @@ func (r *SequenceRewriter) integerValue(h ast.ASTHandle) (*big.Int, bool, error)
 }
 
 func (r *SequenceRewriter) assignInteger(value *big.Int, out ast.ASTRef) (status RewriteStatus, err error) {
-	service := r.manager.NumeralService()
-	if service == nil || value == nil {
-		return RewriteFailed, ast.ErrASTHandle
-	}
-	numeral, err := service.NewValue()
-	if err != nil {
-		return RewriteFailed, err
-	}
-	defer func() { err = errors.Join(err, service.Del(&numeral)) }()
-	if err = service.SetString(&numeral, value.String()); err != nil {
-		return RewriteFailed, err
-	}
-	result, err := r.manager.ArithmeticNumeral(&numeral, true)
+	result, err := r.makeInteger(value)
 	if err != nil {
 		return RewriteFailed, err
 	}
@@ -81,6 +69,22 @@ func (r *SequenceRewriter) assignInteger(value *big.Int, out ast.ASTRef) (status
 		return RewriteFailed, err
 	}
 	return RewriteDone, nil
+}
+
+func (r *SequenceRewriter) makeInteger(value *big.Int) (result ast.ASTHandle, err error) {
+	service := r.manager.NumeralService()
+	if service == nil || value == nil {
+		return result, ast.ErrASTHandle
+	}
+	numeral, err := service.NewValue()
+	if err != nil {
+		return result, err
+	}
+	defer func() { err = errors.Join(err, service.Del(&numeral)) }()
+	if err = service.SetString(&numeral, value.String()); err != nil {
+		return result, err
+	}
+	return r.manager.ArithmeticNumeral(&numeral, true)
 }
 
 func (r *SequenceRewriter) assignEmptyLike(h ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
@@ -95,7 +99,7 @@ func (r *SequenceRewriter) assignEmptyLike(h ast.ASTHandle, out ast.ASTRef) (Rew
 	return RewriteDone, r.manager.SetRef(out, empty)
 }
 
-func (r *SequenceRewriter) RewriteLength(a ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+func (r *SequenceRewriter) RewriteLength(a ast.ASTHandle, out ast.ASTRef) (status RewriteStatus, err error) {
 	if err := r.open(); err != nil {
 		return RewriteFailed, err
 	}
@@ -104,6 +108,7 @@ func (r *SequenceRewriter) RewriteLength(a ast.ASTHandle, out ast.ASTRef) (Rewri
 		return RewriteFailed, err
 	}
 	length := new(big.Int)
+	unknown := make([]ast.ASTHandle, 0, len(leaves))
 	for _, leaf := range leaves {
 		text, stringValue, err := r.manager.SequenceStringValue(leaf)
 		if err != nil {
@@ -118,11 +123,92 @@ func (r *SequenceRewriter) RewriteLength(a ast.ASTHandle, out ast.ASTRef) (Rewri
 			return RewriteFailed, err
 		}
 		if !unit {
-			return RewriteFailed, nil
+			unknown = append(unknown, leaf)
+			continue
 		}
 		length.Add(length, big.NewInt(1))
 	}
-	return r.assignInteger(length, out)
+	if len(unknown) == 0 {
+		return r.assignInteger(length, out)
+	}
+	if len(unknown) == 1 && length.Sign() == 0 && len(leaves) == 1 {
+		return RewriteFailed, nil
+	}
+	terms := make([]ast.ASTHandle, 0, len(unknown)+1)
+	refs := make([]ast.ASTRef, 0, len(unknown)+1)
+	defer func() {
+		for i := len(refs) - 1; i >= 0; i-- {
+			err = errors.Join(err, r.manager.DelRef(&refs[i]))
+		}
+	}()
+	for _, leaf := range unknown {
+		term, e := r.manager.MkSequenceLength(leaf)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		ref, e := r.manager.NewRef(term)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		refs = append(refs, ref)
+		terms = append(terms, term)
+	}
+	if length.Sign() != 0 {
+		term, e := r.makeInteger(length)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		ref, e := r.manager.NewRef(term)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		refs = append(refs, ref)
+		terms = append(terms, term)
+	}
+	family, err := r.manager.ArithmeticFamilyID()
+	if err != nil {
+		return RewriteFailed, err
+	}
+	result, err := r.manager.MkFamilyApp(family, 6, nil, terms)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if err = r.manager.SetRef(out, result); err != nil {
+		return RewriteFailed, err
+	}
+	return Rewrite2, nil
+}
+
+func (r *SequenceRewriter) assignSequenceParts(parts []ast.ASTHandle, like ast.ASTHandle, out ast.ASTRef) (status RewriteStatus, err error) {
+	if len(parts) == 0 {
+		return r.assignEmptyLike(like, out)
+	}
+	if len(parts) == 1 {
+		return RewriteDone, r.manager.SetRef(out, parts[0])
+	}
+	current := parts[len(parts)-1]
+	refs := make([]ast.ASTRef, 0, len(parts)-1)
+	defer func() {
+		for i := len(refs) - 1; i >= 0; i-- {
+			err = errors.Join(err, r.manager.DelRef(&refs[i]))
+		}
+	}()
+	for i := len(parts) - 2; i >= 0; i-- {
+		next, e := r.manager.MkSequenceConcat(parts[i], current)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		ref, e := r.manager.NewRef(next)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		refs = append(refs, ref)
+		current = next
+	}
+	if err = r.manager.SetRef(out, current); err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteDone, nil
 }
 
 func (r *SequenceRewriter) RewriteExtract(a, position, length ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
@@ -141,24 +227,51 @@ func (r *SequenceRewriter) RewriteExtract(a, position, length ast.ASTHandle, out
 		return r.assignEmptyLike(a, out)
 	}
 	text, constant, err := r.manager.SequenceStringValue(a)
-	if err != nil || !constant || !posNumeral || !sizeNumeral {
-		return RewriteFailed, err
-	}
-	textLength := new(big.Int).SetUint64(uint64(len(text)))
-	if pos.Cmp(textLength) >= 0 {
-		return r.assignEmptyLike(a, out)
-	}
-	end := new(big.Int).Add(new(big.Int).Set(pos), size)
-	if end.Cmp(textLength) > 0 {
-		end.Set(textLength)
-	}
-	startIndex := int(pos.Uint64())
-	endIndex := int(end.Uint64())
-	result, err := r.manager.MkString(text[startIndex:endIndex])
 	if err != nil {
 		return RewriteFailed, err
 	}
-	return RewriteDone, r.manager.SetRef(out, result)
+	if constant && posNumeral && sizeNumeral {
+		textLength := new(big.Int).SetUint64(uint64(len(text)))
+		if pos.Cmp(textLength) >= 0 {
+			return r.assignEmptyLike(a, out)
+		}
+		end := new(big.Int).Add(new(big.Int).Set(pos), size)
+		if end.Cmp(textLength) > 0 {
+			end.Set(textLength)
+		}
+		startIndex := int(pos.Uint64())
+		endIndex := int(end.Uint64())
+		result, err := r.manager.MkString(text[startIndex:endIndex])
+		if err != nil {
+			return RewriteFailed, err
+		}
+		return RewriteDone, r.manager.SetRef(out, result)
+	}
+	if !posNumeral || !sizeNumeral || !pos.IsUint64() || !size.IsUint64() {
+		return RewriteFailed, nil
+	}
+	leaves, err := r.manager.SequenceFlattenConcat(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	for _, leaf := range leaves {
+		unit, e := r.manager.IsSequenceUnit(leaf)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if !unit {
+			return RewriteFailed, nil
+		}
+	}
+	start, count := pos.Uint64(), size.Uint64()
+	if start >= uint64(len(leaves)) {
+		return r.assignEmptyLike(a, out)
+	}
+	end := start + count
+	if end < start || end > uint64(len(leaves)) {
+		end = uint64(len(leaves))
+	}
+	return r.assignSequenceParts(leaves[start:end], a, out)
 }
 
 func (r *SequenceRewriter) RewriteAt(a, index ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
@@ -172,18 +285,63 @@ func (r *SequenceRewriter) RewriteAt(a, index ast.ASTHandle, out ast.ASTRef) (Re
 	if position.Sign() < 0 {
 		return r.assignEmptyLike(a, out)
 	}
-	text, constant, err := r.manager.SequenceStringValue(a)
-	if err != nil || !constant {
-		return RewriteFailed, err
-	}
-	if !position.IsUint64() || position.Uint64() >= uint64(len(text)) {
-		return r.assignEmptyLike(a, out)
-	}
-	result, err := r.manager.MkString(text[position.Uint64() : position.Uint64()+1])
+	leaves, err := r.manager.SequenceFlattenConcat(a)
 	if err != nil {
 		return RewriteFailed, err
 	}
-	return RewriteDone, r.manager.SetRef(out, result)
+	knownLength := uint64(0)
+	bounded := true
+	for _, leaf := range leaves {
+		text, stringValue, e := r.manager.SequenceStringValue(leaf)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if stringValue {
+			knownLength += uint64(len(text))
+			continue
+		}
+		unit, e := r.manager.IsSequenceUnit(leaf)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if unit {
+			knownLength++
+		} else {
+			bounded = false
+		}
+	}
+	if bounded && (!position.IsUint64() || position.Uint64() >= knownLength) {
+		return r.assignEmptyLike(a, out)
+	}
+	text, constant, err := r.manager.SequenceStringValue(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if constant {
+		if !position.IsUint64() || position.Uint64() >= uint64(len(text)) {
+			return r.assignEmptyLike(a, out)
+		}
+		result, err := r.manager.MkString(text[position.Uint64() : position.Uint64()+1])
+		if err != nil {
+			return RewriteFailed, err
+		}
+		return RewriteDone, r.manager.SetRef(out, result)
+	}
+	indexValue := position.Uint64()
+	for _, leaf := range leaves {
+		unit, e := r.manager.IsSequenceUnit(leaf)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if !unit {
+			return RewriteFailed, nil
+		}
+		if indexValue == 0 {
+			return RewriteDone, r.manager.SetRef(out, leaf)
+		}
+		indexValue--
+	}
+	return RewriteFailed, nil
 }
 
 func (r *SequenceRewriter) RewriteIndex(a, needle, offset ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {

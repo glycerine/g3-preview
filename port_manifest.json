@@ -33766,16 +33766,16 @@
           ]
         },
         {
-          "name": "seq_rewriter::mk_seq_length constant String/unit concatenation folding; symbolic length-sum publication remains open (seq_rewriter.cpp:521-558)",
-          "status": "partial",
+          "name": "seq_rewriter::mk_seq_length constant String/unit accumulation, symbolic residual length construction and arithmetic sum publication (seq_rewriter.cpp:521-558)",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",
           "tests": [
             "TestSequenceRewriterConstantLengthExtractAtAndIndex"
           ]
         },
         {
-          "name": "seq_rewriter constant and boundary branches for mk_seq_extract and mk_seq_at; symbolic unit-concat traversal remains open (seq_rewriter.cpp:560-619,768-819)",
-          "status": "partial",
+          "name": "seq_rewriter constant and boundary branches plus concrete unit-concat traversal for mk_seq_extract and mk_seq_at (seq_rewriter.cpp:560-619,768-819)",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",
           "tests": [
             "TestSequenceRewriterConstantLengthExtractAtAndIndex"
@@ -33794,7 +33794,8 @@
         "SequenceRewriter borrows its AST manager. RewriteConcat uses temporary owning AST references across nested public factory calls and joins their release errors into the result."
       ],
       "deviations": [
-        "The Go reducer exposes the theory operation directly; integration into the general rewriter traversal remains open with the other sequence reductions. Standard Go strings replace zstring storage for the reached constant-concatenation algorithm."
+        "The Go reducer exposes the theory operation directly; integration into the general rewriter traversal remains open with the other sequence reductions. Standard Go strings replace zstring storage for reached String algorithms.",
+        "The native all-unit extraction branch passes an empty vector to an assertion-constrained concat helper when the start is beyond all units. The Go port returns the sequence empty value for that mathematically empty, otherwise undefined source case."
       ]
     },
     {

@@ -319,4 +319,52 @@ func TestSequenceRewriterConstantLengthExtractAtAndIndex(t *testing.T) {
 	status, err = rw.RewriteLength(concat, out)
 	astTestMust(t, err)
 	readInteger("3", status)
+
+	stringSort, err := m.GetSort(base)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "length-x"), stringSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	symbolicConcat, err := m.MkSequenceConcat(x, str("pq"))
+	astTestMust(t, err)
+	astTestPin(t, m, symbolicConcat)
+	status, err = rw.RewriteLength(symbolicConcat, out)
+	astTestMust(t, err)
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || status != Rewrite2 || kind != 6 {
+		t.Fatalf("symbolic length sum: status=%d kind=%d error=%v", status, kind, e)
+	}
+
+	units := make([]ast.ASTHandle, 3)
+	for i, value := range []uint32{65, 66, 67} {
+		literal, e := m.BitVectorNumeralUnsigned(value, 8)
+		astTestMust(t, e)
+		astTestPin(t, m, literal)
+		units[i], e = m.MkSequenceUnit(literal)
+		astTestMust(t, e)
+		astTestPin(t, m, units[i])
+	}
+	tail, err := m.MkSequenceConcat(units[1], units[2])
+	astTestMust(t, err)
+	astTestPin(t, m, tail)
+	unitSequence, err := m.MkSequenceConcat(units[0], tail)
+	astTestMust(t, err)
+	astTestPin(t, m, unitSequence)
+	status, err = rw.RewriteExtract(unitSequence, num("1"), num("2"), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	parts, err := m.SequenceFlattenConcat(result)
+	astTestMust(t, err)
+	if status != RewriteDone || len(parts) != 2 || parts[0] != units[1] || parts[1] != units[2] {
+		t.Fatalf("unit extraction: status=%d parts=%v", status, parts)
+	}
+	status, err = rw.RewriteAt(unitSequence, num("1"), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteDone || result != units[1] {
+		t.Fatalf("unit at: status=%d result=%v", status, result)
+	}
 }
