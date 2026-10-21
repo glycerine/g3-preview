@@ -204,9 +204,6 @@ func (c *Converter) MkRMConst(declaration ast.ASTHandle) (ast.ASTHandle, error) 
 }
 
 func (c *Converter) convertedUF(declaration ast.ASTHandle, rangeSort ast.ASTHandle) (ast.ASTHandle, error) {
-	if value, found := c.convertedUFs[declaration]; found {
-		return value, nil
-	}
 	arity, err := c.manager.GetArity(declaration)
 	if err != nil {
 		return ast.ASTHandle{}, err
@@ -217,6 +214,13 @@ func (c *Converter) convertedUF(declaration ast.ASTHandle, rangeSort ast.ASTHand
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}
+	}
+	return c.convertedUFWithDomain(declaration, domain, rangeSort)
+}
+
+func (c *Converter) convertedUFWithDomain(declaration ast.ASTHandle, domain []ast.ASTHandle, rangeSort ast.ASTHandle) (ast.ASTHandle, error) {
+	if value, found := c.convertedUFs[declaration]; found {
+		return value, nil
 	}
 	result, err := c.manager.MkFreshFuncDecl(usymbol.Symbol{}, usymbol.Symbol{}, domain, rangeSort)
 	if err != nil {

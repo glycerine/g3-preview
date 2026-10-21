@@ -9,12 +9,9 @@ import (
 
 // ToReal converts an encoded floating-point value to the source arithmetic
 // expression. Under high-unspecified semantics, NaN and infinities map to 0.
-func (c *Converter) ToReal(value ast.ASTHandle) (ast.ASTHandle, error) {
+func (c *Converter) toReal(declaration, value ast.ASTHandle) (ast.ASTHandle, error) {
 	if err := c.open(); err != nil {
 		return ast.ASTHandle{}, err
-	}
-	if !c.highUnspecified {
-		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
 	sort, err := c.manager.GetSort(value)
 	if err != nil {
@@ -66,11 +63,34 @@ func (c *Converter) ToReal(value ast.ASTHandle) (ast.ASTHandle, error) {
 	isZero := b.call(func() (ast.ASTHandle, error) { return c.isZero(value) })
 	isInfinite := b.call(func() (ast.ASTHandle, error) { return c.isInfinite(value) })
 	isNaN := b.call(func() (ast.ASTHandle, error) { return c.isNaN(value) })
+	unspecified := zero
+	if !c.highUnspecified {
+		if declaration.IsNull() {
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
+		nanWrapped := b.call(func() (ast.ASTHandle, error) { return c.nanWrap(value) })
+		domainSort := b.call(func() (ast.ASTHandle, error) { return c.manager.GetSort(nanWrapped) })
+		rangeSort := b.call(func() (ast.ASTHandle, error) { return c.manager.GetRange(declaration) })
+		converted := b.call(func() (ast.ASTHandle, error) {
+			return c.convertedUFWithDomain(declaration, []ast.ASTHandle{domainSort}, rangeSort)
+		})
+		unspecified = b.call(func() (ast.ASTHandle, error) {
+			return c.manager.MkApp(converted, []ast.ASTHandle{nanWrapped})
+		})
+	}
 	result = b.ite(isZero, zero, result)
-	result = b.ite(isInfinite, zero, result)
-	result = b.ite(isNaN, zero, result)
+	result = b.ite(isInfinite, unspecified, result)
+	result = b.ite(isNaN, unspecified, result)
 	if b.err != nil {
 		return ast.ASTHandle{}, b.err
 	}
 	return result, nil
+}
+
+func (c *Converter) ToReal(value ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.toReal(ast.ASTHandle{}, value)
+}
+
+func (c *Converter) ToRealFor(declaration, value ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.toReal(declaration, value)
 }

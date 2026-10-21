@@ -3,11 +3,11 @@ package fpa
 
 import "github.com/glycerine/g3/pkg/ast"
 
-func (c *Converter) toBV(width uint32, roundingMode, value ast.ASTHandle, signed bool) (ast.ASTHandle, error) {
+func (c *Converter) toBV(declaration ast.ASTHandle, width uint32, roundingMode, value ast.ASTHandle, signed bool) (ast.ASTHandle, error) {
 	if err := c.open(); err != nil {
 		return ast.ASTHandle{}, err
 	}
-	if width == 0 || !c.highUnspecified {
+	if width == 0 {
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
 	rm, err := c.splitRoundingMode(roundingMode)
@@ -26,6 +26,21 @@ func (c *Converter) toBV(width uint32, roundingMode, value ast.ASTHandle, signed
 	zero1 := b.zero(1)
 	one1 := b.one(1)
 	unspecified := b.zero(width)
+	if !c.highUnspecified {
+		if declaration.IsNull() {
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
+		nanWrapped := b.call(func() (ast.ASTHandle, error) { return c.nanWrap(value) })
+		rmSort := b.call(func() (ast.ASTHandle, error) { return c.manager.GetSort(rm) })
+		wrappedSort := b.call(func() (ast.ASTHandle, error) { return c.manager.GetSort(nanWrapped) })
+		rangeSort := b.call(func() (ast.ASTHandle, error) { return c.manager.GetRange(declaration) })
+		converted := b.call(func() (ast.ASTHandle, error) {
+			return c.convertedUFWithDomain(declaration, []ast.ASTHandle{rmSort, wrappedSort}, rangeSort)
+		})
+		unspecified = b.call(func() (ast.ASTHandle, error) {
+			return c.manager.MkApp(converted, []ast.ASTHandle{rm, nanWrapped})
+		})
+	}
 	isNaN := b.call(func() (ast.ASTHandle, error) { return c.isNaN(value) })
 	isInfinite := b.call(func() (ast.ASTHandle, error) { return c.isInfinite(value) })
 	isZero := b.call(func() (ast.ASTHandle, error) { return c.isZero(value) })
@@ -89,10 +104,18 @@ func (c *Converter) toBV(width uint32, roundingMode, value ast.ASTHandle, signed
 
 // ToUBV converts floating point to an unsigned bit-vector.
 func (c *Converter) ToUBV(width uint32, roundingMode, value ast.ASTHandle) (ast.ASTHandle, error) {
-	return c.toBV(width, roundingMode, value, false)
+	return c.toBV(ast.ASTHandle{}, width, roundingMode, value, false)
 }
 
 // ToSBV converts floating point to a signed bit-vector.
 func (c *Converter) ToSBV(width uint32, roundingMode, value ast.ASTHandle) (ast.ASTHandle, error) {
-	return c.toBV(width, roundingMode, value, true)
+	return c.toBV(ast.ASTHandle{}, width, roundingMode, value, true)
+}
+
+func (c *Converter) ToUBVFor(declaration ast.ASTHandle, width uint32, roundingMode, value ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.toBV(declaration, width, roundingMode, value, false)
+}
+
+func (c *Converter) ToSBVFor(declaration ast.ASTHandle, width uint32, roundingMode, value ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.toBV(declaration, width, roundingMode, value, true)
 }

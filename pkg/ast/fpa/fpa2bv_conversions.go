@@ -98,7 +98,7 @@ func (c *Converter) FromIEEEBV(sort, bits ast.ASTHandle) (ast.ASTHandle, error) 
 
 // ToIEEEBV packs an encoded value. With the source default high-unspecified
 // setting, every NaN maps to the canonical NaN bit pattern.
-func (c *Converter) ToIEEEBV(value ast.ASTHandle) (ast.ASTHandle, error) {
+func (c *Converter) toIEEEBV(declaration, value ast.ASTHandle) (ast.ASTHandle, error) {
 	if err := c.open(); err != nil {
 		return ast.ASTHandle{}, err
 	}
@@ -110,10 +110,88 @@ func (c *Converter) ToIEEEBV(value ast.ASTHandle) (ast.ASTHandle, error) {
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	if !c.highUnspecified {
-		// The low-unspecified branch introduces a fresh converted UF plus two
-		// owned side constraints; that state is ported with UF conversion.
-		return ast.ASTHandle{}, ast.ErrASTDomain
+	sort, err := c.manager.GetSort(value)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var unspecified ast.ASTHandle
+	if c.highUnspecified {
+		canonical, e := c.MkSpecial(sort, NaN)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		unspecified, err = c.JoinFP(canonical)
+	} else {
+		if declaration.IsNull() {
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
+		nanWrapped, e := c.nanWrap(value)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		domainSort, e := c.manager.GetSort(nanWrapped)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		rangeSort, e := c.manager.GetRange(declaration)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		converted, e := c.convertedUFWithDomain(declaration, []ast.ASTHandle{domainSort}, rangeSort)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		unspecified, err = c.manager.MkApp(converted, []ast.ASTHandle{nanWrapped})
+		if err == nil {
+			ebits, sbits, _, e := c.manager.FloatingPointSortShape(sort)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			exponent := ast.ASTHandle{}
+			exponent, err = c.manager.MkBitVectorExtract(ebits+sbits-2, sbits-1, unspecified)
+			if err == nil {
+				var allOnes ast.ASTHandle
+				allOnes, err = c.manager.BitVectorNumeralAllOnes(ebits)
+				if err == nil {
+					var assertion ast.ASTHandle
+					assertion, err = c.boolEq(exponent, allOnes)
+					if err == nil {
+						err = c.addAssertion(assertion)
+					}
+				}
+			}
+			if err == nil {
+				var significand, zero, equal, nonzero ast.ASTHandle
+				significand, err = c.manager.MkBitVectorExtract(sbits-2, 0, unspecified)
+				if err == nil {
+					zero, err = c.zero(sbits - 1)
+				}
+				if err == nil {
+					equal, err = c.boolEq(significand, zero)
+				}
+				if err == nil {
+					nonzero, err = c.boolNot(equal)
+				}
+				if err == nil {
+					err = c.addAssertion(nonzero)
+				}
+			}
+		}
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return c.boolITE(nan, unspecified, joined)
+}
+
+func (c *Converter) nanWrap(value ast.ASTHandle) (ast.ASTHandle, error) {
+	joined, err := c.JoinFP(value)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	nan, err := c.isNaN(value)
+	if err != nil {
+		return ast.ASTHandle{}, err
 	}
 	sort, err := c.manager.GetSort(value)
 	if err != nil {
@@ -128,4 +206,12 @@ func (c *Converter) ToIEEEBV(value ast.ASTHandle) (ast.ASTHandle, error) {
 		return ast.ASTHandle{}, err
 	}
 	return c.boolITE(nan, canonicalBits, joined)
+}
+
+func (c *Converter) ToIEEEBV(value ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.toIEEEBV(ast.ASTHandle{}, value)
+}
+
+func (c *Converter) ToIEEEBVFor(declaration, value ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.toIEEEBV(declaration, value)
 }

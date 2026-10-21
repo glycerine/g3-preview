@@ -17295,7 +17295,7 @@
       "path": "src/ast/fpa/fpa2bv_converter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/fpa/fpa2bv_converter.go",
         "pkg/ast/fpa/fpa2bv_predicates.go",
@@ -17343,6 +17343,7 @@
         "TestConverterFloatToBitVectorConversions",
         "TestConverterFloatToRealConversion",
         "TestConverterRealToFloatConversions",
+        "TestFPA2BVRewriterLowUnspecifiedDispatch",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18635,11 +18636,11 @@
           "text": "SASSERT(is_well_sorted(m, res_exp));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "constructor/destructor, fp split/join, SMT equality, component ITE, distinct expansion, rounding-mode constants, and canonical infinity/NaN/zero encodings; arithmetic, conversions, constants and UFs remain open",
+          "name": "constructor/destructor, fp split/join, SMT equality, component ITE, distinct expansion, rounding-mode constants, and canonical infinity/NaN/zero encodings",
           "status": "ported",
           "go_target": "pkg/ast/fpa/fpa2bv_converter.go",
           "tests": [
@@ -18657,11 +18658,41 @@
           ]
         },
         {
-          "name": "expanded floating-point bound variables, packed IEEE BV input, and high-unspecified IEEE BV output; low-unspecified UF output remains open",
+          "name": "addition, subtraction, multiplication, division, remainder, fused multiply-add, square root, round-to-integral, and the shared normalization/rounding kernel",
+          "status": "ported",
+          "go_target": "pkg/ast/fpa/fpa2bv_round.go",
+          "tests": [
+            "TestConverterRoundingDecisionModes",
+            "TestConverterRoundKernelWidthsAndResultShape",
+            "TestConverterAddSubtractSpecialCasesAndSymbolicShape",
+            "TestConverterMultiplySpecialCasesAndSymbolicShape",
+            "TestConverterDivideSpecialCasesAndSymbolicShape",
+            "TestConverterRemainderSpecialCasesAndSymbolicShape",
+            "TestConverterRoundToIntegralSpecialCasesAndSymbolicShape",
+            "TestConverterSquareRootSpecialCasesAndSymbolicShape",
+            "TestConverterFMASpecialCasesAndSymbolicShape"
+          ]
+        },
+        {
+          "name": "floating-format, signed/unsigned bit-vector, IEEE bit-vector, arithmetic real, and exponent/rational conversions in both directions, including high/low-unspecified results",
+          "status": "ported",
+          "go_target": "pkg/ast/fpa/fpa2bv_format.go",
+          "tests": [
+            "TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape",
+            "TestConverterSignedUnsignedIntegerConversions",
+            "TestConverterFloatToBitVectorConversions",
+            "TestConverterFloatToRealConversion",
+            "TestConverterRealToFloatConversions",
+            "TestFPA2BVRewriterLowUnspecifiedDispatch"
+          ]
+        },
+        {
+          "name": "expanded floating-point bound variables, packed IEEE BV input, and high/low-unspecified IEEE BV output with canonical NaN wrapping and payload constraints",
           "status": "ported",
           "go_target": "pkg/ast/fpa/fpa2bv_conversions.go",
           "tests": [
-            "TestConverterVariablesAndIEEEBitVectorConversions"
+            "TestConverterVariablesAndIEEEBitVectorConversions",
+            "TestFPA2BVRewriterLowUnspecifiedDispatch"
           ]
         },
         {
@@ -18698,7 +18729,7 @@
       "path": "src/ast/fpa/fpa2bv_converter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/fpa/fpa2bv_converter.go",
         "pkg/ast/fpa/fpa2bv_predicates.go",
@@ -18746,6 +18777,7 @@
         "TestConverterFloatToBitVectorConversions",
         "TestConverterFloatToRealConversion",
         "TestConverterRealToFloatConversions",
+        "TestFPA2BVRewriterLowUnspecifiedDispatch",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18760,11 +18792,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "public converter lifecycle, foundational structural/special-value interface, classifications, unary sign operations and comparisons; remaining arithmetic and model-facing interface remains open",
+          "name": "complete public converter lifecycle, structural and special-value interface, classifications, arithmetic, conversions, caches, side assertions, and model-facing accessors",
           "status": "ported",
           "go_target": "pkg/ast/fpa/fpa2bv_converter.go",
           "tests": [
@@ -18776,6 +18808,8 @@
             "TestConverterBiasLeadingZerosAndUnpack",
             "TestConverterSymbolCachesAssertionsAndReset",
             "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
+            ,
+            "TestFPA2BVRewriterLowUnspecifiedDispatch"
           ]
         }
       ],
@@ -18788,7 +18822,7 @@
       "path": "src/ast/fpa/fpa2bv_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/fpa2bv_rewriter.go",
         "pkg/ast/fpa/fpa2bv_conversions.go",
@@ -18799,6 +18833,10 @@
         "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
         "TestFPA2BVRewriterArithmeticDispatch",
         "TestFPA2BVRewriterToFPFormatDispatch",
+        "TestFPA2BVRewriterToBVDispatch",
+        "TestFPA2BVRewriterToRealDispatch",
+        "TestFPA2BVRewriterFromRealDispatch",
+        "TestFPA2BVRewriterLowUnspecifiedDispatch",
         "TestConverterFiniteNumeral"
       ],
       "assertions": [
@@ -18827,8 +18865,8 @@
           "text": "SASSERT(old_q->get_num_decls() <= curr_sz);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "traversal lifecycle, resource limits, constants, finite numerals, rounding modes, special values, structural operations, predicates, comparisons, extrema, IEEE packing, uninterpreted functions, and quantified FP variables",
@@ -18873,6 +18911,8 @@
             "TestFPA2BVRewriterToRealDispatch"
             ,
             "TestFPA2BVRewriterFromRealDispatch"
+            ,
+            "TestFPA2BVRewriterLowUnspecifiedDispatch"
           ]
         }
       ],
@@ -18885,7 +18925,7 @@
       "path": "src/ast/fpa/fpa2bv_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/fpa2bv_rewriter.go",
         "pkg/ast/fpa/fpa2bv_conversions.go",
@@ -18899,6 +18939,7 @@
         "TestFPA2BVRewriterToBVDispatch",
         "TestFPA2BVRewriterToRealDispatch",
         "TestFPA2BVRewriterFromRealDispatch",
+        "TestFPA2BVRewriterLowUnspecifiedDispatch",
         "TestConverterFiniteNumeral"
       ],
       "conditionals": [
@@ -18911,11 +18952,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "fpa2bv configuration and traversal wrapper with arithmetic, IEEE bit-vector assembly, three-field assembly, floating format conversion, signed/unsigned bit-vector conversion in both directions, and real conversion in both directions; low-unspecified UF conversion remains open",
+          "name": "complete fpa2bv configuration and traversal wrapper with arithmetic, IEEE bit-vector assembly, three-field assembly, floating format conversion, signed/unsigned bit-vector conversion in both directions, real conversion in both directions, and high/low-unspecified conversion",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
           "tests": [
@@ -18930,6 +18971,8 @@
             "TestFPA2BVRewriterToRealDispatch"
             ,
             "TestFPA2BVRewriterFromRealDispatch"
+            ,
+            "TestFPA2BVRewriterLowUnspecifiedDispatch"
           ]
         }
       ],

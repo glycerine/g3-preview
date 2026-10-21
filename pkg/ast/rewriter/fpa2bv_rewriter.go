@@ -71,6 +71,13 @@ func (r *FPA2BVRewriter) SetLimits(maxSteps uint32, maxMemory uint64) error {
 	return nil
 }
 
+func (r *FPA2BVRewriter) SetHighUnspecified(value bool) error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	return r.converter.SetHighUnspecified(value)
+}
+
 func (r *FPA2BVRewriter) Rewrite(root ast.ASTHandle, out ast.ASTRef) error {
 	if err := r.open(); err != nil {
 		return err
@@ -341,7 +348,7 @@ func (c *fpa2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArgument
 			if len(values) != 1 {
 				err = ast.ErrASTDomain
 			} else {
-				value, err = converter.ToIEEEBV(values[0])
+				value, err = converter.ToIEEEBVFor(decl, values[0])
 			}
 		case ast.FPAOpToFP:
 			var targetSort ast.ASTHandle
@@ -402,16 +409,16 @@ func (c *fpa2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArgument
 				var width uint32
 				width, err = m.BitVectorSize(rangeSort)
 				if err == nil && kind == ast.FPAOpToUBV {
-					value, err = converter.ToUBV(width, values[0], values[1])
+					value, err = converter.ToUBVFor(decl, width, values[0], values[1])
 				} else if err == nil {
-					value, err = converter.ToSBV(width, values[0], values[1])
+					value, err = converter.ToSBVFor(decl, width, values[0], values[1])
 				}
 			}
 		case ast.FPAOpToReal:
 			if len(values) != 1 {
 				err = ast.ErrASTDomain
 			} else {
-				value, err = converter.ToReal(values[0])
+				value, err = converter.ToRealFor(decl, values[0])
 			}
 		default:
 			done = false

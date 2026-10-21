@@ -353,3 +353,53 @@ func TestFPA2BVRewriterFromRealDispatch(t *testing.T) {
 		t.Fatal("real/integer conversion dispatch", kind, e)
 	}
 }
+
+func TestFPA2BVRewriterLowUnspecifiedDispatch(t *testing.T) {
+	f := newFPA2BVFixture(t)
+	astTestMust(t, f.rewriter.SetHighUnspecified(false))
+	nan, err := f.m.MkFPANaNOfSort(f.sort)
+	astTestMust(t, err)
+
+	toIEEE, err := f.m.MkFamilyApp(f.family, ast.FPAOpToIEEEBV, nil, []ast.ASTHandle{nan})
+	astTestMust(t, err)
+	before := len(f.converter.ExtraAssertions())
+	bits := f.rewrite(t, toIEEE)
+	if width, e := f.m.BitVectorSize(bits); e != nil || width != 32 {
+		t.Fatal("low-unspecified IEEE result", width, e)
+	}
+	if len(f.converter.ExtraAssertions()) != before+2 {
+		t.Fatal("low-unspecified NaN constraints", before, len(f.converter.ExtraAssertions()))
+	}
+
+	rounding, err := f.m.MkFamilyApp(f.family, ast.FPAOpRMNearestEven, nil, nil)
+	astTestMust(t, err)
+	rmSort, err := f.m.GetSort(rounding)
+	astTestMust(t, err)
+	widthParameter, err := f.m.NewParameterInt(13)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, f.m.DelParameter(&widthParameter)) })
+	toBVDecl, err := f.m.MkFamilyFuncDecl(
+		f.family, ast.FPAOpToUBV, []ast.ASTParameter{widthParameter},
+		[]ast.ASTHandle{rmSort, f.sort}, ast.ASTHandle{},
+	)
+	astTestMust(t, err)
+	toBV, err := f.m.MkApp(toBVDecl, []ast.ASTHandle{rounding, nan})
+	astTestMust(t, err)
+	convertedBV := f.rewrite(t, toBV)
+	if width, e := f.m.BitVectorSize(convertedBV); e != nil || width != 13 {
+		t.Fatal("low-unspecified float-to-BV result", width, e)
+	}
+
+	toReal, err := f.m.MkFamilyApp(f.family, ast.FPAOpToReal, nil, []ast.ASTHandle{nan})
+	astTestMust(t, err)
+	convertedReal := f.rewrite(t, toReal)
+	zero, err := f.m.ArithmeticRealNumeralText("0")
+	astTestMust(t, err)
+	gotSort, err := f.m.GetSort(convertedReal)
+	astTestMust(t, err)
+	wantSort, err := f.m.GetSort(zero)
+	astTestMust(t, err)
+	if gotSort != wantSort || convertedReal == zero {
+		t.Fatal("low-unspecified float-to-real result", gotSort, wantSort, convertedReal, zero)
+	}
+}
