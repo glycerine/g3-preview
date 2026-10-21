@@ -33507,7 +33507,8 @@
       ],
       "tests": [
         "TestSequenceRewriterConcatSourceBranches",
-        "TestSequenceRewriterByteUnit"
+        "TestSequenceRewriterByteUnit",
+        "TestSequenceRewriterConstantPredicates"
       ],
       "assertions": [
         {
@@ -33744,6 +33745,14 @@
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",
           "tests": [
             "TestSequenceRewriterByteUnit"
+          ]
+        },
+        {
+          "name": "seq_rewriter constant String contains folding and the constant/empty leading branches of prefix and suffix reduction (seq_rewriter.cpp:664-766,869-1080)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterConstantPredicates"
           ]
         }
       ],

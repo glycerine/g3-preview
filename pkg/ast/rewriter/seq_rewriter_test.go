@@ -132,3 +132,47 @@ func TestSequenceRewriterByteUnit(t *testing.T) {
 		t.Fatalf("wide unit status: %d", status)
 	}
 }
+
+func TestSequenceRewriterConstantPredicates(t *testing.T) {
+	m := astTestManager(t)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	values := map[string]ast.ASTHandle{}
+	for _, text := range []string{"", "ab", "abc", "bc", "z"} {
+		values[text], err = m.MkString(text)
+		astTestMust(t, err)
+		astTestPin(t, m, values[text])
+	}
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	falsehood, err := m.MkFalse()
+	astTestMust(t, err)
+	check := func(name string, rewrite func(ast.ASTHandle, ast.ASTHandle, ast.ASTRef) (RewriteStatus, error), a, b ast.ASTHandle, want ast.ASTHandle) {
+		t.Helper()
+		status, e := rewrite(a, b, out)
+		astTestMust(t, e)
+		got, e := m.RefGet(out)
+		astTestMust(t, e)
+		if status != RewriteDone || got != want {
+			t.Fatalf("%s: status=%d result=%v want=%v", name, status, got, want)
+		}
+	}
+	check("contains", rw.RewriteContains, values["abc"], values["bc"], truth)
+	check("not-contains", rw.RewriteContains, values["ab"], values["bc"], falsehood)
+	check("prefix", rw.RewritePrefix, values["ab"], values["abc"], truth)
+	check("not-prefix", rw.RewritePrefix, values["abc"], values["ab"], falsehood)
+	check("empty-prefix", rw.RewritePrefix, values[""], values["z"], truth)
+	check("suffix", rw.RewriteSuffix, values["bc"], values["abc"], truth)
+	check("not-suffix", rw.RewriteSuffix, values["abc"], values["bc"], falsehood)
+	check("identity-suffix", rw.RewriteSuffix, values["ab"], values["ab"], truth)
+	status, err := rw.RewriteSuffix(values["ab"], values[""], out)
+	astTestMust(t, err)
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || status != Rewrite3 || kind != ast.ASTOpEq {
+		t.Fatalf("empty target suffix: status=%d kind=%d error=%v", status, kind, e)
+	}
+}

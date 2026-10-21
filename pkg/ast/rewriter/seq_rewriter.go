@@ -4,6 +4,7 @@ package rewriter
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -30,6 +31,109 @@ func (r *SequenceRewriter) open() error {
 	}
 	_, err := r.manager.ProofsEnabled()
 	return err
+}
+
+func (r *SequenceRewriter) assignBoolean(value bool, out ast.ASTRef) (RewriteStatus, error) {
+	var result ast.ASTHandle
+	var err error
+	if value {
+		result, err = r.manager.MkTrue()
+	} else {
+		result, err = r.manager.MkFalse()
+	}
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteDone, r.manager.SetRef(out, result)
+}
+
+func (r *SequenceRewriter) RewriteContains(a, b ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if err := r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	left, leftString, err := r.manager.SequenceStringValue(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	right, rightString, err := r.manager.SequenceStringValue(b)
+	if err != nil || !leftString || !rightString {
+		return RewriteFailed, err
+	}
+	return r.assignBoolean(strings.Contains(left, right), out)
+}
+
+func (r *SequenceRewriter) RewritePrefix(a, b ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if err := r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	left, leftString, err := r.manager.SequenceStringValue(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	right, rightString, err := r.manager.SequenceStringValue(b)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if leftString && rightString {
+		return r.assignBoolean(strings.HasPrefix(right, left), out)
+	}
+	empty, err := r.manager.IsSequenceEmpty(a)
+	if err != nil || !empty {
+		return RewriteFailed, err
+	}
+	return r.assignBoolean(true, out)
+}
+
+func (r *SequenceRewriter) RewriteSuffix(a, b ast.ASTHandle, out ast.ASTRef) (status RewriteStatus, err error) {
+	if err = r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	if a == b {
+		return r.assignBoolean(true, out)
+	}
+	emptyA, err := r.manager.IsSequenceEmpty(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if emptyA {
+		return r.assignBoolean(true, out)
+	}
+	emptyB, err := r.manager.IsSequenceEmpty(b)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if emptyB {
+		sort, err := r.manager.GetSort(a)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		empty, err := r.manager.MkSequenceEmpty(sort)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		emptyRef, err := r.manager.NewRef(empty)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		defer func() { err = errors.Join(err, r.manager.DelRef(&emptyRef)) }()
+		result, err := r.manager.MkEq(empty, a)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		if err = r.manager.SetRef(out, result); err != nil {
+			return RewriteFailed, err
+		}
+		return Rewrite3, nil
+	}
+	left, leftString, err := r.manager.SequenceStringValue(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	right, rightString, err := r.manager.SequenceStringValue(b)
+	if err != nil || !leftString || !rightString {
+		return RewriteFailed, err
+	}
+	return r.assignBoolean(strings.HasSuffix(right, left), out)
 }
 
 // RewriteUnit ports the byte-valued branch of seq_rewriter::mk_seq_unit.
