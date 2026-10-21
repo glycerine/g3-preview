@@ -17299,6 +17299,7 @@
       "go_targets": [
         "pkg/ast/fpa/fpa2bv_converter.go",
         "pkg/ast/fpa/fpa2bv_predicates.go",
+        "pkg/ast/fpa/fpa2bv_conversions.go",
         "pkg/ast/ast_fpa_sort_access.go",
         "pkg/ast/ast_bv_all_ones.go"
       ],
@@ -17306,7 +17307,8 @@
         "TestConverterSortAccessSpecialsSplitAndJoin",
         "TestConverterNaNEqualityDistinctAndComponentITE",
         "TestConverterRoundingModeCodesAndEquality",
-        "TestConverterClassificationsUnarySignsAndComparisons"
+        "TestConverterClassificationsUnarySignsAndComparisons",
+        "TestConverterVariablesAndIEEEBitVectorConversions"
       ],
       "conditionals": [
         {
@@ -18616,6 +18618,14 @@
           "tests": [
             "TestConverterClassificationsUnarySignsAndComparisons"
           ]
+        },
+        {
+          "name": "expanded floating-point bound variables, packed IEEE BV input, and high-unspecified IEEE BV output; low-unspecified UF output remains open",
+          "status": "ported",
+          "go_target": "pkg/ast/fpa/fpa2bv_conversions.go",
+          "tests": [
+            "TestConverterVariablesAndIEEEBitVectorConversions"
+          ]
         }
       ],
       "ownership": [
@@ -18631,6 +18641,7 @@
       "go_targets": [
         "pkg/ast/fpa/fpa2bv_converter.go",
         "pkg/ast/fpa/fpa2bv_predicates.go",
+        "pkg/ast/fpa/fpa2bv_conversions.go",
         "pkg/ast/ast_fpa_sort_access.go",
         "pkg/ast/ast_bv_all_ones.go"
       ],
@@ -18638,7 +18649,8 @@
         "TestConverterSortAccessSpecialsSplitAndJoin",
         "TestConverterNaNEqualityDistinctAndComponentITE",
         "TestConverterRoundingModeCodesAndEquality",
-        "TestConverterClassificationsUnarySignsAndComparisons"
+        "TestConverterClassificationsUnarySignsAndComparisons",
+        "TestConverterVariablesAndIEEEBitVectorConversions"
       ],
       "conditionals": [
         {
@@ -18661,7 +18673,8 @@
             "TestConverterSortAccessSpecialsSplitAndJoin",
             "TestConverterNaNEqualityDistinctAndComponentITE",
             "TestConverterRoundingModeCodesAndEquality",
-            "TestConverterClassificationsUnarySignsAndComparisons"
+            "TestConverterClassificationsUnarySignsAndComparisons",
+            "TestConverterVariablesAndIEEEBitVectorConversions"
           ]
         }
       ],

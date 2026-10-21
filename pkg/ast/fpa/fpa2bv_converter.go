@@ -23,11 +23,12 @@ const (
 // AST results returned by its methods have the same borrowed-handle contract as
 // ASTManager factories.
 type Converter struct {
-	self    *Converter
-	manager *ast.ASTManager
-	family  ast.FamilyID
-	header  uint64
-	closed  bool
+	self            *Converter
+	manager         *ast.ASTManager
+	family          ast.FamilyID
+	header          uint64
+	highUnspecified bool
+	closed          bool
 }
 
 func NewConverter(m *ast.ASTManager) (owner *Converter, result error) {
@@ -38,7 +39,7 @@ func NewConverter(m *ast.ASTManager) (owner *Converter, result error) {
 	if err := m.Budget().Reserve(n); err != nil {
 		return nil, err
 	}
-	owner = &Converter{manager: m, header: n}
+	owner = &Converter{manager: m, header: n, highUnspecified: true}
 	owner.self = owner
 	fail := func(err error) (*Converter, error) { return owner, errors.Join(err, owner.Close()) }
 	if _, err := m.RegisterArithmeticPlugin(); err != nil {
@@ -53,6 +54,16 @@ func NewConverter(m *ast.ASTManager) (owner *Converter, result error) {
 		return fail(err)
 	}
 	return owner, nil
+}
+
+// SetHighUnspecified selects the source converter's deterministic high value
+// for otherwise unspecified floating-point conversions.
+func (c *Converter) SetHighUnspecified(value bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	c.highUnspecified = value
+	return nil
 }
 
 func (c *Converter) open() error {

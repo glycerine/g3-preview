@@ -1,6 +1,7 @@
 package fpa_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -14,6 +15,65 @@ func must(t *testing.T, err error) {
 	t.Helper()
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestConverterVariablesAndIEEEBitVectorConversions(t *testing.T) {
+	m, c := fixture(t)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	variable, err := c.MkVar(7, sort)
+	must(t, err)
+	sign, exponent, significand, err := c.SplitFP(variable)
+	must(t, err)
+	if index, e := m.GetVarIndex(sign); e != nil || index != 7 {
+		t.Fatal("sign variable", index, e)
+	}
+	if index, e := m.GetVarIndex(significand); e != nil || index != 8 {
+		t.Fatal("significand variable", index, e)
+	}
+	if index, e := m.GetVarIndex(exponent); e != nil || index != 9 {
+		t.Fatal("exponent variable", index, e)
+	}
+
+	packedSort, err := m.BitVectorSort(32)
+	must(t, err)
+	packed, err := m.MkVar(10, packedSort)
+	must(t, err)
+	converted, err := c.FromIEEEBV(sort, packed)
+	must(t, err)
+	sign, exponent, significand, err = c.SplitFP(converted)
+	must(t, err)
+	wantSign, err := m.MkBitVectorExtract(31, 31, packed)
+	must(t, err)
+	wantExponent, err := m.MkBitVectorExtract(30, 23, packed)
+	must(t, err)
+	wantSignificand, err := m.MkBitVectorExtract(22, 0, packed)
+	must(t, err)
+	if sign != wantSign || exponent != wantExponent || significand != wantSignificand {
+		t.Fatal("IEEE split ranges", sign, exponent, significand)
+	}
+
+	canonicalNaN, err := c.MkSpecial(sort, fpa.NaN)
+	must(t, err)
+	one, err := m.BitVectorNumeralUnsigned(1, 1)
+	must(t, err)
+	top, err := m.BitVectorNumeralAllOnes(8)
+	must(t, err)
+	payload, err := m.BitVectorNumeralUnsigned(17, 23)
+	must(t, err)
+	alternateNaN, err := c.MkFP(one, top, payload)
+	must(t, err)
+	got, err := c.ToIEEEBV(alternateNaN)
+	must(t, err)
+	want, err := c.JoinFP(canonicalNaN)
+	must(t, err)
+	if got != want {
+		t.Fatal("high-unspecified NaN canonicalization", got, want)
+	}
+	must(t, c.SetHighUnspecified(false))
+	if _, err = c.ToIEEEBV(alternateNaN); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("low-unspecified UF branch must remain explicit", err)
 	}
 }
 
