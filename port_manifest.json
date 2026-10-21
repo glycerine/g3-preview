@@ -14821,6 +14821,8 @@
         "pkg/ast/ast_datatype_decl.go",
         "pkg/ast/ast_datatype_decl_test.go",
         "pkg/ast/ast_datatype_utility.go",
+        "pkg/ast/ast_datatype_definition.go",
+        "pkg/ast/ast_datatype_definition_test.go",
         "pkg/ast/rewriter/datatype_rewriter_test.go",
         "pkg/ast/ast_datatype_plugin.go",
         "pkg/ast/ast_datatype_plugin_source_test.go"
@@ -14830,7 +14832,10 @@
         "TestASTDatatypeDeclarationRefusals",
         "TestDatatypeRewriterOriginalApplicationReductions",
         "TestDatatypeRewriterOriginalConstructorEquality",
-        "TestASTDatatypeRegistrationLifecycle"
+        "TestASTDatatypeRegistrationLifecycle",
+        "TestASTDatatypeDefinitionBlockAndUtilities",
+        "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
+        "TestASTParametricDatatypeDefinitionInstantiation"
       ],
       "assertions": [
         {
@@ -14946,6 +14951,16 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Datatype definition blocks, mutually recursive range resolution, well-foundedness, parametric field instantiation, and constructor metadata queries (datatype_decl_plugin.cpp:27-147,346-429,675-736,753-872,980-1024)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_definition.go",
+          "tests": [
+            "TestASTDatatypeDefinitionBlockAndUtilities",
+            "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
+            "TestASTParametricDatatypeDefinitionInstantiation"
+          ]
+        },
+        {
           "name": "Retained datatype constructor, recognizer and accessor relationship queries used by datatype rewriting (datatype_decl_plugin.cpp:753-872)",
           "status": "ported",
           "go_target": "pkg/ast/ast_datatype_utility.go",
@@ -14964,8 +14979,8 @@
           ]
         },
         {
-          "name": "Datatype plugin registration and empty-definition lifecycle (datatype_decl_plugin.cpp:150-162)",
-          "status": "partial",
+          "name": "Datatype plugin registration and owned-definition lifecycle (datatype_decl_plugin.cpp:150-162)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_datatype_plugin.go",
           "tests": [
             "TestASTDatatypeRegistrationLifecycle"
@@ -14973,10 +14988,10 @@
         }
       ],
       "ownership": [
-        "Only the actual plugin registration header and registry/family acquisitions are retained. Definition tables, utility caches, and vectors had no production Go consumers and have been removed rather than allocating empty copied C++ containers. Registration, repeated lookup, source finalization, and owning history cleanup remain covered."
+        "The plugin owns datatype definition maps and pins every retained definition sort, formal parameter, and accessor range. Finalization releases those pins in reverse acquisition order before clearing the native Go maps and slices. Declaration query results remain borrowed manager nodes."
       ],
       "deviations": [
-        "Datatype definition blocks, parametric instantiation, size expressions, value recognition, and recursive datatype queries remain live upstream and unported. Their future Go implementations must use concrete native maps and slices. Native container allocation ABI and registered upstream-driver credit are not claimed."
+        "Datatype size expressions, value recognition, recursive/non-recursive constructor selection, display/translation, and the remaining utility queries are still unported. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed."
       ]
     },
     {
@@ -14988,13 +15003,18 @@
         "pkg/ast/ast_datatype_decl.go",
         "pkg/ast/ast_datatype_decl_test.go",
         "pkg/ast/ast_datatype_utility.go",
+        "pkg/ast/ast_datatype_definition.go",
+        "pkg/ast/ast_datatype_definition_test.go",
         "pkg/ast/rewriter/datatype_rewriter_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
         "TestASTDatatypeDeclarationRefusals",
         "TestDatatypeRewriterOriginalApplicationReductions",
-        "TestDatatypeRewriterOriginalConstructorEquality"
+        "TestDatatypeRewriterOriginalConstructorEquality",
+        "TestASTDatatypeDefinitionBlockAndUtilities",
+        "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
+        "TestASTParametricDatatypeDefinitionInstantiation"
       ],
       "conditionals": [
         {
@@ -15009,6 +15029,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete datatype definitions, constructors/accessors, mutually recursive blocks, and definition utility interfaces (datatype_decl_plugin.h:50-104,192-220,237-391)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_definition.go",
+          "tests": [
+            "TestASTDatatypeDefinitionBlockAndUtilities",
+            "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
+            "TestASTParametricDatatypeDefinitionInstantiation"
+          ]
+        },
         {
           "name": "Retained datatype utility recognition and constructor/accessor relationship interface (datatype_decl_plugin.h:290-391)",
           "status": "ported",
@@ -15029,10 +15059,10 @@
         }
       ],
       "ownership": [
-        "Datatype declaration parameters and domain/range handles are borrowed. AST factories copy declaration information and own the resulting nodes through the manager."
+        "Datatype declaration parameters and domain/range handles are borrowed. Definition records pin their retained sorts; AST factories copy declaration information and own the resulting nodes through the manager."
       ],
       "deviations": [
-        "Datatype definition classes, size-expression hierarchy, definition-building APIs, and utility queries beyond the retained rewriter relationships remain unported."
+        "The size-expression hierarchy and utility queries for recursion, non-recursive constructors, datatype size, value construction, display, and translation remain unported."
       ]
     },
     {
