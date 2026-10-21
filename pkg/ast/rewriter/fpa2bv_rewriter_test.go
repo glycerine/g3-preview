@@ -293,3 +293,63 @@ func TestFPA2BVRewriterToRealDispatch(t *testing.T) {
 		t.Fatal("float-to-real dispatch", text, integer, matched)
 	}
 }
+
+func TestFPA2BVRewriterFromRealDispatch(t *testing.T) {
+	f := newFPA2BVFixture(t)
+	rounding, err := f.m.MkFamilyApp(f.family, ast.FPAOpRMNearestEven, nil, nil)
+	astTestMust(t, err)
+	rmSort, err := f.m.GetSort(rounding)
+	astTestMust(t, err)
+	realValue, err := f.m.ArithmeticRealNumeralText("3/2")
+	astTestMust(t, err)
+	realSort, err := f.m.GetSort(realValue)
+	astTestMust(t, err)
+	ebits, err := f.m.NewParameterInt(8)
+	astTestMust(t, err)
+	sbits, err := f.m.NewParameterInt(24)
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, f.m.DelParameter(&sbits))
+		astTestMust(t, f.m.DelParameter(&ebits))
+	})
+	declaration, err := f.m.MkFamilyFuncDecl(
+		f.family, ast.FPAOpToFP, []ast.ASTParameter{ebits, sbits},
+		[]ast.ASTHandle{rmSort, realSort}, ast.ASTHandle{},
+	)
+	astTestMust(t, err)
+	conversion, err := f.m.MkApp(declaration, []ast.ASTHandle{rounding, realValue})
+	astTestMust(t, err)
+	got := f.rewrite(t, conversion)
+	if kind, e := f.m.GetDeclKind(got); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("real numeral conversion dispatch", kind, e)
+	}
+
+	symbolic, err := f.m.MkFreshConst("fpa2bv_real", realSort)
+	astTestMust(t, err)
+	conversion, err = f.m.MkApp(declaration, []ast.ASTHandle{rounding, symbolic})
+	astTestMust(t, err)
+	before := len(f.converter.ExtraAssertions())
+	got = f.rewrite(t, conversion)
+	if kind, e := f.m.GetDeclKind(got); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("symbolic real conversion dispatch", kind, e)
+	}
+	if len(f.converter.ExtraAssertions()) != before+1 {
+		t.Fatal("symbolic real conversion assertion", before, len(f.converter.ExtraAssertions()))
+	}
+
+	integerValue, err := f.m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	integerSort, err := f.m.GetSort(integerValue)
+	astTestMust(t, err)
+	pairDeclaration, err := f.m.MkFamilyFuncDecl(
+		f.family, ast.FPAOpToFP, []ast.ASTParameter{ebits, sbits},
+		[]ast.ASTHandle{rmSort, realSort, integerSort}, ast.ASTHandle{},
+	)
+	astTestMust(t, err)
+	pair, err := f.m.MkApp(pairDeclaration, []ast.ASTHandle{rounding, realValue, integerValue})
+	astTestMust(t, err)
+	got = f.rewrite(t, pair)
+	if kind, e := f.m.GetDeclKind(got); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("real/integer conversion dispatch", kind, e)
+	}
+}

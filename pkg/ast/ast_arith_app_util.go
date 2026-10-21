@@ -33,7 +33,7 @@ func (m *ASTManager) MkArithmeticPower(base, exponent ASTHandle) (ASTHandle, err
 
 // ArithmeticRealNumeralText constructs a real numeral from source-compatible
 // rational text.
-func (m *ASTManager) ArithmeticRealNumeralText(text string) (result ASTHandle, resultErr error) {
+func (m *ASTManager) arithmeticNumeralFromText(text string, integer bool) (result ASTHandle, resultErr error) {
 	service := m.NumeralService()
 	value, err := service.NewValue()
 	if err != nil {
@@ -43,5 +43,13 @@ func (m *ASTManager) ArithmeticRealNumeralText(text string) (result ASTHandle, r
 	if err = service.SetString(&value, text); err != nil {
 		return ASTHandle{}, err
 	}
-	return m.ArithmeticNumeral(&value, false)
+	return m.ArithmeticNumeral(&value, integer)
+}
+
+func (m *ASTManager) ArithmeticRealNumeralText(text string) (ASTHandle, error) {
+	return m.arithmeticNumeralFromText(text, false)
+}
+
+func (m *ASTManager) ArithmeticIntegerNumeralText(text string) (ASTHandle, error) {
+	return m.arithmeticNumeralFromText(text, true)
 }

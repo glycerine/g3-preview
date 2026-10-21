@@ -306,6 +306,69 @@ func TestConverterFloatToRealConversion(t *testing.T) {
 	}
 }
 
+func TestConverterRealToFloatConversions(t *testing.T) {
+	m, c := fixture(t)
+	family, err := m.RegisterFloatingPointPlugin()
+	must(t, err)
+	targetSort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	rne, err := c.MkRoundingMode(ast.FPAOpRMNearestEven)
+	must(t, err)
+	sourceRM, err := m.MkFamilyApp(family, ast.FPAOpRMNearestEven, nil, nil)
+	must(t, err)
+	rmSort, err := m.GetSort(sourceRM)
+	must(t, err)
+	realValue, err := m.ArithmeticRealNumeralText("3/2")
+	must(t, err)
+	realSort, err := m.GetSort(realValue)
+	must(t, err)
+	ebits, err := m.NewParameterInt(8)
+	must(t, err)
+	sbits, err := m.NewParameterInt(24)
+	must(t, err)
+	t.Cleanup(func() {
+		must(t, m.DelParameter(&sbits))
+		must(t, m.DelParameter(&ebits))
+	})
+	declaration, err := m.MkFamilyFuncDecl(
+		family, ast.FPAOpToFP, []ast.ASTParameter{ebits, sbits},
+		[]ast.ASTHandle{rmSort, realSort}, ast.ASTHandle{},
+	)
+	must(t, err)
+	got, err := c.ToFPReal(declaration, targetSort, rne, realValue)
+	must(t, err)
+	if gotSort, e := m.GetSort(got); e != nil || gotSort != targetSort {
+		t.Fatal("real numeral conversion sort", gotSort, e)
+	}
+
+	symbolic, err := m.MkFreshConst("real_to_fp", realSort)
+	must(t, err)
+	before := len(c.ExtraAssertions())
+	got, err = c.ToFPReal(declaration, targetSort, rne, symbolic)
+	must(t, err)
+	if kind, e := m.GetDeclKind(got); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("symbolic real conversion shape", kind, e)
+	}
+	if len(c.ExtraAssertions()) != before+1 {
+		t.Fatal("symbolic real conversion assertion", before, len(c.ExtraAssertions()))
+	}
+
+	integerValue, err := m.ArithmeticIntegerNumeralText("2")
+	must(t, err)
+	integerSort, err := m.GetSort(integerValue)
+	must(t, err)
+	pairDeclaration, err := m.MkFamilyFuncDecl(
+		family, ast.FPAOpToFP, []ast.ASTParameter{ebits, sbits},
+		[]ast.ASTHandle{rmSort, realSort, integerSort}, ast.ASTHandle{},
+	)
+	must(t, err)
+	got, err = c.ToFPRealInt(pairDeclaration, rne, realValue, integerValue)
+	must(t, err)
+	if gotSort, e := m.GetSort(got); e != nil || gotSort != targetSort {
+		t.Fatal("real/integer conversion sort", gotSort, e)
+	}
+}
+
 func TestConverterFiniteNumeral(t *testing.T) {
 	m, c := fixture(t)
 	_, err := m.RegisterArithmeticPlugin()

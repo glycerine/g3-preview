@@ -363,10 +363,20 @@ func (c *fpa2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArgument
 				if err == nil && floating {
 					value, err = converter.ToFPFloat(targetSort, values[0], values[1])
 				} else if err == nil {
-					value, err = converter.ToFPSigned(targetSort, values[0], values[1])
+					if _, sizeErr := m.BitVectorSize(values[1]); sizeErr == nil {
+						value, err = converter.ToFPSigned(targetSort, values[0], values[1])
+					} else {
+						value, err = converter.ToFPReal(decl, targetSort, values[0], values[1])
+					}
 				}
 			case 3:
-				value, err = converter.MkFP(values[0], values[1], values[2])
+				var rounding bool
+				_, rounding, err = c.expressionSorts(values[0])
+				if err == nil && rounding {
+					value, err = converter.ToFPRealInt(decl, values[0], values[1], values[2])
+				} else if err == nil {
+					value, err = converter.MkFP(values[0], values[1], values[2])
+				}
 			default:
 				err = ast.ErrASTDomain
 			}
