@@ -34168,6 +34168,7 @@
         "pkg/ast/ast_seq_string.go",
         "pkg/ast/ast_seq_values.go",
         "pkg/ast/ast_seq_factories.go",
+        "pkg/ast/ast_seq_regex.go",
         "pkg/ast/ast_seq_names.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_seq_signature_memory_trace.go",
@@ -34304,6 +34305,14 @@
           "tests": [
             "TestASTSequenceStringValueClassification"
           ]
+        },
+        {
+          "name": "retained sequence-to-regex, membership, regex plus/star/option/complement/range and binary concat/union/intersection factories with sequence-sort parameter matching (seq_decl_plugin.cpp:620-646,674-690,730-767,795-801)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_regex.go",
+          "tests": [
+            "TestASTSequenceStringValueClassification"
+          ]
         }
       ],
       "ownership": [
@@ -34322,7 +34331,8 @@
       "go_targets": [
         "pkg/ast/ast_seq_string.go",
         "pkg/ast/ast_seq_values.go",
-        "pkg/ast/ast_seq_factories.go"
+        "pkg/ast/ast_seq_factories.go",
+        "pkg/ast/ast_seq_regex.go"
       ],
       "tests": [
         "TestASTSMT2StringLiteralSourceEncoding"
@@ -34366,6 +34376,14 @@
           "name": "seq_util retained empty, unit and binary concat construction declarations (seq_decl_plugin.h:234-244)",
           "status": "ported",
           "go_target": "pkg/ast/ast_seq_factories.go",
+          "tests": [
+            "TestASTSequenceStringValueClassification"
+          ]
+        },
+        {
+          "name": "seq_util retained sequence/regex conversion, membership and regular-expression construction declarations (seq_decl_plugin.h:234-244,294-314)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_regex.go",
           "tests": [
             "TestASTSequenceStringValueClassification"
           ]

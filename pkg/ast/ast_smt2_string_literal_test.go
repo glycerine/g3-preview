@@ -174,4 +174,44 @@ func TestASTSequenceStringValueClassification(t *testing.T) {
 	if _, err = m.MkSequenceExtract(first, truth, zero); !errors.Is(err, ErrASTDomain) {
 		t.Fatalf("non-integer sequence offset: %v", err)
 	}
+	stringRegex, err := m.MkSequenceToRegex(first)
+	astTestMust(t, err)
+	genericRegex, err := m.MkSequenceToRegex(truthUnit)
+	astTestMust(t, err)
+	for _, operation := range []struct {
+		make func() (ASTHandle, error)
+		kind int32
+		name string
+	}{
+		{func() (ASTHandle, error) { return stringRegex, nil }, 11, "str.to.re"},
+		{func() (ASTHandle, error) { return genericRegex, nil }, 11, "seq.to.re"},
+		{func() (ASTHandle, error) { return m.MkSequenceInRegex(first, stringRegex) }, 12, "str.in.re"},
+		{func() (ASTHandle, error) { return m.MkSequenceInRegex(truthUnit, genericRegex) }, 12, "seq.in.re"},
+		{func() (ASTHandle, error) { return m.MkRegexPlus(stringRegex) }, 13, "re.+"},
+		{func() (ASTHandle, error) { return m.MkRegexStar(stringRegex) }, 14, "re.*"},
+		{func() (ASTHandle, error) { return m.MkRegexOption(stringRegex) }, 15, "re.opt"},
+		{func() (ASTHandle, error) { return m.MkRegexRange(first, second) }, 16, "re.range"},
+		{func() (ASTHandle, error) { return m.MkRegexConcat(stringRegex, stringRegex) }, 17, "re.++"},
+		{func() (ASTHandle, error) { return m.MkRegexUnion(stringRegex, stringRegex) }, 18, "re.union"},
+		{func() (ASTHandle, error) { return m.MkRegexIntersect(stringRegex, stringRegex) }, 19, "re.inter"},
+		{func() (ASTHandle, error) { return m.MkRegexComplement(stringRegex) }, 21, "re.complement"},
+	} {
+		h, e := operation.make()
+		astTestMust(t, e)
+		kind, e := m.GetDeclKind(h)
+		astTestMust(t, e)
+		ref, e := m.internal(h)
+		astTestMust(t, e)
+		name, e := m.Symbols.String(m.declAt(m.appAt(ref.slot).decl.slot).name)
+		astTestMust(t, e)
+		if kind != operation.kind || name != operation.name {
+			t.Fatalf("regex operation: kind=%d name=%q, want %d %q", kind, name, operation.kind, operation.name)
+		}
+	}
+	if _, err = m.MkSequenceInRegex(first, genericRegex); !errors.Is(err, ErrASTDomain) {
+		t.Fatalf("mismatched regex membership: %v", err)
+	}
+	if _, err = m.MkRegexRange(first, truthUnit); !errors.Is(err, ErrASTDomain) {
+		t.Fatalf("mismatched regex range: %v", err)
+	}
 }
