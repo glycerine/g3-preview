@@ -22586,9 +22586,14 @@
       "path": "src/ast/rewriter/arith_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/arith_rewriter.go"
+      ],
+      "tests": [
+        "TestArithRewriterRationalScalarCores",
+        "TestArithRewriterStructuralScalarRules"
+      ],
       "assertions": [
         {
           "line": 54,
@@ -22809,17 +22814,39 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "configured arithmetic rewriter owner, application dispatch, rational add/multiply, comparisons/equality, division, integer division/mod/remainder, bounded integral power, casts, is_int and abs",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_rewriter.go",
+          "tests": [
+            "TestArithRewriterRationalScalarCores",
+            "TestArithRewriterStructuralScalarRules"
+          ]
+        },
+        {
+          "name": "expression-polynomial cancellation, symbolic modular propagation, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
+          "status": "unported",
+          "reason": "The exact rational scalar core is connected first; the remaining paths require the concrete arithmetic specialization of poly_rewriter and broader algebraic-expression integration."
+        }
+      ],
+      "ownership": [
+        "ArithRewriter borrows the AST and parameter services, owns one budgeted header, and stores scalar parameter values after each temporary generated parameter facade is closed."
+      ],
       "deviations": []
     },
     {
       "path": "src/ast/rewriter/arith_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/arith_rewriter.go"
+      ],
+      "tests": [
+        "TestArithRewriterRationalScalarCores",
+        "TestArithRewriterStructuralScalarRules"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -22832,8 +22859,25 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "concrete owner construction/destruction and public MkAppCore/MkEqCore scalar rewrite surface",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_rewriter.go",
+          "tests": [
+            "TestArithRewriterRationalScalarCores",
+            "TestArithRewriterStructuralScalarRules"
+          ]
+        },
+        {
+          "name": "remaining polynomial and transcendental helper surface",
+          "status": "unported",
+          "reason": "Pending the next arithmetic rewriter slices."
+        }
+      ],
+      "ownership": [
+        "The Go owner is noncopyable by self identity, borrows AST/parameter services, and releases its charged header on Close."
+      ],
       "deviations": []
     },
     {
