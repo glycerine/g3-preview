@@ -62,12 +62,30 @@ func (r *SimplifyingExprReplacer) Rewrite(term ast.ASTHandle, out ast.ASTRef) er
 	return r.rewriter.Rewrite(term, out)
 }
 
+func (r *SimplifyingExprReplacer) RewriteWithProof(term ast.ASTHandle, out, proof ast.ASTRef) error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	return r.rewriter.RewriteWithProof(term, out, proof)
+}
+
+func (r *SimplifyingExprReplacer) RewriteWithProofAndDependency(term ast.ASTHandle, out, proof ast.ASTRef) (ast.ASTDependency, error) {
+	if err := r.RewriteWithProof(term, out, proof); err != nil {
+		return ast.ASTDependency{}, err
+	}
+	return r.transferDependency()
+}
+
 // RewriteWithDependency returns an owning dependency reference. The caller
 // releases a nonnull result with ASTManager.DependencyDec.
 func (r *SimplifyingExprReplacer) RewriteWithDependency(term ast.ASTHandle, out ast.ASTRef) (ast.ASTDependency, error) {
 	if err := r.Rewrite(term, out); err != nil {
 		return ast.ASTDependency{}, err
 	}
+	return r.transferDependency()
+}
+
+func (r *SimplifyingExprReplacer) transferDependency() (ast.ASTDependency, error) {
 	dependency, err := r.rewriter.UsedDependencies()
 	if err != nil || dependency.IsNull() {
 		return dependency, err
@@ -189,7 +207,12 @@ func NewDefaultExprReplacer(m *ast.ASTManager) (*DefaultExprReplacer, error) {
 	r := &DefaultExprReplacer{}
 	r.cfg.manager = m
 	r.engine.header = n
-	if err := r.engine.init(m, &r.cfg); err != nil {
+	proofs, err := m.ProofsEnabled()
+	if err != nil {
+		m.BudgetField.Release(n)
+		return nil, err
+	}
+	if err := r.engine.initMode(m, &r.cfg, proofs); err != nil {
 		m.BudgetField.Release(n)
 		return nil, err
 	}
@@ -251,12 +274,30 @@ func (r *DefaultExprReplacer) Rewrite(t ast.ASTHandle, out ast.ASTRef) error {
 	return r.engine.Rewrite(t, out)
 }
 
+func (r *DefaultExprReplacer) RewriteWithProof(t ast.ASTHandle, out, proof ast.ASTRef) error {
+	if r == nil {
+		return ast.ErrASTHandle
+	}
+	return r.engine.RewriteWithProof(t, out, proof)
+}
+
+func (r *DefaultExprReplacer) RewriteWithProofAndDependency(t ast.ASTHandle, out, proof ast.ASTRef) (ast.ASTDependency, error) {
+	if err := r.RewriteWithProof(t, out, proof); err != nil {
+		return ast.ASTDependency{}, err
+	}
+	return r.transferDependency()
+}
+
 // RewriteWithDependency transfers the accumulated dependency reference to the
 // caller. A nonnull result is owning and must be released with DependencyDec.
 func (r *DefaultExprReplacer) RewriteWithDependency(t ast.ASTHandle, out ast.ASTRef) (ast.ASTDependency, error) {
 	if err := r.Rewrite(t, out); err != nil {
 		return ast.ASTDependency{}, err
 	}
+	return r.transferDependency()
+}
+
+func (r *DefaultExprReplacer) transferDependency() (ast.ASTDependency, error) {
 	d := r.cfg.used
 	r.cfg.used = ast.ASTDependency{}
 	if !d.IsNull() {

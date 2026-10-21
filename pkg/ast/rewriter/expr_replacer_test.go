@@ -53,6 +53,43 @@ func TestDefaultExprReplacerNestedSubstitutionAndScopedApply(t *testing.T) {
 	}
 }
 
+func TestDefaultExprReplacerProofOverload(t *testing.T) {
+	m := astTestManager(t)
+	satOK(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	a, b := goalTestAtom(t, m, "replace-proof-a"), goalTestAtom(t, m, "replace-proof-b")
+	f := rewriterTestDecl(t, m, "replace-proof-f")
+	term := rewriterTestApp(t, m, f, a)
+	want := rewriterTestApp(t, m, f, b)
+	step, err := m.MkProofRewrite(a, b)
+	satOK(t, err)
+	s := ast.ASTExprSubstitution{}
+	s, err = m.NewExprSubstitution()
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, m.DelExprSubstitution(&s)) })
+	satOK(t, m.ExprSubstitutionInsert(s, a, b, step, ast.ASTDependency{}))
+	r, err := NewDefaultExprReplacer(m)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, r.Close()) })
+	satOK(t, r.SetSubstitution(&s))
+	out := astTestPin(t, m, ast.ASTHandle{})
+	proof := astTestPin(t, m, ast.ASTHandle{})
+	satOK(t, r.RewriteWithProof(term, out, proof))
+	got, err := m.RefGet(out)
+	satOK(t, err)
+	if got != want {
+		t.Fatal("proof replacer result", got, want)
+	}
+	p, err := m.RefGet(proof)
+	satOK(t, err)
+	fact, err := m.GetProofFact(p)
+	satOK(t, err)
+	wantFact, err := m.MkIff(term, want)
+	satOK(t, err)
+	if fact != wantFact {
+		t.Fatal("proof replacer fact", fact, wantFact)
+	}
+}
+
 func TestDefaultExprReplacerCollectsUsedDependencies(t *testing.T) {
 	m := astTestManager(t)
 	a := goalTestAtom(t, m, "dependency-a")

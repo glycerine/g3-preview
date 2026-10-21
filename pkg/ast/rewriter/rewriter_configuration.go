@@ -10,7 +10,7 @@ import (
 )
 
 // Configurations are cold owners; frames, bindings and results use concrete
-// handle storage. This is the source's no-proof traversal specialization.
+// handle storage shared by the source proof and no-proof specializations.
 
 type rewriterConfiguration interface {
 	cacheAllResults() bool

@@ -152,3 +152,44 @@ func TestTraversalColdConstructionCleanup(t *testing.T) {
 	}
 	t.Fatal("constructor never completed")
 }
+
+func TestTraversalProofCongruenceRewriteAndReflexivity(t *testing.T) {
+	m := astTestManager(t)
+	satOK(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	a, b := goalTestAtom(t, m, "proof-a"), goalTestAtom(t, m, "proof-b")
+	f, g := rewriterTestDecl(t, m, "proof-f"), rewriterTestDecl(t, m, "proof-g")
+	inner := rewriterTestApp(t, m, g, a)
+	term := rewriterTestApp(t, m, f, inner)
+	want := rewriterTestApp(t, m, f, b)
+	cfg := traversalClient{manager: m, decl: g, result: b}
+	rw, e := NewProofTraversal(m, &cfg)
+	satOK(t, e)
+	defer func() { satOK(t, rw.Close()) }()
+	out := astTestPin(t, m, ast.ASTHandle{})
+	proof := astTestPin(t, m, ast.ASTHandle{})
+	satOK(t, rw.RewriteWithProof(term, out, proof))
+	got, e := m.RefGet(out)
+	satOK(t, e)
+	if got != want {
+		t.Fatal("proof traversal value", got, want)
+	}
+	p, e := m.RefGet(proof)
+	satOK(t, e)
+	fact, e := m.GetProofFact(p)
+	satOK(t, e)
+	if fact != goalTestApp(t, m, ast.ASTOpIff, term, want) {
+		t.Fatal("proof traversal fact", fact)
+	}
+	satOK(t, rw.Reset())
+	satOK(t, rw.RewriteWithProof(a, out, proof))
+	p, e = m.RefGet(proof)
+	satOK(t, e)
+	yes, e := m.IsProofKind(p, ast.ASTPrReflexivity)
+	satOK(t, e)
+	if !yes {
+		t.Fatal("unchanged root needs explicit reflexivity")
+	}
+	if e = rw.SetBindings([]ast.ASTHandle{a}); !errors.Is(e, ast.ErrASTDomain) {
+		t.Fatal("proof traversal bindings guard", e)
+	}
+}

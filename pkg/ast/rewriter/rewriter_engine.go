@@ -10,9 +10,9 @@ import (
 	"github.com/glycerine/g3/pkg/util/messages"
 )
 
-// The no-proof source specialization retains the original iterative states,
-// scopes, bounded revisit depths and borrowed binding vectors. Proof-generating
-// traversal remains a separate port obligation.
+// The source specializations share the original iterative states, scopes,
+// bounded revisit depths and borrowed binding vectors. The core proofGen bit
+// selects the source's proof-generating bookkeeping without changing frames.
 type rewriterEngine struct {
 	self                 *rewriterEngine
 	core                 rewriterCore
@@ -42,9 +42,12 @@ func newRewriterEngine(m *ast.ASTManager, cfg rewriterConfiguration) (*rewriterE
 	return r, r.init(m, cfg)
 }
 func (r *rewriterEngine) init(m *ast.ASTManager, cfg rewriterConfiguration) error {
+	return r.initMode(m, cfg, false)
+}
+func (r *rewriterEngine) initMode(m *ast.ASTManager, cfg rewriterConfiguration, proofGen bool) error {
 	r.self = r
 	r.cfg = cfg
-	if e := r.core.init(m, false); e != nil {
+	if e := r.core.init(m, proofGen); e != nil {
 		return e
 	}
 	if e := r.shifter.init(m, false); e != nil {
@@ -99,6 +102,9 @@ func (r *rewriterEngine) setBindingArguments(values ast.AppArguments, inverse bo
 		return e
 	}
 	if len(r.core.frames) != 0 {
+		return ast.ErrASTDomain
+	}
+	if r.core.proofGen {
 		return ast.ErrASTDomain
 	}
 	r.bindings = r.bindings[:0]
@@ -229,9 +235,31 @@ func (r *rewriterEngine) mustCache(t ast.ASTHandle) (bool, error) {
 }
 func (r *rewriterEngine) cache(fr rewriterFrame, value ast.ASTHandle) error {
 	if fr.cacheResult() {
+		if r.core.proofGen {
+			proof, e := r.coreProofBack()
+			if e != nil {
+				return e
+			}
+			return r.core.cacheResultProof(fr.curr, value, proof)
+		}
 		return r.core.cacheResult(fr.curr, value)
 	}
 	return nil
+}
+func (r *rewriterEngine) appendProof(h ast.ASTHandle) error {
+	return appendRewriterRoot(r.core.manager, &r.core.proofResults, h)
+}
+func (r *rewriterEngine) coreProofBack() (ast.ASTHandle, error) {
+	if len(r.core.proofResults) == 0 {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	return r.core.proofResults[len(r.core.proofResults)-1], nil
+}
+func (r *rewriterEngine) popProof() error {
+	if len(r.core.proofResults) == 0 {
+		return ast.ErrASTDomain
+	}
+	return shrinkRewriterRoots(r.core.manager, &r.core.proofResults, uint32(len(r.core.proofResults)-1))
 }
 func (r *rewriterEngine) sameSort(old, value ast.ASTHandle) error {
 	if !ast.ASTSourceDebug {
@@ -254,7 +282,7 @@ func (r *rewriterEngine) sameSort(old, value ast.ASTHandle) error {
 func (r *rewriterEngine) visit(t ast.ASTHandle, depth uint32) (bool, error) {
 	c := &r.core
 	m := c.manager
-	sub, _, found, e := r.cfg.getSubst(t)
+	sub, subProof, found, e := r.cfg.getSubst(t)
 	if e != nil {
 		return false, e
 	}
@@ -265,10 +293,21 @@ func (r *rewriterEngine) visit(t ast.ASTHandle, depth uint32) (bool, error) {
 		if e = appendRewriterRoot(m, &c.results, sub); e != nil {
 			return false, e
 		}
+		if c.proofGen {
+			if e = r.appendProof(subProof); e != nil {
+				return false, e
+			}
+		}
 		return true, r.setNewChildIfDifferent(t, sub)
 	}
 	if depth == 0 {
-		return true, appendRewriterRoot(m, &c.results, t)
+		if e = appendRewriterRoot(m, &c.results, t); e != nil {
+			return false, e
+		}
+		if c.proofGen {
+			e = r.appendProof(ast.ASTHandle{})
+		}
+		return true, e
 	}
 	cache, e := r.mustCache(t)
 	if e != nil {
@@ -286,6 +325,15 @@ func (r *rewriterEngine) visit(t ast.ASTHandle, depth uint32) (bool, error) {
 			if e = appendRewriterRoot(m, &c.results, h); e != nil {
 				return false, e
 			}
+			if c.proofGen {
+				pr, e := c.getCachedProof(t)
+				if e != nil {
+					return false, e
+				}
+				if e = r.appendProof(pr); e != nil {
+					return false, e
+				}
+			}
 			return true, r.setNewChildIfDifferent(t, h)
 		}
 	}
@@ -294,7 +342,13 @@ func (r *rewriterEngine) visit(t ast.ASTHandle, depth uint32) (bool, error) {
 		return false, e
 	}
 	if !allowed {
-		return true, appendRewriterRoot(m, &c.results, t)
+		if e = appendRewriterRoot(m, &c.results, t); e != nil {
+			return false, e
+		}
+		if c.proofGen {
+			e = r.appendProof(ast.ASTHandle{})
+		}
+		return true, e
 	}
 	kind, e := m.GetKind(t)
 	if e != nil {
@@ -335,6 +389,18 @@ func (r *rewriterEngine) processVar(t ast.ASTHandle) (err error) {
 		if e = appendRewriterRoot(m, &c.results, h); e != nil {
 			return e
 		}
+		if c.proofGen {
+			proof, e := m.RefGet(r.pr)
+			if e != nil {
+				return e
+			}
+			if e = r.appendProof(proof); e != nil {
+				return e
+			}
+			if e = m.ResetRef(r.pr); e != nil {
+				return e
+			}
+		}
 		if e = r.sameSort(t, h); e != nil {
 			return e
 		}
@@ -342,6 +408,12 @@ func (r *rewriterEngine) processVar(t ast.ASTHandle) (err error) {
 			return e
 		}
 		return m.ResetRef(r.r)
+	}
+	if c.proofGen {
+		if e = appendRewriterRoot(m, &c.results, t); e != nil {
+			return e
+		}
+		return r.appendProof(ast.ASTHandle{})
 	}
 	index, e := m.GetVarIndex(t)
 	if e != nil {
@@ -409,6 +481,24 @@ func (r *rewriterEngine) processConst(t ast.ASTHandle) error {
 		if e = appendRewriterRoot(m, &c.results, h); e != nil {
 			return e
 		}
+		if c.proofGen {
+			proof, e := m.RefGet(r.pr)
+			if e != nil {
+				return e
+			}
+			if proof.IsNull() {
+				proof, e = m.MkProofRewrite(t, h)
+				if e != nil {
+					return e
+				}
+			}
+			if e = r.appendProof(proof); e != nil {
+				return e
+			}
+			if e = m.ResetRef(r.pr); e != nil {
+				return e
+			}
+		}
 		if e = m.ResetRef(r.r); e != nil {
 			return e
 		}
@@ -417,7 +507,13 @@ func (r *rewriterEngine) processConst(t ast.ASTHandle) error {
 	if ast.ASTSourceDebug && st != brFailed {
 		return ast.ErrASTDomain
 	}
-	return appendRewriterRoot(m, &c.results, t)
+	if e = appendRewriterRoot(m, &c.results, t); e != nil {
+		return e
+	}
+	if c.proofGen {
+		return r.appendProof(ast.ASTHandle{})
+	}
+	return nil
 }
 
 // Complete one frame while preserving the source's explicit temporary-ref
@@ -537,6 +633,9 @@ func (r *rewriterEngine) constantFold(frameIndex int) (bool, error) {
 }
 
 func (r *rewriterEngine) processApp() (err error) {
+	if r.core.proofGen {
+		return r.processAppProof()
+	}
 	c := &r.core
 	m := c.manager
 	fi := len(c.frames) - 1
@@ -749,6 +848,9 @@ func (r *rewriterEngine) processApp() (err error) {
 }
 
 func (r *rewriterEngine) processQuantifier() (err error) {
+	if r.core.proofGen {
+		return r.processQuantifierProof()
+	}
 	c := &r.core
 	m := c.manager
 	fi := len(c.frames) - 1
@@ -919,6 +1021,15 @@ func (r *rewriterEngine) checkCancel() error {
 	return newRewriterException(message)
 }
 func (r *rewriterEngine) Rewrite(t ast.ASTHandle, out ast.ASTRef) error {
+	return r.rewrite(t, out, ast.ASTRef{})
+}
+func (r *rewriterEngine) RewriteWithProof(t ast.ASTHandle, out, proof ast.ASTRef) error {
+	if !r.core.proofGen {
+		return ast.ErrASTDomain
+	}
+	return r.rewrite(t, out, proof)
+}
+func (r *rewriterEngine) rewrite(t ast.ASTHandle, out, proof ast.ASTRef) error {
 	if e := r.open(); e != nil {
 		return e
 	}
@@ -937,11 +1048,20 @@ func (r *rewriterEngine) Rewrite(t ast.ASTHandle, out ast.ASTRef) error {
 		return e
 	}
 	if done {
-		return r.publish(out)
+		return r.publish(out, proof)
 	}
-	return r.Resume(out)
+	return r.resume(out, proof)
 }
 func (r *rewriterEngine) Resume(out ast.ASTRef) error {
+	return r.resume(out, ast.ASTRef{})
+}
+func (r *rewriterEngine) ResumeWithProof(out, proof ast.ASTRef) error {
+	if !r.core.proofGen {
+		return ast.ErrASTDomain
+	}
+	return r.resume(out, proof)
+}
+func (r *rewriterEngine) resume(out, proof ast.ASTRef) error {
 	if e := r.open(); e != nil {
 		return e
 	}
@@ -973,6 +1093,15 @@ func (r *rewriterEngine) Resume(out ast.ASTRef) error {
 				if e = appendRewriterRoot(m, &c.results, h); e != nil {
 					return e
 				}
+				if c.proofGen {
+					pr, e := c.getCachedProof(t)
+					if e != nil {
+						return e
+					}
+					if e = r.appendProof(pr); e != nil {
+						return e
+					}
+				}
 				c.frames = c.frames[:len(c.frames)-1]
 				if e = r.setNewChildIfDifferent(t, h); e != nil {
 					return e
@@ -999,9 +1128,9 @@ func (r *rewriterEngine) Resume(out ast.ASTRef) error {
 			return e
 		}
 	}
-	return r.publish(out)
+	return r.publish(out, proof)
 }
-func (r *rewriterEngine) publish(out ast.ASTRef) error {
+func (r *rewriterEngine) publish(out, proof ast.ASTRef) error {
 	m := r.core.manager
 	h, e := r.core.resultBack()
 	if e != nil {
@@ -1009,6 +1138,26 @@ func (r *rewriterEngine) publish(out ast.ASTRef) error {
 	}
 	if e = m.SetRef(out, h); e != nil {
 		return e
+	}
+	if r.core.proofGen {
+		pr, e := r.coreProofBack()
+		if e != nil {
+			return e
+		}
+		if pr.IsNull() {
+			pr, e = m.MkProofReflexivity(r.core.root)
+			if e != nil {
+				return e
+			}
+		}
+		if proof != (ast.ASTRef{}) {
+			if e = m.SetRef(proof, pr); e != nil {
+				return e
+			}
+		}
+		if e = r.popProof(); e != nil {
+			return e
+		}
 	}
 	return r.core.popResult()
 }

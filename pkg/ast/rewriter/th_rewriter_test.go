@@ -17,6 +17,69 @@ func theoryRewriterFixture(t *testing.T) (*ast.ASTManager, *TheoryRewriter) {
 	return m, r
 }
 
+func TestTheoryRewriterProofTraversal(t *testing.T) {
+	m, context, globals, local := boolRewriterConfigFixture(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	r, err := NewTheoryRewriter(m, context, globals, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	a := goalTestAtom(t, m, "theory-proof-a")
+	n1, err := m.MkNot(a)
+	astTestMust(t, err)
+	n2, err := m.MkNot(n1)
+	astTestMust(t, err)
+	out := astTestPin(t, m, ast.ASTHandle{})
+	proof := astTestPin(t, m, ast.ASTHandle{})
+	astTestMust(t, r.RewriteWithProof(n2, out, proof))
+	got, err := m.RefGet(out)
+	astTestMust(t, err)
+	if got != a {
+		t.Fatal("theory proof rewrite result", got, a)
+	}
+	p, err := m.RefGet(proof)
+	astTestMust(t, err)
+	fact, err := m.GetProofFact(p)
+	astTestMust(t, err)
+	want, err := m.MkIff(n2, a)
+	astTestMust(t, err)
+	if fact != want {
+		t.Fatal("theory proof rewrite fact", fact, want)
+	}
+	boolSort, err := m.MkBoolSort()
+	astTestMust(t, err)
+	v, err := m.MkVar(0, boolSort)
+	astTestMust(t, err)
+	vn1, err := m.MkNot(v)
+	astTestMust(t, err)
+	vn2, err := m.MkNot(vn1)
+	astTestMust(t, err)
+	q, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true,
+		Sorts:  []ast.ASTHandle{boolSort},
+		Names:  []usymbol.Symbol{astTestSymbol(t, m, "theory-proof-x")},
+		Body:   vn2,
+	})
+	astTestMust(t, err)
+	astTestMust(t, r.Reset())
+	astTestMust(t, r.RewriteWithProof(q, out, proof))
+	got, err = m.RefGet(out)
+	astTestMust(t, err)
+	newBody, err := m.GetQuantifierBody(got)
+	astTestMust(t, err)
+	if newBody != v {
+		t.Fatal("quantifier proof rewrite body", newBody, v)
+	}
+	p, err = m.RefGet(proof)
+	astTestMust(t, err)
+	fact, err = m.GetProofFact(p)
+	astTestMust(t, err)
+	want, err = m.MkIff(q, got)
+	astTestMust(t, err)
+	if fact != want {
+		t.Fatal("quantifier proof rewrite fact", fact, want)
+	}
+}
+
 func TestTheoryRewriterCoreTraversalAcrossFamilies(t *testing.T) {
 	m, r := theoryRewriterFixture(t)
 	two := arithRewriterNumeral(t, m, "2", true)

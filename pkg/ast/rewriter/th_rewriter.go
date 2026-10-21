@@ -987,7 +987,16 @@ func NewTheoryRewriter(m *ast.ASTManager, context *uparams.ParamsContext, global
 	if err := r.constructConfiguration(); err != nil {
 		return r, err
 	}
-	if r.traversal, err = NewTraversal(m, &r.configuration); err != nil {
+	proofs, err := m.ProofsEnabled()
+	if err != nil {
+		return r, err
+	}
+	if proofs {
+		r.traversal, err = NewProofTraversal(m, &r.configuration)
+	} else {
+		r.traversal, err = NewTraversal(m, &r.configuration)
+	}
+	if err != nil {
 		return r, err
 	}
 	return r, nil
@@ -1121,6 +1130,13 @@ func (r *TheoryRewriter) Rewrite(term ast.ASTHandle, out ast.ASTRef) error {
 		return err
 	}
 	return r.traversal.Rewrite(term, out)
+}
+
+func (r *TheoryRewriter) RewriteWithProof(term ast.ASTHandle, out, proof ast.ASTRef) error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	return r.traversal.RewriteWithProof(term, out, proof)
 }
 
 func (r *TheoryRewriter) SetSolver(solver SequenceExpressionSolver) error {
@@ -1298,7 +1314,16 @@ func (r *TheoryRewriter) Cleanup() error {
 	if err := r.constructConfiguration(); err != nil {
 		return err
 	}
-	traversal, err := NewTraversal(r.manager, &r.configuration)
+	proofs, err := r.manager.ProofsEnabled()
+	if err != nil {
+		return err
+	}
+	var traversal *Traversal
+	if proofs {
+		traversal, err = NewProofTraversal(r.manager, &r.configuration)
+	} else {
+		traversal, err = NewTraversal(r.manager, &r.configuration)
+	}
 	if err != nil {
 		return err
 	}

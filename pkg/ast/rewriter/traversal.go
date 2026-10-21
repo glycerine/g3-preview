@@ -19,7 +19,7 @@ const (
 	RewriteFailed RewriteStatus = brFailed
 )
 
-// Configuration is borrowed by the original no-proof traversal. Callback result
+// Configuration is borrowed by the original traversal. Callback result
 // and proof references belong to the traversal. Embed DefaultConfiguration for
 // the source defaults. Resource callbacks may return the source exception as a
 // Go error; a true step-limit result produces the original max-steps exception.
@@ -116,8 +116,8 @@ func (c *traversalConfiguration) getSubst(t ast.ASTHandle) (ast.ASTHandle, ast.A
 func (c *traversalConfiguration) reset()   { c.client.Reset() }
 func (c *traversalConfiguration) cleanup() { c.client.Cleanup() }
 
-// Traversal exposes the original rewriter_tpl no-proof specialization across
-// package boundaries. The configuration must outlive this owner.
+// Traversal exposes the original rewriter_tpl specialization across package
+// boundaries. The configuration must outlive this owner.
 type Traversal struct {
 	engine rewriterEngine
 	cfg    traversalConfiguration
@@ -126,6 +126,26 @@ type Traversal struct {
 // NewTraversal charges the enclosing owner once. A nonnil partial owner returned
 // with an error must be closed, as with the other explicit AST owners.
 func NewTraversal(m *ast.ASTManager, cfg Configuration) (*Traversal, error) {
+	return newTraversalMode(m, cfg, false)
+}
+
+// NewProofTraversal constructs the proof-generating source specialization.
+// The manager must have proofs enabled before construction.
+func NewProofTraversal(m *ast.ASTManager, cfg Configuration) (*Traversal, error) {
+	if m == nil {
+		return nil, ast.ErrASTHandle
+	}
+	proofs, e := m.ProofsEnabled()
+	if e != nil {
+		return nil, e
+	}
+	if !proofs {
+		return nil, ast.ErrASTDomain
+	}
+	return newTraversalMode(m, cfg, true)
+}
+
+func newTraversalMode(m *ast.ASTManager, cfg Configuration, proofs bool) (*Traversal, error) {
 	if m == nil || cfg == nil {
 		return nil, ast.ErrASTHandle
 	}
@@ -139,7 +159,7 @@ func NewTraversal(m *ast.ASTManager, cfg Configuration) (*Traversal, error) {
 	r := &Traversal{}
 	r.cfg.client = cfg
 	r.engine.header = bytes
-	return r, r.engine.init(m, &r.cfg)
+	return r, r.engine.initMode(m, &r.cfg, proofs)
 }
 func (r *Traversal) Rewrite(t ast.ASTHandle, out ast.ASTRef) error {
 	if r == nil {
@@ -147,11 +167,23 @@ func (r *Traversal) Rewrite(t ast.ASTHandle, out ast.ASTRef) error {
 	}
 	return r.engine.Rewrite(t, out)
 }
+func (r *Traversal) RewriteWithProof(t ast.ASTHandle, out, proof ast.ASTRef) error {
+	if r == nil {
+		return ast.ErrASTHandle
+	}
+	return r.engine.RewriteWithProof(t, out, proof)
+}
 func (r *Traversal) Resume(out ast.ASTRef) error {
 	if r == nil {
 		return ast.ErrASTHandle
 	}
 	return r.engine.Resume(out)
+}
+func (r *Traversal) ResumeWithProof(out, proof ast.ASTRef) error {
+	if r == nil {
+		return ast.ErrASTHandle
+	}
+	return r.engine.ResumeWithProof(out, proof)
 }
 func (r *Traversal) Reset() error {
 	if r == nil {

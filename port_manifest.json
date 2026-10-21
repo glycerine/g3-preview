@@ -30051,7 +30051,7 @@
       "path": "src/ast/rewriter/expr_replacer.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/expr_replacer.go",
         "pkg/ast/rewriter/expr_replacer_test.go"
@@ -30059,7 +30059,9 @@
       "tests": [
         "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
         "TestDefaultExprReplacerCollectsUsedDependencies",
-        "TestSimplifyingExprReplacerTheoryRewriteAndDependencyTransfer"
+        "TestSimplifyingExprReplacerTheoryRewriteAndDependencyTransfer",
+        "TestDefaultExprReplacerProofOverload",
+        "TestTheoryRewriterProofTraversal"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -30075,8 +30077,12 @@
         },
         {
           "name": "expr_replacer proof-output overloads through proof-generating rewriter traversal (expr_replacer.cpp:24-31,104-112)",
-          "status": "unported",
-          "reason": "Depends on the still-unported proof-generating rewriter_tpl specialization."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/expr_replacer.go",
+          "tests": [
+            "TestDefaultExprReplacerProofOverload",
+            "TestTheoryRewriterProofTraversal"
+          ]
         },
         {
           "name": "th_rewriter2expr_replacer simplifying adapter and mk_expr_simp_replacer factory (expr_replacer.cpp:124-158)",
@@ -30092,14 +30098,14 @@
         "SimplifyingExprReplacer owns its TheoryRewriter, borrows substitutions, and increments a used ASTDependency before resetting the theory rewriter so ownership transfers safely to the caller."
       ],
       "deviations": [
-        "The available rewriter engine is the retained no-proof specialization, so result proof construction remains open. Dependency results use an explicit owning return that callers release with DependencyDec."
+        "Go named methods replace C++ overloads. Dependency results use an explicit owning return that callers release with DependencyDec."
       ]
     },
     {
       "path": "src/ast/rewriter/expr_replacer.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/expr_replacer.go",
         "pkg/ast/rewriter/expr_replacer_test.go"
@@ -30107,7 +30113,9 @@
       "tests": [
         "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
         "TestDefaultExprReplacerCollectsUsedDependencies",
-        "TestSimplifyingExprReplacerTheoryRewriteAndDependencyTransfer"
+        "TestSimplifyingExprReplacerTheoryRewriteAndDependencyTransfer",
+        "TestDefaultExprReplacerProofOverload",
+        "TestTheoryRewriterProofTraversal"
       ],
       "conditionals": [
         {
@@ -30133,8 +30141,12 @@
         },
         {
           "name": "Abstract proof-output overload declarations (expr_replacer.h:35-38)",
-          "status": "unported",
-          "reason": "Retained declarations await the proof-generating rewriter traversal."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/expr_replacer.go",
+          "tests": [
+            "TestDefaultExprReplacerProofOverload",
+            "TestTheoryRewriterProofTraversal"
+          ]
         },
         {
           "name": "simplifying expression replacer factory declaration (expr_replacer.h:57)",
@@ -30149,7 +30161,7 @@
         "Both Go owners have explicit Close methods; expression substitutions remain borrowed and dependency outputs have documented caller ownership."
       ],
       "deviations": [
-        "Go uses named methods in place of C++ operator overloads. The abstract proof-output overload remains open with the proof-generating traversal."
+        "Go uses named methods in place of C++ operator overloads."
       ]
     },
     {
@@ -33417,11 +33429,12 @@
       "path": "src/ast/rewriter/rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/rewriter_core.go",
         "pkg/ast/rewriter/var_shifter.go",
         "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/rewriter_engine_proof.go",
         "pkg/ast/rewriter/rewriter_configuration.go",
         "pkg/ast/rewriter/traversal.go",
         "pkg/ast/rewriter/rewriter_roots.go",
@@ -33453,7 +33466,8 @@
         "TestRewriterNativeResultAndProofRootsGrowth",
         "TestRewriterNativeRootOnlyReferenceAliasReplacement",
         "TestRewriterNativeFrameAndScopeGrowth",
-        "TestVarSubstitutionNativeColdBindingGrowth"
+        "TestVarSubstitutionNativeColdBindingGrowth",
+        "TestTraversalProofCongruenceRewriteAndReflexivity"
       ],
       "conditionals": [
         {
@@ -33491,8 +33505,8 @@
           "text": "SASSERT(!m_proof_gen);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "rewriter_core constructors/destructor; scoped cache ownership and lookup; reset/free_memory/cleanup; direct-child detection; proof compaction",
@@ -33550,14 +33564,24 @@
             "TestBetaReducerOriginalPatternAndNoPatternReplacement",
             "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
           ]
+        },
+        {
+          "name": "proof-generating concrete engine specialization, explicit public construction and proof-output rewrite/resume surface",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/rewriter_engine_proof.go",
+          "tests": [
+            "TestTraversalProofCongruenceRewriteAndReflexivity",
+            "TestTheoryRewriterProofTraversal",
+            "TestDefaultExprReplacerProofOverload"
+          ]
         }
       ],
       "ownership": [
         "Concrete iterative frames/scopes and borrowed scalar binding/shift arrays use native slices and retain algorithm state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
       ],
       "deviations": [
-        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited.",
-        "The public concrete Traversal exposes the same no-proof engine to other Go packages through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point. This boundary does not implement model evaluator theory reduction, completion or proof generation.",
+        "Original base rewriting infrastructure, forward/inverse shifting and both traversal specializations are translated. Unsupported REWRITE_RULE and proof-mode non-ground macro expansion preserve the source's own unimplemented states. Cancellation resets; step-limit interruption preserves frames for Resume. Trace formatting remains with the separate rewriter.cpp trace-profile audit.",
+        "The public concrete Traversal exposes explicit no-proof and proof-generating constructors through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point.",
         "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added.",
         "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit."
       ]
@@ -33579,9 +33603,10 @@
       "path": "src/ast/rewriter/rewriter_def.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/rewriter_engine_proof.go",
         "pkg/ast/rewriter/rewriter_configuration.go",
         "pkg/ast/rewriter/traversal.go",
         "pkg/ast/rewriter/rewriter_roots.go",
@@ -33604,7 +33629,8 @@
         "TestRewriterNativeResultAndProofRootsGrowth",
         "TestRewriterNativeRootOnlyReferenceAliasReplacement",
         "TestRewriterNativeFrameAndScopeGrowth",
-        "TestVarSubstitutionNativeColdBindingGrowth"
+        "TestVarSubstitutionNativeColdBindingGrowth",
+        "TestTraversalProofCongruenceRewriteAndReflexivity"
       ],
       "conditionals": [
         {
@@ -33794,8 +33820,8 @@
           "text": "SASSERT(result_pr_stack().empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "no-proof rewriter traversal: visit/process_var/process_const/constant_fold/process_app/process_quantifier/main_loop/resume_core; bindings/reset/cleanup and original macro expansion",
@@ -33815,14 +33841,24 @@
             "TestRewriterNativeFrameAndScopeGrowth",
             "TestVarSubstitutionNativeColdBindingGrowth"
           ]
+        },
+        {
+          "name": "proof-generating visit/process_var/process_const/process_app/process_quantifier/main_loop/resume_core with implicit reflexivity, cache proofs, congruence, transitivity and quantifier introduction",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/rewriter_engine_proof.go",
+          "tests": [
+            "TestTraversalProofCongruenceRewriteAndReflexivity",
+            "TestTheoryRewriterProofTraversal",
+            "TestDefaultExprReplacerProofOverload"
+          ]
         }
       ],
       "ownership": [
         "Concrete iterative frames/scopes and borrowed scalar binding/shift arrays use native slices and retain algorithm state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
       ],
       "deviations": [
-        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited.",
-        "The public concrete Traversal exposes the same no-proof engine to other Go packages through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point. This boundary does not implement model evaluator theory reduction, completion or proof generation.",
+        "Original base rewriting infrastructure, forward/inverse shifting and both traversal specializations are translated. Unsupported REWRITE_RULE and proof-mode non-ground macro expansion preserve the source's own unimplemented states. Cancellation resets; step-limit interruption preserves frames for Resume. Trace formatting remains with the separate rewriter.cpp trace-profile audit.",
+        "The public concrete Traversal exposes explicit no-proof and proof-generating constructors through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point.",
         "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added.",
         "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit."
       ]
@@ -34461,7 +34497,7 @@
       "path": "src/ast/rewriter/th_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/th_rewriter.go",
         "pkg/ast/rewriter/th_rewriter_test.go",
@@ -34477,7 +34513,8 @@
         "TestTheoryRewriterParamsCacheCleanupAndBindings",
         "TestTheoryRewriterParameterDescriptions",
         "TestTheoryRewriterQuantifierReduction",
-        "TestTheoryRewriterCloseGuards"
+        "TestTheoryRewriterCloseGuards",
+        "TestTheoryRewriterProofTraversal"
       ],
       "conditionals": [
         {
@@ -34603,8 +34640,12 @@
         },
         {
           "name": "proof-producing th_rewriter operator and quantifier proof composition (th_rewriter.cpp:624-668,769-771)",
-          "status": "unported",
-          "reason": "Requires the proof-generating rewriter_tpl specialization still recorded as partial in rewriter.h and rewriter_def.h."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterProofTraversal",
+            "TestTraversalProofCongruenceRewriteAndReflexivity"
+          ]
         }
       ],
       "ownership": [
@@ -34612,7 +34653,7 @@
         "Cleanup destroys and reconstructs traversal/configuration in source order while retaining the owned parameter snapshot. Temporary proof, quantifier and eliminated-result AST references are owning and released after publication."
       ],
       "deviations": [
-        "Go named methods replace C++ operator overloads. The concrete no-proof traversal is complete; the proof-output overload remains with the audited proof-generating traversal dependency.",
+        "Go named methods replace C++ operator overloads. Separate traversal constructors preserve explicit proof and no-proof call sites.",
         "The disabled #if 0 multi-argument unify_add experiment is intentionally not ported. Duplicate annotation filtering uses a native Go map while preserving first occurrence order.",
         "The source cooperate call is represented by the existing AST budget/cancellation machinery; maximum memory and step failures retain the source callback points."
       ]
@@ -34621,7 +34662,7 @@
       "path": "src/ast/rewriter/th_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/th_rewriter.go",
         "pkg/ast/rewriter/th_rewriter_test.go"
@@ -34630,7 +34671,8 @@
         "TestTheoryRewriterCoreTraversalAcrossFamilies",
         "TestTheoryRewriterParamsCacheCleanupAndBindings",
         "TestTheoryRewriterSubstitutionDependencies",
-        "TestTheoryRewriterCloseGuards"
+        "TestTheoryRewriterCloseGuards",
+        "TestTheoryRewriterProofTraversal"
       ],
       "conditionals": [
         {
@@ -34658,15 +34700,18 @@
         },
         {
           "name": "public proof-output rewrite overload (th_rewriter.h:48)",
-          "status": "unported",
-          "reason": "Requires the proof-generating rewriter_tpl specialization still recorded as partial in rewriter.h and rewriter_def.h."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterProofTraversal"
+          ]
         }
       ],
       "ownership": [
         "TheoryRewriter is a noncopyable Go owner of its parameter snapshot, concrete configuration and traversal. ASTManager, substitutions and sequence solver are borrowed."
       ],
       "deviations": [
-        "Named Go methods replace overloads. Proof-output rewriting remains explicitly deferred with the proof-generating base traversal."
+        "Named Go methods replace overloads."
       ]
     },
     {
