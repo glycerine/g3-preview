@@ -12814,6 +12814,7 @@
         "pkg/ast/ast_smt2_app_format.go",
         "pkg/ast/ast_smt2_arith_literal.go",
         "pkg/ast/ast_smt2_arith_literal_test.go",
+        "pkg/ast/ast_smt2_datalog_literal.go",
         "pkg/ast/ast_smt2_boolean_tree.go",
         "pkg/ast/ast_smt2_as_array_test.go",
         "pkg/ast/ast_smt2_let.go",
@@ -13048,6 +13049,14 @@
           "tests": [
             "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
             "TestASTSMT2ArithmeticLiteralDecimalAndAlgebraicProfiles"
+          ]
+        },
+        {
+          "name": "smt2_pp_environment::pp_datalog_literal finite-domain numeral formatting and pp_const dispatch (ast_smt2_pp.cpp:370-389,637-639)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_datalog_literal.go",
+          "tests": [
+            "TestASTSMT2DatalogFiniteNumeral"
           ]
         },
         {

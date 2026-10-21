@@ -222,6 +222,13 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 					format, e = m.ppFloatBitVectorLiteral(h, true, nil)
 					return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, e
 				}
+				format, matched, e = m.SMT2PPDatalogLiteral(h)
+				if e != nil {
+					return result{}, e
+				}
+				if matched {
+					return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, nil
+				}
 				// The source pp_const falls through to pp_fdecl for other
 				// nullary built-ins, including indexed as-array declarations.
 			}

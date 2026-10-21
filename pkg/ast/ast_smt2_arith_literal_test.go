@@ -136,6 +136,28 @@ func TestASTSMT2BooleanComparisonsWithArithmeticLiterals(t *testing.T) {
 	}
 }
 
+func TestASTSMT2DatalogFiniteNumeral(t *testing.T) {
+	c, g, p, budget := dynAckSourceFixture(t)
+	m, err := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: budget})
+	paramsMust(t, err)
+	defer func() { paramsMust(t, m.Close()) }()
+	sort, err := m.MkDatalogFiniteSort(astTestSymbol(t, m, "finite"), 8)
+	paramsMust(t, err)
+	literal, err := m.MkDatalogNumeral(7, sort)
+	paramsMust(t, err)
+	format, err := m.SMT2PPExprTree(literal, nil)
+	paramsMust(t, err)
+	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: budget})
+	paramsMust(t, err)
+	defer func() { paramsMust(t, out.Close()) }()
+	paramsMust(t, m.PrintFormat(out, format, c, p, g))
+	got, err := out.String()
+	paramsMust(t, err)
+	if got != "7" {
+		t.Fatalf("finite-domain numeral: %q, want 7", got)
+	}
+}
+
 func TestASTSMT2BooleanComparisonsWithBitVectorLiterals(t *testing.T) {
 	c, g, p, budget := dynAckSourceFixture(t)
 	m, err := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: budget})
