@@ -92,6 +92,41 @@ func TestTheoryRewriterTamagotchiAndRawMakeApp(t *testing.T) {
 	}
 }
 
+func TestTheoryRewriterPullCheapITE(t *testing.T) {
+	m, context, globals, local := boolRewriterConfigFixture(t)
+	key := "pull_cheap_ite"
+	astTestMust(t, context.SetBoolName(local, &key, true))
+	r, err := NewTheoryRewriter(m, context, globals, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+
+	condition := goalTestAtom(t, m, "theory-pull-ite")
+	two := arithRewriterNumeral(t, m, "2", true)
+	three := arithRewriterNumeral(t, m, "3", true)
+	choice, err := m.MkIte(condition, two, three)
+	astTestMust(t, err)
+	equality, err := m.MkEq(choice, two)
+	astTestMust(t, err)
+	decl, err := m.GetDecl(equality)
+	astTestMust(t, err)
+	out := astTestPin(t, m, equality)
+	makeOut := astTestPin(t, m, equality)
+	astTestMust(t, r.MakeApp(decl, ast.SliceArguments([]ast.ASTHandle{choice, two}), makeOut))
+	made, err := m.RefGet(makeOut)
+	astTestMust(t, err)
+	if made != condition {
+		t.Fatal("MakeApp skipped configured ITE pulling", made, condition)
+	}
+
+	astTestMust(t, r.Rewrite(equality, out))
+	got, err := m.RefGet(out)
+	astTestMust(t, err)
+	if got != condition {
+		t.Fatal("pulled equality did not simplify to condition", got, condition)
+	}
+
+}
+
 func TestTheoryRewriterCloseGuards(t *testing.T) {
 	m, r := theoryRewriterFixture(t)
 	truth, err := m.MkTrue()
