@@ -1,6 +1,11 @@
 package ast
 
-import "testing"
+import (
+	"bytes"
+	"testing"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+)
 
 func TestASTDatatypeDefinitionBlockAndUtilities(t *testing.T) {
 	m := astTestManager(t)
@@ -91,6 +96,22 @@ func TestASTDatatypeDefinitionBlockAndUtilities(t *testing.T) {
 	}
 	if got, matched, e := m.DatatypeConstructorIndex(nonRecursive); e != nil || !matched || got != 0 {
 		t.Fatal("non-recursive constructor", got, matched, e)
+	}
+	declared, err := m.DatatypeIsDeclared(sorts[0])
+	astTestMust(t, err)
+	if !declared {
+		t.Fatal("installed datatype is not declared")
+	}
+	var display bytes.Buffer
+	astTestMust(t, m.DisplayDatatype(sorts[0], &display))
+	wantDisplay := "EvenList where\nEvenList =\n  even-nil :: \n  even-cons :: (even-head: Bool) (even-tail: OddList) \nOddList =\n  odd-cons :: (odd-head: Bool) (odd-tail: EvenList) \n"
+	if display.String() != wantDisplay {
+		t.Fatalf("datatype display\nwant: %q\n got: %q", wantDisplay, display.String())
+	}
+	var names ASTBuiltinNames
+	astTestMust(t, m.GetDatatypeOpNames(&names, usymbol.Symbol{}))
+	if items := names.Items(); len(items) != 2 || items[0].Kind != ASTDatatypeIs || items[1].Kind != ASTDatatypeUpdateField {
+		t.Fatal("datatype operation names", items)
 	}
 }
 

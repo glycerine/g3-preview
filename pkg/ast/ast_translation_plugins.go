@@ -14,8 +14,8 @@ type astFamilyPluginSnapshot struct {
 
 // CopyFamiliesPlugins preserves the source manager's family IDs and installs
 // fresh concrete declaration plugins in this manager. Plugin-owned AST state is
-// manager-local; the only source plugin inheritance with additional state is
-// datatype definitions, which remain outside the retained Go datatype port.
+// manager-local. ASTTranslation follows this registry copy with datatype
+// definition inheritance because those definitions contain translatable ASTs.
 func (m *ASTManager) CopyFamiliesPlugins(from *ASTManager) error {
 	if from == nil {
 		return ErrASTHandle

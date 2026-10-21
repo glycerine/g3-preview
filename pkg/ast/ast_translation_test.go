@@ -2,11 +2,52 @@
 package ast
 
 import (
+	"bytes"
 	"testing"
 
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestASTTranslationInheritsDatatypeDefinitions(t *testing.T) {
+	from, to := astTranslationManagers(t)
+	_, err := from.RegisterDatatypePlugin()
+	astTestMust(t, err)
+	boolean, err := from.MkBoolSort()
+	astTestMust(t, err)
+	sorts, err := from.MkDatatypes([]DatatypeDefinition{
+		{Name: astTestSymbol(t, from, "Tree"), Constructors: []DatatypeConstructorDefinition{
+			{Name: astTestSymbol(t, from, "leaf"), Recognizer: astTestSymbol(t, from, "is-leaf"), Accessors: []DatatypeAccessorDefinition{{Name: astTestSymbol(t, from, "leaf-value"), Range: boolean}}},
+			{Name: astTestSymbol(t, from, "branch"), Recognizer: astTestSymbol(t, from, "is-branch"), Accessors: []DatatypeAccessorDefinition{{Name: astTestSymbol(t, from, "left"), Recursive: true}, {Name: astTestSymbol(t, from, "right"), Recursive: true}}},
+		}},
+	})
+	astTestMust(t, err)
+	translation, err := NewASTTranslation(from, to, true)
+	astTestMust(t, err)
+	defer func() { astTestMust(t, translation.Close()) }()
+	translated, err := translation.Translate(sorts[0])
+	astTestMust(t, err)
+	constructors, err := to.DatatypeConstructors(translated)
+	astTestMust(t, err)
+	if len(constructors) != 2 {
+		t.Fatal("translated datatype constructors", len(constructors))
+	}
+	accessors, err := to.DatatypeConstructorAccessors(constructors[1])
+	astTestMust(t, err)
+	if len(accessors) != 2 {
+		t.Fatal("translated recursive accessors", len(accessors))
+	}
+	for _, accessor := range accessors {
+		if rangeSort, e := to.GetRange(accessor); e != nil || rangeSort != translated {
+			t.Fatal("translated recursive range", rangeSort, translated, e)
+		}
+	}
+	var display bytes.Buffer
+	astTestMust(t, to.DisplayDatatype(translated, &display))
+	if want := "Tree where\nTree =\n  leaf :: (leaf-value: Bool) \n  branch :: (left: Tree) (right: Tree) \n"; display.String() != want {
+		t.Fatalf("translated datatype display\nwant: %q\n got: %q", want, display.String())
+	}
+}
 
 func TestASTTranslationIterativeQuantifierAndPersistentSharedCache(t *testing.T) {
 	from, to := astTranslationManagers(t)

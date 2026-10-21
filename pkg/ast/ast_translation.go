@@ -67,6 +67,10 @@ func newASTTranslation(from, to *ASTManager, copyPlugins, persist bool) (*ASTTra
 		if err := to.CopyFamiliesPlugins(from); err != nil {
 			return nil, err
 		}
+		if err := t.copyDatatypeDefinitions(); err != nil {
+			_ = t.Close()
+			return nil, err
+		}
 	}
 	return t, nil
 }
