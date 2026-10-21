@@ -232,6 +232,13 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 				if matched {
 					return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, nil
 				}
+				format, matched, e = m.SMT2PPStringLiteral(h)
+				if e != nil {
+					return result{}, e
+				}
+				if matched {
+					return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, nil
+				}
 				matched, e = m.IsBitVectorNumeral(h)
 				if e != nil {
 					return result{}, e

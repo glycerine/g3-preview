@@ -12815,6 +12815,8 @@
         "pkg/ast/ast_smt2_arith_literal.go",
         "pkg/ast/ast_smt2_arith_literal_test.go",
         "pkg/ast/ast_smt2_datalog_literal.go",
+        "pkg/ast/ast_smt2_string_literal.go",
+        "pkg/ast/ast_smt2_string_literal_test.go",
         "pkg/ast/ast_smt2_boolean_tree.go",
         "pkg/ast/ast_smt2_as_array_test.go",
         "pkg/ast/ast_smt2_let.go",
@@ -12846,6 +12848,7 @@
         "TestASTSMT2VariableAndLabelSourceFormats",
         "TestASTSMT2ApplicationSourceShortAndLongNameLayout",
         "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
+        "TestASTSMT2StringLiteralSourceEncoding",
         "TestASTSMT2BooleanComparisonsWithBitVectorLiterals",
         "TestASTSMT2BooleanComparisonsWithFloatingPointLiterals",
         "TestASTWellSortedNonBooleanRootTraceProfiles",
@@ -13023,7 +13026,7 @@
           ]
         },
         {
-          "name": "Selected smt2_printer child-before-parent Boolean and uninterpreted-result application/variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic numeral children carry exact/decimal precision through nested quantifiers, bit-vector and floating-point numeral children use source-default profiles, while string and wider quantifier profiles remain open; selected pattern apps use source mk_seq5",
+          "name": "Selected smt2_printer child-before-parent Boolean and uninterpreted-result application/variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic numeral children carry exact/decimal precision through nested quantifiers, string constants use source encoding and quote doubling, and bit-vector/floating-point numeral children use source-default profiles; wider quantifier profiles remain open; selected pattern apps use source mk_seq5",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_boolean_tree.go",
           "tests": [
@@ -13057,6 +13060,14 @@
           "go_target": "pkg/ast/ast_smt2_datalog_literal.go",
           "tests": [
             "TestASTSMT2DatalogFiniteNumeral"
+          ]
+        },
+        {
+          "name": "smt2_pp_environment::pp_string_literal source escape encoding, quote doubling and pp_const dispatch (ast_smt2_pp.cpp:370-383,628-630)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_string_literal.go",
+          "tests": [
+            "TestASTSMT2StringLiteralSourceEncoding"
           ]
         },
         {
@@ -34154,6 +34165,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_seq_plugin.go",
+        "pkg/ast/ast_seq_string.go",
         "pkg/ast/ast_seq_signature_memory_trace.go",
         "pkg/ast/ast_seq_plugin_source_test.go"
       ],
@@ -34161,7 +34173,8 @@
         "TestASTSequenceSourceSetManagerAndRecursiveSignatureInitialization",
         "TestASTSequenceEveryActualConstructorAndSignatureReservation",
         "TestASTSequenceNativeSignatureOwnershipAndFinalize",
-        "TestASTSequenceSignatureMemoryWrappersSourceOrder"
+        "TestASTSequenceSignatureMemoryWrappersSourceOrder",
+        "TestASTSMT2StringLiteralSourceEncoding"
       ],
       "conditionals": [
         {
@@ -34236,6 +34249,14 @@
             "TestASTSequenceNativeSignatureOwnershipAndFinalize",
             "TestASTSequenceSignatureMemoryWrappersSourceOrder"
           ]
+        },
+        {
+          "name": "seq_decl_plugin string-constant construction and recognition with retained zstring escape encoding (seq_decl_plugin.cpp:20-142,844-858,948-956)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_string.go",
+          "tests": [
+            "TestASTSMT2StringLiteralSourceEncoding"
+          ]
         }
       ],
       "ownership": [
@@ -34250,9 +34271,13 @@
       "path": "src/ast/seq_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_seq_string.go"
+      ],
+      "tests": [
+        "TestASTSMT2StringLiteralSourceEncoding"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -34271,7 +34296,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "seq_op_kind OP_STRING_CONST plus seq_util::str string construction and recognition declarations (seq_decl_plugin.h:35-37,246-263)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_string.go",
+          "tests": [
+            "TestASTSMT2StringLiteralSourceEncoding"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": [
         "The retained sequence signature registry now uses []*astSequenceSignature directly, with owning []astNodeRef domains. Each actual INC is immediately followed by native append; no fallible vector growth, raw vector allocation or unjoined push receipt remains. Range retirement precedes ascending domain retirement with consumed DEC progress. Original recursive initialization, operation-index publication, null unused slots and actual plugin/signature owner-header checks remain. Source allocation-failure geometry and vector internals are excluded; declaration matching/factory operations outside the retained registration/sort paths remain open."
