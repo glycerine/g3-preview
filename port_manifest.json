@@ -35073,7 +35073,7 @@
       "path": "src/ast/seq_decl_plugin.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_seq_plugin.go",
         "pkg/ast/ast_seq_string.go",
@@ -35167,8 +35167,8 @@
           "text": "SASSERT(range);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "ast_seq_plugin concrete reached source counterpart (seq_decl_plugin.cpp:343-357,500-610)",
@@ -35282,7 +35282,7 @@
         "Actual signature owners retain range/domain AST references independently of native slice backing. Completed signatures retire in operation-index order; each range retires before ascending domain entries. Consumed references advance the cursor before errors are returned. Failed-constructor cleanup and body/source/own causes remain until actual manager context end; there is no container-growth-only pending acquisition."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; native specialization profiles outside retained consumers remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "The complete retained concrete pure-Go sequence plugin replaces source pointer containers with checked manager-bound owners. Default SMT2 environment dispatch and well_sorted callers are audited in their own source units. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
         "The retained sequence signature registry now uses []*astSequenceSignature directly, with owning []astNodeRef domains. Each actual INC is immediately followed by native append; no fallible vector growth, raw vector allocation or unjoined push receipt remains. Range retirement precedes ascending domain retirement with consumed DEC progress. Original recursive initialization, operation-index publication, null unused slots and actual plugin/signature owner-header checks remain. Source allocation-failure geometry and vector internals are excluded."
       ]
     },
@@ -35290,7 +35290,7 @@
       "path": "src/ast/seq_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_seq_string.go",
         "pkg/ast/ast_seq_values.go",
@@ -35326,8 +35326,8 @@
           "text": "expr* mk_concat(unsigned n, expr* const* es) const { if (n == 1) return es[0]; SASSERT(n > 1); return m.mk_app(m_fid, OP_SEQ_CONCAT, n, es); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "seq_op_kind OP_STRING_CONST plus seq_util::str string construction and recognition declarations (seq_decl_plugin.h:35-37,246-263)",
@@ -35410,7 +35410,9 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Sequence plugin signatures own their range and domain AST references. Public sequence and regex utility operations borrow validated input handles and return manager-owned RC0 handles; explicit result references are acquired by their consumers."
+      ],
       "deviations": [
         "The retained sequence signature registry now uses []*astSequenceSignature directly, with owning []astNodeRef domains. Each actual INC is immediately followed by native append; no fallible vector growth, raw vector allocation or unjoined push receipt remains. Range retirement precedes ascending domain retirement with consumed DEC progress. Original recursive initialization, operation-index publication, null unused slots and actual plugin/signature owner-header checks remain. Source allocation-failure geometry and vector internals are excluded."
       ]
