@@ -37,6 +37,9 @@ type theoryRewriterConfiguration struct {
 	pushITEBitVector     bool
 	ignoreGroundPatterns bool
 	rewritePatternTerms  bool
+	substitution         ast.ASTExprSubstitution
+	hasSubstitution      bool
+	usedDependencies     ast.ASTDependency
 }
 
 func (c *theoryRewriterConfiguration) CacheAllResults() bool { return c.cacheAll }
@@ -46,6 +49,36 @@ func (c *theoryRewriterConfiguration) MaxStepsExceeded(steps uint32) (bool, erro
 		return false, newRewriterException("max. memory exceeded")
 	}
 	return steps > c.maxSteps, nil
+}
+func (c *theoryRewriterConfiguration) Reset() {
+	c.substitution = ast.ASTExprSubstitution{}
+	c.hasSubstitution = false
+}
+func (c *theoryRewriterConfiguration) GetSubst(term ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
+	if !c.hasSubstitution {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, nil
+	}
+	var value, proof ast.ASTHandle
+	var dependency ast.ASTDependency
+	found, err := c.owner.manager.ExprSubstitutionFindDependency(c.substitution, term, &value, &proof, &dependency)
+	if err != nil || !found || dependency.IsNull() {
+		return value, proof, found, err
+	}
+	joined, err := c.owner.manager.DependencyJoin(c.usedDependencies, dependency)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	if err = c.owner.manager.DependencyInc(joined); err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	if !c.usedDependencies.IsNull() {
+		if err = c.owner.manager.DependencyDec(c.usedDependencies); err != nil {
+			_ = c.owner.manager.DependencyDec(joined)
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+		}
+	}
+	c.usedDependencies = joined
+	return value, proof, true, nil
 }
 func (c *theoryRewriterConfiguration) FlatAssoc(decl ast.ASTHandle) (bool, error) {
 	if !c.flat {
@@ -938,6 +971,63 @@ func (r *TheoryRewriter) Reset() error {
 	return r.traversal.Reset()
 }
 
+// SetSubstitution installs a borrowed substitution after clearing the rewrite
+// cache. A nil argument clears the current substitution.
+func (r *TheoryRewriter) SetSubstitution(substitution *ast.ASTExprSubstitution) error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	if substitution != nil {
+		manager, err := r.manager.ExprSubstitutionManager(*substitution)
+		if err != nil {
+			return err
+		}
+		if manager != r.manager {
+			return ast.ErrASTHandle
+		}
+	}
+	if err := r.traversal.Reset(); err != nil {
+		return err
+	}
+	r.configuration.hasSubstitution = substitution != nil
+	if substitution != nil {
+		r.configuration.substitution = *substitution
+	}
+	return nil
+}
+
+// UsedDependencies returns the borrowed dependency accumulated by substitutions.
+func (r *TheoryRewriter) UsedDependencies() (ast.ASTDependency, error) {
+	if err := r.open(); err != nil {
+		return ast.ASTDependency{}, err
+	}
+	return r.configuration.usedDependencies, nil
+}
+
+// ResetUsedDependencies clears accumulated dependencies while preserving the
+// current substitution and clearing cached rewrite results.
+func (r *TheoryRewriter) ResetUsedDependencies() error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	used := r.configuration.usedDependencies
+	if used.IsNull() {
+		return nil
+	}
+	substitution := r.configuration.substitution
+	hasSubstitution := r.configuration.hasSubstitution
+	if err := r.traversal.Reset(); err != nil {
+		return err
+	}
+	r.configuration.substitution = substitution
+	r.configuration.hasSubstitution = hasSubstitution
+	if err := r.manager.DependencyDec(used); err != nil {
+		return err
+	}
+	r.configuration.usedDependencies = ast.ASTDependency{}
+	return nil
+}
+
 func (r *TheoryRewriter) closeConfiguration() error {
 	c := &r.configuration
 	c.sequence = nil
@@ -993,6 +1083,12 @@ func (r *TheoryRewriter) Close() error {
 	}
 	if r.closed {
 		return nil
+	}
+	if !r.configuration.usedDependencies.IsNull() {
+		if err := r.manager.DependencyDec(r.configuration.usedDependencies); err != nil {
+			return err
+		}
+		r.configuration.usedDependencies = ast.ASTDependency{}
 	}
 	if r.traversal != nil {
 		if err := r.traversal.Close(); err != nil {

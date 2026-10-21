@@ -203,6 +203,66 @@ func TestTheoryRewriterPushITE(t *testing.T) {
 	})
 }
 
+func TestTheoryRewriterSubstitutionDependencies(t *testing.T) {
+	m, r := theoryRewriterFixture(t)
+	a := goalTestAtom(t, m, "theory-subst-a")
+	b := goalTestAtom(t, m, "theory-subst-b")
+	decl := rewriterTestDecl(t, m, "theory-subst-f")
+	term := rewriterTestApp(t, m, decl, a)
+	want := rewriterTestApp(t, m, decl, b)
+
+	dependency, err := m.DependencyLeaf(b)
+	astTestMust(t, err)
+	astTestMust(t, m.DependencyInc(dependency))
+	t.Cleanup(func() { astTestMust(t, m.DependencyDec(dependency)) })
+	substitution, err := m.NewExprSubstitutionPolicy(true, false)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, m.DelExprSubstitution(&substitution)) })
+	astTestMust(t, m.ExprSubstitutionInsert(substitution, a, b, ast.ASTHandle{}, dependency))
+	astTestMust(t, r.SetSubstitution(&substitution))
+
+	out := astTestPin(t, m, term)
+	astTestMust(t, r.Rewrite(term, out))
+	got, err := m.RefGet(out)
+	astTestMust(t, err)
+	if got != want {
+		t.Fatal("theory substitution result", got, want)
+	}
+	used, err := r.UsedDependencies()
+	astTestMust(t, err)
+	if used.IsNull() {
+		t.Fatal("missing used substitution dependency")
+	}
+	contains, err := m.DependencyContains(used, b)
+	astTestMust(t, err)
+	if !contains {
+		t.Fatal("used dependency omitted substitution dependency")
+	}
+
+	astTestMust(t, r.ResetUsedDependencies())
+	used, err = r.UsedDependencies()
+	astTestMust(t, err)
+	if !used.IsNull() {
+		t.Fatal("used dependencies survived reset")
+	}
+	astTestMust(t, m.SetRef(out, term))
+	astTestMust(t, r.Rewrite(term, out))
+	got, err = m.RefGet(out)
+	astTestMust(t, err)
+	if got != want {
+		t.Fatal("dependency reset discarded substitution", got, want)
+	}
+
+	astTestMust(t, r.SetSubstitution(nil))
+	astTestMust(t, m.SetRef(out, term))
+	astTestMust(t, r.Rewrite(term, out))
+	got, err = m.RefGet(out)
+	astTestMust(t, err)
+	if got != term {
+		t.Fatal("nil substitution remained installed", got, term)
+	}
+}
+
 func TestTheoryRewriterCloseGuards(t *testing.T) {
 	m, r := theoryRewriterFixture(t)
 	truth, err := m.MkTrue()
