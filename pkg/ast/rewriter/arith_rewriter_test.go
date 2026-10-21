@@ -829,3 +829,89 @@ func TestArithRewriterAlgebraicComparisonsAndArithmetic(t *testing.T) {
 	astTestMust(t, manager.Del(&root))
 	astTestMust(t, manager.Del(&expected))
 }
+
+func TestArithRewriterTranscendentalCore(t *testing.T) {
+	m, c, g, local := boolRewriterConfigFixture(t)
+	r, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	realSort, err := m.MkFamilySort(r.family, 0, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "arith-trans-x"), realSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	r0 := arithRewriterNumeral(t, m, "0", false)
+	r1 := arithRewriterNumeral(t, m, "1", false)
+	rNeg1 := arithRewriterNumeral(t, m, "-1", false)
+	rHalf := arithRewriterNumeral(t, m, "1/2", false)
+	pi, err := r.pi()
+	astTestMust(t, err)
+	astTestPin(t, m, pi)
+	halfPi, err := r.app(arithOpMul, rHalf, pi)
+	astTestMust(t, err)
+	astTestPin(t, m, halfPi)
+
+	for _, row := range []struct {
+		kind int32
+		arg  ast.ASTHandle
+		want string
+	}{
+		{arithOpSin, r0, "0"},
+		{arithOpCos, r0, "1"},
+		{arithOpSin, halfPi, "1"},
+		{arithOpCos, pi, "-1"},
+		{arithOpTan, pi, "0"},
+	} {
+		status, result := arithRewriterCore(t, r, row.kind, row.arg)
+		if status == RewriteFailed {
+			t.Fatal("transcendental numeral status", row.kind, status)
+		}
+		arithRewriterWantNumeral(t, m, result, row.want, false)
+	}
+
+	asinX, err := r.app(arithOpASin, x)
+	astTestMust(t, err)
+	astTestPin(t, m, asinX)
+	status, result := arithRewriterCore(t, r, arithOpSin, asinX)
+	if status != RewriteDone || result != x {
+		t.Fatal("sin/asin cancellation", status, result, x)
+	}
+	status, result = arithRewriterCore(t, r, arithOpATan, r1)
+	if status != Rewrite2 {
+		t.Fatal("atan one status", status)
+	}
+	arithRewriterWantOperation(t, r, result, arithOpMul, arithRewriterNumeral(t, m, "1/4", false), pi)
+
+	asinhX, err := r.app(arithOpASinh, x)
+	astTestMust(t, err)
+	astTestPin(t, m, asinhX)
+	status, result = arithRewriterCore(t, r, arithOpSinh, asinhX)
+	if status != RewriteDone || result != x {
+		t.Fatal("sinh/asinh cancellation", status, result, x)
+	}
+	negativeX, err := r.app(arithOpMul, rNeg1, x)
+	astTestMust(t, err)
+	astTestPin(t, m, negativeX)
+	status, result = arithRewriterCore(t, r, arithOpCosh, negativeX)
+	if status != RewriteDone {
+		t.Fatal("cosh evenness status", status)
+	}
+	arithRewriterWantOperation(t, r, result, arithOpCosh, x)
+
+	key := "expand_tan"
+	astTestMust(t, c.SetBoolName(local, &key, true))
+	expanding, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, expanding.Close()) })
+	status, result = arithRewriterCore(t, expanding, arithOpTan, x)
+	if status != Rewrite2 {
+		t.Fatal("tan expansion status", status)
+	}
+	_, divisionArgs, matched, err := expanding.operation(result, arithOpDiv)
+	astTestMust(t, err)
+	if !matched || len(divisionArgs) != 2 {
+		t.Fatal("tan expansion", matched, len(divisionArgs))
+	}
+	arithRewriterWantOperation(t, expanding, divisionArgs[0], arithOpSin, x)
+	arithRewriterWantOperation(t, expanding, divisionArgs[1], arithOpCos, x)
+}

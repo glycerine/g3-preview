@@ -22590,7 +22590,8 @@
       "go_targets": [
         "pkg/ast/rewriter/arith_rewriter.go",
         "pkg/ast/rewriter/arith_polynomial.go",
-        "pkg/ast/rewriter/arith_algebraic.go"
+        "pkg/ast/rewriter/arith_algebraic.go",
+        "pkg/ast/rewriter/arith_transcendental.go"
       ],
       "tests": [
         "TestArithRewriterRationalScalarCores",
@@ -22602,7 +22603,8 @@
         "TestArithRewriterStructuralPowerRules",
         "TestArithRewriterComparisonPowerReductionAndToRealElimination",
         "TestArithRewriterPolynomialGCDReduction",
-        "TestArithRewriterAlgebraicComparisonsAndArithmetic"
+        "TestArithRewriterAlgebraicComparisonsAndArithmetic",
+        "TestArithRewriterTranscendentalCore"
       ],
       "assertions": [
         {
@@ -22894,7 +22896,15 @@
           ]
         },
         {
-          "name": "advanced SOM/hoisting modes and trigonometric/hyperbolic rewrites",
+          "name": "transcendental zero/inverse identities, principal exact pi values, inverse-trig constants, hyperbolic parity and configured tangent expansion",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_transcendental.go",
+          "tests": [
+            "TestArithRewriterTranscendentalCore"
+          ]
+        },
+        {
+          "name": "advanced SOM/hoisting modes plus symbolic pi-offset periodicity and remaining twelfth-angle trigonometric expansions",
           "status": "unported",
           "reason": "The exact rational scalar core is connected first; the remaining paths require the concrete arithmetic specialization of poly_rewriter and broader algebraic-expression integration."
         }
@@ -22912,7 +22922,8 @@
       "go_targets": [
         "pkg/ast/rewriter/arith_rewriter.go",
         "pkg/ast/rewriter/arith_polynomial.go",
-        "pkg/ast/rewriter/arith_algebraic.go"
+        "pkg/ast/rewriter/arith_algebraic.go",
+        "pkg/ast/rewriter/arith_transcendental.go"
       ],
       "tests": [
         "TestArithRewriterRationalScalarCores",
@@ -22924,7 +22935,8 @@
         "TestArithRewriterStructuralPowerRules",
         "TestArithRewriterComparisonPowerReductionAndToRealElimination",
         "TestArithRewriterPolynomialGCDReduction",
-        "TestArithRewriterAlgebraicComparisonsAndArithmetic"
+        "TestArithRewriterAlgebraicComparisonsAndArithmetic",
+        "TestArithRewriterTranscendentalCore"
       ],
       "conditionals": [
         {

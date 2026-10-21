@@ -1131,6 +1131,20 @@ func (r *ArithRewriter) MkAppCore(decl ast.ASTHandle, args ast.AppArguments, out
 		return r.rewriteIsInt(arg, out)
 	case arithOpAbs:
 		return r.rewriteAbs(arg, out)
+	case arithOpSin:
+		return r.rewriteSin(arg, out)
+	case arithOpCos:
+		return r.rewriteCos(arg, out)
+	case arithOpTan:
+		return r.rewriteTan(arg, out)
+	case arithOpASin, arithOpACos, arithOpATan:
+		return r.rewriteInverseTrig(kind, arg, out)
+	case arithOpSinh:
+		return r.rewriteHyperbolic(kind, arithOpASinh, arg, out)
+	case arithOpCosh:
+		return r.rewriteHyperbolic(kind, arithOpACosh, arg, out)
+	case arithOpTanh:
+		return r.rewriteHyperbolic(kind, arithOpATanh, arg, out)
 	}
 	return RewriteFailed, nil
 }
