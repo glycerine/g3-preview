@@ -20206,22 +20206,53 @@
       "path": "src/ast/macros/quasi_macros.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/macros/quasi_macros.go",
+        "pkg/ast/macros/macro_util_test.go"
+      ],
+      "tests": [
+        "TestQuasiMacrosUniqueConversionAndRepeatedRejection"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "occurrence counting, uniqueness/dependency checks, quasi recognition and guarded true-macro conversion",
+          "status": "ported",
+          "go_target": "pkg/ast/macros/quasi_macros.go",
+          "tests": [
+            "TestQuasiMacrosUniqueConversionAndRepeatedRejection"
+          ]
+        },
+        {
+          "name": "find_macros/apply_macros/operator overloads",
+          "status": "ported",
+          "go_target": "pkg/ast/macros/quasi_macros.go",
+          "tests": [
+            "TestQuasiMacrosUniqueConversionAndRepeatedRejection"
+          ]
+        }
+      ],
+      "ownership": [
+        "QuasiMacros borrows ASTManager and Manager. Occurrence state is call-local Go storage; Apply returns an owning FormulaBatch and Manager owns every installed converted macro."
+      ],
+      "deviations": [
+        "Raw expression/proof/dependency arrays and justified_expr overloads are consolidated into Formula and FormulaBatch. Manager expansion already performs the source theory-rewriter normalization, so Apply does not repeat it."
+      ]
     },
     {
       "path": "src/ast/macros/quasi_macros.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/macros/quasi_macros.go",
+        "pkg/ast/macros/macro_util_test.go"
+      ],
+      "tests": [
+        "TestQuasiMacrosUniqueConversionAndRepeatedRejection"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -20232,11 +20263,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "quasi macro finder and application public surface",
+          "status": "ported",
+          "go_target": "pkg/ast/macros/quasi_macros.go",
+          "tests": [
+            "TestQuasiMacrosUniqueConversionAndRepeatedRejection"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go facade borrows its manager pair and returns a caller-owned FormulaBatch."
+      ],
+      "deviations": [
+        "C++ overloads are represented by one concrete Formula API."
+      ]
     },
     {
       "path": "src/ast/normal_forms/CMakeLists.txt",

@@ -706,3 +706,57 @@ func TestMacroFinderArithmeticEqualityAndInequality(t *testing.T) {
 		})
 	}
 }
+
+func TestQuasiMacrosUniqueConversionAndRepeatedRejection(t *testing.T) {
+	for _, repeated := range []bool{false, true} {
+		t.Run(map[bool]string{false: "unique", true: "repeated"}[repeated], func(t *testing.T) {
+			m := fixture(t)
+			manager, err := macros.NewManager(m)
+			must(t, err)
+			t.Cleanup(func() { must(t, manager.Close()) })
+			quasi, err := macros.NewQuasiMacros(m, manager)
+			must(t, err)
+			b, err := m.MkBoolSort()
+			must(t, err)
+			v, err := m.MkVar(0, b)
+			must(t, err)
+			ground, err := m.MkConst(mustSymbol(t, m, "quasi-ground"), b)
+			must(t, err)
+			f := declaration(t, m, "quasi-f", []ast.ASTHandle{b, b}, b)
+			head, err := m.MkApp(f, []ast.ASTHandle{v, ground})
+			must(t, err)
+			body, err := m.MkEq(head, v)
+			must(t, err)
+			q, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{mustSymbol(t, m, "quasi-x")}, Body: body})
+			must(t, err)
+			inputs := []macros.Formula{{Expression: q}}
+			if repeated {
+				inputs = append(inputs, macros.Formula{Expression: q})
+			}
+			result, changed, err := quasi.Apply(inputs)
+			must(t, err)
+			t.Cleanup(func() { must(t, result.Close()) })
+			if repeated {
+				if changed || manager.HasMacros() || result.Len() != 2 {
+					t.Fatal("repeated quasi macro accepted", changed, manager.NumMacros(), result.Len())
+				}
+				return
+			}
+			if !changed || manager.NumMacros() != 1 || result.Len() != 1 {
+				t.Fatal("unique quasi macro", changed, manager.NumMacros(), result.Len())
+			}
+			macro, yes := manager.MacroQuantifier(f)
+			if !yes {
+				t.Fatal("converted quasi macro missing")
+			}
+			if declarations, e := m.GetNumDeclarations(macro); e != nil || declarations != 2 {
+				t.Fatal("converted binder count", declarations, e)
+			}
+			macroHead, _, err := manager.GetHeadDefinition(macro, f)
+			must(t, err)
+			if valid, e := manager.Util().IsMacroHead(macroHead, 2); e != nil || !valid {
+				t.Fatal("converted macro head", valid, e)
+			}
+		})
+	}
+}
