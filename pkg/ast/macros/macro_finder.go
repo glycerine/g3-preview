@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 type Formula struct {
@@ -160,6 +161,266 @@ func (f *Finder) simpleMacro(term ast.ASTHandle) (declaration ast.ASTHandle, mat
 	return declaration, err == nil, err
 }
 
+func (f *Finder) freshLike(head ast.ASTHandle) (declaration ast.ASTHandle, arguments []ast.ASTHandle, err error) {
+	original, err := f.manager.GetDecl(head)
+	if err != nil {
+		return declaration, nil, err
+	}
+	name, err := f.manager.GetASTName(original)
+	if err != nil {
+		return declaration, nil, err
+	}
+	arity, err := f.manager.GetArity(original)
+	if err != nil {
+		return declaration, nil, err
+	}
+	domain := make([]ast.ASTHandle, arity)
+	for i := range domain {
+		domain[i], err = f.manager.GetDomain(original, uint32(i))
+		if err != nil {
+			return declaration, nil, err
+		}
+	}
+	rangeSort, err := f.manager.GetRange(original)
+	if err != nil {
+		return declaration, nil, err
+	}
+	declaration, err = f.manager.MkFreshFuncDecl(name, usymbol.Symbol{}, domain, rangeSort)
+	if err != nil {
+		return declaration, nil, err
+	}
+	n, err := f.manager.GetNumArgs(head)
+	if err != nil {
+		return declaration, nil, err
+	}
+	arguments = make([]ast.ASTHandle, n)
+	for i := range arguments {
+		arguments[i], err = f.manager.GetArg(head, uint32(i))
+		if err != nil {
+			return declaration, nil, err
+		}
+	}
+	return declaration, arguments, nil
+}
+
+func (f *Finder) splitPseudoPredicate(q, proof ast.ASTHandle, dependency ast.ASTDependency, head, value, definition ast.ASTHandle, output *FormulaBatch) error {
+	declaration, arguments, err := f.freshLike(head)
+	if err != nil {
+		return err
+	}
+	otherwise, err := f.manager.MkApp(declaration, arguments)
+	if err != nil {
+		return err
+	}
+	choice, err := f.manager.MkIte(definition, value, otherwise)
+	if err != nil {
+		return err
+	}
+	body1, err := f.manager.MkEq(head, choice)
+	if err != nil {
+		return err
+	}
+	equal, err := f.manager.MkEq(otherwise, value)
+	if err != nil {
+		return err
+	}
+	body2, err := f.manager.MkNot(equal)
+	if err != nil {
+		return err
+	}
+	q1, err := f.manager.UpdateQuantifierBody(q, body1)
+	if err != nil {
+		return err
+	}
+	pattern, err := f.manager.MkPattern([]ast.ASTHandle{otherwise})
+	if err != nil {
+		return err
+	}
+	q2, err := f.manager.UpdateQuantifierPatterns(q, []ast.ASTHandle{pattern}, body2)
+	if err != nil {
+		return err
+	}
+	var proof1, proof2 ast.ASTHandle
+	proofs, err := f.manager.ProofsEnabled()
+	if err != nil {
+		return err
+	}
+	if proofs {
+		conjunction, e := f.manager.MkAnd(q1, q2)
+		if e != nil {
+			return e
+		}
+		rewrite, e := f.manager.MkProofOEqRewrite(q, conjunction)
+		if e != nil {
+			return e
+		}
+		combined, e := f.manager.MkProofModusPonens(proof, rewrite)
+		if e != nil {
+			return e
+		}
+		proof1, e = f.manager.MkProofAndElim(combined, 0)
+		if e != nil {
+			return e
+		}
+		proof2, e = f.manager.MkProofAndElim(combined, 1)
+		if e != nil {
+			return e
+		}
+	}
+	if err = output.Insert(Formula{Expression: q1, Proof: proof1, Dependency: dependency}); err != nil {
+		return err
+	}
+	return output.Insert(Formula{Expression: q2, Proof: proof2, Dependency: dependency})
+}
+
+func (f *Finder) arithmeticMacro(q, proof ast.ASTHandle, dependency ast.ASTDependency, output *FormulaBatch) (bool, error) {
+	kind, err := f.manager.GetKind(q)
+	if err != nil || kind != ast.ASTQuantifier {
+		return false, err
+	}
+	forall, err := f.manager.IsForall(q)
+	if err != nil || !forall {
+		return false, err
+	}
+	body, err := f.manager.GetQuantifierBody(q)
+	if err != nil {
+		return false, err
+	}
+	lhs, err := f.manager.GetArg(body, 0)
+	if err != nil {
+		return false, nil
+	}
+	add, err := f.util.IsAdd(lhs)
+	if err != nil || !add {
+		return false, err
+	}
+	declarations, err := f.manager.GetNumDeclarations(q)
+	if err != nil {
+		return false, err
+	}
+	head, definition, inverse, matched, err := f.util.IsArithmeticMacro(body, declarations)
+	if err != nil || !matched {
+		return false, err
+	}
+	family, err := f.manager.GetFamilyID(body)
+	if err != nil {
+		return false, err
+	}
+	op, err := f.manager.GetDeclKind(body)
+	if err != nil {
+		return false, err
+	}
+	equality := family == f.manager.BasicFamilyID() && op == ast.ASTOpEq
+	newOperation := op
+	if inverse && !equality {
+		if op == macroArithLE {
+			newOperation = macroArithGE
+		} else {
+			newOperation = macroArithLE
+		}
+	}
+	newBody, err := f.manager.MkFamilyApp(family, newOperation, nil, []ast.ASTHandle{head, definition})
+	if err != nil {
+		return false, err
+	}
+	newQ, err := f.manager.UpdateQuantifierBody(q, newBody)
+	if err != nil {
+		return false, err
+	}
+	newProof := ast.ASTHandle{}
+	proofs, err := f.manager.ProofsEnabled()
+	if err != nil {
+		return false, err
+	}
+	if proofs {
+		rewrite, e := f.manager.MkProofRewrite(q, newQ)
+		if e != nil {
+			return false, e
+		}
+		newProof, e = f.manager.MkProofModusPonens(proof, rewrite)
+		if e != nil {
+			return false, e
+		}
+	}
+	if equality {
+		declaration, e := f.manager.GetDecl(head)
+		if e != nil {
+			return false, e
+		}
+		return f.macros.Insert(declaration, newQ, newProof, dependency)
+	}
+	declaration, arguments, err := f.freshLike(head)
+	if err != nil {
+		return false, err
+	}
+	slack, err := f.manager.MkApp(declaration, arguments)
+	if err != nil {
+		return false, err
+	}
+	right, err := f.util.MkAdd(definition, slack)
+	if err != nil {
+		return false, err
+	}
+	body1, err := f.manager.MkEq(head, right)
+	if err != nil {
+		return false, err
+	}
+	sort, err := f.manager.GetSort(slack)
+	if err != nil {
+		return false, err
+	}
+	zero, err := f.util.MkZero(sort)
+	if err != nil {
+		return false, err
+	}
+	body2, err := f.manager.MkFamilyApp(family, newOperation, nil, []ast.ASTHandle{slack, zero})
+	if err != nil {
+		return false, err
+	}
+	q1, err := f.manager.UpdateQuantifierBody(newQ, body1)
+	if err != nil {
+		return false, err
+	}
+	pattern, err := f.manager.MkPattern([]ast.ASTHandle{slack})
+	if err != nil {
+		return false, err
+	}
+	q2, err := f.manager.UpdateQuantifierPatterns(newQ, []ast.ASTHandle{pattern}, body2)
+	if err != nil {
+		return false, err
+	}
+	var proof1, proof2 ast.ASTHandle
+	if proofs {
+		conjunction, e := f.manager.MkAnd(q1, q2)
+		if e != nil {
+			return false, e
+		}
+		rewrite, e := f.manager.MkProofOEqRewrite(newQ, conjunction)
+		if e != nil {
+			return false, e
+		}
+		combined, e := f.manager.MkProofModusPonens(newProof, rewrite)
+		if e != nil {
+			return false, e
+		}
+		proof1, e = f.manager.MkProofAndElim(combined, 0)
+		if e != nil {
+			return false, e
+		}
+		proof2, e = f.manager.MkProofAndElim(combined, 1)
+		if e != nil {
+			return false, e
+		}
+	}
+	if err = output.Insert(Formula{Expression: q1, Proof: proof1, Dependency: dependency}); err != nil {
+		return false, err
+	}
+	if err = output.Insert(Formula{Expression: q2, Proof: proof2, Dependency: dependency}); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 func (f *Finder) pass(input *FormulaBatch) (output *FormulaBatch, found bool, result error) {
 	output, err := NewFormulaBatch(f.manager)
 	if err != nil {
@@ -212,6 +473,37 @@ func (f *Finder) pass(input *FormulaBatch) (output *FormulaBatch, found bool, re
 			found = found || inserted
 			if inserted {
 				e = errors.Join(e, f.manager.DependencyDec(dependency), f.manager.DelRef(&outProof), f.manager.DelRef(&out))
+				if e != nil {
+					return fail(e)
+				}
+				continue
+			}
+		}
+		if e == nil {
+			arithmetic, x := f.arithmeticMacro(expression, newProof, dependency, output)
+			e = x
+			if e == nil && arithmetic {
+				found = true
+				if !dependency.IsNull() {
+					e = errors.Join(e, f.manager.DependencyDec(dependency))
+				}
+				e = errors.Join(e, f.manager.DelRef(&outProof), f.manager.DelRef(&out))
+				if e != nil {
+					return fail(e)
+				}
+				continue
+			}
+		}
+		if e == nil {
+			head, value, definition, pseudo, x := f.util.IsPseudoPredicateMacro(expression)
+			e = x
+			if e == nil && pseudo {
+				e = f.splitPseudoPredicate(expression, newProof, dependency, head, value, definition, output)
+				found = found || e == nil
+				if !dependency.IsNull() {
+					e = errors.Join(e, f.manager.DependencyDec(dependency))
+				}
+				e = errors.Join(e, f.manager.DelRef(&outProof), f.manager.DelRef(&out))
 				if e != nil {
 					return fail(e)
 				}

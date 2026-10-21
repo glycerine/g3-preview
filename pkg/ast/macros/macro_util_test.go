@@ -591,3 +591,118 @@ func TestMacroFinderInstallsAndExpandsSimpleMacros(t *testing.T) {
 		}
 	}
 }
+
+func TestMacroFinderSplitsPseudoPredicateAndInstallsDefinition(t *testing.T) {
+	m := fixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	must(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	must(t, err)
+	manager, err := macros.NewManager(m)
+	must(t, err)
+	t.Cleanup(func() { must(t, manager.Close()) })
+	finder, err := macros.NewFinder(m, manager)
+	must(t, err)
+	b, err := m.MkBoolSort()
+	must(t, err)
+	v, err := m.MkVar(0, b)
+	must(t, err)
+	value := bitVectorNumeral(t, m, 5, 8)
+	sort, err := m.GetSort(value)
+	must(t, err)
+	f := declaration(t, m, "finder-pseudo-f", []ast.ASTHandle{b}, sort)
+	head, err := m.MkApp(f, []ast.ASTHandle{v})
+	must(t, err)
+	equal, err := m.MkEq(head, value)
+	must(t, err)
+	body, err := m.MkIff(equal, v)
+	must(t, err)
+	q, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{mustSymbol(t, m, "finder-pseudo-x")}, Body: body})
+	must(t, err)
+	result, err := finder.Apply([]macros.Formula{{Expression: q}})
+	must(t, err)
+	t.Cleanup(func() { must(t, result.Close()) })
+	if manager.NumMacros() != 1 || result.Len() != 1 {
+		t.Fatal("pseudo finder sizes", manager.NumMacros(), result.Len())
+	}
+	installed, yes := manager.MacroQuantifier(f)
+	if !yes || installed.IsNull() {
+		t.Fatal("pseudo definition was not installed")
+	}
+	row, err := result.At(0)
+	must(t, err)
+	remainingBody, err := m.GetQuantifierBody(row.Expression)
+	must(t, err)
+	if family, e := m.GetFamilyID(remainingBody); e != nil || family != m.BasicFamilyID() {
+		t.Fatal("pseudo side condition family", family, e)
+	}
+	if op, e := m.GetDeclKind(remainingBody); e != nil || op != ast.ASTOpNot {
+		t.Fatal("pseudo side condition", op, e)
+	}
+}
+
+func TestMacroFinderArithmeticEqualityAndInequality(t *testing.T) {
+	for _, inequality := range []bool{false, true} {
+		t.Run(map[bool]string{false: "equality", true: "inequality"}[inequality], func(t *testing.T) {
+			m := fixture(t)
+			_, err := m.RegisterArithmeticPlugin()
+			must(t, err)
+			manager, err := macros.NewManager(m)
+			must(t, err)
+			t.Cleanup(func() { must(t, manager.Close()) })
+			finder, err := macros.NewFinder(m, manager)
+			must(t, err)
+			zero := arithmeticNumeral(t, m, "0")
+			sort, err := m.GetSort(zero)
+			must(t, err)
+			v, err := m.MkVar(0, sort)
+			must(t, err)
+			f := declaration(t, m, "finder-arith-f", []ast.ASTHandle{sort}, sort)
+			head, err := m.MkApp(f, []ast.ASTHandle{v})
+			must(t, err)
+			two := arithmeticNumeral(t, m, "2")
+			five := arithmeticNumeral(t, m, "5")
+			family, err := m.ArithmeticFamilyID()
+			must(t, err)
+			sum, err := m.MkFamilyApp(family, 6, nil, []ast.ASTHandle{head, two})
+			must(t, err)
+			body := ast.ASTHandle{}
+			if inequality {
+				body, err = m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{sum, five})
+			} else {
+				body, err = m.MkEq(sum, five)
+			}
+			must(t, err)
+			q, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []usymbol.Symbol{mustSymbol(t, m, "finder-arith-x")}, Body: body})
+			must(t, err)
+			result, err := finder.Apply([]macros.Formula{{Expression: q}})
+			must(t, err)
+			t.Cleanup(func() { must(t, result.Close()) })
+			if manager.NumMacros() != 1 {
+				t.Fatal("arithmetic macro was not installed")
+			}
+			if !inequality {
+				if result.Len() != 0 {
+					t.Fatal("equality residue", result.Len())
+				}
+				return
+			}
+			if result.Len() != 1 {
+				t.Fatal("inequality residue", result.Len())
+			}
+			row, err := result.At(0)
+			must(t, err)
+			remaining, err := m.GetQuantifierBody(row.Expression)
+			must(t, err)
+			if gotFamily, e := m.GetFamilyID(remaining); e != nil || gotFamily != family {
+				t.Fatal("inequality residue family", gotFamily, e)
+			}
+			if op, e := m.GetDeclKind(remaining); e != nil || op != 2 {
+				t.Fatal("inequality residue operation", op, e)
+			}
+			if patterns, e := m.GetNumPatterns(row.Expression); e != nil || patterns != 1 {
+				t.Fatal("inequality slack pattern", patterns, e)
+			}
+		})
+	}
+}
