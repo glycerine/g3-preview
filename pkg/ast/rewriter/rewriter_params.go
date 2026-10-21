@@ -59,9 +59,19 @@ func (p *RewriterParams) unsigned(key string, d uint32) (uint32, error) {
 	return p.context.GetUIntFallbackName(p.local, &key, &p.global, d)
 }
 
-func (p *RewriterParams) MaxMemory() (uint32, error)  { return p.unsigned("max_memory", ^uint32(0)) }
-func (p *RewriterParams) MaxSteps() (uint32, error)   { return p.unsigned("max_steps", ^uint32(0)) }
-func (p *RewriterParams) Flat() (bool, error)         { return p.boolean("flat", true) }
+func (p *RewriterParams) MaxMemory() (uint32, error)    { return p.unsigned("max_memory", ^uint32(0)) }
+func (p *RewriterParams) MaxSteps() (uint32, error)     { return p.unsigned("max_steps", ^uint32(0)) }
+func (p *RewriterParams) Flat() (bool, error)           { return p.boolean("flat", true) }
+func (p *RewriterParams) SumOfMonomials() (bool, error) { return p.boolean("som", false) }
+func (p *RewriterParams) SumOfMonomialsBlowup() (uint32, error) {
+	return p.unsigned("som_blowup", ^uint32(0))
+}
+func (p *RewriterParams) HoistMultiplication() (bool, error) {
+	return p.boolean("hoist_mul", false)
+}
+func (p *RewriterParams) HoistCoefficients() (bool, error) {
+	return p.boolean("hoist_cmul", false)
+}
 func (p *RewriterParams) PushITEArith() (bool, error) { return p.boolean("push_ite_arith", false) }
 func (p *RewriterParams) PushITEBV() (bool, error)    { return p.boolean("push_ite_bv", false) }
 func (p *RewriterParams) PullCheapITE() (bool, error) { return p.boolean("pull_cheap_ite", false) }

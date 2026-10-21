@@ -3,6 +3,7 @@
 package rewriter
 
 import (
+	"errors"
 	"math/big"
 	"sort"
 
@@ -10,6 +11,8 @@ import (
 )
 
 const arithRelationEq int32 = -1
+
+var ErrArithPolynomialMonomialBlowup = errors.New("sum of monomials blowup")
 
 const (
 	arithDivideExact = iota
@@ -74,6 +77,232 @@ func (r *ArithRewriter) sameArguments(args ast.AppArguments, values []ast.ASTHan
 		}
 	}
 	return true, nil
+}
+
+func (r *ArithRewriter) expandSumOfMonomials(factors []ast.ASTHandle, coefficient *big.Rat, term ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	choices := make([][]ast.ASTHandle, len(factors))
+	hasSum := false
+	for i, factor := range factors {
+		_, children, sum, err := r.operation(factor, arithOpAdd)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		if sum {
+			choices[i] = children
+			hasSum = true
+		} else {
+			choices[i] = []ast.ASTHandle{factor}
+		}
+	}
+	if !hasSum {
+		return ast.ASTHandle{}, false, nil
+	}
+	products := [][]ast.ASTHandle{{}}
+	for _, options := range choices {
+		next := make([][]ast.ASTHandle, 0, len(products)*len(options))
+		for _, prefix := range products {
+			for _, option := range options {
+				if uint64(len(next)) > uint64(r.monomialLimit) {
+					return ast.ASTHandle{}, false, ErrArithPolynomialMonomialBlowup
+				}
+				item := append([]ast.ASTHandle(nil), prefix...)
+				item = append(item, option)
+				next = append(next, item)
+			}
+		}
+		products = next
+	}
+	monomials := make([]ast.ASTHandle, len(products))
+	for i, product := range products {
+		if coefficient.Cmp(big.NewRat(1, 1)) != 0 {
+			numeral, err := r.numeralForTerm(coefficient, term)
+			if err != nil {
+				return ast.ASTHandle{}, false, err
+			}
+			product = append([]ast.ASTHandle{numeral}, product...)
+		}
+		var err error
+		monomials[i], err = r.makeMul(product, term)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+	}
+	result, err := r.makeAdd(monomials, term)
+	return result, err == nil, err
+}
+
+func (r *ArithRewriter) distributeCoefficient(coefficient *big.Rat, factor, term ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	if !r.hoistCoeff || coefficient.Cmp(big.NewRat(1, 1)) == 0 {
+		return ast.ASTHandle{}, false, nil
+	}
+	_, children, sum, err := r.operation(factor, arithOpAdd)
+	if err != nil || !sum {
+		return ast.ASTHandle{}, false, err
+	}
+	terms := make([]ast.ASTHandle, len(children))
+	for i, child := range children {
+		terms[i], err = r.coefficientProduct(coefficient, child, term)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+	}
+	result, err := r.makeAdd(terms, term)
+	return result, err == nil, err
+}
+
+func (r *ArithRewriter) hoistEqualCoefficients(terms []ast.ASTHandle, term ast.ASTHandle) ([]ast.ASTHandle, bool, error) {
+	if !r.hoistCoeff {
+		return terms, false, nil
+	}
+	groups := make(map[string][]int)
+	coefficients := make(map[string]*big.Rat)
+	products := make([]ast.ASTHandle, len(terms))
+	for i, item := range terms {
+		coefficient, product, err := r.monomial(item)
+		if err != nil {
+			return nil, false, err
+		}
+		if product == item || coefficient.Cmp(big.NewRat(1, 1)) == 0 {
+			continue
+		}
+		key := coefficient.RatString()
+		groups[key] = append(groups[key], i)
+		coefficients[key] = coefficient
+		products[i] = product
+	}
+	consumed := make(map[int]bool)
+	result := make([]ast.ASTHandle, 0, len(terms))
+	changed := false
+	for i, item := range terms {
+		if consumed[i] {
+			continue
+		}
+		coefficient, product, err := r.monomial(item)
+		if err != nil {
+			return nil, false, err
+		}
+		key := coefficient.RatString()
+		indices := groups[key]
+		if product == item || len(indices) < 2 || indices[0] != i {
+			result = append(result, item)
+			continue
+		}
+		parts := make([]ast.ASTHandle, len(indices))
+		for j, index := range indices {
+			consumed[index] = true
+			parts[j] = products[index]
+		}
+		sum, err := r.makeAdd(parts, term)
+		if err != nil {
+			return nil, false, err
+		}
+		hoisted, err := r.coefficientProduct(coefficients[key], sum, term)
+		if err != nil {
+			return nil, false, err
+		}
+		result = append(result, hoisted)
+		changed = true
+	}
+	return result, changed, nil
+}
+
+func (r *ArithRewriter) hoistCommonMultiplication(terms []ast.ASTHandle, term ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	if !r.hoistMul || len(terms) < 2 {
+		return ast.ASTHandle{}, false, nil
+	}
+	factors := func(item ast.ASTHandle) ([]ast.ASTHandle, error) {
+		_, values, product, err := r.operation(item, arithOpMul)
+		if err != nil {
+			return nil, err
+		}
+		if !product {
+			values = []ast.ASTHandle{item}
+		}
+		return append([]ast.ASTHandle(nil), values...), nil
+	}
+	merge := func(left, right ast.ASTHandle) (ast.ASTHandle, error) {
+		leftFactors, err := factors(left)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		rightFactors, err := factors(right)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		common := make([]ast.ASTHandle, 0)
+		leftRest := make([]ast.ASTHandle, 0, len(leftFactors))
+		for _, candidate := range leftFactors {
+			found := -1
+			for i, other := range rightFactors {
+				if candidate == other {
+					found = i
+					break
+				}
+			}
+			if found < 0 {
+				leftRest = append(leftRest, candidate)
+				continue
+			}
+			common = append(common, candidate)
+			rightFactors = append(rightFactors[:found], rightFactors[found+1:]...)
+		}
+		leftRemainder, err := r.makeMul(leftRest, term)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		rightRemainder, err := r.makeMul(rightFactors, term)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		sum, err := r.makeAdd([]ast.ASTHandle{leftRemainder, rightRemainder}, term)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		common = append(common, sum)
+		return r.makeMul(common, term)
+	}
+
+	resultTerms := append([]ast.ASTHandle(nil), terms...)
+	valid := make([]bool, len(terms))
+	for i := range valid {
+		valid[i] = true
+	}
+	seen := make(map[ast.ASTHandle]int)
+	changed := false
+	for i, item := range terms {
+		values, err := factors(item)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		for _, factor := range values {
+			if _, _, numeral, err := r.numeral(factor); err != nil {
+				return ast.ASTHandle{}, false, err
+			} else if numeral {
+				continue
+			}
+			previous, found := seen[factor]
+			if found && valid[previous] && previous != i {
+				resultTerms[previous], err = merge(resultTerms[previous], resultTerms[i])
+				if err != nil {
+					return ast.ASTHandle{}, false, err
+				}
+				resultTerms[i], err = r.numeralForTerm(big.NewRat(0, 1), term)
+				if err != nil {
+					return ast.ASTHandle{}, false, err
+				}
+				valid[previous] = false
+				valid[i] = false
+				changed = true
+				break
+			}
+			seen[factor] = i
+		}
+	}
+	if !changed {
+		return ast.ASTHandle{}, false, nil
+	}
+	result, err := r.makeAdd(resultTerms, term)
+	return result, err == nil, err
 }
 
 func (r *ArithRewriter) flattenArguments(args ast.AppArguments, kind int32, recursive bool) ([]ast.ASTHandle, bool, error) {
@@ -224,6 +453,16 @@ func (r *ArithRewriter) rewriteAdd(args ast.AppArguments, out ast.ASTRef) (Rewri
 			return RewriteFailed, cause
 		}
 	}
+	coefficientHoisted := false
+	resultArgs, coefficientHoisted, err = r.hoistEqualCoefficients(resultArgs, first)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if result, hoisted, e := r.hoistCommonMultiplication(resultArgs, first); e != nil {
+		return RewriteFailed, e
+	} else if hoisted {
+		return RewriteFull, r.manager.SetRef(out, result)
+	}
 	result, err := r.makeAdd(resultArgs, first)
 	if err != nil {
 		return RewriteFailed, err
@@ -232,7 +471,7 @@ func (r *ArithRewriter) rewriteAdd(args ast.AppArguments, out ast.ASTRef) (Rewri
 	if err != nil {
 		return RewriteFailed, err
 	}
-	if !flattened && !duplicate && same {
+	if !flattened && !duplicate && !coefficientHoisted && same {
 		return RewriteFailed, nil
 	}
 	return RewriteDone, r.manager.SetRef(out, result)
@@ -276,6 +515,20 @@ func (r *ArithRewriter) rewriteMul(args ast.AppArguments, out ast.ASTRef) (Rewri
 			return RewriteFailed, e
 		}
 		return RewriteDone, r.manager.SetRef(out, h)
+	}
+	if len(factors) == 1 {
+		if result, distributed, e := r.distributeCoefficient(coefficient, factors[0], first); e != nil {
+			return RewriteFailed, e
+		} else if distributed {
+			return Rewrite2, r.manager.SetRef(out, result)
+		}
+	}
+	if r.sumOfMonomials {
+		if result, expanded, e := r.expandSumOfMonomials(factors, coefficient, first); e != nil {
+			return RewriteFailed, e
+		} else if expanded {
+			return Rewrite2, r.manager.SetRef(out, result)
+		}
 	}
 	var cause error
 	sort.SliceStable(factors, func(i, j int) bool {

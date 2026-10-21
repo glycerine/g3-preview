@@ -1,6 +1,7 @@
 package rewriter
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -1007,4 +1008,147 @@ func TestArithRewriterTranscendentalCore(t *testing.T) {
 	if _, _, matched, err = r.operation(result, arithOpDiv); err != nil || !matched {
 		t.Fatal("twelfth-angle sine division", matched, err)
 	}
+}
+
+func TestArithRewriterAdvancedPolynomialModes(t *testing.T) {
+	newFixture := func(t *testing.T, settings map[string]bool, blowup *uint32) (*ArithRewriter, ast.ASTHandle, ast.ASTHandle, ast.ASTHandle) {
+		t.Helper()
+		m, c, g, local := boolRewriterConfigFixture(t)
+		for key, value := range settings {
+			name := key
+			astTestMust(t, c.SetBoolName(local, &name, value))
+		}
+		if blowup != nil {
+			name := "som_blowup"
+			astTestMust(t, c.SetUIntName(local, &name, *blowup))
+		}
+		r, err := NewArithRewriter(m, c, g, local)
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, r.Close()) })
+		iSort, err := m.MkFamilySort(r.family, 1, nil)
+		astTestMust(t, err)
+		variable := func(name string) ast.ASTHandle {
+			h, err := m.MkConst(astTestSymbol(t, m, name), iSort)
+			astTestMust(t, err)
+			astTestPin(t, m, h)
+			return h
+		}
+		return r, variable("advanced-poly-x"), variable("advanced-poly-y"), variable("advanced-poly-z")
+	}
+
+	t.Run("sum-of-monomials", func(t *testing.T) {
+		r, x, y, z := newFixture(t, map[string]bool{"som": true}, nil)
+		left, err := r.app(arithOpAdd, x, y)
+		astTestMust(t, err)
+		astTestPin(t, r.manager, left)
+		right, err := r.app(arithOpAdd, y, z)
+		astTestMust(t, err)
+		astTestPin(t, r.manager, right)
+		status, result := arithRewriterCore(t, r, arithOpMul, left, right)
+		if status != Rewrite2 {
+			t.Fatal("sum-of-monomials status", status)
+		}
+		_, monomials, matched, err := r.operation(result, arithOpAdd)
+		astTestMust(t, err)
+		if !matched || len(monomials) != 4 {
+			t.Fatal("sum-of-monomials expansion", matched, len(monomials))
+		}
+		for _, monomial := range monomials {
+			_, factors, product, err := r.operation(monomial, arithOpMul)
+			astTestMust(t, err)
+			if !product || len(factors) != 2 {
+				t.Fatal("sum-of-monomials product", product, len(factors))
+			}
+		}
+	})
+
+	t.Run("sum-of-monomials-blowup", func(t *testing.T) {
+		limit := uint32(0)
+		r, x, y, z := newFixture(t, map[string]bool{"som": true}, &limit)
+		left, err := r.app(arithOpAdd, x, y)
+		astTestMust(t, err)
+		right, err := r.app(arithOpAdd, y, z)
+		astTestMust(t, err)
+		app, err := r.manager.MkFamilyApp(r.family, arithOpMul, nil, []ast.ASTHandle{left, right})
+		astTestMust(t, err)
+		decl, err := r.manager.GetDecl(app)
+		astTestMust(t, err)
+		out := astTestPin(t, r.manager, app)
+		status, err := r.MkAppCore(decl, ast.SliceArguments([]ast.ASTHandle{left, right}), out)
+		if status != RewriteFailed || !errors.Is(err, ErrArithPolynomialMonomialBlowup) {
+			t.Fatal("sum-of-monomials blowup", status, err)
+		}
+	})
+
+	t.Run("coefficient-distribution-and-hoisting", func(t *testing.T) {
+		r, x, y, _ := newFixture(t, map[string]bool{"hoist_cmul": true}, nil)
+		i2 := arithRewriterNumeral(t, r.manager, "2", true)
+		sum, err := r.app(arithOpAdd, x, y)
+		astTestMust(t, err)
+		astTestPin(t, r.manager, sum)
+		status, result := arithRewriterCore(t, r, arithOpMul, i2, sum)
+		if status != Rewrite2 {
+			t.Fatal("coefficient distribution status", status)
+		}
+		_, terms, matched, err := r.operation(result, arithOpAdd)
+		astTestMust(t, err)
+		if !matched || len(terms) != 2 {
+			t.Fatal("coefficient distribution", matched, len(terms))
+		}
+		arithRewriterWantOperation(t, r, terms[0], arithOpMul, i2, x)
+		arithRewriterWantOperation(t, r, terms[1], arithOpMul, i2, y)
+
+		left, err := r.app(arithOpMul, i2, x)
+		astTestMust(t, err)
+		right, err := r.app(arithOpMul, i2, y)
+		astTestMust(t, err)
+		status, result = arithRewriterCore(t, r, arithOpAdd, left, right)
+		if status != RewriteDone {
+			t.Fatal("coefficient hoisting status", status)
+		}
+		_, factors, matched, err := r.operation(result, arithOpMul)
+		astTestMust(t, err)
+		if !matched || len(factors) != 2 || factors[0] != i2 {
+			t.Fatal("coefficient hoisting", matched, len(factors))
+		}
+		arithRewriterWantOperation(t, r, factors[1], arithOpAdd, x, y)
+	})
+
+	t.Run("pairwise-multiplication-hoisting", func(t *testing.T) {
+		r, x, y, z := newFixture(t, map[string]bool{"hoist_mul": true}, nil)
+		left, err := r.app(arithOpMul, x, y)
+		astTestMust(t, err)
+		right, err := r.app(arithOpMul, x, z)
+		astTestMust(t, err)
+		status, result := arithRewriterCore(t, r, arithOpAdd, left, right, y)
+		if status != RewriteFull {
+			t.Fatal("multiplication hoisting status", status)
+		}
+		_, terms, matched, err := r.operation(result, arithOpAdd)
+		astTestMust(t, err)
+		if !matched || len(terms) != 3 {
+			t.Fatal("pairwise multiplication hoisting", matched, len(terms))
+		}
+		_, factors, matched, err := r.operation(terms[0], arithOpMul)
+		astTestMust(t, err)
+		if !matched || len(factors) != 2 || factors[0] != x {
+			t.Fatal("hoisted multiplication", matched, len(factors))
+		}
+		arithRewriterWantOperation(t, r, factors[1], arithOpAdd, y, z)
+		arithRewriterWantNumeral(t, r.manager, terms[1], "0", true)
+		if terms[2] != y {
+			t.Fatal("unrelated summand changed", terms[2], y)
+		}
+	})
+
+	t.Run("mode-normalization", func(t *testing.T) {
+		r, _, _, _ := newFixture(t, map[string]bool{"som": true, "hoist_mul": true}, nil)
+		if !r.sumOfMonomials || r.hoistMul {
+			t.Fatal("sum-of-monomials must disable multiplication hoisting", r.sumOfMonomials, r.hoistMul)
+		}
+		r, _, _, _ = newFixture(t, map[string]bool{"flat": false, "som": true}, nil)
+		if r.sumOfMonomials {
+			t.Fatal("non-flat mode retained sum-of-monomials")
+		}
+	})
 }

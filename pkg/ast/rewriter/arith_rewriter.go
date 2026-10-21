@@ -46,6 +46,8 @@ type ArithRewriter struct {
 	elimToReal, pushToReal, algebraicSimplify bool
 	elimRem, eq2ineq, sortSums                bool
 	flat                                      bool
+	sumOfMonomials, hoistMul, hoistCoeff      bool
+	monomialLimit                             uint32
 	maxDegree                                 uint32
 }
 
@@ -113,6 +115,24 @@ func (r *ArithRewriter) updateParams(c *uparams.ParamsContext, g *uparams.Global
 	}
 	defer func() { result = errors.Join(result, base.Close()) }()
 	r.flat, err = base.Flat()
+	if err == nil {
+		r.sumOfMonomials, err = base.SumOfMonomials()
+	}
+	if err == nil {
+		r.monomialLimit, err = base.SumOfMonomialsBlowup()
+	}
+	if err == nil {
+		r.hoistMul, err = base.HoistMultiplication()
+	}
+	if err == nil {
+		r.hoistCoeff, err = base.HoistCoefficients()
+	}
+	if !r.flat {
+		r.sumOfMonomials = false
+	}
+	if r.sumOfMonomials {
+		r.hoistMul = false
+	}
 	return err
 }
 
