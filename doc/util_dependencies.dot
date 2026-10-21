@@ -14,6 +14,11 @@ digraph packages {
   "util/bitset" -> "util/diagnostic";
   "util/checkedint" [style=filled, fillcolor="#dceafa"];
   "util/cliques" [style=filled, fillcolor="#dceafa"];
+  "util/cmdexception" [style=filled, fillcolor="#dceafa"];
+  "util/cmdexception" -> "arena";
+  "util/cmdexception" -> "util/params";
+  "util/cmdexception" -> "util/symbol";
+  "util/cmdexception" -> "util/z3exception";
   "util/control" [style=filled, fillcolor="#dceafa"];
   "util/control" -> "arena";
   "util/control" -> "util/messages";
