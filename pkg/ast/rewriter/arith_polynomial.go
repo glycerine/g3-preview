@@ -650,3 +650,158 @@ func (r *ArithRewriter) rewriteBound(left, right ast.ASTHandle, kind int32, out 
 	}
 	return true, r.setBool(out, truth)
 }
+
+func (r *ArithRewriter) zero(h ast.ASTHandle) (bool, error) {
+	value, _, numeral, err := r.numeral(h)
+	return err == nil && numeral && value.Sign() == 0, err
+}
+
+func (r *ArithRewriter) reducePowerFactors(h ast.ASTHandle, equality bool) (ast.ASTHandle, bool, error) {
+	_, factors, product, err := r.operation(h, arithOpMul)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	if !product {
+		factors = []ast.ASTHandle{h}
+	}
+	changed := false
+	result := make([]ast.ASTHandle, len(factors))
+	for i, factor := range factors {
+		result[i] = factor
+		_, powerArgs, power, e := r.operation(factor, arithOpPower)
+		if e != nil {
+			return ast.ASTHandle{}, false, e
+		}
+		if !power || len(powerArgs) != 2 {
+			continue
+		}
+		exponent, _, numeral, e := r.numeral(powerArgs[1])
+		if e != nil {
+			return ast.ASTHandle{}, false, e
+		}
+		threshold := int64(2)
+		if equality {
+			threshold = 1
+		}
+		if !numeral || !exponent.IsInt() || !exponent.Num().IsInt64() || exponent.Num().Int64() <= threshold {
+			continue
+		}
+		changed = true
+		if equality || exponent.Num().Bit(0) == 1 {
+			result[i] = powerArgs[0]
+			continue
+		}
+		two, e := r.numeralForTerm(big.NewRat(2, 1), factor)
+		if e != nil {
+			return ast.ASTHandle{}, false, e
+		}
+		result[i], e = r.app(arithOpPower, powerArgs[0], two)
+		if e != nil {
+			return ast.ASTHandle{}, false, e
+		}
+	}
+	if !changed {
+		return h, false, nil
+	}
+	reduced, err := r.makeMul(result, h)
+	return reduced, true, err
+}
+
+func (r *ArithRewriter) reduceComparisonPowers(left, right ast.ASTHandle, equality bool) (ast.ASTHandle, ast.ASTHandle, bool, error) {
+	leftZero, err := r.zero(left)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	rightZero, err := r.zero(right)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	if !leftZero && !rightZero {
+		return left, right, false, nil
+	}
+	newLeft, leftChanged, err := r.reducePowerFactors(left, equality)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	newRight, rightChanged, err := r.reducePowerFactors(right, equality)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	return newLeft, newRight, leftChanged || rightChanged, nil
+}
+
+func (r *ArithRewriter) eliminateToRealVariable(h ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	value, _, numeral, err := r.numeral(h)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	if numeral {
+		if !value.IsInt() {
+			return ast.ASTHandle{}, false, nil
+		}
+		result, e := r.makeNumeral(value, true)
+		return result, e == nil, e
+	}
+	if yes, inner, e := r.unary(h, arithOpToReal); e != nil {
+		return ast.ASTHandle{}, false, e
+	} else if yes {
+		return inner, true, nil
+	}
+	return ast.ASTHandle{}, false, nil
+}
+
+func (r *ArithRewriter) eliminateToRealMonomial(h ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	_, factors, product, err := r.operation(h, arithOpMul)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	if !product {
+		return r.eliminateToRealVariable(h)
+	}
+	converted := make([]ast.ASTHandle, len(factors))
+	for i, factor := range factors {
+		var ok bool
+		converted[i], ok, err = r.eliminateToRealVariable(factor)
+		if err != nil || !ok {
+			return ast.ASTHandle{}, false, err
+		}
+	}
+	result, err := r.makeMul(converted, converted[0])
+	return result, err == nil, err
+}
+
+func (r *ArithRewriter) eliminateToRealPolynomial(h ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	_, monomials, sum, err := r.operation(h, arithOpAdd)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	if !sum {
+		return r.eliminateToRealMonomial(h)
+	}
+	converted := make([]ast.ASTHandle, len(monomials))
+	for i, monomial := range monomials {
+		var ok bool
+		converted[i], ok, err = r.eliminateToRealMonomial(monomial)
+		if err != nil || !ok {
+			return ast.ASTHandle{}, false, err
+		}
+	}
+	result, err := r.makeAdd(converted, converted[0])
+	return result, err == nil, err
+}
+
+func (r *ArithRewriter) eliminateToRealComparison(left, right ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
+	integer, err := r.integerTerm(left)
+	if err != nil || integer {
+		return left, right, false, err
+	}
+	newLeft, leftOK, err := r.eliminateToRealPolynomial(left)
+	if err != nil || !leftOK {
+		return left, right, false, err
+	}
+	newRight, rightOK, err := r.eliminateToRealPolynomial(right)
+	if err != nil || !rightOK {
+		return left, right, false, err
+	}
+	return newLeft, newRight, true, nil
+}

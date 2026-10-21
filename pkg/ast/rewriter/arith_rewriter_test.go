@@ -594,3 +594,80 @@ func TestArithRewriterStructuralPowerRules(t *testing.T) {
 	}
 	arithRewriterWantOperation(t, expanding, result, arithOpMul, x, x, x)
 }
+
+func TestArithRewriterComparisonPowerReductionAndToRealElimination(t *testing.T) {
+	m, c, g, local := boolRewriterConfigFixture(t)
+	r, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	iSort, err := m.MkFamilySort(r.family, 1, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "arith-compare-power-x"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	y, err := m.MkConst(astTestSymbol(t, m, "arith-compare-power-y"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, y)
+	i0 := arithRewriterNumeral(t, m, "0", true)
+	i2 := arithRewriterNumeral(t, m, "2", true)
+	iNeg2 := arithRewriterNumeral(t, m, "-2", true)
+	i4 := arithRewriterNumeral(t, m, "4", true)
+	power4, err := r.app(arithOpPower, x, i4)
+	astTestMust(t, err)
+	astTestPin(t, m, power4)
+
+	status, result := arithRewriterCore(t, r, arithOpLE, power4, i0)
+	if status != Rewrite1 {
+		t.Fatal("comparison power reduction status", status)
+	}
+	_, comparisonArgs, matched, err := r.operation(result, arithOpLE)
+	astTestMust(t, err)
+	if !matched || len(comparisonArgs) != 2 || comparisonArgs[1] != i0 {
+		t.Fatal("comparison power reduction", matched, len(comparisonArgs))
+	}
+	arithRewriterWantOperation(t, r, comparisonArgs[0], arithOpPower, x, i2)
+
+	equalityOut := astTestPin(t, m, power4)
+	status, err = r.MkEqCore(power4, i0, equalityOut)
+	astTestMust(t, err)
+	result, err = m.RefGet(equalityOut)
+	astTestMust(t, err)
+	if status != Rewrite1 {
+		t.Fatal("equality power reduction status", status)
+	}
+	kind, err := m.GetDeclKind(result)
+	astTestMust(t, err)
+	eqLeft, err := m.GetArg(result, 0)
+	astTestMust(t, err)
+	eqRight, err := m.GetArg(result, 1)
+	astTestMust(t, err)
+	if kind != ast.ASTOpEq || eqLeft != x || eqRight != i0 {
+		t.Fatal("equality power reduction", kind, eqLeft, eqRight)
+	}
+
+	key := "elim_to_real"
+	astTestMust(t, c.SetBoolName(local, &key, true))
+	eliminating, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, eliminating.Close()) })
+	toRealX, err := eliminating.app(arithOpToReal, x)
+	astTestMust(t, err)
+	astTestPin(t, m, toRealX)
+	toRealY, err := eliminating.app(arithOpToReal, y)
+	astTestMust(t, err)
+	astTestPin(t, m, toRealY)
+	r2 := arithRewriterNumeral(t, m, "2", false)
+	realLeft, err := eliminating.app(arithOpAdd, toRealX, r2)
+	astTestMust(t, err)
+	astTestPin(t, m, realLeft)
+	status, result = arithRewriterCore(t, eliminating, arithOpLE, realLeft, toRealY)
+	if status != RewriteDone {
+		t.Fatal("to-real comparison elimination status", status)
+	}
+	_, comparisonArgs, matched, err = eliminating.operation(result, arithOpLE)
+	astTestMust(t, err)
+	if !matched || len(comparisonArgs) != 2 || comparisonArgs[0] != x {
+		t.Fatal("to-real comparison elimination", matched, len(comparisonArgs))
+	}
+	arithRewriterWantOperation(t, eliminating, comparisonArgs[1], arithOpAdd, iNeg2, y)
+}

@@ -249,12 +249,32 @@ func (r *ArithRewriter) rewriteComparison(kind int32, left, right ast.ASTHandle,
 		}
 		return Rewrite2, r.manager.SetRef(out, negated)
 	}
+	newLeft, newRight, powerChanged, err := r.reduceComparisonPowers(left, right, false)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if powerChanged {
+		result, e := r.app(kind, newLeft, newRight)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return Rewrite1, r.manager.SetRef(out, result)
+	}
 	newLeft, newRight, changed, err := r.cancelMonomials(left, right, r.arithIneqLHS || r.arithLHS)
 	if err != nil {
 		return RewriteFailed, err
 	}
 	if changed {
 		left, right = newLeft, newRight
+	}
+	if r.elimToReal {
+		newLeft, newRight, eliminated, e := r.eliminateToRealComparison(left, right)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if eliminated {
+			left, right, changed = newLeft, newRight, true
+		}
 	}
 	lv, _, ln, err := r.numeral(left)
 	if err != nil {
@@ -908,6 +928,17 @@ func (r *ArithRewriter) MkEqCore(left, right ast.ASTHandle, out ast.ASTRef) (Rew
 		}
 		return Rewrite2, r.manager.SetRef(out, both)
 	}
+	newLeft, newRight, powerChanged, err := r.reduceComparisonPowers(left, right, true)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if powerChanged {
+		result, e := r.manager.MkEq(newLeft, newRight)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return Rewrite1, r.manager.SetRef(out, result)
+	}
 	leftArithmetic, err := r.arithmeticTerm(left)
 	if err != nil {
 		return RewriteFailed, err
@@ -926,6 +957,15 @@ func (r *ArithRewriter) MkEqCore(left, right ast.ASTHandle, out ast.ASTRef) (Rew
 		changed = cancelled
 		if changed {
 			left, right = newLeft, newRight
+		}
+	}
+	if r.elimToReal {
+		newLeft, newRight, eliminated, e := r.eliminateToRealComparison(left, right)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if eliminated {
+			left, right, changed = newLeft, newRight, true
 		}
 	}
 	lv, _, ln, err := r.numeral(left)
