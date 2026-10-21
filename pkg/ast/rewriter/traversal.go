@@ -201,3 +201,12 @@ func (r *Traversal) NumSteps() (uint32, error) {
 	}
 	return r.engine.numSteps, nil
 }
+func (r *Traversal) CacheSize() (uint32, error) {
+	if r == nil {
+		return 0, ast.ErrASTHandle
+	}
+	if e := r.engine.open(); e != nil {
+		return 0, e
+	}
+	return r.engine.core.getCacheSize()
+}

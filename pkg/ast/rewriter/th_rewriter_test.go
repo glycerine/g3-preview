@@ -263,6 +263,53 @@ func TestTheoryRewriterSubstitutionDependencies(t *testing.T) {
 	}
 }
 
+func TestTheoryRewriterParamsCacheCleanupAndBindings(t *testing.T) {
+	m, context, globals, local := boolRewriterConfigFixture(t)
+	r, err := NewTheoryRewriter(m, context, globals, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	for _, key := range []string{"pull_cheap_ite", "cache_all", "elim_and", "mul_to_power", "bv_sort_ac", "sort_store", "hi_fp_unspecified"} {
+		astTestMust(t, context.SetBoolName(local, &key, true))
+	}
+	astTestMust(t, r.UpdateParams(local))
+	bvState, err := r.configuration.bitVector.State()
+	astTestMust(t, err)
+	if !r.configuration.pullCheapITE || !r.configuration.cacheAll || !r.configuration.boolean.elimAnd ||
+		!r.configuration.arithmetic.mulToPower || !bvState.SortAC || !r.configuration.array.sortStore ||
+		!r.configuration.floating.hiFPUnspecified {
+		t.Fatal("parameter update did not reach every configurable subrewriter")
+	}
+
+	a := goalTestAtom(t, m, "theory-cache-a")
+	decl := rewriterTestDecl(t, m, "theory-cache-f")
+	inner := rewriterTestApp(t, m, decl, a)
+	term := rewriterTestApp(t, m, decl, inner)
+	out := astTestPin(t, m, term)
+	astTestMust(t, r.Rewrite(term, out))
+	if size, e := r.CacheSize(); e != nil || size == 0 {
+		t.Fatal("theory rewrite cache", size, e)
+	}
+
+	boolSort, err := m.MkBoolSort()
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, boolSort)
+	astTestMust(t, err)
+	astTestMust(t, r.RewriteWithBindings(variable, []ast.ASTHandle{a}, out))
+	got, err := m.RefGet(out)
+	astTestMust(t, err)
+	if got != a {
+		t.Fatal("theory inverse binding rewrite", got, a)
+	}
+
+	astTestMust(t, r.Cleanup())
+	if size, e := r.CacheSize(); e != nil || size != 0 {
+		t.Fatal("cleanup retained rewrite cache", size, e)
+	}
+	if !r.configuration.pullCheapITE || !r.configuration.floating.hiFPUnspecified {
+		t.Fatal("cleanup did not preserve owned parameters")
+	}
+}
+
 func TestTheoryRewriterCloseGuards(t *testing.T) {
 	m, r := theoryRewriterFixture(t)
 	truth, err := m.MkTrue()

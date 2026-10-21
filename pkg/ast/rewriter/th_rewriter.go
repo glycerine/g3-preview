@@ -816,6 +816,8 @@ type TheoryRewriter struct {
 	context       *uparams.ParamsContext
 	globals       *uparams.GlobalParamsService
 	local         *uparams.ParamsRef
+	params        uparams.ParamsRef
+	paramsPlaced  bool
 	configuration theoryRewriterConfiguration
 	traversal     *Traversal
 	header        uint64
@@ -833,13 +835,23 @@ func NewTheoryRewriter(m *ast.ASTManager, context *uparams.ParamsContext, global
 	if err := m.Budget().Reserve(n); err != nil {
 		return nil, err
 	}
-	r := &TheoryRewriter{manager: m, context: context, globals: globals, local: local, header: n}
+	r := &TheoryRewriter{manager: m, context: context, globals: globals, header: n}
 	r.self = r
+	var err error
+	if r.params, err = context.NewValue(); err != nil {
+		return r, err
+	}
+	r.paramsPlaced = true
+	if local != nil {
+		if err = context.Assign(&r.params, local); err != nil {
+			return r, err
+		}
+	}
+	r.local = &r.params
 	r.configuration.owner = r
 	if err := r.constructConfiguration(); err != nil {
 		return r, err
 	}
-	var err error
 	if r.traversal, err = NewTraversal(m, &r.configuration); err != nil {
 		return r, err
 	}
@@ -870,6 +882,9 @@ func (r *TheoryRewriter) constructConfiguration() (err error) {
 	if c.floating, err = NewFPARewriter(r.manager); err != nil {
 		return err
 	}
+	if err = r.updateFloatingParams(); err != nil {
+		return err
+	}
 	if c.datalog, err = NewDLRewriter(r.manager); err != nil {
 		return err
 	}
@@ -880,6 +895,19 @@ func (r *TheoryRewriter) constructConfiguration() (err error) {
 		return err
 	}
 	return r.readLocalParams()
+}
+
+func (r *TheoryRewriter) updateFloatingParams() (result error) {
+	p, err := NewFPARewriterParams(r.context, r.globals, r.local)
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, p.Close()) }()
+	high, err := p.HighFPUnspecified()
+	if err != nil {
+		return err
+	}
+	return r.configuration.floating.SetHighFPUnspecified(high)
 }
 
 func (r *TheoryRewriter) readLocalParams() (result error) {
@@ -934,6 +962,19 @@ func (r *TheoryRewriter) Rewrite(term ast.ASTHandle, out ast.ASTRef) error {
 	return r.traversal.Rewrite(term, out)
 }
 
+func (r *TheoryRewriter) RewriteWithBindings(term ast.ASTHandle, bindings []ast.ASTHandle, out ast.ASTRef) error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	if err := r.traversal.Reset(); err != nil {
+		return err
+	}
+	if err := r.traversal.SetInvBindings(bindings); err != nil {
+		return err
+	}
+	return r.traversal.Rewrite(term, out)
+}
+
 func (r *TheoryRewriter) MakeApp(decl ast.ASTHandle, args ast.AppArguments, out ast.ASTRef) error {
 	if err := r.open(); err != nil {
 		return err
@@ -962,6 +1003,46 @@ func (r *TheoryRewriter) NumSteps() (uint32, error) {
 		return 0, err
 	}
 	return r.traversal.NumSteps()
+}
+
+func (r *TheoryRewriter) CacheSize() (uint32, error) {
+	if err := r.open(); err != nil {
+		return 0, err
+	}
+	return r.traversal.CacheSize()
+}
+
+func (r *TheoryRewriter) UpdateParams(params *uparams.ParamsRef) (result error) {
+	if err := r.open(); err != nil {
+		return err
+	}
+	if params == nil {
+		empty, err := r.context.NewValue()
+		if err != nil {
+			return err
+		}
+		params = &empty
+		defer func() { result = errors.Join(result, r.context.Del(&empty)) }()
+	}
+	if err := r.context.Assign(&r.params, params); err != nil {
+		return err
+	}
+	if err := r.configuration.boolean.UpdtParams(r.local); err != nil {
+		return err
+	}
+	if err := r.configuration.arithmetic.updateParams(r.context, r.globals, r.local); err != nil {
+		return err
+	}
+	if err := r.configuration.bitVector.polynomial.config.UpdateBitVector(r.local); err != nil {
+		return err
+	}
+	if err := r.configuration.array.UpdtParams(r.local); err != nil {
+		return err
+	}
+	if err := r.updateFloatingParams(); err != nil {
+		return err
+	}
+	return r.readLocalParams()
 }
 
 func (r *TheoryRewriter) Reset() error {
@@ -1025,6 +1106,35 @@ func (r *TheoryRewriter) ResetUsedDependencies() error {
 		return err
 	}
 	r.configuration.usedDependencies = ast.ASTDependency{}
+	return nil
+}
+
+func (r *TheoryRewriter) Cleanup() error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	if !r.configuration.usedDependencies.IsNull() {
+		if err := r.manager.DependencyDec(r.configuration.usedDependencies); err != nil {
+			return err
+		}
+		r.configuration.usedDependencies = ast.ASTDependency{}
+	}
+	if err := r.traversal.Close(); err != nil {
+		return err
+	}
+	r.traversal = nil
+	if err := r.closeConfiguration(); err != nil {
+		return err
+	}
+	r.configuration = theoryRewriterConfiguration{owner: r}
+	if err := r.constructConfiguration(); err != nil {
+		return err
+	}
+	traversal, err := NewTraversal(r.manager, &r.configuration)
+	if err != nil {
+		return err
+	}
+	r.traversal = traversal
 	return nil
 }
 
@@ -1098,6 +1208,13 @@ func (r *TheoryRewriter) Close() error {
 	}
 	if err := r.closeConfiguration(); err != nil {
 		return err
+	}
+	if r.paramsPlaced {
+		if err := r.context.Del(&r.params); err != nil {
+			return err
+		}
+		r.paramsPlaced = false
+		r.local = nil
 	}
 	r.manager.Budget().Release(r.header)
 	r.header = 0
