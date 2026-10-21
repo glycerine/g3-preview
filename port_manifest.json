@@ -33506,7 +33506,8 @@
         "pkg/ast/rewriter/seq_rewriter_test.go"
       ],
       "tests": [
-        "TestSequenceRewriterConcatSourceBranches"
+        "TestSequenceRewriterConcatSourceBranches",
+        "TestSequenceRewriterByteUnit"
       ],
       "assertions": [
         {
@@ -33735,6 +33736,14 @@
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",
           "tests": [
             "TestSequenceRewriterConcatSourceBranches"
+          ]
+        },
+        {
+          "name": "seq_rewriter::mk_seq_unit eight-bit bit-vector numeral to one-byte String folding (seq_rewriter.cpp:466-481)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterByteUnit"
           ]
         }
       ],

@@ -94,3 +94,41 @@ func TestSequenceRewriterConcatSourceBranches(t *testing.T) {
 		t.Fatalf("unreduced concat status: %d", status)
 	}
 }
+
+func TestSequenceRewriterByteUnit(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	for _, value := range []uint32{0, 65, 255} {
+		literal, e := m.BitVectorNumeralUnsigned(value, 8)
+		astTestMust(t, e)
+		astTestPin(t, m, literal)
+		status, e := rw.RewriteUnit(literal, out)
+		astTestMust(t, e)
+		if status != RewriteDone {
+			t.Fatalf("byte %d status: %d", value, status)
+		}
+		result, e := m.RefGet(out)
+		astTestMust(t, e)
+		text, matched, e := m.SequenceStringValue(result)
+		astTestMust(t, e)
+		if !matched || text != string([]byte{byte(value)}) {
+			t.Fatalf("byte %d result: %q matched=%v", value, text, matched)
+		}
+	}
+	wide, err := m.BitVectorNumeralUnsigned(65, 16)
+	astTestMust(t, err)
+	astTestPin(t, m, wide)
+	status, err := rw.RewriteUnit(wide, out)
+	astTestMust(t, err)
+	if status != RewriteFailed {
+		t.Fatalf("wide unit status: %d", status)
+	}
+}

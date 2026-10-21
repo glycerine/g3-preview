@@ -32,6 +32,22 @@ func (r *SequenceRewriter) open() error {
 	return err
 }
 
+// RewriteUnit ports the byte-valued branch of seq_rewriter::mk_seq_unit.
+func (r *SequenceRewriter) RewriteUnit(element ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if err := r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	value, matched, err := r.manager.SequenceUnitByteElementValue(element)
+	if err != nil || !matched {
+		return RewriteFailed, err
+	}
+	result, err := r.manager.MkString(string([]byte{value}))
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteDone, r.manager.SetRef(out, result)
+}
+
 // RewriteConcat ports seq_rewriter::mk_seq_concat. The caller owns traversal
 // and applies the returned revisit depth.
 func (r *SequenceRewriter) RewriteConcat(a, b ast.ASTHandle, out ast.ASTRef) (status RewriteStatus, err error) {

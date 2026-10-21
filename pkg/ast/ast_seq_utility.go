@@ -1,6 +1,9 @@
 // Source: src/ast/seq_decl_plugin.cpp:959-967,993-1018;
 // src/ast/seq_decl_plugin.h:277-306,319-335.
+// Reached consumer: src/ast/rewriter/seq_rewriter.cpp:466-481.
 package ast
+
+import "errors"
 
 func (m *ASTManager) sequenceBinaryParts(r astNodeRef, kind int32) (astNodeRef, astNodeRef, bool, error) {
 	if m.nodeAt(r.slot).kind != ASTApp || m.sequencePlugin == nil {
@@ -157,4 +160,38 @@ func (m *ASTManager) RegexLoopParameters(h ASTHandle) (body ASTHandle, lower, up
 		return ASTHandle{}, 0, 0, false, false, err
 	}
 	return m.external(child), values[0], values[1], info.count == 2, true, nil
+}
+
+// SequenceUnitByteElementValue recognizes the reached (_ BitVec 8) numeral
+// argument profile used by the seq.unit rewriter.
+func (m *ASTManager) SequenceUnitByteElementValue(h ASTHandle) (value byte, matched bool, err error) {
+	if err = m.lock(); err != nil {
+		return
+	}
+	defer m.mu.Unlock()
+	previous := m.formatExecuting
+	m.formatExecuting = true
+	defer func() { m.formatExecuting = previous }()
+	r, err := m.requireExpr(h)
+	if err != nil {
+		return 0, false, err
+	}
+	numeral, err := m.numerals.NewValue()
+	if err != nil {
+		return 0, false, err
+	}
+	defer func() { err = errors.Join(err, m.numerals.Del(&numeral)) }()
+	var width uint32
+	matched, err = m.readBitVectorNumeral(r, &numeral, &width)
+	if err != nil || !matched || width != 8 {
+		return 0, false, err
+	}
+	u, err := m.numerals.Uint64(&numeral)
+	if err != nil || u > 255 {
+		if err == nil {
+			err = ErrASTDomain
+		}
+		return 0, false, err
+	}
+	return byte(u), true, nil
 }
