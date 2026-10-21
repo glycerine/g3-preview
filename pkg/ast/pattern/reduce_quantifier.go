@@ -253,17 +253,13 @@ func (c *patternCandidates) reduceQuantifierNoDatabaseCore(q, newBody ast.ASTHan
 	}
 	baseQ, outputBody := q, newBody
 	pulledWithPatterns := false
+	pulledProof := ast.ASTHandle{}
 	if len(patterns) == 0 && opts.pullQuantifiers {
 		contained, e := c.bodyContainsQuantifier(newBody)
 		if e != nil {
 			return out, false, e
 		}
 		if contained {
-			if proofs {
-				// The ordinary proof branch is complete below. The source's
-				// pulled-quantifier proof chain remains a separate obligation.
-				return out, false, ast.ErrASTPending
-			}
 			preliminary, e := c.manager.UpdateQuantifierPatterns(q, nil, newBody)
 			if e != nil {
 				return out, false, e
@@ -310,6 +306,12 @@ func (c *patternCandidates) reduceQuantifierNoDatabaseCore(q, newBody ast.ASTHan
 				return out, false, e
 			}
 			if pulled != preliminary {
+				if proofs {
+					pulledProof, e = c.manager.MkProofRewrite(preliminary, pulled)
+					if e != nil {
+						return out, false, e
+					}
+				}
 				pulledBody, e := c.manager.GetQuantifierBody(pulled)
 				if e != nil {
 					return out, false, e
@@ -393,13 +395,19 @@ func (c *patternCandidates) reduceQuantifierNoDatabaseCore(q, newBody ast.ASTHan
 			}
 			return ast.ASTRef{}, false, errors.Join(primary, cleanup)
 		}
-		bodyProof, e := c.manager.MkProofReflexivity(newBody)
+		bodyProof, e := c.manager.MkProofReflexivity(outputBody)
 		if e != nil {
 			return failProof(e)
 		}
-		proof, e := c.manager.MkProofQuantIntro(q, updated, bodyProof)
+		proof, e := c.manager.MkProofQuantIntro(baseQ, updated, bodyProof)
 		if e != nil {
 			return failProof(e)
+		}
+		if pulledWithPatterns {
+			proof, e = c.manager.MkProofTransitivity(pulledProof, proof)
+			if e != nil {
+				return failProof(e)
+			}
 		}
 		if e = c.manager.SetRef(proofOut, proof); e != nil {
 			return failProof(e)

@@ -21425,9 +21425,11 @@
         },
         {
           "name": "pattern_inference_cfg pulled-quantifier proof transitivity (cpp:679-700)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
-          "tests": []
+          "tests": [
+            "TestPatternInferencePullDirectNestedForallFindsPattern"
+          ]
         },
         {
           "name": "pattern_inference_cfg constructor caches AP_NO forbidden family and block-loop policy while subsequent borrowed scalar reads remain live (cpp:104-119,624-658)",
@@ -21441,7 +21443,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The larger-pattern filter searches a native visited-handle map and work slice. Unary and multi-pattern results use independently owning ASTRef values; the source stable weight sort uses Go's sort.SliceStable. Collection, preferred selection, ordinary proof/no-proof quantifier rewriting, nested no-proof pulling, and the complete parameter bridge are ported. Database-backed matching and pulled-quantifier proof composition remain explicit ErrASTPending paths."
+        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The larger-pattern filter searches a native visited-handle map and work slice. Unary and multi-pattern results use independently owning ASTRef values; the source stable weight sort uses Go's sort.SliceStable. Collection, preferred selection, proof/no-proof quantifier rewriting, nested pulling, and the complete parameter bridge are ported. Until the separate pull_quant proof owner is ported, the pulled intermediate uses a generic rewrite certificate with the same endpoints before the source quantifier-introduction transitivity step. Database-backed matching remains the explicit ErrASTPending path."
       ]
     },
     {

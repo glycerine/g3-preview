@@ -97,4 +97,25 @@ func TestPatternInferencePullDirectNestedForallFindsPattern(t *testing.T) {
 		strings.Contains(output.String(), "pulled nested quantifier") {
 		t.Fatal("unsuccessful source pull must keep the ordinary no-pattern result", noRef, noChange, output.String())
 	}
+	patternMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	proof, err := m.NewRef(ast.ASTHandle{})
+	patternMust(t, err)
+	t.Cleanup(func() { patternMust(t, m.DelRef(&proof)) })
+	proofRef, proofChanged, err := c.reduceQuantifierNoDatabaseWithProof(outer, inner, nil, opts, proof)
+	patternMust(t, err)
+	if !proofChanged {
+		t.Fatal("proof direct pull was not published")
+	}
+	defer func() { patternMust(t, m.DelRef(&proofRef)) }()
+	proofResult, err := m.RefGet(proofRef)
+	patternMust(t, err)
+	p, err := m.RefGet(proof)
+	patternMust(t, err)
+	fact, err := m.GetProofFact(p)
+	patternMust(t, err)
+	wantFact, err := m.MkIff(outer, proofResult)
+	patternMust(t, err)
+	if fact != wantFact {
+		t.Fatal("pulled quantifier proof fact", fact, wantFact)
+	}
 }
