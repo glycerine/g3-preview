@@ -283,6 +283,12 @@ func (r *ArithRewriter) rewriteComparison(kind int32, left, right ast.ASTHandle,
 	rv, _, rn, err := r.numeral(right)
 	if err != nil || !ln || !rn {
 		if err == nil {
+			if decided, e := r.rewriteAlgebraicComparison(left, right, kind, out); e != nil || decided {
+				if e != nil {
+					return RewriteFailed, e
+				}
+				return RewriteDone, nil
+			}
 			if decided, e := r.rewriteBound(left, right, kind, out); e != nil || decided {
 				if e != nil {
 					return RewriteFailed, e
@@ -376,6 +382,12 @@ func (r *ArithRewriter) rewriteUnaryMinus(arg ast.ASTHandle, out ast.ASTRef) (Re
 }
 
 func (r *ArithRewriter) rewriteDivision(kind int32, left, right ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if kind == arithOpDiv {
+		status, err := r.rewriteAlgebraicDivision(left, right, out)
+		if err != nil || status != RewriteFailed {
+			return status, err
+		}
+	}
 	lv, li, ln, err := r.numeral(left)
 	if err != nil {
 		return RewriteFailed, err
@@ -987,6 +999,12 @@ func (r *ArithRewriter) MkEqCore(left, right ast.ASTHandle, out ast.ASTRef) (Rew
 	rv, _, rn, err := r.numeral(right)
 	if err != nil || !ln || !rn {
 		if err == nil {
+			if decided, e := r.rewriteAlgebraicComparison(left, right, arithRelationEq, out); e != nil || decided {
+				if e != nil {
+					return RewriteFailed, e
+				}
+				return RewriteDone, nil
+			}
 			if decided, e := r.rewriteBound(left, right, arithRelationEq, out); e != nil || decided {
 				if e != nil {
 					return RewriteFailed, e
@@ -1042,9 +1060,17 @@ func (r *ArithRewriter) MkAppCore(decl ast.ASTHandle, args ast.AppArguments, out
 		return RewriteFailed, nil
 	}
 	if kind == arithOpAdd {
+		status, e := r.rewriteAlgebraicFold(kind, args, out)
+		if e != nil || status != RewriteFailed {
+			return status, e
+		}
 		return r.rewriteAdd(args, out)
 	}
 	if kind == arithOpMul {
+		status, e := r.rewriteAlgebraicFold(kind, args, out)
+		if e != nil || status != RewriteFailed {
+			return status, e
+		}
 		return r.rewriteMul(args, out)
 	}
 	if kind == arithOpSub {

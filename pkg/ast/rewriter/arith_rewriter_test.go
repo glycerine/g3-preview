@@ -4,6 +4,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/math/polynomial"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 func arithRewriterNumeral(t *testing.T, m *ast.ASTManager, text string, integer bool) ast.ASTHandle {
@@ -725,4 +728,73 @@ func TestArithRewriterPolynomialGCDReduction(t *testing.T) {
 	if status != RewriteDone || !m.IsFalse(result) {
 		t.Fatal("GCD equality divisibility", status, result)
 	}
+}
+
+func TestArithRewriterAlgebraicComparisonsAndArithmetic(t *testing.T) {
+	m, c, g, local := boolRewriterConfigFixture(t)
+	previous, err := uparams.BindProcessGlobalParamsService(g)
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		_, e := uparams.BindProcessGlobalParamsService(previous)
+		astTestMust(t, e)
+	})
+	r, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	manager, err := m.ArithmeticAlgebraicManager()
+	astTestMust(t, err)
+	makeRoot := func(n int32) ast.ASTHandle {
+		integer := unumeral.NewInt(n)
+		var basic, root polynomial.Algebraic
+		astTestMust(t, manager.SetInteger(&basic, &integer))
+		astTestMust(t, manager.Root(&basic, 2, &root))
+		astTestMust(t, manager.Del(&basic))
+		h, e := m.ArithmeticAlgebraicNumeral(&root)
+		astTestMust(t, e)
+		astTestPin(t, m, h)
+		astTestMust(t, manager.Del(&root))
+		return h
+	}
+	sqrt2, sqrt3 := makeRoot(2), makeRoot(3)
+
+	status, result := arithRewriterCore(t, r, arithOpLE, sqrt2, sqrt3)
+	if status != RewriteDone || !m.IsTrue(result) {
+		t.Fatal("algebraic comparison", status, result)
+	}
+	equalityOut := astTestPin(t, m, sqrt2)
+	status, err = r.MkEqCore(sqrt2, sqrt3, equalityOut)
+	astTestMust(t, err)
+	result, err = m.RefGet(equalityOut)
+	astTestMust(t, err)
+	if status != RewriteDone || !m.IsFalse(result) {
+		t.Fatal("algebraic equality", status, result)
+	}
+
+	status, result = arithRewriterCore(t, r, arithOpAdd, sqrt2, sqrt2)
+	if status != RewriteDone {
+		t.Fatal("algebraic addition status", status)
+	}
+	var sum polynomial.Algebraic
+	matched, err := m.ArithmeticAlgebraicNumeralValue(result, &sum)
+	astTestMust(t, err)
+	if !matched {
+		t.Fatal("algebraic addition result")
+	}
+	degree, err := manager.Degree(&sum)
+	astTestMust(t, err)
+	if degree != 2 {
+		t.Fatal("algebraic addition degree", degree)
+	}
+	astTestMust(t, manager.Del(&sum))
+
+	status, result = arithRewriterCore(t, r, arithOpMul, sqrt2, sqrt2)
+	if status != RewriteDone {
+		t.Fatal("algebraic multiplication status", status)
+	}
+	arithRewriterWantNumeral(t, m, result, "2", false)
+	status, result = arithRewriterCore(t, r, arithOpDiv, sqrt2, sqrt2)
+	if status != RewriteDone {
+		t.Fatal("algebraic division status", status)
+	}
+	arithRewriterWantNumeral(t, m, result, "1", false)
 }
