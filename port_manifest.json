@@ -34175,6 +34175,8 @@
         "pkg/ast/ast_seq_match_test.go",
         "pkg/ast/ast_seq_decl.go",
         "pkg/ast/ast_seq_decl_test.go",
+        "pkg/ast/ast_seq_utility.go",
+        "pkg/ast/ast_seq_utility_test.go",
         "pkg/ast/ast_seq_names.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_seq_signature_memory_trace.go",
@@ -34191,7 +34193,8 @@
         "TestASTSequenceSourceBuiltinNames",
         "TestASTSequenceParameterizedLoopAndSkolem",
         "TestASTSequenceSourcePolymorphicSignatureMatching",
-        "TestASTSequenceGenericFamilyDispatch"
+        "TestASTSequenceGenericFamilyDispatch",
+        "TestASTSequenceConcatUtilitiesAndRegexLoopRecognition"
       ],
       "conditionals": [
         {
@@ -34258,7 +34261,7 @@
       "methods": [
         {
           "name": "ast_seq_plugin concrete reached source counterpart (seq_decl_plugin.cpp:343-357,500-610)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_seq_plugin.go",
           "tests": [
             "TestASTSequenceSourceSetManagerAndRecursiveSignatureInitialization",
@@ -34354,6 +34357,14 @@
           "tests": [
             "TestASTSequenceParameterizedLoopAndSkolem"
           ]
+        },
+        {
+          "name": "seq_util concat decomposition, empty-eliding source-order flattening, concat edges and unary declaration-parameter regex-loop recognition (seq_decl_plugin.cpp:959-967,993-1018)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_utility.go",
+          "tests": [
+            "TestASTSequenceConcatUtilitiesAndRegexLoopRecognition"
+          ]
         }
       ],
       "ownership": [
@@ -34375,13 +34386,16 @@
         "pkg/ast/ast_seq_factories.go",
         "pkg/ast/ast_seq_regex.go",
         "pkg/ast/ast_seq_parameterized.go",
-        "pkg/ast/ast_seq_recognizers.go"
+        "pkg/ast/ast_seq_recognizers.go",
+        "pkg/ast/ast_seq_utility.go",
+        "pkg/ast/ast_seq_utility_test.go"
       ],
       "tests": [
         "TestASTSMT2StringLiteralSourceEncoding",
         "TestASTSequenceStringValueClassification",
         "TestASTSequenceParameterizedLoopAndSkolem",
-        "TestASTSequenceUtilitySortAndExpressionRecognizers"
+        "TestASTSequenceUtilitySortAndExpressionRecognizers",
+        "TestASTSequenceConcatUtilitiesAndRegexLoopRecognition"
       ],
       "conditionals": [
         {
@@ -34449,11 +34463,19 @@
           "tests": [
             "TestASTSequenceUtilitySortAndExpressionRecognizers"
           ]
+        },
+        {
+          "name": "seq_util concat decomposition, empty-eliding source-order flattening, concat edges and unary regex-loop parameter recognition declarations (seq_decl_plugin.h:277-306,319-335)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_utility.go",
+          "tests": [
+            "TestASTSequenceConcatUtilitiesAndRegexLoopRecognition"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The retained sequence signature registry now uses []*astSequenceSignature directly, with owning []astNodeRef domains. Each actual INC is immediately followed by native append; no fallible vector growth, raw vector allocation or unjoined push receipt remains. Range retirement precedes ascending domain retirement with consumed DEC progress. Original recursive initialization, operation-index publication, null unused slots and actual plugin/signature owner-header checks remain. Source allocation-failure geometry and vector internals are excluded; declaration matching/factory operations outside the retained registration/sort paths remain open."
+        "The retained sequence signature registry now uses []*astSequenceSignature directly, with owning []astNodeRef domains. Each actual INC is immediately followed by native append; no fallible vector growth, raw vector allocation or unjoined push receipt remains. Range retirement precedes ascending domain retirement with consumed DEC progress. Original recursive initialization, operation-index publication, null unused slots and actual plugin/signature owner-header checks remain. Source allocation-failure geometry and vector internals are excluded."
       ]
     },
     {

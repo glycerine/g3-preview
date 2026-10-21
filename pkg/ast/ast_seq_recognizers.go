@@ -104,6 +104,10 @@ func (m *ASTManager) IsSequenceEmpty(h ASTHandle) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	return m.isSequenceEmptyRef(r)
+}
+
+func (m *ASTManager) isSequenceEmptyRef(r astNodeRef) (bool, error) {
 	if m.nodeAt(r.slot).kind != ASTApp || m.sequencePlugin == nil {
 		return false, nil
 	}
