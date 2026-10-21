@@ -22586,7 +22586,7 @@
       "path": "src/ast/rewriter/arith_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/arith_rewriter.go",
         "pkg/ast/rewriter/arith_polynomial.go",
@@ -22604,7 +22604,9 @@
         "TestArithRewriterComparisonPowerReductionAndToRealElimination",
         "TestArithRewriterPolynomialGCDReduction",
         "TestArithRewriterAlgebraicComparisonsAndArithmetic",
-        "TestArithRewriterTranscendentalCore"
+        "TestArithRewriterTranscendentalCore",
+        "TestArithRewriterAdvancedPolynomialModes",
+        "TestArithRewriterRemainingStructuralNormalization"
       ],
       "assertions": [
         {
@@ -22824,8 +22826,8 @@
           "text": "SASSERT(k_prime >= rational(0) && k_prime < rational(1));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "configured arithmetic rewriter owner, application dispatch, rational add/multiply, comparisons/equality, division, integer division, bounded integral power, is_int and abs, symbolic modulo/remainder, and cast distribution",
@@ -22905,20 +22907,33 @@
         },
         {
           "name": "advanced polynomial sum-of-monomials and multiplication/coefficient hoisting modes",
-          "status": "unported",
-          "reason": "The exact rational scalar core is connected first; the remaining paths require the concrete arithmetic specialization of poly_rewriter and broader algebraic-expression integration."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_polynomial.go",
+          "tests": [
+            "TestArithRewriterAdvancedPolynomialModes"
+          ]
+        },
+        {
+          "name": "remaining source normalization branches: rational coefficient division, negative-polynomial comparison orientation, exact rational roots without algebraic evaluation, sum-of-monomials power expansion, source monomial order and guarded product flattening",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_rewriter.go",
+          "tests": [
+            "TestArithRewriterRemainingStructuralNormalization"
+          ]
         }
       ],
       "ownership": [
         "ArithRewriter borrows the AST and parameter services, owns one budgeted header, and stores scalar parameter values after each temporary generated parameter facade is closed."
       ],
-      "deviations": []
+      "deviations": [
+        "The retained concrete arithmetic specialization uses Go slices and maps plus math/big.Rat. C++ template/container implementation details and header convenience wrappers without retained Go consumers are not reproduced; retained consumers call MkAppCore, MkEqCore, or AST factories directly."
+      ]
     },
     {
       "path": "src/ast/rewriter/arith_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/arith_rewriter.go",
         "pkg/ast/rewriter/arith_polynomial.go",
@@ -22936,7 +22951,9 @@
         "TestArithRewriterComparisonPowerReductionAndToRealElimination",
         "TestArithRewriterPolynomialGCDReduction",
         "TestArithRewriterAlgebraicComparisonsAndArithmetic",
-        "TestArithRewriterTranscendentalCore"
+        "TestArithRewriterTranscendentalCore",
+        "TestArithRewriterAdvancedPolynomialModes",
+        "TestArithRewriterRemainingStructuralNormalization"
       ],
       "conditionals": [
         {
@@ -22948,8 +22965,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "concrete owner construction/destruction and public MkAppCore/MkEqCore scalar rewrite surface",
@@ -22965,14 +22982,21 @@
         },
         {
           "name": "remaining polynomial and transcendental helper surface",
-          "status": "unported",
-          "reason": "Pending the next arithmetic rewriter slices."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_polynomial.go",
+          "tests": [
+            "TestArithRewriterAdvancedPolynomialModes",
+            "TestArithRewriterRemainingStructuralNormalization",
+            "TestArithRewriterTranscendentalCore"
+          ]
         }
       ],
       "ownership": [
         "The Go owner is noncopyable by self identity, borrows AST/parameter services, and releases its charged header on Close."
       ],
-      "deviations": []
+      "deviations": [
+        "Inline C++ convenience builders without retained Go consumers are represented by the retained core methods and AST factories rather than duplicated as universal adapters."
+      ]
     },
     {
       "path": "src/ast/rewriter/arith_rewriter_params.hpp",
