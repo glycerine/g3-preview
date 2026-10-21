@@ -252,3 +252,30 @@ func TestFPA2BVRewriterToFPFormatDispatch(t *testing.T) {
 		}
 	}
 }
+
+func TestFPA2BVRewriterToBVDispatch(t *testing.T) {
+	f := newFPA2BVFixture(t)
+	rounding, err := f.m.MkFamilyApp(f.family, ast.FPAOpRMNearestEven, nil, nil)
+	astTestMust(t, err)
+	rmSort, err := f.m.GetSort(rounding)
+	astTestMust(t, err)
+	width, err := f.m.NewParameterInt(13)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, f.m.DelParameter(&width)) })
+	zero, err := f.m.MkFPAZeroOfSort(f.sort, true)
+	astTestMust(t, err)
+	want, err := f.m.BitVectorNumeralUnsigned(0, 13)
+	astTestMust(t, err)
+	for _, kind := range []int32{ast.FPAOpToUBV, ast.FPAOpToSBV} {
+		declaration, e := f.m.MkFamilyFuncDecl(
+			f.family, kind, []ast.ASTParameter{width},
+			[]ast.ASTHandle{rmSort, f.sort}, ast.ASTHandle{},
+		)
+		astTestMust(t, e)
+		conversion, e := f.m.MkApp(declaration, []ast.ASTHandle{rounding, zero})
+		astTestMust(t, e)
+		if got := f.rewrite(t, conversion); got != want {
+			t.Fatal("float-to-BV dispatch", kind, got, want)
+		}
+	}
+}

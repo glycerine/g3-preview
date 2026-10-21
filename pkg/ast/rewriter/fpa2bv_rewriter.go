@@ -380,6 +380,23 @@ func (c *fpa2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArgument
 					value, err = converter.ToFPUnsigned(targetSort, values[0], values[1])
 				}
 			}
+		case ast.FPAOpToUBV, ast.FPAOpToSBV:
+			if len(values) != 2 {
+				err = ast.ErrASTDomain
+			} else {
+				var rangeSort ast.ASTHandle
+				rangeSort, err = m.GetRange(decl)
+				if err != nil {
+					break
+				}
+				var width uint32
+				width, err = m.BitVectorSize(rangeSort)
+				if err == nil && kind == ast.FPAOpToUBV {
+					value, err = converter.ToUBV(width, values[0], values[1])
+				} else if err == nil {
+					value, err = converter.ToSBV(width, values[0], values[1])
+				}
+			}
 		default:
 			done = false
 		}

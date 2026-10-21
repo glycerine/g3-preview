@@ -200,6 +200,60 @@ func TestConverterSignedUnsignedIntegerConversions(t *testing.T) {
 	}
 }
 
+func TestConverterFloatToBitVectorConversions(t *testing.T) {
+	m, c := fixture(t)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	rne, err := c.MkRoundingMode(ast.FPAOpRMNearestEven)
+	must(t, err)
+	wantZero, err := m.BitVectorNumeralUnsigned(0, 8)
+	must(t, err)
+	for _, special := range []fpa.SpecialValue{
+		fpa.NaN, fpa.PositiveInfinity, fpa.NegativeInfinity,
+		fpa.PositiveZero, fpa.NegativeZero,
+	} {
+		input, e := c.MkSpecial(sort, special)
+		must(t, e)
+		for _, conversion := range []func(uint32, ast.ASTHandle, ast.ASTHandle) (ast.ASTHandle, error){
+			c.ToUBV, c.ToSBV,
+		} {
+			got, e := conversion(8, rne, input)
+			must(t, e)
+			if got != wantZero {
+				t.Fatal("float-to-BV special", special, got, wantZero)
+			}
+		}
+	}
+
+	signSort, err := m.BitVectorSort(1)
+	must(t, err)
+	exponentSort, err := m.BitVectorSort(8)
+	must(t, err)
+	significandSort, err := m.BitVectorSort(23)
+	must(t, err)
+	sign, err := m.MkVar(830, signSort)
+	must(t, err)
+	exponent, err := m.MkVar(831, exponentSort)
+	must(t, err)
+	significand, err := m.MkVar(832, significandSort)
+	must(t, err)
+	input, err := c.MkFP(sign, exponent, significand)
+	must(t, err)
+	for _, conversion := range []func(uint32, ast.ASTHandle, ast.ASTHandle) (ast.ASTHandle, error){
+		c.ToUBV, c.ToSBV,
+	} {
+		got, e := conversion(17, rne, input)
+		must(t, e)
+		if width, e := m.BitVectorSize(got); e != nil || width != 17 {
+			t.Fatal("symbolic float-to-BV width", width, e)
+		}
+	}
+	must(t, c.SetHighUnspecified(false))
+	if _, err = c.ToUBV(8, rne, input); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("low-unspecified float-to-BV branch must remain explicit", err)
+	}
+}
+
 func TestConverterFiniteNumeral(t *testing.T) {
 	m, c := fixture(t)
 	_, err := m.RegisterArithmeticPlugin()
