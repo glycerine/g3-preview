@@ -6,6 +6,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	astfpa "github.com/glycerine/g3/pkg/ast/fpa"
+	"github.com/glycerine/g3/pkg/model"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -15,6 +16,14 @@ func testMust(t *testing.T, err error) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func testModelCore(t *testing.T, m *ast.ASTManager) *model.ModelCore {
+	t.Helper()
+	core, err := model.NewModelCore(m)
+	testMust(t, err)
+	t.Cleanup(func() { testMust(t, core.Close()) })
+	return core
 }
 
 func testFixture(t *testing.T) (*ast.ASTManager, *astfpa.Converter, *Converter) {
@@ -109,4 +118,69 @@ func TestBV2FPAConverterRetainsSourceSnapshot(t *testing.T) {
 	}
 	testMust(t, source.Reset())
 	testMust(t, retained.Close())
+}
+
+func TestBV2FPAConverterConvertsFloatAndRoundingConstants(t *testing.T) {
+	m, sourceConverter, _ := testFixture(t)
+	sourceModel := testModelCore(t, m)
+	targetModel := testModelCore(t, m)
+	sort, err := m.FloatingPointSort(8, 24)
+	testMust(t, err)
+	name, err := m.Symbols.Intern("converted-float")
+	testMust(t, err)
+	floatDecl, err := m.MkFuncDecl(name, nil, sort, ast.ASTFuncDeclInfo{})
+	testMust(t, err)
+	encoded, err := sourceConverter.MkConst(floatDecl)
+	testMust(t, err)
+	sign, err := m.GetArg(encoded, 0)
+	testMust(t, err)
+	packed, err := m.GetArg(sign, 0)
+	testMust(t, err)
+	packedDecl, err := m.GetDecl(packed)
+	testMust(t, err)
+	packedValue, err := m.BitVectorNumeralUnsigned(0x3fc00000, 32)
+	testMust(t, err)
+	testMust(t, sourceModel.RegisterConstant(packedDecl, packedValue))
+
+	family, err := m.RegisterFloatingPointPlugin()
+	testMust(t, err)
+	rmSort, err := m.MkFamilySort(family, 1, nil)
+	testMust(t, err)
+	rmName, err := m.Symbols.Intern("converted-rm")
+	testMust(t, err)
+	rmDecl, err := m.MkFuncDecl(rmName, nil, rmSort, ast.ASTFuncDeclInfo{})
+	testMust(t, err)
+	wrappedRM, err := sourceConverter.MkRMConst(rmDecl)
+	testMust(t, err)
+	rmBits, err := m.GetArg(wrappedRM, 0)
+	testMust(t, err)
+	rmBitsDecl, err := m.GetDecl(rmBits)
+	testMust(t, err)
+	rmValue, err := m.BitVectorNumeralUnsigned(3, 3)
+	testMust(t, err)
+	testMust(t, sourceModel.RegisterConstant(rmBitsDecl, rmValue))
+
+	converter, err := NewConverter(m, sourceConverter)
+	testMust(t, err)
+	defer func() { testMust(t, converter.Close()) }()
+	seen, err := converter.ConvertModel(sourceModel, targetModel)
+	testMust(t, err)
+	if _, ok := seen[packedDecl]; !ok {
+		t.Fatal("packed declaration was not consumed")
+	}
+	if _, ok := seen[rmBitsDecl]; !ok {
+		t.Fatal("rounding declaration was not consumed")
+	}
+	gotFloat, err := targetModel.ConstantInterpretation(floatDecl)
+	testMust(t, err)
+	wantFloat, err := converter.ConvertPackedBV(nil, sort, packedValue)
+	testMust(t, err)
+	if gotFloat != wantFloat {
+		t.Fatal("converted float constant", gotFloat, wantFloat)
+	}
+	gotRM, err := targetModel.ConstantInterpretation(rmDecl)
+	testMust(t, err)
+	if kind, e := m.GetDeclKind(gotRM); e != nil || kind != ast.FPAOpRMTowardNegative {
+		t.Fatal("converted rounding constant", kind, e)
+	}
 }

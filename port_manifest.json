@@ -17162,11 +17162,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/model/fpa/bv2fpa_converter.go",
+        "pkg/model/fpa/bv2fpa_model.go",
         "pkg/ast/fpa/fpa2bv_symbols.go"
       ],
       "tests": [
         "TestBV2FPAConverterNumeralsAndRoundingModes",
-        "TestBV2FPAConverterRetainsSourceSnapshot"
+        "TestBV2FPAConverterRetainsSourceSnapshot",
+        "TestBV2FPAConverterConvertsFloatAndRoundingConstants"
       ],
       "conditionals": [
         {
@@ -17272,12 +17274,13 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "constructor/destructor cache snapshot ownership and direct/evaluated bit-vector component and rounding-mode numeral reconstruction; model constant, function, array, special, display, and translation conversion remains open",
+          "name": "constructor/destructor cache snapshot ownership, direct/evaluated bit-vector component and rounding-mode numeral reconstruction, and model float/rounding constant and min/max special conversion; function, array, display, and translation conversion remains open",
           "status": "ported",
           "go_target": "pkg/model/fpa/bv2fpa_converter.go",
           "tests": [
             "TestBV2FPAConverterNumeralsAndRoundingModes",
-            "TestBV2FPAConverterRetainsSourceSnapshot"
+            "TestBV2FPAConverterRetainsSourceSnapshot",
+            "TestBV2FPAConverterConvertsFloatAndRoundingConstants"
           ]
         }
       ],
@@ -17293,11 +17296,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/model/fpa/bv2fpa_converter.go",
+        "pkg/model/fpa/bv2fpa_model.go",
         "pkg/ast/fpa/fpa2bv_symbols.go"
       ],
       "tests": [
         "TestBV2FPAConverterNumeralsAndRoundingModes",
-        "TestBV2FPAConverterRetainsSourceSnapshot"
+        "TestBV2FPAConverterRetainsSourceSnapshot",
+        "TestBV2FPAConverterConvertsFloatAndRoundingConstants"
       ],
       "conditionals": [
         {
@@ -17318,7 +17323,8 @@
           "go_target": "pkg/model/fpa/bv2fpa_converter.go",
           "tests": [
             "TestBV2FPAConverterNumeralsAndRoundingModes",
-            "TestBV2FPAConverterRetainsSourceSnapshot"
+            "TestBV2FPAConverterRetainsSourceSnapshot",
+            "TestBV2FPAConverterConvertsFloatAndRoundingConstants"
           ]
         }
       ],
