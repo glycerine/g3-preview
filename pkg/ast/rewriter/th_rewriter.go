@@ -4,10 +4,16 @@ package rewriter
 
 import (
 	"errors"
+	"math/big"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
 	uparams "github.com/glycerine/g3/pkg/util/params"
+)
+
+const (
+	theoryBVOpAdd int32 = 4
+	theoryBVOpMul int32 = 6
 )
 
 type theoryRewriterConfiguration struct {
@@ -533,6 +539,214 @@ func (c *theoryRewriterConfiguration) pullITEResult(out ast.ASTRef) (RewriteStat
 	return RewriteDone, nil
 }
 
+func (c *theoryRewriterConfiguration) arithmeticBVApp(term ast.ASTHandle) (bool, error) {
+	kind, err := c.owner.manager.GetKind(term)
+	if err != nil || kind != ast.ASTApp {
+		return false, err
+	}
+	family, err := c.owner.manager.GetFamilyID(term)
+	if err != nil {
+		return false, err
+	}
+	return family == c.arithmetic.family && c.pushITEArithmetic || family == c.bitVector.bvFamily && c.pushITEBitVector, nil
+}
+
+func (c *theoryRewriterConfiguration) neutralElement(term ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	family, err := c.owner.manager.GetFamilyID(term)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	kind, err := c.owner.manager.GetDeclKind(term)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	value := int64(0)
+	switch {
+	case family == c.arithmetic.family && kind == arithOpAdd:
+	case family == c.arithmetic.family && kind == arithOpMul:
+		value = 1
+	case family == c.bitVector.bvFamily && kind == theoryBVOpAdd:
+	case family == c.bitVector.bvFamily && kind == theoryBVOpMul:
+		value = 1
+	default:
+		return ast.ASTHandle{}, false, nil
+	}
+	if family == c.bitVector.bvFamily {
+		width, err := c.owner.manager.BitVectorSize(term)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		result, err := c.owner.manager.BitVectorNumeralUnsigned(uint32(value), width)
+		return result, err == nil, err
+	}
+	sort, err := c.owner.manager.GetSort(term)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	sortKind, err := c.owner.manager.GetDeclKind(sort)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	result, err := c.arithmetic.makeNumeral(big.NewRat(value, 1), sortKind == 1)
+	return result, err == nil, err
+}
+
+func (c *theoryRewriterConfiguration) unifyCore(firstTerm, secondTerm ast.ASTHandle) (newFirst, newSecond, common ast.ASTHandle, commonFirst, matched bool, err error) {
+	count, err := c.owner.manager.GetNumArgs(firstTerm)
+	if err != nil || count != 2 {
+		return newFirst, newSecond, common, false, false, err
+	}
+	a1, err := c.owner.manager.GetArg(firstTerm, 0)
+	if err != nil {
+		return newFirst, newSecond, common, false, false, err
+	}
+	b1, err := c.owner.manager.GetArg(firstTerm, 1)
+	if err != nil {
+		return newFirst, newSecond, common, false, false, err
+	}
+	if secondTerm == b1 || secondTerm == a1 {
+		neutral, ok, err := c.neutralElement(firstTerm)
+		if err != nil || !ok {
+			return newFirst, newSecond, common, false, false, err
+		}
+		if secondTerm == b1 {
+			return a1, neutral, b1, false, true, nil
+		}
+		return b1, neutral, a1, true, true, nil
+	}
+	secondKind, err := c.owner.manager.GetKind(secondTerm)
+	if err != nil || secondKind != ast.ASTApp {
+		return newFirst, newSecond, common, false, false, err
+	}
+	firstDecl, err := c.owner.manager.GetDecl(firstTerm)
+	if err != nil {
+		return newFirst, newSecond, common, false, false, err
+	}
+	secondDecl, err := c.owner.manager.GetDecl(secondTerm)
+	if err != nil || secondDecl != firstDecl {
+		return newFirst, newSecond, common, false, false, err
+	}
+	secondCount, err := c.owner.manager.GetNumArgs(secondTerm)
+	if err != nil || secondCount != 2 {
+		return newFirst, newSecond, common, false, false, err
+	}
+	a2, err := c.owner.manager.GetArg(secondTerm, 0)
+	if err != nil {
+		return newFirst, newSecond, common, false, false, err
+	}
+	b2, err := c.owner.manager.GetArg(secondTerm, 1)
+	if err != nil {
+		return newFirst, newSecond, common, false, false, err
+	}
+	if b1 == b2 {
+		return a1, a2, b2, false, true, nil
+	}
+	if a1 == a2 {
+		return b1, b2, a1, true, true, nil
+	}
+	commutative, err := c.owner.manager.RewriterCommutative(firstDecl)
+	if err != nil || !commutative {
+		return newFirst, newSecond, common, false, false, err
+	}
+	if a1 == b2 {
+		return b1, a2, a1, true, true, nil
+	}
+	if b1 == a2 {
+		return a1, b2, b1, false, true, nil
+	}
+	return newFirst, newSecond, common, false, false, nil
+}
+
+func (c *theoryRewriterConfiguration) unify(firstTerm, secondTerm ast.ASTHandle) (decl, newFirst, newSecond, common ast.ASTHandle, commonFirst, matched bool, err error) {
+	firstApp, err := c.arithmeticBVApp(firstTerm)
+	if err != nil {
+		return decl, newFirst, newSecond, common, false, false, err
+	}
+	if firstApp {
+		decl, err = c.owner.manager.GetDecl(firstTerm)
+		if err != nil {
+			return decl, newFirst, newSecond, common, false, false, err
+		}
+		newFirst, newSecond, common, commonFirst, matched, err = c.unifyCore(firstTerm, secondTerm)
+		return
+	}
+	secondApp, err := c.arithmeticBVApp(secondTerm)
+	if err != nil || !secondApp {
+		return decl, newFirst, newSecond, common, false, false, err
+	}
+	decl, err = c.owner.manager.GetDecl(secondTerm)
+	if err != nil {
+		return decl, newFirst, newSecond, common, false, false, err
+	}
+	var secondNew, firstNew ast.ASTHandle
+	secondNew, firstNew, common, commonFirst, matched, err = c.unifyCore(secondTerm, firstTerm)
+	return decl, firstNew, secondNew, common, commonFirst, matched, err
+}
+
+func (c *theoryRewriterConfiguration) pushITE(decl ast.ASTHandle, args ast.AppArguments, out ast.ASTRef) (RewriteStatus, error) {
+	family, err := c.owner.manager.GetFamilyID(decl)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	kind, err := c.owner.manager.GetDeclKind(decl)
+	if err != nil || family != c.owner.manager.BasicFamilyID() || kind != ast.ASTOpIte || args.Count() != 3 {
+		return RewriteFailed, err
+	}
+	condition, err := args.At(0)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	thenValue, err := args.At(1)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	elseValue, err := args.At(2)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	outerDecl, newThen, newElse, common, commonFirst, matched, err := c.unify(thenValue, elseValue)
+	if err != nil || !matched {
+		return RewriteFailed, err
+	}
+	inner, err := c.owner.manager.MkIte(condition, newThen, newElse)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	outerArgs := []ast.ASTHandle{inner, common}
+	if commonFirst {
+		outerArgs[0], outerArgs[1] = common, inner
+	}
+	result, err := c.owner.manager.RewriterMakeApp(outerDecl, ast.SliceArguments(outerArgs))
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteDone, c.owner.manager.SetRef(out, result)
+}
+
+func (c *theoryRewriterConfiguration) pushITEResult(out ast.ASTRef) (RewriteStatus, error) {
+	term, err := c.owner.manager.RefGet(out)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	_, _, _, matched, err := c.iteView(term)
+	if err != nil || !matched {
+		return RewriteDone, err
+	}
+	decl, err := c.owner.manager.GetDecl(term)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	args, err := c.owner.manager.AppArgumentView(term)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	status, err := c.pushITE(decl, args, out)
+	if err != nil || status != RewriteFailed {
+		return status, err
+	}
+	return RewriteDone, nil
+}
+
 func (c *theoryRewriterConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArguments, out, proof ast.ASTRef) (RewriteStatus, error) {
 	if err := c.owner.manager.SetRef(proof, ast.ASTHandle{}); err != nil {
 		return RewriteFailed, err
@@ -540,6 +754,16 @@ func (c *theoryRewriterConfiguration) ReduceApp(decl ast.ASTHandle, args ast.App
 	status, err := c.reduceAppCore(decl, args, out)
 	if err != nil || status != RewriteDone && status != RewriteFailed {
 		return status, err
+	}
+	if c.pushITEArithmetic || c.pushITEBitVector {
+		if status == RewriteFailed {
+			status, err = c.pushITE(decl, args, out)
+		} else {
+			status, err = c.pushITEResult(out)
+		}
+		if err != nil {
+			return status, err
+		}
 	}
 	if c.pullCheapITE {
 		if status == RewriteFailed {
@@ -679,9 +903,6 @@ func (r *TheoryRewriter) Rewrite(term ast.ASTHandle, out ast.ASTRef) error {
 
 func (r *TheoryRewriter) MakeApp(decl ast.ASTHandle, args ast.AppArguments, out ast.ASTRef) error {
 	if err := r.open(); err != nil {
-		return err
-	}
-	if err := r.manager.SetRef(out, ast.ASTHandle{}); err != nil {
 		return err
 	}
 	proof, err := r.manager.NewRef(ast.ASTHandle{})

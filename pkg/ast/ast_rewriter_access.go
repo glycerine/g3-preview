@@ -27,6 +27,19 @@ func (m *ASTManager) RewriterAssociative(d ASTHandle) (bool, error) {
 	return flags.LeftAssociative && flags.RightAssociative, e
 }
 
+func (m *ASTManager) RewriterCommutative(d ASTHandle) (bool, error) {
+	if e := m.lock(); e != nil {
+		return false, e
+	}
+	defer m.mu.Unlock()
+	decl, e := m.requireKind(d, ASTFuncDecl)
+	if e != nil {
+		return false, e
+	}
+	flags, e := m.funcFlags(decl)
+	return flags.Commutative, e
+}
+
 func (m *ASTManager) RewriterPattern(t ASTHandle) (bool, error) {
 	kind, e := m.GetKind(t)
 	if e != nil || kind != ASTApp {

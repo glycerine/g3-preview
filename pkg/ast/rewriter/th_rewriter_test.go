@@ -127,6 +127,82 @@ func TestTheoryRewriterPullCheapITE(t *testing.T) {
 
 }
 
+func TestTheoryRewriterPushITE(t *testing.T) {
+	t.Run("arithmetic", func(t *testing.T) {
+		m, context, globals, local := boolRewriterConfigFixture(t)
+		key := "push_ite_arith"
+		astTestMust(t, context.SetBoolName(local, &key, true))
+		r, err := NewTheoryRewriter(m, context, globals, local)
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, r.Close()) })
+
+		condition := goalTestAtom(t, m, "theory-push-arith")
+		two := arithRewriterNumeral(t, m, "2", true)
+		three := arithRewriterNumeral(t, m, "3", true)
+		sort, err := m.GetSort(two)
+		astTestMust(t, err)
+		x, err := m.MkVar(0, sort)
+		astTestMust(t, err)
+		left, err := m.MkFamilyApp(r.configuration.arithmetic.family, arithOpAdd, nil, []ast.ASTHandle{two, x})
+		astTestMust(t, err)
+		right, err := m.MkFamilyApp(r.configuration.arithmetic.family, arithOpAdd, nil, []ast.ASTHandle{three, x})
+		astTestMust(t, err)
+		choice, err := m.MkIte(condition, left, right)
+		astTestMust(t, err)
+		decl, err := m.GetDecl(choice)
+		astTestMust(t, err)
+		out := astTestPin(t, m, choice)
+		astTestMust(t, r.MakeApp(decl, ast.SliceArguments([]ast.ASTHandle{condition, left, right}), out))
+		got, err := m.RefGet(out)
+		astTestMust(t, err)
+		inner, err := m.MkIte(condition, two, three)
+		astTestMust(t, err)
+		want, err := m.MkFamilyApp(r.configuration.arithmetic.family, arithOpAdd, nil, []ast.ASTHandle{inner, x})
+		astTestMust(t, err)
+		if got != want {
+			t.Fatal("arithmetic ITE was not pushed", got, want)
+		}
+	})
+
+	t.Run("bit-vector", func(t *testing.T) {
+		m, context, globals, local := boolRewriterConfigFixture(t)
+		key := "push_ite_bv"
+		astTestMust(t, context.SetBoolName(local, &key, true))
+		r, err := NewTheoryRewriter(m, context, globals, local)
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, r.Close()) })
+
+		condition := goalTestAtom(t, m, "theory-push-bv")
+		sort, err := m.BitVectorSort(8)
+		astTestMust(t, err)
+		x, err := m.MkVar(0, sort)
+		astTestMust(t, err)
+		two, err := m.BitVectorNumeralUnsigned(2, 8)
+		astTestMust(t, err)
+		three, err := m.BitVectorNumeralUnsigned(3, 8)
+		astTestMust(t, err)
+		left, err := m.MkFamilyApp(r.configuration.bitVector.bvFamily, theoryBVOpAdd, nil, []ast.ASTHandle{two, x})
+		astTestMust(t, err)
+		right, err := m.MkFamilyApp(r.configuration.bitVector.bvFamily, theoryBVOpAdd, nil, []ast.ASTHandle{x, three})
+		astTestMust(t, err)
+		choice, err := m.MkIte(condition, left, right)
+		astTestMust(t, err)
+		decl, err := m.GetDecl(choice)
+		astTestMust(t, err)
+		out := astTestPin(t, m, choice)
+		astTestMust(t, r.MakeApp(decl, ast.SliceArguments([]ast.ASTHandle{condition, left, right}), out))
+		got, err := m.RefGet(out)
+		astTestMust(t, err)
+		inner, err := m.MkIte(condition, two, three)
+		astTestMust(t, err)
+		want, err := m.MkFamilyApp(r.configuration.bitVector.bvFamily, theoryBVOpAdd, nil, []ast.ASTHandle{inner, x})
+		astTestMust(t, err)
+		if got != want {
+			t.Fatal("bit-vector commutative ITE was not pushed", got, want)
+		}
+	})
+}
+
 func TestTheoryRewriterCloseGuards(t *testing.T) {
 	m, r := theoryRewriterFixture(t)
 	truth, err := m.MkTrue()
