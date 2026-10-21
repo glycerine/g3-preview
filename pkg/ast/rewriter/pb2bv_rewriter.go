@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 type pb2BVConfiguration struct {
@@ -34,6 +35,7 @@ type PB2BVRewriter struct {
 	self          *PB2BVRewriter
 	manager       *ast.ASTManager
 	pseudo        *PseudoBooleanRewriter
+	arithFamily   ast.FamilyID
 	runtime       *umemory.Runtime
 	context       *ast.PsortASTContext
 	network       *ast.PsortASTNetwork
@@ -45,6 +47,11 @@ type PB2BVRewriter struct {
 	numTranslated uint32
 	header        uint64
 	closed        bool
+}
+
+type PB2BVStatistics struct {
+	AuxiliaryVariables uint32
+	AuxiliaryClauses   uint32
 }
 
 // NewPB2BVRewriter constructs the source implementation graph. A nonnil
@@ -59,27 +66,37 @@ func NewPB2BVRewriter(m *ast.ASTManager) (*PB2BVRewriter, error) {
 	}
 	r := &PB2BVRewriter{manager: m, header: n}
 	r.self = r
-	var err error
-	if r.pseudo, err = NewPseudoBooleanRewriter(m); err != nil {
-		return r, err
-	}
-	if r.runtime, err = umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.Budget()}); err != nil {
-		return r, err
-	}
-	if r.context, err = ast.NewPsortASTContext(m); err != nil {
-		return r, err
-	}
-	if err = r.context.SetFreshPrefix("sn"); err != nil {
-		return r, err
-	}
-	if r.network, err = ast.NewPsortASTNetwork(r.context, r.runtime, m.Budget(), nil); err != nil {
-		return r, err
-	}
-	r.configuration.owner = r
-	if r.traversal, err = NewTraversal(m, &r.configuration); err != nil {
+	if err := r.constructMembers(); err != nil {
 		return r, err
 	}
 	return r, nil
+}
+
+func (r *PB2BVRewriter) constructMembers() (err error) {
+	m := r.manager
+	if r.pseudo, err = NewPseudoBooleanRewriter(m); err != nil {
+		return err
+	}
+	if r.arithFamily, err = m.ArithmeticFamilyID(); err != nil {
+		return err
+	}
+	if r.runtime, err = umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.Budget()}); err != nil {
+		return err
+	}
+	if r.context, err = ast.NewPsortASTContext(m); err != nil {
+		return err
+	}
+	if err = r.context.SetFreshPrefix("sn"); err != nil {
+		return err
+	}
+	if r.network, err = ast.NewPsortASTNetwork(r.context, r.runtime, m.Budget(), nil); err != nil {
+		return err
+	}
+	r.configuration = pb2BVConfiguration{owner: r}
+	if r.traversal, err = NewTraversal(m, &r.configuration); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *PB2BVRewriter) open() error {
@@ -99,6 +116,485 @@ func pb2BVUnsigned(q *big.Rat) (uint32, bool) {
 		return 0, false
 	}
 	return uint32(v), true
+}
+
+type pb2BVComparison uint8
+
+const (
+	pb2BVLE pb2BVComparison = iota
+	pb2BVEQ
+	pb2BVGE
+)
+
+func (r *PB2BVRewriter) bitVectorNumeral(q *big.Rat, width uint32) (result ast.ASTHandle, err error) {
+	if q == nil || !q.IsInt() || q.Sign() < 0 || width == 0 {
+		return result, ast.ErrASTDomain
+	}
+	sort, err := r.manager.BitVectorSort(width)
+	if err != nil {
+		return result, err
+	}
+	service := r.manager.NumeralService()
+	value, err := service.NewValue()
+	if err != nil {
+		return result, err
+	}
+	defer func() { err = errors.Join(err, service.Del(&value)) }()
+	if err = service.SetString(&value, q.Num().String()); err != nil {
+		return result, err
+	}
+	return r.manager.BitVectorNumeralForSort(&value, sort)
+}
+
+func (r *PB2BVRewriter) negate(h ast.ASTHandle) (ast.ASTHandle, error) {
+	yes, child, err := r.manager.IsNot(h)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if yes {
+		return child, nil
+	}
+	return r.manager.MkNot(h)
+}
+
+func (r *PB2BVRewriter) simplifiedITE(condition, high, low ast.ASTHandle) (ast.ASTHandle, error) {
+	for {
+		negated, child, err := r.manager.IsNot(condition)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		if !negated {
+			break
+		}
+		condition, high, low = child, low, high
+	}
+	if high == low {
+		return high, nil
+	}
+	switch {
+	case r.manager.IsTrue(high) && r.manager.IsFalse(low):
+		return condition, nil
+	case r.manager.IsFalse(high) && r.manager.IsTrue(low):
+		return r.negate(condition)
+	case r.manager.IsTrue(high):
+		return r.manager.MkOr(condition, low)
+	case r.manager.IsFalse(low):
+		return r.manager.MkAnd(condition, high)
+	case r.manager.IsFalse(high):
+		notCondition, err := r.negate(condition)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		return r.manager.MkAnd(notCondition, low)
+	case r.manager.IsTrue(low):
+		return r.manager.MkImplies(condition, high)
+	default:
+		return r.manager.MkIte(condition, high, low)
+	}
+}
+
+func (r *PB2BVRewriter) weightedPair(mode pb2BVComparison, formulas *[]ast.ASTHandle, left, right, bound ast.ASTHandle, width uint32) (ast.ASTHandle, error) {
+	x, err := r.manager.MkBitVectorZeroExtend(1, left)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	y, err := r.manager.MkBitVectorZeroExtend(1, right)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	sum, err := r.manager.MkBitVectorAdd(x, y)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	overflow, err := r.manager.MkBitVectorExtract(width, width, sum)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	low, err := r.manager.MkBitVectorExtract(width-1, 0, sum)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	bit := uint32(0)
+	if mode == pb2BVGE {
+		bit = 1
+	}
+	want, err := r.manager.BitVectorNumeralUnsigned(bit, 1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	equal, err := r.manager.MkEq(overflow, want)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	*formulas = append(*formulas, equal)
+	var bounded ast.ASTHandle
+	if mode == pb2BVGE {
+		bounded, err = r.manager.MkBitVectorULE(bound, low)
+	} else {
+		bounded, err = r.manager.MkBitVectorULE(low, bound)
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	*formulas = append(*formulas, bounded)
+	return low, nil
+}
+
+func (r *PB2BVRewriter) weighted(mode pb2BVComparison, args []ast.ASTHandle, coefficients []*big.Rat, boundValue *big.Rat) (ast.ASTHandle, error) {
+	if boundValue.Sign() == 0 {
+		if mode == pb2BVGE {
+			return r.manager.MkTrue()
+		}
+		disjunction, err := r.manager.MkOrArray(args)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		return r.negate(disjunction)
+	}
+	if boundValue.Sign() < 0 {
+		return r.manager.MkBoolVal(mode == pb2BVGE)
+	}
+	if !boundValue.IsInt() || boundValue.Num().BitLen() > int(^uint32(0)) {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	width := uint32(boundValue.Num().BitLen())
+	zero, err := r.bitVectorNumeral(big.NewRat(0, 1), width)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	bound, err := r.bitVectorNumeral(boundValue, width)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var expressions, formulas []ast.ASTHandle
+	for i, coefficient := range coefficients {
+		if coefficient.Sign() < 0 || !coefficient.IsInt() {
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
+		if coefficient.Cmp(boundValue) > 0 {
+			term := args[i]
+			if mode != pb2BVGE {
+				term, err = r.negate(term)
+				if err != nil {
+					return ast.ASTHandle{}, err
+				}
+			}
+			formulas = append(formulas, term)
+			continue
+		}
+		value, err := r.bitVectorNumeral(coefficient, width)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		term, err := r.simplifiedITE(args[i], value, zero)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		expressions = append(expressions, term)
+	}
+	for len(expressions) > 1 {
+		next := expressions[:0]
+		for i := 0; i+1 < len(expressions); i += 2 {
+			sum, err := r.weightedPair(mode, &formulas, expressions[i], expressions[i+1], bound, width)
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			next = append(next, sum)
+		}
+		if len(expressions)%2 != 0 {
+			next = append(next, expressions[len(expressions)-1])
+		}
+		expressions = next
+	}
+	switch mode {
+	case pb2BVLE:
+		return r.manager.MkAndArray(formulas)
+	case pb2BVGE:
+		if len(expressions) != 0 {
+			last, err := r.manager.MkBitVectorULE(bound, expressions[0])
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			formulas = append(formulas, last)
+		}
+		return r.manager.MkOrArray(formulas)
+	case pb2BVEQ:
+		if len(expressions) == 0 {
+			falsity, err := r.manager.MkBoolVal(boundValue.Sign() == 0)
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			formulas = append(formulas, falsity)
+		} else {
+			equal, err := r.manager.MkEq(bound, expressions[0])
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			formulas = append(formulas, equal)
+		}
+		return r.manager.MkAndArray(formulas)
+	default:
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+}
+
+func (r *PB2BVRewriter) weightedPB(kind int32, decl ast.ASTHandle, arguments ast.AppArguments, bound *big.Rat) (ast.ASTHandle, error) {
+	args := make([]ast.ASTHandle, arguments.Count())
+	coefficients := make([]*big.Rat, arguments.Count())
+	for i := range args {
+		var err error
+		args[i], err = arguments.At(uint32(i))
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		coefficients[i], err = r.pseudo.coefficient(decl, uint32(i))
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
+	mode := pb2BVLE
+	if kind == ast.ASTPBOpEQ {
+		mode = pb2BVEQ
+	} else if kind == ast.ASTPBOpAtLeast || kind == ast.ASTPBOpGE {
+		// Source dualizes >= into <= over negated literals.
+		dual := new(big.Rat).Neg(bound)
+		for i := range args {
+			dual.Add(dual, coefficients[i])
+			var err error
+			args[i], err = r.negate(args[i])
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+		}
+		bound = dual
+	}
+	return r.weighted(mode, args, coefficients, bound)
+}
+
+type pb2BVArithmeticForm struct {
+	args         []ast.ASTHandle
+	coefficients []*big.Rat
+	bound        big.Rat
+}
+
+func (r *PB2BVRewriter) arithmeticNumeral(h ast.ASTHandle) (*big.Rat, bool, error) {
+	text, _, matched, err := r.manager.ArithmeticNumeralText(h)
+	if err != nil || !matched {
+		return nil, matched, err
+	}
+	q, ok := new(big.Rat).SetString(text)
+	if !ok {
+		return nil, true, ast.ErrASTDomain
+	}
+	return q, true, nil
+}
+
+func (r *PB2BVRewriter) collectArithmeticPB(form *pb2BVArithmeticForm, expression ast.ASTHandle, multiplier *big.Rat) (bool, error) {
+	kind, err := r.manager.GetKind(expression)
+	if err != nil || kind != ast.ASTApp {
+		return false, err
+	}
+	family, err := r.manager.GetFamilyID(expression)
+	if err != nil {
+		return false, err
+	}
+	declKind, err := r.manager.GetDeclKind(expression)
+	if err != nil {
+		return false, err
+	}
+	count, err := r.manager.GetNumArgs(expression)
+	if err != nil {
+		return false, err
+	}
+	if family == r.arithFamily {
+		switch declKind {
+		case arithOpAdd:
+			for i := uint32(0); i < count; i++ {
+				arg, e := r.manager.GetArg(expression, i)
+				if e != nil {
+					return false, e
+				}
+				matched, e := r.collectArithmeticPB(form, arg, multiplier)
+				if e != nil || !matched {
+					return matched, e
+				}
+			}
+			return true, nil
+		case arithOpSub:
+			if count == 0 {
+				return false, nil
+			}
+			first, e := r.manager.GetArg(expression, 0)
+			if e != nil {
+				return false, e
+			}
+			matched, e := r.collectArithmeticPB(form, first, multiplier)
+			if e != nil || !matched {
+				return matched, e
+			}
+			negative := new(big.Rat).Neg(multiplier)
+			for i := uint32(1); i < count; i++ {
+				// The source repeatedly reads argument 1 for n-ary subtraction.
+				arg, e := r.manager.GetArg(expression, 1)
+				if e != nil {
+					return false, e
+				}
+				matched, e = r.collectArithmeticPB(form, arg, negative)
+				if e != nil || !matched {
+					return matched, e
+				}
+			}
+			return true, nil
+		case arithOpUMinus:
+			if count != 1 {
+				return false, nil
+			}
+			arg, e := r.manager.GetArg(expression, 0)
+			if e != nil {
+				return false, e
+			}
+			return r.collectArithmeticPB(form, arg, new(big.Rat).Neg(multiplier))
+		case arithOpNum:
+			value, matched, e := r.arithmeticNumeral(expression)
+			if e != nil || !matched {
+				return matched, e
+			}
+			form.bound.Sub(&form.bound, new(big.Rat).Mul(multiplier, value))
+			return true, nil
+		case arithOpMul:
+			if count != 2 {
+				return false, nil
+			}
+			left, e := r.manager.GetArg(expression, 0)
+			if e != nil {
+				return false, e
+			}
+			right, e := r.manager.GetArg(expression, 1)
+			if e != nil {
+				return false, e
+			}
+			if value, matched, e := r.arithmeticNumeral(left); e != nil {
+				return false, e
+			} else if matched {
+				return r.collectArithmeticPB(form, right, new(big.Rat).Mul(value, multiplier))
+			}
+			if value, matched, e := r.arithmeticNumeral(right); e != nil {
+				return false, e
+			} else if matched {
+				return r.collectArithmeticPB(form, left, new(big.Rat).Mul(value, multiplier))
+			}
+			return false, nil
+		default:
+			return false, nil
+		}
+	}
+	if family != r.manager.BasicFamilyID() || declKind != ast.ASTOpIte || count != 3 {
+		return false, nil
+	}
+	condition, err := r.manager.GetArg(expression, 0)
+	if err != nil {
+		return false, err
+	}
+	high, err := r.manager.GetArg(expression, 1)
+	if err != nil {
+		return false, err
+	}
+	low, err := r.manager.GetArg(expression, 2)
+	if err != nil {
+		return false, err
+	}
+	highValue, highMatched, err := r.arithmeticNumeral(high)
+	if err != nil || !highMatched {
+		return false, err
+	}
+	lowValue, lowMatched, err := r.arithmeticNumeral(low)
+	if err != nil || !lowMatched {
+		return false, err
+	}
+	highValue.Mul(highValue, multiplier)
+	lowValue.Mul(lowValue, multiplier)
+	if highValue.Cmp(lowValue) < 0 {
+		condition, err = r.negate(condition)
+		if err != nil {
+			return false, err
+		}
+		form.args = append(form.args, condition)
+		form.coefficients = append(form.coefficients, new(big.Rat).Sub(lowValue, highValue))
+		form.bound.Sub(&form.bound, highValue)
+	} else {
+		form.args = append(form.args, condition)
+		form.coefficients = append(form.coefficients, new(big.Rat).Sub(highValue, lowValue))
+		form.bound.Sub(&form.bound, lowValue)
+	}
+	return true, nil
+}
+
+func (r *PB2BVRewriter) arithmeticPB(left, right ast.ASTHandle) (*pb2BVArithmeticForm, bool, error) {
+	form := &pb2BVArithmeticForm{}
+	matched, err := r.collectArithmeticPB(form, left, big.NewRat(1, 1))
+	if err != nil || !matched {
+		return nil, false, err
+	}
+	matched, err = r.collectArithmeticPB(form, right, big.NewRat(-1, 1))
+	if err != nil || !matched {
+		return nil, false, err
+	}
+	return form, true, nil
+}
+
+func (r *PB2BVRewriter) rewriteArithmeticComparison(kind int32, args ast.AppArguments, out ast.ASTRef) (RewriteStatus, error) {
+	if args.Count() != 2 {
+		return RewriteFailed, nil
+	}
+	left, err := args.At(0)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	right, err := args.At(1)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	mode := pb2BVLE
+	if kind == arithOpGE || kind == arithOpGT {
+		left, right = right, left
+	}
+	form, matched, err := r.arithmeticPB(left, right)
+	if err != nil || !matched {
+		return RewriteFailed, err
+	}
+	if kind == arithOpLT || kind == arithOpGT {
+		form.bound.Add(&form.bound, big.NewRat(1, 1))
+	}
+	result, err := r.weighted(mode, form.args, form.coefficients, &form.bound)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	r.numTranslated++
+	return RewriteDone, r.manager.SetRef(out, result)
+}
+
+func (r *PB2BVRewriter) rewriteArithmeticEquality(args ast.AppArguments, out ast.ASTRef) (RewriteStatus, error) {
+	if args.Count() != 2 {
+		return RewriteFailed, nil
+	}
+	left, err := args.At(0)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	right, err := args.At(1)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	form, matched, err := r.arithmeticPB(left, right)
+	if err != nil || !matched {
+		return RewriteFailed, err
+	}
+	result, err := r.weighted(pb2BVEQ, form.args, form.coefficients, &form.bound)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	r.numTranslated++
+	return RewriteDone, r.manager.SetRef(out, result)
 }
 
 func (r *PB2BVRewriter) syncFresh() error {
@@ -164,12 +660,23 @@ func (r *PB2BVRewriter) rewriteApp(decl ast.ASTHandle, args ast.AppArguments, ou
 	if err != nil {
 		return RewriteFailed, err
 	}
-	if family != r.pseudo.family {
-		return RewriteFailed, nil
-	}
 	kind, err := r.manager.GetDeclKind(decl)
-	if err != nil || kind < ast.ASTPBOpAtMost || kind > ast.ASTPBOpEQ {
+	if err != nil {
 		return RewriteFailed, err
+	}
+	if family == r.arithFamily {
+		switch kind {
+		case arithOpLE, arithOpLT, arithOpGE, arithOpGT:
+			return r.rewriteArithmeticComparison(kind, args, out)
+		default:
+			return RewriteFailed, nil
+		}
+	}
+	if family == r.manager.BasicFamilyID() && kind == ast.ASTOpEq {
+		return r.rewriteArithmeticEquality(args, out)
+	}
+	if family != r.pseudo.family || kind < ast.ASTPBOpAtMost || kind > ast.ASTPBOpEQ {
+		return RewriteFailed, nil
 	}
 	bound, err := r.pseudo.bound(decl)
 	if err != nil {
@@ -199,9 +706,12 @@ func (r *PB2BVRewriter) rewriteApp(decl ast.ASTHandle, args ast.AppArguments, ou
 		}
 	}
 	if !unsigned || !unit {
-		// Weighted conversion and arithmetic-ITE recognition are the next
-		// retained source slice; leave them visible to the caller for now.
-		return RewriteFailed, nil
+		result, err := r.weightedPB(kind, decl, args, bound)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		r.numTranslated++
+		return RewriteDone, r.manager.SetRef(out, result)
 	}
 	result, err := r.cardinality(true, kind, k, args)
 	if err != nil {
@@ -225,6 +735,16 @@ func (r *PB2BVRewriter) NumSteps() (uint32, error) {
 	}
 	return r.traversal.NumSteps()
 }
+
+func (r *PB2BVRewriter) Manager() (*ast.ASTManager, error) {
+	if err := r.open(); err != nil {
+		return nil, err
+	}
+	return r.manager, nil
+}
+
+// UpdateParams is intentionally empty, as in the source implementation.
+func (r *PB2BVRewriter) UpdateParams(_ *uparams.ParamsRef) error { return r.open() }
 
 func (r *PB2BVRewriter) NumTranslated() (uint32, error) {
 	if err := r.open(); err != nil {
@@ -290,13 +810,18 @@ func (r *PB2BVRewriter) Statistics() (ast.PsortASTStats, error) {
 	return r.network.Stats()
 }
 
-func (r *PB2BVRewriter) Close() error {
-	if r == nil || r.self != r {
-		return ast.ErrASTHandle
+func (r *PB2BVRewriter) CollectStatistics() (PB2BVStatistics, error) {
+	if err := r.open(); err != nil {
+		return PB2BVStatistics{}, err
 	}
-	if r.closed {
-		return nil
+	stats, err := r.network.Stats()
+	if err != nil {
+		return PB2BVStatistics{}, err
 	}
+	return PB2BVStatistics{AuxiliaryVariables: uint32(len(r.fresh)), AuxiliaryClauses: stats.CompiledClauses}, nil
+}
+
+func (r *PB2BVRewriter) destroyMembers() error {
 	if r.traversal != nil {
 		if err := r.traversal.Close(); err != nil {
 			return err
@@ -334,6 +859,34 @@ func (r *PB2BVRewriter) Close() error {
 			return err
 		}
 		r.pseudo = nil
+	}
+	return nil
+}
+
+// Cleanup reconstructs the complete source implementation while retaining the
+// outer owner and borrowed manager.
+func (r *PB2BVRewriter) Cleanup() error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	if err := r.destroyMembers(); err != nil {
+		return err
+	}
+	r.freshSeen = 0
+	r.numTranslated = 0
+	r.arithFamily = ast.NullFamilyID
+	return r.constructMembers()
+}
+
+func (r *PB2BVRewriter) Close() error {
+	if r == nil || r.self != r {
+		return ast.ErrASTHandle
+	}
+	if r.closed {
+		return nil
+	}
+	if err := r.destroyMembers(); err != nil {
+		return err
 	}
 	r.manager.Budget().Release(r.header)
 	r.header = 0

@@ -9,6 +9,10 @@ import (
 func pb2BVFixture(t *testing.T) (*ast.ASTManager, *PB2BVRewriter) {
 	t.Helper()
 	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
 	r, err := NewPB2BVRewriter(m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
@@ -58,7 +62,7 @@ func TestPB2BVCardinalityTraversalAndOrShortcut(t *testing.T) {
 	}
 }
 
-func TestPB2BVWeightedSliceRemainsVisibleAndScopeGuards(t *testing.T) {
+func TestPB2BVWeightedConversionAndScopeGuards(t *testing.T) {
 	m, r := pb2BVFixture(t)
 	a := goalTestAtom(t, m, "pb2bv-weight-a")
 	b := goalTestAtom(t, m, "pb2bv-weight-b")
@@ -69,11 +73,20 @@ func TestPB2BVWeightedSliceRemainsVisibleAndScopeGuards(t *testing.T) {
 	astTestMust(t, r.Rewrite(weighted, out))
 	got, err := m.RefGet(out)
 	astTestMust(t, err)
-	if got != weighted {
-		t.Fatal("unported weighted slice was hidden", got, weighted)
+	if got == weighted {
+		t.Fatal("weighted constraint was not translated")
 	}
-	if translated, e := r.NumTranslated(); e != nil || translated != 0 {
-		t.Fatal("weighted refusal count", translated, e)
+	if kind, e := m.GetDeclKind(got); e != nil || kind != ast.ASTOpAnd {
+		t.Fatal("dualized weighted result", kind, e)
+	}
+	if left, e := m.GetArg(got, 0); e != nil || left != a {
+		t.Fatal("dualized first literal", left, a, e)
+	}
+	if right, e := m.GetArg(got, 1); e != nil || right != b {
+		t.Fatal("dualized second literal", right, b, e)
+	}
+	if translated, e := r.NumTranslated(); e != nil || translated != 1 {
+		t.Fatal("weighted translation count", translated, e)
 	}
 
 	astTestMust(t, r.Push())
@@ -92,6 +105,27 @@ func TestPB2BVWeightedSliceRemainsVisibleAndScopeGuards(t *testing.T) {
 	}
 }
 
+func TestPB2BVArithmeticBooleanITERecognition(t *testing.T) {
+	m, r := pb2BVFixture(t)
+	a := goalTestAtom(t, m, "pb2bv-arithmetic-a")
+	zero := arithRewriterNumeral(t, m, "0", true)
+	two := arithRewriterNumeral(t, m, "2", true)
+	conditional, err := m.MkIte(a, two, zero)
+	astTestMust(t, err)
+	comparison, err := m.MkFamilyApp(r.arithFamily, arithOpGE, nil, []ast.ASTHandle{conditional, two})
+	astTestMust(t, err)
+	out := astTestPin(t, m, comparison)
+	astTestMust(t, r.Rewrite(comparison, out))
+	got, err := m.RefGet(out)
+	astTestMust(t, err)
+	if got != a {
+		t.Fatal("arithmetic ITE comparison", got, a)
+	}
+	if translated, e := r.NumTranslated(); e != nil || translated != 1 {
+		t.Fatal("arithmetic translation count", translated, e)
+	}
+}
+
 func TestPB2BVCloseGuards(t *testing.T) {
 	m, r := pb2BVFixture(t)
 	a := goalTestAtom(t, m, "pb2bv-close")
@@ -99,5 +133,37 @@ func TestPB2BVCloseGuards(t *testing.T) {
 	astTestMust(t, r.Close())
 	if err := r.Rewrite(a, out); err != ast.ErrASTHandle {
 		t.Fatal("closed rewriter accepted traversal", err)
+	}
+}
+
+func TestPB2BVCleanupReconstructsImplementation(t *testing.T) {
+	m, r := pb2BVFixture(t)
+	a := goalTestAtom(t, m, "pb2bv-cleanup-a")
+	b := goalTestAtom(t, m, "pb2bv-cleanup-b")
+	constraint, err := m.MkPseudoBooleanAtMost([]ast.ASTHandle{a, b}, 1)
+	astTestMust(t, err)
+	astTestPin(t, m, constraint)
+	out := astTestPin(t, m, constraint)
+	astTestMust(t, r.Rewrite(constraint, out))
+	if translated, e := r.NumTranslated(); e != nil || translated != 1 {
+		t.Fatal("pre-cleanup translation", translated, e)
+	}
+	manager, err := r.Manager()
+	astTestMust(t, err)
+	if manager != m {
+		t.Fatal("manager borrow changed")
+	}
+	astTestMust(t, r.Cleanup())
+	if translated, e := r.NumTranslated(); e != nil || translated != 0 {
+		t.Fatal("cleanup translation reset", translated, e)
+	}
+	stats, err := r.CollectStatistics()
+	astTestMust(t, err)
+	if stats != (PB2BVStatistics{}) {
+		t.Fatal("cleanup statistics reset", stats)
+	}
+	astTestMust(t, r.Rewrite(constraint, out))
+	if translated, e := r.NumTranslated(); e != nil || translated != 1 {
+		t.Fatal("post-cleanup translation", translated, e)
 	}
 }
