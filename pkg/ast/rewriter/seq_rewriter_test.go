@@ -368,3 +368,67 @@ func TestSequenceRewriterConstantLengthExtractAtAndIndex(t *testing.T) {
 		t.Fatalf("unit at: status=%d result=%v", status, result)
 	}
 }
+
+func TestSequenceRewriterIntegerStringConversions(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	checkString := func(input ast.ASTHandle, want string) {
+		t.Helper()
+		status, e := rw.RewriteIntToString(input, out)
+		astTestMust(t, e)
+		result, e := m.RefGet(out)
+		astTestMust(t, e)
+		text, matched, e := m.SequenceStringValue(result)
+		astTestMust(t, e)
+		if status != RewriteDone || !matched || text != want {
+			t.Fatalf("int.to.str: status=%d text=%q matched=%v want=%q", status, text, matched, want)
+		}
+	}
+	checkString(arithRewriterNumeral(t, m, "123456789012345678901234567890", true), "123456789012345678901234567890")
+	checkString(arithRewriterNumeral(t, m, "12", false), "12")
+	checkString(arithRewriterNumeral(t, m, "-1", true), "")
+	checkString(arithRewriterNumeral(t, m, "1/2", false), "")
+
+	checkInteger := func(text, want string) {
+		t.Helper()
+		value, e := m.MkString(text)
+		astTestMust(t, e)
+		astTestPin(t, m, value)
+		status, e := rw.RewriteStringToInt(value, out)
+		astTestMust(t, e)
+		result, e := m.RefGet(out)
+		astTestMust(t, e)
+		got, integer, matched, e := m.ArithmeticNumeralText(result)
+		astTestMust(t, e)
+		if status != RewriteDone || !matched || !integer || got != want {
+			t.Fatalf("str.to.int %q: status=%d got=%q integer=%v matched=%v want=%q", text, status, got, integer, matched, want)
+		}
+	}
+	checkInteger("987654321098765432109876543210", "987654321098765432109876543210")
+	checkInteger("", "-1")
+	checkInteger("12x", "-1")
+	checkInteger("\xff", "-1")
+
+	zero := arithRewriterNumeral(t, m, "0", true)
+	intSort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "stoi-x"), intSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	itos, err := m.MkIntToString(x)
+	astTestMust(t, err)
+	astTestPin(t, m, itos)
+	status, err := rw.RewriteStringToInt(itos, out)
+	astTestMust(t, err)
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || status != RewriteDone || kind != ast.ASTOpIte {
+		t.Fatalf("stoi(itos(x)): status=%d kind=%d error=%v", status, kind, e)
+	}
+}

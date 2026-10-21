@@ -195,3 +195,24 @@ func (m *ASTManager) SequenceUnitByteElementValue(h ASTHandle) (value byte, matc
 	}
 	return byte(u), true, nil
 }
+
+func (m *ASTManager) SequenceIntToStringArgument(h ASTHandle) (ASTHandle, bool, error) {
+	if err := m.lock(); err != nil {
+		return ASTHandle{}, false, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireExpr(h)
+	if err != nil {
+		return ASTHandle{}, false, err
+	}
+	if m.nodeAt(r.slot).kind != ASTApp || m.sequencePlugin == nil {
+		return ASTHandle{}, false, nil
+	}
+	a := m.appAt(r.slot)
+	family, kind, err := m.declIdentity(a.decl)
+	if err != nil || family != m.sequencePlugin.family || kind != 27 || a.count != 1 {
+		return ASTHandle{}, false, err
+	}
+	argument, err := m.readInternal(a.args, 0)
+	return m.external(argument), err == nil, err
+}

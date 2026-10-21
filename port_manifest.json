@@ -33510,7 +33510,8 @@
         "TestSequenceRewriterByteUnit",
         "TestSequenceRewriterConstantPredicates",
         "TestSequenceRewriterReplaceSourceBranches",
-        "TestSequenceRewriterConstantLengthExtractAtAndIndex"
+        "TestSequenceRewriterConstantLengthExtractAtAndIndex",
+        "TestSequenceRewriterIntegerStringConversions"
       ],
       "assertions": [
         {
@@ -33787,6 +33788,14 @@
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",
           "tests": [
             "TestSequenceRewriterConstantLengthExtractAtAndIndex"
+          ]
+        },
+        {
+          "name": "seq_rewriter::mk_str_itos and mk_str_stoi exact numeral/String conversion, invalid-value sentinels and nested int.to.str conditional (seq_rewriter.cpp:1097-1144)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterIntegerStringConversions"
           ]
         }
       ],
@@ -34466,7 +34475,8 @@
         "TestASTSequenceStringValueClassification",
         "TestASTSequenceParameterizedLoopAndSkolem",
         "TestASTSequenceUtilitySortAndExpressionRecognizers",
-        "TestASTSequenceConcatUtilitiesAndRegexLoopRecognition"
+        "TestASTSequenceConcatUtilitiesAndRegexLoopRecognition",
+        "TestSequenceRewriterIntegerStringConversions"
       ],
       "conditionals": [
         {
@@ -34541,6 +34551,14 @@
           "go_target": "pkg/ast/ast_seq_utility.go",
           "tests": [
             "TestASTSequenceConcatUtilitiesAndRegexLoopRecognition"
+          ]
+        },
+        {
+          "name": "seq_util::str int.to.str unary operand recognition used by str.to.int rewriting (seq_decl_plugin.h:276,301)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_utility.go",
+          "tests": [
+            "TestSequenceRewriterIntegerStringConversions"
           ]
         }
       ],

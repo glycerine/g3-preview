@@ -60,6 +60,18 @@ func (r *SequenceRewriter) integerValue(h ast.ASTHandle) (*big.Int, bool, error)
 	return value, true, nil
 }
 
+func (r *SequenceRewriter) rationalValue(h ast.ASTHandle) (*big.Rat, bool, error) {
+	text, _, matched, err := r.manager.ArithmeticNumeralText(h)
+	if err != nil || !matched {
+		return nil, false, err
+	}
+	value, ok := new(big.Rat).SetString(text)
+	if !ok {
+		return nil, false, ast.ErrASTDomain
+	}
+	return value, true, nil
+}
+
 func (r *SequenceRewriter) assignInteger(value *big.Int, out ast.ASTRef) (status RewriteStatus, err error) {
 	result, err := r.makeInteger(value)
 	if err != nil {
@@ -384,6 +396,98 @@ func (r *SequenceRewriter) RewriteIndex(a, needle, offset ast.ASTHandle, out ast
 		return RewriteDone, r.manager.SetRef(out, offset)
 	}
 	return RewriteFailed, nil
+}
+
+func (r *SequenceRewriter) RewriteIntToString(a ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if err := r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	value, matched, err := r.rationalValue(a)
+	if err != nil || !matched {
+		return RewriteFailed, err
+	}
+	text := ""
+	if value.IsInt() && value.Sign() >= 0 {
+		text = value.Num().String()
+	}
+	result, err := r.manager.MkString(text)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteDone, r.manager.SetRef(out, result)
+}
+
+func (r *SequenceRewriter) RewriteStringToInt(a ast.ASTHandle, out ast.ASTRef) (status RewriteStatus, err error) {
+	if err = r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	text, stringValue, err := r.manager.SequenceStringValue(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if stringValue {
+		valid := text != ""
+		for i := 0; valid && i < len(text); i++ {
+			valid = '0' <= text[i] && text[i] <= '9'
+		}
+		if !valid {
+			return r.assignInteger(big.NewInt(-1), out)
+		}
+		value, ok := new(big.Int).SetString(text, 10)
+		if !ok {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		return r.assignInteger(value, out)
+	}
+	integer, matched, err := r.manager.SequenceIntToStringArgument(a)
+	if err != nil || !matched {
+		return RewriteFailed, err
+	}
+	zero, err := r.makeInteger(big.NewInt(0))
+	if err != nil {
+		return RewriteFailed, err
+	}
+	refs := make([]ast.ASTRef, 0, 3)
+	defer func() {
+		for i := len(refs) - 1; i >= 0; i-- {
+			err = errors.Join(err, r.manager.DelRef(&refs[i]))
+		}
+	}()
+	zeroRef, err := r.manager.NewRef(zero)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	refs = append(refs, zeroRef)
+	minusOne, err := r.makeInteger(big.NewInt(-1))
+	if err != nil {
+		return RewriteFailed, err
+	}
+	minusOneRef, err := r.manager.NewRef(minusOne)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	refs = append(refs, minusOneRef)
+	family, err := r.manager.ArithmeticFamilyID()
+	if err != nil {
+		return RewriteFailed, err
+	}
+	ge, err := r.manager.MkFamilyApp(family, 3, nil, []ast.ASTHandle{integer, zero})
+	if err != nil {
+		return RewriteFailed, err
+	}
+	geRef, err := r.manager.NewRef(ge)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	refs = append(refs, geRef)
+	result, err := r.manager.MkIte(ge, integer, minusOne)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if err = r.manager.SetRef(out, result); err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteDone, nil
 }
 
 func (r *SequenceRewriter) RewriteContains(a, b ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
