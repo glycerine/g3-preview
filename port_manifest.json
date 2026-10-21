@@ -34167,6 +34167,7 @@
         "pkg/ast/ast_seq_plugin.go",
         "pkg/ast/ast_seq_string.go",
         "pkg/ast/ast_seq_values.go",
+        "pkg/ast/ast_seq_names.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_seq_signature_memory_trace.go",
         "pkg/ast/ast_seq_plugin_source_test.go",
@@ -34178,7 +34179,8 @@
         "TestASTSequenceNativeSignatureOwnershipAndFinalize",
         "TestASTSequenceSignatureMemoryWrappersSourceOrder",
         "TestASTSMT2StringLiteralSourceEncoding",
-        "TestASTSequenceStringValueClassification"
+        "TestASTSequenceStringValueClassification",
+        "TestASTSequenceSourceBuiltinNames"
       ],
       "conditionals": [
         {
@@ -34276,6 +34278,14 @@
           "go_target": "pkg/ast/ast_seq_values.go",
           "tests": [
             "TestASTSequenceStringValueClassification"
+          ]
+        },
+        {
+          "name": "seq_decl_plugin::get_op_names and get_sort_names initialized signature and compatibility aliases (seq_decl_plugin.cpp:826-842)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_names.go",
+          "tests": [
+            "TestASTSequenceSourceBuiltinNames"
           ]
         }
       ],
