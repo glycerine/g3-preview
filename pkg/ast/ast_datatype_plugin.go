@@ -1,7 +1,8 @@
 // Source: src/ast/datatype_decl_plugin.h:237-246;
 // src/ast/datatype_decl_plugin.cpp:150-162.
-// Datatype definitions and utility operations remain unported; registration
-// needs no copied container storage for their unused members.
+// The definition maps own the concrete datatype definition graph. Node
+// references retained by that graph are recorded in definitionRefs and are
+// released before the plugin's native Go containers are discarded.
 package ast
 
 import (
@@ -15,6 +16,20 @@ type astDatatypeAccessorKey struct {
 	constructor usymbol.Symbol
 }
 
+type astDatatypeDefinition struct {
+	name         usymbol.Symbol
+	classID      uint32
+	sort         astNodeRef
+	parameters   []astNodeRef
+	constructors []astDatatypeConstructorDefinition
+}
+
+type astDatatypeConstructorDefinition struct {
+	name, recognizer usymbol.Symbol
+	ranges           []astNodeRef
+	accessors        []usymbol.Symbol
+}
+
 type astDatatypePluginOwner struct {
 	self                                  *astDatatypePluginOwner
 	owner                                 *ASTManager
@@ -23,6 +38,10 @@ type astDatatypePluginOwner struct {
 	header                                uint64
 	bodyCause                             error
 	accessors                             map[astDatatypeAccessorKey][]usymbol.Symbol
+	definitions                           map[astNodeRef]*astDatatypeDefinition
+	definitionNames                       map[usymbol.Symbol]*astDatatypeDefinition
+	definitionRefs                        []astNodeRef
+	classID                               uint32
 	completed, published, memoryTraceLive bool
 	membersEnded                          bool
 }
@@ -45,6 +64,8 @@ func (m *ASTManager) registerDatatypePlugin() (FamilyID, error) {
 	}
 	p := &astDatatypePluginOwner{owner: m, header: bytes, next: m.datatypePluginFailed}
 	p.accessors = make(map[astDatatypeAccessorKey][]usymbol.Symbol)
+	p.definitions = make(map[astNodeRef]*astDatatypeDefinition)
+	p.definitionNames = make(map[usymbol.Symbol]*astDatatypeDefinition)
 	p.self = p
 	m.traceRegisteredPluginAllocated(p.traceIdentity(), p.header, 41, "datatype_decl_plugin", &p.memoryTraceLive)
 	m.datatypePluginFailed = p
@@ -108,8 +129,24 @@ func (m *ASTManager) finalizeDatatypePlugin() error {
 	if p == nil || p.membersEnded {
 		return nil
 	}
+	for len(p.definitionRefs) != 0 {
+		last := len(p.definitionRefs) - 1
+		ref := p.definitionRefs[last]
+		consumed, err := m.decNode(ref)
+		if consumed {
+			p.definitionRefs[last] = astNodeRef{}
+			p.definitionRefs = p.definitionRefs[:last]
+		}
+		if err != nil {
+			return err
+		}
+	}
 	p.membersEnded = true
 	clear(p.accessors)
 	p.accessors = nil
+	clear(p.definitions)
+	p.definitions = nil
+	clear(p.definitionNames)
+	p.definitionNames = nil
 	return nil
 }
