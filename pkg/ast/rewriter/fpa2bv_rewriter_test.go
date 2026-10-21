@@ -149,6 +149,11 @@ func TestFPA2BVRewriterArithmeticDispatch(t *testing.T) {
 	if got = f.rewrite(t, multiplication); got != want {
 		t.Fatal("zero times infinity did not lower to NaN", got, want)
 	}
+	division, err := f.m.MkFamilyApp(f.family, ast.FPAOpDiv, nil, []ast.ASTHandle{rounding, zero, zero})
+	astTestMust(t, err)
+	if got = f.rewrite(t, division); got != want {
+		t.Fatal("zero divided by zero did not lower to NaN", got, want)
+	}
 
 	left := astTestSymbol(t, f.m, "add-x")
 	right := astTestSymbol(t, f.m, "add-y")

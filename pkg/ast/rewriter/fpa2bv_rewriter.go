@@ -281,15 +281,17 @@ func (c *fpa2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArgument
 			} else {
 				value, err = converter.Abs(values[0])
 			}
-		case ast.FPAOpAdd, ast.FPAOpSub, ast.FPAOpMul:
+		case ast.FPAOpAdd, ast.FPAOpSub, ast.FPAOpMul, ast.FPAOpDiv:
 			if len(values) != 3 {
 				err = ast.ErrASTDomain
 			} else if kind == ast.FPAOpAdd {
 				value, err = converter.Add(values[0], values[1], values[2])
 			} else if kind == ast.FPAOpSub {
 				value, err = converter.Sub(values[0], values[1], values[2])
-			} else {
+			} else if kind == ast.FPAOpMul {
 				value, err = converter.Mul(values[0], values[1], values[2])
+			} else {
+				value, err = converter.Div(values[0], values[1], values[2])
 			}
 		case ast.FPAOpMin, ast.FPAOpMax:
 			if len(values) != 2 {
