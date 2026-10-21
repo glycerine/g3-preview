@@ -125,6 +125,7 @@ func (c *Candidates) Close() error {
 type Util struct {
 	manager   *ast.ASTManager
 	forbidden map[ast.ASTHandle]struct{}
+	clause    ast.ASTHandle
 }
 
 func NewUtil(m *ast.ASTManager) (*Util, error) {
@@ -347,47 +348,4 @@ func (u *Util) NormalizeExpr(head ast.ASTHandle, declarations uint32, term ast.A
 	}
 	defer func() { result = errors.Join(result, s.Close()) }()
 	return s.Substitute(term, mapping, out)
-}
-
-func (u *Util) CollectMacroCandidates(atom ast.ASTHandle, declarations uint32, candidates *Candidates) (result error) {
-	if candidates == nil || candidates.manager != u.manager {
-		return ast.ErrASTHandle
-	}
-	if err := candidates.Reset(); err != nil {
-		return err
-	}
-	head, def, yes, err := u.IsLeftSimpleMacro(atom, declarations)
-	if err != nil {
-		return err
-	}
-	if !yes {
-		head, def, yes, err = u.IsRightSimpleMacro(atom, declarations)
-		if err != nil {
-			return err
-		}
-	}
-	if !yes {
-		return nil
-	}
-	d, err := u.manager.GetDecl(head)
-	if err != nil {
-		return err
-	}
-	norm, err := u.manager.NewRef(ast.ASTHandle{})
-	if err != nil {
-		return err
-	}
-	defer func() { result = errors.Join(result, u.manager.DelRef(&norm)) }()
-	if err = u.NormalizeExpr(head, declarations, def, norm); err != nil {
-		return err
-	}
-	definition, err := u.manager.RefGet(norm)
-	if err != nil {
-		return err
-	}
-	truth, err := u.manager.MkTrue()
-	if err != nil {
-		return err
-	}
-	return candidates.Insert(Candidate{Declaration: d, Definition: definition, Condition: truth, SatisfyAtom: true})
 }

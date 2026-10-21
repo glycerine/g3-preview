@@ -19993,11 +19993,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/macros/macro_util.go",
+        "pkg/ast/macros/macro_candidates.go",
         "pkg/ast/macros/macro_util_test.go"
       ],
       "tests": [
         "TestMacroUtilHeadsSimpleMacrosAndForbiddenDeclarations",
-        "TestMacroUtilQuasiHeadNormalizationAndCandidates"
+        "TestMacroUtilQuasiHeadNormalizationAndCandidates",
+        "TestMacroUtilQuasiConversionClauseConditionsAndHints"
       ],
       "assertions": [
         {
@@ -20054,7 +20056,15 @@
           ]
         },
         {
-          "name": "arithmetic, bit-vector, pseudo-predicate, hint, quasi-head conversion and clause-wide candidate collection",
+          "name": "hint support, quasi-head conversion and clause-wide structural candidate collection",
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_candidates.go",
+          "tests": [
+            "TestMacroUtilQuasiConversionClauseConditionsAndHints"
+          ]
+        },
+        {
+          "name": "arithmetic, bit-vector and pseudo-predicate helpers and arithmetic candidate collection",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -20064,7 +20074,7 @@
         "Candidate rows own declaration, definition and condition AST references and retire them in reverse row order. Util borrows its AST manager and forbidden declaration identities; normalization owns and closes its variable-substitution scratch."
       ],
       "deviations": [
-        "This checkpoint covers the dependency-free structural front of macro_util. Arithmetic and bit-vector normalization and the full quantified/clause candidate collector remain open, so the source unit remains partial."
+        "Arithmetic, bit-vector and pseudo-predicate operations remain open, so the source unit remains partial."
       ]
     },
     {
@@ -20074,11 +20084,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/macros/macro_util.go",
+        "pkg/ast/macros/macro_candidates.go",
         "pkg/ast/macros/macro_util_test.go"
       ],
       "tests": [
         "TestMacroUtilHeadsSimpleMacrosAndForbiddenDeclarations",
-        "TestMacroUtilQuasiHeadNormalizationAndCandidates"
+        "TestMacroUtilQuasiHeadNormalizationAndCandidates",
+        "TestMacroUtilQuasiConversionClauseConditionsAndHints"
       ],
       "conditionals": [
         {
@@ -20103,7 +20115,15 @@
           ]
         },
         {
-          "name": "remaining arithmetic, bit-vector, pseudo-predicate and full candidate collection public surface",
+          "name": "quasi-head conversion, hint recognition and quantified/clause candidate collection public surface",
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_candidates.go",
+          "tests": [
+            "TestMacroUtilQuasiConversionClauseConditionsAndHints"
+          ]
+        },
+        {
+          "name": "remaining arithmetic, bit-vector and pseudo-predicate public surface",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -20113,7 +20133,7 @@
         "Candidates is a noncopyable owning Go value over native rows; Util is a borrowed manager-local helper."
       ],
       "deviations": [
-        "Partial structural checkpoint; remaining header operations track the open cpp implementation."
+        "Arithmetic, bit-vector and pseudo-predicate header operations remain open."
       ]
     },
     {

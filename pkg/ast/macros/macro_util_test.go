@@ -130,13 +130,96 @@ func TestMacroUtilQuasiHeadNormalizationAndCandidates(t *testing.T) {
 	must(t, err)
 	t.Cleanup(func() { must(t, candidates.Close()) })
 	must(t, u.CollectMacroCandidates(eq, 2, candidates))
-	if candidates.Len() != 1 {
+	if candidates.Len() != 2 {
 		t.Fatalf("candidates = %d", candidates.Len())
 	}
 	row, err := candidates.At(0)
 	must(t, err)
 	if row.Declaration != g || row.Definition != want || !m.IsTrue(row.Condition) || !row.SatisfyAtom {
 		t.Fatal("candidate row", row)
+	}
+}
+
+func TestMacroUtilQuasiConversionClauseConditionsAndHints(t *testing.T) {
+	m := fixture(t)
+	u, err := macros.NewUtil(m)
+	must(t, err)
+	b, err := m.MkBoolSort()
+	must(t, err)
+	v0, err := m.MkVar(0, b)
+	must(t, err)
+	f := declaration(t, m, "candidate-f", []ast.ASTHandle{b, b}, b)
+	duplicate, err := m.MkApp(f, []ast.ASTHandle{v0, v0})
+	must(t, err)
+	headRef, err := m.NewRef(ast.ASTHandle{})
+	must(t, err)
+	t.Cleanup(func() { must(t, m.DelRef(&headRef)) })
+	conditionRef, err := m.NewRef(ast.ASTHandle{})
+	must(t, err)
+	t.Cleanup(func() { must(t, m.DelRef(&conditionRef)) })
+	declarations, err := u.QuasiMacroHeadToMacroHead(duplicate, 1, headRef, conditionRef)
+	must(t, err)
+	if declarations != 2 {
+		t.Fatal("converted declaration count", declarations)
+	}
+	converted, err := m.RefGet(headRef)
+	must(t, err)
+	if yes, e := u.IsMacroHead(converted, 2); e != nil || !yes {
+		t.Fatal("converted head", yes, e)
+	}
+	v1, err := m.MkVar(1, b)
+	must(t, err)
+	wantCondition, err := m.MkEq(v1, v0)
+	must(t, err)
+	condition, err := m.RefGet(conditionRef)
+	must(t, err)
+	if condition != wantCondition {
+		t.Fatal("quasi conversion condition", condition, wantCondition)
+	}
+
+	valueSort, err := m.MkUninterpretedSort(mustSymbol(t, m, "candidate-value"), nil)
+	must(t, err)
+	oneArg := declaration(t, m, "candidate-one", []ast.ASTHandle{b}, valueSort)
+	oneHead, err := m.MkApp(oneArg, []ast.ASTHandle{v0})
+	must(t, err)
+	ground, err := m.MkConst(mustSymbol(t, m, "candidate-ground"), valueSort)
+	must(t, err)
+	equality, err := m.MkEq(oneHead, ground)
+	must(t, err)
+	guard, err := m.MkConst(mustSymbol(t, m, "candidate-guard"), b)
+	must(t, err)
+	clause, err := m.MkOr(equality, guard)
+	must(t, err)
+	q, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{mustSymbol(t, m, "candidate-x")}, Body: clause})
+	must(t, err)
+	candidates, err := macros.NewCandidates(m)
+	must(t, err)
+	t.Cleanup(func() { must(t, candidates.Close()) })
+	must(t, u.CollectQuantifierCandidates(q, candidates))
+	if candidates.Len() != 1 {
+		t.Fatalf("clause candidates = %d", candidates.Len())
+	}
+	row, err := candidates.At(0)
+	must(t, err)
+	wantGuard, err := m.MkNotSimplified(guard)
+	must(t, err)
+	if row.Declaration != oneArg || row.Definition != ground || row.Condition != wantGuard || row.Hint || !row.SatisfyAtom {
+		t.Fatal("conditional clause candidate", row)
+	}
+
+	hintDecl := declaration(t, m, "candidate-hint", []ast.ASTHandle{b}, b)
+	hintHead, err := m.MkApp(hintDecl, []ast.ASTHandle{v0})
+	must(t, err)
+	hintEquality, err := m.MkEq(hintHead, v0)
+	must(t, err)
+	must(t, u.CollectMacroCandidates(hintEquality, 2, candidates))
+	if candidates.Len() != 1 {
+		t.Fatalf("hint candidates = %d", candidates.Len())
+	}
+	row, err = candidates.At(0)
+	must(t, err)
+	if row.Declaration != hintDecl || row.Definition != v0 || !row.Condition.IsNull() || !row.Hint {
+		t.Fatal("hint candidate", row)
 	}
 }
 
