@@ -31787,7 +31787,7 @@
       "path": "src/ast/rewriter/poly_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/bv_polynomial_order.go",
         "pkg/ast/rewriter/bv_polynomial_order_test.go",
@@ -31840,7 +31840,13 @@
         "pkg/ast/rewriter/bv_polynomial_cancel_test.go",
         "pkg/ast/rewriter/bv_polynomial_cancel_numeric_test.go",
         "pkg/ast/rewriter/bv_polynomial_sort.go",
-        "pkg/ast/ast_bv_polynomial_cancel_numerals_test.go"
+        "pkg/ast/ast_bv_polynomial_cancel_numerals_test.go",
+        "pkg/ast/rewriter/arith_polynomial.go",
+        "pkg/ast/rewriter/arith_rewriter.go",
+        "pkg/ast/rewriter/arith_algebraic.go",
+        "pkg/ast/rewriter/arith_rewriter_test.go",
+        "pkg/ast/rewriter/polynomial_shapes.go",
+        "pkg/ast/rewriter/polynomial_shapes_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -31943,7 +31949,12 @@
         "TestBVPolynomialCancellationNativeResetActualAllocationPrefixes",
         "TestBVPolynomialCancellationEveryActualNumericReservation",
         "TestASTBitVectorCancellationNumeralsExplicitZeroAndExactSubtraction",
-        "TestBVPolynomialCancellationNativeMembershipPreservesForeignMarkPlanes"
+        "TestBVPolynomialCancellationNativeMembershipPreservesForeignMarkPlanes",
+        "TestArithRewriterPolynomialAddMulSubAndNegation",
+        "TestArithRewriterPolynomialCancellation",
+        "TestArithRewriterAdvancedPolynomialModes",
+        "TestArithmeticPolynomialShapeRecognizers",
+        "TestBitVectorPolynomialShapeRecognizers"
       ],
       "conditionals": [
         {
@@ -31973,12 +31984,12 @@
           "text": "SASSERT(num_args > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "original mon_lt comparator/ordinal specialized for BV use_power()==false: structural AST ordering or signed monomial ordinal, essentially-variable family guard, numeral-first multiplication and constant minus-one ordinal (src/ast/rewriter/poly_rewriter_def.h:490-523; src/ast/rewriter/poly_rewriter.h:88-94; src/ast/rewriter/bv_rewriter.h:43)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_order.go",
           "tests": [
             "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -31988,7 +31999,7 @@
         },
         {
           "name": "original identity-only get_power_product overload with multiplication/exact-two-arity/numeral guards and borrowed second-operand return (src/ast/rewriter/poly_rewriter_def.h:403-408)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_order.go",
           "tests": [
             "TestBVPolynomialPowerProductBorrowingAndUnreadNumeralMetadata"
@@ -31996,7 +32007,7 @@
         },
         {
           "name": "original is_mul coefficient/power-product matcher for BV Config: identity/exact-two-arity guards, stored numeral copy into caller coefficient, then borrowed second-operand publication (src/ast/rewriter/poly_rewriter_def.h:418-426; src/ast/rewriter/poly_rewriter.h:85; src/ast/rewriter/bv_rewriter.h:36)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_coefficient.go",
           "tests": [
             "TestBVPolynomialCoefficientProductSourceGuardsAndBorrowedPublication",
@@ -32005,7 +32016,7 @@
         },
         {
           "name": "original BV-specialized mk_add_app empty integer-zero numeral, borrowed singleton, and borrowed variadic application factory (src/ast/rewriter/poly_rewriter_def.h:47-53; src/ast/rewriter/poly_rewriter.h:55)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_factory.go",
           "tests": [
             "TestASTBitVectorPolynomialVariadicFactorySourceCases",
@@ -32015,7 +32026,7 @@
         },
         {
           "name": "original BV-specialized mk_mul_app empty integer-one numeral, borrowed singleton and variadic factory with Config use_power()==false (src/ast/rewriter/poly_rewriter_def.h:78-124; src/ast/rewriter/poly_rewriter.h:53; src/ast/rewriter/bv_rewriter.h:43)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_factory.go",
           "tests": [
             "TestASTBitVectorPolynomialVariadicFactorySourceCases",
@@ -32025,7 +32036,7 @@
         },
         {
           "name": "original coefficient mk_mul_app one guard, copied stored-numeral is_zero helper, normalized coefficient numeral and retained binary multiplication construction (src/ast/rewriter/poly_rewriter_def.h:70-74,127-138; src/ast/rewriter/poly_rewriter.h:54)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_factory.go",
           "tests": [
             "TestASTBitVectorPolynomialCoefficientFactoryOriginalShortcuts",
@@ -32034,7 +32045,7 @@
         },
         {
           "name": "original coefficient-valued get_power_product for BV Config: multiplication/binary-arity guards, stored numeral copy into caller receiver, borrowed product return, or distinct numeral-one construction/copy assignment/full-expression DT (src/ast/rewriter/poly_rewriter_def.h:410-416; src/ast/rewriter/poly_rewriter.h:61; src/ast/rewriter/bv_rewriter.h:36)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_power_product.go",
           "tests": [
             "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
@@ -32044,7 +32055,7 @@
         },
         {
           "name": "original polynomial m_expr2pos borrowed expr-to-unsigned map specialization: linear probing, growth before duplicate lookup, ascending-bucket rehash, retained reset and sparse reset shrink (src/ast/rewriter/poly_rewriter.h:32; src/ast/rewriter/poly_rewriter_def.h:570-586; src/util/obj_hashtable.h:58-159; src/util/hashtable.h:286-308,377-396,494-510)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_positions.go",
           "tests": [
             "TestBVPolynomialPositionsNativeGrowthUpdateAndBorrowedKeys",
@@ -32054,7 +32065,7 @@
         },
         {
           "name": "complete selected BV-specialized hoist_cmul_lt comparator: default coefficient locals, both coefficient-product reads, nonproducts first, unsigned expression IDs, separate less/greater calls and borrowed pp ID tie break (src/ast/rewriter/poly_rewriter_def.h:428-451; src/ast/rewriter/poly_rewriter.h:84)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_hoist_order.go",
           "tests": [
             "TestASTBitVectorPolynomialHoistOrderOriginalBranches",
@@ -32064,7 +32075,7 @@
         },
         {
           "name": "selected complete BV coefficient-hoist grouping body: comparator ordering, equal stored-coefficient runs, borrowed power-product buffer, original numeral reuse, in-place reference replacement and final resize (src/ast/rewriter/poly_rewriter_def.h:453-487; src/ast/rewriter/poly_rewriter.h:86)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_hoist.go",
           "tests": [
             "TestASTBitVectorCoefficientHoistOriginalGroupsAndLiteralReuse",
@@ -32077,7 +32088,7 @@
         },
         {
           "name": "selected complete BV merge_muls and shared TO_BUFFER flattening: replace head/appended siblings, identity matching/swapped common prefix, last visited factor current-sort publication, residual factories and final factored product (src/ast/rewriter/poly_rewriter_def.h:886-901,947-977; src/ast/rewriter/poly_rewriter.h:82)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_merge.go",
           "tests": [
             "TestBVPolynomialMergeOriginalFlattenAndMatchingSwaps",
@@ -32090,7 +32101,7 @@
         },
         {
           "name": "selected complete BV hoist_mul: borrowed factor map, validity flags, factor merger, exact zero assignment and final result publication (src/ast/rewriter/poly_rewriter_def.h:903-943)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_mul_hoist.go",
           "tests": [
             "TestBVPolynomialMultiplicationHoistDisabledAndNoChange",
@@ -32101,7 +32112,7 @@
         },
         {
           "name": "selected BV hoist zero assignment before rational(0) full-expression destruction (src/ast/rewriter/poly_rewriter_def.h:928)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_factory.go",
           "tests": [
             "TestASTBitVectorPolynomialZeroAssignmentLiteralLifetime"
@@ -32109,7 +32120,7 @@
         },
         {
           "name": "selected complete BV mk_nflat_add_core: original scan, repeated coefficient collection, first-encounter rebuild, shortcuts, monomial sorting and both hoists (src/ast/rewriter/poly_rewriter_def.h:527-660)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_add_core.go",
           "tests": [
             "TestBVPolynomialNonflatAdditionCollectsAndCancelsCoefficients",
@@ -32124,7 +32135,7 @@
         },
         {
           "name": "selected BV nonflat addition numeric locals and coefficient buffer with exact reads, accumulation, copy assignment, normalization and source DT (src/ast/rewriter/poly_rewriter_def.h:530-534,563,570-587,606-609)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_add_numerals.go",
           "tests": [
             "TestASTBitVectorPolynomialAdditionNumeralsPhysicalSlotsAndSourceEnd",
@@ -32133,7 +32144,7 @@
         },
         {
           "name": "selected complete BV mk_flat_add_core: first nested ADD scan, prefix append, depth-one expansion, nonflat call and FAILED fallback (src/ast/rewriter/poly_rewriter_def.h:371-400)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_flat_add.go",
           "tests": [
             "TestBVPolynomialFlatAdditionOnlyOneLevelAndOriginalOrder",
@@ -32144,7 +32155,7 @@
         },
         {
           "name": "selected complete BV mk_add_core caller: singleton assignment before current-sort read, then flat/nonflat dispatch (src/ast/rewriter/poly_rewriter.h:137-148)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_add_core.go",
           "tests": [
             "TestBVPolynomialAdditionApplicationSingletonErasesSortAndNumerics",
@@ -32153,7 +32164,7 @@
         },
         {
           "name": "selected complete BV mk_add convenience overloads: original-argument fallback after FAILED core return, and left-to-right two-element initializer (src/ast/rewriter/poly_rewriter.h:149-156)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_make_add.go",
           "tests": [
             "TestBVPolynomialMakeAdditionOriginalFallbackAndPair",
@@ -32163,7 +32174,7 @@
         },
         {
           "name": "selected BV mk_nflat_mul_core: cheap guard, physical coefficient folding, nested coefficient merging, scalar distribution, source comparator through Go sort, intermediate result assignment and Cartesian expansion with strict blowup check; native slices and explicit AST roots replace source storage without container/STL credit (src/ast/rewriter/poly_rewriter_def.h:198-367)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_mul_core.go",
           "tests": [
             "TestBVPolynomialNonflatMultiplicationCoefficientsAndNestedProduct",
@@ -32178,7 +32189,7 @@
         },
         {
           "name": "selected BV multiplication numeric locals: a before cheap guard, reached c(1), outer c_prime and separate debug shadow, exact reads/compound multiplication/normalization and reverse source DT (src/ast/rewriter/poly_rewriter_def.h:202-218,236-249,259-263)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_mul_numerals.go",
           "tests": [
             "TestASTBitVectorPolynomialMultiplicationNumeralsPlacementAndShadowLifetime",
@@ -32187,7 +32198,7 @@
         },
         {
           "name": "selected BV mk_flat_mul_core: coefficient-form guard, prefix append, reverse-child stack push, recursive flatten and FAILED fallback through native slices without source storage-failure credit (src/ast/rewriter/poly_rewriter_def.h:140-194)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_flat_mul.go",
           "tests": [
             "TestBVPolynomialFlatMultiplicationRecursiveFactorsAndCoefficientGuard",
@@ -32197,7 +32208,7 @@
         },
         {
           "name": "selected complete BV mk_mul_core and mk_mul overloads: singleton before sort, flat/nonflat selection and original-argument FAILED fallback after scope exit (src/ast/rewriter/poly_rewriter.h:125-136,157-164)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_mul_core.go",
           "tests": [
             "TestBVPolynomialMultiplicationCallerSingletonAndOriginalFallback",
@@ -32206,7 +32217,7 @@
         },
         {
           "name": "Selected configuration portion of constructor: sort_sums=false, two parameter updates and intervening debug constraints; independent set_flat/set_sort_sums (src/ast/rewriter/poly_rewriter.h:95-123); full Config/map/current-sort construction remains required",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_config.go",
           "tests": [
             "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
@@ -32219,7 +32230,7 @@
         },
         {
           "name": "Persistent BV polynomial owner: expression map constructed before configuration, shared physical current-sort writes through addition/multiplication/hoist/merger, singleton before sort/helper placement, configured core and convenience overloads, and borrowed map retained across source invocations (src/ast/rewriter/poly_rewriter.h:28-41,95-164; src/ast/rewriter/poly_rewriter_def.h:570-586,903-943; src/ast/rewriter/bv_rewriter.h:35-43)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_owner.go",
           "tests": [
             "TestBVPolynomialOwnerPersistentMapAndSharedSort",
@@ -32231,7 +32242,7 @@
         },
         {
           "name": "Complete selected BV mk_uminus body: default a before current-sort read, copied stored numeral, in-place negation/normalization/result or distinct -1 coefficient full expression through output assignment (src/ast/rewriter/poly_rewriter_def.h:667-681)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_neg.go",
           "tests": [
             "TestBVPolynomialUnaryMinusNumeralsAndSymbolicProduct",
@@ -32241,7 +32252,7 @@
         },
         {
           "name": "Complete selected BV mk_sub body and pair overload: singleton before sort, minus-one reference INC before literal DT, original ordered raw products and zero skipping, owning new_args and output before reverse argument/ref cleanup, fixed REWRITE2 status (src/ast/rewriter/poly_rewriter_def.h:683-701; src/ast/rewriter/poly_rewriter.h:169-172)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_sub.go",
           "tests": [
             "TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero",
@@ -32252,7 +32263,7 @@
         },
         {
           "name": "Complete selected BV cancel_monomials body: cross-side markers, exact constant/coefficient subtraction, persistent map reset, first-encounter rebuild, move-only sorting, constant placement and left-before-right result assignment with reverse scope destruction (src/ast/rewriter/poly_rewriter_def.h:708-883)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_cancel.go",
           "tests": [
             "TestBVPolynomialCancellationOriginalSidesAndMove",
@@ -32267,10 +32278,27 @@
         },
         {
           "name": "Cancellation caller numeric locals: explicit c(0) before default a, physical subtraction into c/coeffs[pos], in-place a/c negation, unnormalized coefficient zero test and separate coefficient NUM factory (src/ast/rewriter/poly_rewriter_def.h:720-721,743,799,815-821,840-842,869-870)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_add_numerals.go",
           "tests": [
             "TestASTBitVectorCancellationNumeralsExplicitZeroAndExactSubtraction"
+          ]
+        },
+        {
+          "name": "Complete arithmetic specialization and final shared shape helpers: power-body exponent folding, bound-variable-safe recognizers, is_times_minus_one, and is_var_plus_ground",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ast/rewriter/arith_polynomial.go",
+            "pkg/ast/rewriter/arith_rewriter.go",
+            "pkg/ast/rewriter/arith_algebraic.go",
+            "pkg/ast/rewriter/polynomial_shapes.go"
+          ],
+          "tests": [
+            "TestArithRewriterPolynomialAddMulSubAndNegation",
+            "TestArithRewriterPolynomialCancellation",
+            "TestArithRewriterAdvancedPolynomialModes",
+            "TestArithmeticPolynomialShapeRecognizers",
+            "TestBitVectorPolynomialShapeRecognizers"
           ]
         }
       ],
@@ -32278,9 +32306,12 @@
         "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited.",
         "BVPolynomialRewriter owns one actual borrowed-key positions table across invocations; addition helper borrows it and never destroys it. Dense resets preserve source capacity/backing. Core, hoist and merger bind directly to the same physical owner current-sort field before allocation/refusal, including last-factor sort writes. Singleton assignment precedes current-sort lookup and charged helper placement. Successful scopes source-end and owning-close before the next invocation; failed scopes remain captured and prohibit replay while exact child cleanup finishes. Concrete Go owner/helper/config wrappers and pair storage are charged. Every reached AST/parameter constructor and repeated-add/hoist body reservation is refused through success; each graph closes to zero. Existing final-reference deletion may allocate during singleton assignment, so allocation-free singleton tests first retire the unrelated old large output. Native layout/stack/process-global/temporary-elision/assertion/fatal/exception ABI, independently injected stopped source DT, broader polynomial methods/arith specialization and overall solver integration remain uncredited.",
         "Persistent owner captures concrete unary default/literal values or subtraction helper plus exact vector/ref/numeric children. Unary output assignment precedes -1 full-expression and outer a source DT. Subtraction constructs an owning minus-one reference after numeral-callee return but before outer literal DT, then places new_args; source exit ends vector before minus-one ref. Refused vector growth retains exact unpublished INC and saved original vector identity. Body refusal stops owner replay and retains actual prefix for two-phase numeric/AST owning cleanup. Width65 actual Runtime campaigns exercise copied big stored NUM, negation/normalization, minus-one modulo construction and zero reads; cold 40-operand campaign covers vector/factory allocations. Every graph closes to zero. Independently stopped source DT/final-reference deletion, native temporary/layout/process-global/fatal/assertion/exception ABI and broader polynomial/arith/solver completion remain uncredited.",
-        "Cancellation borrows actual input monomial views and a persistent native positions map. Cross-side visited/multiple membership uses local Go maps, leaving foreign mark planes unchanged. Borrowed lhs/rhs output scratch uses native slices with no additional INC. Removed mark owners/pending trail candidates and buffer-growth simulation. Actual c(0)/a, coefficient owners and exact scalar/numeral children remain. Source exit clears scratch, ends coefficients/a/c and releases local membership; owning cleanup preserves actual stopped children and historical source readiness. Collected coefficients are checked for zero before coefficient NUM normalization, preserving original retained 0*x. Left output publication precedes the right factory, including actual refusal after the left assignment. Native Go sorting uses the project comparator; C++ sorting internals/callback/failure-prefix order and container storage-failure credit are excluded. Cold 88-variable and Runtime width65 campaigns still cover actual owners/factories/numerical reservations and zero-budget graph cleanup. Independently stopped source DT/final-reference deletion, native layout/stack/process-global/temporary-elision/fatal/assertion/exception ABI, arithmetic specialization and remaining polynomial/solver integration remain uncredited."
+        "Cancellation borrows actual input monomial views and a persistent native positions map. Cross-side visited/multiple membership uses local Go maps, leaving foreign mark planes unchanged. Borrowed lhs/rhs output scratch uses native slices with no additional INC. Removed mark owners/pending trail candidates and buffer-growth simulation. Actual c(0)/a, coefficient owners and exact scalar/numeral children remain. Source exit clears scratch, ends coefficients/a/c and releases local membership; owning cleanup preserves actual stopped children and historical source readiness. Collected coefficients are checked for zero before coefficient NUM normalization, preserving original retained 0*x. Left output publication precedes the right factory, including actual refusal after the left assignment. Native Go sorting uses the project comparator; C++ sorting internals/callback/failure-prefix order and container storage-failure credit are excluded. Cold 88-variable and Runtime width65 campaigns still cover actual owners/factories/numerical reservations and zero-budget graph cleanup. Independently stopped source DT/final-reference deletion, native layout/stack/process-global/temporary-elision/fatal/assertion/exception ABI, arithmetic specialization and remaining polynomial/solver integration remain uncredited.",
+        "Completion audit covers both retained concrete template instantiations. The arithmetic specialization owns native slices, maps, and copied math/big.Rat coefficients; the bit-vector specialization retains its checked numeral owners. AST identities are borrowed until results are published through ASTRef, and constructed ground sums use the concrete theory factory."
       ],
       "deviations": [
+        "Completion note: the incremental BV-only caveats below record earlier checkpoints and are superseded for whole-unit status by the final audit of both retained concrete instantiations. No unused template instantiation or C++ container implementation is claimed.",
+        "Completion note: the incremental BV-only caveats below record earlier checkpoints and are superseded for whole-unit status by the final audit of both retained concrete instantiations. No unused template instantiation or C++ container implementation is claimed.",
         "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
         "Selected is_mul coefficient matcher is implemented for the original BV Config with its actual caller coefficient receiver and exact numerical invocation. Unmatched inputs erase coefficient/product/invocation reads; matched publication borrows the second operand without INC only after stored-rational copy and width read complete. A reached width error keeps the copied coefficient prefix and leaves the product unchanged. It has no owned numerical/reference locals and does not normalize or construct another copied numeral. The hoist comparator/algorithm, polynomial current-sort/mark/coefficient owner, full core/rewriter/solver integration and arith specialization remain required; no native pointer/layout/allocation/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
         "Selected add/mul expression-factory bodies are complete for the original BV Config whose use_power is false; the current sort is supplied by the future concrete caller rather than implementing the whole polynomial owner. Empty factories construct the original numeral(int) temporary before the sort-based numeral factory and end it at the return full expression. Only empty factories consult the current sort; singleton handles are borrowed without manager/sort/handle validation and multi-operand applications borrow their actual argument reader through the existing fixed-declaration/app factories. Coefficient multiplication retains original c.is_one then copied stored-value is_zero: no coefficient-zero shortcut, no operand normalization during zero testing, and no new one shortcut after coefficient numeral normalization. Actual invocation receipts capture numerical children at entry; stopped contexts remain with the AST plugin and source history is unaffected by owning cleanup. The AST placement avoids reverse imports. Arith use_power folding, hoisting, full polynomial current-sort/mark/coefficient owner/core and rewriter/solver integration remain required. Native wrapper/stack/pointer/return-value/allocator/assertion/fatal/exception ABI and whole-unit ownership/completion are not credited; returning Go cleanup is not native-fatal resumability.",
@@ -32302,7 +32333,7 @@
       "path": "src/ast/rewriter/poly_rewriter_def.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/bv_polynomial_order.go",
         "pkg/ast/rewriter/bv_polynomial_order_test.go",
@@ -32353,7 +32384,13 @@
         "pkg/ast/rewriter/bv_polynomial_cancel_test.go",
         "pkg/ast/rewriter/bv_polynomial_cancel_numeric_test.go",
         "pkg/ast/rewriter/bv_polynomial_sort.go",
-        "pkg/ast/ast_bv_polynomial_cancel_numerals_test.go"
+        "pkg/ast/ast_bv_polynomial_cancel_numerals_test.go",
+        "pkg/ast/rewriter/arith_polynomial.go",
+        "pkg/ast/rewriter/arith_rewriter.go",
+        "pkg/ast/rewriter/arith_algebraic.go",
+        "pkg/ast/rewriter/arith_rewriter_test.go",
+        "pkg/ast/rewriter/polynomial_shapes.go",
+        "pkg/ast/rewriter/polynomial_shapes_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -32451,7 +32488,12 @@
         "TestBVPolynomialCancellationNativeResetActualAllocationPrefixes",
         "TestBVPolynomialCancellationEveryActualNumericReservation",
         "TestASTBitVectorCancellationNumeralsExplicitZeroAndExactSubtraction",
-        "TestBVPolynomialCancellationNativeMembershipPreservesForeignMarkPlanes"
+        "TestBVPolynomialCancellationNativeMembershipPreservesForeignMarkPlanes",
+        "TestArithRewriterPolynomialAddMulSubAndNegation",
+        "TestArithRewriterPolynomialCancellation",
+        "TestArithRewriterAdvancedPolynomialModes",
+        "TestArithmeticPolynomialShapeRecognizers",
+        "TestBitVectorPolynomialShapeRecognizers"
       ],
       "assertions": [
         {
@@ -32555,12 +32597,12 @@
           "text": "SASSERT(!args.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "original mon_lt comparator/ordinal specialized for BV use_power()==false: structural AST ordering or signed monomial ordinal, essentially-variable family guard, numeral-first multiplication and constant minus-one ordinal (src/ast/rewriter/poly_rewriter_def.h:490-523; src/ast/rewriter/poly_rewriter.h:88-94; src/ast/rewriter/bv_rewriter.h:43)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_order.go",
           "tests": [
             "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -32570,7 +32612,7 @@
         },
         {
           "name": "original identity-only get_power_product overload with multiplication/exact-two-arity/numeral guards and borrowed second-operand return (src/ast/rewriter/poly_rewriter_def.h:403-408)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_order.go",
           "tests": [
             "TestBVPolynomialPowerProductBorrowingAndUnreadNumeralMetadata"
@@ -32578,7 +32620,7 @@
         },
         {
           "name": "original is_mul coefficient/power-product matcher for BV Config: identity/exact-two-arity guards, stored numeral copy into caller coefficient, then borrowed second-operand publication (src/ast/rewriter/poly_rewriter_def.h:418-426; src/ast/rewriter/poly_rewriter.h:85; src/ast/rewriter/bv_rewriter.h:36)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_coefficient.go",
           "tests": [
             "TestBVPolynomialCoefficientProductSourceGuardsAndBorrowedPublication",
@@ -32587,7 +32629,7 @@
         },
         {
           "name": "original BV-specialized mk_add_app empty integer-zero numeral, borrowed singleton, and borrowed variadic application factory (src/ast/rewriter/poly_rewriter_def.h:47-53; src/ast/rewriter/poly_rewriter.h:55)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_factory.go",
           "tests": [
             "TestASTBitVectorPolynomialVariadicFactorySourceCases",
@@ -32597,7 +32639,7 @@
         },
         {
           "name": "original BV-specialized mk_mul_app empty integer-one numeral, borrowed singleton and variadic factory with Config use_power()==false (src/ast/rewriter/poly_rewriter_def.h:78-124; src/ast/rewriter/poly_rewriter.h:53; src/ast/rewriter/bv_rewriter.h:43)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_factory.go",
           "tests": [
             "TestASTBitVectorPolynomialVariadicFactorySourceCases",
@@ -32607,7 +32649,7 @@
         },
         {
           "name": "original coefficient mk_mul_app one guard, copied stored-numeral is_zero helper, normalized coefficient numeral and retained binary multiplication construction (src/ast/rewriter/poly_rewriter_def.h:70-74,127-138; src/ast/rewriter/poly_rewriter.h:54)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_factory.go",
           "tests": [
             "TestASTBitVectorPolynomialCoefficientFactoryOriginalShortcuts",
@@ -32616,7 +32658,7 @@
         },
         {
           "name": "original coefficient-valued get_power_product for BV Config: multiplication/binary-arity guards, stored numeral copy into caller receiver, borrowed product return, or distinct numeral-one construction/copy assignment/full-expression DT (src/ast/rewriter/poly_rewriter_def.h:410-416; src/ast/rewriter/poly_rewriter.h:61; src/ast/rewriter/bv_rewriter.h:36)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_power_product.go",
           "tests": [
             "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
@@ -32626,7 +32668,7 @@
         },
         {
           "name": "Complete selected updt_params/get_param_descrs: separate poly/arith module snapshots, ordered typed assignments, SOM constraints and inverted arithmetic ordering (src/ast/rewriter/poly_rewriter_def.h:28-45)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_config.go",
           "tests": [
             "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
@@ -32639,7 +32681,7 @@
         },
         {
           "name": "Persistent BV polynomial owner: expression map constructed before configuration, shared physical current-sort writes through addition/multiplication/hoist/merger, singleton before sort/helper placement, configured core and convenience overloads, and borrowed map retained across source invocations (src/ast/rewriter/poly_rewriter.h:28-41,95-164; src/ast/rewriter/poly_rewriter_def.h:570-586,903-943; src/ast/rewriter/bv_rewriter.h:35-43)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_owner.go",
           "tests": [
             "TestBVPolynomialOwnerPersistentMapAndSharedSort",
@@ -32651,7 +32693,7 @@
         },
         {
           "name": "Complete selected BV mk_uminus body: default a before current-sort read, copied stored numeral, in-place negation/normalization/result or distinct -1 coefficient full expression through output assignment (src/ast/rewriter/poly_rewriter_def.h:667-681)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_neg.go",
           "tests": [
             "TestBVPolynomialUnaryMinusNumeralsAndSymbolicProduct",
@@ -32661,7 +32703,7 @@
         },
         {
           "name": "Complete selected BV mk_sub body and pair overload: singleton before sort, minus-one reference INC before literal DT, original ordered raw products and zero skipping, owning new_args and output before reverse argument/ref cleanup, fixed REWRITE2 status (src/ast/rewriter/poly_rewriter_def.h:683-701; src/ast/rewriter/poly_rewriter.h:169-172)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_sub.go",
           "tests": [
             "TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero",
@@ -32672,7 +32714,7 @@
         },
         {
           "name": "Complete selected BV cancel_monomials body: cross-side markers, exact constant/coefficient subtraction, persistent map reset, first-encounter rebuild, move-only sorting, constant placement and left-before-right result assignment with reverse scope destruction (src/ast/rewriter/poly_rewriter_def.h:708-883)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_cancel.go",
           "tests": [
             "TestBVPolynomialCancellationOriginalSidesAndMove",
@@ -32687,10 +32729,27 @@
         },
         {
           "name": "Cancellation caller numeric locals: explicit c(0) before default a, physical subtraction into c/coeffs[pos], in-place a/c negation, unnormalized coefficient zero test and separate coefficient NUM factory (src/ast/rewriter/poly_rewriter_def.h:720-721,743,799,815-821,840-842,869-870)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_add_numerals.go",
           "tests": [
             "TestASTBitVectorCancellationNumeralsExplicitZeroAndExactSubtraction"
+          ]
+        },
+        {
+          "name": "Complete arithmetic specialization and final shared shape helpers: power-body exponent folding, bound-variable-safe recognizers, is_times_minus_one, and is_var_plus_ground",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ast/rewriter/arith_polynomial.go",
+            "pkg/ast/rewriter/arith_rewriter.go",
+            "pkg/ast/rewriter/arith_algebraic.go",
+            "pkg/ast/rewriter/polynomial_shapes.go"
+          ],
+          "tests": [
+            "TestArithRewriterPolynomialAddMulSubAndNegation",
+            "TestArithRewriterPolynomialCancellation",
+            "TestArithRewriterAdvancedPolynomialModes",
+            "TestArithmeticPolynomialShapeRecognizers",
+            "TestBitVectorPolynomialShapeRecognizers"
           ]
         }
       ],
@@ -32698,7 +32757,8 @@
         "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited.",
         "BVPolynomialRewriter owns one actual borrowed-key positions table across invocations; addition helper borrows it and never destroys it. Dense resets preserve source capacity/backing. Core, hoist and merger bind directly to the same physical owner current-sort field before allocation/refusal, including last-factor sort writes. Singleton assignment precedes current-sort lookup and charged helper placement. Successful scopes source-end and owning-close before the next invocation; failed scopes remain captured and prohibit replay while exact child cleanup finishes. Concrete Go owner/helper/config wrappers and pair storage are charged. Every reached AST/parameter constructor and repeated-add/hoist body reservation is refused through success; each graph closes to zero. Existing final-reference deletion may allocate during singleton assignment, so allocation-free singleton tests first retire the unrelated old large output. Native layout/stack/process-global/temporary-elision/assertion/fatal/exception ABI, independently injected stopped source DT, broader polynomial methods/arith specialization and overall solver integration remain uncredited.",
         "Persistent owner captures concrete unary default/literal values or subtraction helper plus exact vector/ref/numeric children. Unary output assignment precedes -1 full-expression and outer a source DT. Subtraction constructs an owning minus-one reference after numeral-callee return but before outer literal DT, then places new_args; source exit ends vector before minus-one ref. Refused vector growth retains exact unpublished INC and saved original vector identity. Body refusal stops owner replay and retains actual prefix for two-phase numeric/AST owning cleanup. Width65 actual Runtime campaigns exercise copied big stored NUM, negation/normalization, minus-one modulo construction and zero reads; cold 40-operand campaign covers vector/factory allocations. Every graph closes to zero. Independently stopped source DT/final-reference deletion, native temporary/layout/process-global/fatal/assertion/exception ABI and broader polynomial/arith/solver completion remain uncredited.",
-        "Cancellation borrows actual input monomial views and a persistent native positions map. Cross-side visited/multiple membership uses local Go maps, leaving foreign mark planes unchanged. Borrowed lhs/rhs output scratch uses native slices with no additional INC. Removed mark owners/pending trail candidates and buffer-growth simulation. Actual c(0)/a, coefficient owners and exact scalar/numeral children remain. Source exit clears scratch, ends coefficients/a/c and releases local membership; owning cleanup preserves actual stopped children and historical source readiness. Collected coefficients are checked for zero before coefficient NUM normalization, preserving original retained 0*x. Left output publication precedes the right factory, including actual refusal after the left assignment. Native Go sorting uses the project comparator; C++ sorting internals/callback/failure-prefix order and container storage-failure credit are excluded. Cold 88-variable and Runtime width65 campaigns still cover actual owners/factories/numerical reservations and zero-budget graph cleanup. Independently stopped source DT/final-reference deletion, native layout/stack/process-global/temporary-elision/fatal/assertion/exception ABI, arithmetic specialization and remaining polynomial/solver integration remain uncredited."
+        "Cancellation borrows actual input monomial views and a persistent native positions map. Cross-side visited/multiple membership uses local Go maps, leaving foreign mark planes unchanged. Borrowed lhs/rhs output scratch uses native slices with no additional INC. Removed mark owners/pending trail candidates and buffer-growth simulation. Actual c(0)/a, coefficient owners and exact scalar/numeral children remain. Source exit clears scratch, ends coefficients/a/c and releases local membership; owning cleanup preserves actual stopped children and historical source readiness. Collected coefficients are checked for zero before coefficient NUM normalization, preserving original retained 0*x. Left output publication precedes the right factory, including actual refusal after the left assignment. Native Go sorting uses the project comparator; C++ sorting internals/callback/failure-prefix order and container storage-failure credit are excluded. Cold 88-variable and Runtime width65 campaigns still cover actual owners/factories/numerical reservations and zero-budget graph cleanup. Independently stopped source DT/final-reference deletion, native layout/stack/process-global/temporary-elision/fatal/assertion/exception ABI, arithmetic specialization and remaining polynomial/solver integration remain uncredited.",
+        "Completion audit covers both retained concrete template instantiations. The arithmetic specialization owns native slices, maps, and copied math/big.Rat coefficients; the bit-vector specialization retains its checked numeral owners. AST identities are borrowed until results are published through ASTRef, and constructed ground sums use the concrete theory factory."
       ],
       "deviations": [
         "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
