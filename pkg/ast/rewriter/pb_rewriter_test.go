@@ -1,11 +1,94 @@
 package rewriter
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func TestPseudoBooleanValidationTranslationAndSMT2Dump(t *testing.T) {
+	m := astTestManager(t)
+	r, err := NewPseudoBooleanRewriter(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	b, err := m.MkBoolSort()
+	astTestMust(t, err)
+	a, err := m.MkConst(astTestSymbol(t, m, "pb-validation-a"), b)
+	astTestMust(t, err)
+	astTestPin(t, m, a)
+	c, err := m.MkConst(astTestSymbol(t, m, "pb-validation-c"), b)
+	astTestMust(t, err)
+	astTestPin(t, m, c)
+	original, err := m.MkPseudoBooleanAtLeast([]ast.ASTHandle{a, c}, 1)
+	astTestMust(t, err)
+	rewritten, err := m.MkOr(a, c)
+	astTestMust(t, err)
+
+	// A basic-family equality has an operator number in the PB range; family
+	// recognition must still leave it unchanged.
+	equality, err := m.MkEq(a, c)
+	astTestMust(t, err)
+	translated, err := r.TranslatePBToLIA(nil, equality)
+	astTestMust(t, err)
+	if translated != equality {
+		t.Fatal("non-PB formula translated", translated, equality)
+	}
+	arithmetic, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	integer, err := m.MkFamilySort(arithmetic, 1, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "pb-validation-x"), integer)
+	astTestMust(t, err)
+	values := pbTestRationals(t, m, "2", "3")
+	weighted, err := m.MkPseudoBooleanGE(values[:1], []ast.ASTHandle{a}, &values[1])
+	astTestMust(t, err)
+	linear, err := r.TranslatePBToLIA(map[ast.ASTHandle]ast.ASTHandle{a: x}, weighted)
+	astTestMust(t, err)
+	bound, err := m.GetArg(linear, 1)
+	astTestMust(t, err)
+	if text, isInteger, matched, e := m.ArithmeticNumeralText(bound); e != nil || !matched || isInteger || text != "3" {
+		t.Fatal("PB bound must use the source Real numeral", text, isInteger, matched, e)
+	}
+	sum, err := m.GetArg(linear, 0)
+	astTestMust(t, err)
+	product, err := m.GetArg(sum, 0)
+	astTestMust(t, err)
+	coefficient, err := m.GetArg(product, 0)
+	astTestMust(t, err)
+	if text, isInteger, matched, e := m.ArithmeticNumeralText(coefficient); e != nil || !matched || isInteger || text != "2" {
+		t.Fatal("PB coefficient must use the source Real numeral", text, isInteger, matched, e)
+	}
+
+	validation, err := r.MakeValidationFormula(original, rewritten)
+	astTestMust(t, err)
+	astTestPin(t, m, validation)
+	kind, err := m.GetDeclKind(validation)
+	astTestMust(t, err)
+	count, err := m.GetNumArgs(validation)
+	astTestMust(t, err)
+	if kind != ast.ASTOpAnd || count != 5 {
+		t.Fatal("validation conjunction", kind, count)
+	}
+
+	directory := t.TempDir()
+	name, err := r.dumpPBRewriteAt(directory, validation)
+	astTestMust(t, err)
+	if filepath.Dir(name) != directory || !strings.HasPrefix(filepath.Base(name), "pb_rewrite_") || filepath.Ext(name) != ".smt2" {
+		t.Fatal("source validation filename", name)
+	}
+	body, err := os.ReadFile(name)
+	astTestMust(t, err)
+	text := string(body)
+	for _, fragment := range []string{"(declare-fun x0 () Int)", "(declare-fun x1 () Int)", "(assert", "(check-sat)"} {
+		if !strings.Contains(text, fragment) {
+			t.Fatalf("validation dump missing %q:\n%s", fragment, text)
+		}
+	}
+}
 
 func pbTestRationals(t *testing.T, m *ast.ASTManager, values ...string) []unumeral.OwnedRational {
 	t.Helper()

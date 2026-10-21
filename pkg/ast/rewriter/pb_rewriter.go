@@ -9,6 +9,7 @@ import (
 	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -30,6 +31,10 @@ type PseudoBooleanRewriter struct {
 	manager *ast.ASTManager
 	family  ast.FamilyID
 	closed  bool
+}
+
+func (r *PseudoBooleanRewriter) traceTags() *diagnostic.TraceTags {
+	return r.manager.BorrowMemoryTraceTags()
 }
 
 func NewPseudoBooleanRewriter(m *ast.ASTManager) (*PseudoBooleanRewriter, error) {
@@ -470,7 +475,13 @@ func (r *PseudoBooleanRewriter) RewriteApp(decl ast.ASTHandle, arguments ast.App
 	if err != nil {
 		return RewriteFailed, err
 	}
-	return RewriteDone, r.manager.SetRef(out, value)
+	if err = r.manager.SetRef(out, value); err != nil {
+		return RewriteFailed, err
+	}
+	if err = r.traceRewrite(decl, arguments, value); err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteDone, nil
 }
 
 func (r *PseudoBooleanRewriter) Close() error {

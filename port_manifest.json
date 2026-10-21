@@ -31099,14 +31099,16 @@
       "path": "src/ast/rewriter/pb_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/ast/rewriter/pb_rewriter.go"
+        "pkg/ast/rewriter/pb_rewriter.go",
+        "pkg/ast/rewriter/pb_rewriter_validate.go"
       ],
       "tests": [
         "TestPseudoBooleanRewriterCardinalityAndConstants",
         "TestPseudoBooleanRewriterUniqueNormalizeAndPrune",
-        "TestPseudoBooleanRewriterAuxiliaryRefusalAndEquality"
+        "TestPseudoBooleanRewriterAuxiliaryRefusalAndEquality",
+        "TestPseudoBooleanValidationTranslationAndSMT2Dump"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -31123,29 +31125,35 @@
         },
         {
           "name": "translate_pb2lia, mk_validate_rewrite, validate_rewrite and dump_pb_rewrite trace validator",
-          "status": "unported",
-          "reason": "Reached only through the pb_validate trace tag; requires the arithmetic expression builder and numbered SMT2 file diagnostic path."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/pb_rewriter_validate.go",
+          "tests": [
+            "TestPseudoBooleanValidationTranslationAndSMT2Dump"
+          ]
         }
       ],
       "ownership": [
         "Each source rational coefficient and bound is copied into math/big.Rat before the numeral-service owner is released. Rebuilt PB declarations use lexical OwnedRational values that remain live through AST publication."
       ],
       "deviations": [
-        "Native expression/coefficient vectors use parallel typed Go slices and exact math/big.Rat values. Sorting uses the source AST identifier order through GetASTID."
+        "Native expression/coefficient vectors use parallel typed Go slices and exact math/big.Rat values. Sorting uses the source AST identifier order through GetASTID.",
+        "The numbered validation-file counter uses atomic increment so independent Go callers cannot duplicate a source filename. The retained single-goroutine sequence and zero-based names are unchanged."
       ]
     },
     {
       "path": "src/ast/rewriter/pb_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/ast/rewriter/pb_rewriter.go"
+        "pkg/ast/rewriter/pb_rewriter.go",
+        "pkg/ast/rewriter/pb_rewriter_validate.go"
       ],
       "tests": [
         "TestPseudoBooleanRewriterCardinalityAndConstants",
         "TestPseudoBooleanRewriterUniqueNormalizeAndPrune",
-        "TestPseudoBooleanRewriterAuxiliaryRefusalAndEquality"
+        "TestPseudoBooleanRewriterAuxiliaryRefusalAndEquality",
+        "TestPseudoBooleanValidationTranslationAndSMT2Dump"
       ],
       "conditionals": [
         {
@@ -31172,8 +31180,11 @@
         },
         {
           "name": "public trace-validation helpers",
-          "status": "unported",
-          "reason": "Only the pb_validate diagnostic trace reaches these declarations."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/pb_rewriter_validate.go",
+          "tests": [
+            "TestPseudoBooleanValidationTranslationAndSMT2Dump"
+          ]
         }
       ],
       "ownership": [
