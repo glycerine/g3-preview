@@ -33512,7 +33512,8 @@
         "TestSequenceRewriterReplaceSourceBranches",
         "TestSequenceRewriterConstantLengthExtractAtAndIndex",
         "TestSequenceRewriterIntegerStringConversions",
-        "TestSequenceRewriterRegexAlgebraicBranches"
+        "TestSequenceRewriterRegexAlgebraicBranches",
+        "TestSequenceRewriterRegexLoopAndMembershipGuards"
       ],
       "assertions": [
         {
@@ -33821,6 +33822,22 @@
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",
           "tests": [
             "TestSequenceRewriterRegexAlgebraicBranches"
+          ]
+        },
+        {
+          "name": "seq_rewriter::mk_re_loop expression-bound numeral conversion to unary declaration parameters (seq_rewriter.cpp:1443-1469)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterRegexLoopAndMembershipGuards"
+          ]
+        },
+        {
+          "name": "seq_rewriter::mk_str_in_regexp definitive empty/full regex guards; automaton-backed membership reduction remains open (seq_rewriter.cpp:1231-1328)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterRegexLoopAndMembershipGuards"
           ]
         }
       ],

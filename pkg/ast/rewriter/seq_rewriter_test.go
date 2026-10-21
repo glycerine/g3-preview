@@ -561,3 +561,59 @@ func TestSequenceRewriterRegexAlgebraicBranches(t *testing.T) {
 		t.Fatalf("star union: status=%d star=%v error=%v", status, yes, e)
 	}
 }
+
+func TestSequenceRewriterRegexLoopAndMembershipGuards(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	text, err := m.MkString("x")
+	astTestMust(t, err)
+	astTestPin(t, m, text)
+	regex, err := m.MkSequenceToRegex(text)
+	astTestMust(t, err)
+	astTestPin(t, m, regex)
+	lower := arithRewriterNumeral(t, m, "2", true)
+	upper := arithRewriterNumeral(t, m, "5", true)
+	for _, args := range [][]ast.ASTHandle{{regex, lower}, {regex, lower, upper}} {
+		status, e := rw.RewriteRegexLoop(args, out)
+		astTestMust(t, e)
+		result, e := m.RefGet(out)
+		astTestMust(t, e)
+		body, lo, hi, bounded, matched, e := m.RegexLoopParameters(result)
+		astTestMust(t, e)
+		if status != RewriteDone || !matched || body != regex || lo != 2 || bounded != (len(args) == 3) || bounded && hi != 5 {
+			t.Fatalf("regex loop: status=%d body=%v lo=%d hi=%d bounded=%v matched=%v", status, body, lo, hi, bounded, matched)
+		}
+	}
+	regexSort, err := m.GetSort(regex)
+	astTestMust(t, err)
+	empty, err := m.MkRegexEmpty(regexSort)
+	astTestMust(t, err)
+	astTestPin(t, m, empty)
+	full, err := m.MkRegexFull(regexSort)
+	astTestMust(t, err)
+	astTestPin(t, m, full)
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	falsehood, err := m.MkFalse()
+	astTestMust(t, err)
+	for _, tc := range []struct {
+		regex, want ast.ASTHandle
+	}{
+		{empty, falsehood},
+		{full, truth},
+	} {
+		status, e := rw.RewriteStringInRegex(text, tc.regex, out)
+		astTestMust(t, e)
+		result, e := m.RefGet(out)
+		astTestMust(t, e)
+		if status != RewriteDone || result != tc.want {
+			t.Fatalf("membership guard: status=%d result=%v want=%v", status, result, tc.want)
+		}
+	}
+}

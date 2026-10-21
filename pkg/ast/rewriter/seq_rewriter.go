@@ -4,6 +4,7 @@ package rewriter
 import (
 	"errors"
 	"fmt"
+	"math"
 	"math/big"
 	"strings"
 
@@ -893,6 +894,54 @@ func (r *SequenceRewriter) RewriteRegexStar(a ast.ASTHandle, out ast.ASTRef) (Re
 		if leftStar && rightStar {
 			return r.assignRegexStarUnion(leftBody, rightBody, out)
 		}
+	}
+	return RewriteFailed, nil
+}
+
+func (r *SequenceRewriter) RewriteRegexLoop(args []ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if err := r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	if len(args) != 2 && len(args) != 3 {
+		return RewriteFailed, nil
+	}
+	lower, matched, err := r.integerValue(args[1])
+	if err != nil || !matched || lower.Sign() < 0 || !lower.IsUint64() || lower.Uint64() > math.MaxInt32 {
+		return RewriteFailed, err
+	}
+	var result ast.ASTHandle
+	if len(args) == 2 {
+		result, err = r.manager.MkRegexLoop(args[0], int32(lower.Uint64()))
+	} else {
+		upper, upperMatched, e := r.integerValue(args[2])
+		if e != nil || !upperMatched || upper.Sign() < 0 || !upper.IsUint64() || upper.Uint64() > math.MaxInt32 {
+			return RewriteFailed, e
+		}
+		result, err = r.manager.MkRegexLoop(args[0], int32(lower.Uint64()), int32(upper.Uint64()))
+	}
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteDone, r.manager.SetRef(out, result)
+}
+
+func (r *SequenceRewriter) RewriteStringInRegex(_ ast.ASTHandle, regex ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if err := r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	empty, err := r.sequenceOperation(regex, 22)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if empty {
+		return r.assignBoolean(false, out)
+	}
+	full, err := r.sequenceOperation(regex, 23)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if full {
+		return r.assignBoolean(true, out)
 	}
 	return RewriteFailed, nil
 }
