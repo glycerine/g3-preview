@@ -22138,9 +22138,22 @@
       "path": "src/ast/proofs/proof_checker.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/proofs/checker.go",
+        "pkg/ast/proofs/checker_basic.go",
+        "pkg/ast/proofs/checker_rules.go",
+        "pkg/ast/proofs/checker_hyper.go",
+        "pkg/ast/proofs/checker_arith.go",
+        "pkg/ast/ast_core_accessors.go"
+      ],
+      "tests": [
+        "TestCheckerStructuralRulesAndInvalidConclusion",
+        "TestCheckerEliminationResolutionAndRewriteSideConditions",
+        "TestCheckerLemmaClosesHypotheses",
+        "TestCheckerHyperResolutionReconstructsSideCondition",
+        "TestCheckerArithmeticFarkasLemma"
+      ],
       "conditionals": [
         {
           "line": 125,
@@ -22245,19 +22258,70 @@
           "text": "SASSERT(m.has_fact(a));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "proof_checker construction/check/check1 and basic proof DAG scheduling; fact, parent, application, operator, equivalence and negation matchers",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/checker.go",
+          "tests": [
+            "TestCheckerStructuralRulesAndInvalidConclusion"
+          ]
+        },
+        {
+          "name": "check1_basic retained structural rules through PR_SKOLEMIZE, including hypotheses, lemmas, unit resolution and rewrite side conditions",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/checker_basic.go",
+          "tests": [
+            "TestCheckerStructuralRulesAndInvalidConclusion",
+            "TestCheckerEliminationResolutionAndRewriteSideConditions",
+            "TestCheckerLemmaClosesHypotheses"
+          ]
+        },
+        {
+          "name": "PR_HYPER_RESOLVE substitution, Horn-position removal and quantified or ground resolvent side-condition reconstruction",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/checker_hyper.go",
+          "tests": [
+            "TestCheckerHyperResolutionReconstructsSideCondition"
+          ]
+        },
+        {
+          "name": "PR_TH_LEMMA dispatch and arithmetic Farkas coefficient scaling, literal accumulation and theory normalization",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/checker_arith.go",
+          "tests": [
+            "TestCheckerArithmeticFarkasLemma"
+          ]
+        }
+      ],
+      "ownership": [
+        "The checker borrows the input proof graph and uses native Go slices and maps for todo, visited and hypothesis sets. Returned side conditions acquire one AST reference each and ReleaseSideConditions retires them. Hyper-resolution uses the existing owning typed reader outputs and explicitly retires premise, substitution, temporary-reference and rewriter owners. Arithmetic checking owns copied declaration parameters and temporary parameter/rewriter services through checked cleanup."
+      ],
+      "deviations": [
+        "Checked Go errors replace source assertions and unreachable control flow. The disabled SPC checker and dump-lemma file writer are omitted: the former is compiled out and no retained production caller enables the latter. Native hypothesis sets replace the private cons/atom/nil declaration plugin while preserving set union and lemma boundaries. Source TODO rules PR_NNF_POS, PR_NNF_NEG and PR_QUANT_INST retain their unconditional acceptance behavior."
+      ]
     },
     {
       "path": "src/ast/proofs/proof_checker.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/proofs/checker.go",
+        "pkg/ast/proofs/checker_basic.go",
+        "pkg/ast/proofs/checker_rules.go",
+        "pkg/ast/proofs/checker_hyper.go",
+        "pkg/ast/proofs/checker_arith.go"
+      ],
+      "tests": [
+        "TestCheckerStructuralRulesAndInvalidConclusion",
+        "TestCheckerEliminationResolutionAndRewriteSideConditions",
+        "TestCheckerLemmaClosesHypotheses",
+        "TestCheckerHyperResolutionReconstructsSideCondition",
+        "TestCheckerArithmeticFarkasLemma"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -22268,11 +22332,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "proof_checker public construction/check interface and all retained private matching, structural, hyper-resolution and arithmetic helpers",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/checker.go",
+          "tests": [
+            "TestCheckerStructuralRulesAndInvalidConclusion",
+            "TestCheckerHyperResolutionReconstructsSideCondition",
+            "TestCheckerArithmeticFarkasLemma"
+          ]
+        }
+      ],
+      "ownership": [
+        "Checker is a confined Go owner over a borrowed ASTManager. Per-check traversal state is lexical; side conditions have explicit reference ownership and release."
+      ],
+      "deviations": [
+        "The private dump-only hypothesis AST plugin is replaced by native hypothesis maps because no retained production consumer enables lemma dumping."
+      ]
     },
     {
       "path": "src/ast/proofs/proof_utils.cpp",
@@ -130730,20 +130809,37 @@
       "path": "src/test/proof_checker.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/proofs/checker_test.go"
+      ],
+      "tests": [
+        "TestCheckerLemmaClosesHypotheses"
+      ],
       "assertions": [
         {
           "line": 28,
           "text": "VERIFY(checker.check(p4.get(), side_conditions));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst_checker1 and tst_proof_checker contradictory hypotheses, unit resolution, lemma closure and successful validation",
+          "status": "ported",
+          "go_target": "pkg/ast/proofs/checker_test.go",
+          "tests": [
+            "TestCheckerLemmaClosesHypotheses"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go fixture closes checker side-condition references and the complete AST, numeral, symbol and budget owner graph."
+      ],
+      "deviations": [
+        "Low-level proof printing is covered by the separately ported AST low-level printer; this test retains the proof construction and checker assertion."
+      ]
     },
     {
       "path": "src/test/qe_arith.cpp",

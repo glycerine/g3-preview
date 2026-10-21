@@ -476,15 +476,3 @@ func (c *Checker) checkSkolemize(fact ast.ASTHandle, has bool) (bool, []ast.ASTH
 	}
 	return negated == forall, nil, nil
 }
-
-func (c *Checker) checkTheoryLemma(_ ast.ASTHandle) (bool, []ast.ASTHandle, error) {
-	// Non-arithmetic theory lemmas are intentionally accepted by the source
-	// checker. Arithmetic Farkas validation is added in checker_arith.go.
-	return true, nil, nil
-}
-
-func (c *Checker) checkHyperResolve(_ ast.ASTHandle) (bool, []ast.ASTHandle, error) {
-	// The source rule emits a reconstructed resolvent equivalence as a side
-	// condition. The full retained implementation is in checker_hyper.go.
-	return true, nil, nil
-}

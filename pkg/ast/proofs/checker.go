@@ -10,9 +10,19 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-// Checker validates proof DAGs produced by ASTManager. Side conditions are
-// borrowed AST handles and remain valid while their manager and input proof
-// graph remain live.
+// ReleaseSideConditions releases handles returned by Check.
+func (c *Checker) ReleaseSideConditions(side []ast.ASTHandle) error {
+	if c == nil || c.manager == nil {
+		return ast.ErrASTHandle
+	}
+	var result error
+	for _, h := range side {
+		result = errors.Join(result, c.manager.DecRef(h))
+	}
+	return result
+}
+
+// Checker validates proof DAGs produced by ASTManager.
 type Checker struct {
 	manager *ast.ASTManager
 }
@@ -30,13 +40,29 @@ func NewChecker(m *ast.ASTManager) (*Checker, error) {
 // Check validates every reachable proof once. A structurally invalid proof is
 // reported as (false, sideConditions, nil); manager/lifetime failures are
 // returned as errors.
-func (c *Checker) Check(proof ast.ASTHandle) (bool, []ast.ASTHandle, error) {
+// Check returns owning side-condition handles. The caller must call DecRef on
+// each returned handle, including when the proof is invalid.
+func (c *Checker) Check(proof ast.ASTHandle) (valid bool, side []ast.ASTHandle, result error) {
 	if c == nil || c.manager == nil {
 		return false, nil, ast.ErrASTHandle
 	}
+	defer func() {
+		owned := 0
+		for i := range side {
+			if err := c.manager.IncRef(side[i]); err != nil {
+				for j := 0; j < owned; j++ {
+					_ = c.manager.DecRef(side[j])
+				}
+				side = nil
+				valid = false
+				result = err
+				return
+			}
+			owned++
+		}
+	}()
 	todo := []ast.ASTHandle{proof}
 	marked := make(map[ast.ASTHandle]struct{})
-	var side []ast.ASTHandle
 	for len(todo) != 0 {
 		last := len(todo) - 1
 		p := todo[last]

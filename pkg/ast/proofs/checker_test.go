@@ -55,6 +55,7 @@ func check(t *testing.T, c *proofs.Checker, p ast.ASTHandle, want bool) []ast.AS
 	if got != want {
 		t.Fatalf("check = %v, want %v", got, want)
 	}
+	t.Cleanup(func() { must(t, c.ReleaseSideConditions(side)) })
 	return side
 }
 
@@ -145,4 +146,90 @@ func TestCheckerLemmaClosesHypotheses(t *testing.T) {
 	closed, err := m.MkProofLemma(pf, na)
 	must(t, err)
 	check(t, c, closed, false)
+}
+
+func TestCheckerHyperResolutionReconstructsSideCondition(t *testing.T) {
+	m := fixture(t)
+	c, err := proofs.NewChecker(m)
+	must(t, err)
+	a, b := boolean(t, m, "a"), boolean(t, m, "b")
+	clause, err := m.MkOr(a, b)
+	must(t, err)
+	notB, err := m.MkNot(b)
+	must(t, err)
+	p0, err := m.MkProofAsserted(clause)
+	must(t, err)
+	p1, err := m.MkProofAsserted(notB)
+	must(t, err)
+	p, err := m.MkProofHyperResolve(
+		[]ast.ASTHandle{p0, p1}, a,
+		[]ast.ASTProofPosition{{First: 1, Second: 0}},
+		[][]ast.ASTHandle{nil, nil},
+	)
+	must(t, err)
+	side := check(t, c, p, true)
+	if len(side) != 1 {
+		t.Fatalf("hyper-resolution side conditions = %d", len(side))
+	}
+	if kind, e := m.GetDeclKind(side[0]); e != nil || kind != ast.ASTOpIff {
+		t.Fatalf("side condition is not an equivalence: %d, %v", kind, e)
+	}
+}
+
+func TestCheckerArithmeticFarkasLemma(t *testing.T) {
+	m := fixture(t)
+	c, err := proofs.NewChecker(m)
+	must(t, err)
+	must(t, m.RegisterDeclarationPlugins())
+	arithName, err := m.Symbols.Intern("arith")
+	must(t, err)
+	arith, err := m.FamilyIDForSymbol(arithName)
+	must(t, err)
+	intSort, err := m.MkFamilySort(arith, 1, nil)
+	must(t, err)
+	xName, err := m.Symbols.Intern("x")
+	must(t, err)
+	x, err := m.MkConst(xName, intSort)
+	must(t, err)
+	service := m.NumeralService()
+	zeroValue, err := service.NewValue()
+	must(t, err)
+	oneValue, err := service.NewValue()
+	must(t, err)
+	must(t, service.SetString(&zeroValue, "0"))
+	must(t, service.SetString(&oneValue, "1"))
+	zero, err := m.ArithmeticNumeral(&zeroValue, true)
+	must(t, err)
+	one, err := m.ArithmeticNumeral(&oneValue, true)
+	must(t, err)
+	must(t, service.Del(&zeroValue))
+	must(t, service.Del(&oneValue))
+	le, err := m.MkFamilyApp(arith, 2, nil, []ast.ASTHandle{x, zero})
+	must(t, err)
+	ge, err := m.MkFamilyApp(arith, 3, nil, []ast.ASTHandle{x, one})
+	must(t, err)
+	p0, err := m.MkProofAsserted(le)
+	must(t, err)
+	p1, err := m.MkProofAsserted(ge)
+	must(t, err)
+	falseExpr, err := m.MkFalse()
+	must(t, err)
+	farkasName, err := m.Symbols.Intern("farkas")
+	must(t, err)
+	farkas, err := m.NewParameterSymbol(farkasName)
+	must(t, err)
+	coefficientValue, err := service.NewValue()
+	must(t, err)
+	must(t, service.SetString(&coefficientValue, "1"))
+	coefficient0, err := m.NewParameterRational(&coefficientValue)
+	must(t, err)
+	coefficient1, err := m.NewParameterRational(&coefficientValue)
+	must(t, err)
+	must(t, service.Del(&coefficientValue))
+	lemma, err := m.MkProofTheoryLemma(arith, falseExpr, []ast.ASTHandle{p0, p1}, []ast.ASTParameter{farkas, coefficient0, coefficient1})
+	must(t, err)
+	must(t, m.DelParameter(&coefficient1))
+	must(t, m.DelParameter(&coefficient0))
+	must(t, m.DelParameter(&farkas))
+	check(t, c, lemma, true)
 }
