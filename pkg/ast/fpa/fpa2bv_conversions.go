@@ -3,6 +3,24 @@ package fpa
 
 import "github.com/glycerine/g3/pkg/ast"
 
+// MkNumeral converts an AST floating-point numeral into the converter's
+// three-field representation.
+func (c *Converter) MkNumeral(value ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	bits, found, _, err := c.manager.RewriteFPAToIEEEBVNumeral(value, true)
+	if err != nil || !found {
+		return ast.ASTHandle{}, found, err
+	}
+	sort, err := c.manager.GetSort(value)
+	if err != nil {
+		return ast.ASTHandle{}, true, err
+	}
+	result, err := c.FromIEEEBV(sort, bits)
+	return result, true, err
+}
+
 // MkVar expands one floating-point bound variable into the three consecutive
 // bit-vector variables used by the source quantifier conversion.
 func (c *Converter) MkVar(base uint32, sort ast.ASTHandle) (ast.ASTHandle, error) {

@@ -60,6 +60,17 @@ const (
 	astFPABV2RM            int32 = 43
 )
 
+// Public numeral and special-value declaration kinds used by the FPA-to-BV
+// converter and its traversal rewriter.
+const (
+	FPAOpNumeral      int32 = astFPANum
+	FPAOpPositiveInf  int32 = astFPAPlusInf
+	FPAOpNegativeInf  int32 = astFPAMinusInf
+	FPAOpNaN          int32 = astFPANaN
+	FPAOpPositiveZero int32 = astFPAPlusZero
+	FPAOpNegativeZero int32 = astFPAMinusZero
+)
+
 func (p *astFloatingPointPluginOwner) numeralAssertionsEnabled() (bool, error) {
 	if !ASTSourceDebug {
 		return false, nil

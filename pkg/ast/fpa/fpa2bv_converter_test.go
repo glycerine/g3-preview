@@ -77,6 +77,48 @@ func TestConverterVariablesAndIEEEBitVectorConversions(t *testing.T) {
 	}
 }
 
+func TestConverterFiniteNumeral(t *testing.T) {
+	m, c := fixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	must(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	must(t, err)
+	family, err := m.RegisterFloatingPointPlugin()
+	must(t, err)
+	sign, err := m.BitVectorNumeralUnsigned(1, 1)
+	must(t, err)
+	exponent, err := m.BitVectorNumeralUnsigned(127, 8)
+	must(t, err)
+	significand, err := m.BitVectorNumeralUnsigned(0, 23)
+	must(t, err)
+	components, err := m.MkFamilyApp(family, ast.FPAOpFP, nil, []ast.ASTHandle{sign, exponent, significand})
+	must(t, err)
+	decl, err := m.GetDecl(components)
+	must(t, err)
+	numeral, found, err := m.RewriteFPAFPComponentsNumerals(decl, sign, exponent, significand)
+	must(t, err)
+	if !found {
+		t.Fatal("concrete FP components did not form a numeral")
+	}
+	converted, found, err := c.MkNumeral(numeral)
+	must(t, err)
+	if !found {
+		t.Fatal("finite FPA numeral was not recognized")
+	}
+	bits, found, _, err := m.RewriteFPAToIEEEBVNumeral(numeral, true)
+	must(t, err)
+	if !found {
+		t.Fatal("finite FPA numeral lost its IEEE encoding")
+	}
+	sort, err := m.GetSort(numeral)
+	must(t, err)
+	want, err := c.FromIEEEBV(sort, bits)
+	must(t, err)
+	if converted != want {
+		t.Fatal("finite numeral conversion", converted, want)
+	}
+}
+
 func fixture(t *testing.T) (*ast.ASTManager, *fpa.Converter) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)

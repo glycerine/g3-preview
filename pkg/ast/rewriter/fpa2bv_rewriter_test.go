@@ -1,0 +1,127 @@
+package rewriter
+
+import (
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+	astfpa "github.com/glycerine/g3/pkg/ast/fpa"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+)
+
+type fpa2BVFixture struct {
+	m         *ast.ASTManager
+	converter *astfpa.Converter
+	rewriter  *FPA2BVRewriter
+	family    ast.FamilyID
+	sort      ast.ASTHandle
+	out       ast.ASTRef
+}
+
+func newFPA2BVFixture(t *testing.T) fpa2BVFixture {
+	t.Helper()
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	family, err := m.RegisterFloatingPointPlugin()
+	astTestMust(t, err)
+	sort, err := m.FloatingPointSort(8, 24)
+	astTestMust(t, err)
+	converter, err := astfpa.NewConverter(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, converter.Close()) })
+	rw, err := NewFPA2BVRewriter(m, converter)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, rw.Close()) })
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, m.DelRef(&out)) })
+	return fpa2BVFixture{m: m, converter: converter, rewriter: rw, family: family, sort: sort, out: out}
+}
+
+func (f fpa2BVFixture) rewrite(t *testing.T, value ast.ASTHandle) ast.ASTHandle {
+	t.Helper()
+	astTestMust(t, f.rewriter.Rewrite(value, f.out))
+	result, err := f.m.RefGet(f.out)
+	astTestMust(t, err)
+	return result
+}
+
+func TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality(t *testing.T) {
+	f := newFPA2BVFixture(t)
+	positive, err := f.m.MkFPAZeroOfSort(f.sort, false)
+	astTestMust(t, err)
+	negative, err := f.m.MkFPAZeroOfSort(f.sort, true)
+	astTestMust(t, err)
+
+	converted := f.rewrite(t, positive)
+	if kind, e := f.m.GetDeclKind(converted); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("special value was not lowered to FP components", kind, e)
+	}
+
+	fpEquality, err := f.m.MkFamilyApp(f.family, ast.FPAOpEq, nil, []ast.ASTHandle{positive, negative})
+	astTestMust(t, err)
+	if result := f.rewrite(t, fpEquality); !f.m.IsTrue(result) {
+		t.Fatal("IEEE fp.eq must identify signed zeros", result)
+	}
+
+	smtEquality, err := f.m.MkEq(positive, negative)
+	astTestMust(t, err)
+	if result := f.rewrite(t, smtEquality); !f.m.IsFalse(result) {
+		t.Fatal("SMT equality must distinguish signed zeros", result)
+	}
+
+	toIEEE, err := f.m.MkFamilyApp(f.family, ast.FPAOpToIEEEBV, nil, []ast.ASTHandle{negative})
+	astTestMust(t, err)
+	bits := f.rewrite(t, toIEEE)
+	bitsSort, err := f.m.GetSort(bits)
+	astTestMust(t, err)
+	if width, e := f.m.BitVectorSize(bitsSort); e != nil || width != 32 {
+		t.Fatal("IEEE conversion width", width, e)
+	}
+}
+
+func TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions(t *testing.T) {
+	f := newFPA2BVFixture(t)
+	variable, err := f.m.MkVar(0, f.sort)
+	astTestMust(t, err)
+	isZero, err := f.m.MkFamilyApp(f.family, int32(ast.FPAIsZero), nil, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	name := astTestSymbol(t, f.m, "x")
+	quantifier, err := f.m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true,
+		Sorts:  []ast.ASTHandle{f.sort},
+		Names:  []usymbol.Symbol{name},
+		Body:   isZero,
+	})
+	astTestMust(t, err)
+	rewritten := f.rewrite(t, quantifier)
+	boundSort, err := f.m.GetDeclarationSort(rewritten, 0)
+	astTestMust(t, err)
+	if width, e := f.m.BitVectorSize(boundSort); e != nil || width != 32 {
+		t.Fatal("quantified FP variable was not packed", width, e)
+	}
+	boundName, err := f.m.GetDeclarationName(rewritten, 0)
+	astTestMust(t, err)
+	text, err := f.m.Symbols.Display(boundName)
+	astTestMust(t, err)
+	if text != "x.bv" {
+		t.Fatal("converted binder name", text)
+	}
+
+	functionName := astTestSymbol(t, f.m, "uf")
+	declaration, err := f.m.MkFuncDecl(functionName, []ast.ASTHandle{f.sort}, f.sort, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	zero, err := f.m.MkFPAZeroOfSort(f.sort, false)
+	astTestMust(t, err)
+	application, err := f.m.MkApp(declaration, []ast.ASTHandle{zero})
+	astTestMust(t, err)
+	convertedUF := f.rewrite(t, application)
+	if kind, e := f.m.GetDeclKind(convertedUF); e != nil || kind != ast.FPAOpFP {
+		t.Fatal("FPA-valued UF was not lowered", kind, e)
+	}
+	if len(f.converter.ExtraAssertions()) != 1 {
+		t.Fatal("UF connection assertion", len(f.converter.ExtraAssertions()))
+	}
+}

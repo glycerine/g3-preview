@@ -17312,6 +17312,7 @@
         "TestConverterRoundingModeCodesAndEquality",
         "TestConverterClassificationsUnarySignsAndComparisons",
         "TestConverterVariablesAndIEEEBitVectorConversions",
+        "TestConverterFiniteNumeral",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18684,6 +18685,7 @@
         "TestConverterRoundingModeCodesAndEquality",
         "TestConverterClassificationsUnarySignsAndComparisons",
         "TestConverterVariablesAndIEEEBitVectorConversions",
+        "TestConverterFiniteNumeral",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18726,9 +18728,17 @@
       "path": "src/ast/fpa/fpa2bv_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/fpa2bv_rewriter.go",
+        "pkg/ast/fpa/fpa2bv_conversions.go",
+        "pkg/ast/ast_fpa_numeral.go"
+      ],
+      "tests": [
+        "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
+        "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
+        "TestConverterFiniteNumeral"
+      ],
       "assertions": [
         {
           "line": 75,
@@ -18757,17 +18767,38 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "traversal lifecycle, resource limits, constants, finite numerals, rounding modes, special values, structural operations, predicates, comparisons, extrema, IEEE packing, uninterpreted functions, and quantified FP variables",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
+          "tests": [
+            "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
+            "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
+            "TestConverterFiniteNumeral"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go rewriter owns its traversal and reserved owner storage while borrowing ASTManager and Converter; Close releases traversal state before converter and manager teardown."
+      ],
       "deviations": []
     },
     {
       "path": "src/ast/fpa/fpa2bv_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/fpa2bv_rewriter.go",
+        "pkg/ast/fpa/fpa2bv_conversions.go",
+        "pkg/ast/ast_fpa_numeral.go"
+      ],
+      "tests": [
+        "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
+        "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
+        "TestConverterFiniteNumeral"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -18780,8 +18811,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "fpa2bv configuration and traversal wrapper with partial converter dispatch; arithmetic and format-conversion dispatch remains open",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
+          "tests": [
+            "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
+            "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions"
+          ]
+        }
+      ],
+      "ownership": [
+        "The wrapper borrows the converter and manager and owns the traversal engine until Close."
+      ],
       "deviations": []
     },
     {
