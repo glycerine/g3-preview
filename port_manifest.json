@@ -31099,22 +31099,54 @@
       "path": "src/ast/rewriter/pb_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/pb_rewriter.go"
+      ],
+      "tests": [
+        "TestPseudoBooleanRewriterCardinalityAndConstants",
+        "TestPseudoBooleanRewriterUniqueNormalizeAndPrune",
+        "TestPseudoBooleanRewriterAuxiliaryRefusalAndEquality"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "pb_ast_rewriter_util literal negation/classification and mk_app_core production rewriting",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/pb_rewriter.go",
+          "tests": [
+            "TestPseudoBooleanRewriterCardinalityAndConstants",
+            "TestPseudoBooleanRewriterUniqueNormalizeAndPrune",
+            "TestPseudoBooleanRewriterAuxiliaryRefusalAndEquality"
+          ]
+        },
+        {
+          "name": "translate_pb2lia, mk_validate_rewrite, validate_rewrite and dump_pb_rewrite trace validator",
+          "status": "unported",
+          "reason": "Reached only through the pb_validate trace tag; requires the arithmetic expression builder and numbered SMT2 file diagnostic path."
+        }
+      ],
+      "ownership": [
+        "Each source rational coefficient and bound is copied into math/big.Rat before the numeral-service owner is released. Rebuilt PB declarations use lexical OwnedRational values that remain live through AST publication."
+      ],
+      "deviations": [
+        "Native expression/coefficient vectors use parallel typed Go slices and exact math/big.Rat values. Sorting uses the source AST identifier order through GetASTID."
+      ]
     },
     {
       "path": "src/ast/rewriter/pb_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/pb_rewriter.go"
+      ],
+      "tests": [
+        "TestPseudoBooleanRewriterCardinalityAndConstants",
+        "TestPseudoBooleanRewriterUniqueNormalizeAndPrune",
+        "TestPseudoBooleanRewriterAuxiliaryRefusalAndEquality"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -31125,19 +31157,42 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "pb_rewriter_util and pb_rewriter production constructor, family and mk_app_core surface",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/pb_rewriter.go",
+          "tests": [
+            "TestPseudoBooleanRewriterCardinalityAndConstants",
+            "TestPseudoBooleanRewriterUniqueNormalizeAndPrune",
+            "TestPseudoBooleanRewriterAuxiliaryRefusalAndEquality"
+          ]
+        },
+        {
+          "name": "public trace-validation helpers",
+          "status": "unported",
+          "reason": "Only the pb_validate diagnostic trace reaches these declarations."
+        }
+      ],
+      "ownership": [
+        "PseudoBooleanRewriter borrows the AST manager and owns no persistent numeral or AST references."
+      ],
       "deviations": []
     },
     {
       "path": "src/ast/rewriter/pb_rewriter_def.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/pb_rewriter.go"
+      ],
+      "tests": [
+        "TestPseudoBooleanRewriterCardinalityAndConstants",
+        "TestPseudoBooleanRewriterUniqueNormalizeAndPrune"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -31178,11 +31233,25 @@
           "text": "SASSERT(min.is_pos());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete concrete unique, normalize and prune specialization used by pb_rewriter",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/pb_rewriter.go",
+          "tests": [
+            "TestPseudoBooleanRewriterCardinalityAndConstants",
+            "TestPseudoBooleanRewriterUniqueNormalizeAndPrune"
+          ]
+        }
+      ],
+      "ownership": [
+        "Normalization mutates invocation-local exact rational copies and borrowed Boolean AST handles; generated negations are retained by the caller output or rebuilt PB application."
+      ],
+      "deviations": [
+        "Only the concrete AST/rational instantiation reached by pb_rewriter is ported, using math/big.Rat instead of a generic numeral adapter."
+      ]
     },
     {
       "path": "src/ast/rewriter/poly_rewriter.h",
