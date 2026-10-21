@@ -617,3 +617,56 @@ func TestSequenceRewriterRegexLoopAndMembershipGuards(t *testing.T) {
 		}
 	}
 }
+
+func TestSequenceRewriterDeclarationDispatch(t *testing.T) {
+	m := astTestManager(t)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	astTestPin(t, m, a)
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	astTestPin(t, m, b)
+	concat, err := m.MkSequenceConcat(a, b)
+	astTestMust(t, err)
+	astTestPin(t, m, concat)
+	decl, err := m.GetDecl(concat)
+	astTestMust(t, err)
+	status, err := rw.RewriteApp(decl, ast.SliceArguments([]ast.ASTHandle{a, b}), out)
+	astTestMust(t, err)
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	text, matched, err := m.SequenceStringValue(result)
+	astTestMust(t, err)
+	if status != RewriteDone || !matched || text != "ab" {
+		t.Fatalf("concat dispatch: status=%d text=%q matched=%v", status, text, matched)
+	}
+
+	indexDecl, err := m.MkFamilyFuncDecl(rw.family, 10, nil, func() []ast.ASTHandle {
+		sort, e := m.GetSort(a)
+		astTestMust(t, e)
+		return []ast.ASTHandle{sort, sort}
+	}(), ast.ASTHandle{})
+	astTestMust(t, err)
+	status, err = rw.RewriteApp(indexDecl, ast.SliceArguments([]ast.ASTHandle{a, b}), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || status != Rewrite1 || kind != 10 {
+		t.Fatalf("two-argument index dispatch: status=%d kind=%d error=%v", status, kind, e)
+	}
+
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	truthDecl, err := m.GetDecl(truth)
+	astTestMust(t, err)
+	status, err = rw.RewriteApp(truthDecl, ast.SliceArguments(nil), out)
+	astTestMust(t, err)
+	if status != RewriteFailed {
+		t.Fatalf("foreign declaration status: %d", status)
+	}
+}

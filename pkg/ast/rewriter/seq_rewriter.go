@@ -15,6 +15,7 @@ import (
 // reductions independently of traversal.
 type SequenceRewriter struct {
 	manager *ast.ASTManager
+	family  ast.FamilyID
 }
 
 func NewSequenceRewriter(m *ast.ASTManager) (*SequenceRewriter, error) {
@@ -24,7 +25,142 @@ func NewSequenceRewriter(m *ast.ASTManager) (*SequenceRewriter, error) {
 	if _, err := m.ProofsEnabled(); err != nil {
 		return nil, err
 	}
-	return &SequenceRewriter{manager: m}, nil
+	family, err := m.SequenceFamilyID()
+	if err != nil {
+		return nil, err
+	}
+	return &SequenceRewriter{manager: m, family: family}, nil
+}
+
+func (r *SequenceRewriter) RewriteApp(decl ast.ASTHandle, args ast.AppArguments, out ast.ASTRef) (status RewriteStatus, err error) {
+	if err = r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	family, err := r.manager.GetFamilyID(decl)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if family != r.family {
+		return RewriteFailed, nil
+	}
+	kind, err := r.manager.GetDeclKind(decl)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	values := make([]ast.ASTHandle, args.Count())
+	for i := uint32(0); i < args.Count(); i++ {
+		values[i], err = args.At(i)
+		if err != nil {
+			return RewriteFailed, err
+		}
+	}
+	switch kind {
+	case 0:
+		if len(values) == 1 {
+			return r.RewriteUnit(values[0], out)
+		}
+	case 2:
+		if len(values) == 1 {
+			return RewriteDone, r.manager.SetRef(out, values[0])
+		}
+		if len(values) == 2 {
+			return r.RewriteConcat(values[0], values[1], out)
+		}
+	case 3:
+		if len(values) == 2 {
+			return r.RewritePrefix(values[0], values[1], out)
+		}
+	case 4:
+		if len(values) == 2 {
+			return r.RewriteSuffix(values[0], values[1], out)
+		}
+	case 5:
+		if len(values) == 2 {
+			return r.RewriteContains(values[0], values[1], out)
+		}
+	case 6:
+		if len(values) == 3 {
+			return r.RewriteExtract(values[0], values[1], values[2], out)
+		}
+	case 7:
+		if len(values) == 3 {
+			return r.RewriteReplace(values[0], values[1], values[2], out)
+		}
+	case 8:
+		if len(values) == 2 {
+			return r.RewriteAt(values[0], values[1], out)
+		}
+	case 9:
+		if len(values) == 1 {
+			return r.RewriteLength(values[0], out)
+		}
+	case 10:
+		if len(values) == 3 {
+			return r.RewriteIndex(values[0], values[1], values[2], out)
+		}
+		if len(values) == 2 {
+			zero, e := r.makeInteger(big.NewInt(0))
+			if e != nil {
+				return RewriteFailed, e
+			}
+			zeroRef, e := r.manager.NewRef(zero)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			defer func() { err = errors.Join(err, r.manager.DelRef(&zeroRef)) }()
+			result, e := r.manager.MkSequenceIndex(values[0], values[1], zero)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			if err = r.manager.SetRef(out, result); err != nil {
+				return RewriteFailed, err
+			}
+			return Rewrite1, nil
+		}
+	case 12:
+		if len(values) == 2 {
+			return r.RewriteStringInRegex(values[0], values[1], out)
+		}
+	case 13:
+		if len(values) == 1 {
+			return r.RewriteRegexPlus(values[0], out)
+		}
+	case 14:
+		if len(values) == 1 {
+			return r.RewriteRegexStar(values[0], out)
+		}
+	case 15:
+		if len(values) == 1 {
+			return r.RewriteRegexOptional(values[0], out)
+		}
+	case 17:
+		if len(values) == 2 {
+			return r.RewriteRegexConcat(values[0], values[1], out)
+		}
+	case 18:
+		if len(values) == 2 {
+			return r.RewriteRegexUnion(values[0], values[1], out)
+		}
+	case 19:
+		if len(values) == 2 {
+			return r.RewriteRegexIntersect(values[0], values[1], out)
+		}
+	case 20:
+		return r.RewriteRegexLoop(values, out)
+	case 21:
+		if len(values) == 1 {
+			return r.RewriteRegexComplement(values[0], out)
+		}
+	case 27:
+		if len(values) == 1 {
+			return r.RewriteIntToString(values[0], out)
+		}
+	case 28:
+		if len(values) == 1 {
+			return r.RewriteStringToInt(values[0], out)
+		}
+	}
+	return RewriteFailed, nil
 }
 
 func (r *SequenceRewriter) open() error {

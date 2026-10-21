@@ -327,6 +327,20 @@ func (m *ASTManager) RegisterSequencePlugin() (FamilyID, error) {
 	defer func() { m.formatExecuting = false }()
 	return m.registerSequencePlugin()
 }
+
+func (m *ASTManager) SequenceFamilyID() (FamilyID, error) {
+	if err := m.prepareSequencePlugin(); err != nil {
+		return NullFamilyID, err
+	}
+	if err := m.lock(); err != nil {
+		return NullFamilyID, err
+	}
+	defer m.mu.Unlock()
+	if m.sequencePlugin == nil || !m.sequencePlugin.published {
+		return NullFamilyID, ErrASTHandle
+	}
+	return m.sequencePlugin.family, nil
+}
 func (m *ASTManager) sequenceSortCreate(p *astSequencePluginOwner, text string, k int32, param *astParameterRecord) (astNodeRef, error) {
 	name, e := m.Symbols.Intern(text)
 	if e != nil {

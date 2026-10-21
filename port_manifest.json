@@ -33513,7 +33513,8 @@
         "TestSequenceRewriterConstantLengthExtractAtAndIndex",
         "TestSequenceRewriterIntegerStringConversions",
         "TestSequenceRewriterRegexAlgebraicBranches",
-        "TestSequenceRewriterRegexLoopAndMembershipGuards"
+        "TestSequenceRewriterRegexLoopAndMembershipGuards",
+        "TestSequenceRewriterDeclarationDispatch"
       ],
       "assertions": [
         {
@@ -33839,13 +33840,21 @@
           "tests": [
             "TestSequenceRewriterRegexLoopAndMembershipGuards"
           ]
+        },
+        {
+          "name": "seq_rewriter::reduce_app sequence-family dispatch for ported sequence/String/regex reductions, including unary concat and two-argument index normalization; remaining reducer cases follow their open algorithms (seq_rewriter.cpp:343-460)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterDeclarationDispatch"
+          ]
         }
       ],
       "ownership": [
         "SequenceRewriter borrows its AST manager. RewriteConcat uses temporary owning AST references across nested public factory calls and joins their release errors into the result."
       ],
       "deviations": [
-        "The Go reducer exposes the theory operation directly; integration into the general rewriter traversal remains open with the other sequence reductions. Standard Go strings replace zstring storage for reached String algorithms.",
+        "The Go reducer exposes theory operations directly and through declaration/argument dispatch. General traversal configuration remains open with the unported sequence algorithms. Standard Go strings replace zstring storage for reached String algorithms.",
         "The native all-unit extraction branch passes an empty vector to an assertion-constrained concat helper when the start is beyond all units. The Go port returns the sequence empty value for that mathematically empty, otherwise undefined source case."
       ]
     },
