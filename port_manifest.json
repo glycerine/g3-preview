@@ -19859,13 +19859,16 @@
       "path": "src/ast/macros/macro_manager.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/macros/macro_manager.go",
+        "pkg/ast/macros/macro_expander.go",
         "pkg/ast/macros/macro_util_test.go"
       ],
       "tests": [
-        "TestMacroManagerInsertionCyclesScopesAndForbiddenTraversal"
+        "TestMacroManagerInsertionCyclesScopesAndForbiddenTraversal",
+        "TestMacroManagerExpandFixedPointTheoryRewriteAndDependencies",
+        "TestMacroManagerExpandProofChain"
       ],
       "assertions": [
         {
@@ -19901,8 +19904,8 @@
           "text": "SASSERT(q_pr != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "constructor/destructor, insert, dependency-cycle rejection, push/pop/reset, mark_forbidden, get_head_def, accessors and macro interpretation",
@@ -19914,29 +19917,36 @@
         },
         {
           "name": "macro_expander_cfg/macro_expander_rw and expand_macros proof/dependency/theory-rewrite loop",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_expander.go",
+          "tests": [
+            "TestMacroManagerExpandFixedPointTheoryRewriteAndDependencies",
+            "TestMacroManagerExpandProofChain"
+          ]
         }
       ],
       "ownership": [
-        "Installed macros own declaration, quantifier, optional proof and dependency references. FuncDeclDependencies owns the dependency graph. Forbidden declarations are pinned once and scoped rollback retires entries in reverse insertion order; native maps and slices replace C++ containers."
+        "Installed macros own declaration, quantifier, optional proof and dependency references. FuncDeclDependencies owns the dependency graph. Forbidden declarations are pinned once and scoped rollback retires entries in reverse insertion order; native maps and slices replace C++ containers.",
+        "Each expansion pass owns its traversal, variable substitution, replacement trail and accumulated dependency. ExpandMacros returns one owned dependency reference to its caller, and the post-expansion theory normalizer owns and closes its explicit parameter services."
       ],
       "deviations": [
-        "Checked Go errors replace source assertions. Macro expansion remains open, so this source unit is partial."
+        "Checked Go errors replace source assertions. The trace-only display helper is omitted because no retained non-tracing consumer calls it. Go constructs the theory rewriter's parameter services explicitly because there is no process-global parameter singleton."
       ]
     },
     {
       "path": "src/ast/macros/macro_manager.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/macros/macro_manager.go",
+        "pkg/ast/macros/macro_expander.go",
         "pkg/ast/macros/macro_util_test.go"
       ],
       "tests": [
-        "TestMacroManagerInsertionCyclesScopesAndForbiddenTraversal"
+        "TestMacroManagerInsertionCyclesScopesAndForbiddenTraversal",
+        "TestMacroManagerExpandFixedPointTheoryRewriteAndDependencies",
+        "TestMacroManagerExpandProofChain"
       ],
       "conditionals": [
         {
@@ -19948,8 +19958,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "macro storage, scopes, forbidden declarations, lookup and interpretation public surface",
@@ -19961,16 +19971,19 @@
         },
         {
           "name": "expand_macros public operation",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_expander.go",
+          "tests": [
+            "TestMacroManagerExpandFixedPointTheoryRewriteAndDependencies",
+            "TestMacroManagerExpandProofChain"
+          ]
         }
       ],
       "ownership": [
-        "Manager is a noncopyable owner over a borrowed ASTManager and explicit child dependency owner."
+        "Manager is a noncopyable owner over a borrowed ASTManager and explicit child dependency owner. ExpandMacros transfers one owned dependency root to its caller."
       ],
       "deviations": [
-        "Partial checkpoint pending macro expansion."
+        "The trace-only display method and unused forbidden-set container exposure are omitted."
       ]
     },
     {

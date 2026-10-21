@@ -196,8 +196,154 @@ func TestMacroManagerInsertionCyclesScopesAndForbiddenTraversal(t *testing.T) {
 	if !manager.IsForbidden(g) || manager.IsForbidden(f) {
 		t.Fatal("forbidden traversal")
 	}
+	h := declaration(t, m, "manager-pattern-h", []ast.ASTHandle{b}, b)
+	hv, err := m.MkApp(h, []ast.ASTHandle{v0})
+	must(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{hv})
+	must(t, err)
+	name, err := m.Symbols.Intern("pattern-x")
+	must(t, err)
+	annotated, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{name}, Body: fv, Patterns: []ast.ASTHandle{pattern}})
+	must(t, err)
+	must(t, manager.MarkForbidden([]ast.ASTHandle{annotated}))
+	if !manager.IsForbidden(h) {
+		t.Fatal("quantifier pattern declaration was not marked forbidden")
+	}
 	must(t, manager.PopScope(1))
-	if manager.HasMacros() || manager.IsForbidden(g) {
+	if manager.HasMacros() || manager.IsForbidden(g) || manager.IsForbidden(h) {
 		t.Fatal("scope restoration")
+	}
+}
+
+func TestMacroManagerExpandFixedPointTheoryRewriteAndDependencies(t *testing.T) {
+	m := fixture(t)
+	manager, err := macros.NewManager(m)
+	must(t, err)
+	t.Cleanup(func() { must(t, manager.Close()) })
+	b, err := m.MkBoolSort()
+	must(t, err)
+	v, err := m.MkVar(0, b)
+	must(t, err)
+	f := declaration(t, m, "expand-f", []ast.ASTHandle{b}, b)
+	g := declaration(t, m, "expand-g", []ast.ASTHandle{b}, b)
+	doubleNot, err := m.MkNot(v)
+	must(t, err)
+	doubleNot, err = m.MkNot(doubleNot)
+	must(t, err)
+	qg := quantifiedMacro(t, m, g, doubleNot, b)
+	gv, err := m.MkApp(g, []ast.ASTHandle{v})
+	must(t, err)
+	qf := quantifiedMacro(t, m, f, gv, b)
+	depGValue, err := m.MkConst(mustSymbol(t, m, "dep-g"), b)
+	must(t, err)
+	depFValue, err := m.MkConst(mustSymbol(t, m, "dep-f"), b)
+	must(t, err)
+	inputDepValue, err := m.MkConst(mustSymbol(t, m, "dep-input"), b)
+	must(t, err)
+	depG, err := m.DependencyLeaf(depGValue)
+	must(t, err)
+	depF, err := m.DependencyLeaf(depFValue)
+	must(t, err)
+	inputDep, err := m.DependencyLeaf(inputDepValue)
+	must(t, err)
+	inserted, err := manager.Insert(g, qg, ast.ASTHandle{}, depG)
+	must(t, err)
+	if !inserted {
+		t.Fatal("g macro was not inserted")
+	}
+	inserted, err = manager.Insert(f, qf, ast.ASTHandle{}, depF)
+	must(t, err)
+	if !inserted {
+		t.Fatal("f macro was not inserted")
+	}
+	a, err := m.MkConst(mustSymbol(t, m, "expand-a"), b)
+	must(t, err)
+	term, err := m.MkApp(f, []ast.ASTHandle{a})
+	must(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	must(t, err)
+	t.Cleanup(func() { must(t, m.DelRef(&out)) })
+	outProof, err := m.NewRef(ast.ASTHandle{})
+	must(t, err)
+	t.Cleanup(func() { must(t, m.DelRef(&outProof)) })
+	used, err := manager.ExpandMacros(term, ast.ASTHandle{}, inputDep, out, outProof)
+	must(t, err)
+	t.Cleanup(func() { must(t, m.DependencyDec(used)) })
+	got, err := m.RefGet(out)
+	must(t, err)
+	if got != a {
+		t.Fatal("fixed-point expansion and theory rewrite", got, a)
+	}
+	values, err := m.DependencyLinearize(used, nil)
+	must(t, err)
+	want := map[ast.ASTHandle]bool{inputDepValue: true, depFValue: true, depGValue: true}
+	if len(values) != len(want) {
+		t.Fatal("dependency count", len(values), values)
+	}
+	for _, value := range values {
+		if !want[value] {
+			t.Fatal("unexpected dependency", value)
+		}
+	}
+}
+
+func mustSymbol(t *testing.T, m *ast.ASTManager, text string) usymbol.Symbol {
+	t.Helper()
+	s, err := m.Symbols.Intern(text)
+	must(t, err)
+	return s
+}
+
+func TestMacroManagerExpandProofChain(t *testing.T) {
+	m := fixture(t)
+	must(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	manager, err := macros.NewManager(m)
+	must(t, err)
+	t.Cleanup(func() { must(t, manager.Close()) })
+	b, err := m.MkBoolSort()
+	must(t, err)
+	v, err := m.MkVar(0, b)
+	must(t, err)
+	f := declaration(t, m, "proof-expand-f", []ast.ASTHandle{b}, b)
+	notV, err := m.MkNot(v)
+	must(t, err)
+	q := quantifiedMacro(t, m, f, notV, b)
+	qProof, err := m.MkProofAsserted(q)
+	must(t, err)
+	inserted, err := manager.Insert(f, q, qProof, ast.ASTDependency{})
+	must(t, err)
+	if !inserted {
+		t.Fatal("proof macro was not inserted")
+	}
+	a, err := m.MkConst(mustSymbol(t, m, "proof-expand-a"), b)
+	must(t, err)
+	term, err := m.MkApp(f, []ast.ASTHandle{a})
+	must(t, err)
+	termProof, err := m.MkProofAsserted(term)
+	must(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	must(t, err)
+	t.Cleanup(func() { must(t, m.DelRef(&out)) })
+	outProof, err := m.NewRef(ast.ASTHandle{})
+	must(t, err)
+	t.Cleanup(func() { must(t, m.DelRef(&outProof)) })
+	used, err := manager.ExpandMacros(term, termProof, ast.ASTDependency{}, out, outProof)
+	must(t, err)
+	if !used.IsNull() {
+		t.Fatal("unexpected dependency")
+	}
+	want, err := m.MkNot(a)
+	must(t, err)
+	got, err := m.RefGet(out)
+	must(t, err)
+	if got != want {
+		t.Fatal("proof expansion result", got, want)
+	}
+	proof, err := m.RefGet(outProof)
+	must(t, err)
+	fact, err := m.GetProofFact(proof)
+	must(t, err)
+	if fact != want {
+		t.Fatal("expanded proof fact", fact, want)
 	}
 }

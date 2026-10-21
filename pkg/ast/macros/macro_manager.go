@@ -335,6 +335,28 @@ func (m *Manager) MarkForbidden(expressions []ast.ASTHandle) error {
 				return e2
 			}
 			stack = append(stack, body)
+			patterns, e2 := m.manager.GetNumPatterns(e)
+			if e2 != nil {
+				return e2
+			}
+			for j := patterns; j > 0; j-- {
+				pattern, e3 := m.manager.GetPattern(e, j-1)
+				if e3 != nil {
+					return e3
+				}
+				stack = append(stack, pattern)
+			}
+			noPatterns, e2 := m.manager.GetNumNoPatterns(e)
+			if e2 != nil {
+				return e2
+			}
+			for j := noPatterns; j > 0; j-- {
+				pattern, e3 := m.manager.GetNoPattern(e, j-1)
+				if e3 != nil {
+					return e3
+				}
+				stack = append(stack, pattern)
+			}
 		}
 	}
 	m.publishForbidden()
