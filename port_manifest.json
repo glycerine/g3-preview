@@ -25029,9 +25029,15 @@
       "path": "src/ast/rewriter/bv_bounds.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/bv_bounds.go",
+        "pkg/ast/rewriter/bv_bounds_convert.go"
+      ],
+      "tests": [
+        "TestBVBoundsContradictionAndSingletonRewrite",
+        "TestBVBoundsNegativeIntervalsAndSignedConstraint"
+      ],
       "assertions": [
         {
           "line": 28,
@@ -25191,18 +25197,43 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "interval recording, unsigned/signed conversion, direct constraint addition, satisfiability, singleton extraction and Boolean rewrite core",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_bounds.go",
+          "tests": [
+            "TestBVBoundsContradictionAndSingletonRewrite",
+            "TestBVBoundsNegativeIntervalsAndSignedConstraint"
+          ]
+        },
+        {
+          "name": "bv_bounds TRACE records and complete source assertion profile",
+          "status": "unported",
+          "reason": "The mathematical production paths are connected; source diagnostic ordering and the full debug-only assertion matrix remain to be audited before whole-unit promotion."
+        }
+      ],
+      "ownership": [
+        "Native maps own independent math/big.Int copies for lower, upper, negative-interval and singleton values. Reset and Close discard those Go-owned values without a translated container allocator."
+      ],
+      "deviations": [
+        "Native Go maps and slices replace obj_map, obj_hashtable and vector storage; exact integer arithmetic replaces rational values whose retained bit-vector domains are integral."
+      ]
     },
     {
       "path": "src/ast/rewriter/bv_bounds.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/bv_bounds.go",
+        "pkg/ast/rewriter/bv_bounds_convert.go"
+      ],
+      "tests": [
+        "TestBVBoundsContradictionAndSingletonRewrite",
+        "TestBVBoundsNegativeIntervalsAndSignedConstraint"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -25224,9 +25255,26 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete BVBounds construction, bound maps, conversion helpers, public constraint/bound/query/reset/rewrite surface",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_bounds.go",
+          "tests": [
+            "TestBVBoundsContradictionAndSingletonRewrite",
+            "TestBVBoundsNegativeIntervalsAndSignedConstraint"
+          ]
+        },
+        {
+          "name": "complete inline-helper source assertion profile",
+          "status": "unported",
+          "reason": "Debug-only precondition ordering still requires focused verification."
+        }
+      ],
+      "ownership": [
+        "BVBounds borrows its AST manager and owns only native exact-integer map and slice values."
+      ],
       "deviations": []
     },
     {
