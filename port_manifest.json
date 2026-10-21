@@ -33852,11 +33852,12 @@
           ]
         },
         {
-          "name": "seq_rewriter::mk_eq_core boundary cancellation, concrete String splitting, unit alignment and empty residual reduction; integer-string, bounded-length and subsequence helpers remain open (seq_rewriter.cpp:1572-1931)",
-          "status": "partial",
+          "name": "seq_rewriter::mk_eq_core boundary cancellation, concrete String splitting, unit alignment, empty residual, integer-string, bounded-length and subsequence reductions (seq_rewriter.cpp:1572-2043,2051-2111)",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/seq_rewriter_equality.go",
           "tests": [
-            "TestSequenceRewriterEqualityBoundaryReductions"
+            "TestSequenceRewriterEqualityBoundaryReductions",
+            "TestSequenceRewriterEqualityArithmeticLengthAndSubsequence"
           ]
         },
         {

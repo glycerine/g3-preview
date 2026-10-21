@@ -3,6 +3,7 @@ package rewriter
 
 import (
 	"errors"
+	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -64,6 +65,214 @@ func (s *sequenceEqualityReduction) concat(parts []ast.ASTHandle, like ast.ASTHa
 	}
 	s.refs = append(s.refs, ref)
 	return h, nil
+}
+
+func (s *sequenceEqualityReduction) concreteString(parts []ast.ASTHandle) (string, bool, error) {
+	result := ""
+	for _, part := range parts {
+		text, stringValue, err := s.rewriter.manager.SequenceStringValue(part)
+		if err != nil {
+			return "", false, err
+		}
+		if stringValue {
+			result += text
+			continue
+		}
+		element, unit, err := s.rewriter.manager.SequenceUnitArgument(part)
+		if err != nil {
+			return "", false, err
+		}
+		if !unit {
+			return "", false, nil
+		}
+		value, numeral, err := s.rewriter.manager.SequenceUnitByteElementValue(element)
+		if err != nil {
+			return "", false, err
+		}
+		if !numeral {
+			return "", false, nil
+		}
+		result += string([]byte{value})
+	}
+	return result, true, nil
+}
+
+func (s *sequenceEqualityReduction) solveIntToString(left, right []ast.ASTHandle) (bool, error) {
+	if len(left) == 1 {
+		integer, leftConversion, err := s.rewriter.manager.SequenceIntToStringArgument(left[0])
+		if err != nil {
+			return false, err
+		}
+		if leftConversion {
+			if len(right) == 1 {
+				other, rightConversion, err := s.rewriter.manager.SequenceIntToStringArgument(right[0])
+				if err != nil {
+					return false, err
+				}
+				if rightConversion {
+					s.add(integer, other)
+					return true, nil
+				}
+			}
+			text, concrete, err := s.concreteString(right)
+			if err != nil || !concrete {
+				return false, err
+			}
+			value, valid := new(big.Int).SetString(text, 10)
+			if !valid || value.String() != text {
+				return false, nil
+			}
+			numeral, err := s.rewriter.makeInteger(value)
+			if err != nil {
+				return false, err
+			}
+			if err = s.hold(numeral); err != nil {
+				return false, err
+			}
+			s.add(integer, numeral)
+			return true, nil
+		}
+	}
+	if len(right) == 1 && len(left) >= 1 {
+		_, rightConversion, err := s.rewriter.manager.SequenceIntToStringArgument(right[0])
+		if err != nil {
+			return false, err
+		}
+		_, leftConversion, err := s.rewriter.manager.SequenceIntToStringArgument(left[0])
+		if err != nil {
+			return false, err
+		}
+		if rightConversion && !leftConversion {
+			return s.solveIntToString(right, left)
+		}
+	}
+	return false, nil
+}
+
+func (s *sequenceEqualityReduction) concatNonEmpty(parts []ast.ASTHandle, like ast.ASTHandle) (ast.ASTHandle, error) {
+	kept := make([]ast.ASTHandle, 0, len(parts))
+	for _, part := range parts {
+		unit, err := s.rewriter.manager.IsSequenceUnit(part)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		_, stringValue, err := s.rewriter.manager.SequenceStringValue(part)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		if unit || stringValue {
+			kept = append(kept, part)
+		}
+	}
+	return s.concat(kept, like)
+}
+
+func (s *sequenceEqualityReduction) lengthConstrained(left, right []ast.ASTHandle, leftLike, rightLike ast.ASTHandle) (handled, satisfiable bool, err error) {
+	leftLength, leftBounded, err := s.rewriter.sequenceMinimumLength(left)
+	if err != nil {
+		return false, false, err
+	}
+	rightLength, rightBounded, err := s.rewriter.sequenceMinimumLength(right)
+	if err != nil {
+		return false, false, err
+	}
+	if leftBounded && leftLength < rightLength || rightBounded && rightLength < leftLength {
+		return true, false, nil
+	}
+	bounded := leftBounded && leftLength == rightLength && leftLength > 0
+	boundedRight := false
+	if !bounded {
+		boundedRight = rightBounded && leftLength == rightLength && leftLength > 0
+		bounded = boundedRight
+	}
+	if !bounded {
+		return false, true, nil
+	}
+	unknown := right
+	if boundedRight {
+		unknown = left
+	}
+	if _, err = s.setEmpty(unknown, false); err != nil {
+		return false, false, err
+	}
+	leftValue, err := s.concatNonEmpty(left, leftLike)
+	if err != nil {
+		return false, false, err
+	}
+	rightValue, err := s.concatNonEmpty(right, rightLike)
+	if err != nil {
+		return false, false, err
+	}
+	s.add(leftValue, rightValue)
+	return true, true, nil
+}
+
+func (s *sequenceEqualityReduction) alignSubsequence(left, right []ast.ASTHandle, leftLike, rightLike ast.ASTHandle) (handled, satisfiable bool, err error) {
+	if len(left) == len(right) {
+		return false, true, nil
+	}
+	if len(right) < len(left) {
+		return s.alignSubsequence(right, left, rightLike, leftLike)
+	}
+	used := make([]bool, len(right))
+	for _, part := range left {
+		unit, err := s.rewriter.manager.IsSequenceUnit(part)
+		if err != nil {
+			return false, false, err
+		}
+		found := -1
+		for j, candidate := range right {
+			if used[j] {
+				continue
+			}
+			candidateUnit := false
+			if unit {
+				candidateUnit, err = s.rewriter.manager.IsSequenceUnit(candidate)
+				if err != nil {
+					return false, false, err
+				}
+			}
+			if part == candidate || unit && candidateUnit {
+				found = j
+				break
+			}
+		}
+		if found < 0 {
+			return false, true, nil
+		}
+		used[found] = true
+	}
+	changed := false
+	matched := make([]ast.ASTHandle, 0, len(left))
+	for j, part := range right {
+		if used[j] {
+			matched = append(matched, part)
+			continue
+		}
+		satisfiable, err := s.setEmpty([]ast.ASTHandle{part}, true)
+		if err != nil {
+			return false, false, err
+		}
+		if !satisfiable {
+			return true, false, nil
+		}
+		changed = true
+	}
+	if !changed {
+		return false, true, nil
+	}
+	if len(left) > 0 {
+		leftValue, err := s.concat(left, leftLike)
+		if err != nil {
+			return false, false, err
+		}
+		rightValue, err := s.concat(matched, rightLike)
+		if err != nil {
+			return false, false, err
+		}
+		s.add(leftValue, rightValue)
+	}
+	return true, true, nil
 }
 
 func (s *sequenceEqualityReduction) setEmpty(parts []ast.ASTHandle, all bool) (bool, error) {
@@ -366,6 +575,23 @@ func (r *SequenceRewriter) RewriteEquality(left, right ast.ASTHandle, out ast.AS
 	}
 
 	remainingLeft, remainingRight := ls[headLeft:], rs[headRight:]
+	handled, e := state.solveIntToString(remainingLeft, remainingRight)
+	if e != nil {
+		return RewriteFailed, e
+	}
+	if handled {
+		return state.publish(out)
+	}
+	handled, satisfiable, e := state.lengthConstrained(remainingLeft, remainingRight, left, right)
+	if e != nil {
+		return RewriteFailed, e
+	}
+	if handled {
+		if !satisfiable {
+			return r.assignBoolean(false, out)
+		}
+		return state.publish(out)
+	}
 	if len(remainingLeft) == 0 && len(remainingRight) == 0 {
 		if !changed {
 			return RewriteFailed, nil
@@ -393,6 +619,16 @@ func (r *SequenceRewriter) RewriteEquality(left, right ast.ASTHandle, out ast.AS
 		changed = changed || len(parts) > 1
 		if !changed {
 			return RewriteFailed, nil
+		}
+		return state.publish(out)
+	}
+	handled, satisfiable, e = state.alignSubsequence(remainingLeft, remainingRight, left, right)
+	if e != nil {
+		return RewriteFailed, e
+	}
+	if handled {
+		if !satisfiable {
+			return r.assignBoolean(false, out)
 		}
 		return state.publish(out)
 	}

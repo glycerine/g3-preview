@@ -1,6 +1,7 @@
 package rewriter
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -134,5 +135,81 @@ func TestSequenceRewriterEqualityBoundaryReductions(t *testing.T) {
 	astTestMust(t, err)
 	if status != RewriteFailed {
 		t.Fatalf("singleton empty equality status: %d", status)
+	}
+}
+
+func TestSequenceRewriterEqualityArithmeticLengthAndSubsequence(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	pin := func(h ast.ASTHandle, err error) ast.ASTHandle {
+		t.Helper()
+		astTestMust(t, err)
+		astTestPin(t, m, h)
+		return h
+	}
+	concat := func(left, right ast.ASTHandle) ast.ASTHandle {
+		return pin(m.MkSequenceConcat(left, right))
+	}
+	numeral := pin(rw.makeInteger(big.NewInt(0)))
+	integerSort, err := m.GetSort(numeral)
+	astTestMust(t, err)
+	n := pin(m.MkConst(astTestSymbol(t, m, "equality-n"), integerSort))
+	conversion := pin(m.MkIntToString(n))
+	status, err := rw.RewriteEquality(conversion, pin(m.MkString("42")), out)
+	astTestMust(t, err)
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	args, err := m.AppArgumentView(result)
+	astTestMust(t, err)
+	left, err := args.At(0)
+	astTestMust(t, err)
+	right, err := args.At(1)
+	astTestMust(t, err)
+	text, integer, matched, err := m.ArithmeticNumeralText(right)
+	astTestMust(t, err)
+	if status != Rewrite3 || left != n || !matched || !integer || text != "42" {
+		t.Fatalf("int.to.str equality: status=%d left=%v text=%q integer=%v matched=%v", status, left, text, integer, matched)
+	}
+
+	stringSort, err := m.GetSort(pin(m.MkString("sort witness")))
+	astTestMust(t, err)
+	constant := func(name string) ast.ASTHandle {
+		return pin(m.MkConst(astTestSymbol(t, m, name), stringSort))
+	}
+	x, y, z := constant("length-x"), constant("length-y"), constant("length-z")
+	byteZero := pin(m.BitVectorNumeralUnsigned(0, 8))
+	byteSort, err := m.GetSort(byteZero)
+	astTestMust(t, err)
+	p := pin(m.MkConst(astTestSymbol(t, m, "length-p"), byteSort))
+	unitP := pin(m.MkSequenceUnit(p))
+	status, err = rw.RewriteEquality(pin(m.MkString("a")), concat(x, concat(unitP, y)), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || status != Rewrite3 || kind != ast.ASTOpAnd {
+		t.Fatalf("length constrained equality: status=%d kind=%d error=%v", status, kind, e)
+	}
+
+	status, err = rw.RewriteEquality(x, concat(y, concat(x, z)), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || status != Rewrite3 || kind != ast.ASTOpAnd {
+		t.Fatalf("subsequence equality: status=%d kind=%d error=%v", status, kind, e)
+	}
+	status, err = rw.RewriteEquality(x, concat(y, concat(x, unitP)), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteDone || !m.IsFalse(result) {
+		t.Fatalf("subsequence contradiction: status=%d result=%v", status, result)
 	}
 }
