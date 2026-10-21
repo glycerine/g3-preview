@@ -22595,7 +22595,8 @@
         "TestArithRewriterRationalScalarCores",
         "TestArithRewriterStructuralScalarRules",
         "TestArithRewriterSymbolicModRemAndCasts",
-        "TestArithRewriterPolynomialAddMulSubAndNegation"
+        "TestArithRewriterPolynomialAddMulSubAndNegation",
+        "TestArithRewriterPolynomialCancellation"
       ],
       "assertions": [
         {
@@ -22834,11 +22835,20 @@
           "status": "ported",
           "go_target": "pkg/ast/rewriter/arith_polynomial.go",
           "tests": [
-            "TestArithRewriterPolynomialAddMulSubAndNegation"
+            "TestArithRewriterPolynomialAddMulSubAndNegation",
+            "TestArithRewriterPolynomialCancellation"
           ]
         },
         {
-          "name": "expression-polynomial cancellation and advanced SOM/hoisting modes, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
+          "name": "cross-side polynomial monomial and constant cancellation, including configured movement to the left-hand side",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_polynomial.go",
+          "tests": [
+            "TestArithRewriterPolynomialCancellation"
+          ]
+        },
+        {
+          "name": "advanced SOM/hoisting modes, arithmetic bound/GCD/power reductions, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
           "status": "unported",
           "reason": "The exact rational scalar core is connected first; the remaining paths require the concrete arithmetic specialization of poly_rewriter and broader algebraic-expression integration."
         }
@@ -22861,7 +22871,8 @@
         "TestArithRewriterRationalScalarCores",
         "TestArithRewriterStructuralScalarRules",
         "TestArithRewriterSymbolicModRemAndCasts",
-        "TestArithRewriterPolynomialAddMulSubAndNegation"
+        "TestArithRewriterPolynomialAddMulSubAndNegation",
+        "TestArithRewriterPolynomialCancellation"
       ],
       "conditionals": [
         {
@@ -22884,7 +22895,8 @@
             "TestArithRewriterRationalScalarCores",
             "TestArithRewriterStructuralScalarRules",
             "TestArithRewriterSymbolicModRemAndCasts",
-            "TestArithRewriterPolynomialAddMulSubAndNegation"
+            "TestArithRewriterPolynomialAddMulSubAndNegation",
+            "TestArithRewriterPolynomialCancellation"
           ]
         },
         {

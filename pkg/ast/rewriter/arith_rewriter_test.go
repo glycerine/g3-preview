@@ -379,3 +379,88 @@ func TestArithRewriterPolynomialAddMulSubAndNegation(t *testing.T) {
 		t.Fatal("disabled polynomial flattening", status)
 	}
 }
+
+func TestArithRewriterPolynomialCancellation(t *testing.T) {
+	m, c, g, local := boolRewriterConfigFixture(t)
+	r, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	iSort, err := m.MkFamilySort(r.family, 1, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "arith-cancel-x"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	y, err := m.MkConst(astTestSymbol(t, m, "arith-cancel-y"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, y)
+	z, err := m.MkConst(astTestSymbol(t, m, "arith-cancel-z"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, z)
+	i2 := arithRewriterNumeral(t, m, "2", true)
+	i5 := arithRewriterNumeral(t, m, "5", true)
+	left, err := r.app(arithOpAdd, x, i2)
+	astTestMust(t, err)
+	astTestPin(t, m, left)
+	right, err := r.app(arithOpAdd, x, i5)
+	astTestMust(t, err)
+	astTestPin(t, m, right)
+
+	status, result := arithRewriterCore(t, r, arithOpLE, left, right)
+	if status != RewriteDone || !m.IsTrue(result) {
+		t.Fatal("inequality cancellation", status, result)
+	}
+
+	equalityOut := astTestPin(t, m, left)
+	status, err = r.MkEqCore(left, right, equalityOut)
+	astTestMust(t, err)
+	result, err = m.RefGet(equalityOut)
+	astTestMust(t, err)
+	if status != RewriteDone || !m.IsFalse(result) {
+		t.Fatal("equality cancellation", status, result)
+	}
+
+	left, err = r.app(arithOpAdd, x, y)
+	astTestMust(t, err)
+	astTestPin(t, m, left)
+	right, err = r.app(arithOpAdd, x, z)
+	astTestMust(t, err)
+	astTestPin(t, m, right)
+	status, result = arithRewriterCore(t, r, arithOpGE, left, right)
+	if status != RewriteDone {
+		t.Fatal("symbolic cancellation status", status)
+	}
+	arithRewriterWantOperation(t, r, result, arithOpGE, y, z)
+
+	key := "arith_lhs"
+	astTestMust(t, c.SetBoolName(local, &key, true))
+	lhsRewriter, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, lhsRewriter.Close()) })
+	left, err = lhsRewriter.app(arithOpAdd, x, i2)
+	astTestMust(t, err)
+	astTestPin(t, m, left)
+	right, err = lhsRewriter.app(arithOpAdd, y, i5)
+	astTestMust(t, err)
+	astTestPin(t, m, right)
+	status, result = arithRewriterCore(t, lhsRewriter, arithOpLE, left, right)
+	if status != RewriteDone {
+		t.Fatal("move-to-lhs status", status)
+	}
+	_, comparisonArgs, matched, err := lhsRewriter.operation(result, arithOpLE)
+	astTestMust(t, err)
+	if !matched || len(comparisonArgs) != 2 {
+		t.Fatal("move-to-lhs comparison", matched, len(comparisonArgs))
+	}
+	arithRewriterWantNumeral(t, m, comparisonArgs[1], "3", true)
+	_, lhsArgs, matched, err := lhsRewriter.operation(comparisonArgs[0], arithOpAdd)
+	astTestMust(t, err)
+	if !matched || len(lhsArgs) != 2 || lhsArgs[0] != x {
+		t.Fatal("move-to-lhs polynomial", matched, len(lhsArgs))
+	}
+	_, negativeY, matched, err := lhsRewriter.operation(lhsArgs[1], arithOpMul)
+	astTestMust(t, err)
+	if !matched || len(negativeY) != 2 || negativeY[1] != y {
+		t.Fatal("move-to-lhs negative term", matched, len(negativeY))
+	}
+	arithRewriterWantNumeral(t, m, negativeY[0], "-1", true)
+}

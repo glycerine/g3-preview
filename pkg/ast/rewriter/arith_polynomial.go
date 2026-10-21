@@ -362,3 +362,184 @@ func (r *ArithRewriter) rewriteSub(args ast.AppArguments, out ast.ASTRef) (Rewri
 	}
 	return Rewrite2, r.manager.SetRef(out, result)
 }
+
+func (r *ArithRewriter) monomials(h ast.ASTHandle) ([]ast.ASTHandle, error) {
+	_, args, add, err := r.operation(h, arithOpAdd)
+	if err != nil {
+		return nil, err
+	}
+	if add {
+		return args, nil
+	}
+	return []ast.ASTHandle{h}, nil
+}
+
+func (r *ArithRewriter) cancelMonomials(left, right ast.ASTHandle, move bool) (ast.ASTHandle, ast.ASTHandle, bool, error) {
+	sides := [2][]ast.ASTHandle{}
+	var err error
+	sides[0], err = r.monomials(left)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	sides[1], err = r.monomials(right)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	constant := new(big.Rat)
+	constantCount := 0
+	leftProducts := make(map[ast.ASTHandle]bool)
+	shared := make(map[ast.ASTHandle]bool)
+	for _, term := range sides[0] {
+		value, _, numeral, e := r.numeral(term)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		}
+		if numeral {
+			constant.Add(constant, value)
+			constantCount++
+			continue
+		}
+		_, product, e := r.monomial(term)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		}
+		leftProducts[product] = true
+	}
+	if move && constantCount == 0 {
+		if _, _, numeral, e := r.numeral(right); e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		} else if numeral {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, nil
+		}
+	}
+	for _, term := range sides[1] {
+		value, _, numeral, e := r.numeral(term)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		}
+		if numeral {
+			constant.Sub(constant, value)
+			constantCount++
+			continue
+		}
+		_, product, e := r.monomial(term)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		}
+		if leftProducts[product] {
+			shared[product] = true
+		}
+	}
+	if len(shared) == 0 && constantCount <= 1 {
+		_, _, rightNumeral, e := r.numeral(right)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		}
+		if move && rightNumeral || !move && (constantCount == 0 || rightNumeral) {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, nil
+		}
+	}
+	sharedCoefficients := make(map[ast.ASTHandle]*big.Rat)
+	for side := range sides {
+		for _, term := range sides[side] {
+			if _, _, numeral, e := r.numeral(term); e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+			} else if numeral {
+				continue
+			}
+			coefficient, product, e := r.monomial(term)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+			}
+			if !shared[product] {
+				continue
+			}
+			if sharedCoefficients[product] == nil {
+				sharedCoefficients[product] = new(big.Rat)
+			}
+			if side == 0 {
+				sharedCoefficients[product].Add(sharedCoefficients[product], coefficient)
+			} else {
+				sharedCoefficients[product].Sub(sharedCoefficients[product], coefficient)
+			}
+		}
+	}
+	lhs := make([]ast.ASTHandle, 0, len(sides[0])+len(sides[1]))
+	rhs := make([]ast.ASTHandle, 0, len(sides[1]))
+	seen := make(map[ast.ASTHandle]bool)
+	for _, term := range sides[0] {
+		if _, _, numeral, e := r.numeral(term); e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		} else if numeral {
+			continue
+		}
+		_, product, e := r.monomial(term)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		}
+		if !shared[product] {
+			lhs = append(lhs, term)
+			continue
+		}
+		if seen[product] {
+			continue
+		}
+		seen[product] = true
+		coefficient := sharedCoefficients[product]
+		if coefficient.Sign() != 0 {
+			h, e := r.coefficientProduct(coefficient, product, left)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+			}
+			lhs = append(lhs, h)
+		}
+	}
+	for _, term := range sides[1] {
+		if _, _, numeral, e := r.numeral(term); e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		} else if numeral {
+			continue
+		}
+		coefficient, product, e := r.monomial(term)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		}
+		if shared[product] {
+			continue
+		}
+		if !move {
+			rhs = append(rhs, term)
+			continue
+		}
+		coefficient.Neg(coefficient)
+		h, e := r.coefficientProduct(coefficient, product, left)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		}
+		lhs = append(lhs, h)
+	}
+	constantAtRight := move || len(rhs) == 0 || len(lhs) != 0
+	if constantAtRight {
+		constant.Neg(constant)
+	}
+	if constant.Sign() != 0 || constantAtRight && len(rhs) == 0 || !constantAtRight && len(lhs) == 0 {
+		h, e := r.numeralForTerm(constant, left)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		}
+		if constantAtRight {
+			rhs = append([]ast.ASTHandle{h}, rhs...)
+		} else {
+			lhs = append([]ast.ASTHandle{h}, lhs...)
+		}
+	}
+	newLeft, err := r.makeAdd(lhs, left)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	newRight, err := r.makeAdd(rhs, left)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	return newLeft, newRight, newLeft != left || newRight != right, nil
+}

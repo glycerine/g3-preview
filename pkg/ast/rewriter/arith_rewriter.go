@@ -191,6 +191,15 @@ func (r *ArithRewriter) operation(h ast.ASTHandle, kinds ...int32) (int32, []ast
 	return kind, args, true, nil
 }
 
+func (r *ArithRewriter) arithmeticTerm(h ast.ASTHandle) (bool, error) {
+	kind, err := r.manager.GetKind(h)
+	if err != nil || kind != ast.ASTApp {
+		return false, err
+	}
+	family, err := r.manager.GetFamilyID(h)
+	return err == nil && family == r.family, err
+}
+
 func (r *ArithRewriter) isITE(h ast.ASTHandle) (bool, error) {
 	family, err := r.manager.GetFamilyID(h)
 	if err != nil || family != r.manager.BasicFamilyID() {
@@ -240,12 +249,26 @@ func (r *ArithRewriter) rewriteComparison(kind int32, left, right ast.ASTHandle,
 		}
 		return Rewrite2, r.manager.SetRef(out, negated)
 	}
+	newLeft, newRight, changed, err := r.cancelMonomials(left, right, r.arithIneqLHS || r.arithLHS)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if changed {
+		left, right = newLeft, newRight
+	}
 	lv, _, ln, err := r.numeral(left)
 	if err != nil {
 		return RewriteFailed, err
 	}
 	rv, _, rn, err := r.numeral(right)
 	if err != nil || !ln || !rn {
+		if changed && err == nil {
+			result, e := r.app(kind, left, right)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			return RewriteDone, r.manager.SetRef(out, result)
+		}
 		return RewriteFailed, err
 	}
 	cmp := lv.Cmp(rv)
@@ -759,12 +782,34 @@ func (r *ArithRewriter) MkEqCore(left, right ast.ASTHandle, out ast.ASTRef) (Rew
 		}
 		return Rewrite2, r.manager.SetRef(out, both)
 	}
+	leftArithmetic, err := r.arithmeticTerm(left)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	rightArithmetic, err := r.arithmeticTerm(right)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	changed := false
+	if r.arithLHS || leftArithmetic || rightArithmetic {
+		left, right, changed, err = r.cancelMonomials(left, right, r.arithLHS)
+		if err != nil {
+			return RewriteFailed, err
+		}
+	}
 	lv, _, ln, err := r.numeral(left)
 	if err != nil {
 		return RewriteFailed, err
 	}
 	rv, _, rn, err := r.numeral(right)
 	if err != nil || !ln || !rn {
+		if changed && err == nil {
+			result, e := r.manager.MkEq(left, right)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			return RewriteDone, r.manager.SetRef(out, result)
+		}
 		return RewriteFailed, err
 	}
 	return RewriteDone, r.setBool(out, lv.Cmp(rv) == 0)
