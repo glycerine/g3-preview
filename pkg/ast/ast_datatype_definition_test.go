@@ -108,6 +108,11 @@ func TestASTDatatypeDefinitionBlockAndUtilities(t *testing.T) {
 	if display.String() != wantDisplay {
 		t.Fatalf("datatype display\nwant: %q\n got: %q", wantDisplay, display.String())
 	}
+	descriptions, err := m.DatatypeDefinitions(sorts[0])
+	astTestMust(t, err)
+	if len(descriptions) != 2 || descriptions[0].Sort != sorts[0] || len(descriptions[0].Constructors) != 2 || descriptions[0].Constructors[1].Accessors[1].Range != sorts[1] {
+		t.Fatal("datatype definition descriptions", descriptions)
+	}
 	var names ASTBuiltinNames
 	astTestMust(t, m.GetDatatypeOpNames(&names, usymbol.Symbol{}))
 	if items := names.Items(); len(items) != 2 || items[0].Kind != ASTDatatypeIs || items[1].Kind != ASTDatatypeUpdateField {
