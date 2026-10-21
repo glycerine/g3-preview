@@ -100,17 +100,24 @@ func decodeSequenceString(value string) string {
 }
 
 // MkString constructs the retained seq_decl_plugin string constant.
-func (m *ASTManager) MkString(value string) (ASTHandle, error) {
+func (m *ASTManager) prepareSequencePlugin() error {
 	if _, err := m.RegisterArithmeticPlugin(); err != nil {
-		return ASTHandle{}, err
+		return err
 	}
 	if _, err := m.RegisterBitVectorPlugin(); err != nil {
-		return ASTHandle{}, err
+		return err
 	}
 	if _, err := m.RegisterArrayPlugin(); err != nil {
-		return ASTHandle{}, err
+		return err
 	}
 	if _, err := m.RegisterSequencePlugin(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ASTManager) MkString(value string) (ASTHandle, error) {
+	if err := m.prepareSequencePlugin(); err != nil {
 		return ASTHandle{}, err
 	}
 	if err := m.lock(); err != nil {

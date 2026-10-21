@@ -109,4 +109,34 @@ func TestASTSequenceStringValueClassification(t *testing.T) {
 	if genericKind != ASTSequenceOpEmpty {
 		t.Fatalf("generic sequence some value kind: %d", genericKind)
 	}
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	falsity, err := m.MkFalse()
+	astTestMust(t, err)
+	truthUnit, err := m.MkSequenceUnit(truth)
+	astTestMust(t, err)
+	falseUnit, err := m.MkSequenceUnit(falsity)
+	astTestMust(t, err)
+	unitsDistinct, err := m.AreDistinct(truthUnit, falseUnit)
+	astTestMust(t, err)
+	emptyUnitDistinct, err := m.AreDistinct(genericEmpty, truthUnit)
+	astTestMust(t, err)
+	concat, err := m.MkSequenceConcat(truthUnit, genericEmpty)
+	astTestMust(t, err)
+	concatValue, err := m.IsValue(concat)
+	astTestMust(t, err)
+	concatUnique, err := m.IsUniqueValue(concat)
+	astTestMust(t, err)
+	if !unitsDistinct || !emptyUnitDistinct || !concatValue || concatUnique {
+		t.Fatalf("sequence values: units-distinct=%v empty-unit=%v concat-value=%v concat-unique=%v", unitsDistinct, emptyUnitDistinct, concatValue, concatUnique)
+	}
+	stringConcat, err := m.MkSequenceConcat(first, second)
+	astTestMust(t, err)
+	stringKind, err := m.GetDeclKind(stringConcat)
+	astTestMust(t, err)
+	stringValue, err := m.IsValue(stringConcat)
+	astTestMust(t, err)
+	if stringKind != ASTSequenceOpConcat || !stringValue {
+		t.Fatalf("string concat: kind=%d value=%v", stringKind, stringValue)
+	}
 }

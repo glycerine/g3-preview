@@ -34167,6 +34167,7 @@
         "pkg/ast/ast_seq_plugin.go",
         "pkg/ast/ast_seq_string.go",
         "pkg/ast/ast_seq_values.go",
+        "pkg/ast/ast_seq_factories.go",
         "pkg/ast/ast_seq_names.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_seq_signature_memory_trace.go",
@@ -34287,6 +34288,14 @@
           "tests": [
             "TestASTSequenceSourceBuiltinNames"
           ]
+        },
+        {
+          "name": "retained seq_decl_plugin empty, unit and binary sequence/string concatenation factories with sort inference and string specialization (seq_decl_plugin.cpp:620-672,755-767)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_factories.go",
+          "tests": [
+            "TestASTSequenceStringValueClassification"
+          ]
         }
       ],
       "ownership": [
@@ -34304,7 +34313,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_seq_string.go",
-        "pkg/ast/ast_seq_values.go"
+        "pkg/ast/ast_seq_values.go",
+        "pkg/ast/ast_seq_factories.go"
       ],
       "tests": [
         "TestASTSMT2StringLiteralSourceEncoding"
@@ -34340,6 +34350,14 @@
           "name": "seq_decl_plugin value callbacks plus seq_util empty and to-re construction declarations (seq_decl_plugin.h:180-188,234-244)",
           "status": "ported",
           "go_target": "pkg/ast/ast_seq_values.go",
+          "tests": [
+            "TestASTSequenceStringValueClassification"
+          ]
+        },
+        {
+          "name": "seq_util retained empty, unit and binary concat construction declarations (seq_decl_plugin.h:234-244)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_factories.go",
           "tests": [
             "TestASTSequenceStringValueClassification"
           ]
