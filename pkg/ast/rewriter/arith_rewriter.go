@@ -573,19 +573,131 @@ func (r *ArithRewriter) rewriteRem(left, right ast.ASTHandle, out ast.ASTRef) (R
 }
 
 func (r *ArithRewriter) rewritePower(base, exponent ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
-	x, integer, xn, err := r.numeral(base)
+	x, _, xn, err := r.numeral(base)
 	if err != nil {
 		return RewriteFailed, err
 	}
 	y, _, yn, err := r.numeral(exponent)
-	if err != nil || !yn || !y.IsInt() || !y.Num().IsInt64() {
+	if err != nil || !yn {
 		return RewriteFailed, err
 	}
-	n := y.Num().Int64()
-	if xn && x.Cmp(big.NewRat(1, 1)) == 0 || n == 1 {
+	integer, err := r.integerTerm(base)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if xn && x.Cmp(big.NewRat(1, 1)) == 0 || y.Cmp(big.NewRat(1, 1)) == 0 {
 		return RewriteDone, r.manager.SetRef(out, base)
 	}
-	if !xn || n == 0 && x.Sign() == 0 || n < 0 && integer || n > int64(r.maxDegree) || n < -int64(r.maxDegree) {
+	if xn && y.IsInt() && y.Num().IsInt64() {
+		n := y.Num().Int64()
+		if n == 0 && x.Sign() == 0 {
+			return RewriteFailed, nil
+		}
+		if n == 0 {
+			h, e := r.makeNumeral(big.NewRat(1, 1), integer)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			return RewriteDone, r.manager.SetRef(out, h)
+		}
+		if x.Sign() == 0 {
+			return RewriteDone, r.manager.SetRef(out, base)
+		}
+		if n > 0 && n <= int64(r.maxDegree) || n < 0 && !integer && n >= -int64(r.maxDegree) {
+			negative := n < 0
+			if negative {
+				n = -n
+			}
+			value := new(big.Rat).SetInt64(1)
+			for i := int64(0); i < n; i++ {
+				value.Mul(value, x)
+			}
+			if negative {
+				value.Inv(value)
+			}
+			h, e := r.makeNumeral(value, integer)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			return RewriteDone, r.manager.SetRef(out, h)
+		}
+	}
+	if _, inner, nested, e := r.operation(base, arithOpPower); e != nil {
+		return RewriteFailed, e
+	} else if nested && len(inner) == 2 && y.IsInt() && y.Sign() != 0 {
+		innerExponent, _, numeral, e := r.numeral(inner[1])
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if numeral && innerExponent.IsInt() && innerExponent.Sign() > 0 {
+			combinedExponent, e := r.makeNumeral(new(big.Rat).Mul(y, innerExponent), integer)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			result, e := r.app(arithOpPower, inner[0], combinedExponent)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			return Rewrite1, r.manager.SetRef(out, result)
+		}
+	}
+	if !integer && y.Sign() < 0 {
+		one, e := r.makeNumeral(big.NewRat(1, 1), false)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		inverse, e := r.app(arithOpDiv, one, base)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		positive, e := r.makeNumeral(new(big.Rat).Neg(y), false)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		result, e := r.app(arithOpPower, inverse, positive)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return Rewrite2, r.manager.SetRef(out, result)
+	}
+	if !integer && !y.IsInt() && y.Num().Cmp(big.NewInt(1)) != 0 {
+		rootExponent, e := r.makeNumeral(new(big.Rat).SetFrac(big.NewInt(1), y.Denom()), false)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		root, e := r.app(arithOpPower, base, rootExponent)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		numerator, e := r.makeNumeral(new(big.Rat).SetInt(y.Num()), false)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		result, e := r.app(arithOpPower, root, numerator)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return Rewrite2, r.manager.SetRef(out, result)
+	}
+	if r.expandPower && y.IsInt() && y.Num().IsInt64() {
+		n := y.Num().Int64()
+		if 1 < n && n <= int64(r.maxDegree) {
+			factors := make([]ast.ASTHandle, n)
+			for i := range factors {
+				factors[i] = base
+			}
+			result, e := r.app(arithOpMul, factors...)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			return Rewrite1, r.manager.SetRef(out, result)
+		}
+	}
+	if !xn || !y.IsInt() || !y.Num().IsInt64() {
+		return RewriteFailed, nil
+	}
+	n := y.Num().Int64()
+	if n == 0 && x.Sign() == 0 || n < 0 && integer || n > int64(r.maxDegree) || n < -int64(r.maxDegree) {
 		return RewriteFailed, nil
 	}
 	if n == 0 {

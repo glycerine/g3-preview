@@ -22597,7 +22597,8 @@
         "TestArithRewriterSymbolicModRemAndCasts",
         "TestArithRewriterPolynomialAddMulSubAndNegation",
         "TestArithRewriterPolynomialCancellation",
-        "TestArithRewriterCoefficientAndModuloBounds"
+        "TestArithRewriterCoefficientAndModuloBounds",
+        "TestArithRewriterStructuralPowerRules"
       ],
       "assertions": [
         {
@@ -22857,7 +22858,15 @@
           ]
         },
         {
-          "name": "advanced SOM/hoisting modes, polynomial GCD and power reductions, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
+          "name": "nested, negative-real and fractional power identities plus configured bounded power expansion",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_rewriter.go",
+          "tests": [
+            "TestArithRewriterStructuralPowerRules"
+          ]
+        },
+        {
+          "name": "advanced SOM/hoisting modes, polynomial GCD and comparison power reductions, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
           "status": "unported",
           "reason": "The exact rational scalar core is connected first; the remaining paths require the concrete arithmetic specialization of poly_rewriter and broader algebraic-expression integration."
         }
@@ -22882,7 +22891,8 @@
         "TestArithRewriterSymbolicModRemAndCasts",
         "TestArithRewriterPolynomialAddMulSubAndNegation",
         "TestArithRewriterPolynomialCancellation",
-        "TestArithRewriterCoefficientAndModuloBounds"
+        "TestArithRewriterCoefficientAndModuloBounds",
+        "TestArithRewriterStructuralPowerRules"
       ],
       "conditionals": [
         {

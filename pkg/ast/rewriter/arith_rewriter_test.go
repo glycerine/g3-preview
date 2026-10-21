@@ -529,3 +529,68 @@ func TestArithRewriterCoefficientAndModuloBounds(t *testing.T) {
 		t.Fatal("modulo excluded equality", status, result)
 	}
 }
+
+func TestArithRewriterStructuralPowerRules(t *testing.T) {
+	m, c, g, local := boolRewriterConfigFixture(t)
+	r, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	realSort, err := m.MkFamilySort(r.family, 0, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "arith-power-x"), realSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	r2 := arithRewriterNumeral(t, m, "2", false)
+	r3 := arithRewriterNumeral(t, m, "3", false)
+	r6 := arithRewriterNumeral(t, m, "6", false)
+	rNeg2 := arithRewriterNumeral(t, m, "-2", false)
+	rTwoThirds := arithRewriterNumeral(t, m, "2/3", false)
+	rOneThird := arithRewriterNumeral(t, m, "1/3", false)
+	inner, err := r.app(arithOpPower, x, r3)
+	astTestMust(t, err)
+	astTestPin(t, m, inner)
+
+	status, result := arithRewriterCore(t, r, arithOpPower, inner, r2)
+	if status != Rewrite1 {
+		t.Fatal("nested power status", status)
+	}
+	arithRewriterWantOperation(t, r, result, arithOpPower, x, r6)
+
+	status, result = arithRewriterCore(t, r, arithOpPower, x, rNeg2)
+	if status != Rewrite2 {
+		t.Fatal("negative power status", status)
+	}
+	_, powerArgs, matched, err := r.operation(result, arithOpPower)
+	astTestMust(t, err)
+	if !matched || len(powerArgs) != 2 || powerArgs[1] != r2 {
+		t.Fatal("negative power shape", matched, len(powerArgs))
+	}
+	_, divisionArgs, matched, err := r.operation(powerArgs[0], arithOpDiv)
+	astTestMust(t, err)
+	if !matched || len(divisionArgs) != 2 || divisionArgs[1] != x {
+		t.Fatal("negative power inverse", matched, len(divisionArgs))
+	}
+	arithRewriterWantNumeral(t, m, divisionArgs[0], "1", false)
+
+	status, result = arithRewriterCore(t, r, arithOpPower, x, rTwoThirds)
+	if status != Rewrite2 {
+		t.Fatal("fractional power status", status)
+	}
+	_, powerArgs, matched, err = r.operation(result, arithOpPower)
+	astTestMust(t, err)
+	if !matched || len(powerArgs) != 2 || powerArgs[1] != r2 {
+		t.Fatal("fractional outer power", matched, len(powerArgs))
+	}
+	arithRewriterWantOperation(t, r, powerArgs[0], arithOpPower, x, rOneThird)
+
+	key := "expand_power"
+	astTestMust(t, c.SetBoolName(local, &key, true))
+	expanding, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, expanding.Close()) })
+	status, result = arithRewriterCore(t, expanding, arithOpPower, x, r3)
+	if status != Rewrite1 {
+		t.Fatal("power expansion status", status)
+	}
+	arithRewriterWantOperation(t, expanding, result, arithOpMul, x, x, x)
+}
