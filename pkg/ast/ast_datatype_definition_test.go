@@ -81,6 +81,9 @@ func TestASTDatatypeDefinitionBlockAndUtilities(t *testing.T) {
 	if recursive, e := m.DatatypeIsRecursive(sorts[0]); e != nil || !recursive {
 		t.Fatal("mutually recursive datatype", recursive, e)
 	}
+	if size, e := m.GetSortSize(sorts[0]); e != nil || !size.IsInfinite() {
+		t.Fatal("recursive datatype cardinality", size, e)
+	}
 	nonRecursive, found, err := m.DatatypeNonRecursiveConstructor(sorts[0])
 	astTestMust(t, err)
 	if !found {
@@ -106,6 +109,11 @@ func TestASTDatatypeDefinitionEnumAndWellFoundedRefusal(t *testing.T) {
 	astTestMust(t, err)
 	if enum, e := m.DatatypeIsEnumSort(color[0]); e != nil || !enum {
 		t.Fatal("enum datatype", enum, e)
+	}
+	if size, e := m.GetSortSize(color[0]); e != nil || !size.IsFinite() {
+		t.Fatal("enum cardinality kind", size, e)
+	} else if count, e := size.Size(); e != nil || count != 2 {
+		t.Fatal("enum cardinality", count, e)
 	}
 	if recursive, e := m.DatatypeIsRecursive(color[0]); e != nil || recursive {
 		t.Fatal("enum recursion", recursive, e)
@@ -174,6 +182,11 @@ func TestASTParametricDatatypeDefinitionInstantiation(t *testing.T) {
 	}
 	if parameter, e := m.DatatypeParameter(boxBool, 0); e != nil || parameter != boolean {
 		t.Fatal("datatype parameter", parameter, e)
+	}
+	if size, e := m.GetSortSize(boxBool); e != nil || !size.IsFinite() {
+		t.Fatal("parametric datatype cardinality kind", size, e)
+	} else if count, e := size.Size(); e != nil || count != 2 {
+		t.Fatal("parametric datatype cardinality", count, e)
 	}
 }
 

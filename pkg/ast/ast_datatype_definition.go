@@ -189,13 +189,29 @@ func (m *ASTManager) MkDatatypes(defs []DatatypeDefinition) (result []ASTHandle,
 		return nil, datatypeDeclarationError("datatype is not well-founded")
 	}
 
+	previous := make([]*astDatatypeDefinition, len(built))
 	for i, definition := range built {
-		if previous := p.definitionNames[definition.name]; previous != nil {
-			delete(p.definitions, previous.sort)
+		previous[i] = p.definitionNames[definition.name]
+		if previous[i] != nil {
+			delete(p.definitions, previous[i].sort)
 		}
 		p.definitionNames[definition.name] = definition
 		p.definitions[definition.sort] = definition
 		result = append(result, m.external(sorts[i]))
+	}
+	for _, sort := range sorts {
+		if e := m.datatypeSetCardinality(sort); e != nil {
+			for i, definition := range built {
+				delete(p.definitions, definition.sort)
+				if previous[i] == nil {
+					delete(p.definitionNames, definition.name)
+				} else {
+					p.definitionNames[definition.name] = previous[i]
+					p.definitions[previous[i].sort] = previous[i]
+				}
+			}
+			return nil, e
+		}
 	}
 	p.definitionRefs = append(p.definitionRefs, acquired...)
 	rollback = false

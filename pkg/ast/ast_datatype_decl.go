@@ -69,7 +69,13 @@ func (m *ASTManager) datatypeSort(kind int32, parameters []ASTParameter) (result
 		return astNodeRef{}, err
 	}
 	defer func() { err = errors.Join(err, m.dropInfoStorage(slot, generation)) }()
-	return m.mkSort(first.symbol, ASTSortInfo{m.origin, slot, generation})
+	result, err = m.mkSort(first.symbol, ASTSortInfo{m.origin, slot, generation})
+	if err == nil {
+		if _, found := p.definitionNames[first.symbol]; found {
+			err = m.datatypeSetCardinality(result)
+		}
+	}
+	return result, err
 }
 
 func (m *ASTManager) datatypeDecl(kind int32, parameters []ASTParameter, domain []ASTHandle, suppliedRange ASTHandle) (astNodeRef, error) {
