@@ -15,6 +15,8 @@ type PsortASTContext struct {
 	budget            *arena.Budget
 	header            uint64
 	clauses, trail    []ASTHandle
+	fresh             []ASTHandle // borrowed from trail ownership
+	freshPrefix       string
 	closed, executing bool
 	stage             uint8
 	destructorCause   error
@@ -33,9 +35,59 @@ func NewPsortASTContext(m *ASTManager) (*PsortASTContext, error) {
 	if e := b.Reserve(bytes); e != nil {
 		return nil, e
 	}
-	c := &PsortASTContext{manager: m, budget: b, header: bytes}
+	c := &PsortASTContext{manager: m, budget: b, header: bytes, freshPrefix: "x"}
 	c.self = c
 	return c, nil
+}
+
+// SetFreshPrefix selects the source prefix used by a retained concrete
+// specialization before it emits any auxiliary variable.
+func (c *PsortASTContext) SetFreshPrefix(prefix string) error {
+	if e := c.open(); e != nil {
+		return e
+	}
+	if len(c.fresh) != 0 {
+		return ErrASTPending
+	}
+	c.freshPrefix = prefix
+	return nil
+}
+
+// FreshCount and FreshApplication expose borrowed fresh applications while
+// trail retains their owning references.
+func (c *PsortASTContext) FreshCount() (uint32, error) {
+	if e := c.open(); e != nil {
+		return 0, e
+	}
+	return uint32(len(c.fresh)), nil
+}
+
+func (c *PsortASTContext) FreshApplication(index uint32) (ASTHandle, error) {
+	if e := c.open(); e != nil {
+		return ASTHandle{}, e
+	}
+	if uint64(index) >= uint64(len(c.fresh)) {
+		return ASTHandle{}, arena.ErrBounds
+	}
+	return c.fresh[index], nil
+}
+
+// TakeClauses transfers the context's owned clause references to the caller.
+// The caller must eventually release each handle with ASTManager.DecRef.
+func (c *PsortASTContext) TakeClauses() ([]ASTHandle, error) {
+	if e := c.open(); e != nil {
+		return nil, e
+	}
+	result := c.clauses
+	c.clauses = nil
+	return result, nil
+}
+
+func (c *PsortASTContext) ClauseCount() (uint32, error) {
+	if e := c.open(); e != nil {
+		return 0, e
+	}
+	return uint32(len(c.clauses)), nil
 }
 func (c *PsortASTContext) identity() error {
 	if c == nil || c.self != c {
@@ -87,11 +139,15 @@ func (c *PsortASTContext) Fresh() (ASTHandle, error) {
 	if e != nil {
 		return ASTHandle{}, e
 	}
-	h, e := c.manager.MkFreshConst("x", sort)
+	h, e := c.manager.MkFreshConst(c.freshPrefix, sort)
 	if e != nil {
 		return h, e
 	}
-	return h, c.push(&c.trail, h)
+	if e = c.push(&c.trail, h); e != nil {
+		return h, e
+	}
+	c.fresh = append(c.fresh, h)
+	return h, nil
 }
 func (c *PsortASTContext) Min(a, b ASTHandle) (ASTHandle, error) {
 	if e := c.open(); e != nil {
@@ -152,6 +208,10 @@ func (c *PsortASTContext) finalizeMembers() error {
 	m := c.manager
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	if c.stage == 0 {
+		clear(c.fresh)
+		c.fresh = nil
+	}
 	// Reverse member order, ascending references within each member.
 	members := [2]*[]ASTHandle{&c.trail, &c.clauses}
 	for c.stage < 2 {

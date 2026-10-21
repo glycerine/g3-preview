@@ -40,6 +40,42 @@ func TestPsortASTContextActualFactoriesClausesAndTrail(t *testing.T) {
 	}
 }
 
+func TestPsortASTContextRetainedConsumerTransfers(t *testing.T) {
+	m := astTestManager(t)
+	c, e := NewPsortASTContext(m)
+	astTestMust(t, e)
+	astTestMust(t, c.SetFreshPrefix("sn"))
+	fresh, e := c.Fresh()
+	astTestMust(t, e)
+	if n, e := c.FreshCount(); e != nil || n != 1 || c.freshPrefix != "sn" {
+		t.Fatal("fresh specialization state", n, c.freshPrefix, e)
+	}
+	if got, e := c.FreshApplication(0); e != nil || got != fresh {
+		t.Fatal("borrowed fresh application", got, fresh, e)
+	}
+	if e = c.SetFreshPrefix("late"); e != ErrASTPending {
+		t.Fatal("late prefix update", e)
+	}
+	astTestMust(t, c.Clause(0, ASTLiteralVectorSpan{}))
+	if n, e := c.ClauseCount(); e != nil || n != 1 {
+		t.Fatal("clause count", n, e)
+	}
+	clauses, e := c.TakeClauses()
+	astTestMust(t, e)
+	if len(clauses) != 1 {
+		t.Fatal("transferred clauses", len(clauses))
+	}
+	before, e := m.GetRefCount(clauses[0])
+	astTestMust(t, e)
+	astTestMust(t, c.Close())
+	after, e := m.GetRefCount(clauses[0])
+	astTestMust(t, e)
+	if after != before {
+		t.Fatal("context consumed transferred clause", before, after)
+	}
+	astTestMust(t, m.DecRef(clauses[0]))
+}
+
 func TestPsortASTContextActualConstructorRefusalPrefixes(t *testing.T) {
 	success := int64(-1)
 	for ordinal := int64(0); ordinal < 16; ordinal++ {
