@@ -176,3 +176,46 @@ func TestASTParametricDatatypeDefinitionInstantiation(t *testing.T) {
 		t.Fatal("datatype parameter", parameter, e)
 	}
 }
+
+func TestASTDatatypeValueAndSomeValueCallbacks(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterDatatypePlugin()
+	astTestMust(t, err)
+	nat, err := m.MkDatatypes([]DatatypeDefinition{{
+		Name: astTestSymbol(t, m, "UnaryNat"),
+		Constructors: []DatatypeConstructorDefinition{
+			{Name: astTestSymbol(t, m, "zero"), Recognizer: astTestSymbol(t, m, "is-zero")},
+			{Name: astTestSymbol(t, m, "succ"), Recognizer: astTestSymbol(t, m, "is-succ"), Accessors: []DatatypeAccessorDefinition{{Name: astTestSymbol(t, m, "pred"), Recursive: true}}},
+		},
+	}})
+	astTestMust(t, err)
+	constructors, err := m.DatatypeConstructors(nat[0])
+	astTestMust(t, err)
+	zero, err := m.MkApp(constructors[0], nil)
+	astTestMust(t, err)
+	succ, err := m.MkApp(constructors[1], []ASTHandle{zero})
+	astTestMust(t, err)
+	for _, value := range []ASTHandle{zero, succ} {
+		if yes, e := m.IsValue(value); e != nil || !yes {
+			t.Fatal("datatype value", yes, e)
+		}
+		if yes, e := m.IsUniqueValue(value); e != nil || !yes {
+			t.Fatal("datatype unique value", yes, e)
+		}
+	}
+	variable, err := m.MkVar(0, nat[0])
+	astTestMust(t, err)
+	nonValue, err := m.MkApp(constructors[1], []ASTHandle{variable})
+	astTestMust(t, err)
+	if yes, e := m.IsValue(nonValue); e != nil || yes {
+		t.Fatal("symbolic constructor classified as value", yes, e)
+	}
+	some, err := m.GetSomeValue(nat[0])
+	astTestMust(t, err)
+	if yes, e := m.IsValue(some); e != nil || !yes {
+		t.Fatal("datatype some value", yes, e)
+	}
+	if sort, e := m.GetSort(some); e != nil || sort != nat[0] {
+		t.Fatal("datatype some value sort", sort, e)
+	}
+}

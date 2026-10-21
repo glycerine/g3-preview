@@ -29,6 +29,9 @@ func (m *ASTManager) pluginValue(fid FamilyID, r astNodeRef) (bool, error) {
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astSequencePlugin {
 		return m.sequenceValue(fid, r)
 	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astDatatypePlugin {
+		return m.datatypeValue(r)
+	}
 	return false, nil
 }
 func (m *ASTManager) isValue(r astNodeRef) (bool, error) {
@@ -268,6 +271,9 @@ func (m *ASTManager) getSomeValue(r astNodeRef) (ASTHandle, error) {
 	}
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astSequencePlugin {
 		return m.sequenceSomeValue(r)
+	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astDatatypePlugin {
+		return m.datatypeSomeValue(r)
 	}
 	// Actual manager fallback constructs two lexical parameters; AST-valued
 	// parameter construction doesn't retain until its declaration info attaches.
