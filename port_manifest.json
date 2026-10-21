@@ -34352,10 +34352,14 @@
         "pkg/ast/ast_seq_values.go",
         "pkg/ast/ast_seq_factories.go",
         "pkg/ast/ast_seq_regex.go",
-        "pkg/ast/ast_seq_parameterized.go"
+        "pkg/ast/ast_seq_parameterized.go",
+        "pkg/ast/ast_seq_recognizers.go"
       ],
       "tests": [
-        "TestASTSMT2StringLiteralSourceEncoding"
+        "TestASTSMT2StringLiteralSourceEncoding",
+        "TestASTSequenceStringValueClassification",
+        "TestASTSequenceParameterizedLoopAndSkolem",
+        "TestASTSequenceUtilitySortAndExpressionRecognizers"
       ],
       "conditionals": [
         {
@@ -34414,6 +34418,14 @@
           "go_target": "pkg/ast/ast_seq_parameterized.go",
           "tests": [
             "TestASTSequenceParameterizedLoopAndSkolem"
+          ]
+        },
+        {
+          "name": "seq_util sequence, regex, String and Char sort recognition plus empty, unit, concat and skolem expression recognition (seq_decl_plugin.h:198-225,246-288)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_recognizers.go",
+          "tests": [
+            "TestASTSequenceUtilitySortAndExpressionRecognizers"
           ]
         }
       ],
