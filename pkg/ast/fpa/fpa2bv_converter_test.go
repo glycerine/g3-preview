@@ -227,6 +227,65 @@ func TestConverterRoundKernelWidthsAndResultShape(t *testing.T) {
 	}
 }
 
+func TestConverterAddSubtractSpecialCasesAndSymbolicShape(t *testing.T) {
+	m, c := fixture(t)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	rne, err := c.MkRoundingMode(ast.FPAOpRMNearestEven)
+	must(t, err)
+	rtn, err := c.MkRoundingMode(ast.FPAOpRMTowardNegative)
+	must(t, err)
+	nan, err := c.MkSpecial(sort, fpa.NaN)
+	must(t, err)
+	pinf, err := c.MkSpecial(sort, fpa.PositiveInfinity)
+	must(t, err)
+	ninf, err := c.MkSpecial(sort, fpa.NegativeInfinity)
+	must(t, err)
+	pzero, err := c.MkSpecial(sort, fpa.PositiveZero)
+	must(t, err)
+	nzero, err := c.MkSpecial(sort, fpa.NegativeZero)
+	must(t, err)
+	for _, tc := range []struct {
+		mode        ast.ASTHandle
+		left, right ast.ASTHandle
+		want        ast.ASTHandle
+	}{
+		{rne, pinf, ninf, nan},
+		{rne, pinf, pzero, pinf},
+		{rne, pzero, nzero, pzero},
+		{rtn, pzero, nzero, nzero},
+		{rne, nzero, nzero, nzero},
+		{rne, nan, pzero, nan},
+	} {
+		got, e := c.Add(tc.mode, tc.left, tc.right)
+		must(t, e)
+		if got != tc.want {
+			t.Fatal("special addition", got, tc.want)
+		}
+	}
+	negatedInfinity, err := c.Negate(pinf)
+	must(t, err)
+	wantSubtraction, err := c.Add(rne, pinf, negatedInfinity)
+	must(t, err)
+	if got, e := c.Sub(rne, pinf, pinf); e != nil || got != wantSubtraction {
+		t.Fatal("subtraction add-of-negation", got, wantSubtraction, e)
+	}
+
+	leftDecl := declaration(t, m, "add-left", nil, sort)
+	rightDecl := declaration(t, m, "add-right", nil, sort)
+	left, err := c.MkConst(leftDecl)
+	must(t, err)
+	right, err := c.MkConst(rightDecl)
+	must(t, err)
+	result, err := c.Add(rne, left, right)
+	must(t, err)
+	resultSort, err := m.GetSort(result)
+	must(t, err)
+	if resultSort != sort {
+		t.Fatal("symbolic addition sort", resultSort, sort)
+	}
+}
+
 func fixture(t *testing.T) (*ast.ASTManager, *fpa.Converter) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)

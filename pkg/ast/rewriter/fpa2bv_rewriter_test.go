@@ -125,3 +125,34 @@ func TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions(t *testing.T
 		t.Fatal("UF connection assertion", len(f.converter.ExtraAssertions()))
 	}
 }
+
+func TestFPA2BVRewriterAdditionDispatch(t *testing.T) {
+	f := newFPA2BVFixture(t)
+	rounding, err := f.m.MkFamilyApp(f.family, ast.FPAOpRMNearestEven, nil, nil)
+	astTestMust(t, err)
+	positive, err := f.m.MkFPAInfinityOfSort(f.sort, false)
+	astTestMust(t, err)
+	negative, err := f.m.MkFPAInfinityOfSort(f.sort, true)
+	astTestMust(t, err)
+	addition, err := f.m.MkFamilyApp(f.family, ast.FPAOpAdd, nil, []ast.ASTHandle{rounding, positive, negative})
+	astTestMust(t, err)
+	got := f.rewrite(t, addition)
+	want, err := f.converter.MkSpecial(f.sort, astfpa.NaN)
+	astTestMust(t, err)
+	if got != want {
+		t.Fatal("opposite infinities did not lower to NaN", got, want)
+	}
+
+	left := astTestSymbol(t, f.m, "add-x")
+	right := astTestSymbol(t, f.m, "add-y")
+	leftValue, err := f.m.MkConst(left, f.sort)
+	astTestMust(t, err)
+	rightValue, err := f.m.MkConst(right, f.sort)
+	astTestMust(t, err)
+	addition, err = f.m.MkFamilyApp(f.family, ast.FPAOpAdd, nil, []ast.ASTHandle{rounding, leftValue, rightValue})
+	astTestMust(t, err)
+	got = f.rewrite(t, addition)
+	if family, e := f.m.GetFamilyID(got); e != nil || family == f.family {
+		t.Fatal("symbolic addition retained FPA arithmetic root", family, e)
+	}
+}

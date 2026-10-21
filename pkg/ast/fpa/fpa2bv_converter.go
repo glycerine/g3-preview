@@ -225,6 +225,25 @@ func (c *Converter) boolOr(values ...ast.ASTHandle) (ast.ASTHandle, error) {
 	return c.manager.MkOrArray(result)
 }
 
+func (c *Converter) boolXor(left, right ast.ASTHandle) (ast.ASTHandle, error) {
+	if c.manager.IsFalse(left) {
+		return right, nil
+	}
+	if c.manager.IsFalse(right) {
+		return left, nil
+	}
+	if c.manager.IsTrue(left) {
+		return c.boolNot(right)
+	}
+	if c.manager.IsTrue(right) {
+		return c.boolNot(left)
+	}
+	if left == right {
+		return c.manager.MkFalse()
+	}
+	return c.manager.MkXor(left, right)
+}
+
 func (c *Converter) boolITE(condition, thenValue, elseValue ast.ASTHandle) (ast.ASTHandle, error) {
 	if c.manager.IsTrue(condition) || thenValue == elseValue {
 		return thenValue, nil

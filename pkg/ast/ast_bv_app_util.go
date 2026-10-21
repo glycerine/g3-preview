@@ -94,6 +94,10 @@ func (m *ASTManager) MkBitVectorOr(args []ASTHandle) (ASTHandle, error) {
 	return m.mkBitVectorUtilityApp(31, args)
 }
 
+func (m *ASTManager) MkBitVectorAnd(args []ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(30, args)
+}
+
 func (m *ASTManager) MkBitVectorXor(args []ASTHandle) (ASTHandle, error) {
 	return m.mkBitVectorUtilityApp(33, args)
 }
