@@ -1124,8 +1124,125 @@ func (r *SequenceRewriter) RewriteStringInRegex(_ ast.ASTHandle, regex ast.ASTHa
 	return RewriteFailed, nil
 }
 
-func (r *SequenceRewriter) RewriteContains(a, b ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
-	if err := r.open(); err != nil {
+func (r *SequenceRewriter) sequenceMinimumLength(parts []ast.ASTHandle) (length uint64, bounded bool, err error) {
+	bounded = true
+	for _, part := range parts {
+		unit, e := r.manager.IsSequenceUnit(part)
+		if e != nil {
+			return 0, false, e
+		}
+		if unit {
+			length++
+			continue
+		}
+		empty, e := r.manager.IsSequenceEmpty(part)
+		if e != nil {
+			return 0, false, e
+		}
+		if empty {
+			continue
+		}
+		text, stringValue, e := r.manager.SequenceStringValue(part)
+		if e != nil {
+			return 0, false, e
+		}
+		if stringValue {
+			length += uint64(len(text))
+		} else {
+			bounded = false
+		}
+	}
+	return length, bounded, nil
+}
+
+func (r *SequenceRewriter) cannotContainPrefix(a, b ast.ASTHandle) (bool, error) {
+	unitA, err := r.manager.IsSequenceUnit(a)
+	if err != nil {
+		return false, err
+	}
+	unitB, err := r.manager.IsSequenceUnit(b)
+	if err != nil {
+		return false, err
+	}
+	if unitA && unitB {
+		distinct, err := r.manager.AreDistinct(a, b)
+		if err != nil || distinct {
+			return distinct, err
+		}
+	}
+	left, leftString, err := r.manager.SequenceStringValue(a)
+	if err != nil {
+		return false, err
+	}
+	right, rightString, err := r.manager.SequenceStringValue(b)
+	if err != nil || !leftString || !rightString {
+		return false, err
+	}
+	for i := 0; i < len(left); i++ {
+		if strings.HasSuffix(right, left[i:]) {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func (r *SequenceRewriter) cannotContainSuffix(a, b ast.ASTHandle) (bool, error) {
+	unitA, err := r.manager.IsSequenceUnit(a)
+	if err != nil {
+		return false, err
+	}
+	unitB, err := r.manager.IsSequenceUnit(b)
+	if err != nil {
+		return false, err
+	}
+	if unitA && unitB {
+		distinct, err := r.manager.AreDistinct(a, b)
+		if err != nil || distinct {
+			return distinct, err
+		}
+	}
+	left, leftString, err := r.manager.SequenceStringValue(a)
+	if err != nil {
+		return false, err
+	}
+	right, rightString, err := r.manager.SequenceStringValue(b)
+	if err != nil || !leftString || !rightString {
+		return false, err
+	}
+	for i := 1; i <= len(left); i++ {
+		if strings.HasSuffix(right, left[:i]) {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func (r *SequenceRewriter) assignSequenceEmptyEquality(value ast.ASTHandle, status RewriteStatus, out ast.ASTRef) (resultStatus RewriteStatus, err error) {
+	sort, err := r.manager.GetSort(value)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	empty, err := r.manager.MkSequenceEmpty(sort)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	emptyRef, err := r.manager.NewRef(empty)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	defer func() { err = errors.Join(err, r.manager.DelRef(&emptyRef)) }()
+	equality, err := r.manager.MkEq(value, empty)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if err = r.manager.SetRef(out, equality); err != nil {
+		return RewriteFailed, err
+	}
+	return status, nil
+}
+
+func (r *SequenceRewriter) RewriteContains(a, b ast.ASTHandle, out ast.ASTRef) (status RewriteStatus, err error) {
+	if err = r.open(); err != nil {
 		return RewriteFailed, err
 	}
 	left, leftString, err := r.manager.SequenceStringValue(a)
@@ -1133,10 +1250,190 @@ func (r *SequenceRewriter) RewriteContains(a, b ast.ASTHandle, out ast.ASTRef) (
 		return RewriteFailed, err
 	}
 	right, rightString, err := r.manager.SequenceStringValue(b)
-	if err != nil || !leftString || !rightString {
+	if err != nil {
 		return RewriteFailed, err
 	}
-	return r.assignBoolean(strings.Contains(left, right), out)
+	if leftString && rightString {
+		return r.assignBoolean(strings.Contains(left, right), out)
+	}
+	as, err := r.manager.SequenceFlattenConcat(a)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	bs, err := r.manager.SequenceFlattenConcat(b)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if len(bs) == 0 {
+		return r.assignBoolean(true, out)
+	}
+	allValues := true
+	for _, part := range bs {
+		value, e := r.manager.IsValue(part)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		allValues = allValues && value
+	}
+	found := false
+	for i := 0; !found && i < len(as); i++ {
+		value, e := r.manager.IsValue(as[i])
+		if e != nil {
+			return RewriteFailed, e
+		}
+		allValues = allValues && value
+		if len(bs) <= len(as)-i {
+			j := 0
+			for ; j < len(bs) && as[i+j] == bs[j]; j++ {
+			}
+			found = j == len(bs)
+		}
+	}
+	if found {
+		return r.assignBoolean(true, out)
+	}
+	if allValues {
+		return r.assignBoolean(false, out)
+	}
+	lengthA, boundedA, err := r.sequenceMinimumLength(as)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if boundedA {
+		lengthB, _, e := r.sequenceMinimumLength(bs)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if lengthB > lengthA {
+			return r.assignBoolean(false, out)
+		}
+	}
+	if len(as) == 0 {
+		return r.assignSequenceEmptyEquality(b, Rewrite2, out)
+	}
+	if len(bs) == 1 {
+		needle, stringNeedle, e := r.manager.SequenceStringValue(bs[0])
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if stringNeedle {
+			for _, part := range as {
+				text, stringPart, e := r.manager.SequenceStringValue(part)
+				if e != nil {
+					return RewriteFailed, e
+				}
+				if stringPart && strings.Contains(text, needle) {
+					return r.assignBoolean(true, out)
+				}
+			}
+		}
+	}
+	offset := 0
+	for offset < len(as) {
+		cannot, e := r.cannotContainPrefix(as[offset], bs[0])
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if !cannot {
+			break
+		}
+		offset++
+	}
+	size := len(as)
+	for size > offset {
+		cannot, e := r.cannotContainSuffix(as[size-1], bs[len(bs)-1])
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if !cannot {
+			break
+		}
+		size--
+	}
+	if offset == size {
+		return r.assignSequenceEmptyEquality(b, Rewrite2, out)
+	}
+	if offset > 0 || size < len(as) {
+		baseRef, base, e := r.makeSequencePartsRef(as[offset:size], a)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		defer func() { err = errors.Join(err, r.manager.DelRef(&baseRef)) }()
+		result, e := r.manager.MkSequenceContains(base, b)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if err = r.manager.SetRef(out, result); err != nil {
+			return RewriteFailed, err
+		}
+		return Rewrite2, nil
+	}
+	extracted, _, _, extract, err := r.manager.SequenceExtractArguments(b)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if extract && extracted == a {
+		return r.assignBoolean(true, out)
+	}
+	allUnits := true
+	for _, part := range bs {
+		allUnits, err = r.manager.IsSequenceUnit(part)
+		if err != nil {
+			return RewriteFailed, err
+		}
+	}
+	for _, part := range as {
+		allUnits, err = r.manager.IsSequenceUnit(part)
+		if err != nil {
+			return RewriteFailed, err
+		}
+	}
+	if !allUnits {
+		return RewriteFailed, nil
+	}
+	if len(as) < len(bs) {
+		return r.assignBoolean(false, out)
+	}
+	refs := make([]ast.ASTRef, 0, len(as)*len(bs))
+	defer func() {
+		for i := len(refs) - 1; i >= 0; i-- {
+			err = errors.Join(err, r.manager.DelRef(&refs[i]))
+		}
+	}()
+	disjuncts := make([]ast.ASTHandle, 0, len(as)-len(bs)+1)
+	for i := 0; i <= len(as)-len(bs); i++ {
+		conjuncts := make([]ast.ASTHandle, 0, len(bs))
+		for j := range bs {
+			equality, e := r.manager.MkEq(as[i+j], bs[j])
+			if e != nil {
+				return RewriteFailed, e
+			}
+			ref, e := r.manager.NewRef(equality)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			refs = append(refs, ref)
+			conjuncts = append(conjuncts, equality)
+		}
+		conjunction, e := r.manager.MkAndArray(conjuncts)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		ref, e := r.manager.NewRef(conjunction)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		refs = append(refs, ref)
+		disjuncts = append(disjuncts, conjunction)
+	}
+	result, err := r.manager.MkOrArray(disjuncts)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if err = r.manager.SetRef(out, result); err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteFull, nil
 }
 
 func (r *SequenceRewriter) RewritePrefix(a, b ast.ASTHandle, out ast.ASTRef) (status RewriteStatus, err error) {

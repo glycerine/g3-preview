@@ -1,6 +1,7 @@
 package rewriter
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -289,6 +290,118 @@ func TestSequenceRewriterPrefixSuffixConcatReductions(t *testing.T) {
 	astTestMust(t, err)
 	if status != RewriteDone || result != falsehood {
 		t.Fatalf("distinct value suffix: status=%d result=%v", status, result)
+	}
+}
+
+func TestSequenceRewriterContainsConcatReductions(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	pin := func(h ast.ASTHandle, err error) ast.ASTHandle {
+		t.Helper()
+		astTestMust(t, err)
+		astTestPin(t, m, h)
+		return h
+	}
+	str := func(text string) ast.ASTHandle { return pin(m.MkString(text)) }
+	concat := func(left, right ast.ASTHandle) ast.ASTHandle {
+		return pin(m.MkSequenceConcat(left, right))
+	}
+	stringSort, err := m.GetSort(str("contains sort witness"))
+	astTestMust(t, err)
+	stringConstant := func(name string) ast.ASTHandle {
+		return pin(m.MkConst(astTestSymbol(t, m, name), stringSort))
+	}
+	x, y, z := stringConstant("contains-x"), stringConstant("contains-y"), stringConstant("contains-z")
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	falsehood, err := m.MkFalse()
+	astTestMust(t, err)
+
+	status, err := rw.RewriteContains(concat(x, y), y, out)
+	astTestMust(t, err)
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteDone || result != truth {
+		t.Fatalf("exact subsequence: status=%d result=%v", status, result)
+	}
+
+	status, err = rw.RewriteContains(concat(str("a"), str("b")), concat(str("b"), str("a")), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteDone || result != falsehood {
+		t.Fatalf("all-value miss: status=%d result=%v", status, result)
+	}
+
+	status, err = rw.RewriteContains(concat(x, str("abc")), str("b"), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteDone || result != truth {
+		t.Fatalf("contained string segment: status=%d result=%v", status, result)
+	}
+
+	empty := str("")
+	status, err = rw.RewriteContains(empty, x, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || status != Rewrite2 || kind != ast.ASTOpEq {
+		t.Fatalf("empty base: status=%d kind=%d error=%v", status, kind, e)
+	}
+
+	needle := concat(str("q"), z)
+	status, err = rw.RewriteContains(concat(str("x"), y), needle, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	base, retainedNeedle, matched, err := m.SequenceBinaryOperationArguments(result, 5)
+	astTestMust(t, err)
+	if status != Rewrite2 || !matched || base != y || retainedNeedle != needle {
+		t.Fatalf("trimmed base: status=%d matched=%v base=%v needle=%v", status, matched, base, retainedNeedle)
+	}
+
+	zero := pin(rw.makeInteger(big.NewInt(0)))
+	one := pin(rw.makeInteger(big.NewInt(1)))
+	extract := pin(m.MkSequenceExtract(x, zero, one))
+	status, err = rw.RewriteContains(x, extract, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteDone || result != truth {
+		t.Fatalf("self extract: status=%d result=%v", status, result)
+	}
+
+	boolSort, err := m.MkBoolSort()
+	astTestMust(t, err)
+	p := pin(m.MkConst(astTestSymbol(t, m, "contains-p"), boolSort))
+	q := pin(m.MkConst(astTestSymbol(t, m, "contains-q"), boolSort))
+	r := pin(m.MkConst(astTestSymbol(t, m, "contains-r"), boolSort))
+	s := pin(m.MkConst(astTestSymbol(t, m, "contains-s"), boolSort))
+	unitP := pin(m.MkSequenceUnit(p))
+	unitQ := pin(m.MkSequenceUnit(q))
+	unitR := pin(m.MkSequenceUnit(r))
+	unitS := pin(m.MkSequenceUnit(s))
+	units := concat(unitP, concat(unitQ, concat(unitR, unitS)))
+	status, err = rw.RewriteContains(units, concat(unitP, unitS), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || status != RewriteFull || kind != ast.ASTOpOr {
+		t.Fatalf("unit expansion: status=%d kind=%d error=%v", status, kind, e)
+	}
+	status, err = rw.RewriteContains(unitP, concat(unitQ, unitR), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteDone || result != falsehood {
+		t.Fatalf("minimum length: status=%d result=%v", status, result)
 	}
 }
 

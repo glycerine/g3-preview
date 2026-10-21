@@ -274,3 +274,34 @@ func (m *ASTManager) SequenceBinaryOperationArguments(h ASTHandle, kind int32) (
 	left, right, matched, err := m.sequenceBinaryParts(r, kind)
 	return m.external(left), m.external(right), matched, err
 }
+
+// SequenceExtractArguments recognizes the retained three-argument seq.extract
+// application used by the sequence contains rewriter.
+func (m *ASTManager) SequenceExtractArguments(h ASTHandle) (sequence, offset, length ASTHandle, matched bool, err error) {
+	if err = m.lock(); err != nil {
+		return
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireExpr(h)
+	if err != nil {
+		return ASTHandle{}, ASTHandle{}, ASTHandle{}, false, err
+	}
+	if m.nodeAt(r.slot).kind != ASTApp || m.sequencePlugin == nil {
+		return ASTHandle{}, ASTHandle{}, ASTHandle{}, false, nil
+	}
+	a := m.appAt(r.slot)
+	family, kind, err := m.declIdentity(a.decl)
+	if err != nil || family != m.sequencePlugin.family || kind != 6 || a.count != 3 {
+		return ASTHandle{}, ASTHandle{}, ASTHandle{}, false, err
+	}
+	x, err := m.readInternal(a.args, 0)
+	if err != nil {
+		return ASTHandle{}, ASTHandle{}, ASTHandle{}, false, err
+	}
+	y, err := m.readInternal(a.args, 1)
+	if err != nil {
+		return ASTHandle{}, ASTHandle{}, ASTHandle{}, false, err
+	}
+	z, err := m.readInternal(a.args, 2)
+	return m.external(x), m.external(y), m.external(z), err == nil, err
+}

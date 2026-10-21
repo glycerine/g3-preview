@@ -33754,11 +33754,12 @@
           ]
         },
         {
-          "name": "seq_rewriter::mk_seq_contains constant String folding; concat/value decomposition and length-derived reductions remain open (seq_rewriter.cpp:664-766)",
-          "status": "partial",
+          "name": "seq_rewriter::mk_seq_contains constant, concat subsequence, bounded-length, boundary trimming, extract and finite unit-sequence reductions (seq_rewriter.cpp:622-766,1913-1931)",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",
           "tests": [
-            "TestSequenceRewriterConstantPredicates"
+            "TestSequenceRewriterConstantPredicates",
+            "TestSequenceRewriterContainsConcatReductions"
           ]
         },
         {
