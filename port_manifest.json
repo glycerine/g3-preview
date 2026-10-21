@@ -14951,6 +14951,16 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Datatype parameter, accessor-owner, recursion, sibling, constructor-index, and non-recursive-constructor utilities (datatype_decl_plugin.cpp:818-1024)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_definition.go",
+          "tests": [
+            "TestASTDatatypeDefinitionBlockAndUtilities",
+            "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
+            "TestASTParametricDatatypeDefinitionInstantiation"
+          ]
+        },
+        {
           "name": "Datatype definition blocks, mutually recursive range resolution, well-foundedness, parametric field instantiation, and constructor metadata queries (datatype_decl_plugin.cpp:27-147,346-429,675-736,753-872,980-1024)",
           "status": "ported",
           "go_target": "pkg/ast/ast_datatype_definition.go",
@@ -14991,7 +15001,7 @@
         "The plugin owns datatype definition maps and pins every retained definition sort, formal parameter, and accessor range. Finalization releases those pins in reverse acquisition order before clearing the native Go maps and slices. Declaration query results remain borrowed manager nodes."
       ],
       "deviations": [
-        "Datatype size expressions, value recognition, recursive/non-recursive constructor selection, display/translation, and the remaining utility queries are still unported. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed."
+        "Datatype size expressions, value recognition/construction, display, translation, and utility caching remain unported. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed."
       ]
     },
     {
@@ -15030,6 +15040,16 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Datatype parameter, accessor-owner, recursion, sibling, constructor-index, and non-recursive-constructor utility interfaces (datatype_decl_plugin.h:290-391)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_definition.go",
+          "tests": [
+            "TestASTDatatypeDefinitionBlockAndUtilities",
+            "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
+            "TestASTParametricDatatypeDefinitionInstantiation"
+          ]
+        },
+        {
           "name": "Concrete datatype definitions, constructors/accessors, mutually recursive blocks, and definition utility interfaces (datatype_decl_plugin.h:50-104,192-220,237-391)",
           "status": "ported",
           "go_target": "pkg/ast/ast_datatype_definition.go",
@@ -15062,7 +15082,7 @@
         "Datatype declaration parameters and domain/range handles are borrowed. Definition records pin their retained sorts; AST factories copy declaration information and own the resulting nodes through the manager."
       ],
       "deviations": [
-        "The size-expression hierarchy and utility queries for recursion, non-recursive constructors, datatype size, value construction, display, and translation remain unported."
+        "The size-expression hierarchy and utility paths for datatype size, value construction, display, translation, and caching remain unported."
       ]
     },
     {
