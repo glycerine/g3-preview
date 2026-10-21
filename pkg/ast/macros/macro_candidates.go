@@ -361,7 +361,7 @@ func (u *Util) collectCandidateCore(atom ast.ASTHandle, declarations uint32, can
 		return err
 	}
 	if family != u.manager.BasicFamilyID() || kind != ast.ASTOpEq && kind != ast.ASTOpIff {
-		return nil
+		return u.collectArithmeticCandidates(atom, declarations, candidates)
 	}
 	lhs, err := u.manager.GetArg(atom, 0)
 	if err != nil {
@@ -411,7 +411,7 @@ func (u *Util) collectCandidateCore(atom ast.ASTHandle, declarations uint32, can
 			}
 		}
 	}
-	return nil
+	return u.collectArithmeticCandidates(atom, declarations, candidates)
 }
 
 func (u *Util) CollectMacroCandidates(atom ast.ASTHandle, declarations uint32, candidates *Candidates) error {

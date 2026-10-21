@@ -19990,16 +19990,18 @@
       "path": "src/ast/macros/macro_util.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/macros/macro_util.go",
         "pkg/ast/macros/macro_candidates.go",
+        "pkg/ast/macros/macro_numeric.go",
         "pkg/ast/macros/macro_util_test.go"
       ],
       "tests": [
         "TestMacroUtilHeadsSimpleMacrosAndForbiddenDeclarations",
         "TestMacroUtilQuasiHeadNormalizationAndCandidates",
-        "TestMacroUtilQuasiConversionClauseConditionsAndHints"
+        "TestMacroUtilQuasiConversionClauseConditionsAndHints",
+        "TestMacroUtilArithmeticCandidatesAndPseudoPredicates"
       ],
       "assertions": [
         {
@@ -20043,8 +20045,8 @@
           "text": "SASSERT(m_curr_clause == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "macro_candidates ownership/reset/insert/access; is_macro_head, left/right/simple macro, is_quasi_macro_head and normalize_expr",
@@ -20065,32 +20067,36 @@
         },
         {
           "name": "arithmetic, bit-vector and pseudo-predicate helpers and arithmetic candidate collection",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_numeric.go",
+          "tests": [
+            "TestMacroUtilArithmeticCandidatesAndPseudoPredicates"
+          ]
         }
       ],
       "ownership": [
         "Candidate rows own declaration, definition and condition AST references and retire them in reverse row order. Util borrows its AST manager and forbidden declaration identities; normalization owns and closes its variable-substitution scratch."
       ],
       "deviations": [
-        "Arithmetic, bit-vector and pseudo-predicate operations remain open, so the source unit remains partial."
+        "Checked Go errors replace source assertions. Arithmetic and bit-vector constructors use the retained typed AST family factories; macro expansion's theory-rewriter pass performs the source's final normalization. Trace-only printing is omitted."
       ]
     },
     {
       "path": "src/ast/macros/macro_util.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/macros/macro_util.go",
         "pkg/ast/macros/macro_candidates.go",
+        "pkg/ast/macros/macro_numeric.go",
         "pkg/ast/macros/macro_util_test.go"
       ],
       "tests": [
         "TestMacroUtilHeadsSimpleMacrosAndForbiddenDeclarations",
         "TestMacroUtilQuasiHeadNormalizationAndCandidates",
-        "TestMacroUtilQuasiConversionClauseConditionsAndHints"
+        "TestMacroUtilQuasiConversionClauseConditionsAndHints",
+        "TestMacroUtilArithmeticCandidatesAndPseudoPredicates"
       ],
       "conditionals": [
         {
@@ -20102,8 +20108,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "macro_candidates and structural macro head/simple/quasi/normalization public surface",
@@ -20124,16 +20130,18 @@
         },
         {
           "name": "remaining arithmetic, bit-vector and pseudo-predicate public surface",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_numeric.go",
+          "tests": [
+            "TestMacroUtilArithmeticCandidatesAndPseudoPredicates"
+          ]
         }
       ],
       "ownership": [
         "Candidates is a noncopyable owning Go value over native rows; Util is a borrowed manager-local helper."
       ],
       "deviations": [
-        "Arithmetic, bit-vector and pseudo-predicate header operations remain open."
+        "The Go API returns checked values and errors instead of mutating C++ reference wrappers and out booleans."
       ]
     },
     {

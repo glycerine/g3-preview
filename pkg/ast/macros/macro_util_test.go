@@ -377,6 +377,114 @@ func mustSymbol(t *testing.T, m *ast.ASTManager, text string) usymbol.Symbol {
 	return s
 }
 
+func arithmeticNumeral(t *testing.T, m *ast.ASTManager, text string) ast.ASTHandle {
+	t.Helper()
+	value, err := m.NumeralService().NewValue()
+	must(t, err)
+	defer func() { must(t, m.NumeralService().Del(&value)) }()
+	must(t, m.NumeralService().SetString(&value, text))
+	h, err := m.ArithmeticNumeral(&value, true)
+	must(t, err)
+	return h
+}
+
+func bitVectorNumeral(t *testing.T, m *ast.ASTManager, value int64, width uint32) ast.ASTHandle {
+	t.Helper()
+	n, err := m.NumeralService().NewValue()
+	must(t, err)
+	defer func() { must(t, m.NumeralService().Del(&n)) }()
+	must(t, m.NumeralService().SetInt64(&n, value))
+	h, err := m.BitVectorNumeral(&n, width)
+	must(t, err)
+	return h
+}
+
+func TestMacroUtilArithmeticCandidatesAndPseudoPredicates(t *testing.T) {
+	m := fixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	must(t, err)
+	u, err := macros.NewUtil(m)
+	must(t, err)
+	arithmetic, err := m.ArithmeticFamilyID()
+	must(t, err)
+	zero := arithmeticNumeral(t, m, "0")
+	integerSort, err := m.GetSort(zero)
+	must(t, err)
+	v, err := m.MkVar(0, integerSort)
+	must(t, err)
+	f := declaration(t, m, "arith-candidate-f", []ast.ASTHandle{integerSort}, integerSort)
+	head, err := m.MkApp(f, []ast.ASTHandle{v})
+	must(t, err)
+	two := arithmeticNumeral(t, m, "2")
+	five := arithmeticNumeral(t, m, "5")
+	sum, err := m.MkFamilyApp(arithmetic, 6, nil, []ast.ASTHandle{head, two})
+	must(t, err)
+	equality, err := m.MkEq(sum, five)
+	must(t, err)
+	candidates, err := macros.NewCandidates(m)
+	must(t, err)
+	t.Cleanup(func() { must(t, candidates.Close()) })
+	must(t, u.CollectMacroCandidates(equality, 1, candidates))
+	if candidates.Len() != 1 {
+		t.Fatalf("arithmetic candidates = %d", candidates.Len())
+	}
+	row, err := candidates.At(0)
+	must(t, err)
+	if row.Declaration != f || row.Inequality || row.Hint || !row.SatisfyAtom {
+		t.Fatal("arithmetic candidate flags", row)
+	}
+	if yes, e := u.IsZero(zero); e != nil || !yes {
+		t.Fatal("arithmetic zero", yes, e)
+	}
+	if family, e := m.GetFamilyID(row.Definition); e != nil || family != arithmetic {
+		t.Fatal("arithmetic definition family", family, e)
+	}
+	if op, e := m.GetDeclKind(row.Definition); e != nil || op != 7 {
+		t.Fatal("arithmetic definition operation", op, e)
+	}
+	legacyHead, legacyDefinition, inverse, yes, err := u.IsArithmeticMacro(equality, 1)
+	must(t, err)
+	if !yes || inverse || legacyHead != head || legacyDefinition != row.Definition {
+		t.Fatal("legacy arithmetic macro", yes, inverse, legacyHead, legacyDefinition)
+	}
+	varPlusGround, err := m.MkFamilyApp(arithmetic, 6, nil, []ast.ASTHandle{two, v})
+	must(t, err)
+	groundRef, err := m.NewRef(ast.ASTHandle{})
+	must(t, err)
+	t.Cleanup(func() { must(t, m.DelRef(&groundRef)) })
+	inverse, variable, yes, err := u.IsVarPlusGround(varPlusGround, groundRef)
+	must(t, err)
+	groundPart, err := m.RefGet(groundRef)
+	must(t, err)
+	if !yes || inverse || variable != v || groundPart != two {
+		t.Fatal("variable plus ground", yes, inverse, variable, groundPart)
+	}
+
+	_, err = m.RegisterBitVectorPlugin()
+	must(t, err)
+	b, err := m.MkBoolSort()
+	must(t, err)
+	bvValue := bitVectorNumeral(t, m, 3, 8)
+	bvSort, err := m.GetSort(bvValue)
+	must(t, err)
+	bvHeadDecl := declaration(t, m, "pseudo-f", []ast.ASTHandle{b}, bvSort)
+	bvVar, err := m.MkVar(0, b)
+	must(t, err)
+	bvHead, err := m.MkApp(bvHeadDecl, []ast.ASTHandle{bvVar})
+	must(t, err)
+	pseudoAtom, err := m.MkEq(bvHead, bvValue)
+	must(t, err)
+	pseudoBody, err := m.MkIff(pseudoAtom, bvVar)
+	must(t, err)
+	pseudo, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{mustSymbol(t, m, "pseudo-x")}, Body: pseudoBody})
+	must(t, err)
+	gotHead, gotValue, gotDefinition, yes, err := u.IsPseudoPredicateMacro(pseudo)
+	must(t, err)
+	if !yes || gotHead != bvHead || gotValue != bvValue || gotDefinition != bvVar {
+		t.Fatal("pseudo predicate", yes, gotHead, gotValue, gotDefinition)
+	}
+}
+
 func TestMacroManagerExpandProofChain(t *testing.T) {
 	m := fixture(t)
 	must(t, m.ToggleProofMode(ast.ASTProofEnabled))
