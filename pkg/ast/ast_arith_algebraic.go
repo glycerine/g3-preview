@@ -186,6 +186,31 @@ func (m *ASTManager) ArithmeticAlgebraicManager() (*polynomial.AlgebraicManager,
 	return w.manager, nil
 }
 
+// ArithmeticAlgebraicNumeralValue recognizes an irrational arithmetic
+// numeral and copies its value into out. The caller owns the copy and must
+// release it with the borrowed ArithmeticAlgebraicManager.
+func (m *ASTManager) ArithmeticAlgebraicNumeralValue(h ASTHandle, out *polynomial.Algebraic) (bool, error) {
+	if e := m.lock(); e != nil {
+		return false, e
+	}
+	defer m.mu.Unlock()
+	if out == nil || m.arithmeticPlugin == nil {
+		return false, ErrASTHandle
+	}
+	r, e := m.requireExpr(h)
+	if e != nil {
+		return false, e
+	}
+	value, matched, e := m.arithmeticAlgebraicValue(m.arithmeticPlugin.family, r)
+	if e != nil || !matched {
+		return false, e
+	}
+	if e = m.arithmeticPlugin.algebraic.manager.Copy(out, value); e != nil {
+		return false, e
+	}
+	return true, nil
+}
+
 // ArithmeticAlgebraicNumeral implements the irrational branch of
 // arith_decl_plugin::mk_numeral(anum,false).
 func (m *ASTManager) ArithmeticAlgebraicNumeral(value *polynomial.Algebraic) (ASTHandle, error) {

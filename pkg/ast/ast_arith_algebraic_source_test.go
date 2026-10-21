@@ -202,6 +202,18 @@ func TestASTArithmeticAlgebraicEqualityAndDistinctness(t *testing.T) {
 	astTestMust(t, am.Del(&two))
 	astTestMust(t, am.Del(&anotherTwo))
 	astTestMust(t, am.Del(&three))
+	var copied polynomial.Algebraic
+	matched, e := m.ArithmeticAlgebraicNumeralValue(a, &copied)
+	astTestMust(t, e)
+	if !matched {
+		t.Fatal("irrational algebraic numeral read did not match")
+	}
+	degree, e := am.Degree(&copied)
+	astTestMust(t, e)
+	if degree != 2 {
+		t.Fatal("irrational algebraic numeral copied degree", degree)
+	}
+	astTestMust(t, am.Del(&copied))
 
 	equal, e := m.AreEqual(a, b)
 	astTestMust(t, e)
