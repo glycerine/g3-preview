@@ -14008,7 +14008,7 @@
       "path": "src/ast/bv_decl_plugin.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_bv_plugin.go",
         "pkg/ast/ast_bv_plugin_source_test.go",
@@ -14199,12 +14199,12 @@
           "text": "VERIFY(m_plugin->get_int2bv_size(1, &p, sz));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "ast_bv_plugin concrete reached source counterpart (bv_decl_plugin.cpp:26-178)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_plugin.go",
           "tests": [
             "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -14214,7 +14214,7 @@
         },
         {
           "name": "ast_bv_numeral concrete reached source counterpart (bv_decl_plugin.cpp:416-435,778-789,865-868)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_numeral.go",
           "tests": [
             "TestASTBitVectorNumeralLiteralNormalizationAndRead",
@@ -14226,7 +14226,7 @@
         },
         {
           "name": "ast_bv_normalization concrete reached source counterpart (bv_decl_plugin.cpp:753-765)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_normalization.go",
           "tests": [
             "TestASTBitVectorNumeralLiteralNormalizationAndRead",
@@ -14238,7 +14238,7 @@
         },
         {
           "name": "original is_value numeral recognition and get_some_value zero-numeral callback with actual manager dispatch (src/ast/bv_decl_plugin.cpp:632-634,746-751)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_values.go",
           "tests": [
             "TestASTBitVectorOriginalValueCallbacks",
@@ -14248,7 +14248,7 @@
         },
         {
           "name": "original numeric plugin completion through model/evaluator constant registration and recursive array range completion",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_bv_values_test.go",
           "tests": [
             "TestModelOriginalBitVectorZeroCompletion"
@@ -14256,7 +14256,7 @@
         },
         {
           "name": "original get_sort_names/get_op_names, exact aliases/kinds/order and null/ALL legacy/internal-name guards (src/ast/bv_decl_plugin.cpp:672-743)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_names.go",
           "tests": [
             "TestASTBitVectorOriginalNameCallbacks",
@@ -14265,7 +14265,7 @@
         },
         {
           "name": "original fixed-width unary/binary/predicate/reduction/comparison declarations, cache publication, eager constants and selected domain-overload validation (src/ast/bv_decl_plugin.cpp:67-142,181-212,249-357,470-519)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_fixed_decl.go",
           "tests": [
             "TestASTBitVectorOriginalFixedDeclarations",
@@ -14277,7 +14277,7 @@
         },
         {
           "name": "original get_offset_term copy/power/mod/assignment and are_distinct offset comparison before base unique-value callback (src/ast/bv_decl_plugin.cpp:636-669)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_distinct.go",
           "tests": [
             "TestASTBitVectorOriginalOffsetDistinctness",
@@ -14289,7 +14289,7 @@
         },
         {
           "name": "original BV offset distinctness through Boolean mk_eq_core manager dispatch (src/ast/rewriter/bool_rewriter.cpp:650-659)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bool_rewriter_bv_distinct_test.go",
           "tests": [
             "TestBoolRewriterOriginalBitVectorOffsetEquality"
@@ -14297,7 +14297,7 @@
         },
         {
           "name": "original concat/extend/extract/repeat/fixed-rotation declarations, get_bv_sort large-width path and specialized fixed-operator expression dispatch (src/ast/bv_decl_plugin.cpp:155-164,360-403,530-576,584-628)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_parameterized_decl.go",
           "tests": [
             "TestASTBitVectorOriginalParameterizedDeclarations",
@@ -14310,7 +14310,7 @@
         },
         {
           "name": "original mk_num_decl parameter/arity/width guards, power/mod/parameter copies and declaration-only return through both plugin overloads (src/ast/bv_decl_plugin.cpp:416-435,475-477,590-592)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_raw_numeral.go",
           "tests": [
             "TestASTBitVectorRawNumeralDeclarationDoesNotConstructApp",
@@ -14322,7 +14322,7 @@
         },
         {
           "name": "original get_int2bv_size and width-keyed int2bv/bv2int caches with resize-before-arity validation, assignment-before-INC and domain/expression dispatch (src/ast/bv_decl_plugin.cpp:214-248,395-413,470-477,523-529,584-589)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_conversion.go",
           "tests": [
             "TestASTBitVectorOriginalConversionCachesAndParameters",
@@ -14335,7 +14335,7 @@
         },
         {
           "name": "original mk_bit2bool nested width/index cache and mk_mkbv Boolean-domain/arity cache, domain/expression dispatch and source finalize order (src/ast/bv_decl_plugin.cpp:132-141,437-468,490-491,523-524,604-606)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_boolean_bits.go",
           "tests": [
             "TestASTBitVectorOriginalBooleanBitConstructors",
@@ -14347,7 +14347,7 @@
         },
         {
           "name": "original bv_recognizers is_allone/is_zero and extract/bv2int operand overloads with actual numeric copy/power/subtraction/equality and borrowed output order (src/ast/bv_decl_plugin.cpp:793-830; src/ast/bv_decl_plugin.h:307-310; src/util/rational.h:462-464)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_recognizers.go",
           "tests": [
             "TestASTBitVectorOriginalZeroAndAllOneRecognizers",
@@ -14362,7 +14362,7 @@
         },
         {
           "name": "original mk_sort count/type/zero-width guards, ignored kind and explicit cache lookup through generic family dispatcher (src/ast/bv_decl_plugin.cpp:169-178)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_sort.go",
           "tests": [
             "TestASTBitVectorOriginalFamilySortDispatch",
@@ -14373,7 +14373,7 @@
         },
         {
           "name": "original mult_inverse one/parity branches, gcd coefficient assignment, negative correction and gated numeric assertions (src/ast/bv_decl_plugin.cpp:827-848)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_inverse.go",
           "tests": [
             "TestASTBitVectorOriginalMultiplicativeInverse",
@@ -14384,7 +14384,7 @@
         },
         {
           "name": "original has_sign_bit width assertion, nested unsigned normalization, half-modulus construction and rational comparison (src/ast/bv_decl_plugin.cpp:767-773)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_sign_bit.go",
           "tests": [
             "TestASTBitVectorOriginalSignBitNormalizesInput",
@@ -14395,7 +14395,7 @@
         },
         {
           "name": "original is_bv_sort family/kind/exact parameter count recognizer and mk_numeral(value,sort) guard/width delegation (src/ast/bv_decl_plugin.cpp:774-776,858-864; src/ast/bv_decl_plugin.h:390-394)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_numeral_sort.go",
           "tests": [
             "TestASTBitVectorNumeralForSortGuardErasesNumericalRead",
@@ -14406,7 +14406,7 @@
         },
         {
           "name": "original extract/zero_extend/sign_extend scalar parameter utilities and mk_bv2int borrowed Int-sort parameter with family/sort lookup before app dispatch (src/ast/bv_decl_plugin.h:399-402,416-423; src/ast/bv_decl_plugin.cpp:880-885; src/ast/ast.h:113-122)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_app_parameter_util.go",
           "tests": [
             "TestASTBitVectorOriginalParameterizedUtilities",
@@ -14417,7 +14417,7 @@
         },
         {
           "name": "original variadic mk_bv_or with borrowed application/ref-vector argument readers through shared fixed-declaration domain checks and application candidate factory (src/ast/bv_decl_plugin.h:406; src/ast/bv_decl_plugin.cpp:571-630; src/ast/ast.cpp:1863-1881,2064-2211)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_arguments.go",
           "tests": [
             "TestASTBitVectorBorrowedORArguments",
@@ -14426,7 +14426,7 @@
         },
         {
           "name": "original is_numeral copy into caller receiver followed by width publication, exposed with exact caller-owned rational assignment invocation (src/ast/bv_decl_plugin.cpp:778-790; src/ast/rewriter/bv_rewriter.h:36)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_numeral_read.go",
           "tests": [
             "TestASTBitVectorNumeralReadInvocationStoredValueAndUnmatchedOutputs",
@@ -14443,7 +14443,7 @@
         },
         {
           "name": "Exact optional caller invocation around existing all-one recognizer body and real copied numeral/power/subtraction condition frame, without ambient numerical adoption (src/ast/bv_decl_plugin.cpp:794-803; src/ast/rewriter/bv_rewriter.h:38)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_recognizers.go",
           "tests": [
             "TestASTBitVectorAllOneExactInvocationEveryReservation"
@@ -14451,7 +14451,7 @@
         },
         {
           "name": "Original unsigned norm returned value exposed with exact caller invocation at actual normalization frame entry; input remains unchanged and returned ownership survives child cleanup (src/ast/bv_decl_plugin.cpp:753-765)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_normalization.go",
           "tests": [
             "TestASTBitVectorNumericCallerReturnedNormAndInverse",
@@ -14461,7 +14461,7 @@
         },
         {
           "name": "Original mult_inverse exposed with exact caller invocation at actual inverse frame entry; unchanged one/parity/gcd/correction/assertion/output-copy body and aliased receiver behavior (src/ast/bv_decl_plugin.cpp:827-848)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_inverse.go",
           "tests": [
             "TestASTBitVectorNumericCallerReturnedNormAndInverse",
@@ -14471,7 +14471,7 @@
         },
         {
           "name": "Original arithmetic utility family creation without plugin installation and BV utility repeated family lookup with DEBUG plugin assertion (src/ast/arith_decl_plugin.cpp:641-645; src/ast/bv_decl_plugin.cpp:850-855)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_numeric_util_families.go",
           "tests": [
             "TestASTNumericUtilityFamilyConstruction"
@@ -14479,7 +14479,7 @@
         },
         {
           "name": "Exact has_sign_bit invocation bridge captures the original sign/normalization frame at entry, preserves assertion-before-input and immutable source history, joins stopped owned children without ambient adoption (src/ast/bv_decl_plugin.cpp:767-773)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_sign_bit.go",
           "tests": [
             "TestASTBitVectorSignBitInvocationEveryActualReservation",
@@ -14488,7 +14488,7 @@
         },
         {
           "name": "Exact signed norm invocation bridge delegates original norm with signed=true, retains distinct returned ownership and unchanged caller value until physical copy (src/ast/bv_decl_plugin.cpp:753-765)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_normalization.go",
           "tests": [
             "TestASTBitVectorSignedNormalizationDistinctReturnAndCopy"
@@ -14516,32 +14516,15 @@
         "Utility family bridges borrow ASTManager and return its actual source family identities; no plugin is installed by utility construction. The containing derived BV owner captures the identities in charged fields. Existing native utility plugin pointer/layout/assertion ABI qualifications remain; cached plugin access continues through the manager."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
-        "Selected numeral is_value and zero get_some_value callbacks are integrated, including scoped override priority and model/evaluator completion. The small literal and its lexical parameter use the explicit Go owned-value representation; no native rational temporary/parameter allocator ABI credit is claimed. Original are_distinct offset-term arithmetic, other BV declarations/reducers, native SASSERT/TRACE/exception transport and whole-unit ownership/representation audits remain open. Base unique-value comparison now recognizes BV numerals without claiming the offset algorithm.",
-        "Selected original sort/operator name callbacks are implemented: null/ALL includes legacy bv and 19 extended/internal operator aliases, other logics always retain BitVec and exactly 39 ordinary operators. bv2int and bv2nat retain the same original declaration kind. Parser symbol-table consumers and unsupported BV operator declaration/evaluation dependencies remain required; offering source names does not claim those factories or reducers are complete. The caller-owned vector remains the explicit Go representation, without native record/header/copy/allocator ABI or whole-unit ownership credit.",
-        "Selected 45 fixed-width cache factories and four eager declaration returns are implemented. The specialized expression overload bypasses the sort buffer for fixed cached operators; parameterized/uncached operators retain the base overload spill. Associative domain-overload validation checks only the two formal domains; application construction independently validates every argument. A single-argument associative domain input would read out of bounds in C++; the Go adapter rejects that undefined input after cache publication. BV reducers/evaluation remain required; concat/extensions/extract/repeat/fixed rotations and offset distinctness are now implemented. The 61-slot concrete Go cache-owner representation and scalar pointer codecs claim no native header/pointer/allocator ABI equivalence or whole-unit ownership/assertion/exception transport credit.",
-        "Original offset distinctness is now integrated before base unique-value fallback, including identical-app inputs; the numeral-first/exactly-two-argument restriction remains conservative. Raw numeral parameters are explicitly reduced modulo their stored width rather than trusting canonical factory normalization. Small default-zero/assignment use the explicit Go scalar rational representation without native lexical temporary/allocator ABI credit. Actual Runtime memout is process-fatal in C++; the returning-error adapter retains interrupted raw numeric owners for whole-context owning cleanup and does not claim source-operation retry after that failure. TRACE output, native exception/allocator transport equivalence, remaining BV factories/reducers and whole-unit ownership audit remain open.",
-        "Corrected the earlier inherited-expression-overload claim by implementing src/ast/bv_decl_plugin.cpp:584-628 selected direct cached dispatch. Fixed associative expression factories check every supplied sort when arity differs and accept a singleton; the domain overload preserves its distinct two-formal-domain behavior. Same-arity wrong-sort expression rejection remains ErrASTDomain because original mk_pp/ostringstream SMT2 diagnostic formatting is still required. Parameterized factories preserve negative extraction lows, nonzero negative repeats and arbitrary rotation parameters. Signed size overflow is C++ undefined behavior and is rejected by a checked Go adapter; defined negative results retain unsigned conversion and the uncached large-sort path. No native parameter/header/pointer/allocator ABI, complete diagnostic transport or whole-unit audit credit is inferred.",
-        "Raw NUM declaration normalization is now integrated through domain and expression overloads without inventing an application in the declaration-only path. The shared concrete Go numeric continuation combines lexical owners while preserving original copy/power/mod/parameter destruction boundaries; no native rational/parameter/header allocator ABI or whole-unit ownership credit follows. Actual Runtime memout retains interrupted contexts for owning cleanup and does not claim a resumable source operation on that process-fatal path. Whole-source exception/TRACE/assertion and pretty-print diagnostic behavior, remaining cached bit constructors and reducers remain required.",
-        "Original integer conversion caches and parameter parser are integrated. The source width-only int2bv cache preserves its first domain and parameter list without requiring an Int domain. An AST expression parameter supplies its BV sort width; a non-BV expression parameter returns false and falls through to the original first-domain/argument width path. Expression dispatch parses the width before the base domain-buffer fallback, preserving source validation order. Source uint width+1/index overflow is rejected by the checked Go adapter. Small scalar parameter copies and concrete encoded cache headers retain explicit Go representation qualifications; native exception/parameter/header/allocator ABI and whole-unit ownership credit are not inferred. Reducers and full pretty-print diagnostics remain required.",
-        "Original Boolean-bit declaration factories are integrated with inherited expression fallback, exact parameter/domain/arity rules, width/index and arity cache identities and source destruction order. mkbv zero arity retains the source zero-width result despite the ordinary sort factory rejecting zero width. A negative bit2bool index passes the source signed comparison and then reads out of bounds after unsigned conversion; the Go adapter rejects that undefined access after preserving the reached outer/inner resize prefix. Source width+1 overflow is also rejected. Concrete Go row/slice headers and encoded references do not claim native pointer/header/reallocation/move/allocator ABI, source assertion/exception transport or whole-unit ownership equivalence. BV evaluation/reducers and exact same-arity pretty-print diagnostics remain open.",
-        "Selected BV recognizers are now exposed through manager-bound Go methods. Neither zero nor all-one recognition assumes factory normalization: raw stored values are inspected exactly. All-one follows copy/power/subtraction/equality rather than a host-bitset shortcut. The explicit concrete Go scalar/temporary and deterministic operand evaluation representation claims no native rational/parameter/header/operand-order/allocator ABI equivalence; original TRACE output and whole-unit assertion/exception/ownership audits remain required. Modular inverse, remaining recognizer/utility interfaces, evaluator/reducer consumers and full pretty-print diagnostics are still open.",
-        "The original BV mk_sort route is now connected to generic MkFamilySort. Parser/default SMT2 environment consumers remain separate obligations; this route does not claim they are ported. Signed input widths retain source unsigned conversion and existing checked width+1/index overflow handling. The sort cache acquisition-receipt and reflected-header representation retains prior Go/native allocation/ABI qualifications; complete native assertion/exception/ownership audit is still required.",
-        "The selected modular inverse is now implemented using the original rational/extended-GCD algorithm. Go math/big.ModInverse appears only in independent tests. SASSERT numeric expressions are erased in release and gated independently in debug; zero width with nonunit odd input follows original assertion/release behavior. Deterministic Go operand evaluation and reflected larger numerical-frame headers retain explicit native rational/temporary/ABI/allocation qualifications. Actual Runtime failures prove owning cleanup, not resumability of source process-fatal operations. Remaining utility/recognizer consumers, reducers/evaluation, full pretty-print diagnostics and whole-unit native ownership/representation audit remain open.",
-        "Selected has_sign_bit follows original unsigned normalization and rational comparison; it does not inspect host bits or assume canonical input. The original DEBUG width assertion precedes input/plugin reads. Release retains source unsigned bits-1 arithmetic and existing checked power/cache bounds. The nested normalization and reflected caller-header representation retains explicit concrete Go/native rational, return-value, pointer/header, allocator/assertion/exception ABI qualifications. BV rewriter shift consumers and whole-unit ownership/representation audit remain to be ported; no source operation resumability is claimed after Runtime process-fatal refusal.",
-        "The recognizer checks exactly one sort parameter, unlike the original plugin internal get_bv_size helper, which intentionally remains unchanged. Recognition does not inspect parameter kind; the reached width getter uses the prior checked wrong-kind rejection. No registered BV plugin yields false in this manager-bound adapter; native bv_util construction requires its plugin. Concrete Go sort/parameter/return/numeric-frame representation and existing native allocator/assertion/exception qualifications remain. BV uint64 numeral/conversion/construction utilities and full reducer/whole-unit audits remain required.",
-        "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited.",
-        "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition now uses this factory in its post-core reduction and still requires its original polynomial core.",
-        "Tracked numeral reading delegates the existing original body directly into the physical caller receiver, without an additional AST numerical wrapper or value-return temporary. Unmatched inputs leave receiver/width/invocation unread; a reached NUM copy requires a nonnil exact caller invocation. Width is published after copy, preserving a modified-coefficient prefix on a reached missing-width domain error. Actual Runtime allocation refusals with a stored negative 4098-bit magnitude are named by the copy child; successful/failed cleanup preserves recorded source readiness and owner graphs close to zero. The future polynomial owner must embed/charge and retain this caller invocation through source exit; native stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership are not credited. Returning Go cleanup is not native-fatal resumability.",
-        "The new exact norm/inverse entry points delegate already implemented original bodies, preserving existing DEBUG/release/global-slot/transport/normalization qualifications. Caller tokens name actual frames rather than adopting ambient numerical ownership. Returned unsigned norm is not the coefficient copy-assignment helper. Full mk_mul_eq and broader BV configuration/equality/solver dispatch remain required; no whole source unit is promoted and explicit Go owning cleanup is not native-fatal resumability.",
-        "Arithmetic small numeral caches, BV sort/fixed/conversion caches and bit2bool nested rows now use native slices with direct zero-gap filling/indexing. Removed astFormatRefVector, resizeNull geometric backing and reflected byte/capacity charges, plus duplicate bit2bool logical-size state. Sort acquired flags remain native metadata for actual successful INC leaves; fixed declaration interrupted-INC metadata preserves source publish-before-INC and explicit owning abort. Removed arithmetic cachePending since no fallible storage step remains after successful INC. Actual numerical/factory invocation cleanup, validation/publication order and ascending consumed-DEC retirement remain. Existing actual constructor/numeric reservation campaigns are retained; growth-only unpublished-cache expectations are retired. A native integration grows nested/conversion/sort caches under disabled arena reservations, preserves earlier cache pins, checks validation prefixes and completes source finalization. Cached arithmetic numerals retain one pin across repeated disabled-budget lookups. Prior source-capacity/refusal geometry claims are superseded; no generic C++ container or STL implementation credit is added."
+        "The complete retained bit-vector declaration plugin uses concrete checked Go owners and typed slices for sorts, declarations, caches and numerical frames. It preserves source validation, publication, hash-consing, reference ownership, normalization and finalization order without porting C++ container internals.",
+        "Checked Go errors replace native assertion, exception and undefined-domain behavior. Native layout and ABI equivalence are outside the port; retained algorithms and live concrete instantiations are covered."
       ]
     },
     {
       "path": "src/ast/bv_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_uninterpreted_plugin.go",
         "pkg/ast/ast_uninterpreted_plugin_test.go",
@@ -14631,12 +14614,12 @@
           "text": "SASSERT(is_bv_sort(s));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "original is_considered_uninterpreted family/kind predicate and borrowed numeral declaration identity adapter (src/ast/bv_decl_plugin.h:271-285)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_uninterpreted_plugin.go",
           "tests": [
             "TestASTOriginalPluginUninterpretedClassification"
@@ -14644,7 +14627,7 @@
         },
         {
           "name": "original mk_numeral(uint64_t,unsigned) ui64 rational construction, full-expression temporary lifetime and delegated numeral algorithm (src/ast/bv_decl_plugin.h:387; src/util/rational.h:65)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_uint64_numeral.go",
           "tests": [
             "TestASTBitVectorOriginalUint64Numeral",
@@ -14654,7 +14637,7 @@
         },
         {
           "name": "original is_bv expression-to-sort recognition and get_bv_size sort/expression overloads with gated SASSERT then signed-to-unsigned parameter read (src/ast/bv_decl_plugin.h:302,390-394)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_size.go",
           "tests": [
             "TestASTBitVectorOriginalSizeSortAndExpression",
@@ -14663,7 +14646,7 @@
         },
         {
           "name": "original fifteen MATCH_BINARY BV operand overloads with family/kind then exact arity guards and left/right borrowed publication (src/ast/bv_decl_plugin.h:353-368; src/ast/ast.h:530-534)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_binary_match.go",
           "tests": [
             "TestASTBitVectorOriginalBinaryOperandMatchers",
@@ -14672,7 +14655,7 @@
         },
         {
           "name": "original twenty parameter-free BV application utility overloads with source overflow operand reversal and delegated family factories (src/ast/bv_decl_plugin.h:397-434)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_app_util.go",
           "tests": [
             "TestASTBitVectorOriginalApplicationConstructors",
@@ -14681,7 +14664,7 @@
         },
         {
           "name": "original get_div0_op five-operation mapping and get_div0_decl family-preserving unary first-domain factory delegation (src/ast/bv_decl_plugin.h:107-126)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_div0.go",
           "tests": [
             "TestASTBitVectorOriginalDivZeroKindMapping",
@@ -14692,7 +14675,7 @@
         },
         {
           "name": "original extract/zero_extend/sign_extend scalar parameter utilities and mk_bv2int borrowed Int-sort parameter with family/sort lookup before app dispatch (src/ast/bv_decl_plugin.h:399-402,416-423; src/ast/bv_decl_plugin.cpp:880-885; src/ast/ast.h:113-122)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_app_parameter_util.go",
           "tests": [
             "TestASTBitVectorOriginalParameterizedUtilities",
@@ -14703,7 +14686,7 @@
         },
         {
           "name": "original parameter-free is_numeral(expr) app/family/kind overload (src/ast/bv_decl_plugin.h:298)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_numeral_identity.go",
           "tests": [
             "TestASTBitVectorNumeralPredicateOnlyReadsIdentity"
@@ -14711,7 +14694,7 @@
         },
         {
           "name": "original parameter-free is_concat/is_bv_add/is_bv_mul app/family/kind predicates for structural trailing analysis (src/ast/bv_decl_plugin.h:304,313,315; src/ast/ast.h:1308)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_operation_identity.go",
           "tests": [
             "TestASTBitVectorOperationIdentityErasesMetadata"
@@ -14719,7 +14702,7 @@
         },
         {
           "name": "original variadic mk_bv_or with borrowed application/ref-vector argument readers through shared fixed-declaration domain checks and application candidate factory (src/ast/bv_decl_plugin.h:406; src/ast/bv_decl_plugin.cpp:571-630; src/ast/ast.cpp:1863-1881,2064-2211)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_arguments.go",
           "tests": [
             "TestASTBitVectorBorrowedORArguments",
@@ -14728,7 +14711,7 @@
         },
         {
           "name": "Exact optional caller invocation around existing all-one recognizer body and real copied numeral/power/subtraction condition frame, without ambient numerical adoption (src/ast/bv_decl_plugin.cpp:794-803; src/ast/rewriter/bv_rewriter.h:38)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_recognizers.go",
           "tests": [
             "TestASTBitVectorAllOneExactInvocationEveryReservation"
@@ -14736,7 +14719,7 @@
         },
         {
           "name": "Original unsigned norm returned value exposed with exact caller invocation at actual normalization frame entry; input remains unchanged and returned ownership survives child cleanup (src/ast/bv_decl_plugin.cpp:753-765)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_normalization.go",
           "tests": [
             "TestASTBitVectorNumericCallerReturnedNormAndInverse",
@@ -14746,7 +14729,7 @@
         },
         {
           "name": "Original mult_inverse exposed with exact caller invocation at actual inverse frame entry; unchanged one/parity/gcd/correction/assertion/output-copy body and aliased receiver behavior (src/ast/bv_decl_plugin.cpp:827-848)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_inverse.go",
           "tests": [
             "TestASTBitVectorNumericCallerReturnedNormAndInverse",
@@ -14756,7 +14739,7 @@
         },
         {
           "name": "Original individual get_extract_high/get_extract_low parameter reads without eager combined recognition (src/ast/bv_decl_plugin.h:307-310)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_extract_bounds.go",
           "tests": [
             "TestASTBitVectorExtractBoundsOriginalParameters"
@@ -14764,7 +14747,7 @@
         },
         {
           "name": "Original mk_bv_xor unsigned-arity factory bridge over borrowed concrete argument storage, preserving candidate allocation and stale-view guards (bv_decl_plugin.h:408)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_arguments.go",
           "tests": [
             "TestASTBitVectorBorrowedXORFactoryAndLifetime"
@@ -14772,7 +14755,7 @@
         },
         {
           "name": "Original concat factory over borrowed source argument suffixes: shared lexical inline16/doubling SORT domain and unchanged declaration/candidate application factory (src/ast/bv_decl_plugin.h:404; src/ast/ast.cpp:1568-1638)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_arguments.go",
           "tests": [
             "TestASTBitVectorConcatBorrowedSuffix"
@@ -14780,7 +14763,7 @@
         },
         {
           "name": "Original cached ADD factory over borrowed common operand suffix without pointer-array/domain-buffer copying (src/ast/rewriter/bv_rewriter.cpp:305-306; src/ast/bv_decl_plugin.cpp:571-630)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_arguments.go",
           "tests": [
             "TestASTBitVectorAddBorrowedCommonSuffix"
@@ -14800,18 +14783,8 @@
         "The exact caller interfaces prepare the actual ASTBitVectorNumeralInvocation before numerical acquisition, capture the real inverse/normalization frame identity and generation at entry, and delegate the original bodies without extra wrappers or substitute arithmetic. Unsigned normalization returns its original distinct owned value and never assigns the input; inverse retains the physical output assignment and its one/even/aliased branches. Failed exact frames can be joined before older caller locals end, with preserved source history and failed-call replay rejection after owning cleanup. Fresh actual Runtime width65 campaigns refuse all reached norm and inverse allocations through success; live returned normalized/output values survive child cleanup and both inputs remain unchanged. Enclosing production callers must embed/charge and retain the invocation through source exit. Native layout/stack/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source DT, higher-level multiplication-equality integration and whole-unit completion remain uncredited."
       ],
       "deviations": [
-        "The selected predicate is connected to model interpretation/completion; whole-header and native representation/assertion/ownership audit are not credited. A declaration naming an unregistered plugin receives false in the checked Go adapter; native consumers require a nonnull registered plugin. Declaration-only numeral identity is a checked consumer adapter of the original app/decl identity recognizers, with no application construction or numerical parameter reads.",
-        "Selected uint64 numeral construction preserves the strict uint64 setter boundary: values at INT_MAX allocate big backing, unlike the unsigned32 overload. The concrete shared Go frame represents nested source lexical lifetimes and retains existing rational/temporary/header/allocator/assertion/exception ABI qualifications. Runtime refusal tests prove graph ownership and release, not resumability of process-fatal native operations. Other BV construction/conversion utilities and complete rewriter/whole-unit audits remain open.",
-        "The selected width getter preserves source release assertion erasure: wrong family/kind or extra parameters do not block reading a present integer parameter zero. Debug invokes the existing optional namespace assertion adapter before that read. Wrong AST kinds, missing parameters or noninteger parameter access retain checked Go rejection of native invalid/undefined domains. Native global assertion/parameter union/ABI and whole-header ownership audits remain uncredited; remaining BV utility/reducer work is still open.",
-        "The selected named Go methods implement all fifteen source MATCH_BINARY overloads. Invalid Go output pointers are a checked adapter boundary and can preserve a reached left-output publication before rejecting the right pointer; native C++ references cannot be nil. Missing plugin/invalid handles retain existing checked owner behavior. Native pointer/reference/assertion/ABI and whole-header ownership audits remain uncredited; full BV rewriter consumers and remaining utility construction interfaces remain open.",
-        "Twenty parameter-free application utility overloads are selected: comparisons, unary/binary arithmetic and bitwise/shift operations, three overflow predicates, variadic concat/or/xor/mkbv and binary concat. The three multiplication overflow predicates intentionally reverse source operands. Missing registered BV plugin is rejected by the checked Go utility adapter. Parameterized extract/extension helpers, bv2int utility and full rewriter consumers remain separate work; whole-header native representation/assertion/ownership audits remain uncredited.",
-        "Selected get_div0_op/get_div0_decl preserve the five ordinary division/remainder/modulus mappings, family and first domain, erasing input parameters/remaining domains/range. The shared family declaration dispatcher was extracted without changing its branches. Invalid kinds at native UNREACHABLE, invalid handles and empty domain pointers receive checked Go errors; native assertion/compiler-unreachable behavior and whole-header ABI/ownership audits remain uncredited. Full BV rewriter consumers remain separate work.",
-        "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited.",
-        "Selected parameter-free numeral predicate exposes the existing original identity algorithm for BV reducers. Missing registered plugin and invalid Go handle/kind domains retain checked adapter behavior; native whole-header pointer/union/assertion/ownership audit is not credited.",
-        "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition now uses this factory in its post-core reduction and still requires its original polynomial core.",
-        "The new exact norm/inverse entry points delegate already implemented original bodies, preserving existing DEBUG/release/global-slot/transport/normalization qualifications. Caller tokens name actual frames rather than adopting ambient numerical ownership. Returned unsigned norm is not the coefficient copy-assignment helper. Full mk_mul_eq and broader BV configuration/equality/solver dispatch remain required; no whole source unit is promoted and explicit Go owning cleanup is not native-fatal resumability.",
-        "The concrete AppArguments suffix reader avoids an extra pointer-buffer copy when extraction propagation removes a complete leading concat segment. Existing family fallback domain construction is shared without changing its numerical sort/declaration/application order or existing failure-cleanup qualifications. Borrowed suffix tests check mixed-width output, hash-cons identity, domain growth and source-application expiry; propagation every-reservation campaigns cover both suffix and shortened-head paths.",
-        "Arithmetic small numeral caches, BV sort/fixed/conversion caches and bit2bool nested rows now use native slices with direct zero-gap filling/indexing. Removed astFormatRefVector, resizeNull geometric backing and reflected byte/capacity charges, plus duplicate bit2bool logical-size state. Sort acquired flags remain native metadata for actual successful INC leaves; fixed declaration interrupted-INC metadata preserves source publish-before-INC and explicit owning abort. Removed arithmetic cachePending since no fallible storage step remains after successful INC. Actual numerical/factory invocation cleanup, validation/publication order and ascending consumed-DEC retirement remain. Existing actual constructor/numeric reservation campaigns are retained; growth-only unpublished-cache expectations are retired. A native integration grows nested/conversion/sort caches under disabled arena reservations, preserves earlier cache pins, checks validation prefixes and completes source finalization. Cached arithmetic numerals retain one pin across repeated disabled-budget lookups. Prior source-capacity/refusal geometry claims are superseded; no generic C++ container or STL implementation credit is added."
+        "Concrete manager-bound Go methods replace C++ overloads and MATCH macros for every retained live bit-vector utility instantiation. Inputs are validated handles and borrowed argument slices; returned RC0 handles retain manager ownership.",
+        "Checked errors replace invalid native reference, assertion and unreachable domains. C++ pointer/layout ABI and generic container implementation are outside the port."
       ]
     },
     {
