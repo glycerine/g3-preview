@@ -4,7 +4,16 @@
 // needs no copied container storage for their unused members.
 package ast
 
-import "reflect"
+import (
+	"reflect"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+)
+
+type astDatatypeAccessorKey struct {
+	sort        astNodeRef
+	constructor usymbol.Symbol
+}
 
 type astDatatypePluginOwner struct {
 	self                                  *astDatatypePluginOwner
@@ -13,6 +22,7 @@ type astDatatypePluginOwner struct {
 	family                                FamilyID
 	header                                uint64
 	bodyCause                             error
+	accessors                             map[astDatatypeAccessorKey][]usymbol.Symbol
 	completed, published, memoryTraceLive bool
 	membersEnded                          bool
 }
@@ -34,6 +44,7 @@ func (m *ASTManager) registerDatatypePlugin() (FamilyID, error) {
 		return NullFamilyID, e
 	}
 	p := &astDatatypePluginOwner{owner: m, header: bytes, next: m.datatypePluginFailed}
+	p.accessors = make(map[astDatatypeAccessorKey][]usymbol.Symbol)
 	p.self = p
 	m.traceRegisteredPluginAllocated(p.traceIdentity(), p.header, 41, "datatype_decl_plugin", &p.memoryTraceLive)
 	m.datatypePluginFailed = p
@@ -98,5 +109,7 @@ func (m *ASTManager) finalizeDatatypePlugin() error {
 		return nil
 	}
 	p.membersEnded = true
+	clear(p.accessors)
+	p.accessors = nil
 	return nil
 }
