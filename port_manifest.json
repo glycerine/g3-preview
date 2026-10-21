@@ -22599,7 +22599,8 @@
         "TestArithRewriterPolynomialCancellation",
         "TestArithRewriterCoefficientAndModuloBounds",
         "TestArithRewriterStructuralPowerRules",
-        "TestArithRewriterComparisonPowerReductionAndToRealElimination"
+        "TestArithRewriterComparisonPowerReductionAndToRealElimination",
+        "TestArithRewriterPolynomialGCDReduction"
       ],
       "assertions": [
         {
@@ -22875,7 +22876,15 @@
           ]
         },
         {
-          "name": "advanced SOM/hoisting modes, polynomial GCD reduction, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
+          "name": "configured integer-polynomial coefficient GCD reduction with exact equality divisibility and inequality rounding",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_polynomial.go",
+          "tests": [
+            "TestArithRewriterPolynomialGCDReduction"
+          ]
+        },
+        {
+          "name": "advanced SOM/hoisting modes, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
           "status": "unported",
           "reason": "The exact rational scalar core is connected first; the remaining paths require the concrete arithmetic specialization of poly_rewriter and broader algebraic-expression integration."
         }
@@ -22902,7 +22911,8 @@
         "TestArithRewriterPolynomialCancellation",
         "TestArithRewriterCoefficientAndModuloBounds",
         "TestArithRewriterStructuralPowerRules",
-        "TestArithRewriterComparisonPowerReductionAndToRealElimination"
+        "TestArithRewriterComparisonPowerReductionAndToRealElimination",
+        "TestArithRewriterPolynomialGCDReduction"
       ],
       "conditionals": [
         {

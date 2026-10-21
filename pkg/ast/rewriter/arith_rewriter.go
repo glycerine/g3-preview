@@ -296,6 +296,18 @@ func (r *ArithRewriter) rewriteComparison(kind int32, left, right ast.ASTHandle,
 				return RewriteDone, nil
 			}
 		}
+		if r.gcdRounding {
+			newLeft, newRight, reduced, impossible, e := r.reducePolynomialGCD(left, right, kind)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			if impossible {
+				return RewriteDone, r.setBool(out, false)
+			}
+			if reduced {
+				left, right, changed = newLeft, newRight, true
+			}
+		}
 		if changed && err == nil {
 			result, e := r.app(kind, left, right)
 			if e != nil {
@@ -986,6 +998,18 @@ func (r *ArithRewriter) MkEqCore(left, right ast.ASTHandle, out ast.ASTRef) (Rew
 					return RewriteFailed, e
 				}
 				return RewriteDone, nil
+			}
+		}
+		if r.gcdRounding {
+			newLeft, newRight, reduced, impossible, e := r.reducePolynomialGCD(left, right, arithRelationEq)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			if impossible {
+				return RewriteDone, r.setBool(out, false)
+			}
+			if reduced {
+				left, right, changed = newLeft, newRight, true
 			}
 		}
 		if changed && err == nil {

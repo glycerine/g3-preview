@@ -671,3 +671,58 @@ func TestArithRewriterComparisonPowerReductionAndToRealElimination(t *testing.T)
 	}
 	arithRewriterWantOperation(t, eliminating, comparisonArgs[1], arithOpAdd, iNeg2, y)
 }
+
+func TestArithRewriterPolynomialGCDReduction(t *testing.T) {
+	m, c, g, local := boolRewriterConfigFixture(t)
+	key := "gcd_rounding"
+	astTestMust(t, c.SetBoolName(local, &key, true))
+	r, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	iSort, err := m.MkFamilySort(r.family, 1, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "arith-gcd-x"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	y, err := m.MkConst(astTestSymbol(t, m, "arith-gcd-y"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, y)
+	i2 := arithRewriterNumeral(t, m, "2", true)
+	i4 := arithRewriterNumeral(t, m, "4", true)
+	i5 := arithRewriterNumeral(t, m, "5", true)
+	twoX, err := r.app(arithOpMul, i2, x)
+	astTestMust(t, err)
+	astTestPin(t, m, twoX)
+	fourY, err := r.app(arithOpMul, i4, y)
+	astTestMust(t, err)
+	astTestPin(t, m, fourY)
+	polynomial, err := r.app(arithOpAdd, twoX, fourY)
+	astTestMust(t, err)
+	astTestPin(t, m, polynomial)
+
+	status, result := arithRewriterCore(t, r, arithOpLE, polynomial, i5)
+	if status != RewriteDone {
+		t.Fatal("GCD inequality reduction status", status)
+	}
+	_, comparisonArgs, matched, err := r.operation(result, arithOpLE)
+	astTestMust(t, err)
+	if !matched || len(comparisonArgs) != 2 {
+		t.Fatal("GCD inequality comparison", matched, len(comparisonArgs))
+	}
+	arithRewriterWantNumeral(t, m, comparisonArgs[1], "2", true)
+	_, lhsArgs, matched, err := r.operation(comparisonArgs[0], arithOpAdd)
+	astTestMust(t, err)
+	if !matched || len(lhsArgs) != 2 || lhsArgs[0] != x {
+		t.Fatal("GCD quotient polynomial", matched, len(lhsArgs))
+	}
+	arithRewriterWantOperation(t, r, lhsArgs[1], arithOpMul, i2, y)
+
+	equalityOut := astTestPin(t, m, polynomial)
+	status, err = r.MkEqCore(polynomial, i5, equalityOut)
+	astTestMust(t, err)
+	result, err = m.RefGet(equalityOut)
+	astTestMust(t, err)
+	if status != RewriteDone || !m.IsFalse(result) {
+		t.Fatal("GCD equality divisibility", status, result)
+	}
+}

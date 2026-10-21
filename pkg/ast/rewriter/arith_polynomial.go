@@ -11,6 +11,12 @@ import (
 
 const arithRelationEq int32 = -1
 
+const (
+	arithDivideExact = iota
+	arithDivideFloor
+	arithDivideCeil
+)
+
 func (r *ArithRewriter) integerTerm(h ast.ASTHandle) (bool, error) {
 	s, err := r.manager.GetSort(h)
 	if err != nil {
@@ -804,4 +810,134 @@ func (r *ArithRewriter) eliminateToRealComparison(left, right ast.ASTHandle) (as
 		return left, right, false, err
 	}
 	return newLeft, newRight, true, nil
+}
+
+func arithCeil(value *big.Rat) *big.Int {
+	negative := new(big.Rat).Neg(value)
+	return new(big.Int).Neg(arithFloor(negative))
+}
+
+func (r *ArithRewriter) polynomialCoefficientGCD(h ast.ASTHandle, gcd *big.Int, first *bool, constants *int) error {
+	terms, err := r.monomials(h)
+	if err != nil {
+		return err
+	}
+	for _, term := range terms {
+		value, _, numeral, e := r.numeral(term)
+		if e != nil {
+			return e
+		}
+		if numeral {
+			if value.Sign() != 0 {
+				*constants++
+			}
+			continue
+		}
+		coefficient, _, e := r.monomial(term)
+		if e != nil {
+			return e
+		}
+		if !coefficient.IsInt() {
+			return ast.ErrASTDomain
+		}
+		absolute := new(big.Int).Abs(coefficient.Num())
+		if *first {
+			gcd.Set(absolute)
+			*first = false
+		} else {
+			gcd.GCD(nil, nil, gcd, absolute)
+		}
+		if gcd.Cmp(big.NewInt(1)) == 0 {
+			return nil
+		}
+	}
+	return nil
+}
+
+func (r *ArithRewriter) dividePolynomial(h ast.ASTHandle, divisor *big.Int, treatment int) (ast.ASTHandle, bool, error) {
+	terms, err := r.monomials(h)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	result := make([]ast.ASTHandle, 0, len(terms))
+	denominator := new(big.Rat).SetInt(divisor)
+	for _, term := range terms {
+		value, _, numeral, e := r.numeral(term)
+		if e != nil {
+			return ast.ASTHandle{}, false, e
+		}
+		if numeral {
+			value.Quo(value, denominator)
+			if !value.IsInt() {
+				switch treatment {
+				case arithDivideFloor:
+					value.SetInt(arithFloor(value))
+				case arithDivideCeil:
+					value.SetInt(arithCeil(value))
+				default:
+					return ast.ASTHandle{}, false, nil
+				}
+			}
+			if value.Sign() != 0 {
+				n, e := r.numeralForTerm(value, h)
+				if e != nil {
+					return ast.ASTHandle{}, false, e
+				}
+				result = append(result, n)
+			}
+			continue
+		}
+		coefficient, product, e := r.monomial(term)
+		if e != nil {
+			return ast.ASTHandle{}, false, e
+		}
+		coefficient.Quo(coefficient, denominator)
+		if !coefficient.IsInt() {
+			return ast.ASTHandle{}, false, ast.ErrASTDomain
+		}
+		if coefficient.Sign() != 0 {
+			monomial, e := r.coefficientProduct(coefficient, product, h)
+			if e != nil {
+				return ast.ASTHandle{}, false, e
+			}
+			result = append(result, monomial)
+		}
+	}
+	quotient, err := r.makeAdd(result, h)
+	return quotient, err == nil, err
+}
+
+func (r *ArithRewriter) reducePolynomialGCD(left, right ast.ASTHandle, relation int32) (ast.ASTHandle, ast.ASTHandle, bool, bool, error) {
+	integer, err := r.integerTerm(left)
+	if err != nil || !integer {
+		return left, right, false, false, err
+	}
+	gcd := new(big.Int)
+	first, constants := true, 0
+	if err = r.polynomialCoefficientGCD(left, gcd, &first, &constants); err != nil {
+		return left, right, false, false, err
+	}
+	if (first || gcd.Cmp(big.NewInt(1)) != 0) && constants <= 1 {
+		if err = r.polynomialCoefficientGCD(right, gcd, &first, &constants); err != nil {
+			return left, right, false, false, err
+		}
+	}
+	if first || gcd.Cmp(big.NewInt(1)) == 0 || constants > 1 {
+		return left, right, false, false, nil
+	}
+	leftTreatment, rightTreatment := arithDivideExact, arithDivideExact
+	if relation == arithOpLE {
+		leftTreatment, rightTreatment = arithDivideCeil, arithDivideFloor
+	} else if relation == arithOpGE {
+		leftTreatment, rightTreatment = arithDivideFloor, arithDivideCeil
+	}
+	newLeft, possible, err := r.dividePolynomial(left, gcd, leftTreatment)
+	if err != nil || !possible {
+		return left, right, false, !possible, err
+	}
+	newRight, possible, err := r.dividePolynomial(right, gcd, rightTreatment)
+	if err != nil || !possible {
+		return left, right, false, !possible, err
+	}
+	return newLeft, newRight, true, false, nil
 }
