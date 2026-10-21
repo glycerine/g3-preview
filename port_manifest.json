@@ -17298,13 +17298,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/fpa/fpa2bv_converter.go",
+        "pkg/ast/fpa/fpa2bv_predicates.go",
         "pkg/ast/ast_fpa_sort_access.go",
         "pkg/ast/ast_bv_all_ones.go"
       ],
       "tests": [
         "TestConverterSortAccessSpecialsSplitAndJoin",
         "TestConverterNaNEqualityDistinctAndComponentITE",
-        "TestConverterRoundingModeCodesAndEquality"
+        "TestConverterRoundingModeCodesAndEquality",
+        "TestConverterClassificationsUnarySignsAndComparisons"
       ],
       "conditionals": [
         {
@@ -18598,13 +18600,21 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "constructor/destructor, fp split/join, SMT equality, component ITE, distinct expansion, rounding-mode constants, and canonical infinity/NaN/zero encodings; arithmetic, classifications, comparisons, conversions, constants and UFs remain open",
+          "name": "constructor/destructor, fp split/join, SMT equality, component ITE, distinct expansion, rounding-mode constants, and canonical infinity/NaN/zero encodings; arithmetic, conversions, constants and UFs remain open",
           "status": "ported",
           "go_target": "pkg/ast/fpa/fpa2bv_converter.go",
           "tests": [
             "TestConverterSortAccessSpecialsSplitAndJoin",
             "TestConverterNaNEqualityDistinctAndComponentITE",
             "TestConverterRoundingModeCodesAndEquality"
+          ]
+        },
+        {
+          "name": "sign, zero, infinity, NaN, normal and subnormal predicates; public classifications; negation, absolute value and IEEE equality/order comparisons",
+          "status": "ported",
+          "go_target": "pkg/ast/fpa/fpa2bv_predicates.go",
+          "tests": [
+            "TestConverterClassificationsUnarySignsAndComparisons"
           ]
         }
       ],
@@ -18620,13 +18630,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/fpa/fpa2bv_converter.go",
+        "pkg/ast/fpa/fpa2bv_predicates.go",
         "pkg/ast/ast_fpa_sort_access.go",
         "pkg/ast/ast_bv_all_ones.go"
       ],
       "tests": [
         "TestConverterSortAccessSpecialsSplitAndJoin",
         "TestConverterNaNEqualityDistinctAndComponentITE",
-        "TestConverterRoundingModeCodesAndEquality"
+        "TestConverterRoundingModeCodesAndEquality",
+        "TestConverterClassificationsUnarySignsAndComparisons"
       ],
       "conditionals": [
         {
@@ -18642,13 +18654,14 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "public converter lifecycle and foundational structural/special-value interface; remaining arithmetic and model-facing interface remains open",
+          "name": "public converter lifecycle, foundational structural/special-value interface, classifications, unary sign operations and comparisons; remaining arithmetic and model-facing interface remains open",
           "status": "ported",
           "go_target": "pkg/ast/fpa/fpa2bv_converter.go",
           "tests": [
             "TestConverterSortAccessSpecialsSplitAndJoin",
             "TestConverterNaNEqualityDistinctAndComponentITE",
-            "TestConverterRoundingModeCodesAndEquality"
+            "TestConverterRoundingModeCodesAndEquality",
+            "TestConverterClassificationsUnarySignsAndComparisons"
           ]
         }
       ],

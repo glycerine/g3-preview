@@ -146,3 +146,75 @@ func TestConverterRoundingModeCodesAndEquality(t *testing.T) {
 		}
 	}
 }
+
+func TestConverterClassificationsUnarySignsAndComparisons(t *testing.T) {
+	m, c := fixture(t)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	values := make(map[fpa.SpecialValue]ast.ASTHandle)
+	for _, value := range []fpa.SpecialValue{fpa.PositiveInfinity, fpa.NegativeInfinity, fpa.NaN, fpa.PositiveZero, fpa.NegativeZero} {
+		values[value], err = c.MkSpecial(sort, value)
+		must(t, err)
+	}
+	zeroSign, err := m.BitVectorNumeralUnsigned(0, 1)
+	must(t, err)
+	zeroExp, err := m.BitVectorNumeralUnsigned(0, 8)
+	must(t, err)
+	oneExp, err := m.BitVectorNumeralUnsigned(1, 8)
+	must(t, err)
+	zeroSig, err := m.BitVectorNumeralUnsigned(0, 23)
+	must(t, err)
+	oneSig, err := m.BitVectorNumeralUnsigned(1, 23)
+	must(t, err)
+	subnormal, err := c.MkFP(zeroSign, zeroExp, oneSig)
+	must(t, err)
+	normal, err := c.MkFP(zeroSign, oneExp, zeroSig)
+	must(t, err)
+
+	classify := func(value ast.ASTHandle, kind ast.FPAClassificationKind, want bool) {
+		t.Helper()
+		got, e := c.Classify(value, kind)
+		must(t, e)
+		if m.IsTrue(got) != want || m.IsFalse(got) == want {
+			t.Fatalf("classification %d: got %v want %v", kind, got, want)
+		}
+	}
+	classify(values[fpa.NaN], ast.FPAIsNaN, true)
+	classify(values[fpa.NaN], ast.FPAIsPositive, false)
+	classify(values[fpa.PositiveInfinity], ast.FPAIsInfinite, true)
+	classify(values[fpa.NegativeInfinity], ast.FPAIsNegative, true)
+	classify(values[fpa.PositiveZero], ast.FPAIsZero, true)
+	classify(values[fpa.NegativeZero], ast.FPAIsNegative, true)
+	classify(subnormal, ast.FPAIsSubnormal, true)
+	classify(subnormal, ast.FPAIsNormal, false)
+	classify(normal, ast.FPAIsNormal, true)
+
+	abs, err := c.Abs(values[fpa.NegativeZero])
+	must(t, err)
+	if abs != values[fpa.PositiveZero] {
+		t.Fatal("absolute value clears sign", abs, values[fpa.PositiveZero])
+	}
+	negatedNaN, err := c.Negate(values[fpa.NaN])
+	must(t, err)
+	if negatedNaN != values[fpa.NaN] {
+		t.Fatal("negation preserves NaN sign", negatedNaN, values[fpa.NaN])
+	}
+
+	compare := func(kind int32, left, right ast.ASTHandle, want bool) {
+		t.Helper()
+		got, e := c.Compare(kind, left, right)
+		must(t, e)
+		if m.IsTrue(got) != want || m.IsFalse(got) == want {
+			t.Fatalf("comparison %d: got %v want %v", kind, got, want)
+		}
+	}
+	compare(ast.FPAOpEq, values[fpa.PositiveZero], values[fpa.NegativeZero], true)
+	compare(ast.FPAOpEq, values[fpa.NaN], values[fpa.NaN], false)
+	compare(ast.FPAOpLt, values[fpa.NegativeInfinity], values[fpa.PositiveInfinity], true)
+	compare(ast.FPAOpLt, values[fpa.PositiveInfinity], values[fpa.NegativeInfinity], false)
+	compare(ast.FPAOpLt, values[fpa.NegativeZero], values[fpa.PositiveZero], false)
+	compare(ast.FPAOpLt, values[fpa.NaN], values[fpa.PositiveInfinity], false)
+	compare(ast.FPAOpLe, values[fpa.NegativeZero], values[fpa.PositiveZero], true)
+	compare(ast.FPAOpGt, values[fpa.PositiveInfinity], values[fpa.NegativeInfinity], true)
+	compare(ast.FPAOpGe, values[fpa.NegativeZero], values[fpa.PositiveZero], true)
+}
