@@ -186,6 +186,47 @@ func TestConverterRoundingDecisionModes(t *testing.T) {
 	}
 }
 
+func TestConverterRoundKernelWidthsAndResultShape(t *testing.T) {
+	m, c := fixture(t)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	mode, err := c.MkRoundingMode(ast.FPAOpRMNearestEven)
+	must(t, err)
+	signSort, err := m.BitVectorSort(1)
+	must(t, err)
+	significandSort, err := m.BitVectorSort(28)
+	must(t, err)
+	exponentSort, err := m.BitVectorSort(10)
+	must(t, err)
+	sign, err := m.MkVar(200, signSort)
+	must(t, err)
+	significand, err := m.MkVar(201, significandSort)
+	must(t, err)
+	exponent, err := m.MkVar(202, exponentSort)
+	must(t, err)
+	result, err := c.Round(sort, mode, sign, significand, exponent)
+	must(t, err)
+	gotSign, gotExponent, gotSignificand, err := c.SplitFP(result)
+	must(t, err)
+	for _, field := range []struct {
+		value ast.ASTHandle
+		width uint32
+	}{{gotSign, 1}, {gotExponent, 8}, {gotSignificand, 23}} {
+		width, e := m.BitVectorSize(field.value)
+		must(t, e)
+		if width != field.width {
+			t.Fatal("rounded field width", width, field.width)
+		}
+	}
+	badSort, err := m.BitVectorSort(27)
+	must(t, err)
+	bad, err := m.MkVar(203, badSort)
+	must(t, err)
+	if _, err = c.Round(sort, mode, sign, bad, exponent); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("invalid extended significand width", err)
+	}
+}
+
 func fixture(t *testing.T) (*ast.ASTManager, *fpa.Converter) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)

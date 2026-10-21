@@ -74,6 +74,14 @@ func (m *ASTManager) MkBitVectorNot(arg ASTHandle) (ASTHandle, error) {
 	return m.mkBitVectorUtilityApp(32, []ASTHandle{arg})
 }
 
+func (m *ASTManager) MkBitVectorReductionOr(arg ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(42, []ASTHandle{arg})
+}
+
+func (m *ASTManager) MkBitVectorReductionAnd(arg ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(43, []ASTHandle{arg})
+}
+
 func (m *ASTManager) MkBitVectorNeg(arg ASTHandle) (ASTHandle, error) {
 	return m.mkBitVectorUtilityApp(3, []ASTHandle{arg})
 }

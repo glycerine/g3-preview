@@ -17305,7 +17305,8 @@
         "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
-        "pkg/ast/ast_bv_all_ones.go"
+        "pkg/ast/ast_bv_all_ones.go",
+        "pkg/ast/ast_bv_app_util.go"
       ],
       "tests": [
         "TestConverterSortAccessSpecialsSplitAndJoin",
@@ -17315,6 +17316,7 @@
         "TestConverterVariablesAndIEEEBitVectorConversions",
         "TestConverterFiniteNumeral",
         "TestConverterRoundingDecisionModes",
+        "TestConverterRoundKernelWidthsAndResultShape",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18680,7 +18682,8 @@
         "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
-        "pkg/ast/ast_bv_all_ones.go"
+        "pkg/ast/ast_bv_all_ones.go",
+        "pkg/ast/ast_bv_app_util.go"
       ],
       "tests": [
         "TestConverterSortAccessSpecialsSplitAndJoin",
@@ -18690,6 +18693,7 @@
         "TestConverterVariablesAndIEEEBitVectorConversions",
         "TestConverterFiniteNumeral",
         "TestConverterRoundingDecisionModes",
+        "TestConverterRoundKernelWidthsAndResultShape",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
