@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func theoryRewriterFixture(t *testing.T) (*ast.ASTManager, *TheoryRewriter) {
@@ -307,6 +308,76 @@ func TestTheoryRewriterParamsCacheCleanupAndBindings(t *testing.T) {
 	}
 	if !r.configuration.pullCheapITE || !r.configuration.floating.hiFPUnspecified {
 		t.Fatal("cleanup did not preserve owned parameters")
+	}
+}
+
+func TestTheoryRewriterQuantifierReduction(t *testing.T) {
+	m, r := theoryRewriterFixture(t)
+	boolSort, err := m.MkBoolSort()
+	astTestMust(t, err)
+	v0, err := m.MkVar(0, boolSort)
+	astTestMust(t, err)
+	v1, err := m.MkVar(1, boolSort)
+	astTestMust(t, err)
+	body, err := m.MkOr(v0, v1)
+	astTestMust(t, err)
+	inner, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{boolSort},
+		Names: []usymbol.Symbol{astTestSymbol(t, m, "theory-inner")}, Body: body, Weight: 3})
+	astTestMust(t, err)
+	outerQID := astTestSymbol(t, m, "theory-outer-qid")
+	outer, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{boolSort},
+		Names: []usymbol.Symbol{astTestSymbol(t, m, "theory-outer")}, Body: inner, Weight: 7, QID: outerQID})
+	astTestMust(t, err)
+	out := astTestPin(t, m, outer)
+	astTestMust(t, r.Rewrite(outer, out))
+	got, err := m.RefGet(out)
+	astTestMust(t, err)
+	if count, e := m.GetNumDeclarations(got); e != nil || count != 2 {
+		t.Fatal("nested quantifiers were not pulled", count, e)
+	}
+	if weight, e := m.GetQuantifierWeight(got); e != nil || weight != 3 {
+		t.Fatal("pulled quantifier weight", weight, e)
+	}
+	if qid, _, e := m.GetQuantifierIDs(got); e != nil || qid != outerQID {
+		t.Fatal("pulled quantifier identifiers", qid, e)
+	}
+	if pulledBody, e := m.GetQuantifierBody(got); e != nil || pulledBody != body {
+		t.Fatal("pulled quantifier body", pulledBody, body, e)
+	}
+
+	pattern, err := m.MkPattern([]ast.ASTHandle{v0})
+	astTestMust(t, err)
+	annotated, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{boolSort},
+		Names: []usymbol.Symbol{astTestSymbol(t, m, "theory-pattern")}, Body: v0, Patterns: []ast.ASTHandle{pattern}})
+	astTestMust(t, err)
+	annotatedOut := astTestPin(t, m, annotated)
+	proof := astTestPin(t, m, annotated)
+	done, err := r.configuration.ReduceQuantifier(annotated, v0,
+		ast.SliceArguments([]ast.ASTHandle{pattern, pattern}), ast.AppArguments{}, annotatedOut, proof)
+	astTestMust(t, err)
+	if !done {
+		t.Fatal("quantifier reducer refused annotations")
+	}
+	got, err = m.RefGet(annotatedOut)
+	astTestMust(t, err)
+	if count, e := m.GetNumPatterns(got); e != nil || count != 1 {
+		t.Fatal("duplicate quantifier patterns survived", count, e)
+	}
+	if proofValue, e := m.RefGet(proof); e != nil || !proofValue.IsNull() {
+		t.Fatal("no-proof quantifier reduction produced proof", proofValue, e)
+	}
+
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	ground, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{boolSort},
+		Names: []usymbol.Symbol{astTestSymbol(t, m, "theory-unused")}, Body: truth})
+	astTestMust(t, err)
+	groundOut := astTestPin(t, m, ground)
+	astTestMust(t, r.Rewrite(ground, groundOut))
+	got, err = m.RefGet(groundOut)
+	astTestMust(t, err)
+	if got != truth {
+		t.Fatal("unused ground quantifier survived", got, truth)
 	}
 }
 

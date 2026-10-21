@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	uparams "github.com/glycerine/g3/pkg/util/params"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 const (
@@ -102,6 +103,140 @@ func (c *theoryRewriterConfiguration) FlatAssoc(decl ast.ASTHandle) (bool, error
 		return kind == 4 || kind == 31 || kind == 30 || kind == 33, nil
 	}
 	return false, nil
+}
+
+func theoryUniqueArguments(arguments ast.AppArguments) ([]ast.ASTHandle, error) {
+	result := make([]ast.ASTHandle, 0, arguments.Count())
+	seen := make(map[ast.ASTHandle]struct{}, arguments.Count())
+	for i := uint32(0); i < arguments.Count(); i++ {
+		value, err := arguments.At(i)
+		if err != nil {
+			return nil, err
+		}
+		if _, found := seen[value]; found {
+			continue
+		}
+		seen[value] = struct{}{}
+		result = append(result, value)
+	}
+	return result, nil
+}
+
+func (c *theoryRewriterConfiguration) ReduceQuantifier(old, body ast.ASTHandle, patterns, noPatterns ast.AppArguments, out, proof ast.ASTRef) (result bool, err error) {
+	m := c.owner.manager
+	if err = m.SetRef(proof, ast.ASTHandle{}); err != nil {
+		return false, err
+	}
+	oldForall, err := m.IsForall(old)
+	if err != nil {
+		return false, err
+	}
+	oldPatterns, err := m.GetNumPatterns(old)
+	if err != nil {
+		return false, err
+	}
+	oldNoPatterns, err := m.GetNumNoPatterns(old)
+	if err != nil {
+		return false, err
+	}
+	bodyKind, err := m.GetKind(body)
+	if err != nil {
+		return false, err
+	}
+	var updated ast.ASTHandle
+	if bodyKind == ast.ASTQuantifier && oldPatterns == 0 && oldNoPatterns == 0 {
+		innerForall, e := m.IsForall(body)
+		if e != nil {
+			return false, e
+		}
+		innerPatterns, e := m.GetNumPatterns(body)
+		if e != nil {
+			return false, e
+		}
+		innerNoPatterns, e := m.GetNumNoPatterns(body)
+		if e != nil {
+			return false, e
+		}
+		if innerForall == oldForall && innerPatterns == 0 && innerNoPatterns == 0 {
+			outerCount, e := m.GetNumDeclarations(old)
+			if e != nil {
+				return false, e
+			}
+			innerCount, e := m.GetNumDeclarations(body)
+			if e != nil {
+				return false, e
+			}
+			sorts := make([]ast.ASTHandle, 0, outerCount+innerCount)
+			names := make([]usymbol.Symbol, 0, outerCount+innerCount)
+			for _, item := range []struct {
+				quantifier ast.ASTHandle
+				count      uint32
+			}{{old, outerCount}, {body, innerCount}} {
+				for i := uint32(0); i < item.count; i++ {
+					sort, e := m.GetDeclarationSort(item.quantifier, i)
+					if e != nil {
+						return false, e
+					}
+					name, e := m.GetDeclarationName(item.quantifier, i)
+					if e != nil {
+						return false, e
+					}
+					sorts = append(sorts, sort)
+					names = append(names, name)
+				}
+			}
+			outerWeight, e := m.GetQuantifierWeight(old)
+			if e != nil {
+				return false, e
+			}
+			innerWeight, e := m.GetQuantifierWeight(body)
+			if e != nil {
+				return false, e
+			}
+			if innerWeight < outerWeight {
+				outerWeight = innerWeight
+			}
+			qid, skid, e := m.GetQuantifierIDs(old)
+			if e != nil {
+				return false, e
+			}
+			innerBody, e := m.GetQuantifierBody(body)
+			if e != nil {
+				return false, e
+			}
+			updated, err = m.MkQuantifier(ast.ASTQuantifierSpec{Forall: oldForall, Sorts: sorts, Names: names,
+				Body: innerBody, Weight: outerWeight, QID: qid, SkolemID: skid})
+		}
+	}
+	if updated.IsNull() {
+		uniquePatterns, e := theoryUniqueArguments(patterns)
+		if e != nil {
+			return false, e
+		}
+		uniqueNoPatterns, e := theoryUniqueArguments(noPatterns)
+		if e != nil {
+			return false, e
+		}
+		updated, err = m.UpdateQuantifierAnnotations(old, uniquePatterns, uniqueNoPatterns, body)
+	}
+	if err != nil {
+		return false, err
+	}
+	updatedRef, err := m.NewRef(updated)
+	if err != nil {
+		return false, err
+	}
+	defer func() { err = errors.Join(err, m.DelRef(&updatedRef)) }()
+	eliminated, err := elimUnusedVars(m, updated, c.ignoreGroundPatterns)
+	if err != nil {
+		return false, err
+	}
+	defer func() { err = errors.Join(err, m.DelRef(&eliminated)) }()
+	value, err := m.RefGet(eliminated)
+	if err != nil {
+		return false, err
+	}
+	return true, m.SetRef(out, value)
 }
 
 func (c *theoryRewriterConfiguration) bitNumeral(h ast.ASTHandle) (uint32, bool, error) {
