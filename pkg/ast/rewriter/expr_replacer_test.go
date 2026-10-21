@@ -101,3 +101,51 @@ func TestDefaultExprReplacerCollectsUsedDependencies(t *testing.T) {
 		t.Fatal("source dependency join order", leaves)
 	}
 }
+
+func TestSimplifyingExprReplacerTheoryRewriteAndDependencyTransfer(t *testing.T) {
+	m, context, globals, params := boolRewriterConfigFixture(t)
+	a := goalTestAtom(t, m, "simplifying-replacer-a")
+	b := goalTestAtom(t, m, "simplifying-replacer-b")
+	truth, err := m.MkTrue()
+	satOK(t, err)
+	term, err := m.MkAnd(a, truth)
+	satOK(t, err)
+	astTestPin(t, m, term)
+
+	dependency, err := m.DependencyLeaf(b)
+	satOK(t, err)
+	satOK(t, m.DependencyInc(dependency))
+	t.Cleanup(func() { satOK(t, m.DependencyDec(dependency)) })
+	substitution, err := m.NewExprSubstitutionPolicy(true, false)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, m.DelExprSubstitution(&substitution)) })
+	satOK(t, m.ExprSubstitutionInsert(substitution, a, b, ast.ASTHandle{}, dependency))
+
+	r, err := NewSimplifyingExprReplacer(m, context, globals, params)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, r.Close()) })
+	if r.Manager() != m {
+		t.Fatal("simplifying replacer manager")
+	}
+	satOK(t, r.SetSubstitution(&substitution))
+	out := astTestPin(t, m, term)
+	used, err := r.RewriteWithDependency(term, out)
+	satOK(t, err)
+	if used.IsNull() {
+		t.Fatal("simplifying replacer omitted dependency")
+	}
+	defer func() { satOK(t, m.DependencyDec(used)) }()
+	got, err := m.RefGet(out)
+	satOK(t, err)
+	if got != b {
+		t.Fatal("substitution was not theory simplified", got, b)
+	}
+	contains, err := m.DependencyContains(used, b)
+	satOK(t, err)
+	if !contains {
+		t.Fatal("transferred dependency omitted replacement")
+	}
+	if steps, e := r.NumSteps(); e != nil || steps == 0 {
+		t.Fatal("simplifying replacer steps", steps, e)
+	}
+}

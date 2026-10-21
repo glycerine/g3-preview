@@ -30058,10 +30058,11 @@
       ],
       "tests": [
         "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
-        "TestDefaultExprReplacerCollectsUsedDependencies"
+        "TestDefaultExprReplacerCollectsUsedDependencies",
+        "TestSimplifyingExprReplacerTheoryRewriteAndDependencyTransfer"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "default_expr_replacer substitution lookup, iterative rewriting, step count, cache cleanup/reset, scoped one-entry apply and used-dependency transfer (expr_replacer.cpp:24-112)",
@@ -30079,15 +30080,19 @@
         },
         {
           "name": "th_rewriter2expr_replacer simplifying adapter and mk_expr_simp_replacer factory (expr_replacer.cpp:124-158)",
-          "status": "unported",
-          "reason": "Depends on the still-unported th_rewriter source unit."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/expr_replacer.go",
+          "tests": [
+            "TestSimplifyingExprReplacerTheoryRewriteAndDependencyTransfer"
+          ]
         }
       ],
       "ownership": [
-        "DefaultExprReplacer borrows its selected ASTExprSubstitution, owns the rewriter traversal/cache and one accumulated ASTDependency reference, and transfers a nonnull dependency result to the caller. ApplySubstitution owns and destroys its temporary substitution after clearing the borrowed pointer."
+        "DefaultExprReplacer borrows its selected ASTExprSubstitution, owns the rewriter traversal/cache and one accumulated ASTDependency reference, and transfers a nonnull dependency result to the caller. ApplySubstitution owns and destroys its temporary substitution after clearing the borrowed pointer.",
+        "SimplifyingExprReplacer owns its TheoryRewriter, borrows substitutions, and increments a used ASTDependency before resetting the theory rewriter so ownership transfers safely to the caller."
       ],
       "deviations": [
-        "The available rewriter engine is the retained no-proof specialization, so result proof construction and the th_rewriter simplifying adapter remain open. Dependency results use an explicit owning return that callers release with DependencyDec."
+        "The available rewriter engine is the retained no-proof specialization, so result proof construction remains open. Dependency results use an explicit owning return that callers release with DependencyDec."
       ]
     },
     {
@@ -30101,7 +30106,8 @@
       ],
       "tests": [
         "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
-        "TestDefaultExprReplacerCollectsUsedDependencies"
+        "TestDefaultExprReplacerCollectsUsedDependencies",
+        "TestSimplifyingExprReplacerTheoryRewriteAndDependencyTransfer"
       ],
       "conditionals": [
         {
@@ -30113,8 +30119,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete default replacer manager/substitution/rewrite/reset/step/apply interface (expr_replacer.h:27-56)",
@@ -30126,16 +30132,24 @@
           ]
         },
         {
-          "name": "Abstract proof-output overload and simplifying replacer factory declarations (expr_replacer.h:35-38,57)",
+          "name": "Abstract proof-output overload declarations (expr_replacer.h:35-38)",
           "status": "unported",
-          "reason": "Retained declarations await proof-generating rewriter traversal and th_rewriter."
+          "reason": "Retained declarations await the proof-generating rewriter traversal."
+        },
+        {
+          "name": "simplifying expression replacer factory declaration (expr_replacer.h:57)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/expr_replacer.go",
+          "tests": [
+            "TestSimplifyingExprReplacerTheoryRewriteAndDependencyTransfer"
+          ]
         }
       ],
       "ownership": [
-        "The Go owner has an explicit Close method; its expression substitution remains borrowed and its dependency output has documented caller ownership."
+        "Both Go owners have explicit Close methods; expression substitutions remain borrowed and dependency outputs have documented caller ownership."
       ],
       "deviations": [
-        "Go uses named methods in place of C++ operator overloads. The abstract proof-output overload and simplifying th_rewriter factory remain open with the proof-generating traversal and theory rewriter."
+        "Go uses named methods in place of C++ operator overloads. The abstract proof-output overload remains open with the proof-generating traversal."
       ]
     },
     {

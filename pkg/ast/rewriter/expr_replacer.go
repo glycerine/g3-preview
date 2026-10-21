@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 type defaultExprReplacerConfig struct {
@@ -14,6 +15,127 @@ type defaultExprReplacerConfig struct {
 	substitution ast.ASTExprSubstitution
 	hasSubst     bool
 	used         ast.ASTDependency
+}
+
+// SimplifyingExprReplacer is the source th_rewriter2expr_replacer adapter. It
+// owns the theory rewriter and transfers each accumulated dependency result to
+// its caller.
+type SimplifyingExprReplacer struct {
+	self     *SimplifyingExprReplacer
+	rewriter *TheoryRewriter
+	closed   bool
+}
+
+func NewSimplifyingExprReplacer(m *ast.ASTManager, context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) (*SimplifyingExprReplacer, error) {
+	r := &SimplifyingExprReplacer{}
+	r.self = r
+	var err error
+	r.rewriter, err = NewTheoryRewriter(m, context, globals, params)
+	return r, err
+}
+
+func (r *SimplifyingExprReplacer) open() error {
+	if r == nil || r.self != r || r.closed || r.rewriter == nil {
+		return ast.ErrASTHandle
+	}
+	return nil
+}
+
+func (r *SimplifyingExprReplacer) Manager() *ast.ASTManager {
+	if r.open() != nil {
+		return nil
+	}
+	return r.rewriter.Manager()
+}
+
+func (r *SimplifyingExprReplacer) SetSubstitution(substitution *ast.ASTExprSubstitution) error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	return r.rewriter.SetSubstitution(substitution)
+}
+
+func (r *SimplifyingExprReplacer) Rewrite(term ast.ASTHandle, out ast.ASTRef) error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	return r.rewriter.Rewrite(term, out)
+}
+
+// RewriteWithDependency returns an owning dependency reference. The caller
+// releases a nonnull result with ASTManager.DependencyDec.
+func (r *SimplifyingExprReplacer) RewriteWithDependency(term ast.ASTHandle, out ast.ASTRef) (ast.ASTDependency, error) {
+	if err := r.Rewrite(term, out); err != nil {
+		return ast.ASTDependency{}, err
+	}
+	dependency, err := r.rewriter.UsedDependencies()
+	if err != nil || dependency.IsNull() {
+		return dependency, err
+	}
+	manager := r.rewriter.Manager()
+	if err = manager.DependencyInc(dependency); err != nil {
+		return ast.ASTDependency{}, err
+	}
+	if err = r.rewriter.ResetUsedDependencies(); err != nil {
+		_ = manager.DependencyDec(dependency)
+		return ast.ASTDependency{}, err
+	}
+	return dependency, nil
+}
+
+func (r *SimplifyingExprReplacer) ApplySubstitution(source, definition, proof ast.ASTHandle, target ast.ASTRef) (result error) {
+	if err := r.open(); err != nil {
+		return err
+	}
+	m := r.rewriter.Manager()
+	substitution, err := m.NewExprSubstitution()
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, m.DelExprSubstitution(&substitution)) }()
+	if err = m.ExprSubstitutionInsert(substitution, source, definition, proof, ast.ASTDependency{}); err != nil {
+		return err
+	}
+	if err = r.SetSubstitution(&substitution); err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, r.SetSubstitution(nil)) }()
+	term, err := m.RefGet(target)
+	if err != nil {
+		return err
+	}
+	return r.Rewrite(term, target)
+}
+
+func (r *SimplifyingExprReplacer) NumSteps() (uint32, error) {
+	if err := r.open(); err != nil {
+		return 0, err
+	}
+	return r.rewriter.NumSteps()
+}
+
+func (r *SimplifyingExprReplacer) Reset() error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	return r.rewriter.Reset()
+}
+
+func (r *SimplifyingExprReplacer) Close() error {
+	if r == nil || r.self != r {
+		return ast.ErrASTHandle
+	}
+	if r.closed {
+		return nil
+	}
+	if r.rewriter != nil {
+		if err := r.rewriter.Close(); err != nil {
+			return err
+		}
+		r.rewriter = nil
+	}
+	r.closed = true
+	return nil
 }
 
 func (c *defaultExprReplacerConfig) maxStepsExceeded(uint32) (bool, error) {
