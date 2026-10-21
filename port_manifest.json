@@ -34447,9 +34447,24 @@
       "path": "src/ast/rewriter/th_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/th_rewriter.go",
+        "pkg/ast/rewriter/th_rewriter_test.go",
+        "pkg/ast/ast_rewriter_access.go",
+        "pkg/ast/rewriter/traversal.go"
+      ],
+      "tests": [
+        "TestTheoryRewriterCoreTraversalAcrossFamilies",
+        "TestTheoryRewriterTamagotchiAndRawMakeApp",
+        "TestTheoryRewriterPullCheapITE",
+        "TestTheoryRewriterPushITE",
+        "TestTheoryRewriterSubstitutionDependencies",
+        "TestTheoryRewriterParamsCacheCleanupAndBindings",
+        "TestTheoryRewriterParameterDescriptions",
+        "TestTheoryRewriterQuantifierReduction",
+        "TestTheoryRewriterCloseGuards"
+      ],
       "conditionals": [
         {
           "line": 491,
@@ -34498,19 +34513,111 @@
           "text": "SASSERT(is_well_sorted(m(), q1));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "th_rewriter_cfg construction, local and delegated parameter updates, flat/cache/pattern/resource configuration (th_rewriter.cpp:37-110,675-685)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterParamsCacheCleanupAndBindings",
+            "TestTheoryRewriterParameterDescriptions"
+          ]
+        },
+        {
+          "name": "one-bit equality recognition, tamagotchi IFF/EQ rewriting and complete builtin-family application/equality dispatch (th_rewriter.cpp:112-223)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterCoreTraversalAcrossFamilies",
+            "TestTheoryRewriterTamagotchiAndRawMakeApp"
+          ]
+        },
+        {
+          "name": "equality-value construction, ITE value-tree recognition and cheap ITE pulling (th_rewriter.cpp:225-327)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterPullCheapITE"
+          ]
+        },
+        {
+          "name": "arithmetic/BV neutral elements, binary common-term unification and ITE pushing (th_rewriter.cpp:329-559)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterPushITE"
+          ]
+        },
+        {
+          "name": "application reduction ordering and direct mk_app fallback (th_rewriter.cpp:561-592)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterTamagotchiAndRawMakeApp",
+            "TestTheoryRewriterPullCheapITE",
+            "TestTheoryRewriterPushITE"
+          ]
+        },
+        {
+          "name": "nested quantifier pulling, annotation deduplication and unused-variable elimination (th_rewriter.cpp:595-671)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterQuantifierReduction"
+          ]
+        },
+        {
+          "name": "borrowed expression substitution lookup and coarse used-dependency accumulation/reset (th_rewriter.cpp:687-707,780-797)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterSubstitutionDependencies"
+          ]
+        },
+        {
+          "name": "th_rewriter construction/destruction, manager/parameter-description access, cache/step queries, cleanup/reset, no-proof rewrite overloads, bindings, mk_app and sequence solver injection (th_rewriter.cpp:710-726,729-779,799-813)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterCoreTraversalAcrossFamilies",
+            "TestTheoryRewriterParamsCacheCleanupAndBindings",
+            "TestTheoryRewriterParameterDescriptions",
+            "TestTheoryRewriterCloseGuards"
+          ]
+        },
+        {
+          "name": "proof-producing th_rewriter operator and quantifier proof composition (th_rewriter.cpp:624-668,769-771)",
+          "status": "unported",
+          "reason": "Requires the proof-generating rewriter_tpl specialization still recorded as partial in rewriter.h and rewriter_def.h."
+        }
+      ],
+      "ownership": [
+        "TheoryRewriter owns its copied ParamsRef snapshot, traversal, concrete configurable subrewriters and accumulated ASTDependency reference; it borrows ASTManager, parameter services, substitutions and the optional sequence solver.",
+        "Cleanup destroys and reconstructs traversal/configuration in source order while retaining the owned parameter snapshot. Temporary proof, quantifier and eliminated-result AST references are owning and released after publication."
+      ],
+      "deviations": [
+        "Go named methods replace C++ operator overloads. The concrete no-proof traversal is complete; the proof-output overload remains with the audited proof-generating traversal dependency.",
+        "The disabled #if 0 multi-argument unify_add experiment is intentionally not ported. Duplicate annotation filtering uses a native Go map while preserving first occurrence order.",
+        "The source cooperate call is represented by the existing AST budget/cancellation machinery; maximum memory and step failures retain the source callback points."
+      ]
     },
     {
       "path": "src/ast/rewriter/th_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/th_rewriter.go",
+        "pkg/ast/rewriter/th_rewriter_test.go"
+      ],
+      "tests": [
+        "TestTheoryRewriterCoreTraversalAcrossFamilies",
+        "TestTheoryRewriterParamsCacheCleanupAndBindings",
+        "TestTheoryRewriterSubstitutionDependencies",
+        "TestTheoryRewriterCloseGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -34521,11 +34628,32 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "public construction/destruction, manager, parameter update/descriptions, cache/step queries, cleanup/reset, no-proof rewrite overloads, binding rewrite, mk_app, substitutions/dependencies and solver injection (th_rewriter.h:30-65)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterCoreTraversalAcrossFamilies",
+            "TestTheoryRewriterParamsCacheCleanupAndBindings",
+            "TestTheoryRewriterSubstitutionDependencies",
+            "TestTheoryRewriterCloseGuards"
+          ]
+        },
+        {
+          "name": "public proof-output rewrite overload (th_rewriter.h:48)",
+          "status": "unported",
+          "reason": "Requires the proof-generating rewriter_tpl specialization still recorded as partial in rewriter.h and rewriter_def.h."
+        }
+      ],
+      "ownership": [
+        "TheoryRewriter is a noncopyable Go owner of its parameter snapshot, concrete configuration and traversal. ASTManager, substitutions and sequence solver are borrowed."
+      ],
+      "deviations": [
+        "Named Go methods replace overloads. Proof-output rewriting remains explicitly deferred with the proof-generating base traversal."
+      ]
     },
     {
       "path": "src/ast/rewriter/var_subst.cpp",
