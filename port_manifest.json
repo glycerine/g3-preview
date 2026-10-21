@@ -17309,6 +17309,7 @@
         "pkg/ast/fpa/fpa2bv_integral.go",
         "pkg/ast/fpa/fpa2bv_sqrt.go",
         "pkg/ast/fpa/fpa2bv_fma.go",
+        "pkg/ast/fpa/fpa2bv_format.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
@@ -17331,6 +17332,7 @@
         "TestConverterRoundToIntegralSpecialCasesAndSymbolicShape",
         "TestConverterSquareRootSpecialCasesAndSymbolicShape",
         "TestConverterFMASpecialCasesAndSymbolicShape",
+        "TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18700,6 +18702,7 @@
         "pkg/ast/fpa/fpa2bv_integral.go",
         "pkg/ast/fpa/fpa2bv_sqrt.go",
         "pkg/ast/fpa/fpa2bv_fma.go",
+        "pkg/ast/fpa/fpa2bv_format.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
@@ -18722,6 +18725,7 @@
         "TestConverterRoundToIntegralSpecialCasesAndSymbolicShape",
         "TestConverterSquareRootSpecialCasesAndSymbolicShape",
         "TestConverterFMASpecialCasesAndSymbolicShape",
+        "TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18774,6 +18778,7 @@
         "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
         "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
         "TestFPA2BVRewriterArithmeticDispatch",
+        "TestFPA2BVRewriterToFPFormatDispatch",
         "TestConverterFiniteNumeral"
       ],
       "assertions": [
@@ -18830,6 +18835,16 @@
             "TestFPA2BVRewriterArithmeticDispatch"
           ]
         }
+        ,
+        {
+          "name": "IEEE bit-vector assembly, three-field assembly, and floating format conversion with source significand resizing, sticky-bit collapse, exponent clamping, and shared rounding",
+          "status": "ported",
+          "go_target": "pkg/ast/fpa/fpa2bv_format.go",
+          "tests": [
+            "TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape",
+            "TestFPA2BVRewriterToFPFormatDispatch"
+          ]
+        }
       ],
       "ownership": [
         "The Go rewriter owns its traversal and reserved owner storage while borrowing ASTManager and Converter; Close releases traversal state before converter and manager teardown."
@@ -18850,6 +18865,7 @@
         "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
         "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
         "TestFPA2BVRewriterArithmeticDispatch",
+        "TestFPA2BVRewriterToFPFormatDispatch",
         "TestConverterFiniteNumeral"
       ],
       "conditionals": [
@@ -18866,13 +18882,15 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "fpa2bv configuration and traversal wrapper with addition, subtraction, multiplication, division, remainder, fused multiply-add, square root, round-to-integral, and partial converter dispatch; remaining format-conversion dispatch remains open",
+          "name": "fpa2bv configuration and traversal wrapper with arithmetic, IEEE bit-vector assembly, three-field assembly, floating format conversion, and partial converter dispatch; remaining arithmetic/bit-vector/real format conversions remain open",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
           "tests": [
             "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
             "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
             "TestFPA2BVRewriterArithmeticDispatch"
+            ,
+            "TestFPA2BVRewriterToFPFormatDispatch"
           ]
         }
       ],

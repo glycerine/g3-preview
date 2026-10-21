@@ -77,6 +77,64 @@ func TestConverterVariablesAndIEEEBitVectorConversions(t *testing.T) {
 	}
 }
 
+func TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape(t *testing.T) {
+	m, c := fixture(t)
+	sourceSort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	narrowSort, err := m.FloatingPointSort(5, 11)
+	must(t, err)
+	wideSort, err := m.FloatingPointSort(11, 53)
+	must(t, err)
+	rne, err := c.MkRoundingMode(ast.FPAOpRMNearestEven)
+	must(t, err)
+
+	for _, kind := range []fpa.SpecialValue{
+		fpa.NaN, fpa.PositiveZero, fpa.NegativeZero,
+		fpa.PositiveInfinity, fpa.NegativeInfinity,
+	} {
+		input, e := c.MkSpecial(sourceSort, kind)
+		must(t, e)
+		got, e := c.ToFPFloat(narrowSort, rne, input)
+		must(t, e)
+		want, e := c.MkSpecial(narrowSort, kind)
+		must(t, e)
+		if got != want {
+			t.Fatal("format conversion special", kind, got, want)
+		}
+	}
+
+	signSort, err := m.BitVectorSort(1)
+	must(t, err)
+	exponentSort, err := m.BitVectorSort(8)
+	must(t, err)
+	significandSort, err := m.BitVectorSort(23)
+	must(t, err)
+	sign, err := m.MkVar(810, signSort)
+	must(t, err)
+	exponent, err := m.MkVar(811, exponentSort)
+	must(t, err)
+	significand, err := m.MkVar(812, significandSort)
+	must(t, err)
+	input, err := c.MkFP(sign, exponent, significand)
+	must(t, err)
+	for _, target := range []ast.ASTHandle{narrowSort, wideSort} {
+		got, e := c.ToFPFloat(target, rne, input)
+		must(t, e)
+		gotSort, e := m.GetSort(got)
+		must(t, e)
+		kind, e := m.GetDeclKind(got)
+		must(t, e)
+		if gotSort != target || kind != ast.FPAOpFP {
+			t.Fatal("symbolic format conversion shape", gotSort, target, kind)
+		}
+	}
+	identity, err := c.ToFPFloat(sourceSort, rne, input)
+	must(t, err)
+	if identity != input {
+		t.Fatal("same-format conversion did not preserve the input", identity, input)
+	}
+}
+
 func TestConverterFiniteNumeral(t *testing.T) {
 	m, c := fixture(t)
 	_, err := m.RegisterArithmeticPlugin()

@@ -198,3 +198,37 @@ func TestFPA2BVRewriterArithmeticDispatch(t *testing.T) {
 		t.Fatal("symbolic addition did not lower to FP components", kind, e)
 	}
 }
+
+func TestFPA2BVRewriterToFPFormatDispatch(t *testing.T) {
+	f := newFPA2BVFixture(t)
+	targetSort, err := f.m.FloatingPointSort(5, 11)
+	astTestMust(t, err)
+	rounding, err := f.m.MkFamilyApp(f.family, ast.FPAOpRMNearestEven, nil, nil)
+	astTestMust(t, err)
+	ebits, err := f.m.NewParameterInt(5)
+	astTestMust(t, err)
+	sbits, err := f.m.NewParameterInt(11)
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, f.m.DelParameter(&sbits))
+		astTestMust(t, f.m.DelParameter(&ebits))
+	})
+	rmSort, err := f.m.GetSort(rounding)
+	astTestMust(t, err)
+	declaration, err := f.m.MkFamilyFuncDecl(
+		f.family, ast.FPAOpToFP,
+		[]ast.ASTParameter{ebits, sbits},
+		[]ast.ASTHandle{rmSort, f.sort}, ast.ASTHandle{},
+	)
+	astTestMust(t, err)
+	positiveInfinity, err := f.m.MkFPAInfinityOfSort(f.sort, false)
+	astTestMust(t, err)
+	conversion, err := f.m.MkApp(declaration, []ast.ASTHandle{rounding, positiveInfinity})
+	astTestMust(t, err)
+	got := f.rewrite(t, conversion)
+	want, err := f.converter.MkSpecial(targetSort, astfpa.PositiveInfinity)
+	astTestMust(t, err)
+	if got != want {
+		t.Fatal("format conversion dispatch", got, want)
+	}
+}

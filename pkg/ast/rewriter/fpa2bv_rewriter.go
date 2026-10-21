@@ -343,6 +343,33 @@ func (c *fpa2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArgument
 			} else {
 				value, err = converter.ToIEEEBV(values[0])
 			}
+		case ast.FPAOpToFP:
+			var targetSort ast.ASTHandle
+			targetSort, err = m.GetRange(decl)
+			if err != nil {
+				break
+			}
+			switch len(values) {
+			case 1:
+				value, err = converter.FromIEEEBV(targetSort, values[0])
+			case 2:
+				var sourceSort ast.ASTHandle
+				sourceSort, err = m.GetSort(values[1])
+				if err != nil {
+					break
+				}
+				var floating bool
+				_, _, floating, err = m.FloatingPointSortShape(sourceSort)
+				if err == nil && floating {
+					value, err = converter.ToFPFloat(targetSort, values[0], values[1])
+				} else if err == nil {
+					done = false
+				}
+			case 3:
+				value, err = converter.MkFP(values[0], values[1], values[2])
+			default:
+				err = ast.ErrASTDomain
+			}
 		default:
 			done = false
 		}
