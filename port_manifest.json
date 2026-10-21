@@ -17159,9 +17159,15 @@
       "path": "src/ast/fpa/bv2fpa_converter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/model/fpa/bv2fpa_converter.go",
+        "pkg/ast/fpa/fpa2bv_symbols.go"
+      ],
+      "tests": [
+        "TestBV2FPAConverterNumeralsAndRoundingModes",
+        "TestBV2FPAConverterRetainsSourceSnapshot"
+      ],
       "conditionals": [
         {
           "line": 333,
@@ -17264,17 +17270,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "constructor/destructor cache snapshot ownership and direct/evaluated bit-vector component and rounding-mode numeral reconstruction; model constant, function, array, special, display, and translation conversion remains open",
+          "status": "ported",
+          "go_target": "pkg/model/fpa/bv2fpa_converter.go",
+          "tests": [
+            "TestBV2FPAConverterNumeralsAndRoundingModes",
+            "TestBV2FPAConverterRetainsSourceSnapshot"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go model converter owns retained references to every copied converter cache key/value and min/max sign pair until Close."
+      ],
       "deviations": []
     },
     {
       "path": "src/ast/fpa/bv2fpa_converter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/model/fpa/bv2fpa_converter.go",
+        "pkg/ast/fpa/fpa2bv_symbols.go"
+      ],
+      "tests": [
+        "TestBV2FPAConverterNumeralsAndRoundingModes",
+        "TestBV2FPAConverterRetainsSourceSnapshot"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -17287,8 +17311,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "owned converter snapshot and numeral reconstruction surface; remaining model conversion methods remain open",
+          "status": "ported",
+          "go_target": "pkg/model/fpa/bv2fpa_converter.go",
+          "tests": [
+            "TestBV2FPAConverterNumeralsAndRoundingModes",
+            "TestBV2FPAConverterRetainsSourceSnapshot"
+          ]
+        }
+      ],
+      "ownership": [
+        "The converter retains copied AST cache entries independently of the originating FPA-to-BV converter."
+      ],
       "deviations": []
     },
     {

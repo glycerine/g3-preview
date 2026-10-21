@@ -8,6 +8,40 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
+type ConverterSnapshot struct {
+	Constants         map[ast.ASTHandle]ast.ASTHandle
+	RoundingConstants map[ast.ASTHandle]ast.ASTHandle
+	ConvertedUFs      map[ast.ASTHandle]ast.ASTHandle
+	MinMaxSigns       map[ast.ASTHandle][2]ast.ASTHandle
+}
+
+// Snapshot returns borrowed copies of the model-conversion maps accumulated by
+// this converter. A model converter that outlives Converter must retain them.
+func (c *Converter) Snapshot() (ConverterSnapshot, error) {
+	if err := c.open(); err != nil {
+		return ConverterSnapshot{}, err
+	}
+	s := ConverterSnapshot{
+		Constants:         make(map[ast.ASTHandle]ast.ASTHandle, len(c.constants)),
+		RoundingConstants: make(map[ast.ASTHandle]ast.ASTHandle, len(c.roundingConstants)),
+		ConvertedUFs:      make(map[ast.ASTHandle]ast.ASTHandle, len(c.convertedUFs)),
+		MinMaxSigns:       make(map[ast.ASTHandle][2]ast.ASTHandle, len(c.minMaxSigns)),
+	}
+	for key, value := range c.constants {
+		s.Constants[key] = value
+	}
+	for key, value := range c.roundingConstants {
+		s.RoundingConstants[key] = value
+	}
+	for key, value := range c.convertedUFs {
+		s.ConvertedUFs[key] = value
+	}
+	for key, value := range c.minMaxSigns {
+		s.MinMaxSigns[key] = value
+	}
+	return s, nil
+}
+
 func (c *Converter) cacheInsert(cache map[ast.ASTHandle]ast.ASTHandle, declaration, value ast.ASTHandle) error {
 	if err := c.manager.IncRef(declaration); err != nil {
 		return err
