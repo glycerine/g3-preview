@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -269,6 +270,14 @@ func TestTheoryRewriterParamsCacheCleanupAndBindings(t *testing.T) {
 	r, err := NewTheoryRewriter(m, context, globals, local)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	if r.Manager() != m {
+		t.Fatal("theory rewriter manager accessor")
+	}
+	solver := &sequenceAutomatonTestSolver{}
+	astTestMust(t, r.SetSolver(solver))
+	if r.configuration.sequence.solver != solver {
+		t.Fatal("theory rewriter solver injection")
+	}
 	for _, key := range []string{"pull_cheap_ite", "cache_all", "elim_and", "mul_to_power", "bv_sort_ac", "sort_store", "hi_fp_unspecified"} {
 		astTestMust(t, context.SetBoolName(local, &key, true))
 	}
@@ -308,6 +317,21 @@ func TestTheoryRewriterParamsCacheCleanupAndBindings(t *testing.T) {
 	}
 	if !r.configuration.pullCheapITE || !r.configuration.floating.hiFPUnspecified {
 		t.Fatal("cleanup did not preserve owned parameters")
+	}
+}
+
+func TestTheoryRewriterParameterDescriptions(t *testing.T) {
+	m, _, _, _ := boolRewriterConfigFixture(t)
+	descriptions, err := uparams.NewParamDescrs(m.Symbols, uparams.ParamDescrsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, descriptions.Close()) })
+	astTestMust(t, TheoryRewriterParameterDescriptions(descriptions))
+	for _, name := range []string{"elim_and", "som", "arith_lhs", "bv_sort_ac", "sort_store", "max_steps", "pull_cheap_ite"} {
+		present, e := descriptions.ContainsName(name)
+		astTestMust(t, e)
+		if !present {
+			t.Fatal("missing theory rewriter parameter description", name)
+		}
 	}
 }
 

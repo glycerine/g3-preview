@@ -1090,11 +1090,44 @@ func (r *TheoryRewriter) open() error {
 	return err
 }
 
+func (r *TheoryRewriter) Manager() *ast.ASTManager {
+	if r == nil || r.self != r || r.closed {
+		return nil
+	}
+	return r.manager
+}
+
+func TheoryRewriterParameterDescriptions(descriptions *uparams.ParamDescrs) error {
+	if descriptions == nil {
+		return uparams.ErrParamsOwner
+	}
+	for _, collect := range []func(*uparams.ParamDescrs) error{
+		catalogCollectBoolRewriterParams,
+		catalogCollectPolyRewriterParams,
+		catalogCollectArithRewriterParams,
+		catalogCollectBvRewriterParams,
+		catalogCollectArrayRewriterParams,
+		catalogCollectRewriterParams,
+	} {
+		if err := collect(descriptions); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (r *TheoryRewriter) Rewrite(term ast.ASTHandle, out ast.ASTRef) error {
 	if err := r.open(); err != nil {
 		return err
 	}
 	return r.traversal.Rewrite(term, out)
+}
+
+func (r *TheoryRewriter) SetSolver(solver SequenceExpressionSolver) error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	return r.configuration.sequence.SetSolver(solver)
 }
 
 func (r *TheoryRewriter) RewriteWithBindings(term ast.ASTHandle, bindings []ast.ASTHandle, out ast.ASTRef) error {
