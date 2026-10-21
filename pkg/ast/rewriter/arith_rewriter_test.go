@@ -1154,6 +1154,72 @@ func TestArithRewriterAdvancedPolynomialModes(t *testing.T) {
 }
 
 func TestArithRewriterRemainingStructuralNormalization(t *testing.T) {
+	t.Run("coefficient-product-flattening-guard", func(t *testing.T) {
+		m, c, g, local := boolRewriterConfigFixture(t)
+		r, err := NewArithRewriter(m, c, g, local)
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, r.Close()) })
+		iSort, err := m.MkFamilySort(r.family, 1, nil)
+		astTestMust(t, err)
+		x, err := m.MkConst(astTestSymbol(t, m, "arith-flat-guard-x"), iSort)
+		astTestMust(t, err)
+		astTestPin(t, m, x)
+		y, err := m.MkConst(astTestSymbol(t, m, "arith-flat-guard-y"), iSort)
+		astTestMust(t, err)
+		astTestPin(t, m, y)
+		two := arithRewriterNumeral(t, m, "2", true)
+		product, err := r.app(arithOpMul, x, y)
+		astTestMust(t, err)
+		status, _ := arithRewriterCore(t, r, arithOpMul, two, product)
+		if status != RewriteFailed {
+			t.Fatal("coefficient times plain product must retain source normal form", status)
+		}
+	})
+
+	t.Run("inequality-order-and-equality-movement", func(t *testing.T) {
+		m, c, g, local := boolRewriterConfigFixture(t)
+		key := "arith_ineq_lhs"
+		astTestMust(t, c.SetBoolName(local, &key, true))
+		r, err := NewArithRewriter(m, c, g, local)
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, r.Close()) })
+		iSort, err := m.MkFamilySort(r.family, 1, nil)
+		astTestMust(t, err)
+		x, err := m.MkConst(astTestSymbol(t, m, "arith-ordinal-x"), iSort)
+		astTestMust(t, err)
+		astTestPin(t, m, x)
+		y, err := m.MkConst(astTestSymbol(t, m, "arith-ordinal-y"), iSort)
+		astTestMust(t, err)
+		astTestPin(t, m, y)
+		xID, err := m.GetASTID(x)
+		astTestMust(t, err)
+		yID, err := m.GetASTID(y)
+		astTestMust(t, err)
+		less, err := r.monomialLess(x, y)
+		astTestMust(t, err)
+		if less != (xID < yID) {
+			t.Fatal("inequality monomial ordinal", less, xID, yID)
+		}
+		arithmeticLeft, err := r.app(arithOpAdd, x, x)
+		astTestMust(t, err)
+		out := astTestPin(t, m, x)
+		status, err := r.MkEqCore(arithmeticLeft, y, out)
+		astTestMust(t, err)
+		if status != RewriteDone {
+			t.Fatal("inequality-mode equality movement status", status)
+		}
+		result, err := m.RefGet(out)
+		astTestMust(t, err)
+		kind, err := m.GetDeclKind(result)
+		astTestMust(t, err)
+		right, err := m.GetArg(result, 1)
+		astTestMust(t, err)
+		arithRewriterWantNumeral(t, m, right, "0", true)
+		if kind != ast.ASTOpEq {
+			t.Fatal("inequality-mode equality movement result", kind)
+		}
+	})
+
 	t.Run("exact-root-without-algebraic-evaluator", func(t *testing.T) {
 		m, c, g, local := boolRewriterConfigFixture(t)
 		key := "algebraic_number_evaluator"

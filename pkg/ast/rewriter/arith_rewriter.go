@@ -1150,7 +1150,7 @@ func (r *ArithRewriter) MkEqCore(left, right ast.ASTHandle, out ast.ASTRef) (Rew
 	}
 	changed := false
 	if r.arithLHS || leftArithmetic || rightArithmetic {
-		newLeft, newRight, cancelled, e := r.cancelMonomials(left, right, r.arithLHS)
+		newLeft, newRight, cancelled, e := r.cancelMonomials(left, right, r.arithLHS || r.arithIneqLHS)
 		err = e
 		if err != nil {
 			return RewriteFailed, err

@@ -8,6 +8,7 @@ import (
 	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/productiter"
 )
 
 const arithRelationEq int32 = -1
@@ -79,6 +80,72 @@ func (r *ArithRewriter) sameArguments(args ast.AppArguments, values []ast.ASTHan
 	return true, nil
 }
 
+func (r *ArithRewriter) monomialOrdinal(h ast.ASTHandle) (int64, error) {
+	kind, err := r.manager.GetKind(h)
+	if err != nil {
+		return 0, err
+	}
+	if kind == ast.ASTVar {
+		id, err := r.manager.GetASTID(h)
+		return int64(id), err
+	}
+	family, err := r.manager.GetFamilyID(h)
+	if err != nil {
+		return 0, err
+	}
+	if family != r.family {
+		id, err := r.manager.GetASTID(h)
+		return int64(id), err
+	}
+	if _, factors, product, err := r.operation(h, arithOpMul); err != nil {
+		return 0, err
+	} else if product {
+		if len(factors) != 0 {
+			if _, _, numeral, err := r.numeral(factors[0]); err != nil {
+				return 0, err
+			} else if numeral && len(factors) > 1 {
+				id, err := r.manager.GetASTID(factors[1])
+				return int64(id), err
+			}
+		}
+		id, err := r.manager.GetASTID(h)
+		return int64(id), err
+	}
+	if _, _, numeral, err := r.numeral(h); err != nil {
+		return 0, err
+	} else if numeral {
+		return -1, nil
+	}
+	if r.mulToPower && !r.expandPower {
+		if _, args, power, err := r.operation(h, arithOpPower); err != nil {
+			return 0, err
+		} else if power && len(args) == 2 {
+			exponent, _, numeral, err := r.numeral(args[1])
+			if err != nil {
+				return 0, err
+			}
+			if numeral && exponent.Cmp(big.NewRat(1, 1)) > 0 {
+				id, err := r.manager.GetASTID(args[0])
+				return int64(id), err
+			}
+		}
+	}
+	id, err := r.manager.GetASTID(h)
+	return int64(id), err
+}
+
+func (r *ArithRewriter) monomialLess(left, right ast.ASTHandle) (bool, error) {
+	if !r.arithIneqLHS {
+		return r.manager.ASTLess(left, right)
+	}
+	leftOrdinal, err := r.monomialOrdinal(left)
+	if err != nil {
+		return false, err
+	}
+	rightOrdinal, err := r.monomialOrdinal(right)
+	return leftOrdinal < rightOrdinal, err
+}
+
 func (r *ArithRewriter) expandSumOfMonomials(factors []ast.ASTHandle, coefficient *big.Rat, term ast.ASTHandle) (ast.ASTHandle, bool, error) {
 	choices := make([][]ast.ASTHandle, len(factors))
 	hasSum := false
@@ -97,20 +164,24 @@ func (r *ArithRewriter) expandSumOfMonomials(factors []ast.ASTHandle, coefficien
 	if !hasSum {
 		return ast.ASTHandle{}, false, nil
 	}
-	products := [][]ast.ASTHandle{{}}
-	for _, options := range choices {
-		next := make([][]ast.ASTHandle, 0, len(products)*len(options))
-		for _, prefix := range products {
-			for _, option := range options {
-				if uint64(len(next)) > uint64(r.monomialLimit) {
-					return ast.ASTHandle{}, false, ErrArithPolynomialMonomialBlowup
-				}
-				item := append([]ast.ASTHandle(nil), prefix...)
-				item = append(item, option)
-				next = append(next, item)
-			}
+	sizes := make([]uint32, len(choices))
+	coordinates := make([]uint32, len(choices))
+	for i := range choices {
+		sizes[i] = uint32(len(choices[i]))
+	}
+	products := make([][]ast.ASTHandle, 0)
+	for {
+		if uint64(len(products)) > uint64(r.monomialLimit) {
+			return ast.ASTHandle{}, false, ErrArithPolynomialMonomialBlowup
 		}
-		products = next
+		product := make([]ast.ASTHandle, len(choices))
+		for i := range choices {
+			product[i] = choices[i][coordinates[i]]
+		}
+		products = append(products, product)
+		if !productiter.Next(sizes, coordinates) {
+			break
+		}
 	}
 	monomials := make([]ast.ASTHandle, len(products))
 	for i, product := range products {
@@ -153,6 +224,54 @@ func (r *ArithRewriter) distributeCoefficient(coefficient *big.Rat, factor, term
 func (r *ArithRewriter) hoistEqualCoefficients(terms []ast.ASTHandle, term ast.ASTHandle) ([]ast.ASTHandle, bool, error) {
 	if !r.hoistCoeff {
 		return terms, false, nil
+	}
+	terms = append([]ast.ASTHandle(nil), terms...)
+	var sortErr error
+	sort.SliceStable(terms, func(i, j int) bool {
+		leftCoefficient, leftProduct, err := r.monomial(terms[i])
+		if err != nil {
+			sortErr = err
+			return false
+		}
+		rightCoefficient, rightProduct, err := r.monomial(terms[j])
+		if err != nil {
+			sortErr = err
+			return false
+		}
+		leftMul, rightMul := leftProduct != terms[i], rightProduct != terms[j]
+		if leftMul != rightMul {
+			return !leftMul
+		}
+		if !leftMul {
+			leftID, err := r.manager.GetASTID(terms[i])
+			if err != nil {
+				sortErr = err
+				return false
+			}
+			rightID, err := r.manager.GetASTID(terms[j])
+			if err != nil {
+				sortErr = err
+				return false
+			}
+			return leftID < rightID
+		}
+		if comparison := leftCoefficient.Cmp(rightCoefficient); comparison != 0 {
+			return comparison < 0
+		}
+		leftID, err := r.manager.GetASTID(leftProduct)
+		if err != nil {
+			sortErr = err
+			return false
+		}
+		rightID, err := r.manager.GetASTID(rightProduct)
+		if err != nil {
+			sortErr = err
+			return false
+		}
+		return leftID < rightID
+	})
+	if sortErr != nil {
+		return nil, false, sortErr
 	}
 	groups := make(map[string][]int)
 	coefficients := make(map[string]*big.Rat)
@@ -511,7 +630,7 @@ func (r *ArithRewriter) rewriteAdd(args ast.AppArguments, out ast.ASTRef) (Rewri
 		}
 		var cause error
 		sort.SliceStable(resultArgs[start:], func(i, j int) bool {
-			less, e := r.manager.ASTLess(resultArgs[start+i], resultArgs[start+j])
+			less, e := r.monomialLess(resultArgs[start+i], resultArgs[start+j])
 			if cause == nil {
 				cause = e
 			}
@@ -556,7 +675,49 @@ func (r *ArithRewriter) rewriteMul(args ast.AppArguments, out ast.ASTRef) (Rewri
 		}
 		return RewriteDone, r.manager.SetRef(out, h)
 	}
-	values, flattened, err := r.flattenArguments(args, arithOpMul, true)
+	allowFlatten := true
+	if args.Count() == 2 {
+		left, e := args.At(0)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		_, _, numeral, e := r.numeral(left)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if numeral {
+			right, e := args.At(1)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			_, nested, product, e := r.operation(right, arithOpMul)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			allowFlatten = product && len(nested) != 0
+			if allowFlatten {
+				_, _, nestedNumeral, e := r.numeral(nested[0])
+				if e != nil {
+					return RewriteFailed, e
+				}
+				allowFlatten = nestedNumeral
+			}
+		}
+	}
+	var values []ast.ASTHandle
+	var flattened bool
+	var err error
+	if allowFlatten {
+		values, flattened, err = r.flattenArguments(args, arithOpMul, true)
+	} else {
+		values = make([]ast.ASTHandle, args.Count())
+		for i := range values {
+			values[i], err = args.At(uint32(i))
+			if err != nil {
+				return RewriteFailed, err
+			}
+		}
+	}
 	if err != nil {
 		return RewriteFailed, err
 	}
@@ -600,7 +761,7 @@ func (r *ArithRewriter) rewriteMul(args ast.AppArguments, out ast.ASTRef) (Rewri
 	}
 	var cause error
 	sort.SliceStable(factors, func(i, j int) bool {
-		less, e := r.manager.ASTLess(factors[i], factors[j])
+		less, e := r.monomialLess(factors[i], factors[j])
 		if cause == nil {
 			cause = e
 		}
