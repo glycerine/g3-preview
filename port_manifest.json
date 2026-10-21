@@ -17300,6 +17300,7 @@
         "pkg/ast/fpa/fpa2bv_converter.go",
         "pkg/ast/fpa/fpa2bv_predicates.go",
         "pkg/ast/fpa/fpa2bv_conversions.go",
+        "pkg/ast/fpa/fpa2bv_unpack.go",
         "pkg/ast/ast_fpa_sort_access.go",
         "pkg/ast/ast_bv_all_ones.go"
       ],
@@ -17308,7 +17309,8 @@
         "TestConverterNaNEqualityDistinctAndComponentITE",
         "TestConverterRoundingModeCodesAndEquality",
         "TestConverterClassificationsUnarySignsAndComparisons",
-        "TestConverterVariablesAndIEEEBitVectorConversions"
+        "TestConverterVariablesAndIEEEBitVectorConversions",
+        "TestConverterBiasLeadingZerosAndUnpack"
       ],
       "conditionals": [
         {
@@ -18626,6 +18628,14 @@
           "tests": [
             "TestConverterVariablesAndIEEEBitVectorConversions"
           ]
+        },
+        {
+          "name": "exponent bias/unbias, recursive leading-zero count, and normal/subnormal unpacking with optional normalization",
+          "status": "ported",
+          "go_target": "pkg/ast/fpa/fpa2bv_unpack.go",
+          "tests": [
+            "TestConverterBiasLeadingZerosAndUnpack"
+          ]
         }
       ],
       "ownership": [
@@ -18642,6 +18652,7 @@
         "pkg/ast/fpa/fpa2bv_converter.go",
         "pkg/ast/fpa/fpa2bv_predicates.go",
         "pkg/ast/fpa/fpa2bv_conversions.go",
+        "pkg/ast/fpa/fpa2bv_unpack.go",
         "pkg/ast/ast_fpa_sort_access.go",
         "pkg/ast/ast_bv_all_ones.go"
       ],
@@ -18650,7 +18661,8 @@
         "TestConverterNaNEqualityDistinctAndComponentITE",
         "TestConverterRoundingModeCodesAndEquality",
         "TestConverterClassificationsUnarySignsAndComparisons",
-        "TestConverterVariablesAndIEEEBitVectorConversions"
+        "TestConverterVariablesAndIEEEBitVectorConversions",
+        "TestConverterBiasLeadingZerosAndUnpack"
       ],
       "conditionals": [
         {
@@ -18674,7 +18686,8 @@
             "TestConverterNaNEqualityDistinctAndComponentITE",
             "TestConverterRoundingModeCodesAndEquality",
             "TestConverterClassificationsUnarySignsAndComparisons",
-            "TestConverterVariablesAndIEEEBitVectorConversions"
+            "TestConverterVariablesAndIEEEBitVectorConversions",
+            "TestConverterBiasLeadingZerosAndUnpack"
           ]
         }
       ],

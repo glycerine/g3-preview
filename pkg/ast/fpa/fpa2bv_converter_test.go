@@ -278,3 +278,78 @@ func TestConverterClassificationsUnarySignsAndComparisons(t *testing.T) {
 	compare(ast.FPAOpGt, values[fpa.PositiveInfinity], values[fpa.NegativeInfinity], true)
 	compare(ast.FPAOpGe, values[fpa.NegativeZero], values[fpa.PositiveZero], true)
 }
+
+func TestConverterBiasLeadingZerosAndUnpack(t *testing.T) {
+	m, c := fixture(t)
+	zeroBit, err := m.BitVectorNumeralUnsigned(0, 1)
+	must(t, err)
+	oneBit, err := m.BitVectorNumeralUnsigned(1, 1)
+	must(t, err)
+	leading, err := c.LeadingZeros(zeroBit, 8)
+	must(t, err)
+	wantOne, err := m.BitVectorNumeralUnsigned(1, 8)
+	must(t, err)
+	if leading != wantOne {
+		t.Fatal("one-bit zero leading count", leading, wantOne)
+	}
+	leading, err = c.LeadingZeros(oneBit, 8)
+	must(t, err)
+	wantZero, err := m.BitVectorNumeralUnsigned(0, 8)
+	must(t, err)
+	if leading != wantZero {
+		t.Fatal("one-bit one leading count", leading, wantZero)
+	}
+	exponent, err := m.MkVar(0, func() ast.ASTHandle {
+		s, e := m.BitVectorSort(8)
+		must(t, e)
+		return s
+	}())
+	must(t, err)
+	biased, err := c.Bias(exponent)
+	must(t, err)
+	unbiased, err := c.Unbias(exponent)
+	must(t, err)
+	if width, e := m.BitVectorSize(biased); e != nil || width != 8 {
+		t.Fatal("biased exponent width", width, e)
+	}
+	if width, e := m.BitVectorSize(unbiased); e != nil || width != 8 {
+		t.Fatal("unbiased exponent width", width, e)
+	}
+
+	zeroSig, err := m.BitVectorNumeralUnsigned(0, 23)
+	must(t, err)
+	oneSig, err := m.BitVectorNumeralUnsigned(1, 23)
+	must(t, err)
+	oneExp, err := m.BitVectorNumeralUnsigned(1, 8)
+	must(t, err)
+	zeroExp, err := m.BitVectorNumeralUnsigned(0, 8)
+	must(t, err)
+	normal, err := c.MkFP(zeroBit, oneExp, zeroSig)
+	must(t, err)
+	normalParts, err := c.Unpack(normal, false)
+	must(t, err)
+	wantNormalSig, err := m.MkBitVectorConcatPair(oneBit, zeroSig)
+	must(t, err)
+	wantNormalExp, err := c.Unbias(oneExp)
+	must(t, err)
+	if normalParts.Sign != zeroBit || normalParts.Significand != wantNormalSig || normalParts.Exponent != wantNormalExp || normalParts.LeadingZeros != zeroExp {
+		t.Fatal("normal unpack", normalParts)
+	}
+	subnormal, err := c.MkFP(zeroBit, zeroExp, oneSig)
+	must(t, err)
+	subnormalParts, err := c.Unpack(subnormal, false)
+	must(t, err)
+	wantSubnormalSig, err := m.MkBitVectorZeroExtend(1, oneSig)
+	must(t, err)
+	if subnormalParts.Significand != wantSubnormalSig || subnormalParts.Exponent != wantNormalExp || subnormalParts.LeadingZeros != zeroExp {
+		t.Fatal("subnormal unpack", subnormalParts)
+	}
+	normalized, err := c.Unpack(subnormal, true)
+	must(t, err)
+	if width, e := m.BitVectorSize(normalized.Significand); e != nil || width != 24 {
+		t.Fatal("normalized significand width", width, e)
+	}
+	if width, e := m.BitVectorSize(normalized.LeadingZeros); e != nil || width != 8 {
+		t.Fatal("normalization shift width", width, e)
+	}
+}
