@@ -34171,6 +34171,10 @@
         "pkg/ast/ast_seq_regex.go",
         "pkg/ast/ast_seq_parameterized.go",
         "pkg/ast/ast_seq_parameterized_test.go",
+        "pkg/ast/ast_seq_match.go",
+        "pkg/ast/ast_seq_match_test.go",
+        "pkg/ast/ast_seq_decl.go",
+        "pkg/ast/ast_seq_decl_test.go",
         "pkg/ast/ast_seq_names.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_seq_signature_memory_trace.go",
@@ -34185,7 +34189,9 @@
         "TestASTSMT2StringLiteralSourceEncoding",
         "TestASTSequenceStringValueClassification",
         "TestASTSequenceSourceBuiltinNames",
-        "TestASTSequenceParameterizedLoopAndSkolem"
+        "TestASTSequenceParameterizedLoopAndSkolem",
+        "TestASTSequenceSourcePolymorphicSignatureMatching",
+        "TestASTSequenceGenericFamilyDispatch"
       ],
       "conditionals": [
         {
@@ -34294,6 +34300,22 @@
           ]
         },
         {
+          "name": "seq_decl_plugin polymorphic sort matching, binding application and right-associative matching (seq_decl_plugin.cpp:358-498)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_match.go",
+          "tests": [
+            "TestASTSequenceSourcePolymorphicSignatureMatching"
+          ]
+        },
+        {
+          "name": "seq_decl_plugin generic family declaration dispatch, String aliases, canonical operation kinds, associative declaration shapes, index overloads and unary/expression-argument regex loops (seq_decl_plugin.cpp:620-825)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_decl.go",
+          "tests": [
+            "TestASTSequenceGenericFamilyDispatch"
+          ]
+        },
+        {
           "name": "retained seq_decl_plugin empty, unit and binary sequence/string concatenation factories with sort inference and string specialization (seq_decl_plugin.cpp:620-672,755-767)",
           "status": "ported",
           "go_target": "pkg/ast/ast_seq_factories.go",
@@ -34338,8 +34360,8 @@
         "Actual signature owners retain range/domain AST references independently of native slice backing. Completed signatures retire in operation-index order; each range retires before ascending domain entries. Consumed references advance the cursor before errors are returned. Failed-constructor cleanup and body/source/own causes remain until actual manager context end; there is no container-growth-only pending acquisition."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
-        "The retained sequence signature registry now uses []*astSequenceSignature directly, with owning []astNodeRef domains. Each actual INC is immediately followed by native append; no fallible vector growth, raw vector allocation or unjoined push receipt remains. Range retirement precedes ascending domain retirement with consumed DEC progress. Original recursive initialization, operation-index publication, null unused slots and actual plugin/signature owner-header checks remain. Source allocation-failure geometry and vector internals are excluded; declaration matching/factory operations outside the retained registration/sort paths remain open."
+        "Selected concrete pure-Go counterpart only; native specialization profiles outside retained consumers remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "The retained sequence signature registry now uses []*astSequenceSignature directly, with owning []astNodeRef domains. Each actual INC is immediately followed by native append; no fallible vector growth, raw vector allocation or unjoined push receipt remains. Range retirement precedes ascending domain retirement with consumed DEC progress. Original recursive initialization, operation-index publication, null unused slots and actual plugin/signature owner-header checks remain. Source allocation-failure geometry and vector internals are excluded."
       ]
     },
     {
