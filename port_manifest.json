@@ -33852,6 +33852,14 @@
           ]
         },
         {
+          "name": "seq_rewriter::mk_eq_core boundary cancellation, concrete String splitting, unit alignment and empty residual reduction; integer-string, bounded-length and subsequence helpers remain open (seq_rewriter.cpp:1572-1931)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/seq_rewriter_equality.go",
+          "tests": [
+            "TestSequenceRewriterEqualityBoundaryReductions"
+          ]
+        },
+        {
           "name": "seq_rewriter::reduce_app sequence-family dispatch for ported sequence/String/regex reductions, including unary concat and two-argument index normalization; remaining reducer cases follow their open algorithms (seq_rewriter.cpp:343-460)",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",

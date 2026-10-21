@@ -262,6 +262,10 @@ func (m *ASTManager) SequenceUnaryOperationArgument(h ASTHandle, kind int32) (AS
 	return m.external(argument), err == nil, err
 }
 
+func (m *ASTManager) SequenceUnitArgument(h ASTHandle) (ASTHandle, bool, error) {
+	return m.SequenceUnaryOperationArgument(h, ASTSequenceOpUnit)
+}
+
 func (m *ASTManager) SequenceBinaryOperationArguments(h ASTHandle, kind int32) (ASTHandle, ASTHandle, bool, error) {
 	if err := m.lock(); err != nil {
 		return ASTHandle{}, ASTHandle{}, false, err
