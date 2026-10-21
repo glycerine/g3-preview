@@ -14818,10 +14818,14 @@
       "role": "production",
       "status": "unported",
       "go_targets": [
+        "pkg/ast/ast_datatype_decl.go",
+        "pkg/ast/ast_datatype_decl_test.go",
         "pkg/ast/ast_datatype_plugin.go",
         "pkg/ast/ast_datatype_plugin_source_test.go"
       ],
       "tests": [
+        "TestASTDatatypeSortAndOriginalDeclarations",
+        "TestASTDatatypeDeclarationRefusals",
         "TestASTDatatypeRegistrationLifecycle"
       ],
       "assertions": [
@@ -14938,6 +14942,15 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Datatype sort and constructor/recognizer/is/accessor/update-field declaration dispatch and validation (datatype_decl_plugin.cpp:193-381)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_decl.go",
+          "tests": [
+            "TestASTDatatypeSortAndOriginalDeclarations",
+            "TestASTDatatypeDeclarationRefusals"
+          ]
+        },
+        {
           "name": "Datatype plugin registration and empty-definition lifecycle (datatype_decl_plugin.cpp:150-162)",
           "status": "partial",
           "go_target": "pkg/ast/ast_datatype_plugin.go",
@@ -14950,7 +14963,7 @@
         "Only the actual plugin registration header and registry/family acquisitions are retained. Definition tables, utility caches, and vectors had no production Go consumers and have been removed rather than allocating empty copied C++ containers. Registration, repeated lookup, source finalization, and owning history cleanup remain covered."
       ],
       "deviations": [
-        "Datatype definitions and utility operations remain live upstream and unported; their removed Go storage is not classified as dead C++. Future consumers must use concrete native maps/slices. No datatype construction/reduction, native container allocation ABI, or registered upstream-driver credit is claimed."
+        "Datatype definition blocks, instantiation utilities, size expressions, value recognition, and recursive datatype queries remain live upstream and unported. Their future Go implementations must use concrete native maps and slices. Native container allocation ABI and registered upstream-driver credit are not claimed."
       ]
     },
     {
@@ -14958,8 +14971,14 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/ast_datatype_decl.go",
+        "pkg/ast/ast_datatype_decl_test.go"
+      ],
+      "tests": [
+        "TestASTDatatypeSortAndOriginalDeclarations",
+        "TestASTDatatypeDeclarationRefusals"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -14972,9 +14991,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Datatype sort/operator kinds and retained declaration plugin entry points (datatype_decl_plugin.h:24-38,237-288)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_decl.go",
+          "tests": [
+            "TestASTDatatypeSortAndOriginalDeclarations",
+            "TestASTDatatypeDeclarationRefusals"
+          ]
+        }
+      ],
+      "ownership": [
+        "Datatype declaration parameters and domain/range handles are borrowed. AST factories copy declaration information and own the resulting nodes through the manager."
+      ],
+      "deviations": [
+        "Datatype definition classes, size-expression hierarchy, utility caches, and definition-building APIs remain unported."
+      ]
     },
     {
       "path": "src/ast/decl_collector.cpp",
