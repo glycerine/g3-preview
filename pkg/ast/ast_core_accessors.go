@@ -173,6 +173,19 @@ func (m *ASTManager) IsSkolemDecl(h ASTHandle) (bool, error) {
 	flags, e := m.funcFlags(r)
 	return flags.Skolem, e
 }
+
+// GetFuncDeclFlags returns the source func_decl_info flags as a plain value.
+func (m *ASTManager) GetFuncDeclFlags(h ASTHandle) (ASTFuncFlags, error) {
+	if e := m.lock(); e != nil {
+		return ASTFuncFlags{}, e
+	}
+	defer m.mu.Unlock()
+	r, e := m.requireKind(h, ASTFuncDecl)
+	if e != nil {
+		return ASTFuncFlags{}, e
+	}
+	return m.funcFlags(r)
+}
 func (m *ASTManager) GetSortSize(h ASTHandle) (SortSize, error) {
 	if e := m.lock(); e != nil {
 		return SortSize{}, e
