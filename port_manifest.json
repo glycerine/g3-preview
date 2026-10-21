@@ -22886,7 +22886,7 @@
           ]
         },
         {
-          "name": "bounded-degree algebraic-number comparisons, addition, multiplication and division with rational-result collapse",
+          "name": "bounded-degree algebraic-number comparisons, addition, multiplication, division, rational powers and roots with rational-result collapse",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/arith_algebraic.go",
           "tests": [
@@ -22894,7 +22894,7 @@
           ]
         },
         {
-          "name": "advanced SOM/hoisting modes, algebraic-number power/root completion and trigonometric/hyperbolic rewrites",
+          "name": "advanced SOM/hoisting modes and trigonometric/hyperbolic rewrites",
           "status": "unported",
           "reason": "The exact rational scalar core is connected first; the remaining paths require the concrete arithmetic specialization of poly_rewriter and broader algebraic-expression integration."
         }

@@ -797,4 +797,35 @@ func TestArithRewriterAlgebraicComparisonsAndArithmetic(t *testing.T) {
 		t.Fatal("algebraic division status", status)
 	}
 	arithRewriterWantNumeral(t, m, result, "1", false)
+
+	r2 := arithRewriterNumeral(t, m, "2", false)
+	rHalf := arithRewriterNumeral(t, m, "1/2", false)
+	status, result = arithRewriterCore(t, r, arithOpPower, sqrt2, r2)
+	if status != RewriteDone {
+		t.Fatal("algebraic square status", status)
+	}
+	arithRewriterWantNumeral(t, m, result, "2", false)
+	status, result = arithRewriterCore(t, r, arithOpPower, r2, rHalf)
+	if status != RewriteDone {
+		t.Fatal("algebraic root status", status)
+	}
+	var root polynomial.Algebraic
+	matched, err = m.ArithmeticAlgebraicNumeralValue(result, &root)
+	astTestMust(t, err)
+	if !matched {
+		t.Fatal("algebraic root result")
+	}
+	var expected polynomial.Algebraic
+	matched, err = m.ArithmeticAlgebraicNumeralValue(sqrt2, &expected)
+	astTestMust(t, err)
+	if !matched {
+		t.Fatal("algebraic expected root")
+	}
+	comparison, err := manager.Compare(&root, &expected)
+	astTestMust(t, err)
+	if comparison != 0 {
+		t.Fatal("algebraic root value", comparison)
+	}
+	astTestMust(t, manager.Del(&root))
+	astTestMust(t, manager.Del(&expected))
 }

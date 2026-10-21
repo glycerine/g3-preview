@@ -3,6 +3,7 @@ package rewriter
 
 import (
 	"errors"
+	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/polynomial"
@@ -233,6 +234,75 @@ func (r *ArithRewriter) rewriteAlgebraicDivision(left, right ast.ASTHandle, out 
 	}
 	defer func() { _ = manager.Del(&quotient) }()
 	h, err := r.makeAlgebraicNumeral(manager, &quotient)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteDone, r.manager.SetRef(out, h)
+}
+
+func (r *ArithRewriter) rewriteAlgebraicPower(base ast.ASTHandle, exponent *big.Rat, out ast.ASTRef) (RewriteStatus, error) {
+	if !r.algebraicSimplify || exponent == nil {
+		return RewriteFailed, nil
+	}
+	syntax, err := r.algebraicNumeralSyntax(base)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	_, _, rational, err := r.numeral(base)
+	if err != nil || !syntax && !rational {
+		return RewriteFailed, err
+	}
+	numerator := new(big.Int).Set(exponent.Num())
+	negative := numerator.Sign() < 0
+	if negative {
+		numerator.Neg(numerator)
+	}
+	denominator := exponent.Denom()
+	if numerator.Sign() == 0 || !numerator.IsUint64() || !denominator.IsUint64() {
+		return RewriteFailed, nil
+	}
+	n, d := numerator.Uint64(), denominator.Uint64()
+	if n > uint64(r.maxDegree) || d > uint64(r.maxDegree) || n > uint64(^uint32(0)) || d > uint64(^uint32(0)) {
+		return RewriteFailed, nil
+	}
+	integer, err := r.integerTerm(base)
+	if err != nil || negative && integer {
+		return RewriteFailed, err
+	}
+	manager, err := r.manager.ArithmeticAlgebraicManager()
+	if err != nil {
+		return RewriteFailed, err
+	}
+	value, _, matched, err := r.algebraicOperand(base, manager)
+	if err != nil || !matched {
+		return RewriteFailed, err
+	}
+	defer func() { _ = manager.Del(&value) }()
+	if d%2 == 0 {
+		isNegative, e := manager.IsNeg(&value)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if isNegative && n%2 == 1 {
+			return RewriteFailed, nil
+		}
+	}
+	var powered polynomial.Algebraic
+	if err = manager.Power(&value, uint32(n), &powered); err != nil {
+		return RewriteFailed, err
+	}
+	defer func() { _ = manager.Del(&powered) }()
+	var rooted polynomial.Algebraic
+	if err = manager.Root(&powered, uint32(d), &rooted); err != nil {
+		return RewriteFailed, err
+	}
+	defer func() { _ = manager.Del(&rooted) }()
+	if negative {
+		if err = manager.Inv(&rooted); err != nil {
+			return RewriteFailed, err
+		}
+	}
+	h, err := r.makeAlgebraicNumeral(manager, &rooted)
 	if err != nil {
 		return RewriteFailed, err
 	}

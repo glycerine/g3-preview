@@ -737,6 +737,9 @@ func (r *ArithRewriter) rewritePower(base, exponent ast.ASTHandle, out ast.ASTRe
 			return Rewrite1, r.manager.SetRef(out, result)
 		}
 	}
+	if status, e := r.rewriteAlgebraicPower(base, y, out); e != nil || status != RewriteFailed {
+		return status, e
+	}
 	if !xn || !y.IsInt() || !y.Num().IsInt64() {
 		return RewriteFailed, nil
 	}
