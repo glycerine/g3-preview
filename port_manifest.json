@@ -33754,11 +33754,20 @@
           ]
         },
         {
-          "name": "seq_rewriter constant String contains folding and the constant/empty leading branches of prefix and suffix reduction (seq_rewriter.cpp:664-766,869-1080)",
+          "name": "seq_rewriter::mk_seq_contains constant String folding; concat/value decomposition and length-derived reductions remain open (seq_rewriter.cpp:664-766)",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",
           "tests": [
             "TestSequenceRewriterConstantPredicates"
+          ]
+        },
+        {
+          "name": "seq_rewriter::mk_seq_prefix and mk_seq_suffix constant, empty, String boundary, flattened concat, unit equality, value conflict and residual predicate reductions (seq_rewriter.cpp:869-1095)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterConstantPredicates",
+            "TestSequenceRewriterPrefixSuffixConcatReductions"
           ]
         },
         {

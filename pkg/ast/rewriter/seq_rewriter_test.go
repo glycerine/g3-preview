@@ -177,6 +177,121 @@ func TestSequenceRewriterConstantPredicates(t *testing.T) {
 	}
 }
 
+func TestSequenceRewriterPrefixSuffixConcatReductions(t *testing.T) {
+	m := astTestManager(t)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	pin := func(h ast.ASTHandle, err error) ast.ASTHandle {
+		t.Helper()
+		astTestMust(t, err)
+		astTestPin(t, m, h)
+		return h
+	}
+	str := func(text string) ast.ASTHandle { return pin(m.MkString(text)) }
+	concat := func(left, right ast.ASTHandle) ast.ASTHandle {
+		return pin(m.MkSequenceConcat(left, right))
+	}
+	stringSort, err := m.GetSort(str("sort witness"))
+	astTestMust(t, err)
+	constant := func(name string) ast.ASTHandle {
+		return pin(m.MkConst(astTestSymbol(t, m, name), stringSort))
+	}
+	x, y, z := constant("predicate-x"), constant("predicate-y"), constant("predicate-z")
+
+	status, err := rw.RewritePrefix(concat(str("ab"), x), concat(str("abc"), y), out)
+	astTestMust(t, err)
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	left, right, matched, err := m.SequenceBinaryOperationArguments(result, 3)
+	astTestMust(t, err)
+	if status != RewriteFull || !matched || left != x {
+		t.Fatalf("split prefix: status=%d matched=%v left=%v", status, matched, left)
+	}
+	parts, err := m.SequenceFlattenConcat(right)
+	astTestMust(t, err)
+	if len(parts) != 2 || parts[1] != y {
+		t.Fatalf("split prefix right parts: %v", parts)
+	}
+	text, stringValue, err := m.SequenceStringValue(parts[0])
+	astTestMust(t, err)
+	if !stringValue || text != "c" {
+		t.Fatalf("split prefix remainder: %q matched=%v", text, stringValue)
+	}
+
+	status, err = rw.RewritePrefix(concat(x, y), concat(x, z), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	left, right, matched, err = m.SequenceBinaryOperationArguments(result, 3)
+	astTestMust(t, err)
+	if status != RewriteDone || !matched || left != y || right != z {
+		t.Fatalf("shared prefix: status=%d matched=%v left=%v right=%v", status, matched, left, right)
+	}
+
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	falsehood, err := m.MkFalse()
+	astTestMust(t, err)
+	trueUnit := pin(m.MkSequenceUnit(truth))
+	falseUnit := pin(m.MkSequenceUnit(falsehood))
+	status, err = rw.RewritePrefix(trueUnit, falseUnit, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || status != Rewrite3 || kind != ast.ASTOpEq {
+		t.Fatalf("unit prefix equality: status=%d kind=%d error=%v", status, kind, e)
+	}
+
+	status, err = rw.RewriteSuffix(concat(x, str("bc")), concat(y, str("abc")), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	left, right, matched, err = m.SequenceBinaryOperationArguments(result, 4)
+	astTestMust(t, err)
+	if status != RewriteDone || !matched || left != x {
+		t.Fatalf("split suffix: status=%d matched=%v left=%v", status, matched, left)
+	}
+	parts, err = m.SequenceFlattenConcat(right)
+	astTestMust(t, err)
+	if len(parts) != 2 || parts[0] != y {
+		t.Fatalf("split suffix right parts: %v", parts)
+	}
+	text, stringValue, err = m.SequenceStringValue(parts[1])
+	astTestMust(t, err)
+	if !stringValue || text != "a" {
+		t.Fatalf("split suffix remainder: %q matched=%v", text, stringValue)
+	}
+
+	tail := constant("predicate-tail")
+	status, err = rw.RewriteSuffix(concat(x, tail), concat(y, tail), out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	left, right, matched, err = m.SequenceBinaryOperationArguments(result, 4)
+	astTestMust(t, err)
+	if status != RewriteDone || !matched || left != x || right != y {
+		t.Fatalf("shared suffix: status=%d matched=%v left=%v right=%v", status, matched, left, right)
+	}
+
+	status, err = rw.RewriteSuffix(concat(x, tail), tail, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if kind, e := m.GetDeclKind(result); e != nil || status != Rewrite3 || kind != ast.ASTOpEq {
+		t.Fatalf("suffix empty residual: status=%d kind=%d error=%v", status, kind, e)
+	}
+	status, err = rw.RewriteSuffix(trueUnit, falseUnit, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if status != RewriteDone || result != falsehood {
+		t.Fatalf("distinct value suffix: status=%d result=%v", status, result)
+	}
+}
+
 func TestSequenceRewriterReplaceSourceBranches(t *testing.T) {
 	m := astTestManager(t)
 	rw, err := NewSequenceRewriter(m)
