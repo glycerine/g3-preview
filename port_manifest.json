@@ -22592,7 +22592,8 @@
       ],
       "tests": [
         "TestArithRewriterRationalScalarCores",
-        "TestArithRewriterStructuralScalarRules"
+        "TestArithRewriterStructuralScalarRules",
+        "TestArithRewriterSymbolicModRemAndCasts"
       ],
       "assertions": [
         {
@@ -22816,16 +22817,17 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "configured arithmetic rewriter owner, application dispatch, rational add/multiply, comparisons/equality, division, integer division/mod/remainder, bounded integral power, casts, is_int and abs",
+          "name": "configured arithmetic rewriter owner, application dispatch, rational add/multiply, comparisons/equality, division, integer division, bounded integral power, is_int and abs, symbolic modulo/remainder, and cast distribution",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/arith_rewriter.go",
           "tests": [
             "TestArithRewriterRationalScalarCores",
-            "TestArithRewriterStructuralScalarRules"
+            "TestArithRewriterStructuralScalarRules",
+            "TestArithRewriterSymbolicModRemAndCasts"
           ]
         },
         {
-          "name": "expression-polynomial cancellation, symbolic modular propagation, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
+          "name": "expression-polynomial cancellation, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
           "status": "unported",
           "reason": "The exact rational scalar core is connected first; the remaining paths require the concrete arithmetic specialization of poly_rewriter and broader algebraic-expression integration."
         }
@@ -22845,7 +22847,8 @@
       ],
       "tests": [
         "TestArithRewriterRationalScalarCores",
-        "TestArithRewriterStructuralScalarRules"
+        "TestArithRewriterStructuralScalarRules",
+        "TestArithRewriterSymbolicModRemAndCasts"
       ],
       "conditionals": [
         {
@@ -22866,7 +22869,8 @@
           "go_target": "pkg/ast/rewriter/arith_rewriter.go",
           "tests": [
             "TestArithRewriterRationalScalarCores",
-            "TestArithRewriterStructuralScalarRules"
+            "TestArithRewriterStructuralScalarRules",
+            "TestArithRewriterSymbolicModRemAndCasts"
           ]
         },
         {

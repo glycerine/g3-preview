@@ -151,6 +151,45 @@ func (r *ArithRewriter) app(kind int32, args ...ast.ASTHandle) (ast.ASTHandle, e
 	return r.manager.MkFamilyApp(r.family, kind, nil, args)
 }
 
+func (r *ArithRewriter) operation(h ast.ASTHandle, kinds ...int32) (int32, []ast.ASTHandle, bool, error) {
+	family, err := r.manager.GetFamilyID(h)
+	if err != nil || family != r.family {
+		return 0, nil, false, err
+	}
+	kind, err := r.manager.GetDeclKind(h)
+	if err != nil {
+		return 0, nil, false, err
+	}
+	matched := len(kinds) == 0
+	for _, candidate := range kinds {
+		matched = matched || kind == candidate
+	}
+	if !matched {
+		return kind, nil, false, nil
+	}
+	n, err := r.manager.GetNumArgs(h)
+	if err != nil {
+		return 0, nil, false, err
+	}
+	args := make([]ast.ASTHandle, n)
+	for i := range args {
+		args[i], err = r.manager.GetArg(h, uint32(i))
+		if err != nil {
+			return 0, nil, false, err
+		}
+	}
+	return kind, args, true, nil
+}
+
+func (r *ArithRewriter) isITE(h ast.ASTHandle) (bool, error) {
+	family, err := r.manager.GetFamilyID(h)
+	if err != nil || family != r.manager.BasicFamilyID() {
+		return false, err
+	}
+	kind, err := r.manager.GetDeclKind(h)
+	return err == nil && kind == ast.ASTOpIte, err
+}
+
 func arithFloor(value *big.Rat) *big.Int {
 	q, rem := new(big.Int).QuoRem(value.Num(), value.Denom(), new(big.Int))
 	if value.Sign() < 0 && rem.Sign() != 0 {
@@ -296,6 +335,185 @@ func (r *ArithRewriter) rewriteDivision(kind int32, left, right ast.ASTHandle, o
 	return RewriteDone, r.manager.SetRef(out, h)
 }
 
+func (r *ArithRewriter) rewriteMod(left, right ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	lv, li, ln, err := r.numeral(left)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	rv, ri, rn, err := r.numeral(right)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if ln && rn && rv.Sign() != 0 && li && ri {
+		h, e := r.makeNumeral(new(big.Rat).SetInt(arithIntegerMod(lv, rv)), true)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return RewriteDone, r.manager.SetRef(out, h)
+	}
+	if rn && ri && rv.Cmp(big.NewRat(1, 1)) == 0 {
+		h, e := r.makeNumeral(new(big.Rat), true)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return RewriteDone, r.manager.SetRef(out, h)
+	}
+	if left == right && !rn {
+		zero, e := r.makeNumeral(new(big.Rat), true)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		undefined, e := r.app(arithOpMod, zero, zero)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		absRef, e := r.manager.NewRef(ast.ASTHandle{})
+		if e != nil {
+			return RewriteFailed, e
+		}
+		defer func() { _ = r.manager.DelRef(&absRef) }()
+		if _, e = r.rewriteAbs(right, absRef); e != nil {
+			return RewriteFailed, e
+		}
+		absolute, e := r.manager.RefGet(absRef)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		equal, e := r.manager.MkEq(right, zero)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		result, e := r.manager.MkIte(equal, undefined, absolute)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return RewriteDone, r.manager.SetRef(out, result)
+	}
+	if _, inner, yes, e := r.operation(left, arithOpMod); e != nil {
+		return RewriteFailed, e
+	} else if yes && len(inner) == 2 && inner[1] == right && rn && ri && rv.Sign() != 0 {
+		return RewriteDone, r.manager.SetRef(out, left)
+	}
+	if !rn || !ri || rv.Sign() <= 0 {
+		return RewriteFailed, nil
+	}
+	kind, children, composite, err := r.operation(left, arithOpAdd, arithOpMul)
+	if err != nil || !composite {
+		return RewriteFailed, err
+	}
+	target := false
+	for _, child := range children {
+		if _, _, isMod, e := r.operation(child, arithOpMod); e != nil {
+			return RewriteFailed, e
+		} else if isMod {
+			continue
+		}
+		if value, _, numeral, e := r.numeral(child); e != nil {
+			return RewriteFailed, e
+		} else if numeral && new(big.Int).Mod(value.Num(), rv.Num()).Cmp(value.Num()) == 0 {
+			continue
+		}
+		if ite, e := r.isITE(child); e != nil {
+			return RewriteFailed, e
+		} else if ite {
+			continue
+		}
+		target = true
+		break
+	}
+	if !target {
+		return RewriteFailed, nil
+	}
+	wrapped := make([]ast.ASTHandle, len(children))
+	for i, child := range children {
+		wrapped[i], err = r.app(arithOpMod, child, right)
+		if err != nil {
+			return RewriteFailed, err
+		}
+	}
+	inside, err := r.app(kind, wrapped...)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	result, err := r.app(arithOpMod, inside, right)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return Rewrite3, r.manager.SetRef(out, result)
+}
+
+func (r *ArithRewriter) rewriteRem(left, right ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	lv, li, ln, err := r.numeral(left)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	rv, ri, rn, err := r.numeral(right)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if ln && rn && rv.Sign() != 0 && li && ri {
+		value := arithIntegerMod(lv, rv)
+		if rv.Sign() < 0 {
+			value.Neg(value)
+		}
+		h, e := r.makeNumeral(new(big.Rat).SetInt(value), true)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return RewriteDone, r.manager.SetRef(out, h)
+	}
+	if rn && ri && rv.Cmp(big.NewRat(1, 1)) == 0 {
+		h, e := r.makeNumeral(new(big.Rat), true)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return RewriteDone, r.manager.SetRef(out, h)
+	}
+	if rn && ri && rv.Sign() != 0 {
+		if _, _, composite, e := r.operation(left, arithOpAdd, arithOpMul); e != nil {
+			return RewriteFailed, e
+		} else if composite {
+			return RewriteFailed, nil
+		}
+		mod, e := r.app(arithOpMod, left, right)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if rv.Sign() > 0 {
+			return Rewrite1, r.manager.SetRef(out, mod)
+		}
+		negative, e := r.app(arithOpUMinus, mod)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return Rewrite2, r.manager.SetRef(out, negative)
+	}
+	if !r.elimRem {
+		return RewriteFailed, nil
+	}
+	mod, err := r.app(arithOpMod, left, right)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	negative, err := r.app(arithOpUMinus, mod)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	zero, err := r.makeNumeral(new(big.Rat), true)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	nonnegative, err := r.app(arithOpGE, right, zero)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	result, err := r.manager.MkIte(nonnegative, mod, negative)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return Rewrite3, r.manager.SetRef(out, result)
+}
+
 func (r *ArithRewriter) rewritePower(base, exponent ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
 	x, integer, xn, err := r.numeral(base)
 	if err != nil {
@@ -352,7 +570,36 @@ func (r *ArithRewriter) rewriteToInt(arg ast.ASTHandle, out ast.ASTRef) (Rewrite
 	} else if yes {
 		return RewriteDone, r.manager.SetRef(out, child)
 	}
-	return RewriteFailed, nil
+	kind, children, composite, err := r.operation(arg, arithOpAdd, arithOpMul, arithOpPower)
+	if err != nil || !composite {
+		return RewriteFailed, err
+	}
+	converted := make([]ast.ASTHandle, len(children))
+	for i, child := range children {
+		value, _, numeral, e := r.numeral(child)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if numeral && value.IsInt() {
+			converted[i], e = r.makeNumeral(value, true)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			continue
+		}
+		if yes, inner, e := r.unary(child, arithOpToReal); e != nil {
+			return RewriteFailed, e
+		} else if yes {
+			converted[i] = inner
+			continue
+		}
+		return RewriteFailed, nil
+	}
+	result, err := r.app(kind, converted...)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return Rewrite1, r.manager.SetRef(out, result)
 }
 
 func (r *ArithRewriter) rewriteToReal(arg ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
@@ -366,6 +613,26 @@ func (r *ArithRewriter) rewriteToReal(arg ast.ASTHandle, out ast.ASTRef) (Rewrit
 			return RewriteFailed, e
 		}
 		return RewriteDone, r.manager.SetRef(out, h)
+	}
+	if r.pushToReal {
+		kind, children, composite, e := r.operation(arg, arithOpAdd, arithOpMul)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if composite {
+			converted := make([]ast.ASTHandle, len(children))
+			for i, child := range children {
+				converted[i], e = r.app(arithOpToReal, child)
+				if e != nil {
+					return RewriteFailed, e
+				}
+			}
+			result, e := r.app(kind, converted...)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			return Rewrite2, r.manager.SetRef(out, result)
+		}
 	}
 	return RewriteFailed, nil
 }
@@ -528,6 +795,10 @@ func (r *ArithRewriter) MkAppCore(decl ast.ASTHandle, args ast.AppArguments, out
 			return r.rewriteComparison(kind, left, right, out)
 		case arithOpPower:
 			return r.rewritePower(left, right, out)
+		case arithOpMod:
+			return r.rewriteMod(left, right, out)
+		case arithOpRem:
+			return r.rewriteRem(left, right, out)
 		default:
 			return r.rewriteDivision(kind, left, right, out)
 		}

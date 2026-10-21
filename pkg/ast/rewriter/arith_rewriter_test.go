@@ -42,6 +42,20 @@ func arithRewriterWantNumeral(t *testing.T, m *ast.ASTManager, h ast.ASTHandle, 
 	}
 }
 
+func arithRewriterWantOperation(t *testing.T, r *ArithRewriter, h ast.ASTHandle, kind int32, args ...ast.ASTHandle) {
+	t.Helper()
+	gotKind, gotArgs, matched, err := r.operation(h, kind)
+	astTestMust(t, err)
+	if !matched || gotKind != kind || len(gotArgs) != len(args) {
+		t.Fatal("arithmetic operation", gotKind, len(gotArgs), matched, "want", kind, len(args))
+	}
+	for i := range args {
+		if gotArgs[i] != args[i] {
+			t.Fatal("arithmetic argument", i, gotArgs[i], args[i])
+		}
+	}
+}
+
 func TestArithRewriterRationalScalarCores(t *testing.T) {
 	m, c, g, local := boolRewriterConfigFixture(t)
 	r, err := NewArithRewriter(m, c, g, local)
@@ -137,5 +151,124 @@ func TestArithRewriterStructuralScalarRules(t *testing.T) {
 	status, result = arithRewriterCore(t, r, arithOpIsInt, toReal)
 	if status != RewriteDone || !m.IsTrue(result) {
 		t.Fatal("to-real is integral", status, result)
+	}
+}
+
+func TestArithRewriterSymbolicModRemAndCasts(t *testing.T) {
+	m, c, g, local := boolRewriterConfigFixture(t)
+	r, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	iSort, err := m.MkFamilySort(r.family, 1, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "arith-symbolic-x"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	y, err := m.MkConst(astTestSymbol(t, m, "arith-symbolic-y"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, y)
+	i1 := arithRewriterNumeral(t, m, "1", true)
+	i2 := arithRewriterNumeral(t, m, "2", true)
+	iNeg2 := arithRewriterNumeral(t, m, "-2", true)
+	r1 := arithRewriterNumeral(t, m, "1", false)
+
+	status, result := arithRewriterCore(t, r, arithOpMod, x, i1)
+	if status != RewriteDone {
+		t.Fatal("modulo one status", status)
+	}
+	arithRewriterWantNumeral(t, m, result, "0", true)
+
+	status, result = arithRewriterCore(t, r, arithOpMod, x, x)
+	if status != RewriteDone {
+		t.Fatal("self modulo status", status)
+	}
+	if kind, e := m.GetDeclKind(result); e != nil || kind != ast.ASTOpIte {
+		t.Fatal("self modulo ITE", kind, e)
+	}
+
+	innerMod, err := r.app(arithOpMod, x, i2)
+	astTestMust(t, err)
+	astTestPin(t, m, innerMod)
+	status, result = arithRewriterCore(t, r, arithOpMod, innerMod, i2)
+	if status != RewriteDone || result != innerMod {
+		t.Fatal("idempotent modulo", status, result, innerMod)
+	}
+
+	sum, err := r.app(arithOpAdd, x, i1)
+	astTestMust(t, err)
+	astTestPin(t, m, sum)
+	status, result = arithRewriterCore(t, r, arithOpMod, sum, i2)
+	if status != Rewrite3 {
+		t.Fatal("modulo propagation status", status)
+	}
+	_, outerArgs, matched, err := r.operation(result, arithOpMod)
+	astTestMust(t, err)
+	if !matched || len(outerArgs) != 2 || outerArgs[1] != i2 {
+		t.Fatal("modulo propagation outer", matched, len(outerArgs))
+	}
+	_, addArgs, matched, err := r.operation(outerArgs[0], arithOpAdd)
+	astTestMust(t, err)
+	if !matched || len(addArgs) != 2 {
+		t.Fatal("modulo propagation sum", matched, len(addArgs))
+	}
+	for _, arg := range addArgs {
+		_, modArgs, yes, e := r.operation(arg, arithOpMod)
+		astTestMust(t, e)
+		if !yes || len(modArgs) != 2 || modArgs[1] != i2 {
+			t.Fatal("modulo propagation child", yes, len(modArgs))
+		}
+	}
+
+	status, result = arithRewriterCore(t, r, arithOpRem, x, i2)
+	if status != Rewrite1 {
+		t.Fatal("positive symbolic remainder", status)
+	}
+	arithRewriterWantOperation(t, r, result, arithOpMod, x, i2)
+	status, result = arithRewriterCore(t, r, arithOpRem, x, iNeg2)
+	if status != Rewrite2 {
+		t.Fatal("negative symbolic remainder", status)
+	}
+	_, negativeArgs, matched, err := r.operation(result, arithOpUMinus)
+	astTestMust(t, err)
+	if !matched || len(negativeArgs) != 1 {
+		t.Fatal("negative symbolic remainder shape", matched, len(negativeArgs))
+	}
+	arithRewriterWantOperation(t, r, negativeArgs[0], arithOpMod, x, iNeg2)
+
+	toRealX, err := r.app(arithOpToReal, x)
+	astTestMust(t, err)
+	astTestPin(t, m, toRealX)
+	realSum, err := r.app(arithOpAdd, r1, toRealX)
+	astTestMust(t, err)
+	astTestPin(t, m, realSum)
+	status, result = arithRewriterCore(t, r, arithOpToInt, realSum)
+	if status != Rewrite1 {
+		t.Fatal("to-int distribution status", status)
+	}
+	arithRewriterWantOperation(t, r, result, arithOpAdd, i1, x)
+
+	status, result = arithRewriterCore(t, r, arithOpToReal, sum)
+	if status != Rewrite2 {
+		t.Fatal("to-real distribution status", status)
+	}
+	_, realArgs, matched, err := r.operation(result, arithOpAdd)
+	astTestMust(t, err)
+	if !matched || len(realArgs) != 2 {
+		t.Fatal("to-real distribution sum", matched, len(realArgs))
+	}
+	arithRewriterWantOperation(t, r, realArgs[0], arithOpToReal, x)
+	arithRewriterWantOperation(t, r, realArgs[1], arithOpToReal, i1)
+
+	key := "elim_rem"
+	astTestMust(t, c.SetBoolName(local, &key, true))
+	eliminating, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, eliminating.Close()) })
+	status, result = arithRewriterCore(t, eliminating, arithOpRem, x, y)
+	if status != Rewrite3 {
+		t.Fatal("remainder elimination status", status)
+	}
+	if kind, e := m.GetDeclKind(result); e != nil || kind != ast.ASTOpIte {
+		t.Fatal("remainder elimination ITE", kind, e)
 	}
 }
