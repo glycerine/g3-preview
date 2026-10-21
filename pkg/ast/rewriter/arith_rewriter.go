@@ -45,6 +45,7 @@ type ArithRewriter struct {
 	arithLHS, arithIneqLHS, gcdRounding       bool
 	elimToReal, pushToReal, algebraicSimplify bool
 	elimRem, eq2ineq, sortSums                bool
+	flat                                      bool
 	maxDegree                                 uint32
 }
 
@@ -103,6 +104,15 @@ func (r *ArithRewriter) updateParams(c *uparams.ParamsContext, g *uparams.Global
 		}
 	}
 	r.maxDegree, err = p.MaxDegree()
+	if err != nil {
+		return err
+	}
+	base, err := NewRewriterParams(c, g, local)
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, base.Close()) }()
+	r.flat, err = base.Flat()
 	return err
 }
 
@@ -274,15 +284,26 @@ func (r *ArithRewriter) rewriteNumeralFold(kind int32, args ast.AppArguments, ou
 
 func (r *ArithRewriter) rewriteUnaryMinus(arg ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
 	v, integer, matched, err := r.numeral(arg)
-	if err != nil || !matched {
-		return RewriteFailed, err
-	}
-	v.Neg(v)
-	h, err := r.makeNumeral(v, integer)
 	if err != nil {
 		return RewriteFailed, err
 	}
-	return RewriteDone, r.manager.SetRef(out, h)
+	if matched {
+		v.Neg(v)
+		h, e := r.makeNumeral(v, integer)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return RewriteDone, r.manager.SetRef(out, h)
+	}
+	minusOne, err := r.numeralForTerm(big.NewRat(-1, 1), arg)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	h, err := r.app(arithOpMul, minusOne, arg)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return Rewrite1, r.manager.SetRef(out, h)
 }
 
 func (r *ArithRewriter) rewriteDivision(kind int32, left, right ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
@@ -766,8 +787,14 @@ func (r *ArithRewriter) MkAppCore(decl ast.ASTHandle, args ast.AppArguments, out
 	if kind == arithOpNum {
 		return RewriteFailed, nil
 	}
-	if kind == arithOpAdd || kind == arithOpMul {
-		return r.rewriteNumeralFold(kind, args, out)
+	if kind == arithOpAdd {
+		return r.rewriteAdd(args, out)
+	}
+	if kind == arithOpMul {
+		return r.rewriteMul(args, out)
+	}
+	if kind == arithOpSub {
+		return r.rewriteSub(args, out)
 	}
 	if kind == arithOpDiv || kind == arithOpIDiv {
 		if args.Count() == 1 {

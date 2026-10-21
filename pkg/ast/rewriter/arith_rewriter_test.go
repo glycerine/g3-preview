@@ -272,3 +272,110 @@ func TestArithRewriterSymbolicModRemAndCasts(t *testing.T) {
 		t.Fatal("remainder elimination ITE", kind, e)
 	}
 }
+
+func TestArithRewriterPolynomialAddMulSubAndNegation(t *testing.T) {
+	m, c, g, local := boolRewriterConfigFixture(t)
+	r, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	iSort, err := m.MkFamilySort(r.family, 1, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "arith-poly-x"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	y, err := m.MkConst(astTestSymbol(t, m, "arith-poly-y"), iSort)
+	astTestMust(t, err)
+	astTestPin(t, m, y)
+	i0 := arithRewriterNumeral(t, m, "0", true)
+	i2 := arithRewriterNumeral(t, m, "2", true)
+	i3 := arithRewriterNumeral(t, m, "3", true)
+
+	status, result := arithRewriterCore(t, r, arithOpAdd, x, x)
+	if status != RewriteDone {
+		t.Fatal("combine like monomials status", status)
+	}
+	arithRewriterWantOperation(t, r, result, arithOpMul, i2, x)
+
+	nested, err := r.app(arithOpAdd, y, x)
+	astTestMust(t, err)
+	astTestPin(t, m, nested)
+	status, result = arithRewriterCore(t, r, arithOpAdd, x, nested)
+	if status != RewriteDone {
+		t.Fatal("flatten addition status", status)
+	}
+	_, sumArgs, matched, err := r.operation(result, arithOpAdd)
+	astTestMust(t, err)
+	if !matched || len(sumArgs) != 2 {
+		t.Fatal("flattened addition", matched, len(sumArgs))
+	}
+	foundX, foundY := false, false
+	for _, arg := range sumArgs {
+		if arg == y {
+			foundY = true
+			continue
+		}
+		_, productArgs, yes, e := r.operation(arg, arithOpMul)
+		astTestMust(t, e)
+		foundX = foundX || yes && len(productArgs) == 2 && productArgs[0] == i2 && productArgs[1] == x
+	}
+	if !foundX || !foundY {
+		t.Fatal("flattened addition terms", foundX, foundY)
+	}
+
+	status, result = arithRewriterCore(t, r, arithOpMul, x, x)
+	if status != RewriteDone {
+		t.Fatal("combine repeated factor status", status)
+	}
+	arithRewriterWantOperation(t, r, result, arithOpPower, x, i2)
+
+	innerProduct, err := r.app(arithOpMul, i3, x)
+	astTestMust(t, err)
+	astTestPin(t, m, innerProduct)
+	status, result = arithRewriterCore(t, r, arithOpMul, i2, innerProduct)
+	if status != RewriteDone {
+		t.Fatal("flatten product status", status)
+	}
+	_, productArgs, matched, err := r.operation(result, arithOpMul)
+	astTestMust(t, err)
+	if !matched || len(productArgs) != 2 || productArgs[1] != x {
+		t.Fatal("flattened product", matched, len(productArgs))
+	}
+	arithRewriterWantNumeral(t, m, productArgs[0], "6", true)
+
+	status, result = arithRewriterCore(t, r, arithOpUMinus, x)
+	if status != Rewrite1 {
+		t.Fatal("symbolic unary minus status", status)
+	}
+	_, negativeArgs, matched, err := r.operation(result, arithOpMul)
+	astTestMust(t, err)
+	if !matched || len(negativeArgs) != 2 || negativeArgs[1] != x {
+		t.Fatal("symbolic unary minus", matched, len(negativeArgs))
+	}
+	arithRewriterWantNumeral(t, m, negativeArgs[0], "-1", true)
+
+	status, result = arithRewriterCore(t, r, arithOpSub, x, y, i0)
+	if status != Rewrite2 {
+		t.Fatal("subtraction status", status)
+	}
+	_, subtractionArgs, matched, err := r.operation(result, arithOpAdd)
+	astTestMust(t, err)
+	if !matched || len(subtractionArgs) != 2 || subtractionArgs[0] != x {
+		t.Fatal("subtraction addition", matched, len(subtractionArgs))
+	}
+	_, negativeArgs, matched, err = r.operation(subtractionArgs[1], arithOpMul)
+	astTestMust(t, err)
+	if !matched || len(negativeArgs) != 2 || negativeArgs[1] != y {
+		t.Fatal("subtraction negative", matched, len(negativeArgs))
+	}
+	arithRewriterWantNumeral(t, m, negativeArgs[0], "-1", true)
+
+	key := "flat"
+	astTestMust(t, c.SetBoolName(local, &key, false))
+	nonflat, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, nonflat.Close()) })
+	status, _ = arithRewriterCore(t, nonflat, arithOpAdd, x, nested)
+	if status != RewriteFailed {
+		t.Fatal("disabled polynomial flattening", status)
+	}
+}

@@ -22588,12 +22588,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/rewriter/arith_rewriter.go"
+        "pkg/ast/rewriter/arith_rewriter.go",
+        "pkg/ast/rewriter/arith_polynomial.go"
       ],
       "tests": [
         "TestArithRewriterRationalScalarCores",
         "TestArithRewriterStructuralScalarRules",
-        "TestArithRewriterSymbolicModRemAndCasts"
+        "TestArithRewriterSymbolicModRemAndCasts",
+        "TestArithRewriterPolynomialAddMulSubAndNegation"
       ],
       "assertions": [
         {
@@ -22823,11 +22825,20 @@
           "tests": [
             "TestArithRewriterRationalScalarCores",
             "TestArithRewriterStructuralScalarRules",
-            "TestArithRewriterSymbolicModRemAndCasts"
+            "TestArithRewriterSymbolicModRemAndCasts",
+            "TestArithRewriterPolynomialAddMulSubAndNegation"
           ]
         },
         {
-          "name": "expression-polynomial cancellation, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
+          "name": "concrete arithmetic polynomial flattening, coefficient folding, like-monomial addition, repeated-factor multiplication, subtraction and negation",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_polynomial.go",
+          "tests": [
+            "TestArithRewriterPolynomialAddMulSubAndNegation"
+          ]
+        },
+        {
+          "name": "expression-polynomial cancellation and advanced SOM/hoisting modes, algebraic-number roots/division and trigonometric/hyperbolic rewrites",
           "status": "unported",
           "reason": "The exact rational scalar core is connected first; the remaining paths require the concrete arithmetic specialization of poly_rewriter and broader algebraic-expression integration."
         }
@@ -22843,12 +22854,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/rewriter/arith_rewriter.go"
+        "pkg/ast/rewriter/arith_rewriter.go",
+        "pkg/ast/rewriter/arith_polynomial.go"
       ],
       "tests": [
         "TestArithRewriterRationalScalarCores",
         "TestArithRewriterStructuralScalarRules",
-        "TestArithRewriterSymbolicModRemAndCasts"
+        "TestArithRewriterSymbolicModRemAndCasts",
+        "TestArithRewriterPolynomialAddMulSubAndNegation"
       ],
       "conditionals": [
         {
@@ -22870,7 +22883,8 @@
           "tests": [
             "TestArithRewriterRationalScalarCores",
             "TestArithRewriterStructuralScalarRules",
-            "TestArithRewriterSymbolicModRemAndCasts"
+            "TestArithRewriterSymbolicModRemAndCasts",
+            "TestArithRewriterPolynomialAddMulSubAndNegation"
           ]
         },
         {
