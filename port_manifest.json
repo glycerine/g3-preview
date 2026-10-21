@@ -17159,11 +17159,13 @@
       "path": "src/ast/fpa/bv2fpa_converter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/fpa/bv2fpa_converter.go",
         "pkg/model/fpa/bv2fpa_model.go",
         "pkg/model/fpa/bv2fpa_functions.go",
+        "pkg/model/fpa/bv2fpa_display.go",
+        "pkg/model/fpa/bv2fpa_translate.go",
         "pkg/model/function_interpretation.go",
         "pkg/ast/fpa/fpa2bv_symbols.go"
       ],
@@ -17171,7 +17173,9 @@
         "TestBV2FPAConverterNumeralsAndRoundingModes",
         "TestBV2FPAConverterRetainsSourceSnapshot",
         "TestBV2FPAConverterConvertsFloatAndRoundingConstants",
-        "TestBV2FPAConverterRebuildsFunctionInterpretation"
+        "TestBV2FPAConverterRebuildsFunctionInterpretation",
+        "TestBV2FPAConverterDisplay",
+        "TestBV2FPAConverterTranslationOwnsCopiedCache"
       ],
       "conditionals": [
         {
@@ -17273,35 +17277,41 @@
           "text": "SASSERT(!m_fpa_util.is_float(f->get_range()) && !m_fpa_util.is_rm(f->get_range()));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "owned converter snapshot, numeral reconstruction, model constant/special conversion, floating subterm rebuilding, and FPA unspecified-function interpretation conversion; legacy array, display, and translation conversion remains open",
+          "name": "complete retained converter snapshot, numeral reconstruction, model constant/special and FPA unspecified-function conversion, floating subterm rebuilding, diagnostic display, and cross-manager translation; unreachable legacy array branch audited dead",
           "status": "ported",
           "go_target": "pkg/model/fpa/bv2fpa_converter.go",
           "tests": [
             "TestBV2FPAConverterNumeralsAndRoundingModes",
             "TestBV2FPAConverterRetainsSourceSnapshot",
             "TestBV2FPAConverterConvertsFloatAndRoundingConstants",
-            "TestBV2FPAConverterRebuildsFunctionInterpretation"
+            "TestBV2FPAConverterRebuildsFunctionInterpretation",
+            "TestBV2FPAConverterDisplay",
+            "TestBV2FPAConverterTranslationOwnsCopiedCache"
           ]
         }
       ],
       "ownership": [
         "The Go model converter owns retained references to every copied converter cache key/value and min/max sign pair until Close."
       ],
-      "deviations": []
+      "deviations": [
+        "convert_array_func_interp is dead for retained source consumers: every mk_bv_uf insertion site supplies a floating-point/rounding result or a nonzero-arity FPA conversion declaration, so m_uf2bvuf never contains a zero-arity declaration with array range. No universal array-model adapter is introduced."
+      ]
     },
     {
       "path": "src/ast/fpa/bv2fpa_converter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/fpa/bv2fpa_converter.go",
         "pkg/model/fpa/bv2fpa_model.go",
         "pkg/model/fpa/bv2fpa_functions.go",
+        "pkg/model/fpa/bv2fpa_display.go",
+        "pkg/model/fpa/bv2fpa_translate.go",
         "pkg/model/function_interpretation.go",
         "pkg/ast/fpa/fpa2bv_symbols.go"
       ],
@@ -17309,7 +17319,9 @@
         "TestBV2FPAConverterNumeralsAndRoundingModes",
         "TestBV2FPAConverterRetainsSourceSnapshot",
         "TestBV2FPAConverterConvertsFloatAndRoundingConstants",
-        "TestBV2FPAConverterRebuildsFunctionInterpretation"
+        "TestBV2FPAConverterRebuildsFunctionInterpretation",
+        "TestBV2FPAConverterDisplay",
+        "TestBV2FPAConverterTranslationOwnsCopiedCache"
       ],
       "conditionals": [
         {
@@ -17321,25 +17333,29 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "owned converter snapshot, numeral reconstruction, model conversion, floating subterm rebuilding, and FPA unspecified-function interpretation conversion; legacy array, display, and translation conversion remains open",
+          "name": "complete retained converter surface: owned snapshot, numeral and model conversion, floating subterm rebuilding, FPA unspecified-function conversion, display, and translation; unreachable legacy array helper audited dead",
           "status": "ported",
           "go_target": "pkg/model/fpa/bv2fpa_converter.go",
           "tests": [
             "TestBV2FPAConverterNumeralsAndRoundingModes",
             "TestBV2FPAConverterRetainsSourceSnapshot",
             "TestBV2FPAConverterConvertsFloatAndRoundingConstants",
-            "TestBV2FPAConverterRebuildsFunctionInterpretation"
+            "TestBV2FPAConverterRebuildsFunctionInterpretation",
+            "TestBV2FPAConverterDisplay",
+            "TestBV2FPAConverterTranslationOwnsCopiedCache"
           ]
         }
       ],
       "ownership": [
         "The converter retains copied AST cache entries independently of the originating FPA-to-BV converter."
       ],
-      "deviations": []
+      "deviations": [
+        "The declared array-model helper is unreachable from retained mk_bv_uf cache producers and is intentionally not represented by a universal Go adapter."
+      ]
     },
     {
       "path": "src/ast/fpa/fpa2bv_converter.cpp",

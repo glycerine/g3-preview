@@ -1,6 +1,8 @@
 package fpa
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -253,5 +255,69 @@ func TestBV2FPAConverterRebuildsFunctionInterpretation(t *testing.T) {
 	testMust(t, err)
 	if fallback != fallbackBits {
 		t.Fatal("converted function fallback", fallback, fallbackBits)
+	}
+}
+
+func TestBV2FPAConverterTranslationOwnsCopiedCache(t *testing.T) {
+	from, sourceConverter, _ := testFixture(t)
+	floatSort, err := from.FloatingPointSort(8, 24)
+	testMust(t, err)
+	name, err := from.Symbols.Intern("translated-float")
+	testMust(t, err)
+	declaration, err := from.MkFuncDecl(name, nil, floatSort, ast.ASTFuncDeclInfo{})
+	testMust(t, err)
+	_, err = sourceConverter.MkConst(declaration)
+	testMust(t, err)
+	original, err := NewConverter(from, sourceConverter)
+	testMust(t, err)
+	t.Cleanup(func() { testMust(t, original.Close()) })
+
+	budget := arena.NewBudget(1 << 30)
+	symbols, err := usymbol.NewManager(usymbol.Config{Budget: budget})
+	testMust(t, err)
+	numerals, err := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
+	testMust(t, err)
+	to, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numerals, Budget: budget})
+	testMust(t, err)
+	t.Cleanup(func() {
+		testMust(t, to.Close())
+		testMust(t, numerals.Close())
+		testMust(t, symbols.Close())
+		if budget.Used() != 0 {
+			t.Fatalf("translated manager retained %d bytes", budget.Used())
+		}
+	})
+	translation, err := ast.NewASTTranslation(from, to, true)
+	testMust(t, err)
+	t.Cleanup(func() { testMust(t, translation.Close()) })
+	translated, err := original.Translate(translation)
+	testMust(t, err)
+	t.Cleanup(func() { testMust(t, translated.Close()) })
+	translatedDeclaration, err := translation.Translate(declaration)
+	testMust(t, err)
+	if _, found := translated.constants[translatedDeclaration]; !found {
+		t.Fatal("translated cache omitted floating constant")
+	}
+	testMust(t, sourceConverter.Reset())
+}
+
+func TestBV2FPAConverterDisplay(t *testing.T) {
+	m, sourceConverter, _ := testFixture(t)
+	floatSort, err := m.FloatingPointSort(8, 24)
+	testMust(t, err)
+	name, err := m.Symbols.Intern("display-float")
+	testMust(t, err)
+	declaration, err := m.MkFuncDecl(name, nil, floatSort, ast.ASTFuncDeclInfo{})
+	testMust(t, err)
+	_, err = sourceConverter.MkConst(declaration)
+	testMust(t, err)
+	converter, err := NewConverter(m, sourceConverter)
+	testMust(t, err)
+	defer func() { testMust(t, converter.Close()) }()
+	var out bytes.Buffer
+	testMust(t, converter.Display(&out))
+	text := out.String()
+	if !strings.Contains(text, "\n  (display-float ") || !strings.Contains(text, "fp") {
+		t.Fatal("converter display", text)
 	}
 }
