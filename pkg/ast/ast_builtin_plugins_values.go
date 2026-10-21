@@ -26,6 +26,10 @@ func (m *ASTManager) pluginValue(fid FamilyID, r astNodeRef) (bool, error) {
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astFloatingPointPlugin {
 		return m.floatingPointValue(fid, r, false)
 	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astSequencePlugin {
+		family, kind, e := m.declIdentity(decl)
+		return family == fid && kind == ASTSequenceOpStringConst, e
+	}
 	return false, nil
 }
 func (m *ASTManager) isValue(r astNodeRef) (bool, error) {

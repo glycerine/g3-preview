@@ -34166,15 +34166,18 @@
       "go_targets": [
         "pkg/ast/ast_seq_plugin.go",
         "pkg/ast/ast_seq_string.go",
+        "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_seq_signature_memory_trace.go",
-        "pkg/ast/ast_seq_plugin_source_test.go"
+        "pkg/ast/ast_seq_plugin_source_test.go",
+        "pkg/ast/ast_smt2_string_literal_test.go"
       ],
       "tests": [
         "TestASTSequenceSourceSetManagerAndRecursiveSignatureInitialization",
         "TestASTSequenceEveryActualConstructorAndSignatureReservation",
         "TestASTSequenceNativeSignatureOwnershipAndFinalize",
         "TestASTSequenceSignatureMemoryWrappersSourceOrder",
-        "TestASTSMT2StringLiteralSourceEncoding"
+        "TestASTSMT2StringLiteralSourceEncoding",
+        "TestASTSequenceStringValueClassification"
       ],
       "conditionals": [
         {
@@ -34256,6 +34259,14 @@
           "go_target": "pkg/ast/ast_seq_string.go",
           "tests": [
             "TestASTSMT2StringLiteralSourceEncoding"
+          ]
+        },
+        {
+          "name": "seq_decl_plugin string-constant is_value, are_equal and are_distinct semantics (seq_decl_plugin.cpp:860-907)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_builtin_plugins_values.go",
+          "tests": [
+            "TestASTSequenceStringValueClassification"
           ]
         }
       ],

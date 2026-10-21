@@ -42,3 +42,31 @@ func TestASTSMT2StringLiteralSourceEncoding(t *testing.T) {
 		paramsMust(t, out.ResetText())
 	}
 }
+
+func TestASTSequenceStringValueClassification(t *testing.T) {
+	m := astTestManager(t)
+	first, err := m.MkString("alpha")
+	astTestMust(t, err)
+	again, err := m.MkString("alpha")
+	astTestMust(t, err)
+	second, err := m.MkString("beta")
+	astTestMust(t, err)
+	for _, h := range []ASTHandle{first, again, second} {
+		value, e := m.IsValue(h)
+		astTestMust(t, e)
+		unique, e := m.IsUniqueValue(h)
+		astTestMust(t, e)
+		if !value || !unique {
+			t.Fatalf("string constant classification: value=%v unique=%v", value, unique)
+		}
+	}
+	equal, err := m.AreEqual(first, again)
+	astTestMust(t, err)
+	distinctSame, err := m.AreDistinct(first, again)
+	astTestMust(t, err)
+	distinctDifferent, err := m.AreDistinct(first, second)
+	astTestMust(t, err)
+	if !equal || distinctSame || !distinctDifferent {
+		t.Fatalf("string equality: equal=%v same-distinct=%v different-distinct=%v", equal, distinctSame, distinctDifferent)
+	}
+}
