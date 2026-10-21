@@ -119,6 +119,73 @@ func TestConverterFiniteNumeral(t *testing.T) {
 	}
 }
 
+func TestConverterRoundingDecisionModes(t *testing.T) {
+	m, c := fixture(t)
+	bit, err := m.BitVectorSort(1)
+	must(t, err)
+	sign, err := m.MkVar(100, bit)
+	must(t, err)
+	last, err := m.MkVar(101, bit)
+	must(t, err)
+	round, err := m.MkVar(102, bit)
+	must(t, err)
+	sticky, err := m.MkVar(103, bit)
+	must(t, err)
+
+	lastOrSticky, err := m.MkBitVectorOr([]ast.ASTHandle{last, sticky})
+	must(t, err)
+	notRound, err := m.MkBitVectorNot(round)
+	must(t, err)
+	notLastOrSticky, err := m.MkBitVectorNot(lastOrSticky)
+	must(t, err)
+	evenRefusal, err := m.MkBitVectorOr([]ast.ASTHandle{notRound, notLastOrSticky})
+	must(t, err)
+	incrementEven, err := m.MkBitVectorNot(evenRefusal)
+	must(t, err)
+	roundOrSticky, err := m.MkBitVectorOr([]ast.ASTHandle{round, sticky})
+	must(t, err)
+	notRoundOrSticky, err := m.MkBitVectorNot(roundOrSticky)
+	must(t, err)
+	positiveRefusal, err := m.MkBitVectorOr([]ast.ASTHandle{sign, notRoundOrSticky})
+	must(t, err)
+	incrementPositive, err := m.MkBitVectorNot(positiveRefusal)
+	must(t, err)
+	notSign, err := m.MkBitVectorNot(sign)
+	must(t, err)
+	negativeRefusal, err := m.MkBitVectorOr([]ast.ASTHandle{notSign, notRoundOrSticky})
+	must(t, err)
+	incrementNegative, err := m.MkBitVectorNot(negativeRefusal)
+	must(t, err)
+	zero, err := m.BitVectorNumeralUnsigned(0, 1)
+	must(t, err)
+
+	for _, tc := range []struct {
+		kind int32
+		want ast.ASTHandle
+	}{
+		{ast.FPAOpRMNearestEven, incrementEven},
+		{ast.FPAOpRMNearestAway, round},
+		{ast.FPAOpRMTowardPositive, incrementPositive},
+		{ast.FPAOpRMTowardNegative, incrementNegative},
+		{ast.FPAOpRMTowardZero, zero},
+	} {
+		mode, e := c.MkRoundingMode(tc.kind)
+		must(t, e)
+		got, e := c.RoundingDecision(mode, sign, last, round, sticky)
+		must(t, e)
+		if got != tc.want {
+			t.Fatal("rounding decision", tc.kind, got, tc.want)
+		}
+	}
+	mode, err := c.MkRoundingMode(ast.FPAOpRMNearestEven)
+	must(t, err)
+	bad, err := m.BitVectorNumeralUnsigned(0, 2)
+	must(t, err)
+	if _, err = c.RoundingDecision(mode, bad, last, round, sticky); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("invalid rounding decision width", err)
+	}
+}
+
 func fixture(t *testing.T) (*ast.ASTManager, *fpa.Converter) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)
