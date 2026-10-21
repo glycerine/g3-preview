@@ -27,8 +27,7 @@ func (m *ASTManager) pluginValue(fid FamilyID, r astNodeRef) (bool, error) {
 		return m.floatingPointValue(fid, r, false)
 	}
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astSequencePlugin {
-		family, kind, e := m.declIdentity(decl)
-		return family == fid && kind == ASTSequenceOpStringConst, e
+		return m.sequenceValue(fid, r)
 	}
 	return false, nil
 }
@@ -58,6 +57,9 @@ func (m *ASTManager) IsValue(h ASTHandle) (bool, error) {
 }
 
 func (m *ASTManager) pluginUniqueValue(fid FamilyID, r astNodeRef) (bool, error) {
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astSequencePlugin {
+		return false, nil
+	}
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArithmeticPlugin {
 		return m.arithmeticValue(fid, r, true)
 	}
@@ -156,6 +158,9 @@ func (m *ASTManager) AreDistinct(a, b ASTHandle) (bool, error) {
 	}
 	if m.pluginAt(fid).kind == astBitVectorPlugin {
 		return m.bitVectorOffsetDistinct(fid, x, y)
+	}
+	if m.pluginAt(fid).kind == astSequencePlugin {
+		return m.sequenceDistinct(fid, x, y)
 	}
 	if x == y {
 		return false, nil
@@ -260,6 +265,9 @@ func (m *ASTManager) getSomeValue(r astNodeRef) (ASTHandle, error) {
 			value, e := m.mkFamilyApp(fid, astFPARMTowardZero, nil, nil)
 			return m.external(value), e
 		}
+	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astSequencePlugin {
+		return m.sequenceSomeValue(r)
 	}
 	// Actual manager fallback constructs two lexical parameters; AST-valued
 	// parameter construction doesn't retain until its declaration info attaches.

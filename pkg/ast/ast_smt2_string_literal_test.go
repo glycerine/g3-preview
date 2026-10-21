@@ -56,7 +56,7 @@ func TestASTSequenceStringValueClassification(t *testing.T) {
 		astTestMust(t, e)
 		unique, e := m.IsUniqueValue(h)
 		astTestMust(t, e)
-		if !value || !unique {
+		if !value || unique {
 			t.Fatalf("string constant classification: value=%v unique=%v", value, unique)
 		}
 	}
@@ -68,5 +68,29 @@ func TestASTSequenceStringValueClassification(t *testing.T) {
 	astTestMust(t, err)
 	if !equal || distinctSame || !distinctDifferent {
 		t.Fatalf("string equality: equal=%v same-distinct=%v different-distinct=%v", equal, distinctSame, distinctDifferent)
+	}
+	empty, err := m.GetSomeValue(m.external(m.sequencePlugin.stringSort))
+	astTestMust(t, err)
+	kind, err := m.GetDeclKind(empty)
+	astTestMust(t, err)
+	value, err := m.IsValue(empty)
+	astTestMust(t, err)
+	unique, err := m.IsUniqueValue(empty)
+	astTestMust(t, err)
+	distinctEmptyString, err := m.AreDistinct(empty, first)
+	astTestMust(t, err)
+	if kind != ASTSequenceOpEmpty || !value || unique || distinctEmptyString {
+		t.Fatalf("empty sequence value: kind=%d value=%v unique=%v distinct-string=%v", kind, value, unique, distinctEmptyString)
+	}
+	regex, err := m.GetSomeValue(m.external(m.sequencePlugin.regex))
+	astTestMust(t, err)
+	kind, err = m.GetDeclKind(regex)
+	astTestMust(t, err)
+	regexEmpty, err := m.GetArg(regex, 0)
+	astTestMust(t, err)
+	emptyKind, err := m.GetDeclKind(regexEmpty)
+	astTestMust(t, err)
+	if kind != ASTSequenceOpToRegex || emptyKind != ASTSequenceOpEmpty {
+		t.Fatalf("regular-expression some value: kind=%d child=%d", kind, emptyKind)
 	}
 }

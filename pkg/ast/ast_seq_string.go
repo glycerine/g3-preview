@@ -8,7 +8,13 @@ import (
 	"strings"
 )
 
-const ASTSequenceOpStringConst int32 = 26
+const (
+	ASTSequenceOpUnit        int32 = 0
+	ASTSequenceOpEmpty       int32 = 1
+	ASTSequenceOpConcat      int32 = 2
+	ASTSequenceOpToRegex     int32 = 11
+	ASTSequenceOpStringConst int32 = 26
+)
 
 func encodeSequenceString(value string) string {
 	var out strings.Builder

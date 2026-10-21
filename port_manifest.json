@@ -34166,6 +34166,7 @@
       "go_targets": [
         "pkg/ast/ast_seq_plugin.go",
         "pkg/ast/ast_seq_string.go",
+        "pkg/ast/ast_seq_values.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_seq_signature_memory_trace.go",
         "pkg/ast/ast_seq_plugin_source_test.go",
@@ -34262,9 +34263,17 @@
           ]
         },
         {
-          "name": "seq_decl_plugin string-constant is_value, are_equal and are_distinct semantics (seq_decl_plugin.cpp:860-907)",
+          "name": "seq_decl_plugin empty/string/unit/concat is_value, non-unique values, are_equal and source are_distinct semantics (seq_decl_plugin.cpp:860-907)",
           "status": "ported",
-          "go_target": "pkg/ast/ast_builtin_plugins_values.go",
+          "go_target": "pkg/ast/ast_seq_values.go",
+          "tests": [
+            "TestASTSequenceStringValueClassification"
+          ]
+        },
+        {
+          "name": "seq_decl_plugin::get_some_value sequence-empty and regex-to-re construction (seq_decl_plugin.cpp:909-923)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_values.go",
           "tests": [
             "TestASTSequenceStringValueClassification"
           ]
@@ -34284,7 +34293,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/ast_seq_string.go"
+        "pkg/ast/ast_seq_string.go",
+        "pkg/ast/ast_seq_values.go"
       ],
       "tests": [
         "TestASTSMT2StringLiteralSourceEncoding"
@@ -34314,6 +34324,14 @@
           "go_target": "pkg/ast/ast_seq_string.go",
           "tests": [
             "TestASTSMT2StringLiteralSourceEncoding"
+          ]
+        },
+        {
+          "name": "seq_decl_plugin value callbacks plus seq_util empty and to-re construction declarations (seq_decl_plugin.h:180-188,234-244)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_values.go",
+          "tests": [
+            "TestASTSequenceStringValueClassification"
           ]
         }
       ],
