@@ -119153,22 +119153,42 @@
       "path": "src/tactic/fpa/fpa2bv_model_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/fpa2bv_model_converter.go",
+        "pkg/model/fpa/bv2fpa_model.go"
+      ],
+      "tests": [
+        "TestFPA2BVModelConverterRebuildsFloatsAndKeepsOtherDeclarations"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete model-converter construction, indexed/unindexed application, FPA reconstruction, consumed auxiliary filtering, untouched constant/function/universe copying, display, translation, cancel, and destruction",
+          "status": "ported",
+          "go_target": "pkg/tactic/fpa2bv_model_converter.go",
+          "tests": [
+            "TestFPA2BVModelConverterRebuildsFloatsAndKeepsOtherDeclarations"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic converter owns its retained BV-to-FPA snapshot. A replacement model remains a raw local owner until ModelRef publication; a stopped replacement transfers the acquired receipt to ModelRef exactly as the existing converter boundary requires."
+      ],
       "deviations": []
     },
     {
       "path": "src/tactic/fpa/fpa2bv_model_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/fpa2bv_model_converter.go"
+      ],
+      "tests": [
+        "TestFPA2BVModelConverterRebuildsFloatsAndKeepsOtherDeclarations"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -119185,10 +119205,21 @@
           "text": "SASSERT(goal_idx == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete concrete ModelConverter surface and factory including goal-zero guard, display, translation, and protected conversion flow",
+          "status": "ported",
+          "go_target": "pkg/tactic/fpa2bv_model_converter.go",
+          "tests": [
+            "TestFPA2BVModelConverterRebuildsFloatsAndKeepsOtherDeclarations"
+          ]
+        }
+      ],
+      "ownership": [
+        "The root tactic package hosts the concrete converter because ModelRef and the source-compatible converter reference base are package-owned lifecycle boundaries; FPA reconstruction remains in pkg/model/fpa."
+      ],
       "deviations": []
     },
     {
