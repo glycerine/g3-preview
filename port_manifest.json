@@ -29044,9 +29044,17 @@
       "path": "src/ast/rewriter/der.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/der.go",
+        "pkg/ast/rewriter/der_rewrite.go"
+      ],
+      "tests": [
+        "TestDERVariableDisequalityEncodings",
+        "TestDERSortVariablesOrderCyclesAndExclusions",
+        "TestDERUnitAndMultiEqualityReduction",
+        "TestDERRewriterNestedCycleAndProofEntry"
+      ],
       "assertions": [
         {
           "line": 45,
@@ -29085,19 +29093,68 @@
           "text": "SASSERT(m_subst_map[inx]==0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_var_diseq Boolean and equality encodings",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/der.go",
+          "tests": [
+            "TestDERVariableDisequalityEncodings"
+          ]
+        },
+        {
+          "name": "der_sort_vars and get_elimination_order cycle-breaking topological traversal",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/der.go",
+          "tests": [
+            "TestDERSortVariablesOrderCyclesAndExclusions",
+            "TestDERRewriterNestedCycleAndProofEntry"
+          ]
+        },
+        {
+          "name": "create_substitution, apply_substitution, reduce1 and fixed-point quantifier operation",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/der_rewrite.go",
+          "tests": [
+            "TestDERUnitAndMultiEqualityReduction",
+            "TestDERRewriterNestedCycleAndProofEntry"
+          ]
+        },
+        {
+          "name": "der_rewriter_cfg and der_rewriter complete traversal, reset and cleanup",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/der_rewrite.go",
+          "tests": [
+            "TestDERRewriterNestedCycleAndProofEntry"
+          ]
+        }
+      ],
+      "ownership": [
+        "DER owns its reusable VarSubstitution. Generated complemented definitions and every intermediate quantifier are held by invocation-local ASTRef owners through substitution and publication.",
+        "DERRewriter owns its configuration and traversal and releases traversal state before the DER core."
+      ],
+      "deviations": [
+        "Source pointer vectors, integer vectors and fast marks are native Go slices and maps; the iterative DFS preserves source child and candidate order.",
+        "The proof-producing traversal entry publishes an equivalent root rewrite or reflexivity proof around the completed no-proof traversal."
+      ]
     },
     {
       "path": "src/ast/rewriter/der.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/der.go",
+        "pkg/ast/rewriter/der_rewrite.go"
+      ],
+      "tests": [
+        "TestDERVariableDisequalityEncodings",
+        "TestDERSortVariablesOrderCyclesAndExclusions",
+        "TestDERUnitAndMultiEqualityReduction",
+        "TestDERRewriterNestedCycleAndProofEntry"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -29108,11 +29165,27 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete der core, der_rewriter wrapper and der_star alias surface",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/der_rewrite.go",
+          "tests": [
+            "TestDERVariableDisequalityEncodings",
+            "TestDERSortVariablesOrderCyclesAndExclusions",
+            "TestDERUnitAndMultiEqualityReduction",
+            "TestDERRewriterNestedCycleAndProofEntry"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete typed slices replace the source mapping and argument vectors. AST handles borrowed from the input quantifier remain protected by that quantifier; generated and rewritten expressions use ASTRef ownership."
+      ],
+      "deviations": [
+        "DERRewriter is the Go spelling for der_rewriter and its der_star typedef."
+      ]
     },
     {
       "path": "src/ast/rewriter/distribute_forall.cpp",
