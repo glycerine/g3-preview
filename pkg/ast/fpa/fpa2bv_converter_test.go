@@ -100,6 +100,15 @@ func fixture(t *testing.T) (*ast.ASTManager, *fpa.Converter) {
 	return m, c
 }
 
+func declaration(t *testing.T, m *ast.ASTManager, name string, domain []ast.ASTHandle, result ast.ASTHandle) ast.ASTHandle {
+	t.Helper()
+	symbol, err := m.Symbols.Intern(name)
+	must(t, err)
+	decl, err := m.MkFuncDecl(symbol, domain, result, ast.ASTFuncDeclInfo{})
+	must(t, err)
+	return decl
+}
+
 func TestConverterSortAccessSpecialsSplitAndJoin(t *testing.T) {
 	m, c := fixture(t)
 	sort, err := m.FloatingPointSort(40, 65)
@@ -351,5 +360,65 @@ func TestConverterBiasLeadingZerosAndUnpack(t *testing.T) {
 	}
 	if width, e := m.BitVectorSize(normalized.LeadingZeros); e != nil || width != 8 {
 		t.Fatal("normalization shift width", width, e)
+	}
+}
+
+func TestConverterSymbolCachesAssertionsAndReset(t *testing.T) {
+	m, c := fixture(t)
+	floatSort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	rmSort, err := m.RoundingModeSort()
+	must(t, err)
+	floatConstant := declaration(t, m, "symbolic-float", nil, floatSort)
+	rmConstant := declaration(t, m, "symbolic-rm", nil, rmSort)
+	for _, decl := range []ast.ASTHandle{floatConstant, rmConstant} {
+		must(t, m.IncRef(decl))
+		decl := decl
+		t.Cleanup(func() { must(t, m.DecRef(decl)) })
+	}
+	first, err := c.MkConst(floatConstant)
+	must(t, err)
+	second, err := c.MkConst(floatConstant)
+	must(t, err)
+	if first != second {
+		t.Fatal("floating constant cache", first, second)
+	}
+	rmFirst, err := c.MkRMConst(rmConstant)
+	must(t, err)
+	rmSecond, err := c.MkRMConst(rmConstant)
+	must(t, err)
+	if rmFirst != rmSecond || len(c.ExtraAssertions()) != 1 {
+		t.Fatal("rounding constant cache/assertion", rmFirst, rmSecond, len(c.ExtraAssertions()))
+	}
+	if sorted, e := m.IsWellSorted(c.ExtraAssertions()[0], nil); e != nil || !sorted {
+		t.Fatal("rounding range assertion", sorted, e)
+	}
+
+	boolSort, err := m.MkBoolSort()
+	must(t, err)
+	uf := declaration(t, m, "symbolic-fp-uf", []ast.ASTHandle{boolSort}, floatSort)
+	must(t, m.IncRef(uf))
+	t.Cleanup(func() { must(t, m.DecRef(uf)) })
+	truth, err := m.MkTrue()
+	must(t, err)
+	converted, err := c.MkUF(uf, []ast.ASTHandle{truth})
+	must(t, err)
+	if _, _, _, e := c.SplitFP(converted); e != nil {
+		t.Fatal("converted FP UF", e)
+	}
+	if len(c.ExtraAssertions()) != 2 {
+		t.Fatal("UF connection assertion", len(c.ExtraAssertions()))
+	}
+	if sorted, e := m.IsWellSorted(c.ExtraAssertions()[1], nil); e != nil || !sorted {
+		t.Fatal("UF connection assertion sorting", sorted, e)
+	}
+	must(t, c.Reset())
+	if len(c.ExtraAssertions()) != 0 {
+		t.Fatal("reset assertions", len(c.ExtraAssertions()))
+	}
+	third, err := c.MkConst(floatConstant)
+	must(t, err)
+	if third == first {
+		t.Fatal("reset must discard the fresh constant cache")
 	}
 }

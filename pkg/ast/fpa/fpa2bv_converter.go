@@ -23,12 +23,16 @@ const (
 // AST results returned by its methods have the same borrowed-handle contract as
 // ASTManager factories.
 type Converter struct {
-	self            *Converter
-	manager         *ast.ASTManager
-	family          ast.FamilyID
-	header          uint64
-	highUnspecified bool
-	closed          bool
+	self              *Converter
+	manager           *ast.ASTManager
+	family            ast.FamilyID
+	constants         map[ast.ASTHandle]ast.ASTHandle
+	roundingConstants map[ast.ASTHandle]ast.ASTHandle
+	convertedUFs      map[ast.ASTHandle]ast.ASTHandle
+	extraAssertions   []ast.ASTHandle
+	header            uint64
+	highUnspecified   bool
+	closed            bool
 }
 
 func NewConverter(m *ast.ASTManager) (owner *Converter, result error) {
@@ -39,7 +43,12 @@ func NewConverter(m *ast.ASTManager) (owner *Converter, result error) {
 	if err := m.Budget().Reserve(n); err != nil {
 		return nil, err
 	}
-	owner = &Converter{manager: m, header: n, highUnspecified: true}
+	owner = &Converter{
+		manager: m, header: n, highUnspecified: true,
+		constants:         make(map[ast.ASTHandle]ast.ASTHandle),
+		roundingConstants: make(map[ast.ASTHandle]ast.ASTHandle),
+		convertedUFs:      make(map[ast.ASTHandle]ast.ASTHandle),
+	}
 	owner.self = owner
 	fail := func(err error) (*Converter, error) { return owner, errors.Join(err, owner.Close()) }
 	if _, err := m.RegisterArithmeticPlugin(); err != nil {
@@ -78,12 +87,13 @@ func (c *Converter) Close() error {
 	if c == nil || c.self != c || c.closed {
 		return nil
 	}
+	result := c.Reset()
 	c.closed = true
 	c.manager.Budget().Release(c.header)
 	c.header = 0
 	c.manager = nil
 	c.self = nil
-	return nil
+	return result
 }
 
 func (c *Converter) isFloatExpression(h ast.ASTHandle) (bool, error) {

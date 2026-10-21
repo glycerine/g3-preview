@@ -17301,6 +17301,7 @@
         "pkg/ast/fpa/fpa2bv_predicates.go",
         "pkg/ast/fpa/fpa2bv_conversions.go",
         "pkg/ast/fpa/fpa2bv_unpack.go",
+        "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/ast_fpa_sort_access.go",
         "pkg/ast/ast_bv_all_ones.go"
       ],
@@ -17310,7 +17311,8 @@
         "TestConverterRoundingModeCodesAndEquality",
         "TestConverterClassificationsUnarySignsAndComparisons",
         "TestConverterVariablesAndIEEEBitVectorConversions",
-        "TestConverterBiasLeadingZerosAndUnpack"
+        "TestConverterBiasLeadingZerosAndUnpack",
+        "TestConverterSymbolCachesAssertionsAndReset"
       ],
       "conditionals": [
         {
@@ -18636,10 +18638,18 @@
           "tests": [
             "TestConverterBiasLeadingZerosAndUnpack"
           ]
+        },
+        {
+          "name": "stable FP and rounding-mode constant caches, RM range assertions, converted UF declaration cache and connection assertions, reset and destructor release",
+          "status": "ported",
+          "go_target": "pkg/ast/fpa/fpa2bv_symbols.go",
+          "tests": [
+            "TestConverterSymbolCachesAssertionsAndReset"
+          ]
         }
       ],
       "ownership": [
-        "The converter owns its reserved Go owner storage and borrows the AST manager. This initial slice has no persistent AST caches or extra assertions; those source-owned collections remain open."
+        "The converter owns its reserved Go owner storage, cached declaration/value pairs, and extra assertion handles while borrowing the AST manager. Reset and Close release each retained AST reference. The min/max special cache remains open."
       ],
       "deviations": []
     },
@@ -18653,6 +18663,7 @@
         "pkg/ast/fpa/fpa2bv_predicates.go",
         "pkg/ast/fpa/fpa2bv_conversions.go",
         "pkg/ast/fpa/fpa2bv_unpack.go",
+        "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/ast_fpa_sort_access.go",
         "pkg/ast/ast_bv_all_ones.go"
       ],
@@ -18662,7 +18673,8 @@
         "TestConverterRoundingModeCodesAndEquality",
         "TestConverterClassificationsUnarySignsAndComparisons",
         "TestConverterVariablesAndIEEEBitVectorConversions",
-        "TestConverterBiasLeadingZerosAndUnpack"
+        "TestConverterBiasLeadingZerosAndUnpack",
+        "TestConverterSymbolCachesAssertionsAndReset"
       ],
       "conditionals": [
         {
@@ -18687,12 +18699,13 @@
             "TestConverterRoundingModeCodesAndEquality",
             "TestConverterClassificationsUnarySignsAndComparisons",
             "TestConverterVariablesAndIEEEBitVectorConversions",
-            "TestConverterBiasLeadingZerosAndUnpack"
+            "TestConverterBiasLeadingZerosAndUnpack",
+            "TestConverterSymbolCachesAssertionsAndReset"
           ]
         }
       ],
       "ownership": [
-        "The Go converter is a checked single owner borrowing ASTManager; returned AST handles follow ASTManager factory borrowing. Persistent source maps and assertion vectors remain open."
+        "The Go converter is a checked single owner borrowing ASTManager; returned AST handles follow ASTManager factory borrowing. It owns converted constant/UF cache references and side assertions through Reset or Close. The min/max special cache remains open."
       ],
       "deviations": []
     },
