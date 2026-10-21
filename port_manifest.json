@@ -25707,7 +25707,7 @@
       "path": "src/ast/rewriter/bv_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/bv_rewriter_dispatch.go",
         "pkg/ast/rewriter/bv_rewriter_dispatch_test.go",
@@ -26554,8 +26554,8 @@
           "text": "SASSERT(num == 2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "mk_app_core declaration dispatch across constants, arithmetic, division variants, comparisons, bitwise operations, indexed operators, shifts, rotations, bounds and conversions (src/ast/rewriter/bv_rewriter.cpp:52-208; src/ast/rewriter/bv_rewriter.h:179-183)",
@@ -26568,7 +26568,7 @@
         },
         {
           "name": "original mk_bv_nand/mk_bv_nor/mk_bv_xnor algorithms and BR_REWRITE2 publication (src/ast/rewriter/bv_rewriter.cpp:1981-2002; src/util/buffer.h:25-48,98-104,250-258)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_bitwise.go",
           "tests": [
             "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -26578,7 +26578,7 @@
         },
         {
           "name": "original fixed mk_bv_rotate_left/right modulo, identity, ordered cached extraction/concat and right-to-left delegation (src/ast/rewriter/bv_rewriter.cpp:2000-2021)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_rotate.go",
           "tests": [
             "TestBVRewriterOriginalFixedRotations",
@@ -26588,7 +26588,7 @@
         },
         {
           "name": "original mk_repeat inline-buffer/concat and mk_zero_extend unsigned-rational zero-prefix concat with identity branches (src/ast/rewriter/bv_rewriter.cpp:1513-1523,1555-1566; src/ast/rewriter/bv_rewriter.h:177)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_extend_repeat.go",
           "tests": [
             "TestBVRewriterOriginalRepeatAndZeroExtend",
@@ -26597,7 +26597,7 @@
         },
         {
           "name": "original mk_bv_redor numeral/borrowed-zero guard and mk_bv_comp identity/short-circuit numeral/ITE branches (src/ast/rewriter/bv_rewriter.cpp:2040-2046,2058-2074)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_compare.go",
           "tests": [
             "TestBVRewriterOriginalCompareAndReductionOR",
@@ -26607,7 +26607,7 @@
         },
         {
           "name": "original mk_bv_redand numerical condition and source full-expression/local lifetimes through unsigned result construction and expr_ref publication (src/ast/rewriter/bv_rewriter.cpp:2048-2056; src/ast/rewriter/bv_rewriter.h:177; src/util/rational.h:462-464)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_redand.go",
           "tests": [
             "TestASTBitVectorReductionANDEveryNumericalReservation",
@@ -26616,7 +26616,7 @@
         },
         {
           "name": "original mk_bv_redand BR_DONE numeral and BR_FAILED symbolic dispatch (src/ast/rewriter/bv_rewriter.cpp:2048-2056)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_redand.go",
           "tests": [
             "TestBVRewriterOriginalReductionAND"
@@ -26624,7 +26624,7 @@
         },
         {
           "name": "original mk_sign_extend copied local numeral, signed norm copy assignment, void aliased modulo and numeral publication lifetimes (src/ast/rewriter/bv_rewriter.cpp:1532-1540; src/util/rational.h:131-134,198-200)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_sign_extend.go",
           "tests": [
             "TestASTBitVectorSignExtensionEveryNumericalReservation",
@@ -26634,7 +26634,7 @@
         },
         {
           "name": "original mk_sign_extend identity/numerical BR_DONE, optional cached sign-bit extract and repeated-prefix concat BR_REWRITE2, symbolic BR_FAILED (src/ast/rewriter/bv_rewriter.cpp:1525-1553)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_sign_extend.go",
           "tests": [
             "TestBVRewriterOriginalSignExtend",
@@ -26643,7 +26643,7 @@
         },
         {
           "name": "original mk_bv_and ordered NOT buffer, OR then outer NOT and BR_REWRITE3 publication (src/ast/rewriter/bv_rewriter.cpp:1971-1979)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_bitwise.go",
           "tests": [
             "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -26653,7 +26653,7 @@
         },
         {
           "name": "original complete is_zero_bit: copied stored numeral, zero shortcut, void div by power return temporary, modulo-two return expression and reverse concat/goto routing (src/ast/rewriter/bv_rewriter.cpp:2141-2168; src/ast/rewriter/bv_rewriter.h:71)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_zero_bit.go",
           "tests": [
             "TestASTBitVectorOriginalZeroBitStoredNumerals",
@@ -26663,7 +26663,7 @@
         },
         {
           "name": "Complete selected active mk_bv_add caller: actual configured polynomial core, source core scope exit before bit-major disjoint-bit reduction, FAILED original operands, DONE borrowed assigned sum and other-status bypass, exact numerical child capture and original OR assignment (src/ast/rewriter/bv_rewriter.cpp:2076-2079,2109-2137; src/ast/rewriter/bv_rewriter.h:105)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_add.go",
           "tests": [
             "TestBVRewriterAdditionAfterCoreStatusAndUnreadOperands",
@@ -26681,7 +26681,7 @@
         },
         {
           "name": "Complete selected mk_bv_mul caller: actual polynomial core, original status/binary-shape guards, FAILED original or DONE borrowed product, first-factor power-of-two test, extraction before zero and concat assignment (src/ast/rewriter/bv_rewriter.cpp:2170-2205)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_mul.go",
           "tests": [
             "TestBVRewriterMultiplicationPowerOfTwoCaller",
@@ -26694,7 +26694,7 @@
         },
         {
           "name": "Reached default numeral v, exact stored-numeral copy, physical power-of-two inspection, unsigned zero literal full-expression factory and v source destruction after result assignment (src/ast/rewriter/bv_rewriter.cpp:2190-2203; src/ast/rewriter/bv_rewriter.h:177; src/util/rational.h:43,48,298-300)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_mul_numerals.go",
           "tests": [
             "TestASTBitVectorMultiplicationNumeralLocalLifetime"
@@ -26702,7 +26702,7 @@
         },
         {
           "name": "Complete selected mk_bit2bool: lhs width guard before numeral swap, copied rhs, pointer-equal numeral Boolean, ITE equalities, NOT with literal-one subtraction, owning bit1 and ordered OR/XOR equalities with intermediate result before optional NOT (src/ast/rewriter/bv_rewriter.cpp:2205-2277)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_bit2bool.go",
           "tests": [
             "TestBVRewriterBit2BoolOriginalORAndXOR",
@@ -26714,7 +26714,7 @@
         },
         {
           "name": "Bit2bool default v and reached rational(1)/subtraction return lifetimes through complete assignment expressions, exact scalar/numeral child capture and reverse source destruction (src/ast/rewriter/bv_rewriter.cpp:2212-2236; src/util/rational.h:43,46,462-464)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_bit2bool_numerals.go",
           "tests": [
             "TestASTBit2BoolSubtractionReturnAndLiteralLifetimes"
@@ -26722,7 +26722,7 @@
         },
         {
           "name": "Complete selected mk_blast_eq_value: width-one guard before swap, copied rhs updates loop width, OR/XOR/NOT guard, ordered remainder/extract/bit equality push/direct division, and final AND assignment (src/ast/rewriter/bv_rewriter.cpp:2279-2304)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_blast_eq.go",
           "tests": [
             "TestBVRewriterBlastEqualityOriginalBitOrder",
@@ -26733,7 +26733,7 @@
         },
         {
           "name": "Blast equality default v, reached two, remainder return full-expression lifetime, captured unsigned bit numeral and void division into the physical v receiver (src/ast/rewriter/bv_rewriter.cpp:2287-2302; src/util/rational.h:43,46,182-184,202-206)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_blast_eq_numerals.go",
           "tests": [
             "TestASTBlastEqualityPhysicalDivisionAndRemainderLifetimes"
@@ -26741,7 +26741,7 @@
         },
         {
           "name": "Complete selected mk_eq_concat: borrowed concat/singleton operands, low-end suffix alignment with original three width branches, equality push before cursor update, DEBUG completion guards and final AND assignment (src/ast/rewriter/bv_rewriter.cpp:2306-2370)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_eq_concat.go",
           "tests": [
             "TestBVRewriterConcatEqualityOriginalAlignment",
@@ -26752,7 +26752,7 @@
         },
         {
           "name": "Original is_concat_split_target and is_concat_target short-circuit predicates: option before operand reads, concat/numeral/OR recognition and either-side concat requirement (src/ast/rewriter/bv_rewriter.cpp:2372-2378,2433-2437)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_eq_concat.go",
           "tests": [
             "TestBVRewriterConcatEqualitySingletonSidesAndTargetGuards"
@@ -26760,7 +26760,7 @@
         },
         {
           "name": "Complete selected term isolation and helper: original numeral/add swap guards, both owning expr_ref constructors before assignment, original first/raw remaining sum, binary first-factor all-one recognition and original subtraction/equality orientation (src/ast/rewriter/bv_rewriter.cpp:2380-2414)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_isolate.go",
           "tests": [
             "TestBVRewriterIsolateTermOriginalOrientation",
@@ -26771,7 +26771,7 @@
         },
         {
           "name": "Original is_add_mul_const: ordered sum operands, numeral-only recognition and binary multiplication with first-factor numeral guard (src/ast/rewriter/bv_rewriter.cpp:2416-2431)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_isolate.go",
           "tests": [
             "TestBVRewriterIsolateTermGuardsBinaryAndConstantPredicate"
@@ -26779,7 +26779,7 @@
         },
         {
           "name": "Exact optional caller invocation around existing all-one recognizer body and real copied numeral/power/subtraction condition frame, without ambient numerical adoption (src/ast/bv_decl_plugin.cpp:794-803; src/ast/rewriter/bv_rewriter.h:38)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_recognizers.go",
           "tests": [
             "TestASTBitVectorAllOneExactInvocationEveryReservation"
@@ -26787,7 +26787,7 @@
         },
         {
           "name": "Complete selected mk_mul_eq: binary first-factor numeral/inverse guards, constant/coefficient/unit/sum branches, first invertible sum coefficient search and original BR_REWRITE1/2/3/FAILED results (src/ast/rewriter/bv_rewriter.cpp:2448-2508)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_mul_eq.go",
           "tests": [
             "TestBVRewriterMultiplicationEqualityOriginalBranches",
@@ -26798,7 +26798,7 @@
         },
         {
           "name": "Original mk_mul_eq outer/block numeral placement, distinct product/returned-normalization lifetimes, exact scalar/factory/inverse child receipts and reverse source destruction (src/ast/rewriter/bv_rewriter.cpp:2451-2507)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_mul_eq_numerals.go",
           "tests": [
             "TestASTBitVectorMulEqualityLocalAndReturnLifetimes"
@@ -26806,7 +26806,7 @@
         },
         {
           "name": "Complete selected updt_local_params/updt_params: original ordered generated BV boolean lookups, typed local/module/literal fallback, local-only mkbv2num and repeated final bv_sort_ac lookup assigning base SortSums after base update (src/ast/rewriter/bv_rewriter.cpp:26-51; src/ast/rewriter/bv_rewriter_params.pyg:1-20; scripts/mk_genfile_common.py:895-939)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_config.go",
           "tests": [
             "TestBVRewriterConfigurationDefaultsAndLocalOnlyOption",
@@ -26816,7 +26816,7 @@
         },
         {
           "name": "Original set_mkbv2num and get_param_descrs base/BV collector order with _EXTERNAL_RELEASE omission of internal mkbv2num (src/ast/rewriter/bv_rewriter.cpp:53-60; src/ast/rewriter/bv_rewriter.h:170)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_config.go",
           "tests": [
             "TestBVRewriterConfigurationDescriptionsAndIndependentSetter"
@@ -26824,7 +26824,7 @@
         },
         {
           "name": "Complete selected derived BV owner construction: BV utility family lookups, polynomial map/two base parameter updates, embedded extraction initialization, trailing cache implementation owner, arithmetic family lookup then local BV update and caller default-parameter exit (src/ast/rewriter/bv_rewriter.h:158-164; src/ast/arith_decl_plugin.cpp:641-645; src/ast/bv_decl_plugin.cpp:850-855)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_owner.go",
           "tests": [
             "TestBVRewriterOwnerOriginalConstructionAndConfiguredMultiplication",
@@ -26834,7 +26834,7 @@
         },
         {
           "name": "Configured original BV addition/multiplication callers consuming the real local state and persistent extraction member, stopped-parent replay guards and reverse persistent-member cleanup (src/ast/rewriter/bv_rewriter.cpp:2076-2079,2109-2137,2170-2205)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_owner.go",
           "tests": [
             "TestBVRewriterOwnerOriginalConstructionAndConfiguredMultiplication",
@@ -26844,7 +26844,7 @@
         },
         {
           "name": "Complete selected mk_eq_core: identity/two-numeral guards, numeral swap, ordered configured bit2bool/trailing/mul forward/reverse/blast/remainder rules, unconditional reached trailing reset(4096), owning cancellation refs and isolation/concat/swapped fallback (src/ast/rewriter/bv_rewriter.cpp:2520-2635)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_equality.go",
           "tests": [
             "TestBVRewriterEqualityOriginalDispatcherBranches",
@@ -26856,7 +26856,7 @@
         },
         {
           "name": "Original is_urem_any recognition of bvurem/bvurem_i with DEBUG arity assertion and ordered borrowed dividend/divisor reads (src/ast/rewriter/bv_rewriter.cpp:2510-2518)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_equality.go",
           "tests": [
             "TestBVRewriterEqualityRemainderAndTrailing"
@@ -26864,7 +26864,7 @@
         },
         {
           "name": "Original remainder equality copied divisor/rhs locals, rhs>=divisor condition, distinct returned sum/power temporaries and condition-before-result destruction (src/ast/rewriter/bv_rewriter.cpp:2574-2589)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_remainder_eq_numerals.go",
           "tests": [
             "TestASTBitVectorRemainderEqualityEveryActualReservation"
@@ -26872,7 +26872,7 @@
         },
         {
           "name": "Complete selected mk_mkbv: disabled option/ordered all-Boolean-literal guards before numeric placement, reverse bit scan with physical val*=two and discarded original postfix old value, numerator factory/output assignment before two/val DT (src/ast/rewriter/bv_rewriter.cpp:2636-2655)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_mkbv.go",
           "tests": [
             "TestBVRewriterMkBVOriginalBitOrderAndGuards",
@@ -26881,7 +26881,7 @@
         },
         {
           "name": "Original mk_mkbv physical val/two locals, captured compound multiplication/postfix contexts and distinct discarded old-value full-expression lifetime (src/ast/rewriter/bv_rewriter.cpp:2642-2652; src/util/rational.h:220-225)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_mkbv_numerals.go",
           "tests": [
             "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
@@ -26890,7 +26890,7 @@
         },
         {
           "name": "Complete selected mk_ite_core: equal branches before condition reads, unconditional negated-condition swap, ordered enabled equality/BV guards and identity orientations, numeral-LHS swap, original one-bit conditional identity/NOT selection (src/ast/rewriter/bv_rewriter.cpp:2657-2704)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_ite.go",
           "tests": [
             "TestBVRewriterIteOriginalBranchOrderAndIdentities",
@@ -26901,7 +26901,7 @@
         },
         {
           "name": "Original one-bit ITE reached rhs_n/e_n/t_n declarations, RHS/then/else numeric copy order, independent widths, checked source assertions and reverse declaration destruction after output assignment (src/ast/rewriter/bv_rewriter.cpp:2687-2698)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_ite_numerals.go",
           "tests": [
             "TestASTBitVectorIteEveryActualCopyReservation"
@@ -26909,7 +26909,7 @@
         },
         {
           "name": "Complete selected mk_bvsmul_no_overflow/mk_bvumul_no_overflow/mk_bvsmul_no_underflow: both copied operand reads before zero/one guards, original last stored width, returned product/limits, ordered signed adjustment and exact bound comparisons (src/ast/rewriter/bv_rewriter.cpp:2706-2800)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_mul_bounds.go",
           "tests": [
             "TestBVRewriterMultiplyBoundsOriginalBranches",
@@ -26918,7 +26918,7 @@
         },
         {
           "name": "Original multiplication bound operand/product/full-modulus/half-modulus/negative-limit physical locals and exact compound subtraction/returned negation invocation ownership (src/ast/rewriter/bv_rewriter.cpp:2706-2800; src/util/rational.h:474-478)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_mul_bound_numerals.go",
           "tests": [
             "TestASTBitVectorMultiplyBoundEveryActualReservation"
@@ -26926,7 +26926,7 @@
         },
         {
           "name": "Complete selected mk_concat: ordered numeral fusion, one-level configured flattening, adjacent same-base extraction fusion, original result/status precedence (src/ast/rewriter/bv_rewriter.cpp:1451-1510)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_concat.go",
           "tests": [
             "TestBVRewriterConcatOriginalBranchesAndStatuses",
@@ -26936,7 +26936,7 @@
         },
         {
           "name": "Original concat v1/v2 locals, physical v2 multiplication/addition, returned power full-expression lifetime and exact numeral factory invocation (src/ast/rewriter/bv_rewriter.cpp:1452-1469)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_concat_numerals.go",
           "tests": [
             "TestASTBitVectorConcatEveryActualReservationAndPowerLifetime"
@@ -26944,7 +26944,7 @@
         },
         {
           "name": "Complete selected mk_bv_shl/mk_bv_lshr: ordered rhs-zero/threshold/lhs-numeral guards, lhs-sort width, original narrow/wide paths and ordered symbolic extraction/zero concat (src/ast/rewriter/bv_rewriter.cpp:792-889)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_shift.go",
           "tests": [
             "TestBVRewriterLogicalShiftsOriginalBranches",
@@ -26954,7 +26954,7 @@
         },
         {
           "name": "Original logical shift r1/r2, threshold full expression, uint64 rn construction, distinct normalization return/copy, wide returned product versus void aliased division and exact captured numerical/factory cleanup (src/ast/rewriter/bv_rewriter.cpp:792-889; src/util/util.h:131-139)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_logical_shift_numerals.go",
           "tests": [
             "TestASTBitVectorLogicalShiftsEveryActualReservation"
@@ -26962,7 +26962,7 @@
         },
         {
           "name": "Complete selected mk_bv_ashr: original stored-width overwrites, rhs-zero short circuit, narrow modulo/saturation/sign mask, wide sign/iterative padding and nested sum/clamp (src/ast/rewriter/bv_rewriter.cpp:891-985)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_ashr.go",
           "tests": [
             "TestBVRewriterArithmeticShiftOriginalBranches",
@@ -26972,7 +26972,7 @@
         },
         {
           "name": "Original ASHR physical r1/r2, threshold/full-expression literals, uint64 return, captured sign helper, power/division, iterative p/each-two temporaries and allone subtraction/factory lifetimes (src/ast/rewriter/bv_rewriter.cpp:891-985; src/ast/bv_decl_plugin.cpp:767-773)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_arithmetic_shift_numerals.go",
           "tests": [
             "TestASTBitVectorArithmeticShiftEveryActualReservation"
@@ -26980,7 +26980,7 @@
         },
         {
           "name": "Complete selected mk_bv_srem_core and configured/internal wrappers: signed RHS normalization before zero/one, independent width overwrites, original rational percent rem, raw internal fallback and hi_div0 conditional interpretation (src/ast/rewriter/bv_rewriter.cpp:1101-1144; src/ast/rewriter/bv_rewriter.h:123,128)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_srem.go",
           "tests": [
             "TestBVRewriterSignedRemainderOriginalBranches",
@@ -26990,7 +26990,7 @@
         },
         {
           "name": "Original SREM default r1/r2, distinct signed norm returns and physical copy assignments, returned remainder through factory/output and exact scalar/norm/factory ownership (src/ast/rewriter/bv_rewriter.cpp:1101-1144; src/ast/bv_decl_plugin.cpp:753-765)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_srem_numerals.go",
           "tests": [
             "TestASTBitVectorSignedRemainderEveryActualReservation"
@@ -26998,7 +26998,7 @@
         },
         {
           "name": "Complete selected mk_bv_sdiv_core and configured/internal wrappers: signed rhs/lhs norm copies, original zero/one order, truncating machine quotient, raw hardware-zero SLT/ITE and internal/symbolic fallback (src/ast/rewriter/bv_rewriter.cpp:987-1032; src/ast/rewriter/bv_rewriter.h:121,126)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_sdiv.go",
           "tests": [
             "TestBVRewriterSignedDivisionOriginalBranches",
@@ -27008,7 +27008,7 @@
         },
         {
           "name": "Original SDIV physical r1/r2 and returned norm/quotient, hardware-zero power/one/subtraction full expression, captured machine integer division/factory receipts and reverse ownership (src/ast/rewriter/bv_rewriter.cpp:987-1032; src/util/rational.h:186-190)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_sdiv_numerals.go",
           "tests": [
             "TestASTBitVectorSignedDivisionEveryActualReservation"
@@ -27076,7 +27076,7 @@
         },
         {
           "name": "Complete selected mk_bv_udiv_core and configured/internal wrappers: unsigned norm copies, original zero/one and numeral folding order, power-before-inverse option, failed-inverse block exit and raw internal/symbolic fallback (src/ast/rewriter/bv_rewriter.cpp:1034-1099; src/ast/rewriter/bv_rewriter.h:122,127)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_udiv.go",
           "tests": [
             "TestBVRewriterUnsignedDivisionOriginalBranchesAndOptionOrder",
@@ -27086,7 +27086,7 @@
         },
         {
           "name": "Original UDIV default r1/r2, returned unsigned norm/quotient and allone full expression, exact optional inverse invocation/block lifetime and captured scalar/factory ownership (src/ast/rewriter/bv_rewriter.cpp:1034-1099)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_udiv_numerals.go",
           "tests": [
             "TestASTBitVectorUnsignedDivisionEveryActualReservation"
@@ -27094,7 +27094,7 @@
         },
         {
           "name": "Complete selected is_minus_one_core and is_x_minus_one: default numeral before recognition, raw stored-value comparison and ordered binary-add guards/borrowed output assignment (src/ast/rewriter/bv_rewriter.cpp:1146-1153,1172-1184; src/ast/rewriter/bv_rewriter.h:110-111)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_minus_one.go",
           "tests": [
             "TestBVRewriterOriginalMinusOneAndXMinusOne",
@@ -27103,7 +27103,7 @@
         },
         {
           "name": "Original minus-one default r, reached power/literal one/returned subtraction comparison expression and exact scalar invocation lifetime/owning cleanup (src/ast/rewriter/bv_rewriter.cpp:1146-1153)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_minus_one_numerals.go",
           "tests": [
             "TestASTBitVectorMinusOneEveryActualReservation"
@@ -27111,7 +27111,7 @@
         },
         {
           "name": "Complete selected mk_bv_urem_core and configured/internal wrappers: lhs-before-rhs copy, rhs width overwrite, unsigned norms/physical remainder, power concat/extraction, lhs-zero/x-minus-one branches and raw fallback (src/ast/rewriter/bv_rewriter.cpp:1185-1280; src/ast/rewriter/bv_rewriter.h:124,129)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_urem.go",
           "tests": [
             "TestBVRewriterUnsignedRemainderOriginalBranches",
@@ -27120,7 +27120,7 @@
         },
         {
           "name": "Original UREM default r1/r2, returned norm full expressions, physical operator%= receiver, low x-minus-one power/one/subtraction declaration and exact scalar/norm/factory lifetimes (src/ast/rewriter/bv_rewriter.cpp:1185-1280)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_urem_numerals.go",
           "tests": [
             "TestASTBitVectorUnsignedRemainderEveryActualReservation"
@@ -27128,7 +27128,7 @@
         },
         {
           "name": "Complete selected mk_bv_smod_core and configured/internal wrappers: signed lhs normalization/zero-before-rhs UREM rewrite, signed rhs norm/zero handling, original abs/remainder/sign algorithm, symbolic positive-one status and internal/conditional fallback (src/ast/rewriter/bv_rewriter.cpp:1282-1341; src/ast/rewriter/bv_rewriter.h:125,130)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_smod.go",
           "tests": [
             "TestBVRewriterSignedModuloOriginalBranches",
@@ -27137,7 +27137,7 @@
         },
         {
           "name": "Original SMOD physical r1/r2, distinct abs_r1/abs_r2/u and default r, reached abs/negation/remainder/add/norm expression owners and exact child receipts (src/ast/rewriter/bv_rewriter.cpp:1282-1341)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_smod_numerals.go",
           "tests": [
             "TestASTBitVectorSignedModuloEveryActualReservation"
@@ -27145,7 +27145,7 @@
         },
         {
           "name": "Complete selected mk_bv_redor/mk_bv_redand/mk_bv_comp through persistent BV owner: original kind/zero/default-r/raw comparison and identity/numeral/conditional guard order, exact output status and child lifetime (src/ast/rewriter/bv_rewriter.cpp:2040-2074; src/ast/rewriter/bv_rewriter.h:133-135)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_scalar.go",
           "tests": [
             "TestBVRewriterScalarOperatorsOnDerivedOwner",
@@ -27154,7 +27154,7 @@
         },
         {
           "name": "Exact unsigned numeral factory invocation capture at real unsigned constructor/factory frame; AND caller keeps power/one/subtraction/default-r alive through publication and joins younger stopped factory first (src/ast/rewriter/bv_rewriter.cpp:2048-2056; src/ast/rewriter/bv_rewriter.h:177)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_unsigned_numeral.go",
           "tests": [
             "TestASTBitVectorReductionANDCallerEveryActualReservation"
@@ -27162,7 +27162,7 @@
         },
         {
           "name": "Complete selected mk_int2bv: default val, arithmetic stored numeral/flag read, original unsigned norm physical assignment, NUM publication and guarded reverse bv2int conversion (src/ast/rewriter/bv_rewriter.cpp:1343-1360; src/ast/rewriter/bv_rewriter.h:131)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_int2bv.go",
           "tests": [
             "TestBVRewriterInt2BVOriginalBranches",
@@ -27171,7 +27171,7 @@
         },
         {
           "name": "Original int2bv default val, distinct returned norm/copy/full-expression retirement and exact arithmetic-copy/norm/factory ownership (src/ast/rewriter/bv_rewriter.cpp:1343-1360)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_int2bv_numerals.go",
           "tests": [
             "TestASTBitVectorInt2BVEveryActualReservation"
@@ -27179,7 +27179,7 @@
         },
         {
           "name": "Complete selected is_mul_no_overflow/is_add_no_overflow/num_leading_zero_bits: original kind/sort/operand order, uint32 sum, literal div loop and recursive first-two-child concat behavior (src/ast/rewriter/bv_rewriter.cpp:1409-1446; src/ast/rewriter/bv_rewriter.h:112-114)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leading.go",
           "tests": [
             "TestBVRewriterOriginalLeadingZerosAndOverflowHelpers",
@@ -27188,7 +27188,7 @@
         },
         {
           "name": "Original leading-zero default v before sort read, literal-two/returned div/physical copy expression, exact scalar context and recursive older-frame ownership (src/ast/rewriter/bv_rewriter.cpp:1425-1446)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_leading_zero_numerals.go",
           "tests": [
             "TestASTBitVectorLeadingZeroEveryActualReservation",
@@ -27197,7 +27197,7 @@
         },
         {
           "name": "Complete selected mk_bv2int: original default v, stored numeral, empty concat, ordered child vector, backwards power coefficients and overflow-guarded arithmetic rewrites (bv_rewriter.cpp:1362-1406; bv_rewriter.h:132)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_bv2int.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_bv2int_test.go",
@@ -27213,7 +27213,7 @@
         },
         {
           "name": "Selected original repeat/zero-extend derived-owner wiring, erased identity branches and exact stopped buffer/numeral ownership (bv_rewriter.cpp:1513-1523,1555-1566; bv_rewriter.h:87-88,177)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_derived_extend_repeat.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_derived_extend_repeat_test.go"
@@ -27225,7 +27225,7 @@
         },
         {
           "name": "Complete selected is_negatable: original default r, returned bitwise complement/physical assignment, numeral publication, bvnot arity assertion and borrowed child assignment (bv_rewriter.cpp:1155-1170; bv_rewriter.h:90)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_negatable.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_negatable_test.go",
@@ -27242,7 +27242,7 @@
         },
         {
           "name": "Prerequisite for original mk_bv_not static-one factory call: original parameter copy and captured normalization frame without rational(1) outer temporary (bv_rewriter.cpp:1960-1963; rational.h:43,306-308)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_one_numeral.go",
           "go_targets": [
             "pkg/ast/ast_bv_one_numeral_test.go"
@@ -27254,7 +27254,7 @@
         },
         {
           "name": "Complete selected mk_bv_not: original guard/branch/configuration order, complement assignment and temporary end, borrowed concat buffer, literal versus static one, t-before-s negatable helpers, raw ordered ternary ADD and reverse reference/default-value end (bv_rewriter.cpp:1905-1969; bv_rewriter.h:91)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_not.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_not_test.go",
@@ -27271,7 +27271,7 @@
         },
         {
           "name": "Selected original AND/NAND/NOR/XNOR derived-owner bodies: ordered De Morgan construction, source buffer retained through stopped publication, direct borrowed NOR/XNOR argument views and original rewrite depths (bv_rewriter.cpp:1971-1998; bv_rewriter.h:94-97; bv_decl_plugin.h:406-408)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_derived_bitwise.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_derived_bitwise_test.go",
@@ -27287,7 +27287,7 @@
         },
         {
           "name": "Complete selected fixed left/right rotations on derived owner: original modulo/identity guards, ordered embedded extraction cache calls, borrowed pair/concat publication and right-to-left delegation with repeated size read (bv_rewriter.cpp:2000-2018; bv_rewriter.h:98-99)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_derived_rotate.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_derived_rotate_test.go"
@@ -27299,7 +27299,7 @@
         },
         {
           "name": "Complete selected extended left/right rotations: default r2 before recognition, raw stored width/value, original unsigned width literal and signed remainder/get_uint64/modulo full-expression end, fixed rotation delegation before default destruction and stopped caller cleanup (bv_rewriter.cpp:2020-2038; bv_rewriter.h:100-101; rational.h:101,202-206)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_extended_rotate.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_extended_rotate_test.go",
@@ -27315,7 +27315,7 @@
         },
         {
           "name": "Original OR/XOR numerical-local prerequisite: stored v2 reads, physical v1 assignments from distinct returned bitwise values, power-minus-literal all-one full expressions, OR normalization and ordered modulo/direct-division mask expressions (src/ast/rewriter/bv_rewriter.cpp:1599-1734,1772-1903)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_bitwise_numerals.go",
           "tests": [
             "TestASTBitVectorBitwiseNumeralsEveryActualReservation",
@@ -27324,7 +27324,7 @@
         },
         {
           "name": "Complete selected mk_bv_or: singleton before sort/scopes, count-change-only flattening, local positive/negative Go membership maps, stored numeric accumulation, opposite/all-one guards, concat disjointness, normalized mask scans, configured sorting/FAILED guard and original output statuses (src/ast/rewriter/bv_rewriter.cpp:1567-1734; src/ast/rewriter/bv_rewriter.h:92)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_or.go",
           "tests": [
             "TestBVRewriterOROriginalBranchesAndStatuses",
@@ -27336,7 +27336,7 @@
         },
         {
           "name": "Exact OR mask expression cleanup boundary: join younger numerical children/temporaries before caller branch buffer while preserving older two/v2/v1 and without crediting source return (src/ast/rewriter/bv_rewriter.cpp:1677-1716)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_bitwise_numerals.go",
           "tests": [
             "TestASTBitVectorBitwiseCloseExpressionPreservesOlderMaskLocals"
@@ -27344,7 +27344,7 @@
         },
         {
           "name": "Complete selected mk_bv_xor: count-change-only flattening, local Go parity membership, distinct bitwise/all-one assignments, unnormalized owning mask scopes, original survivor order, configured FAILED/sort guards and BR_REWRITE3 versus BR_DONE publication (src/ast/rewriter/bv_rewriter.cpp:1736-1903; src/ast/rewriter/bv_rewriter.h:93)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_xor.go",
           "tests": [
             "TestBVRewriterXOROriginalBranchesAndStatuses",
@@ -27356,7 +27356,7 @@
         },
         {
           "name": "Complete selected mk_extract: whole-width erasure before default v, original negative modulo/result-width and saturating shifts, nested fusion, concat routing/statuses, ordered operation distribution, configured propagation and ITE routing (src/ast/rewriter/bv_rewriter.cpp:668-790; src/ast/rewriter/bv_rewriter.h:85)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_extract.go",
           "tests": [
             "TestBVRewriterExtractOriginalBranchesAndStatuses",
@@ -27368,7 +27368,7 @@
         },
         {
           "name": "Complete selected propagate_extract: ADD/MUL/top guards, single default val, order-dependent numerical/symbolic prefix scan, shortened numerals, borrowed concat suffix and original raw operation rebuilding (src/ast/rewriter/bv_rewriter.cpp:590-666; src/ast/rewriter/bv_rewriter.h:84)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_extract_propagation.go",
           "tests": [
             "TestBVRewriterExtractPropagationOriginalOrderAndShapes",
@@ -27378,7 +27378,7 @@
         },
         {
           "name": "Exact extraction/propagation numerical authority: one default v/val, distinct reached power and ui64 literal, void aliased modulo/division, captured numeral factory and expression cleanup before older v (src/ast/rewriter/bv_rewriter.cpp:590-666,668-690; src/util/util.h:133-139)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_extract_numerals.go",
           "tests": [
             "TestASTBitVectorExtractNumeralsEveryActualReservation",
@@ -27387,7 +27387,7 @@
         },
         {
           "name": "Complete selected rw_leq_concats and short-circuited concat: ordered concat guards, high-numeral short circuit, normalized high-prefix comparisons, owning suffix reconstruction, common prefix unsigned comparison and postfix original-signedness comparison (src/ast/rewriter/bv_rewriter.cpp:245-252,349-434; src/ast/rewriter/bv_rewriter.h:79)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq_concat.go",
           "tests": [
             "TestBVRewriterLEConcatOriginalShapesAndStatuses",
@@ -27397,7 +27397,7 @@
         },
         {
           "name": "Exact concat comparison numerical authority: af/bf defaults, only reached returned power/division, retained normalized hi_af/hi_bf, captured shortened-prefix NUM factory and source/owning expression boundaries (src/ast/rewriter/bv_rewriter.cpp:358-393)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_concat_comparison_numerals.go",
           "tests": [
             "TestASTBitVectorConcatComparisonEveryActualReservation"
@@ -27405,7 +27405,7 @@
         },
         {
           "name": "Complete selected are_eq_upto_num and rw_leq_overflow: leading coefficient recognition, repeated borrowed-zero assignments, ordered pointer commonality, original mixed-case guards, borrowed common ADD suffix, exact difference and interval/equality publication (src/ast/rewriter/bv_rewriter.cpp:255-346; src/ast/rewriter/bv_rewriter.h:80-81)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq_overflow.go",
           "tests": [
             "TestBVRewriterLEOverflowOriginalBranchesAndSumGuards",
@@ -27416,7 +27416,7 @@
         },
         {
           "name": "Exact overflow comparison numerical authority: a0/b0 defaults, borrowed static zero, stored coefficient copy, reached power/subtraction/one-subtraction returns, retained lower/upper and captured numerical factory (src/ast/rewriter/bv_rewriter.cpp:262-263,298-303,315-346)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_overflow_comparison_numerals.go",
           "tests": [
             "TestASTBitVectorOverflowComparisonEveryActualReservation"
@@ -27424,7 +27424,7 @@
         },
         {
           "name": "Complete selected mk_leq_core: original three defaults/two reads before identity, shared stored-width normalization, numeric/bounds rewrites, ordered signed-remainder predicate and repeated sum expression, configured concat then overflow helpers, descending zero-bit scan and original statuses (src/ast/rewriter/bv_rewriter.cpp:436-584; src/ast/rewriter/bv_rewriter.h:82)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq.go",
           "tests": [
             "TestBVRewriterLEOriginalBranchesAndStatuses",
@@ -27435,7 +27435,7 @@
         },
         {
           "name": "Complete selected signed/unsigned LE/GE/LT wrappers: reversed core calls, raw reversed fallback after FAILED and raw NOT of reversed comparison with REWRITE2 (src/ast/rewriter/bv_rewriter.cpp:210-242; src/ast/rewriter/bv_rewriter.h:73-78)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq_wrappers.go",
           "tests": [
             "TestBVRewriterLEOriginalWrappers",
@@ -27444,7 +27444,7 @@
         },
         {
           "name": "Exact LE numerical authority: original unused r3, later default lower/upper, reached signed literals/power/negation/subtraction/norm/remainder/sum returns, original assignment/full-expression ends and captured numeral factory (src/ast/rewriter/bv_rewriter.cpp:436-517,560-568)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_le_comparison_numerals.go",
           "tests": [
             "TestASTBitVectorLEComparisonEveryActualReservation"
@@ -27452,7 +27452,7 @@
         },
         {
           "name": "Complete selected derived mk_sign_extend: allocation-free zero extension identity, default r before symbolic/numeric read, captured signed normalization/copy/modulo/NUM, configured cached sign extraction and retained borrowed concat buffer (src/ast/rewriter/bv_rewriter.cpp:1525-1553; src/ast/rewriter/bv_rewriter.h:89)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_derived_sign_extend.go",
           "tests": [
             "TestBVRewriterSignExtensionOriginalBranches",
@@ -27463,7 +27463,7 @@
         },
         {
           "name": "Exact sign-extension numerical authority: original single default r across symbolic result construction, normalization return and reached power full-expression ends before NUM/output, owning cleanup boundary before older r (src/ast/rewriter/bv_rewriter.cpp:1531-1553)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_sign_extension_numerals.go",
           "tests": [
             "TestASTBitVectorSignExtensionSymbolicDefaultLifetime"
@@ -27568,7 +27568,7 @@
       "path": "src/ast/rewriter/bv_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_bv_unsigned_numeral.go",
         "pkg/ast/ast_bv_unsigned_numeral_test.go",
@@ -27995,12 +27995,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "original mk_numeral(unsigned,unsigned) rational(unsigned) construction and delegated BV numeral application (src/ast/rewriter/bv_rewriter.h:177; src/util/rational.h:48)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_unsigned_numeral.go",
           "tests": [
             "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -28010,7 +28010,7 @@
         },
         {
           "name": "original complete is_zero_bit: copied stored numeral, zero shortcut, void div by power return temporary, modulo-two return expression and reverse concat/goto routing (src/ast/rewriter/bv_rewriter.cpp:2141-2168; src/ast/rewriter/bv_rewriter.h:71)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_zero_bit.go",
           "tests": [
             "TestASTBitVectorOriginalZeroBitStoredNumerals",
@@ -28020,7 +28020,7 @@
         },
         {
           "name": "Complete selected active mk_bv_add caller: actual configured polynomial core, source core scope exit before bit-major disjoint-bit reduction, FAILED original operands, DONE borrowed assigned sum and other-status bypass, exact numerical child capture and original OR assignment (src/ast/rewriter/bv_rewriter.cpp:2076-2079,2109-2137; src/ast/rewriter/bv_rewriter.h:105)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_add.go",
           "tests": [
             "TestBVRewriterAdditionAfterCoreStatusAndUnreadOperands",
@@ -28038,7 +28038,7 @@
         },
         {
           "name": "original BV polynomial configuration normalize hook: source sort width, unsigned norm return, rational copy assignment and full-expression return-temporary DT (src/ast/rewriter/bv_rewriter.h:39; src/ast/bv_decl_plugin.cpp:753-765; src/util/rational.h:131-134)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_coefficient.go",
           "tests": [
             "TestASTBitVectorCoefficientNormalizationIndependentModulo",
@@ -28049,7 +28049,7 @@
         },
         {
           "name": "original is_numeral copy into caller receiver followed by width publication, exposed with exact caller-owned rational assignment invocation (src/ast/bv_decl_plugin.cpp:778-790; src/ast/rewriter/bv_rewriter.h:36)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_numeral_read.go",
           "tests": [
             "TestASTBitVectorNumeralReadInvocationStoredValueAndUnmatchedOutputs",
@@ -28059,7 +28059,7 @@
         },
         {
           "name": "original BV polynomial Config numeral construction/use_power=false hooks consumed by empty/variadic/coefficient factory bodies with exact copied-zero and literal lifetimes (src/ast/rewriter/bv_rewriter.h:35-43; src/ast/rewriter/poly_rewriter_def.h:47-53,70-74,78-124,127-138)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_factory.go",
           "tests": [
             "TestASTBitVectorPolynomialVariadicFactorySourceCases",
@@ -28071,7 +28071,7 @@
         },
         {
           "name": "BV Config stored-numeral reader consumed by the complete selected coefficient-valued power-product helper and exact fallback-one full expression (src/ast/rewriter/bv_rewriter.h:36; src/ast/rewriter/poly_rewriter_def.h:410-416)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_power_product.go",
           "tests": [
             "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
@@ -28081,7 +28081,7 @@
         },
         {
           "name": "Persistent BV polynomial owner: expression map constructed before configuration, shared physical current-sort writes through addition/multiplication/hoist/merger, singleton before sort/helper placement, configured core and convenience overloads, and borrowed map retained across source invocations (src/ast/rewriter/poly_rewriter.h:28-41,95-164; src/ast/rewriter/poly_rewriter_def.h:570-586,903-943; src/ast/rewriter/bv_rewriter.h:35-43)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_owner.go",
           "tests": [
             "TestBVPolynomialOwnerPersistentMapAndSharedSort",
@@ -28093,7 +28093,7 @@
         },
         {
           "name": "BV Config numerical hooks consumed by selected unary minus and subtraction, with charged actual caller literals and exact NUM children (src/ast/rewriter/bv_rewriter.h:35-43; src/ast/rewriter/poly_rewriter_def.h:667-701)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_neg_numerals.go",
           "tests": [
             "TestASTBitVectorUnaryMinusPhysicalLocalAndLiteralLifetimes"
@@ -28101,7 +28101,7 @@
         },
         {
           "name": "Complete selected BV cancel_monomials body: cross-side markers, exact constant/coefficient subtraction, persistent map reset, first-encounter rebuild, move-only sorting, constant placement and left-before-right result assignment with reverse scope destruction (src/ast/rewriter/poly_rewriter_def.h:708-883)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_polynomial_cancel.go",
           "tests": [
             "TestBVPolynomialCancellationOriginalSidesAndMove",
@@ -28116,7 +28116,7 @@
         },
         {
           "name": "Cancellation caller numeric locals: explicit c(0) before default a, physical subtraction into c/coeffs[pos], in-place a/c negation, unnormalized coefficient zero test and separate coefficient NUM factory (src/ast/rewriter/poly_rewriter_def.h:720-721,743,799,815-821,840-842,869-870)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_add_numerals.go",
           "tests": [
             "TestASTBitVectorCancellationNumeralsExplicitZeroAndExactSubtraction"
@@ -28124,7 +28124,7 @@
         },
         {
           "name": "Complete selected mk_bv_mul caller: actual polynomial core, original status/binary-shape guards, FAILED original or DONE borrowed product, first-factor power-of-two test, extraction before zero and concat assignment (src/ast/rewriter/bv_rewriter.cpp:2170-2205)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_mul.go",
           "tests": [
             "TestBVRewriterMultiplicationPowerOfTwoCaller",
@@ -28137,7 +28137,7 @@
         },
         {
           "name": "Reached default numeral v, exact stored-numeral copy, physical power-of-two inspection, unsigned zero literal full-expression factory and v source destruction after result assignment (src/ast/rewriter/bv_rewriter.cpp:2190-2203; src/ast/rewriter/bv_rewriter.h:177; src/util/rational.h:43,48,298-300)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_mul_numerals.go",
           "tests": [
             "TestASTBitVectorMultiplicationNumeralLocalLifetime"
@@ -28145,7 +28145,7 @@
         },
         {
           "name": "Complete selected mk_bit2bool: lhs width guard before numeral swap, copied rhs, pointer-equal numeral Boolean, ITE equalities, NOT with literal-one subtraction, owning bit1 and ordered OR/XOR equalities with intermediate result before optional NOT (src/ast/rewriter/bv_rewriter.cpp:2205-2277)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_bit2bool.go",
           "tests": [
             "TestBVRewriterBit2BoolOriginalORAndXOR",
@@ -28157,7 +28157,7 @@
         },
         {
           "name": "Bit2bool default v and reached rational(1)/subtraction return lifetimes through complete assignment expressions, exact scalar/numeral child capture and reverse source destruction (src/ast/rewriter/bv_rewriter.cpp:2212-2236; src/util/rational.h:43,46,462-464)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_bit2bool_numerals.go",
           "tests": [
             "TestASTBit2BoolSubtractionReturnAndLiteralLifetimes"
@@ -28165,7 +28165,7 @@
         },
         {
           "name": "Complete selected mk_blast_eq_value: width-one guard before swap, copied rhs updates loop width, OR/XOR/NOT guard, ordered remainder/extract/bit equality push/direct division, and final AND assignment (src/ast/rewriter/bv_rewriter.cpp:2279-2304)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_blast_eq.go",
           "tests": [
             "TestBVRewriterBlastEqualityOriginalBitOrder",
@@ -28176,7 +28176,7 @@
         },
         {
           "name": "Blast equality default v, reached two, remainder return full-expression lifetime, captured unsigned bit numeral and void division into the physical v receiver (src/ast/rewriter/bv_rewriter.cpp:2287-2302; src/util/rational.h:43,46,182-184,202-206)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_blast_eq_numerals.go",
           "tests": [
             "TestASTBlastEqualityPhysicalDivisionAndRemainderLifetimes"
@@ -28184,7 +28184,7 @@
         },
         {
           "name": "Complete selected mk_eq_concat: borrowed concat/singleton operands, low-end suffix alignment with original three width branches, equality push before cursor update, DEBUG completion guards and final AND assignment (src/ast/rewriter/bv_rewriter.cpp:2306-2370)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_eq_concat.go",
           "tests": [
             "TestBVRewriterConcatEqualityOriginalAlignment",
@@ -28195,7 +28195,7 @@
         },
         {
           "name": "Original is_concat_split_target and is_concat_target short-circuit predicates: option before operand reads, concat/numeral/OR recognition and either-side concat requirement (src/ast/rewriter/bv_rewriter.cpp:2372-2378,2433-2437)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_eq_concat.go",
           "tests": [
             "TestBVRewriterConcatEqualitySingletonSidesAndTargetGuards"
@@ -28203,7 +28203,7 @@
         },
         {
           "name": "Complete selected term isolation and helper: original numeral/add swap guards, both owning expr_ref constructors before assignment, original first/raw remaining sum, binary first-factor all-one recognition and original subtraction/equality orientation (src/ast/rewriter/bv_rewriter.cpp:2380-2414)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_isolate.go",
           "tests": [
             "TestBVRewriterIsolateTermOriginalOrientation",
@@ -28214,7 +28214,7 @@
         },
         {
           "name": "Original is_add_mul_const: ordered sum operands, numeral-only recognition and binary multiplication with first-factor numeral guard (src/ast/rewriter/bv_rewriter.cpp:2416-2431)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_isolate.go",
           "tests": [
             "TestBVRewriterIsolateTermGuardsBinaryAndConstantPredicate"
@@ -28222,7 +28222,7 @@
         },
         {
           "name": "Exact optional caller invocation around existing all-one recognizer body and real copied numeral/power/subtraction condition frame, without ambient numerical adoption (src/ast/bv_decl_plugin.cpp:794-803; src/ast/rewriter/bv_rewriter.h:38)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_recognizers.go",
           "tests": [
             "TestASTBitVectorAllOneExactInvocationEveryReservation"
@@ -28230,7 +28230,7 @@
         },
         {
           "name": "Complete selected mk_mul_eq: binary first-factor numeral/inverse guards, constant/coefficient/unit/sum branches, first invertible sum coefficient search and original BR_REWRITE1/2/3/FAILED results (src/ast/rewriter/bv_rewriter.cpp:2448-2508)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_mul_eq.go",
           "tests": [
             "TestBVRewriterMultiplicationEqualityOriginalBranches",
@@ -28241,7 +28241,7 @@
         },
         {
           "name": "Original mk_mul_eq outer/block numeral placement, distinct product/returned-normalization lifetimes, exact scalar/factory/inverse child receipts and reverse source destruction (src/ast/rewriter/bv_rewriter.cpp:2451-2507)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_mul_eq_numerals.go",
           "tests": [
             "TestASTBitVectorMulEqualityLocalAndReturnLifetimes"
@@ -28249,7 +28249,7 @@
         },
         {
           "name": "Complete selected updt_local_params/updt_params: original ordered generated BV boolean lookups, typed local/module/literal fallback, local-only mkbv2num and repeated final bv_sort_ac lookup assigning base SortSums after base update (src/ast/rewriter/bv_rewriter.cpp:26-51; src/ast/rewriter/bv_rewriter_params.pyg:1-20; scripts/mk_genfile_common.py:895-939)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_config.go",
           "tests": [
             "TestBVRewriterConfigurationDefaultsAndLocalOnlyOption",
@@ -28259,7 +28259,7 @@
         },
         {
           "name": "Original set_mkbv2num and get_param_descrs base/BV collector order with _EXTERNAL_RELEASE omission of internal mkbv2num (src/ast/rewriter/bv_rewriter.cpp:53-60; src/ast/rewriter/bv_rewriter.h:170)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_config.go",
           "tests": [
             "TestBVRewriterConfigurationDescriptionsAndIndependentSetter"
@@ -28267,7 +28267,7 @@
         },
         {
           "name": "Complete selected derived BV owner construction: BV utility family lookups, polynomial map/two base parameter updates, embedded extraction initialization, trailing cache implementation owner, arithmetic family lookup then local BV update and caller default-parameter exit (src/ast/rewriter/bv_rewriter.h:158-164; src/ast/arith_decl_plugin.cpp:641-645; src/ast/bv_decl_plugin.cpp:850-855)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_owner.go",
           "tests": [
             "TestBVRewriterOwnerOriginalConstructionAndConfiguredMultiplication",
@@ -28277,7 +28277,7 @@
         },
         {
           "name": "Configured original BV addition/multiplication callers consuming the real local state and persistent extraction member, stopped-parent replay guards and reverse persistent-member cleanup (src/ast/rewriter/bv_rewriter.cpp:2076-2079,2109-2137,2170-2205)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_owner.go",
           "tests": [
             "TestBVRewriterOwnerOriginalConstructionAndConfiguredMultiplication",
@@ -28287,7 +28287,7 @@
         },
         {
           "name": "Complete selected mk_eq_core: identity/two-numeral guards, numeral swap, ordered configured bit2bool/trailing/mul forward/reverse/blast/remainder rules, unconditional reached trailing reset(4096), owning cancellation refs and isolation/concat/swapped fallback (src/ast/rewriter/bv_rewriter.cpp:2520-2635)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_equality.go",
           "tests": [
             "TestBVRewriterEqualityOriginalDispatcherBranches",
@@ -28299,7 +28299,7 @@
         },
         {
           "name": "Original is_urem_any recognition of bvurem/bvurem_i with DEBUG arity assertion and ordered borrowed dividend/divisor reads (src/ast/rewriter/bv_rewriter.cpp:2510-2518)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_equality.go",
           "tests": [
             "TestBVRewriterEqualityRemainderAndTrailing"
@@ -28307,7 +28307,7 @@
         },
         {
           "name": "Original remainder equality copied divisor/rhs locals, rhs>=divisor condition, distinct returned sum/power temporaries and condition-before-result destruction (src/ast/rewriter/bv_rewriter.cpp:2574-2589)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_remainder_eq_numerals.go",
           "tests": [
             "TestASTBitVectorRemainderEqualityEveryActualReservation"
@@ -28315,7 +28315,7 @@
         },
         {
           "name": "Complete selected mk_mkbv: disabled option/ordered all-Boolean-literal guards before numeric placement, reverse bit scan with physical val*=two and discarded original postfix old value, numerator factory/output assignment before two/val DT (src/ast/rewriter/bv_rewriter.cpp:2636-2655)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_mkbv.go",
           "tests": [
             "TestBVRewriterMkBVOriginalBitOrderAndGuards",
@@ -28324,7 +28324,7 @@
         },
         {
           "name": "Original mk_mkbv physical val/two locals, captured compound multiplication/postfix contexts and distinct discarded old-value full-expression lifetime (src/ast/rewriter/bv_rewriter.cpp:2642-2652; src/util/rational.h:220-225)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_mkbv_numerals.go",
           "tests": [
             "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
@@ -28333,7 +28333,7 @@
         },
         {
           "name": "Complete selected mk_ite_core: equal branches before condition reads, unconditional negated-condition swap, ordered enabled equality/BV guards and identity orientations, numeral-LHS swap, original one-bit conditional identity/NOT selection (src/ast/rewriter/bv_rewriter.cpp:2657-2704)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_ite.go",
           "tests": [
             "TestBVRewriterIteOriginalBranchOrderAndIdentities",
@@ -28344,7 +28344,7 @@
         },
         {
           "name": "Original one-bit ITE reached rhs_n/e_n/t_n declarations, RHS/then/else numeric copy order, independent widths, checked source assertions and reverse declaration destruction after output assignment (src/ast/rewriter/bv_rewriter.cpp:2687-2698)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_ite_numerals.go",
           "tests": [
             "TestASTBitVectorIteEveryActualCopyReservation"
@@ -28352,7 +28352,7 @@
         },
         {
           "name": "Complete selected mk_bvsmul_no_overflow/mk_bvumul_no_overflow/mk_bvsmul_no_underflow: both copied operand reads before zero/one guards, original last stored width, returned product/limits, ordered signed adjustment and exact bound comparisons (src/ast/rewriter/bv_rewriter.cpp:2706-2800)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_mul_bounds.go",
           "tests": [
             "TestBVRewriterMultiplyBoundsOriginalBranches",
@@ -28361,7 +28361,7 @@
         },
         {
           "name": "Original multiplication bound operand/product/full-modulus/half-modulus/negative-limit physical locals and exact compound subtraction/returned negation invocation ownership (src/ast/rewriter/bv_rewriter.cpp:2706-2800; src/util/rational.h:474-478)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_mul_bound_numerals.go",
           "tests": [
             "TestASTBitVectorMultiplyBoundEveryActualReservation"
@@ -28369,7 +28369,7 @@
         },
         {
           "name": "Complete selected mk_concat: ordered numeral fusion, one-level configured flattening, adjacent same-base extraction fusion, original result/status precedence (src/ast/rewriter/bv_rewriter.cpp:1451-1510)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_concat.go",
           "tests": [
             "TestBVRewriterConcatOriginalBranchesAndStatuses",
@@ -28379,7 +28379,7 @@
         },
         {
           "name": "Original concat v1/v2 locals, physical v2 multiplication/addition, returned power full-expression lifetime and exact numeral factory invocation (src/ast/rewriter/bv_rewriter.cpp:1452-1469)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_concat_numerals.go",
           "tests": [
             "TestASTBitVectorConcatEveryActualReservationAndPowerLifetime"
@@ -28387,7 +28387,7 @@
         },
         {
           "name": "Complete selected mk_bv_shl/mk_bv_lshr: ordered rhs-zero/threshold/lhs-numeral guards, lhs-sort width, original narrow/wide paths and ordered symbolic extraction/zero concat (src/ast/rewriter/bv_rewriter.cpp:792-889)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_shift.go",
           "tests": [
             "TestBVRewriterLogicalShiftsOriginalBranches",
@@ -28397,7 +28397,7 @@
         },
         {
           "name": "Original logical shift r1/r2, threshold full expression, uint64 rn construction, distinct normalization return/copy, wide returned product versus void aliased division and exact captured numerical/factory cleanup (src/ast/rewriter/bv_rewriter.cpp:792-889; src/util/util.h:131-139)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_logical_shift_numerals.go",
           "tests": [
             "TestASTBitVectorLogicalShiftsEveryActualReservation"
@@ -28405,7 +28405,7 @@
         },
         {
           "name": "Complete selected mk_bv_ashr: original stored-width overwrites, rhs-zero short circuit, narrow modulo/saturation/sign mask, wide sign/iterative padding and nested sum/clamp (src/ast/rewriter/bv_rewriter.cpp:891-985)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_ashr.go",
           "tests": [
             "TestBVRewriterArithmeticShiftOriginalBranches",
@@ -28415,7 +28415,7 @@
         },
         {
           "name": "Original ASHR physical r1/r2, threshold/full-expression literals, uint64 return, captured sign helper, power/division, iterative p/each-two temporaries and allone subtraction/factory lifetimes (src/ast/rewriter/bv_rewriter.cpp:891-985; src/ast/bv_decl_plugin.cpp:767-773)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_arithmetic_shift_numerals.go",
           "tests": [
             "TestASTBitVectorArithmeticShiftEveryActualReservation"
@@ -28423,7 +28423,7 @@
         },
         {
           "name": "Complete selected mk_bv_srem_core and configured/internal wrappers: signed RHS normalization before zero/one, independent width overwrites, original rational percent rem, raw internal fallback and hi_div0 conditional interpretation (src/ast/rewriter/bv_rewriter.cpp:1101-1144; src/ast/rewriter/bv_rewriter.h:123,128)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_srem.go",
           "tests": [
             "TestBVRewriterSignedRemainderOriginalBranches",
@@ -28433,7 +28433,7 @@
         },
         {
           "name": "Original SREM default r1/r2, distinct signed norm returns and physical copy assignments, returned remainder through factory/output and exact scalar/norm/factory ownership (src/ast/rewriter/bv_rewriter.cpp:1101-1144; src/ast/bv_decl_plugin.cpp:753-765)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_srem_numerals.go",
           "tests": [
             "TestASTBitVectorSignedRemainderEveryActualReservation"
@@ -28441,7 +28441,7 @@
         },
         {
           "name": "Complete selected mk_bv_sdiv_core and configured/internal wrappers: signed rhs/lhs norm copies, original zero/one order, truncating machine quotient, raw hardware-zero SLT/ITE and internal/symbolic fallback (src/ast/rewriter/bv_rewriter.cpp:987-1032; src/ast/rewriter/bv_rewriter.h:121,126)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_sdiv.go",
           "tests": [
             "TestBVRewriterSignedDivisionOriginalBranches",
@@ -28451,7 +28451,7 @@
         },
         {
           "name": "Original SDIV physical r1/r2 and returned norm/quotient, hardware-zero power/one/subtraction full expression, captured machine integer division/factory receipts and reverse ownership (src/ast/rewriter/bv_rewriter.cpp:987-1032; src/util/rational.h:186-190)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_sdiv_numerals.go",
           "tests": [
             "TestASTBitVectorSignedDivisionEveryActualReservation"
@@ -28459,7 +28459,7 @@
         },
         {
           "name": "Complete selected mk_bv_udiv_core and configured/internal wrappers: unsigned norm copies, original zero/one and numeral folding order, power-before-inverse option, failed-inverse block exit and raw internal/symbolic fallback (src/ast/rewriter/bv_rewriter.cpp:1034-1099; src/ast/rewriter/bv_rewriter.h:122,127)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_udiv.go",
           "tests": [
             "TestBVRewriterUnsignedDivisionOriginalBranchesAndOptionOrder",
@@ -28469,7 +28469,7 @@
         },
         {
           "name": "Original UDIV default r1/r2, returned unsigned norm/quotient and allone full expression, exact optional inverse invocation/block lifetime and captured scalar/factory ownership (src/ast/rewriter/bv_rewriter.cpp:1034-1099)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_udiv_numerals.go",
           "tests": [
             "TestASTBitVectorUnsignedDivisionEveryActualReservation"
@@ -28477,7 +28477,7 @@
         },
         {
           "name": "Complete selected is_minus_one_core and is_x_minus_one: default numeral before recognition, raw stored-value comparison and ordered binary-add guards/borrowed output assignment (src/ast/rewriter/bv_rewriter.cpp:1146-1153,1172-1184; src/ast/rewriter/bv_rewriter.h:110-111)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_minus_one.go",
           "tests": [
             "TestBVRewriterOriginalMinusOneAndXMinusOne",
@@ -28486,7 +28486,7 @@
         },
         {
           "name": "Original minus-one default r, reached power/literal one/returned subtraction comparison expression and exact scalar invocation lifetime/owning cleanup (src/ast/rewriter/bv_rewriter.cpp:1146-1153)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_minus_one_numerals.go",
           "tests": [
             "TestASTBitVectorMinusOneEveryActualReservation"
@@ -28494,7 +28494,7 @@
         },
         {
           "name": "Complete selected mk_bv_urem_core and configured/internal wrappers: lhs-before-rhs copy, rhs width overwrite, unsigned norms/physical remainder, power concat/extraction, lhs-zero/x-minus-one branches and raw fallback (src/ast/rewriter/bv_rewriter.cpp:1185-1280; src/ast/rewriter/bv_rewriter.h:124,129)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_urem.go",
           "tests": [
             "TestBVRewriterUnsignedRemainderOriginalBranches",
@@ -28503,7 +28503,7 @@
         },
         {
           "name": "Original UREM default r1/r2, returned norm full expressions, physical operator%= receiver, low x-minus-one power/one/subtraction declaration and exact scalar/norm/factory lifetimes (src/ast/rewriter/bv_rewriter.cpp:1185-1280)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_urem_numerals.go",
           "tests": [
             "TestASTBitVectorUnsignedRemainderEveryActualReservation"
@@ -28511,7 +28511,7 @@
         },
         {
           "name": "Complete selected mk_bv_smod_core and configured/internal wrappers: signed lhs normalization/zero-before-rhs UREM rewrite, signed rhs norm/zero handling, original abs/remainder/sign algorithm, symbolic positive-one status and internal/conditional fallback (src/ast/rewriter/bv_rewriter.cpp:1282-1341; src/ast/rewriter/bv_rewriter.h:125,130)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_smod.go",
           "tests": [
             "TestBVRewriterSignedModuloOriginalBranches",
@@ -28520,7 +28520,7 @@
         },
         {
           "name": "Original SMOD physical r1/r2, distinct abs_r1/abs_r2/u and default r, reached abs/negation/remainder/add/norm expression owners and exact child receipts (src/ast/rewriter/bv_rewriter.cpp:1282-1341)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_smod_numerals.go",
           "tests": [
             "TestASTBitVectorSignedModuloEveryActualReservation"
@@ -28528,7 +28528,7 @@
         },
         {
           "name": "Complete selected mk_bv_redor/mk_bv_redand/mk_bv_comp through persistent BV owner: original kind/zero/default-r/raw comparison and identity/numeral/conditional guard order, exact output status and child lifetime (src/ast/rewriter/bv_rewriter.cpp:2040-2074; src/ast/rewriter/bv_rewriter.h:133-135)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_scalar.go",
           "tests": [
             "TestBVRewriterScalarOperatorsOnDerivedOwner",
@@ -28537,7 +28537,7 @@
         },
         {
           "name": "Exact unsigned numeral factory invocation capture at real unsigned constructor/factory frame; AND caller keeps power/one/subtraction/default-r alive through publication and joins younger stopped factory first (src/ast/rewriter/bv_rewriter.cpp:2048-2056; src/ast/rewriter/bv_rewriter.h:177)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_unsigned_numeral.go",
           "tests": [
             "TestASTBitVectorReductionANDCallerEveryActualReservation"
@@ -28545,7 +28545,7 @@
         },
         {
           "name": "Complete selected mk_int2bv: default val, arithmetic stored numeral/flag read, original unsigned norm physical assignment, NUM publication and guarded reverse bv2int conversion (src/ast/rewriter/bv_rewriter.cpp:1343-1360; src/ast/rewriter/bv_rewriter.h:131)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_int2bv.go",
           "tests": [
             "TestBVRewriterInt2BVOriginalBranches",
@@ -28554,7 +28554,7 @@
         },
         {
           "name": "Original int2bv default val, distinct returned norm/copy/full-expression retirement and exact arithmetic-copy/norm/factory ownership (src/ast/rewriter/bv_rewriter.cpp:1343-1360)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_int2bv_numerals.go",
           "tests": [
             "TestASTBitVectorInt2BVEveryActualReservation"
@@ -28562,7 +28562,7 @@
         },
         {
           "name": "Complete selected is_mul_no_overflow/is_add_no_overflow/num_leading_zero_bits: original kind/sort/operand order, uint32 sum, literal div loop and recursive first-two-child concat behavior (src/ast/rewriter/bv_rewriter.cpp:1409-1446; src/ast/rewriter/bv_rewriter.h:112-114)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leading.go",
           "tests": [
             "TestBVRewriterOriginalLeadingZerosAndOverflowHelpers",
@@ -28571,7 +28571,7 @@
         },
         {
           "name": "Original leading-zero default v before sort read, literal-two/returned div/physical copy expression, exact scalar context and recursive older-frame ownership (src/ast/rewriter/bv_rewriter.cpp:1425-1446)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_leading_zero_numerals.go",
           "tests": [
             "TestASTBitVectorLeadingZeroEveryActualReservation",
@@ -28580,7 +28580,7 @@
         },
         {
           "name": "Complete selected mk_bv2int: original default v, stored numeral, empty concat, ordered child vector, backwards power coefficients and overflow-guarded arithmetic rewrites (bv_rewriter.cpp:1362-1406; bv_rewriter.h:132)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_bv2int.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_bv2int_test.go",
@@ -28596,7 +28596,7 @@
         },
         {
           "name": "Selected original repeat/zero-extend derived-owner wiring, erased identity branches and exact stopped buffer/numeral ownership (bv_rewriter.cpp:1513-1523,1555-1566; bv_rewriter.h:87-88,177)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_derived_extend_repeat.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_derived_extend_repeat_test.go"
@@ -28608,7 +28608,7 @@
         },
         {
           "name": "Complete selected is_negatable: original default r, returned bitwise complement/physical assignment, numeral publication, bvnot arity assertion and borrowed child assignment (bv_rewriter.cpp:1155-1170; bv_rewriter.h:90)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_negatable.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_negatable_test.go",
@@ -28625,7 +28625,7 @@
         },
         {
           "name": "Complete selected mk_bv_not: original guard/branch/configuration order, complement assignment and temporary end, borrowed concat buffer, literal versus static one, t-before-s negatable helpers, raw ordered ternary ADD and reverse reference/default-value end (bv_rewriter.cpp:1905-1969; bv_rewriter.h:91)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_not.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_not_test.go",
@@ -28642,7 +28642,7 @@
         },
         {
           "name": "Selected original AND/NAND/NOR/XNOR derived-owner bodies: ordered De Morgan construction, source buffer retained through stopped publication, direct borrowed NOR/XNOR argument views and original rewrite depths (bv_rewriter.cpp:1971-1998; bv_rewriter.h:94-97; bv_decl_plugin.h:406-408)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_derived_bitwise.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_derived_bitwise_test.go",
@@ -28658,7 +28658,7 @@
         },
         {
           "name": "Complete selected fixed left/right rotations on derived owner: original modulo/identity guards, ordered embedded extraction cache calls, borrowed pair/concat publication and right-to-left delegation with repeated size read (bv_rewriter.cpp:2000-2018; bv_rewriter.h:98-99)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_derived_rotate.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_derived_rotate_test.go"
@@ -28670,7 +28670,7 @@
         },
         {
           "name": "Complete selected extended left/right rotations: default r2 before recognition, raw stored width/value, original unsigned width literal and signed remainder/get_uint64/modulo full-expression end, fixed rotation delegation before default destruction and stopped caller cleanup (bv_rewriter.cpp:2020-2038; bv_rewriter.h:100-101; rational.h:101,202-206)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_extended_rotate.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_extended_rotate_test.go",
@@ -28686,7 +28686,7 @@
         },
         {
           "name": "Original OR/XOR numerical-local prerequisite: stored v2 reads, physical v1 assignments from distinct returned bitwise values, power-minus-literal all-one full expressions, OR normalization and ordered modulo/direct-division mask expressions (src/ast/rewriter/bv_rewriter.cpp:1599-1734,1772-1903)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_bitwise_numerals.go",
           "tests": [
             "TestASTBitVectorBitwiseNumeralsEveryActualReservation",
@@ -28695,7 +28695,7 @@
         },
         {
           "name": "Complete selected mk_bv_or: singleton before sort/scopes, count-change-only flattening, local positive/negative Go membership maps, stored numeric accumulation, opposite/all-one guards, concat disjointness, normalized mask scans, configured sorting/FAILED guard and original output statuses (src/ast/rewriter/bv_rewriter.cpp:1567-1734; src/ast/rewriter/bv_rewriter.h:92)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_or.go",
           "tests": [
             "TestBVRewriterOROriginalBranchesAndStatuses",
@@ -28707,7 +28707,7 @@
         },
         {
           "name": "Exact OR mask expression cleanup boundary: join younger numerical children/temporaries before caller branch buffer while preserving older two/v2/v1 and without crediting source return (src/ast/rewriter/bv_rewriter.cpp:1677-1716)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_bitwise_numerals.go",
           "tests": [
             "TestASTBitVectorBitwiseCloseExpressionPreservesOlderMaskLocals"
@@ -28715,7 +28715,7 @@
         },
         {
           "name": "Complete selected mk_bv_xor: count-change-only flattening, local Go parity membership, distinct bitwise/all-one assignments, unnormalized owning mask scopes, original survivor order, configured FAILED/sort guards and BR_REWRITE3 versus BR_DONE publication (src/ast/rewriter/bv_rewriter.cpp:1736-1903; src/ast/rewriter/bv_rewriter.h:93)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_xor.go",
           "tests": [
             "TestBVRewriterXOROriginalBranchesAndStatuses",
@@ -28727,7 +28727,7 @@
         },
         {
           "name": "Complete selected mk_extract: whole-width erasure before default v, original negative modulo/result-width and saturating shifts, nested fusion, concat routing/statuses, ordered operation distribution, configured propagation and ITE routing (src/ast/rewriter/bv_rewriter.cpp:668-790; src/ast/rewriter/bv_rewriter.h:85)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_extract.go",
           "tests": [
             "TestBVRewriterExtractOriginalBranchesAndStatuses",
@@ -28739,7 +28739,7 @@
         },
         {
           "name": "Complete selected propagate_extract: ADD/MUL/top guards, single default val, order-dependent numerical/symbolic prefix scan, shortened numerals, borrowed concat suffix and original raw operation rebuilding (src/ast/rewriter/bv_rewriter.cpp:590-666; src/ast/rewriter/bv_rewriter.h:84)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_extract_propagation.go",
           "tests": [
             "TestBVRewriterExtractPropagationOriginalOrderAndShapes",
@@ -28749,7 +28749,7 @@
         },
         {
           "name": "Exact extraction/propagation numerical authority: one default v/val, distinct reached power and ui64 literal, void aliased modulo/division, captured numeral factory and expression cleanup before older v (src/ast/rewriter/bv_rewriter.cpp:590-666,668-690; src/util/util.h:133-139)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_extract_numerals.go",
           "tests": [
             "TestASTBitVectorExtractNumeralsEveryActualReservation",
@@ -28758,7 +28758,7 @@
         },
         {
           "name": "Complete selected rw_leq_concats and short-circuited concat: ordered concat guards, high-numeral short circuit, normalized high-prefix comparisons, owning suffix reconstruction, common prefix unsigned comparison and postfix original-signedness comparison (src/ast/rewriter/bv_rewriter.cpp:245-252,349-434; src/ast/rewriter/bv_rewriter.h:79)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq_concat.go",
           "tests": [
             "TestBVRewriterLEConcatOriginalShapesAndStatuses",
@@ -28768,7 +28768,7 @@
         },
         {
           "name": "Exact concat comparison numerical authority: af/bf defaults, only reached returned power/division, retained normalized hi_af/hi_bf, captured shortened-prefix NUM factory and source/owning expression boundaries (src/ast/rewriter/bv_rewriter.cpp:358-393)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_concat_comparison_numerals.go",
           "tests": [
             "TestASTBitVectorConcatComparisonEveryActualReservation"
@@ -28776,7 +28776,7 @@
         },
         {
           "name": "Complete selected are_eq_upto_num and rw_leq_overflow: leading coefficient recognition, repeated borrowed-zero assignments, ordered pointer commonality, original mixed-case guards, borrowed common ADD suffix, exact difference and interval/equality publication (src/ast/rewriter/bv_rewriter.cpp:255-346; src/ast/rewriter/bv_rewriter.h:80-81)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq_overflow.go",
           "tests": [
             "TestBVRewriterLEOverflowOriginalBranchesAndSumGuards",
@@ -28787,7 +28787,7 @@
         },
         {
           "name": "Exact overflow comparison numerical authority: a0/b0 defaults, borrowed static zero, stored coefficient copy, reached power/subtraction/one-subtraction returns, retained lower/upper and captured numerical factory (src/ast/rewriter/bv_rewriter.cpp:262-263,298-303,315-346)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_overflow_comparison_numerals.go",
           "tests": [
             "TestASTBitVectorOverflowComparisonEveryActualReservation"
@@ -28795,7 +28795,7 @@
         },
         {
           "name": "Complete selected mk_leq_core: original three defaults/two reads before identity, shared stored-width normalization, numeric/bounds rewrites, ordered signed-remainder predicate and repeated sum expression, configured concat then overflow helpers, descending zero-bit scan and original statuses (src/ast/rewriter/bv_rewriter.cpp:436-584; src/ast/rewriter/bv_rewriter.h:82)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq.go",
           "tests": [
             "TestBVRewriterLEOriginalBranchesAndStatuses",
@@ -28806,7 +28806,7 @@
         },
         {
           "name": "Complete selected signed/unsigned LE/GE/LT wrappers: reversed core calls, raw reversed fallback after FAILED and raw NOT of reversed comparison with REWRITE2 (src/ast/rewriter/bv_rewriter.cpp:210-242; src/ast/rewriter/bv_rewriter.h:73-78)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq_wrappers.go",
           "tests": [
             "TestBVRewriterLEOriginalWrappers",
@@ -28815,7 +28815,7 @@
         },
         {
           "name": "Exact LE numerical authority: original unused r3, later default lower/upper, reached signed literals/power/negation/subtraction/norm/remainder/sum returns, original assignment/full-expression ends and captured numeral factory (src/ast/rewriter/bv_rewriter.cpp:436-517,560-568)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_le_comparison_numerals.go",
           "tests": [
             "TestASTBitVectorLEComparisonEveryActualReservation"
@@ -28823,7 +28823,7 @@
         },
         {
           "name": "Complete selected derived mk_sign_extend: allocation-free zero extension identity, default r before symbolic/numeric read, captured signed normalization/copy/modulo/NUM, configured cached sign extraction and retained borrowed concat buffer (src/ast/rewriter/bv_rewriter.cpp:1525-1553; src/ast/rewriter/bv_rewriter.h:89)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_derived_sign_extend.go",
           "tests": [
             "TestBVRewriterSignExtensionOriginalBranches",
@@ -28834,7 +28834,7 @@
         },
         {
           "name": "Exact sign-extension numerical authority: original single default r across symbolic result construction, normalization return and reached power full-expression ends before NUM/output, owning cleanup boundary before older r (src/ast/rewriter/bv_rewriter.cpp:1531-1553)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_bv_sign_extension_numerals.go",
           "tests": [
             "TestASTBitVectorSignExtensionSymbolicDefaultLifetime"
