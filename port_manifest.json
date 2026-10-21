@@ -34169,6 +34169,8 @@
         "pkg/ast/ast_seq_values.go",
         "pkg/ast/ast_seq_factories.go",
         "pkg/ast/ast_seq_regex.go",
+        "pkg/ast/ast_seq_parameterized.go",
+        "pkg/ast/ast_seq_parameterized_test.go",
         "pkg/ast/ast_seq_names.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_seq_signature_memory_trace.go",
@@ -34182,7 +34184,8 @@
         "TestASTSequenceSignatureMemoryWrappersSourceOrder",
         "TestASTSMT2StringLiteralSourceEncoding",
         "TestASTSequenceStringValueClassification",
-        "TestASTSequenceSourceBuiltinNames"
+        "TestASTSequenceSourceBuiltinNames",
+        "TestASTSequenceParameterizedLoopAndSkolem"
       ],
       "conditionals": [
         {
@@ -34321,6 +34324,14 @@
           "tests": [
             "TestASTSequenceStringValueClassification"
           ]
+        },
+        {
+          "name": "parameterized unary regex loop and symbol-parameterized sequence skolem construction with retained declaration parameters (seq_decl_plugin.cpp:692-717,925-931)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_parameterized.go",
+          "tests": [
+            "TestASTSequenceParameterizedLoopAndSkolem"
+          ]
         }
       ],
       "ownership": [
@@ -34340,7 +34351,8 @@
         "pkg/ast/ast_seq_string.go",
         "pkg/ast/ast_seq_values.go",
         "pkg/ast/ast_seq_factories.go",
-        "pkg/ast/ast_seq_regex.go"
+        "pkg/ast/ast_seq_regex.go",
+        "pkg/ast/ast_seq_parameterized.go"
       ],
       "tests": [
         "TestASTSMT2StringLiteralSourceEncoding"
@@ -34394,6 +34406,14 @@
           "go_target": "pkg/ast/ast_seq_regex.go",
           "tests": [
             "TestASTSequenceStringValueClassification"
+          ]
+        },
+        {
+          "name": "seq_util parameterized regex loop and symbol-parameterized skolem construction declarations (seq_decl_plugin.h:319-320,359-361)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_parameterized.go",
+          "tests": [
+            "TestASTSequenceParameterizedLoopAndSkolem"
           ]
         }
       ],
