@@ -439,6 +439,20 @@ func (m *ASTManager) DatatypeIsEnumSort(sort ASTHandle) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	if m.datatypePlugin == nil {
+		return false, nil
+	}
+	info := m.sortAt(r.slot).info
+	if info == (ASTSortInfo{}) {
+		return false, nil
+	}
+	identity, err := m.sortInfo(info)
+	if err != nil {
+		return false, err
+	}
+	if identity.family != m.datatypePlugin.family || identity.kind != ASTDatatypeSort {
+		return false, nil
+	}
 	d, err := m.datatypeDefinitionForSort(r)
 	if err != nil {
 		return false, err
