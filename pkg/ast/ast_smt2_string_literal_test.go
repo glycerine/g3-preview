@@ -151,9 +151,12 @@ func TestASTSequenceStringValueClassification(t *testing.T) {
 		{func() (ASTHandle, error) { return m.MkSequencePrefix(first, second) }, 3, "str.prefixof"},
 		{func() (ASTHandle, error) { return m.MkSequenceSuffix(first, second) }, 4, "str.suffixof"},
 		{func() (ASTHandle, error) { return m.MkSequenceContains(first, second) }, 5, "str.contains"},
+		{func() (ASTHandle, error) { return m.MkSequenceReplace(first, second, first) }, 7, "str.replace"},
 		{func() (ASTHandle, error) { return m.MkSequenceExtract(first, zero, zero) }, 6, "str.substr"},
 		{func() (ASTHandle, error) { return m.MkSequenceAt(first, zero) }, 8, "str.at"},
 		{func() (ASTHandle, error) { return m.MkSequenceIndex(first, second, zero) }, 10, "str.indexof"},
+		{func() (ASTHandle, error) { return m.MkIntToString(zero) }, 27, "int.to.str"},
+		{func() (ASTHandle, error) { return m.MkStringToInt(first) }, 28, "str.to.int"},
 		{func() (ASTHandle, error) { return m.MkSequenceLength(truthUnit) }, 9, "seq.len"},
 	} {
 		h, e := operation.make()
@@ -174,9 +177,17 @@ func TestASTSequenceStringValueClassification(t *testing.T) {
 	if _, err = m.MkSequenceExtract(first, truth, zero); !errors.Is(err, ErrASTDomain) {
 		t.Fatalf("non-integer sequence offset: %v", err)
 	}
+	if _, err = m.MkSequenceReplace(first, truthUnit, second); !errors.Is(err, ErrASTDomain) {
+		t.Fatalf("mixed sequence replacement: %v", err)
+	}
+	if _, err = m.MkIntToString(truth); !errors.Is(err, ErrASTDomain) {
+		t.Fatalf("non-integer int.to.str: %v", err)
+	}
 	stringRegex, err := m.MkSequenceToRegex(first)
 	astTestMust(t, err)
 	genericRegex, err := m.MkSequenceToRegex(truthUnit)
+	astTestMust(t, err)
+	stringRegexSort, err := m.GetSort(stringRegex)
 	astTestMust(t, err)
 	for _, operation := range []struct {
 		make func() (ASTHandle, error)
@@ -195,6 +206,9 @@ func TestASTSequenceStringValueClassification(t *testing.T) {
 		{func() (ASTHandle, error) { return m.MkRegexUnion(stringRegex, stringRegex) }, 18, "re.union"},
 		{func() (ASTHandle, error) { return m.MkRegexIntersect(stringRegex, stringRegex) }, 19, "re.inter"},
 		{func() (ASTHandle, error) { return m.MkRegexComplement(stringRegex) }, 21, "re.complement"},
+		{func() (ASTHandle, error) { return m.MkRegexEmpty(stringRegexSort) }, 22, "re.nostr"},
+		{func() (ASTHandle, error) { return m.MkRegexFull(stringRegexSort) }, 23, "re.all"},
+		{func() (ASTHandle, error) { return m.MkRegexFullChar(stringRegexSort) }, 24, "re.allchar"},
 	} {
 		h, e := operation.make()
 		astTestMust(t, e)
@@ -213,5 +227,8 @@ func TestASTSequenceStringValueClassification(t *testing.T) {
 	}
 	if _, err = m.MkRegexRange(first, truthUnit); !errors.Is(err, ErrASTDomain) {
 		t.Fatalf("mismatched regex range: %v", err)
+	}
+	if _, err = m.MkRegexEmpty(boolSort); !errors.Is(err, ErrASTDomain) {
+		t.Fatalf("non-regex empty set sort: %v", err)
 	}
 }

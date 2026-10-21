@@ -174,6 +174,67 @@ func (m *ASTManager) MkSequenceContains(left, right ASTHandle) (ASTHandle, error
 	return m.sequenceRelation(5, "seq.contains", "str.contains", left, right)
 }
 
+func (m *ASTManager) MkSequenceReplace(sequence, source, replacement ASTHandle) (ASTHandle, error) {
+	return m.withSequenceFactory(func() (ASTHandle, error) {
+		arguments := []ASTHandle{sequence, source, replacement}
+		var sequenceSort astNodeRef
+		for i, argument := range arguments {
+			ref, err := m.requireExpr(argument)
+			if err != nil {
+				return ASTHandle{}, err
+			}
+			sort, err := m.sortOf(ref)
+			if err != nil {
+				return ASTHandle{}, err
+			}
+			if i == 0 {
+				sequenceSort = sort
+			} else if sort != sequenceSort {
+				return ASTHandle{}, ErrASTDomain
+			}
+		}
+		return m.sequenceApplication(7, "seq.replace", "str.replace", arguments, sequenceSort)
+	})
+}
+
+func (m *ASTManager) MkIntToString(integer ASTHandle) (ASTHandle, error) {
+	return m.withSequenceFactory(func() (ASTHandle, error) {
+		ref, err := m.requireExpr(integer)
+		if err != nil {
+			return ASTHandle{}, err
+		}
+		sort, err := m.sortOf(ref)
+		if err != nil || sort != m.arithmeticPlugin.fields[1] {
+			return ASTHandle{}, ErrASTDomain
+		}
+		decl, err := m.makePluginDeclaration(m.sequencePlugin.family, "int.to.str", 27, []astNodeRef{sort}, m.sequencePlugin.stringSort, ASTFuncFlags{})
+		if err != nil {
+			return ASTHandle{}, err
+		}
+		app, err := m.mkApp(decl, []ASTHandle{integer})
+		return m.external(app), err
+	})
+}
+
+func (m *ASTManager) MkStringToInt(str ASTHandle) (ASTHandle, error) {
+	return m.withSequenceFactory(func() (ASTHandle, error) {
+		ref, err := m.requireExpr(str)
+		if err != nil {
+			return ASTHandle{}, err
+		}
+		sort, err := m.sortOf(ref)
+		if err != nil || sort != m.sequencePlugin.stringSort {
+			return ASTHandle{}, ErrASTDomain
+		}
+		decl, err := m.makePluginDeclaration(m.sequencePlugin.family, "str.to.int", 28, []astNodeRef{sort}, m.arithmeticPlugin.fields[1], ASTFuncFlags{})
+		if err != nil {
+			return ASTHandle{}, err
+		}
+		app, err := m.mkApp(decl, []ASTHandle{str})
+		return m.external(app), err
+	})
+}
+
 func (m *ASTManager) sequenceIndexed(kind int32, genericName, stringName string, sequence ASTHandle, indices ...ASTHandle) (ASTHandle, error) {
 	return m.withSequenceFactory(func() (ASTHandle, error) {
 		sequenceRef, err := m.requireExpr(sequence)

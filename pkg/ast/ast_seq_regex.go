@@ -201,3 +201,36 @@ func (m *ASTManager) MkRegexUnion(left, right ASTHandle) (ASTHandle, error) {
 func (m *ASTManager) MkRegexIntersect(left, right ASTHandle) (ASTHandle, error) {
 	return m.regexBinary(19, "re.inter", left, right)
 }
+
+func (m *ASTManager) regexConstant(kind int32, genericName, stringName string, sort ASTHandle) (ASTHandle, error) {
+	return m.withSequenceFactory(func() (ASTHandle, error) {
+		r, err := m.requireKind(sort, ASTSort)
+		if err != nil {
+			return ASTHandle{}, err
+		}
+		sequenceSort, err := m.regexSequenceSort(r)
+		if err != nil {
+			return ASTHandle{}, err
+		}
+		name := genericName
+		if sequenceSort == m.sequencePlugin.stringSort {
+			name = stringName
+		}
+		decl, err := m.makePluginDeclaration(m.sequencePlugin.family, name, kind, nil, r, ASTFuncFlags{})
+		if err != nil {
+			return ASTHandle{}, err
+		}
+		app, err := m.mkApp(decl, nil)
+		return m.external(app), err
+	})
+}
+
+func (m *ASTManager) MkRegexEmpty(sort ASTHandle) (ASTHandle, error) {
+	return m.regexConstant(22, "re.empty", "re.nostr", sort)
+}
+func (m *ASTManager) MkRegexFull(sort ASTHandle) (ASTHandle, error) {
+	return m.regexConstant(23, "re.all", "re.all", sort)
+}
+func (m *ASTManager) MkRegexFullChar(sort ASTHandle) (ASTHandle, error) {
+	return m.regexConstant(24, "re.allchar", "re.allchar", sort)
+}

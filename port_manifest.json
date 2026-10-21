@@ -34313,6 +34313,14 @@
           "tests": [
             "TestASTSequenceStringValueClassification"
           ]
+        },
+        {
+          "name": "retained sequence replacement, int/string conversions and regex empty/full/full-character constant factories with generic and String declaration names (seq_decl_plugin.cpp:674-690,692-729,768-794)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_factories.go",
+          "tests": [
+            "TestASTSequenceStringValueClassification"
+          ]
         }
       ],
       "ownership": [
