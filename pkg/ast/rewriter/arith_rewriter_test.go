@@ -278,6 +278,8 @@ func TestArithRewriterSymbolicModRemAndCasts(t *testing.T) {
 
 func TestArithRewriterPolynomialAddMulSubAndNegation(t *testing.T) {
 	m, c, g, local := boolRewriterConfigFixture(t)
+	key := "mul_to_power"
+	astTestMust(t, c.SetBoolName(local, &key, true))
 	r, err := NewArithRewriter(m, c, g, local)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
@@ -372,7 +374,7 @@ func TestArithRewriterPolynomialAddMulSubAndNegation(t *testing.T) {
 	}
 	arithRewriterWantNumeral(t, m, negativeArgs[0], "-1", true)
 
-	key := "flat"
+	key = "flat"
 	astTestMust(t, c.SetBoolName(local, &key, false))
 	nonflat, err := NewArithRewriter(m, c, g, local)
 	astTestMust(t, err)
@@ -380,6 +382,17 @@ func TestArithRewriterPolynomialAddMulSubAndNegation(t *testing.T) {
 	status, _ = arithRewriterCore(t, nonflat, arithOpAdd, x, nested)
 	if status != RewriteFailed {
 		t.Fatal("disabled polynomial flattening", status)
+	}
+	key = "flat"
+	astTestMust(t, c.SetBoolName(local, &key, true))
+	key = "mul_to_power"
+	astTestMust(t, c.SetBoolName(local, &key, false))
+	withoutPowers, err := NewArithRewriter(m, c, g, local)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, withoutPowers.Close()) })
+	status, _ = arithRewriterCore(t, withoutPowers, arithOpMul, x, x)
+	if status != RewriteFailed {
+		t.Fatal("disabled multiplication-to-power", status)
 	}
 }
 
@@ -914,4 +927,84 @@ func TestArithRewriterTranscendentalCore(t *testing.T) {
 	}
 	arithRewriterWantOperation(t, expanding, divisionArgs[0], arithOpSin, x)
 	arithRewriterWantOperation(t, expanding, divisionArgs[1], arithOpCos, x)
+
+	offset, err := r.app(arithOpAdd, x, halfPi)
+	astTestMust(t, err)
+	astTestPin(t, m, offset)
+	status, result = arithRewriterCore(t, r, arithOpSin, offset)
+	if status != Rewrite2 {
+		t.Fatal("sine pi offset status", status)
+	}
+	_, cosineArgs, matched, err := r.operation(result, arithOpCos)
+	astTestMust(t, err)
+	if !matched || len(cosineArgs) != 1 {
+		t.Fatal("sine pi offset", matched, len(cosineArgs))
+	}
+	arithRewriterWantOperation(t, r, cosineArgs[0], arithOpSub, offset, halfPi)
+
+	offset, err = r.app(arithOpAdd, x, pi)
+	astTestMust(t, err)
+	astTestPin(t, m, offset)
+	status, result = arithRewriterCore(t, r, arithOpCos, offset)
+	if status != Rewrite3 {
+		t.Fatal("cosine pi offset status", status)
+	}
+	_, negativeArgs, matched, err := r.operation(result, arithOpUMinus)
+	astTestMust(t, err)
+	if !matched || len(negativeArgs) != 1 {
+		t.Fatal("cosine pi offset negative", matched, len(negativeArgs))
+	}
+	_, cosineArgs, matched, err = r.operation(negativeArgs[0], arithOpCos)
+	astTestMust(t, err)
+	if !matched || len(cosineArgs) != 1 {
+		t.Fatal("cosine pi offset cosine", matched, len(cosineArgs))
+	}
+	arithRewriterWantOperation(t, r, cosineArgs[0], arithOpSub, offset, pi)
+
+	status, result = arithRewriterCore(t, r, arithOpTan, offset)
+	if status != Rewrite2 {
+		t.Fatal("tangent pi offset status", status)
+	}
+	_, tangentArgs, matched, err := r.operation(result, arithOpTan)
+	astTestMust(t, err)
+	if !matched || len(tangentArgs) != 1 {
+		t.Fatal("tangent pi offset", matched, len(tangentArgs))
+	}
+	arithRewriterWantOperation(t, r, tangentArgs[0], arithOpSub, offset, pi)
+
+	intSort, err := m.MkFamilySort(r.family, 1, nil)
+	astTestMust(t, err)
+	n, err := m.MkConst(astTestSymbol(t, m, "arith-trans-n"), intSort)
+	astTestMust(t, err)
+	astTestPin(t, m, n)
+	toRealN, err := r.app(arithOpToReal, n)
+	astTestMust(t, err)
+	piN, err := r.app(arithOpMul, pi, toRealN)
+	astTestMust(t, err)
+	r2 := arithRewriterNumeral(t, m, "2", false)
+	twoPiN, err := r.app(arithOpMul, r2, piN)
+	astTestMust(t, err)
+	dynamicOffset, err := r.app(arithOpAdd, x, twoPiN)
+	astTestMust(t, err)
+	status, result = arithRewriterCore(t, r, arithOpSin, dynamicOffset)
+	if status != Rewrite2 {
+		t.Fatal("dynamic sine period status", status)
+	}
+	_, sineArgs, matched, err := r.operation(result, arithOpSin)
+	astTestMust(t, err)
+	if !matched || len(sineArgs) != 1 {
+		t.Fatal("dynamic sine period", matched, len(sineArgs))
+	}
+	arithRewriterWantOperation(t, r, sineArgs[0], arithOpSub, dynamicOffset, twoPiN)
+
+	twelfth := arithRewriterNumeral(t, m, "1/12", false)
+	twelfthPi, err := r.app(arithOpMul, twelfth, pi)
+	astTestMust(t, err)
+	status, result = arithRewriterCore(t, r, arithOpSin, twelfthPi)
+	if status != RewriteFull {
+		t.Fatal("twelfth-angle sine status", status)
+	}
+	if _, _, matched, err = r.operation(result, arithOpDiv); err != nil || !matched {
+		t.Fatal("twelfth-angle sine division", matched, err)
+	}
 }

@@ -22896,7 +22896,7 @@
           ]
         },
         {
-          "name": "transcendental zero/inverse identities, principal exact pi values, inverse-trig constants, hyperbolic parity and configured tangent expansion",
+          "name": "complete retained transcendental rewrite surface: inverse identities, all exact pi values, symbolic pi periodicity, inverse-trig constants, hyperbolic parity and configured tangent expansion",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/arith_transcendental.go",
           "tests": [
@@ -22904,7 +22904,7 @@
           ]
         },
         {
-          "name": "advanced SOM/hoisting modes plus symbolic pi-offset periodicity and remaining twelfth-angle trigonometric expansions",
+          "name": "advanced polynomial sum-of-monomials and multiplication/coefficient hoisting modes",
           "status": "unported",
           "reason": "The exact rational scalar core is connected first; the remaining paths require the concrete arithmetic specialization of poly_rewriter and broader algebraic-expression integration."
         }

@@ -129,7 +129,109 @@ func (r *ArithRewriter) sinValue(k *big.Rat) (ast.ASTHandle, bool, error) {
 		h, err = r.signed(h, negative)
 		return h, err == nil, err
 	}
+	if k.Cmp(big.NewRat(1, 12)) == 0 || k.Cmp(big.NewRat(11, 12)) == 0 || k.Cmp(big.NewRat(5, 12)) == 0 || k.Cmp(big.NewRat(7, 12)) == 0 {
+		six, err := r.sqrt(big.NewRat(6, 1))
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		twoRoot, err := r.sqrt(big.NewRat(2, 1))
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		operator := arithOpSub
+		if k.Cmp(big.NewRat(5, 12)) == 0 || k.Cmp(big.NewRat(7, 12)) == 0 {
+			operator = arithOpAdd
+		}
+		numerator, err := r.app(operator, six, twoRoot)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		four, err := r.makeNumeral(big.NewRat(4, 1), false)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		h, err := r.app(arithOpDiv, numerator, four)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		h, err = r.signed(h, negative)
+		return h, err == nil, err
+	}
 	return ast.ASTHandle{}, false, nil
+}
+
+func (r *ArithRewriter) piOffset(h ast.ASTHandle) (*big.Rat, ast.ASTHandle, bool, error) {
+	_, args, add, err := r.operation(h, arithOpAdd)
+	if err != nil || !add {
+		return nil, ast.ASTHandle{}, false, err
+	}
+	for _, arg := range args {
+		coefficient, yes, e := r.piMultiple(arg)
+		if e != nil {
+			return nil, ast.ASTHandle{}, false, e
+		}
+		if yes {
+			return coefficient, arg, true, nil
+		}
+	}
+	return nil, ast.ASTHandle{}, false, nil
+}
+
+func (r *ArithRewriter) integerPiMultiple(h ast.ASTHandle, even bool) (bool, error) {
+	_, args, mul, err := r.operation(h, arithOpMul)
+	if err != nil || !mul || len(args) != 2 {
+		return false, err
+	}
+	isPair := func(left, right ast.ASTHandle) (bool, error) {
+		_, piArgs, pi, e := r.operation(left, arithOpPi)
+		if e != nil {
+			return false, e
+		}
+		toReal, _, e := r.unary(right, arithOpToReal)
+		return pi && len(piArgs) == 0 && toReal, e
+	}
+	coefficient := big.NewRat(1, 1)
+	pair := args
+	if value, _, numeral, e := r.numeral(args[0]); e != nil {
+		return false, e
+	} else if numeral {
+		if !value.IsInt() {
+			return false, nil
+		}
+		coefficient = value
+		_, pair, mul, err = r.operation(args[1], arithOpMul)
+		if err != nil || !mul || len(pair) != 2 {
+			return false, err
+		}
+	}
+	if even && new(big.Int).Mod(coefficient.Num(), big.NewInt(2)).Sign() != 0 {
+		return false, nil
+	}
+	if yes, e := isPair(pair[0], pair[1]); e != nil || yes {
+		return yes, e
+	}
+	return isPair(pair[1], pair[0])
+}
+
+func (r *ArithRewriter) integerPiOffset(h ast.ASTHandle, even bool) (ast.ASTHandle, bool, error) {
+	_, args, add, err := r.operation(h, arithOpAdd)
+	if err != nil || !add {
+		return ast.ASTHandle{}, false, err
+	}
+	for _, arg := range args {
+		yes, e := r.integerPiMultiple(arg, even)
+		if e != nil {
+			return ast.ASTHandle{}, false, e
+		}
+		if yes {
+			return arg, true, nil
+		}
+	}
+	return ast.ASTHandle{}, false, nil
+}
+
+func (r *ArithRewriter) subtractOffset(arg, offset ast.ASTHandle) (ast.ASTHandle, error) {
+	return r.app(arithOpSub, arg, offset)
 }
 
 func (r *ArithRewriter) rewriteSin(arg ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
@@ -183,6 +285,54 @@ func (r *ArithRewriter) rewriteSin(arg ast.ASTHandle, out ast.ASTRef) (RewriteSt
 			return RewriteFull, r.manager.SetRef(out, result)
 		}
 	}
+	if coefficient, offset, yes, err := r.piOffset(arg); err != nil {
+		return RewriteFailed, err
+	} else if yes {
+		period := arithPiPeriod(coefficient)
+		base, e := r.subtractOffset(arg, offset)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		var result ast.ASTHandle
+		status := Rewrite2
+		switch {
+		case period.Sign() == 0:
+			result, e = r.app(arithOpSin, base)
+		case period.Cmp(big.NewRat(1, 2)) == 0:
+			result, e = r.app(arithOpCos, base)
+		case period.Cmp(big.NewRat(1, 1)) == 0:
+			result, e = r.app(arithOpSin, base)
+			if e == nil {
+				result, e = r.app(arithOpUMinus, result)
+			}
+			status = Rewrite3
+		case period.Cmp(big.NewRat(3, 2)) == 0:
+			result, e = r.app(arithOpCos, base)
+			if e == nil {
+				result, e = r.app(arithOpUMinus, result)
+			}
+			status = Rewrite3
+		default:
+			return RewriteFailed, nil
+		}
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return status, r.manager.SetRef(out, result)
+	}
+	if offset, yes, err := r.integerPiOffset(arg, true); err != nil {
+		return RewriteFailed, err
+	} else if yes {
+		base, e := r.subtractOffset(arg, offset)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		result, e := r.app(arithOpSin, base)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return Rewrite2, r.manager.SetRef(out, result)
+	}
 	return RewriteFailed, nil
 }
 
@@ -212,6 +362,54 @@ func (r *ArithRewriter) rewriteCos(arg ast.ASTHandle, out ast.ASTRef) (RewriteSt
 		if matched {
 			return RewriteFull, r.manager.SetRef(out, result)
 		}
+	}
+	if coefficient, offset, yes, err := r.piOffset(arg); err != nil {
+		return RewriteFailed, err
+	} else if yes {
+		period := arithPiPeriod(coefficient)
+		base, e := r.subtractOffset(arg, offset)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		var result ast.ASTHandle
+		status := Rewrite2
+		switch {
+		case period.Sign() == 0:
+			result, e = r.app(arithOpCos, base)
+		case period.Cmp(big.NewRat(1, 2)) == 0:
+			result, e = r.app(arithOpSin, base)
+			if e == nil {
+				result, e = r.app(arithOpUMinus, result)
+			}
+			status = Rewrite3
+		case period.Cmp(big.NewRat(1, 1)) == 0:
+			result, e = r.app(arithOpCos, base)
+			if e == nil {
+				result, e = r.app(arithOpUMinus, result)
+			}
+			status = Rewrite3
+		case period.Cmp(big.NewRat(3, 2)) == 0:
+			result, e = r.app(arithOpSin, base)
+		default:
+			return RewriteFailed, nil
+		}
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return status, r.manager.SetRef(out, result)
+	}
+	if offset, yes, err := r.integerPiOffset(arg, true); err != nil {
+		return RewriteFailed, err
+	} else if yes {
+		base, e := r.subtractOffset(arg, offset)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		result, e := r.app(arithOpCos, base)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return Rewrite2, r.manager.SetRef(out, result)
 	}
 	return RewriteFailed, nil
 }
@@ -256,6 +454,35 @@ func (r *ArithRewriter) rewriteTan(arg ast.ASTHandle, out ast.ASTRef) (RewriteSt
 				}
 			}
 		}
+	}
+	if coefficient, offset, yes, err := r.piOffset(arg); err != nil {
+		return RewriteFailed, err
+	} else if yes {
+		fraction := new(big.Rat).Sub(coefficient, new(big.Rat).SetInt(arithFloor(coefficient)))
+		if fraction.Sign() == 0 {
+			base, e := r.subtractOffset(arg, offset)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			result, e := r.app(arithOpTan, base)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			return Rewrite2, r.manager.SetRef(out, result)
+		}
+	}
+	if offset, yes, err := r.integerPiOffset(arg, false); err != nil {
+		return RewriteFailed, err
+	} else if yes {
+		base, e := r.subtractOffset(arg, offset)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		result, e := r.app(arithOpTan, base)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return Rewrite2, r.manager.SetRef(out, result)
 	}
 	if r.expandTan {
 		sine, err := r.app(arithOpSin, arg)
@@ -302,6 +529,21 @@ func (r *ArithRewriter) rewriteInverseTrig(kind int32, arg ast.ASTHandle, out as
 				return Rewrite2, r.manager.SetRef(out, h)
 			}
 			return RewriteDone, r.manager.SetRef(out, arg)
+		}
+		if (kind == arithOpASin || kind == arithOpATan) && value.Cmp(big.NewRat(-1, 1)) < 0 {
+			positive, e := r.makeNumeral(new(big.Rat).Neg(value), false)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			inner, e := r.app(kind, positive)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			result, e := r.app(arithOpUMinus, inner)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			return Rewrite2, r.manager.SetRef(out, result)
 		}
 		var coefficient *big.Rat
 		switch kind {

@@ -301,8 +301,8 @@ func (r *ArithRewriter) rewriteMul(args ast.AppArguments, out ast.ASTRef) (Rewri
 		for j < len(factors) && factors[j] == factors[i] {
 			j++
 		}
-		if j-i == 1 {
-			combined = append(combined, factors[i])
+		if j-i == 1 || !r.mulToPower || r.expandPower {
+			combined = append(combined, factors[i:j]...)
 		} else {
 			exponent, e := r.numeralForTerm(new(big.Rat).SetInt64(int64(j-i)), first)
 			if e != nil {
