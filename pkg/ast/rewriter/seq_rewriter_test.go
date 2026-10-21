@@ -449,6 +449,12 @@ func TestSequenceRewriterRegexAlgebraicBranches(t *testing.T) {
 	ra, err := m.MkSequenceToRegex(a)
 	astTestMust(t, err)
 	astTestPin(t, m, ra)
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	astTestPin(t, m, b)
+	rb, err := m.MkSequenceToRegex(b)
+	astTestMust(t, err)
+	astTestPin(t, m, rb)
 	epsilon, err := m.MkSequenceToRegex(emptyString)
 	astTestMust(t, err)
 	astTestPin(t, m, epsilon)
@@ -506,5 +512,52 @@ func TestSequenceRewriterRegexAlgebraicBranches(t *testing.T) {
 	}
 	if yes, e := m.IsSequenceOperation(result, 18); e != nil || !yes {
 		t.Fatalf("regex optional: union=%v error=%v", yes, e)
+	}
+	status, err = rw.RewriteRegexComplement(empty, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if yes, e := m.IsSequenceOperation(result, 23); e != nil || status != RewriteDone || !yes {
+		t.Fatalf("complement empty: status=%d full=%v error=%v", status, yes, e)
+	}
+	intersection, err := m.MkRegexIntersect(ra, rb)
+	astTestMust(t, err)
+	astTestPin(t, m, intersection)
+	status, err = rw.RewriteRegexComplement(intersection, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if yes, e := m.IsSequenceOperation(result, 18); e != nil || status != Rewrite2 || !yes {
+		t.Fatalf("De Morgan complement: status=%d union=%v error=%v", status, yes, e)
+	}
+	status, err = rw.RewriteRegexStar(empty, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if yes, e := m.IsRegexEpsilon(result); e != nil || status != RewriteDone || !yes {
+		t.Fatalf("star empty: status=%d epsilon=%v error=%v", status, yes, e)
+	}
+	plus, err := m.MkRegexPlus(ra)
+	astTestMust(t, err)
+	astTestPin(t, m, plus)
+	status, err = rw.RewriteRegexStar(plus, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if yes, e := m.IsSequenceOperation(result, 14); e != nil || status != RewriteDone || !yes {
+		t.Fatalf("star plus: status=%d star=%v error=%v", status, yes, e)
+	}
+	starA, err := m.MkRegexStar(ra)
+	astTestMust(t, err)
+	astTestPin(t, m, starA)
+	union, err := m.MkRegexUnion(starA, rb)
+	astTestMust(t, err)
+	astTestPin(t, m, union)
+	status, err = rw.RewriteRegexStar(union, out)
+	astTestMust(t, err)
+	result, err = m.RefGet(out)
+	astTestMust(t, err)
+	if yes, e := m.IsSequenceOperation(result, 14); e != nil || status != Rewrite2 || !yes {
+		t.Fatalf("star union: status=%d star=%v error=%v", status, yes, e)
 	}
 }

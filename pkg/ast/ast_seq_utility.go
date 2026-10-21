@@ -240,3 +240,37 @@ func (m *ASTManager) IsRegexEpsilon(h ASTHandle) (bool, error) {
 	}
 	return m.isSequenceEmptyRef(argument)
 }
+
+func (m *ASTManager) SequenceUnaryOperationArgument(h ASTHandle, kind int32) (ASTHandle, bool, error) {
+	if err := m.lock(); err != nil {
+		return ASTHandle{}, false, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireExpr(h)
+	if err != nil {
+		return ASTHandle{}, false, err
+	}
+	if m.nodeAt(r.slot).kind != ASTApp || m.sequencePlugin == nil {
+		return ASTHandle{}, false, nil
+	}
+	a := m.appAt(r.slot)
+	family, actualKind, err := m.declIdentity(a.decl)
+	if err != nil || family != m.sequencePlugin.family || actualKind != kind || a.count != 1 {
+		return ASTHandle{}, false, err
+	}
+	argument, err := m.readInternal(a.args, 0)
+	return m.external(argument), err == nil, err
+}
+
+func (m *ASTManager) SequenceBinaryOperationArguments(h ASTHandle, kind int32) (ASTHandle, ASTHandle, bool, error) {
+	if err := m.lock(); err != nil {
+		return ASTHandle{}, ASTHandle{}, false, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireExpr(h)
+	if err != nil {
+		return ASTHandle{}, ASTHandle{}, false, err
+	}
+	left, right, matched, err := m.sequenceBinaryParts(r, kind)
+	return m.external(left), m.external(right), matched, err
+}

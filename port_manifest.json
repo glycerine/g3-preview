@@ -33814,6 +33814,14 @@
           "tests": [
             "TestSequenceRewriterRegexAlgebraicBranches"
           ]
+        },
+        {
+          "name": "seq_rewriter regex complement De Morgan/empty/full reductions and complete regex star normalization branches (seq_rewriter.cpp:1390-1418,1472-1517)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterRegexAlgebraicBranches"
+          ]
         }
       ],
       "ownership": [
@@ -34581,6 +34589,14 @@
         },
         {
           "name": "seq_util regex epsilon recognition through to-regex of an empty sequence value (seq_decl_plugin.h:294,310)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_utility.go",
+          "tests": [
+            "TestSequenceRewriterRegexAlgebraicBranches"
+          ]
+        },
+        {
+          "name": "seq_util concrete unary and binary sequence-operation operand decomposition used by regex normalization (seq_decl_plugin.h:280-304,310-334)",
           "status": "ported",
           "go_target": "pkg/ast/ast_seq_utility.go",
           "tests": [
