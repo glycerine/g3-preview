@@ -117,25 +117,29 @@ func (m *ASTManager) MkString(value string) (ASTHandle, error) {
 		return ASTHandle{}, err
 	}
 	defer m.mu.Unlock()
+	app, err := m.mkSequenceString(value)
+	return m.external(app), err
+}
+
+func (m *ASTManager) mkSequenceString(value string) (astNodeRef, error) {
 	p := m.sequencePlugin
 	if p == nil {
-		return ASTHandle{}, ErrASTHandle
+		return astNodeRef{}, ErrASTHandle
 	}
 	symbol, err := m.Symbols.Intern(encodeSequenceString(value))
 	if err != nil {
-		return ASTHandle{}, err
+		return astNodeRef{}, err
 	}
 	parameter := astParameterRecord{Kind: ASTParameterSymbol, symbol: symbol}
 	if err = m.beginFormatInfo(false, p.family, ASTSequenceOpStringConst, &parameter); err != nil {
-		return ASTHandle{}, err
+		return astNodeRef{}, err
 	}
 	decl, err := m.mkFuncDecl(p.names[0], nil, m.external(p.stringSort), ASTFuncDeclInfo{m.origin, math.MaxUint32 - 1, m.formatLexical.epoch})
 	m.endFormatInfo()
 	if err != nil {
-		return ASTHandle{}, err
+		return astNodeRef{}, err
 	}
-	app, err := m.mkApp(decl, nil)
-	return m.external(app), err
+	return m.mkApp(decl, nil)
 }
 
 // SequenceStringValue recognizes a string constant and returns its decoded

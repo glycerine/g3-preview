@@ -34273,7 +34273,7 @@
           ]
         },
         {
-          "name": "seq_decl_plugin::get_some_value sequence-empty and regex-to-re construction (seq_decl_plugin.cpp:909-923)",
+          "name": "seq_decl_plugin::get_some_value generic sequence-empty, canonical empty-string and sequence/string regex-to-re construction (seq_decl_plugin.cpp:647-661,909-923)",
           "status": "ported",
           "go_target": "pkg/ast/ast_seq_values.go",
           "tests": [

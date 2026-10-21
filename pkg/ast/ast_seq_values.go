@@ -81,8 +81,12 @@ func (m *ASTManager) mkSequenceEmpty(sort astNodeRef) (astNodeRef, error) {
 	if err != nil || family != p.family || kind != 0 {
 		return astNodeRef{}, ErrASTDomain
 	}
+	if sort == p.stringSort {
+		return m.mkSequenceString("")
+	}
 	name := p.signatures[ASTSequenceOpEmpty].name
-	if err = m.beginFormatInfo(false, p.family, ASTSequenceOpEmpty, nil); err != nil {
+	parameter := astParameterRecord{Kind: ASTParameterAST, ast: sort}
+	if err = m.beginFormatInfo(false, p.family, ASTSequenceOpEmpty, &parameter); err != nil {
 		return astNodeRef{}, err
 	}
 	decl, err := m.mkFuncDecl(name, nil, m.external(sort), ASTFuncDeclInfo{m.origin, math.MaxUint32 - 1, m.formatLexical.epoch})
@@ -126,6 +130,9 @@ func (m *ASTManager) sequenceSomeValue(sort astNodeRef) (ASTHandle, error) {
 		return ASTHandle{}, err
 	}
 	name := p.signatures[ASTSequenceOpToRegex].name
+	if parameter.ast == p.stringSort {
+		name = p.signatures[36].name
+	}
 	if err = m.beginFormatInfo(false, p.family, ASTSequenceOpToRegex, nil); err != nil {
 		return ASTHandle{}, err
 	}

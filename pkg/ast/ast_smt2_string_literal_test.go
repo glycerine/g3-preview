@@ -79,7 +79,9 @@ func TestASTSequenceStringValueClassification(t *testing.T) {
 	astTestMust(t, err)
 	distinctEmptyString, err := m.AreDistinct(empty, first)
 	astTestMust(t, err)
-	if kind != ASTSequenceOpEmpty || !value || unique || distinctEmptyString {
+	decoded, matched, err := m.SequenceStringValue(empty)
+	astTestMust(t, err)
+	if kind != ASTSequenceOpStringConst || !matched || decoded != "" || !value || unique || !distinctEmptyString {
 		t.Fatalf("empty sequence value: kind=%d value=%v unique=%v distinct-string=%v", kind, value, unique, distinctEmptyString)
 	}
 	regex, err := m.GetSomeValue(m.external(m.sequencePlugin.regex))
@@ -90,7 +92,21 @@ func TestASTSequenceStringValueClassification(t *testing.T) {
 	astTestMust(t, err)
 	emptyKind, err := m.GetDeclKind(regexEmpty)
 	astTestMust(t, err)
-	if kind != ASTSequenceOpToRegex || emptyKind != ASTSequenceOpEmpty {
+	if kind != ASTSequenceOpToRegex || emptyKind != ASTSequenceOpStringConst {
 		t.Fatalf("regular-expression some value: kind=%d child=%d", kind, emptyKind)
+	}
+	boolSort, err := m.MkBoolSort()
+	astTestMust(t, err)
+	element, err := m.NewParameterAST(boolSort)
+	astTestMust(t, err)
+	sequenceSort, err := m.MkFamilySort(m.sequencePlugin.family, 0, []ASTParameter{element})
+	astTestMust(t, err)
+	astTestMust(t, m.DelParameter(&element))
+	genericEmpty, err := m.GetSomeValue(sequenceSort)
+	astTestMust(t, err)
+	genericKind, err := m.GetDeclKind(genericEmpty)
+	astTestMust(t, err)
+	if genericKind != ASTSequenceOpEmpty {
+		t.Fatalf("generic sequence some value kind: %d", genericKind)
 	}
 }
