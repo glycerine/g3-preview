@@ -169,6 +169,12 @@ func (b *roundBuilder) bitOr(values ...ast.ASTHandle) ast.ASTHandle {
 func (b *roundBuilder) bitAnd(values ...ast.ASTHandle) ast.ASTHandle {
 	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkBitVectorAnd(values) })
 }
+func (b *roundBuilder) bitXor(values ...ast.ASTHandle) ast.ASTHandle {
+	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkBitVectorXor(values) })
+}
+func (b *roundBuilder) mul(a, c ast.ASTHandle) ast.ASTHandle {
+	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkBitVectorMul(a, c) })
+}
 func (b *roundBuilder) bitNot(v ast.ASTHandle) ast.ASTHandle {
 	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkBitVectorNot(v) })
 }

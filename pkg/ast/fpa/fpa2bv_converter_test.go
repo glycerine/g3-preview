@@ -286,6 +286,47 @@ func TestConverterAddSubtractSpecialCasesAndSymbolicShape(t *testing.T) {
 	}
 }
 
+func TestConverterMultiplySpecialCasesAndSymbolicShape(t *testing.T) {
+	m, c := fixture(t)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	mode, err := c.MkRoundingMode(ast.FPAOpRMNearestEven)
+	must(t, err)
+	values := make(map[fpa.SpecialValue]ast.ASTHandle)
+	for _, kind := range []fpa.SpecialValue{fpa.NaN, fpa.PositiveInfinity, fpa.NegativeInfinity, fpa.PositiveZero, fpa.NegativeZero} {
+		values[kind], err = c.MkSpecial(sort, kind)
+		must(t, err)
+	}
+	for _, tc := range []struct {
+		left, right fpa.SpecialValue
+		want        fpa.SpecialValue
+	}{
+		{fpa.PositiveZero, fpa.PositiveInfinity, fpa.NaN},
+		{fpa.NegativeZero, fpa.NegativeInfinity, fpa.NaN},
+		{fpa.PositiveInfinity, fpa.NegativeInfinity, fpa.NegativeInfinity},
+		{fpa.NegativeInfinity, fpa.NegativeInfinity, fpa.PositiveInfinity},
+		{fpa.PositiveZero, fpa.NegativeZero, fpa.NegativeZero},
+		{fpa.NaN, fpa.PositiveInfinity, fpa.NaN},
+	} {
+		got, e := c.Mul(mode, values[tc.left], values[tc.right])
+		must(t, e)
+		if got != values[tc.want] {
+			t.Fatal("special multiplication", tc, got, values[tc.want])
+		}
+	}
+	left, err := c.MkConst(declaration(t, m, "mul-left", nil, sort))
+	must(t, err)
+	right, err := c.MkConst(declaration(t, m, "mul-right", nil, sort))
+	must(t, err)
+	result, err := c.Mul(mode, left, right)
+	must(t, err)
+	resultSort, err := m.GetSort(result)
+	must(t, err)
+	if resultSort != sort {
+		t.Fatal("symbolic multiplication sort", resultSort, sort)
+	}
+}
+
 func fixture(t *testing.T) (*ast.ASTManager, *fpa.Converter) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)

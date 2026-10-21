@@ -126,7 +126,7 @@ func TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions(t *testing.T
 	}
 }
 
-func TestFPA2BVRewriterAdditionDispatch(t *testing.T) {
+func TestFPA2BVRewriterArithmeticDispatch(t *testing.T) {
 	f := newFPA2BVFixture(t)
 	rounding, err := f.m.MkFamilyApp(f.family, ast.FPAOpRMNearestEven, nil, nil)
 	astTestMust(t, err)
@@ -141,6 +141,13 @@ func TestFPA2BVRewriterAdditionDispatch(t *testing.T) {
 	astTestMust(t, err)
 	if got != want {
 		t.Fatal("opposite infinities did not lower to NaN", got, want)
+	}
+	zero, err := f.m.MkFPAZeroOfSort(f.sort, false)
+	astTestMust(t, err)
+	multiplication, err := f.m.MkFamilyApp(f.family, ast.FPAOpMul, nil, []ast.ASTHandle{rounding, zero, positive})
+	astTestMust(t, err)
+	if got = f.rewrite(t, multiplication); got != want {
+		t.Fatal("zero times infinity did not lower to NaN", got, want)
 	}
 
 	left := astTestSymbol(t, f.m, "add-x")

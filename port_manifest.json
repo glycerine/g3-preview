@@ -17303,6 +17303,7 @@
         "pkg/ast/fpa/fpa2bv_unpack.go",
         "pkg/ast/fpa/fpa2bv_round.go",
         "pkg/ast/fpa/fpa2bv_add.go",
+        "pkg/ast/fpa/fpa2bv_mul.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
@@ -17319,6 +17320,7 @@
         "TestConverterRoundingDecisionModes",
         "TestConverterRoundKernelWidthsAndResultShape",
         "TestConverterAddSubtractSpecialCasesAndSymbolicShape",
+        "TestConverterMultiplySpecialCasesAndSymbolicShape",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18682,6 +18684,7 @@
         "pkg/ast/fpa/fpa2bv_unpack.go",
         "pkg/ast/fpa/fpa2bv_round.go",
         "pkg/ast/fpa/fpa2bv_add.go",
+        "pkg/ast/fpa/fpa2bv_mul.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
@@ -18698,6 +18701,7 @@
         "TestConverterRoundingDecisionModes",
         "TestConverterRoundKernelWidthsAndResultShape",
         "TestConverterAddSubtractSpecialCasesAndSymbolicShape",
+        "TestConverterMultiplySpecialCasesAndSymbolicShape",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18749,7 +18753,7 @@
       "tests": [
         "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
         "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
-        "TestFPA2BVRewriterAdditionDispatch",
+        "TestFPA2BVRewriterArithmeticDispatch",
         "TestConverterFiniteNumeral"
       ],
       "assertions": [
@@ -18792,12 +18796,13 @@
           ]
         },
         {
-          "name": "floating-point addition and subtraction dispatch through the shared normalization rounder",
+          "name": "floating-point addition, subtraction, and multiplication dispatch through the shared normalization rounder",
           "status": "ported",
-          "go_target": "pkg/ast/fpa/fpa2bv_add.go",
+          "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
           "tests": [
             "TestConverterAddSubtractSpecialCasesAndSymbolicShape",
-            "TestFPA2BVRewriterAdditionDispatch"
+            "TestConverterMultiplySpecialCasesAndSymbolicShape",
+            "TestFPA2BVRewriterArithmeticDispatch"
           ]
         }
       ],
@@ -18819,7 +18824,7 @@
       "tests": [
         "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
         "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
-        "TestFPA2BVRewriterAdditionDispatch",
+        "TestFPA2BVRewriterArithmeticDispatch",
         "TestConverterFiniteNumeral"
       ],
       "conditionals": [
@@ -18836,13 +18841,13 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "fpa2bv configuration and traversal wrapper with addition/subtraction and partial converter dispatch; remaining arithmetic and format-conversion dispatch remains open",
+          "name": "fpa2bv configuration and traversal wrapper with addition, subtraction, multiplication, and partial converter dispatch; remaining arithmetic and format-conversion dispatch remains open",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
           "tests": [
             "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
             "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
-            "TestFPA2BVRewriterAdditionDispatch"
+            "TestFPA2BVRewriterArithmeticDispatch"
           ]
         }
       ],
