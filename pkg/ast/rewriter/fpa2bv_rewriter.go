@@ -363,12 +363,22 @@ func (c *fpa2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArgument
 				if err == nil && floating {
 					value, err = converter.ToFPFloat(targetSort, values[0], values[1])
 				} else if err == nil {
-					done = false
+					value, err = converter.ToFPSigned(targetSort, values[0], values[1])
 				}
 			case 3:
 				value, err = converter.MkFP(values[0], values[1], values[2])
 			default:
 				err = ast.ErrASTDomain
+			}
+		case ast.FPAOpToFPUnsigned:
+			if len(values) != 2 {
+				err = ast.ErrASTDomain
+			} else {
+				var targetSort ast.ASTHandle
+				targetSort, err = m.GetRange(decl)
+				if err == nil {
+					value, err = converter.ToFPUnsigned(targetSort, values[0], values[1])
+				}
 			}
 		default:
 			done = false

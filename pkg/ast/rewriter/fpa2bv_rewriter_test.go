@@ -231,4 +231,24 @@ func TestFPA2BVRewriterToFPFormatDispatch(t *testing.T) {
 	if got != want {
 		t.Fatal("format conversion dispatch", got, want)
 	}
+	bvSort, err := f.m.BitVectorSort(32)
+	astTestMust(t, err)
+	zero, err := f.m.BitVectorNumeralUnsigned(0, 32)
+	astTestMust(t, err)
+	for _, kind := range []int32{ast.FPAOpToFP, ast.FPAOpToFPUnsigned} {
+		integerDeclaration, e := f.m.MkFamilyFuncDecl(
+			f.family, kind,
+			[]ast.ASTParameter{ebits, sbits},
+			[]ast.ASTHandle{rmSort, bvSort}, ast.ASTHandle{},
+		)
+		astTestMust(t, e)
+		integerConversion, e := f.m.MkApp(integerDeclaration, []ast.ASTHandle{rounding, zero})
+		astTestMust(t, e)
+		got = f.rewrite(t, integerConversion)
+		want, e = f.converter.MkSpecial(targetSort, astfpa.PositiveZero)
+		astTestMust(t, e)
+		if got != want {
+			t.Fatal("integer conversion dispatch", kind, got, want)
+		}
+	}
 }

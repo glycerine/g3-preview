@@ -17310,6 +17310,7 @@
         "pkg/ast/fpa/fpa2bv_sqrt.go",
         "pkg/ast/fpa/fpa2bv_fma.go",
         "pkg/ast/fpa/fpa2bv_format.go",
+        "pkg/ast/fpa/fpa2bv_integer.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
@@ -17333,6 +17334,7 @@
         "TestConverterSquareRootSpecialCasesAndSymbolicShape",
         "TestConverterFMASpecialCasesAndSymbolicShape",
         "TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape",
+        "TestConverterSignedUnsignedIntegerConversions",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18703,6 +18705,7 @@
         "pkg/ast/fpa/fpa2bv_sqrt.go",
         "pkg/ast/fpa/fpa2bv_fma.go",
         "pkg/ast/fpa/fpa2bv_format.go",
+        "pkg/ast/fpa/fpa2bv_integer.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
@@ -18726,6 +18729,7 @@
         "TestConverterSquareRootSpecialCasesAndSymbolicShape",
         "TestConverterFMASpecialCasesAndSymbolicShape",
         "TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape",
+        "TestConverterSignedUnsignedIntegerConversions",
         "TestConverterBiasLeadingZerosAndUnpack",
         "TestConverterSymbolCachesAssertionsAndReset",
         "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
@@ -18837,11 +18841,12 @@
         }
         ,
         {
-          "name": "IEEE bit-vector assembly, three-field assembly, and floating format conversion with source significand resizing, sticky-bit collapse, exponent clamping, and shared rounding",
+          "name": "IEEE bit-vector assembly, three-field assembly, floating format conversion, and signed/unsigned bit-vector conversion with significand normalization, sticky-bit collapse, exponent clamping, and shared rounding",
           "status": "ported",
           "go_target": "pkg/ast/fpa/fpa2bv_format.go",
           "tests": [
             "TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape",
+            "TestConverterSignedUnsignedIntegerConversions",
             "TestFPA2BVRewriterToFPFormatDispatch"
           ]
         }
@@ -18882,7 +18887,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "fpa2bv configuration and traversal wrapper with arithmetic, IEEE bit-vector assembly, three-field assembly, floating format conversion, and partial converter dispatch; remaining arithmetic/bit-vector/real format conversions remain open",
+          "name": "fpa2bv configuration and traversal wrapper with arithmetic, IEEE bit-vector assembly, three-field assembly, floating format conversion, signed/unsigned bit-vector-to-float conversion, and partial converter dispatch; remaining float-to-bit-vector and real conversions remain open",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
           "tests": [

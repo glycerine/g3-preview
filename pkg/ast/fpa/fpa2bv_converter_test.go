@@ -135,6 +135,71 @@ func TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape(t *testing.T
 	}
 }
 
+func TestConverterSignedUnsignedIntegerConversions(t *testing.T) {
+	m, c := fixture(t)
+	targetSort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	rne, err := c.MkRoundingMode(ast.FPAOpRMNearestEven)
+	must(t, err)
+	zero, err := m.BitVectorNumeralUnsigned(0, 32)
+	must(t, err)
+	positiveZero, err := c.MkSpecial(targetSort, fpa.PositiveZero)
+	must(t, err)
+	for _, conversion := range []func(ast.ASTHandle, ast.ASTHandle, ast.ASTHandle) (ast.ASTHandle, error){
+		c.ToFPSigned, c.ToFPUnsigned,
+	} {
+		got, e := conversion(targetSort, rne, zero)
+		must(t, e)
+		if got != positiveZero {
+			t.Fatal("integer zero conversion", got, positiveZero)
+		}
+	}
+
+	one, err := m.BitVectorNumeralUnsigned(1, 32)
+	must(t, err)
+	for _, conversion := range []func(ast.ASTHandle, ast.ASTHandle, ast.ASTHandle) (ast.ASTHandle, error){
+		c.ToFPSigned, c.ToFPUnsigned,
+	} {
+		got, e := conversion(targetSort, rne, one)
+		must(t, e)
+		gotSort, e := m.GetSort(got)
+		must(t, e)
+		kind, e := m.GetDeclKind(got)
+		must(t, e)
+		if gotSort != targetSort || kind != ast.FPAOpFP {
+			t.Fatal("integer one conversion shape", gotSort, kind)
+		}
+	}
+
+	minusOneBits, err := m.BitVectorNumeralAllOnes(32)
+	must(t, err)
+	got, err := c.ToFPSigned(targetSort, rne, minusOneBits)
+	must(t, err)
+	gotSort, err := m.GetSort(got)
+	must(t, err)
+	if kind, e := m.GetDeclKind(got); e != nil || gotSort != targetSort || kind != ast.FPAOpFP {
+		t.Fatal("signed minus-one conversion shape", gotSort, kind, e)
+	}
+
+	bvSort, err := m.BitVectorSort(32)
+	must(t, err)
+	variable, err := m.MkVar(820, bvSort)
+	must(t, err)
+	for _, conversion := range []func(ast.ASTHandle, ast.ASTHandle, ast.ASTHandle) (ast.ASTHandle, error){
+		c.ToFPSigned, c.ToFPUnsigned,
+	} {
+		got, e := conversion(targetSort, rne, variable)
+		must(t, e)
+		gotSort, e := m.GetSort(got)
+		must(t, e)
+		kind, e := m.GetDeclKind(got)
+		must(t, e)
+		if gotSort != targetSort || kind != ast.FPAOpFP {
+			t.Fatal("symbolic integer conversion shape", gotSort, kind)
+		}
+	}
+}
+
 func TestConverterFiniteNumeral(t *testing.T) {
 	m, c := fixture(t)
 	_, err := m.RegisterArithmeticPlugin()
