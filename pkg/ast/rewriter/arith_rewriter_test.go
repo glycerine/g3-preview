@@ -1152,3 +1152,130 @@ func TestArithRewriterAdvancedPolynomialModes(t *testing.T) {
 		}
 	})
 }
+
+func TestArithRewriterRemainingStructuralNormalization(t *testing.T) {
+	t.Run("exact-root-without-algebraic-evaluator", func(t *testing.T) {
+		m, c, g, local := boolRewriterConfigFixture(t)
+		key := "algebraic_number_evaluator"
+		astTestMust(t, c.SetBoolName(local, &key, false))
+		r, err := NewArithRewriter(m, c, g, local)
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, r.Close()) })
+		four := arithRewriterNumeral(t, m, "4", false)
+		half := arithRewriterNumeral(t, m, "1/2", false)
+		status, result := arithRewriterCore(t, r, arithOpPower, four, half)
+		if status != RewriteDone {
+			t.Fatal("exact root status", status)
+		}
+		arithRewriterWantNumeral(t, m, result, "2", false)
+	})
+
+	t.Run("sum-of-monomials-power-expansion", func(t *testing.T) {
+		m, c, g, local := boolRewriterConfigFixture(t)
+		key := "som"
+		astTestMust(t, c.SetBoolName(local, &key, true))
+		r, err := NewArithRewriter(m, c, g, local)
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, r.Close()) })
+		iSort, err := m.MkFamilySort(r.family, 1, nil)
+		astTestMust(t, err)
+		x, err := m.MkConst(astTestSymbol(t, m, "arith-som-power-x"), iSort)
+		astTestMust(t, err)
+		astTestPin(t, m, x)
+		y, err := m.MkConst(astTestSymbol(t, m, "arith-som-power-y"), iSort)
+		astTestMust(t, err)
+		astTestPin(t, m, y)
+		sum, err := r.app(arithOpAdd, x, y)
+		astTestMust(t, err)
+		two := arithRewriterNumeral(t, m, "2", true)
+		status, result := arithRewriterCore(t, r, arithOpPower, sum, two)
+		if status != Rewrite1 {
+			t.Fatal("sum-of-monomials power status", status)
+		}
+		arithRewriterWantOperation(t, r, result, arithOpMul, sum, sum)
+	})
+
+	t.Run("division-coefficients", func(t *testing.T) {
+		m, c, g, local := boolRewriterConfigFixture(t)
+		r, err := NewArithRewriter(m, c, g, local)
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, r.Close()) })
+		realSort, err := m.MkFamilySort(r.family, 0, nil)
+		astTestMust(t, err)
+		x, err := m.MkConst(astTestSymbol(t, m, "arith-div-coefficient-x"), realSort)
+		astTestMust(t, err)
+		astTestPin(t, m, x)
+		y, err := m.MkConst(astTestSymbol(t, m, "arith-div-coefficient-y"), realSort)
+		astTestMust(t, err)
+		astTestPin(t, m, y)
+		r2 := arithRewriterNumeral(t, m, "2", false)
+		r3 := arithRewriterNumeral(t, m, "3", false)
+		left, err := r.app(arithOpMul, r2, x)
+		astTestMust(t, err)
+		right, err := r.app(arithOpMul, r3, y)
+		astTestMust(t, err)
+		status, result := arithRewriterCore(t, r, arithOpDiv, left, right)
+		if status != Rewrite2 {
+			t.Fatal("division coefficient status", status)
+		}
+		_, factors, matched, err := r.operation(result, arithOpMul)
+		astTestMust(t, err)
+		if !matched || len(factors) != 2 {
+			t.Fatal("division coefficient product", matched, len(factors))
+		}
+		arithRewriterWantNumeral(t, m, factors[0], "2/3", false)
+		arithRewriterWantOperation(t, r, factors[1], arithOpDiv, x, y)
+	})
+
+	t.Run("negative-polynomial-orientation", func(t *testing.T) {
+		m, c, g, local := boolRewriterConfigFixture(t)
+		key := "arith_lhs"
+		astTestMust(t, c.SetBoolName(local, &key, true))
+		r, err := NewArithRewriter(m, c, g, local)
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, r.Close()) })
+		iSort, err := m.MkFamilySort(r.family, 1, nil)
+		astTestMust(t, err)
+		x, err := m.MkConst(astTestSymbol(t, m, "arith-negative-poly-x"), iSort)
+		astTestMust(t, err)
+		astTestPin(t, m, x)
+		y, err := m.MkConst(astTestSymbol(t, m, "arith-negative-poly-y"), iSort)
+		astTestMust(t, err)
+		astTestPin(t, m, y)
+		minusTwo := arithRewriterNumeral(t, m, "-2", true)
+		minusThree := arithRewriterNumeral(t, m, "-3", true)
+		five := arithRewriterNumeral(t, m, "5", true)
+		leftTerm, err := r.app(arithOpMul, minusTwo, x)
+		astTestMust(t, err)
+		rightTerm, err := r.app(arithOpMul, minusThree, y)
+		astTestMust(t, err)
+		polynomial, err := r.app(arithOpAdd, leftTerm, rightTerm)
+		astTestMust(t, err)
+		status, result := arithRewriterCore(t, r, arithOpLE, polynomial, five)
+		if status != RewriteDone {
+			t.Fatal("negative polynomial status", status)
+		}
+		_, comparison, matched, err := r.operation(result, arithOpGE)
+		astTestMust(t, err)
+		if !matched || len(comparison) != 2 {
+			t.Fatal("negative polynomial comparison orientation", matched, len(comparison))
+		}
+		_, terms, matched, err := r.operation(comparison[0], arithOpAdd)
+		astTestMust(t, err)
+		if !matched || len(terms) == 0 {
+			t.Fatal("negative polynomial positive left side", matched, len(terms))
+		}
+		coefficient, _, numeral, err := r.numeral(func() ast.ASTHandle {
+			_, factors, product, e := r.operation(terms[0], arithOpMul)
+			astTestMust(t, e)
+			if !product || len(factors) == 0 {
+				t.Fatal("negative polynomial first monomial", product, len(factors))
+			}
+			return factors[0]
+		}())
+		astTestMust(t, err)
+		if !numeral || coefficient.Sign() <= 0 {
+			t.Fatal("negative polynomial coefficient", coefficient, numeral)
+		}
+	})
+}

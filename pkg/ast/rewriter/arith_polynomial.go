@@ -372,6 +372,74 @@ func (r *ArithRewriter) coefficientProduct(coefficient *big.Rat, powerProduct, t
 	return r.app(arithOpMul, numeral, powerProduct)
 }
 
+func (r *ArithRewriter) negateMonomial(h ast.ASTHandle) (ast.ASTHandle, error) {
+	_, factors, product, err := r.operation(h, arithOpMul)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if product && len(factors) != 0 {
+		coefficient, _, numeral, err := r.numeral(factors[0])
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		if numeral {
+			result := make([]ast.ASTHandle, 0, len(factors))
+			if coefficient.Cmp(big.NewRat(-1, 1)) != 0 {
+				negative, err := r.numeralForTerm(new(big.Rat).Neg(coefficient), h)
+				if err != nil {
+					return ast.ASTHandle{}, err
+				}
+				result = append(result, negative)
+			}
+			result = append(result, factors[1:]...)
+			return r.makeMul(result, h)
+		}
+	}
+	minusOne, err := r.numeralForTerm(big.NewRat(-1, 1), h)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return r.makeMul([]ast.ASTHandle{minusOne, h}, h)
+}
+
+func (r *ArithRewriter) negativePolynomial(h ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	_, factors, product, err := r.operation(h, arithOpMul)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	if product && len(factors) != 0 {
+		coefficient, _, numeral, err := r.numeral(factors[0])
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		if numeral && coefficient.Sign() < 0 {
+			result, err := r.negateMonomial(h)
+			return result, err == nil, err
+		}
+	}
+	_, terms, sum, err := r.operation(h, arithOpAdd)
+	if err != nil || !sum || len(terms) == 0 {
+		return ast.ASTHandle{}, false, err
+	}
+	_, firstFactors, firstProduct, err := r.operation(terms[0], arithOpMul)
+	if err != nil || !firstProduct || len(firstFactors) == 0 {
+		return ast.ASTHandle{}, false, err
+	}
+	coefficient, _, numeral, err := r.numeral(firstFactors[0])
+	if err != nil || !numeral || coefficient.Sign() >= 0 {
+		return ast.ASTHandle{}, false, err
+	}
+	negated := make([]ast.ASTHandle, len(terms))
+	for i, item := range terms {
+		negated[i], err = r.negateMonomial(item)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+	}
+	result, err := r.makeAdd(negated, h)
+	return result, err == nil, err
+}
+
 func (r *ArithRewriter) rewriteAdd(args ast.AppArguments, out ast.ASTRef) (RewriteStatus, error) {
 	if args.Count() == 0 {
 		return RewriteFailed, ast.ErrASTDomain

@@ -245,12 +245,94 @@ func arithIntegerMod(left, right *big.Rat) *big.Int {
 	return new(big.Int).Mod(left.Num(), right.Num())
 }
 
+func arithExactIntegerRoot(value *big.Int, degree uint32) (*big.Int, bool) {
+	if value == nil || degree == 0 {
+		return nil, false
+	}
+	negative := value.Sign() < 0
+	if negative && degree%2 == 0 {
+		return nil, false
+	}
+	absolute := new(big.Int).Abs(value)
+	if absolute.Sign() == 0 || absolute.Cmp(big.NewInt(1)) == 0 || degree == 1 {
+		root := new(big.Int).Set(absolute)
+		if negative {
+			root.Neg(root)
+		}
+		return root, true
+	}
+	one := big.NewInt(1)
+	low := new(big.Int).Set(one)
+	bits := (uint64(absolute.BitLen()) + uint64(degree) - 1) / uint64(degree)
+	high := new(big.Int).Lsh(new(big.Int).Set(one), uint(bits+1))
+	exponent := new(big.Int).SetUint64(uint64(degree))
+	for low.Cmp(high) <= 0 {
+		middle := new(big.Int).Rsh(new(big.Int).Add(low, high), 1)
+		powered := new(big.Int).Exp(middle, exponent, nil)
+		switch powered.Cmp(absolute) {
+		case 0:
+			if negative {
+				middle.Neg(middle)
+			}
+			return middle, true
+		case -1:
+			low = new(big.Int).Add(middle, one)
+		default:
+			high = new(big.Int).Sub(middle, one)
+		}
+	}
+	return nil, false
+}
+
+func arithExactRationalRoot(value *big.Rat, degree uint32) (*big.Rat, bool) {
+	if value == nil {
+		return nil, false
+	}
+	numerator, exact := arithExactIntegerRoot(value.Num(), degree)
+	if !exact {
+		return nil, false
+	}
+	denominator, exact := arithExactIntegerRoot(value.Denom(), degree)
+	if !exact {
+		return nil, false
+	}
+	return new(big.Rat).SetFrac(numerator, denominator), true
+}
+
 func (r *ArithRewriter) setBool(out ast.ASTRef, value bool) error {
 	h, err := r.manager.MkBoolVal(value)
 	if err != nil {
 		return err
 	}
 	return r.manager.SetRef(out, h)
+}
+
+func (r *ArithRewriter) rewriteNegativePolynomialComparison(kind int32, left, right ast.ASTHandle, out ast.ASTRef) (bool, error) {
+	if !r.arithLHS && !r.arithIneqLHS {
+		return false, nil
+	}
+	rightValue, _, numeral, err := r.numeral(right)
+	if err != nil || !numeral {
+		return false, err
+	}
+	positive, negative, err := r.negativePolynomial(left)
+	if err != nil || !negative {
+		return false, err
+	}
+	negatedRight, err := r.numeralForTerm(new(big.Rat).Neg(rightValue), positive)
+	if err != nil {
+		return false, err
+	}
+	var result ast.ASTHandle
+	if kind == arithRelationEq {
+		result, err = r.manager.MkEq(positive, negatedRight)
+	} else {
+		result, err = r.app(invertArithmeticRelation(kind), positive, negatedRight)
+	}
+	if err != nil {
+		return false, err
+	}
+	return true, r.manager.SetRef(out, result)
 }
 
 func (r *ArithRewriter) rewriteComparison(kind int32, left, right ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
@@ -334,6 +416,9 @@ func (r *ArithRewriter) rewriteComparison(kind int32, left, right ast.ASTHandle,
 				left, right, changed = newLeft, newRight, true
 			}
 		}
+		if rewritten, e := r.rewriteNegativePolynomialComparison(kind, left, right, out); e != nil || rewritten {
+			return RewriteDone, e
+		}
 		if changed && err == nil {
 			result, e := r.app(kind, left, right)
 			if e != nil {
@@ -413,29 +498,78 @@ func (r *ArithRewriter) rewriteDivision(kind int32, left, right ast.ASTHandle, o
 		return RewriteFailed, err
 	}
 	rv, ri, rn, err := r.numeral(right)
-	if err != nil || !rn || rv.Sign() == 0 {
+	if err != nil {
 		return RewriteFailed, err
 	}
 	if kind == arithOpDiv {
-		if ln {
-			h, e := r.makeNumeral(new(big.Rat).Quo(lv, rv), false)
+		if rn {
+			if rv.Sign() == 0 {
+				return RewriteFailed, nil
+			}
+			if ln {
+				h, e := r.makeNumeral(new(big.Rat).Quo(lv, rv), false)
+				if e != nil {
+					return RewriteFailed, e
+				}
+				return RewriteDone, r.manager.SetRef(out, h)
+			}
+			coefficient := new(big.Rat).Inv(rv)
+			c, e := r.makeNumeral(coefficient, false)
 			if e != nil {
 				return RewriteFailed, e
 			}
-			return RewriteDone, r.manager.SetRef(out, h)
+			h, e := r.app(arithOpMul, c, left)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			return Rewrite1, r.manager.SetRef(out, h)
 		}
-		coefficient := new(big.Rat).Inv(rv)
-		c, e := r.makeNumeral(coefficient, false)
+		integer, e := r.integerTerm(left)
+		if e != nil || integer {
+			return RewriteFailed, e
+		}
+		extract := func(h ast.ASTHandle) (*big.Rat, ast.ASTHandle, error) {
+			_, factors, product, e := r.operation(h, arithOpMul)
+			if e != nil {
+				return nil, ast.ASTHandle{}, e
+			}
+			if product && len(factors) == 2 {
+				coefficient, _, numeral, e := r.numeral(factors[0])
+				if e != nil {
+					return nil, ast.ASTHandle{}, e
+				}
+				if numeral {
+					return coefficient, factors[1], nil
+				}
+			}
+			return big.NewRat(1, 1), h, nil
+		}
+		leftCoefficient, numerator, e := extract(left)
 		if e != nil {
 			return RewriteFailed, e
 		}
-		h, e := r.app(arithOpMul, c, left)
+		rightCoefficient, denominator, e := extract(right)
 		if e != nil {
 			return RewriteFailed, e
 		}
-		return Rewrite1, r.manager.SetRef(out, h)
+		if leftCoefficient.Cmp(big.NewRat(1, 1)) != 0 || rightCoefficient.Cmp(big.NewRat(1, 1)) != 0 {
+			coefficient, e := r.makeNumeral(new(big.Rat).Quo(leftCoefficient, rightCoefficient), false)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			division, e := r.app(arithOpDiv, numerator, denominator)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			result, e := r.app(arithOpMul, coefficient, division)
+			if e != nil {
+				return RewriteFailed, e
+			}
+			return Rewrite2, r.manager.SetRef(out, result)
+		}
+		return RewriteFailed, nil
 	}
-	if !ln || !li || !ri {
+	if !rn || rv.Sign() == 0 || !ln || !li || !ri {
 		return RewriteFailed, nil
 	}
 	var result *big.Int
@@ -743,7 +877,11 @@ func (r *ArithRewriter) rewritePower(base, exponent ast.ASTHandle, out ast.ASTRe
 		}
 		return Rewrite2, r.manager.SetRef(out, result)
 	}
-	if r.expandPower && y.IsInt() && y.Num().IsInt64() {
+	arithmeticBase, e := r.arithmeticTerm(base)
+	if e != nil {
+		return RewriteFailed, e
+	}
+	if (r.expandPower || r.sumOfMonomials && arithmeticBase) && y.IsInt() && y.Num().IsInt64() {
 		n := y.Num().Int64()
 		if 1 < n && n <= int64(r.maxDegree) {
 			factors := make([]ast.ASTHandle, n)
@@ -755,6 +893,22 @@ func (r *ArithRewriter) rewritePower(base, exponent ast.ASTHandle, out ast.ASTRe
 				return RewriteFailed, e
 			}
 			return Rewrite1, r.manager.SetRef(out, result)
+		}
+	}
+	if xn && y.Num().IsUint64() && y.Denom().IsUint64() {
+		numerator, denominator := y.Num().Uint64(), y.Denom().Uint64()
+		if numerator != 0 && numerator <= uint64(r.maxDegree) && denominator <= uint64(r.maxDegree) && numerator <= uint64(^uint32(0)) && denominator <= uint64(^uint32(0)) {
+			powered := new(big.Rat).SetInt64(1)
+			for i := uint64(0); i < numerator; i++ {
+				powered.Mul(powered, x)
+			}
+			if rooted, exact := arithExactRationalRoot(powered, uint32(denominator)); exact {
+				h, e := r.makeNumeral(rooted, integer)
+				if e != nil {
+					return RewriteFailed, e
+				}
+				return RewriteDone, r.manager.SetRef(out, h)
+			}
 		}
 	}
 	if status, e := r.rewriteAlgebraicPower(base, y, out); e != nil || status != RewriteFailed {
@@ -1052,6 +1206,9 @@ func (r *ArithRewriter) MkEqCore(left, right ast.ASTHandle, out ast.ASTRef) (Rew
 			if reduced {
 				left, right, changed = newLeft, newRight, true
 			}
+		}
+		if rewritten, e := r.rewriteNegativePolynomialComparison(arithRelationEq, left, right, out); e != nil || rewritten {
+			return RewriteDone, e
 		}
 		if changed && err == nil {
 			result, e := r.manager.MkEq(left, right)
