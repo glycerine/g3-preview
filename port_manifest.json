@@ -29913,9 +29913,15 @@
       "path": "src/ast/rewriter/enum2bv_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/enum2bv_rewriter.go",
+        "pkg/ast/rewriter/enum2bv_rewriter_test.go"
+      ],
+      "tests": [
+        "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes",
+        "TestEnum2BVQuantifierSortAndBound"
+      ],
       "assertions": [
         {
           "line": 112,
@@ -29930,19 +29936,39 @@
           "text": "SASSERT(num_scopes <= m_enum_consts_lim.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete enum2bv_rewriter implementation",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/enum2bv_rewriter.go",
+          "tests": [
+            "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes",
+            "TestEnum2BVQuantifierSortAndBound"
+          ]
+        }
+      ],
+      "ownership": [
+        "Typed Go maps preserve enum declaration, fresh bit-vector declaration, and inverse-definition relationships. Explicit ASTRef owners retain all mapped declarations, definitions, pending bounds, and flushed bounds until scope removal, cleanup, or close. Traversal ownership is closed before retained AST references."
+      ],
+      "deviations": [
+        "The source parameter update is behaviorally empty and the Go UpdateParams method therefore performs only the owner-state validation. Map accessors return native Go map snapshots instead of exposing mutable C++ obj_map storage."
+      ]
     },
     {
       "path": "src/ast/rewriter/enum2bv_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/enum2bv_rewriter.go",
+        "pkg/ast/rewriter/enum2bv_rewriter_test.go"
+      ],
+      "tests": [
+        "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes",
+        "TestEnum2BVQuantifierSortAndBound"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -29953,11 +29979,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete enum2bv_rewriter public interface",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/enum2bv_rewriter.go",
+          "tests": [
+            "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes",
+            "TestEnum2BVQuantifierSortAndBound"
+          ]
+        }
+      ],
+      "ownership": [
+        "Enum2BVRewriter owns its traversal, persistent AST reference sets, native maps, scope limits, and arena-accounted header. Close and Cleanup release retained references in reverse order."
+      ],
+      "deviations": [
+        "The Go sort predicate is a concrete function type returning a checked error. Returned map snapshots and flushed side-constraint slices contain borrowed AST handles retained by the rewriter through its lifetime."
+      ]
     },
     {
       "path": "src/ast/rewriter/expr_replacer.cpp",
