@@ -33509,7 +33509,8 @@
         "TestSequenceRewriterConcatSourceBranches",
         "TestSequenceRewriterByteUnit",
         "TestSequenceRewriterConstantPredicates",
-        "TestSequenceRewriterReplaceSourceBranches"
+        "TestSequenceRewriterReplaceSourceBranches",
+        "TestSequenceRewriterConstantLengthExtractAtAndIndex"
       ],
       "assertions": [
         {
@@ -33762,6 +33763,30 @@
           "go_target": "pkg/ast/rewriter/seq_rewriter.go",
           "tests": [
             "TestSequenceRewriterReplaceSourceBranches"
+          ]
+        },
+        {
+          "name": "seq_rewriter::mk_seq_length constant String/unit concatenation folding; symbolic length-sum publication remains open (seq_rewriter.cpp:521-558)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterConstantLengthExtractAtAndIndex"
+          ]
+        },
+        {
+          "name": "seq_rewriter constant and boundary branches for mk_seq_extract and mk_seq_at; symbolic unit-concat traversal remains open (seq_rewriter.cpp:560-619,768-819)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterConstantLengthExtractAtAndIndex"
+          ]
+        },
+        {
+          "name": "seq_rewriter::mk_seq_index constant String search, negative offset, and empty-pattern zero-offset branches (seq_rewriter.cpp:821-845)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter.go",
+          "tests": [
+            "TestSequenceRewriterConstantLengthExtractAtAndIndex"
           ]
         }
       ],

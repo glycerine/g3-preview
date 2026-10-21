@@ -232,3 +232,91 @@ func TestSequenceRewriterReplaceSourceBranches(t *testing.T) {
 		t.Fatalf("empty-base replace: status=%d result=%v", status, result)
 	}
 }
+
+func TestSequenceRewriterConstantLengthExtractAtAndIndex(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	out, err := m.NewRef(ast.ASTHandle{})
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&out)) }()
+	str := func(text string) ast.ASTHandle {
+		h, e := m.MkString(text)
+		astTestMust(t, e)
+		astTestPin(t, m, h)
+		return h
+	}
+	num := func(text string) ast.ASTHandle { return arithRewriterNumeral(t, m, text, true) }
+	readInteger := func(want string, status RewriteStatus) {
+		t.Helper()
+		if status != RewriteDone {
+			t.Fatalf("integer status: %d", status)
+		}
+		h, e := m.RefGet(out)
+		astTestMust(t, e)
+		text, integer, matched, e := m.ArithmeticNumeralText(h)
+		astTestMust(t, e)
+		if !matched || !integer || text != want {
+			t.Fatalf("integer result: %q integer=%v matched=%v want=%q", text, integer, matched, want)
+		}
+	}
+	readString := func(want string, status RewriteStatus) {
+		t.Helper()
+		if status != RewriteDone {
+			t.Fatalf("string status: %d", status)
+		}
+		h, e := m.RefGet(out)
+		astTestMust(t, e)
+		text, matched, e := m.SequenceStringValue(h)
+		astTestMust(t, e)
+		if !matched || text != want {
+			t.Fatalf("string result: %q matched=%v want=%q", text, matched, want)
+		}
+	}
+	base, needle := str("ababa"), str("ba")
+	status, err := rw.RewriteLength(base, out)
+	astTestMust(t, err)
+	readInteger("5", status)
+
+	status, err = rw.RewriteExtract(base, num("1"), num("20"), out)
+	astTestMust(t, err)
+	readString("baba", status)
+	status, err = rw.RewriteExtract(base, num("-1"), num("2"), out)
+	astTestMust(t, err)
+	readString("", status)
+	status, err = rw.RewriteAt(base, num("2"), out)
+	astTestMust(t, err)
+	readString("a", status)
+	status, err = rw.RewriteAt(base, num("999999999999999999999999"), out)
+	astTestMust(t, err)
+	readString("", status)
+	status, err = rw.RewriteIndex(base, needle, num("0"), out)
+	astTestMust(t, err)
+	readInteger("1", status)
+	status, err = rw.RewriteIndex(base, needle, num("2"), out)
+	astTestMust(t, err)
+	readInteger("3", status)
+	status, err = rw.RewriteIndex(base, str("z"), num("0"), out)
+	astTestMust(t, err)
+	readInteger("-1", status)
+	status, err = rw.RewriteIndex(base, needle, num("-2"), out)
+	astTestMust(t, err)
+	readInteger("-1", status)
+
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	byteValue, err := m.BitVectorNumeralUnsigned(65, 8)
+	astTestMust(t, err)
+	astTestPin(t, m, byteValue)
+	unit, err := m.MkSequenceUnit(byteValue)
+	astTestMust(t, err)
+	astTestPin(t, m, unit)
+	concat, err := m.MkSequenceConcat(str("xy"), unit)
+	astTestMust(t, err)
+	astTestPin(t, m, concat)
+	status, err = rw.RewriteLength(concat, out)
+	astTestMust(t, err)
+	readInteger("3", status)
+}
