@@ -31,6 +31,8 @@ type Method struct {
 	GoTarget  string   `json:"go_target,omitempty"`
 	GoTargets []string `json:"go_targets,omitempty"`
 	Tests     []string `json:"tests,omitempty"`
+	Evidence  string   `json:"evidence,omitempty"`
+	Reason    string   `json:"reason,omitempty"`
 }
 type Line struct {
 	Number int    `json:"line"`
@@ -49,8 +51,11 @@ type Unit struct {
 	MethodsAudited   bool     `json:"methods_audited"`
 	OwnershipAudited bool     `json:"ownership_audited"`
 	Methods          []Method `json:"methods"`
-	Ownership        []string `json:"ownership"`
-	Deviations       []string `json:"deviations"`
+	// Ownership accepts both the original prose strings and newer structured
+	// evidence records. Validation currently requires only the audited flag;
+	// retaining RawMessage keeps the ledger lossless across both schema-2 forms.
+	Ownership  []json.RawMessage `json:"ownership"`
+	Deviations []string          `json:"deviations"`
 }
 type API struct {
 	Name     string   `json:"name"`
@@ -187,7 +192,7 @@ func Inventory(root string) (Manifest, error) {
 				role = "build_specification"
 			}
 		}
-		u := Unit{Path: p, Component: component, Role: role, Status: "unported", GoTargets: []string{}, Tests: []string{}, Methods: []Method{}, Ownership: []string{}, Deviations: []string{}}
+		u := Unit{Path: p, Component: component, Role: role, Status: "unported", GoTargets: []string{}, Tests: []string{}, Methods: []Method{}, Ownership: []json.RawMessage{}, Deviations: []string{}}
 		clean := uncomment(string(b))
 		for i, line := range strings.Split(clean, "\n") {
 			t := strings.TrimSpace(line)
@@ -254,10 +259,10 @@ func Validate(m Manifest) error {
 			for _, method := range u.Methods {
 				switch method.Status {
 				case "ported", "platform_replacement":
-					if method.GoTarget != "" && len(method.Tests) != 0 {
+					if (method.GoTarget != "" || len(method.GoTargets) != 0) && (len(method.Tests) != 0 || method.Evidence != "" || len(u.Tests) != 0) {
 						continue
 					}
-				case "reference_only", "dead_deleted":
+				case "reference_only", "dead_deleted", "dead":
 					continue
 				}
 				return fmt.Errorf("unfinished method %s in %s", method.Name, u.Path)

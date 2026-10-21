@@ -60,6 +60,16 @@ func TestExecutableEvidenceRefreshesChangedTests(t *testing.T) {
 	}
 }
 
+func TestExecutableEvidenceAcceptsEmbeddedPackageAssetTarget(t *testing.T) {
+	root := t.TempDir()
+	source(t, root, "pattern/database.smt2", "(assert true)\n")
+	source(t, root, "pattern/database_test.go", "package pattern\nimport \"testing\"\nfunc TestDatabase(t *testing.T) {}\n")
+	m := Manifest{Units: []Unit{{Path: "src/ast/pattern/database.h", GoTargets: []string{"pattern/database.smt2"}, Tests: []string{"TestDatabase"}}}}
+	if err := VerifyEvidence(m, root); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestExecutableEvidenceKeepsMethodPackageScope(t *testing.T) {
 	root := t.TempDir()
 	for _, item := range []struct{ dir, name string }{{"first", "TestFirst"}, {"second", "TestSecond"}} {

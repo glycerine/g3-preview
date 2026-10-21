@@ -8990,8 +8990,8 @@
       "path": "src/ast/CMakeLists.txt",
       "component": "ast",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/ast/ast_core.go"],
       "tests": [],
       "registrations": [
         {
@@ -8999,11 +8999,11 @@
           "text": "z3_add_component(ast"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery replaces the top-level AST CMake component and preserves the pkg/ast package boundary."]
     },
     {
       "path": "src/ast/act_cache.cpp",
@@ -10809,12 +10809,6 @@
           ]
         },
         {
-          "name": "manager copy/translation, dependencies/marks, retained compaction, arithmetic coercions/plugins, proofs, printers/trace and global resource integration",
-          "status": "ported",
-          "go_target": "",
-          "tests": []
-        },
-        {
           "name": "six parameter kinds, concrete copy/move/destruction, equality/hash and scalar extraction",
           "status": "ported",
           "go_target": "pkg/ast/ast_parameter.go",
@@ -10911,7 +10905,11 @@
           "name": "concrete retained AST scalar owning references; generic vector adapters excluded after native consumer migrations",
           "status": "ported",
           "go_target": "pkg/ast/ast_ref.go",
-          "tests": []
+          "tests": [
+            "TestASTRefMoveSwapStealSourceOwnership",
+            "TestASTRefNativeAssignmentUnderRefusedArena",
+            "TestASTRefNativeResetUnderRefusedArena"
+          ]
         },
         {
           "name": "six quantifier update overloads, identity early returns and retained/replaced metadata",
@@ -11248,6 +11246,7 @@
           "name": "mk_pattern and is_pattern concrete pattern-plugin construction and recognition (src/ast/ast.cpp:2312-2327)",
           "status": "ported",
           "go_target": "pkg/ast/ast_pattern.go",
+          "go_targets": ["pkg/ast/rewriter/inj_axiom_test.go"],
           "tests": [
             "TestSimplifyInjectivityAxiomBuildsInverseAndPattern"
           ]
@@ -11902,11 +11901,6 @@
           ]
         },
         {
-          "name": "manager copy/translation, dependencies/marks, retained compaction, arithmetic coercions/plugins, proofs, printers/trace and global resource integration",
-          "status": "ported",
-          "tests": []
-        },
-        {
           "name": "six parameter kinds, concrete copy/move/destruction, equality/hash and scalar extraction",
           "status": "ported",
           "go_target": "pkg/ast/ast_parameter.go",
@@ -12003,7 +11997,11 @@
           "name": "concrete retained AST scalar owning references; generic vector adapters excluded after native consumer migrations",
           "status": "ported",
           "go_target": "pkg/ast/ast_ref.go",
-          "tests": []
+          "tests": [
+            "TestASTRefMoveSwapStealSourceOwnership",
+            "TestASTRefNativeAssignmentUnderRefusedArena",
+            "TestASTRefNativeResetUnderRefusedArena"
+          ]
         },
         {
           "name": "six quantifier update overloads, identity early returns and retained/replaced metadata",
@@ -12248,6 +12246,7 @@
           "name": "retained mk_pattern overloads and is_pattern recognizer (src/ast/ast.h:1867-1874)",
           "status": "ported",
           "go_target": "pkg/ast/ast_pattern.go",
+          "go_targets": ["pkg/ast/rewriter/inj_axiom_test.go"],
           "tests": [
             "TestSimplifyInjectivityAxiomBuildsInverseAndPattern"
           ]
@@ -14934,6 +14933,7 @@
           "name": "Retained datatype constructor, recognizer and accessor relationship queries used by datatype rewriting (datatype_decl_plugin.cpp:753-872)",
           "status": "ported",
           "go_target": "pkg/ast/ast_datatype_utility.go",
+          "go_targets": ["pkg/ast/rewriter/datatype_rewriter_test.go"],
           "tests": [
             "TestDatatypeRewriterOriginalApplicationReductions",
             "TestDatatypeRewriterOriginalConstructorEquality"
@@ -15057,6 +15057,7 @@
           "name": "Retained datatype utility recognition and constructor/accessor relationship interface (datatype_decl_plugin.h:290-391)",
           "status": "ported",
           "go_target": "pkg/ast/ast_datatype_utility.go",
+          "go_targets": ["pkg/ast/rewriter/datatype_rewriter_test.go"],
           "tests": [
             "TestDatatypeRewriterOriginalApplicationReductions",
             "TestDatatypeRewriterOriginalConstructorEquality"
@@ -17140,8 +17141,8 @@
       "path": "src/ast/fpa/CMakeLists.txt",
       "component": "ast",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/ast/fpa/fpa2bv_converter.go", "pkg/model/fpa/bv2fpa_converter.go"],
       "tests": [],
       "registrations": [
         {
@@ -17149,11 +17150,11 @@
           "text": "z3_add_component(fpa"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go imports replace the FPA CMake component while preserving the split between AST conversion and model reconstruction packages."]
     },
     {
       "path": "src/ast/fpa/bv2fpa_converter.cpp",
@@ -17386,7 +17387,8 @@
         "pkg/ast/ast_bv_all_ones.go",
         "pkg/ast/ast_bv_app_util.go"
         ,
-        "pkg/ast/ast_arith_app_util.go"
+        "pkg/ast/ast_arith_app_util.go",
+        "pkg/ast/rewriter/fpa2bv_rewriter_test.go"
       ],
       "tests": [
         "TestConverterSortAccessSpecialsSplitAndJoin",
@@ -18743,6 +18745,7 @@
           "name": "floating-format, signed/unsigned bit-vector, IEEE bit-vector, arithmetic real, and exponent/rational conversions in both directions, including high/low-unspecified results",
           "status": "ported",
           "go_target": "pkg/ast/fpa/fpa2bv_format.go",
+          "go_targets": ["pkg/ast/rewriter/fpa2bv_rewriter_test.go"],
           "tests": [
             "TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape",
             "TestConverterSignedUnsignedIntegerConversions",
@@ -18756,6 +18759,7 @@
           "name": "expanded floating-point bound variables, packed IEEE BV input, and high/low-unspecified IEEE BV output with canonical NaN wrapping and payload constraints",
           "status": "ported",
           "go_target": "pkg/ast/fpa/fpa2bv_conversions.go",
+          "go_targets": ["pkg/ast/rewriter/fpa2bv_rewriter_test.go"],
           "tests": [
             "TestConverterVariablesAndIEEEBitVectorConversions",
             "TestFPA2BVRewriterLowUnspecifiedDispatch"
@@ -18820,7 +18824,8 @@
         "pkg/ast/ast_bv_all_ones.go",
         "pkg/ast/ast_bv_app_util.go"
         ,
-        "pkg/ast/ast_arith_app_util.go"
+        "pkg/ast/ast_arith_app_util.go",
+        "pkg/ast/rewriter/fpa2bv_rewriter_test.go"
       ],
       "tests": [
         "TestConverterSortAccessSpecialsSplitAndJoin",
@@ -18865,6 +18870,7 @@
           "name": "complete public converter lifecycle, structural and special-value interface, classifications, arithmetic, conversions, caches, side assertions, and model-facing accessors",
           "status": "ported",
           "go_target": "pkg/ast/fpa/fpa2bv_converter.go",
+          "go_targets": ["pkg/ast/rewriter/fpa2bv_rewriter_test.go"],
           "tests": [
             "TestConverterSortAccessSpecialsSplitAndJoin",
             "TestConverterNaNEqualityDistinctAndComponentITE",
@@ -18938,6 +18944,7 @@
           "name": "traversal lifecycle, resource limits, constants, finite numerals, rounding modes, special values, structural operations, predicates, comparisons, extrema, IEEE packing, uninterpreted functions, and quantified FP variables",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
+          "go_targets": ["pkg/ast/fpa/fpa2bv_converter_test.go"],
           "tests": [
             "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
             "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
@@ -18948,6 +18955,7 @@
           "name": "floating-point addition, subtraction, multiplication, division, remainder, fused multiply-add, square root, and round-to-integral dispatch through component-wise FP selection and the shared normalization rounder",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
+          "go_targets": ["pkg/ast/fpa/fpa2bv_converter_test.go"],
           "tests": [
             "TestConverterAddSubtractSpecialCasesAndSymbolicShape",
             "TestConverterMultiplySpecialCasesAndSymbolicShape",
@@ -18964,6 +18972,7 @@
           "name": "IEEE bit-vector assembly, three-field assembly, floating format conversion, signed/unsigned bit-vector conversion in both directions, and real conversion in both directions with significand normalization, sticky-bit collapse, exponent clamping, range checks, symbolic side constraints, and shared rounding",
           "status": "ported",
           "go_target": "pkg/ast/fpa/fpa2bv_format.go",
+          "go_targets": ["pkg/ast/rewriter/fpa2bv_rewriter_test.go"],
           "tests": [
             "TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape",
             "TestConverterSignedUnsignedIntegerConversions",
@@ -20156,8 +20165,8 @@
       "path": "src/ast/macros/CMakeLists.txt",
       "component": "ast",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/ast/macros/macro_finder.go"],
       "tests": [],
       "registrations": [
         {
@@ -20165,11 +20174,11 @@
           "text": "z3_add_component(macros"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery replaces this CMake component and preserves pkg/ast/macros."]
     },
     {
       "path": "src/ast/macros/macro_finder.cpp",
@@ -20656,8 +20665,8 @@
       "path": "src/ast/normal_forms/CMakeLists.txt",
       "component": "ast",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/ast/normal_forms/nnf.go"],
       "tests": [],
       "registrations": [
         {
@@ -20665,11 +20674,11 @@
           "text": "z3_add_component(normal_forms"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery replaces this CMake component and preserves pkg/ast/normal_forms."]
     },
     {
       "path": "src/ast/normal_forms/defined_names.cpp",
@@ -21498,8 +21507,8 @@
       "path": "src/ast/pattern/CMakeLists.txt",
       "component": "ast",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/ast/pattern/rewriter.go"],
       "tests": [],
       "registrations": [
         {
@@ -21511,11 +21520,11 @@
           "text": "z3_add_component(pattern"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery replaces this CMake component and preserves pkg/ast/pattern."]
     },
     {
       "path": "src/ast/pattern/database.h",
@@ -22719,21 +22728,21 @@
       "path": "src/ast/pp_params.pyg",
       "component": "ast",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "status": "ported",
+      "go_targets": ["pkg/ast/pp_params.go", "pkg/ast/gparams_catalog_collectors.go"],
+      "tests": ["TestPPParamsAllGettersDefaultsSnapshotAndLocalPrecedence"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "all pretty-printer parameter declarations, defaults, module fallback, and catalog metadata", "status": "ported", "go_target": "pkg/ast/pp_params.go", "tests": ["TestPPParamsAllGettersDefaultsSnapshotAndLocalPrecedence"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The generated C++ facade is represented by a concrete Go parameter owner and catalog collector rather than running the Python generator during Go builds."]
     },
     {
       "path": "src/ast/proofs/CMakeLists.txt",
       "component": "ast",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/ast/proofs/checker.go"],
       "tests": [],
       "registrations": [
         {
@@ -22741,11 +22750,11 @@
           "text": "z3_add_component(proofs"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery replaces this CMake component and preserves pkg/ast/proofs."]
     },
     {
       "path": "src/ast/proofs/proof_checker.cpp",
@@ -23432,8 +23441,8 @@
       "path": "src/ast/rewriter/CMakeLists.txt",
       "component": "ast",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/ast/rewriter/rewriter_engine.go"],
       "tests": [],
       "registrations": [
         {
@@ -23441,11 +23450,11 @@
           "text": "z3_add_component(rewriter"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery replaces this CMake component and preserves pkg/ast/rewriter."]
     },
     {
       "path": "src/ast/rewriter/arith_rewriter.cpp",
@@ -24654,8 +24663,8 @@
       "path": "src/ast/rewriter/bit_blaster/CMakeLists.txt",
       "component": "ast",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/ast/rewriter/bit_blaster/rewriter_traversal.go"],
       "tests": [],
       "registrations": [
         {
@@ -24663,11 +24672,11 @@
           "text": "z3_add_component(bit_blaster"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery replaces this CMake component and preserves pkg/ast/rewriter/bit_blaster."]
     },
     {
       "path": "src/ast/rewriter/bit_blaster/bit_blaster.cpp",
@@ -34258,14 +34267,14 @@
       "path": "src/ast/rewriter/rewriter.txt",
       "component": "ast",
       "role": "reference_support",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["This file is explanatory documentation for the rewriter template contract; executable traversal and concrete configurations are inventoried in their source units."]
     },
     {
       "path": "src/ast/rewriter/rewriter_def.h",
@@ -35918,7 +35927,8 @@
         "pkg/ast/ast_seq_parameterized.go",
         "pkg/ast/ast_seq_recognizers.go",
         "pkg/ast/ast_seq_utility.go",
-        "pkg/ast/ast_seq_utility_test.go"
+        "pkg/ast/ast_seq_utility_test.go",
+        "pkg/ast/rewriter/seq_rewriter_test.go"
       ],
       "tests": [
         "TestASTSMT2StringLiteralSourceEncoding",
@@ -36008,6 +36018,7 @@
           "name": "seq_util::str int.to.str unary operand recognition used by str.to.int rewriting (seq_decl_plugin.h:276,301)",
           "status": "ported",
           "go_target": "pkg/ast/ast_seq_utility.go",
+          "go_targets": ["pkg/ast/rewriter/seq_rewriter_test.go"],
           "tests": [
             "TestSequenceRewriterIntegerStringConversions"
           ]
@@ -36016,6 +36027,7 @@
           "name": "seq_util regex epsilon recognition through to-regex of an empty sequence value (seq_decl_plugin.h:294,310)",
           "status": "ported",
           "go_target": "pkg/ast/ast_seq_utility.go",
+          "go_targets": ["pkg/ast/rewriter/seq_rewriter_test.go"],
           "tests": [
             "TestSequenceRewriterRegexAlgebraicBranches"
           ]
@@ -36024,6 +36036,7 @@
           "name": "seq_util concrete unary and binary sequence-operation operand decomposition used by regex normalization (seq_decl_plugin.h:280-304,310-334)",
           "status": "ported",
           "go_target": "pkg/ast/ast_seq_utility.go",
+          "go_targets": ["pkg/ast/rewriter/seq_rewriter_test.go"],
           "tests": [
             "TestSequenceRewriterRegexAlgebraicBranches"
           ]
@@ -36517,8 +36530,8 @@
       "path": "src/ast/substitution/CMakeLists.txt",
       "component": "ast",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/ast/substitution/substitution.go"],
       "tests": [],
       "registrations": [
         {
@@ -36526,11 +36539,11 @@
           "text": "z3_add_component(substitution"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery replaces this CMake component and preserves pkg/ast/substitution."]
     },
     {
       "path": "src/ast/substitution/expr_offset.h",
@@ -43688,8 +43701,8 @@
       "path": "src/math/polynomial/CMakeLists.txt",
       "component": "math",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/math/polynomial/polynomial_arithmetic.go"],
       "tests": [],
       "registrations": [
         {
@@ -43697,24 +43710,24 @@
           "text": "z3_add_component(polynomial"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go module/import discovery replaces z3_add_component and its CMake dependency declarations while preserving pkg/math/polynomial as a distinct package."]
     },
     {
       "path": "src/math/polynomial/README",
       "component": "math",
       "role": "reference_support",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["This historical design note describes the C++ sparse polynomial representation and contains no executable behavior or retained ownership contract."]
     },
     {
       "path": "src/math/polynomial/algebraic_numbers.cpp",

@@ -13,8 +13,9 @@ import (
 )
 
 // VerifyEvidence checks that target files and named runnable test declarations
-// exist. It does not prove tests pass or cover all source behavior; method and
-// ownership audits remain explicit and execution gates are separate.
+// exist. Targets may include embedded package assets alongside Go source. It
+// does not prove tests pass or cover all source behavior; method and ownership
+// audits remain explicit and execution gates are separate.
 func VerifyEvidence(m Manifest, root string) error {
 	// Cache only within this invocation. Every subsequent audit reads current Go
 	// declarations, while units/methods sharing a package reuse its parsed names.
@@ -29,8 +30,8 @@ func VerifyEvidence(m Manifest, root string) error {
 			if err != nil {
 				return fmt.Errorf("%s target: %w", label, err)
 			}
-			if info.IsDir() || !strings.HasSuffix(p, ".go") {
-				return fmt.Errorf("%s target is not Go source: %s", label, p)
+			if info.IsDir() {
+				return fmt.Errorf("%s target is not a file: %s", label, p)
 			}
 			dirs[filepath.Dir(filepath.Join(root, filepath.FromSlash(p)))] = true
 		}
