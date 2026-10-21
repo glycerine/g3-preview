@@ -1103,25 +1103,8 @@ func (r *SequenceRewriter) RewriteRegexLoop(args []ast.ASTHandle, out ast.ASTRef
 	return RewriteDone, r.manager.SetRef(out, result)
 }
 
-func (r *SequenceRewriter) RewriteStringInRegex(_ ast.ASTHandle, regex ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
-	if err := r.open(); err != nil {
-		return RewriteFailed, err
-	}
-	empty, err := r.sequenceOperation(regex, 22)
-	if err != nil {
-		return RewriteFailed, err
-	}
-	if empty {
-		return r.assignBoolean(false, out)
-	}
-	full, err := r.sequenceOperation(regex, 23)
-	if err != nil {
-		return RewriteFailed, err
-	}
-	if full {
-		return r.assignBoolean(true, out)
-	}
-	return RewriteFailed, nil
+func (r *SequenceRewriter) RewriteStringInRegex(sequence, regex ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	return r.rewriteStringInRegex(sequence, regex, out)
 }
 
 func (r *SequenceRewriter) sequenceMinimumLength(parts []ast.ASTHandle) (length uint64, bounded bool, err error) {
