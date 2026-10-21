@@ -57,6 +57,13 @@ func bvCopy(v *big.Int) *big.Int    { return new(big.Int).Set(v) }
 func bvPower(width uint32) *big.Int { return new(big.Int).Lsh(big.NewInt(1), uint(width)) }
 func bvMax(width uint32) *big.Int   { return new(big.Int).Sub(bvPower(width), big.NewInt(1)) }
 
+func bvBoundsDebugInterval(width uint32, lo, hi *big.Int) error {
+	if ast.ASTSourceDebug && (lo == nil || hi == nil || lo.Sign() < 0 || lo.Cmp(hi) > 0 || hi.Cmp(bvPower(width)) >= 0) {
+		return ast.ErrASTDomain
+	}
+	return nil
+}
+
 func (b *BVBounds) Reset() {
 	if b == nil {
 		return
@@ -137,6 +144,15 @@ func (b *BVBounds) toBound(h ast.ASTHandle) (bool, error) {
 }
 
 func (b *BVBounds) constantAdd(width uint32, h ast.ASTHandle) (ast.ASTHandle, *big.Int, bool, error) {
+	if ast.ASTSourceDebug {
+		actual, err := b.manager.BitVectorSize(h)
+		if err != nil {
+			return ast.ASTHandle{}, nil, false, err
+		}
+		if actual != width {
+			return ast.ASTHandle{}, nil, false, ast.ErrASTDomain
+		}
+	}
 	var left, right ast.ASTHandle
 	yes, err := b.manager.BitVectorAddOperands(h, &left, &right)
 	if err != nil {
@@ -167,8 +183,18 @@ func (b *BVBounds) constantAdd(width uint32, h ast.ASTHandle) (ast.ASTHandle, *b
 }
 
 func (b *BVBounds) record(value ast.ASTHandle, lo, hi *big.Int, negated bool, intervals *[]bvBoundInterval) (bvConversion, error) {
+	marker := "["
+	if negated {
+		marker = "~["
+	}
+	if err := b.traceValue("record", 25, "record0 ", value, ":"+marker+lo.String()+";"+hi.String()+"]"); err != nil {
+		return bvUndefined, err
+	}
 	width, err := b.manager.BitVectorSize(value)
 	if err != nil {
+		return bvUndefined, err
+	}
+	if err = bvBoundsDebugInterval(width, lo, hi); err != nil {
 		return bvUndefined, err
 	}
 	minimum := new(big.Int)
@@ -207,6 +233,13 @@ func (b *BVBounds) record(value ast.ASTHandle, lo, hi *big.Int, negated bool, in
 	if hiMax {
 		hi.Set(maximum)
 	}
+	marker = "["
+	if negated {
+		marker = "~["
+	}
+	if err = b.traceValue("record", 57, "record1 ", value, ":"+marker+lo.String()+";"+hi.String()+"]"); err != nil {
+		return bvUndefined, err
+	}
 	if lo.Cmp(hi) > 0 {
 		if negated {
 			return bvConverted, nil
@@ -227,6 +260,16 @@ func (b *BVBounds) BoundLower(value ast.ASTHandle, lower *big.Int) (bool, error)
 	if err := b.open(); err != nil {
 		return false, err
 	}
+	width, err := b.manager.BitVectorSize(value)
+	if err != nil {
+		return false, err
+	}
+	if ast.ASTSourceDebug && (lower == nil || lower.Sign() < 0 || lower.Cmp(bvPower(width)) >= 0) {
+		return false, ast.ErrASTDomain
+	}
+	if err = b.traceValue("bound_lo", 524, "lower ", value, ":"+lower.String()); err != nil {
+		return false, err
+	}
 	if current, found := b.lowers[value]; !found || current.Cmp(lower) < 0 {
 		b.lowers[value] = bvCopy(lower)
 	}
@@ -237,14 +280,35 @@ func (b *BVBounds) BoundUpper(value ast.ASTHandle, upper *big.Int) (bool, error)
 	if err := b.open(); err != nil {
 		return false, err
 	}
+	width, err := b.manager.BitVectorSize(value)
+	if err != nil {
+		return false, err
+	}
+	if ast.ASTSourceDebug && (upper == nil || upper.Sign() < 0 || upper.Cmp(bvPower(width)) >= 0) {
+		return false, ast.ErrASTDomain
+	}
+	if err = b.traceValue("bound_up", 535, "upper ", value, ":"+upper.String()); err != nil {
+		return false, err
+	}
 	if current, found := b.uppers[value]; !found || upper.Cmp(current) < 0 {
 		b.uppers[value] = bvCopy(upper)
 	}
 	return b.okay, nil
 }
 
-func (b *BVBounds) addNegative(value ast.ASTHandle, lo, hi *big.Int) {
+func (b *BVBounds) addNegative(value ast.ASTHandle, lo, hi *big.Int) error {
+	width, err := b.manager.BitVectorSize(value)
+	if err != nil {
+		return err
+	}
+	if err = bvBoundsDebugInterval(width, lo, hi); err != nil {
+		return err
+	}
+	if err = b.traceValue("add_neg_bound", 545, "negative bound ", value, ":"+lo.String()+";"+hi.String()); err != nil {
+		return err
+	}
 	b.negative[value] = append(b.negative[value], bvBoundInterval{lo: bvCopy(lo), hi: bvCopy(hi), value: value})
+	return nil
 }
 
 func (b *BVBounds) AddBoundUnsigned(value ast.ASTHandle, lo, hi *big.Int, negated bool) (bool, error) {
@@ -255,7 +319,17 @@ func (b *BVBounds) AddBoundUnsigned(value ast.ASTHandle, lo, hi *big.Int, negate
 	if err != nil {
 		return false, err
 	}
-	zero, one, maximum := new(big.Int), big.NewInt(1), bvMax(width)
+	if err = bvBoundsDebugInterval(width, lo, hi); err != nil {
+		return false, err
+	}
+	marker := "["
+	if negated {
+		marker = "~["
+	}
+	if err = b.traceValue("add_bound_unsigned", 453, "bound_unsigned ", value, ": "+marker+lo.String()+";"+hi.String()+"]"); err != nil {
+		return false, err
+	}
+	one, maximum := big.NewInt(1), bvMax(width)
 	loMin, hiMax := lo.Sign() == 0, hi.Cmp(maximum) == 0
 	if negated {
 		switch {
@@ -266,7 +340,7 @@ func (b *BVBounds) AddBoundUnsigned(value ast.ASTHandle, lo, hi *big.Int, negate
 		case hiMax:
 			_, err = b.BoundUpper(value, new(big.Int).Sub(lo, one))
 		default:
-			b.addNegative(value, lo, hi)
+			err = b.addNegative(value, lo, hi)
 		}
 		return b.okay, err
 	}
@@ -280,13 +354,22 @@ func (b *BVBounds) AddBoundUnsigned(value ast.ASTHandle, lo, hi *big.Int, negate
 			return false, err
 		}
 	}
-	_ = zero
 	return b.okay, nil
 }
 
 func (b *BVBounds) convertSigned(value ast.ASTHandle, lo, hi *big.Int, negated bool, intervals *[]bvBoundInterval) (bvConversion, error) {
 	width, err := b.manager.BitVectorSize(value)
 	if err != nil {
+		return bvUndefined, err
+	}
+	if ast.ASTSourceDebug && (lo == nil || hi == nil || lo.Cmp(hi) > 0) {
+		return bvUndefined, ast.ErrASTDomain
+	}
+	marker := "["
+	if negated {
+		marker = "~["
+	}
+	if err = b.traceValue("convert_signed", 476, "convert_signed ", value, ":"+marker+lo.String()+";"+hi.String()+"]"); err != nil {
 		return bvUndefined, err
 	}
 	zero, one, modulus := new(big.Int), big.NewInt(1), bvPower(width)
@@ -317,6 +400,13 @@ func (b *BVBounds) convertSigned(value ast.ASTHandle, lo, hi *big.Int, negated b
 }
 
 func (b *BVBounds) AddBoundSigned(value ast.ASTHandle, lo, hi *big.Int, negated bool) (bool, error) {
+	marker := " "
+	if negated {
+		marker = "~"
+	}
+	if err := b.traceValue("add_bound_signed", 500, "bound_signed ", value, ":"+marker+lo.String()+";"+hi.String()); err != nil {
+		return false, err
+	}
 	var intervals []bvBoundInterval
 	converted, err := b.convertSigned(value, lo, hi, negated, &intervals)
 	if err != nil {
@@ -334,7 +424,18 @@ func (b *BVBounds) AddBoundSigned(value ast.ASTHandle, lo, hi *big.Int, negated 
 	return b.okay, nil
 }
 
-func (b *BVBounds) satisfiableValue(value ast.ASTHandle) (bool, error) {
+func (b *BVBounds) satisfiableValue(value ast.ASTHandle) (result bool, err error) {
+	if err := b.traceValue("is_sat", 606, "is_sat ", value, ""); err != nil {
+		return false, err
+	}
+	defer func() {
+		resultText := "0"
+		if result {
+			resultText = "1"
+		}
+		traceErr := b.traceValue("is_sat", 608, "is_sat ", value, "\nres: "+resultText)
+		err = errors.Join(err, traceErr)
+	}()
 	width, err := b.manager.BitVectorSize(value)
 	if err != nil {
 		return false, err
@@ -348,6 +449,9 @@ func (b *BVBounds) satisfiableValue(value ast.ASTHandle) (bool, error) {
 	}
 	if lower.Cmp(upper) > 0 {
 		return false, nil
+	}
+	if err = b.traceText("is_sat_core", 623, "is_sat bound:"+lower.String()+"-"+upper.String()); err != nil {
+		return false, err
 	}
 	intervals := b.negative[value]
 	sort.Slice(intervals, func(i, j int) bool { return intervals[i].lo.Cmp(intervals[j].lo) < 0 })
@@ -370,7 +474,13 @@ func (b *BVBounds) satisfiableValue(value ast.ASTHandle) (bool, error) {
 			}
 			sat = true
 		}
+		if err = b.traceText("is_sat_core", 644, "is_sat new_lo, new_hi:"+newLo.String()+"-"+newHi.String()); err != nil {
+			return false, err
+		}
 		ptr.Add(interval.hi, one)
+		if err = b.traceText("is_sat_core", 646, "is_sat ptr, new_hi:"+ptr.String()+"-"+newHi.String()); err != nil {
+			return false, err
+		}
 		if ptr.Cmp(upper) > 0 {
 			break
 		}
@@ -391,8 +501,20 @@ func (b *BVBounds) satisfiableValue(value ast.ASTHandle) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	if err = b.traceText("is_sat_core", 658, "is_sat new_lo, new_hi:"+newLo.String()+"-"+newHi.String()); err != nil {
+		return false, err
+	}
 	if sat && newLo.Cmp(newHi) == 0 {
-		b.singletons[value] = bvCopy(newLo)
+		if _, found := b.singletons[value]; found {
+			if ast.ASTSourceDebug {
+				return false, ast.ErrASTDomain
+			}
+		} else {
+			if err = b.traceValue("record_singleton", 600, "singleton:", value, ":"+newLo.String()); err != nil {
+				return false, err
+			}
+			b.singletons[value] = bvCopy(newLo)
+		}
 	}
 	return sat, nil
 }
@@ -497,7 +619,13 @@ func (b *BVBounds) Rewrite(limit uint32, declaration ast.ASTHandle, arguments as
 	remaining := make([]ast.ASTHandle, 0, len(converted)+len(b.singletons))
 	hasSingleton := false
 	for _, entry := range converted {
+		if err = b.traceValue("rewrite", 284, "check red: ", entry.original, ""); err != nil {
+			return RewriteFailed, err
+		}
 		if entry.undefined {
+			if err = b.traceText("rewrite", 286, "unprocessed"); err != nil {
+				return RewriteFailed, err
+			}
 			remaining = append(remaining, entry.original)
 			continue
 		}
@@ -516,12 +644,18 @@ func (b *BVBounds) Rewrite(limit uint32, declaration ast.ASTHandle, arguments as
 			if v, found := b.uppers[value]; found {
 				hi = v
 			}
+			if err = b.traceValue("rewrite", 302, "bounds: ", value, "["+lo.String()+"-"+hi.String()+"]"); err != nil {
+				return RewriteFailed, err
+			}
 			isSingleton = lo.Cmp(hi) == 0
 		}
 		if !redundant && !isSingleton {
 			remaining = append(remaining, entry.original)
 		}
 		hasSingleton = hasSingleton || isSingleton
+		if err = b.traceValueIf(redundant, "rewrite", 308, "redundant: ", entry.original, ""); err != nil {
+			return RewriteFailed, err
+		}
 	}
 	if len(remaining) == int(arguments.Count()) && !hasSingleton {
 		return RewriteFailed, nil

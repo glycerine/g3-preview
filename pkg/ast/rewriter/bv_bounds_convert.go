@@ -76,6 +76,13 @@ func (b *BVBounds) signed(value *big.Int, width uint32) *big.Int {
 }
 
 func (b *BVBounds) convert(h ast.ASTHandle, intervals *[]bvBoundInterval, negated bool) (bvConversion, error) {
+	prefix := "new constraint: "
+	if negated {
+		prefix += "~"
+	}
+	if err := b.traceValue("convert", 103, prefix, h, ""); err != nil {
+		return bvUndefined, err
+	}
 	if yes, arg, err := b.manager.IsNot(h); err != nil {
 		return bvUndefined, err
 	} else if yes {
@@ -288,6 +295,9 @@ func (b *BVBounds) AddConstraint(h ast.ASTHandle) (bool, error) {
 	}
 	if !b.okay {
 		return false, nil
+	}
+	if err := b.traceValue("add_constraint", 333, "new constraint", h, ""); err != nil {
+		return false, err
 	}
 	negated := false
 	if yes, arg, err := b.manager.IsNot(h); err != nil {

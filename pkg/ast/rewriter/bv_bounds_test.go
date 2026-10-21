@@ -1,11 +1,100 @@
 package rewriter
 
 import (
+	"bytes"
+	"errors"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+func TestBVBoundsSourceDebugGuards(t *testing.T) {
+	if !ast.ASTSourceDebug {
+		t.Skip("source assertions erased")
+	}
+	m, x := bvBoundsFixture(t)
+	bounds, err := NewBVBounds(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, bounds.Close()) })
+	for _, interval := range [][2]*big.Int{
+		{big.NewInt(-1), big.NewInt(7)},
+		{big.NewInt(8), big.NewInt(7)},
+		{big.NewInt(0), big.NewInt(256)},
+	} {
+		if _, err = bounds.AddBoundUnsigned(x, interval[0], interval[1], false); !errors.Is(err, ast.ErrASTDomain) {
+			t.Fatal("unsigned interval source assertion", interval, err)
+		}
+	}
+	if _, err = bounds.BoundLower(x, big.NewInt(-1)); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("lower-bound source assertion", err)
+	}
+	if _, err = bounds.BoundUpper(x, big.NewInt(256)); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("upper-bound source assertion", err)
+	}
+	if _, err = bounds.AddBoundSigned(x, big.NewInt(2), big.NewInt(1), false); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("signed interval source assertion", err)
+	}
+}
+
+func TestBVBoundsSourceTraceRecords(t *testing.T) {
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("bv_bounds")
+	if !tags.ShouldTrace("bv_bounds") {
+		t.Skip("source trace macro erased")
+	}
+	symbols, numerals, budget := astTestOwners(t)
+	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numerals, Budget: budget, TraceTags: tags})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, m.Close()) })
+	bindBVTraceGlobals(t, m)
+	_, err = m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	bounds, err := NewBVBounds(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, bounds.Close()) })
+	sort, err := m.BitVectorSort(8)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "bv-bounds-trace-x"), sort)
+	astTestMust(t, err)
+	if _, err = bounds.AddBoundUnsigned(x, big.NewInt(2), big.NewInt(7), false); err != nil {
+		t.Fatal(err)
+	}
+	if sat, e := bounds.IsSatisfiable(); e != nil || !sat {
+		t.Fatal("trace satisfiability", sat, e)
+	}
+	bounds.Reset()
+	seven := bvAddNum(t, m, 7, 8)
+	constraint, err := m.MkBitVectorULE(x, seven)
+	astTestMust(t, err)
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	conjunction, err := m.MkAndArgs([]ast.ASTHandle{constraint, truth})
+	astTestMust(t, err)
+	if status, _ := bvBoundsRewrite(t, bounds, conjunction); status != RewriteFailed {
+		t.Fatal("trace rewrite status", status)
+	}
+	text := output.String()
+	for _, fragment := range []string{
+		"[bv_bounds] add_bound_unsigned src/ast/rewriter/bv_bounds.cpp:453",
+		"bound_unsigned bv-bounds-trace-x: [2;7]",
+		"[bv_bounds] bound_lo src/ast/rewriter/bv_bounds.cpp:524",
+		"[bv_bounds] bound_up src/ast/rewriter/bv_bounds.cpp:535",
+		"[bv_bounds] is_sat src/ast/rewriter/bv_bounds.cpp:606",
+		"[bv_bounds] is_sat_core src/ast/rewriter/bv_bounds.cpp:623",
+		"res: 1",
+		"[bv_bounds] rewrite src/ast/rewriter/bv_bounds.cpp:284",
+		"[bv_bounds] rewrite src/ast/rewriter/bv_bounds.cpp:286",
+		"[bv_bounds] rewrite src/ast/rewriter/bv_bounds.cpp:302",
+	} {
+		if !strings.Contains(text, fragment) {
+			t.Fatalf("bounds trace missing %q:\n%s", fragment, text)
+		}
+	}
+}
 
 func bvBoundsFixture(t *testing.T) (*ast.ASTManager, ast.ASTHandle) {
 	t.Helper()

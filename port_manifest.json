@@ -25029,14 +25029,17 @@
       "path": "src/ast/rewriter/bv_bounds.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/bv_bounds.go",
-        "pkg/ast/rewriter/bv_bounds_convert.go"
+        "pkg/ast/rewriter/bv_bounds_convert.go",
+        "pkg/ast/rewriter/bv_bounds_trace.go"
       ],
       "tests": [
         "TestBVBoundsContradictionAndSingletonRewrite",
-        "TestBVBoundsNegativeIntervalsAndSignedConstraint"
+        "TestBVBoundsNegativeIntervalsAndSignedConstraint",
+        "TestBVBoundsSourceDebugGuards",
+        "TestBVBoundsSourceTraceRecords"
       ],
       "assertions": [
         {
@@ -25196,7 +25199,7 @@
           "text": "SASSERT(negative_intervals != NULL);"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -25210,8 +25213,12 @@
         },
         {
           "name": "bv_bounds TRACE records and complete source assertion profile",
-          "status": "unported",
-          "reason": "The mathematical production paths are connected; source diagnostic ordering and the full debug-only assertion matrix remain to be audited before whole-unit promotion."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_bounds_trace.go",
+          "tests": [
+            "TestBVBoundsSourceDebugGuards",
+            "TestBVBoundsSourceTraceRecords"
+          ]
         }
       ],
       "ownership": [
@@ -25225,14 +25232,17 @@
       "path": "src/ast/rewriter/bv_bounds.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/bv_bounds.go",
-        "pkg/ast/rewriter/bv_bounds_convert.go"
+        "pkg/ast/rewriter/bv_bounds_convert.go",
+        "pkg/ast/rewriter/bv_bounds_trace.go"
       ],
       "tests": [
         "TestBVBoundsContradictionAndSingletonRewrite",
-        "TestBVBoundsNegativeIntervalsAndSignedConstraint"
+        "TestBVBoundsNegativeIntervalsAndSignedConstraint",
+        "TestBVBoundsSourceDebugGuards",
+        "TestBVBoundsSourceTraceRecords"
       ],
       "conditionals": [
         {
@@ -25254,7 +25264,7 @@
           "text": "SASSERT(m_bv_util.get_bv_size(e) == bv_sz);"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -25268,8 +25278,11 @@
         },
         {
           "name": "complete inline-helper source assertion profile",
-          "status": "unported",
-          "reason": "Debug-only precondition ordering still requires focused verification."
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_bounds.go",
+          "tests": [
+            "TestBVBoundsSourceDebugGuards"
+          ]
         }
       ],
       "ownership": [
