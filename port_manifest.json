@@ -19859,9 +19859,14 @@
       "path": "src/ast/macros/macro_manager.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/macros/macro_manager.go",
+        "pkg/ast/macros/macro_util_test.go"
+      ],
+      "tests": [
+        "TestMacroManagerInsertionCyclesScopesAndForbiddenTraversal"
+      ],
       "assertions": [
         {
           "line": 172,
@@ -19898,17 +19903,41 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constructor/destructor, insert, dependency-cycle rejection, push/pop/reset, mark_forbidden, get_head_def, accessors and macro interpretation",
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_manager.go",
+          "tests": [
+            "TestMacroManagerInsertionCyclesScopesAndForbiddenTraversal"
+          ]
+        },
+        {
+          "name": "macro_expander_cfg/macro_expander_rw and expand_macros proof/dependency/theory-rewrite loop",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Installed macros own declaration, quantifier, optional proof and dependency references. FuncDeclDependencies owns the dependency graph. Forbidden declarations are pinned once and scoped rollback retires entries in reverse insertion order; native maps and slices replace C++ containers."
+      ],
+      "deviations": [
+        "Checked Go errors replace source assertions. Macro expansion remains open, so this source unit is partial."
+      ]
     },
     {
       "path": "src/ast/macros/macro_manager.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/macros/macro_manager.go",
+        "pkg/ast/macros/macro_util_test.go"
+      ],
+      "tests": [
+        "TestMacroManagerInsertionCyclesScopesAndForbiddenTraversal"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -19921,9 +19950,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "macro storage, scopes, forbidden declarations, lookup and interpretation public surface",
+          "status": "ported",
+          "go_target": "pkg/ast/macros/macro_manager.go",
+          "tests": [
+            "TestMacroManagerInsertionCyclesScopesAndForbiddenTraversal"
+          ]
+        },
+        {
+          "name": "expand_macros public operation",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Manager is a noncopyable owner over a borrowed ASTManager and explicit child dependency owner."
+      ],
+      "deviations": [
+        "Partial checkpoint pending macro expansion."
+      ]
     },
     {
       "path": "src/ast/macros/macro_util.cpp",

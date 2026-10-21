@@ -139,3 +139,65 @@ func TestMacroUtilQuasiHeadNormalizationAndCandidates(t *testing.T) {
 		t.Fatal("candidate row", row)
 	}
 }
+
+func quantifiedMacro(t *testing.T, m *ast.ASTManager, declaration ast.ASTHandle, definition ast.ASTHandle, sort ast.ASTHandle) ast.ASTHandle {
+	t.Helper()
+	v, err := m.MkVar(0, sort)
+	must(t, err)
+	head, err := m.MkApp(declaration, []ast.ASTHandle{v})
+	must(t, err)
+	body, err := m.MkEq(head, definition)
+	must(t, err)
+	name, err := m.Symbols.Intern("x")
+	must(t, err)
+	q, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []usymbol.Symbol{name}, Body: body})
+	must(t, err)
+	return q
+}
+
+func TestMacroManagerInsertionCyclesScopesAndForbiddenTraversal(t *testing.T) {
+	m := fixture(t)
+	manager, err := macros.NewManager(m)
+	must(t, err)
+	t.Cleanup(func() { must(t, manager.Close()) })
+	b, err := m.MkBoolSort()
+	must(t, err)
+	v0, err := m.MkVar(0, b)
+	must(t, err)
+	f := declaration(t, m, "manager-f", []ast.ASTHandle{b}, b)
+	g := declaration(t, m, "manager-g", []ast.ASTHandle{b}, b)
+	gv, err := m.MkApp(g, []ast.ASTHandle{v0})
+	must(t, err)
+	fv, err := m.MkApp(f, []ast.ASTHandle{v0})
+	must(t, err)
+	qf := quantifiedMacro(t, m, f, gv, b)
+	qg := quantifiedMacro(t, m, g, fv, b)
+	must(t, manager.PushScope())
+	inserted, err := manager.Insert(f, qf, ast.ASTHandle{}, ast.ASTDependency{})
+	must(t, err)
+	if !inserted || manager.NumMacros() != 1 || manager.FirstMacroLastLevel() != 0 {
+		t.Fatal("first insertion", inserted, manager.NumMacros(), manager.FirstMacroLastLevel())
+	}
+	inserted, err = manager.Insert(g, qg, ast.ASTHandle{}, ast.ASTDependency{})
+	must(t, err)
+	if inserted {
+		t.Fatal("dependency cycle accepted")
+	}
+	if got, yes := manager.MacroQuantifier(f); !yes || got != qf {
+		t.Fatal("macro lookup", yes, got)
+	}
+	out, err := m.NewRef(ast.ASTHandle{})
+	must(t, err)
+	t.Cleanup(func() { must(t, m.DelRef(&out)) })
+	if got, e := manager.MacroInterpretation(0, out); e != nil || got != f {
+		t.Fatal("interpretation", got, e)
+	}
+	must(t, manager.MarkForbidden([]ast.ASTHandle{gv}))
+	if !manager.IsForbidden(g) || manager.IsForbidden(f) {
+		t.Fatal("forbidden traversal")
+	}
+	must(t, manager.PopScope(1))
+	if manager.HasMacros() || manager.IsForbidden(g) {
+		t.Fatal("scope restoration")
+	}
+}
