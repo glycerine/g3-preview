@@ -64,6 +64,15 @@ func (f *FunctionInterpretation) open() error {
 func (f *FunctionInterpretation) Arity() uint32            { return f.arity }
 func (f *FunctionInterpretation) NumEntries() uint32       { return uint32(len(f.entries)) }
 func (f *FunctionInterpretation) ArgumentsAreValues() bool { return f.argsAreValues }
+func (f *FunctionInterpretation) Entry(index uint32) (*FunctionEntry, error) {
+	if e := f.open(); e != nil {
+		return nil, e
+	}
+	if uint64(index) >= uint64(len(f.entries)) {
+		return nil, arena.ErrBounds
+	}
+	return f.entries[index], nil
+}
 func (f *FunctionInterpretation) Else() (ast.ASTHandle, error) {
 	if e := f.open(); e != nil {
 		return ast.ASTHandle{}, e

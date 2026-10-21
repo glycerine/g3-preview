@@ -224,5 +224,8 @@ func (c *Converter) ConvertModel(source, target *model.ModelCore) (map[ast.ASTHa
 	if err := c.convertMinMaxSpecials(source, target, seen); err != nil {
 		return nil, err
 	}
+	if err := c.convertUFs(source, target, seen); err != nil {
+		return nil, err
+	}
 	return seen, nil
 }

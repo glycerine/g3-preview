@@ -184,3 +184,74 @@ func TestBV2FPAConverterConvertsFloatAndRoundingConstants(t *testing.T) {
 		t.Fatal("converted rounding constant", kind, e)
 	}
 }
+
+func TestBV2FPAConverterRebuildsFunctionInterpretation(t *testing.T) {
+	m, sourceConverter, _ := testFixture(t)
+	sourceModel := testModelCore(t, m)
+	targetModel := testModelCore(t, m)
+	floatSort, err := m.FloatingPointSort(8, 24)
+	testMust(t, err)
+	family, err := m.RegisterFloatingPointPlugin()
+	testMust(t, err)
+	declaration, err := m.MkFamilyFuncDecl(family, ast.FPAOpToIEEEBV, nil, []ast.ASTHandle{floatSort}, ast.ASTHandle{})
+	testMust(t, err)
+	inputName, err := m.Symbols.Intern("converted-function-input")
+	testMust(t, err)
+	inputDeclaration, err := m.MkFuncDecl(inputName, nil, floatSort, ast.ASTFuncDeclInfo{})
+	testMust(t, err)
+	input, err := sourceConverter.MkConst(inputDeclaration)
+	testMust(t, err)
+	testMust(t, sourceConverter.SetHighUnspecified(false))
+	_, err = sourceConverter.ToIEEEBVFor(declaration, input)
+	testMust(t, err)
+	snapshot, err := sourceConverter.Snapshot()
+	testMust(t, err)
+	convertedDeclaration := snapshot.ConvertedUFs[declaration]
+	if convertedDeclaration.IsNull() {
+		t.Fatal("converted declaration was not recorded")
+	}
+	interpretation, err := model.NewFunctionInterpretation(m, 1)
+	testMust(t, err)
+	argumentBits, err := m.BitVectorNumeralUnsigned(0x3f800000, 32)
+	testMust(t, err)
+	resultBits, err := m.BitVectorNumeralUnsigned(0x40000000, 32)
+	testMust(t, err)
+	fallbackBits, err := m.BitVectorNumeralUnsigned(0, 32)
+	testMust(t, err)
+	testMust(t, interpretation.InsertNewEntry([]ast.ASTHandle{argumentBits}, resultBits))
+	testMust(t, interpretation.SetElse(fallbackBits))
+	testMust(t, sourceModel.RegisterFunction(convertedDeclaration, interpretation))
+
+	converter, err := NewConverter(m, sourceConverter)
+	testMust(t, err)
+	defer func() { testMust(t, converter.Close()) }()
+	seen, err := converter.ConvertModel(sourceModel, targetModel)
+	testMust(t, err)
+	if _, ok := seen[convertedDeclaration]; !ok {
+		t.Fatal("converted function declaration was not consumed")
+	}
+	got, err := targetModel.FunctionInterpretation(declaration)
+	testMust(t, err)
+	if got == nil || got.NumEntries() != 1 {
+		t.Fatal("converted function graph", got)
+	}
+	entry, err := got.Entry(0)
+	testMust(t, err)
+	argument, err := entry.Argument(0)
+	testMust(t, err)
+	wantArgument, err := converter.ConvertPackedBV(nil, floatSort, argumentBits)
+	testMust(t, err)
+	if argument != wantArgument {
+		t.Fatal("converted function argument", argument, wantArgument)
+	}
+	entryResult, err := entry.Result()
+	testMust(t, err)
+	if entryResult != resultBits {
+		t.Fatal("converted function result", entryResult, resultBits)
+	}
+	fallback, err := got.Else()
+	testMust(t, err)
+	if fallback != fallbackBits {
+		t.Fatal("converted function fallback", fallback, fallbackBits)
+	}
+}

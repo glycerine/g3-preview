@@ -17163,12 +17163,15 @@
       "go_targets": [
         "pkg/model/fpa/bv2fpa_converter.go",
         "pkg/model/fpa/bv2fpa_model.go",
+        "pkg/model/fpa/bv2fpa_functions.go",
+        "pkg/model/function_interpretation.go",
         "pkg/ast/fpa/fpa2bv_symbols.go"
       ],
       "tests": [
         "TestBV2FPAConverterNumeralsAndRoundingModes",
         "TestBV2FPAConverterRetainsSourceSnapshot",
-        "TestBV2FPAConverterConvertsFloatAndRoundingConstants"
+        "TestBV2FPAConverterConvertsFloatAndRoundingConstants",
+        "TestBV2FPAConverterRebuildsFunctionInterpretation"
       ],
       "conditionals": [
         {
@@ -17274,13 +17277,14 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "constructor/destructor cache snapshot ownership, direct/evaluated bit-vector component and rounding-mode numeral reconstruction, and model float/rounding constant and min/max special conversion; function, array, display, and translation conversion remains open",
+          "name": "owned converter snapshot, numeral reconstruction, model constant/special conversion, floating subterm rebuilding, and FPA unspecified-function interpretation conversion; legacy array, display, and translation conversion remains open",
           "status": "ported",
           "go_target": "pkg/model/fpa/bv2fpa_converter.go",
           "tests": [
             "TestBV2FPAConverterNumeralsAndRoundingModes",
             "TestBV2FPAConverterRetainsSourceSnapshot",
-            "TestBV2FPAConverterConvertsFloatAndRoundingConstants"
+            "TestBV2FPAConverterConvertsFloatAndRoundingConstants",
+            "TestBV2FPAConverterRebuildsFunctionInterpretation"
           ]
         }
       ],
@@ -17297,12 +17301,15 @@
       "go_targets": [
         "pkg/model/fpa/bv2fpa_converter.go",
         "pkg/model/fpa/bv2fpa_model.go",
+        "pkg/model/fpa/bv2fpa_functions.go",
+        "pkg/model/function_interpretation.go",
         "pkg/ast/fpa/fpa2bv_symbols.go"
       ],
       "tests": [
         "TestBV2FPAConverterNumeralsAndRoundingModes",
         "TestBV2FPAConverterRetainsSourceSnapshot",
-        "TestBV2FPAConverterConvertsFloatAndRoundingConstants"
+        "TestBV2FPAConverterConvertsFloatAndRoundingConstants",
+        "TestBV2FPAConverterRebuildsFunctionInterpretation"
       ],
       "conditionals": [
         {
@@ -17318,13 +17325,14 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "owned converter snapshot and numeral reconstruction surface; remaining model conversion methods remain open",
+          "name": "owned converter snapshot, numeral reconstruction, model conversion, floating subterm rebuilding, and FPA unspecified-function interpretation conversion; legacy array, display, and translation conversion remains open",
           "status": "ported",
           "go_target": "pkg/model/fpa/bv2fpa_converter.go",
           "tests": [
             "TestBV2FPAConverterNumeralsAndRoundingModes",
             "TestBV2FPAConverterRetainsSourceSnapshot",
-            "TestBV2FPAConverterConvertsFloatAndRoundingConstants"
+            "TestBV2FPAConverterConvertsFloatAndRoundingConstants",
+            "TestBV2FPAConverterRebuildsFunctionInterpretation"
           ]
         }
       ],
