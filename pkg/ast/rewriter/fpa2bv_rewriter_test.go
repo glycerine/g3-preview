@@ -279,3 +279,17 @@ func TestFPA2BVRewriterToBVDispatch(t *testing.T) {
 		}
 	}
 }
+
+func TestFPA2BVRewriterToRealDispatch(t *testing.T) {
+	f := newFPA2BVFixture(t)
+	zero, err := f.m.MkFPAZeroOfSort(f.sort, true)
+	astTestMust(t, err)
+	conversion, err := f.m.MkFamilyApp(f.family, ast.FPAOpToReal, nil, []ast.ASTHandle{zero})
+	astTestMust(t, err)
+	got := f.rewrite(t, conversion)
+	text, integer, matched, err := f.m.ArithmeticNumeralText(got)
+	astTestMust(t, err)
+	if !matched || integer || text != "0" {
+		t.Fatal("float-to-real dispatch", text, integer, matched)
+	}
+}

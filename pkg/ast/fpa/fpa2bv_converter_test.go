@@ -254,6 +254,58 @@ func TestConverterFloatToBitVectorConversions(t *testing.T) {
 	}
 }
 
+func TestConverterFloatToRealConversion(t *testing.T) {
+	m, c := fixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	must(t, err)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	for _, special := range []fpa.SpecialValue{
+		fpa.NaN, fpa.PositiveInfinity, fpa.NegativeInfinity,
+		fpa.PositiveZero, fpa.NegativeZero,
+	} {
+		input, e := c.MkSpecial(sort, special)
+		must(t, e)
+		got, e := c.ToReal(input)
+		must(t, e)
+		text, integer, matched, e := m.ArithmeticNumeralText(got)
+		must(t, e)
+		if !matched || integer || text != "0" {
+			t.Fatal("float-to-real special", special, text, integer, matched)
+		}
+	}
+
+	signSort, err := m.BitVectorSort(1)
+	must(t, err)
+	exponentSort, err := m.BitVectorSort(8)
+	must(t, err)
+	significandSort, err := m.BitVectorSort(23)
+	must(t, err)
+	sign, err := m.MkVar(840, signSort)
+	must(t, err)
+	exponent, err := m.MkVar(841, exponentSort)
+	must(t, err)
+	significand, err := m.MkVar(842, significandSort)
+	must(t, err)
+	input, err := c.MkFP(sign, exponent, significand)
+	must(t, err)
+	got, err := c.ToReal(input)
+	must(t, err)
+	gotSort, err := m.GetSort(got)
+	must(t, err)
+	zero, err := m.ArithmeticRealNumeralText("0")
+	must(t, err)
+	realSort, err := m.GetSort(zero)
+	must(t, err)
+	if gotSort != realSort {
+		t.Fatal("symbolic float-to-real sort", gotSort, realSort)
+	}
+	must(t, c.SetHighUnspecified(false))
+	if _, err = c.ToReal(input); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("low-unspecified float-to-real branch must remain explicit", err)
+	}
+}
+
 func TestConverterFiniteNumeral(t *testing.T) {
 	m, c := fixture(t)
 	_, err := m.RegisterArithmeticPlugin()

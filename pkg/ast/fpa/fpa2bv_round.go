@@ -229,6 +229,21 @@ func (b *roundBuilder) ite(condition, yes, no ast.ASTHandle) ast.ASTHandle {
 func (b *roundBuilder) fpITE(condition, yes, no ast.ASTHandle) ast.ASTHandle {
 	return b.call(func() (ast.ASTHandle, error) { return b.c.MkITE(condition, yes, no) })
 }
+func (b *roundBuilder) arithAdd(a, c ast.ASTHandle) ast.ASTHandle {
+	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkArithmeticAdd(a, c) })
+}
+func (b *roundBuilder) arithMul(a, c ast.ASTHandle) ast.ASTHandle {
+	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkArithmeticMul(a, c) })
+}
+func (b *roundBuilder) arithDiv(a, c ast.ASTHandle) ast.ASTHandle {
+	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkArithmeticDiv(a, c) })
+}
+func (b *roundBuilder) arithNeg(v ast.ASTHandle) ast.ASTHandle {
+	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkArithmeticNeg(v) })
+}
+func (b *roundBuilder) arithPower(a, c ast.ASTHandle) ast.ASTHandle {
+	return b.call(func() (ast.ASTHandle, error) { return b.c.manager.MkArithmeticPower(a, c) })
+}
 func (b *roundBuilder) leading(v ast.ASTHandle, n uint32) ast.ASTHandle {
 	return b.call(func() (ast.ASTHandle, error) { return b.c.LeadingZeros(v, n) })
 }

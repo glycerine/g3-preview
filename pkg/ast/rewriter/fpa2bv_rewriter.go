@@ -397,6 +397,12 @@ func (c *fpa2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArgument
 					value, err = converter.ToSBV(width, values[0], values[1])
 				}
 			}
+		case ast.FPAOpToReal:
+			if len(values) != 1 {
+				err = ast.ErrASTDomain
+			} else {
+				value, err = converter.ToReal(values[0])
+			}
 		default:
 			done = false
 		}
