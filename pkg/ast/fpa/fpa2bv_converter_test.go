@@ -422,3 +422,60 @@ func TestConverterSymbolCachesAssertionsAndReset(t *testing.T) {
 		t.Fatal("reset must discard the fresh constant cache")
 	}
 }
+
+func TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros(t *testing.T) {
+	m, c := fixture(t)
+	sort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	family, err := m.ExistingFloatingPointFamilyID()
+	must(t, err)
+	minDecl, err := m.MkFamilyFuncDecl(family, ast.FPAOpMin, nil, []ast.ASTHandle{sort, sort}, ast.ASTHandle{})
+	must(t, err)
+	maxDecl, err := m.MkFamilyFuncDecl(family, ast.FPAOpMax, nil, []ast.ASTHandle{sort, sort}, ast.ASTHandle{})
+	must(t, err)
+	pinf, err := c.MkSpecial(sort, fpa.PositiveInfinity)
+	must(t, err)
+	ninf, err := c.MkSpecial(sort, fpa.NegativeInfinity)
+	must(t, err)
+	nan, err := c.MkSpecial(sort, fpa.NaN)
+	must(t, err)
+	pzero, err := c.MkSpecial(sort, fpa.PositiveZero)
+	must(t, err)
+	nzero, err := c.MkSpecial(sort, fpa.NegativeZero)
+	must(t, err)
+	minimum, err := c.Extremum(minDecl, ast.FPAOpMin, ninf, pinf)
+	must(t, err)
+	if minimum != ninf {
+		t.Fatal("minimum order", minimum, ninf)
+	}
+	maximum, err := c.Extremum(maxDecl, ast.FPAOpMax, ninf, pinf)
+	must(t, err)
+	if maximum != pinf {
+		t.Fatal("maximum order", maximum, pinf)
+	}
+	minimum, err = c.Extremum(minDecl, ast.FPAOpMin, nan, pinf)
+	must(t, err)
+	if minimum != pinf {
+		t.Fatal("minimum ignores one NaN", minimum, pinf)
+	}
+	first, err := c.Extremum(minDecl, ast.FPAOpMin, pzero, nzero)
+	must(t, err)
+	second, err := c.Extremum(minDecl, ast.FPAOpMin, pzero, nzero)
+	must(t, err)
+	if first != second {
+		t.Fatal("stable unspecified zero result", first, second)
+	}
+	otherOrder, err := c.Extremum(minDecl, ast.FPAOpMin, nzero, pzero)
+	must(t, err)
+	firstSign, firstExp, firstSig, err := c.SplitFP(first)
+	must(t, err)
+	otherSign, otherExp, otherSig, err := c.SplitFP(otherOrder)
+	must(t, err)
+	zeroExp, err := m.BitVectorNumeralUnsigned(0, 8)
+	must(t, err)
+	zeroSig, err := m.BitVectorNumeralUnsigned(0, 23)
+	must(t, err)
+	if firstSign == otherSign || firstExp != zeroExp || otherExp != zeroExp || firstSig != zeroSig || otherSig != zeroSig {
+		t.Fatal("opposite-zero unspecified encodings", first, otherOrder)
+	}
+}

@@ -29,6 +29,7 @@ type Converter struct {
 	constants         map[ast.ASTHandle]ast.ASTHandle
 	roundingConstants map[ast.ASTHandle]ast.ASTHandle
 	convertedUFs      map[ast.ASTHandle]ast.ASTHandle
+	minMaxSigns       map[ast.ASTHandle][2]ast.ASTHandle
 	extraAssertions   []ast.ASTHandle
 	header            uint64
 	highUnspecified   bool
@@ -48,6 +49,7 @@ func NewConverter(m *ast.ASTManager) (owner *Converter, result error) {
 		constants:         make(map[ast.ASTHandle]ast.ASTHandle),
 		roundingConstants: make(map[ast.ASTHandle]ast.ASTHandle),
 		convertedUFs:      make(map[ast.ASTHandle]ast.ASTHandle),
+		minMaxSigns:       make(map[ast.ASTHandle][2]ast.ASTHandle),
 	}
 	owner.self = owner
 	fail := func(err error) (*Converter, error) { return owner, errors.Join(err, owner.Close()) }

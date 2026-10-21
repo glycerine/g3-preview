@@ -51,6 +51,10 @@ func (c *Converter) Reset() (result error) {
 		return nil
 	}
 	result = errors.Join(result, c.releaseCache(c.constants), c.releaseCache(c.roundingConstants), c.releaseCache(c.convertedUFs))
+	for declaration, signs := range c.minMaxSigns {
+		result = errors.Join(result, c.manager.DecRef(declaration), c.manager.DecRef(signs[0]), c.manager.DecRef(signs[1]))
+		delete(c.minMaxSigns, declaration)
+	}
 	for _, assertion := range c.extraAssertions {
 		result = errors.Join(result, c.manager.DecRef(assertion))
 	}

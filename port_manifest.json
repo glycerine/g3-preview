@@ -17302,6 +17302,7 @@
         "pkg/ast/fpa/fpa2bv_conversions.go",
         "pkg/ast/fpa/fpa2bv_unpack.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
+        "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
         "pkg/ast/ast_bv_all_ones.go"
       ],
@@ -17312,7 +17313,8 @@
         "TestConverterClassificationsUnarySignsAndComparisons",
         "TestConverterVariablesAndIEEEBitVectorConversions",
         "TestConverterBiasLeadingZerosAndUnpack",
-        "TestConverterSymbolCachesAssertionsAndReset"
+        "TestConverterSymbolCachesAssertionsAndReset",
+        "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
       ],
       "conditionals": [
         {
@@ -18646,10 +18648,18 @@
           "tests": [
             "TestConverterSymbolCachesAssertionsAndReset"
           ]
+        },
+        {
+          "name": "minimum and maximum special cases with stable fresh-sign results for opposite-signed zero",
+          "status": "ported",
+          "go_target": "pkg/ast/fpa/fpa2bv_extrema.go",
+          "tests": [
+            "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
+          ]
         }
       ],
       "ownership": [
-        "The converter owns its reserved Go owner storage, cached declaration/value pairs, and extra assertion handles while borrowing the AST manager. Reset and Close release each retained AST reference. The min/max special cache remains open."
+        "The converter owns its reserved Go owner storage, cached declaration/value pairs, min/max fresh-sign triples, and extra assertion handles while borrowing the AST manager. Reset and Close release each retained AST reference."
       ],
       "deviations": []
     },
@@ -18664,6 +18674,7 @@
         "pkg/ast/fpa/fpa2bv_conversions.go",
         "pkg/ast/fpa/fpa2bv_unpack.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
+        "pkg/ast/fpa/fpa2bv_extrema.go",
         "pkg/ast/ast_fpa_sort_access.go",
         "pkg/ast/ast_bv_all_ones.go"
       ],
@@ -18674,7 +18685,8 @@
         "TestConverterClassificationsUnarySignsAndComparisons",
         "TestConverterVariablesAndIEEEBitVectorConversions",
         "TestConverterBiasLeadingZerosAndUnpack",
-        "TestConverterSymbolCachesAssertionsAndReset"
+        "TestConverterSymbolCachesAssertionsAndReset",
+        "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
       ],
       "conditionals": [
         {
@@ -18700,12 +18712,13 @@
             "TestConverterClassificationsUnarySignsAndComparisons",
             "TestConverterVariablesAndIEEEBitVectorConversions",
             "TestConverterBiasLeadingZerosAndUnpack",
-            "TestConverterSymbolCachesAssertionsAndReset"
+            "TestConverterSymbolCachesAssertionsAndReset",
+            "TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros"
           ]
         }
       ],
       "ownership": [
-        "The Go converter is a checked single owner borrowing ASTManager; returned AST handles follow ASTManager factory borrowing. It owns converted constant/UF cache references and side assertions through Reset or Close. The min/max special cache remains open."
+        "The Go converter is a checked single owner borrowing ASTManager; returned AST handles follow ASTManager factory borrowing. It owns converted constant/UF cache references, min/max fresh signs, and side assertions through Reset or Close."
       ],
       "deviations": []
     },
