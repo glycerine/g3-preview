@@ -14823,6 +14823,8 @@
         "pkg/ast/ast_datatype_utility.go",
         "pkg/ast/ast_datatype_definition.go",
         "pkg/ast/ast_datatype_definition_test.go",
+        "pkg/ast/ast_datatype_values.go",
+        "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/rewriter/datatype_rewriter_test.go",
         "pkg/ast/ast_datatype_plugin.go",
         "pkg/ast/ast_datatype_plugin_source_test.go"
@@ -14835,7 +14837,8 @@
         "TestASTDatatypeRegistrationLifecycle",
         "TestASTDatatypeDefinitionBlockAndUtilities",
         "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
-        "TestASTParametricDatatypeDefinitionInstantiation"
+        "TestASTParametricDatatypeDefinitionInstantiation",
+        "TestASTDatatypeValueAndSomeValueCallbacks"
       ],
       "assertions": [
         {
@@ -14951,6 +14954,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Datatype constructor value/unique-value recognition and well-founded default-value construction (datatype_decl_plugin.cpp:410-477)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_values.go",
+          "tests": [
+            "TestASTDatatypeValueAndSomeValueCallbacks"
+          ]
+        },
+        {
           "name": "Datatype parameter, accessor-owner, recursion, sibling, constructor-index, and non-recursive-constructor utilities (datatype_decl_plugin.cpp:818-1024)",
           "status": "ported",
           "go_target": "pkg/ast/ast_datatype_definition.go",
@@ -15001,7 +15012,7 @@
         "The plugin owns datatype definition maps and pins every retained definition sort, formal parameter, and accessor range. Finalization releases those pins in reverse acquisition order before clearing the native Go maps and slices. Declaration query results remain borrowed manager nodes."
       ],
       "deviations": [
-        "Datatype size expressions, value recognition/construction, display, translation, and utility caching remain unported. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed."
+        "Datatype size expressions, display, translation, and utility caching remain unported. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed."
       ]
     },
     {
@@ -15015,6 +15026,7 @@
         "pkg/ast/ast_datatype_utility.go",
         "pkg/ast/ast_datatype_definition.go",
         "pkg/ast/ast_datatype_definition_test.go",
+        "pkg/ast/ast_datatype_values.go",
         "pkg/ast/rewriter/datatype_rewriter_test.go"
       ],
       "tests": [
@@ -15024,7 +15036,8 @@
         "TestDatatypeRewriterOriginalConstructorEquality",
         "TestASTDatatypeDefinitionBlockAndUtilities",
         "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
-        "TestASTParametricDatatypeDefinitionInstantiation"
+        "TestASTParametricDatatypeDefinitionInstantiation",
+        "TestASTDatatypeValueAndSomeValueCallbacks"
       ],
       "conditionals": [
         {
@@ -15039,6 +15052,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Datatype value and default-value plugin callbacks (datatype_decl_plugin.h:246-262)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_values.go",
+          "tests": [
+            "TestASTDatatypeValueAndSomeValueCallbacks"
+          ]
+        },
         {
           "name": "Datatype parameter, accessor-owner, recursion, sibling, constructor-index, and non-recursive-constructor utility interfaces (datatype_decl_plugin.h:290-391)",
           "status": "ported",
@@ -15082,7 +15103,7 @@
         "Datatype declaration parameters and domain/range handles are borrowed. Definition records pin their retained sorts; AST factories copy declaration information and own the resulting nodes through the manager."
       ],
       "deviations": [
-        "The size-expression hierarchy and utility paths for datatype size, value construction, display, translation, and caching remain unported."
+        "The size-expression hierarchy and utility paths for datatype size, display, translation, and caching remain unported."
       ]
     },
     {
