@@ -69,8 +69,25 @@ func TestASTDatatypeDefinitionBlockAndUtilities(t *testing.T) {
 	if original, matched, e := m.DatatypeRecognizerConstructor(recognizer); e != nil || !matched || original != constructors[1] {
 		t.Fatal("recognizer constructor", original, matched, e)
 	}
+	if got, matched, e := m.DatatypeRecognizerConstructorIndex(recognizer); e != nil || !matched || got != 1 {
+		t.Fatal("recognizer constructor index", got, matched, e)
+	}
+	if owner, matched, e := m.DatatypeAccessorConstructor(accessors[0]); e != nil || !matched || owner != constructors[1] {
+		t.Fatal("accessor constructor", owner, matched, e)
+	}
 	if enum, e := m.DatatypeIsEnumSort(sorts[0]); e != nil || enum {
 		t.Fatal("recursive datatype classified as enum", enum, e)
+	}
+	if recursive, e := m.DatatypeIsRecursive(sorts[0]); e != nil || !recursive {
+		t.Fatal("mutually recursive datatype", recursive, e)
+	}
+	nonRecursive, found, err := m.DatatypeNonRecursiveConstructor(sorts[0])
+	astTestMust(t, err)
+	if !found {
+		t.Fatal("missing non-recursive constructor")
+	}
+	if got, matched, e := m.DatatypeConstructorIndex(nonRecursive); e != nil || !matched || got != 0 {
+		t.Fatal("non-recursive constructor", got, matched, e)
 	}
 }
 
@@ -89,6 +106,9 @@ func TestASTDatatypeDefinitionEnumAndWellFoundedRefusal(t *testing.T) {
 	astTestMust(t, err)
 	if enum, e := m.DatatypeIsEnumSort(color[0]); e != nil || !enum {
 		t.Fatal("enum datatype", enum, e)
+	}
+	if recursive, e := m.DatatypeIsRecursive(color[0]); e != nil || recursive {
+		t.Fatal("enum recursion", recursive, e)
 	}
 
 	_, err = m.MkDatatypes([]DatatypeDefinition{{
@@ -148,5 +168,11 @@ func TestASTParametricDatatypeDefinitionInstantiation(t *testing.T) {
 	}
 	if fieldRange, e := m.GetRange(accessors[0]); e != nil || fieldRange != boolean {
 		t.Fatal("substituted accessor range", fieldRange, e)
+	}
+	if count, e := m.DatatypeNumParameters(boxBool); e != nil || count != 1 {
+		t.Fatal("datatype parameter count", count, e)
+	}
+	if parameter, e := m.DatatypeParameter(boxBool, 0); e != nil || parameter != boolean {
+		t.Fatal("datatype parameter", parameter, e)
 	}
 }

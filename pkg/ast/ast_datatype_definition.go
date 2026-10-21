@@ -558,3 +558,264 @@ func (m *ASTManager) DatatypeConstructorRecognizer(constructor ASTHandle) (ASTHa
 	}
 	return ASTHandle{}, ErrASTDomain
 }
+
+func (m *ASTManager) DatatypeRecognizerConstructorIndex(recognizer ASTHandle) (uint32, bool, error) {
+	if err := m.lock(); err != nil {
+		return 0, false, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireKind(recognizer, ASTFuncDecl)
+	if err != nil {
+		return 0, false, err
+	}
+	family, kind, err := m.declIdentity(r)
+	if err != nil || m.datatypePlugin == nil || family != m.datatypePlugin.family || kind != ASTDatatypeRecognizer && kind != ASTDatatypeIs {
+		return 0, false, err
+	}
+	constructor, err := m.datatypeDeclASTParameter(r, 0)
+	if err != nil {
+		return 0, false, err
+	}
+	definition, err := m.datatypeDefinitionForSort(m.declAt(constructor.slot).rangeSort)
+	if err != nil {
+		return 0, false, err
+	}
+	name, err := m.datatypeDeclSymbolParameter(constructor, 0)
+	if err != nil {
+		return 0, false, err
+	}
+	for i := range definition.constructors {
+		if definition.constructors[i].name == name {
+			return uint32(i), true, nil
+		}
+	}
+	return 0, false, nil
+}
+
+func (m *ASTManager) DatatypeAccessorConstructor(accessor ASTHandle) (ASTHandle, bool, error) {
+	if err := m.lock(); err != nil {
+		return ASTHandle{}, false, err
+	}
+	defer m.mu.Unlock()
+	a, err := m.requireKind(accessor, ASTFuncDecl)
+	if err != nil {
+		return ASTHandle{}, false, err
+	}
+	family, kind, err := m.declIdentity(a)
+	if err != nil || m.datatypePlugin == nil || family != m.datatypePlugin.family || kind != ASTDatatypeAccessor {
+		return ASTHandle{}, false, err
+	}
+	domain, err := m.readInternal(m.declAt(a.slot).domain, 0)
+	if err != nil {
+		return ASTHandle{}, false, err
+	}
+	definition, err := m.datatypeDefinitionForSort(domain)
+	if err != nil {
+		return ASTHandle{}, false, err
+	}
+	constructorName, err := m.datatypeDeclSymbolParameter(a, 1)
+	if err != nil {
+		return ASTHandle{}, false, err
+	}
+	for i := range definition.constructors {
+		if definition.constructors[i].name == constructorName {
+			decl, e := m.datatypeConstructorDecl(domain, definition, &definition.constructors[i])
+			return m.external(decl), e == nil, e
+		}
+	}
+	return ASTHandle{}, false, nil
+}
+
+func (m *ASTManager) DatatypeNumParameters(sort ASTHandle) (uint32, error) {
+	if err := m.lock(); err != nil {
+		return 0, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireKind(sort, ASTSort)
+	if err != nil {
+		return 0, err
+	}
+	d, err := m.datatypeDefinitionForSort(r)
+	if err != nil {
+		return 0, err
+	}
+	arguments, err := m.datatypeSortArguments(r, d)
+	return uint32(len(arguments)), err
+}
+
+func (m *ASTManager) DatatypeParameter(sort ASTHandle, index uint32) (ASTHandle, error) {
+	if err := m.lock(); err != nil {
+		return ASTHandle{}, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireKind(sort, ASTSort)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	d, err := m.datatypeDefinitionForSort(r)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	arguments, err := m.datatypeSortArguments(r, d)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	if index >= uint32(len(arguments)) {
+		return ASTHandle{}, ErrASTDomain
+	}
+	return m.external(arguments[index]), nil
+}
+
+func (m *ASTManager) datatypeSubsorts(sort astNodeRef, result *[]astNodeRef) error {
+	*result = append(*result, sort)
+	record := m.sortAt(sort.slot)
+	if record.info == (ASTSortInfo{}) {
+		return nil
+	}
+	info, err := m.sortInfo(record.info)
+	if err != nil {
+		return err
+	}
+	for i := uint32(0); i < info.count; i++ {
+		parameter, e := m.infoParameter(info, i)
+		if e != nil {
+			return e
+		}
+		value, e := m.parameter(parameter)
+		if e != nil {
+			return e
+		}
+		if value.Kind == ASTParameterAST && m.validNode(value.ast) == nil && m.nodeAt(value.ast.slot).kind == ASTSort {
+			if e = m.datatypeSubsorts(value.ast, result); e != nil {
+				return e
+			}
+		}
+	}
+	return nil
+}
+
+func (m *ASTManager) datatypeRecursive(sort astNodeRef, marks map[astNodeRef]uint8) (bool, error) {
+	if marks[sort] == 1 {
+		return true, nil
+	}
+	if marks[sort] == 2 {
+		return false, nil
+	}
+	definition, err := m.datatypeDefinitionForSort(sort)
+	if err != nil {
+		return false, err
+	}
+	marks[sort] = 1
+	for ci := range definition.constructors {
+		ranges, e := m.datatypeInstantiatedRanges(sort, definition, &definition.constructors[ci])
+		if e != nil {
+			return false, e
+		}
+		for _, field := range ranges {
+			var subsorts []astNodeRef
+			if e = m.datatypeSubsorts(field, &subsorts); e != nil {
+				return false, e
+			}
+			for _, nested := range subsorts {
+				if _, e = m.datatypeDefinitionForSort(nested); e != nil {
+					continue
+				}
+				recursive, e := m.datatypeRecursive(nested, marks)
+				if e != nil || recursive {
+					return recursive, e
+				}
+			}
+		}
+	}
+	marks[sort] = 2
+	return false, nil
+}
+
+func (m *ASTManager) DatatypeIsRecursive(sort ASTHandle) (bool, error) {
+	if err := m.lock(); err != nil {
+		return false, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireKind(sort, ASTSort)
+	if err != nil {
+		return false, err
+	}
+	return m.datatypeRecursive(r, make(map[astNodeRef]uint8))
+}
+
+func (m *ASTManager) datatypeNonRecursiveConstructor(sort astNodeRef, forbidden map[astNodeRef]bool) (astNodeRef, bool, error) {
+	definition, err := m.datatypeDefinitionForSort(sort)
+	if err != nil {
+		return astNodeRef{}, false, err
+	}
+	n := len(definition.constructors)
+	if n == 0 {
+		return astNodeRef{}, false, nil
+	}
+	m.datatypePlugin.utilityStart++
+	start := int(m.datatypePlugin.utilityStart % uint32(n))
+	allNonDatatype := func(ranges []astNodeRef) bool {
+		for _, field := range ranges {
+			if _, e := m.datatypeDefinitionForSort(field); e == nil {
+				return false
+			}
+		}
+		return true
+	}
+	for j := 0; j < n; j++ {
+		candidate := &definition.constructors[(j+start)%n]
+		ranges, e := m.datatypeInstantiatedRanges(sort, definition, candidate)
+		if e != nil {
+			return astNodeRef{}, false, e
+		}
+		if allNonDatatype(ranges) {
+			decl, e := m.datatypeConstructorDecl(sort, definition, candidate)
+			return decl, e == nil, e
+		}
+	}
+	for j := 0; j < n; j++ {
+		candidate := &definition.constructors[(j+start)%n]
+		ranges, e := m.datatypeInstantiatedRanges(sort, definition, candidate)
+		if e != nil {
+			return astNodeRef{}, false, e
+		}
+		valid := true
+		for _, field := range ranges {
+			if _, e = m.datatypeDefinitionForSort(field); e != nil {
+				continue
+			}
+			if forbidden[field] {
+				valid = false
+				break
+			}
+			forbidden[field] = true
+			_, found, e := m.datatypeNonRecursiveConstructor(field, forbidden)
+			delete(forbidden, field)
+			if e != nil {
+				return astNodeRef{}, false, e
+			}
+			if !found {
+				valid = false
+				break
+			}
+		}
+		if valid {
+			decl, e := m.datatypeConstructorDecl(sort, definition, candidate)
+			return decl, e == nil, e
+		}
+	}
+	return astNodeRef{}, false, nil
+}
+
+func (m *ASTManager) DatatypeNonRecursiveConstructor(sort ASTHandle) (ASTHandle, bool, error) {
+	if err := m.lock(); err != nil {
+		return ASTHandle{}, false, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireKind(sort, ASTSort)
+	if err != nil {
+		return ASTHandle{}, false, err
+	}
+	constructor, found, err := m.datatypeNonRecursiveConstructor(r, map[astNodeRef]bool{r: true})
+	return m.external(constructor), found, err
+}

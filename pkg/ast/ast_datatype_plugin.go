@@ -42,6 +42,7 @@ type astDatatypePluginOwner struct {
 	definitionNames                       map[usymbol.Symbol]*astDatatypeDefinition
 	definitionRefs                        []astNodeRef
 	classID                               uint32
+	utilityStart                          uint32
 	completed, published, memoryTraceLive bool
 	membersEnded                          bool
 }
