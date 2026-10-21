@@ -14820,12 +14820,16 @@
       "go_targets": [
         "pkg/ast/ast_datatype_decl.go",
         "pkg/ast/ast_datatype_decl_test.go",
+        "pkg/ast/ast_datatype_utility.go",
+        "pkg/ast/rewriter/datatype_rewriter_test.go",
         "pkg/ast/ast_datatype_plugin.go",
         "pkg/ast/ast_datatype_plugin_source_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
         "TestASTDatatypeDeclarationRefusals",
+        "TestDatatypeRewriterOriginalApplicationReductions",
+        "TestDatatypeRewriterOriginalConstructorEquality",
         "TestASTDatatypeRegistrationLifecycle"
       ],
       "assertions": [
@@ -14942,6 +14946,15 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained datatype constructor, recognizer and accessor relationship queries used by datatype rewriting (datatype_decl_plugin.cpp:753-872)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_utility.go",
+          "tests": [
+            "TestDatatypeRewriterOriginalApplicationReductions",
+            "TestDatatypeRewriterOriginalConstructorEquality"
+          ]
+        },
+        {
           "name": "Datatype sort and constructor/recognizer/is/accessor/update-field declaration dispatch and validation (datatype_decl_plugin.cpp:193-381)",
           "status": "ported",
           "go_target": "pkg/ast/ast_datatype_decl.go",
@@ -14963,7 +14976,7 @@
         "Only the actual plugin registration header and registry/family acquisitions are retained. Definition tables, utility caches, and vectors had no production Go consumers and have been removed rather than allocating empty copied C++ containers. Registration, repeated lookup, source finalization, and owning history cleanup remain covered."
       ],
       "deviations": [
-        "Datatype definition blocks, instantiation utilities, size expressions, value recognition, and recursive datatype queries remain live upstream and unported. Their future Go implementations must use concrete native maps and slices. Native container allocation ABI and registered upstream-driver credit are not claimed."
+        "Datatype definition blocks, parametric instantiation, size expressions, value recognition, and recursive datatype queries remain live upstream and unported. Their future Go implementations must use concrete native maps and slices. Native container allocation ABI and registered upstream-driver credit are not claimed."
       ]
     },
     {
@@ -14973,11 +14986,15 @@
       "status": "unported",
       "go_targets": [
         "pkg/ast/ast_datatype_decl.go",
-        "pkg/ast/ast_datatype_decl_test.go"
+        "pkg/ast/ast_datatype_decl_test.go",
+        "pkg/ast/ast_datatype_utility.go",
+        "pkg/ast/rewriter/datatype_rewriter_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
-        "TestASTDatatypeDeclarationRefusals"
+        "TestASTDatatypeDeclarationRefusals",
+        "TestDatatypeRewriterOriginalApplicationReductions",
+        "TestDatatypeRewriterOriginalConstructorEquality"
       ],
       "conditionals": [
         {
@@ -14993,6 +15010,15 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained datatype utility recognition and constructor/accessor relationship interface (datatype_decl_plugin.h:290-391)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_utility.go",
+          "tests": [
+            "TestDatatypeRewriterOriginalApplicationReductions",
+            "TestDatatypeRewriterOriginalConstructorEquality"
+          ]
+        },
+        {
           "name": "Datatype sort/operator kinds and retained declaration plugin entry points (datatype_decl_plugin.h:24-38,237-288)",
           "status": "ported",
           "go_target": "pkg/ast/ast_datatype_decl.go",
@@ -15006,7 +15032,7 @@
         "Datatype declaration parameters and domain/range handles are borrowed. AST factories copy declaration information and own the resulting nodes through the manager."
       ],
       "deviations": [
-        "Datatype definition classes, size-expression hierarchy, utility caches, and definition-building APIs remain unported."
+        "Datatype definition classes, size-expression hierarchy, definition-building APIs, and utility queries beyond the retained rewriter relationships remain unported."
       ]
     },
     {
@@ -29264,9 +29290,16 @@
       "path": "src/ast/rewriter/datatype_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/ast_datatype_utility.go",
+        "pkg/ast/rewriter/datatype_rewriter.go",
+        "pkg/ast/rewriter/datatype_rewriter_test.go"
+      ],
+      "tests": [
+        "TestDatatypeRewriterOriginalApplicationReductions",
+        "TestDatatypeRewriterOriginalConstructorEquality"
+      ],
       "assertions": [
         {
           "line": 22,
@@ -29301,19 +29334,42 @@
           "text": "SASSERT(num == to_app(rhs)->get_num_args());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_app_core constructor, recognizer, is, accessor and update-field reductions (datatype_rewriter.cpp:24-94)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/datatype_rewriter.go",
+          "tests": ["TestDatatypeRewriterOriginalApplicationReductions"]
+        },
+        {
+          "name": "mk_eq_core constructor discrimination and field equality decomposition (datatype_rewriter.cpp:96-140)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/datatype_rewriter.go",
+          "tests": ["TestDatatypeRewriterOriginalConstructorEquality"]
+        }
+      ],
+      "ownership": [
+        "The rewriter borrows its AST manager, declarations, and argument views. Generated applications are published through caller-owned ASTRef values. Temporary declaration parameters are explicitly destroyed after the declaration factory copies them."
+      ],
+      "deviations": [
+        "Concrete Go maps and slices retain constructor-ordered accessor names. The generic C++ datatype utility caches and pointer buffers are not ported as containers. Invalid source assertion domains return checked Go errors or rewrite refusal."
+      ]
     },
     {
       "path": "src/ast/rewriter/datatype_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ast/rewriter/datatype_rewriter.go",
+        "pkg/ast/rewriter/datatype_rewriter_test.go"
+      ],
+      "tests": [
+        "TestDatatypeRewriterOriginalApplicationReductions",
+        "TestDatatypeRewriterOriginalConstructorEquality"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -29324,11 +29380,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "datatype_rewriter manager/family owner and application/equality entry points (datatype_rewriter.h:24-35)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/datatype_rewriter.go",
+          "tests": [
+            "TestDatatypeRewriterOriginalApplicationReductions",
+            "TestDatatypeRewriterOriginalConstructorEquality"
+          ]
+        }
+      ],
+      "ownership": [
+        "DatatypeRewriter is a borrowing value with no independent AST ownership."
+      ],
+      "deviations": [
+        "Go exposes explicit RewriteApp and RewriteEquality methods in place of C++ reference parameters."
+      ]
     },
     {
       "path": "src/ast/rewriter/der.cpp",
