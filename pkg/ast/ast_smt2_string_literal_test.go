@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"errors"
 	"testing"
 
 	utext "github.com/glycerine/g3/pkg/util/text"
@@ -138,5 +139,39 @@ func TestASTSequenceStringValueClassification(t *testing.T) {
 	astTestMust(t, err)
 	if stringKind != ASTSequenceOpConcat || !stringValue {
 		t.Fatalf("string concat: kind=%d value=%v", stringKind, stringValue)
+	}
+	zero, err := m.GetSomeValue(m.external(m.arithmeticPlugin.fields[1]))
+	astTestMust(t, err)
+	for _, operation := range []struct {
+		make func() (ASTHandle, error)
+		kind int32
+		name string
+	}{
+		{func() (ASTHandle, error) { return m.MkSequenceLength(first) }, 9, "str.len"},
+		{func() (ASTHandle, error) { return m.MkSequencePrefix(first, second) }, 3, "str.prefixof"},
+		{func() (ASTHandle, error) { return m.MkSequenceSuffix(first, second) }, 4, "str.suffixof"},
+		{func() (ASTHandle, error) { return m.MkSequenceContains(first, second) }, 5, "str.contains"},
+		{func() (ASTHandle, error) { return m.MkSequenceExtract(first, zero, zero) }, 6, "str.substr"},
+		{func() (ASTHandle, error) { return m.MkSequenceAt(first, zero) }, 8, "str.at"},
+		{func() (ASTHandle, error) { return m.MkSequenceIndex(first, second, zero) }, 10, "str.indexof"},
+		{func() (ASTHandle, error) { return m.MkSequenceLength(truthUnit) }, 9, "seq.len"},
+	} {
+		h, e := operation.make()
+		astTestMust(t, e)
+		kind, e := m.GetDeclKind(h)
+		astTestMust(t, e)
+		ref, e := m.internal(h)
+		astTestMust(t, e)
+		name, e := m.Symbols.String(m.declAt(m.appAt(ref.slot).decl.slot).name)
+		astTestMust(t, e)
+		if kind != operation.kind || name != operation.name {
+			t.Fatalf("sequence observer: kind=%d name=%q, want %d %q", kind, name, operation.kind, operation.name)
+		}
+	}
+	if _, err = m.MkSequencePrefix(first, truthUnit); !errors.Is(err, ErrASTDomain) {
+		t.Fatalf("mixed sequence relation: %v", err)
+	}
+	if _, err = m.MkSequenceExtract(first, truth, zero); !errors.Is(err, ErrASTDomain) {
+		t.Fatalf("non-integer sequence offset: %v", err)
 	}
 }

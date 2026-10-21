@@ -34296,6 +34296,14 @@
           "tests": [
             "TestASTSequenceStringValueClassification"
           ]
+        },
+        {
+          "name": "retained seq_decl_plugin length, contains, prefix, suffix, extract, at and index factories with generic sequence and String declaration names (seq_decl_plugin.cpp:768-814)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_seq_factories.go",
+          "tests": [
+            "TestASTSequenceStringValueClassification"
+          ]
         }
       ],
       "ownership": [
