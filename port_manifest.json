@@ -14816,7 +14816,7 @@
       "path": "src/ast/datatype_decl_plugin.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_datatype_decl.go",
         "pkg/ast/ast_datatype_decl_test.go",
@@ -14826,6 +14826,9 @@
         "pkg/ast/ast_datatype_values.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_datatype_cardinality.go",
+        "pkg/ast/ast_datatype_display.go",
+        "pkg/ast/ast_datatype_names.go",
+        "pkg/ast/ast_translation_datatype.go",
         "pkg/ast/rewriter/datatype_rewriter_test.go",
         "pkg/ast/ast_datatype_plugin.go",
         "pkg/ast/ast_datatype_plugin_source_test.go"
@@ -14839,7 +14842,8 @@
         "TestASTDatatypeDefinitionBlockAndUtilities",
         "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
         "TestASTParametricDatatypeDefinitionInstantiation",
-        "TestASTDatatypeValueAndSomeValueCallbacks"
+        "TestASTDatatypeValueAndSomeValueCallbacks",
+        "TestASTTranslationInheritsDatatypeDefinitions"
       ],
       "assertions": [
         {
@@ -14951,9 +14955,18 @@
           "text": "SASSERT(is_datatype(s0));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "Datatype definition inheritance/translation, operation names, declared-definition traversal, and display (datatype_decl_plugin.cpp:54-112,170-191,458-466,620-621,1023-1070)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_translation_datatype.go",
+          "tests": [
+            "TestASTDatatypeDefinitionBlockAndUtilities",
+            "TestASTTranslationInheritsDatatypeDefinitions"
+          ]
+        },
         {
           "name": "Datatype size-function construction and concrete parametric cardinality evaluation (datatype_decl_plugin.cpp:112-147,215-229,557-673)",
           "status": "ported",
@@ -15020,17 +15033,17 @@
         }
       ],
       "ownership": [
-        "The plugin owns datatype definition maps and pins every retained definition sort, formal parameter, and accessor range. Finalization releases those pins in reverse acquisition order before clearing the native Go maps and slices. Declaration query results remain borrowed manager nodes."
+        "The plugin owns datatype definition maps and pins every retained definition sort, formal parameter, and accessor range. Finalization releases those pins in reverse acquisition order before clearing the native Go maps and slices. Translation snapshots definitions without retaining source pointers, then destination definitions acquire their own translated sort references. Declaration and description query results remain borrowed manager nodes."
       ],
       "deviations": [
-        "Datatype display, definition translation/inheritance, and utility caching remain unported. Size functions are evaluated directly into the existing pointer-free SortSize representation instead of retaining a polymorphic C++ expression tree. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed."
+        "Private utility memoization maps are omitted because concrete Go queries reconstruct hash-consed declarations and compute recursion/enum properties directly. The unused plugin remove entry point and undeclared get_datatype_size declaration are not ported. Size functions are evaluated directly into the existing pointer-free SortSize representation instead of retaining a polymorphic C++ expression tree. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed."
       ]
     },
     {
       "path": "src/ast/datatype_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_datatype_decl.go",
         "pkg/ast/ast_datatype_decl_test.go",
@@ -15039,6 +15052,9 @@
         "pkg/ast/ast_datatype_definition_test.go",
         "pkg/ast/ast_datatype_values.go",
         "pkg/ast/ast_datatype_cardinality.go",
+        "pkg/ast/ast_datatype_display.go",
+        "pkg/ast/ast_datatype_names.go",
+        "pkg/ast/ast_translation_datatype.go",
         "pkg/ast/rewriter/datatype_rewriter_test.go"
       ],
       "tests": [
@@ -15049,7 +15065,8 @@
         "TestASTDatatypeDefinitionBlockAndUtilities",
         "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
         "TestASTParametricDatatypeDefinitionInstantiation",
-        "TestASTDatatypeValueAndSomeValueCallbacks"
+        "TestASTDatatypeValueAndSomeValueCallbacks",
+        "TestASTTranslationInheritsDatatypeDefinitions"
       ],
       "conditionals": [
         {
@@ -15061,9 +15078,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "Datatype definition translation, declared-definition descriptions, display, and complete retained utility interface (datatype_decl_plugin.h:50-104,192-391)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_display.go",
+          "tests": [
+            "TestASTDatatypeDefinitionBlockAndUtilities",
+            "TestASTTranslationInheritsDatatypeDefinitions"
+          ]
+        },
         {
           "name": "Datatype size-expression behavior and cardinality interface (datatype_decl_plugin.h:107-220)",
           "status": "ported",
@@ -15122,10 +15148,10 @@
         }
       ],
       "ownership": [
-        "Datatype declaration parameters and domain/range handles are borrowed. Definition records pin their retained sorts; AST factories copy declaration information and own the resulting nodes through the manager."
+        "Datatype declaration parameters and domain/range handles are borrowed. Definition records pin their retained sorts; AST factories copy declaration information and own the resulting nodes through the manager. Exported definition descriptions contain borrowed handles and copied native slices."
       ],
       "deviations": [
-        "Datatype display, definition translation/inheritance, and utility caches remain unported. The private size-expression hierarchy is represented by direct checked SortSize evaluation because no retained consumer observes expression nodes."
+        "Private utility caches, the unused plugin remove entry point, and the undeclared get_datatype_size implementation are omitted under the retained-consumer rule. The private size-expression hierarchy is represented by direct checked SortSize evaluation because no retained consumer observes expression nodes."
       ]
     },
     {
