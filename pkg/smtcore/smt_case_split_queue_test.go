@@ -460,3 +460,25 @@ func TestSMTRelevantGoalCaseSplitUsesLowestGeneration(t *testing.T) {
 		t.Fatal("goal relevance ignored lower generation", selected, lowVar, highVar)
 	}
 }
+
+func TestSMTTheoryAwareCaseSplitWithoutHintProducerUsesActivity(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	first := smtRelevancyBool(t, m, "theory-aware-first")
+	second := smtRelevancyBool(t, m, "theory-aware-second")
+	astTestMust(t, state.Internalize(first, true))
+	astTestMust(t, state.Internalize(second, true))
+	firstVar, _ := state.BoolVar(first)
+	secondVar, _ := state.BoolVar(second)
+	state.activity[firstVar] = 1
+	state.activity[secondVar] = 8
+	queue, err := NewSMTActivityCaseSplitQueue(state)
+	astTestMust(t, err)
+	params := SMTParamsState{CaseSplitStrategy: 6, PhaseSelection: 1}
+	astTestMust(t, queue.ConfigurePhases(params))
+	selected, phase, err := queue.NextCaseSplit()
+	astTestMust(t, err)
+	if selected != secondVar || phase != lbool.True {
+		t.Fatal("theory-aware queue without retained hints diverged from activity", selected, phase, secondVar)
+	}
+}

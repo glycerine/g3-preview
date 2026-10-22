@@ -103030,7 +103030,7 @@
       "path": "src/smt/smt_case_split_queue.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_case_split_queue.go"
       ],
@@ -103185,7 +103185,7 @@
           "text": "SASSERT(m_context.get_num_b_internalized() > 0);"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -103215,8 +103215,16 @@
           ]
         },
         {
-          "name": "theory-aware branching queue strategy",
-          "status": "unported",
+          "name": "theory-aware strategy's retained no-hint activity and phase behavior",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_queue.go",
+          "tests": [
+            "TestSMTTheoryAwareCaseSplitWithoutHintProducerUsesActivity"
+          ]
+        },
+        {
+          "name": "theory-aware priority/phase hint registration and display",
+          "status": "dead_deleted",
           "go_target": null,
           "tests": []
         }
@@ -103226,14 +103234,15 @@
       ],
       "deviations": [
         "The retained activity and generation strategies scan Go slices instead of porting the C++ heap implementations; deterministic source insertion or variable order resolves equal priorities.",
-        "Relevancy queues derive their ordered candidates from the propagator's scoped relevant-expression trail at selection time; this replaces duplicate C++ queue trails while retaining base-before-search order and rollback behavior."
+        "Relevancy queues derive their ordered candidates from the propagator's scoped relevant-expression trail at selection time; this replaces duplicate C++ queue trails while retaining base-before-search order and rollback behavior.",
+        "The only source producer for theory-aware priority and phase hints is the unretained legacy string theory. With no retained producer, strategy 6 reduces to its activity/random-frequency path; no unused hint-registration adapter is added."
       ]
     },
     {
       "path": "src/smt/smt_case_split_queue.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_case_split_queue.go"
       ],
@@ -103249,7 +103258,8 @@
         "TestSMTRelevantCaseSplitQueueSelectsConnectiveChild",
         "TestSMTRelevantCaseSplitQueueLooksAheadAtDisequality",
         "TestSMTRelevantActivityCaseSplitDelaysSearchVariables",
-        "TestSMTRelevantGoalCaseSplitUsesLowestGeneration"
+        "TestSMTRelevantGoalCaseSplitUsesLowestGeneration",
+        "TestSMTTheoryAwareCaseSplitWithoutHintProducerUsesActivity"
       ],
       "conditionals": [
         {
@@ -103288,8 +103298,8 @@
           ]
         },
         {
-          "name": "display and theory-aware branching interfaces",
-          "status": "unported",
+          "name": "display and theory-aware priority/phase hint interfaces without retained callers",
+          "status": "dead_deleted",
           "go_target": null,
           "tests": []
         }
@@ -147407,8 +147417,8 @@
           ]
         },
         {
-          "name": "SMT theory-aware case-split activity heap (smt_case_split_queue.cpp:1113)",
-          "status": "unported"
+          "name": "SMT theory-aware case-split priority heap specialization without a retained hint producer (smt_case_split_queue.cpp:1113)",
+          "status": "dead_deleted"
         },
         {
           "name": "SMT arithmetic theory variable, quantified-instance priority and difference-logic variable/DFS heaps (theory_arith.h:395; smt_quantifier_instances.h:57; diff_logic.h:201,1396)",
