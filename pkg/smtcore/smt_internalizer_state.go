@@ -17,6 +17,7 @@ type smtInternalizerScope struct {
 	equalityLimit      int
 	assignmentLimit    int
 	clauseLimit        int
+	justificationLimit int
 	theoryLimit        int
 	assignedLimit      int
 	propagationHead    int
@@ -121,6 +122,7 @@ type SMTInternalizerState struct {
 	atomPropagationHead      int
 	notifyTrail              []smtInternalizerNotifyTrail
 	clauses                  []SMTInternalizedClause
+	ownedJustifications      []SMTJustification
 	assignedLiterals         []SMTLiteral
 	propagationHead          int
 	conflict                 SMTBooleanJustification
@@ -557,7 +559,7 @@ func (s *SMTInternalizerState) PushScope() error {
 	s.scopes = append(s.scopes, smtInternalizerScope{
 		booleanLimit: len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending), pendingHead: s.pendingHead,
 		equalityLimit:   len(s.equalityTrail),
-		assignmentLimit: len(s.assignmentTrail), clauseLimit: len(s.clauses), theoryLimit: len(s.theoryTrail), inconsistent: s.inconsistent,
+		assignmentLimit: len(s.assignmentTrail), clauseLimit: len(s.clauses), justificationLimit: len(s.ownedJustifications), theoryLimit: len(s.theoryTrail), inconsistent: s.inconsistent,
 		assignedLimit: len(s.assignedLiterals), propagationHead: s.propagationHead, conflict: s.conflict,
 		conflictLiteral: s.conflictLiteral,
 		disequalities:   disequalities, disequalityReasons: reasons,
@@ -714,6 +716,16 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	}
 	s.statistics.NumDelClause += uint32(len(s.clauses) - scope.clauseLimit)
 	s.clauses = s.clauses[:scope.clauseLimit]
+	if scope.justificationLimit < 0 || scope.justificationLimit > len(s.ownedJustifications) {
+		return ast.ErrASTDomain
+	}
+	for len(s.ownedJustifications) > scope.justificationLimit {
+		index := len(s.ownedJustifications) - 1
+		if err := s.ownedJustifications[index].Release(s.manager); err != nil {
+			return err
+		}
+		s.ownedJustifications = s.ownedJustifications[:index]
+	}
 	for len(s.enodeStack) > scope.enodeLimit {
 		node := s.enodeStack[len(s.enodeStack)-1]
 		if err := s.unregisterEnode(node); err != nil {

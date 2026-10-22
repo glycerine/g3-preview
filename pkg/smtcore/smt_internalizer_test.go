@@ -60,6 +60,102 @@ func TestSMTInternalizerBooleanGateClausesAndRootAssertions(t *testing.T) {
 	}
 }
 
+func TestSMTInternalizerBuildsGateAndRootClauseProofs(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	a := smtRelevancyBool(t, m, "internalizer-proof-a")
+	b := smtRelevancyBool(t, m, "internalizer-proof-b")
+	conjunction, err := m.MkAnd(a, b)
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.Internalize(conjunction, true))
+	builder := &smtConflictProofBuilder{
+		state: state, marked: make(map[int32]struct{}), literal: make(map[SMTLiteral]ast.ASTHandle),
+		objects: make(map[SMTJustification]ast.ASTHandle), equality: make(map[smtEnodePairKey]ast.ASTHandle),
+	}
+	for index := range state.clauses {
+		clause := state.clauses[index].clause
+		proof, proofErr := builder.clauseProof(clause)
+		astTestMust(t, proofErr)
+		fact, proofErr := m.GetProofFact(proof)
+		astTestMust(t, proofErr)
+		want, proofErr := builder.theoryFact(clause.literals)
+		astTestMust(t, proofErr)
+		if fact != want {
+			t.Fatal("gate clause proof fact", index, fact, want)
+		}
+	}
+
+	before := len(state.clauses)
+	iff, err := m.MkIff(a, b)
+	astTestMust(t, err)
+	asserted, err := m.MkProofAsserted(iff)
+	astTestMust(t, err)
+	astTestMust(t, state.Assert(iff, asserted, 0))
+	for index := before; index < len(state.clauses); index++ {
+		clause := state.clauses[index].clause
+		proof, proofErr := builder.clauseProof(clause)
+		astTestMust(t, proofErr)
+		fact, proofErr := m.GetProofFact(proof)
+		astTestMust(t, proofErr)
+		want, proofErr := builder.theoryFact(clause.literals)
+		astTestMust(t, proofErr)
+		if fact != want {
+			t.Fatal("root clause proof fact", index, fact, want)
+		}
+	}
+
+	c := smtRelevancyBool(t, m, "internalizer-proof-unit")
+	cProof, err := m.MkProofAsserted(c)
+	astTestMust(t, err)
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.Assert(c, cProof, 0))
+	cVariable, found := state.BoolVar(c)
+	if !found {
+		t.Fatal("missing unit assertion variable")
+	}
+	justification, ok := state.booleanData[cVariable].Justification().Justification()
+	if !ok {
+		t.Fatal("unit assertion did not retain proof justification")
+	}
+	unitProof, err := builder.objectProof(justification)
+	astTestMust(t, err)
+	unitFact, err := m.GetProofFact(unitProof)
+	astTestMust(t, err)
+	if unitFact != c {
+		t.Fatal("unit assertion proof fact", unitFact, c)
+	}
+	astTestMust(t, state.PopScopes(1))
+
+	d := smtRelevancyBool(t, m, "internalizer-proof-reduced-left")
+	e := smtRelevancyBool(t, m, "internalizer-proof-reduced-right")
+	astTestMust(t, state.Internalize(d, true))
+	astTestMust(t, state.Internalize(e, true))
+	dVariable, _ := state.BoolVar(d)
+	eVariable, _ := state.BoolVar(e)
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.AssignLiteral(NewSMTLiteral(dVariable, true), NewSMTBooleanAxiom()))
+	reducedIFF, err := m.MkIff(d, e)
+	astTestMust(t, err)
+	reducedProof, err := m.MkProofAsserted(reducedIFF)
+	astTestMust(t, err)
+	astTestMust(t, state.Assert(reducedIFF, reducedProof, 0))
+	eJustification, ok := state.booleanData[eVariable].Justification().Justification()
+	if !ok {
+		t.Fatal("simplified root clause lost proof justification")
+	}
+	eProof, err := builder.objectProof(eJustification)
+	astTestMust(t, err)
+	eFact, err := m.GetProofFact(eProof)
+	astTestMust(t, err)
+	notE, err := m.MkNot(e)
+	astTestMust(t, err)
+	if eFact != notE {
+		t.Fatal("simplified root clause proof fact", eFact, notE)
+	}
+	astTestMust(t, state.PopScopes(1))
+}
+
 func TestSMTInternalizerTermITEEqualityClausesAndRelevancy(t *testing.T) {
 	m := astTestManager(t)
 	condition := smtRelevancyBool(t, m, "internalize-term-condition")

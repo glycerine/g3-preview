@@ -106746,6 +106746,7 @@
         "TestSMTInternalizerBooleanVariablesLiteralsAssignmentsAndScopes",
         "TestSMTInternalizerEnodeGenerationCongruenceAndRollback",
         "TestSMTInternalizerBooleanGateClausesAndRootAssertions",
+        "TestSMTInternalizerBuildsGateAndRootClauseProofs",
         "TestSMTInternalizerImplicationGateWithoutPreprocessing",
         "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
         "TestSMTInternalizerTermITEEqualityClausesAndRelevancy",
@@ -107201,7 +107202,15 @@
           ]
         },
         {
-          "name": "search-scope clause reinitialization, proof-producing gate and root clauses, and clause garbage collection",
+          "name": "proof-producing gate, root, and scoped unit clauses with false-antecedent resolution",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer.go",
+          "tests": [
+            "TestSMTInternalizerBuildsGateAndRootClauseProofs"
+          ]
+        },
+        {
+          "name": "search-scope clause reinitialization and clause garbage collection",
           "status": "unported",
           "go_target": null,
           "tests": []

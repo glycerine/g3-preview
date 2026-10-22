@@ -3,6 +3,7 @@
 package smtcore
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -116,6 +117,7 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 	}
 	seen := make(map[SMTLiteral]struct{}, len(literals))
 	kept := make([]SMTLiteral, 0, len(literals))
+	removedFalse := make([]SMTLiteral, 0)
 	for _, literal := range literals {
 		if literal == SMTTrueLiteral {
 			return nil
@@ -138,11 +140,26 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 				return nil
 			}
 			if value == lbool.False {
+				removedFalse = append(removedFalse, literal.Negated())
 				continue
 			}
 		}
 		seen[literal] = struct{}{}
 		kept = append(kept, literal)
+	}
+	if !proof.IsNull() && len(removedFalse) != 0 {
+		builder := &smtConflictProofBuilder{
+			state: s, marked: make(map[int32]struct{}), literal: make(map[SMTLiteral]ast.ASTHandle),
+			objects: make(map[SMTJustification]ast.ASTHandle), equality: make(map[smtEnodePairKey]ast.ASTHandle),
+		}
+		parents, err := builder.literalProofs(removedFalse)
+		if err != nil {
+			return err
+		}
+		proof, err = s.manager.MkProofUnitResolution(append([]ast.ASTHandle{proof}, parents...))
+		if err != nil {
+			return err
+		}
 	}
 	s.statistics.NumMkLits += uint32(len(kept))
 	if len(kept) == 0 {
@@ -153,6 +170,21 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 		return nil
 	}
 	if len(kept) == 1 {
+		if !proof.IsNull() {
+			owner, err := NewSMTJustificationProofWrapper(s.manager, proof, false)
+			if err != nil {
+				return err
+			}
+			wrapped, err := NewSMTBooleanJustification(owner)
+			if err != nil {
+				return errors.Join(err, owner.Release(s.manager))
+			}
+			if err = s.AssignLiteral(kept[0], wrapped); err != nil {
+				return errors.Join(err, owner.Release(s.manager))
+			}
+			s.ownedJustifications = append(s.ownedJustifications, owner)
+			return nil
+		}
 		return s.assignLiteral(kept[0])
 	}
 	if kind == SMTClauseLearned {
@@ -483,10 +515,10 @@ func (s *SMTInternalizerState) internalizeDistinct(expression ast.ASTHandle, gat
 	if err != nil {
 		return err
 	}
-	if err = s.addClause([]SMTLiteral{literal.Negated(), definition}, false, ast.ASTHandle{}); err != nil {
+	if err = s.addGateClause([]SMTLiteral{literal.Negated(), definition}); err != nil {
 		return err
 	}
-	if err = s.addClause([]SMTLiteral{literal, definition.Negated()}, false, ast.ASTHandle{}); err != nil {
+	if err = s.addGateClause([]SMTLiteral{literal, definition.Negated()}); err != nil {
 		return err
 	}
 	if s.relevancy != nil {
@@ -561,6 +593,115 @@ func (s *SMTInternalizerState) argumentLiterals(expression ast.ASTHandle) ([]SMT
 	return result, nil
 }
 
+func (s *SMTInternalizerState) clauseLiteralExpressions(literals []SMTLiteral) ([]ast.ASTHandle, error) {
+	result := make([]ast.ASTHandle, len(literals))
+	for index, literal := range literals {
+		expression, err := s.BoolExpression(literal.Var())
+		if err != nil {
+			return nil, err
+		}
+		if literal.Sign() {
+			expression, err = s.manager.MkNot(expression)
+			if err != nil {
+				return nil, err
+			}
+		}
+		result[index] = expression
+	}
+	return result, nil
+}
+
+func (s *SMTInternalizerState) gateClauseProof(literals []SMTLiteral) (ast.ASTHandle, error) {
+	proofs, err := s.manager.ProofsEnabled()
+	if err != nil || !proofs {
+		return ast.ASTHandle{}, err
+	}
+	expressions, err := s.clauseLiteralExpressions(literals)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	fact, err := s.manager.MkOrArgs(expressions)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return s.manager.MkProofDefAxiom(fact)
+}
+
+func (s *SMTInternalizerState) addGateClause(literals []SMTLiteral) error {
+	proof, err := s.gateClauseProof(literals)
+	if err != nil {
+		return err
+	}
+	return s.addClause(literals, false, proof)
+}
+
+func (s *SMTInternalizerState) rootClauseProof(literals []SMTLiteral, assertionProof ast.ASTHandle) (ast.ASTHandle, error) {
+	proofs, err := s.manager.ProofsEnabled()
+	if err != nil || !proofs {
+		return ast.ASTHandle{}, err
+	}
+	if assertionProof.IsNull() {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	fact, err := s.manager.GetProofFact(assertionProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	operation, basic, err := s.basicOperation(fact)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if basic && operation == ast.ASTOpOr {
+		return assertionProof, nil
+	}
+	expressions, err := s.clauseLiteralExpressions(literals)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negatedFact, err := s.manager.MkNot(fact)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	expressions = append(expressions, negatedFact)
+	definition, err := s.manager.MkOrArgs(expressions)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	definitionProof, err := s.manager.MkProofDefAxiom(definition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return s.manager.MkProofUnitResolution([]ast.ASTHandle{definitionProof, assertionProof})
+}
+
+func (s *SMTInternalizerState) addRootClause(literals []SMTLiteral, assertionProof ast.ASTHandle) error {
+	proof, err := s.rootClauseProof(literals, assertionProof)
+	if err != nil {
+		return err
+	}
+	return s.addClause(literals, true, proof)
+}
+
+func (s *SMTInternalizerState) assignRootLiteral(literal SMTLiteral, proof ast.ASTHandle) error {
+	justification := NewSMTBooleanAxiom()
+	if proof.IsNull() {
+		return s.AssignLiteral(literal, justification)
+	}
+	owner, err := NewSMTJustificationProofWrapper(s.manager, proof, false)
+	if err != nil {
+		return err
+	}
+	justification, err = NewSMTBooleanJustification(owner)
+	if err != nil {
+		return errors.Join(err, owner.Release(s.manager))
+	}
+	if err = s.AssignLiteral(literal, justification); err != nil {
+		return errors.Join(err, owner.Release(s.manager))
+	}
+	s.ownedJustifications = append(s.ownedJustifications, owner)
+	return nil
+}
+
 func (s *SMTInternalizerState) addGateConstraints(expression ast.ASTHandle, operation int32) error {
 	variable := s.boolVar[expression]
 	literal := NewSMTLiteral(variable, false)
@@ -568,7 +709,7 @@ func (s *SMTInternalizerState) addGateConstraints(expression ast.ASTHandle, oper
 	if err != nil {
 		return err
 	}
-	add := func(values ...SMTLiteral) error { return s.addClause(values, false, ast.ASTHandle{}) }
+	add := func(values ...SMTLiteral) error { return s.addGateClause(values) }
 	switch operation {
 	case ast.ASTOpNot:
 		if len(arguments) != 1 {
@@ -588,7 +729,7 @@ func (s *SMTInternalizerState) addGateConstraints(expression ast.ASTHandle, oper
 		for _, argument := range arguments {
 			last = append(last, argument.Negated())
 		}
-		if err = s.addClause(last, false, ast.ASTHandle{}); err != nil {
+		if err = s.addGateClause(last); err != nil {
 			return err
 		}
 		if s.relevancy != nil {
@@ -602,7 +743,7 @@ func (s *SMTInternalizerState) addGateConstraints(expression ast.ASTHandle, oper
 		}
 		last := []SMTLiteral{literal.Negated()}
 		last = append(last, arguments...)
-		if err = s.addClause(last, false, ast.ASTHandle{}); err != nil {
+		if err = s.addGateClause(last); err != nil {
 			return err
 		}
 		if s.relevancy != nil {
@@ -616,7 +757,7 @@ func (s *SMTInternalizerState) addGateConstraints(expression ast.ASTHandle, oper
 			{literal.Negated(), arguments[0], arguments[1].Negated()}, {literal.Negated(), arguments[0].Negated(), arguments[1]},
 			{literal, arguments[0], arguments[1]}, {literal, arguments[0].Negated(), arguments[1].Negated()},
 		} {
-			if err = s.addClause(clause, false, ast.ASTHandle{}); err != nil {
+			if err = s.addGateClause(clause); err != nil {
 				return err
 			}
 		}
@@ -629,7 +770,7 @@ func (s *SMTInternalizerState) addGateConstraints(expression ast.ASTHandle, oper
 			{literal, arguments[0]},
 			{literal, arguments[1].Negated()},
 		} {
-			if err = s.addClause(clause, false, ast.ASTHandle{}); err != nil {
+			if err = s.addGateClause(clause); err != nil {
 				return err
 			}
 		}
@@ -655,7 +796,7 @@ func (s *SMTInternalizerState) addGateConstraints(expression ast.ASTHandle, oper
 			{literal.Negated(), arguments[0].Negated(), arguments[1]}, {literal.Negated(), arguments[0], arguments[2]},
 			{literal, arguments[0].Negated(), arguments[1].Negated()}, {literal, arguments[0], arguments[2].Negated()},
 		} {
-			if err = s.addClause(clause, false, ast.ASTHandle{}); err != nil {
+			if err = s.addGateClause(clause); err != nil {
 				return err
 			}
 		}
@@ -771,10 +912,10 @@ func (s *SMTInternalizerState) internalizeTermITE(expression ast.ASTHandle) erro
 	if err != nil {
 		return err
 	}
-	if err = s.addClause([]SMTLiteral{conditionLiteral.Negated(), thenLiteral}, false, ast.ASTHandle{}); err != nil {
+	if err = s.addGateClause([]SMTLiteral{conditionLiteral.Negated(), thenLiteral}); err != nil {
 		return fmt.Errorf("internalize term ITE then clause: %w", err)
 	}
-	if err = s.addClause([]SMTLiteral{conditionLiteral, elseLiteral}, false, ast.ASTHandle{}); err != nil {
+	if err = s.addGateClause([]SMTLiteral{conditionLiteral, elseLiteral}); err != nil {
 		return fmt.Errorf("internalize term ITE else clause: %w", err)
 	}
 	if s.relevancy != nil {
@@ -869,7 +1010,7 @@ func (s *SMTInternalizerState) Assert(expression, proof ast.ASTHandle, generatio
 					return err
 				}
 			}
-			if err = s.addClause(literals, true, proof); err != nil {
+			if err = s.addRootClause(literals, proof); err != nil {
 				return err
 			}
 			if s.relevancy != nil {
@@ -891,10 +1032,10 @@ func (s *SMTInternalizerState) Assert(expression, proof ast.ASTHandle, generatio
 			if err != nil {
 				return err
 			}
-			if err = s.addClause([]SMTLiteral{left, right.Negated()}, true, proof); err != nil {
+			if err = s.addRootClause([]SMTLiteral{left, right.Negated()}, proof); err != nil {
 				return err
 			}
-			if err = s.addClause([]SMTLiteral{left.Negated(), right}, true, proof); err != nil {
+			if err = s.addRootClause([]SMTLiteral{left.Negated(), right}, proof); err != nil {
 				return err
 			}
 		case ast.ASTOpImplies:
@@ -908,7 +1049,7 @@ func (s *SMTInternalizerState) Assert(expression, proof ast.ASTHandle, generatio
 			if literalErr != nil {
 				return literalErr
 			}
-			if err = s.addClause([]SMTLiteral{literal}, true, proof); err != nil {
+			if err = s.assignRootLiteral(literal, proof); err != nil {
 				return err
 			}
 		case ast.ASTOpIte:
@@ -929,10 +1070,10 @@ func (s *SMTInternalizerState) Assert(expression, proof ast.ASTHandle, generatio
 			if err != nil {
 				return err
 			}
-			if err = s.addClause([]SMTLiteral{condition.Negated(), thenLiteral}, true, proof); err != nil {
+			if err = s.addRootClause([]SMTLiteral{condition.Negated(), thenLiteral}, proof); err != nil {
 				return err
 			}
-			if err = s.addClause([]SMTLiteral{condition, elseLiteral}, true, proof); err != nil {
+			if err = s.addRootClause([]SMTLiteral{condition, elseLiteral}, proof); err != nil {
 				return err
 			}
 			if s.relevancy != nil {
@@ -950,7 +1091,7 @@ func (s *SMTInternalizerState) Assert(expression, proof ast.ASTHandle, generatio
 	if err != nil {
 		return err
 	}
-	if err = s.assignLiteral(literal); err != nil {
+	if err = s.assignRootLiteral(literal, proof); err != nil {
 		return err
 	}
 	return s.markRelevant(expression)
