@@ -146,3 +146,78 @@ func (t *SMTSequenceTheory) rejectImpossibleCyclicBinaryEquation(left, right []a
 	}
 	return false, nil
 }
+
+func (t *SMTSequenceTheory) branchTwoVariableFixedWordEquation(left, right []ast.ASTHandle) (bool, error) {
+	for pass := 0; pass < 2; pass++ {
+		if len(left) == 2 && len(right) == 1 {
+			firstVariable, err := t.sequenceVariable(left[0])
+			if err != nil {
+				return false, err
+			}
+			secondVariable, err := t.sequenceVariable(left[1])
+			if err != nil {
+				return false, err
+			}
+			state, stateErr := t.State()
+			if stateErr != nil {
+				return false, stateErr
+			}
+			word, fixed, textErr := state.manager.SequenceStringValue(right[0])
+			if textErr != nil {
+				return false, textErr
+			}
+			if firstVariable && secondVariable && fixed {
+				alternatives := make([]ast.ASTHandle, 0, len(word)+1)
+				for split := 0; split <= len(word); split++ {
+					prefix, makeErr := state.manager.MkString(word[:split])
+					if makeErr != nil {
+						return false, makeErr
+					}
+					suffix, makeErr := state.manager.MkString(word[split:])
+					if makeErr != nil {
+						return false, makeErr
+					}
+					firstEquality, makeErr := state.manager.MkEq(left[0], prefix)
+					if makeErr != nil {
+						return false, makeErr
+					}
+					secondEquality, makeErr := state.manager.MkEq(left[1], suffix)
+					if makeErr != nil {
+						return false, makeErr
+					}
+					alternative, makeErr := state.manager.MkAnd(firstEquality, secondEquality)
+					if makeErr != nil {
+						return false, makeErr
+					}
+					alternatives = append(alternatives, alternative)
+				}
+				choices, makeErr := state.manager.MkOrArray(alternatives)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				sort, makeErr := state.manager.GetSort(left[0])
+				if makeErr != nil {
+					return false, makeErr
+				}
+				leftWord, makeErr := t.makeWord(left, sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				equality, makeErr := state.manager.MkEq(leftWord, right[0])
+				if makeErr != nil {
+					return false, makeErr
+				}
+				constraint, makeErr := state.manager.MkImplies(equality, choices)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				if _, found := t.axioms.set[constraint]; found {
+					return false, nil
+				}
+				return true, t.axioms.Push(constraint)
+			}
+		}
+		left, right = right, left
+	}
+	return false, nil
+}
