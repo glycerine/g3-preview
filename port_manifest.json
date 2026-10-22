@@ -42387,7 +42387,7 @@
       "path": "src/interp/iz3translate_direct.cpp",
       "component": "interp",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -42556,11 +42556,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "alternative direct proof translator selected only by IZ3_TRANSLATE_DIRECT",
+          "status": "reference_only",
+          "reason": "The retained header defines IZ3_TRANSLATE_FULL, its factory is compiled from iz3translate.cpp, and IZ3_TRANSLATE_DIRECT is not defined. The source describes this implementation as unused historical comparison code."
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "No Go adapter is introduced for the unselected historical translator; the retained full translator in iz3translate.cpp is the sole live implementation."
+      ]
     },
     {
       "path": "src/math/automata/CMakeLists.txt",
