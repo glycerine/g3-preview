@@ -847,6 +847,8 @@ func (p *DirectProofInterpolator) simplifyRotation(args []ast.ASTHandle) (ast.AS
 		return p.simplifyRotatedSum(args)
 	case p.congruence:
 		return p.simplifyRotatedCongruence(placeholder, args[1])
+	case p.modusPonens:
+		return p.simplifyRotatedModusPonens(placeholder, args[1])
 	default:
 		return ast.ASTHandle{}, ProofError{}
 	}
@@ -877,11 +879,47 @@ func (p *DirectProofInterpolator) simplifyModusPonens(args []ast.ASTHandle) (ast
 		return ast.ASTHandle{}, err
 	}
 	bProof := aProof
-	first, err := p.separateRewriteCondition(args[0], &bProof)
+	chain, err := p.modusPonensForward(args, &bProof)
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	second, err := p.separateRewriteCondition(args[1], &bProof)
+	third, err := p.destructConditionalInequality(args[2], &aProof, &bProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	inequality, err := p.isInequality(third)
+	if err != nil || inequality {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	negative, err := p.isNegationChain(chain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var result ast.ASTHandle
+	if negative {
+		result, err = p.contradictChains(chain, third)
+	} else {
+		result, err = p.contradictChains(third, chain)
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result, err = p.base.manager.MkImplies(bProof, result)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.MkAnd(aProof, result)
+}
+
+func (p *DirectProofInterpolator) modusPonensForward(args []ast.ASTHandle, condition *ast.ASTHandle) (ast.ASTHandle, error) {
+	if len(args) != 3 {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	first, err := p.separateRewriteCondition(args[0], condition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	second, err := p.separateRewriteCondition(args[1], condition)
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
@@ -917,32 +955,7 @@ func (p *DirectProofInterpolator) simplifyModusPonens(args []ast.ASTHandle) (ast
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	third, err := p.destructConditionalInequality(args[2], &aProof, &bProof)
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
-	inequality, err := p.isInequality(third)
-	if err != nil || inequality {
-		return ast.ASTHandle{}, ProofError{}
-	}
-	negative, err := p.isNegationChain(chain)
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
-	var result ast.ASTHandle
-	if negative {
-		result, err = p.contradictChains(chain, third)
-	} else {
-		result, err = p.contradictChains(third, chain)
-	}
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
-	result, err = p.base.manager.MkImplies(bProof, result)
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
-	return p.base.manager.MkAnd(aProof, result)
+	return chain, nil
 }
 
 func (p *DirectProofInterpolator) simplifyUnsplitModusPonens(first, second ast.ASTHandle) (ast.ASTHandle, error) {
@@ -1025,6 +1038,42 @@ func (p *DirectProofInterpolator) simplifyUnsplitModusPonens(first, second ast.A
 		return ast.ASTHandle{}, err
 	}
 	return p.concatRewriteChains(chain, parts[1])
+}
+
+func (p *DirectProofInterpolator) simplifyRotatedModusPonens(placeholder ast.ASTHandle, proof ast.ASTHandle) (ast.ASTHandle, error) {
+	args, err := p.base.manager.Args(proof)
+	if err != nil || len(args) != 3 {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	if placeholder == args[0] {
+		args[1], err = p.simplifySymmetry([]ast.ASTHandle{args[1]})
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		equivalence, e := p.isEquivalenceChain(args[2])
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if equivalence {
+			args[1], e = p.downRewriteChain(args[1])
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+		}
+		args[0], args[2] = args[2], args[0]
+	}
+	if placeholder != args[2] {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	condition, err := p.base.manager.Make(OperatorTrue)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	chain, err := p.modusPonensForward(args, &condition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.MkImplies(condition, chain)
 }
 
 func (p *DirectProofInterpolator) isEquivalenceChain(chain ast.ASTHandle) (bool, error) {

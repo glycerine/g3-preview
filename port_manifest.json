@@ -41609,6 +41609,7 @@
         "TestDirectProofNestedSumCoefficientDistribution",
         "TestDirectProofRotatedOrdinarySumSimplification",
         "TestDirectProofRotatedCongruenceSimplification",
+        "TestDirectProofRotatedModusPonensSimplification",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41836,9 +41837,10 @@
             "TestDirectProofUnsplitModusPonensSimplification",
             "TestDirectProofNestedSumCoefficientDistribution",
             "TestDirectProofRotatedOrdinarySumSimplification",
-            "TestDirectProofRotatedCongruenceSimplification"
+            "TestDirectProofRotatedCongruenceSimplification",
+            "TestDirectProofRotatedModusPonensSimplification"
           ],
-          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, nested coefficient distribution, ordinary sum/congruence rotation, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Normal-form arithmetic sums, arithmetic modus-ponens, and leq2eq/eq2leq/modus-ponens rotation remain pending."
+          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, nested coefficient distribution, ordinary sum/congruence/modus-ponens rotation, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Normal-form arithmetic sums, arithmetic modus-ponens, and leq2eq/eq2leq rotation remain pending."
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
@@ -41925,6 +41927,7 @@
         "TestDirectProofNestedSumCoefficientDistribution",
         "TestDirectProofRotatedOrdinarySumSimplification",
         "TestDirectProofRotatedCongruenceSimplification",
+        "TestDirectProofRotatedModusPonensSimplification",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],

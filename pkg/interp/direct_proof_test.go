@@ -1071,3 +1071,32 @@ func TestDirectProofRotatedCongruenceSimplification(t *testing.T) {
 		t.Fatal("rotated congruence", declaration, e)
 	}
 }
+
+func TestDirectProofRotatedModusPonensSimplification(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	literal, err := manager.Make(OperatorIff, p, q)
+	interpMust(t, err)
+	placeholder, err := direct.placeholder(literal)
+	interpMust(t, err)
+	chain, err := direct.makeLocalRewrite(TermA, p)
+	interpMust(t, err)
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	for _, arguments := range [][3]ast.ASTHandle{
+		{chain, truth, placeholder},
+		{placeholder, truth, chain},
+	} {
+		proof, e := direct.makeSymbol(direct.modusPonens, arguments[:]...)
+		interpMust(t, e)
+		proof, e = direct.makeSymbol(direct.rotateSum, literal, proof)
+		interpMust(t, e)
+		result, e := direct.SimplifyProofTerm(proof)
+		interpMust(t, e)
+		if declaration, symbolErr := manager.Symbol(result); symbolErr != nil || declaration != direct.concat {
+			t.Fatal("rotated modus ponens", declaration, symbolErr)
+		}
+	}
+}
