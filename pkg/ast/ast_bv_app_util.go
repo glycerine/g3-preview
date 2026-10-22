@@ -27,6 +27,18 @@ func (m *ASTManager) MkBitVectorURem(left, right ASTHandle) (ASTHandle, error) {
 	return m.mkBitVectorUtilityApp(10, []ASTHandle{left, right})
 }
 
+func (m *ASTManager) MkBitVectorUDiv(left, right ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(8, []ASTHandle{left, right})
+}
+
+func (m *ASTManager) MkBitVectorSDiv(left, right ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(7, []ASTHandle{left, right})
+}
+
+func (m *ASTManager) MkBitVectorSMod(left, right ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(11, []ASTHandle{left, right})
+}
+
 // MkBitVectorUDivInternal is the source OP_BUDIV_I form used when the caller
 // has already proved that the divisor is nonzero.
 func (m *ASTManager) MkBitVectorUDivInternal(left, right ASTHandle) (ASTHandle, error) {
