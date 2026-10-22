@@ -107649,9 +107649,14 @@
       "path": "src/smt/smt_quick_checker.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_quick_checker.go"
+      ],
+      "tests": [
+        "TestSMTQuickCheckerCollectorConservativeIntersectionAndUnion",
+        "TestSMTQuickCheckerUnsatInstantiationCanonicalizationAndDuplicates"
+      ],
       "assertions": [
         {
           "line": 90,
@@ -107662,19 +107667,53 @@
           "text": "SASSERT(m_manager.is_bool(n));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "collector initialization, parent-argument filtering, repeated-variable intersection or union, and candidate publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quick_checker.go",
+          "tests": [
+            "TestSMTQuickCheckerCollectorConservativeIntersectionAndUnion"
+          ]
+        },
+        {
+          "name": "unsatisfied and not-satisfied candidate processing with Cartesian bindings, duplicate suppression, and instance insertion",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quick_checker.go",
+          "tests": [
+            "TestSMTQuickCheckerUnsatInstantiationCanonicalizationAndDuplicates"
+          ]
+        },
+        {
+          "name": "assignment-aware Boolean checking and congruence, model-value, and theory-rewriter canonicalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quick_checker.go",
+          "tests": [
+            "TestSMTQuickCheckerUnsatInstantiationCanonicalizationAndDuplicates"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTQuickChecker borrows its checker context, theory rewriter, quantifier registry, enodes, and model-value handles; native maps and slices own per-query caches and candidate views, while ASTRef values retain rewritten temporary applications until query cleanup."
+      ],
+      "deviations": [
+        "The source context calls are supplied by concrete SMTCheckerContext and SMTQuantifierRegistry components. Explicit ground candidates are recursively internalized into concrete Go enodes without a universal context adapter."
+      ]
     },
     {
       "path": "src/smt/smt_quick_checker.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_quick_checker.go"
+      ],
+      "tests": [
+        "TestSMTQuickCheckerCollectorConservativeIntersectionAndUnion",
+        "TestSMTQuickCheckerUnsatInstantiationCanonicalizationAndDuplicates"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -107685,11 +107724,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "quick checker collector, canonicalizer, model checker, and three instantiation entry points",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quick_checker.go",
+          "tests": [
+            "TestSMTQuickCheckerCollectorConservativeIntersectionAndUnion",
+            "TestSMTQuickCheckerUnsatInstantiationCanonicalizationAndDuplicates"
+          ]
+        }
+      ],
+      "ownership": [
+        "The checker owns no solver state and borrows all persistent context objects; candidate and binding slices contain borrowed enode pointers."
+      ],
+      "deviations": [
+        "Public Go entry points return errors for invalid ownership, non-ground explicit candidates, non-Boolean checks, and source assertion failures."
+      ]
     },
     {
       "path": "src/smt/smt_relevancy.cpp",
