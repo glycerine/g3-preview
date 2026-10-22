@@ -116776,7 +116776,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -116791,7 +116791,8 @@
         "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution",
         "TestSMTSequenceTheoryConcreteRelationConflicts",
         "TestSMTSequenceTheoryLengthAxioms",
-        "TestSMTSequenceTheoryIntegerStringAxioms"
+        "TestSMTSequenceTheoryIntegerStringAxioms",
+        "TestSMTSequenceStructuredModelValues"
       ],
       "conditionals": [
         {
@@ -117309,6 +117310,12 @@
           "tests": ["TestSMTSequenceTheoryIntegerStringAxioms"]
         },
         {
+          "name": "dependency-ordered sequence model values for concat, unit, string literals and int.to.str with fresh cyclic-leaf fallback (src/smt/theory_seq.cpp:2630-2785)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_model.go",
+          "tests": ["TestSMTSequenceStructuredModelValues"]
+        },
+        {
           "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
           "status": "unported",
           "go_target": null,
@@ -117328,7 +117335,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -117343,7 +117350,8 @@
         "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution",
         "TestSMTSequenceTheoryConcreteRelationConflicts",
         "TestSMTSequenceTheoryLengthAxioms",
-        "TestSMTSequenceTheoryIntegerStringAxioms"
+        "TestSMTSequenceTheoryIntegerStringAxioms",
+        "TestSMTSequenceStructuredModelValues"
       ],
       "conditionals": [
         {
@@ -117433,6 +117441,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_conversion.go",
           "tests": ["TestSMTSequenceTheoryIntegerStringAxioms"]
+        },
+        {
+          "name": "sequence model-value source declarations and dependency-ordered construction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_model.go",
+          "tests": ["TestSMTSequenceStructuredModelValues"]
         },
         {
           "name": "remaining word-equation, arithmetic, containment, regular-language, propagation and branching declarations",

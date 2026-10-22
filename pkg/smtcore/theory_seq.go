@@ -869,6 +869,18 @@ func (t *SMTSequenceTheory) ModelValue(node *SMTEnode, generator *SMTModelGenera
 			break
 		}
 	}
+	for current := root; ; current = current.Next() {
+		procedure, structured, procedureErr := t.structuredModelValue(current.Owner(), root, generator)
+		if procedureErr != nil {
+			return nil, procedureErr
+		}
+		if structured {
+			return procedure, nil
+		}
+		if current.Next() == root {
+			break
+		}
+	}
 	sort, err := state.manager.GetSort(node.Owner())
 	if err != nil {
 		return nil, err

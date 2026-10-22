@@ -1,11 +1,65 @@
 package smtcore
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
+
+func TestSMTSequenceStructuredModelValues(t *testing.T) {
+	m, config := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-model-x"), sort)
+	astTestMust(t, err)
+	concat, err := m.MkSequenceConcat(x, a)
+	astTestMust(t, err)
+	family, err := m.SequenceFamilyID()
+	astTestMust(t, err)
+	theory, err := NewSMTSequenceTheory(family)
+	astTestMust(t, err)
+	context, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.RegisterTheory(theory))
+	astTestMust(t, state.Internalize(concat, false))
+	astTestMust(t, context.SetRelevant(x, true))
+	astTestMust(t, context.SetRelevant(concat, true))
+	generator, err := NewSMTModelGenerator(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, generator.Close()) })
+	astTestMust(t, generator.SetContext(context))
+	astTestMust(t, generator.InitializeModel(config))
+	astTestMust(t, generator.BuildStateValues(state))
+	xValue, err := generator.Value(context.enodes[x])
+	astTestMust(t, err)
+	concatValue, err := generator.Value(context.enodes[concat])
+	astTestMust(t, err)
+	xText, xString, err := m.SequenceStringValue(xValue)
+	astTestMust(t, err)
+	concatText, concatString, err := m.SequenceStringValue(concatValue)
+	astTestMust(t, err)
+	if !xString || !concatString || concatText != xText+"a" {
+		t.Fatal("structured concat model value", xText, concatText)
+	}
+
+	byteValue, err := m.BitVectorNumeralUnsigned('A', 8)
+	astTestMust(t, err)
+	integerValue, err := m.ArithmeticNumeralRat(big.NewRat(12, 1), true)
+	astTestMust(t, err)
+	procedure := &smtSequenceValueProcedure{
+		sort:         sort,
+		sources:      []smtSequenceModelSource{{kind: smtSequenceModelUnit}, {kind: smtSequenceModelInteger}},
+		dependencies: make([]SMTModelValueDependency, 2),
+	}
+	value, err := procedure.MakeValue(generator, []ast.ASTHandle{byteValue, integerValue})
+	astTestMust(t, err)
+	if text, matched, textErr := m.SequenceStringValue(value); textErr != nil || !matched || text != "A12" {
+		t.Fatal("unit and integer model sources", text, matched, textErr)
+	}
+}
 
 func TestSMTEmptySequenceTheoryScopesAndModelFactory(t *testing.T) {
 	m := astTestManager(t)
