@@ -147,32 +147,8 @@ func (p *DirectProofInterpolator) MakeCongruence(premiseConclusion, conclusion, 
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	if premiseSide == TermMixed && conclusionSide == TermMixed {
-		position, e := p.findCongruencePosition(premiseConclusion, conclusion)
-		if e != nil {
-			return ast.ASTHandle{}, e
-		}
-		premisePlaceholder, e := p.placeholder(premiseConclusion)
-		if e != nil {
-			return ast.ASTHandle{}, e
-		}
-		positionTerm, e := p.base.manager.MakeIntText(strconv.Itoa(position))
-		if e != nil {
-			return ast.ASTHandle{}, e
-		}
-		negatedConclusion, e := p.base.manager.MkNot(conclusion)
-		if e != nil {
-			return ast.ASTHandle{}, e
-		}
-		conclusionPlaceholder, e := p.placeholder(negatedConclusion)
-		if e != nil {
-			return ast.ASTHandle{}, e
-		}
-		proof, e := p.makeSymbol(p.congruence, premisePlaceholder, positionTerm, conclusionPlaceholder)
-		if e != nil {
-			return ast.ASTHandle{}, e
-		}
-		interpolation, e := p.makeContraNode(proof, []ast.ASTHandle{premiseConclusion, negatedConclusion}, -1)
+	if conclusionSide == TermMixed {
+		interpolation, e := p.makeMixedCongruence(premiseConclusion, conclusion)
 		if e != nil {
 			return ast.ASTHandle{}, e
 		}
@@ -197,6 +173,46 @@ func (p *DirectProofInterpolator) MakeCongruence(premiseConclusion, conclusion, 
 		return ast.ASTHandle{}, err
 	}
 	return p.MakeResolution(premiseConclusion, []ast.ASTHandle{conclusion}, interpolation, premise)
+}
+
+func (p *DirectProofInterpolator) makeMixedCongruence(premiseConclusion, conclusion ast.ASTHandle) (ast.ASTHandle, error) {
+	position, err := p.findCongruencePosition(premiseConclusion, conclusion)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	premiseSide, err := p.TermSide(premiseConclusion)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var proof ast.ASTHandle
+	literals := make([]ast.ASTHandle, 0, 2)
+	if premiseSide == TermMixed {
+		proof, err = p.placeholder(premiseConclusion)
+		literals = append(literals, premiseConclusion)
+	} else {
+		proof, err = p.makeLocalRewrite(premiseSide, premiseConclusion)
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	positionTerm, err := p.base.manager.MakeIntText(strconv.Itoa(position))
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negatedConclusion, err := p.base.manager.MkNot(conclusion)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	conclusionPlaceholder, err := p.placeholder(negatedConclusion)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	proof, err = p.makeSymbol(p.congruence, proof, positionTerm, conclusionPlaceholder)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	literals = append(literals, negatedConclusion)
+	return p.makeContraNode(proof, literals, -1)
 }
 
 func (p *DirectProofInterpolator) findCongruencePosition(premiseConclusion, conclusion ast.ASTHandle) (int, error) {

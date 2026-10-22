@@ -670,3 +670,36 @@ func TestDirectProofMixedModusPonens(t *testing.T) {
 		t.Fatal("mixed modus ponens", op, e)
 	}
 }
+
+func TestDirectProofLocalToMixedCongruenceAndTransitivity(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	localEquality, err := manager.Make(OperatorIff, p, p)
+	interpMust(t, err)
+	application, err := manager.Make(OperatorAnd, p, q)
+	interpMust(t, err)
+	mixedConclusion, err := manager.Make(OperatorIff, application, application)
+	interpMust(t, err)
+	localPremise, err := direct.MakeHypothesis(localEquality)
+	interpMust(t, err)
+	congruence, err := direct.MakeCongruence(localEquality, mixedConclusion, localPremise)
+	interpMust(t, err)
+	if op, e := manager.Operator(congruence); e != nil || op != OperatorAnd {
+		t.Fatal("local-to-mixed congruence", op, e)
+	}
+	left, err := manager.Make(OperatorIff, p, q)
+	interpMust(t, err)
+	right, err := manager.Make(OperatorIff, q, q)
+	interpMust(t, err)
+	leftPremise, err := direct.MakeHypothesis(left)
+	interpMust(t, err)
+	rightPremise, err := direct.MakeHypothesis(right)
+	interpMust(t, err)
+	transitivity, err := direct.MakeTransitivity(p, q, q, leftPremise, rightPremise)
+	interpMust(t, err)
+	if op, e := manager.Operator(transitivity); e != nil || op != OperatorAnd {
+		t.Fatal("mixed transitivity", op, e)
+	}
+}

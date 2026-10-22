@@ -41595,6 +41595,7 @@
         "TestDirectProofLocalEqualityRules",
         "TestDirectProofTrivialInterpolationRewriteChains",
         "TestDirectProofMixedModusPonens",
+        "TestDirectProofLocalToMixedCongruenceAndTransitivity",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41828,9 +41829,10 @@
             "TestDirectProofLocalResolutionAndSymmetry",
             "TestDirectProofLocalArithmeticRules",
             "TestDirectProofLocalEqualityRules",
-            "TestDirectProofMixedModusPonens"
+            "TestDirectProofMixedModusPonens",
+            "TestDirectProofLocalToMixedCongruenceAndTransitivity"
           ],
-          "reason": "Local and mixed modus ponens, single/multi-premise congruence, and local transitivity plus direct mixed-premise congruence, local/mixed symmetry, Farkas, leq2eq, eq2leq, and cut rules are ported. Mixed transitivity, local-to-mixed congruence rewrites, and localized axioms remain pending."
+          "reason": "Local and mixed modus ponens, single/multi-premise congruence, local-to-mixed congruence rewrites, local and mixed transitivity, local/mixed symmetry, Farkas, leq2eq, eq2leq, and cut rules are ported. Localized axioms remain pending."
         },
         {
           "name": "term localization, quantification, and final interpolation",
@@ -41885,6 +41887,7 @@
         "TestDirectProofLocalEqualityRules",
         "TestDirectProofTrivialInterpolationRewriteChains",
         "TestDirectProofMixedModusPonens",
+        "TestDirectProofLocalToMixedCongruenceAndTransitivity",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41936,7 +41939,8 @@
           ],
           "tests": [
             "TestDirectProofTrivialInterpolationRewriteChains",
-            "TestDirectProofMixedModusPonens"
+            "TestDirectProofMixedModusPonens",
+            "TestDirectProofLocalToMixedCongruenceAndTransitivity"
           ]
         },
         {
