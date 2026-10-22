@@ -1,0 +1,228 @@
+// Source: src/smt/qi_queue.cpp:202-288, excluding proof construction and the
+// final context::internalize_instance call.
+package smtcore
+
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
+
+type SMTQIPreparedInstance struct {
+	manager          *ast.ASTManager
+	entry            SMTQIQueueEntry
+	quantifier       ast.ASTHandle
+	instance         ast.ASTRef
+	alreadySatisfied bool
+	closed           bool
+}
+
+func (p *SMTQIPreparedInstance) AlreadySatisfied() bool {
+	return p != nil && p.alreadySatisfied
+}
+
+func (p *SMTQIPreparedInstance) Instance() (ast.ASTHandle, error) {
+	if p == nil || p.manager == nil || p.closed || p.alreadySatisfied {
+		return ast.ASTHandle{}, ast.ErrASTHandle
+	}
+	return p.manager.RefGet(p.instance)
+}
+
+func (p *SMTQIPreparedInstance) Close() error {
+	if p == nil || p.manager == nil {
+		return ast.ErrASTHandle
+	}
+	if p.closed {
+		return nil
+	}
+	var err error
+	if !p.alreadySatisfied {
+		err = p.manager.DelRef(&p.instance)
+	}
+	p.closed = err == nil
+	return err
+}
+
+type SMTQIInstance struct {
+	manager     *ast.ASTManager
+	fingerprint *SMTFingerprint
+	quantifier  ast.ASTHandle
+	lemma       ast.ASTRef
+	generation  uint32
+	reducedTrue bool
+	closed      bool
+}
+
+func (i *SMTQIInstance) Fingerprint() *SMTFingerprint {
+	if i == nil {
+		return nil
+	}
+	return i.fingerprint
+}
+
+func (i *SMTQIInstance) Quantifier() ast.ASTHandle {
+	if i == nil {
+		return ast.ASTHandle{}
+	}
+	return i.quantifier
+}
+
+func (i *SMTQIInstance) ReducedTrue() bool { return i != nil && i.reducedTrue }
+func (i *SMTQIInstance) Generation() uint32 {
+	if i == nil {
+		return 0
+	}
+	return i.generation
+}
+
+func (i *SMTQIInstance) Lemma() (ast.ASTHandle, error) {
+	if i == nil || i.manager == nil || i.closed || i.reducedTrue {
+		return ast.ASTHandle{}, ast.ErrASTHandle
+	}
+	return i.manager.RefGet(i.lemma)
+}
+
+func (i *SMTQIInstance) Close() error {
+	if i == nil || i.manager == nil {
+		return ast.ErrASTHandle
+	}
+	if i.closed {
+		return nil
+	}
+	var err error
+	if !i.reducedTrue {
+		err = i.manager.DelRef(&i.lemma)
+	}
+	i.closed = err == nil
+	return err
+}
+
+type SMTQIInstanceBuilder struct {
+	manager      *ast.ASTManager
+	checker      *SMTChecker
+	substitution *SMTCachedVarSubstitution
+	costs        *SMTQICostModel
+}
+
+func NewSMTQIInstanceBuilder(manager *ast.ASTManager, checker *SMTChecker, substitution *SMTCachedVarSubstitution, costs *SMTQICostModel) (*SMTQIInstanceBuilder, error) {
+	if manager == nil || checker == nil || substitution == nil || costs == nil {
+		return nil, ast.ErrASTHandle
+	}
+	if checker.context == nil || checker.context.manager != manager || substitution.manager != manager || costs.manager != manager {
+		return nil, ast.ErrASTDomain
+	}
+	return &SMTQIInstanceBuilder{manager: manager, checker: checker, substitution: substitution, costs: costs}, nil
+}
+
+func (b *SMTQIInstanceBuilder) Prepare(entry SMTQIQueueEntry) (*SMTQIPreparedInstance, error) {
+	if b == nil || b.manager == nil || b.checker == nil || b.substitution == nil {
+		return nil, ast.ErrASTHandle
+	}
+	if entry.Fingerprint == nil || entry.Fingerprint.data.IsNull() {
+		return nil, ast.ErrASTDomain
+	}
+	quantifier := entry.Fingerprint.data
+	kind, err := b.manager.GetKind(quantifier)
+	if err != nil || kind != ast.ASTQuantifier {
+		if err != nil {
+			return nil, err
+		}
+		return nil, ast.ErrASTDomain
+	}
+	body, err := b.manager.GetQuantifierBody(quantifier)
+	if err != nil {
+		return nil, err
+	}
+	bindings := entry.Fingerprint.args
+	satisfied, err := b.checker.IsSatisfiable(body, bindings)
+	if err != nil {
+		return nil, err
+	}
+	prepared := &SMTQIPreparedInstance{manager: b.manager, entry: entry, quantifier: quantifier, alreadySatisfied: satisfied}
+	if satisfied {
+		return prepared, nil
+	}
+	prepared.instance, err = b.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return nil, err
+	}
+	if _, err = b.substitution.Instantiate(quantifier, bindings, prepared.instance); err != nil {
+		return nil, errors.Join(err, prepared.Close())
+	}
+	return prepared, nil
+}
+
+func (b *SMTQIInstanceBuilder) Finish(prepared *SMTQIPreparedInstance, simplified ast.ASTHandle, stat *SMTQuantifierStat, scope uint32) (*SMTQIInstance, error) {
+	if b == nil || b.manager == nil || prepared == nil || prepared.manager != b.manager || prepared.closed || prepared.alreadySatisfied || stat == nil {
+		return nil, ast.ErrASTDomain
+	}
+	sort, err := b.manager.GetSort(simplified)
+	if err != nil {
+		return nil, err
+	}
+	boolean, err := b.manager.MkBoolSort()
+	if err != nil {
+		return nil, err
+	}
+	if sort != boolean {
+		return nil, ast.ErrASTDomain
+	}
+	result := &SMTQIInstance{manager: b.manager, fingerprint: prepared.entry.Fingerprint, quantifier: prepared.quantifier}
+	if b.manager.IsTrue(simplified) {
+		result.reducedTrue = true
+		return result, nil
+	}
+	stat.IncrementInstances()
+	negatedQuantifier, err := b.manager.MkNot(prepared.quantifier)
+	if err != nil {
+		return nil, err
+	}
+	lemma := negatedQuantifier
+	if !b.manager.IsFalse(simplified) {
+		kind, err := b.manager.GetKind(simplified)
+		if err != nil {
+			return nil, err
+		}
+		arguments := []ast.ASTHandle{negatedQuantifier}
+		if kind == ast.ASTApp {
+			family, err := b.manager.GetFamilyID(simplified)
+			if err != nil {
+				return nil, err
+			}
+			op, err := b.manager.GetDeclKind(simplified)
+			if err != nil {
+				return nil, err
+			}
+			if family == b.manager.BasicFamilyID() && op == ast.ASTOpOr {
+				count, err := b.manager.GetNumArgs(simplified)
+				if err != nil {
+					return nil, err
+				}
+				for index := uint32(0); index < count; index++ {
+					argument, err := b.manager.GetArg(simplified, index)
+					if err != nil {
+						return nil, err
+					}
+					arguments = append(arguments, argument)
+				}
+			} else {
+				arguments = append(arguments, simplified)
+			}
+		} else {
+			arguments = append(arguments, simplified)
+		}
+		lemma, err = b.manager.MkOrArgs(arguments)
+		if err != nil {
+			return nil, err
+		}
+	}
+	result.generation, err = b.costs.NewGeneration(prepared.quantifier, stat, prepared.entry.Generation, scope, prepared.entry.Cost)
+	if err != nil {
+		return nil, err
+	}
+	result.lemma, err = b.manager.NewRef(lemma)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
