@@ -102333,12 +102333,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_qi_queue_schedule.go"
+        "pkg/smtcore/smt_qi_queue_schedule.go",
+        "pkg/smtcore/smt_qi_cost.go"
       ],
       "tests": [
         "TestSMTQIQueueScheduleEagerPromotionAndLazyThreshold",
         "TestSMTQIQueueScheduleConservativeCostBatches",
-        "TestSMTQIQueueScheduleScopeRollbackAndDelayedSummaries"
+        "TestSMTQIQueueScheduleScopeRollbackAndDelayedSummaries",
+        "TestSMTQICostModelPublishesSourceVariablesAndNewGeneration",
+        "TestSMTQICostModelInvalidFunctionsUseSourceFallbacks"
       ],
       "conditionals": [
         {
@@ -102406,9 +102409,12 @@
         },
         {
           "name": "cost parser setup, quantifier-stat value publication, cost and new-generation evaluation",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_qi_cost.go",
+          "tests": [
+            "TestSMTQICostModelPublishesSourceVariablesAndNewGeneration",
+            "TestSMTQICostModelInvalidFunctionsUseSourceFallbacks"
+          ]
         },
         {
           "name": "quantifier substitution, rewriting, lemma/proof construction and context internalization",
@@ -102418,7 +102424,7 @@
         }
       ],
       "ownership": [
-        "The concrete scheduler borrows fingerprint pointers and quantifier AST handles; native slices own entry values, scope limits, lemma handles, and instantiated-entry indexes."
+        "The concrete scheduler borrows fingerprint pointers and quantifier AST handles; native slices own entry values, scope limits, lemma handles, and instantiated-entry indexes. SMTQICostModel owns parser variables and parsed AST references and borrows the AST manager and warning service."
       ],
       "deviations": [
         "Scheduling is separated from quantifier lemma construction so the unfinished quantifier manager and SMT context can consume ready entries directly. The source delayed-summary maximum update uses minimum and is preserved."
@@ -102430,12 +102436,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_qi_queue_schedule.go"
+        "pkg/smtcore/smt_qi_queue_schedule.go",
+        "pkg/smtcore/smt_qi_cost.go"
       ],
       "tests": [
         "TestSMTQIQueueScheduleEagerPromotionAndLazyThreshold",
         "TestSMTQIQueueScheduleConservativeCostBatches",
-        "TestSMTQIQueueScheduleScopeRollbackAndDelayedSummaries"
+        "TestSMTQIQueueScheduleScopeRollbackAndDelayedSummaries",
+        "TestSMTQICostModelPublishesSourceVariablesAndNewGeneration",
+        "TestSMTQICostModelInvalidFunctionsUseSourceFallbacks"
       ],
       "conditionals": [
         {
