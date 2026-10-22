@@ -98357,9 +98357,16 @@
       "path": "src/smt/arith_eq_solver.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_arith_eq_solver.go"
+      ],
+      "tests": [
+        "TestSMTArithmeticEquationSolverSingleEquation",
+        "TestSMTArithmeticEquationSolverSubstitution",
+        "TestSMTArithmeticEquationSolverMatrixGCDElimination",
+        "TestSMTArithmeticEquationSolverRetainsKnownSolutions"
+      ],
       "conditionals": [
         {
           "line": 116,
@@ -98432,19 +98439,55 @@
           "text": "SASSERT(g == r0[i]);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "integer row GCD normalization/divisibility, least coefficient selection, centered modulus, substitution and single-equation Omega step",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arith_eq_solver.go",
+          "tests": [
+            "TestSMTArithmeticEquationSolverSingleEquation",
+            "TestSMTArithmeticEquationSolverSubstitution"
+          ]
+        },
+        {
+          "name": "public solve_integer_equations GCD combination and elimination path",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arith_eq_solver.go",
+          "tests": [
+            "TestSMTArithmeticEquationSolverMatrixGCDElimination",
+            "TestSMTArithmeticEquationSolverRetainsKnownSolutions"
+          ]
+        },
+        {
+          "name": "unselected units, Omega-matrix, Hermite/HNF alternatives and unused AST modular-rewrite helpers",
+          "status": "dead_deleted"
+        },
+        {
+          "name": "trace-only row formatting",
+          "status": "dead_deleted"
+        }
+      ],
+      "ownership": [
+        "The solver borrows and mutates caller-owned [][]*big.Int rows. A contradiction result is an independently copied []*big.Int witness."
+      ],
+      "deviations": [
+        "math/big.Int represents the source rational values after the live methods' integer preconditions; no rational or AST rewrite adapter is added for unreachable private helpers."
+      ]
     },
     {
       "path": "src/smt/arith_eq_solver.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_arith_eq_solver.go"
+      ],
+      "tests": [
+        "TestSMTArithmeticEquationSolverSingleEquation",
+        "TestSMTArithmeticEquationSolverMatrixGCDElimination"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -98455,11 +98498,29 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "single-row and row-matrix integer equation solver surface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arith_eq_solver.go",
+          "tests": [
+            "TestSMTArithmeticEquationSolverSingleEquation",
+            "TestSMTArithmeticEquationSolverMatrixGCDElimination"
+          ]
+        },
+        {
+          "name": "private alternative solver declarations not reached by solve_integer_equations",
+          "status": "dead_deleted"
+        }
+      ],
+      "ownership": [
+        "Go slices replace the source vector rows; coefficients are caller-owned big.Int values mutated in place."
+      ],
+      "deviations": [
+        "The stateless Go solver needs no AST manager or arithmetic rewriter because the retained public row algorithms do not call the source AST helper methods."
+      ]
     },
     {
       "path": "src/smt/asserted_formulas.cpp",
