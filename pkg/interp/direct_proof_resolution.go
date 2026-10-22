@@ -36,7 +36,51 @@ func (p *DirectProofInterpolator) MakeSymmetry(conclusion, premiseConclusion, pr
 		return ast.ASTHandle{}, err
 	}
 	if side == TermMixed {
-		return ast.ASTHandle{}, ProofError{}
+		negatedConclusion, e := p.base.manager.MkNot(conclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		premisePlaceholder, e := p.placeholder(premiseConclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		negatedPlaceholder, e := p.placeholder(negatedConclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		symmetricPremise, e := p.makeSymbol(p.symmetry, premisePlaceholder)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		excludedMiddle, e := p.makeSymbol(p.excludedMid, conclusion, symmetricPremise, negatedPlaceholder)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		falsehood, e := p.base.manager.Make(OperatorFalse)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		first, e := p.makeSymbol(p.contra, excludedMiddle, falsehood)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		negatedSymmetry, e := p.makeSymbol(p.symmetry, negatedPlaceholder)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		second, e := p.makeSymbol(p.contra, negatedSymmetry, premiseConclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		third, e := p.makeSymbol(p.contra, symmetricPremise, negatedConclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		interpolation, e := p.base.manager.Make(OperatorAnd, first, second, third)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.MakeResolution(premiseConclusion, []ast.ASTHandle{conclusion}, interpolation, premise)
 	}
 	return p.keep(premise, nil)
 }
