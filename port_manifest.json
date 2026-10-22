@@ -105416,7 +105416,7 @@
           ]
         },
         {
-          "name": "Boolean decisions, first-UIP conflict learning, non-chronological backjumping, propagation, cancellation/resource and conflict-limit checks, and final-check search control",
+          "name": "Boolean decisions, first-UIP conflict learning, non-chronological backjumping, propagation, timeout/cancellation/resource and conflict-limit checks, and final-check search control",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_search.go",
           "tests": [
@@ -105424,6 +105424,7 @@
             "TestSMTKernelConflictLearningProvesBooleanUnsat",
             "TestSMTInternalizerInstallsLearnedClauseInCurrentScope",
             "TestSMTKernelSearchReportsCancellationAndResourceLimit",
+            "TestSMTKernelSearchReportsTimeout",
             "TestSMTSolverStopsAtConfiguredConflictLimit"
           ]
         },
@@ -105477,7 +105478,7 @@
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
       ],
       "deviations": [
-        "Structural subsumption, restarts, timeout sampling, and the memory high-watermark check remain unported."
+        "Structural subsumption, restarts, and the memory high-watermark check remain unported."
       ]
     },
     {
@@ -105696,7 +105697,7 @@
           ]
         },
         {
-          "name": "decision scopes, learned clauses, first-UIP backjumping, cancellation/resource and conflict-limit state, and Boolean search control consumed by the kernel",
+          "name": "decision scopes, learned clauses, first-UIP backjumping, timeout/cancellation/resource and conflict-limit state, and Boolean search control consumed by the kernel",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_search.go",
           "tests": [
@@ -105704,6 +105705,7 @@
             "TestSMTKernelConflictLearningProvesBooleanUnsat",
             "TestSMTInternalizerInstallsLearnedClauseInCurrentScope",
             "TestSMTKernelSearchReportsCancellationAndResourceLimit",
+            "TestSMTKernelSearchReportsTimeout",
             "TestSMTSolverStopsAtConfiguredConflictLimit"
           ]
         },

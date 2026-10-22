@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 type smtSearchProgress struct {
@@ -73,7 +74,15 @@ func smtDecisionLiteral(variable int32, phase lbool.LBool) SMTLiteral {
 	return NewSMTLiteral(variable, phase == lbool.False)
 }
 
-func (k *SMTKernel) searchResourceLimitExceeded() (bool, error) {
+func (k *SMTKernel) searchResourceLimitExceeded(timer *stopwatch.Timer) (bool, error) {
+	timedOut, err := timer.MSTimeout(k.smtState.Timeout)
+	if err != nil {
+		return false, err
+	}
+	if timedOut {
+		k.lastFailure = SMTFailureTimeout
+		return true, nil
+	}
 	exceeded, err := k.manager.Canceled()
 	if err != nil || !exceeded {
 		return exceeded, err
@@ -92,12 +101,17 @@ func (k *SMTKernel) searchResourceLimitExceeded() (bool, error) {
 func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool, resultErr error) {
 	baseLevel := k.internalizer.scopeLevel
 	conflictBase := k.internalizer.statistics.NumConflicts
-	resolver, err := NewSMTConflictResolver(k.internalizer)
+	timer, err := stopwatch.NewTimer(k.timerClock)
 	if err != nil {
 		return lbool.Undef, err
 	}
+	resolver, err := NewSMTConflictResolver(k.internalizer)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, timer.Close())
+	}
 	defer func() {
 		resultErr = errors.Join(resultErr, resolver.Close())
+		resultErr = errors.Join(resultErr, timer.Close())
 		if count := k.internalizer.scopeLevel - baseLevel; count != 0 {
 			resultErr = errors.Join(resultErr, k.internalizer.PopScopes(count))
 			if resultErr != nil {
@@ -106,7 +120,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		}
 	}()
 	for {
-		exceeded, err := k.searchResourceLimitExceeded()
+		exceeded, err := k.searchResourceLimitExceeded(timer)
 		if err != nil {
 			return lbool.Undef, err
 		}
@@ -182,7 +196,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			}
 			continue
 		}
-		exceeded, err = k.searchResourceLimitExceeded()
+		exceeded, err = k.searchResourceLimitExceeded(timer)
 		if err != nil {
 			return lbool.Undef, err
 		}

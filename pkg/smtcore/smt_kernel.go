@@ -51,6 +51,7 @@ type SMTKernel struct {
 	preprocessState  SMTPreprocessorState
 	produceModel     bool
 	preprocess       bool
+	timerClock       func() (uint64, error)
 	closed           bool
 }
 

@@ -90,6 +90,30 @@ func TestSMTKernelSearchReportsCancellationAndResourceLimit(t *testing.T) {
 	}
 }
 
+func TestSMTKernelSearchReportsTimeout(t *testing.T) {
+	m := astTestManager(t)
+	kernel := smtTestKernel(t, m)
+	kernel.smtState.Timeout = 1
+	reads := 0
+	kernel.timerClock = func() (uint64, error) {
+		reads++
+		if reads == 1 {
+			return 0, nil
+		}
+		return 2_000_000, nil
+	}
+	status, err := kernel.Check()
+	astTestMust(t, err)
+	if status != lbool.Undef || kernel.lastFailure != SMTFailureTimeout {
+		t.Fatal("timed search", status, kernel.lastFailure)
+	}
+	reason, err := kernel.ReasonUnknown()
+	astTestMust(t, err)
+	if reason != "timeout" {
+		t.Fatal("timeout reason", reason)
+	}
+}
+
 func TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof(t *testing.T) {
 	m := astTestManager(t)
 	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
