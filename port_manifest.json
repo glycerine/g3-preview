@@ -122443,14 +122443,15 @@
       "path": "src/tactic/extension_model_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/tactic_extension_model_trace.go",
         "pkg/ast/ast_func_decl_info_text.go",
         "pkg/model/model_v2_display.go",
         "pkg/tactic/tactic_extension_model_trace_test.go",
         "pkg/model/model_evaluator_function_memory_trace.go",
-        "pkg/tactic/tactic_extension_model.go"
+        "pkg/tactic/tactic_extension_model.go",
+        "pkg/tactic/tactic_extension_model_test.go"
       ],
       "tests": [
         "TestExtensionModelTraceAttachedDeclarationInfo",
@@ -122459,7 +122460,8 @@
         "TestTacticExtensionModelOriginalReverseDefinitionOrder",
         "TestTacticExtensionModelFunctionFallbackCompletionAndDefaultCallbacks",
         "TestTacticExtensionInvocationRefusalsCleanupAndReuse",
-        "TestTacticExtensionOwningTrailsCopiedClosedAndGoalGuards"
+        "TestTacticExtensionOwningTrailsCopiedClosedAndGoalGuards",
+        "TestTacticExtensionModelDisplayAndTranslate"
       ],
       "conditionals": [
         {
@@ -122477,8 +122479,8 @@
           "text": "SASSERT(goal_idx == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Extension-model TRACE writer refusal preserves source sticky ostream state while model reconstruction continues",
@@ -122489,7 +122491,7 @@
         },
         {
           "name": "extension_mc model_v2_pp and declaration-info snapshots before and after reverse definition reconstruction at cpp:49,71; attached declaration metadata and Boolean SMT2 profiles",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/tactic_extension_model_trace.go",
           "go_targets": ["pkg/model/model_v2_display.go"],
           "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder", "TestExtensionModelTraceAttachedDeclarationInfo"]
@@ -122508,7 +122510,7 @@
         },
         {
           "name": "extension_model_converter construction/destruction, insert and reverse-order indexed model reconstruction; inherited unindexed/labels/cancel no-op operations",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/tactic_extension_model.go",
           "tests": [
             "TestTacticExtensionModelOriginalReverseDefinitionOrder",
@@ -122516,28 +122518,38 @@
             "TestTacticExtensionInvocationRefusalsCleanupAndReuse",
             "TestTacticExtensionOwningTrailsCopiedClosedAndGoalGuards"
           ]
+        },
+        {
+          "name": "ordered SMT2 display and AST translation",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_extension_model.go",
+          "go_targets": ["pkg/tactic/tactic_extension_model_trace.go"],
+          "tests": ["TestTacticExtensionModelDisplayAndTranslate"]
         }
       ],
       "ownership": [
         "Native owning []ASTHandle declaration/definition slices acquire each reference before append and retain duplicates. Reconstruction walks definitions in reverse order with actual evaluator/value/function owners. Cleanup retires unpublished function, value then evaluator; destruction retires definitions before declarations, each in ascending order. Consumed DEC slots clear before returning errors, preserving remaining roots for cleanup. Successful function registration transfers ownership to the model. No vector backing-failure credit remains."
       ],
       "deviations": [
-        "Original reverse reconstruction and constant/function publication are integrated for the existing evaluator base paths. Source model completion is enabled and array_equalities disabled. Theory evaluation, array expansion, source display/TRACE and AST translation remain required; this is not whole converter or solver API completion. Source indexed goal assertion applies only in checked/debug profiles; inherited unindexed model and label callbacks remain empty. Explicit borrowed parameter/Runtime/Cooperation services replace source process-global access; runtime-wide typed allocator binding and whole native allocator/ownership campaigns remain unqualified."
+        "Original reverse reconstruction and constant/function publication use the fully audited model evaluator with model completion enabled and array equalities disabled. Display uses the ported SMT2 document printer and AST translation retains declarations and definitions in their source vector order. Source indexed goal assertion applies only in checked/debug profiles; inherited unindexed model and label callbacks remain empty. Explicit borrowed parameter/Runtime/Cooperation services replace source process-global access."
       ]
     },
     {
       "path": "src/tactic/extension_model_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/tactic/tactic_extension_model.go"
+        "pkg/tactic/tactic_extension_model.go",
+        "pkg/tactic/tactic_extension_model_trace.go",
+        "pkg/tactic/tactic_extension_model_test.go"
       ],
       "tests": [
         "TestTacticExtensionModelOriginalReverseDefinitionOrder",
         "TestTacticExtensionModelFunctionFallbackCompletionAndDefaultCallbacks",
         "TestTacticExtensionInvocationRefusalsCleanupAndReuse",
-        "TestTacticExtensionOwningTrailsCopiedClosedAndGoalGuards"
+        "TestTacticExtensionOwningTrailsCopiedClosedAndGoalGuards",
+        "TestTacticExtensionModelDisplayAndTranslate"
       ],
       "conditionals": [
         {
@@ -122549,12 +122561,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "extension_model_converter construction/destruction, insert and reverse-order indexed model reconstruction; inherited unindexed/labels/cancel no-op operations",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/tactic_extension_model.go",
           "tests": [
             "TestTacticExtensionModelOriginalReverseDefinitionOrder",
@@ -122562,13 +122574,20 @@
             "TestTacticExtensionInvocationRefusalsCleanupAndReuse",
             "TestTacticExtensionOwningTrailsCopiedClosedAndGoalGuards"
           ]
+        },
+        {
+          "name": "manager query, ordered SMT2 display and AST translation",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_extension_model.go",
+          "go_targets": ["pkg/tactic/tactic_extension_model_trace.go"],
+          "tests": ["TestTacticExtensionModelDisplayAndTranslate"]
         }
       ],
       "ownership": [
         "Native owning []ASTHandle declaration/definition slices acquire each reference before append and retain duplicates. Reconstruction walks definitions in reverse order with actual evaluator/value/function owners. Cleanup retires unpublished function, value then evaluator; destruction retires definitions before declarations, each in ascending order. Consumed DEC slots clear before returning errors, preserving remaining roots for cleanup. Successful function registration transfers ownership to the model. No vector backing-failure credit remains."
       ],
       "deviations": [
-        "Original reverse reconstruction and constant/function publication are integrated for the existing evaluator base paths. Source model completion is enabled and array_equalities disabled. Theory evaluation, array expansion, source display/TRACE and AST translation remain required; this is not whole converter or solver API completion. Source indexed goal assertion applies only in checked/debug profiles; inherited unindexed model and label callbacks remain empty. Explicit borrowed parameter/Runtime/Cooperation services replace source process-global access; runtime-wide typed allocator binding and whole native allocator/ownership campaigns remain unqualified."
+        "Original reverse reconstruction and constant/function publication use the fully audited model evaluator with model completion enabled and array equalities disabled. Display uses the ported SMT2 document printer and AST translation retains declarations and definitions in their source vector order. Source indexed goal assertion applies only in checked/debug profiles; inherited unindexed model and label callbacks remain empty. Explicit borrowed parameter/Runtime/Cooperation services replace source process-global access."
       ]
     },
     {

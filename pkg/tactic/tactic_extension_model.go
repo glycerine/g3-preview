@@ -5,13 +5,13 @@ package tactic
 
 import (
 	"errors"
+	"reflect"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
-	"reflect"
 )
 
 // The source reconstruction walks eliminated definitions in reverse order.
-// Its original evaluator remains partial for theory and array expressions.
 type tacticExtensionModelConverter struct {
 	tacticConverterBase
 	manager    *ast.ASTManager
@@ -163,6 +163,47 @@ func (c *tacticExtensionModelConverter) ApplyModel(out *ModelRef, goal uint32) (
 		}
 	}
 	return c.traceExtensionModel(md, 71)
+}
+
+func (c *tacticExtensionModelConverter) Translate(translator *ast.ASTTranslation) (_ *tacticExtensionModelConverter, err error) {
+	if err = c.open(); err != nil {
+		return nil, err
+	}
+	if translator == nil || translator.From() != c.manager || translator.To() == nil {
+		return nil, ast.ErrASTHandle
+	}
+	result, err := NewExtensionModel(translator.To(), c.services)
+	if err != nil {
+		return nil, err
+	}
+	published := false
+	defer func() {
+		if !published {
+			err = errors.Join(err, result.Close())
+		}
+	}()
+	for _, declaration := range c.vars {
+		translated, e := translator.Translate(declaration)
+		if e != nil {
+			return nil, e
+		}
+		if e = result.manager.IncRef(translated); e != nil {
+			return nil, e
+		}
+		result.vars = append(result.vars, translated)
+	}
+	for _, definition := range c.defs {
+		translated, e := translator.Translate(definition)
+		if e != nil {
+			return nil, e
+		}
+		if e = result.manager.IncRef(translated); e != nil {
+			return nil, e
+		}
+		result.defs = append(result.defs, translated)
+	}
+	published = true
+	return result, nil
 }
 
 // Preserve the inherited source unindexed and labels no-op operations.

@@ -3,6 +3,7 @@
 package tactic
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -14,6 +15,51 @@ import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
+
+func TestTacticExtensionModelDisplayAndTranslate(t *testing.T) {
+	from, _, _, config := extensionFixture(t)
+	to, err := ast.NewASTManager(ast.ASTManagerConfig{
+		Symbols: from.Symbols, Numerals: from.NumeralService(), Budget: from.Budget(),
+	})
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, to.Close()) })
+	c, err := NewExtensionModel(from, config)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, c.Close()) })
+	a := goalTestAtom(t, from, "extension-translated")
+	d, err := from.GetDecl(a)
+	satOK(t, err)
+	yes, err := from.MkTrue()
+	satOK(t, err)
+	satOK(t, c.Insert(d, yes))
+	var display bytes.Buffer
+	satOK(t, c.Display(&display))
+	if got, want := display.String(), "(extension-model-converter\n  (extension-translated true))\n"; got != want {
+		t.Fatalf("display = %q; want %q", got, want)
+	}
+	translator, err := ast.NewASTTranslation(from, to, true)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, translator.Close()) })
+	translated, err := c.Translate(translator)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, translated.Close()) })
+	wantDeclaration, err := translator.Translate(d)
+	satOK(t, err)
+	wantDefinition, err := translator.Translate(yes)
+	satOK(t, err)
+	if translated.manager != to || len(translated.vars) != 1 || translated.vars[0] != wantDeclaration ||
+		len(translated.defs) != 1 || translated.defs[0] != wantDefinition {
+		t.Fatal("translated extension entries")
+	}
+	display.Reset()
+	satOK(t, translated.Display(&display))
+	if got, want := display.String(), "(extension-model-converter\n  (extension-translated true))\n"; got != want {
+		t.Fatalf("translated display = %q; want %q", got, want)
+	}
+	if _, err = translated.Translate(translator); err != ast.ErrASTHandle {
+		t.Fatal("wrong-manager translation accepted", err)
+	}
+}
 
 func extensionFixture(t *testing.T, traces ...*diagnostic.TraceTags) (*ast.ASTManager, *model.Model, *ModelRef, model.ModelEvaluatorConfig) {
 	ctx, sy, q := paramsTestOwner(t)

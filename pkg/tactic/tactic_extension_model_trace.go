@@ -29,11 +29,54 @@ func (c *tacticExtensionModelConverter) extensionTraceTags() *diagnostic.TraceTa
 }
 
 func (c *tacticExtensionModelConverter) writeExtensionSMT2(w io.Writer, h ast.ASTHandle) (result error) {
+	return c.writeExtensionSMT2Indented(w, h, 0)
+}
+
+func (c *tacticExtensionModelConverter) writeExtensionSMT2Indented(w io.Writer, h ast.ASTHandle, indent uint32) (result error) {
 	format, err := c.manager.SMT2PPExprTree(h, nil)
 	if err != nil {
 		return err
 	}
+	if indent != 0 {
+		format, err = c.manager.FormatIndent(indent, format)
+		if err != nil {
+			return err
+		}
+	}
 	return c.writeExtensionFormat(w, format)
+}
+
+func (c *tacticExtensionModelConverter) Display(out io.Writer) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if out == nil || len(c.vars) != len(c.defs) {
+		return ast.ErrASTHandle
+	}
+	if _, err := io.WriteString(out, "(extension-model-converter"); err != nil {
+		return err
+	}
+	for i, declaration := range c.vars {
+		name, err := c.manager.GetASTName(declaration)
+		if err != nil {
+			return err
+		}
+		spelling, err := c.manager.Symbols.String(name)
+		if err != nil {
+			return err
+		}
+		if _, err = io.WriteString(out, "\n  ("+spelling+" "); err != nil {
+			return err
+		}
+		if err = c.writeExtensionSMT2Indented(out, c.defs[i], uint32(len(spelling))+4); err != nil {
+			return err
+		}
+		if _, err = io.WriteString(out, ")"); err != nil {
+			return err
+		}
+	}
+	_, err := io.WriteString(out, ")\n")
+	return err
 }
 
 func (c *tacticExtensionModelConverter) writeExtensionFormat(w io.Writer, format ast.ASTHandle) (result error) {
