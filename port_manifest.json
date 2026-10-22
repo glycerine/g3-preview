@@ -113118,22 +113118,43 @@
       "path": "src/smt/theory_dummy.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/theory_dummy.go"
+      ],
+      "tests": [
+        "TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "construction, expression detection, internalization refusal, equality callback guards, scoped rollback, reset, final check and name",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dummy.go",
+          "tests": [
+            "TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh"
+          ]
+        }
+      ],
+      "ownership": [
+        "The dummy theory owns its Go name and scoped Boolean snapshots while borrowing its initialized SMT state through SMTTheoryBase."
+      ],
+      "deviations": [
+        "Native Go scope snapshots replace the source value_trail entry; unreachable equality and disequality callbacks return a checked domain error."
+      ]
     },
     {
       "path": "src/smt/theory_dummy.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/theory_dummy.go"
+      ],
+      "tests": [
+        "TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113144,11 +113165,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "dummy-theory interface, fresh construction, model refusal and empty display",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dummy.go",
+          "tests": [
+            "TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh"
+          ]
+        }
+      ],
+      "ownership": [
+        "Fresh returns an independent uninitialized dummy owner with the same copied name and borrowed family identifier."
+      ],
+      "deviations": [
+        "The source empty display has no retained Go output call and is represented by the absence of display state."
+      ]
     },
     {
       "path": "src/smt/theory_fpa.cpp",
