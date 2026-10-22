@@ -1732,6 +1732,13 @@ func TestSMTSequenceTheoryGroundOperationsAreComplete(t *testing.T) {
 		name  string
 		build func(*testing.T, *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle)
 	}{
+		{name: "nested-concat", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			left, err := m.MkSequenceConcat(astTestString(t, m, "ab"), astTestString(t, m, "cd"))
+			astTestMust(t, err)
+			operation, err := m.MkSequenceConcat(left, astTestString(t, m, "ef"))
+			astTestMust(t, err)
+			return operation, astTestString(t, m, "abcdef")
+		}},
 		{name: "length", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
 			s := astTestString(t, m, "abcd")
 			operation, err := m.MkSequenceLength(s)

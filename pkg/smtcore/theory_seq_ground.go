@@ -47,13 +47,61 @@ func (t *SMTSequenceTheory) groundStringArgument(expression ast.ASTHandle, index
 	if err != nil {
 		return "", false, err
 	}
-	return state.manager.SequenceStringValue(argument)
+	return t.syntacticGroundString(argument, make(map[ast.ASTHandle]struct{}))
+}
+
+func (t *SMTSequenceTheory) syntacticGroundString(expression ast.ASTHandle, visiting map[ast.ASTHandle]struct{}) (string, bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return "", false, err
+	}
+	if _, found := visiting[expression]; found {
+		return "", false, nil
+	}
+	visiting[expression] = struct{}{}
+	defer delete(visiting, expression)
+	if text, matched, textErr := state.manager.SequenceStringValue(expression); textErr != nil || matched {
+		return text, matched, textErr
+	}
+	if element, unit, unitErr := state.manager.SequenceUnitArgument(expression); unitErr != nil {
+		return "", false, unitErr
+	} else if unit {
+		value, matched, valueErr := state.manager.SequenceUnitByteElementValue(element)
+		if valueErr != nil || !matched {
+			return "", false, valueErr
+		}
+		return string([]byte{value}), true, nil
+	}
+	left, right, concat, err := state.manager.SequenceConcatParts(expression)
+	if err != nil || !concat {
+		return "", false, err
+	}
+	leftText, leftConcrete, err := t.syntacticGroundString(left, visiting)
+	if err != nil || !leftConcrete {
+		return "", false, err
+	}
+	rightText, rightConcrete, err := t.syntacticGroundString(right, visiting)
+	if err != nil || !rightConcrete {
+		return "", false, err
+	}
+	return leftText + rightText, true, nil
 }
 
 func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, operation int32) (bool, error) {
 	state, err := t.State()
 	if err != nil {
 		return false, err
+	}
+	if operation == ast.ASTSequenceOpUnit || operation == ast.ASTSequenceOpConcat {
+		text, concrete, textErr := t.syntacticGroundString(expression, make(map[ast.ASTHandle]struct{}))
+		if textErr != nil || !concrete {
+			return false, textErr
+		}
+		value, makeErr := state.manager.MkString(text)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		return t.pushGroundValue(expression, value)
 	}
 	if operation == 9 {
 		text, concrete, textErr := t.groundStringArgument(expression, 0)
