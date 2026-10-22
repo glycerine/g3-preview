@@ -113189,22 +113189,66 @@
       "path": "src/solver/solver.cpp",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/solver.go",
+        "pkg/solver/solver_test.go"
+      ],
+      "tests": [
+        "TestSolverDefaultsScopedPushAssertionsAndConsequence",
+        "TestSolverDefaultConsequenceForNonBooleanValue"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "assertion collection and SMT declaration/assertion display (solver.cpp:29-55)",
+          "status": "ported",
+          "go_target": "pkg/solver/solver.go",
+          "tests": [
+            "TestSolverDefaultsScopedPushAssertionsAndConsequence"
+          ]
+        },
+        {
+          "name": "consequence wrapper, cancellation reason and Boolean/non-Boolean model-guided core algorithm (solver.cpp:65-147)",
+          "status": "ported",
+          "go_target": "pkg/solver/solver.go",
+          "tests": [
+            "TestSolverDefaultsScopedPushAssertionsAndConsequence",
+            "TestSolverDefaultConsequenceForNonBooleanValue"
+          ]
+        },
+        {
+          "name": "default mutex, preferred-SAT and literal recognition operations (solver.cpp:149-161)",
+          "status": "ported",
+          "go_target": "pkg/solver/solver.go",
+          "tests": [
+            "TestSolverDefaultsScopedPushAssertionsAndConsequence"
+          ]
+        }
+      ],
+      "ownership": [
+        "Assertion and assumption slices are borrowed; consequence outputs are manager-owned AST handles, while the algorithm owns and releases its acquired model, evaluator and temporary ASTRef values.",
+        "ScopedPush owns exactly one matching pop unless explicitly disabled."
+      ],
+      "deviations": [
+        "The model-evaluator factory is explicit because Go model evaluation requires explicit process services instead of source globals.",
+        "Abstract NumAssertions and Assertion methods replace the source NOT_IMPLEMENTED_YET defaults."
+      ]
     },
     {
       "path": "src/solver/solver.h",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/solver.go",
+        "pkg/solver/solver_test.go"
+      ],
+      "tests": [
+        "TestSolverDefaultsScopedPushAssertionsAndConsequence",
+        "TestSolverDefaultConsequenceForNonBooleanValue"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113215,11 +113259,36 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "solver factory and complete incremental solver/check-result virtual surface (solver.h:29-184)",
+          "status": "ported",
+          "go_target": "pkg/solver/solver.go",
+          "tests": [
+            "TestSolverDefaultsScopedPushAssertionsAndConsequence",
+            "TestSolverDefaultConsequenceForNonBooleanValue"
+          ]
+        },
+        {
+          "name": "scoped push lifetime and default consequence/literal helpers (solver.h:166-200)",
+          "status": "ported",
+          "go_target": "pkg/solver/solver.go",
+          "tests": [
+            "TestSolverDefaultsScopedPushAssertionsAndConsequence",
+            "TestSolverDefaultConsequenceForNonBooleanValue"
+          ]
+        }
+      ],
+      "ownership": [
+        "Solver methods borrow manager, parameter, callback and input AST values; concrete solvers own their assertion stacks and result state.",
+        "FactoryFunc is a typed borrowed callable adapter, and native slices replace source expression and nested-vector overloads."
+      ],
+      "deviations": [
+        "Go errors replace source exception transport, and io.Writer replaces ostream.",
+        "Factory function adapters replace source virtual factory subclasses."
+      ]
     },
     {
       "path": "src/solver/solver2tactic.cpp",
