@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
@@ -614,4 +615,81 @@ func (t *SMTDatatypeTheory) ResetStatistics() {
 	if t != nil {
 		t.statistics = smtDatatypeStatistics{}
 	}
+}
+
+func (t *SMTDatatypeTheory) InitializeModel(generator *SMTModelGenerator) error {
+	state, err := t.State()
+	if err != nil || generator == nil || generator.manager != state.manager || generator.model == nil {
+		if err != nil {
+			return err
+		}
+		return ast.ErrASTDomain
+	}
+	factory, err := protomodel.NewDatatypeFactory(generator.model)
+	if err != nil {
+		return err
+	}
+	return generator.RegisterFactory(factory)
+}
+
+type smtDatatypeValueProcedure struct {
+	constructor  ast.ASTHandle
+	dependencies []SMTModelValueDependency
+}
+
+func (p *smtDatatypeValueProcedure) Dependencies() []SMTModelValueDependency {
+	if p == nil {
+		return nil
+	}
+	return append([]SMTModelValueDependency(nil), p.dependencies...)
+}
+
+func (p *smtDatatypeValueProcedure) MakeValue(generator *SMTModelGenerator, values []ast.ASTHandle) (ast.ASTHandle, error) {
+	if p == nil || generator == nil || p.constructor.IsNull() || len(values) != len(p.dependencies) {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	return generator.manager.MkApp(p.constructor, values)
+}
+
+func (*smtDatatypeValueProcedure) IsFresh() bool { return false }
+
+func (t *SMTDatatypeTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
+	if node == nil || generator == nil || !t.IsAttachedToVariable(node) || generator.model == nil {
+		return nil, ast.ErrASTDomain
+	}
+	state, err := t.State()
+	if err != nil {
+		return nil, err
+	}
+	for expression := range t.initialized {
+		candidate := state.context.enodes[expression]
+		if candidate == nil || candidate.root != node.root {
+			continue
+		}
+		constructor, matched, constructorErr := state.manager.DatatypeConstructorApp(expression)
+		if constructorErr != nil {
+			return nil, constructorErr
+		}
+		if !matched {
+			continue
+		}
+		dependencies := make([]SMTModelValueDependency, 0, len(candidate.arguments))
+		for _, argument := range candidate.arguments {
+			dependency, dependencyErr := NewSMTEnodeValueDependency(argument)
+			if dependencyErr != nil {
+				return nil, dependencyErr
+			}
+			dependencies = append(dependencies, dependency)
+		}
+		return &smtDatatypeValueProcedure{constructor: constructor, dependencies: dependencies}, nil
+	}
+	sort, err := state.manager.GetSort(node.owner)
+	if err != nil {
+		return nil, err
+	}
+	value, err := generator.SomeValue(sort)
+	if err != nil {
+		return nil, err
+	}
+	return NewSMTExpressionValueProcedure(value)
 }

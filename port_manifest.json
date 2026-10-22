@@ -114260,7 +114260,8 @@
         "TestSMTDatatypeConstructorAccessor",
         "TestSMTDatatypeRecursiveOccursCheck",
         "TestSMTDatatypeUpdateFieldAxioms",
-        "TestSMTDatatypeQFDTSetup"
+        "TestSMTDatatypeQFDTSetup",
+        "TestSMTDatatypeConstructorModelValue"
       ],
       "assertions": [
         {
@@ -114491,7 +114492,8 @@
         "TestSMTDatatypeConstructorAccessor",
         "TestSMTDatatypeRecursiveOccursCheck",
         "TestSMTDatatypeUpdateFieldAxioms",
-        "TestSMTDatatypeQFDTSetup"
+        "TestSMTDatatypeQFDTSetup",
+        "TestSMTDatatypeConstructorModelValue"
       ],
       "conditionals": [
         {

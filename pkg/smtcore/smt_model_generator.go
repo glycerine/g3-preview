@@ -222,13 +222,17 @@ func (g *SMTModelGenerator) discoverValueProcedures(state *SMTInternalizerState)
 		}
 		var procedure SMTModelValueProcedure
 		if sort == booleanSort {
-			assignment := g.context.assignments[node.owner]
-			if assignment == lbool.Undef {
-				return nil, nil, ast.ErrASTDomain
-			}
 			value, valueErr := g.manager.MkFalse()
-			if assignment == lbool.True {
+			if g.manager.IsTrue(node.owner) {
 				value, valueErr = g.manager.MkTrue()
+			} else if !g.manager.IsFalse(node.owner) {
+				assignment := g.context.assignments[node.owner]
+				if assignment == lbool.Undef {
+					return nil, nil, ast.ErrASTDomain
+				}
+				if assignment == lbool.True {
+					value, valueErr = g.manager.MkTrue()
+				}
 			}
 			if valueErr != nil {
 				return nil, nil, valueErr
@@ -372,10 +376,10 @@ func (g *SMTModelGenerator) publishConstantInterpretations(state *SMTInternalize
 		}
 	}
 	for _, node := range state.enodeStack {
-		if node == nil || node.root != node || !g.context.relevant[node.owner] {
+		if node == nil || !g.context.relevant[node.owner] {
 			continue
 		}
-		value := g.rootValues[node]
+		value := g.rootValues[node.root]
 		if value.IsNull() {
 			continue
 		}

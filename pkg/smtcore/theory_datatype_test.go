@@ -243,3 +243,63 @@ func TestSMTDatatypeUpdateFieldAxioms(t *testing.T) {
 		})
 	}
 }
+
+func TestSMTDatatypeConstructorModelValue(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterDatatypePlugin()
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	sorts, err := m.MkDatatypes([]ast.DatatypeDefinition{{
+		Name: astTestSymbol(t, m, "smt-model-box"),
+		Constructors: []ast.DatatypeConstructorDefinition{{
+			Name:       astTestSymbol(t, m, "smt-model-mk-box"),
+			Recognizer: astTestSymbol(t, m, "smt-model-is-box"),
+			Accessors:  []ast.DatatypeAccessorDefinition{{Name: astTestSymbol(t, m, "smt-model-unbox"), Range: boolean}},
+		}},
+	}})
+	astTestMust(t, err)
+	constructors, err := m.DatatypeConstructors(sorts[0])
+	astTestMust(t, err)
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	box, err := m.MkApp(constructors[0], []ast.ASTHandle{truth})
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "smt-model-box-x"), sorts[0])
+	astTestMust(t, err)
+	equality, err := m.MkEq(box, x)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_DT", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.SetProduceModels(true))
+	astTestMust(t, solver.Assert(equality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("datatype model status", status)
+	}
+	generated, err := solver.AcquireModel()
+	astTestMust(t, err)
+	if generated == nil {
+		t.Fatal("datatype solver omitted model")
+	}
+	t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
+	declaration, err := m.GetDecl(x)
+	astTestMust(t, err)
+	value, err := generated.ConstantInterpretation(declaration)
+	astTestMust(t, err)
+	if value.IsNull() {
+		t.Fatal("datatype model omitted constant interpretation")
+	}
+	constructor, matched, err := m.DatatypeConstructorApp(value)
+	astTestMust(t, err)
+	if !matched || constructor != constructors[0] {
+		t.Fatal("datatype model omitted constructor", value)
+	}
+	argument, err := m.GetArg(value, 0)
+	astTestMust(t, err)
+	if !m.IsTrue(argument) {
+		t.Fatal("datatype model omitted constructor argument", argument)
+	}
+}
