@@ -106823,22 +106823,46 @@
       "path": "src/smt/smt_quantifier_stat.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_quantifier_stat.go"
+      ],
+      "tests": [
+        "TestSMTQuantifierStatSourceShapeAndCaseSplitFactor",
+        "TestSMTQuantifierStatDepthOnlyRevisitAndCounters"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "quantifier_stat constructor and quantifier_stat_gen traversal",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quantifier_stat.go",
+          "tests": [
+            "TestSMTQuantifierStatSourceShapeAndCaseSplitFactor",
+            "TestSMTQuantifierStatDepthOnlyRevisitAndCounters"
+          ]
+        }
+      ],
+      "ownership": [
+        "The generator borrows the AST manager and handles; each returned Go statistic value is owned by its caller."
+      ],
+      "deviations": [
+        "Native Go maps and slices replace obj_map, svector, and region storage; util/approx preserves source case-split saturation."
+      ]
     },
     {
       "path": "src/smt/smt_quantifier_stat.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_quantifier_stat.go"
+      ],
+      "tests": [
+        "TestSMTQuantifierStatSourceShapeAndCaseSplitFactor",
+        "TestSMTQuantifierStatDepthOnlyRevisitAndCounters"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -106849,10 +106873,21 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "quantifier statistic accessors and mutable counters",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quantifier_stat.go",
+          "tests": [
+            "TestSMTQuantifierStatDepthOnlyRevisitAndCounters"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTQuantifierStat contains scalar values only."
+      ],
       "deviations": []
     },
     {
