@@ -122988,7 +122988,7 @@
       "path": "src/tactic/goal.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/tactic_goal.go",
         "pkg/tactic/tactic_goal_ownership.go",
@@ -123016,6 +123016,7 @@
         "TestTacticGoalDefaultAndFullCopyConstructors",
         "TestTacticGoalWellSortedStopsAtFirstBadFormula",
         "TestGoalSourceDefaultDisplayAndProcessPrinter",
+        "TestGoalSpecializedDisplayProfiles",
         "TestTacticGoalTranslatePreservesConfigurationAndDependencies"
       ],
       "assertions": [
@@ -123072,8 +123073,8 @@
           "text": "SASSERT(num1 >= num2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "goal assertion, update, retained arrays, redundancy elimination, reset/copy, precision and source reference controls",
@@ -123136,6 +123137,12 @@
           "tests": [
             "TestGoalSourceDefaultDisplayAndProcessPrinter"
           ]
+        },
+        {
+          "name": "attribute, dependency, conjunction, low-level and DIMACS display profiles",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal_display.go",
+          "tests": ["TestGoalSpecializedDisplayProfiles"]
         }
       ],
       "ownership": [
@@ -123143,7 +123150,7 @@
         "quick_process temporary negations now use a native []ASTHandle with explicit INC before append and DEC on lexical exit, matching the source expr_ref_vector ownership. This corrects the prior nonowning expression-vector borrow. Goal output acquisition still precedes temporary cleanup."
       ],
       "deviations": [
-        "The default, full-copy and configuration-only constructors, cross-manager translation, formula-set is_equal helper, default display, and formula-order is_well_sorted caller are concrete. Specialized dependency, conjunction, low-level and DIMACS displays remain open.",
+        "The source printer overloads map to typed io.Writer methods using the retained SMT2 and low-level AST printers. A separate C++ ast_printer inheritance hierarchy is unnecessary for retained Go consumers.",
         "Goal forms/proofs/dependencies now own native []ASTHandle/[]ASTDependency slices. Copies acquire independent element pins and backing rather than persistent-array reroot graphs; native growth has no emulated allocation geometry. Actual formula/proof/core publication order, saved-first and literal-false update behavior, snapshot isolation, depth/precision and explicit reference ownership remain. Concrete ownership helpers retire consumed references even when destruction reports an error, and retain unconsumed guard failures. Added 129-row native/debug growth/copy/update/shrink/close tests with arena reservations disabled and exact formula/proof/dependency pin checks, plus a real foreign-core guard publication-prefix check. Printing/translation and other declared gaps remain open."
       ]
     },
@@ -123151,7 +123158,7 @@
       "path": "src/tactic/goal.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/tactic_goal_inequality_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_memory_trace.go",
@@ -123182,6 +123189,7 @@
         "TestTacticGoalDefaultAndFullCopyConstructors",
         "TestTacticGoalWellSortedStopsAtFirstBadFormula",
         "TestGoalSourceDefaultDisplayAndProcessPrinter",
+        "TestGoalSpecializedDisplayProfiles",
         "TestTacticGoalTranslatePreservesConfigurationAndDependencies"
       ],
       "conditionals": [
@@ -123194,8 +123202,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
@@ -123269,13 +123277,19 @@
           "tests": [
             "TestGoalSourceDefaultDisplayAndProcessPrinter"
           ]
+        },
+        {
+          "name": "attribute, dependency, conjunction, low-level and DIMACS display declarations",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal_display.go",
+          "tests": ["TestGoalSpecializedDisplayProfiles"]
         }
       ],
       "ownership": [
         "Goal expression/dependency arrays retain their actual AST-manager owners. Assertions retain f/pr/dependencies through processing; false replacement protects proof/dependency references before reset. Redundancy membership uses local borrowed Go maps; original formula prefix/suffix ownership keeps encountered atoms alive through compaction. NumExprs shares a native identity map across formulas and the existing postorder project visitor with native frames, preserving shared-only deduplication, quantifier children and associative application weight. No shared mark/trail or native-frame backing reservation is credited at these callers."
       ],
       "deviations": [
-        "The default, full-copy and configuration-only constructors, cross-manager translation, formula-set is_equal helper, default display, and formula-order is_well_sorted caller are concrete. Specialized dependency, conjunction, low-level and DIMACS displays remain open.",
+        "The source printer overloads map to typed io.Writer methods using the retained SMT2 and low-level AST printers. A separate C++ ast_printer inheritance hierarchy is unnecessary for retained Go consumers.",
         "Goal forms/proofs/dependencies now own native []ASTHandle/[]ASTDependency slices. Copies acquire independent element pins and backing rather than persistent-array reroot graphs; native growth has no emulated allocation geometry. Actual formula/proof/core publication order, saved-first and literal-false update behavior, snapshot isolation, depth/precision and explicit reference ownership remain. Concrete ownership helpers retire consumed references even when destruction reports an error, and retain unconsumed guard failures. Added 129-row native/debug growth/copy/update/shrink/close tests with arena reservations disabled and exact formula/proof/dependency pin checks, plus a real foreign-core guard publication-prefix check. Printing/translation and other declared gaps remain open."
       ]
     },
