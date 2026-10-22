@@ -65488,7 +65488,7 @@
       "path": "src/math/simplex/network_flow.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -65501,17 +65501,17 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["No retained source unit instantiates or calls network_flow; references are confined to network_flow.h/network_flow_def.h, and the simplex CMake component compiles only simplex.cpp and model_based_opt.cpp. The unused template is not ported."]
     },
     {
       "path": "src/math/simplex/network_flow_def.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -65594,11 +65594,11 @@
           "text": "SASSERT(edge_in_tree(i) || m_flows[i].is_zero());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["No retained source unit instantiates or calls this network simplex template implementation. Per the retained-consumer rule, its graph/spanning-tree algorithm and debug-only checks remain source reference material."]
     },
     {
       "path": "src/math/simplex/simplex.cpp",
