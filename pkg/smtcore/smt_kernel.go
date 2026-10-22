@@ -49,6 +49,7 @@ type SMTKernel struct {
 	smtParams        *SMTParams
 	smtState         SMTParamsState
 	arithState       SMTArithState
+	bvState          SMTBVState
 	preprocessState  SMTPreprocessorState
 	produceModel     bool
 	preprocess       bool
@@ -147,6 +148,10 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	if err != nil {
 		return errors.Join(err, full.Close())
 	}
+	bitVector, err := full.BitVectorState()
+	if err != nil {
+		return errors.Join(err, full.Close())
+	}
 	proofs, err := k.manager.ProofsEnabled()
 	if err != nil {
 		return errors.Join(err, full.Close())
@@ -175,6 +180,7 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	k.smtParams = full
 	k.smtState = fullState
 	k.arithState = arithmetic
+	k.bvState = bitVector
 	state, err := k.readPreprocessorState(context, globals, params)
 	if err != nil {
 		return err
@@ -222,6 +228,10 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err != nil {
 		return err
 	}
+	bitVector, err := k.smtParams.BitVectorState()
+	if err != nil {
+		return err
+	}
 	if err = k.internalizer.UpdateDynamicAck(dynamic); err != nil {
 		return err
 	}
@@ -231,9 +241,15 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	k.relevancy.enabled = paramsState.RelevancyLvl > 0
 	k.smtState = paramsState
 	k.arithState = arithmetic
+	k.bvState = bitVector
 	for _, theory := range k.internalizer.theories {
 		if configurable, ok := theory.(interface{ ConfigureArithmetic(SMTArithState) error }); ok {
 			if err = configurable.ConfigureArithmetic(arithmetic); err != nil {
+				return err
+			}
+		}
+		if configurable, ok := theory.(interface{ ConfigureBitVector(SMTBVState) error }); ok {
+			if err = configurable.ConfigureBitVector(bitVector); err != nil {
 				return err
 			}
 		}
@@ -287,6 +303,11 @@ func (k *SMTKernel) Internalizer() (*SMTInternalizerState, error) {
 func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 	if err := k.open(); err != nil {
 		return err
+	}
+	if configurable, ok := theory.(interface{ ConfigureBitVector(SMTBVState) error }); ok {
+		if err := configurable.ConfigureBitVector(k.bvState); err != nil {
+			return err
+		}
 	}
 	if configurable, ok := theory.(interface{ ConfigureArithmetic(SMTArithState) error }); ok {
 		if err := configurable.ConfigureArithmetic(k.arithState); err != nil {

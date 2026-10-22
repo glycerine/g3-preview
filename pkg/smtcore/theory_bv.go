@@ -41,6 +41,15 @@ type SMTBitVectorTheory struct {
 	scopes      []smtBVScope
 	unsupported bool
 	statistics  smtBVStatistics
+	config      SMTBVState
+}
+
+func (t *SMTBitVectorTheory) ConfigureBitVector(config SMTBVState) error {
+	if t == nil {
+		return ast.ErrASTDomain
+	}
+	t.config = config
+	return nil
 }
 
 func NewSMTBitVectorTheory(family ast.FamilyID) (*SMTBitVectorTheory, error) {
@@ -52,6 +61,7 @@ func NewSMTBitVectorTheory(family ast.FamilyID) (*SMTBitVectorTheory, error) {
 		SMTTheoryBase: base,
 		bits:          make(map[ast.ASTHandle][]ast.ASTHandle),
 		bitOwners:     make(map[ast.ASTHandle]ast.ASTRef),
+		config:        SMTBVState{BlastMaxSize: 2147483647, EnableInt2BV: true},
 	}, nil
 }
 
@@ -1328,9 +1338,35 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	if err != nil || !own {
 		return false, err
 	}
+	if (op == 57 || op == 58) && !t.config.EnableInt2BV {
+		return false, nil
+	}
 	count, err := state.manager.GetNumArgs(expression)
 	if err != nil {
 		return false, err
+	}
+	for i := uint32(0); i <= count; i++ {
+		candidate := expression
+		if i < count {
+			candidate, err = state.manager.GetArg(expression, i)
+			if err != nil {
+				return false, err
+			}
+		}
+		isBV, candidateErr := state.manager.IsBitVector(candidate)
+		if candidateErr != nil {
+			return false, candidateErr
+		}
+		if isBV {
+			width, widthErr := state.manager.BitVectorSize(candidate)
+			if widthErr != nil {
+				return false, widthErr
+			}
+			if width > t.config.BlastMaxSize {
+				t.unsupported = true
+				return false, nil
+			}
+		}
 	}
 	for i := uint32(0); i < count; i++ {
 		argument, argErr := state.manager.GetArg(expression, i)

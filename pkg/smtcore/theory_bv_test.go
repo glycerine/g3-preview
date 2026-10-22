@@ -274,6 +274,31 @@ func TestSMTBitVectorRelevantTermMarksBits(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorBlastLimitGivesUnknown(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	family, err := m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	theory, ok := solver.kernel.internalizer.theories[family].(*SMTBitVectorTheory)
+	if !ok || theory == nil {
+		t.Fatal("missing bit-vector theory")
+	}
+	astTestMust(t, theory.ConfigureBitVector(SMTBVState{BlastMaxSize: 2, EnableInt2BV: true}))
+	one, err := m.BitVectorNumeralUint64(1, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(one)
+	astTestMust(t, err)
+	value, err := m.MkConst(astTestSymbol(t, m, "bv-blast-limit-value"), sort)
+	astTestMust(t, err)
+	equality, err := m.MkEq(value, one)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(equality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.Undef {
+		t.Fatal("large bit-vector approximation", status)
+	}
+}
+
 func TestSMTBitVectorToIntAxiom(t *testing.T) {
 	m := astTestManager(t)
 	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})

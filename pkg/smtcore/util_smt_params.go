@@ -289,6 +289,15 @@ func (s *SMTParams) ArithmeticState() (SMTArithState, error) {
 	}
 	return s.arith.State()
 }
+
+// BitVectorState exposes the embedded theory_bv_params snapshot consumed by
+// the retained bit-vector theory.
+func (s *SMTParams) BitVectorState() (SMTBVState, error) {
+	if e := s.open(); e != nil {
+		return SMTBVState{}, e
+	}
+	return s.bv.State()
+}
 func (s *SMTParams) sourceStop() error {
 	if s.DestructorCause != nil {
 		return s.DestructorCause

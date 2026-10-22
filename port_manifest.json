@@ -113718,7 +113718,8 @@
         "TestSMTBitVectorCloseReleasesBitOwners",
         "TestSMTBitVectorToIntAxiom",
         "TestSMTIntToBitVectorAxiom",
-        "TestSMTBitVectorRelevantTermMarksBits"
+        "TestSMTBitVectorRelevantTermMarksBits",
+        "TestSMTBitVectorBlastLimitGivesUnknown"
       ],
       "conditionals": [
         {
@@ -114094,7 +114095,8 @@
         "TestSMTBitVectorCloseReleasesBitOwners",
         "TestSMTBitVectorToIntAxiom",
         "TestSMTIntToBitVectorAxiom",
-        "TestSMTBitVectorRelevantTermMarksBits"
+        "TestSMTBitVectorRelevantTermMarksBits",
+        "TestSMTBitVectorBlastLimitGivesUnknown"
       ],
       "conditionals": [
         {
