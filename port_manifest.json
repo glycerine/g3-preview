@@ -113871,22 +113871,46 @@
       "path": "src/smt/uses_theory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/uses_theory.go"
+      ],
+      "tests": [
+        "TestSMTUsesTheoryTraversesQuantifierAnnotations",
+        "TestSMTUsesTheorySharedVisitedSkipsPreviouslyMarkedSubgraph"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "uses_theory overloads and full expression traversal",
+          "status": "ported",
+          "go_target": "pkg/smtcore/uses_theory.go",
+          "tests": [
+            "TestSMTUsesTheoryTraversesQuantifierAnnotations",
+            "TestSMTUsesTheorySharedVisitedSkipsPreviouslyMarkedSubgraph"
+          ]
+        }
+      ],
+      "ownership": [
+        "Traversal borrows expression handles; the convenience overload owns and closes its temporary AST expression mark."
+      ],
+      "deviations": [
+        "The source exception used for early success is a normal Boolean return in Go; AST and mark failures are explicit errors."
+      ]
     },
     {
       "path": "src/smt/uses_theory.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/uses_theory.go"
+      ],
+      "tests": [
+        "TestSMTUsesTheoryTraversesQuantifierAnnotations",
+        "TestSMTUsesTheorySharedVisitedSkipsPreviouslyMarkedSubgraph"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113897,10 +113921,21 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "theory-use query and shared-mark interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/uses_theory.go",
+          "tests": [
+            "TestSMTUsesTheorySharedVisitedSkipsPreviouslyMarkedSubgraph"
+          ]
+        }
+      ],
+      "ownership": [
+        "The shared-mark overload borrows the caller-owned ASTExprMark and preserves it across calls."
+      ],
       "deviations": []
     },
     {
