@@ -40283,20 +40283,26 @@
       "path": "src/interp/CMakeLists.txt",
       "component": "interp",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "platform_replacement",
+      "go_targets": [
+        "pkg/interp/orchestration.go"
+      ],
+      "tests": [
+        "TestInterpolationProofTreeAndSolverOrchestration"
+      ],
       "registrations": [
         {
           "line": 1,
           "text": "z3_add_component(interp"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go package discovery and imports replace the CMake component source list and dependency registration."
+      ]
     },
     {
       "path": "src/interp/interp_params.hpp",
@@ -105016,9 +105022,13 @@
       "path": "src/smt/smt_failure.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_types.go"
+      ],
+      "tests": [
+        "TestSMTCoreTypesFailureFinalCheckAndTheoryVarList"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -105029,10 +105039,21 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "undefined-check failure reasons",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_types.go",
+          "tests": [
+            "TestSMTCoreTypesFailureFinalCheckAndTheoryVarList"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTFailure is an inline value with no owning payload."
+      ],
       "deviations": []
     },
     {
@@ -107240,9 +107261,13 @@
       "path": "src/smt/smt_theory_var_list.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_types.go"
+      ],
+      "tests": [
+        "TestSMTCoreTypesFailureFinalCheckAndTheoryVarList"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -107253,10 +107278,21 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "theory-variable intrusive list construction and accessors",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_types.go",
+          "tests": [
+            "TestSMTCoreTypesFailureFinalCheckAndTheoryVarList"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTTheoryVarList nodes borrow their Next link; the enclosing SMT context owns node storage."
+      ],
       "deviations": []
     },
     {
@@ -107266,13 +107302,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_literal.go",
-        "pkg/smtcore/smt_literal_source_test.go"
+        "pkg/smtcore/smt_literal_source_test.go",
+        "pkg/smtcore/smt_types.go"
       ],
       "tests": [
         "TestSMTLiteralSignedSentinelsAndSourceOperations",
         "TestSMTLiteralBackwardSubsumptionIndependentFiniteMultisets",
         "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
-        "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
+        "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation",
+        "TestSMTCoreTypesFailureFinalCheckAndTheoryVarList"
       ],
       "conditionals": [
         {
@@ -107296,6 +107334,14 @@
             "TestSMTLiteralBackwardSubsumptionIndependentFiniteMultisets",
             "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
             "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
+          ]
+        },
+        {
+          "name": "theory identifiers, theory variables, and final-check status values",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_types.go",
+          "tests": [
+            "TestSMTCoreTypesFailureFinalCheckAndTheoryVarList"
           ]
         }
       ],
