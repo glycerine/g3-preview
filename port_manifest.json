@@ -101052,7 +101052,7 @@
       "path": "src/smt/params/smt_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_params.go",
         "pkg/smtcore/util_smt_params_source_test.go"
@@ -101072,12 +101072,12 @@
         "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
         "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Literal local/full/context update and eight-base plus sixty-eight local display chains (src/smt/params/smt_params.cpp:24-164)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_params.go",
           "tests": [
             "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
@@ -101109,7 +101109,7 @@
       "path": "src/smt/params/smt_params.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_params.go",
         "pkg/smtcore/util_smt_params_source_test.go",
@@ -101148,12 +101148,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete nine-base parent, local member frontier and display chains (src/smt/params/smt_params.h:75-318)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_params.go",
           "tests": [
             "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
@@ -101173,7 +101173,7 @@
         },
         {
           "name": "Compiler-generated concrete parent/QI owned copy and assignment (src/smt/params/smt_params.h:75-318)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_params_copy_source.go",
           "tests": [
             "TestSMTParamsCopyConstructorPreservesAllBasesAndBorrowedPointerWithoutGetters",
