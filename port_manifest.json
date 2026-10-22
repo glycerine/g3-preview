@@ -144121,7 +144121,8 @@
         "pkg/ast/ast_dependency.go",
         "pkg/ast/ast_dependency_api.go",
         "pkg/ast/ast_dependency_traversal.go",
-        "pkg/ast/ast_dependency_consumed_test.go"
+        "pkg/ast/ast_dependency_consumed_test.go",
+        "pkg/smtcore/smt_arith_bound_dependency.go"
       ],
       "tests": [
         "TestASTDependencyNativeLIFOCallbacksWithReservationsDisabled",
@@ -144139,7 +144140,9 @@
         "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
         "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
         "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix",
-        "TestASTDependencyDecConsumedActualRootOwnership"
+        "TestASTDependencyDecConsumedActualRootOwnership",
+        "TestSMTArithmeticBoundDependencyJoinLinearizeAndContains",
+        "TestSMTArithmeticBoundDependencyScopesAndReset"
       ],
       "conditionals": [
         {
@@ -144366,14 +144369,18 @@
         },
         {
           "name": "scoped_dependency_manager<void*> region-owned bound/justification leaves, joins, linearization and reset for SMT arithmetic, old_interval, Grobner and MUZ relation consumers",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_arith_bound_dependency.go",
+          "tests": [
+            "TestSMTArithmeticBoundDependencyJoinLinearizeAndContains",
+            "TestSMTArithmeticBoundDependencyScopesAndReset"
+          ]
         }
       ],
       "ownership": [
         "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Project RC30 wrapping and charged leaf/join16/24 records remain; dependency FIFO/LIFO worklists and persistent-array scratch use native Go slices without container arena charges or intrusive fallback links. Actual cold manager/header/payload and persistent-array object overlaps remain charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md.",
-        "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers."
+        "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers.",
+        "The SMT nonlinear-arithmetic specialization stores borrowed concrete *smtArithmeticBound leaves in a search-scoped DAG; Go reachability replaces region allocation while reset and scope rollback retire manager ownership."
       ],
       "deviations": [
         "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
