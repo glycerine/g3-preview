@@ -100657,11 +100657,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/old_interval_extended.go"
+        "pkg/smtcore/old_interval_extended.go",
+        "pkg/smtcore/old_interval.go"
       ],
       "tests": [
         "TestSMTExtendedRationalArithmeticAndUndefinedInfinity",
-        "TestSMTExtendedRationalZeroInfinityPowerAndNegation"
+        "TestSMTExtendedRationalZeroInfinityPowerAndNegation",
+        "TestSMTOldIntervalAddSubtractContainsAndDependencies",
+        "TestSMTOldIntervalInverseAndPower"
       ],
       "conditionals": [
         {
@@ -100869,9 +100872,12 @@
         },
         {
           "name": "old_interval arithmetic and dependencies",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/old_interval.go",
+          "tests": [
+            "TestSMTOldIntervalAddSubtractContainsAndDependencies",
+            "TestSMTOldIntervalInverseAndPower"
+          ]
         }
       ],
       "ownership": [],
@@ -100883,11 +100889,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/old_interval_extended.go"
+        "pkg/smtcore/old_interval_extended.go",
+        "pkg/smtcore/old_interval.go"
       ],
       "tests": [
         "TestSMTExtendedRationalArithmeticAndUndefinedInfinity",
-        "TestSMTExtendedRationalZeroInfinityPowerAndNegation"
+        "TestSMTExtendedRationalZeroInfinityPowerAndNegation",
+        "TestSMTOldIntervalAddSubtractContainsAndDependencies",
+        "TestSMTOldIntervalInverseAndPower"
       ],
       "conditionals": [
         {
@@ -100927,9 +100936,12 @@
         },
         {
           "name": "old_interval interface",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/old_interval.go",
+          "tests": [
+            "TestSMTOldIntervalAddSubtractContainsAndDependencies",
+            "TestSMTOldIntervalInverseAndPower"
+          ]
         }
       ],
       "ownership": [],
