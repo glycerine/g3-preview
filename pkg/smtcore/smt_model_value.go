@@ -107,6 +107,11 @@ type SMTModelFunctionTheory interface {
 	IncludeFunctionInterpretation(ast.ASTHandle) bool
 }
 
+// SMTModelFinalizer is the optional source finalize_model hook.
+type SMTModelFinalizer interface {
+	FinalizeModel(*SMTModelGenerator) error
+}
+
 type SMTExpressionValueProcedure struct{ value ast.ASTHandle }
 
 func NewSMTExpressionValueProcedure(value ast.ASTHandle) (*SMTExpressionValueProcedure, error) {

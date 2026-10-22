@@ -54,6 +54,12 @@ func TestASTAllEagerPluginBranches(t *testing.T) {
 	if !yes {
 		t.Fatal("model value is not unique")
 	}
+	if yes, e = m.IsModelValue(value); e != nil || !yes {
+		t.Fatal("model value classification", yes, e)
+	}
+	if yes, e = m.IsModelValue(a); e != nil || yes {
+		t.Fatal("ordinary constant classified as model value", yes, e)
+	}
 	us, e := m.MkUninterpretedSort(astTestSymbol(t, m, "User"), nil)
 	astTestMust(t, e)
 	astTestPin(t, m, us)

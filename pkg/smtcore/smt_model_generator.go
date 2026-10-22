@@ -287,13 +287,40 @@ func (g *SMTModelGenerator) BuildStateValues(state *SMTInternalizerState) error 
 	if err != nil {
 		return err
 	}
+	if err = g.registerExistingModelValues(state); err != nil {
+		return err
+	}
 	if err = g.BuildValues(roots, procedures); err != nil {
 		return err
 	}
 	if err = g.publishConstantInterpretations(state); err != nil {
 		return err
 	}
-	return g.publishFunctionInterpretations(state)
+	if err = g.publishFunctionInterpretations(state); err != nil {
+		return err
+	}
+	return g.finalizeTheoryModels(state)
+}
+
+func (g *SMTModelGenerator) registerExistingModelValues(state *SMTInternalizerState) error {
+	if g.model == nil {
+		return ast.ErrASTDomain
+	}
+	for _, node := range state.enodeStack {
+		if node == nil || node.root != node || !g.context.relevant[node.owner] {
+			continue
+		}
+		modelValue, err := g.manager.IsModelValue(node.owner)
+		if err != nil {
+			return err
+		}
+		if modelValue {
+			if err = g.model.RegisterValue(node.owner); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (g *SMTModelGenerator) uninterpretedConstant(expression ast.ASTHandle) (ast.ASTHandle, bool, error) {
@@ -440,6 +467,17 @@ func (g *SMTModelGenerator) publishFunctionInterpretations(state *SMTInternalize
 		}
 		if err = interpretation.InsertNewEntry(arguments, result); err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func (g *SMTModelGenerator) finalizeTheoryModels(state *SMTInternalizerState) error {
+	for _, theory := range state.theoryOrder {
+		if finalizer, ok := theory.(SMTModelFinalizer); ok {
+			if err := finalizer.FinalizeModel(g); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

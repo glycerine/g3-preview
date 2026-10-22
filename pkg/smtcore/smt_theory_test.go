@@ -18,6 +18,7 @@ type smtInternalizerTestTheory struct {
 	relevant                        []ast.ASTHandle
 	setupCalls, searchCalls         int
 	restartCalls, finalCheckCalls   int
+	finalizeModelCalls              int
 	finalStatus                     SMTFinalCheckStatus
 }
 
@@ -127,6 +128,11 @@ func (t *smtInternalizerTestTheory) Restart() error {
 func (t *smtInternalizerTestTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	t.finalCheckCalls++
 	return t.finalStatus, nil
+}
+
+func (t *smtInternalizerTestTheory) FinalizeModel(*SMTModelGenerator) error {
+	t.finalizeModelCalls++
+	return nil
 }
 
 func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {

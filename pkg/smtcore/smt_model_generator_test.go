@@ -251,3 +251,57 @@ func TestSMTModelGeneratorPublishesFunctionInterpretation(t *testing.T) {
 		t.Fatal("function interpretation result", got, entryErr)
 	}
 }
+
+func TestSMTModelGeneratorFinalizesTheories(t *testing.T) {
+	m, config := smtModelGeneratorFixture(t)
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	base, err := NewSMTTheoryBase(family)
+	astTestMust(t, err)
+	theory := &smtInternalizerTestTheory{SMTTheoryBase: base}
+	context, err := NewSMTCheckerContext(m)
+	astTestMust(t, err)
+	state, err := NewSMTInternalizerState(m, context, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, state.Close()) })
+	astTestMust(t, state.RegisterTheory(theory))
+	generator, err := NewSMTModelGenerator(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, generator.Close()) })
+	astTestMust(t, generator.SetContext(context))
+	astTestMust(t, generator.InitializeModel(config))
+	astTestMust(t, generator.BuildStateValues(state))
+	if theory.finalizeModelCalls != 1 {
+		t.Fatal("theory finalization calls", theory.finalizeModelCalls)
+	}
+}
+
+func TestSMTModelGeneratorRegistersExistingModelValues(t *testing.T) {
+	m, config := smtModelGeneratorFixture(t)
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "existing-model-value-sort"), nil)
+	astTestMust(t, err)
+	value, err := m.MkModelValue(7, sort)
+	astTestMust(t, err)
+	context, err := NewSMTCheckerContext(m)
+	astTestMust(t, err)
+	state, err := NewSMTInternalizerState(m, context, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, state.Close()) })
+	_, err = state.MkEnode(value, false, false, true)
+	astTestMust(t, err)
+	astTestMust(t, context.SetRelevant(value, true))
+	generator, err := NewSMTModelGenerator(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, generator.Close()) })
+	astTestMust(t, generator.SetContext(context))
+	astTestMust(t, generator.InitializeModel(config))
+	astTestMust(t, generator.BuildStateValues(state))
+	finalModel, err := generator.FinalModel()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, finalModel.Close()) })
+	universe, err := finalModel.Universe(sort)
+	astTestMust(t, err)
+	if len(universe) != 1 || universe[0] != value {
+		t.Fatal("existing model value universe", universe)
+	}
+}

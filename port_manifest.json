@@ -9947,6 +9947,7 @@
         "pkg/ast/ast_mark_doc.go",
         "pkg/ast/ast_mark_fast.go",
         "pkg/ast/ast_mark_node.go",
+        "pkg/ast/ast_model_value.go",
         "pkg/ast/ast_parameter.go",
         "pkg/ast/ast_parameter_access.go",
         "pkg/ast/ast_proof_manager.go",
@@ -108043,6 +108044,8 @@
         "TestSMTModelGeneratorBuildsAndPinsRootValues",
         "TestSMTModelGeneratorPublishesBooleanConstant",
         "TestSMTModelGeneratorPublishesFunctionInterpretation",
+        "TestSMTModelGeneratorFinalizesTheories",
+        "TestSMTModelGeneratorRegistersExistingModelValues",
         "TestSMTIntegerDiffTheoryBuildsModelValues"
       ],
       "assertions": [
@@ -108183,7 +108186,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Generator construction, proto-model and theory-factory initialization, relevant enode-root procedure discovery, fallback/fresh/theory/Boolean value selection, fresh placeholder allocation, source identity, dependency topological ordering, ordered root-value construction/registration and lookup, Boolean and non-Boolean constant publication, congruence-root function interpretation entries and proto-model finalization (src/smt/smt_model_generator.cpp:25-485,516-525)",
+          "name": "Generator construction, proto-model and theory-factory initialization, relevant enode-root procedure discovery, fallback/fresh/theory/Boolean value selection, fresh placeholder allocation, source identity, dependency topological ordering, ordered root-value construction/registration and lookup, Boolean and non-Boolean constant publication, congruence-root function interpretation entries, existing model-value registration, theory finalization and proto-model finalization (src/smt/smt_model_generator.cpp:25-509,516-525)",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_generator.go",
           "tests": [
@@ -108192,11 +108195,13 @@
             "TestSMTModelGeneratorBuildsAndPinsRootValues",
             "TestSMTModelGeneratorPublishesBooleanConstant",
             "TestSMTModelGeneratorPublishesFunctionInterpretation",
+            "TestSMTModelGeneratorFinalizesTheories",
+            "TestSMTModelGeneratorRegistersExistingModelValues",
             "TestSMTIntegerDiffTheoryBuildsModelValues"
           ]
         },
         {
-          "name": "Theory finalization, existing model-value registration, macros and remaining model-assembly orchestration (remaining src/smt/smt_model_generator.cpp)",
+          "name": "Asserted-formula macro interpretations and remaining model-assembly orchestration (remaining src/smt/smt_model_generator.cpp)",
           "status": "unported"
         }
       ],
@@ -108224,6 +108229,8 @@
         "TestSMTModelGeneratorBuildsAndPinsRootValues",
         "TestSMTModelGeneratorPublishesBooleanConstant",
         "TestSMTModelGeneratorPublishesFunctionInterpretation",
+        "TestSMTModelGeneratorFinalizesTheories",
+        "TestSMTModelGeneratorRegistersExistingModelValues",
         "TestSMTIntegerDiffTheoryBuildsModelValues",
         "TestSMTModelValueDependenciesAndProcedures",
         "TestSMTModelValueEnodeDependencyCanonicalizesRoot"
@@ -108264,7 +108271,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Generator-owned context/proto-model state, relevant-root procedure discovery, fresh sources, root values, pinned ASTs, factory/value access, dependency ordering, constant/function publication and final-model transfer (src/smt/smt_model_generator.h:177-225)",
+          "name": "Generator-owned context/proto-model state, relevant-root procedure discovery, fresh sources, root values, pinned ASTs, factory/value access, dependency ordering, constant/function publication, existing-value registration, theory finalization and final-model transfer (src/smt/smt_model_generator.h:177-225)",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_generator.go",
           "tests": [
@@ -108273,6 +108280,8 @@
             "TestSMTModelGeneratorBuildsAndPinsRootValues",
             "TestSMTModelGeneratorPublishesBooleanConstant",
             "TestSMTModelGeneratorPublishesFunctionInterpretation",
+            "TestSMTModelGeneratorFinalizesTheories",
+            "TestSMTModelGeneratorRegistersExistingModelValues",
             "TestSMTIntegerDiffTheoryBuildsModelValues"
           ]
         },
@@ -108286,7 +108295,7 @@
           ]
         },
         {
-          "name": "Theory finalization, hidden declarations and remaining model construction (remaining src/smt/smt_model_generator.h:177-232)",
+          "name": "Hidden declarations, asserted-formula macros and remaining model construction (remaining src/smt/smt_model_generator.h:177-232)",
           "status": "unported"
         }
       ],
