@@ -235,6 +235,10 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 	if err != nil || !own {
 		return false, err
 	}
+	ground, err := t.addGroundOperationAxiom(expression, op)
+	if err != nil {
+		return false, err
+	}
 	regexReduced := false
 	if op == 12 {
 		regexReduced, err = t.addRegexMembershipAxiom(expression)
@@ -259,36 +263,25 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 	if err = t.ensureVariable(expression); err != nil {
 		return false, err
 	}
-	if op == 9 {
-		if err = t.addLengthAxiom(expression); err != nil {
-			return false, err
+	if !ground {
+		if op == 9 {
+			err = t.addLengthAxiom(expression)
+		} else if op == 3 || op == 4 || op == 5 {
+			err = t.addRelationAxioms(expression, op)
+		} else if op == 8 {
+			err = t.addAtAxioms(expression)
+		} else if op == 6 {
+			err = t.addExtractAxioms(expression)
+		} else if op == 10 {
+			err = t.addIndexAxioms(expression)
+		} else if op == 7 {
+			err = t.addReplaceAxioms(expression)
+		} else if op == 27 {
+			err = t.addIntToStringAxioms(expression)
+		} else if op == 28 {
+			err = t.addStringToIntAxioms(expression)
 		}
-	} else if op == 3 || op == 4 || op == 5 {
-		if err = t.addRelationAxioms(expression, op); err != nil {
-			return false, err
-		}
-	} else if op == 8 {
-		if err = t.addAtAxioms(expression); err != nil {
-			return false, err
-		}
-	} else if op == 6 {
-		if err = t.addExtractAxioms(expression); err != nil {
-			return false, err
-		}
-	} else if op == 10 {
-		if err = t.addIndexAxioms(expression); err != nil {
-			return false, err
-		}
-	} else if op == 7 {
-		if err = t.addReplaceAxioms(expression); err != nil {
-			return false, err
-		}
-	} else if op == 27 {
-		if err = t.addIntToStringAxioms(expression); err != nil {
-			return false, err
-		}
-	} else if op == 28 {
-		if err = t.addStringToIntAxioms(expression); err != nil {
+		if err != nil {
 			return false, err
 		}
 	}

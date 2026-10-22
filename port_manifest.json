@@ -117405,6 +117405,12 @@
           "tests": ["TestSMTSequenceStructuredModelValues"]
         },
         {
+          "name": "complete ground evaluation for string length, prefix, suffix, contains, at, extract, indexof and replace, with arbitrary-precision index guards and definitive satisfiability (src/smt/theory_seq.cpp:3137-3285,3313-3740)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_ground.go",
+          "tests": ["TestSMTSequenceTheoryGroundOperationsAreComplete"]
+        },
+        {
           "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
           "status": "unported",
           "go_target": null,

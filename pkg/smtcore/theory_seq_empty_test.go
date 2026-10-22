@@ -2,11 +2,26 @@ package smtcore
 
 import (
 	"math/big"
+	"strconv"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
+
+func astTestString(t *testing.T, manager *ast.ASTManager, value string) ast.ASTHandle {
+	t.Helper()
+	result, err := manager.MkString(value)
+	astTestMust(t, err)
+	return result
+}
+
+func astTestInteger(t *testing.T, manager *ast.ASTManager, value int64) ast.ASTHandle {
+	t.Helper()
+	result, err := manager.ArithmeticIntegerNumeralText(strconv.FormatInt(value, 10))
+	astTestMust(t, err)
+	return result
+}
 
 func TestSMTSequenceStructuredModelValues(t *testing.T) {
 	m, config := smtModelGeneratorFixture(t)
@@ -1709,6 +1724,71 @@ func TestSMTSequenceTheoryGroundIntegerStringConversionsAreComplete(t *testing.T
 		if status != lbool.True {
 			t.Fatal("exact ground conversion remained incomplete", status)
 		}
+	}
+}
+
+func TestSMTSequenceTheoryGroundOperationsAreComplete(t *testing.T) {
+	for _, test := range []struct {
+		name  string
+		build func(*testing.T, *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle)
+	}{
+		{name: "length", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			s := astTestString(t, m, "abcd")
+			operation, err := m.MkSequenceLength(s)
+			astTestMust(t, err)
+			return operation, astTestInteger(t, m, 4)
+		}},
+		{name: "prefix", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			operation, err := m.MkSequencePrefix(astTestString(t, m, "ab"), astTestString(t, m, "abcd"))
+			astTestMust(t, err)
+			expected, err := m.MkTrue()
+			astTestMust(t, err)
+			return operation, expected
+		}},
+		{name: "at-out-of-bounds", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			operation, err := m.MkSequenceAt(astTestString(t, m, "abcd"), astTestInteger(t, m, 99))
+			astTestMust(t, err)
+			return operation, astTestString(t, m, "")
+		}},
+		{name: "extract", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			operation, err := m.MkSequenceExtract(astTestString(t, m, "abcdef"), astTestInteger(t, m, 2), astTestInteger(t, m, 3))
+			astTestMust(t, err)
+			return operation, astTestString(t, m, "cde")
+		}},
+		{name: "index", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			operation, err := m.MkSequenceIndex(astTestString(t, m, "ababa"), astTestString(t, m, "ba"), astTestInteger(t, m, 2))
+			astTestMust(t, err)
+			return operation, astTestInteger(t, m, 3)
+		}},
+		{name: "replace", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			operation, err := m.MkSequenceReplace(astTestString(t, m, "ababa"), astTestString(t, m, "ba"), astTestString(t, m, "X"))
+			astTestMust(t, err)
+			return operation, astTestString(t, m, "aXba")
+		}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			for _, polarity := range []bool{true, false} {
+				m, modelConfig := smtModelGeneratorFixture(t)
+				operation, expected := test.build(t, m)
+				assertion, err := m.MkEq(operation, expected)
+				astTestMust(t, err)
+				want := lbool.True
+				if !polarity {
+					assertion, err = m.MkNot(assertion)
+					astTestMust(t, err)
+					want = lbool.False
+				}
+				solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+				astTestMust(t, err)
+				astTestMust(t, solver.Assert(assertion))
+				status, err := solver.CheckSat(nil)
+				astTestMust(t, err)
+				astTestMust(t, solver.Close())
+				if status != want {
+					t.Fatal("exact ground sequence operation", polarity, status)
+				}
+			}
+		})
 	}
 }
 
