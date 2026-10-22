@@ -40722,9 +40722,17 @@
       "path": "src/interp/iz3interp.cpp",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/interp/interpolator.go"
+      ],
+      "tests": [
+        "TestInterpolationOptionsErrorsAndLinearParents",
+        "TestInterpolationProofAssumptionsDeduplicateDAG",
+        "TestInterpolationCollectAndAssertConjuncts",
+        "TestInterpolationFrameReducerTreeAndRestoration",
+        "TestInterpolationFrameReducerSequenceAndGuards"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -40779,19 +40787,53 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "frame reduction and interpolant restoration",
+          "status": "ported",
+          "go_target": "pkg/interp/interpolator.go",
+          "tests": [
+            "TestInterpolationFrameReducerTreeAndRestoration",
+            "TestInterpolationFrameReducerSequenceAndGuards"
+          ]
+        },
+        {
+          "name": "parent linearity, interpolation-marker conjunct collection, solver assertion, and asserted-proof assumption reconstruction",
+          "status": "ported",
+          "go_target": "pkg/interp/interpolator.go",
+          "tests": [
+            "TestInterpolationOptionsErrorsAndLinearParents",
+            "TestInterpolationProofAssumptionsDeduplicateDAG",
+            "TestInterpolationCollectAndAssertConjuncts"
+          ]
+        },
+        {
+          "name": "proof translation, proof interpolation, tree-position reconstruction, and public solver orchestration",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "FrameReducer borrows Manager and its one-call proof/formula inputs; FixInterpolants returns independently owned ASTRef roots. Proof-assumption and conjunct collectors return handles borrowed from rooted inputs."
+      ],
+      "deviations": [
+        "Go's growable goroutine stacks replace the process-wide native stack-resource-limit initializer. The disabled secondary-prover path and inactive non-binary interpolation branch have no retained source consumer."
+      ]
     },
     {
       "path": "src/interp/iz3interp.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/interp/interpolator.go"
+      ],
+      "tests": [
+        "TestInterpolationOptionsErrorsAndLinearParents"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -40802,10 +40844,27 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "string options and interpolation exception declarations",
+          "status": "ported",
+          "go_target": "pkg/interp/interpolator.go",
+          "tests": [
+            "TestInterpolationOptionsErrorsAndLinearParents"
+          ]
+        },
+        {
+          "name": "proof-, tree-, and solver-based interpolation entry points",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Options owns native Go strings and map entries; interpolation entry-point ownership remains pending with the implementation."
+      ],
       "deviations": []
     },
     {
