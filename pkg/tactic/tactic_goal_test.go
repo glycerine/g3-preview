@@ -61,6 +61,30 @@ func TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions(t *testin
 	goalTestForms(t, source, p)
 }
 
+func TestTacticGoalDefaultAndFullCopyConstructors(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	defaultGoal, err := NewDefaultGoal(m, false, true)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, defaultGoal.Close()) })
+	if !defaultGoal.proofsEnabled || defaultGoal.modelsEnabled || !defaultGoal.coreEnabled {
+		t.Fatal("default constructor flags")
+	}
+	p := goalTestAtom(t, m, "full-copy-p")
+	astTestMust(t, defaultGoal.Assert(p))
+	astTestMust(t, defaultGoal.SetDepth(11))
+	astTestMust(t, defaultGoal.SetPrecision(GoalOver))
+	copy, err := NewGoalCopy(defaultGoal)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, copy.Close()) })
+	goalTestForms(t, copy, p)
+	if copy.manager != m || !copy.proofsEnabled || copy.modelsEnabled || !copy.coreEnabled || copy.depth != 11 || copy.precision != GoalOver {
+		t.Fatal("full copy constructor configuration")
+	}
+	astTestMust(t, defaultGoal.ResetAll())
+	goalTestForms(t, copy, p)
+}
+
 func TestTacticGoalAssertionSplittingAndSourceOrder(t *testing.T) {
 	m := astTestManager(t)
 	p := goalTestAtom(t, m, "p")

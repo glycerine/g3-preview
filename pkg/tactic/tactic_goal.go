@@ -33,7 +33,6 @@ func tacticGoalPrecisionUnion(a, b GoalPrecision) GoalPrecision {
 
 // Native slices own formula, proof and dependency references. Copies acquire
 // independent pins and backing storage. Borrowed services and managers outlive the goal.
-// Display and cross-manager translation remain separate source dependencies.
 type Goal struct {
 	self                                                            *Goal
 	manager                                                         *ast.ASTManager
@@ -64,6 +63,41 @@ func NewGoal(m *ast.ASTManager, proofs, models, cores bool) (*Goal, error) {
 	g := &Goal{manager: m, proofsEnabled: proofs, modelsEnabled: models, coreEnabled: cores, ownerBytes: amount}
 	g.self = g
 	return g, nil
+}
+
+// NewDefaultGoal is goal(ast_manager&, bool, bool): proof production follows
+// the manager's current proof mode.
+func NewDefaultGoal(m *ast.ASTManager, models, cores bool) (*Goal, error) {
+	if m == nil {
+		return nil, ast.ErrASTHandle
+	}
+	proofs, err := m.ProofsEnabled()
+	if err != nil {
+		return nil, err
+	}
+	return NewGoal(m, proofs, models, cores)
+}
+
+// NewGoalCopy is goal(goal const&): copy configuration and assertions into an
+// independently owning goal.
+func NewGoalCopy(src *Goal) (result *Goal, err error) {
+	if err = src.open(); err != nil {
+		return nil, err
+	}
+	result, err = NewGoal(src.manager, src.proofsEnabled, src.modelsEnabled, src.coreEnabled)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, result.Close())
+			result = nil
+		}
+	}()
+	if err = src.CopyTo(result); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // NewGoalConfigCopy is goal(goal const&, bool): copy flags, depth and
