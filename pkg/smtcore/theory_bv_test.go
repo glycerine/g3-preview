@@ -365,3 +365,42 @@ func TestSMTBitVectorUnsignedMulOverflowCircuit(t *testing.T) {
 		t.Fatal("unsigned multiplication overflow", status)
 	}
 }
+
+func TestSMTBitVectorSignedMulBounds(t *testing.T) {
+	for _, test := range []struct {
+		name        string
+		left, right uint64
+		build       func(*ast.ASTManager, ast.ASTHandle, ast.ASTHandle) (ast.ASTHandle, error)
+	}{
+		{name: "positive-overflow", left: 7, right: 2, build: (*ast.ASTManager).MkBitVectorSignedMulNoOverflow},
+		{name: "negative-underflow", left: 8, right: 2, build: (*ast.ASTManager).MkBitVectorSignedMulNoUnderflow},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, _, solver := smtBVSolver(t)
+			leftValue, err := m.BitVectorNumeralUint64(test.left, 4)
+			astTestMust(t, err)
+			sort, err := m.GetSort(leftValue)
+			astTestMust(t, err)
+			left, err := m.MkConst(astTestSymbol(t, m, "bv-signed-bound-left"), sort)
+			astTestMust(t, err)
+			right, err := m.MkConst(astTestSymbol(t, m, "bv-signed-bound-right"), sort)
+			astTestMust(t, err)
+			bound, err := test.build(m, left, right)
+			astTestMust(t, err)
+			rightValue, err := m.BitVectorNumeralUint64(test.right, 4)
+			astTestMust(t, err)
+			leftConstraint, err := m.MkEq(left, leftValue)
+			astTestMust(t, err)
+			rightConstraint, err := m.MkEq(right, rightValue)
+			astTestMust(t, err)
+			astTestMust(t, solver.Assert(leftConstraint))
+			astTestMust(t, solver.Assert(rightConstraint))
+			astTestMust(t, solver.Assert(bound))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("signed multiplication bound", status)
+			}
+		})
+	}
+}

@@ -604,6 +604,48 @@ func (t *SMTBitVectorTheory) unsignedMulNoOverflow(left, right []ast.ASTHandle) 
 	return t.boolNot(overflow)
 }
 
+func (t *SMTBitVectorTheory) signedMulBound(left, right []ast.ASTHandle, positiveOverflow bool) (ast.ASTHandle, error) {
+	if len(left) == 0 || len(left) != len(right) {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	width := len(left)
+	extendedLeft := append([]ast.ASTHandle(nil), left...)
+	extendedRight := append([]ast.ASTHandle(nil), right...)
+	for i := 0; i < width; i++ {
+		extendedLeft = append(extendedLeft, left[width-1])
+		extendedRight = append(extendedRight, right[width-1])
+	}
+	product, err := t.multiplyBits(extendedLeft, extendedRight)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	mismatches := make([]ast.ASTHandle, width)
+	for i := range mismatches {
+		mismatches[i], err = t.boolXor(product[width+i], product[width-1])
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
+	overflow, err := t.reduceBits(mismatches, false)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var signCondition ast.ASTHandle
+	if positiveOverflow {
+		signCondition, err = t.boolIff(left[width-1], right[width-1])
+	} else {
+		signCondition, err = t.boolXor(left[width-1], right[width-1])
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	violation, err := t.boolAnd(signCondition, overflow)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return t.boolNot(violation)
+}
+
 func (t *SMTBitVectorTheory) shiftBits(bits, amount []ast.ASTHandle, operation int32) ([]ast.ASTHandle, error) {
 	if len(bits) == 0 || len(amount) == 0 {
 		return nil, ast.ErrASTDomain
@@ -993,7 +1035,7 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 		return false, err
 	}
 	if op != smtBVOpBit2Bool {
-		if op != 22 && op != 23 && op != 52 {
+		if op != 22 && op != 23 && op != 52 && op != 53 && op != 54 {
 			t.unsupported = true
 			return false, nil
 		}
@@ -1007,6 +1049,13 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 		left, right := arguments[0], arguments[1]
 		if op == 52 {
 			definition, overflowErr := t.unsignedMulNoOverflow(left, right)
+			if overflowErr != nil {
+				return false, overflowErr
+			}
+			return t.bridgeAtom(expression, definition)
+		}
+		if op == 53 || op == 54 {
+			definition, overflowErr := t.signedMulBound(left, right, op == 53)
 			if overflowErr != nil {
 				return false, overflowErr
 			}
