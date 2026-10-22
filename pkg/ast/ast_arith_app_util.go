@@ -42,6 +42,9 @@ func (m *ASTManager) MkArithmeticGE(left, right ASTHandle) (ASTHandle, error) {
 // ArithmeticRealNumeralText constructs a real numeral from source-compatible
 // rational text.
 func (m *ASTManager) arithmeticNumeralFromText(text string, integer bool) (result ASTHandle, resultErr error) {
+	if _, err := m.RegisterArithmeticPlugin(); err != nil {
+		return ASTHandle{}, err
+	}
 	service := m.NumeralService()
 	value, err := service.NewValue()
 	if err != nil {

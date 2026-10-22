@@ -375,3 +375,84 @@ func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
 		})
 	}
 }
+
+func TestSMTSequenceTheoryIntegerStringAxioms(t *testing.T) {
+	for _, test := range []struct {
+		name  string
+		build func(*testing.T, *ast.ASTManager) []ast.ASTHandle
+	}{
+		{name: "negative-is-empty", build: func(t *testing.T, m *ast.ASTManager) []ast.ASTHandle {
+			minusOne, err := m.ArithmeticIntegerNumeralText("-1")
+			astTestMust(t, err)
+			sort, err := m.GetSort(minusOne)
+			astTestMust(t, err)
+			n, err := m.MkConst(astTestSymbol(t, m, "sequence-itos-negative"), sort)
+			astTestMust(t, err)
+			binding, err := m.MkEq(n, minusOne)
+			astTestMust(t, err)
+			converted, err := m.MkIntToString(n)
+			astTestMust(t, err)
+			empty, err := m.MkString("")
+			astTestMust(t, err)
+			equality, err := m.MkEq(converted, empty)
+			astTestMust(t, err)
+			result, err := m.MkNot(equality)
+			astTestMust(t, err)
+			return []ast.ASTHandle{binding, result}
+		}},
+		{name: "nonnegative-roundtrip", build: func(t *testing.T, m *ast.ASTManager) []ast.ASTHandle {
+			twelve, err := m.ArithmeticIntegerNumeralText("12")
+			astTestMust(t, err)
+			sort, err := m.GetSort(twelve)
+			astTestMust(t, err)
+			n, err := m.MkConst(astTestSymbol(t, m, "sequence-itos-positive"), sort)
+			astTestMust(t, err)
+			binding, err := m.MkEq(n, twelve)
+			astTestMust(t, err)
+			converted, err := m.MkIntToString(n)
+			astTestMust(t, err)
+			back, err := m.MkStringToInt(converted)
+			astTestMust(t, err)
+			equality, err := m.MkEq(back, twelve)
+			astTestMust(t, err)
+			result, err := m.MkNot(equality)
+			astTestMust(t, err)
+			return []ast.ASTHandle{binding, result}
+		}},
+		{name: "stoi-lower-bound", build: func(t *testing.T, m *ast.ASTManager) []ast.ASTHandle {
+			value, err := m.MkString("not-a-number")
+			astTestMust(t, err)
+			sort, err := m.GetSort(value)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "sequence-stoi-string"), sort)
+			astTestMust(t, err)
+			binding, err := m.MkEq(x, value)
+			astTestMust(t, err)
+			converted, err := m.MkStringToInt(x)
+			astTestMust(t, err)
+			minusOne, err := m.ArithmeticIntegerNumeralText("-1")
+			astTestMust(t, err)
+			lowerBound, err := m.MkArithmeticGE(converted, minusOne)
+			astTestMust(t, err)
+			result, err := m.MkNot(lowerBound)
+			astTestMust(t, err)
+			return []ast.ASTHandle{binding, result}
+		}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			assertions := test.build(t, m)
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			for _, assertion := range assertions {
+				astTestMust(t, solver.Assert(assertion))
+			}
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("integer/string axiom contradiction", status)
+			}
+		})
+	}
+}
