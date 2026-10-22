@@ -105922,11 +105922,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_internalizer_order.go"
+        "pkg/smtcore/smt_internalizer_order.go",
+        "pkg/smtcore/smt_internalizer_state.go"
       ],
       "tests": [
         "TestSMTInternalizationOrderBooleanGateContextsAndNotElision",
-        "TestSMTInternalizationOrderTermITEContextsAndInternalizedCutoff"
+        "TestSMTInternalizationOrderTermITEContextsAndInternalizedCutoff",
+        "TestSMTInternalizerBooleanVariablesLiteralsAssignmentsAndScopes",
+        "TestSMTInternalizerEnodeGenerationCongruenceAndRollback"
       ],
       "conditionals": [
         {
@@ -106285,14 +106288,24 @@
           ]
         },
         {
-          "name": "assertion, formula, term, quantifier, Boolean variable, enode, clause, gate, and theory-variable internalization",
+          "name": "Boolean variable creation and rollback, literal lookup, assignment storage, enode creation and rollback, cached generations, and congruence insertion",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer_state.go",
+          "tests": [
+            "TestSMTInternalizerBooleanVariablesLiteralsAssignmentsAndScopes",
+            "TestSMTInternalizerEnodeGenerationCongruenceAndRollback"
+          ]
+        },
+        {
+          "name": "assertion, recursive formula and term, quantifier, clause, gate, and theory-variable internalization",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [
-        "SMTInternalizationOrder borrows the AST manager and checker context; native maps and slices own traversal colors, theory-family configuration, and returned order values."
+        "SMTInternalizationOrder borrows the AST manager and checker context; native maps and slices own traversal colors, theory-family configuration, and returned order values.",
+        "SMTInternalizerState owns references for registered Boolean expressions and enode owners, owns its congruence table, variable arrays, watch lists, scopes, and pending congruence records, and borrows the checker context and optional quantifier registry."
       ],
       "deviations": [
         "Default-internalizer selection is stored as concrete family configuration until SMT theory registration owns it. Source nondefault theory families remain top-down boundaries in the ordering pass."

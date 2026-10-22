@@ -1,0 +1,107 @@
+package smtcore
+
+import (
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
+)
+
+func TestSMTInternalizerBooleanVariablesLiteralsAssignmentsAndScopes(t *testing.T) {
+	m := astTestManager(t)
+	a := smtRelevancyBool(t, m, "internalizer-state-a")
+	context, err := NewSMTCheckerContext(m)
+	astTestMust(t, err)
+	state, err := NewSMTInternalizerState(m, context, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, state.Close()) })
+	astTestMust(t, state.PushScope())
+	variable, err := state.MkBoolVar(a)
+	astTestMust(t, err)
+	if variable != SMTFirstBoolVar {
+		t.Fatal("first source Boolean variable", variable)
+	}
+	positive, err := state.Literal(a)
+	astTestMust(t, err)
+	negation, err := m.MkNot(a)
+	astTestMust(t, err)
+	negative, err := state.Literal(negation)
+	astTestMust(t, err)
+	if positive != NewSMTLiteral(variable, false) || negative != positive.Negated() {
+		t.Fatal("literal mapping", positive, negative)
+	}
+	astTestMust(t, state.SetAssignment(variable, lbool.True))
+	if value, err := state.Assignment(positive); err != nil || value != lbool.True {
+		t.Fatal("positive assignment", value, err)
+	}
+	if value, err := state.Assignment(negative); err != nil || value != lbool.False {
+		t.Fatal("negative assignment", value, err)
+	}
+	watches, err := state.WatchList(negative)
+	astTestMust(t, err)
+	astTestMust(t, watches.InsertLiteral(positive))
+	data, err := state.BooleanData(variable)
+	astTestMust(t, err)
+	data.SetEquality()
+	if !data.IsAtom() || !data.IsEquality() || watches.Size() != 1 {
+		t.Fatal("Boolean data or watch allocation")
+	}
+	astTestMust(t, state.PopScopes(1))
+	if _, found := state.BoolVar(a); found {
+		t.Fatal("Boolean scope rollback")
+	}
+	stats := state.Statistics()
+	if stats.NumMkBoolVar != 1 || stats.NumDelBoolVar != 1 {
+		t.Fatal("Boolean variable statistics", stats)
+	}
+}
+
+func TestSMTInternalizerEnodeGenerationCongruenceAndRollback(t *testing.T) {
+	m := astTestManager(t)
+	sort, err := m.MkSort(astTestSymbol(t, m, "InternalizerStateSort"), ast.ASTSortInfo{})
+	astTestMust(t, err)
+	a, _ := smtEnodeConstant(t, m, 2230, sort, 0)
+	b, _ := smtEnodeConstant(t, m, 2231, sort, 0)
+	context, err := NewSMTCheckerContext(m)
+	astTestMust(t, err)
+	state, err := NewSMTInternalizerState(m, context, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, state.Close()) })
+	astTestMust(t, state.SetGeneration(3))
+	astTestMust(t, state.SetCachedGeneration(b, 7))
+	an, err := state.MkEnode(a, false, false, true)
+	astTestMust(t, err)
+	bn, err := state.MkEnode(b, false, false, true)
+	astTestMust(t, err)
+	if an.Generation() != 3 || bn.Generation() != 7 || state.Statistics().MaxGeneration != 3 {
+		t.Fatal("current and cached generations", an.Generation(), bn.Generation(), state.Statistics())
+	}
+	info, err := m.NewFuncDeclInfo(ast.NullFamilyID, -1, nil, ast.ASTFuncFlags{}, false)
+	astTestMust(t, err)
+	f, err := m.MkFuncDeclWithInfo(astTestSymbol(t, m, "internalizer-state-f"), []ast.ASTHandle{sort}, sort, info)
+	astTestMust(t, err)
+	astTestMust(t, m.DelFuncDeclInfo(&info))
+	fa, err := m.MkApp(f, []ast.ASTHandle{a})
+	astTestMust(t, err)
+	fb, err := m.MkApp(f, []ast.ASTHandle{b})
+	astTestMust(t, err)
+	bn.root = an
+	astTestMust(t, state.PushScope())
+	fan, err := state.MkEnode(fa, false, false, true)
+	astTestMust(t, err)
+	_, err = state.MkEnode(fb, false, false, true)
+	astTestMust(t, err)
+	pending := state.PendingCongruences()
+	if len(pending) != 1 || pending[0].Existing != fan || pending[0].Node.owner != fb {
+		t.Fatal("pending congruence", pending)
+	}
+	astTestMust(t, state.PopScopes(1))
+	if context.enodes[fa] != nil || context.enodes[fb] != nil || len(state.PendingCongruences()) != 0 {
+		t.Fatal("enode scope rollback")
+	}
+	bn.root = bn
+	stats := state.Statistics()
+	if stats.NumMkEnode != 4 || stats.NumDelEnode != 2 {
+		t.Fatal("enode statistics", stats)
+	}
+}
