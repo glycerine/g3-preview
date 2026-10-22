@@ -2,7 +2,11 @@
 package interp
 
 import (
+	"errors"
+	"math/big"
+
 	"github.com/glycerine/g3/pkg/ast"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Operator is the interpolation wrapper's family-independent AST vocabulary.
@@ -265,6 +269,168 @@ func (m *Manager) Type(h ast.ASTHandle) (ast.ASTHandle, error) {
 	return m.ast.GetSort(h)
 }
 
+func (m *Manager) ASTID(h ast.ASTHandle) (uint32, error) {
+	if err := m.open(); err != nil {
+		return 0, err
+	}
+	return m.ast.GetASTID(h)
+}
+
+func (m *Manager) StringOfSymbol(declaration ast.ASTHandle) (string, error) {
+	if err := m.open(); err != nil {
+		return "", err
+	}
+	name, err := m.ast.GetASTName(declaration)
+	if err != nil {
+		return "", err
+	}
+	text, present, err := m.ast.Symbols.BareString(name)
+	if err != nil {
+		return "", err
+	}
+	if present {
+		return text, nil
+	}
+	return m.ast.Symbols.String(name)
+}
+
+func (m *Manager) Numeral(h ast.ASTHandle) (*big.Rat, bool, error) {
+	if err := m.open(); err != nil {
+		return nil, false, err
+	}
+	text, _, matched, err := m.ast.ArithmeticNumeralText(h)
+	if err != nil || !matched {
+		return nil, matched, err
+	}
+	value, ok := new(big.Rat).SetString(text)
+	if !ok {
+		return nil, false, NewError("invalid arithmetic numeral text")
+	}
+	return value, true, nil
+}
+
+func (m *Manager) StringOfNumeral(h ast.ASTHandle) (string, error) {
+	value, matched, err := m.Numeral(h)
+	if err != nil {
+		return "", err
+	}
+	if !matched {
+		return "", ast.ErrASTDomain
+	}
+	return value.RatString(), nil
+}
+
+func (m *Manager) Coefficient(h ast.ASTHandle) (*big.Rat, error) {
+	op, err := m.Operator(h)
+	if err != nil {
+		return nil, err
+	}
+	if op == OperatorTimes {
+		first, e := m.Arg(h, 0)
+		if e != nil {
+			return nil, e
+		}
+		if value, matched, e := m.Numeral(first); e != nil {
+			return nil, e
+		} else if matched {
+			return value, nil
+		}
+	}
+	return new(big.Rat).SetInt64(1), nil
+}
+
+func (m *Manager) LinearVariable(h ast.ASTHandle) (ast.ASTHandle, error) {
+	op, err := m.Operator(h)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if op == OperatorTimes {
+		first, e := m.Arg(h, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if _, matched, e := m.Numeral(first); e != nil {
+			return ast.ASTHandle{}, e
+		} else if matched {
+			return m.Arg(h, 1)
+		}
+	}
+	return h, nil
+}
+
+func (m *Manager) QuantifierNumBound(h ast.ASTHandle) (uint32, error) {
+	if err := m.open(); err != nil {
+		return 0, err
+	}
+	return m.ast.GetNumDeclarations(h)
+}
+
+func (m *Manager) QuantifierBoundName(h ast.ASTHandle, index uint32) (string, error) {
+	if err := m.open(); err != nil {
+		return "", err
+	}
+	name, err := m.ast.GetDeclarationName(h, index)
+	if err != nil {
+		return "", err
+	}
+	text, present, err := m.ast.Symbols.BareString(name)
+	if err != nil {
+		return "", err
+	}
+	if present {
+		return text, nil
+	}
+	return m.ast.Symbols.String(name)
+}
+
+func (m *Manager) QuantifierBoundType(h ast.ASTHandle, index uint32) (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.GetDeclarationSort(h, index)
+}
+
+func (m *Manager) QuantifierBody(h ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.GetQuantifierBody(h)
+}
+
+func (m *Manager) VariableIndex(h ast.ASTHandle) (uint32, error) {
+	if err := m.open(); err != nil {
+		return 0, err
+	}
+	return m.ast.GetVarIndex(h)
+}
+
+func (m *Manager) IsBoolType(sort ast.ASTHandle) (bool, error) {
+	if err := m.open(); err != nil {
+		return false, err
+	}
+	boolean, err := m.ast.MkBoolSort()
+	return sort == boolean, err
+}
+
+func (m *Manager) IsArrayType(sort ast.ASTHandle) (bool, error) {
+	if err := m.open(); err != nil {
+		return false, err
+	}
+	family, err := m.ast.GetFamilyID(sort)
+	if err != nil {
+		return false, err
+	}
+	kind, err := m.ast.GetDeclKind(sort)
+	return err == nil && family == m.array && kind == 0, err
+}
+
+func (m *Manager) RangeType(declaration ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.GetRange(declaration)
+}
+
 func (m *Manager) MakeVariable(name string, sort ast.ASTHandle) (ast.ASTHandle, error) {
 	if err := m.open(); err != nil {
 		return ast.ASTHandle{}, err
@@ -281,6 +447,161 @@ func (m *Manager) MakeDeclaration(declaration ast.ASTHandle, args ...ast.ASTHand
 		return ast.ASTHandle{}, err
 	}
 	return m.ast.MkApp(declaration, args)
+}
+
+func (m *Manager) MakeQuantifier(op Operator, bound []ast.ASTHandle, body ast.ASTHandle) (result ast.ASTHandle, resultErr error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if op != OperatorForall && op != OperatorExists {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	if len(bound) == 0 {
+		return body, nil
+	}
+	out, err := m.ast.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, m.ast.DelRef(&out)) }()
+	abstractor, err := ast.NewExprAbstractor(m.ast)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, abstractor.Close()) }()
+	if err = abstractor.Abstract(0, bound, body, out); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	abstracted, err := m.ast.RefGet(out)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	sorts := make([]ast.ASTHandle, len(bound))
+	names := make([]usymbol.Symbol, len(bound))
+	for i, value := range bound {
+		sorts[i], err = m.ast.GetSort(value)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		declaration, e := m.ast.GetDecl(value)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		names[i], e = m.ast.GetASTName(declaration)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+	}
+	return m.ast.MkQuantifier(ast.ASTQuantifierSpec{Forall: op == OperatorForall, Sorts: sorts, Names: names, Body: abstracted})
+}
+
+func (m *Manager) Clone(h ast.ASTHandle, args []ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if len(args) == 0 {
+		return h, nil
+	}
+	kind, err := m.ast.GetKind(h)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	switch kind {
+	case ast.ASTApp:
+		count, e := m.ast.GetNumArgs(h)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if int(count) != len(args) {
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
+		declaration, e := m.ast.GetDecl(h)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return m.ast.MkApp(declaration, args)
+	case ast.ASTQuantifier:
+		if len(args) != 1 {
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
+		return m.ast.UpdateQuantifierBody(h, args[0])
+	default:
+		return h, nil
+	}
+}
+
+func (m *Manager) MakeIntText(text string) (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.ArithmeticIntegerNumeralText(text)
+}
+
+func (m *Manager) MakeRealText(text string) (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.ArithmeticRealNumeralText(text)
+}
+
+func (m *Manager) MakeInt(value *big.Rat) (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.ArithmeticNumeralRat(value, true)
+}
+
+func (m *Manager) MakeReal(value *big.Rat) (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.ArithmeticNumeralRat(value, false)
+}
+
+func (m *Manager) FreshConstant(prefix string, sort ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.MkFreshConst(prefix, sort)
+}
+
+func (m *Manager) BoolType() (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.MkBoolSort()
+}
+
+func (m *Manager) IntType() (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.MkFamilySort(m.arithmetic, 1, nil)
+}
+
+func (m *Manager) RealType() (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.MkFamilySort(m.arithmetic, 0, nil)
+}
+
+func (m *Manager) ArrayType(domain, rangeSort ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.MkArraySort(ast.SliceArguments([]ast.ASTHandle{domain}), rangeSort)
+}
+
+func (m *Manager) Function(name string, domain []ast.ASTHandle, rangeSort ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	symbol, err := m.ast.Symbols.Intern(name)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return m.ast.MkFuncDecl(symbol, domain, rangeSort, ast.ASTFuncDeclInfo{})
 }
 
 func (m *Manager) familyOperator(op Operator) (ast.FamilyID, int32, bool) {
