@@ -68,7 +68,7 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 				return theoryErr
 			}
 			err = kernel.RegisterTheory(theory)
-		} else if logic == "QF_LIA" || logic == "QF_UFLIA" {
+		} else if logic == "QF_LIA" || logic == "QF_UFLIA" || logic == "QF_BVRE" {
 			theory, theoryErr := NewSMTLinearIntegerArithmeticTheory(family)
 			if theoryErr != nil {
 				return theoryErr

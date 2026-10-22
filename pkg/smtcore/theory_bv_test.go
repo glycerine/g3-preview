@@ -248,6 +248,41 @@ func TestSMTBitVectorCloseReleasesBitOwners(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorToIntAxiom(t *testing.T) {
+	m := astTestManager(t)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_BVRE", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, solver.Close())
+		astTestMust(t, params.Close())
+	})
+	fiveBV, err := m.BitVectorNumeralUint64(5, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(fiveBV)
+	astTestMust(t, err)
+	value, err := m.MkConst(astTestSymbol(t, m, "bv2int-value"), sort)
+	astTestMust(t, err)
+	converted, err := m.MkBitVectorToInt(value)
+	astTestMust(t, err)
+	fiveInt, err := m.ArithmeticIntegerNumeralText("5")
+	astTestMust(t, err)
+	valueConstraint, err := m.MkEq(value, fiveBV)
+	astTestMust(t, err)
+	convertedConstraint, err := m.MkEq(converted, fiveInt)
+	astTestMust(t, err)
+	wrongConverted, err := m.MkNot(convertedConstraint)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(valueConstraint))
+	astTestMust(t, solver.Assert(wrongConverted))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("bv2int axiom", status)
+	}
+}
+
 func TestSMTBitVectorUnsignedDivisionCircuit(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
 	two, err := m.BitVectorNumeralUint64(2, 4)

@@ -113715,7 +113715,8 @@
         "TestSMTBitVectorSignedMulBounds",
         "TestSMTBitVectorPublishesNumeralModelValue",
         "TestSMTBitVectorDivisionByZeroValueIsUninterpreted",
-        "TestSMTBitVectorCloseReleasesBitOwners"
+        "TestSMTBitVectorCloseReleasesBitOwners",
+        "TestSMTBitVectorToIntAxiom"
       ],
       "conditionals": [
         {
@@ -114088,7 +114089,8 @@
         "TestSMTBitVectorSignedMulBounds",
         "TestSMTBitVectorPublishesNumeralModelValue",
         "TestSMTBitVectorDivisionByZeroValueIsUninterpreted",
-        "TestSMTBitVectorCloseReleasesBitOwners"
+        "TestSMTBitVectorCloseReleasesBitOwners",
+        "TestSMTBitVectorToIntAxiom"
       ],
       "conditionals": [
         {

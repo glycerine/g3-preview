@@ -1312,7 +1312,8 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	if err != nil {
 		return false, err
 	}
-	if _, own, err := t.operation(expression); err != nil || !own {
+	op, own, err := t.operation(expression)
+	if err != nil || !own {
 		return false, err
 	}
 	count, err := state.manager.GetNumArgs(expression)
@@ -1343,6 +1344,58 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 		if _, err = t.CreateVariable(node); err != nil {
 			return false, err
 		}
+	}
+	if op == 58 {
+		argument, argErr := state.manager.GetArg(expression, 0)
+		if argErr != nil {
+			return false, argErr
+		}
+		bits, argErr := t.bitsFor(argument)
+		if argErr != nil || len(bits) == 0 {
+			if argErr != nil {
+				return false, argErr
+			}
+			return false, ast.ErrASTDomain
+		}
+		zero, argErr := state.manager.ArithmeticIntegerNumeralText("0")
+		if argErr != nil {
+			return false, argErr
+		}
+		var sum ast.ASTHandle
+		for i, bit := range bits {
+			weight := new(big.Int).Lsh(big.NewInt(1), uint(i))
+			numeral, numeralErr := state.manager.ArithmeticIntegerNumeralText(weight.String())
+			if numeralErr != nil {
+				return false, numeralErr
+			}
+			term, termErr := state.manager.MkIte(bit, numeral, zero)
+			if termErr != nil {
+				return false, termErr
+			}
+			if i == 0 {
+				sum = term
+			} else {
+				sum, termErr = state.manager.MkArithmeticAdd(sum, term)
+				if termErr != nil {
+					return false, termErr
+				}
+			}
+		}
+		axiom, argErr := state.manager.MkEq(expression, sum)
+		if argErr != nil {
+			return false, argErr
+		}
+		if argErr = state.Internalize(axiom, true); argErr != nil {
+			return false, argErr
+		}
+		literal, argErr := state.Literal(axiom)
+		if argErr != nil {
+			return false, argErr
+		}
+		if argErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); argErr != nil {
+			return false, argErr
+		}
+		return true, nil
 	}
 	bits, err := t.bitsFor(expression)
 	if err != nil {
