@@ -866,6 +866,13 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if conflict {
 		return SMTFinalCheckContinue, nil
 	}
+	progress, err = t.checkSequenceExtensionality()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if progress {
+		return SMTFinalCheckContinue, nil
+	}
 	if t.unsupported != 0 {
 		return SMTFinalCheckGiveUp, nil
 	}

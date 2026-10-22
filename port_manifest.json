@@ -116776,7 +116776,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_extensionality.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -116792,6 +116792,7 @@
         "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries",
         "TestSMTSequenceTheoryReducesEqualLengthBoundaries",
         "TestSMTSequenceTheoryLengthCoherenceDecomposition",
+        "TestSMTSequenceTheoryExposesExtensionalityEquality",
         "TestSMTSequenceTheoryBranchesBinaryUnitEquation",
         "TestSMTSequenceTheoryBranchesFixedStringOverlaps",
         "TestSMTSequenceTheoryConcreteRelationConflicts",
@@ -117339,6 +117340,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_coherence.go",
           "tests": ["TestSMTSequenceTheoryLengthCoherenceDecomposition"]
+        },
+        {
+          "name": "relevant symbolic sequence root extensionality through an equality case split, excluding pairs already equal or disequal (src/smt/theory_seq.cpp check_extensionality)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_extensionality.go",
+          "tests": ["TestSMTSequenceTheoryExposesExtensionalityEquality"]
         },
         {
           "name": "seq.at negative and out-of-bounds empty results plus in-bounds decomposition, prefix length and unit result length (src/smt/theory_seq.cpp:3733-3763)",

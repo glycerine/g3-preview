@@ -416,6 +416,38 @@ func TestSMTSequenceTheoryLengthCoherenceDecomposition(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryExposesExtensionalityEquality(t *testing.T) {
+	m := astTestManager(t)
+	value, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(value)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-extensionality-x"), sort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-extensionality-y"), sort)
+	astTestMust(t, err)
+	family, err := m.SequenceFamilyID()
+	astTestMust(t, err)
+	theory, err := NewSMTSequenceTheory(family)
+	astTestMust(t, err)
+	context, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.RegisterTheory(theory))
+	astTestMust(t, state.Internalize(x, false))
+	astTestMust(t, state.Internalize(y, false))
+	astTestMust(t, context.SetRelevant(x, true))
+	astTestMust(t, context.SetRelevant(y, true))
+	status, err := theory.FinalCheck()
+	astTestMust(t, err)
+	if status != SMTFinalCheckContinue {
+		t.Fatal("extensionality did not request an equality split", status)
+	}
+	equality, err := m.MkEq(x, y)
+	astTestMust(t, err)
+	if _, found := state.BoolVar(equality); !found || !context.relevant[equality] {
+		t.Fatal("extensionality equality is not a relevant Boolean atom", found, context.relevant[equality])
+	}
+}
+
 func TestSMTSequenceTheoryBranchesBinaryUnitEquation(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	a, err := m.MkString("a")
