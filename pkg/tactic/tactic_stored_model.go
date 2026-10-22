@@ -4,18 +4,17 @@ package tactic
 
 import (
 	"errors"
+	"io"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-// Original model2mc's ownership/application portion. The stored value currently
-// exposes model_core through the original derived lifetime dispatch;
-// display and AST translation remain required; this wrapper
-// does not build or evaluate a model.
+// Original model2mc stores and republishes a derived model.
 type tacticStoredModelConverter struct {
 	tacticConverterBase
 	model           ModelRef
@@ -78,6 +77,57 @@ func (c *tacticStoredModelConverter) ApplyLabels(out *ModelLabels, _ uint32) err
 	}
 	return nil
 }
+
+func (c *tacticStoredModelConverter) Display(out io.Writer) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if out == nil {
+		return ast.ErrASTHandle
+	}
+	stored, err := c.model.Get()
+	if err != nil {
+		return err
+	}
+	if stored == nil {
+		return ast.ErrASTHandle
+	}
+	globals := uparams.BorrowProcessGlobalParamsService()
+	if globals == nil || globals.Context == nil {
+		return uparams.ErrGlobalParamsOwner
+	}
+	if _, err = io.WriteString(out, "(model->model-converter-wrapper\n"); err != nil {
+		return err
+	}
+	if err = stored.WriteV2(out, globals.Context, globals, false); err != nil {
+		return err
+	}
+	_, err = io.WriteString(out, ")\n")
+	return err
+}
+
+func (c *tacticStoredModelConverter) Translate(translator *ast.ASTTranslation) (result ModelConverter, err error) {
+	if err = c.open(); err != nil {
+		return nil, err
+	}
+	stored, err := c.model.Get()
+	if err != nil {
+		return nil, err
+	}
+	if translator == nil || stored == nil || translator.From() != stored.Manager() || stored.DerivedModel() == nil {
+		return nil, ast.ErrASTHandle
+	}
+	translated, err := stored.DerivedModel().Translate(translator)
+	if err != nil {
+		return nil, err
+	}
+	result, err = newTacticStoredModelWithLabels(translated.Core(), c.labels)
+	if err != nil {
+		return nil, errors.Join(err, translated.Close())
+	}
+	return result, nil
+}
+
 func (c *tacticStoredModelConverter) Cancel() error { return c.open() }
 func (c *tacticStoredModelConverter) Close() error {
 	if c == nil || c.self != &c.tacticConverterBase {

@@ -3,13 +3,72 @@
 package tactic
 
 import (
+	"bytes"
 	"fmt"
-
 	"reflect"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestTacticStoredModelDisplayAndTranslate(t *testing.T) {
+	from := astTestManager(t)
+	goalDisplayBindParams(t, from)
+	to, err := ast.NewASTManager(ast.ASTManagerConfig{
+		Symbols: from.Symbols, Numerals: from.NumeralService(), Budget: from.Budget(),
+	})
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, to.Close()) })
+	md, err := model.NewModel(from)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, md.Close()) })
+	a := goalTestAtom(t, from, "stored-translated")
+	d, err := from.GetDecl(a)
+	satOK(t, err)
+	yes, err := from.MkTrue()
+	satOK(t, err)
+	satOK(t, md.Core().RegisterConstant(d, yes))
+	label := astTestSymbol(t, from, "stored-label")
+	base, err := newTacticStoredModelWithLabels(md.Core(), []usymbol.Symbol{label})
+	satOK(t, err)
+	c := base.(*tacticStoredModelConverter)
+	t.Cleanup(func() { satOK(t, c.Close()) })
+	var display bytes.Buffer
+	satOK(t, c.Display(&display))
+	if got, want := display.String(), "(model->model-converter-wrapper\nstored-translated -> true\n)\n"; got != want {
+		t.Fatalf("display = %q; want %q", got, want)
+	}
+	translator, err := ast.NewASTTranslation(from, to, true)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, translator.Close()) })
+	translated, err := c.Translate(translator)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, translated.Close()) })
+	var out ModelRef
+	t.Cleanup(func() { satOK(t, out.Close()) })
+	satOK(t, translated.ApplyModel(&out, 0))
+	got, err := out.Get()
+	satOK(t, err)
+	if got.Manager() != to {
+		t.Fatal("translated model manager")
+	}
+	wantDeclaration, err := translator.Translate(d)
+	satOK(t, err)
+	wantValue, err := translator.Translate(yes)
+	satOK(t, err)
+	value, err := got.ConstantInterpretation(wantDeclaration)
+	satOK(t, err)
+	if value != wantValue {
+		t.Fatal("translated model binding", value, wantValue)
+	}
+	var labels ModelLabels
+	satOK(t, translated.ApplyLabels(&labels, 0))
+	if !reflect.DeepEqual(labels.Values, []usymbol.Symbol{label}) {
+		t.Fatal("translated labels", labels.Values)
+	}
+}
 
 func TestTacticStoredModelLabelsSnapshotAndAppend(t *testing.T) {
 	for _, n := range []int{0, 16, 17, 40} {

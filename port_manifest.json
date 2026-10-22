@@ -123514,6 +123514,7 @@
         "pkg/tactic/tactic_stored_model_memory_trace.go",
         "pkg/model/model_lifecycle.go",
         "pkg/tactic/tactic_stored_model.go",
+        "pkg/tactic/tactic_stored_model_test.go",
         "pkg/tactic/tactic_model_converter.go",
         "pkg/tactic/tactic_model_to_model.go"
       ],
@@ -123532,6 +123533,7 @@
         "TestTacticStoredModelCopyAssignmentUsesNativeIDRecycle",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
         "TestTacticStoredModelLabelAppendUsesNativeSliceStorage",
+        "TestTacticStoredModelDisplayAndTranslate",
         "TestTacticModelReferenceOwningAliasAndReplacement",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
@@ -123578,15 +123580,16 @@
           ]
         },
         {
-          "name": "model2mc ownership, indexed/unindexed/label application, cancel and factories (model-core portion)",
-          "status": "partial",
+          "name": "model2mc ownership, indexed/unindexed/label application, cancel, display, translation and factories",
+          "status": "ported",
           "go_target": "pkg/tactic/tactic_stored_model.go",
           "tests": [
             "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
             "TestTacticStoredModelLabelsSnapshotAndAppend",
             "TestTacticStoredModelCopyAssignmentUsesNativeIDRecycle",
             "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
-            "TestTacticStoredModelLabelAppendUsesNativeSliceStorage"
+            "TestTacticStoredModelLabelAppendUsesNativeSliceStorage",
+            "TestTacticStoredModelDisplayAndTranslate"
           ]
         },
         {
@@ -123602,7 +123605,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "Stored wrappers and composition now use actual derived lifetime dispatch. model_converter2model allocates the original derived model, assigns it before indexed0 application, and preserves the assigned model on converter error; null converter leaves the output unchanged. Function interpretation operations, concrete recovery converters, model evaluation, translation/display and public API integration remain required."
+        "Stored wrappers and composition use actual derived lifetime dispatch. Stored-model display and AST translation include constants, function graphs, universes and labels. model_converter2model allocates the original derived model, assigns it before indexed0 application, and preserves the assigned model on converter error; null converter leaves the output unchanged. Concat/star translation and display remain required before the unit is complete."
       ]
     },
     {
@@ -123613,6 +123616,7 @@
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/tactic/tactic_stored_model.go",
+        "pkg/tactic/tactic_stored_model_test.go",
         "pkg/tactic/tactic_model_converter.go",
         "pkg/tactic/tactic_model_to_model.go"
       ],
@@ -123629,6 +123633,7 @@
         "TestTacticStoredModelCopyAssignmentUsesNativeIDRecycle",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
         "TestTacticStoredModelLabelAppendUsesNativeSliceStorage",
+        "TestTacticStoredModelDisplayAndTranslate",
         "TestTacticModelReferenceOwningAliasAndReplacement",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
@@ -123679,15 +123684,16 @@
           ]
         },
         {
-          "name": "model2mc ownership, indexed/unindexed/label application, cancel and factories (model-core portion)",
-          "status": "partial",
+          "name": "model2mc ownership, indexed/unindexed/label application, cancel, display, translation and factories",
+          "status": "ported",
           "go_target": "pkg/tactic/tactic_stored_model.go",
           "tests": [
             "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
             "TestTacticStoredModelLabelsSnapshotAndAppend",
             "TestTacticStoredModelCopyAssignmentUsesNativeIDRecycle",
             "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
-            "TestTacticStoredModelLabelAppendUsesNativeSliceStorage"
+            "TestTacticStoredModelLabelAppendUsesNativeSliceStorage",
+            "TestTacticStoredModelDisplayAndTranslate"
           ]
         },
         {
@@ -123703,7 +123709,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "Stored wrappers and composition now use actual derived lifetime dispatch. model_converter2model allocates the original derived model, assigns it before indexed0 application, and preserves the assigned model on converter error; null converter leaves the output unchanged. Function interpretation operations, concrete recovery converters, model evaluation, translation/display and public API integration remain required."
+        "Stored wrappers and composition use actual derived lifetime dispatch. Stored-model display and AST translation include constants, function graphs, universes and labels. model_converter2model allocates the original derived model, assigns it before indexed0 application, and preserves the assigned model on converter error; null converter leaves the output unchanged. Concat/star translation and display remain required before the unit is complete."
       ]
     },
     {
