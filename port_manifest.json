@@ -104219,14 +104219,16 @@
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_theory_lifecycle.go",
         "pkg/smtcore/smt_search.go",
-        "pkg/smtcore/smt_assumptions.go"
+        "pkg/smtcore/smt_assumptions.go",
+        "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
         "TestSMTInternalizerInstallsLearnedClauseInCurrentScope",
-        "TestSMTKernelAssumptionsValidateCheckAndRollback"
+        "TestSMTKernelAssumptionsValidateCheckAndRollback",
+        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
       ],
       "conditionals": [
         {
@@ -105192,13 +105194,21 @@
           "tests": [
             "TestSMTKernelAssumptionsValidateCheckAndRollback"
           ]
+        },
+        {
+          "name": "relevant true label-literal collection after a satisfiable final check",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
+          ]
         }
       ],
       "ownership": [
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
       ],
       "deviations": [
-        "Structural subsumption, conflict proofs, restarts, resource limits, and binary-clause specialization remain unported."
+        "Structural subsumption, restarts, resource limits, and binary-clause specialization remain unported."
       ]
     },
     {
@@ -105212,13 +105222,15 @@
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_theory_lifecycle.go",
         "pkg/smtcore/smt_search.go",
-        "pkg/smtcore/smt_assumptions.go"
+        "pkg/smtcore/smt_assumptions.go",
+        "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
-        "TestSMTKernelAssumptionsValidateCheckAndRollback"
+        "TestSMTKernelAssumptionsValidateCheckAndRollback",
+        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
       ],
       "conditionals": [
         {
@@ -105424,13 +105436,21 @@
           "tests": [
             "TestSMTKernelAssumptionsValidateCheckAndRollback"
           ]
+        },
+        {
+          "name": "relevant true label-literal result state",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
+          ]
         }
       ],
       "ownership": [
         "SMTInternalizerState owns the concrete slices and clause objects for this context subset."
       ],
       "deviations": [
-        "The complete context interface, structural subsumption, conflict proofs, model state, and remaining lifecycle operations remain unported."
+        "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported."
       ]
     },
     {
@@ -107041,7 +107061,8 @@
         "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
         "TestSMTKernelScopesRestoreAssertionsAndContext",
         "TestSMTSolverPublishesKernelUnsatProof",
-        "TestSMTSolverReasonUnknownUsesKernelFailure"
+        "TestSMTSolverReasonUnknownUsesKernelFailure",
+        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -107092,6 +107113,14 @@
           ]
         },
         {
+          "name": "relevant label result",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
+          ]
+        },
+        {
           "name": "copy and reset, consequences, mutexes, preferred SAT, model, labels, guessed literals, display, cancellation, and parameter updates",
           "status": "unported",
           "go_target": null,
@@ -107125,7 +107154,8 @@
         "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
         "TestSMTKernelScopesRestoreAssertionsAndContext",
         "TestSMTSolverPublishesKernelUnsatProof",
-        "TestSMTSolverReasonUnknownUsesKernelFailure"
+        "TestSMTSolverReasonUnknownUsesKernelFailure",
+        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
       ],
       "conditionals": [
         {
@@ -107183,6 +107213,14 @@
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
             "TestSMTSolverReasonUnknownUsesKernelFailure"
+          ]
+        },
+        {
+          "name": "relevant label access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
           ]
         },
         {
@@ -108745,6 +108783,7 @@
         "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
         "TestSMTSolverPublishesKernelUnsatProof",
         "TestSMTSolverReasonUnknownUsesKernelFailure",
+        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
       ],
       "assertions": [
@@ -108777,6 +108816,7 @@
             "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
             "TestSMTSolverPublishesKernelUnsatProof",
             "TestSMTSolverReasonUnknownUsesKernelFailure",
+            "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
             "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
           ]
         },
@@ -108789,7 +108829,7 @@
           ]
         },
         {
-          "name": "kernel translation and copy, model exposure, label extraction, consequence and mutex solving, progress sampling, and unsat-core minimization and pattern extension",
+          "name": "kernel translation and copy, model exposure, consequence and mutex solving, progress sampling, and unsat-core minimization and pattern extension",
           "status": "unported",
           "go_target": null,
           "tests": []

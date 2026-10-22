@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -224,6 +225,40 @@ func TestSMTSolverReasonUnknownUsesKernelFailure(t *testing.T) {
 	astTestMust(t, err)
 	if failure != SMTFailureTheory || failure.String() != "THEORY" {
 		t.Fatal("last failure", failure)
+	}
+}
+
+func TestSMTSolverPublishesRelevantLabelsInInternalizationOrder(t *testing.T) {
+	m, s := smtSolverFixture(t)
+	first := astTestSymbol(t, m, "smt-result-label-first")
+	second := astTestSymbol(t, m, "smt-result-label-second")
+	literal, err := m.MkLabelLit([]usymbol.Symbol{first, second})
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(literal))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("label status", status)
+	}
+	labels, err := s.Labels()
+	astTestMust(t, err)
+	if len(labels) != 2 || labels[0] != first || labels[1] != second {
+		t.Fatal("relevant labels", labels)
+	}
+
+	astTestMust(t, s.Push())
+	falsity, err := m.MkFalse()
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(falsity))
+	status, err = s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("scoped false status", status)
+	}
+	labels, err = s.Labels()
+	astTestMust(t, err)
+	if len(labels) != 0 {
+		t.Fatal("stale satisfiable labels", labels)
 	}
 }
 

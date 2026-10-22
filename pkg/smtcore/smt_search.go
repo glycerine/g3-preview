@@ -106,6 +106,9 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		}
 		switch status {
 		case SMTFinalCheckDone:
+			if err = k.captureRelevantLabels(); err != nil {
+				return lbool.Undef, err
+			}
 			return lbool.True, nil
 		case SMTFinalCheckGiveUp:
 			k.lastFailure = SMTFailureTheory

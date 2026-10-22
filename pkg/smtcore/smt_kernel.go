@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 type SMTKernelAssertion struct {
@@ -29,6 +30,7 @@ type SMTKernel struct {
 	assumptions  map[SMTLiteral]ast.ASTHandle
 	lastFailure  SMTFailure
 	unknown      string
+	labels       []usymbol.Symbol
 	closed       bool
 }
 
@@ -225,6 +227,7 @@ func (k *SMTKernel) Check() (lbool.LBool, error) {
 		return lbool.Undef, err
 	}
 	k.lastFailure = SMTFailureOK
+	k.labels = nil
 	queue, err := k.prepareCheck()
 	if err != nil {
 		return lbool.Undef, err
@@ -282,6 +285,39 @@ func (k *SMTKernel) SetReasonUnknown(message string) error {
 	}
 	k.unknown = message
 	return nil
+}
+
+func (k *SMTKernel) captureRelevantLabels() error {
+	k.labels = nil
+	for variable := int32(SMTFirstBoolVar); int(variable) < len(k.internalizer.boolExpr); variable++ {
+		expression := k.internalizer.boolExpr[variable]
+		if !k.relevancy.IsRelevant(expression) {
+			continue
+		}
+		value, err := k.internalizer.Assignment(NewSMTLiteral(variable, false))
+		if err != nil {
+			return err
+		}
+		if value != lbool.True {
+			continue
+		}
+		var names []usymbol.Symbol
+		label, err := k.manager.IsLabelLit(expression, &names)
+		if err != nil {
+			return err
+		}
+		if label {
+			k.labels = append(k.labels, names...)
+		}
+	}
+	return nil
+}
+
+func (k *SMTKernel) Labels() ([]usymbol.Symbol, error) {
+	if err := k.open(); err != nil {
+		return nil, err
+	}
+	return append([]usymbol.Symbol(nil), k.labels...), nil
 }
 
 // Proof returns the kernel-owned proof from the latest unsatisfiable check.
