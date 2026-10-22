@@ -349,3 +349,43 @@ func TestDirectProofTermSubstitutionAndBarriers(t *testing.T) {
 		t.Fatal("rotation proof was not substituted")
 	}
 }
+
+func TestDirectProofContraRecognitionAndResolvents(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	equality, err := manager.Make(OperatorEqual, p, q)
+	interpMust(t, err)
+	negativeEquality, err := manager.MkNot(equality)
+	interpMust(t, err)
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	conjunction, err := direct.makeContraNode(truth, []ast.ASTHandle{negativeEquality, p}, 0)
+	interpMust(t, err)
+	pivot, found, err := direct.contraPivot(negativeEquality, conjunction)
+	interpMust(t, err)
+	if !found {
+		t.Fatal("negative equality pivot not found")
+	}
+	if literal, e := manager.Arg(pivot, 1); e != nil || literal != negativeEquality {
+		t.Fatal("recognized pivot", literal, e)
+	}
+	entries, err := manager.Args(conjunction)
+	interpMust(t, err)
+	if count, e := direct.countNegativeEqualities(entries[1:]); e != nil || count != 1 {
+		t.Fatal("negative equality count", count, e)
+	}
+	var resolvents []ast.ASTHandle
+	interpMust(t, direct.collectContraResolvents(0, entries[1], entries[2], conjunction, &resolvents))
+	if len(resolvents) != 2 {
+		t.Fatal("resolvent count", len(resolvents))
+	}
+	for _, resolvent := range resolvents {
+		proof, e := manager.Arg(resolvent, 0)
+		interpMust(t, e)
+		if proof != direct.noProof {
+			t.Fatal("no-proof resolvent", proof, direct.noProof)
+		}
+	}
+}

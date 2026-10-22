@@ -41573,7 +41573,8 @@
         "pkg/interp/direct_proof_resolution.go",
         "pkg/interp/direct_proof_arithmetic.go",
         "pkg/interp/direct_proof_finalize.go",
-        "pkg/interp/direct_proof_substitution.go"
+        "pkg/interp/direct_proof_substitution.go",
+        "pkg/interp/direct_proof_mixed_resolution.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41582,7 +41583,8 @@
         "TestDirectProofLocalResolutionAndSymmetry",
         "TestDirectProofLocalArithmeticRules",
         "TestDirectProofFinalSimplificationOwnership",
-        "TestDirectProofTermSubstitutionAndBarriers"
+        "TestDirectProofTermSubstitutionAndBarriers",
+        "TestDirectProofContraRecognitionAndResolvents"
       ],
       "conditionals": [
         {
@@ -41756,6 +41758,14 @@
           ]
         },
         {
+          "name": "mixed contradiction recognition, negative-equality accounting, and resolvent collection",
+          "status": "ported",
+          "go_target": "pkg/interp/direct_proof_mixed_resolution.go",
+          "tests": [
+            "TestDirectProofContraRecognitionAndResolvents"
+          ]
+        },
+        {
           "name": "resolution and arithmetic proof-term reduction",
           "status": "unported",
           "go_target": "",
@@ -41808,7 +41818,8 @@
         "pkg/interp/direct_proof_resolution.go",
         "pkg/interp/direct_proof_arithmetic.go",
         "pkg/interp/direct_proof_finalize.go",
-        "pkg/interp/direct_proof_substitution.go"
+        "pkg/interp/direct_proof_substitution.go",
+        "pkg/interp/direct_proof_mixed_resolution.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41817,7 +41828,8 @@
         "TestDirectProofLocalResolutionAndSymmetry",
         "TestDirectProofLocalArithmeticRules",
         "TestDirectProofFinalSimplificationOwnership",
-        "TestDirectProofTermSubstitutionAndBarriers"
+        "TestDirectProofTermSubstitutionAndBarriers",
+        "TestDirectProofContraRecognitionAndResolvents"
       ],
       "conditionals": [
         {
