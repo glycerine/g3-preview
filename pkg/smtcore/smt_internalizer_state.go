@@ -103,6 +103,8 @@ type SMTInternalizerState struct {
 	boolExpr                 []ast.ASTHandle
 	booleanData              []SMTBoolVarData
 	activity                 []float64
+	activityIncrement        float64
+	activityInverseDecay     float64
 	assignment               []lbool.LBool
 	watches                  []SMTWatchList
 	booleanStack             []ast.ASTHandle
@@ -163,10 +165,12 @@ func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext
 		boolVar: make(map[ast.ASTHandle]int32), boolExpr: make([]ast.ASTHandle, 1), booleanData: make([]SMTBoolVarData, 1),
 		activity: make([]float64, 1), assignment: []lbool.LBool{lbool.True, lbool.False}, watches: make([]SMTWatchList, 2),
 		cachedGeneration: make(map[ast.ASTHandle]uint32), theories: make(map[ast.FamilyID]SMTTheoryInternalizer),
-		disequalityReasons: make(map[smtEnodePairKey]SMTLiteral),
-		conflictLiteral:    SMTNullLiteral,
-		clauseMaintenance:  defaultSMTClauseMaintenanceConfig(),
-		lemmaGCThreshold:   5000,
+		disequalityReasons:   make(map[smtEnodePairKey]SMTLiteral),
+		conflictLiteral:      SMTNullLiteral,
+		activityIncrement:    1,
+		activityInverseDecay: 1.052,
+		clauseMaintenance:    defaultSMTClauseMaintenanceConfig(),
+		lemmaGCThreshold:     5000,
 	}
 	state.booleanData[0].Initialize(0)
 	dynamicAck, err := newSMTDynAckManager(state, defaultSMTDynAckState())

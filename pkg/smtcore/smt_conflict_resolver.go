@@ -367,7 +367,9 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 			return nil
 		}
 		marks[variable] = true
-		r.state.activity[variable]++
+		if err := r.state.incrementBooleanActivity(variable); err != nil {
+			return err
+		}
 		if level == conflictLevel {
 			numMarks++
 		} else {

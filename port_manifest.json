@@ -104465,6 +104465,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_boolean_activity.go",
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_clause_simplification.go",
         "pkg/smtcore/smt_learned_persistence.go",
@@ -104494,6 +104495,7 @@
         "TestSMTClauseSimplificationRetainsProofReasons",
         "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals",
         "TestSMTDelayedUnitBackjumpGuard",
+        "TestSMTBooleanActivityIncrementDecayAndRescale",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
@@ -105450,7 +105452,7 @@
           ]
         },
         {
-          "name": "Boolean decisions, first-UIP conflict learning, non-chronological backjumping, propagation, fast and timed slow progress sampling, timeout/cancellation/resource/memory and conflict-limit checks, and final-check search control",
+          "name": "Boolean decisions, first-UIP conflict learning, variable activity increment/decay/rescaling, non-chronological backjumping, propagation, fast and timed slow progress sampling, timeout/cancellation/resource/memory and conflict-limit checks, and final-check search control",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_search.go",
           "tests": [
@@ -105461,7 +105463,8 @@
             "TestSMTKernelSearchReportsTimeout",
             "TestSMTKernelSearchReportsMemoryWatermark",
             "TestSMTSolverStopsAtConfiguredConflictLimit",
-            "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals"
+            "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals",
+            "TestSMTBooleanActivityIncrementDecayAndRescale"
           ]
         },
         {

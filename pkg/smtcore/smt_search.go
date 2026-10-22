@@ -260,6 +260,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			if err = k.internalizer.recordConflictForClauseMaintenance(); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search collect learned clauses: %w", err)
 			}
+			k.internalizer.decayBooleanActivity()
 			queue.RecordConflict()
 			restarts.conflicts++
 			if k.internalizer.statistics.NumConflicts-conflictBase > k.smtState.MaxConflicts {
