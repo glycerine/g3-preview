@@ -108,6 +108,8 @@ type SMTInternalizerState struct {
 	activityInverseDecay     float64
 	random                   z3rand.Generator
 	randomInitialActivity    uint32
+	caseSplitStrategy        uint32
+	activityCache            map[ast.ASTHandle]float64
 	assignment               []lbool.LBool
 	watches                  []SMTWatchList
 	booleanStack             []ast.ASTHandle
@@ -173,6 +175,8 @@ func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext
 		activityIncrement:     1,
 		activityInverseDecay:  1.052,
 		randomInitialActivity: 1,
+		caseSplitStrategy:     1,
+		activityCache:         make(map[ast.ASTHandle]float64),
 		clauseMaintenance:     defaultSMTClauseMaintenanceConfig(),
 		lemmaGCThreshold:      5000,
 	}
@@ -413,6 +417,11 @@ func (s *SMTInternalizerState) MkBoolVar(expression ast.ASTHandle) (int32, error
 	initialActivity := 0.0
 	if s.randomInitialActivity == 2 || s.randomInitialActivity == 1 && s.searching {
 		initialActivity = -float64(s.random.Next()%1000) / 1000
+	}
+	if s.caseSplitStrategy == 2 {
+		if cached, found := s.activityCache[expression]; found {
+			initialActivity = cached
+		}
 	}
 	s.activity = append(s.activity, initialActivity)
 	s.assignment = append(s.assignment, lbool.Undef, lbool.Undef)
@@ -772,6 +781,11 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	for len(s.booleanStack) > scope.booleanLimit {
 		expression := s.booleanStack[len(s.booleanStack)-1]
 		variable := s.boolVar[expression]
+		if s.caseSplitStrategy == 2 {
+			if err := s.cacheBooleanActivity(expression, s.activity[variable]); err != nil {
+				return err
+			}
+		}
 		if s.quantifiers != nil {
 			kind, err := s.manager.GetKind(expression)
 			if err != nil {
@@ -877,6 +891,7 @@ func (s *SMTInternalizerState) Close() error {
 	}
 	result = errors.Join(result, s.popTo(smtInternalizerScope{}))
 	result = errors.Join(result, s.releaseLearnedUnits())
+	result = errors.Join(result, s.releaseBooleanActivityCache())
 	result = errors.Join(result, s.dynamicAck.close())
 	result = errors.Join(result, s.congruence.Close())
 	if result == nil {

@@ -165,3 +165,55 @@ func TestSMTActivityCaseSplitQueueHonorsRandomVariableFrequency(t *testing.T) {
 		t.Fatal("random split did not override activity", selected, variables)
 	}
 }
+
+func TestSMTActivityCaseSplitQueueDelaysSearchVariables(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	base := smtRelevancyBool(t, m, "delayed-variable-base")
+	astTestMust(t, state.Internalize(base, true))
+	baseVar, _ := state.BoolVar(base)
+	params := SMTParamsState{InvDecay: 1.052, CaseSplitStrategy: 1, PhaseSelection: 0}
+	astTestMust(t, state.configureBooleanHeuristics(params))
+	queue, err := NewSMTActivityCaseSplitQueue(state)
+	astTestMust(t, err)
+	astTestMust(t, queue.ConfigurePhases(params))
+	astTestMust(t, state.beginSearchPersistence(0, params))
+	defer func() { astTestMust(t, state.endSearchPersistence()) }()
+	search := smtRelevancyBool(t, m, "delayed-variable-search")
+	astTestMust(t, state.Internalize(search, true))
+	searchVar, _ := state.BoolVar(search)
+	state.activity[searchVar] = 100
+
+	selected, _, err := queue.NextCaseSplit()
+	astTestMust(t, err)
+	if selected != baseVar {
+		t.Fatal("search variable bypassed delayed pool", selected, baseVar)
+	}
+	astTestMust(t, state.AssignLiteral(NewSMTLiteral(baseVar, false), NewSMTBooleanAxiom()))
+	selected, _, err = queue.NextCaseSplit()
+	astTestMust(t, err)
+	if selected != searchVar {
+		t.Fatal("delayed pool was not promoted", selected, searchVar)
+	}
+}
+
+func TestSMTActivityCaseSplitQueueCachesReinternalizedActivity(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	params := SMTParamsState{InvDecay: 1.052, CaseSplitStrategy: 2}
+	astTestMust(t, state.configureBooleanHeuristics(params))
+	expression := smtRelevancyBool(t, m, "cached-reinternalized-activity")
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.Internalize(expression, true))
+	variable, _ := state.BoolVar(expression)
+	state.activity[variable] = 17
+	astTestMust(t, state.PopScopes(1))
+	if _, err := m.GetKind(expression); err != nil {
+		t.Fatal("activity cache did not retain expression", err)
+	}
+	astTestMust(t, state.Internalize(expression, true))
+	variable, _ = state.BoolVar(expression)
+	if state.activity[variable] != 17 {
+		t.Fatal("reinternalized variable lost cached activity", state.activity[variable])
+	}
+}

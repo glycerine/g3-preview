@@ -2,7 +2,11 @@
 // decay_bvar_activity(), and src/smt/smt_context.cpp rescale_bool_var_activity().
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
 
 const (
 	smtBooleanActivityLimit        = 1e100
@@ -28,11 +32,30 @@ func (s *SMTInternalizerState) decayBooleanActivity() {
 }
 
 func (s *SMTInternalizerState) configureBooleanHeuristics(params SMTParamsState) error {
-	if params.RandomInitialActivity > 2 || params.InvDecay <= 0 {
+	if params.RandomInitialActivity > 2 || params.CaseSplitStrategy > 6 || params.InvDecay <= 0 {
 		return ast.ErrASTDomain
 	}
 	s.random.SetSeed(params.RandomSeed)
 	s.randomInitialActivity = params.RandomInitialActivity
+	s.caseSplitStrategy = params.CaseSplitStrategy
 	s.activityInverseDecay = params.InvDecay
 	return nil
+}
+
+func (s *SMTInternalizerState) cacheBooleanActivity(expression ast.ASTHandle, activity float64) error {
+	if _, found := s.activityCache[expression]; !found {
+		if err := s.manager.IncRef(expression); err != nil {
+			return err
+		}
+	}
+	s.activityCache[expression] = activity
+	return nil
+}
+
+func (s *SMTInternalizerState) releaseBooleanActivityCache() (result error) {
+	for expression := range s.activityCache {
+		result = errors.Join(result, s.manager.DecRef(expression))
+	}
+	s.activityCache = nil
+	return result
 }

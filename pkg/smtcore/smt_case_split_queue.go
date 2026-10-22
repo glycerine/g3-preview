@@ -15,6 +15,8 @@ type SMTActivityCaseSplitQueue struct {
 	state                                 *SMTInternalizerState
 	phaseSelection, cachingOn, cachingOff uint32
 	randomVariableFrequency               float64
+	strategy                              uint32
+	activeVariableLimit                   int
 	phaseCounter                          uint32
 	cacheEnabled, phaseDefault            bool
 }
@@ -34,6 +36,8 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	q.cachingOn = state.PhaseCachingOn
 	q.cachingOff = state.PhaseCachingOff
 	q.randomVariableFrequency = state.RandomVarFreq
+	q.strategy = state.CaseSplitStrategy
+	q.activeVariableLimit = len(q.state.boolExpr)
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
@@ -121,19 +125,21 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 			}
 		}
 	}
-	best := 0.0
 	if next == SMTNullBoolVar {
-		for variable := int32(SMTFirstBoolVar); int(variable) < len(q.state.boolExpr); variable++ {
-			value, err := q.state.Assignment(NewSMTLiteral(variable, false))
+		limit := len(q.state.boolExpr)
+		if q.strategy == 1 && q.activeVariableLimit < limit {
+			limit = q.activeVariableLimit
+		}
+		var err error
+		next, err = q.highestActivity(limit)
+		if err != nil {
+			return SMTNullBoolVar, lbool.Undef, err
+		}
+		if next == SMTNullBoolVar && q.strategy == 1 && limit < len(q.state.boolExpr) {
+			q.activeVariableLimit = len(q.state.boolExpr)
+			next, err = q.highestActivity(q.activeVariableLimit)
 			if err != nil {
 				return SMTNullBoolVar, lbool.Undef, err
-			}
-			if value != lbool.Undef {
-				continue
-			}
-			activity := q.state.activity[variable]
-			if next == SMTNullBoolVar || activity > best {
-				next, best = variable, activity
 			}
 		}
 	}
@@ -168,4 +174,23 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 		return next, lbool.True, nil
 	}
 	return next, lbool.False, nil
+}
+
+func (q *SMTActivityCaseSplitQueue) highestActivity(limit int) (int32, error) {
+	next := SMTNullBoolVar
+	best := 0.0
+	for variable := int32(SMTFirstBoolVar); int(variable) < limit; variable++ {
+		value, err := q.state.Assignment(NewSMTLiteral(variable, false))
+		if err != nil {
+			return SMTNullBoolVar, err
+		}
+		if value != lbool.Undef {
+			continue
+		}
+		activity := q.state.activity[variable]
+		if next == SMTNullBoolVar || activity > best {
+			next, best = variable, activity
+		}
+	}
+	return next, nil
 }
