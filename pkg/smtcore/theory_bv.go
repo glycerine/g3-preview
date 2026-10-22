@@ -577,6 +577,33 @@ func (t *SMTBitVectorTheory) multiplyBits(left, right []ast.ASTHandle) ([]ast.AS
 	return result, nil
 }
 
+func (t *SMTBitVectorTheory) unsignedMulNoOverflow(left, right []ast.ASTHandle) (ast.ASTHandle, error) {
+	if len(left) == 0 || len(left) != len(right) {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	state, _ := t.State()
+	width := len(left)
+	extendedLeft := append([]ast.ASTHandle(nil), left...)
+	extendedRight := append([]ast.ASTHandle(nil), right...)
+	for i := 0; i < width; i++ {
+		zero, err := state.manager.MkFalse()
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		extendedLeft = append(extendedLeft, zero)
+		extendedRight = append(extendedRight, zero)
+	}
+	product, err := t.multiplyBits(extendedLeft, extendedRight)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	overflow, err := t.reduceBits(product[width:], false)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return t.boolNot(overflow)
+}
+
 func (t *SMTBitVectorTheory) shiftBits(bits, amount []ast.ASTHandle, operation int32) ([]ast.ASTHandle, error) {
 	if len(bits) == 0 || len(amount) == 0 {
 		return nil, ast.ErrASTDomain
@@ -844,6 +871,9 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 func (t *SMTBitVectorTheory) bridgeAtom(expression, definition ast.ASTHandle) (bool, error) {
 	state, _ := t.State()
 	if err := state.Internalize(definition, true); err != nil {
+		return false, errors.Join(err, t.releaseTemporary())
+	}
+	if err := t.releaseTemporary(); err != nil {
 		return false, err
 	}
 	variable, found := state.boolVar[expression]
@@ -963,7 +993,7 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 		return false, err
 	}
 	if op != smtBVOpBit2Bool {
-		if op != 22 && op != 23 {
+		if op != 22 && op != 23 && op != 52 {
 			t.unsupported = true
 			return false, nil
 		}
@@ -975,6 +1005,13 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 			return false, ast.ErrASTDomain
 		}
 		left, right := arguments[0], arguments[1]
+		if op == 52 {
+			definition, overflowErr := t.unsignedMulNoOverflow(left, right)
+			if overflowErr != nil {
+				return false, overflowErr
+			}
+			return t.bridgeAtom(expression, definition)
+		}
 		if op == 23 {
 			left = append([]ast.ASTHandle(nil), left...)
 			right = append([]ast.ASTHandle(nil), right...)

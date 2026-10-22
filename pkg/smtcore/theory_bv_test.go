@@ -337,3 +337,31 @@ func TestSMTBitVectorExtendedRotateCircuit(t *testing.T) {
 		t.Fatal("extended rotate circuit", status)
 	}
 }
+
+func TestSMTBitVectorUnsignedMulOverflowCircuit(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	two, err := m.BitVectorNumeralUint64(2, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(two)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "bv-overflow-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "bv-overflow-right"), sort)
+	astTestMust(t, err)
+	noOverflow, err := m.MkBitVectorUnsignedMulNoOverflow(left, right)
+	astTestMust(t, err)
+	eight, err := m.BitVectorNumeralUint64(8, 4)
+	astTestMust(t, err)
+	leftValue, err := m.MkEq(left, eight)
+	astTestMust(t, err)
+	rightValue, err := m.MkEq(right, two)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(leftValue))
+	astTestMust(t, solver.Assert(rightValue))
+	astTestMust(t, solver.Assert(noOverflow))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("unsigned multiplication overflow", status)
+	}
+}
