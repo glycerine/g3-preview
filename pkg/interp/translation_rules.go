@@ -441,9 +441,158 @@ func (t *FullTranslation) translateTheoryLemma(proof, conclusion ast.ASTHandle, 
 			return ast.ASTHandle{}, e
 		}
 		return direct.MakeEqToLeq(x, y, inequality)
+	case AssignBoundsKind:
+		return t.translateAssignBounds(proof, conclusion, premises, premiseConclusions, direct)
+	case GomoryCutKind:
+		return t.translateGomoryCut(proof, conclusion, premises, premiseConclusions, direct)
 	default:
 		return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
 	}
+}
+
+func (t *FullTranslation) translateAssignBounds(proof, conclusion ast.ASTHandle, premises, premiseConclusions []ast.ASTHandle, direct *DirectProofInterpolator) (ast.ASTHandle, error) {
+	var coefficients []ast.ASTHandle
+	var err error
+	if len(premises) == 0 {
+		coefficients, err = t.base.manager.AssignBoundsCoefficientTerms(proof)
+	} else {
+		coefficients, err = t.base.manager.AssignBoundsRuleCoefficientTerms(proof)
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	consequence := conclusion
+	inputs := append([]ast.ASTHandle(nil), premiseConclusions...)
+	inputProofs := append([]ast.ASTHandle(nil), premises...)
+	if len(premises) == 0 {
+		arguments, e := t.base.manager.Args(conclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if len(arguments) != len(coefficients) || len(arguments) == 0 {
+			return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
+		}
+		consequence = arguments[0]
+		for _, argument := range arguments[1:] {
+			input, e := t.base.manager.MkNot(argument)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			inputs = append(inputs, input)
+			hypothesis, e := direct.MakeHypothesis(input)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			inputProofs = append(inputProofs, hypothesis)
+		}
+	} else if len(coefficients) != len(premises)+1 {
+		return ast.ASTHandle{}, NewError("bad assign-bounds theory lemma")
+	}
+	if len(inputs) != len(coefficients)-1 {
+		return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
+	}
+	sum, err := t.base.manager.SumInequalities(coefficients[1:], inputs, false)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	sum, err = t.NormalizeInequality(sum)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	normalizedConsequence, err := t.NormalizeInequality(consequence)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	divisor, err := t.DivideInequalities(sum, normalizedConsequence)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	farkasConclusion, err := t.base.manager.SumInequalities(coefficients[1:], inputs, true)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	farkasConclusion, err = t.NormalizeInequality(farkasConclusion)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negative, err := t.base.manager.MkNot(farkasConclusion)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	hypothesis, err := direct.MakeHypothesis(negative)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	inputs = append(inputs, negative)
+	inputProofs = append(inputProofs, hypothesis)
+	one, err := t.base.manager.MakeIntText("1")
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	farkasCoefficients := append([]ast.ASTHandle(nil), coefficients[1:]...)
+	farkasCoefficients = append(farkasCoefficients, one)
+	falsehood, err := t.base.manager.Make(OperatorFalse)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	interpolation, err := direct.MakeFarkas(falsehood, inputProofs, inputs, farkasCoefficients)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return direct.MakeCutRule(farkasConclusion, divisor, consequence, interpolation)
+}
+
+func (t *FullTranslation) translateGomoryCut(proof, conclusion ast.ASTHandle, premises, premiseConclusions []ast.ASTHandle, direct *DirectProofInterpolator) (ast.ASTHandle, error) {
+	if len(premises) == 0 {
+		return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
+	}
+	coefficients, err := t.base.manager.GomoryCutCoefficientTerms(proof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if len(coefficients) != len(premises) {
+		return ast.ASTHandle{}, NewError("bad gomory-cut theory lemma")
+	}
+	combined, err := t.base.manager.SumInequalities(coefficients, premiseConclusions, false)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	combined, err = t.NormalizeInequality(combined)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negative, err := t.base.manager.MkNot(combined)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	hypothesis, err := direct.MakeHypothesis(negative)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	proofs := append(append([]ast.ASTHandle(nil), premises...), hypothesis)
+	conclusions := append(append([]ast.ASTHandle(nil), premiseConclusions...), negative)
+	one, err := t.base.manager.MakeIntText("1")
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	coefficients = append(coefficients, one)
+	falsehood, err := t.base.manager.Make(OperatorFalse)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	interpolation, err := direct.MakeFarkas(falsehood, proofs, conclusions, coefficients)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	left, err := t.base.manager.Arg(combined, 0)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	divisor, err := t.GCDOfCoefficients(left)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return direct.MakeCutRule(combined, divisor, conclusion, interpolation)
 }
 
 // Translate computes one direct interpolant per retained frame boundary and
