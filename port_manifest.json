@@ -40557,9 +40557,15 @@
       "path": "src/interp/iz3checker.cpp",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/checker.go"
+      ],
+      "tests": [
+        "TestInterpolationCheckerSequenceSuccess",
+        "TestInterpolationCheckerSemanticAndSymbolFailures",
+        "TestInterpolationCheckerTreeConversion"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -40570,19 +40576,40 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "support collection, per-node unsatisfiability checks, downward-closure diagnostics, symbol condition, and tree conversion",
+          "status": "ported",
+          "go_target": "pkg/interp/checker.go",
+          "tests": [
+            "TestInterpolationCheckerSequenceSuccess",
+            "TestInterpolationCheckerSemanticAndSymbolFailures",
+            "TestInterpolationCheckerTreeConversion"
+          ]
+        }
+      ],
+      "ownership": [
+        "Checker borrows Manager, Solver, writer, and all input handles for one call. Its temporary Base owns and releases its copied AST roots."
+      ],
+      "deviations": [
+        "Native Go maps implement support sets and memo tables; sorted keys preserve std::set diagnostic order."
+      ]
     },
     {
       "path": "src/interp/iz3checker.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/checker.go"
+      ],
+      "tests": [
+        "TestInterpolationCheckerSequenceSuccess",
+        "TestInterpolationCheckerSemanticAndSymbolFailures",
+        "TestInterpolationCheckerTreeConversion"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -40593,11 +40620,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "sequence and tree interpolant checker entry points",
+          "status": "ported",
+          "go_target": "pkg/interp/checker.go",
+          "tests": [
+            "TestInterpolationCheckerSequenceSuccess",
+            "TestInterpolationCheckerSemanticAndSymbolFailures",
+            "TestInterpolationCheckerTreeConversion"
+          ]
+        }
+      ],
+      "ownership": [
+        "Entry points borrow the solver and expression handles; no result ownership escapes."
+      ],
+      "deviations": [
+        "Go slices replace ptr_vector and project vector overloads."
+      ]
     },
     {
       "path": "src/interp/iz3exception.h",

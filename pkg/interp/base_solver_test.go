@@ -15,6 +15,8 @@ type interpolationScriptSolver struct {
 	*solver.SimpleCheckSatResult
 	manager    *ast.ASTManager
 	status     lbool.LBool
+	script     []lbool.LBool
+	checks     int
 	assertions []ast.ASTHandle
 	params     *uparams.ParamsRef
 }
@@ -49,10 +51,15 @@ func (s *interpolationScriptSolver) Push() error                            { re
 func (s *interpolationScriptSolver) Pop(uint32) error                       { return nil }
 func (s *interpolationScriptSolver) ScopeLevel() (uint32, error)            { return 0, nil }
 func (s *interpolationScriptSolver) CheckSat([]ast.ASTHandle) (lbool.LBool, error) {
-	if err := s.SetStatus(s.status); err != nil {
+	status := s.status
+	if s.checks < len(s.script) {
+		status = s.script[s.checks]
+	}
+	s.checks++
+	if err := s.SetStatus(status); err != nil {
 		return lbool.Undef, err
 	}
-	return s.status, nil
+	return status, nil
 }
 func (s *interpolationScriptSolver) SetProgressCallback(solver.ProgressCallback) error { return nil }
 func (s *interpolationScriptSolver) NumAssertions() (uint32, error) {
