@@ -460,6 +460,10 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if err != nil || rejected {
 			return rejected, err
 		}
+		constrained, err := t.constrainCyclicUnitEquation(left, right, dependency)
+		if err != nil || constrained {
+			return constrained, err
+		}
 		branched, err := t.branchVariableFixedWordEquation(left, right)
 		if err != nil || branched {
 			return branched, err

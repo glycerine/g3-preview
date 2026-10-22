@@ -683,6 +683,37 @@ func TestSMTSequenceTheoryBranchesBinaryUnitEquation(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryRejectsIncompatibleCyclicUnits(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	b, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	unitA, err := m.MkSequenceUnit(a)
+	astTestMust(t, err)
+	unitB, err := m.MkSequenceUnit(b)
+	astTestMust(t, err)
+	sequenceSort, err := m.GetSort(unitA)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-cyclic-x"), sequenceSort)
+	astTestMust(t, err)
+	left, err := m.MkSequenceConcat(x, unitA)
+	astTestMust(t, err)
+	right, err := m.MkSequenceConcat(unitB, x)
+	astTestMust(t, err)
+	wordEquality, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "ALL", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(wordEquality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("incompatible cyclic sequence units", status)
+	}
+}
+
 func TestSMTSequenceTheoryBranchesFixedStringOverlaps(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	a, err := m.MkString("abc")

@@ -147,6 +147,100 @@ func (t *SMTSequenceTheory) rejectImpossibleCyclicBinaryEquation(left, right []a
 	return false, nil
 }
 
+func (t *SMTSequenceTheory) constrainCyclicUnitEquation(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
+	for pass := 0; pass < 2; pass++ {
+		if len(left) > 1 && len(right) > 1 && left[0] == right[len(right)-1] {
+			variable, err := t.sequenceVariable(left[0])
+			if err != nil {
+				return false, err
+			}
+			if !variable {
+				left, right = right, left
+				continue
+			}
+			leftUnits := left[1:]
+			rightUnits := right[:len(right)-1]
+			state, stateErr := t.State()
+			if stateErr != nil {
+				return false, stateErr
+			}
+			leftElements := make([]ast.ASTHandle, len(leftUnits))
+			rightElements := make([]ast.ASTHandle, len(rightUnits))
+			allUnits := true
+			for partIndex, parts := range [][]ast.ASTHandle{leftUnits, rightUnits} {
+				elements := leftElements
+				if partIndex != 0 {
+					elements = rightElements
+				}
+				for index, part := range parts {
+					element, unit, unitErr := state.manager.SequenceUnitArgument(part)
+					if unitErr != nil {
+						return false, unitErr
+					}
+					if !unit {
+						allUnits = false
+						break
+					}
+					elements[index] = element
+				}
+			}
+			if !allUnits {
+				left, right = right, left
+				continue
+			}
+			if len(leftUnits) != len(rightUnits) {
+				return true, t.setDependencyConflict(dependency)
+			}
+			alignments := make([]ast.ASTHandle, 0, len(leftUnits))
+			for offset := 0; offset < len(leftUnits); offset++ {
+				equalities := make([]ast.ASTHandle, 0, len(leftUnits))
+				for index, element := range leftElements {
+					equality, makeErr := state.manager.MkEq(element, rightElements[(offset+index)%len(rightElements)])
+					if makeErr != nil {
+						return false, makeErr
+					}
+					equalities = append(equalities, equality)
+				}
+				alignment, makeErr := state.manager.MkAndArray(equalities)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				alignments = append(alignments, alignment)
+			}
+			compatible, makeErr := state.manager.MkOrArray(alignments)
+			if makeErr != nil {
+				return false, makeErr
+			}
+			sort, makeErr := state.manager.GetSort(left[0])
+			if makeErr != nil {
+				return false, makeErr
+			}
+			leftWord, makeErr := t.makeWord(left, sort)
+			if makeErr != nil {
+				return false, makeErr
+			}
+			rightWord, makeErr := t.makeWord(right, sort)
+			if makeErr != nil {
+				return false, makeErr
+			}
+			equality, makeErr := state.manager.MkEq(leftWord, rightWord)
+			if makeErr != nil {
+				return false, makeErr
+			}
+			constraint, makeErr := state.manager.MkImplies(equality, compatible)
+			if makeErr != nil {
+				return false, makeErr
+			}
+			if _, found := t.axioms.set[constraint]; found {
+				return false, nil
+			}
+			return true, t.axioms.Push(constraint)
+		}
+		left, right = right, left
+	}
+	return false, nil
+}
+
 func (t *SMTSequenceTheory) branchVariableFixedWordEquation(left, right []ast.ASTHandle) (bool, error) {
 	for pass := 0; pass < 2; pass++ {
 		if len(left) > 1 && len(right) == 1 {
