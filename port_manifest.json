@@ -115745,9 +115745,21 @@
       "path": "src/smt/theory_fpa.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/theory_fpa.go",
+        "pkg/smtcore/proto_model/fpa_factory.go",
+        "pkg/smtcore/smt_setup.go",
+        "pkg/ast/fpa/fpa2bv_symbols.go",
+        "pkg/model/fpa/bv2fpa_model.go"
+      ],
+      "tests": [
+        "TestSMTFloatingPointIEEEAndStructuralEqualities",
+        "TestSMTFloatingPointWrappedConstantAndScopes",
+        "TestSMTFloatingPointConversionTermsAndArithmetic",
+        "TestSMTFloatingPointModelReconstructsWrappedConstants",
+        "TestSMTFloatingPointModelFinalizesConvertedFunction"
+      ],
       "assertions": [
         {
           "line": 46,
@@ -115978,19 +115990,61 @@
           "text": "SASSERT(res != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "wrapped FP and rounding-mode constants, conversion cache, atom and conversion-term bit-vector definitions, side constraints and scoped rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_fpa.go",
+          "tests": [
+            "TestSMTFloatingPointIEEEAndStructuralEqualities",
+            "TestSMTFloatingPointWrappedConstantAndScopes",
+            "TestSMTFloatingPointConversionTermsAndArithmetic"
+          ]
+        },
+        {
+          "name": "theory installation, sort constraints, structural FP and rounding-mode equalities, relevancy and lifecycle",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_fpa.go",
+          "tests": [
+            "TestSMTFloatingPointIEEEAndStructuralEqualities",
+            "TestSMTFloatingPointWrappedConstantAndScopes"
+          ]
+        },
+        {
+          "name": "canonical value factory, FP and rounding-mode model value procedures, and converted-function model finalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_fpa.go",
+          "tests": [
+            "TestSMTFloatingPointModelReconstructsWrappedConstants",
+            "TestSMTFloatingPointModelFinalizesConvertedFunction"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTFloatingPointTheory owns its converter, rewriter, scoped conversion references and model-finalization temporaries; FlushExtraAssertions transfers owned assertion references to the theory for assertion and release.",
+        "The proto-model owns the registered floating-point value factory, while model procedures borrow context enodes and return manager-owned AST values through the model generator protocol."
+      ],
+      "deviations": [
+        "The retained Go internalizer installs an eager biconditional when each FPA atom or structural equality is internalized, so the native assignment callback's polarity-specific implication is redundant.",
+        "NewEquality and NewDisequality remain inert because the exact structural-equality bit-vector definition is installed syntactically; creating fresh Boolean circuits during a Go e-graph merge would violate rollback ordering.",
+        "Float operands are reached recursively while translating atoms and equalities; rounding-mode relevancy additionally connects wrappers to finite encodings. Native trace display and fresh-theory allocation have no separate retained consumer."
+      ]
     },
     {
       "path": "src/smt/theory_fpa.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/theory_fpa.go",
+        "pkg/smtcore/proto_model/fpa_factory.go"
+      ],
+      "tests": [
+        "TestSMTFloatingPointModelReconstructsWrappedConstants",
+        "TestSMTFloatingPointModelFinalizesConvertedFunction"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -116011,11 +116065,25 @@
           "text": "SASSERT(m_util.get_sbits(s) == val.get_sbits());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "floating-point value factory, model value dependency procedures and SMT theory interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_fpa.go",
+          "tests": [
+            "TestSMTFloatingPointModelReconstructsWrappedConstants",
+            "TestSMTFloatingPointModelFinalizesConvertedFunction"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete Go interfaces replace the nested native callback classes; the theory owns conversion state and the proto-model owns its registered factory."
+      ],
+      "deviations": [
+        "The native fresh-value factory method is itself unimplemented; the Go factory implements the retained canonical-value operations and deliberately reports that it cannot manufacture an unbounded fresh FP value."
+      ]
     },
     {
       "path": "src/smt/theory_lra.cpp",

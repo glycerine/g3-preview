@@ -71,6 +71,17 @@ func (c *Converter) ExtraAssertions() []ast.ASTHandle {
 	return c.extraAssertions
 }
 
+// FlushExtraAssertions transfers the converter's owned references to the
+// caller. The caller must DecRef every returned assertion.
+func (c *Converter) FlushExtraAssertions() ([]ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return nil, err
+	}
+	result := c.extraAssertions
+	c.extraAssertions = nil
+	return result, nil
+}
+
 func (c *Converter) releaseCache(cache map[ast.ASTHandle]ast.ASTHandle) (result error) {
 	for declaration, value := range cache {
 		result = errors.Join(result, c.manager.DecRef(declaration), c.manager.DecRef(value))

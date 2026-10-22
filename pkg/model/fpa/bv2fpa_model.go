@@ -229,3 +229,25 @@ func (c *Converter) ConvertModel(source, target *model.ModelCore) (map[ast.ASTHa
 	}
 	return seen, nil
 }
+
+// ConvertFunctions reconstructs converted uninterpreted functions and
+// min/max auxiliary interpretations while leaving source constants alone.
+// SMT model generation already assigns wrapper-backed FP/RM constants from
+// their theory value procedures, so replacing them through the standalone
+// constant-cache path would discard those assignments.
+func (c *Converter) ConvertFunctions(source, target *model.ModelCore) (map[ast.ASTHandle]struct{}, error) {
+	if err := c.open(); err != nil {
+		return nil, err
+	}
+	if source == nil || target == nil {
+		return nil, ast.ErrASTHandle
+	}
+	seen := make(map[ast.ASTHandle]struct{})
+	if err := c.convertMinMaxSpecials(source, target, seen); err != nil {
+		return nil, err
+	}
+	if err := c.convertUFs(source, target, seen); err != nil {
+		return nil, err
+	}
+	return seen, nil
+}

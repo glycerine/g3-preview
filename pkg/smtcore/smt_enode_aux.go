@@ -15,15 +15,35 @@ func (n *SMTEnode) Delete(updateChildrenParent bool) error {
 		return err
 	}
 	if n.classSize != 1 || n.root != n || n.next != n {
-		return ast.ErrASTDomain
+		return fmt.Errorf("delete non-singleton enode (class %d root-self %t next-self %t): %w", n.classSize, n.root == n, n.next == n, ast.ErrASTDomain)
 	}
 	if updateChildrenParent {
-		for _, argument := range n.arguments {
-			parents := argument.root.parents
-			if len(parents) == 0 || parents[len(parents)-1] != n {
-				return ast.ErrASTDomain
+		seenRoots := make(map[*SMTEnode]struct{}, len(n.arguments))
+		for index, argument := range n.arguments {
+			root := argument.root
+			if _, found := seenRoots[root]; found {
+				continue
 			}
-			argument.root.parents = parents[:len(parents)-1]
+			seenRoots[root] = struct{}{}
+			parents := root.parents
+			kept := parents[:0]
+			removed := 0
+			for _, parent := range parents {
+				if parent == n {
+					removed++
+					continue
+				}
+				kept = append(kept, parent)
+			}
+			if removed == 0 {
+				operation, _ := n.manager.GetDeclKind(n.owner)
+				family, _ := n.manager.GetFamilyID(n.owner)
+				return fmt.Errorf("delete enode %d family %d operation %d argument %d missing from parents (parents %d): %w", n.owner.Slot(), family, operation, index, len(parents), ast.ErrASTDomain)
+			}
+			for i := len(kept); i < len(parents); i++ {
+				parents[i] = nil
+			}
+			root.parents = kept
 		}
 	}
 	n.manager = nil

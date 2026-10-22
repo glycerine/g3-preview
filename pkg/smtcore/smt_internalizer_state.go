@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -665,29 +666,29 @@ func (s *SMTInternalizerState) PushScope() error {
 
 func (s *SMTInternalizerState) unregisterEnode(node *SMTEnode) error {
 	if s.context.enodes[node.owner] != node {
-		return ast.ErrASTDomain
+		return fmt.Errorf("enode owner %d is not current: %w", node.owner.Slot(), ast.ErrASTDomain)
 	}
 	bucket := s.context.byDeclaration[node.declaration]
 	if len(bucket) == 0 || bucket[len(bucket)-1] != node {
-		return ast.ErrASTDomain
+		return fmt.Errorf("enode declaration %d is not bucket tail (size %d): %w", node.declaration.Slot(), len(bucket), ast.ErrASTDomain)
 	}
 	if node.IsCongruenceRoot() && node.NumArgs() != 0 && node.congruenceEnabled && !node.IsTrueEquality() {
 		erased, err := s.congruence.Erase(node)
 		if err != nil || !erased {
 			if err != nil {
-				return err
+				return fmt.Errorf("erase congruence entry: %w", err)
 			}
-			return ast.ErrASTDomain
+			return fmt.Errorf("congruence entry was absent: %w", ast.ErrASTDomain)
 		}
 	}
 	delete(s.context.enodes, node.owner)
 	s.context.byDeclaration[node.declaration] = bucket[:len(bucket)-1]
 	delete(s.context.relevant, node.owner)
 	if err := node.Delete(true); err != nil {
-		return err
+		return fmt.Errorf("delete enode: %w", err)
 	}
 	if err := s.manager.DecRef(node.owner); err != nil {
-		return err
+		return fmt.Errorf("release enode owner: %w", err)
 	}
 	s.statistics.NumDelEnode++
 	return nil
@@ -702,7 +703,7 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		entry := s.equalityTrail[index]
 		s.equalityTrail = s.equalityTrail[:index]
 		if err := s.restoreEqualitySnapshot(entry); err != nil {
-			return err
+			return fmt.Errorf("restore equality snapshot: %w", err)
 		}
 	}
 	if scope.disequalities == nil {
@@ -721,15 +722,15 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		s.theoryTrail = s.theoryTrail[:index]
 		if entry.old == SMTNullTheoryVar {
 			if err := entry.node.DeleteTheoryVar(entry.theory); err != nil {
-				return err
+				return fmt.Errorf("delete node theory variable: %w", err)
 			}
 			if entry.rootAdded {
 				if err := entry.root.DeleteTheoryVar(entry.theory); err != nil {
-					return err
+					return fmt.Errorf("delete root theory variable: %w", err)
 				}
 			}
 		} else if err := entry.node.ReplaceTheoryVar(entry.theory, entry.old); err != nil {
-			return err
+			return fmt.Errorf("restore node theory variable: %w", err)
 		}
 	}
 	if scope.assignmentLimit < 0 || scope.assignmentLimit > len(s.assignmentTrail) {
@@ -744,7 +745,7 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		s.booleanData[entry.variable].SetJustification(entry.justification)
 		s.booleanData[entry.variable].ScopeLevel = entry.scopeLevel
 		if err := s.context.SetAssignment(s.boolExpr[entry.variable], entry.value); err != nil {
-			return err
+			return fmt.Errorf("restore Boolean assignment: %w", err)
 		}
 	}
 	if scope.assignedLimit < 0 || scope.assignedLimit > len(s.assignedLiterals) {
@@ -786,7 +787,7 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	}
 	for index := len(s.clauses); index > scope.clauseLimit; index-- {
 		if err := s.closeClause(&s.clauses[index-1]); err != nil {
-			return err
+			return fmt.Errorf("close clause: %w", err)
 		}
 	}
 	s.statistics.NumDelClause += uint32(len(s.clauses) - scope.clauseLimit)
@@ -797,14 +798,14 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	for len(s.ownedJustifications) > scope.justificationLimit {
 		index := len(s.ownedJustifications) - 1
 		if err := s.ownedJustifications[index].Release(s.manager); err != nil {
-			return err
+			return fmt.Errorf("release owned justification: %w", err)
 		}
 		s.ownedJustifications = s.ownedJustifications[:index]
 	}
 	for len(s.enodeStack) > scope.enodeLimit {
 		node := s.enodeStack[len(s.enodeStack)-1]
 		if err := s.unregisterEnode(node); err != nil {
-			return err
+			return fmt.Errorf("unregister enode: %w", err)
 		}
 		s.enodeStack = s.enodeStack[:len(s.enodeStack)-1]
 	}
@@ -843,7 +844,7 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		s.watches = s.watches[:2*variable]
 		s.booleanStack = s.booleanStack[:len(s.booleanStack)-1]
 		if err := s.manager.DecRef(expression); err != nil {
-			return err
+			return fmt.Errorf("release Boolean expression: %w", err)
 		}
 		s.statistics.NumDelBoolVar++
 	}
@@ -928,12 +929,18 @@ func (s *SMTInternalizerState) Close() error {
 	}
 	var result error
 	if len(s.scopes) != 0 {
-		result = errors.Join(result, s.PopScopes(uint32(len(s.scopes))))
+		if err := s.PopScopes(uint32(len(s.scopes))); err != nil {
+			result = errors.Join(result, fmt.Errorf("close SMT scopes: %w", err))
+		}
 	}
-	result = errors.Join(result, s.popTo(smtInternalizerScope{}))
+	if err := s.popTo(smtInternalizerScope{}); err != nil {
+		result = errors.Join(result, fmt.Errorf("close SMT root scope: %w", err))
+	}
 	for i := len(s.theoryOrder) - 1; i >= 0; i-- {
 		if closer, ok := s.theoryOrder[i].(interface{ Close() error }); ok {
-			result = errors.Join(result, closer.Close())
+			if err := closer.Close(); err != nil {
+				result = errors.Join(result, fmt.Errorf("close SMT theory %T: %w", s.theoryOrder[i], err))
+			}
 		}
 	}
 	result = errors.Join(result, s.releaseLearnedUnits())

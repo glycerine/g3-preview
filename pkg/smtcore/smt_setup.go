@@ -47,6 +47,10 @@ func smtLogicUsesPseudoBooleans(logic string) bool { return logic == "QF_FD" || 
 
 func smtLogicUsesDatalog(logic string) bool { return logic == "QF_FD" || logic == "ALL" }
 
+func smtLogicUsesFloatingPoint(logic string) bool {
+	return logic == "QF_FPBV" || logic == "QF_BVFP" || logic == "ALL"
+}
+
 func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic string) error {
 	if kernel == nil || manager == nil {
 		return ast.ErrASTHandle
@@ -117,6 +121,25 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 			return err
 		}
 		theory, theoryErr := NewSMTBitVectorTheory(family)
+		if theoryErr != nil {
+			return theoryErr
+		}
+		if err = kernel.RegisterTheory(theory); err != nil {
+			return err
+		}
+	}
+	if smtLogicUsesFloatingPoint(logic) {
+		if _, err := manager.RegisterArithmeticPlugin(); err != nil {
+			return err
+		}
+		if _, err := manager.RegisterBitVectorPlugin(); err != nil {
+			return err
+		}
+		family, err := manager.RegisterFloatingPointPlugin()
+		if err != nil {
+			return err
+		}
+		theory, theoryErr := NewSMTFloatingPointTheory(family)
 		if theoryErr != nil {
 			return theoryErr
 		}
