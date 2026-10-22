@@ -122935,6 +122935,7 @@
         "TestTacticGoalRedundanciesProofAndDependency",
         "TestTacticGoalProofAssertionSplitting",
         "TestTacticGoalCopyAndPrecisionAlgebra",
+        "TestTacticGoalsEqualSourceSetAndSizeSemantics",
         "TestTacticGoalDuplicateEliminationAndRetainedReferences",
         "TestTacticGoalUpdateRetainsSavedFirstBeforeLaterFalse",
         "TestTacticGoalUpdateLiteralFalseHeadSourceBehavior",
@@ -123033,6 +123034,14 @@
           ]
         },
         {
+          "name": "is_equal formula-set comparison with exact source size and unique-identity semantics (goal.cpp:678-708)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal.go",
+          "tests": [
+            "TestTacticGoalsEqualSourceSetAndSizeSemantics"
+          ]
+        },
+        {
           "name": "goal::is_well_sorted checks formulas in order and stops after the first failed AST walk (goal.cpp:622-630)",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_goal.go",
@@ -123052,7 +123061,7 @@
         "quick_process temporary negations now use a native []ASTHandle with explicit INC before append and DEC on lexical exit, matching the source expr_ref_vector ownership. This corrects the prior nonowning expression-vector borrow. Goal output acquisition still precedes temporary cleanup."
       ],
       "deviations": [
-        "Display/printing, cross-manager translation, is_equal, the default and full copying constructor facades remain unported; the configuration-only constructor and formula-order is_well_sorted caller are concrete. The AST walk still lacks exact sort-mismatch diagnostic text. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
+        "Cross-manager translation and the default and full copying constructor facades remain unported; the configuration-only constructor, formula-set is_equal helper, display, and formula-order is_well_sorted caller are concrete. The AST walk still lacks exact sort-mismatch diagnostic text. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
         "Goal forms/proofs/dependencies now own native []ASTHandle/[]ASTDependency slices. Copies acquire independent element pins and backing rather than persistent-array reroot graphs; native growth has no emulated allocation geometry. Actual formula/proof/core publication order, saved-first and literal-false update behavior, snapshot isolation, depth/precision and explicit reference ownership remain. Concrete ownership helpers retire consumed references even when destruction reports an error, and retain unconsumed guard failures. Added 129-row native/debug growth/copy/update/shrink/close tests with arena reservations disabled and exact formula/proof/dependency pin checks, plus a real foreign-core guard publication-prefix check. Printing/translation and other declared gaps remain open."
       ]
     },
@@ -123077,6 +123086,7 @@
         "TestTacticGoalRedundanciesProofAndDependency",
         "TestTacticGoalProofAssertionSplitting",
         "TestTacticGoalCopyAndPrecisionAlgebra",
+        "TestTacticGoalsEqualSourceSetAndSizeSemantics",
         "TestTacticGoalDuplicateEliminationAndRetainedReferences",
         "TestTacticGoalUpdateRetainsSavedFirstBeforeLaterFalse",
         "TestTacticGoalUpdateLiteralFalseHeadSourceBehavior",
@@ -123142,6 +123152,14 @@
           ]
         },
         {
+          "name": "is_equal goal comparison declaration and formula-set behavior (goal.h:168)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal.go",
+          "tests": [
+            "TestTacticGoalsEqualSourceSetAndSizeSemantics"
+          ]
+        },
+        {
           "name": "goal::is_well_sorted declaration and formula-order caller (goal.h:142)",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_goal.go",
@@ -123160,7 +123178,7 @@
         "Goal expression/dependency arrays retain their actual AST-manager owners. Assertions retain f/pr/dependencies through processing; false replacement protects proof/dependency references before reset. Redundancy membership uses local borrowed Go maps; original formula prefix/suffix ownership keeps encountered atoms alive through compaction. NumExprs shares a native identity map across formulas and the existing postorder project visitor with native frames, preserving shared-only deduplication, quantifier children and associative application weight. No shared mark/trail or native-frame backing reservation is credited at these callers."
       ],
       "deviations": [
-        "Display/printing, cross-manager translation, is_equal, the default and full copying constructor facades remain unported; the configuration-only constructor and formula-order is_well_sorted caller are concrete. The AST walk still lacks exact sort-mismatch diagnostic text. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
+        "Cross-manager translation and the default and full copying constructor facades remain unported; the configuration-only constructor, formula-set is_equal helper, display, and formula-order is_well_sorted caller are concrete. The AST walk still lacks exact sort-mismatch diagnostic text. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
         "Goal forms/proofs/dependencies now own native []ASTHandle/[]ASTDependency slices. Copies acquire independent element pins and backing rather than persistent-array reroot graphs; native growth has no emulated allocation geometry. Actual formula/proof/core publication order, saved-first and literal-false update behavior, snapshot isolation, depth/precision and explicit reference ownership remain. Concrete ownership helpers retire consumed references even when destruction reports an error, and retain unconsumed guard failures. Added 129-row native/debug growth/copy/update/shrink/close tests with arena reservations disabled and exact formula/proof/dependency pin checks, plus a real foreign-core guard publication-prefix check. Printing/translation and other declared gaps remain open."
       ]
     },

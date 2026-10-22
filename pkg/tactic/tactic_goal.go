@@ -183,6 +183,39 @@ func (g *Goal) IsDecidedUnsat() bool {
 	return g != nil && !g.Closed && g.inconsistent && g.UnsatPreserved()
 }
 func (g *Goal) IsDecided() bool { return g.IsDecidedSat() || g.IsDecidedUnsat() }
+
+// GoalsEqual implements the source is_equal helper. Formula order is ignored,
+// but the total formula count and the number of unique formula identities must
+// agree.
+func GoalsEqual(first, second *Goal) (bool, error) {
+	if first == nil || second == nil {
+		return false, ast.ErrASTHandle
+	}
+	if err := first.open(); err != nil {
+		return false, err
+	}
+	if err := second.open(); err != nil {
+		return false, err
+	}
+	if first.manager != second.manager {
+		return false, ast.ErrASTHandle
+	}
+	if len(first.forms) != len(second.forms) {
+		return false, nil
+	}
+	left := make(map[ast.ASTHandle]bool, len(first.forms))
+	for _, formula := range first.forms {
+		left[formula] = true
+	}
+	right := make(map[ast.ASTHandle]bool, len(second.forms))
+	for _, formula := range second.forms {
+		if !left[formula] {
+			return false, nil
+		}
+		right[formula] = true
+	}
+	return len(left) == len(right), nil
+}
 func (g *Goal) IncRef() error {
 	if e := g.open(); e != nil {
 		return e

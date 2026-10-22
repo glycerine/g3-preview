@@ -224,6 +224,40 @@ func TestTacticGoalCopyAndPrecisionAlgebra(t *testing.T) {
 	}
 }
 
+func TestTacticGoalsEqualSourceSetAndSizeSemantics(t *testing.T) {
+	m := astTestManager(t)
+	p := goalTestAtom(t, m, "goal-equal-p")
+	q := goalTestAtom(t, m, "goal-equal-q")
+	first := goalTestNew(t, m, false, false)
+	second := goalTestNew(t, m, false, false)
+	astTestMust(t, first.Assert(p))
+	astTestMust(t, first.Assert(q))
+	astTestMust(t, second.Assert(q))
+	astTestMust(t, second.Assert(p))
+	equal, err := GoalsEqual(first, second)
+	astTestMust(t, err)
+	if !equal {
+		t.Fatal("formula order changed source equality")
+	}
+	astTestMust(t, second.Assert(p))
+	equal, err = GoalsEqual(first, second)
+	astTestMust(t, err)
+	if equal {
+		t.Fatal("different formula counts compared equal")
+	}
+	third := goalTestNew(t, m, false, false)
+	astTestMust(t, third.Assert(p))
+	astTestMust(t, third.Assert(p))
+	fourth := goalTestNew(t, m, false, false)
+	astTestMust(t, fourth.Assert(p))
+	astTestMust(t, fourth.Assert(q))
+	equal, err = GoalsEqual(third, fourth)
+	astTestMust(t, err)
+	if equal {
+		t.Fatal("different unique formula sets compared equal")
+	}
+}
+
 func TestTacticGoalDuplicateEliminationAndRetainedReferences(t *testing.T) {
 	m := astTestManager(t)
 	p := goalTestAtom(t, m, "p")
