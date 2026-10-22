@@ -245,11 +245,18 @@ func (s *SMTInternalizerState) PropagateCore() (bool, error) {
 				}
 			}
 		}
+		quantifierProgress := false
+		if s.quantifierManager != nil && s.quantifierManager.CanPropagate() {
+			quantifierProgress = true
+			if err = s.quantifierManager.Propagate(); err != nil {
+				return false, err
+			}
+		}
 		if s.inconsistent {
 			return false, nil
 		}
 		relevancyDone := s.relevancy == nil || !s.relevancy.CanPropagate()
-		if s.propagationHead == len(s.assignedLiterals) && s.atomPropagationHead == len(s.assignedLiterals) && s.theoryEqualityHead == len(s.theoryEqualities) && s.theoryDisequalityHead == len(s.theoryDisequalities) && relevancyDone && !theoryProgress && !dynamicAckProgress {
+		if s.propagationHead == len(s.assignedLiterals) && s.atomPropagationHead == len(s.assignedLiterals) && s.theoryEqualityHead == len(s.theoryEqualities) && s.theoryDisequalityHead == len(s.theoryDisequalities) && relevancyDone && !theoryProgress && !quantifierProgress && !dynamicAckProgress {
 			return true, nil
 		}
 	}

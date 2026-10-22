@@ -29,6 +29,11 @@ func (s *SMTInternalizerState) InitializeTheorySearch() error {
 			return err
 		}
 	}
+	if s.quantifierManager != nil {
+		if err := s.quantifierManager.InitSearch(); err != nil {
+			return err
+		}
+	}
 	return s.dynamicAck.initSearch()
 }
 
@@ -54,10 +59,10 @@ func (s *SMTInternalizerState) FinalCheckTheories() (SMTFinalCheckStatus, error)
 	s.statistics.NumFinalChecks++
 	s.incompleteTheories = s.incompleteTheories[:0]
 	count := len(s.theoryOrder)
-	if count == 0 {
-		return SMTFinalCheckDone, nil
+	start := 0
+	if count != 0 {
+		start = s.finalCheckIndex % count
 	}
-	start := s.finalCheckIndex % count
 	result := SMTFinalCheckDone
 	for offset := 0; offset < count; offset++ {
 		index := (start + offset) % count
@@ -80,6 +85,12 @@ func (s *SMTInternalizerState) FinalCheckTheories() (SMTFinalCheckStatus, error)
 	for _, theory := range s.theoryOrder {
 		if theory.CanPropagate() {
 			return SMTFinalCheckContinue, nil
+		}
+	}
+	if s.quantifierManager != nil {
+		status, err := s.quantifierManager.FinalCheck(true)
+		if err != nil || status != SMTFinalCheckDone {
+			return status, err
 		}
 	}
 	return result, nil

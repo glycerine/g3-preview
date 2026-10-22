@@ -97,6 +97,7 @@ type SMTInternalizerState struct {
 	context                  *SMTCheckerContext
 	congruence               *SMTCongruenceTable
 	quantifiers              *SMTQuantifierRegistry
+	quantifierManager        *SMTQuantifierManager
 	relevancy                *SMTRelevancyPropagator
 	theories                 map[ast.FamilyID]SMTTheoryInternalizer
 	theoryOrder              []SMTTheoryInternalizer
@@ -615,8 +616,17 @@ func (s *SMTInternalizerState) PushScope() error {
 		theoryDiseqLimit: len(s.theoryDisequalities), theoryDiseqHead: s.theoryDisequalityHead,
 		atomHead: s.atomPropagationHead, notifyLimit: len(s.notifyTrail), simplifyHead: s.simplifyHead,
 	})
+	if s.quantifiers != nil {
+		if err := s.quantifiers.PushScope(); err != nil {
+			s.scopes = s.scopes[:len(s.scopes)-1]
+			return err
+		}
+	}
 	if s.relevancy != nil {
 		if err := s.relevancy.PushScope(); err != nil {
+			if s.quantifiers != nil {
+				_ = s.quantifiers.PopScopes(1)
+			}
 			s.scopes = s.scopes[:len(s.scopes)-1]
 			return err
 		}
@@ -628,6 +638,9 @@ func (s *SMTInternalizerState) PushScope() error {
 			}
 			if s.relevancy != nil {
 				_ = s.relevancy.PopScopes(1)
+			}
+			if s.quantifiers != nil {
+				_ = s.quantifiers.PopScopes(1)
 			}
 			s.scopes = s.scopes[:len(s.scopes)-1]
 			return err
@@ -865,6 +878,11 @@ func (s *SMTInternalizerState) PopScopes(count uint32) error {
 			return errors.Join(err, s.releasePreservedLearnedClauses(learned))
 		}
 	}
+	if s.quantifiers != nil {
+		if err := s.quantifiers.PopScopes(count); err != nil {
+			return errors.Join(err, s.releasePreservedLearnedClauses(learned))
+		}
+	}
 	s.scopes = s.scopes[:level]
 	s.scopeLevel = uint32(level)
 	if preserve {
@@ -903,6 +921,9 @@ func (s *SMTInternalizerState) Close() error {
 	result = errors.Join(result, s.releaseLearnedUnits())
 	result = errors.Join(result, s.releaseBooleanActivityCache())
 	result = errors.Join(result, s.dynamicAck.close())
+	if s.quantifierManager != nil {
+		result = errors.Join(result, s.quantifierManager.Close())
+	}
 	result = errors.Join(result, s.congruence.Close())
 	if result == nil {
 		s.closed = true
