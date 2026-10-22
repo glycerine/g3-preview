@@ -104582,9 +104582,10 @@
       "path": "src/smt/smt_consequences.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/smtcore/smt_solver.go"
+        "pkg/smtcore/smt_solver.go",
+        "pkg/solver/solver.go"
       ],
       "tests": [
         "TestSMTSolverDerivesBooleanConsequences",
@@ -104644,7 +104645,7 @@
           "text": "SASSERT(is_sat != l_false);"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -104665,14 +104666,19 @@
         },
         {
           "name": "context-native antecedent tracking, tuned fixed-value consequence search and preferred SAT (remaining src/smt/smt_consequences.cpp)",
-          "status": "unported"
+          "status": "platform_replacement",
+          "go_target": "pkg/solver/solver.go",
+          "tests": [
+            "TestSMTSolverDerivesBooleanConsequences"
+          ]
         }
       ],
       "ownership": [
         "Mutex extraction borrows the current internalizer Boolean expressions and clause/watch graph; returned rows own Go slices and borrow canonical AST handles."
       ],
       "deviations": [
-        "Mutex extraction reads both compact literal watches and ordinary two-literal clauses because proof mode and parameter changes can leave either representation in the retained context; both feed the same literal edges to util/cliques."
+        "Mutex extraction reads both compact literal watches and ordinary two-literal clauses because proof mode and parameter changes can leave either representation in the retained context; both feed the same literal edges to util/cliques.",
+        "The retained consequence query uses solver-level model counterexamples and unsat cores instead of the context-private antecedent cache, preferred phases and chunked search. It returns the same implication form while keeping the implementation shared by solver backends."
       ]
     },
     {
