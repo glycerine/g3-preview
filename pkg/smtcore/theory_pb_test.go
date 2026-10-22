@@ -26,6 +26,13 @@ func TestSMTPseudoBooleanQFFDExactCardinality(t *testing.T) {
 			if _, ok := solver.kernel.internalizer.theories[family].(*SMTPseudoBooleanTheory); !ok {
 				t.Fatal("QF_FD did not install the pseudo-Boolean theory")
 			}
+			bvName, err := m.Symbols.Intern("bv")
+			astTestMust(t, err)
+			bvFamily, err := m.FamilyIDForSymbol(bvName)
+			astTestMust(t, err)
+			if _, ok := solver.kernel.internalizer.theories[bvFamily].(*SMTBitVectorTheory); !ok {
+				t.Fatal("QF_FD did not install the bit-vector theory")
+			}
 			boolean, err := m.MkBoolSort()
 			astTestMust(t, err)
 			a, err := m.MkConst(astTestSymbol(t, m, "smt-pb-a"), boolean)

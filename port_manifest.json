@@ -109817,7 +109817,7 @@
           ]
         },
         {
-          "name": "static-feature auto configuration plus concrete finite-domain, sequence, string, pseudo-Boolean, and floating-point theory selection",
+          "name": "static-feature auto configuration plus concrete finite-domain, sequence, string and floating-point theory selection",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -109832,6 +109832,14 @@
         },
         {
           "name": "explicit QF_FD and ALL pseudo-Boolean theory selection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "tests": [
+            "TestSMTPseudoBooleanQFFDExactCardinality"
+          ]
+        },
+        {
+          "name": "explicit QF_FD bit-vector theory selection",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
