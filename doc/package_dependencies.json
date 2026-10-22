@@ -1533,6 +1533,17 @@
       ]
     },
     {
+      "package": "math/simplex",
+      "imports": [
+        "util/control",
+        "util/lbool"
+      ],
+      "production_files": [
+        "matrix.go",
+        "simplex.go"
+      ]
+    },
+    {
       "package": "math/subpaving",
       "imports": [
         "arena",

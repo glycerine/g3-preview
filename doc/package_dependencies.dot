@@ -160,6 +160,9 @@ digraph packages {
   "math/realclosure" -> "math/interval";
   "math/realclosure" -> "util/numeral";
   "math/realclosure" -> "util/params";
+  "math/simplex" [style=filled, fillcolor="#eeeeee"];
+  "math/simplex" -> "util/control";
+  "math/simplex" -> "util/lbool";
   "math/subpaving" [style=filled, fillcolor="#eeeeee"];
   "math/subpaving" -> "arena";
   "math/subpaving" -> "math/interval";

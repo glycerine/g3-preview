@@ -65604,9 +65604,9 @@
       "path": "src/math/simplex/simplex.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/math/simplex/simplex.go", "pkg/math/simplex/simplex_test.go"],
+      "tests": ["TestSimplexFeasiblePivotAndValues", "TestSimplexMinimizeBoundedAndUnbounded"],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
@@ -65617,9 +65617,9 @@
       "path": "src/math/simplex/simplex.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/math/simplex/simplex.go", "pkg/math/simplex/simplex_test.go"],
+      "tests": ["TestSimplexFeasiblePivotAndValues", "TestSimplexInfeasibleFixedNonbasicAndWitnessRow", "TestSimplexInfinitesimalStrictBounds", "TestSimplexIntegerRowFacadeAndReset", "TestSimplexMinimizeBoundedAndUnbounded", "TestSimplexDeleteBaseAndNonbasicRows"],
       "conditionals": [
         {
           "line": 32,
@@ -65640,9 +65640,9 @@
       "path": "src/math/simplex/simplex_def.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/math/simplex/simplex.go", "pkg/math/simplex/simplex_test.go"],
+      "tests": ["TestSimplexFeasiblePivotAndValues", "TestSimplexInfeasibleFixedNonbasicAndWitnessRow", "TestSimplexInfinitesimalStrictBounds", "TestSimplexMinimizeBoundedAndUnbounded", "TestSimplexDeleteBaseAndNonbasicRows"],
       "conditionals": [
         {
           "line": 22,
@@ -65853,9 +65853,9 @@
       "path": "src/math/simplex/sparse_matrix.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/math/simplex/matrix.go", "pkg/math/simplex/matrix_test.go"],
+      "tests": ["TestSparseMatrixRowArithmeticColumnsAndReuse", "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay", "TestSparseMatrixIntegerEntryAndCancellation"],
       "conditionals": [
         {
           "line": 19,
@@ -65876,9 +65876,9 @@
       "path": "src/math/simplex/sparse_matrix_def.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/math/simplex/matrix.go", "pkg/math/simplex/matrix_test.go"],
+      "tests": ["TestSparseMatrixRowArithmeticColumnsAndReuse", "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay", "TestSparseMatrixIntegerEntryAndCancellation"],
       "conditionals": [
         {
           "line": 21,
