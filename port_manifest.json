@@ -108032,9 +108032,15 @@
       "path": "src/smt/smt_model_generator.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_model_generator.go",
+        "pkg/smtcore/smt_model_generator_test.go"
+      ],
+      "tests": [
+        "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
+        "TestSMTModelGeneratorRejectsDependencyCycle"
+      ],
       "assertions": [
         {
           "line": 51,
@@ -108170,10 +108176,28 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Generator construction, fresh placeholder allocation, source identity, implicit same-sort fresh dependencies and dependency topological ordering (src/smt/smt_model_generator.cpp:25-45,137-307,466-472)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "tests": [
+            "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
+            "TestSMTModelGeneratorRejectsDependencyCycle"
+          ]
+        },
+        {
+          "name": "Proto-model initialization, Boolean/enode value construction, interpretation installation, theory finalization, macros and complete model assembly (remaining src/smt/smt_model_generator.cpp)",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The generator owns fresh placeholder objects and source-ordering state while borrowing the AST manager, enode roots and theory-created model-value procedures."
+      ],
+      "deviations": [
+        "The source iterative color traversal is expressed as a concrete recursive Go DFS with identical dependency-before-source order. A dependency cycle returns ast.ErrASTDomain instead of relying on a debug assertion."
+      ]
     },
     {
       "path": "src/smt/smt_model_generator.h",
@@ -108181,10 +108205,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_model_generator.go",
+        "pkg/smtcore/smt_model_generator_test.go",
         "pkg/smtcore/smt_model_value.go",
         "pkg/smtcore/smt_model_value_test.go"
       ],
       "tests": [
+        "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
+        "TestSMTModelGeneratorRejectsDependencyCycle",
         "TestSMTModelValueDependenciesAndProcedures",
         "TestSMTModelValueEnodeDependencyCanonicalizesRoot"
       ],
@@ -108224,6 +108252,15 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Generator-owned fresh source collection and dependency-ordering state (src/smt/smt_model_generator.h:177-209,212-214)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "tests": [
+            "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
+            "TestSMTModelGeneratorRejectsDependencyCycle"
+          ]
+        },
+        {
           "name": "Extra fresh-value placeholders, canonical enode/fresh dependency union, model-value procedure contract, expression wrapper and fresh-value procedure (src/smt/smt_model_generator.h:67-175)",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_value.go",
@@ -108233,7 +108270,7 @@
           ]
         },
         {
-          "name": "Model generator state, dependency topological ordering, factory/value registration, Boolean/function interpretations, theory finalization and model construction (src/smt/smt_model_generator.h:177-232)",
+          "name": "Context attachment, proto-model/factory/value registration, Boolean/function interpretations, theory finalization and model construction (remaining src/smt/smt_model_generator.h:177-232)",
           "status": "unported"
         }
       ],
