@@ -112788,6 +112788,7 @@
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
+        "TestSMTSolverLinearArithmeticEvaluatesFixedPolynomial",
         "TestSMTSolverLinearArithmeticRejectsNonlinearTerms"
       ],
       "conditionals": [
@@ -113074,7 +113075,15 @@
           ]
         },
         {
-          "name": "nonlinear clustering, interval propagation, assignment repair, Horner and Grobner reasoning",
+          "name": "exact evaluation and conflict of polynomials whose variables have fixed linear bounds",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTSolverLinearArithmeticEvaluatesFixedPolynomial"
+          ]
+        },
+        {
+          "name": "nonlinear clustering, interval propagation, unfixed assignment repair, Horner and Grobner reasoning",
           "status": "unported",
           "go_target": null,
           "tests": [
@@ -113084,7 +113093,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The first retained nonlinear rule recognizes products whose non-numeral factors all have even powers and decides their comparison with zero from the coefficient sign and exact half-infinite interval. Other nonlinear atoms remain unsupported and make CheckSat return unknown."
+        "The retained nonlinear rules recognize products whose non-numeral factors all have even powers and evaluate polynomials exactly when opposing linear bounds fix every variable. Other nonlinear atoms remain unsupported and make CheckSat return unknown."
       ]
     },
     {

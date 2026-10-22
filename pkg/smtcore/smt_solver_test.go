@@ -1191,6 +1191,60 @@ func TestSMTSolverLinearArithmeticSquareNonnegative(t *testing.T) {
 	}
 }
 
+func TestSMTSolverLinearArithmeticEvaluatesFixedPolynomial(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		op   int32
+		want lbool.LBool
+	}{
+		{name: "consistent", op: smtArithOpGT, want: lbool.True},
+		{name: "conflict", op: smtArithOpLT, want: lbool.False},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m := astTestManager(t)
+			arithmetic, err := m.RegisterArithmeticPlugin()
+			astTestMust(t, err)
+			params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+			astTestMust(t, err)
+			s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: params})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
+			two, err := m.ArithmeticRealNumeralText("2")
+			astTestMust(t, err)
+			three, err := m.ArithmeticRealNumeralText("3")
+			astTestMust(t, err)
+			five, err := m.ArithmeticRealNumeralText("5")
+			astTestMust(t, err)
+			realSort, err := m.GetSort(two)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "fixed-polynomial-x"), realSort)
+			astTestMust(t, err)
+			y, err := m.MkConst(astTestSymbol(t, m, "fixed-polynomial-y"), realSort)
+			astTestMust(t, err)
+			for _, fixed := range []struct {
+				variable ast.ASTHandle
+				value    ast.ASTHandle
+			}{{x, two}, {y, three}} {
+				for _, op := range []int32{smtArithOpLE, smtArithOpGE} {
+					bound, makeErr := m.MkFamilyApp(arithmetic, op, nil, []ast.ASTHandle{fixed.variable, fixed.value})
+					astTestMust(t, makeErr)
+					astTestMust(t, s.Assert(bound))
+				}
+			}
+			product, err := m.MkFamilyApp(arithmetic, smtArithOpMul, nil, []ast.ASTHandle{x, y})
+			astTestMust(t, err)
+			comparison, err := m.MkFamilyApp(arithmetic, test.op, nil, []ast.ASTHandle{product, five})
+			astTestMust(t, err)
+			astTestMust(t, s.Assert(comparison))
+			status, err := s.CheckSat(nil)
+			astTestMust(t, err)
+			if status != test.want {
+				t.Fatalf("fixed polynomial status %v, want %v", status, test.want)
+			}
+		})
+	}
+}
+
 func TestSMTSolverSetupUsesPartialLinearIntegerArithmetic(t *testing.T) {
 	for _, test := range []struct {
 		name string

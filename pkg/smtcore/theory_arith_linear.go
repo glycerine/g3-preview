@@ -65,6 +65,8 @@ func (f *smtLinearForm) scale(coefficient *big.Rat) {
 
 type smtLinearArithmeticAtom struct {
 	variable  int32
+	left      ast.ASTHandle
+	right     ast.ASTHandle
 	form      smtLinearForm
 	op        int32
 	supported bool
@@ -385,7 +387,6 @@ func (t *SMTLinearArithmeticTheory) InternalizeTerm(expression ast.ASTHandle) (b
 	}
 	form, linear, err := t.linearize(expression)
 	if err == nil && !linear {
-		t.unsupported = true
 		node := state.context.enodes[expression]
 		if node == nil {
 			node, err = state.MkEnode(expression, false, false, true)
@@ -446,7 +447,6 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 		return false, err
 	}
 	if !linear {
-		t.unsupported = t.unsupported || !decided
 		form = newSMTLinearForm()
 	}
 	rhs, rhsLinear, err := t.linearize(right)
@@ -458,7 +458,6 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 		rhs.scale(big.NewRat(-1, 1))
 		form.add(&rhs)
 	} else {
-		t.unsupported = t.unsupported || !decided
 		form = newSMTLinearForm()
 	}
 	variable, err := state.MkBoolVar(expression)
@@ -469,7 +468,7 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 		return false, err
 	}
 	t.atomByBool[variable] = len(t.atoms)
-	t.atoms = append(t.atoms, smtLinearArithmeticAtom{variable: variable, form: form, op: op, supported: linear, decided: decided, required: required})
+	t.atoms = append(t.atoms, smtLinearArithmeticAtom{variable: variable, left: left, right: right, form: form, op: op, supported: linear, decided: decided, required: required})
 	if linear {
 		t.statistics.addRows++
 	}
@@ -1099,6 +1098,16 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if t.unsupported {
 		return SMTFinalCheckGiveUp, nil
 	}
+	complete, conflict, err := t.checkFixedNonlinearAssertions()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if conflict {
+		return SMTFinalCheckContinue, nil
+	}
+	if !complete {
+		return SMTFinalCheckGiveUp, nil
+	}
 	propagated, err := t.propagateImpliedEqualities()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
@@ -1141,6 +1150,154 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		}
 	}
 	return SMTFinalCheckDone, nil
+}
+
+type smtFixedPolynomialValue struct {
+	value    big.Rat
+	literals []SMTLiteral
+}
+
+func (t *SMTLinearArithmeticTheory) fixedLinearAssignments() map[uint32]smtFixedPolynomialValue {
+	fixed := make(map[uint32]smtFixedPolynomialValue)
+	for firstIndex, firstAssertion := range t.assertions {
+		firstAtom := &t.atoms[firstAssertion.atom]
+		firstForm, firstOK := smtLinearNormalizedLE(firstAtom, firstAssertion)
+		if !firstOK || len(firstForm.terms) != 1 {
+			continue
+		}
+		for _, secondAssertion := range t.assertions[firstIndex+1:] {
+			secondAtom := &t.atoms[secondAssertion.atom]
+			secondForm, secondOK := smtLinearNormalizedLE(secondAtom, secondAssertion)
+			if !secondOK || !smtLinearFormsOpposite(&firstForm, &secondForm) {
+				continue
+			}
+			for variable, coefficient := range firstForm.terms {
+				var value big.Rat
+				value.Neg(&firstForm.constant)
+				value.Quo(&value, coefficient)
+				fixed[variable] = smtFixedPolynomialValue{value: value, literals: []SMTLiteral{
+					smtLinearAssertionLiteral(firstAtom, firstAssertion),
+					smtLinearAssertionLiteral(secondAtom, secondAssertion),
+				}}
+			}
+			break
+		}
+	}
+	return fixed
+}
+
+func (t *SMTLinearArithmeticTheory) fixedPolynomialValue(expression ast.ASTHandle, fixed map[uint32]smtFixedPolynomialValue) (*big.Rat, []SMTLiteral, bool, error) {
+	if value, numeral, err := t.numeral(expression); err != nil || numeral {
+		return value, nil, numeral, err
+	}
+	op, arithmetic, err := t.operation(expression)
+	if err != nil {
+		return nil, nil, false, err
+	}
+	state, _ := t.State()
+	if arithmetic {
+		count, countErr := state.manager.GetNumArgs(expression)
+		if countErr != nil {
+			return nil, nil, false, countErr
+		}
+		values := make([]*big.Rat, count)
+		var literals []SMTLiteral
+		for index := uint32(0); index < count; index++ {
+			argument, argErr := state.manager.GetArg(expression, index)
+			if argErr != nil {
+				return nil, nil, false, argErr
+			}
+			value, dependencies, isFixed, valueErr := t.fixedPolynomialValue(argument, fixed)
+			if valueErr != nil || !isFixed {
+				return nil, nil, isFixed, valueErr
+			}
+			values[index] = value
+			literals = append(literals, dependencies...)
+		}
+		switch op {
+		case smtArithOpAdd, smtArithOpSub:
+			result := new(big.Rat)
+			for index, value := range values {
+				if op == smtArithOpSub && index != 0 {
+					result.Sub(result, value)
+				} else {
+					result.Add(result, value)
+				}
+			}
+			return result, literals, true, nil
+		case smtArithOpUMinus:
+			if count == 1 {
+				return new(big.Rat).Neg(values[0]), literals, true, nil
+			}
+		case smtArithOpToReal:
+			if count == 1 {
+				return new(big.Rat).Set(values[0]), literals, true, nil
+			}
+		case smtArithOpMul:
+			result := new(big.Rat).SetInt64(1)
+			for _, value := range values {
+				result.Mul(result, value)
+			}
+			return result, literals, true, nil
+		case smtArithOpDiv:
+			if count == 2 && values[1].Sign() != 0 {
+				return new(big.Rat).Quo(values[0], values[1]), literals, true, nil
+			}
+		}
+		return nil, nil, false, nil
+	}
+	node := state.context.enodes[expression]
+	if node == nil || !t.IsAttachedToVariable(node) {
+		return nil, nil, false, nil
+	}
+	theoryVariable := node.TheoryVar(t.FamilyID())
+	if theoryVariable < 0 || int(theoryVariable) >= len(t.simplexVariables) {
+		return nil, nil, false, nil
+	}
+	variable := t.simplexVariables[theoryVariable]
+	value, found := fixed[variable]
+	if !found {
+		return nil, nil, false, nil
+	}
+	return new(big.Rat).Set(&value.value), append([]SMTLiteral(nil), value.literals...), true, nil
+}
+
+func (t *SMTLinearArithmeticTheory) checkFixedNonlinearAssertions() (bool, bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, false, err
+	}
+	fixed := t.fixedLinearAssignments()
+	for _, assertion := range t.assertions {
+		atom := &t.atoms[assertion.atom]
+		if atom.supported || atom.decided {
+			continue
+		}
+		left, leftLiterals, leftFixed, valueErr := t.fixedPolynomialValue(atom.left, fixed)
+		if valueErr != nil || !leftFixed {
+			return false, false, valueErr
+		}
+		right, rightLiterals, rightFixed, valueErr := t.fixedPolynomialValue(atom.right, fixed)
+		if valueErr != nil || !rightFixed {
+			return false, false, valueErr
+		}
+		comparison := left.Cmp(right)
+		truth := (atom.op == smtArithOpLE && comparison <= 0) ||
+			(atom.op == smtArithOpGE && comparison >= 0) ||
+			(atom.op == smtArithOpLT && comparison < 0) ||
+			(atom.op == smtArithOpGT && comparison > 0)
+		if truth != assertion.truth {
+			t.statistics.conflicts++
+			literals := []SMTLiteral{smtLinearAssertionLiteral(atom, assertion)}
+			literals = append(literals, leftLiterals...)
+			literals = append(literals, rightLiterals...)
+			if err = state.SetTheoryConflict(t.FamilyID(), literals); err != nil {
+				return false, false, err
+			}
+			return true, true, nil
+		}
+	}
+	return true, false, nil
 }
 
 func (t *SMTLinearArithmeticTheory) InitializeSearch() error {
