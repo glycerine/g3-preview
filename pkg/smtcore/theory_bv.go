@@ -1418,9 +1418,62 @@ func (t *SMTBitVectorTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHan
 	return err
 }
 
-func (*SMTBitVectorTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error    { return nil }
-func (*SMTBitVectorTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error { return nil }
-func (*SMTBitVectorTheory) Assign(int32, bool) error                        { return nil }
+func (*SMTBitVectorTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error { return nil }
+
+func (t *SMTBitVectorTheory) NewDisequality(left, right SMTTheoryVar) error {
+	leftNode, err := t.Enode(left)
+	if err != nil {
+		return err
+	}
+	rightNode, err := t.Enode(right)
+	if err != nil {
+		return err
+	}
+	leftBits, err := t.bitsFor(leftNode.owner)
+	if err != nil {
+		return err
+	}
+	rightBits, err := t.bitsFor(rightNode.owner)
+	if err != nil || len(leftBits) == 0 || len(leftBits) != len(rightBits) {
+		if err != nil {
+			return err
+		}
+		return ast.ErrASTDomain
+	}
+	state, _ := t.State()
+	differences := make([]ast.ASTHandle, len(leftBits))
+	for i := range differences {
+		differences[i], err = t.boolXor(leftBits[i], rightBits[i])
+		if err != nil {
+			return errors.Join(err, t.releaseTemporary())
+		}
+	}
+	if err = t.retainTemporary(differences); err != nil {
+		return errors.Join(err, t.releaseTemporary())
+	}
+	clause := make([]SMTLiteral, 1, len(differences)+1)
+	clause[0], err = t.MkEqualityLiteral(leftNode.owner, rightNode.owner, true)
+	if err != nil {
+		return errors.Join(err, t.releaseTemporary())
+	}
+	for _, difference := range differences {
+		if err = state.Internalize(difference, true); err != nil {
+			return errors.Join(err, t.releaseTemporary())
+		}
+		literal, literalErr := state.Literal(difference)
+		if literalErr != nil {
+			return errors.Join(literalErr, t.releaseTemporary())
+		}
+		clause = append(clause, literal)
+	}
+	if err = t.releaseTemporary(); err != nil {
+		return err
+	}
+	t.statistics.diseqDynamic++
+	return state.addTheoryAxiom(t.FamilyID(), clause)
+}
+
+func (*SMTBitVectorTheory) Assign(int32, bool) error { return nil }
 
 func (t *SMTBitVectorTheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {

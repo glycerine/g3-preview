@@ -128,6 +128,39 @@ func TestSMTBitVectorAdditionCircuit(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorExpandsDynamicDisequality(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	zero, err := m.BitVectorNumeralUint64(0, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "bv-diseq-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "bv-diseq-right"), sort)
+	astTestMust(t, err)
+	equality, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	disequality, err := m.MkNot(equality)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(disequality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("bit-vector disequality", status)
+	}
+	stats := statistics.New()
+	astTestMust(t, solver.CollectStatistics(stats))
+	found := false
+	for i := 0; i < stats.Size(); i++ {
+		if stats.Key(i) == "bv dynamic diseqs" {
+			found = stats.IsUint(i) && stats.UintValue(i) != 0
+		}
+	}
+	if !found {
+		t.Fatal("missing dynamic bit-vector disequality statistic")
+	}
+}
+
 func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
 	one, err := m.BitVectorNumeralUint64(1, 4)
