@@ -4,9 +4,11 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
@@ -14,6 +16,7 @@ import (
 type smtPseudoBooleanStatistics struct {
 	predicates uint64
 	clauses    uint64
+	compiled   uint64
 }
 
 // SMTPseudoBooleanTheory defines each reached pseudo-Boolean atom with exact
@@ -22,6 +25,22 @@ type smtPseudoBooleanStatistics struct {
 type SMTPseudoBooleanTheory struct {
 	*SMTTheoryBase
 	statistics smtPseudoBooleanStatistics
+	compiler   *rewriter.PB2BVRewriter
+}
+
+func (t *SMTPseudoBooleanTheory) Initialize(state *SMTInternalizerState) error {
+	if err := t.SMTTheoryBase.Initialize(state); err != nil {
+		return fmt.Errorf("pseudo-Boolean initialization: %w", err)
+	}
+	compiler, err := rewriter.NewPB2BVRewriter(state.manager)
+	if err != nil {
+		if compiler != nil {
+			_ = compiler.Close()
+		}
+		return fmt.Errorf("pseudo-Boolean compiler construction: %w", err)
+	}
+	t.compiler = compiler
+	return nil
 }
 
 func NewSMTPseudoBooleanTheory(family ast.FamilyID) (*SMTPseudoBooleanTheory, error) {
@@ -73,6 +92,66 @@ func smtPseudoBooleanRelation(op int32, sum, bound *big.Rat) (bool, error) {
 	}
 }
 
+func (t *SMTPseudoBooleanTheory) compile(expression ast.ASTHandle, atom SMTLiteral) (bool, error) {
+	if t.compiler == nil {
+		return false, ast.ErrASTHandle
+	}
+	state, _ := t.State()
+	output, err := state.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return false, err
+	}
+	defer func() { _ = state.manager.DelRef(&output) }()
+	if err = t.compiler.Rewrite(expression, output); err != nil {
+		return false, err
+	}
+	rewritten, err := state.manager.RefGet(output)
+	if err != nil {
+		return false, err
+	}
+	if rewritten == expression {
+		return false, nil
+	}
+	if err = state.Internalize(rewritten, true); err != nil {
+		return false, err
+	}
+	literal, err := state.Literal(rewritten)
+	if err != nil {
+		return false, err
+	}
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{atom.Negated(), literal}); err != nil {
+		return false, err
+	}
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{atom, literal.Negated()}); err != nil {
+		return false, err
+	}
+	sides, err := t.compiler.FlushSideConstraints()
+	if err != nil {
+		return false, err
+	}
+	for _, side := range sides {
+		if err = state.Internalize(side, true); err != nil {
+			break
+		}
+		sideLiteral, sideErr := state.Literal(side)
+		if sideErr != nil {
+			err = sideErr
+			break
+		}
+		if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{sideLiteral}); err != nil {
+			break
+		}
+	}
+	for _, side := range sides {
+		err = errors.Join(err, state.manager.DecRef(side))
+	}
+	if err != nil {
+		return false, err
+	}
+	t.statistics.compiled++
+	return true, nil
+}
+
 func (t *SMTPseudoBooleanTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool, error) {
 	op, own, err := t.operation(expression)
 	if err != nil || !own || op < ast.ASTPBOpAtMost || op > ast.ASTPBOpAuxBool {
@@ -96,6 +175,15 @@ func (t *SMTPseudoBooleanTheory) InternalizeAtom(expression ast.ASTHandle, _ boo
 		}
 	}
 	if op == ast.ASTPBOpAuxBool || found {
+		return true, nil
+	}
+	atom := NewSMTLiteral(variable, false)
+	compiled, err := t.compile(expression, atom)
+	if err != nil {
+		return false, err
+	}
+	if compiled {
+		t.statistics.predicates++
 		return true, nil
 	}
 	count, err := state.manager.GetNumArgs(expression)
@@ -134,7 +222,6 @@ func (t *SMTPseudoBooleanTheory) InternalizeAtom(expression ast.ASTHandle, _ boo
 		return false, err
 	}
 	selected := make([]bool, count)
-	atom := NewSMTLiteral(variable, false)
 	var emit func(int) error
 	emit = func(index int) error {
 		if index != len(selected) {
@@ -194,12 +281,36 @@ func (*SMTPseudoBooleanTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 }
 func (*SMTPseudoBooleanTheory) Name() string { return "pb" }
 
+func (t *SMTPseudoBooleanTheory) PushScope() error {
+	if err := t.SMTTheoryBase.PushScope(); err != nil {
+		return err
+	}
+	return t.compiler.Push()
+}
+
+func (t *SMTPseudoBooleanTheory) PopScopes(count uint32) error {
+	if err := t.compiler.Pop(count); err != nil {
+		return err
+	}
+	return t.SMTTheoryBase.PopScopes(count)
+}
+
+func (t *SMTPseudoBooleanTheory) Close() error {
+	if t == nil || t.compiler == nil {
+		return nil
+	}
+	err := t.compiler.Close()
+	t.compiler = nil
+	return err
+}
+
 func (t *SMTPseudoBooleanTheory) CollectStatistics(target *statistics.Statistics) error {
 	if t == nil || target == nil {
 		return ast.ErrASTHandle
 	}
 	target.UpdateUint64("pb predicates", t.statistics.predicates)
 	target.UpdateUint64("pb clauses", t.statistics.clauses)
+	target.UpdateUint64("pb compilations", t.statistics.compiled)
 	return nil
 }
 

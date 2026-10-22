@@ -116073,17 +116073,23 @@
           "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"]
         },
         {
-          "name": "watched propagation, simplex compilation, conflict-resolution strengthening and sorting-network compilation heuristics",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "sorting-network and bit-vector compilation path",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb.go",
+          "tests": ["TestSMTPseudoBooleanQFFDExactCardinality"]
+		},
+		{
+		  "name": "native watched propagation, simplex compilation and conflict-resolution strengthening heuristics",
+		  "status": "unported",
+		  "go_target": null,
+		  "tests": []
         }
       ],
       "ownership": [
         "The current exact encoder owns only temporary Go slices and big.Rat values while the SAT core owns generated clauses and literals."
       ],
       "deviations": [
-        "The semantic checkpoint emits an exact blocking clause for every Boolean argument valuation. This preserves reached truth conditions but does not yet preserve the source theory's polynomial propagation and compilation performance."
+        "The theory uses the ported PB2BV sorting-network and bit-vector compiler for accepted forms and exact blocking clauses as a semantic fallback. Native watch/simplex heuristics remain unported."
       ]
     },
     {

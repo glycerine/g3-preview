@@ -23,7 +23,8 @@ func TestSMTPseudoBooleanQFFDExactCardinality(t *testing.T) {
 				astTestMust(t, solver.Close())
 				astTestMust(t, params.Close())
 			})
-			if _, ok := solver.kernel.internalizer.theories[family].(*SMTPseudoBooleanTheory); !ok {
+			pbTheory, ok := solver.kernel.internalizer.theories[family].(*SMTPseudoBooleanTheory)
+			if !ok {
 				t.Fatal("QF_FD did not install the pseudo-Boolean theory")
 			}
 			bvName, err := m.Symbols.Intern("bv")
@@ -46,6 +47,7 @@ func TestSMTPseudoBooleanQFFDExactCardinality(t *testing.T) {
 				constraint, err = m.MkPseudoBooleanAtMost([]ast.ASTHandle{a, b}, 1)
 			}
 			astTestMust(t, err)
+			astTestMust(t, solver.kernel.internalizer.Internalize(constraint, true))
 			astTestMust(t, solver.Assert(constraint))
 			astTestMust(t, solver.Assert(a))
 			if !atLeast {
@@ -59,6 +61,9 @@ func TestSMTPseudoBooleanQFFDExactCardinality(t *testing.T) {
 			astTestMust(t, err)
 			if status != lbool.False {
 				t.Fatal("pseudo-Boolean cardinality violation accepted", status)
+			}
+			if pbTheory.statistics.compiled == 0 {
+				t.Fatal("pseudo-Boolean atom bypassed the sorting-network compiler")
 			}
 		})
 	}

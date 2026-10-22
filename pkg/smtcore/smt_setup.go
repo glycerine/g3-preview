@@ -27,7 +27,7 @@ func smtLogicUsesArrays(logic string) bool {
 
 func smtLogicUsesBitVectors(logic string) bool {
 	switch logic {
-	case "QF_BV", "QF_UFBV", "QF_AUFBV", "QF_ABV", "QF_BVRE", "QF_FPBV", "QF_BVFP", "QF_FD":
+	case "QF_BV", "QF_UFBV", "QF_AUFBV", "QF_ABV", "QF_BVRE", "QF_FPBV", "QF_BVFP", "QF_FD", "ALL":
 		return true
 	default:
 		return false
