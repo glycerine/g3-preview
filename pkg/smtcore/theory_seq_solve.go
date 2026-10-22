@@ -444,6 +444,10 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if err != nil || reduced {
 			return reduced, err
 		}
+		branched, err := t.branchBinaryUnitEquation(left, right)
+		if err != nil || branched {
+			return branched, err
+		}
 		solved, err := t.solveUnitWord(left, right, dependency)
 		if err != nil || solved {
 			return solved, err

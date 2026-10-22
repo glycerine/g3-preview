@@ -367,6 +367,46 @@ func TestSMTSequenceTheoryReducesEqualLengthBoundaries(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryBranchesBinaryUnitEquation(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-binary-x"), sort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-binary-y"), sort)
+	astTestMust(t, err)
+	left, err := m.MkSequenceConcat(x, a)
+	astTestMust(t, err)
+	right, err := m.MkSequenceConcat(b, y)
+	astTestMust(t, err)
+	wordEquality, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	tailName, err := m.Symbols.Intern("seq.binary.tail")
+	astTestMust(t, err)
+	tail, err := m.MkSequenceSkolem(tailName, []ast.ASTHandle{x, y, a, b}, sort)
+	astTestMust(t, err)
+	xValue, err := m.MkSequenceConcat(b, tail)
+	astTestMust(t, err)
+	xEquality, err := m.MkEq(x, xValue)
+	astTestMust(t, err)
+	notXEquality, err := m.MkNot(xEquality)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(wordEquality))
+	astTestMust(t, solver.Assert(notXEquality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("binary unit equation branch", status)
+	}
+}
+
 func TestSMTSequenceTheoryConcreteRelationConflicts(t *testing.T) {
 	for _, test := range []struct {
 		name  string
