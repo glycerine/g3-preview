@@ -854,6 +854,55 @@ func TestSMTSolverLinearArithmeticRejectsNonlinearTerms(t *testing.T) {
 	}
 }
 
+func TestSMTSolverSetupUsesPartialLinearIntegerArithmetic(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		mode int
+		want lbool.LBool
+	}{
+		{name: "strict-conflict", want: lbool.False},
+		{name: "parity-conflict", mode: 1, want: lbool.False},
+		{name: "integral-model", mode: 2, want: lbool.True},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m := astTestManager(t)
+			family, err := m.RegisterArithmeticPlugin()
+			astTestMust(t, err)
+			integer, err := m.MkFamilySort(family, 1, nil)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "linear-lia-x"), integer)
+			astTestMust(t, err)
+			one, err := m.ArithmeticNumeralRat(big.NewRat(1, 1), true)
+			astTestMust(t, err)
+			params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+			astTestMust(t, err)
+			s, err := NewSMTSolver(m, nil, "QF_LIA", SMTSolverConfig{Params: params})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
+			left := x
+			firstOp := smtArithOpLT
+			if test.mode == 1 {
+				left, err = m.MkFamilyApp(family, smtArithOpAdd, nil, []ast.ASTHandle{x, x})
+				astTestMust(t, err)
+				firstOp = smtArithOpLE
+			} else if test.mode == 2 {
+				firstOp = smtArithOpLE
+			}
+			first, err := m.MkFamilyApp(family, firstOp, nil, []ast.ASTHandle{left, one})
+			astTestMust(t, err)
+			astTestMust(t, s.Assert(first))
+			second, err := m.MkFamilyApp(family, smtArithOpGE, nil, []ast.ASTHandle{left, one})
+			astTestMust(t, err)
+			astTestMust(t, s.Assert(second))
+			status, err := s.CheckSat(nil)
+			astTestMust(t, err)
+			if status != test.want {
+				t.Fatal("linear integer status", status, "want", test.want)
+			}
+		})
+	}
+}
+
 func TestSMTSolverSetupUsesIntegerDifferenceLogic(t *testing.T) {
 	for _, test := range []struct {
 		name   string

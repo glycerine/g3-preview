@@ -109771,6 +109771,7 @@
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
         "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+        "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
         "TestSMTSolverSetupUsesRealDifferenceLogic",
         "TestSMTSolverPublishesStrictRealDifferenceModel"
@@ -109793,12 +109794,13 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "explicit arithmetic and array logic classification, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA theory selection, and conservative incomplete-theory installation for remaining arithmetic and array logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409)",
+          "name": "explicit arithmetic and array logic classification, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA theory selection, and conservative incomplete-theory installation for remaining arithmetic and array logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409)",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
             "TestSMTSolverSetupUsesLinearRealArithmetic",
             "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+            "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
             "TestSMTSolverSetupUsesIntegerDifferenceLogic",
             "TestSMTSolverSetupUsesRealDifferenceLogic",
             "TestSMTSolverPublishesStrictRealDifferenceModel"
@@ -109812,10 +109814,10 @@
         }
       ],
       "ownership": [
-        "The kernel owns its theory registry; setup creates concrete real difference, integer difference, or linear rational theories for QF_RDL, QF_IDL/QF_UFIDL, and QF_LRA and dummy-theory values for reached families whose solvers remain unavailable."
+        "The kernel owns its theory registry; setup creates concrete real difference, integer difference, linear rational, or partial linear integer theories for QF_RDL, QF_IDL/QF_UFIDL, QF_LRA, and QF_LIA and dummy-theory values for reached families whose solvers remain unavailable."
       ],
       "deviations": [
-        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, and QF_LRA uses the retained rational linear simplex specialization. Nonlinear QF_LRA expressions and other incomplete arithmetic and array logics return source-style incompleteness instead of an unsound propositional SAT result."
+        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA uses the retained rational linear simplex specialization, and QF_LIA uses its integer-bound specialization. Fractional QF_LIA models, nonlinear expressions, and other incomplete arithmetic and array logics return source-style incompleteness instead of an unsound result."
       ]
     },
     {
@@ -109829,6 +109831,7 @@
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
         "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+        "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
         "TestSMTSolverSetupUsesRealDifferenceLogic"
       ],
@@ -109852,6 +109855,7 @@
           "tests": [
             "TestSMTSolverSetupUsesLinearRealArithmetic",
             "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+            "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
             "TestSMTSolverSetupUsesIntegerDifferenceLogic",
             "TestSMTSolverSetupUsesRealDifferenceLogic"
           ]
@@ -110896,7 +110900,8 @@
         "TestSMTNormalizeArithmeticIntegerBound",
         "TestSMTSolverSetupUsesLinearRealArithmetic",
         "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
-        "TestSMTSolverPublishesStrictLinearRealModel"
+        "TestSMTSolverPublishesStrictLinearRealModel",
+        "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic"
       ],
       "conditionals": [
         {
@@ -111042,7 +111047,8 @@
           "tests": [
             "TestSMTSolverSetupUsesLinearRealArithmetic",
             "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
-            "TestSMTSolverPublishesStrictLinearRealModel"
+            "TestSMTSolverPublishesStrictLinearRealModel",
+            "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic"
           ]
         }
       ],
@@ -112386,9 +112392,15 @@
       "path": "src/smt/theory_arith_int.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/smtcore/theory_arith_bounds.go"
+      ],
+      "tests": [
+        "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
+        "TestSMTNormalizeArithmeticIntegerBound"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -112547,7 +112559,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "integer strict-bound normalization, integral-model check, and conservative fractional-model refusal",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },

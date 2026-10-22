@@ -1,5 +1,6 @@
 // Source: retained linear rational fragment of src/smt/theory_arith.h,
-// src/smt/theory_arith_core.h, and src/smt/theory_arith_core_def.h.
+// src/smt/theory_arith_core.h, src/smt/theory_arith_core_def.h, and the
+// retained integer-bound fragment of src/smt/theory_arith_int.h.
 package smtcore
 
 import (
@@ -80,11 +81,20 @@ type SMTLinearArithmeticTheory struct {
 	assertionHead    int
 	scopes           []smtLinearArithmeticScope
 	unsupported      bool
+	integer          bool
 	delta            big.Rat
 	equalityAdapter  *smtArithmeticEqualityAdapter
 }
 
 func NewSMTLinearArithmeticTheory(family ast.FamilyID) (*SMTLinearArithmeticTheory, error) {
+	return newSMTLinearArithmeticTheory(family, false)
+}
+
+func NewSMTLinearIntegerArithmeticTheory(family ast.FamilyID) (*SMTLinearArithmeticTheory, error) {
+	return newSMTLinearArithmeticTheory(family, true)
+}
+
+func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinearArithmeticTheory, error) {
 	base, err := NewSMTTheoryBase(family)
 	if err != nil {
 		return nil, err
@@ -93,6 +103,7 @@ func NewSMTLinearArithmeticTheory(family ast.FamilyID) (*SMTLinearArithmeticTheo
 		SMTTheoryBase: base,
 		solver:        simplex.NewSolver(nil),
 		atomByBool:    make(map[int32]int),
+		integer:       integer,
 	}
 	t.equalityAdapter, err = newSMTArithmeticEqualityAdapter(base)
 	if err != nil {
@@ -137,7 +148,11 @@ func (t *SMTLinearArithmeticTheory) ApplySortConstraint(node *SMTEnode, sort ast
 	if err != nil {
 		return err
 	}
-	if kind != 0 { // This specialization is QF_LRA; integer cuts are separate.
+	expected := int32(0)
+	if t.integer {
+		expected = 1
+	}
+	if kind != expected {
 		t.unsupported = true
 		return nil
 	}
@@ -207,6 +222,9 @@ func (t *SMTLinearArithmeticTheory) linearize(expression ast.ASTHandle) (smtLine
 	if value, numeral, err := t.numeral(expression); err != nil {
 		return smtLinearForm{}, false, err
 	} else if numeral {
+		if t.integer && !value.IsInt() {
+			return smtLinearForm{}, false, nil
+		}
 		result := newSMTLinearForm()
 		result.constant.Set(value)
 		return result, true, nil
@@ -240,6 +258,9 @@ func (t *SMTLinearArithmeticTheory) linearize(expression ast.ASTHandle) (smtLine
 			}
 			return result, true, nil
 		case smtArithOpUMinus, smtArithOpToReal:
+			if t.integer && op == smtArithOpToReal {
+				return smtLinearForm{}, false, nil
+			}
 			if count != 1 {
 				return smtLinearForm{}, false, nil
 			}
@@ -273,11 +294,17 @@ func (t *SMTLinearArithmeticTheory) linearize(expression ast.ASTHandle) (smtLine
 					part.scale(&result.constant)
 					result = part
 				} else {
+					if t.integer && !part.constant.IsInt() {
+						return smtLinearForm{}, false, nil
+					}
 					result.scale(&part.constant)
 				}
 			}
 			return result, true, nil
 		case smtArithOpDiv:
+			if t.integer {
+				return smtLinearForm{}, false, nil
+			}
 			if count != 2 {
 				return smtLinearForm{}, false, nil
 			}
@@ -396,7 +423,7 @@ func (t *SMTLinearArithmeticTheory) CanPropagate() bool {
 	return t != nil && t.assertionHead < len(t.assertions)
 }
 
-func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth bool) (lower bool, value simplex.Infinitesimal) {
+func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth, integer bool) (lower bool, value simplex.Infinitesimal) {
 	value.Main.Neg(&atom.form.constant)
 	op := atom.op
 	if !truth {
@@ -412,7 +439,11 @@ func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth bool) (lower bool, 
 		}
 	}
 	lower = op == smtArithOpGE || op == smtArithOpGT
-	if op == smtArithOpGT {
+	if integer && op == smtArithOpGT {
+		value.Main.Add(&value.Main, big.NewRat(1, 1))
+	} else if integer && op == smtArithOpLT {
+		value.Main.Sub(&value.Main, big.NewRat(1, 1))
+	} else if op == smtArithOpGT {
 		value.Epsilon.SetInt64(1)
 	} else if op == smtArithOpLT {
 		value.Epsilon.SetInt64(-1)
@@ -454,7 +485,7 @@ func (t *SMTLinearArithmeticTheory) rebuild() (bool, error) {
 		if !atom.supported {
 			continue
 		}
-		lower, bound := smtLinearAtomBound(atom, assertion.truth)
+		lower, bound := smtLinearAtomBound(atom, assertion.truth, t.integer)
 		base := t.nextSimplex + uint32(assertion.atom)
 		var err error
 		if lower {
@@ -543,6 +574,14 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	}
 	if t.unsupported {
 		return SMTFinalCheckGiveUp, nil
+	}
+	if t.integer {
+		for _, variable := range t.simplexVariables {
+			value := t.solver.Value(variable)
+			if !value.Main.IsInt() || value.Epsilon.Sign() != 0 {
+				return SMTFinalCheckGiveUp, nil
+			}
+		}
 	}
 	return SMTFinalCheckDone, nil
 }
@@ -687,7 +726,7 @@ func (t *SMTLinearArithmeticTheory) ModelValue(node *SMTEnode, generator *SMTMod
 	var epsilon, rational big.Rat
 	epsilon.Mul(&t.delta, &value.Epsilon)
 	rational.Add(&value.Main, &epsilon)
-	numeral, err := state.manager.ArithmeticNumeralRat(&rational, false)
+	numeral, err := state.manager.ArithmeticNumeralRat(&rational, t.integer)
 	if err != nil {
 		return nil, err
 	}
