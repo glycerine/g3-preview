@@ -41575,7 +41575,8 @@
         "pkg/interp/direct_proof_finalize.go",
         "pkg/interp/direct_proof_substitution.go",
         "pkg/interp/direct_proof_mixed_resolution.go",
-        "pkg/interp/direct_proof_simplify.go"
+        "pkg/interp/direct_proof_simplify.go",
+        "pkg/interp/direct_proof_sum.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41586,7 +41587,8 @@
         "TestDirectProofFinalSimplificationOwnership",
         "TestDirectProofTermSubstitutionAndBarriers",
         "TestDirectProofContraRecognitionAndResolvents",
-        "TestDirectProofGenericSymbolicSimplification"
+        "TestDirectProofGenericSymbolicSimplification",
+        "TestDirectProofOrdinarySumSimplification"
       ],
       "conditionals": [
         {
@@ -41791,9 +41793,10 @@
           "go_target": "pkg/interp/direct_proof_simplify.go",
           "tests": [
             "TestDirectProofContraRecognitionAndResolvents",
-            "TestDirectProofGenericSymbolicSimplification"
+            "TestDirectProofGenericSymbolicSimplification",
+            "TestDirectProofOrdinarySumSimplification"
           ],
-          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, and single-resolvent reduction are ported. Specialized rotation, arithmetic sum, equality-rule, excluded-middle, congruence, modus-ponens, and rewrite-chain normalization remain pending."
+          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, and ordinary conditional inequality summation are ported. Specialized rotation, nested/normal arithmetic sums, equality-rule, excluded-middle, congruence, modus-ponens, and rewrite-chain normalization remain pending."
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
@@ -41830,7 +41833,8 @@
         "pkg/interp/direct_proof_finalize.go",
         "pkg/interp/direct_proof_substitution.go",
         "pkg/interp/direct_proof_mixed_resolution.go",
-        "pkg/interp/direct_proof_simplify.go"
+        "pkg/interp/direct_proof_simplify.go",
+        "pkg/interp/direct_proof_sum.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41841,7 +41845,8 @@
         "TestDirectProofFinalSimplificationOwnership",
         "TestDirectProofTermSubstitutionAndBarriers",
         "TestDirectProofContraRecognitionAndResolvents",
-        "TestDirectProofGenericSymbolicSimplification"
+        "TestDirectProofGenericSymbolicSimplification",
+        "TestDirectProofOrdinarySumSimplification"
       ],
       "conditionals": [
         {

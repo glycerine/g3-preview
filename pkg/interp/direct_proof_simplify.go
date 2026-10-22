@@ -81,7 +81,9 @@ func (p *DirectProofInterpolator) simplifyProofTerm(expression ast.ASTHandle) (a
 					err = errors.Join(err, p.base.manager.ast.DelRef(&ref))
 				}
 			}
-		case op == OperatorUninterpreted && !hasPlaceholder && (declaration == p.rotateSum || declaration == p.sum || declaration == p.leqToEq || declaration == p.eqToLeq || declaration == p.excludedMid):
+		case op == OperatorUninterpreted && !hasPlaceholder && declaration == p.sum:
+			result, err = p.simplifySum(args)
+		case op == OperatorUninterpreted && !hasPlaceholder && (declaration == p.rotateSum || declaration == p.leqToEq || declaration == p.eqToLeq || declaration == p.excludedMid):
 			return ast.ASTHandle{}, ProofError{}
 		default:
 			result, err = p.base.manager.Clone(current, args)

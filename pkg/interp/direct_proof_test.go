@@ -441,3 +441,36 @@ func TestDirectProofGenericSymbolicSimplification(t *testing.T) {
 		t.Fatal("equality proof simplification", yes, e)
 	}
 }
+
+func TestDirectProofOrdinarySumSimplification(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	integer, err := manager.IntType()
+	interpMust(t, err)
+	x, err := manager.MakeVariable("sum-proof-x", integer)
+	interpMust(t, err)
+	x = interpPin(t, m, x)
+	zero, err := manager.MakeIntText("0")
+	interpMust(t, err)
+	one, err := manager.MakeIntText("1")
+	interpMust(t, err)
+	first, err := manager.Make(OperatorLE, zero, x)
+	interpMust(t, err)
+	first = interpPin(t, m, first)
+	second, err := manager.Make(OperatorLE, zero, one)
+	interpMust(t, err)
+	base, err := NewBase(manager, []ast.ASTHandle{first}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	proof, err := direct.makeSymbol(direct.sum, first, one, second)
+	interpMust(t, err)
+	got, err := direct.SimplifyProofTerm(proof)
+	interpMust(t, err)
+	want, err := manager.LinearCombination(first, one, second, false)
+	interpMust(t, err)
+	if got != want {
+		t.Fatal("ordinary sum simplification", got, want)
+	}
+}
