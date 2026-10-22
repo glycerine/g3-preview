@@ -99768,7 +99768,7 @@
       "path": "src/smt/expr_context_simplifier.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -99791,17 +99791,35 @@
           "text": "VERIFY(cache.find(fml, path_r));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "expr_context_simplifier local Boolean context reduction and fixed-point traversal",
+          "status": "reference_only",
+          "tests": []
+        },
+        {
+          "name": "expr_strong_context_simplifier kernel-backed basic and model-based reduction",
+          "status": "reference_only",
+          "tests": []
+        },
+        {
+          "name": "disabled quantifier-body descent",
+          "status": "dead_deleted",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The only production consumer is src/qe/qe_sat_tactic.cpp, which belongs to the unretained native QE component. The retained Go Boolean rewriter has its own local-context implementation and is not treated as a port of this source unit."
+      ]
     },
     {
       "path": "src/smt/expr_context_simplifier.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -99814,11 +99832,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "local and strong context simplifier declarations and solver ownership contract",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The declarations are consumed only by the unretained native QE SAT tactic."
+      ]
     },
     {
       "path": "src/smt/fingerprints.cpp",
