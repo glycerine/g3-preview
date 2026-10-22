@@ -437,7 +437,7 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 	if err != nil {
 		return false, err
 	}
-	decided, required, decisionErr := t.squareComparison(left, right, op)
+	decided, required, decisionErr := t.evenMonomialComparison(left, right, op)
 	if decisionErr != nil {
 		return false, decisionErr
 	}
@@ -476,29 +476,47 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 	return true, nil
 }
 
-func (t *SMTLinearArithmeticTheory) squareComparison(left, right ast.ASTHandle, op int32) (bool, bool, error) {
+func (t *SMTLinearArithmeticTheory) evenMonomialComparison(left, right ast.ASTHandle, op int32) (bool, bool, error) {
 	zero := func(expression ast.ASTHandle) (bool, error) {
 		value, numeral, err := t.numeral(expression)
 		return numeral && value.Sign() == 0, err
 	}
-	square := func(expression ast.ASTHandle) (bool, error) {
+	evenMonomial := func(expression ast.ASTHandle) (int, bool, error) {
 		operation, arithmetic, err := t.operation(expression)
 		if err != nil || !arithmetic || operation != smtArithOpMul {
-			return false, err
+			return 0, false, err
 		}
 		state, _ := t.State()
 		count, err := state.manager.GetNumArgs(expression)
-		if err != nil || count != 2 {
-			return false, err
+		if err != nil || count < 2 {
+			return 0, false, err
 		}
-		first, err := state.manager.GetArg(expression, 0)
-		if err != nil {
-			return false, err
+		coefficient := new(big.Rat).SetInt64(1)
+		powers := make(map[ast.ASTHandle]uint32)
+		for index := uint32(0); index < count; index++ {
+			argument, argErr := state.manager.GetArg(expression, index)
+			if argErr != nil {
+				return 0, false, argErr
+			}
+			if value, numeral, numeralErr := t.numeral(argument); numeralErr != nil {
+				return 0, false, numeralErr
+			} else if numeral {
+				coefficient.Mul(coefficient, value)
+			} else {
+				powers[argument]++
+			}
 		}
-		second, err := state.manager.GetArg(expression, 1)
-		return first == second, err
+		if len(powers) == 0 || coefficient.Sign() == 0 {
+			return 0, false, nil
+		}
+		for _, power := range powers {
+			if power%2 != 0 {
+				return 0, false, nil
+			}
+		}
+		return coefficient.Sign(), true, nil
 	}
-	leftSquare, err := square(left)
+	leftSign, leftEven, err := evenMonomial(left)
 	if err != nil {
 		return false, false, err
 	}
@@ -506,15 +524,15 @@ func (t *SMTLinearArithmeticTheory) squareComparison(left, right ast.ASTHandle, 
 	if err != nil {
 		return false, false, err
 	}
-	if leftSquare && rightZero {
-		if op == smtArithOpGE {
+	if leftEven && rightZero {
+		if (leftSign > 0 && op == smtArithOpGE) || (leftSign < 0 && op == smtArithOpLE) {
 			return true, true, nil
 		}
-		if op == smtArithOpLT {
+		if (leftSign > 0 && op == smtArithOpLT) || (leftSign < 0 && op == smtArithOpGT) {
 			return true, false, nil
 		}
 	}
-	rightSquare, err := square(right)
+	rightSign, rightEven, err := evenMonomial(right)
 	if err != nil {
 		return false, false, err
 	}
@@ -522,11 +540,11 @@ func (t *SMTLinearArithmeticTheory) squareComparison(left, right ast.ASTHandle, 
 	if err != nil {
 		return false, false, err
 	}
-	if rightSquare && leftZero {
-		if op == smtArithOpLE {
+	if rightEven && leftZero {
+		if (rightSign > 0 && op == smtArithOpLE) || (rightSign < 0 && op == smtArithOpGE) {
 			return true, true, nil
 		}
-		if op == smtArithOpGT {
+		if (rightSign > 0 && op == smtArithOpGT) || (rightSign < 0 && op == smtArithOpLT) {
 			return true, false, nil
 		}
 	}

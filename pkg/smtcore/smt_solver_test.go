@@ -1130,6 +1130,8 @@ func TestSMTSolverLinearArithmeticSquareNonnegative(t *testing.T) {
 		op         int32
 		squareLeft bool
 		negate     bool
+		negative   bool
+		twoSquares bool
 		want       lbool.LBool
 	}{
 		{name: "square-ge-zero", op: smtArithOpGE, squareLeft: true, want: lbool.True},
@@ -1137,6 +1139,9 @@ func TestSMTSolverLinearArithmeticSquareNonnegative(t *testing.T) {
 		{name: "zero-le-square", op: smtArithOpLE, want: lbool.True},
 		{name: "zero-gt-square", op: smtArithOpGT, want: lbool.False},
 		{name: "negated-square-ge-zero", op: smtArithOpGE, squareLeft: true, negate: true, want: lbool.False},
+		{name: "two-even-powers-ge-zero", op: smtArithOpGE, squareLeft: true, twoSquares: true, want: lbool.True},
+		{name: "negative-square-le-zero", op: smtArithOpLE, squareLeft: true, negative: true, want: lbool.True},
+		{name: "negative-square-gt-zero", op: smtArithOpGT, squareLeft: true, negative: true, want: lbool.False},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			m := astTestManager(t)
@@ -1153,7 +1158,18 @@ func TestSMTSolverLinearArithmeticSquareNonnegative(t *testing.T) {
 			astTestMust(t, err)
 			x, err := m.MkConst(astTestSymbol(t, m, "square-x"), realSort)
 			astTestMust(t, err)
-			square, err := m.MkFamilyApp(arithmetic, smtArithOpMul, nil, []ast.ASTHandle{x, x})
+			factors := []ast.ASTHandle{x, x}
+			if test.twoSquares {
+				y, makeErr := m.MkConst(astTestSymbol(t, m, "square-y"), realSort)
+				astTestMust(t, makeErr)
+				factors = append(factors, y, y)
+			}
+			if test.negative {
+				minusOne, makeErr := m.ArithmeticRealNumeralText("-1")
+				astTestMust(t, makeErr)
+				factors = append([]ast.ASTHandle{minusOne}, factors...)
+			}
+			square, err := m.MkFamilyApp(arithmetic, smtArithOpMul, nil, factors)
 			astTestMust(t, err)
 			left, right := zero, square
 			if test.squareLeft {

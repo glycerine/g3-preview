@@ -113084,7 +113084,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The first retained nonlinear rule recognizes a syntactic square and decides its comparison with zero from the exact [0,+infinity) interval. Other nonlinear atoms remain unsupported and make CheckSat return unknown."
+        "The first retained nonlinear rule recognizes products whose non-numeral factors all have even powers and decides their comparison with zero from the coefficient sign and exact half-infinite interval. Other nonlinear atoms remain unsupported and make CheckSat return unknown."
       ]
     },
     {
