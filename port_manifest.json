@@ -105611,9 +105611,15 @@
       "path": "src/smt/smt_context_inv.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_context_invariant.go",
+        "pkg/smtcore/smt_context_invariant_test.go"
+      ],
+      "tests": [
+        "TestSMTContextInvariantWatchesAssignmentsAndJustifications",
+        "TestSMTContextInvariantDetectsInvalidClauseJustification"
+      ],
       "conditionals": [
         {
           "line": 26,
@@ -105738,11 +105744,29 @@
           "text": "SASSERT(m_assignment[l.index()] == l_true);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Boolean vector, assignment complement, clause watch, binary watch symmetry, enode, congruence-table, propagation-head, equality-class assignment and clause-justification invariants (src/smt/smt_context_inv.cpp:28-155,289-313,405-416)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_context_invariant.go",
+          "tests": [
+            "TestSMTContextInvariantWatchesAssignmentsAndJustifications",
+            "TestSMTContextInvariantDetectsInvalidClauseJustification"
+          ]
+        },
+        {
+          "name": "Debug-only missing-propagation, relevancy and theory-disequality audits plus model and unsat-core validation (src/smt/smt_context_inv.cpp:158-287,315-403,418-487)",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Invariant checks borrow the internalizer-owned slices, clauses, enodes, congruence table and checker-context maps without retaining them."
+      ],
+      "deviations": [
+        "Source assertion failures return ast.ErrASTDomain. Go validates every live ordinary clause because it does not split clauses into native auxiliary and lemma vectors."
+      ]
     },
     {
       "path": "src/smt/smt_context_pp.cpp",
