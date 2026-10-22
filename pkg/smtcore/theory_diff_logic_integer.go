@@ -173,6 +173,65 @@ func (t *SMTIntegerDiffTheory) addFixedValue(variable SMTTheoryVar, value *big.R
 	return nil
 }
 
+func (t *SMTIntegerDiffTheory) offset(expression ast.ASTHandle) (ast.ASTHandle, *big.Rat, bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return ast.ASTHandle{}, nil, false, err
+	}
+	op, arithmetic, err := t.operation(expression)
+	if err != nil || !arithmetic || op != smtArithOpAdd {
+		return ast.ASTHandle{}, nil, false, err
+	}
+	count, err := state.manager.GetNumArgs(expression)
+	if err != nil || count != 2 {
+		return ast.ASTHandle{}, nil, false, err
+	}
+	left, err := state.manager.GetArg(expression, 0)
+	if err != nil {
+		return ast.ASTHandle{}, nil, false, err
+	}
+	right, err := state.manager.GetArg(expression, 1)
+	if err != nil {
+		return ast.ASTHandle{}, nil, false, err
+	}
+	if value, numeral, numeralErr := t.numeral(left); numeralErr != nil {
+		return ast.ASTHandle{}, nil, false, numeralErr
+	} else if numeral {
+		return right, value, true, nil
+	}
+	if value, numeral, numeralErr := t.numeral(right); numeralErr != nil {
+		return ast.ASTHandle{}, nil, false, numeralErr
+	} else if numeral {
+		return left, value, true, nil
+	}
+	return ast.ASTHandle{}, nil, false, nil
+}
+
+func (t *SMTIntegerDiffTheory) addOffset(source, target SMTTheoryVar, value *big.Rat) error {
+	forward, err := t.graph.AddEdge(int32(source), int32(target), value, SMTNullLiteral)
+	if err != nil {
+		return err
+	}
+	if feasible, enableErr := t.graph.EnableEdge(forward); enableErr != nil || !feasible {
+		if enableErr != nil {
+			return enableErr
+		}
+		return ast.ErrASTDomain
+	}
+	negative := new(big.Rat).Neg(value)
+	backward, err := t.graph.AddEdge(int32(target), int32(source), negative, SMTNullLiteral)
+	if err != nil {
+		return err
+	}
+	if feasible, enableErr := t.graph.EnableEdge(backward); enableErr != nil || !feasible {
+		if enableErr != nil {
+			return enableErr
+		}
+		return ast.ErrASTDomain
+	}
+	return nil
+}
+
 func (t *SMTIntegerDiffTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error) {
 	state, err := t.State()
 	if err != nil {
@@ -201,6 +260,38 @@ func (t *SMTIntegerDiffTheory) InternalizeTerm(expression ast.ASTHandle) (bool, 
 			return false, mkErr
 		}
 		return true, t.addFixedValue(variable, value)
+	}
+	base, value, offset, err := t.offset(expression)
+	if err != nil {
+		return false, err
+	}
+	if offset {
+		source, sourceErr := t.ensureVariable(base)
+		if sourceErr != nil {
+			return false, sourceErr
+		}
+		count, countErr := state.manager.GetNumArgs(expression)
+		if countErr != nil {
+			return false, countErr
+		}
+		for index := uint32(0); index < count; index++ {
+			argument, argumentErr := state.manager.GetArg(expression, index)
+			if argumentErr != nil {
+				return false, argumentErr
+			}
+			if internalizeErr := state.Internalize(argument, false); internalizeErr != nil {
+				return false, internalizeErr
+			}
+		}
+		node, mkErr := state.MkEnode(expression, false, false, true)
+		if mkErr != nil {
+			return false, mkErr
+		}
+		target, mkErr := t.createVariable(node)
+		if mkErr != nil {
+			return false, mkErr
+		}
+		return true, t.addOffset(source, target, value)
 	}
 	_, arithmetic, err := t.operation(expression)
 	if err != nil {

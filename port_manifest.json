@@ -113244,6 +113244,7 @@
         "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
         "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
         "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback",
+        "TestSMTIntegerDiffTheoryOffsetTerm",
         "TestSMTSolverSetupUsesIntegerDifferenceLogic"
       ],
       "conditionals": [
@@ -113267,6 +113268,7 @@
             "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
             "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
             "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback",
+            "TestSMTIntegerDiffTheoryOffsetTerm",
             "TestSMTSolverSetupUsesIntegerDifferenceLogic"
           ]
         },
@@ -113297,6 +113299,7 @@
         "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
         "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
         "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback",
+        "TestSMTIntegerDiffTheoryOffsetTerm",
         "TestSMTSolverSetupUsesIntegerDifferenceLogic"
       ],
       "conditionals": [
@@ -113443,18 +113446,19 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Integer zero initialization, <=/>= atom decomposition and polarity, integer complement edge, assignment queue, scope rollback, final-check give-up, sign decomposition, negative-cycle propagation/conflict, numeral variables and ordinary theory-variable attachment (src/smt/theory_diff_logic_def.h:64-82,153-263,299-373,389-476,536-559,664-701,716-837)",
+          "name": "Integer zero initialization, <=/>= atom decomposition and polarity, integer complement edge, assignment queue, scope rollback, final-check give-up, sign decomposition, negative-cycle propagation/conflict, numeral and offset terms, and ordinary theory-variable attachment (src/smt/theory_diff_logic_def.h:64-82,153-263,299-373,389-476,536-559,664-701,703-837)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_diff_logic_integer.go",
           "tests": [
             "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
             "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
             "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback",
+            "TestSMTIntegerDiffTheoryOffsetTerm",
             "TestSMTSolverSetupUsesIntegerDifferenceLogic"
           ]
         },
         {
-          "name": "Binary-bound axioms, equality adapter, adaptive and implied-bound propagation, offset-term equalities, cheap equality propagation, core equality/disequality reflection, reset/model/statistics/display, optimization and simplex integration (remaining src/smt/theory_diff_logic_def.h)",
+          "name": "Binary-bound axioms, equality adapter, adaptive and implied-bound propagation, cheap equality propagation, core equality/disequality reflection, reset/model/statistics/display, optimization and simplex integration (remaining src/smt/theory_diff_logic_def.h)",
           "status": "unported"
         }
       ],

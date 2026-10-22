@@ -171,3 +171,30 @@ func TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback(t *testing.T) {
 		t.Fatal("rolled-back final check", status, finalErr)
 	}
 }
+
+func TestSMTIntegerDiffTheoryOffsetTerm(t *testing.T) {
+	f := newSMTIntegerDiffFixture(t)
+	offset, err := f.manager.MkFamilyApp(f.family, smtArithOpAdd, nil, []ast.ASTHandle{f.x, f.numeral(t, 3)})
+	astTestMust(t, err)
+	astTestMust(t, f.state.Internalize(offset, false))
+	sourceNode := f.state.context.enodes[f.x]
+	targetNode := f.state.context.enodes[offset]
+	if sourceNode == nil || targetNode == nil || !f.theory.IsAttachedToVariable(sourceNode) || !f.theory.IsAttachedToVariable(targetNode) {
+		t.Fatal("offset theory variables", sourceNode, targetNode)
+	}
+	source := sourceNode.TheoryVar(f.family)
+	target := targetNode.TheoryVar(f.family)
+	forward, _, found, err := f.theory.graph.MinimumEnabledEdge(int32(source), int32(target))
+	astTestMust(t, err)
+	if !found || forward.Cmp(big.NewRat(3, 1)) != 0 {
+		t.Fatal("offset forward edge", forward, found)
+	}
+	backward, _, found, err := f.theory.graph.MinimumEnabledEdge(int32(target), int32(source))
+	astTestMust(t, err)
+	if !found || backward.Cmp(big.NewRat(-3, 1)) != 0 {
+		t.Fatal("offset backward edge", backward, found)
+	}
+	if status, finalErr := f.theory.FinalCheck(); finalErr != nil || status != SMTFinalCheckDone {
+		t.Fatal("offset final check", status, finalErr)
+	}
+}
