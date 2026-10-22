@@ -98221,7 +98221,7 @@
       "path": "src/smt/arith_eq_adapter.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arith_eq_adapter.go",
         "pkg/smtcore/smt_arith_eq_adapter_test.go"
@@ -98229,7 +98229,10 @@
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
         "TestSMTRealDifferenceEqualityEventAdapter",
-        "TestSMTArithmeticEqualityAdapterRecreatesSearchAxiomsAtRestart"
+        "TestSMTArithmeticEqualityAdapterRecreatesSearchAxiomsAtRestart",
+        "TestSMTArithmeticEqualityAdapterBinaryBoundsAndLazyRestart",
+        "TestSMTArithmeticEqualityAdapterDefersGeneratedRelevancy",
+        "TestSMTKernelAppliesArithmeticConfigurationOnTheoryRegistration"
       ],
       "assertions": [
         {
@@ -98270,22 +98273,32 @@
           ]
         },
         {
-          "name": "Optional binary-bound parameter, relevancy callback and diagnostic display (src/smt/arith_eq_adapter.cpp:49-81,210-218,269-279)",
-          "status": "unported"
+          "name": "Optional binary-bound and lazy-adapter parameters plus pair-relevancy callback (src/smt/arith_eq_adapter.cpp:49-81,210-260)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arith_eq_adapter.go",
+          "tests": [
+            "TestSMTArithmeticEqualityAdapterBinaryBoundsAndLazyRestart",
+            "TestSMTArithmeticEqualityAdapterDefersGeneratedRelevancy",
+            "TestSMTKernelAppliesArithmeticConfigurationOnTheoryRegistration"
+          ]
+        },
+        {
+          "name": "diagnostic display without a retained caller (src/smt/arith_eq_adapter.cpp:269-279)",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
         "The adapter borrows its owning SMTTheoryBase and enodes, owns canonical AST-handle pairs, and removes pairs when their theory scope is popped."
       ],
       "deviations": [
-        "Default AddBinaryBounds is false. Relevancy is managed by the shared SMT relevancy propagator."
+        "The adapter installs pair dependencies in the shared SMT relevancy propagator instead of allocating a polymorphic C++ relevancy callback."
       ]
     },
     {
       "path": "src/smt/arith_eq_adapter.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arith_eq_adapter.go",
         "pkg/smtcore/smt_arith_eq_adapter_test.go"
@@ -98293,7 +98306,9 @@
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
         "TestSMTRealDifferenceEqualityEventAdapter",
-        "TestSMTArithmeticEqualityAdapterRecreatesSearchAxiomsAtRestart"
+        "TestSMTArithmeticEqualityAdapterRecreatesSearchAxiomsAtRestart",
+        "TestSMTArithmeticEqualityAdapterBinaryBoundsAndLazyRestart",
+        "TestSMTArithmeticEqualityAdapterDefersGeneratedRelevancy"
       ],
       "conditionals": [
         {
@@ -98318,8 +98333,17 @@
           ]
         },
         {
-          "name": "Statistics collection and debug display surface",
-          "status": "unported"
+          "name": "axiom statistics collection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arith_eq_adapter.go",
+          "tests": [
+            "TestSMTArithmeticEqualityAdapterEventsAndScopes",
+            "TestSMTArithmeticEqualityAdapterRecreatesSearchAxiomsAtRestart"
+          ]
+        },
+        {
+          "name": "debug display surface without a retained caller",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [

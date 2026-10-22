@@ -19,6 +19,7 @@ type smtArithmeticEqualityAdapter struct {
 	limits    []int
 	restart   []smtArithmeticEqualityPair
 	numAxioms uint64
+	lazy      bool
 }
 
 func newSMTArithmeticEqualityAdapter(owner *SMTTheoryBase) (*smtArithmeticEqualityAdapter, error) {
@@ -85,9 +86,28 @@ func (a *smtArithmeticEqualityAdapter) MkAxioms(left, right SMTTheoryVar) error 
 		return err
 	}
 	a.numAxioms++
-	if state.searching && state.scopeLevel > state.searchBaseLevel &&
+	if !a.lazy && state.searching && state.scopeLevel > state.searchBaseLevel &&
 		leftNode.InternalScopeLevel() <= state.searchBaseLevel && rightNode.InternalScopeLevel() <= state.searchBaseLevel {
 		a.restart = append(a.restart, pair)
+	}
+	return nil
+}
+
+func (a *smtArithmeticEqualityAdapter) AddRelevancy(first, second ast.ASTHandle, targets ...ast.ASTHandle) error {
+	if a == nil || a.owner == nil {
+		return ast.ErrASTHandle
+	}
+	state, err := a.owner.State()
+	if err != nil {
+		return err
+	}
+	if state.relevancy == nil {
+		return nil
+	}
+	for _, target := range targets {
+		if err = state.relevancy.AddPairDependency(first, second, target); err != nil {
+			return err
+		}
 	}
 	return nil
 }

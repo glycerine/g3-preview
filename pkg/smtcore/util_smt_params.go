@@ -280,6 +280,15 @@ func (s *SMTParams) DynamicAckState() (SMTDynAckState, error) {
 	}
 	return s.dyn.State()
 }
+
+// ArithmeticState exposes the embedded theory_arith_params snapshot consumed
+// by retained arithmetic theory implementations.
+func (s *SMTParams) ArithmeticState() (SMTArithState, error) {
+	if e := s.open(); e != nil {
+		return SMTArithState{}, e
+	}
+	return s.arith.State()
+}
 func (s *SMTParams) sourceStop() error {
 	if s.DestructorCause != nil {
 		return s.DestructorCause

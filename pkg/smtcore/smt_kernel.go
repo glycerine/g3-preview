@@ -48,6 +48,7 @@ type SMTKernel struct {
 	paramGlobals     *uparams.GlobalParamsService
 	smtParams        *SMTParams
 	smtState         SMTParamsState
+	arithState       SMTArithState
 	preprocessState  SMTPreprocessorState
 	produceModel     bool
 	preprocess       bool
@@ -142,6 +143,10 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	if err != nil {
 		return errors.Join(err, full.Close())
 	}
+	arithmetic, err := full.ArithmeticState()
+	if err != nil {
+		return errors.Join(err, full.Close())
+	}
 	proofs, err := k.manager.ProofsEnabled()
 	if err != nil {
 		return errors.Join(err, full.Close())
@@ -169,6 +174,7 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	k.relevancy.enabled = fullState.RelevancyLvl > 0
 	k.smtParams = full
 	k.smtState = fullState
+	k.arithState = arithmetic
 	state, err := k.readPreprocessorState(context, globals, params)
 	if err != nil {
 		return err
@@ -212,6 +218,10 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err != nil {
 		return err
 	}
+	arithmetic, err := k.smtParams.ArithmeticState()
+	if err != nil {
+		return err
+	}
 	if err = k.internalizer.UpdateDynamicAck(dynamic); err != nil {
 		return err
 	}
@@ -220,6 +230,14 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	}
 	k.relevancy.enabled = paramsState.RelevancyLvl > 0
 	k.smtState = paramsState
+	k.arithState = arithmetic
+	for _, theory := range k.internalizer.theories {
+		if configurable, ok := theory.(interface{ ConfigureArithmetic(SMTArithState) error }); ok {
+			if err = configurable.ConfigureArithmetic(arithmetic); err != nil {
+				return err
+			}
+		}
+	}
 	name := "preprocess"
 	enabled, err := k.paramContext.GetBoolName(params, &name, true)
 	if err != nil {
@@ -269,6 +287,11 @@ func (k *SMTKernel) Internalizer() (*SMTInternalizerState, error) {
 func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 	if err := k.open(); err != nil {
 		return err
+	}
+	if configurable, ok := theory.(interface{ ConfigureArithmetic(SMTArithState) error }); ok {
+		if err := configurable.ConfigureArithmetic(k.arithState); err != nil {
+			return err
+		}
 	}
 	return k.internalizer.RegisterTheory(theory)
 }

@@ -39,7 +39,17 @@ type SMTIntegerDiffTheory struct {
 	assertionHead   int
 	scopes          []smtIntegerDiffScope
 	nonDifference   bool
+	addBinaryBounds bool
 	equalityAdapter *smtArithmeticEqualityAdapter
+}
+
+func (t *SMTIntegerDiffTheory) ConfigureArithmetic(config SMTArithState) error {
+	if t == nil || t.equalityAdapter == nil {
+		return ast.ErrASTHandle
+	}
+	t.addBinaryBounds = config.AddBinaryBounds
+	t.equalityAdapter.lazy = config.LazyAdapter
+	return nil
 }
 
 func NewSMTIntegerDiffTheory(family ast.FamilyID) (*SMTIntegerDiffTheory, error) {
@@ -751,7 +761,15 @@ func (t *SMTIntegerDiffTheory) InternalizeEquality(expression ast.ASTHandle, var
 	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality.Negated(), upperLiteral}); err != nil {
 		return err
 	}
-	return state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality, lowerLiteral.Negated(), upperLiteral.Negated()})
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality, lowerLiteral.Negated(), upperLiteral.Negated()}); err != nil {
+		return err
+	}
+	if t.addBinaryBounds {
+		if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{lowerLiteral, upperLiteral}); err != nil {
+			return err
+		}
+	}
+	return t.equalityAdapter.AddRelevancy(left, right, expression, lower, upper)
 }
 func (t *SMTIntegerDiffTheory) NewEquality(left, right SMTTheoryVar) error {
 	return t.equalityAdapter.MkAxioms(left, right)
