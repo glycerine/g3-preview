@@ -590,6 +590,44 @@ func TestSMTSequenceTheoryBranchesFixedStringOverlaps(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryRejectsImpossibleCyclicBinaryEquations(t *testing.T) {
+	for _, test := range []struct {
+		name  string
+		left  string
+		right string
+	}{
+		{name: "unequal-tail-lengths", left: "a", right: "bb"},
+		{name: "tails-are-not-rotations", left: "ab", right: "aa"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			leftTail, err := m.MkString(test.left)
+			astTestMust(t, err)
+			rightHead, err := m.MkString(test.right)
+			astTestMust(t, err)
+			sort, err := m.GetSort(leftTail)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "sequence-cyclic-binary-x"), sort)
+			astTestMust(t, err)
+			left, err := m.MkSequenceConcat(x, leftTail)
+			astTestMust(t, err)
+			right, err := m.MkSequenceConcat(rightHead, x)
+			astTestMust(t, err)
+			equality, err := m.MkEq(left, right)
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.Assert(equality))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("impossible cyclic binary equation", status)
+			}
+		})
+	}
+}
+
 func TestSMTSequenceTheoryConcreteRelationConflicts(t *testing.T) {
 	for _, test := range []struct {
 		name  string

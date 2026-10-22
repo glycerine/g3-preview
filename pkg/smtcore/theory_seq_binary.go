@@ -31,7 +31,7 @@ func (t *SMTSequenceTheory) branchBinaryUnitEquation(left, right []ast.ASTHandle
 			if textErr != nil {
 				return false, textErr
 			}
-			if leftVariable && rightVariable && leftString && leftText != "" && rightString && rightText != "" {
+			if leftVariable && rightVariable && left[0] != right[1] && leftString && leftText != "" && rightString && rightText != "" {
 				sort, sortErr := state.manager.GetSort(left[0])
 				if sortErr != nil {
 					return false, sortErr
@@ -112,6 +112,34 @@ func (t *SMTSequenceTheory) branchBinaryUnitEquation(left, right []ast.ASTHandle
 					return false, nil
 				}
 				return true, t.axioms.Push(constraint)
+			}
+		}
+		left, right = right, left
+	}
+	return false, nil
+}
+
+func (t *SMTSequenceTheory) rejectImpossibleCyclicBinaryEquation(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
+	for pass := 0; pass < 2; pass++ {
+		if len(left) == 2 && len(right) == 2 && left[0] == right[1] {
+			variable, err := t.sequenceVariable(left[0])
+			if err != nil {
+				return false, err
+			}
+			state, stateErr := t.State()
+			if stateErr != nil {
+				return false, stateErr
+			}
+			leftText, leftString, textErr := state.manager.SequenceStringValue(left[1])
+			if textErr != nil {
+				return false, textErr
+			}
+			rightText, rightString, textErr := state.manager.SequenceStringValue(right[0])
+			if textErr != nil {
+				return false, textErr
+			}
+			if variable && leftString && rightString && (len(leftText) != len(rightText) || !strings.Contains(leftText+leftText, rightText)) {
+				return true, t.setDependencyConflict(dependency)
 			}
 		}
 		left, right = right, left
