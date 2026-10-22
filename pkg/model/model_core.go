@@ -23,10 +23,18 @@ type ModelCore struct {
 	copiedFunction                     *FunctionInterpretation
 	functionDeclarations               []ast.ASTHandle
 	Derived                            *Model
+	valueProvider                      ModelValueProvider
 	declarations, ConstantDeclarations []ast.ASTHandle
 	References                         uint32
 	ownerBytes                         uint64
 	Closed                             bool
+}
+
+// ModelValueProvider is the virtual get_some_value surface used by model
+// construction. Proto-models replace the final model's universe provider while
+// they own the core.
+type ModelValueProvider interface {
+	GetSomeValue(ast.ASTHandle) (ast.ASTHandle, error)
 }
 
 func NewModelCore(m *ast.ASTManager) (md *ModelCore, err error) {

@@ -100769,28 +100769,28 @@
       "path": "src/smt/proto_model/CMakeLists.txt",
       "component": "smt",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/smtcore/proto_model/proto_model.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestProtoModelCompletionCleanupEvaluationAndFinalModel"],
       "registrations": [
         {
           "line": 1,
           "text": "z3_add_component(proto_model"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery and compilation replace the proto_model CMake component registration."]
     },
     {
       "path": "src/smt/proto_model/array_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/array_factory.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestArrayAndDatatypeFactories"],
       "assertions": [
         {
           "line": 79,
@@ -100813,19 +100813,19 @@
           "text": "SASSERT(set->size() >= 2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "auxiliary declaration construction, as-array interpretations, representative arguments, distinct pair construction, and fresh arrays", "status": "ported", "go_target": "pkg/smtcore/proto_model/array_factory.go", "tests": ["TestArrayAndDatatypeFactories"]}],
+      "ownership": ["ArrayFactory retains every constructed as-array value; the prototype model owns each auxiliary declaration and function interpretation."],
       "deviations": []
     },
     {
       "path": "src/smt/proto_model/array_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/array_factory.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestArrayAndDatatypeFactories"],
       "conditionals": [
         {
           "line": 19,
@@ -100836,19 +100836,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "array value-factory construction and complete value-generation interface", "status": "ported", "go_target": "pkg/smtcore/proto_model/array_factory.go", "tests": ["TestArrayAndDatatypeFactories"]}],
+      "ownership": ["The factory borrows its manager and prototype model and owns its structured value registry."],
       "deviations": []
     },
     {
       "path": "src/smt/proto_model/datatype_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/datatype_factory.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestArrayAndDatatypeFactories"],
       "assertions": [
         {
           "line": 83,
@@ -100879,19 +100879,19 @@
           "text": "SASSERT(!m_util.is_recursive(s));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "nonrecursive representatives, fresh argument search, recursive sibling growth, almost-fresh construction, and subterm guard", "status": "ported", "go_target": "pkg/smtcore/proto_model/datatype_factory.go", "tests": ["TestArrayAndDatatypeFactories"]}],
+      "ownership": ["DatatypeFactory retains generated datatype values and borrows constructor metadata from the AST manager."],
       "deviations": []
     },
     {
       "path": "src/smt/proto_model/datatype_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/datatype_factory.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestArrayAndDatatypeFactories"],
       "conditionals": [
         {
           "line": 19,
@@ -100902,32 +100902,32 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "datatype factory construction and some/fresh value interface", "status": "ported", "go_target": "pkg/smtcore/proto_model/datatype_factory.go", "tests": ["TestArrayAndDatatypeFactories"]}],
+      "ownership": ["The last-fresh table borrows handles whose owning references are held by the structured factory."],
       "deviations": []
     },
     {
       "path": "src/smt/proto_model/numeral_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/factory.go", "pkg/ast/ast_arith_numeral_rat.go", "pkg/ast/ast_bv_numeral_rat.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "arithmetic and bit-vector exact numeral construction for requested sorts", "status": "ported", "go_target": "pkg/smtcore/proto_model/factory.go", "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"]}],
+      "ownership": ["Exact math/big integers are temporary Go values; the scalar factory owns references to canonical numeral ASTs."],
       "deviations": []
     },
     {
       "path": "src/smt/proto_model/numeral_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/factory.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"],
       "conditionals": [
         {
           "line": 19,
@@ -100938,19 +100938,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "concrete arithmetic and bit-vector numeral factory interfaces", "status": "ported", "go_target": "pkg/smtcore/proto_model/factory.go", "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"]}],
+      "ownership": ["A concrete scalarFactory replaces the live rational template instantiations without porting the C++ template container."],
       "deviations": []
     },
     {
       "path": "src/smt/proto_model/proto_model.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/proto_model.go", "pkg/smtcore/proto_model/cleanup.go", "pkg/model/model_package_boundary.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues", "TestProtoModelCompletionCleanupEvaluationAndFinalModel"],
       "assertions": [
         {
           "line": 72,
@@ -100977,19 +100977,19 @@
           "text": "SASSERT(fi != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "construction, factory dispatch, evaluation, auxiliary registration/reregistration, cleanup, universes, compression, partial completion, and final-model conversion", "status": "ported", "go_target": "pkg/smtcore/proto_model/proto_model.go", "tests": ["TestProtoModelCompletionCleanupEvaluationAndFinalModel"]}],
+      "ownership": ["ProtoModel owns its construction model, evaluator, theory rewriter, registered factories and auxiliary-declaration set; FinalModel produces independent interpretation copies before closing the construction owner."],
+      "deviations": ["Reregistration and final conversion copy function interpretations before retiring their source owners; this preserves independent Go ownership instead of transferring raw C++ pointers."]
     },
     {
       "path": "src/smt/proto_model/proto_model.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/proto_model.go", "pkg/smtcore/proto_model/cleanup.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues", "TestProtoModelCompletionCleanupEvaluationAndFinalModel"],
       "conditionals": [
         {
           "line": 28,
@@ -101000,38 +101000,38 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "complete ProtoModel public construction, model-building, universe, evaluation, completion, cleanup and conversion surface", "status": "ported", "go_target": "pkg/smtcore/proto_model/proto_model.go", "tests": ["TestProtoModelCompletionCleanupEvaluationAndFinalModel"]}],
+      "ownership": ["The Go owner is noncopyable, closes child services in dependency order, and rejects operations once final-model conversion begins."],
       "deviations": []
     },
     {
       "path": "src/smt/proto_model/struct_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/structured.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestArrayAndDatatypeFactories"],
       "assertions": [
         {
           "line": 30,
           "text": "SASSERT(set != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "per-sort value registry, registration, distinct representative selection, and destruction", "status": "ported", "go_target": "pkg/smtcore/proto_model/structured.go", "tests": ["TestArrayAndDatatypeFactories"]}],
+      "ownership": ["Native maps and slices replace pointer containers; explicit ASTRef slices retain every sort and structured value."],
       "deviations": []
     },
     {
       "path": "src/smt/proto_model/struct_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/structured.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestArrayAndDatatypeFactories"],
       "conditionals": [
         {
           "line": 19,
@@ -101042,19 +101042,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "structured factory base state and shared value operations", "status": "ported", "go_target": "pkg/smtcore/proto_model/structured.go", "tests": ["TestArrayAndDatatypeFactories"]}],
+      "ownership": ["The base borrows ProtoModel and ASTManager and owns its sort/value references."],
       "deviations": []
     },
     {
       "path": "src/smt/proto_model/value_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/factory.go", "pkg/ast/ast_model_value.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"],
       "assertions": [
         {
           "line": 65,
@@ -101073,19 +101073,19 @@
           "text": "SASSERT(!is_finite(m_manager.get_sort(n)));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "basic Boolean factory and user-sort freezing, universes, registration, some pairs and fresh model values", "status": "ported", "go_target": "pkg/smtcore/proto_model/factory.go", "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"]}],
+      "ownership": ["The user-sort factory owns canonical value and sort AST references; returned handles are borrowed."],
       "deviations": []
     },
     {
       "path": "src/smt/proto_model/value_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/proto_model/factory.go", "pkg/smtcore/proto_model/proto_model_test.go"],
+      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"],
       "conditionals": [
         {
           "line": 19,
@@ -101122,11 +101122,11 @@
           "text": "SASSERT(result != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "typed ValueFactory interface plus concrete basic, scalar numeral, and user-sort factory algorithms", "status": "ported", "go_target": "pkg/smtcore/proto_model/factory.go", "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"]}],
+      "ownership": ["Concrete typed Go implementations cover the retained unsigned and rational instantiations; native maps and slices replace C++ object tables and vectors."],
+      "deviations": ["The live scalar instantiations share one concrete implementation selected by a closed factory kind; no any-valued adapter or generic public surface is introduced."]
     },
     {
       "path": "src/smt/qi_queue.cpp",

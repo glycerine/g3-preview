@@ -27,9 +27,9 @@ func (md *ModelCore) GetSomeValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	if e := md.open(); e != nil {
 		return ast.ASTHandle{}, e
 	}
-	// The source base method is abstract; a bare core has no universe provider.
-	if md.Derived == nil {
+	// The source base method is abstract; a bare core has no value provider.
+	if md.valueProvider == nil {
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
-	return md.Derived.GetSomeValue(s)
+	return md.valueProvider.GetSomeValue(s)
 }

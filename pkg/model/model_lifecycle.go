@@ -47,6 +47,7 @@ func NewModel(m *ast.ASTManager) (md *Model, err error) {
 	md.CoreField.manager = m
 	md.CoreField.self = &md.CoreField
 	md.CoreField.Derived = md
+	md.CoreField.valueProvider = md
 	md.CoreField.Constants = *insdict.NewDictFunc[ast.ASTHandle, *modelConstantEntry](modelHandleHash)
 	md.CoreField.Functions = *insdict.NewDictFunc[ast.ASTHandle, *modelFunctionEntry](modelHandleHash)
 	md.Universes = *insdict.NewDictFunc[ast.ASTHandle, *modelUniverse](modelHandleHash)
