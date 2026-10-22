@@ -475,11 +475,23 @@ func (s *SMTSolver) Assumption(index uint32) (ast.ASTHandle, error) {
 	return s.named.Assumption(index)
 }
 
-func (s *SMTSolver) GetConsequences([]ast.ASTHandle, []ast.ASTHandle) (lbool.LBool, []ast.ASTHandle, error) {
+func (s *SMTSolver) GetConsequences(assumptions []ast.ASTHandle, variables []ast.ASTHandle) (status lbool.LBool, consequences []ast.ASTHandle, err error) {
 	if err := s.open(); err != nil {
 		return lbool.Undef, nil, err
 	}
-	return lbool.Undef, nil, ast.ErrASTDomain
+	if s.config.ModelEvaluator.Context == nil {
+		return lbool.Undef, nil, ast.ErrASTDomain
+	}
+	previous := s.produceModels
+	if err = s.SetProduceModels(true); err != nil {
+		return lbool.Undef, nil, err
+	}
+	defer func() { err = errors.Join(err, s.SetProduceModels(previous)) }()
+	return solver.DefaultGetConsequences(s, assumptions, variables, func(md *model.ModelCore) (solver.ConsequenceEvaluator, error) {
+		config := s.config.ModelEvaluator
+		config.Params = &s.params
+		return model.NewModelEvaluator(md, config)
+	})
 }
 
 func (s *SMTSolver) FindMutexes([]ast.ASTHandle) (lbool.LBool, [][]ast.ASTHandle, error) {

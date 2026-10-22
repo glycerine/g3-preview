@@ -142,6 +142,23 @@ func TestSMTSolverPublishesIntegerDifferenceModel(t *testing.T) {
 	}
 }
 
+func TestSMTSolverDerivesBooleanConsequences(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	s, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	constant := smtRelevancyBool(t, m, "smt-solver-consequence")
+	astTestMust(t, s.Assert(constant))
+	status, consequences, err := s.GetConsequences(nil, []ast.ASTHandle{constant})
+	astTestMust(t, err)
+	if status != lbool.True || len(consequences) != 1 {
+		t.Fatal("Boolean consequences", status, consequences)
+	}
+	if s.produceModels {
+		t.Fatal("consequence query did not restore model setting")
+	}
+}
+
 func TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	a := smtRelevancyBool(t, m, "smt-solver-tracked-a")

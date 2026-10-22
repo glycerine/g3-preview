@@ -109095,7 +109095,15 @@
           ]
         },
         {
-          "name": "registered theory-plugin copying, consequence and mutex solving, timed slow progress sampling, and unsat-core minimization and pattern extension",
+          "name": "model-guided consequence extraction with counterexample checks and model-setting restoration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverDerivesBooleanConsequences"
+          ]
+        },
+        {
+          "name": "registered theory-plugin copying, mutex solving, timed slow progress sampling, and unsat-core minimization and pattern extension",
           "status": "unported",
           "go_target": null,
           "tests": []
