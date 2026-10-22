@@ -42221,9 +42221,13 @@
       "path": "src/interp/iz3translate.cpp",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/interp/translation_analysis.go"
+      ],
+      "tests": [
+        "TestFullTranslationProofAnalysisAndResolution"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -42356,17 +42360,36 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "translator state ownership, hypothesis DAGs, local equivalence discovery, clause extraction, and unit-resolution reconstruction",
+          "status": "ported",
+          "go_target": "pkg/interp/translation_analysis.go",
+          "tests": [
+            "TestFullTranslationProofAnalysisAndResolution"
+          ]
+        },
+        {
+          "name": "locality and skolem scans, localization and quantification, proof-rule translation, and final lemma construction",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "FullTranslation borrows Base and owns its translator-specific commute declaration; Close releases owned roots in reverse order."
+      ],
       "deviations": []
     },
     {
       "path": "src/interp/iz3translate.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/interp/translation_analysis.go"
+      ],
+      "tests": [
+        "TestFullTranslationProofAnalysisAndResolution"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -42379,8 +42402,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "retained full-translation construction and lifetime",
+          "status": "ported",
+          "go_target": "pkg/interp/translation_analysis.go",
+          "tests": [
+            "TestFullTranslationProofAnalysisAndResolution"
+          ]
+        },
+        {
+          "name": "Translate and Quantify interface behavior",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The concrete Go translator owns declarations it creates and borrows the shared interpolation Base."
+      ],
       "deviations": []
     },
     {

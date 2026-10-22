@@ -166,3 +166,67 @@ func TestInterpolationFrameReducerSequenceAndGuards(t *testing.T) {
 		t.Fatal("parent length guard", err)
 	}
 }
+
+func TestFullTranslationProofAnalysisAndResolution(t *testing.T) {
+	m, manager := interpProofManagerFixture(t)
+	boolean, err := manager.BoolType()
+	interpMust(t, err)
+	p, err := manager.MakeVariable("translation-a", boolean)
+	interpMust(t, err)
+	p = interpPin(t, m, p)
+	q, err := manager.MakeVariable("translation-b", boolean)
+	interpMust(t, err)
+	q = interpPin(t, m, q)
+	base, err := NewBase(manager, []ast.ASTHandle{p, q}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	translation, err := NewFullTranslation(base)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, translation.Close()) })
+
+	falsehood, err := manager.Make(OperatorFalse)
+	interpMust(t, err)
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	hypothesis, err := m.MkProofHypothesis(falsehood)
+	interpMust(t, err)
+	lemma, err := m.MkProofLemma(hypothesis, truth)
+	interpMust(t, err)
+	hypotheses, err := translation.ProofHypotheses(lemma)
+	interpMust(t, err)
+	if len(hypotheses) != 0 {
+		t.Fatal("discharged hypotheses", hypotheses)
+	}
+
+	mixed, err := manager.Make(OperatorAnd, p, q)
+	interpMust(t, err)
+	equivalence, err := manager.Make(OperatorIff, mixed, p)
+	interpMust(t, err)
+	equivalenceProof, err := m.MkProofAsserted(equivalence)
+	interpMust(t, err)
+	interpMust(t, translation.FindEquivalences(equivalenceProof))
+	local, proof, found, err := translation.EquivalentLocal(mixed)
+	if err != nil || !found || local != p || proof != equivalenceProof {
+		t.Fatal("local equivalence", local, proof, found, err)
+	}
+
+	clause, err := manager.Make(OperatorOr, p, q)
+	interpMust(t, err)
+	clauseProof, err := m.MkProofAsserted(clause)
+	interpMust(t, err)
+	notP, err := manager.MkNot(p)
+	interpMust(t, err)
+	unitProof, err := m.MkProofAsserted(notP)
+	interpMust(t, err)
+	resolution, err := m.MkProofUnitResolution([]ast.ASTHandle{clauseProof, unitProof})
+	interpMust(t, err)
+	literals, err := translation.UnitResolutionLiterals(resolution, 1)
+	interpMust(t, err)
+	if len(literals) != 1 || literals[0] != q {
+		t.Fatal("unit resolution literals", literals)
+	}
+	empty, err := translation.ClauseLiterals(falsehood)
+	if err != nil || len(empty) != 0 {
+		t.Fatal("false clause", empty, err)
+	}
+}
