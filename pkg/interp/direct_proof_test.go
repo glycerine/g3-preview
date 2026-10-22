@@ -319,6 +319,16 @@ func TestDirectProofFinalSimplificationOwnership(t *testing.T) {
 	interpMust(t, err)
 	result, err := direct.Interpolate(proof)
 	interpMust(t, err)
+	localized, err := direct.freshLocalizationVariable(p, 0)
+	interpMust(t, err)
+	localizedResult, err := direct.Interpolate(localized)
+	interpMust(t, err)
+	localizedHandle, err := m.RefGet(localizedResult)
+	interpMust(t, err)
+	if op, e := manager.Operator(localizedHandle); e != nil || op != OperatorExists {
+		t.Fatal("final localization quantifier", op, e)
+	}
+	interpMust(t, m.DelRef(&localizedResult))
 	interpMust(t, direct.Close())
 	got, err := m.RefGet(result)
 	interpMust(t, err)
@@ -328,6 +338,27 @@ func TestDirectProofFinalSimplificationOwnership(t *testing.T) {
 	interpMust(t, m.DelRef(&result))
 	if _, err = direct.Interpolate(proof); !errors.Is(err, ast.ErrASTHandle) {
 		t.Fatal("closed finalizer guard", err)
+	}
+}
+
+func TestDirectProofLocalizationQuantifierInsertion(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	localA, err := direct.freshLocalizationVariable(p, 0)
+	interpMust(t, err)
+	localB, err := direct.freshLocalizationVariable(q, 1)
+	interpMust(t, err)
+	body, err := manager.Make(OperatorAnd, localA, localB)
+	interpMust(t, err)
+	quantified, err := direct.addLocalizationQuantifiers(body)
+	interpMust(t, err)
+	if op, e := manager.Operator(quantified); e != nil || op != OperatorExists {
+		t.Fatal("outer localization quantifier", op, e)
+	}
+	if len(direct.localizationVariables) != 2 || direct.localizationVariables[0].term != p || direct.localizationVariables[1].term != q {
+		t.Fatal("localization metadata", direct.localizationVariables)
 	}
 }
 

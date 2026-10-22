@@ -41577,7 +41577,8 @@
         "pkg/interp/direct_proof_mixed_resolution.go",
         "pkg/interp/direct_proof_simplify.go",
         "pkg/interp/direct_proof_sum.go",
-        "pkg/interp/direct_proof_equality.go"
+        "pkg/interp/direct_proof_equality.go",
+        "pkg/interp/direct_proof_localization.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41590,7 +41591,8 @@
         "TestDirectProofContraRecognitionAndResolvents",
         "TestDirectProofGenericSymbolicSimplification",
         "TestDirectProofOrdinarySumSimplification",
-        "TestDirectProofLocalEqualityRules"
+        "TestDirectProofLocalEqualityRules",
+        "TestDirectProofLocalizationQuantifierInsertion"
       ],
       "conditionals": [
         {
@@ -41820,9 +41822,10 @@
           "status": "partial",
           "go_target": "pkg/interp/direct_proof_finalize.go",
           "tests": [
-            "TestDirectProofFinalSimplificationOwnership"
+            "TestDirectProofFinalSimplificationOwnership",
+            "TestDirectProofLocalizationQuantifierInsertion"
           ],
-          "reason": "Final strong simplification, caller-owned result publication, and universal closure are ported; localization-variable introduction and quantifier insertion remain pending."
+          "reason": "Final strong simplification, caller-owned result publication, localization-variable creation, reverse existential/universal insertion, and universal closure are ported; recursive term localization and localized proof construction remain pending."
         }
       ],
       "ownership": [
@@ -41846,7 +41849,8 @@
         "pkg/interp/direct_proof_mixed_resolution.go",
         "pkg/interp/direct_proof_simplify.go",
         "pkg/interp/direct_proof_sum.go",
-        "pkg/interp/direct_proof_equality.go"
+        "pkg/interp/direct_proof_equality.go",
+        "pkg/interp/direct_proof_localization.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41859,7 +41863,8 @@
         "TestDirectProofContraRecognitionAndResolvents",
         "TestDirectProofGenericSymbolicSimplification",
         "TestDirectProofOrdinarySumSimplification",
-        "TestDirectProofLocalEqualityRules"
+        "TestDirectProofLocalEqualityRules",
+        "TestDirectProofLocalizationQuantifierInsertion"
       ],
       "conditionals": [
         {
@@ -41905,9 +41910,10 @@
           "status": "partial",
           "go_target": "pkg/interp/direct_proof_finalize.go",
           "tests": [
-            "TestDirectProofFinalSimplificationOwnership"
+            "TestDirectProofFinalSimplificationOwnership",
+            "TestDirectProofLocalizationQuantifierInsertion"
           ],
-          "reason": "The final simplification and universal closure are implemented; localization quantifier insertion remains pending."
+          "reason": "Final simplification, localization quantifier insertion, and universal closure are implemented; recursive term localization remains pending."
         },
         {
           "name": "remaining direct interpolation proof-rule surface and final result",

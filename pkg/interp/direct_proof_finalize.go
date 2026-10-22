@@ -23,6 +23,10 @@ func (p *DirectProofInterpolator) Interpolate(proof ast.ASTHandle) (result ast.A
 	if err != nil {
 		return ast.ASTRef{}, err
 	}
+	handle, err = p.addLocalizationQuantifiers(handle)
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
 	closed, err := p.base.manager.CloseUniversally(handle)
 	if err != nil {
 		return ast.ASTRef{}, err

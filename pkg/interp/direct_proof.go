@@ -20,25 +20,26 @@ const (
 // IZ3_TRANSLATE_FULL path. It borrows Base and owns its declarations,
 // placeholders, and returned proof-term roots until Close.
 type DirectProofInterpolator struct {
-	self         *DirectProofInterpolator
-	base         *Base
-	scope        ScopeRange
-	weak         bool
-	contra       ast.ASTHandle
-	sum          ast.ASTHandle
-	rotateSum    ast.ASTHandle
-	leqToEq      ast.ASTHandle
-	eqToLeq      ast.ASTHandle
-	excludedMid  ast.ASTHandle
-	symmetry     ast.ASTHandle
-	congruence   ast.ASTHandle
-	concat       ast.ASTHandle
-	standForall  ast.ASTHandle
-	standExists  ast.ASTHandle
-	noProof      ast.ASTHandle
-	placeholders map[ast.ASTHandle]ast.ASTHandle
-	owned        []ast.ASTRef
-	closed       bool
+	self                  *DirectProofInterpolator
+	base                  *Base
+	scope                 ScopeRange
+	weak                  bool
+	contra                ast.ASTHandle
+	sum                   ast.ASTHandle
+	rotateSum             ast.ASTHandle
+	leqToEq               ast.ASTHandle
+	eqToLeq               ast.ASTHandle
+	excludedMid           ast.ASTHandle
+	symmetry              ast.ASTHandle
+	congruence            ast.ASTHandle
+	concat                ast.ASTHandle
+	standForall           ast.ASTHandle
+	standExists           ast.ASTHandle
+	noProof               ast.ASTHandle
+	placeholders          map[ast.ASTHandle]ast.ASTHandle
+	localizationVariables []localizationVariable
+	owned                 []ast.ASTRef
+	closed                bool
 }
 
 func NewDirectProofInterpolator(base *Base, scope ScopeRange, weak bool) (result *DirectProofInterpolator, resultErr error) {
@@ -157,6 +158,7 @@ func (p *DirectProofInterpolator) Close() (result error) {
 	}
 	p.owned = nil
 	p.placeholders = nil
+	p.localizationVariables = nil
 	p.closed = true
 	return result
 }
