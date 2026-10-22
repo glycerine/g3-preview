@@ -123242,22 +123242,45 @@
       "path": "src/tactic/goal_shared_occs.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/goal_shared_occurrences.go",
+        "pkg/tactic/goal_shared_occurrences_test.go"
+      ],
+      "tests": [
+        "TestGoalSharedOccurrencesRetainsVisitedAcrossFormulas",
+        "TestGoalSharedOccurrencesAtomicPolicy"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "goal_shared_occs reset and shared visited mark across formulas",
+          "status": "ported",
+          "go_target": "pkg/tactic/goal_shared_occurrences.go",
+          "tests": [
+            "TestGoalSharedOccurrencesRetainsVisitedAcrossFormulas",
+            "TestGoalSharedOccurrencesAtomicPolicy"
+          ]
+        }
+      ],
+      "ownership": [
+        "GoalSharedOccurrences owns its AST shared-occurrence collector; each Collect owns a temporary visited mark through the whole formula sequence."
+      ],
       "deviations": []
     },
     {
       "path": "src/tactic/goal_shared_occs.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/goal_shared_occurrences.go"
+      ],
+      "tests": [
+        "TestGoalSharedOccurrencesRetainsVisitedAcrossFormulas",
+        "TestGoalSharedOccurrencesAtomicPolicy"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -123268,10 +123291,22 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "goal_shared_occs construction, goal collection, query, count, reset and cleanup",
+          "status": "ported",
+          "go_target": "pkg/tactic/goal_shared_occurrences.go",
+          "tests": [
+            "TestGoalSharedOccurrencesRetainsVisitedAcrossFormulas",
+            "TestGoalSharedOccurrencesAtomicPolicy"
+          ]
+        }
+      ],
+      "ownership": [
+        "The wrapper owns the concrete ASTSharedOccurrences service and borrows its AST manager and input goals."
+      ],
       "deviations": []
     },
     {
