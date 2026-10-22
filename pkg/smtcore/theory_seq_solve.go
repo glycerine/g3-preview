@@ -378,6 +378,40 @@ func (t *SMTSequenceTheory) removeEquation(index int) error {
 	return t.equations.PopBack()
 }
 
+func (t *SMTSequenceTheory) reduceEqualLengthBoundary(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
+	if len(left) == 0 || len(right) == 0 {
+		return false, nil
+	}
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	for _, front := range []bool{true, false} {
+		li, ri := 0, 0
+		if !front {
+			li, ri = len(left)-1, len(right)-1
+		}
+		if left[li] == right[ri] {
+			continue
+		}
+		leftLength, makeErr := state.manager.MkSequenceLength(left[li])
+		if makeErr != nil {
+			return false, makeErr
+		}
+		rightLength, makeErr := state.manager.MkSequenceLength(right[ri])
+		if makeErr != nil {
+			return false, makeErr
+		}
+		leftNode, rightNode := state.context.enodes[leftLength], state.context.enodes[rightLength]
+		if leftNode == nil || rightNode == nil || leftNode.Root() != rightNode.Root() {
+			continue
+		}
+		lengthEquality := t.dependencies.Leaf(smtSequenceAssumption{left: leftNode, right: rightNode})
+		return t.addSolution(left[li], right[ri], t.dependencies.Join(dependency, lengthEquality))
+	}
+	return false, nil
+}
+
 func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 	for index := 0; index < t.equations.Len(); index++ {
 		id, left, right, dependency, err := t.equations.At(index)
@@ -405,6 +439,10 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		}
 		if len(left) == 0 && len(right) == 0 {
 			return true, t.removeEquation(index)
+		}
+		reduced, err := t.reduceEqualLengthBoundary(left, right, dependency)
+		if err != nil || reduced {
+			return reduced, err
 		}
 		solved, err := t.solveUnitWord(left, right, dependency)
 		if err != nil || solved {

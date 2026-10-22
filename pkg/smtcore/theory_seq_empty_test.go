@@ -331,6 +331,42 @@ func TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryReducesEqualLengthBoundaries(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-length-cancel-x"), sort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-length-cancel-y"), sort)
+	astTestMust(t, err)
+	xLength, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	yLength, err := m.MkSequenceLength(y)
+	astTestMust(t, err)
+	lengthsEqual, err := m.MkEq(xLength, yLength)
+	astTestMust(t, err)
+	left, err := m.MkSequenceConcat(x, a)
+	astTestMust(t, err)
+	right, err := m.MkSequenceConcat(y, b)
+	astTestMust(t, err)
+	wordsEqual, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(lengthsEqual))
+	astTestMust(t, solver.Assert(wordsEqual))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("equal-length boundary reduction", status)
+	}
+}
+
 func TestSMTSequenceTheoryConcreteRelationConflicts(t *testing.T) {
 	for _, test := range []struct {
 		name  string
