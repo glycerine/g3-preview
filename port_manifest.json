@@ -109781,7 +109781,8 @@
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
         "TestSMTSolverSetupUsesRealDifferenceLogic",
         "TestSMTSolverPublishesStrictRealDifferenceModel",
-        "TestSMTDatatypeQFDTSetup"
+        "TestSMTDatatypeQFDTSetup",
+        "TestSMTPseudoBooleanQFFDExactCardinality"
       ],
       "assertions": [
         {
@@ -109827,6 +109828,14 @@
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
             "TestSMTDatatypeQFDTSetup"
+          ]
+        },
+        {
+          "name": "explicit QF_FD and ALL pseudo-Boolean theory selection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "tests": [
+            "TestSMTPseudoBooleanQFFDExactCardinality"
           ]
         }
       ],
@@ -115739,9 +115748,9 @@
       "path": "src/smt/theory_pb.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/smtcore/theory_pb.go"],
+      "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"],
       "conditionals": [
         {
           "line": 1062,
@@ -116046,30 +116055,60 @@
           "text": "SASSERT(values.size() == m_app->get_num_args());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "exact at-most, at-least, weighted <=, >= and = atom internalization with both Boolean polarities",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb.go",
+          "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"]
+        },
+        {
+          "name": "watched propagation, simplex compilation, conflict-resolution strengthening and sorting-network compilation heuristics",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The current exact encoder owns only temporary Go slices and big.Rat values while the SAT core owns generated clauses and literals."
+      ],
+      "deviations": [
+        "The semantic checkpoint emits an exact blocking clause for every Boolean argument valuation. This preserves reached truth conditions but does not yet preserve the source theory's polynomial propagation and compilation performance."
+      ]
     },
     {
       "path": "src/smt/theory_pb.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/smtcore/theory_pb.go"],
+      "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"],
       "assertions": [
         {
           "line": 160,
           "text": "SASSERT(begin < end);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained pseudo-Boolean theory registration, atom internalization and exact logical semantics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb.go",
+          "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"]
+        },
+        {
+          "name": "specialized watch, simplex, compilation and lemma data structures",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": ["Concrete Go values replace manual ineq, watch-list and temporary numeral allocation for the exact checkpoint encoder."],
+      "deviations": ["No public universal adapter is introduced for source-private propagation structures."]
     },
     {
       "path": "src/smt/theory_seq.cpp",
