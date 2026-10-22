@@ -106205,7 +106205,7 @@
       "path": "src/smt/smt_context_pp.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_types.go"
@@ -106272,7 +106272,7 @@
         },
         {
           "name": "context, assignment, enode, theory-variable, asserted-formula, unsat-core, parent-equality, statistics, lemma, and debug-trace displays",
-          "status": "unported",
+          "status": "reference_only",
           "go_target": null,
           "tests": []
         }
@@ -106281,7 +106281,8 @@
         "Failure names and reason strings are returned as native Go strings; incomplete-theory objects remain borrowed from the internalizer registry."
       ],
       "deviations": [
-        "Theory names are read through the retained optional Name method; unnamed theory implementations preserve the source generic incomplete-theory reason."
+        "Theory names are read through the retained optional Name method; unnamed theory implementations preserve the source generic incomplete-theory reason.",
+        "The retained kernel display owns asserted-formula rendering. Remaining context, assignment, enode, clause, statistics and trace renderers have no retained Go caller, so no universal debug-display adapter is added."
       ]
     },
     {
