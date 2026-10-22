@@ -122380,28 +122380,42 @@
       "path": "src/tactic/equiv_proof_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/equiv_proof_converter.go",
+        "pkg/tactic/replace_proof_converter_test.go"
+      ],
+      "tests": [
+        "TestEquivProofConverterBuildsModusPonensReplacement"
+      ],
       "assertions": [
         {
           "line": 32,
           "text": "SASSERT(m.has_fact(p3));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "equivalence insertion through asserted, rewrite and modus ponens plus replacement delegation and translation",
+          "status": "ported",
+          "go_target": "pkg/tactic/equiv_proof_converter.go",
+          "tests": ["TestEquivProofConverterBuildsModusPonensReplacement"]
+        }
+      ],
+      "ownership": [
+        "EquivProofConverter owns its concrete ReplaceProofConverter and releases it before its own header."
+      ],
       "deviations": []
     },
     {
       "path": "src/tactic/equiv_proof_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/tactic/equiv_proof_converter.go"],
+      "tests": ["TestEquivProofConverterBuildsModusPonensReplacement"],
       "conditionals": [
         {
           "line": 24,
@@ -122412,10 +122426,17 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "equiv_proof_converter construction, conversion, translation, insertion and manager query",
+          "status": "ported",
+          "go_target": "pkg/tactic/equiv_proof_converter.go",
+          "tests": ["TestEquivProofConverterBuildsModusPonensReplacement"]
+        }
+      ],
+      "ownership": ["The converter owns its replacement converter and borrows the AST manager."],
       "deviations": []
     },
     {
@@ -124257,28 +124278,40 @@
       "path": "src/tactic/replace_proof_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/replace_proof_converter.go",
+        "pkg/tactic/replace_proof_converter_test.go"
+      ],
+      "tests": ["TestReplaceProofConverterRewritesAssertedLeaves"],
       "assertions": [
         {
           "line": 58,
           "text": "SASSERT(num_source == 1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "ordered asserted-leaf replacement with prefix substitution and translated proof storage",
+          "status": "ported",
+          "go_target": "pkg/tactic/replace_proof_converter.go",
+          "tests": ["TestReplaceProofConverterRewritesAssertedLeaves"]
+        }
+      ],
+      "ownership": [
+        "ReplaceProofConverter owns one AST reference for each inserted proof and releases them in reverse insertion order."
+      ],
       "deviations": []
     },
     {
       "path": "src/tactic/replace_proof_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/tactic/replace_proof_converter.go"],
+      "tests": ["TestReplaceProofConverterRewritesAssertedLeaves"],
       "conditionals": [
         {
           "line": 23,
@@ -124289,10 +124322,17 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "replace_proof_converter construction, conversion, translation, insert, invert and manager query",
+          "status": "ported",
+          "go_target": "pkg/tactic/replace_proof_converter.go",
+          "tests": ["TestReplaceProofConverterRewritesAssertedLeaves"]
+        }
+      ],
+      "ownership": ["Inserted proofs are retained by explicit AST references until converter close."],
       "deviations": []
     },
     {
