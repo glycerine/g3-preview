@@ -42,6 +42,7 @@ func TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase(t *testing.T) {
 func TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases(t *testing.T) {
 	m := astTestManager(t)
 	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.SetBinaryClauseOptimization(true))
 	a := smtRelevancyBool(t, m, "case-split-configured-a")
 	astTestMust(t, state.Internalize(a, true))
 	variable, found := state.BoolVar(a)

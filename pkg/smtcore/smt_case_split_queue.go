@@ -59,11 +59,12 @@ func (q *SMTActivityCaseSplitQueue) RecordConflict() {
 func (q *SMTActivityCaseSplitQueue) occurrencePhase(variable int32) bool {
 	positive, negative := 0, 0
 	for i := range q.state.clauses {
-		clause := q.state.clauses[i].clause
-		if clause == nil {
-			continue
+		record := &q.state.clauses[i]
+		literals := record.Literals
+		if record.clause != nil {
+			literals = record.clause.literals
 		}
-		for _, literal := range clause.literals {
+		for _, literal := range literals {
 			if literal.Var() != variable {
 				continue
 			}
