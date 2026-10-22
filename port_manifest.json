@@ -98199,7 +98199,7 @@
       "path": "src/smt/CMakeLists.txt",
       "component": "smt",
       "role": "build_specification",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "registrations": [
@@ -98208,11 +98208,13 @@
           "text": "z3_add_component(smt"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go package discovery and pkg/go.mod replace this CMake component source list; the file contains no runtime algorithm or registration beyond C++ build enumeration."
+      ]
     },
     {
       "path": "src/smt/arith_eq_adapter.cpp",
@@ -100606,7 +100608,7 @@
       "path": "src/smt/params/CMakeLists.txt",
       "component": "smt",
       "role": "build_specification",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "registrations": [
@@ -100615,11 +100617,13 @@
           "text": "z3_add_component(smt_params"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go package discovery and pkg/go.mod replace this CMake parameter-component source list; parameter implementations remain tracked by their production source units."
+      ]
     },
     {
       "path": "src/smt/params/dyn_ack_params.cpp",
@@ -109583,7 +109587,7 @@
       "path": "src/smt/tactic/CMakeLists.txt",
       "component": "smt",
       "role": "build_specification",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "registrations": [
@@ -109592,11 +109596,13 @@
           "text": "z3_add_component(smt_tactic"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go package discovery and pkg/go.mod replace this CMake tactic-component source list; tactic behavior remains tracked by the individual production units."
+      ]
     },
     {
       "path": "src/smt/tactic/ctx_solver_simplify_tactic.cpp",
