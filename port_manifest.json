@@ -113500,9 +113500,13 @@
       "path": "src/smt/theory_array_full.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_array.go"
+      ],
+      "tests": [
+        "TestSMTArrayMapRead"
+      ],
       "conditionals": [
         {
           "line": 731,
@@ -113657,9 +113661,13 @@
       "path": "src/smt/theory_array_full.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_array.go"
+      ],
+      "tests": [
+        "TestSMTArrayMapRead"
+      ],
       "conditionals": [
         {
           "line": 19,

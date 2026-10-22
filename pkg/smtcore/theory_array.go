@@ -139,9 +139,7 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 		if err = t.assertSelectStoreAxioms(expression); err != nil {
 			return false, fmt.Errorf("array select-store axiom: %w", err)
 		}
-	case ast.ASTArrayOpConst, ast.ASTArrayOpExt:
-		// Const arrays need no axiom until selected; that rule is added with
-		// the retained constant-array fragment.
+	case ast.ASTArrayOpConst, ast.ASTArrayOpExt, ast.ASTArrayOpMap:
 	default:
 		t.unsupported = true
 	}
@@ -215,6 +213,9 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 		}
 		return nil
 	}
+	if op == ast.ASTArrayOpMap {
+		return t.assertSelectMapAxiom(selectExpression, array)
+	}
 	if op != ast.ASTArrayOpStore {
 		return nil
 	}
@@ -284,6 +285,61 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 		if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{antecedent, consequence}); err != nil {
 			return fmt.Errorf("array conditional store axiom: %w", err)
 		}
+	}
+	return nil
+}
+
+func (t *SMTArrayTheory) assertSelectMapAxiom(selectExpression, arrayMap ast.ASTHandle) error {
+	state, _ := t.State()
+	mapDeclaration, err := state.manager.GetDecl(arrayMap)
+	if err != nil {
+		return err
+	}
+	function, err := state.manager.ArrayMapFunction(mapDeclaration)
+	if err != nil {
+		return err
+	}
+	mapCount, err := state.manager.GetNumArgs(arrayMap)
+	if err != nil {
+		return err
+	}
+	selectCount, err := state.manager.GetNumArgs(selectExpression)
+	if err != nil || selectCount < 2 {
+		return err
+	}
+	indices := make([]ast.ASTHandle, 0, selectCount-1)
+	for index := uint32(1); index < selectCount; index++ {
+		argument, argErr := state.manager.GetArg(selectExpression, index)
+		if argErr != nil {
+			return argErr
+		}
+		indices = append(indices, argument)
+	}
+	values := make([]ast.ASTHandle, 0, mapCount)
+	for index := uint32(0); index < mapCount; index++ {
+		input, argErr := state.manager.GetArg(arrayMap, index)
+		if argErr != nil {
+			return argErr
+		}
+		arguments := make([]ast.ASTHandle, 0, selectCount)
+		arguments = append(arguments, input)
+		arguments = append(arguments, indices...)
+		value, selectErr := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, arguments)
+		if selectErr != nil {
+			return selectErr
+		}
+		values = append(values, value)
+	}
+	mapped, err := state.manager.MkApp(function, values)
+	if err != nil {
+		return err
+	}
+	literal, err := t.MkEqualityLiteral(selectExpression, mapped, true)
+	if err != nil {
+		return err
+	}
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); err != nil {
+		return fmt.Errorf("array map select axiom: %w", err)
 	}
 	return nil
 }
