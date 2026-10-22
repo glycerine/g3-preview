@@ -6,6 +6,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 func TestSMTArrayReadOverWrite(t *testing.T) {
@@ -210,6 +211,25 @@ func TestSMTArrayMapRead(t *testing.T) {
 	astTestMust(t, err)
 	if status != lbool.False {
 		t.Fatal("mapped array read disequality", status)
+	}
+	stats := statistics.New()
+	astTestMust(t, solver.CollectStatistics(stats))
+	found := false
+	for index := 0; index < stats.Size(); index++ {
+		if stats.Key(index) == "array map ax" {
+			found = stats.IsUint(index) && stats.UintValue(index) != 0
+		}
+	}
+	if !found {
+		t.Fatal("missing array map statistics")
+	}
+	astTestMust(t, solver.kernel.ResetStatistics())
+	stats.Reset()
+	astTestMust(t, solver.CollectStatistics(stats))
+	for index := 0; index < stats.Size(); index++ {
+		if stats.Key(index) == "array map ax" {
+			t.Fatal("array statistics survived reset")
+		}
 	}
 }
 

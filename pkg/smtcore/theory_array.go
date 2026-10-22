@@ -8,11 +8,18 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 type smtArrayScope struct {
 	stores, selects, defaults, epsilons int
 	unsupported                         bool
+}
+
+type smtArrayStatistics struct {
+	axiom1, axiom2, extensionality                        uint64
+	mapAxiom, defaultMap, selectConst, defaultStore       uint64
+	defaultConst, defaultAsArray, selectAsArray, eqSplits uint64
 }
 
 // SMTArrayTheory internalizes core read-over-write, constant-array, and
@@ -26,6 +33,7 @@ type SMTArrayTheory struct {
 	epsilonTrail                          []ast.ASTHandle
 	scopes                                []smtArrayScope
 	unsupported                           bool
+	statistics                            smtArrayStatistics
 }
 
 func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
@@ -189,6 +197,7 @@ func (t *SMTArrayTheory) assertStoreAxiom(store ast.ASTHandle) error {
 	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); err != nil {
 		return fmt.Errorf("array store unit axiom: %w", err)
 	}
+	t.statistics.axiom1++
 	return nil
 }
 
@@ -219,6 +228,7 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 		if equalityErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); equalityErr != nil {
 			return fmt.Errorf("constant array select axiom: %w", equalityErr)
 		}
+		t.statistics.selectConst++
 		return nil
 	}
 	if op == ast.ASTArrayOpMap {
@@ -236,6 +246,7 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 		return err
 	}
 	allEqual := true
+	added := false
 	for index := uint32(1); index < selectCount; index++ {
 		storedIndex, argErr := state.manager.GetArg(array, index)
 		if argErr != nil {
@@ -293,6 +304,10 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 		if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{antecedent, consequence}); err != nil {
 			return fmt.Errorf("array conditional store axiom: %w", err)
 		}
+		added = true
+	}
+	if added {
+		t.statistics.axiom2++
 	}
 	return nil
 }
@@ -349,6 +364,7 @@ func (t *SMTArrayTheory) assertSelectMapAxiom(selectExpression, arrayMap ast.AST
 	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); err != nil {
 		return fmt.Errorf("array map select axiom: %w", err)
 	}
+	t.statistics.mapAxiom++
 	return nil
 }
 
@@ -460,6 +476,14 @@ func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) err
 	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); err != nil {
 		return fmt.Errorf("array default value axiom: %w", err)
 	}
+	switch op {
+	case ast.ASTArrayOpConst:
+		t.statistics.defaultConst++
+	case ast.ASTArrayOpMap:
+		t.statistics.defaultMap++
+	case ast.ASTArrayOpStore:
+		t.statistics.defaultStore++
+	}
 	return nil
 }
 
@@ -568,7 +592,11 @@ func (t *SMTArrayTheory) InternalizeEquality(expression ast.ASTHandle, variable 
 		return err
 	}
 	arrayEquality := NewSMTLiteral(variable, false)
-	return state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{arrayEquality, selectEquality.Negated()})
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{arrayEquality, selectEquality.Negated()}); err != nil {
+		return err
+	}
+	t.statistics.extensionality++
+	return nil
 }
 func (*SMTArrayTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error    { return nil }
 func (*SMTArrayTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error { return nil }
@@ -630,3 +658,27 @@ func (t *SMTArrayTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 }
 
 func (*SMTArrayTheory) Name() string { return "array" }
+
+func (t *SMTArrayTheory) CollectStatistics(target *statistics.Statistics) error {
+	if t == nil || target == nil {
+		return ast.ErrASTHandle
+	}
+	target.UpdateUint64("array ax1", t.statistics.axiom1)
+	target.UpdateUint64("array ax2", t.statistics.axiom2)
+	target.UpdateUint64("array exp ax2", 0)
+	target.UpdateUint64("array ext ax", t.statistics.extensionality)
+	target.UpdateUint64("array splits", t.statistics.eqSplits)
+	target.UpdateUint64("array map ax", t.statistics.mapAxiom)
+	target.UpdateUint64("array def const", t.statistics.defaultConst)
+	target.UpdateUint64("array sel const", t.statistics.selectConst)
+	target.UpdateUint64("array def store", t.statistics.defaultStore)
+	target.UpdateUint64("array def as-array", t.statistics.defaultAsArray)
+	target.UpdateUint64("array sel as-array", t.statistics.selectAsArray)
+	return nil
+}
+
+func (t *SMTArrayTheory) ResetStatistics() {
+	if t != nil {
+		t.statistics = smtArrayStatistics{}
+	}
+}
