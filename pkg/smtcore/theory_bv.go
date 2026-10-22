@@ -21,6 +21,7 @@ const (
 
 type smtBVScope struct {
 	bits        int
+	lazyBridges int
 	unsupported bool
 }
 
@@ -37,6 +38,8 @@ type SMTBitVectorTheory struct {
 	bits             map[ast.ASTHandle][]ast.ASTHandle
 	bitOwners        map[ast.ASTHandle]ast.ASTRef
 	bitTrail         []ast.ASTHandle
+	lazyBridges      map[ast.ASTHandle]ast.ASTRef
+	lazyBridgeTrail  []ast.ASTHandle
 	temporary        []ast.ASTRef
 	scopes           []smtBVScope
 	unsupported      bool
@@ -62,7 +65,8 @@ func NewSMTBitVectorTheory(family ast.FamilyID) (*SMTBitVectorTheory, error) {
 		SMTTheoryBase: base,
 		bits:          make(map[ast.ASTHandle][]ast.ASTHandle),
 		bitOwners:     make(map[ast.ASTHandle]ast.ASTRef),
-		config:        SMTBVState{BlastMaxSize: 2147483647, EnableInt2BV: true},
+		lazyBridges:   make(map[ast.ASTHandle]ast.ASTRef),
+		config:        SMTBVState{Mode: 1, HiDiv0: true, Reflect: true, BlastMaxSize: 2147483647, EnableInt2BV: true},
 	}, nil
 }
 
@@ -1091,7 +1095,32 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 	}
 }
 
-func (t *SMTBitVectorTheory) bridgeAtom(expression, definition ast.ASTHandle) (bool, error) {
+func (t *SMTBitVectorTheory) publishBridge(expression, definition ast.ASTHandle) error {
+	state, _ := t.State()
+	variable, found := state.boolVar[expression]
+	if !found {
+		return ast.ErrASTDomain
+	}
+	defined, err := state.Literal(definition)
+	if err != nil {
+		return fmt.Errorf("read bit-vector atom definition literal: %w", err)
+	}
+	literal := NewSMTLiteral(variable, false)
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal.Negated(), defined}); err != nil {
+		return err
+	}
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal, defined.Negated()}); err != nil {
+		return err
+	}
+	if state.relevancy != nil {
+		if err = state.relevancy.AddDependency(expression, definition); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t *SMTBitVectorTheory) bridgeAtom(expression, definition ast.ASTHandle, lazy bool) (bool, error) {
 	state, _ := t.State()
 	if err := state.Internalize(definition, true); err != nil {
 		return false, fmt.Errorf("internalize bit-vector atom definition: %w", errors.Join(err, t.releaseTemporary()))
@@ -1116,21 +1145,19 @@ func (t *SMTBitVectorTheory) bridgeAtom(expression, definition ast.ASTHandle) (b
 			return false, err
 		}
 	}
-	defined, err := state.Literal(definition)
-	if err != nil {
-		return false, fmt.Errorf("read bit-vector atom definition literal: %w", err)
-	}
-	literal := NewSMTLiteral(variable, false)
-	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal.Negated(), defined}); err != nil {
-		return false, err
-	}
-	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal, defined.Negated()}); err != nil {
-		return false, err
-	}
-	if state.relevancy != nil {
-		if err = state.relevancy.AddDependency(expression, definition); err != nil {
-			return false, err
+	if lazy && t.config.LazyLE && state.relevancy != nil {
+		if _, exists := t.lazyBridges[expression]; !exists {
+			owner, ownerErr := state.manager.NewRef(definition)
+			if ownerErr != nil {
+				return false, ownerErr
+			}
+			t.lazyBridges[expression] = owner
+			t.lazyBridgeTrail = append(t.lazyBridgeTrail, expression)
 		}
+		return true, nil
+	}
+	if err = t.publishBridge(expression, definition); err != nil {
+		return false, err
 	}
 	return true, nil
 }
@@ -1344,7 +1371,7 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 			if gateErr != nil {
 				return false, fmt.Errorf("expand bit-vector Boolean gate: %w", gateErr)
 			}
-			handled, bridgeErr := t.bridgeAtom(expression, definition)
+			handled, bridgeErr := t.bridgeAtom(expression, definition, false)
 			if bridgeErr != nil {
 				return false, fmt.Errorf("bridge bit-vector Boolean gate: %w", bridgeErr)
 			}
@@ -1367,14 +1394,14 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 			if overflowErr != nil {
 				return false, overflowErr
 			}
-			return t.bridgeAtom(expression, definition)
+			return t.bridgeAtom(expression, definition, true)
 		}
 		if op == 53 || op == 54 {
 			definition, overflowErr := t.signedMulBound(left, right, op == 53)
 			if overflowErr != nil {
 				return false, overflowErr
 			}
-			return t.bridgeAtom(expression, definition)
+			return t.bridgeAtom(expression, definition, true)
 		}
 		if op == 23 {
 			left = append([]ast.ASTHandle(nil), left...)
@@ -1391,7 +1418,7 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 		if argErr != nil {
 			return false, argErr
 		}
-		return t.bridgeAtom(expression, definition)
+		return t.bridgeAtom(expression, definition, true)
 	}
 	state, _ := t.State()
 	owner, err := state.manager.GetArg(expression, 0)
@@ -1709,6 +1736,22 @@ func (t *SMTBitVectorTheory) Relevant(expression ast.ASTHandle) error {
 	if err != nil || state.relevancy == nil {
 		return err
 	}
+	if owner, found := t.lazyBridges[expression]; found {
+		definition, refErr := state.manager.RefGet(owner)
+		if refErr != nil {
+			return refErr
+		}
+		if err = state.relevancy.MarkRelevant(definition); err != nil {
+			return err
+		}
+		if err = t.publishBridge(expression, definition); err != nil {
+			return err
+		}
+		if err = state.manager.DelRef(&owner); err != nil {
+			return err
+		}
+		delete(t.lazyBridges, expression)
+	}
 	isBV, err := state.manager.IsBitVector(expression)
 	if err != nil {
 		return err
@@ -1884,7 +1927,7 @@ func (t *SMTBitVectorTheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {
 		return err
 	}
-	t.scopes = append(t.scopes, smtBVScope{len(t.bitTrail), t.unsupported})
+	t.scopes = append(t.scopes, smtBVScope{len(t.bitTrail), len(t.lazyBridgeTrail), t.unsupported})
 	return nil
 }
 
@@ -1907,6 +1950,17 @@ func (t *SMTBitVectorTheory) PopScopes(count uint32) error {
 		delete(t.bitOwners, expression)
 	}
 	t.bitTrail = t.bitTrail[:scope.bits]
+	for _, expression := range t.lazyBridgeTrail[scope.lazyBridges:] {
+		owner, found := t.lazyBridges[expression]
+		if !found {
+			continue
+		}
+		if err := state.manager.DelRef(&owner); err != nil {
+			return err
+		}
+		delete(t.lazyBridges, expression)
+	}
+	t.lazyBridgeTrail = t.lazyBridgeTrail[:scope.lazyBridges]
 	t.unsupported = scope.unsupported
 	t.scopes = t.scopes[:level]
 	return t.SMTTheoryBase.PopScopes(count)
@@ -1954,7 +2008,12 @@ func (t *SMTBitVectorTheory) Close() (result error) {
 		delete(t.bitOwners, expression)
 		delete(t.bits, expression)
 	}
+	for expression, owner := range t.lazyBridges {
+		result = errors.Join(result, state.manager.DelRef(&owner))
+		delete(t.lazyBridges, expression)
+	}
 	t.bitTrail = t.bitTrail[:0]
+	t.lazyBridgeTrail = t.lazyBridgeTrail[:0]
 	t.scopes = t.scopes[:0]
 	return result
 }

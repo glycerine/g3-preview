@@ -235,6 +235,38 @@ func TestSMTBitVectorEnodeConfiguration(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorLazyComparisonBridge(t *testing.T) {
+	m, family, solver := smtBVSolver(t)
+	family, err := m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	zero, err := m.BitVectorNumeralUint64(0, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "bv-lazy-le-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "bv-lazy-le-right"), sort)
+	astTestMust(t, err)
+	comparison, err := m.MkBitVectorULE(left, right)
+	astTestMust(t, err)
+	theory, ok := solver.kernel.internalizer.theories[family].(*SMTBitVectorTheory)
+	if !ok || theory == nil {
+		t.Fatal("missing bit-vector theory")
+	}
+	config := theory.config
+	config.LazyLE = true
+	astTestMust(t, theory.ConfigureBitVector(config))
+	astTestMust(t, solver.kernel.internalizer.Internalize(comparison, false))
+	if len(theory.lazyBridges) != 1 {
+		t.Fatal("comparison bridge was not delayed", len(theory.lazyBridges))
+	}
+	before := len(solver.kernel.internalizer.Clauses())
+	astTestMust(t, theory.Relevant(comparison))
+	if len(theory.lazyBridges) != 0 || len(solver.kernel.internalizer.Clauses()) < before+2 {
+		t.Fatal("relevant comparison did not publish bridge", before, len(solver.kernel.internalizer.Clauses()))
+	}
+}
+
 func TestSMTBitVectorExpandsDynamicDisequality(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
 	zero, err := m.BitVectorNumeralUint64(0, 4)
