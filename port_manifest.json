@@ -110918,7 +110918,7 @@
       "path": "src/smt/tactic/ctx_solver_simplify_tactic.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -110943,17 +110943,32 @@
           "text": "VERIFY(cache.find(fml, path_r));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "goal reduction, solver-guided contextual traversal, Boolean forcing and fresh-name construction",
+          "status": "reference_only",
+          "tests": []
+        },
+        {
+          "name": "parameter, statistics, translation and cleanup hooks",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The native tactic owns its private SMT kernel, generated declaration cache and reference-counted declarations."
+      ],
+      "deviations": [
+        "Only native shell, test and DLL tactic registries construct this optional tactic; none is part of the retained Go command or solver graph."
+      ]
     },
     {
       "path": "src/smt/tactic/ctx_solver_simplify_tactic.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -110966,11 +110981,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "ctx-solver-simplify factory and native tactic registration",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The retained Go tactic API does not expose the native global tactic registry."
+      ]
     },
     {
       "path": "src/smt/tactic/smt_tactic.cpp",
@@ -111100,7 +111123,7 @@
       "path": "src/smt/tactic/unit_subsumption_tactic.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -111109,17 +111132,32 @@
           "text": "SASSERT(count <= v.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "clause proxy creation, contextual subsumption checks and goal reconstruction",
+          "status": "reference_only",
+          "tests": []
+        },
+        {
+          "name": "parameter update, translation, cancellation and factory construction",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The native tactic owns its SMT context, reusable clause proxies, deletion marks and parameter snapshot."
+      ],
+      "deviations": [
+        "Production consumers are the unretained native PDR/Spacer components plus native tactic registries; no retained Go consumer invokes unit-subsumption simplification."
+      ]
     },
     {
       "path": "src/smt/tactic/unit_subsumption_tactic.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -111132,11 +111170,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "unit-subsume-simplify factory and native tactic registration",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The retained Go tactic API does not expose the native global tactic registry, PDR or Spacer."
+      ]
     },
     {
       "path": "src/smt/theory_arith.cpp",
