@@ -15,12 +15,12 @@ func TestSMTInternalizerBooleanVariablesLiteralsAssignmentsAndScopes(t *testing.
 	state, err := NewSMTInternalizerState(m, context, nil)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, state.Close()) })
-	astTestMust(t, state.PushScope())
 	variable, err := state.MkBoolVar(a)
 	astTestMust(t, err)
 	if variable != SMTFirstBoolVar {
 		t.Fatal("first source Boolean variable", variable)
 	}
+	astTestMust(t, state.PushScope())
 	positive, err := state.Literal(a)
 	astTestMust(t, err)
 	negation, err := m.MkNot(a)
@@ -47,11 +47,14 @@ func TestSMTInternalizerBooleanVariablesLiteralsAssignmentsAndScopes(t *testing.
 		t.Fatal("Boolean data or watch allocation")
 	}
 	astTestMust(t, state.PopScopes(1))
-	if _, found := state.BoolVar(a); found {
-		t.Fatal("Boolean scope rollback")
+	if _, found := state.BoolVar(a); !found {
+		t.Fatal("preexisting Boolean variable was removed")
+	}
+	if value, err := state.Assignment(positive); err != nil || value != lbool.Undef {
+		t.Fatal("assignment scope rollback", value, err)
 	}
 	stats := state.Statistics()
-	if stats.NumMkBoolVar != 1 || stats.NumDelBoolVar != 1 {
+	if stats.NumMkBoolVar != 1 || stats.NumDelBoolVar != 0 {
 		t.Fatal("Boolean variable statistics", stats)
 	}
 }

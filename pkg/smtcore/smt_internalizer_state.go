@@ -10,9 +10,23 @@ import (
 )
 
 type smtInternalizerScope struct {
-	booleanLimit int
-	enodeLimit   int
-	pendingLimit int
+	booleanLimit    int
+	enodeLimit      int
+	pendingLimit    int
+	assignmentLimit int
+	clauseLimit     int
+	inconsistent    bool
+}
+
+type smtInternalizerAssignmentTrail struct {
+	variable int32
+	value    lbool.LBool
+}
+
+type SMTInternalizedClause struct {
+	Literals []SMTLiteral
+	Root     bool
+	Proof    ast.ASTHandle
 }
 
 type SMTInternalizerCongruence struct {
@@ -26,6 +40,7 @@ type SMTInternalizerState struct {
 	context          *SMTCheckerContext
 	congruence       *SMTCongruenceTable
 	quantifiers      *SMTQuantifierRegistry
+	relevancy        *SMTRelevancyPropagator
 	boolVar          map[ast.ASTHandle]int32
 	boolExpr         []ast.ASTHandle
 	booleanData      []SMTBoolVarData
@@ -37,6 +52,9 @@ type SMTInternalizerState struct {
 	scopes           []smtInternalizerScope
 	cachedGeneration map[ast.ASTHandle]uint32
 	pending          []SMTInternalizerCongruence
+	assignmentTrail  []smtInternalizerAssignmentTrail
+	clauses          []SMTInternalizedClause
+	inconsistent     bool
 	generation       uint32
 	scopeLevel       uint32
 	statistics       SMTContextStatistics
@@ -203,6 +221,13 @@ func (s *SMTInternalizerState) SetAssignment(variable int32, value lbool.LBool) 
 		return ast.ErrASTDomain
 	}
 	positive := NewSMTLiteral(variable, false)
+	old := s.assignment[positive.Index()]
+	if old == value {
+		return nil
+	}
+	if len(s.scopes) != 0 {
+		s.assignmentTrail = append(s.assignmentTrail, smtInternalizerAssignmentTrail{variable: variable, value: old})
+	}
 	s.assignment[positive.Index()] = value
 	s.assignment[positive.Negated().Index()] = value.Negated()
 	return s.context.SetAssignment(s.boolExpr[variable], value)
@@ -305,7 +330,16 @@ func (s *SMTInternalizerState) PushScope() error {
 	if err := s.open(); err != nil {
 		return err
 	}
-	s.scopes = append(s.scopes, smtInternalizerScope{booleanLimit: len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending)})
+	s.scopes = append(s.scopes, smtInternalizerScope{
+		booleanLimit: len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending),
+		assignmentLimit: len(s.assignmentTrail), clauseLimit: len(s.clauses), inconsistent: s.inconsistent,
+	})
+	if s.relevancy != nil {
+		if err := s.relevancy.PushScope(); err != nil {
+			s.scopes = s.scopes[:len(s.scopes)-1]
+			return err
+		}
+	}
 	s.scopeLevel++
 	return nil
 }
@@ -341,6 +375,19 @@ func (s *SMTInternalizerState) unregisterEnode(node *SMTEnode) error {
 }
 
 func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
+	if scope.assignmentLimit < 0 || scope.assignmentLimit > len(s.assignmentTrail) {
+		return ast.ErrASTDomain
+	}
+	for len(s.assignmentTrail) > scope.assignmentLimit {
+		entry := s.assignmentTrail[len(s.assignmentTrail)-1]
+		s.assignmentTrail = s.assignmentTrail[:len(s.assignmentTrail)-1]
+		positive := NewSMTLiteral(entry.variable, false)
+		s.assignment[positive.Index()] = entry.value
+		s.assignment[positive.Negated().Index()] = entry.value.Negated()
+		if err := s.context.SetAssignment(s.boolExpr[entry.variable], entry.value); err != nil {
+			return err
+		}
+	}
 	for len(s.enodeStack) > scope.enodeLimit {
 		node := s.enodeStack[len(s.enodeStack)-1]
 		if err := s.unregisterEnode(node); err != nil {
@@ -368,6 +415,7 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		}
 		delete(s.boolVar, expression)
 		delete(s.context.assignments, expression)
+		delete(s.context.relevant, expression)
 		s.boolExpr[variable] = ast.ASTHandle{}
 		s.boolExpr = s.boolExpr[:variable]
 		s.booleanData = s.booleanData[:variable]
@@ -384,6 +432,21 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		return ast.ErrASTDomain
 	}
 	s.pending = s.pending[:scope.pendingLimit]
+	if scope.clauseLimit < 0 || scope.clauseLimit > len(s.clauses) {
+		return ast.ErrASTDomain
+	}
+	for index := len(s.clauses); index > scope.clauseLimit; index-- {
+		proof := s.clauses[index-1].Proof
+		if !proof.IsNull() {
+			if err := s.manager.DecRef(proof); err != nil {
+				return err
+			}
+			s.clauses[index-1].Proof = ast.ASTHandle{}
+		}
+	}
+	s.statistics.NumDelClause += uint32(len(s.clauses) - scope.clauseLimit)
+	s.clauses = s.clauses[:scope.clauseLimit]
+	s.inconsistent = scope.inconsistent
 	return nil
 }
 
@@ -397,6 +460,11 @@ func (s *SMTInternalizerState) PopScopes(count uint32) error {
 	level := len(s.scopes) - int(count)
 	if err := s.popTo(s.scopes[level]); err != nil {
 		return err
+	}
+	if s.relevancy != nil {
+		if err := s.relevancy.PopScopes(count); err != nil {
+			return err
+		}
 	}
 	s.scopes = s.scopes[:level]
 	s.scopeLevel = uint32(level)

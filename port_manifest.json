@@ -102346,7 +102346,8 @@
         "TestSMTQIInstancePrepareSubstituteAndBuildFlattenedLemma",
         "TestSMTQIInstanceSatisfiedAndReducedTrueShortCircuits",
         "TestSMTQIInstanceQuantifierInstantiationProof",
-        "TestSMTQIInstanceMaterializeInvokesTheoryRewriter"
+        "TestSMTQIInstanceMaterializeInvokesTheoryRewriter",
+        "TestSMTInternalizerConsumesMaterializedQuantifierInstance"
       ],
       "conditionals": [
         {
@@ -102448,9 +102449,11 @@
         },
         {
           "name": "context internalize_instance integration",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_qi_instance.go",
+          "tests": [
+            "TestSMTInternalizerConsumesMaterializedQuantifierInstance"
+          ]
         }
       ],
       "ownership": [
@@ -105923,13 +105926,18 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_internalizer_order.go",
-        "pkg/smtcore/smt_internalizer_state.go"
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_internalizer.go"
       ],
       "tests": [
         "TestSMTInternalizationOrderBooleanGateContextsAndNotElision",
         "TestSMTInternalizationOrderTermITEContextsAndInternalizedCutoff",
         "TestSMTInternalizerBooleanVariablesLiteralsAssignmentsAndScopes",
-        "TestSMTInternalizerEnodeGenerationCongruenceAndRollback"
+        "TestSMTInternalizerEnodeGenerationCongruenceAndRollback",
+        "TestSMTInternalizerBooleanGateClausesAndRootAssertions",
+        "TestSMTInternalizerTermITEEqualityClausesAndRelevancy",
+        "TestSMTInternalizerQuantifierRegistrationAndDefaultAssertion",
+        "TestSMTInternalizerConsumesMaterializedQuantifierInstance"
       ],
       "conditionals": [
         {
@@ -106297,7 +106305,30 @@
           ]
         },
         {
-          "name": "assertion, recursive formula and term, quantifier, clause, gate, and theory-variable internalization",
+          "name": "recursive Boolean gate and default formula internalization, quantifier registration, distinct expansion, default uninterpreted terms, term ITE clauses, and assertion and instance entry points",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer.go",
+          "tests": [
+            "TestSMTInternalizerBooleanGateClausesAndRootAssertions",
+            "TestSMTInternalizerTermITEEqualityClausesAndRelevancy",
+            "TestSMTInternalizerQuantifierRegistrationAndDefaultAssertion",
+            "TestSMTInternalizerConsumesMaterializedQuantifierInstance"
+          ]
+        },
+        {
+          "name": "theory atom and term callbacks, sort constraints, and theory-variable attachment and replacement",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "watched-clause propagation, conflict justifications, proof-producing unit assignment, and clause garbage collection",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "deep-expression topological ordering invocation from the assertion entry point",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -106305,10 +106336,11 @@
       ],
       "ownership": [
         "SMTInternalizationOrder borrows the AST manager and checker context; native maps and slices own traversal colors, theory-family configuration, and returned order values.",
-        "SMTInternalizerState owns references for registered Boolean expressions and enode owners, owns its congruence table, variable arrays, watch lists, scopes, and pending congruence records, and borrows the checker context and optional quantifier registry."
+        "SMTInternalizerState owns references for registered Boolean expressions, enode owners, and retained clause proofs; it owns its congruence table, variable arrays, watch lists, scopes, clauses, assignment trail, and pending congruence records, and borrows the checker context and optional relevancy propagator and quantifier registry."
       ],
       "deviations": [
-        "Default-internalizer selection is stored as concrete family configuration until SMT theory registration owns it. Source nondefault theory families remain top-down boundaries in the ordering pass."
+        "Default-internalizer selection is stored as concrete family configuration until SMT theory registration owns it. Source nondefault theory families remain top-down boundaries in the ordering pass.",
+        "Internalized logical clauses are retained as concrete typed records for the future DPLL watch and justification layer; the port does not introduce a universal callback adapter while the concrete theory interface is unfinished."
       ]
     },
     {

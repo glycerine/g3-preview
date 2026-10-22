@@ -220,6 +220,23 @@ func (b *SMTQIInstanceBuilder) Materialize(prepared *SMTQIPreparedInstance, rw *
 	return b.FinishWithProof(prepared, rewritten, proof, stat, scope)
 }
 
+// MaterializeAndInternalize completes qi_queue::instantiate through the
+// concrete SMT internalizer. The returned object retains the source queue's
+// lemma/proof ownership until its caller closes or scopes it.
+func (b *SMTQIInstanceBuilder) MaterializeAndInternalize(prepared *SMTQIPreparedInstance, rw *rewriter.TheoryRewriter, stat *SMTQuantifierStat, scope uint32, internalizer *SMTInternalizerState) (*SMTQIInstance, error) {
+	if internalizer == nil || internalizer.manager != b.manager {
+		return nil, ast.ErrASTDomain
+	}
+	result, err := b.Materialize(prepared, rw, stat, scope)
+	if err != nil || result == nil {
+		return result, err
+	}
+	if err = internalizer.InternalizeInstance(result); err != nil {
+		return nil, errors.Join(err, result.Close())
+	}
+	return result, nil
+}
+
 func (b *SMTQIInstanceBuilder) Finish(prepared *SMTQIPreparedInstance, simplified ast.ASTHandle, stat *SMTQuantifierStat, scope uint32) (*SMTQIInstance, error) {
 	if b == nil || b.manager == nil {
 		return nil, ast.ErrASTHandle
