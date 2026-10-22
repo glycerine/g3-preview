@@ -280,4 +280,12 @@ func TestSMTIntegerDiffTheoryBuildsModelValues(t *testing.T) {
 	if !xMatched || !yMatched || !xOK || !yOK || new(big.Rat).Sub(xRat, yRat).Cmp(big.NewRat(-2, 1)) > 0 {
 		t.Fatal("difference model values", xText, yText)
 	}
+	finalModel, err := generator.FinalModel()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, finalModel.Close()) })
+	xDeclaration, err := m.GetDecl(x)
+	astTestMust(t, err)
+	if interpreted, interpretationErr := finalModel.Core().ConstantInterpretation(xDeclaration); interpretationErr != nil || interpreted != xValue {
+		t.Fatal("published difference model constant", interpreted, interpretationErr)
+	}
 }

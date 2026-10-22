@@ -287,7 +287,105 @@ func (g *SMTModelGenerator) BuildStateValues(state *SMTInternalizerState) error 
 	if err != nil {
 		return err
 	}
-	return g.BuildValues(roots, procedures)
+	if err = g.BuildValues(roots, procedures); err != nil {
+		return err
+	}
+	return g.publishConstantInterpretations(state)
+}
+
+func (g *SMTModelGenerator) uninterpretedConstant(expression ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	kind, err := g.manager.GetKind(expression)
+	if err != nil || kind != ast.ASTApp {
+		return ast.ASTHandle{}, false, err
+	}
+	count, err := g.manager.GetNumArgs(expression)
+	if err != nil || count != 0 {
+		return ast.ASTHandle{}, false, err
+	}
+	family, err := g.manager.GetFamilyID(expression)
+	if err != nil || family != ast.NullFamilyID {
+		return ast.ASTHandle{}, false, err
+	}
+	declaration, err := g.manager.GetDecl(expression)
+	return declaration, err == nil, err
+}
+
+func (g *SMTModelGenerator) publishConstantInterpretations(state *SMTInternalizerState) error {
+	if g.model == nil {
+		return ast.ErrASTDomain
+	}
+	for variable := int32(SMTFirstBoolVar); int(variable) < len(state.boolExpr); variable++ {
+		expression := state.boolExpr[variable]
+		if expression.IsNull() || !g.context.relevant[expression] {
+			continue
+		}
+		declaration, constant, err := g.uninterpretedConstant(expression)
+		if err != nil {
+			return err
+		}
+		if !constant {
+			continue
+		}
+		assignment := state.assignment[NewSMTLiteral(variable, false).Index()]
+		if assignment == lbool.Undef {
+			return ast.ErrASTDomain
+		}
+		value, err := g.manager.MkFalse()
+		if assignment == lbool.True {
+			value, err = g.manager.MkTrue()
+		}
+		if err != nil {
+			return err
+		}
+		if err = g.model.Core().RegisterConstant(declaration, value); err != nil {
+			return err
+		}
+	}
+	for _, node := range state.enodeStack {
+		if node == nil || node.root != node || !g.context.relevant[node.owner] {
+			continue
+		}
+		value := g.rootValues[node]
+		if value.IsNull() {
+			continue
+		}
+		sort, err := g.manager.GetSort(node.owner)
+		if err != nil {
+			return err
+		}
+		booleanSort, err := g.manager.MkBoolSort()
+		if err != nil {
+			return err
+		}
+		if sort == booleanSort {
+			continue
+		}
+		declaration, constant, err := g.uninterpretedConstant(node.owner)
+		if err != nil {
+			return err
+		}
+		if constant {
+			if err = g.model.Core().RegisterConstant(declaration, value); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (g *SMTModelGenerator) FinalModel() (*model.Model, error) {
+	if err := g.open(); err != nil {
+		return nil, err
+	}
+	if g.model == nil {
+		return nil, ast.ErrASTDomain
+	}
+	result, err := g.model.FinalModel()
+	if err != nil {
+		return nil, err
+	}
+	g.model = nil
+	return result, nil
 }
 
 func (g *SMTModelGenerator) Value(node *SMTEnode) (ast.ASTHandle, error) {

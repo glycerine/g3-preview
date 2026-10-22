@@ -7,6 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
@@ -169,5 +170,40 @@ func TestSMTModelGeneratorBuildsAndPinsRootValues(t *testing.T) {
 	}
 	if err = generator.BuildValues([]*SMTEnode{node}, map[*SMTEnode]SMTModelValueProcedure{node: procedure}); !errors.Is(err, ast.ErrASTDomain) {
 		t.Fatal("duplicate build", err)
+	}
+}
+
+func TestSMTModelGeneratorPublishesBooleanConstant(t *testing.T) {
+	m, config := smtModelGeneratorFixture(t)
+	sort, err := m.MkBoolSort()
+	astTestMust(t, err)
+	expression, err := m.MkConst(astTestSymbol(t, m, "model-build-boolean"), sort)
+	astTestMust(t, err)
+	context, err := NewSMTCheckerContext(m)
+	astTestMust(t, err)
+	state, err := NewSMTInternalizerState(m, context, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, state.Close()) })
+	variable, err := state.MkBoolVar(expression)
+	astTestMust(t, err)
+	_, err = state.MkEnode(expression, false, false, true)
+	astTestMust(t, err)
+	astTestMust(t, state.SetAssignment(variable, lbool.True))
+	astTestMust(t, context.SetRelevant(expression, true))
+	generator, err := NewSMTModelGenerator(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, generator.Close()) })
+	astTestMust(t, generator.SetContext(context))
+	astTestMust(t, generator.InitializeModel(config))
+	astTestMust(t, generator.BuildStateValues(state))
+	finalModel, err := generator.FinalModel()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, finalModel.Close()) })
+	declaration, err := m.GetDecl(expression)
+	astTestMust(t, err)
+	value, err := finalModel.Core().ConstantInterpretation(declaration)
+	astTestMust(t, err)
+	if !m.IsTrue(value) {
+		t.Fatal("Boolean model interpretation", value)
 	}
 }
