@@ -100629,7 +100629,7 @@
       "path": "src/smt/params/dyn_ack_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_dyn_ack_params.go",
         "pkg/smtcore/util_smt_dyn_ack_params_source_test.go",
@@ -100653,12 +100653,12 @@
         "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
         "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Literal six assignment getter sequence, acquired module reference source destructor and six ostream chains with endl (src/smt/params/dyn_ack_params.cpp:22-41)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_dyn_ack_params.go",
           "tests": [
             "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -100672,7 +100672,7 @@
         },
         {
           "name": "Concrete embedded generated module helper engine shared with array without changing dack assignments or source acquisition/destructor order (scripts/mk_genfile_common.py:895-939; src/smt/params/dyn_ack_params.cpp:22-30)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_module_params_source.go",
           "tests": [
             "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
@@ -100685,7 +100685,7 @@
         },
         {
           "name": "Concrete simultaneous generated-helper frame engine, older reads and strict younger source stop before older DT (scripts/mk_genfile_common.py:895-939; src/smt/params/theory_bv_params.cpp:24-29)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_module_params_source.go",
           "tests": [
             "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
@@ -100711,7 +100711,7 @@
       "path": "src/smt/params/dyn_ack_params.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_dyn_ack_params.go",
         "pkg/smtcore/util_smt_dyn_ack_params_source_test.go",
@@ -100742,12 +100742,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete dyn_ack_params scalar initialization then actual generated helper source update (src/smt/params/dyn_ack_params.h:24-51)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_dyn_ack_params.go",
           "tests": [
             "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -100761,7 +100761,7 @@
         },
         {
           "name": "Concrete embedded generated module helper engine shared with array without changing dack assignments or source acquisition/destructor order (scripts/mk_genfile_common.py:895-939; src/smt/params/dyn_ack_params.cpp:22-30)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_module_params_source.go",
           "tests": [
             "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
@@ -100774,7 +100774,7 @@
         },
         {
           "name": "DACK_DISABLED, DACK_ROOT and DACK_CR enumerator values and concrete source event dispatch",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_dyn_ack_schedule.go",
           "tests": [
             "TestDynAckScheduleSourceEventGates"
