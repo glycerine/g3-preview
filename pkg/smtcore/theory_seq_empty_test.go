@@ -212,3 +212,35 @@ func TestSMTSequenceTheoryConcreteNonContainsConflict(t *testing.T) {
 		t.Fatal("concrete non-contains conflict", status)
 	}
 }
+
+func TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	ab, err := m.MkString("ab")
+	astTestMust(t, err)
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-cancel-x"), sort)
+	astTestMust(t, err)
+	word, err := m.MkSequenceConcat(a, x)
+	astTestMust(t, err)
+	wordEquality, err := m.MkEq(word, ab)
+	astTestMust(t, err)
+	xEqualsB, err := m.MkEq(x, b)
+	astTestMust(t, err)
+	xNotB, err := m.MkNot(xEqualsB)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(wordEquality))
+	astTestMust(t, solver.Assert(xNotB))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("cancelled word solution did not conflict", status)
+	}
+}

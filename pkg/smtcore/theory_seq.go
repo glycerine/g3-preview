@@ -649,6 +649,13 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if conflict {
 		return SMTFinalCheckContinue, nil
 	}
+	progress, err := t.solveWordEquations()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if progress {
+		return SMTFinalCheckContinue, nil
+	}
 	conflict, err = t.checkConcreteDisequations()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
