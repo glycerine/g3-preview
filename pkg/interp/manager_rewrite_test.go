@@ -1,11 +1,46 @@
 package interp
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
+
+func TestFullTranslationArithmeticHelpers(t *testing.T) {
+	_, manager := interpRewritingManagerFixture(t)
+	integer, err := manager.IntType()
+	interpMust(t, err)
+	x, err := manager.MakeVariable("translation-x", integer)
+	interpMust(t, err)
+	y, err := manager.MakeVariable("translation-y", integer)
+	interpMust(t, err)
+	base, err := NewBase(manager, []ast.ASTHandle{x, y}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	translation, err := NewFullTranslation(base)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, translation.Close()) })
+	three, err := manager.MakeIntText("3")
+	interpMust(t, err)
+	right, err := manager.Make(OperatorPlus, three, y)
+	interpMust(t, err)
+	inequality, err := manager.Make(OperatorLE, x, right)
+	interpMust(t, err)
+	normalized, err := translation.NormalizeInequality(inequality)
+	interpMust(t, err)
+	normalizedRight, err := manager.Arg(normalized, 1)
+	interpMust(t, err)
+	value, numeral, err := manager.Numeral(normalizedRight)
+	if err != nil || !numeral || value.Cmp(new(big.Rat).SetInt64(3)) != 0 {
+		t.Fatal("normalized affine right side", value, numeral, err)
+	}
+	valid, err := translation.CheckFarkas([]ast.ASTHandle{inequality}, inequality)
+	if err != nil || !valid {
+		t.Fatal("Farkas identity", valid, err)
+	}
+}
 
 func interpRewritingManagerFixture(t *testing.T) (*ast.ASTManager, *Manager) {
 	t.Helper()

@@ -42223,10 +42223,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/interp/translation_analysis.go"
+        "pkg/interp/translation_analysis.go",
+        "pkg/interp/translation_arithmetic.go"
       ],
       "tests": [
-        "TestFullTranslationProofAnalysisAndResolution"
+        "TestFullTranslationProofAnalysisAndResolution",
+        "TestFullTranslationArithmeticHelpers"
       ],
       "conditionals": [
         {
@@ -42367,6 +42369,14 @@
           "go_target": "pkg/interp/translation_analysis.go",
           "tests": [
             "TestFullTranslationProofAnalysisAndResolution"
+          ]
+        },
+        {
+          "name": "inequality right-side and affine normalization plus Farkas identity validation",
+          "status": "ported",
+          "go_target": "pkg/interp/translation_arithmetic.go",
+          "tests": [
+            "TestFullTranslationArithmeticHelpers"
           ]
         },
         {
