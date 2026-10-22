@@ -106648,9 +106648,16 @@
       "path": "src/smt/smt_farkas_util.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_farkas_util.go"
+      ],
+      "tests": [
+        "TestSMTFarkasEmptyIgnoredAndOwnedPremises",
+        "TestSMTFarkasIntegerSignCorrection",
+        "TestSMTFarkasIntegerNormalizationAndConsequence",
+        "TestSMTFarkasSplitDisconnectedLiterals"
+      ],
       "assertions": [
         {
           "line": 90,
@@ -106673,19 +106680,66 @@
           "text": "SASSERT(tail < i);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "farkas_util construction, reset and configuration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_farkas_util.go",
+          "tests": [
+            "TestSMTFarkasEmptyIgnoredAndOwnedPremises",
+            "TestSMTFarkasSplitDisconnectedLiterals"
+          ]
+        },
+        {
+          "name": "add and fix_sign",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_farkas_util.go",
+          "tests": [
+            "TestSMTFarkasEmptyIgnoredAndOwnedPremises",
+            "TestSMTFarkasIntegerSignCorrection"
+          ]
+        },
+        {
+          "name": "coercion, coefficient normalization and consequence extraction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_farkas_util.go",
+          "tests": [
+            "TestSMTFarkasIntegerNormalizationAndConsequence"
+          ]
+        },
+        {
+          "name": "uninterpreted-term partition and difference-logic repair",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_farkas_util.go",
+          "tests": [
+            "TestSMTFarkasSplitDisconnectedLiterals"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTFarkasUtil borrows the AST and parameter services, owns a private theory rewriter, and retains every accepted premise until Reset or Close.",
+        "Get writes an owning result reference and temporary consequence references are released before return."
+      ],
+      "deviations": [
+        "Union-find state uses Go maps scoped to one partition pass instead of timestamped reusable C++ vectors."
+      ]
     },
     {
       "path": "src/smt/smt_farkas_util.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_farkas_util.go"
+      ],
+      "tests": [
+        "TestSMTFarkasEmptyIgnoredAndOwnedPremises",
+        "TestSMTFarkasIntegerSignCorrection",
+        "TestSMTFarkasIntegerNormalizationAndConsequence",
+        "TestSMTFarkasSplitDisconnectedLiterals"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -106696,10 +106750,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "farkas_util public interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_farkas_util.go",
+          "tests": [
+            "TestSMTFarkasEmptyIgnoredAndOwnedPremises",
+            "TestSMTFarkasIntegerSignCorrection",
+            "TestSMTFarkasIntegerNormalizationAndConsequence",
+            "TestSMTFarkasSplitDisconnectedLiterals"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go owner makes the source app_ref_vector lifetime explicit through IncRef, DecRef, Reset and Close."
+      ],
       "deviations": []
     },
     {
