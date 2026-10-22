@@ -113127,9 +113127,15 @@
       "path": "src/solver/mus.cpp",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/mus.go"
+      ],
+      "tests": [
+        "TestMUSDeletionExtractionCoreReductionAndAssumptions",
+        "TestMUSSingleUnknownAndLiteralGuards",
+        "TestMUSWeightedBestModel"
+      ],
       "assertions": [
         {
           "line": 58,
@@ -113148,19 +113154,52 @@
           "text": "SASSERT(min_core_valid);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "construction, reset, literal validation, soft constraints, additional assumptions and deletion-based get_mus/get_mus1",
+          "status": "ported",
+          "go_target": "pkg/solver/mus.go",
+          "tests": [
+            "TestMUSDeletionExtractionCoreReductionAndAssumptions",
+            "TestMUSSingleUnknownAndLiteralGuards"
+          ]
+        },
+        {
+          "name": "set_soft, update_model and get_best_model exact weighted model tracking",
+          "status": "ported",
+          "go_target": "pkg/solver/mus.go",
+          "tests": [
+            "TestMUSWeightedBestModel"
+          ]
+        },
+        {
+          "name": "private correction-set alternative get_mus2/get_next_mcs and helpers",
+          "status": "reference_only",
+          "reason": "No retained source consumer calls the private alternative; every public get_mus overload dispatches get_mus1."
+        }
+      ],
+      "ownership": [
+        "MUS pins every stored literal, assumption and weighted soft expression, borrows its solver, retains the best model independently and returns another acquired model reference to callers. Exact weights are independent math/big.Rat copies."
+      ],
+      "deviations": [
+        "Literal debug assertions are typed domain errors in every Go build. MUSConfig supplies a concrete Boolean model-evaluation callback backed by the retained model evaluator services; native slices and maps replace source containers."
+      ]
     },
     {
       "path": "src/solver/mus.h",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/mus.go"
+      ],
+      "tests": [
+        "TestMUSDeletionExtractionCoreReductionAndAssumptions",
+        "TestMUSSingleUnknownAndLiteralGuards",
+        "TestMUSWeightedBestModel"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113171,10 +113210,23 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "MUS constructor/destructor, add_soft overloads, add_assumption, get_mus overloads, reset, set_soft and get_best_model",
+          "status": "ported",
+          "go_target": "pkg/solver/mus.go",
+          "tests": [
+            "TestMUSDeletionExtractionCoreReductionAndAssumptions",
+            "TestMUSSingleUnknownAndLiteralGuards",
+            "TestMUSWeightedBestModel"
+          ]
+        }
+      ],
+      "ownership": [
+        "The explicit Close method replaces pimpl destruction and releases all AST, rational-slice and model ownership while continuing to borrow the solver."
+      ],
       "deviations": []
     },
     {
