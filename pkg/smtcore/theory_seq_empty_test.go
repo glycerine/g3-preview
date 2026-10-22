@@ -1579,6 +1579,17 @@ func TestSMTSequenceTheoryIntegerStringAxioms(t *testing.T) {
 			astTestMust(t, err)
 			return []ast.ASTHandle{binding, result}
 		}},
+		{name: "stoi-nondigits-are-negative", build: func(t *testing.T, m *ast.ASTManager) []ast.ASTHandle {
+			value, err := m.MkString("not-a-number")
+			astTestMust(t, err)
+			converted, err := m.MkStringToInt(value)
+			astTestMust(t, err)
+			zero, err := m.ArithmeticIntegerNumeralText("0")
+			astTestMust(t, err)
+			nonnegative, err := m.MkArithmeticGE(converted, zero)
+			astTestMust(t, err)
+			return []ast.ASTHandle{nonnegative}
+		}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			m, modelConfig := smtModelGeneratorFixture(t)
@@ -1595,5 +1606,50 @@ func TestSMTSequenceTheoryIntegerStringAxioms(t *testing.T) {
 				t.Fatal("integer/string axiom contradiction", status)
 			}
 		})
+	}
+}
+
+func TestSMTSequenceTheoryIntegerStringLanguageAxioms(t *testing.T) {
+	m := astTestManager(t)
+	family, err := m.SequenceFamilyID()
+	astTestMust(t, err)
+	theory, err := NewSMTSequenceTheory(family)
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.RegisterTheory(theory))
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	integerSort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	n, err := m.MkConst(astTestSymbol(t, m, "sequence-language-integer"), integerSort)
+	astTestMust(t, err)
+	converted, err := m.MkIntToString(n)
+	astTestMust(t, err)
+	nonnegative, err := m.MkArithmeticGE(n, zero)
+	astTestMust(t, err)
+	numeric, err := theory.numericStringMembership(converted)
+	astTestMust(t, err)
+	guard, err := m.MkImplies(nonnegative, numeric)
+	astTestMust(t, err)
+	astTestMust(t, theory.addIntToStringAxioms(converted))
+	if _, found := theory.axioms.set[guard]; !found {
+		t.Fatal("int.to.str lacks its nonnegative numeric-language axiom")
+	}
+
+	stringSort, err := m.GetSort(converted)
+	astTestMust(t, err)
+	s, err := m.MkConst(astTestSymbol(t, m, "sequence-language-string"), stringSort)
+	astTestMust(t, err)
+	parsed, err := m.MkStringToInt(s)
+	astTestMust(t, err)
+	parsedNonnegative, err := m.MkArithmeticGE(parsed, zero)
+	astTestMust(t, err)
+	stringNumeric, err := theory.numericStringMembership(s)
+	astTestMust(t, err)
+	equivalence, err := m.MkIff(parsedNonnegative, stringNumeric)
+	astTestMust(t, err)
+	astTestMust(t, theory.addStringToIntAxioms(parsed))
+	if _, found := theory.axioms.set[equivalence]; !found {
+		t.Fatal("str.to.int lacks its exact numeric-language axiom")
 	}
 }

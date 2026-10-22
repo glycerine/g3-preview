@@ -117393,10 +117393,10 @@
           "tests": ["TestSMTSequenceTheoryRegexMembershipReduction"]
         },
         {
-          "name": "int.to.str empty iff negative, nonnegative round trip through str.to.int, and str.to.int lower bound (src/smt/theory_seq.cpp:2298-2321,2410-2440)",
+          "name": "int.to.str empty iff negative, nonnegative round trip through str.to.int, numeric-language membership for nonnegative conversions, and str.to.int lower bound plus exact nonnegative iff [0-9]+ membership (src/smt/theory_seq.cpp:2298-2321,2410-2440)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_conversion.go",
-          "tests": ["TestSMTSequenceTheoryIntegerStringAxioms"]
+          "tests": ["TestSMTSequenceTheoryIntegerStringAxioms", "TestSMTSequenceTheoryIntegerStringLanguageAxioms"]
         },
         {
           "name": "dependency-ordered sequence model values for concat, unit, string literals and int.to.str with fresh cyclic-leaf fallback (src/smt/theory_seq.cpp:2630-2785)",
