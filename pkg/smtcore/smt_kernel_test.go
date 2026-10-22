@@ -5,6 +5,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func smtTestKernel(t *testing.T, manager *ast.ASTManager) *SMTKernel {
@@ -57,6 +58,75 @@ func TestSMTKernelAssertionCheckAndDecisionClause(t *testing.T) {
 	astTestMust(t, err)
 	if result != lbool.False || !unsat.Inconsistent() {
 		t.Fatal("false assertion check", result, unsat.Inconsistent())
+	}
+}
+
+func TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals(t *testing.T) {
+	m := astTestManager(t)
+	kernel, err := NewSMTKernel(m, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, kernel.Close()) })
+	a := smtRelevancyBool(t, m, "kernel-result-a")
+	b := smtRelevancyBool(t, m, "kernel-result-b")
+	clause, err := m.MkOr(a, b)
+	astTestMust(t, err)
+	astTestMust(t, kernel.Assert(clause, ast.ASTHandle{}))
+	status, err := kernel.Check()
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("kernel result status", status)
+	}
+	assignments, err := kernel.Assignments()
+	astTestMust(t, err)
+	relevant, err := kernel.RelevantLiterals()
+	astTestMust(t, err)
+	guessed, err := kernel.GuessedLiterals()
+	astTestMust(t, err)
+	if len(assignments) == 0 || len(relevant) == 0 || len(guessed) == 0 {
+		t.Fatal("captured kernel literals", assignments, relevant, guessed)
+	}
+	labeled, err := kernel.RelevantLabeledLiterals(false)
+	astTestMust(t, err)
+	if len(labeled) != 0 {
+		t.Fatal("unlabeled formula produced labeled literals", labeled)
+	}
+	falsehood, err := m.MkFalse()
+	astTestMust(t, err)
+	astTestMust(t, kernel.Assert(falsehood, ast.ASTHandle{}))
+	status, err = kernel.Check()
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("second kernel result status", status)
+	}
+	assignments, err = kernel.Assignments()
+	astTestMust(t, err)
+	if len(assignments) != 0 {
+		t.Fatal("stale satisfiable assignments survived unsat check", assignments)
+	}
+}
+
+func TestSMTKernelCapturesRelevantLabeledLiterals(t *testing.T) {
+	m := astTestManager(t)
+	kernel, err := NewSMTKernel(m, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, kernel.Close()) })
+	literal, err := m.MkLabelLit([]usymbol.Symbol{
+		astTestSymbol(t, m, "kernel-label@selected"),
+		astTestSymbol(t, m, "kernel-label-plain"),
+	})
+	astTestMust(t, err)
+	astTestMust(t, kernel.Assert(literal, ast.ASTHandle{}))
+	status, err := kernel.Check()
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("labeled kernel result", status)
+	}
+	all, err := kernel.RelevantLabeledLiterals(false)
+	astTestMust(t, err)
+	atOnly, err := kernel.RelevantLabeledLiterals(true)
+	astTestMust(t, err)
+	if len(all) != 1 || all[0] != literal || len(atOnly) != 1 || atOnly[0] != literal {
+		t.Fatal("relevant labeled literals", all, atOnly)
 	}
 }
 

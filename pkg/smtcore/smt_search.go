@@ -112,6 +112,9 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			if err = k.captureRelevantLabels(); err != nil {
 				return lbool.Undef, err
 			}
+			if err = k.captureLiteralResults(baseLevel); err != nil {
+				return lbool.Undef, err
+			}
 			if err = k.buildGeneratedModel(); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search build model: %w", err)
 			}

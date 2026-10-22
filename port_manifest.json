@@ -104383,7 +104383,8 @@
         "pkg/smtcore/smt_search.go",
         "pkg/smtcore/smt_assumptions.go",
         "pkg/smtcore/smt_kernel.go",
-        "pkg/smtcore/smt_equality_propagation.go"
+        "pkg/smtcore/smt_equality_propagation.go",
+        "pkg/smtcore/smt_kernel_results.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -104394,7 +104395,9 @@
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
         "TestSMTCoreEqualityCongruencePropagation",
-        "TestSMTCoreEqualityPropagatesBooleanCongruence"
+        "TestSMTCoreEqualityPropagatesBooleanCongruence",
+        "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
+        "TestSMTKernelCapturesRelevantLabeledLiterals"
       ],
       "conditionals": [
         {
@@ -105388,6 +105391,15 @@
             "TestSMTCoreEqualityPropagatesBooleanCongruence",
             "TestSMTSolverImpliedEqualitiesPartitionsByProofAndSort"
           ]
+        },
+        {
+          "name": "owned final assignment, relevant literal, relevant labeled literal, and decision-literal results captured before search rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel_results.go",
+          "tests": [
+            "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
+            "TestSMTKernelCapturesRelevantLabeledLiterals"
+          ]
         }
       ],
       "ownership": [
@@ -105410,7 +105422,8 @@
         "pkg/smtcore/smt_search.go",
         "pkg/smtcore/smt_assumptions.go",
         "pkg/smtcore/smt_kernel.go",
-        "pkg/smtcore/smt_equality_propagation.go"
+        "pkg/smtcore/smt_equality_propagation.go",
+        "pkg/smtcore/smt_kernel_results.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -105420,7 +105433,9 @@
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
         "TestSMTCoreEqualityCongruencePropagation",
-        "TestSMTCoreEqualityPropagatesBooleanCongruence"
+        "TestSMTCoreEqualityPropagatesBooleanCongruence",
+        "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
+        "TestSMTKernelCapturesRelevantLabeledLiterals"
       ],
       "conditionals": [
         {
@@ -105652,6 +105667,15 @@
             "TestSMTCoreEqualityTransitivityAndScopeRollback",
             "TestSMTCoreEqualityCongruencePropagation",
             "TestSMTCoreEqualityPropagatesBooleanCongruence"
+          ]
+        },
+        {
+          "name": "final assignment, relevant literal, labeled literal, and decision result access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel_results.go",
+          "tests": [
+            "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
+            "TestSMTKernelCapturesRelevantLabeledLiterals"
           ]
         }
       ],
@@ -107361,7 +107385,8 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_asserted_formulas.go",
         "pkg/smtcore/smt_assumptions.go",
-        "pkg/smtcore/smt_search.go"
+        "pkg/smtcore/smt_search.go",
+        "pkg/smtcore/smt_kernel_results.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -107374,7 +107399,9 @@
         "TestSMTSolverPublishesKernelUnsatProof",
         "TestSMTSolverReasonUnknownUsesKernelFailure",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
-        "TestSMTSolverForwardsFastProgressSamples"
+        "TestSMTSolverForwardsFastProgressSamples",
+        "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
+        "TestSMTKernelCapturesRelevantLabeledLiterals"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -107450,7 +107477,16 @@
           ]
         },
         {
-          "name": "copy and reset, consequences, mutexes, preferred SAT, guessed literals, display, cancellation, and parameter updates",
+          "name": "owned assignment, relevant literal, relevant labeled literal, and guessed decision results",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel_results.go",
+          "tests": [
+            "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
+            "TestSMTKernelCapturesRelevantLabeledLiterals"
+          ]
+        },
+        {
+          "name": "copy and reset, consequences, mutexes, preferred SAT, display, cancellation, and parameter updates",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -107460,7 +107496,7 @@
         "SMTKernel owns formula and proof references for asserted entries, the latest terminal unsat proof reference, and its checker, relevancy propagator, and internalizer lifecycle."
       ],
       "deviations": [
-        "Check uses first-UIP learning and backjumping and returns undef when a theory gives up or requests continuation without observable progress; model retention remains unported."
+        "Check uses first-UIP learning and backjumping and returns undef when a theory gives up or requests continuation without observable progress."
       ]
     },
     {
@@ -107472,7 +107508,8 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_asserted_formulas.go",
         "pkg/smtcore/smt_assumptions.go",
-        "pkg/smtcore/smt_search.go"
+        "pkg/smtcore/smt_search.go",
+        "pkg/smtcore/smt_kernel_results.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -107485,7 +107522,9 @@
         "TestSMTSolverPublishesKernelUnsatProof",
         "TestSMTSolverReasonUnknownUsesKernelFailure",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
-        "TestSMTSolverForwardsFastProgressSamples"
+        "TestSMTSolverForwardsFastProgressSamples",
+        "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
+        "TestSMTKernelCapturesRelevantLabeledLiterals"
       ],
       "conditionals": [
         {
@@ -107568,6 +107607,15 @@
           "tests": [
             "TestSMTSolverPublishesGeneratedModel",
             "TestSMTSolverPublishesIntegerDifferenceModel"
+          ]
+        },
+        {
+          "name": "assignment, relevant literal, relevant labeled literal, and guessed decision result access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel_results.go",
+          "tests": [
+            "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
+            "TestSMTKernelCapturesRelevantLabeledLiterals"
           ]
         },
         {

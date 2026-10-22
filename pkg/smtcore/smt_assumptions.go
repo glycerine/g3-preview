@@ -51,6 +51,9 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 	if err := k.open(); err != nil {
 		return lbool.Undef, err
 	}
+	if err := k.clearLiteralResults(); err != nil {
+		return lbool.Undef, err
+	}
 	if err := k.clearGeneratedModel(); err != nil {
 		return lbool.Undef, err
 	}

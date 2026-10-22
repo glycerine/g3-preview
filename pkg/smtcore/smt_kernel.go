@@ -20,24 +20,28 @@ type SMTKernelAssertion struct {
 }
 
 type SMTKernel struct {
-	manager      *ast.ASTManager
-	checker      *SMTCheckerContext
-	relevancy    *SMTRelevancyPropagator
-	internalizer *SMTInternalizerState
-	assertions   []SMTKernelAssertion
-	assertedHead int
-	scopes       []int
-	unsatCore    []ast.ASTHandle
-	unsatProof   ast.ASTRef
-	assumptions  map[SMTLiteral]ast.ASTHandle
-	lastFailure  SMTFailure
-	unknown      string
-	labels       []usymbol.Symbol
-	callback     solver.ProgressCallback
-	modelConfig  model.ModelEvaluatorConfig
-	generated    *model.Model
-	produceModel bool
-	closed       bool
+	manager          *ast.ASTManager
+	checker          *SMTCheckerContext
+	relevancy        *SMTRelevancyPropagator
+	internalizer     *SMTInternalizerState
+	assertions       []SMTKernelAssertion
+	assertedHead     int
+	scopes           []int
+	unsatCore        []ast.ASTHandle
+	unsatProof       ast.ASTRef
+	assumptions      map[SMTLiteral]ast.ASTHandle
+	lastFailure      SMTFailure
+	unknown          string
+	labels           []usymbol.Symbol
+	assignments      []ast.ASTHandle
+	relevantLiterals []ast.ASTHandle
+	relevantLabeled  []ast.ASTHandle
+	guessed          []ast.ASTHandle
+	callback         solver.ProgressCallback
+	modelConfig      model.ModelEvaluatorConfig
+	generated        *model.Model
+	produceModel     bool
+	closed           bool
 }
 
 func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (*SMTKernel, error) {
@@ -235,6 +239,9 @@ func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 }
 
 func (k *SMTKernel) Check() (lbool.LBool, error) {
+	if err := k.clearLiteralResults(); err != nil {
+		return lbool.Undef, err
+	}
 	if err := k.clearGeneratedModel(); err != nil {
 		return lbool.Undef, err
 	}
@@ -434,6 +441,7 @@ func (k *SMTKernel) Close() error {
 		return nil
 	}
 	var result error
+	result = errors.Join(result, k.clearLiteralResults())
 	result = errors.Join(result, k.clearGeneratedModel())
 	result = errors.Join(result, k.clearUnsatCore())
 	result = errors.Join(result, k.manager.DelRef(&k.unsatProof))
