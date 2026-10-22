@@ -116792,6 +116792,7 @@
         "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries",
         "TestSMTSequenceTheoryReducesEqualLengthBoundaries",
         "TestSMTSequenceTheoryBranchesBinaryUnitEquation",
+        "TestSMTSequenceTheoryBranchesFixedStringOverlaps",
         "TestSMTSequenceTheoryConcreteRelationConflicts",
         "TestSMTSequenceTheoryLengthAxioms",
         "TestSMTSequenceTheoryIntegerStringAxioms",
@@ -117295,10 +117296,10 @@
           "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict"]
         },
         {
-          "name": "complete one-character binary word-equation branching with shared-tail Skolem and equal-boundary empty alternative (src/smt/theory_seq.cpp:335-410,1554-1570,1693-1720)",
+          "name": "complete fixed-string binary word-equation branching with finite prefix-overlap alternatives and an unbounded shared-tail Skolem family (src/smt/theory_seq.cpp:335-410,1554-1570,1693-1720)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_binary.go",
-          "tests": ["TestSMTSequenceTheoryBranchesBinaryUnitEquation"]
+          "tests": ["TestSMTSequenceTheoryBranchesBinaryUnitEquation", "TestSMTSequenceTheoryBranchesFixedStringOverlaps"]
         },
         {
           "name": "scoped assigned prefix/suffix/contains atoms and concrete relation checking after solution expansion (src/smt/theory_seq.cpp:3927-4010 and m_atoms scope limits)",
@@ -117402,6 +117403,7 @@
         "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries",
         "TestSMTSequenceTheoryReducesEqualLengthBoundaries",
         "TestSMTSequenceTheoryBranchesBinaryUnitEquation",
+        "TestSMTSequenceTheoryBranchesFixedStringOverlaps",
         "TestSMTSequenceTheoryConcreteRelationConflicts",
         "TestSMTSequenceTheoryLengthAxioms",
         "TestSMTSequenceTheoryIntegerStringAxioms",
@@ -117479,10 +117481,10 @@
           "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries"]
         },
         {
-          "name": "one-character binary word-equation branching declarations",
+          "name": "fixed-string binary word-equation prefix-overlap and shared-tail branching declarations",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_binary.go",
-          "tests": ["TestSMTSequenceTheoryBranchesBinaryUnitEquation"]
+          "tests": ["TestSMTSequenceTheoryBranchesBinaryUnitEquation", "TestSMTSequenceTheoryBranchesFixedStringOverlaps"]
         },
         {
           "name": "scoped assigned relation ownership and concrete prefix, suffix and contains checks",

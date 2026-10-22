@@ -1,8 +1,12 @@
 // Source: src/smt/theory_seq.cpp is_binary_eq, solve_binary_eq and
-// branch_binary_variable for the retained one-character boundary case.
+// branch_binary_variable for fixed string boundaries.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"strings"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
 
 func (t *SMTSequenceTheory) branchBinaryUnitEquation(left, right []ast.ASTHandle) (bool, error) {
 	for pass := 0; pass < 2; pass++ {
@@ -27,7 +31,7 @@ func (t *SMTSequenceTheory) branchBinaryUnitEquation(left, right []ast.ASTHandle
 			if textErr != nil {
 				return false, textErr
 			}
-			if leftVariable && rightVariable && len(leftText) == 1 && leftString && len(rightText) == 1 && rightString {
+			if leftVariable && rightVariable && leftString && leftText != "" && rightString && rightText != "" {
 				sort, sortErr := state.manager.GetSort(left[0])
 				if sortErr != nil {
 					return false, sortErr
@@ -52,31 +56,41 @@ func (t *SMTSequenceTheory) branchBinaryUnitEquation(left, right []ast.ASTHandle
 				if makeErr != nil {
 					return false, makeErr
 				}
-				alternatives, makeErr := state.manager.MkAnd(leftEquality, rightEquality)
+				longAlternative, makeErr := state.manager.MkAnd(leftEquality, rightEquality)
 				if makeErr != nil {
 					return false, makeErr
 				}
-				if leftText == rightText {
-					empty, emptyErr := state.manager.MkSequenceEmpty(sort)
-					if emptyErr != nil {
-						return false, emptyErr
+				choices := []ast.ASTHandle{longAlternative}
+				for split := 0; split < len(rightText); split++ {
+					remaining := rightText[split:]
+					if !strings.HasPrefix(leftText, remaining) {
+						continue
 					}
-					leftEmpty, emptyErr := state.manager.MkEq(left[0], empty)
-					if emptyErr != nil {
-						return false, emptyErr
+					leftPrefix, prefixErr := state.manager.MkString(rightText[:split])
+					if prefixErr != nil {
+						return false, prefixErr
 					}
-					rightEmpty, emptyErr := state.manager.MkEq(right[1], empty)
-					if emptyErr != nil {
-						return false, emptyErr
+					rightSuffix, prefixErr := state.manager.MkString(leftText[len(remaining):])
+					if prefixErr != nil {
+						return false, prefixErr
 					}
-					bothEmpty, emptyErr := state.manager.MkAnd(leftEmpty, rightEmpty)
-					if emptyErr != nil {
-						return false, emptyErr
+					shortLeft, prefixErr := state.manager.MkEq(left[0], leftPrefix)
+					if prefixErr != nil {
+						return false, prefixErr
 					}
-					alternatives, makeErr = state.manager.MkOr(bothEmpty, alternatives)
-					if makeErr != nil {
-						return false, makeErr
+					shortRight, prefixErr := state.manager.MkEq(right[1], rightSuffix)
+					if prefixErr != nil {
+						return false, prefixErr
 					}
+					shortAlternative, prefixErr := state.manager.MkAnd(shortLeft, shortRight)
+					if prefixErr != nil {
+						return false, prefixErr
+					}
+					choices = append(choices, shortAlternative)
+				}
+				alternatives, makeErr := state.manager.MkOrArray(choices)
+				if makeErr != nil {
+					return false, makeErr
 				}
 				leftWord, makeErr := t.makeWord(left, sort)
 				if makeErr != nil {
