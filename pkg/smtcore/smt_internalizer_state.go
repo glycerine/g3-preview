@@ -138,6 +138,9 @@ type SMTInternalizerState struct {
 	clauseMaintenance        SMTClauseMaintenanceConfig
 	conflictsSinceLemmaGC    uint32
 	lemmaGCThreshold         uint32
+	learnedUnits             []smtPersistentLearnedUnit
+	searchBaseLevel          uint32
+	searching                bool
 	closed                   bool
 }
 
@@ -802,22 +805,37 @@ func (s *SMTInternalizerState) PopScopes(count uint32) error {
 		return ast.ErrASTDomain
 	}
 	level := len(s.scopes) - int(count)
+	preserve := s.searching && uint32(level) >= s.searchBaseLevel
+	var learned []smtPreservedLearnedClause
+	var err error
+	if preserve {
+		learned, err = s.preserveLearnedClauses(s.scopes[level].clauseLimit)
+		if err != nil {
+			return err
+		}
+	}
 	if err := s.popTo(s.scopes[level]); err != nil {
-		return err
+		return errors.Join(err, s.releasePreservedLearnedClauses(learned))
 	}
 	if s.relevancy != nil {
 		if err := s.relevancy.PopScopes(count); err != nil {
-			return err
+			return errors.Join(err, s.releasePreservedLearnedClauses(learned))
 		}
 	}
 	for index := len(s.theoryOrder) - 1; index >= 0; index-- {
 		if err := s.theoryOrder[index].PopScopes(count); err != nil {
-			return err
+			return errors.Join(err, s.releasePreservedLearnedClauses(learned))
 		}
 	}
 	s.scopes = s.scopes[:level]
 	s.scopeLevel = uint32(level)
-	return nil
+	if preserve {
+		if err = s.restoreLearnedClauses(learned); err != nil {
+			return err
+		}
+		return s.restoreLearnedUnits(uint32(level))
+	}
+	return s.discardLearnedUnitsAbove(uint32(level))
 }
 
 func (s *SMTInternalizerState) Statistics() SMTContextStatistics {
@@ -839,6 +857,7 @@ func (s *SMTInternalizerState) Close() error {
 		result = errors.Join(result, s.PopScopes(uint32(len(s.scopes))))
 	}
 	result = errors.Join(result, s.popTo(smtInternalizerScope{}))
+	result = errors.Join(result, s.releaseLearnedUnits())
 	result = errors.Join(result, s.dynamicAck.close())
 	result = errors.Join(result, s.congruence.Close())
 	if result == nil {

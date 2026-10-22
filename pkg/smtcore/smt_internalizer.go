@@ -365,13 +365,30 @@ func (s *SMTInternalizerState) addTheoryAxiom(theory SMTTheoryID, literals []SMT
 // AddLearnedClauseWithProof installs a conflict lemma and transfers an owned
 // reference to its proof wrapper when proof production is enabled.
 func (s *SMTInternalizerState) AddLearnedClauseWithProof(literals []SMTLiteral, proof ast.ASTHandle) error {
+	return s.addLearnedClauseWithProof(literals, proof, true)
+}
+
+func (s *SMTInternalizerState) addLearnedClauseWithProof(literals []SMTLiteral, proof ast.ASTHandle, captureUnit bool) error {
 	if err := s.open(); err != nil {
 		return err
 	}
 	if len(literals) == 0 {
 		return ast.ErrASTDomain
 	}
-	return s.addClauseKind(literals, false, SMTClauseLearned, proof)
+	unitCount := len(s.learnedUnits)
+	if captureUnit && s.searching && len(literals) == 1 {
+		if err := s.captureLearnedUnit(literals[0], proof); err != nil {
+			return err
+		}
+	}
+	if err := s.addClauseKind(literals, false, SMTClauseLearned, proof); err != nil {
+		if len(s.learnedUnits) != unitCount {
+			err = errors.Join(err, s.releaseLearnedUnit(&s.learnedUnits[len(s.learnedUnits)-1]))
+			s.learnedUnits = s.learnedUnits[:unitCount]
+		}
+		return err
+	}
+	return nil
 }
 
 func (s *SMTInternalizerState) markRelevant(expression ast.ASTHandle) error {

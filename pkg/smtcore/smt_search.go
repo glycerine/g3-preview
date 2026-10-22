@@ -129,6 +129,9 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 	if err != nil {
 		return lbool.Undef, errors.Join(err, timer.Close())
 	}
+	if err = k.internalizer.beginSearchPersistence(baseLevel); err != nil {
+		return lbool.Undef, errors.Join(err, resolver.Close(), timer.Close())
+	}
 	defer func() {
 		resultErr = errors.Join(resultErr, resolver.Close())
 		resultErr = errors.Join(resultErr, timer.Close())
@@ -138,6 +141,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 				result = lbool.Undef
 			}
 		}
+		k.internalizer.endSearchPersistence()
 	}()
 	for {
 		exceeded, err := k.searchResourceLimitExceeded(timer)
@@ -184,25 +188,18 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			if proofErr != nil {
 				return lbool.Undef, proofErr
 			}
-			var retained []smtRetainedLemmaAtom
-			if resolution.InternalScopeLevel > resolution.NewScopeLevel {
-				retained, err = k.internalizer.retainLemmaAtoms(resolution.Lemma)
-				if err != nil {
-					return lbool.Undef, err
-				}
+			retained, err := k.internalizer.retainLemmaAtoms(resolution.Lemma)
+			if err != nil {
+				return lbool.Undef, err
 			}
 			if err = k.internalizer.PopScopes(k.internalizer.scopeLevel - resolution.NewScopeLevel); err != nil {
-				if len(retained) != 0 {
-					err = errors.Join(err, k.internalizer.releaseLemmaAtoms(retained))
-				}
+				err = errors.Join(err, k.internalizer.releaseLemmaAtoms(retained))
 				return lbool.Undef, fmt.Errorf("smt search backjump: %w", err)
 			}
-			if len(retained) != 0 {
-				resolution.Lemma, err = k.internalizer.reinternalizeLemmaAtoms(retained)
-				err = errors.Join(err, k.internalizer.releaseLemmaAtoms(retained))
-				if err != nil {
-					return lbool.Undef, fmt.Errorf("smt search reinternalize learned clause: %w", err)
-				}
+			resolution.Lemma, err = k.internalizer.reinternalizeLemmaAtoms(retained)
+			err = errors.Join(err, k.internalizer.releaseLemmaAtoms(retained))
+			if err != nil {
+				return lbool.Undef, fmt.Errorf("smt search reinternalize learned clause: %w", err)
 			}
 			if err = k.internalizer.AddLearnedClauseWithProof(resolution.Lemma, proof); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search learn clause: %w", err)
