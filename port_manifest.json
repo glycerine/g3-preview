@@ -41567,9 +41567,15 @@
       "path": "src/interp/iz3proof_itp.cpp",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/interp/direct_proof.go"
+      ],
+      "tests": [
+        "TestDirectProofTermSidesAndAssumptions",
+        "TestDirectProofHypothesisReflexivityAndContra",
+        "TestDirectProofArithmeticHypothesisAndGuards"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -41712,19 +41718,64 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor state, A/B/mixed term classification, stable placeholders, assumptions, hypotheses, contra pass-through, and reflexivity",
+          "status": "ported",
+          "go_target": "pkg/interp/direct_proof.go",
+          "tests": [
+            "TestDirectProofTermSidesAndAssumptions",
+            "TestDirectProofHypothesisReflexivityAndContra",
+            "TestDirectProofArithmeticHypothesisAndGuards"
+          ]
+        },
+        {
+          "name": "resolution and arithmetic proof-term reduction",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        },
+        {
+          "name": "rewrite-chain normalization and symbolic proof simplification",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        },
+        {
+          "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        },
+        {
+          "name": "term localization, quantification, and final interpolation",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "DirectProofInterpolator borrows Base and owns ASTRef roots for symbolic declarations, special constants, stable placeholders, and proof terms returned during translation; Close releases all roots in reverse order."
+      ],
+      "deviations": [
+        "The selected source constructor ignores its weak argument and forces strong interpolation; the Go constructor preserves this behavior."
+      ]
     },
     {
       "path": "src/interp/iz3proof_itp.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/interp/direct_proof.go"
+      ],
+      "tests": [
+        "TestDirectProofTermSidesAndAssumptions",
+        "TestDirectProofHypothesisReflexivityAndContra",
+        "TestDirectProofArithmeticHypothesisAndGuards"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -41735,10 +41786,29 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "direct proof constructor plus assumption, hypothesis, contra, and reflexivity rule surface",
+          "status": "ported",
+          "go_target": "pkg/interp/direct_proof.go",
+          "tests": [
+            "TestDirectProofTermSidesAndAssumptions",
+            "TestDirectProofHypothesisReflexivityAndContra",
+            "TestDirectProofArithmeticHypothesisAndGuards"
+          ]
+        },
+        {
+          "name": "remaining direct interpolation proof-rule surface and final result",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The concrete Go implementation owns all symbolic proof-term roots and borrows its prover Base."
+      ],
       "deviations": []
     },
     {
