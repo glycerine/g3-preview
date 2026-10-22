@@ -98445,7 +98445,8 @@
         "TestSMTKernelScopesRestoreAssertionsAndContext",
         "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices",
         "TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions",
-        "TestSMTSolverValuePropagationComposesProofs"
+        "TestSMTSolverValuePropagationComposesProofs",
+        "TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof"
       ],
       "conditionals": [
         {
@@ -98538,7 +98539,15 @@
           ]
         },
         {
-          "name": "remaining pending-formula reduction passes, macros, NNF/CNF, quantifier transforms, statistics, and display",
+          "name": "asserted-formula display, commit-head marker, inconsistency query, and inconsistency proof access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_formulas.go",
+          "tests": [
+            "TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof"
+          ]
+        },
+        {
+          "name": "remaining pending-formula reduction passes, macros, NNF/CNF, and quantifier transforms",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -98569,7 +98578,8 @@
         "TestSMTKernelScopesRestoreAssertionsAndContext",
         "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices",
         "TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions",
-        "TestSMTSolverValuePropagationComposesProofs"
+        "TestSMTSolverValuePropagationComposesProofs",
+        "TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof"
       ],
       "conditionals": [
         {
@@ -98613,7 +98623,15 @@
           ]
         },
         {
-          "name": "setup, reset, remaining pending-formula reductions, macros, inconsistency proof, statistics, and display",
+          "name": "asserted-formula display, commit-head marker, inconsistency query, empty statistics collector, and inconsistency proof access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_formulas.go",
+          "tests": [
+            "TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof"
+          ]
+        },
+        {
+          "name": "setup, reset, remaining pending-formula reductions, and macros",
           "status": "unported",
           "go_target": null,
           "tests": []

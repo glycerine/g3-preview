@@ -58,6 +58,49 @@ func TestSMTKernelDisplayStatisticsResetAndCancellation(t *testing.T) {
 	}
 }
 
+func TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	kernel := smtTestKernel(t, m)
+	a := smtRelevancyBool(t, m, "asserted-display-a")
+	astTestMust(t, kernel.Assert(a, ast.ASTHandle{}))
+	var before strings.Builder
+	astTestMust(t, kernel.DisplayAssertedFormulas(&before))
+	if got := before.String(); got != "asserted formulas:\n[HEAD] ==>\nasserted-display-a\ninconsistent: false\n" {
+		t.Fatal("pending asserted-formula display", got)
+	}
+	if proof, err := kernel.AssertionInconsistencyProof(); err != nil || !proof.IsNull() {
+		t.Fatal("consistent assertion proof", proof, err)
+	}
+	if err := kernel.internalizePending(); err != nil {
+		t.Fatal(err)
+	}
+	var committed strings.Builder
+	astTestMust(t, kernel.DisplayAssertedFormulas(&committed))
+	if strings.Contains(committed.String(), "[HEAD]") {
+		t.Fatal("committed display retained head marker", committed.String())
+	}
+
+	falsity, err := m.MkFalse()
+	astTestMust(t, err)
+	astTestMust(t, kernel.Assert(falsity, ast.ASTHandle{}))
+	proof, err := kernel.AssertionInconsistencyProof()
+	astTestMust(t, err)
+	if proof.IsNull() {
+		t.Fatal("missing asserted inconsistency proof")
+	}
+	fact, err := m.GetProofFact(proof)
+	astTestMust(t, err)
+	if fact != falsity {
+		t.Fatal("asserted inconsistency proof fact", fact, falsity)
+	}
+	var inconsistent strings.Builder
+	astTestMust(t, kernel.DisplayAssertedFormulas(&inconsistent))
+	if !strings.Contains(inconsistent.String(), "inconsistent: true") {
+		t.Fatal("inconsistent asserted-formula display", inconsistent.String())
+	}
+}
+
 func TestSMTKernelAssertionCheckAndDecisionClause(t *testing.T) {
 	m := astTestManager(t)
 	atom := smtRelevancyBool(t, m, "kernel-atom")

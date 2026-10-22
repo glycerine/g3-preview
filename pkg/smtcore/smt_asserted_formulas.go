@@ -4,9 +4,69 @@ package smtcore
 import (
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
+
+// DisplayAssertedFormulas renders the asserted-formula manager view, including
+// the first formula that has not yet been committed to the internalizer.
+func (k *SMTKernel) DisplayAssertedFormulas(out io.Writer) error {
+	if err := k.open(); err != nil {
+		return err
+	}
+	if out == nil {
+		return ast.ErrASTHandle
+	}
+	printer, err := ast.NewLegacySMTPrinter(k.manager)
+	if err != nil {
+		return err
+	}
+	if _, err = io.WriteString(out, "asserted formulas:\n"); err != nil {
+		return err
+	}
+	for i, assertion := range k.assertions {
+		if i == k.assertedHead {
+			if _, err = io.WriteString(out, "[HEAD] ==>\n"); err != nil {
+				return err
+			}
+		}
+		if err = printer.DisplayAST(out, assertion.Formula, 0, nil); err != nil {
+			return err
+		}
+		if _, err = io.WriteString(out, "\n"); err != nil {
+			return err
+		}
+	}
+	_, err = fmt.Fprintf(out, "inconsistent: %t\n", k.assertedFormulasInconsistent())
+	return err
+}
+
+func (k *SMTKernel) assertedFormulasInconsistent() bool {
+	if k == nil || k.manager == nil {
+		return false
+	}
+	for _, assertion := range k.assertions {
+		if k.manager.IsFalse(assertion.Formula) {
+			return true
+		}
+	}
+	return false
+}
+
+// AssertionInconsistencyProof returns the borrowed proof attached to the first
+// false asserted formula, matching asserted_formulas::get_inconsistency_proof.
+func (k *SMTKernel) AssertionInconsistencyProof() (ast.ASTHandle, error) {
+	if err := k.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	for _, assertion := range k.assertions {
+		if k.manager.IsFalse(assertion.Formula) {
+			return assertion.Proof, nil
+		}
+	}
+	return ast.ASTHandle{}, nil
+}
 
 func (k *SMTKernel) appendAssertion(formula, proof ast.ASTHandle) error {
 	if err := k.manager.IncRef(formula); err != nil {
