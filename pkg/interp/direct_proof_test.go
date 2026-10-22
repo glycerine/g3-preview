@@ -517,4 +517,13 @@ func TestDirectProofLocalEqualityRules(t *testing.T) {
 	if yes, e := manager.IsTrue(transitivity); e != nil || !yes {
 		t.Fatal("local transitivity", yes, e)
 	}
+	application, err := manager.Make(OperatorAnd, p, p)
+	interpMust(t, err)
+	conclusion, err := manager.Make(OperatorIff, application, application)
+	interpMust(t, err)
+	multi, err := direct.MakeCongruences([]ast.ASTHandle{equivalence, equivalence}, conclusion, []ast.ASTHandle{truth, truth})
+	interpMust(t, err)
+	if yes, e := manager.IsTrue(multi); e != nil || !yes {
+		t.Fatal("local multi-congruence", yes, e)
+	}
 }

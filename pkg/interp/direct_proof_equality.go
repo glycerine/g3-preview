@@ -130,6 +130,152 @@ func (p *DirectProofInterpolator) MakeCongruence(premiseConclusion, conclusion, 
 	return p.MakeResolution(premiseConclusion, []ast.ASTHandle{conclusion}, interpolation, premise)
 }
 
+func (p *DirectProofInterpolator) findCongruencePosition(premiseConclusion, conclusion ast.ASTHandle) (int, error) {
+	x, err := p.base.manager.Arg(premiseConclusion, 0)
+	if err != nil {
+		return 0, err
+	}
+	y, err := p.base.manager.Arg(premiseConclusion, 1)
+	if err != nil {
+		return 0, err
+	}
+	left, err := p.base.manager.Arg(conclusion, 0)
+	if err != nil {
+		return 0, err
+	}
+	right, err := p.base.manager.Arg(conclusion, 1)
+	if err != nil {
+		return 0, err
+	}
+	count, err := p.base.manager.NumArgs(left)
+	if err != nil {
+		return 0, err
+	}
+	for i := uint32(0); i < count; i++ {
+		leftArg, e := p.base.manager.Arg(left, i)
+		if e != nil {
+			return 0, e
+		}
+		rightArg, e := p.base.manager.Arg(right, i)
+		if e != nil {
+			return 0, e
+		}
+		if leftArg == x && rightArg == y {
+			return int(i), nil
+		}
+	}
+	return 0, ProofError{}
+}
+
+func (p *DirectProofInterpolator) substituteArgument(position int, term, application ast.ASTHandle) (ast.ASTHandle, error) {
+	args, err := p.base.manager.Args(application)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if position < 0 || position >= len(args) {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	args[position] = term
+	return p.base.manager.Clone(application, args)
+}
+
+func (p *DirectProofInterpolator) MakeCongruences(premiseConclusions []ast.ASTHandle, conclusion ast.ASTHandle, premises []ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := p.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if len(premiseConclusions) == 0 || len(premiseConclusions) != len(premises) {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	if len(premiseConclusions) == 1 {
+		return p.MakeCongruence(premiseConclusions[0], conclusion, premises[0])
+	}
+	thing := conclusion
+	truth, err := p.base.manager.Make(OperatorTrue)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result := truth
+	for i, premiseConclusion := range premiseConclusions {
+		position, e := p.findCongruencePosition(premiseConclusion, thing)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		rightTerm, e := p.base.manager.Arg(premiseConclusion, 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		thingLeft, e := p.base.manager.Arg(thing, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		next, e := p.substituteArgument(position, rightTerm, thingLeft)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		thingOp, e := p.base.manager.Operator(thing)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		goal, e := p.base.manager.Make(thingOp, thingLeft, next)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		equality, e := p.MakeCongruence(premiseConclusion, goal, premises[i])
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if i == 0 {
+			result = equality
+		} else {
+			conclusionLeft, e := p.base.manager.Arg(conclusion, 0)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			thingCurrentLeft, e := p.base.manager.Arg(thing, 0)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			conclusionOp, e := p.base.manager.Operator(conclusion)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			trace, e := p.base.manager.Make(conclusionOp, conclusionLeft, thingCurrentLeft)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			traceLeft, e := p.base.manager.Arg(trace, 0)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			updatedTrace, e := p.base.manager.Make(conclusionOp, traceLeft, next)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			equivalence, e := p.base.manager.Make(OperatorIff, trace, updatedTrace)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			proof, e := p.MakeCongruence(goal, equivalence, equality)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			result, e = p.MakeModusPonens(equivalence, result, proof)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+		}
+		thingRight, e := p.base.manager.Arg(thing, 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		thing, e = p.base.manager.Make(thingOp, next, thingRight)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+	}
+	return p.keep(result, nil)
+}
+
 func (p *DirectProofInterpolator) MakeTransitivity(x, y, z, premise1, premise2 ast.ASTHandle) (ast.ASTHandle, error) {
 	left, err := p.makeEquivalence(x, y)
 	if err != nil {
