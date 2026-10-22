@@ -115811,7 +115811,7 @@
       "path": "src/smt/theory_opt.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_opt.go"
       ],
@@ -115841,16 +115841,16 @@
         },
         {
           "name": "value, maximize and add_objective virtual contract",
-          "status": "unported",
+          "status": "reference_only",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [
-        "The helper borrows expressions. The future objective contract must return concrete owned infinite-rational and blocker values from retained arithmetic-theory consumers."
+        "The helper borrows expressions; its Go work stack and visited map are call-local owners."
       ],
       "deviations": [
-        "No speculative universal optimizer interface is added before a retained Go arithmetic-theory consumer fixes the concrete ownership contract."
+        "The abstract value, maximize and add_objective declarations have no retained Go consumer. Per the retained-instantiation rule, no speculative universal optimizer interface is added."
       ]
     },
     {
