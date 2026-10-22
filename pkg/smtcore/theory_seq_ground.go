@@ -330,6 +330,21 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 		return t.pushGroundValue(expression, value)
 	}
 	if operation == 7 {
+		sourceExpression, argumentErr := state.manager.GetArg(expression, 0)
+		if argumentErr != nil {
+			return false, argumentErr
+		}
+		needleExpression, argumentErr := state.manager.GetArg(expression, 1)
+		if argumentErr != nil {
+			return false, argumentErr
+		}
+		replacementExpression, argumentErr := state.manager.GetArg(expression, 2)
+		if argumentErr != nil {
+			return false, argumentErr
+		}
+		if needleExpression == replacementExpression {
+			return t.pushGroundValue(expression, sourceExpression)
+		}
 		source, sourceConcrete, textErr := t.groundStringArgument(expression, 0)
 		if textErr != nil || !sourceConcrete {
 			return false, textErr

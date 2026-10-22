@@ -1742,6 +1742,13 @@ func TestSMTSequenceTheoryGroundOperationsAreComplete(t *testing.T) {
 		name  string
 		build func(*testing.T, *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle)
 	}{
+		{name: "replace-pattern-with-itself", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-replace-source-x")
+			pattern := astTestStringConst(t, m, "sequence-exact-replace-pattern-x")
+			operation, err := m.MkSequenceReplace(x, pattern, pattern)
+			astTestMust(t, err)
+			return operation, x
+		}},
 		{name: "empty-prefix", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
 			x := astTestStringConst(t, m, "sequence-exact-prefix-x")
 			operation, err := m.MkSequencePrefix(astTestString(t, m, ""), x)
