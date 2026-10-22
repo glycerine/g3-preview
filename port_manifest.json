@@ -106669,22 +106669,52 @@
       "path": "src/smt/smt_kernel.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_kernel.go"
+      ],
+      "tests": [
+        "TestSMTKernelAssertionCheckAndIncompleteClause",
+        "TestSMTKernelScopesRestoreAssertionsAndContext"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "construction and close, assertion storage, formula access, push/pop, scope level, inconsistency, setup and conservative check, statistics, and internalizer access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTKernelAssertionCheckAndIncompleteClause",
+            "TestSMTKernelScopesRestoreAssertionsAndContext"
+          ]
+        },
+        {
+          "name": "copy and reset, assumptions, consequences, mutexes, preferred SAT, model, proof, unsat core, failure reason, labels, guessed literals, display, cancellation, and parameter updates",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "SMTKernel owns formula and proof references for asserted entries and owns its checker, relevancy propagator, and internalizer lifecycle."
+      ],
+      "deviations": [
+        "Check returns undef whenever unresolved clauses require a SAT decision; the decision/search loop remains in smt_context.cpp."
+      ]
     },
     {
       "path": "src/smt/smt_kernel.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_kernel.go"
+      ],
+      "tests": [
+        "TestSMTKernelAssertionCheckAndIncompleteClause",
+        "TestSMTKernelScopesRestoreAssertionsAndContext"
+      ],
       "conditionals": [
         {
           "line": 27,
@@ -106695,11 +106725,31 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "assertion, formula, scope, inconsistency, conservative check, statistics, and concrete context facade",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTKernelAssertionCheckAndIncompleteClause",
+            "TestSMTKernelScopesRestoreAssertionsAndContext"
+          ]
+        },
+        {
+          "name": "translation, reset, assumptions and derived queries, model/proof/core results, diagnostics, display, cancellation, and parameter interface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Public formula and assertion views are borrowed AST handles; the kernel retains the underlying references until pop or close."
+      ],
+      "deviations": [
+        "The Go facade exposes errors directly and remains conservative until the full context search driver is present."
+      ]
     },
     {
       "path": "src/smt/smt_literal.cpp",
