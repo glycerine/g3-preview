@@ -41570,13 +41570,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/interp/direct_proof.go",
-        "pkg/interp/direct_proof_resolution.go"
+        "pkg/interp/direct_proof_resolution.go",
+        "pkg/interp/direct_proof_arithmetic.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
         "TestDirectProofHypothesisReflexivityAndContra",
         "TestDirectProofArithmeticHypothesisAndGuards",
-        "TestDirectProofLocalResolutionAndSymmetry"
+        "TestDirectProofLocalResolutionAndSymmetry",
+        "TestDirectProofLocalArithmeticRules"
       ],
       "conditionals": [
         {
@@ -41742,6 +41744,14 @@
           ]
         },
         {
+          "name": "local Farkas combination, leq2eq, eq2leq, and integer cut rules",
+          "status": "ported",
+          "go_target": "pkg/interp/direct_proof_arithmetic.go",
+          "tests": [
+            "TestDirectProofLocalArithmeticRules"
+          ]
+        },
+        {
           "name": "resolution and arithmetic proof-term reduction",
           "status": "unported",
           "go_target": "",
@@ -41780,13 +41790,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/interp/direct_proof.go",
-        "pkg/interp/direct_proof_resolution.go"
+        "pkg/interp/direct_proof_resolution.go",
+        "pkg/interp/direct_proof_arithmetic.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
         "TestDirectProofHypothesisReflexivityAndContra",
         "TestDirectProofArithmeticHypothesisAndGuards",
-        "TestDirectProofLocalResolutionAndSymmetry"
+        "TestDirectProofLocalResolutionAndSymmetry",
+        "TestDirectProofLocalArithmeticRules"
       ],
       "conditionals": [
         {
@@ -41817,6 +41829,14 @@
           "go_target": "pkg/interp/direct_proof_resolution.go",
           "tests": [
             "TestDirectProofLocalResolutionAndSymmetry"
+          ]
+        },
+        {
+          "name": "local arithmetic proof-rule declarations",
+          "status": "ported",
+          "go_target": "pkg/interp/direct_proof_arithmetic.go",
+          "tests": [
+            "TestDirectProofLocalArithmeticRules"
           ]
         },
         {

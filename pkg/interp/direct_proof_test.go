@@ -176,3 +176,80 @@ func TestDirectProofLocalResolutionAndSymmetry(t *testing.T) {
 		t.Fatal("mixed symmetry boundary", err)
 	}
 }
+
+func TestDirectProofLocalArithmeticRules(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	integer, err := manager.IntType()
+	interpMust(t, err)
+	x, err := manager.MakeVariable("rules-x", integer)
+	interpMust(t, err)
+	x = interpPin(t, m, x)
+	y, err := manager.MakeVariable("rules-y", integer)
+	interpMust(t, err)
+	y = interpPin(t, m, y)
+	zero, err := manager.MakeIntText("0")
+	interpMust(t, err)
+	one, err := manager.MakeIntText("1")
+	interpMust(t, err)
+	xLeqZero, err := manager.Make(OperatorLE, x, zero)
+	interpMust(t, err)
+	xLeqZero = interpPin(t, m, xLeqZero)
+	yLeqZero, err := manager.Make(OperatorLE, y, zero)
+	interpMust(t, err)
+	yLeqZero = interpPin(t, m, yLeqZero)
+	base, err := NewBase(manager, []ast.ASTHandle{xLeqZero, yLeqZero}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	falsehood, err := manager.Make(OperatorFalse)
+	interpMust(t, err)
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	farkas, err := direct.MakeFarkas(falsehood, []ast.ASTHandle{falsehood, truth}, []ast.ASTHandle{xLeqZero, yLeqZero}, []ast.ASTHandle{one, one})
+	interpMust(t, err)
+	want, err := manager.SumInequalities([]ast.ASTHandle{one}, []ast.ASTHandle{xLeqZero}, true)
+	interpMust(t, err)
+	if farkas != want {
+		t.Fatal("local Farkas", farkas, want)
+	}
+	leqEqA, err := direct.MakeLeqToEq(x, zero, xLeqZero, xLeqZero)
+	interpMust(t, err)
+	if no, _ := manager.IsFalse(leqEqA); !no {
+		t.Fatal("A leq-to-eq")
+	}
+	leqEqB, err := direct.MakeLeqToEq(y, zero, yLeqZero, yLeqZero)
+	interpMust(t, err)
+	if yes, _ := manager.IsTrue(leqEqB); !yes {
+		t.Fatal("B leq-to-eq")
+	}
+	eqLeqA, err := direct.MakeEqToLeq(x, zero, xLeqZero)
+	interpMust(t, err)
+	if no, _ := manager.IsFalse(eqLeqA); !no {
+		t.Fatal("A eq-to-leq")
+	}
+	eqLeqB, err := direct.MakeEqToLeq(y, zero, yLeqZero)
+	interpMust(t, err)
+	if yes, _ := manager.IsTrue(eqLeqB); !yes {
+		t.Fatal("B eq-to-leq")
+	}
+	cutA, err := direct.MakeCutRule(xLeqZero, one, xLeqZero, yLeqZero)
+	interpMust(t, err)
+	if cutA != yLeqZero {
+		t.Fatal("A cut", cutA, yLeqZero)
+	}
+	cutB, err := direct.MakeCutRule(yLeqZero, one, yLeqZero, xLeqZero)
+	interpMust(t, err)
+	if cutB != xLeqZero {
+		t.Fatal("B cut", cutB, xLeqZero)
+	}
+	if _, err = direct.MakeFarkas(falsehood, nil, []ast.ASTHandle{xLeqZero}, nil); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("Farkas length guard", err)
+	}
+	mixed, err := manager.Make(OperatorLE, x, y)
+	interpMust(t, err)
+	if _, err = direct.MakeEqToLeq(x, y, mixed); !errors.As(err, new(ProofError)) {
+		t.Fatal("mixed arithmetic boundary", err)
+	}
+}
