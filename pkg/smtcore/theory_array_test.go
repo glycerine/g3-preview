@@ -116,3 +116,58 @@ func TestSMTArrayConstantRead(t *testing.T) {
 		t.Fatal("constant array read disequality", status)
 	}
 }
+
+func TestSMTArrayExtensionality(t *testing.T) {
+	for _, test := range []struct {
+		name         string
+		equalWitness bool
+		want         lbool.LBool
+	}{
+		{name: "disequal-arrays", want: lbool.True},
+		{name: "equal-extensional-read", equalWitness: true, want: lbool.False},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m := astTestManager(t)
+			family, err := m.RegisterArrayPlugin()
+			astTestMust(t, err)
+			boolean, err := m.MkBoolSort()
+			astTestMust(t, err)
+			indexSort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "extensional-index"), nil)
+			astTestMust(t, err)
+			arraySort, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{indexSort}), boolean)
+			astTestMust(t, err)
+			left, err := m.MkConst(astTestSymbol(t, m, "extensional-left"), arraySort)
+			astTestMust(t, err)
+			right, err := m.MkConst(astTestSymbol(t, m, "extensional-right"), arraySort)
+			astTestMust(t, err)
+			equality, err := m.MkEq(left, right)
+			astTestMust(t, err)
+			disequality, err := m.MkNot(equality)
+			astTestMust(t, err)
+			params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: params})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()); astTestMust(t, params.Close()) })
+			astTestMust(t, solver.Assert(disequality))
+			if test.equalWitness {
+				extDeclaration, makeErr := m.MkArrayExtDecl(arraySort, 0)
+				astTestMust(t, makeErr)
+				witness, makeErr := m.MkApp(extDeclaration, []ast.ASTHandle{left, right})
+				astTestMust(t, makeErr)
+				leftSelect, makeErr := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{left, witness})
+				astTestMust(t, makeErr)
+				rightSelect, makeErr := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{right, witness})
+				astTestMust(t, makeErr)
+				selectEquality, makeErr := m.MkEq(leftSelect, rightSelect)
+				astTestMust(t, makeErr)
+				astTestMust(t, solver.Assert(selectEquality))
+			}
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != test.want {
+				t.Fatalf("array extensionality status %v, want %v", status, test.want)
+			}
+		})
+	}
+}

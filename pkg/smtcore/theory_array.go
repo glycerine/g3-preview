@@ -4,6 +4,7 @@
 package smtcore
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -14,8 +15,9 @@ type smtArrayScope struct {
 	unsupported     bool
 }
 
-// SMTArrayTheory internalizes the core read-over-write axioms. Extensionality,
-// maps, defaults, and model construction are added by later retained slices.
+// SMTArrayTheory internalizes core read-over-write, constant-array, and
+// extensionality axioms. Maps, defaults, and model construction are added by
+// later retained slices.
 type SMTArrayTheory struct {
 	*SMTTheoryBase
 	stores, selects         map[ast.ASTHandle]bool
@@ -58,9 +60,9 @@ func (t *SMTArrayTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool
 		return false, err
 	} else if array {
 		if op == ast.ASTArrayOpSelect {
-			handled, termErr := t.InternalizeTerm(expression)
-			if termErr != nil || !handled {
-				return handled, fmt.Errorf("array select atom: %w", termErr)
+			_, termErr := t.InternalizeTerm(expression)
+			if termErr != nil {
+				return false, fmt.Errorf("array select atom: %w", termErr)
 			}
 			state, _ := t.State()
 			variable, found := state.boolVar[expression]
@@ -112,7 +114,9 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 	if err != nil {
 		return false, err
 	}
+	handled := false
 	if family, familyErr := state.manager.GetFamilyID(sort); familyErr == nil && family == t.FamilyID() {
+		handled = true
 		node := state.context.enodes[expression]
 		if node == nil {
 			node, err = state.MkEnode(expression, false, false, true)
@@ -135,13 +139,13 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 		if err = t.assertSelectStoreAxioms(expression); err != nil {
 			return false, fmt.Errorf("array select-store axiom: %w", err)
 		}
-	case ast.ASTArrayOpConst:
+	case ast.ASTArrayOpConst, ast.ASTArrayOpExt:
 		// Const arrays need no axiom until selected; that rule is added with
 		// the retained constant-array fragment.
 	default:
 		t.unsupported = true
 	}
-	return true, nil
+	return handled, nil
 }
 
 func (t *SMTArrayTheory) assertStoreAxiom(store ast.ASTHandle) error {
@@ -284,7 +288,58 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 	return nil
 }
 
-func (*SMTArrayTheory) InternalizeEquality(ast.ASTHandle, int32) error  { return nil }
+func (t *SMTArrayTheory) InternalizeEquality(expression ast.ASTHandle, variable int32) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	left, err := state.manager.GetArg(expression, 0)
+	if err != nil {
+		return err
+	}
+	right, err := state.manager.GetArg(expression, 1)
+	if err != nil {
+		return err
+	}
+	sort, err := state.manager.GetSort(left)
+	if err != nil {
+		return err
+	}
+	leftArguments := []ast.ASTHandle{left}
+	rightArguments := []ast.ASTHandle{right}
+	for index := uint32(0); ; index++ {
+		declaration, declErr := state.manager.MkArrayExtDecl(sort, index)
+		if errors.Is(declErr, ast.ErrASTDomain) {
+			break
+		}
+		if declErr != nil {
+			return declErr
+		}
+		witness, appErr := state.manager.MkApp(declaration, []ast.ASTHandle{left, right})
+		if appErr != nil {
+			return appErr
+		}
+		leftArguments = append(leftArguments, witness)
+		rightArguments = append(rightArguments, witness)
+	}
+	if len(leftArguments) == 1 {
+		return ast.ErrASTDomain
+	}
+	leftSelect, err := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, leftArguments)
+	if err != nil {
+		return err
+	}
+	rightSelect, err := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, rightArguments)
+	if err != nil {
+		return err
+	}
+	selectEquality, err := t.MkEqualityLiteral(leftSelect, rightSelect, true)
+	if err != nil {
+		return err
+	}
+	arrayEquality := NewSMTLiteral(variable, false)
+	return state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{arrayEquality, selectEquality.Negated()})
+}
 func (*SMTArrayTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error    { return nil }
 func (*SMTArrayTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error { return nil }
 func (*SMTArrayTheory) Assign(int32, bool) error                        { return nil }

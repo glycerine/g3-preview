@@ -113308,7 +113308,8 @@
       ],
       "tests": [
         "TestSMTArrayReadOverWrite",
-        "TestSMTArrayConstantRead"
+        "TestSMTArrayConstantRead",
+        "TestSMTArrayExtensionality"
       ],
       "conditionals": [
         {
