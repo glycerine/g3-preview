@@ -107386,7 +107386,8 @@
         "pkg/smtcore/smt_asserted_formulas.go",
         "pkg/smtcore/smt_assumptions.go",
         "pkg/smtcore/smt_search.go",
-        "pkg/smtcore/smt_kernel_results.go"
+        "pkg/smtcore/smt_kernel_results.go",
+        "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -107401,7 +107402,8 @@
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTSolverForwardsFastProgressSamples",
         "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
-        "TestSMTKernelCapturesRelevantLabeledLiterals"
+        "TestSMTKernelCapturesRelevantLabeledLiterals",
+        "TestSMTKernelDisplayStatisticsResetAndCancellation"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -107486,7 +107488,15 @@
           ]
         },
         {
-          "name": "copy and reset, consequences, mutexes, preferred SAT, display, cancellation, and parameter updates",
+          "name": "assertion display, cumulative statistics reset, and resource-counting cancellation query",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTKernelDisplayStatisticsResetAndCancellation"
+          ]
+        },
+        {
+          "name": "copy and reset, consequences, mutexes, preferred SAT, and parameter updates",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -107509,7 +107519,8 @@
         "pkg/smtcore/smt_asserted_formulas.go",
         "pkg/smtcore/smt_assumptions.go",
         "pkg/smtcore/smt_search.go",
-        "pkg/smtcore/smt_kernel_results.go"
+        "pkg/smtcore/smt_kernel_results.go",
+        "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -107524,7 +107535,8 @@
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTSolverForwardsFastProgressSamples",
         "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
-        "TestSMTKernelCapturesRelevantLabeledLiterals"
+        "TestSMTKernelCapturesRelevantLabeledLiterals",
+        "TestSMTKernelDisplayStatisticsResetAndCancellation"
       ],
       "conditionals": [
         {
@@ -107619,7 +107631,15 @@
           ]
         },
         {
-          "name": "translation, reset, derived queries, labels, other diagnostics, display, cancellation, and parameter interface",
+          "name": "assertion display, cumulative statistics reset, and resource-counting cancellation query",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTKernelDisplayStatisticsResetAndCancellation"
+          ]
+        },
+        {
+          "name": "translation, reset, derived queries, labels, other diagnostics, and parameter interface",
           "status": "unported",
           "go_target": null,
           "tests": []

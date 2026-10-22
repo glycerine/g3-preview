@@ -5,6 +5,7 @@ package smtcore
 import (
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -431,6 +432,51 @@ func (k *SMTKernel) Statistics() SMTContextStatistics {
 		return SMTContextStatistics{}
 	}
 	return k.internalizer.Statistics()
+}
+
+// ResetStatistics clears the cumulative counters retained by the kernel.
+func (k *SMTKernel) ResetStatistics() error {
+	if err := k.open(); err != nil {
+		return err
+	}
+	k.internalizer.statistics.Reset()
+	return nil
+}
+
+// Canceled performs the same resource-limit check used by the source context.
+// The check accounts for one resource step before reporting the cancel state.
+func (k *SMTKernel) Canceled() (bool, error) {
+	if err := k.open(); err != nil {
+		return false, err
+	}
+	return k.manager.Canceled()
+}
+
+// Display renders the retained asserted formulas in the source kernel format.
+func (k *SMTKernel) Display(out io.Writer) error {
+	if err := k.open(); err != nil {
+		return err
+	}
+	if out == nil {
+		return ast.ErrASTHandle
+	}
+	printer, err := ast.NewLegacySMTPrinter(k.manager)
+	if err != nil {
+		return err
+	}
+	if _, err = io.WriteString(out, "(kernel"); err != nil {
+		return err
+	}
+	for _, assertion := range k.assertions {
+		if _, err = io.WriteString(out, "\n  "); err != nil {
+			return err
+		}
+		if err = printer.DisplayAST(out, assertion.Formula, 2, nil); err != nil {
+			return err
+		}
+	}
+	_, err = io.WriteString(out, ")")
+	return err
 }
 
 func (k *SMTKernel) Close() error {

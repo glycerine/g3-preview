@@ -1,6 +1,7 @@
 package smtcore
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -14,6 +15,47 @@ func smtTestKernel(t *testing.T, manager *ast.ASTManager) *SMTKernel {
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, kernel.Close()) })
 	return kernel
+}
+
+func TestSMTKernelDisplayStatisticsResetAndCancellation(t *testing.T) {
+	m := astTestManager(t)
+	kernel := smtTestKernel(t, m)
+	a := smtRelevancyBool(t, m, "kernel-surface-a")
+	b := smtRelevancyBool(t, m, "kernel-surface-b")
+	astTestMust(t, kernel.Assert(a, ast.ASTHandle{}))
+	astTestMust(t, kernel.Assert(b, ast.ASTHandle{}))
+
+	var out strings.Builder
+	astTestMust(t, kernel.Display(&out))
+	if got := out.String(); got != "(kernel\n  kernel-surface-a\n  kernel-surface-b)" {
+		t.Fatal("kernel display", got)
+	}
+	if err := kernel.Display(nil); err != ast.ErrASTHandle {
+		t.Fatal("nil display writer", err)
+	}
+
+	status, err := kernel.Check()
+	astTestMust(t, err)
+	if status != lbool.True || kernel.Statistics().NumChecks != 1 {
+		t.Fatal("statistics before reset", status, kernel.Statistics())
+	}
+	astTestMust(t, kernel.ResetStatistics())
+	if got := kernel.Statistics(); got != (SMTContextStatistics{}) {
+		t.Fatal("statistics after reset", got)
+	}
+
+	canceled, err := kernel.Canceled()
+	astTestMust(t, err)
+	if canceled {
+		t.Fatal("uncanceled kernel reported cancellation")
+	}
+	m.Limit.Cancel()
+	t.Cleanup(m.Limit.ResetCancel)
+	canceled, err = kernel.Canceled()
+	astTestMust(t, err)
+	if !canceled {
+		t.Fatal("kernel missed manager cancellation")
+	}
 }
 
 func TestSMTKernelAssertionCheckAndDecisionClause(t *testing.T) {
