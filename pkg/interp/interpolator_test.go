@@ -240,4 +240,7 @@ func TestFullTranslationProofAnalysisAndResolution(t *testing.T) {
 		t.Fatal("second asserted locality", locality, e)
 	}
 	interpMust(t, translation.ScanSkolems(assertedP))
+	if quantified, e := translation.Quantify(p, DownwardScopeRange(0)); e != nil || quantified != p {
+		t.Fatal("identity quantification", quantified, e)
+	}
 }

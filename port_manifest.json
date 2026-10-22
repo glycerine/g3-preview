@@ -42370,7 +42370,20 @@
           ]
         },
         {
-          "name": "localization and quantification, proof-rule translation, and final lemma construction",
+          "name": "retained identity Quantify behavior",
+          "status": "ported",
+          "go_target": "pkg/interp/translation_analysis.go",
+          "tests": [
+            "TestFullTranslationProofAnalysisAndResolution"
+          ]
+        },
+        {
+          "name": "disabled legacy localization, controlling-equality substitution, and quantifier insertion block",
+          "status": "reference_only",
+          "reason": "The complete source block at iz3translate.cpp:374-629 is excluded by #if 0 and has no retained caller."
+        },
+        {
+          "name": "proof-rule translation and final lemma construction",
           "status": "unported"
         }
       ],
@@ -42412,7 +42425,15 @@
           ]
         },
         {
-          "name": "Translate and Quantify interface behavior",
+          "name": "default identity Quantify interface behavior",
+          "status": "ported",
+          "go_target": "pkg/interp/translation_analysis.go",
+          "tests": [
+            "TestFullTranslationProofAnalysisAndResolution"
+          ]
+        },
+        {
+          "name": "Translate interface behavior",
           "status": "unported"
         }
       ],

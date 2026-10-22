@@ -194,6 +194,16 @@ func (t *FullTranslation) ScanSkolems(proof ast.ASTHandle) error {
 	return err
 }
 
+// Quantify preserves the retained iz3translation default. The alternative
+// localization-variable quantifier machinery in iz3translate.cpp is disabled
+// by the selected source's #if 0 block.
+func (t *FullTranslation) Quantify(term ast.ASTHandle, _ ScopeRange) (ast.ASTHandle, error) {
+	if err := t.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return term, nil
+}
+
 func (t *FullTranslation) localityRecursive(proof ast.ASTHandle) (int, error) {
 	if result, found := t.locality[proof]; found {
 		return result, nil
