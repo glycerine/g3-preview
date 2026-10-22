@@ -535,6 +535,96 @@ func TestSMTSequenceTheoryAtBoundaryAxioms(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms(t *testing.T) {
+	for _, test := range []struct{ name, offset, length string }{
+		{name: "negative-offset", offset: "-1", length: "1"},
+		{name: "zero-length", offset: "0", length: "0"},
+		{name: "negative-length", offset: "0", length: "-1"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			empty, err := m.MkString("")
+			astTestMust(t, err)
+			sort, err := m.GetSort(empty)
+			astTestMust(t, err)
+			sequence, err := m.MkConst(astTestSymbol(t, m, "sequence-extract-"+test.name), sort)
+			astTestMust(t, err)
+			offset, err := m.ArithmeticIntegerNumeralText(test.offset)
+			astTestMust(t, err)
+			length, err := m.ArithmeticIntegerNumeralText(test.length)
+			astTestMust(t, err)
+			extract, err := m.MkSequenceExtract(sequence, offset, length)
+			astTestMust(t, err)
+			equality, err := m.MkEq(extract, empty)
+			astTestMust(t, err)
+			notEmpty, err := m.MkNot(equality)
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.Assert(notEmpty))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("extract boundary value", status)
+			}
+		})
+	}
+
+	m, modelConfig := smtModelGeneratorFixture(t)
+	empty, err := m.MkString("")
+	astTestMust(t, err)
+	sort, err := m.GetSort(empty)
+	astTestMust(t, err)
+	sequence, err := m.MkConst(astTestSymbol(t, m, "sequence-extract-valid"), sort)
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	extract, err := m.MkSequenceExtract(sequence, zero, one)
+	astTestMust(t, err)
+	sequenceLength, err := m.MkSequenceLength(sequence)
+	astTestMust(t, err)
+	remaining, err := m.MkArithmeticSub(sequenceLength, zero)
+	astTestMust(t, err)
+	postLength, err := m.MkArithmeticSub(remaining, one)
+	astTestMust(t, err)
+	prefixName, err := m.Symbols.Intern("seq.pre")
+	astTestMust(t, err)
+	prefix, err := m.MkSequenceSkolem(prefixName, []ast.ASTHandle{sequence, zero}, sort)
+	astTestMust(t, err)
+	suffixName, err := m.Symbols.Intern("seq.post")
+	astTestMust(t, err)
+	suffix, err := m.MkSequenceSkolem(suffixName, []ast.ASTHandle{sequence, postLength}, sort)
+	astTestMust(t, err)
+	tail, err := m.MkSequenceConcat(extract, suffix)
+	astTestMust(t, err)
+	word, err := m.MkSequenceConcat(prefix, tail)
+	astTestMust(t, err)
+	definition, err := m.MkEq(sequence, word)
+	astTestMust(t, err)
+	notDefinition, err := m.MkNot(definition)
+	astTestMust(t, err)
+	nonnegative, err := m.MkArithmeticGE(zero, zero)
+	astTestMust(t, err)
+	pastEnd, err := m.MkArithmeticGE(zero, sequenceLength)
+	astTestMust(t, err)
+	inside, err := m.MkNot(pastEnd)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(nonnegative))
+	astTestMust(t, solver.Assert(inside))
+	astTestMust(t, solver.Assert(notDefinition))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("extract in-bounds decomposition", status)
+	}
+}
+
 func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name  string

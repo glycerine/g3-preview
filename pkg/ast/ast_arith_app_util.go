@@ -15,6 +15,10 @@ func (m *ASTManager) MkArithmeticAdd(left, right ASTHandle) (ASTHandle, error) {
 	return m.arithmeticApp(6, left, right)
 }
 
+func (m *ASTManager) MkArithmeticSub(left, right ASTHandle) (ASTHandle, error) {
+	return m.arithmeticApp(7, left, right)
+}
+
 func (m *ASTManager) MkArithmeticMul(left, right ASTHandle) (ASTHandle, error) {
 	return m.arithmeticApp(9, left, right)
 }
