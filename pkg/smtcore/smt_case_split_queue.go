@@ -5,7 +5,6 @@ package smtcore
 import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
-	z3rand "github.com/glycerine/g3/pkg/util/random"
 )
 
 // SMTActivityCaseSplitQueue is the concrete activity strategy retained by the
@@ -13,7 +12,6 @@ import (
 // Go slices preserves its choice of a greatest-activity unassigned variable.
 type SMTActivityCaseSplitQueue struct {
 	state                                 *SMTInternalizerState
-	random                                z3rand.Generator
 	phaseSelection, cachingOn, cachingOff uint32
 	phaseCounter                          uint32
 	cacheEnabled, phaseDefault            bool
@@ -33,7 +31,6 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	q.phaseSelection = state.PhaseSelection
 	q.cachingOn = state.PhaseCachingOn
 	q.cachingOff = state.PhaseCachingOff
-	q.random.SetSeed(state.RandomSeed)
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
@@ -143,7 +140,7 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 			phase = data.Phase
 		}
 	case 5:
-		phase = q.random.Next()%2 == 0
+		phase = q.state.random.Next()%2 == 0
 	case 6:
 		phase = q.occurrencePhase(next)
 	default:

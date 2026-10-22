@@ -26,3 +26,13 @@ func (s *SMTInternalizerState) incrementBooleanActivity(variable int32) error {
 func (s *SMTInternalizerState) decayBooleanActivity() {
 	s.activityIncrement *= s.activityInverseDecay
 }
+
+func (s *SMTInternalizerState) configureBooleanHeuristics(params SMTParamsState) error {
+	if params.RandomInitialActivity > 2 || params.InvDecay <= 0 {
+		return ast.ErrASTDomain
+	}
+	s.random.SetSeed(params.RandomSeed)
+	s.randomInitialActivity = params.RandomInitialActivity
+	s.activityInverseDecay = params.InvDecay
+	return nil
+}

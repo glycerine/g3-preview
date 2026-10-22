@@ -100,7 +100,7 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 	return &SMTKernel{
 		manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof,
 		smtState: SMTParamsState{
-			MaxConflicts: ^uint32(0), InvDecay: 1.052, RestartStrategy: 1, RestartInitial: 100, RestartFactor: 1.1,
+			MaxConflicts: ^uint32(0), InvDecay: 1.052, RandomInitialActivity: 1, RestartStrategy: 1, RestartInitial: 100, RestartFactor: 1.1,
 			RestartAdaptive: true, AgilityFactor: 0.9999, RestartAgilityThreshold: 0.18, SimplifyClauses: true,
 		},
 	}, nil
@@ -163,7 +163,9 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	if err = k.internalizer.ConfigureClauseMaintenance(maintenance); err != nil {
 		return errors.Join(err, full.Close())
 	}
-	k.internalizer.activityInverseDecay = fullState.InvDecay
+	if err = k.internalizer.configureBooleanHeuristics(fullState); err != nil {
+		return errors.Join(err, full.Close())
+	}
 	k.relevancy.enabled = fullState.RelevancyLvl > 0
 	k.smtParams = full
 	k.smtState = fullState
@@ -213,7 +215,9 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err = k.internalizer.UpdateDynamicAck(dynamic); err != nil {
 		return err
 	}
-	k.internalizer.activityInverseDecay = paramsState.InvDecay
+	if err = k.internalizer.configureBooleanHeuristics(paramsState); err != nil {
+		return err
+	}
 	k.relevancy.enabled = paramsState.RelevancyLvl > 0
 	k.smtState = paramsState
 	name := "preprocess"
@@ -405,6 +409,9 @@ func (k *SMTKernel) ScopeLevel() uint32 {
 func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 	if err := k.open(); err != nil {
 		return nil, err
+	}
+	if err := k.internalizer.configureBooleanHeuristics(k.smtState); err != nil {
+		return nil, fmt.Errorf("smt kernel configure Boolean heuristics: %w", err)
 	}
 	if err := k.internalizer.SetupTheories(); err != nil {
 		return nil, fmt.Errorf("smt kernel setup theories: %w", err)

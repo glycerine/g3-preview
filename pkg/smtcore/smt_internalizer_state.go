@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	z3rand "github.com/glycerine/g3/pkg/util/random"
 )
 
 type smtInternalizerScope struct {
@@ -105,6 +106,8 @@ type SMTInternalizerState struct {
 	activity                 []float64
 	activityIncrement        float64
 	activityInverseDecay     float64
+	random                   z3rand.Generator
+	randomInitialActivity    uint32
 	assignment               []lbool.LBool
 	watches                  []SMTWatchList
 	booleanStack             []ast.ASTHandle
@@ -165,12 +168,13 @@ func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext
 		boolVar: make(map[ast.ASTHandle]int32), boolExpr: make([]ast.ASTHandle, 1), booleanData: make([]SMTBoolVarData, 1),
 		activity: make([]float64, 1), assignment: []lbool.LBool{lbool.True, lbool.False}, watches: make([]SMTWatchList, 2),
 		cachedGeneration: make(map[ast.ASTHandle]uint32), theories: make(map[ast.FamilyID]SMTTheoryInternalizer),
-		disequalityReasons:   make(map[smtEnodePairKey]SMTLiteral),
-		conflictLiteral:      SMTNullLiteral,
-		activityIncrement:    1,
-		activityInverseDecay: 1.052,
-		clauseMaintenance:    defaultSMTClauseMaintenanceConfig(),
-		lemmaGCThreshold:     5000,
+		disequalityReasons:    make(map[smtEnodePairKey]SMTLiteral),
+		conflictLiteral:       SMTNullLiteral,
+		activityIncrement:     1,
+		activityInverseDecay:  1.052,
+		randomInitialActivity: 1,
+		clauseMaintenance:     defaultSMTClauseMaintenanceConfig(),
+		lemmaGCThreshold:      5000,
 	}
 	state.booleanData[0].Initialize(0)
 	dynamicAck, err := newSMTDynAckManager(state, defaultSMTDynAckState())
@@ -406,7 +410,11 @@ func (s *SMTInternalizerState) MkBoolVar(expression ast.ASTHandle) (int32, error
 	data := SMTBoolVarData{}
 	data.Initialize(s.scopeLevel)
 	s.booleanData = append(s.booleanData, data)
-	s.activity = append(s.activity, 0)
+	initialActivity := 0.0
+	if s.randomInitialActivity == 2 || s.randomInitialActivity == 1 && s.searching {
+		initialActivity = -float64(s.random.Next()%1000) / 1000
+	}
+	s.activity = append(s.activity, initialActivity)
 	s.assignment = append(s.assignment, lbool.Undef, lbool.Undef)
 	s.watches = append(s.watches, SMTWatchList{}, SMTWatchList{})
 	s.booleanStack = append(s.booleanStack, expression)
