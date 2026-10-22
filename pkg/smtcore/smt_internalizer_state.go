@@ -895,6 +895,11 @@ func (s *SMTInternalizerState) Close() error {
 		result = errors.Join(result, s.PopScopes(uint32(len(s.scopes))))
 	}
 	result = errors.Join(result, s.popTo(smtInternalizerScope{}))
+	for i := len(s.theoryOrder) - 1; i >= 0; i-- {
+		if closer, ok := s.theoryOrder[i].(interface{ Close() error }); ok {
+			result = errors.Join(result, closer.Close())
+		}
+	}
 	result = errors.Join(result, s.releaseLearnedUnits())
 	result = errors.Join(result, s.releaseBooleanActivityCache())
 	result = errors.Join(result, s.dynamicAck.close())

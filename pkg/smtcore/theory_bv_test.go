@@ -223,6 +223,31 @@ func TestSMTBitVectorDivisionByZeroValueIsUninterpreted(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorCloseReleasesBitOwners(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	family, err := m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	one, err := m.BitVectorNumeralUint64(1, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(one)
+	astTestMust(t, err)
+	value, err := m.MkConst(astTestSymbol(t, m, "bv-close-value"), sort)
+	astTestMust(t, err)
+	equality, err := m.MkEq(value, one)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(equality))
+	_, err = solver.CheckSat(nil)
+	astTestMust(t, err)
+	theory, ok := solver.kernel.internalizer.theories[family].(*SMTBitVectorTheory)
+	if !ok || len(theory.bitOwners) == 0 {
+		t.Fatal("missing retained bit owners")
+	}
+	astTestMust(t, solver.Close())
+	if len(theory.bitOwners) != 0 || len(theory.bits) != 0 || len(theory.bitTrail) != 0 {
+		t.Fatal("bit owners survived theory close")
+	}
+}
+
 func TestSMTBitVectorUnsignedDivisionCircuit(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
 	two, err := m.BitVectorNumeralUint64(2, 4)

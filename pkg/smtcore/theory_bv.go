@@ -1550,6 +1550,25 @@ func (t *SMTBitVectorTheory) ResetStatistics() {
 	}
 }
 
+func (t *SMTBitVectorTheory) Close() (result error) {
+	if t == nil {
+		return ast.ErrASTHandle
+	}
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	result = errors.Join(result, t.releaseTemporary())
+	for expression, owner := range t.bitOwners {
+		result = errors.Join(result, state.manager.DelRef(&owner))
+		delete(t.bitOwners, expression)
+		delete(t.bits, expression)
+	}
+	t.bitTrail = t.bitTrail[:0]
+	t.scopes = t.scopes[:0]
+	return result
+}
+
 func (t *SMTBitVectorTheory) InitializeModel(generator *SMTModelGenerator) error {
 	state, err := t.State()
 	if err != nil || generator == nil || generator.manager != state.manager || generator.model == nil {
