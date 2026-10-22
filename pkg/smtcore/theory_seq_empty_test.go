@@ -652,6 +652,89 @@ func TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryNegativeBoundaryWitnesses(t *testing.T) {
+	for _, suffix := range []bool{false, true} {
+		name := "prefix"
+		if suffix {
+			name = "suffix"
+		}
+		t.Run(name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			empty, err := m.MkString("")
+			astTestMust(t, err)
+			sort, err := m.GetSort(empty)
+			astTestMust(t, err)
+			elementSort, sequence, err := m.SequenceSortElement(sort)
+			astTestMust(t, err)
+			if !sequence {
+				t.Fatal("string sequence sort")
+			}
+			boundary, err := m.MkConst(astTestSymbol(t, m, "sequence-negative-boundary-"+name), sort)
+			astTestMust(t, err)
+			container, err := m.MkConst(astTestSymbol(t, m, "sequence-negative-container-"+name), sort)
+			astTestMust(t, err)
+			var relation ast.ASTHandle
+			if suffix {
+				relation, err = m.MkSequenceSuffix(boundary, container)
+			} else {
+				relation, err = m.MkSequencePrefix(boundary, container)
+			}
+			astTestMust(t, err)
+			notRelation, err := m.MkNot(relation)
+			astTestMust(t, err)
+			containerEmpty, err := m.MkEq(container, empty)
+			astTestMust(t, err)
+			containerNonempty, err := m.MkNot(containerEmpty)
+			astTestMust(t, err)
+			prefix := "seq.prefix."
+			if suffix {
+				prefix = "seq.suffix."
+			}
+			arguments := []ast.ASTHandle{boundary, container}
+			xName, err := m.Symbols.Intern(prefix + "x")
+			astTestMust(t, err)
+			x, err := m.MkSequenceSkolem(xName, arguments, sort)
+			astTestMust(t, err)
+			yName, err := m.Symbols.Intern(prefix + "y")
+			astTestMust(t, err)
+			y, err := m.MkSequenceSkolem(yName, arguments, sort)
+			astTestMust(t, err)
+			cName, err := m.Symbols.Intern(prefix + "c")
+			astTestMust(t, err)
+			c, err := m.MkSequenceSkolem(cName, arguments, elementSort)
+			astTestMust(t, err)
+			unit, err := m.MkSequenceUnit(c)
+			astTestMust(t, err)
+			var word ast.ASTHandle
+			if suffix {
+				tail, makeErr := m.MkSequenceConcat(unit, x)
+				astTestMust(t, makeErr)
+				word, err = m.MkSequenceConcat(y, tail)
+			} else {
+				tail, makeErr := m.MkSequenceConcat(unit, y)
+				astTestMust(t, makeErr)
+				word, err = m.MkSequenceConcat(x, tail)
+			}
+			astTestMust(t, err)
+			definition, err := m.MkEq(boundary, word)
+			astTestMust(t, err)
+			notDefinition, err := m.MkNot(definition)
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.Assert(notRelation))
+			astTestMust(t, solver.Assert(containerNonempty))
+			astTestMust(t, solver.Assert(notDefinition))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("negative boundary witness", status)
+			}
+		})
+	}
+}
+
 func TestSMTSequenceTheoryAtBoundaryAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name  string

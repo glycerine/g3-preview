@@ -115,8 +115,8 @@ func (t *SMTSequenceTheory) addRelationAxioms(expression ast.ASTHandle, operatio
 	if err = t.axioms.Push(guard); err != nil {
 		return err
 	}
-	if operation != 5 {
-		return nil
+	if operation == 3 || operation == 4 {
+		return t.addNegativeBoundaryWitness(expression, left, right, operation == 4)
 	}
 	prefix, err := state.manager.MkSequencePrefix(right, left)
 	if err != nil {
