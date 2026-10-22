@@ -41572,7 +41572,8 @@
         "pkg/interp/direct_proof.go",
         "pkg/interp/direct_proof_resolution.go",
         "pkg/interp/direct_proof_arithmetic.go",
-        "pkg/interp/direct_proof_finalize.go"
+        "pkg/interp/direct_proof_finalize.go",
+        "pkg/interp/direct_proof_substitution.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41580,7 +41581,8 @@
         "TestDirectProofArithmeticHypothesisAndGuards",
         "TestDirectProofLocalResolutionAndSymmetry",
         "TestDirectProofLocalArithmeticRules",
-        "TestDirectProofFinalSimplificationOwnership"
+        "TestDirectProofFinalSimplificationOwnership",
+        "TestDirectProofTermSubstitutionAndBarriers"
       ],
       "conditionals": [
         {
@@ -41760,6 +41762,14 @@
           "tests": []
         },
         {
+          "name": "symbolic proof-term substitution, rotation-pivot protection, and rewrite-chain barriers",
+          "status": "ported",
+          "go_target": "pkg/interp/direct_proof_substitution.go",
+          "tests": [
+            "TestDirectProofTermSubstitutionAndBarriers"
+          ]
+        },
+        {
           "name": "rewrite-chain normalization and symbolic proof simplification",
           "status": "unported",
           "go_target": "",
@@ -41797,7 +41807,8 @@
         "pkg/interp/direct_proof.go",
         "pkg/interp/direct_proof_resolution.go",
         "pkg/interp/direct_proof_arithmetic.go",
-        "pkg/interp/direct_proof_finalize.go"
+        "pkg/interp/direct_proof_finalize.go",
+        "pkg/interp/direct_proof_substitution.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41805,7 +41816,8 @@
         "TestDirectProofArithmeticHypothesisAndGuards",
         "TestDirectProofLocalResolutionAndSymmetry",
         "TestDirectProofLocalArithmeticRules",
-        "TestDirectProofFinalSimplificationOwnership"
+        "TestDirectProofFinalSimplificationOwnership",
+        "TestDirectProofTermSubstitutionAndBarriers"
       ],
       "conditionals": [
         {

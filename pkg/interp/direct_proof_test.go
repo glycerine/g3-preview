@@ -301,3 +301,51 @@ func TestDirectProofFinalSimplificationOwnership(t *testing.T) {
 		t.Fatal("closed finalizer guard", err)
 	}
 }
+
+func TestDirectProofTermSubstitutionAndBarriers(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	conjunction, err := manager.Make(OperatorAnd, p, q)
+	interpMust(t, err)
+	replaced, err := direct.SubstituteProofTerm(p, q, conjunction)
+	interpMust(t, err)
+	replacedArgs, err := manager.Args(replaced)
+	interpMust(t, err)
+	if len(replacedArgs) != 2 || replacedArgs[0] != q || replacedArgs[1] != q {
+		t.Fatal("conjunction substitution", replacedArgs, q)
+	}
+	equality, err := manager.Make(OperatorEqual, p, p)
+	interpMust(t, err)
+	equality, err = direct.SubstituteProofTerm(p, q, equality)
+	interpMust(t, err)
+	if truth, e := manager.IsTrue(equality); e != nil || !truth {
+		t.Fatal("reflexive equality substitution", truth, e)
+	}
+	chain, err := direct.makeSymbol(direct.concat, p, q)
+	interpMust(t, err)
+	unchangedChain, err := direct.SubstituteProofTerm(p, q, chain)
+	interpMust(t, err)
+	if unchangedChain != chain {
+		t.Fatal("rewrite chain barrier", unchangedChain, chain)
+	}
+	pivotPlaceholder, err := direct.placeholder(p)
+	interpMust(t, err)
+	proof, err := manager.Make(OperatorAnd, pivotPlaceholder, q)
+	interpMust(t, err)
+	rotation, err := direct.makeSymbol(direct.rotateSum, p, proof)
+	interpMust(t, err)
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	unchangedRotation, err := direct.SubstituteProofTerm(pivotPlaceholder, truth, rotation)
+	interpMust(t, err)
+	if unchangedRotation != rotation {
+		t.Fatal("rotation pivot barrier", unchangedRotation, rotation)
+	}
+	changedRotation, err := direct.SubstituteProofTerm(q, truth, rotation)
+	interpMust(t, err)
+	if changedRotation == rotation {
+		t.Fatal("rotation proof was not substituted")
+	}
+}
