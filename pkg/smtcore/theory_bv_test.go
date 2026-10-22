@@ -197,6 +197,44 @@ func TestSMTBitVectorAdditionCircuit(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorEnodeConfiguration(t *testing.T) {
+	for _, test := range []struct {
+		name                string
+		reflect, congruence bool
+	}{
+		{name: "source-default", reflect: true},
+		{name: "suppressed-congruence", congruence: true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, family, solver := smtBVSolver(t)
+			family, err := m.RegisterBitVectorPlugin()
+			astTestMust(t, err)
+			zero, err := m.BitVectorNumeralUint64(0, 2)
+			astTestMust(t, err)
+			sort, err := m.GetSort(zero)
+			astTestMust(t, err)
+			left, err := m.MkConst(astTestSymbol(t, m, "bv-enode-left"), sort)
+			astTestMust(t, err)
+			right, err := m.MkConst(astTestSymbol(t, m, "bv-enode-right"), sort)
+			astTestMust(t, err)
+			term, err := m.MkBitVectorPolynomialAdd(sort, ast.SliceArguments([]ast.ASTHandle{left, right}))
+			astTestMust(t, err)
+			theory, ok := solver.kernel.internalizer.theories[family].(*SMTBitVectorTheory)
+			if !ok || theory == nil {
+				t.Fatal("missing bit-vector theory")
+			}
+			config := theory.config
+			config.Reflect, config.CC = test.reflect, test.congruence
+			astTestMust(t, theory.ConfigureBitVector(config))
+			astTestMust(t, solver.kernel.internalizer.Internalize(term, false))
+			node := solver.kernel.internalizer.context.enodes[term]
+			if node == nil || node.suppressArguments == test.reflect || node.congruenceEnabled != test.congruence {
+				t.Fatal("bit-vector enode flags", node)
+			}
+		})
+	}
+}
+
 func TestSMTBitVectorExpandsDynamicDisequality(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
 	zero, err := m.BitVectorNumeralUint64(0, 4)

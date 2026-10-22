@@ -1513,7 +1513,7 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	}
 	node := state.context.enodes[expression]
 	if node == nil {
-		node, err = state.MkEnode(expression, false, false, true)
+		node, err = state.MkEnode(expression, !t.config.Reflect, false, t.config.CC)
 		if err != nil {
 			return false, err
 		}
