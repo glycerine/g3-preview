@@ -447,6 +447,108 @@ func (p *DirectProofInterpolator) concatRewriteChains(first, second ast.ASTHandl
 	return p.addRewriteToChain(first, last)
 }
 
+func (p *DirectProofInterpolator) chainPositionAdd(index int64, chain ast.ASTHandle) (ast.ASTHandle, error) {
+	empty, err := p.base.manager.IsTrue(chain)
+	if err != nil || empty {
+		return chain, err
+	}
+	rest, last, err := p.chainParts(chain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	side, position, condition, equality, err := p.rewriteFields(last)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	position, err = p.positionAdd(index, position)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	last, err = p.makeRewrite(side, position, condition, equality)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	rest, err = p.chainPositionAdd(index, rest)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.chainCons(rest, last)
+}
+
+func (p *DirectProofInterpolator) chainSideConjunction(side TermSide, chain ast.ASTHandle, formulas bool) (ast.ASTHandle, error) {
+	result, err := p.base.manager.Make(OperatorTrue)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	for {
+		empty, e := p.base.manager.IsTrue(chain)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if empty {
+			return result, nil
+		}
+		rest, last, e := p.chainParts(chain)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		rewriteSide, _, condition, equality, e := p.rewriteFields(last)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if rewriteSide == side {
+			entry := condition
+			if formulas {
+				entry = equality
+			}
+			result, e = p.base.manager.MkAnd(result, entry)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+		}
+		chain = rest
+	}
+}
+
+func (p *DirectProofInterpolator) contradictChains(negativeChain, positiveChain ast.ASTHandle) (ast.ASTHandle, error) {
+	equivalence, err := p.isEquivalenceChain(positiveChain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if equivalence {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	positiveChain, err = p.reverseChain(positiveChain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	positiveChain, err = p.chainPositionAdd(0, positiveChain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	chain, err := p.concatRewriteChains(negativeChain, positiveChain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	aConditions, err := p.chainSideConjunction(TermA, chain, false)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	aFormulas, err := p.chainSideConjunction(TermA, chain, true)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	bConditions, err := p.chainSideConjunction(TermB, chain, false)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result, err := p.base.manager.MkImplies(aConditions, aFormulas)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.MkAnd(result, bConditions)
+}
+
 func (p *DirectProofInterpolator) isEquivalenceChain(chain ast.ASTHandle) (bool, error) {
 	for {
 		empty, err := p.base.manager.IsTrue(chain)

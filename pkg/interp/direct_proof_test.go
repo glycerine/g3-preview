@@ -856,3 +856,21 @@ func TestDirectProofRewriteChainAbsorption(t *testing.T) {
 		t.Fatal("absorbed rewrite", left, right, p)
 	}
 }
+
+func TestDirectProofPredicateChainContradiction(t *testing.T) {
+	_, manager, base, p, _ := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	negativeP, err := manager.MkNot(p)
+	interpMust(t, err)
+	negativeChain, err := direct.makeLocalRewrite(TermA, negativeP)
+	interpMust(t, err)
+	positiveChain, err := direct.makeLocalRewrite(TermB, p)
+	interpMust(t, err)
+	result, err := direct.contradictChains(negativeChain, positiveChain)
+	interpMust(t, err)
+	if op, e := manager.Operator(result); e != nil || op != OperatorIff {
+		t.Fatal("predicate chain contradiction", op, e)
+	}
+}
