@@ -109,3 +109,234 @@ func (p *DirectProofInterpolator) isNormalInequality(proof ast.ASTHandle) (bool,
 	}
 	return p.isInequality(proof)
 }
+
+func (p *DirectProofInterpolator) mergeNormalChains(first, second ast.ASTHandle, aProof, bProof *ast.ASTHandle) (ast.ASTHandle, error) {
+	transitive := make(map[ast.ASTHandle]ast.ASTHandle)
+	result, err := p.mergeNormalChainsRecursive(first, second, transitive, aProof, bProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.transitiveNormalChain(result, transitive)
+}
+
+func (p *DirectProofInterpolator) mergeNormalChainsRecursive(first, second ast.ASTHandle, transitive map[ast.ASTHandle]ast.ASTHandle, aProof, bProof *ast.ASTHandle) (ast.ASTHandle, error) {
+	firstEmpty, err := p.base.manager.IsTrue(first)
+	if err != nil || firstEmpty {
+		return second, err
+	}
+	secondEmpty, err := p.base.manager.IsTrue(second)
+	if err != nil || secondEmpty {
+		return first, err
+	}
+	firstStep, firstRest, err := p.normalChainParts(first)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	secondStep, secondRest, err := p.normalChainParts(second)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	left1, right1, proof1, err := p.normalStepParts(firstStep)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	left2, right2, proof2, err := p.normalStepParts(secondStep)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	id1, err := p.base.manager.ASTID(left1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	id2, err := p.base.manager.ASTID(left2)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if id1 < id2 {
+		rest, e := p.mergeNormalChainsRecursive(firstRest, second, transitive, aProof, bProof)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.consNormal(firstStep, rest)
+	}
+	if id2 < id1 {
+		rest, e := p.mergeNormalChainsRecursive(first, secondRest, transitive, aProof, bProof)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.consNormal(secondStep, rest)
+	}
+	side1, err := p.TermSide(right1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	side2, err := p.TermSide(right2)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	rightID1, err := p.base.manager.ASTID(right1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	rightID2, err := p.base.manager.ASTID(right2)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var mergedStep ast.ASTHandle
+	if side1 == TermMixed && (side2 != TermMixed || rightID2 > rightID1) {
+		reversed, e := p.reverseChain(proof1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		combined, e := p.concatRewriteChains(reversed, proof2)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		mergedStep = secondStep
+		transitive[right1], e = p.makeNormalStep(right1, right2, combined)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+	} else if side2 == TermMixed && (side1 != TermMixed || rightID1 > rightID2) {
+		return p.mergeNormalChainsRecursive(second, first, transitive, aProof, bProof)
+	} else if side1 == TermA && side2 == TermB {
+		reversed, e := p.reverseChain(proof1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		combined, e := p.concatRewriteChains(reversed, proof2)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		aRewrites, bRewrites, e := p.dropRewrites(TermB, combined)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		condition, e := p.chainSideProof(TermB, aRewrites)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		*bProof, e = p.base.manager.MkAnd(*bProof, condition)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		condition, e = p.chainSideProof(TermA, bRewrites)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		*aProof, e = p.base.manager.MkAnd(*aProof, condition)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		representative, e := p.applyRewriteChain(right1, aRewrites)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		combined, e = p.concatRewriteChains(proof1, aRewrites)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		mergedStep, e = p.makeNormalStep(left1, representative, combined)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		aNormal, e := p.makeNormalStep(right1, representative, aRewrites)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		rest, e := p.mergeNormalChainsRecursive(firstRest, secondRest, transitive, aProof, bProof)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		result, e := p.consNormal(mergedStep, rest)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		truth, e := p.base.manager.Make(OperatorTrue)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		aChain, e := p.consNormal(aNormal, truth)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.mergeNormalChainsRecursive(result, aChain, transitive, aProof, bProof)
+	} else if side1 == TermB && side2 == TermA {
+		return p.mergeNormalChainsRecursive(second, first, transitive, aProof, bProof)
+	} else {
+		reversed, e := p.reverseChain(proof1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		combined, e := p.concatRewriteChains(reversed, proof2)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if side1 == TermA {
+			condition, e := p.chainSideProof(TermB, combined)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			*bProof, e = p.base.manager.MkAnd(*bProof, condition)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+		} else {
+			condition, e := p.chainSideProof(TermA, combined)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			*aProof, e = p.base.manager.MkAnd(*aProof, condition)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+		}
+		mergedStep = firstStep
+	}
+	rest, err := p.mergeNormalChainsRecursive(firstRest, secondRest, transitive, aProof, bProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.consNormal(mergedStep, rest)
+}
+
+func (p *DirectProofInterpolator) transitiveNormalChain(chain ast.ASTHandle, transitive map[ast.ASTHandle]ast.ASTHandle) (ast.ASTHandle, error) {
+	empty, err := p.base.manager.IsTrue(chain)
+	if err != nil || empty {
+		return chain, err
+	}
+	step, rest, err := p.normalChainParts(chain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	rest, err = p.transitiveNormalChain(rest, transitive)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	left, right, proof, err := p.normalStepParts(step)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	leftSide, err := p.TermSide(left)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if next, found := transitive[right]; found && leftSide == TermMixed {
+		_, nextRight, nextProof, e := p.normalStepParts(next)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		proof, e = p.concatRewriteChains(proof, nextProof)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		step, e = p.makeNormalStep(left, nextRight, proof)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+	}
+	if leftSide == TermMixed {
+		transitive[left] = step
+	}
+	return p.consNormal(step, rest)
+}

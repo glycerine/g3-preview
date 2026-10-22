@@ -510,6 +510,81 @@ func (p *DirectProofInterpolator) chainSideConjunction(side TermSide, chain ast.
 	}
 }
 
+func (p *DirectProofInterpolator) applyRewriteChain(term, chain ast.ASTHandle) (ast.ASTHandle, error) {
+	empty, err := p.base.manager.IsTrue(chain)
+	if err != nil || empty {
+		return term, err
+	}
+	rest, last, err := p.chainParts(chain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	term, err = p.applyRewriteChain(term, rest)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	_, position, _, _, err := p.rewriteFields(last)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	_, replacement, err := p.rewriteEndpoints(last)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.substituteAtPosition(term, position, replacement)
+}
+
+func (p *DirectProofInterpolator) dropRewrites(side TermSide, chain ast.ASTHandle) (kept, remainder ast.ASTHandle, err error) {
+	empty, err := p.base.manager.IsTrue(chain)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	if !empty {
+		rest, last, e := p.chainParts(chain)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		rewriteSide, _, _, _, e := p.rewriteFields(last)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		if rewriteSide == side {
+			kept, remainder, e = p.dropRewrites(side, rest)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+			remainder, e = p.chainCons(remainder, last)
+			return kept, remainder, e
+		}
+	}
+	remainder, err = p.base.manager.Make(OperatorTrue)
+	return chain, remainder, err
+}
+
+func (p *DirectProofInterpolator) chainSideProof(side TermSide, chain ast.ASTHandle) (ast.ASTHandle, error) {
+	other := TermA
+	if side == TermA {
+		other = TermB
+	}
+	otherConditions, err := p.chainSideConjunction(other, chain, false)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	conditions, err := p.chainSideConjunction(side, chain, false)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	formulas, err := p.chainSideConjunction(side, chain, true)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	proof, err := p.base.manager.MkImplies(conditions, formulas)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.MkAnd(otherConditions, proof)
+}
+
 func (p *DirectProofInterpolator) rewriteAtPosition(rewrite, position ast.ASTHandle) (ast.ASTHandle, error) {
 	side, _, condition, equality, err := p.rewriteFields(rewrite)
 	if err != nil {
