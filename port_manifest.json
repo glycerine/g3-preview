@@ -99254,22 +99254,46 @@
       "path": "src/smt/elim_term_ite.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/elim_term_ite.go"
+      ],
+      "tests": [
+        "TestSMTTermITEEliminatorNamesOnlyTermITEAndOwnsDefinitions",
+        "TestSMTTermITEEliminatorLeavesBooleanITE"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "elim_term_ite_cfg::reduce_app",
+          "status": "ported",
+          "go_target": "pkg/smtcore/elim_term_ite.go",
+          "tests": [
+            "TestSMTTermITEEliminatorNamesOnlyTermITEAndOwnsDefinitions",
+            "TestSMTTermITEEliminatorLeavesBooleanITE"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each introduced JustifiedExpr owns its definition and optional proof until reset or close; the name table and traversal are borrowed/owned as in their Go APIs."
+      ],
+      "deviations": [
+        "The source vector is exposed as a detached Go slice of borrowed definition-owner pointers."
+      ]
     },
     {
       "path": "src/smt/elim_term_ite.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/elim_term_ite.go"
+      ],
+      "tests": [
+        "TestSMTTermITEEliminatorNamesOnlyTermITEAndOwnsDefinitions",
+        "TestSMTTermITEEliminatorLeavesBooleanITE"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -99280,10 +99304,21 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "elim_term_ite rewriter construction, new_defs, and reset",
+          "status": "ported",
+          "go_target": "pkg/smtcore/elim_term_ite.go",
+          "tests": [
+            "TestSMTTermITEEliminatorNamesOnlyTermITEAndOwnsDefinitions"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTTermITEEliminator owns its traversal and introduced definitions and borrows DefinedNames."
+      ],
       "deviations": []
     },
     {
