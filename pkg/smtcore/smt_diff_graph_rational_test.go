@@ -211,3 +211,40 @@ func TestSMTRationalDiffGraphDirectAndTwoHopSubsumption(t *testing.T) {
 		t.Fatal("two-hop subsumption", twoHop, err)
 	}
 }
+
+func TestSMTRationalDiffGraphLazySubsumptionExplanationTimestamp(t *testing.T) {
+	g := NewSMTRationalDiffGraph()
+	for variable := int32(0); variable < 3; variable++ {
+		if err := g.InitVariable(variable); err != nil {
+			t.Fatal(err)
+		}
+	}
+	add := func(source, target int32, weight int64, literal SMTLiteral, enabled bool) int32 {
+		t.Helper()
+		id, err := g.AddEdge(source, target, diffRat(weight), literal)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if enabled {
+			feasible, enableErr := g.EnableEdge(id)
+			if enableErr != nil || !feasible {
+				t.Fatal(feasible, enableErr)
+			}
+		}
+		return id
+	}
+	firstLiteral := NewSMTLiteral(21, false)
+	secondLiteral := NewSMTLiteral(22, true)
+	_ = add(0, 1, 1, firstLiteral, true)
+	bridge := add(1, 2, 1, secondLiteral, true)
+	subsumed := add(0, 2, 3, SMTNullLiteral, false)
+	_ = add(0, 2, 0, NewSMTLiteral(23, false), true) // newer than bridge
+
+	explanation, err := g.ExplainSubsumedLazy(bridge, subsumed)
+	if err != nil || !reflect.DeepEqual(explanation, []SMTLiteral{secondLiteral, firstLiteral}) {
+		t.Fatal("timestamp-bounded explanation", explanation, err)
+	}
+	if _, err = g.ExplainSubsumedLazy(subsumed, subsumed); !errors.Is(err, errSMTDiffGraphDomain) {
+		t.Fatal("disabled bridge guard", err)
+	}
+}

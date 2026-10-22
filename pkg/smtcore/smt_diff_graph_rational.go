@@ -483,6 +483,70 @@ func (g *SMTRationalDiffGraph) FindTwoHopSubsumed(id int32) ([]int32, error) {
 	return result, nil
 }
 
+// ExplainSubsumedLazy finds an enabled path, no newer than bridge, whose
+// weight implies the disabled subsumed edge. Explanations are returned from
+// destination to source, matching the source parent walk.
+func (g *SMTRationalDiffGraph) ExplainSubsumedLazy(bridgeID, subsumedID int32) ([]SMTLiteral, error) {
+	if !g.validEdge(bridgeID) || !g.validEdge(subsumedID) || !g.edges[bridgeID].enabled || !g.heap.empty() || len(g.visited) != 0 {
+		return nil, errSMTDiffGraphDomain
+	}
+	bridge := &g.edges[bridgeID]
+	subsumed := &g.edges[subsumedID]
+	source, destination := subsumed.source, subsumed.target
+	g.gamma[source].SetInt64(0)
+	g.gamma[destination].Set(&subsumed.weight)
+	g.heap.insert(source)
+	g.visited = append(g.visited, source)
+
+	for !g.heap.empty() {
+		variable := g.heap.eraseMin()
+		g.mark[variable] = smtDiffProcessed
+		for _, edgeID := range g.outEdges[variable] {
+			edge := &g.edges[edgeID]
+			if !edge.enabled || edge.timestamp > bridge.timestamp {
+				continue
+			}
+			next := edge.target
+			var distance big.Rat
+			distance.Add(&g.gamma[variable], &edge.weight)
+			if g.mark[next] != smtDiffUnmarked && g.gamma[next].Cmp(&distance) <= 0 {
+				continue
+			}
+			g.gamma[next].Set(&distance)
+			g.parent[next] = edgeID
+			if next == destination && distance.Cmp(&subsumed.weight) <= 0 {
+				g.resetMarks()
+				g.heap.reset()
+				result := make([]SMTLiteral, 0, 4)
+				current := destination
+				for steps := 0; current != source; steps++ {
+					if steps > len(g.edges) || !g.validEdge(g.parent[current]) {
+						return nil, errSMTDiffGraphDomain
+					}
+					parentID := g.parent[current]
+					g.activity[parentID]++
+					result = append(result, g.edges[parentID].explanation)
+					current = g.edges[parentID].source
+				}
+				return result, nil
+			}
+			switch g.mark[next] {
+			case smtDiffUnmarked:
+				g.visited = append(g.visited, next)
+				g.mark[next] = smtDiffFound
+				g.heap.insert(next)
+			case smtDiffProcessed:
+				g.mark[next] = smtDiffFound
+				g.heap.insert(next)
+			case smtDiffFound:
+				g.heap.decreased(next)
+			}
+		}
+	}
+	g.resetMarks()
+	return nil, errSMTDiffGraphDomain
+}
+
 func (g *SMTRationalDiffGraph) NumNodes() int {
 	if g == nil {
 		return 0
