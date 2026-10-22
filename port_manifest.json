@@ -125818,10 +125818,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/arith/propagate_ineq_clean.go",
-        "pkg/tactic/arith/propagate_ineq_clean_test.go"
+        "pkg/tactic/arith/propagate_ineq_clean_test.go",
+        "pkg/tactic/tactic_conditional.go",
+        "pkg/tactic/tactic_conditional_test.go"
       ],
       "tests": [
-        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
+        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
+        "TestConditionalTacticsChooseWhenAndFailIf",
+        "TestConditionalTacticsGoalProductionGuards"
       ],
       "conditionals": [
         {
@@ -126025,9 +126029,27 @@
           "tests": [
             "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
           ]
+        },
+        {
+          "name": "cond, when, fail_if and fail_if_not application, translation and lifecycle forwarding (tactical.cpp:1225-1305)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_conditional.go",
+          "tests": [
+            "TestConditionalTacticsChooseWhenAndFailIf"
+          ]
+        },
+        {
+          "name": "proof, unsat-core and model production conditional guards (tactical.cpp:1307-1379)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_conditional.go",
+          "tests": [
+            "TestConditionalTacticsGoalProductionGuards"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Conditional tacticals retain each child and probe independently and release them in source member order on the final intrusive reference."
+      ],
       "deviations": []
     },
     {
@@ -126037,10 +126059,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/arith/propagate_ineq_clean.go",
-        "pkg/tactic/arith/propagate_ineq_clean_test.go"
+        "pkg/tactic/arith/propagate_ineq_clean_test.go",
+        "pkg/tactic/tactic_conditional.go"
       ],
       "tests": [
-        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
+        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
+        "TestConditionalTacticsChooseWhenAndFailIf",
+        "TestConditionalTacticsGoalProductionGuards"
       ],
       "conditionals": [
         {
@@ -126062,9 +126087,20 @@
           "tests": [
             "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
           ]
+        },
+        {
+          "name": "typed cond, when, fail-if and goal-production guard constructors",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_conditional.go",
+          "tests": [
+            "TestConditionalTacticsChooseWhenAndFailIf",
+            "TestConditionalTacticsGoalProductionGuards"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Typed constructors preserve the source intrusive ownership of probe and tactic operands."
+      ],
       "deviations": []
     },
     {
