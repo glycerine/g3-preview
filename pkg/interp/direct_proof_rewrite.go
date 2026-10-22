@@ -787,6 +787,92 @@ func (p *DirectProofInterpolator) simplifyCongruence(args []ast.ASTHandle) (ast.
 	return p.base.manager.MkAnd(aProof, result)
 }
 
+func (p *DirectProofInterpolator) separateRewriteCondition(term ast.ASTHandle, condition *ast.ASTHandle) (ast.ASTHandle, error) {
+	op, err := p.base.manager.Operator(term)
+	if err != nil || op != OperatorImplies {
+		return term, err
+	}
+	premise, err := p.base.manager.Arg(term, 0)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	*condition, err = p.base.manager.MkAnd(*condition, premise)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.Arg(term, 1)
+}
+
+func (p *DirectProofInterpolator) simplifyModusPonens(args []ast.ASTHandle) (ast.ASTHandle, error) {
+	if len(args) != 3 {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	aProof, err := p.base.manager.Make(OperatorTrue)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	bProof := aProof
+	first, err := p.separateRewriteCondition(args[0], &bProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	second, err := p.separateRewriteCondition(args[1], &bProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	equivalence, err := p.isEquivalenceChain(first)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var chain ast.ASTHandle
+	if equivalence {
+		parts, e := p.splitRewriteChain(second)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		chain, e = p.reverseChain(parts[0])
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		chain, e = p.concatRewriteChains(chain, first)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		chain, err = p.concatRewriteChains(chain, parts[1])
+	} else {
+		chain, err = p.concatRewriteChains(first, second)
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	third, err := p.destructConditionalInequality(args[2], &aProof, &bProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	inequality, err := p.isInequality(third)
+	if err != nil || inequality {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	negative, err := p.isNegationChain(chain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var result ast.ASTHandle
+	if negative {
+		result, err = p.contradictChains(chain, third)
+	} else {
+		result, err = p.contradictChains(third, chain)
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result, err = p.base.manager.MkImplies(bProof, result)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.MkAnd(aProof, result)
+}
+
 func (p *DirectProofInterpolator) isEquivalenceChain(chain ast.ASTHandle) (bool, error) {
 	for {
 		empty, err := p.base.manager.IsTrue(chain)

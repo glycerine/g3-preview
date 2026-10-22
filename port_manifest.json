@@ -41604,6 +41604,7 @@
         "TestDirectProofPredicateChainContradiction",
         "TestDirectProofEqualityChainContradiction",
         "TestDirectProofExcludedMiddleAndCongruenceSimplification",
+        "TestDirectProofPredicateModusPonensSimplification",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41826,9 +41827,10 @@
             "TestDirectProofRewriteChainAbsorption",
             "TestDirectProofPredicateChainContradiction",
             "TestDirectProofEqualityChainContradiction",
-            "TestDirectProofExcludedMiddleAndCongruenceSimplification"
+            "TestDirectProofExcludedMiddleAndCongruenceSimplification",
+            "TestDirectProofPredicateModusPonensSimplification"
           ],
-          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, and congruence are ported. Specialized rotation, nested/normal arithmetic sums, and modus-ponens simplification remain pending."
+          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, and ordinary modus-ponens are ported. Specialized rotation, nested/normal arithmetic sums, arithmetic modus-ponens, and the unsplittable equality-chain fallback remain pending."
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
@@ -41910,6 +41912,7 @@
         "TestDirectProofPredicateChainContradiction",
         "TestDirectProofEqualityChainContradiction",
         "TestDirectProofExcludedMiddleAndCongruenceSimplification",
+        "TestDirectProofPredicateModusPonensSimplification",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],

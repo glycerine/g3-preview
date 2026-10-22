@@ -925,3 +925,25 @@ func TestDirectProofExcludedMiddleAndCongruenceSimplification(t *testing.T) {
 		t.Fatal("congruence simplification", result, e)
 	}
 }
+
+func TestDirectProofPredicateModusPonensSimplification(t *testing.T) {
+	_, manager, base, p, _ := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	negativeP, err := manager.MkNot(p)
+	interpMust(t, err)
+	first, err := direct.makeLocalRewrite(TermA, p)
+	interpMust(t, err)
+	second, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	third, err := direct.makeLocalRewrite(TermB, negativeP)
+	interpMust(t, err)
+	proof, err := direct.makeSymbol(direct.modusPonens, first, second, third)
+	interpMust(t, err)
+	result, err := direct.SimplifyProofTerm(proof)
+	interpMust(t, err)
+	if result.IsNull() {
+		t.Fatal("predicate modus-ponens simplification")
+	}
+}
