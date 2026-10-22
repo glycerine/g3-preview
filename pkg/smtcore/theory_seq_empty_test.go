@@ -517,6 +517,47 @@ func TestSMTSequenceTheorySplitsFixedLengthPrefixes(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryRejectsFixedLengthWordMismatch(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-mismatch-x"), sort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-mismatch-y"), sort)
+	astTestMust(t, err)
+	left, err := m.MkSequenceConcat(x, a)
+	astTestMust(t, err)
+	right, err := m.MkSequenceConcat(y, a)
+	astTestMust(t, err)
+	wordEquality, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	two, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	for _, fixed := range []struct {
+		expression ast.ASTHandle
+		value      ast.ASTHandle
+	}{{x, one}, {y, two}} {
+		length, makeErr := m.MkSequenceLength(fixed.expression)
+		astTestMust(t, makeErr)
+		equality, makeErr := m.MkEq(length, fixed.value)
+		astTestMust(t, makeErr)
+		astTestMust(t, solver.Assert(equality))
+	}
+	astTestMust(t, solver.Assert(wordEquality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("fixed-length word mismatch", status)
+	}
+}
+
 func TestSMTSequenceTheoryLengthCoherenceDecomposition(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	value, err := m.MkString("a")

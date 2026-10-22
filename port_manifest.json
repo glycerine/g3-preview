@@ -116794,6 +116794,7 @@
         "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries",
         "TestSMTSequenceTheoryReducesEqualLengthBoundaries",
         "TestSMTSequenceTheorySplitsFixedLengthPrefixes",
+        "TestSMTSequenceTheoryRejectsFixedLengthWordMismatch",
         "TestSMTSequenceTheoryLengthCoherenceDecomposition",
         "TestSMTSequenceTheoryExposesExtensionalityEquality",
         "TestSMTSequenceTheoryFixedLengthOneDecomposition",
@@ -117321,10 +117322,10 @@
           "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict", "TestSMTSequenceTheoryNativeWordVariableClassification"]
         },
         {
-          "name": "zero-length leading-variable elimination plus multi-part prefix and suffix word-equation splitting at arithmetic-proven equal total lengths, with guarded prefix and residual equalities (src/smt/theory_seq.cpp:544-630,1574-1691)",
+          "name": "zero-length leading-variable elimination, exact total-length mismatch conflicts, and multi-part prefix and suffix word-equation splitting at arithmetic-proven equal total lengths with guarded prefix and residual equalities (src/smt/theory_seq.cpp:482-630,1574-1691)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_length_split.go",
-          "tests": ["TestSMTSequenceTheorySplitsFixedLengthPrefixes"]
+          "tests": ["TestSMTSequenceTheorySplitsFixedLengthPrefixes", "TestSMTSequenceTheoryRejectsFixedLengthWordMismatch"]
         },
         {
           "name": "complete fixed-string binary word-equation branching with finite prefix-overlap alternatives, exhaustive variable-prefix splits against fixed string and generic seq.unit words, an unbounded shared-tail Skolem family, exact rejection of self-referential fixed tails with unequal lengths or no cyclic rotation, and cyclic unit-element compatibility constraints (src/smt/theory_seq.cpp:335-790,1554-1763)",

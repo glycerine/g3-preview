@@ -234,3 +234,26 @@ func (t *SMTSequenceTheory) solveZeroLengthBoundary(left, right []ast.ASTHandle,
 	}
 	return false, nil
 }
+
+func (t *SMTSequenceTheory) rejectFixedLengthMismatch(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
+	var totals [2]uint64
+	for side, parts := range [][]ast.ASTHandle{left, right} {
+		for _, part := range parts {
+			length, exact, err := t.exactSequenceLength(part)
+			if err != nil {
+				return false, err
+			}
+			if !exact {
+				return false, nil
+			}
+			if length > math.MaxUint64-totals[side] {
+				return false, nil
+			}
+			totals[side] += length
+		}
+	}
+	if totals[0] == totals[1] {
+		return false, nil
+	}
+	return true, t.setDependencyConflict(dependency)
+}
