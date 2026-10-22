@@ -117892,28 +117892,30 @@
       "path": "src/smt/theory_utvpi.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/theory_arith_linear.go"],
+      "tests": ["TestSMTSolverSetupUsesLinearRealArithmetic", "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic"],
       "assertions": [
         {
           "line": 73,
           "text": "SASSERT(m_terms.size() <= 2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "UTVPI fragment linearization and integer/real explicit theory instantiations", "status": "platform_replacement", "go_target": "pkg/smtcore/theory_arith_linear.go", "tests": ["TestSMTSolverSetupUsesLinearRealArithmetic", "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic"]}
+      ],
+      "ownership": ["The shared exact linear solver owns normalized rows directly and therefore needs no separate fragment-tester scratch maps or template instantiations."],
+      "deviations": ["The general exact linearizer accepts the UTVPI fragment as a subset; it does not need a separate acceptance-only tester or doubled-variable Bellman-Ford specialization."]
     },
     {
       "path": "src/smt/theory_utvpi.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/theory_arith_linear.go"],
+      "tests": ["TestSMTSolverLinearArithmeticEqualityAdapter", "TestSMTSolverPublishesStrictLinearRealModel"],
       "conditionals": [
         {
           "line": 22,
@@ -117930,19 +117932,21 @@
           "text": "SASSERT(m_asserted_qhead <= m_asserted_atoms.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "UTVPI atom, graph, trail, equality-adapter, lifecycle, propagation, statistics and model interface", "status": "platform_replacement", "go_target": "pkg/smtcore/theory_arith_linear.go", "tests": ["TestSMTSolverLinearArithmeticEqualityAdapter", "TestSMTSolverPublishesStrictLinearRealModel"]}
+      ],
+      "ownership": ["SMTLinearArithmeticTheory owns exact simplex rows, atoms, assertions, scopes, equality state and model-value procedures."],
+      "deviations": ["The specialized graph representation is an algorithm choice. The generic setup's arith.solver selector remains tracked in src/smt/smt_setup.cpp rather than duplicating theory semantics here."]
     },
     {
       "path": "src/smt/theory_utvpi_def.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/theory_arith_linear.go"],
+      "tests": ["TestSMTSolverLinearArithmeticPropagatesImpliedEquality", "TestSMTSolverLinearArithmeticPropagatesFixedEquality", "TestSMTSolverLinearArithmeticPropagatesOffsetEquality", "TestSMTSolverPublishesStrictLinearRealModel"],
       "conditionals": [
         {
           "line": 50,
@@ -118067,11 +118071,13 @@
           "text": "SASSERT(num_r.is_pos());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "term and atom internalization, complementary inequalities, exact feasibility, integer branching, equality propagation, scope rollback, conflicts and model values", "status": "platform_replacement", "go_target": "pkg/smtcore/theory_arith_linear.go", "tests": ["TestSMTSolverLinearArithmeticPropagatesImpliedEquality", "TestSMTSolverLinearArithmeticPropagatesFixedEquality", "TestSMTSolverLinearArithmeticPropagatesOffsetEquality", "TestSMTSolverPublishesStrictLinearRealModel"]}
+      ],
+      "ownership": ["Go maps and slices replace the native doubled-variable graph, atom index, asserted queue and scope vectors while the exact simplex solver owns arithmetic rows."],
+      "deviations": ["Exact simplex feasibility and integer branch search replace parity edges and Bellman-Ford traversal while preserving the retained UTVPI theory result and model contract."]
     },
     {
       "path": "src/smt/theory_wmaxsat.cpp",
