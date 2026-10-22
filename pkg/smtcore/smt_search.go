@@ -78,10 +78,14 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			if resolution.NewScopeLevel < baseLevel || resolution.NewScopeLevel >= k.internalizer.scopeLevel {
 				return lbool.Undef, ast.ErrASTDomain
 			}
+			proof, proofErr := resolver.LemmaProof()
+			if proofErr != nil {
+				return lbool.Undef, proofErr
+			}
 			if err = k.internalizer.PopScopes(k.internalizer.scopeLevel - resolution.NewScopeLevel); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search backjump: %w", err)
 			}
-			if err = k.internalizer.AddLearnedClause(resolution.Lemma); err != nil {
+			if err = k.internalizer.AddLearnedClauseWithProof(resolution.Lemma, proof); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search learn clause: %w", err)
 			}
 			continue

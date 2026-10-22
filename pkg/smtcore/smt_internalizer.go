@@ -129,15 +129,17 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 		if _, found := seen[literal]; found {
 			continue
 		}
-		value, err := s.Assignment(literal)
-		if err != nil {
-			return err
-		}
-		if value == lbool.True {
-			return nil
-		}
-		if value == lbool.False {
-			continue
+		if kind == SMTClauseAux {
+			value, err := s.Assignment(literal)
+			if err != nil {
+				return err
+			}
+			if value == lbool.True {
+				return nil
+			}
+			if value == lbool.False {
+				continue
+			}
 		}
 		seen[literal] = struct{}{}
 		kept = append(kept, literal)
@@ -152,6 +154,24 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 	}
 	if len(kept) == 1 {
 		return s.assignLiteral(kept[0])
+	}
+	if kind == SMTClauseLearned {
+		watch, err := s.selectLearnedWatchLiteral(kept)
+		if err != nil {
+			return err
+		}
+		kept[1], kept[watch] = kept[watch], kept[1]
+	} else if kind == SMTClauseAuxLemma {
+		first, err := s.selectWatchLiteral(kept, 0)
+		if err != nil {
+			return err
+		}
+		kept[0], kept[first] = kept[first], kept[0]
+		second, err := s.selectWatchLiteral(kept, 1)
+		if err != nil {
+			return err
+		}
+		kept[1], kept[second] = kept[second], kept[1]
 	}
 	if len(kept) == 2 && s.binaryClauseOptimization && s.scopeLevel == 0 && (kind == SMTClauseAux || s.relevancy == nil) {
 		first, second := kept[0], kept[1]
@@ -175,18 +195,103 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 	if len(kept) == 2 {
 		s.statistics.NumMkBinClause++
 	}
+	firstValue, err := s.Assignment(kept[0])
+	if err != nil {
+		return err
+	}
+	secondValue, err := s.Assignment(kept[1])
+	if err != nil {
+		return err
+	}
+	if firstValue == lbool.False {
+		s.inconsistent = true
+		s.conflict = NewSMTBooleanClause(clause)
+		s.conflictLiteral = SMTNullLiteral
+		s.statistics.NumConflicts++
+	} else if secondValue == lbool.False && firstValue == lbool.Undef {
+		s.statistics.NumPropagations++
+		if err = s.AssignLiteral(kept[0], NewSMTBooleanClause(clause)); err != nil {
+			return err
+		}
+	}
 	return nil
+}
+
+func (s *SMTInternalizerState) selectLearnedWatchLiteral(literals []SMTLiteral) (int, error) {
+	if len(literals) < 2 {
+		return -1, ast.ErrASTDomain
+	}
+	selected := -1
+	var selectedLevel uint32
+	for index := 1; index < len(literals); index++ {
+		value, err := s.Assignment(literals[index])
+		if err != nil {
+			return -1, err
+		}
+		if value == lbool.True {
+			return -1, ast.ErrASTDomain
+		}
+		level := s.scopeLevel
+		if value == lbool.False {
+			level = s.booleanData[literals[index].Var()].ScopeLevel
+		}
+		if selected == -1 || level > selectedLevel {
+			selected, selectedLevel = index, level
+		}
+	}
+	return selected, nil
+}
+
+func (s *SMTInternalizerState) selectWatchLiteral(literals []SMTLiteral, startingAt int) (int, error) {
+	if len(literals) < 2 || startingAt < 0 || startingAt >= len(literals) {
+		return -1, ast.ErrASTDomain
+	}
+	minTrue, maxFalse, unknown := -1, -1, -1
+	for index := startingAt; index < len(literals); index++ {
+		value, err := s.Assignment(literals[index])
+		if err != nil {
+			return -1, err
+		}
+		switch value {
+		case lbool.False:
+			if maxFalse == -1 || s.booleanData[literals[index].Var()].ScopeLevel > s.booleanData[literals[maxFalse].Var()].ScopeLevel {
+				maxFalse = index
+			}
+		case lbool.Undef:
+			unknown = index
+		case lbool.True:
+			if minTrue == -1 || s.booleanData[literals[index].Var()].ScopeLevel < s.booleanData[literals[minTrue].Var()].ScopeLevel {
+				minTrue = index
+			}
+		}
+	}
+	if minTrue != -1 {
+		return minTrue, nil
+	}
+	if unknown != -1 {
+		return unknown, nil
+	}
+	if maxFalse != -1 {
+		return maxFalse, nil
+	}
+	return -1, ast.ErrASTDomain
 }
 
 // AddLearnedClause installs a conflict lemma into the current logical scope.
 func (s *SMTInternalizerState) AddLearnedClause(literals []SMTLiteral) error {
+	return s.AddLearnedClauseWithProof(literals, ast.ASTHandle{})
+}
+
+// AddLearnedClauseWithProof installs a conflict lemma and transfers an owned
+// reference to its proof wrapper when proof production is enabled.
+func (s *SMTInternalizerState) AddLearnedClauseWithProof(literals []SMTLiteral, proof ast.ASTHandle) error {
 	if err := s.open(); err != nil {
 		return err
 	}
 	if len(literals) == 0 {
 		return ast.ErrASTDomain
 	}
-	return s.addClauseKind(literals, false, SMTClauseLearned, ast.ASTHandle{})
+	return s.addClauseKind(literals, false, SMTClauseLearned, proof)
 }
 
 func (s *SMTInternalizerState) markRelevant(expression ast.ASTHandle) error {

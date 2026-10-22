@@ -104457,6 +104457,8 @@
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
         "TestSMTInternalizerInstallsLearnedClauseInCurrentScope",
+        "TestSMTInternalizerLearnedClausePreservesFalseAntecedents",
+        "TestSMTInternalizerLearnedClauseRetainsProof",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
@@ -106752,6 +106754,9 @@
         "TestSMTInternalizerDeepAssertionUsesTopologicalPrepass",
         "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
+        "TestSMTInternalizerLearnedClausePreservesFalseAntecedents",
+        "TestSMTInternalizerLearnedClauseRetainsProof",
+        "TestSMTDynamicAckManagerBuildsPairAndTripleClauses",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTBinaryClauseOptimizationPropagationAndInvariant",
         "TestSMTBinaryClauseOptimizationConflictAndEligibility",
@@ -107186,7 +107191,17 @@
           ]
         },
         {
-          "name": "learned and auxiliary-lemma watch selection and reinitialization, proof-producing gate and root clauses, and clause garbage collection",
+          "name": "learned and auxiliary-lemma watch selection, learned-proof retention, and immediate conflict and asserting-literal propagation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer.go",
+          "tests": [
+            "TestSMTInternalizerLearnedClausePreservesFalseAntecedents",
+            "TestSMTInternalizerLearnedClauseRetainsProof",
+            "TestSMTDynamicAckManagerBuildsPairAndTripleClauses"
+          ]
+        },
+        {
+          "name": "search-scope clause reinitialization, proof-producing gate and root clauses, and clause garbage collection",
           "status": "unported",
           "go_target": null,
           "tests": []

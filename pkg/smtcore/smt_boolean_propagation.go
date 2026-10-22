@@ -116,7 +116,7 @@ func (s *SMTInternalizerState) makeClauseWithJustificationAndDeleteHandler(liter
 	}
 	owner := justification
 	if !proof.IsNull() {
-		owner, err = NewSMTJustificationProofWrapper(s.manager, proof, true)
+		owner, err = NewSMTJustificationProofWrapper(s.manager, proof, kind == SMTClauseAux)
 		if err != nil {
 			return nil, nil, err
 		}

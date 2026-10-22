@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel(t *testing.T) {
@@ -68,6 +69,73 @@ func TestSMTInternalizerInstallsLearnedClauseInCurrentScope(t *testing.T) {
 	astTestMust(t, state.PopScopes(1))
 	if len(state.Clauses()) != 0 {
 		t.Fatal("learned clause survived its logical scope")
+	}
+}
+
+func TestSMTInternalizerLearnedClausePreservesFalseAntecedents(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	literals := make([]SMTLiteral, 3)
+	for index := range literals {
+		expression := smtRelevancyBool(t, m, "learned-preserve-"+string(rune('a'+index)))
+		astTestMust(t, state.Internalize(expression, true))
+		variable, found := state.BoolVar(expression)
+		if !found {
+			t.Fatal("missing learned-clause variable", index)
+		}
+		literals[index] = NewSMTLiteral(variable, false)
+	}
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.AssignLiteral(literals[1].Negated(), NewSMTBooleanAxiom()))
+	astTestMust(t, state.AssignLiteral(literals[2].Negated(), NewSMTBooleanAxiom()))
+	astTestMust(t, state.AddLearnedClause(literals))
+	if len(state.clauses) != 1 || len(state.clauses[0].clause.Literals()) != 3 {
+		t.Fatal("learned clause discarded false antecedents", state.Clauses())
+	}
+	value, err := state.Assignment(literals[0])
+	astTestMust(t, err)
+	if value != lbool.True {
+		t.Fatal("learned clause did not propagate asserting literal", value)
+	}
+	justification := state.booleanData[literals[0].Var()].Justification()
+	clause, ok := justification.Clause()
+	if !ok || clause != state.clauses[0].clause {
+		t.Fatal("asserting literal lost learned-clause justification")
+	}
+}
+
+func TestSMTInternalizerLearnedClauseRetainsProof(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	literals := make([]SMTLiteral, 2)
+	expressions := make([]ast.ASTHandle, 2)
+	for index := range literals {
+		expressions[index] = smtRelevancyBool(t, m, "learned-proof-"+string(rune('a'+index)))
+		astTestMust(t, state.Internalize(expressions[index], true))
+		variable, found := state.BoolVar(expressions[index])
+		if !found {
+			t.Fatal("missing learned-clause variable", index)
+		}
+		literals[index] = NewSMTLiteral(variable, false)
+	}
+	fact, err := m.MkOrArgs(expressions)
+	astTestMust(t, err)
+	proof, err := m.MkProofHypothesis(fact)
+	astTestMust(t, err)
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.AddLearnedClauseWithProof(literals, proof))
+	clause := state.clauses[0].clause
+	builder := &smtConflictProofBuilder{
+		state: state, marked: make(map[int32]struct{}), literal: make(map[SMTLiteral]ast.ASTHandle),
+		objects: make(map[SMTJustification]ast.ASTHandle), equality: make(map[smtEnodePairKey]ast.ASTHandle),
+	}
+	got, err := builder.clauseProof(clause)
+	astTestMust(t, err)
+	gotFact, err := m.GetProofFact(got)
+	astTestMust(t, err)
+	if gotFact != fact {
+		t.Fatal("learned clause proof fact", gotFact, fact)
 	}
 }
 
