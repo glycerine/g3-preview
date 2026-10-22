@@ -725,3 +725,37 @@ func TestDirectProofLocalizedAxioms(t *testing.T) {
 		t.Fatal("localized axiom", localized, direct.localizationVariables)
 	}
 }
+
+func TestDirectProofNoProofResolutionLocalization(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	pivot, err := manager.Make(OperatorIff, p, q)
+	interpMust(t, err)
+	negativePivot, err := manager.MkNot(pivot)
+	interpMust(t, err)
+	positiveConjunction, err := direct.makeContraNode(direct.noProof, []ast.ASTHandle{pivot}, 0)
+	interpMust(t, err)
+	negativeConjunction, err := direct.makeContraNode(direct.noProof, []ast.ASTHandle{negativePivot}, 0)
+	interpMust(t, err)
+	positiveEntries, err := manager.Args(positiveConjunction)
+	interpMust(t, err)
+	negativeEntries, err := manager.Args(negativeConjunction)
+	interpMust(t, err)
+	for _, test := range []struct {
+		firstPivot, firstConjunction, secondPivot, secondConjunction ast.ASTHandle
+	}{
+		{positiveEntries[1], positiveConjunction, negativeEntries[1], negativeConjunction},
+		{negativeEntries[1], negativeConjunction, positiveEntries[1], positiveConjunction},
+	} {
+		result, e := direct.resolveContradictions(test.firstPivot, test.firstConjunction, test.secondPivot, test.secondConjunction)
+		interpMust(t, e)
+		if result.IsNull() {
+			t.Fatal("localized no-proof resolution")
+		}
+	}
+	if len(direct.localizationVariables) == 0 {
+		t.Fatal("no localization variable recorded")
+	}
+}

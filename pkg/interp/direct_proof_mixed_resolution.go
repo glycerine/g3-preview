@@ -291,7 +291,7 @@ func (p *DirectProofInterpolator) resolveContradictions(pivot1, conjunction1, pi
 		return ast.ASTHandle{}, err
 	}
 	if proof1 == p.noProof && proof2 == p.noProof {
-		return ast.ASTHandle{}, ProofError{}
+		return p.resolveWithLocalization(pivot1, conjunction1, pivot2, conjunction2)
 	}
 	if proof1 == p.noProof {
 		pivot1, conjunction1, pivot2, conjunction2 = pivot2, conjunction2, pivot1, conjunction1
@@ -318,4 +318,67 @@ func (p *DirectProofInterpolator) resolveContradictions(pivot1, conjunction1, pi
 		return p.simplifyProofTerm(proof)
 	}
 	return p.base.manager.Make(OperatorAnd, resolvent...)
+}
+
+func (p *DirectProofInterpolator) resolveWithLocalization(pivot1, conjunction1, pivot2, conjunction2 ast.ASTHandle) (ast.ASTHandle, error) {
+	literal, err := p.base.manager.Arg(pivot1, 1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	op, err := p.base.manager.Operator(literal)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if op == OperatorNot {
+		return p.resolveWithLocalization(pivot2, conjunction2, pivot1, conjunction1)
+	}
+	localized, equalityProof, err := p.localizeTerm(literal, p.scope)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	localizedHypothesis, err := p.MakeHypothesis(localized)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	equality, err := p.base.manager.Make(OperatorIff, localized, literal)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	positiveProof, err := p.MakeModusPonens(equality, localizedHypothesis, equalityProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	positiveResult, err := p.MakeResolution(literal, nil, conjunction1, positiveProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negativeLiteral, err := p.base.manager.MkNot(literal)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negativeLocalized, err := p.base.manager.MkNot(localized)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negativeEquality, err := p.base.manager.Make(OperatorIff, negativeLocalized, negativeLiteral)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negativeEqualityProof, err := p.MakeCongruence(equality, negativeEquality, equalityProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negativeHypothesis, err := p.MakeHypothesis(negativeLocalized)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negativeProof, err := p.MakeModusPonens(negativeEquality, negativeHypothesis, negativeEqualityProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negativeResult, err := p.MakeResolution(negativeLiteral, nil, conjunction2, negativeProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.MakeResolution(localized, nil, positiveResult, negativeResult)
 }
