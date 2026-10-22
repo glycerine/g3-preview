@@ -39,6 +39,75 @@ func (m *Manager) PrintClause(out io.Writer, clause []ast.ASTHandle) error {
 	return interpWrite(out, ")")
 }
 
+func (m *Manager) PrintLiteral(out io.Writer, literal ast.ASTHandle) error {
+	if err := m.open(); err != nil {
+		return err
+	}
+	isNot, absolute, err := m.ast.IsNot(literal)
+	if err != nil {
+		return err
+	}
+	if !isNot {
+		absolute = literal
+	}
+	op, err := m.Operator(absolute)
+	if err != nil {
+		return err
+	}
+	if op != OperatorAnd && op != OperatorOr && op != OperatorIff {
+		return m.PrintExpr(out, literal)
+	}
+	if isNot {
+		if err = interpWrite(out, "~"); err != nil {
+			return err
+		}
+	}
+	if err = interpWrite(out, "["); err != nil {
+		return err
+	}
+	if err = m.PrintExpr(out, absolute); err != nil {
+		return err
+	}
+	return interpWrite(out, "]")
+}
+
+func (m *Manager) Show(out io.Writer, expression ast.ASTHandle) error {
+	if err := m.open(); err != nil {
+		return err
+	}
+	if expression.IsNull() {
+		return interpWrite(out, "(null)\n")
+	}
+	if err := m.PrintExpr(out, expression); err != nil {
+		return err
+	}
+	return interpWrite(out, "\n")
+}
+
+func (m *Manager) ShowSymbol(out io.Writer, declaration ast.ASTHandle) error {
+	if err := m.open(); err != nil {
+		return err
+	}
+	if out == nil {
+		return NewError("invalid interpolation output")
+	}
+	printer, err := ast.NewLegacySMTPrinter(m.ast)
+	if err != nil {
+		return err
+	}
+	if err = printer.DisplayAST(out, declaration, 0, nil); err != nil {
+		return err
+	}
+	return interpWrite(out, "\n")
+}
+
+func (m *Manager) ShowClause(out io.Writer, clause []ast.ASTHandle) error {
+	if err := m.PrintClause(out, clause); err != nil {
+		return err
+	}
+	return interpWrite(out, "\n")
+}
+
 func (m *Manager) PrintSATProblem(out io.Writer, expression ast.ASTHandle) error {
 	if err := m.open(); err != nil {
 		return err

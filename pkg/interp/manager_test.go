@@ -222,6 +222,45 @@ func TestInterpolationManagerBorrowAndCopyGuards(t *testing.T) {
 	}
 }
 
+func TestInterpolationManagerDiagnosticDisplayHelpers(t *testing.T) {
+	m, w := interpManagerFixture(t)
+	boolSort, err := w.BoolType()
+	interpMust(t, err)
+	p, err := w.MakeVariable("display-helper-p", boolSort)
+	interpMust(t, err)
+	p = interpPin(t, m, p)
+	q, err := w.MakeVariable("display-helper-q", boolSort)
+	interpMust(t, err)
+	q = interpPin(t, m, q)
+	disjunction, err := w.Make(OperatorOr, p, q)
+	interpMust(t, err)
+	notDisjunction, err := w.Make(OperatorNot, disjunction)
+	interpMust(t, err)
+
+	var out bytes.Buffer
+	interpMust(t, w.PrintLiteral(&out, notDisjunction))
+	if text := out.String(); !strings.HasPrefix(text, "~[") || !strings.HasSuffix(text, "]") {
+		t.Fatal("compound literal", text)
+	}
+	out.Reset()
+	interpMust(t, w.Show(&out, ast.ASTHandle{}))
+	if out.String() != "(null)\n" {
+		t.Fatal("null display", out.String())
+	}
+	out.Reset()
+	interpMust(t, w.ShowClause(&out, []ast.ASTHandle{p, q}))
+	if text := out.String(); !strings.HasPrefix(text, "(") || !strings.HasSuffix(text, ")\n") {
+		t.Fatal("clause display", text)
+	}
+	out.Reset()
+	declaration, err := w.Symbol(p)
+	interpMust(t, err)
+	interpMust(t, w.ShowSymbol(&out, declaration))
+	if out.Len() == 0 || out.Bytes()[out.Len()-1] != '\n' {
+		t.Fatal("symbol display", out.String())
+	}
+}
+
 func TestInterpolationManagerOccursSubstitutionAndFreeVariables(t *testing.T) {
 	m, w := interpManagerFixture(t)
 	intSort, err := w.IntType()

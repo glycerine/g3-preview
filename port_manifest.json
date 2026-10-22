@@ -40687,11 +40687,12 @@
       "path": "src/interp/iz3mgr.cpp",
       "component": "interp",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/interp/manager.go",
         "pkg/interp/manager_arithmetic.go",
         "pkg/interp/manager_proof.go",
+        "pkg/interp/manager_quantifier.go",
         "pkg/interp/manager_rewrite.go"
       ],
       "tests": [
@@ -40708,6 +40709,10 @@
         "TestInterpolationManagerSimplifierConfigurationGuard",
         "TestInterpolationManagerLinearCombinations",
         "TestInterpolationManagerIntegerDivisionDecomposition",
+        "TestInterpolationManagerControllingEqualityQuantifiers",
+        "TestInterpolationManagerQuantifierDistributionAndArithmeticSolve",
+        "TestInterpolationManagerCloseUniversally",
+        "TestInterpolationManagerDiagnosticDisplayHelpers",
         "TestInterpolationManagerBorrowAndCopyGuards"
       ],
       "conditionals": [
@@ -40776,8 +40781,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "operator construction/classification, application and quantifier construction/cloning, structural and quantifier access, symbol/type/numeral access, variables, types, declarations, coefficients, Boolean simplifying constructors, occurrence/substitution, free-variable counting, and display helpers",
@@ -40788,7 +40793,8 @@
             "TestInterpolationManagerNumeralsTypesQuantifiersAndClone",
             "TestInterpolationManagerBooleanSimplifiers",
             "TestInterpolationManagerOccursSubstitutionAndFreeVariables",
-            "TestInterpolationManagerDisplayAndPrettyFormatting"
+            "TestInterpolationManagerDisplayAndPrettyFormatting",
+            "TestInterpolationManagerDiagnosticDisplayHelpers"
           ]
         },
         {
@@ -40822,26 +40828,33 @@
         },
         {
           "name": "free-variable universal closure and controlling-equality quantifier optimization",
-          "status": "unported",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/interp/manager_quantifier.go",
+          "tests": [
+            "TestInterpolationManagerControllingEqualityQuantifiers",
+            "TestInterpolationManagerQuantifierDistributionAndArithmeticSolve",
+            "TestInterpolationManagerCloseUniversally"
+          ]
         }
       ],
       "ownership": [
-        "The wrapper borrows ASTManager. Returned handles follow the Go AST package contract: consumers pin handles stored beyond the immediate operation. Full manager ownership audit remains open."
+        "The copy-guarded wrapper borrows ASTManager and optional parameter services. Close releases its owned theory rewriters. Returned handles follow the Go AST package contract and callers pin handles retained beyond the immediate operation; rewriting and integer-division entry points return owning ASTRef values. Parameter and numeral copies are released on all exits."
       ],
       "deviations": [
-        "Native Go maps replace source operator lookup tables. Structural operations use checked ASTHandle values; theory rewriting returns owning ASTRef values because rewritten roots can otherwise be reclaimed before caller pinning."
+        "Native Go maps replace source operator lookup tables. Structural operations use checked ASTHandle values; theory rewriting returns owning ASTRef values because rewritten roots can otherwise be reclaimed before caller pinning.",
+        "The inactive get_bound_substitutes block and declaration-parameter adapters unused by retained interpolation consumers are not exposed. Diagnostic stdout helpers accept an explicit io.Writer."
       ]
     },
     {
       "path": "src/interp/iz3mgr.h",
       "component": "interp",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/interp/manager.go",
         "pkg/interp/manager_arithmetic.go",
         "pkg/interp/manager_proof.go",
+        "pkg/interp/manager_quantifier.go",
         "pkg/interp/manager_rewrite.go"
       ],
       "tests": [
@@ -40858,6 +40871,10 @@
         "TestInterpolationManagerSimplifierConfigurationGuard",
         "TestInterpolationManagerLinearCombinations",
         "TestInterpolationManagerIntegerDivisionDecomposition",
+        "TestInterpolationManagerControllingEqualityQuantifiers",
+        "TestInterpolationManagerQuantifierDistributionAndArithmeticSolve",
+        "TestInterpolationManagerCloseUniversally",
+        "TestInterpolationManagerDiagnosticDisplayHelpers",
         "TestInterpolationManagerBorrowAndCopyGuards"
       ],
       "conditionals": [
@@ -40870,8 +40887,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Operator vocabulary, borrowed manager facade, structural/quantifier/numeral/type accessors, construction/cloning, predicates, Boolean simplification, substitution, free-variable counting, and display surface",
@@ -40883,6 +40900,7 @@
             "TestInterpolationManagerBooleanSimplifiers",
             "TestInterpolationManagerOccursSubstitutionAndFreeVariables",
             "TestInterpolationManagerDisplayAndPrettyFormatting",
+            "TestInterpolationManagerDiagnosticDisplayHelpers",
             "TestInterpolationManagerBorrowAndCopyGuards"
           ]
         },
@@ -40916,15 +40934,22 @@
           ]
         },
         {
-          "name": "remaining universal closure and optimized-quantification declarations",
-          "status": "unported",
-          "tests": []
+          "name": "universal closure and optimized-quantification declarations",
+          "status": "ported",
+          "go_target": "pkg/interp/manager_quantifier.go",
+          "tests": [
+            "TestInterpolationManagerControllingEqualityQuantifiers",
+            "TestInterpolationManagerQuantifierDistributionAndArithmeticSolve",
+            "TestInterpolationManagerCloseUniversally"
+          ]
         }
       ],
       "ownership": [
-        "Manager is a copy-guarded borrowed facade; persistent consumers remain responsible for explicit ASTRef ownership. Full header audit remains open."
+        "Manager is a copy-guarded borrowed facade over ASTManager and optional parameter services. It owns and closes configured theory rewriters; persistent handle consumers retain explicit ASTRef responsibility."
       ],
-      "deviations": []
+      "deviations": [
+        "The inactive get_bound_substitutes declaration and generic declaration-parameter adapters unused by retained interpolation consumers are omitted under the retained-consumer rule. Diagnostic stdout helpers take an explicit io.Writer."
+      ]
     },
     {
       "path": "src/interp/iz3pp.cpp",
