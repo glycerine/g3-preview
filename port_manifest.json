@@ -107692,7 +107692,7 @@
       "path": "src/smt/smt_kernel.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_asserted_formulas.go",
@@ -107848,8 +107848,16 @@
           ]
         },
         {
-          "name": "copy and reset",
-          "status": "unported",
+          "name": "base-level cross-manager kernel copy",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions"
+          ]
+        },
+        {
+          "name": "in-place placement-new reset without a retained solver-interface caller",
+          "status": "dead_deleted",
           "go_target": null,
           "tests": []
         }
@@ -107858,14 +107866,15 @@
         "SMTKernel owns formula and proof references for asserted entries, the latest terminal unsat proof reference, and its checker, relevancy propagator, and internalizer lifecycle."
       ],
       "deviations": [
-        "Check uses first-UIP learning and backjumping and returns undef when a theory gives up or requests continuation without observable progress."
+        "Check uses first-UIP learning and backjumping and returns undef when a theory gives up or requests continuation without observable progress.",
+        "Cross-manager Translate reconstructs a kernel and replays owned base assertions instead of invoking context::copy; the solver interface has no reset operation, so the source placement-new reset is not exposed."
       ]
     },
     {
       "path": "src/smt/smt_kernel.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_asserted_formulas.go",
@@ -108023,8 +108032,8 @@
           ]
         },
         {
-          "name": "reset and remaining diagnostics",
-          "status": "unported",
+          "name": "in-place reset and unconsumed internal diagnostic display entry points",
+          "status": "dead_deleted",
           "go_target": null,
           "tests": []
         }
@@ -108033,7 +108042,8 @@
         "Public formula, assertion, and proof views are borrowed AST handles; the kernel retains the underlying references until reset, pop, or close."
       ],
       "deviations": [
-        "The Go facade exposes errors directly; theory incompleteness and final-check continuation without progress produce undef."
+        "The Go facade exposes errors directly; theory incompleteness and final-check continuation without progress produce undef.",
+        "The retained solver facade uses Translate for copy semantics and has no reset method; no unused kernel-only reset adapter is added."
       ]
     },
     {
