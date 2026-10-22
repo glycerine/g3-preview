@@ -125820,12 +125820,16 @@
         "pkg/tactic/arith/propagate_ineq_clean.go",
         "pkg/tactic/arith/propagate_ineq_clean_test.go",
         "pkg/tactic/tactic_conditional.go",
-        "pkg/tactic/tactic_conditional_test.go"
+        "pkg/tactic/tactic_conditional_test.go",
+        "pkg/tactic/tactic_or_else.go",
+        "pkg/tactic/tactic_or_else_test.go"
       ],
       "tests": [
         "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
         "TestConditionalTacticsChooseWhenAndFailIf",
-        "TestConditionalTacticsGoalProductionGuards"
+        "TestConditionalTacticsGoalProductionGuards",
+        "TestOrElseRestoresGoalAfterTacticFailure",
+        "TestOrElseLastFailureAndSkipIfFailed"
       ],
       "conditionals": [
         {
@@ -126045,6 +126049,15 @@
           "tests": [
             "TestConditionalTacticsGoalProductionGuards"
           ]
+        },
+        {
+          "name": "n-ary or_else with goal snapshot restoration after tactic exceptions and skip_if_failed (tactical.cpp:272-459,1385-1387)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_or_else.go",
+          "tests": [
+            "TestOrElseRestoresGoalAfterTacticFailure",
+            "TestOrElseLastFailureAndSkipIfFailed"
+          ]
         }
       ],
       "ownership": [
@@ -126060,12 +126073,15 @@
       "go_targets": [
         "pkg/tactic/arith/propagate_ineq_clean.go",
         "pkg/tactic/arith/propagate_ineq_clean_test.go",
-        "pkg/tactic/tactic_conditional.go"
+        "pkg/tactic/tactic_conditional.go",
+        "pkg/tactic/tactic_or_else.go"
       ],
       "tests": [
         "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
         "TestConditionalTacticsChooseWhenAndFailIf",
-        "TestConditionalTacticsGoalProductionGuards"
+        "TestConditionalTacticsGoalProductionGuards",
+        "TestOrElseRestoresGoalAfterTacticFailure",
+        "TestOrElseLastFailureAndSkipIfFailed"
       ],
       "conditionals": [
         {
@@ -126095,6 +126111,15 @@
           "tests": [
             "TestConditionalTacticsChooseWhenAndFailIf",
             "TestConditionalTacticsGoalProductionGuards"
+          ]
+        },
+        {
+          "name": "typed n-ary or-else and skip-if-failed constructors",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_or_else.go",
+          "tests": [
+            "TestOrElseRestoresGoalAfterTacticFailure",
+            "TestOrElseLastFailureAndSkipIfFailed"
           ]
         }
       ],
