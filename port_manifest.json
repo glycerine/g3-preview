@@ -112782,9 +112782,14 @@
       "path": "src/smt/theory_arith_nl.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_arith_linear.go"
+      ],
+      "tests": [
+        "TestSMTSolverLinearArithmeticSquareNonnegative",
+        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113057,11 +113062,30 @@
           "text": "SASSERT(v != null_theory_var);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "even-power monomial nonnegative interval consequence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTSolverLinearArithmeticSquareNonnegative"
+          ]
+        },
+        {
+          "name": "nonlinear clustering, interval propagation, assignment repair, Horner and Grobner reasoning",
+          "status": "unported",
+          "go_target": null,
+          "tests": [
+            "TestSMTSolverLinearArithmeticRejectsNonlinearTerms"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The first retained nonlinear rule recognizes a syntactic square and decides its comparison with zero from the exact [0,+infinity) interval. Other nonlinear atoms remain unsupported and make CheckSat return unknown."
+      ]
     },
     {
       "path": "src/smt/theory_arith_pp.h",

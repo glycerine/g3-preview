@@ -1124,6 +1124,57 @@ func TestSMTSolverLinearArithmeticRejectsNonlinearTerms(t *testing.T) {
 	}
 }
 
+func TestSMTSolverLinearArithmeticSquareNonnegative(t *testing.T) {
+	for _, test := range []struct {
+		name       string
+		op         int32
+		squareLeft bool
+		negate     bool
+		want       lbool.LBool
+	}{
+		{name: "square-ge-zero", op: smtArithOpGE, squareLeft: true, want: lbool.True},
+		{name: "square-lt-zero", op: smtArithOpLT, squareLeft: true, want: lbool.False},
+		{name: "zero-le-square", op: smtArithOpLE, want: lbool.True},
+		{name: "zero-gt-square", op: smtArithOpGT, want: lbool.False},
+		{name: "negated-square-ge-zero", op: smtArithOpGE, squareLeft: true, negate: true, want: lbool.False},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m := astTestManager(t)
+			arithmetic, err := m.RegisterArithmeticPlugin()
+			astTestMust(t, err)
+			params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+			astTestMust(t, err)
+			s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: params})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
+			zero, err := m.ArithmeticRealNumeralText("0")
+			astTestMust(t, err)
+			realSort, err := m.GetSort(zero)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "square-x"), realSort)
+			astTestMust(t, err)
+			square, err := m.MkFamilyApp(arithmetic, smtArithOpMul, nil, []ast.ASTHandle{x, x})
+			astTestMust(t, err)
+			left, right := zero, square
+			if test.squareLeft {
+				left, right = square, zero
+			}
+			comparison, err := m.MkFamilyApp(arithmetic, test.op, nil, []ast.ASTHandle{left, right})
+			astTestMust(t, err)
+			if test.negate {
+				comparison, err = m.MkNot(comparison)
+				astTestMust(t, err)
+			}
+			astTestMust(t, s.Assert(comparison))
+			status, err := s.CheckSat(nil)
+			astTestMust(t, err)
+			if status != test.want {
+				t.Fatalf("square comparison status %v, want %v", status, test.want)
+			}
+		})
+	}
+}
+
 func TestSMTSolverSetupUsesPartialLinearIntegerArithmetic(t *testing.T) {
 	for _, test := range []struct {
 		name string

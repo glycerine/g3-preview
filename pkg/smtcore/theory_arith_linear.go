@@ -1,7 +1,8 @@
 // Source: retained linear rational fragment of src/smt/theory_arith.h,
 // src/smt/theory_arith_core.h, src/smt/theory_arith_core_def.h, and the
 // retained fragments of src/smt/theory_arith_int.h and
-// src/smt/theory_arith_eq.h, plus statistics from src/smt/theory_arith_pp.h.
+// src/smt/theory_arith_eq.h and src/smt/theory_arith_nl.h, plus statistics
+// from src/smt/theory_arith_pp.h.
 package smtcore
 
 import (
@@ -67,6 +68,8 @@ type smtLinearArithmeticAtom struct {
 	form      smtLinearForm
 	op        int32
 	supported bool
+	decided   bool
+	required  bool
 	truth     bool
 }
 
@@ -434,12 +437,16 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 	if err != nil {
 		return false, err
 	}
+	decided, required, decisionErr := t.squareComparison(left, right, op)
+	if decisionErr != nil {
+		return false, decisionErr
+	}
 	form, linear, err := t.linearize(left)
 	if err != nil {
 		return false, err
 	}
 	if !linear {
-		t.unsupported = true
+		t.unsupported = t.unsupported || !decided
 		form = newSMTLinearForm()
 	}
 	rhs, rhsLinear, err := t.linearize(right)
@@ -451,7 +458,7 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 		rhs.scale(big.NewRat(-1, 1))
 		form.add(&rhs)
 	} else {
-		t.unsupported = true
+		t.unsupported = t.unsupported || !decided
 		form = newSMTLinearForm()
 	}
 	variable, err := state.MkBoolVar(expression)
@@ -462,11 +469,68 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 		return false, err
 	}
 	t.atomByBool[variable] = len(t.atoms)
-	t.atoms = append(t.atoms, smtLinearArithmeticAtom{variable: variable, form: form, op: op, supported: linear})
+	t.atoms = append(t.atoms, smtLinearArithmeticAtom{variable: variable, form: form, op: op, supported: linear, decided: decided, required: required})
 	if linear {
 		t.statistics.addRows++
 	}
 	return true, nil
+}
+
+func (t *SMTLinearArithmeticTheory) squareComparison(left, right ast.ASTHandle, op int32) (bool, bool, error) {
+	zero := func(expression ast.ASTHandle) (bool, error) {
+		value, numeral, err := t.numeral(expression)
+		return numeral && value.Sign() == 0, err
+	}
+	square := func(expression ast.ASTHandle) (bool, error) {
+		operation, arithmetic, err := t.operation(expression)
+		if err != nil || !arithmetic || operation != smtArithOpMul {
+			return false, err
+		}
+		state, _ := t.State()
+		count, err := state.manager.GetNumArgs(expression)
+		if err != nil || count != 2 {
+			return false, err
+		}
+		first, err := state.manager.GetArg(expression, 0)
+		if err != nil {
+			return false, err
+		}
+		second, err := state.manager.GetArg(expression, 1)
+		return first == second, err
+	}
+	leftSquare, err := square(left)
+	if err != nil {
+		return false, false, err
+	}
+	rightZero, err := zero(right)
+	if err != nil {
+		return false, false, err
+	}
+	if leftSquare && rightZero {
+		if op == smtArithOpGE {
+			return true, true, nil
+		}
+		if op == smtArithOpLT {
+			return true, false, nil
+		}
+	}
+	rightSquare, err := square(right)
+	if err != nil {
+		return false, false, err
+	}
+	leftZero, err := zero(left)
+	if err != nil {
+		return false, false, err
+	}
+	if rightSquare && leftZero {
+		if op == smtArithOpLE {
+			return true, true, nil
+		}
+		if op == smtArithOpGT {
+			return true, false, nil
+		}
+	}
+	return false, false, nil
 }
 
 func (t *SMTLinearArithmeticTheory) Assign(variable int32, truth bool) error {
@@ -942,6 +1006,14 @@ func (t *SMTLinearArithmeticTheory) Propagate() error {
 		return err
 	}
 	t.assertionHead = len(t.assertions)
+	for _, assertion := range t.assertions {
+		atom := &t.atoms[assertion.atom]
+		if atom.decided && assertion.truth != atom.required {
+			t.statistics.conflicts++
+			literal := smtLinearAssertionLiteral(atom, assertion)
+			return state.SetTheoryConflict(t.FamilyID(), []SMTLiteral{literal})
+		}
+	}
 	feasible, err := t.rebuild()
 	if err != nil || feasible || state.inconsistent {
 		return err
