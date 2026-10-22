@@ -107465,7 +107465,10 @@
         "TestSMTSolverForwardsFastProgressSamples",
         "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
         "TestSMTKernelCapturesRelevantLabeledLiterals",
-        "TestSMTKernelDisplayStatisticsResetAndCancellation"
+        "TestSMTKernelDisplayStatisticsResetAndCancellation",
+        "TestSMTSolverDerivesBooleanConsequences",
+        "TestSMTSolverFindsBinaryClauseMutexes",
+        "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -107566,7 +107569,24 @@
           ]
         },
         {
-          "name": "copy and reset, consequences, mutexes, and preferred SAT",
+          "name": "Boolean consequence extraction and binary-clause mutex discovery through the solver facade",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverDerivesBooleanConsequences",
+            "TestSMTSolverFindsBinaryClauseMutexes"
+          ]
+        },
+        {
+          "name": "base-level cross-manager translation of kernel and tracked assertions",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions"
+          ]
+        },
+        {
+          "name": "copy and reset, and preferred SAT",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -107606,7 +107626,10 @@
         "TestSMTSolverForwardsFastProgressSamples",
         "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
         "TestSMTKernelCapturesRelevantLabeledLiterals",
-        "TestSMTKernelDisplayStatisticsResetAndCancellation"
+        "TestSMTKernelDisplayStatisticsResetAndCancellation",
+        "TestSMTSolverDerivesBooleanConsequences",
+        "TestSMTSolverFindsBinaryClauseMutexes",
+        "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions"
       ],
       "conditionals": [
         {
@@ -107717,7 +107740,17 @@
           ]
         },
         {
-          "name": "translation, reset, derived queries, labels, and other diagnostics",
+          "name": "base-level cross-manager translation and retained derived queries",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
+            "TestSMTSolverDerivesBooleanConsequences",
+            "TestSMTSolverFindsBinaryClauseMutexes"
+          ]
+        },
+        {
+          "name": "reset, preferred SAT, and remaining diagnostics",
           "status": "unported",
           "go_target": null,
           "tests": []
