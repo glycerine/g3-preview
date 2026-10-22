@@ -17,6 +17,7 @@ import (
 // interpolation layer and tactic adapters.
 type Solver interface {
 	CheckSatResult
+	Close() error
 	Translate(*ast.ASTManager, *uparams.ParamsRef) (Solver, error)
 	UpdateParams(*uparams.ParamsRef) error
 	Params() (*uparams.ParamsRef, error)
@@ -41,6 +42,7 @@ type Solver interface {
 
 type Factory interface {
 	New(*ast.ASTManager, *uparams.ParamsRef, bool, bool, bool, string) (Solver, error)
+	Close() error
 }
 
 type FactoryFunc func(*ast.ASTManager, *uparams.ParamsRef, bool, bool, bool, string) (Solver, error)
@@ -51,6 +53,7 @@ func (f FactoryFunc) New(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models
 	}
 	return f(m, p, proofs, models, cores, logic)
 }
+func (FactoryFunc) Close() error { return nil }
 
 func Assertions(s Solver) ([]ast.ASTHandle, error) {
 	if s == nil {

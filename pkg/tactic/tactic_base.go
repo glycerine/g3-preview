@@ -44,6 +44,7 @@ type Tactic interface {
 // adapters replace the C++ factory-declaration macros.
 type TacticFactory interface {
 	New(*ast.ASTManager, *uparams.ParamsRef) (Tactic, error)
+	Close() error
 }
 
 type TacticFactoryFunc func(*ast.ASTManager, *uparams.ParamsRef) (Tactic, error)
@@ -54,6 +55,7 @@ func (f TacticFactoryFunc) New(m *ast.ASTManager, p *uparams.ParamsRef) (Tactic,
 	}
 	return f(m, p)
 }
+func (TacticFactoryFunc) Close() error { return nil }
 
 // TacticResult owns the subgoal, converter and dependency references returned
 // by one tactic application.

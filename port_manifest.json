@@ -113541,22 +113541,84 @@
       "path": "src/solver/tactic2solver.cpp",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/tactic_solver.go",
+        "pkg/solver/tactic_solver_test.go"
+      ],
+      "tests": [
+        "TestTacticSolverSATUnknownScopesAndFailureReason",
+        "TestTacticSolverTrackedCoreProofFactoriesAndTranslation",
+        "TestTacticSolverBaseLevelTranslation",
+        "TestTacticFactoryToSolverFactory",
+        "TestTacticSolverExceptionTransportAndTrace"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tactic-backed assertion/result state, parameter forwarding, scopes, statistics and result access (tactic2solver.cpp:34-85,183-222)",
+          "status": "ported",
+          "go_target": "pkg/solver/tactic_solver.go",
+          "tests": [
+            "TestTacticSolverSATUnknownScopesAndFailureReason",
+            "TestTacticSolverTrackedCoreProofFactoriesAndTranslation"
+          ]
+        },
+        {
+          "name": "from-scratch tactic check with goal construction, assumptions, models, proofs, cores, exception transport, statistics and cleanup (tactic2solver.cpp:87-153)",
+          "status": "ported",
+          "go_target": "pkg/solver/tactic_solver.go",
+          "tests": [
+            "TestTacticSolverSATUnknownScopesAndFailureReason",
+            "TestTacticSolverTrackedCoreProofFactoriesAndTranslation",
+            "TestTacticSolverExceptionTransportAndTrace"
+          ]
+        },
+        {
+          "name": "base-level cross-manager translation of tactic and assertions (tactic2solver.cpp:156-180)",
+          "status": "ported",
+          "go_target": "pkg/solver/tactic_solver.go",
+          "tests": [
+            "TestTacticSolverBaseLevelTranslation",
+            "TestTacticSolverTrackedCoreProofFactoriesAndTranslation"
+          ]
+        },
+        {
+          "name": "direct-tactic and tactic-factory solver factories with owning lifetimes (tactic2solver.cpp:225-293)",
+          "status": "ported",
+          "go_target": "pkg/solver/tactic_solver.go",
+          "tests": [
+            "TestTacticSolverTrackedCoreProofFactoriesAndTranslation",
+            "TestTacticFactoryToSolverFactory"
+          ]
+        }
+      ],
+      "ownership": [
+        "TacticSolver owns independent ASTRef pins for assertions, an owned parameter snapshot, its current result, named-assumption adapter and one retained tactic reference.",
+        "CheckSatCore owns its goal, model reference, proof reference and dependency reference for the invocation and copies all published result values before cleanup.",
+        "Both factory forms own their tactic or tactic-factory resource until explicit Close and can create multiple independent solvers."
+      ],
+      "deviations": [
+        "TacticSolverConfig supplies explicit parameter, evaluator and trace services that were process-global or implicit in the source.",
+        "Go error classification replaces C++ catch clauses; Z3Error remains fatal while other tactic errors become unknown results with their message."
+      ]
     },
     {
       "path": "src/solver/tactic2solver.h",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/tactic_solver.go",
+        "pkg/solver/tactic_solver_test.go"
+      ],
+      "tests": [
+        "TestTacticSolverSATUnknownScopesAndFailureReason",
+        "TestTacticSolverTrackedCoreProofFactoriesAndTranslation",
+        "TestTacticSolverBaseLevelTranslation",
+        "TestTacticFactoryToSolverFactory"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -113567,11 +113629,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tactic solver constructor and direct/factory adapter declarations (tactic2solver.h:28-41)",
+          "status": "ported",
+          "go_target": "pkg/solver/tactic_solver.go",
+          "tests": [
+            "TestTacticSolverSATUnknownScopesAndFailureReason",
+            "TestTacticSolverTrackedCoreProofFactoriesAndTranslation",
+            "TestTacticFactoryToSolverFactory"
+          ]
+        }
+      ],
+      "ownership": [
+        "Constructors retain tactics and copy parameters; typed Factory values expose explicit Close for source destructor ownership."
+      ],
+      "deviations": [
+        "A configuration object carries explicit Go services alongside the source constructor arguments."
+      ]
     },
     {
       "path": "src/tactic/CMakeLists.txt",
