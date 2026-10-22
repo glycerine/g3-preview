@@ -468,6 +468,10 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if err != nil || reduced {
 			return reduced, err
 		}
+		branched, err := t.branchLeadingVariableOverlap(left, right)
+		if err != nil || branched {
+			return branched, err
+		}
 		rejected, err = t.rejectImpossibleCyclicBinaryEquation(left, right, dependency)
 		if err != nil || rejected {
 			return rejected, err
@@ -476,7 +480,7 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if err != nil || constrained {
 			return constrained, err
 		}
-		branched, err := t.branchVariableFixedUnitWordEquation(left, right)
+		branched, err = t.branchVariableFixedUnitWordEquation(left, right)
 		if err != nil || branched {
 			return branched, err
 		}

@@ -558,6 +558,51 @@ func TestSMTSequenceTheoryRejectsFixedLengthWordMismatch(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryBranchesLeadingVariableOverlap(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-overlap-leading-x"), sort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-overlap-leading-y"), sort)
+	astTestMust(t, err)
+	left, err := m.MkSequenceConcat(x, a)
+	astTestMust(t, err)
+	right, err := m.MkSequenceConcat(y, b)
+	astTestMust(t, err)
+	wordEquality, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	xLength, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	yLength, err := m.MkSequenceLength(y)
+	astTestMust(t, err)
+	lengthOrder, err := m.MkArithmeticLE(xLength, yLength)
+	astTestMust(t, err)
+	leftName, err := m.Symbols.Intern("seq.left")
+	astTestMust(t, err)
+	shared, err := m.MkSequenceSkolem(leftName, []ast.ASTHandle{x, y}, sort)
+	astTestMust(t, err)
+	xDefinition, err := m.MkEq(x, shared)
+	astTestMust(t, err)
+	notXDefinition, err := m.MkNot(xDefinition)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(wordEquality))
+	astTestMust(t, solver.Assert(lengthOrder))
+	astTestMust(t, solver.Assert(notXDefinition))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("leading variable overlap branch", status)
+	}
+}
+
 func TestSMTSequenceTheoryLengthCoherenceDecomposition(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	value, err := m.MkString("a")

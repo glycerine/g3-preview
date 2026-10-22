@@ -257,3 +257,92 @@ func (t *SMTSequenceTheory) rejectFixedLengthMismatch(left, right []ast.ASTHandl
 	}
 	return true, t.setDependencyConflict(dependency)
 }
+
+func (t *SMTSequenceTheory) branchLeadingVariableOverlap(left, right []ast.ASTHandle) (bool, error) {
+	for pass := 0; pass < 2; pass++ {
+		if len(left) > 1 && len(right) > 1 && left[0] != right[0] {
+			leftVariable, err := t.sequenceVariable(left[0])
+			if err != nil {
+				return false, err
+			}
+			rightVariable, err := t.sequenceVariable(right[0])
+			if err != nil {
+				return false, err
+			}
+			if leftVariable && rightVariable {
+				state, stateErr := t.State()
+				if stateErr != nil {
+					return false, stateErr
+				}
+				sort, makeErr := state.manager.GetSort(left[0])
+				if makeErr != nil {
+					return false, makeErr
+				}
+				arguments := []ast.ASTHandle{left[0], right[0]}
+				shared, makeErr := t.relationSkolem("seq.left", arguments, sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				remainder, makeErr := t.relationSkolem("seq.right", arguments, sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				leftDefinition, makeErr := state.manager.MkEq(left[0], shared)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				rightWord, makeErr := state.manager.MkSequenceConcat(shared, remainder)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				rightDefinition, makeErr := state.manager.MkEq(right[0], rightWord)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				definitions, makeErr := state.manager.MkAnd(leftDefinition, rightDefinition)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				leftLength, makeErr := state.manager.MkSequenceLength(left[0])
+				if makeErr != nil {
+					return false, makeErr
+				}
+				rightLength, makeErr := state.manager.MkSequenceLength(right[0])
+				if makeErr != nil {
+					return false, makeErr
+				}
+				lengthOrder, makeErr := state.manager.MkArithmeticLE(leftLength, rightLength)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				leftWord, makeErr := t.makeWord(left, sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				fullRightWord, makeErr := t.makeWord(right, sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				wordEquality, makeErr := state.manager.MkEq(leftWord, fullRightWord)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				antecedent, makeErr := state.manager.MkAnd(wordEquality, lengthOrder)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				constraint, makeErr := state.manager.MkImplies(antecedent, definitions)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				if _, found := t.axioms.set[constraint]; found {
+					return false, nil
+				}
+				t.trackInternalTerms(shared, remainder, rightWord)
+				return true, t.axioms.Push(constraint)
+			}
+		}
+		left, right = right, left
+	}
+	return false, nil
+}
