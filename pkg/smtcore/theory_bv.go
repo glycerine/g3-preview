@@ -1565,6 +1565,21 @@ func (t *SMTBitVectorTheory) InitializeModel(generator *SMTModelGenerator) error
 	return generator.RegisterFactory(factory)
 }
 
+// IncludeFunctionInterpretation retains the source model hook for the five
+// unspecified division-by-zero functions.
+func (t *SMTBitVectorTheory) IncludeFunctionInterpretation(declaration ast.ASTHandle) bool {
+	state, err := t.State()
+	if err != nil {
+		return false
+	}
+	family, err := state.manager.GetFamilyID(declaration)
+	if err != nil || family != t.FamilyID() {
+		return false
+	}
+	op, err := state.manager.GetDeclKind(declaration)
+	return err == nil && op >= 12 && op <= 16
+}
+
 func (t *SMTBitVectorTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
 	if node == nil || generator == nil || !t.IsAttachedToVariable(node) || generator.model == nil {
 		return nil, ast.ErrASTDomain

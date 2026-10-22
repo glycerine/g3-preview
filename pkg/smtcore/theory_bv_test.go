@@ -208,6 +208,19 @@ func TestSMTBitVectorDivisionByZeroValueIsUninterpreted(t *testing.T) {
 	if status != lbool.True {
 		t.Fatal("uninterpreted BV division-by-zero value", status)
 	}
+	family, err := m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	theory, ok := solver.kernel.internalizer.theories[family].(*SMTBitVectorTheory)
+	if !ok || theory == nil {
+		t.Fatal("missing bit-vector theory")
+	}
+	declaration, err := m.GetDecl(division)
+	astTestMust(t, err)
+	leftDeclaration, err := m.GetDecl(left)
+	astTestMust(t, err)
+	if !theory.IncludeFunctionInterpretation(declaration) || theory.IncludeFunctionInterpretation(leftDeclaration) {
+		t.Fatal("division-by-zero model interpretation selection")
+	}
 }
 
 func TestSMTBitVectorUnsignedDivisionCircuit(t *testing.T) {
