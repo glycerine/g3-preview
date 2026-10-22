@@ -148,3 +148,70 @@ func TestInterpolationManagerTriangleEqualityKinds(t *testing.T) {
 		})
 	}
 }
+
+func TestInterpolationManagerAssignBoundsAndCoefficientTerms(t *testing.T) {
+	m, w := interpProofManagerFixture(t)
+	intSort, err := w.IntType()
+	interpMust(t, err)
+	x, err := w.MakeVariable("assign-bounds-x", intSort)
+	interpMust(t, err)
+	x = interpPin(t, m, x)
+	zero, err := w.MakeIntText("0")
+	interpMust(t, err)
+	zero = interpPin(t, m, zero)
+	one, err := w.MakeIntText("1")
+	interpMust(t, err)
+	one = interpPin(t, m, one)
+	le, err := w.Make(OperatorLE, x, zero)
+	interpMust(t, err)
+	le = interpPin(t, m, le)
+	ge, err := w.Make(OperatorGE, x, one)
+	interpMust(t, err)
+	ge = interpPin(t, m, ge)
+	clause, err := w.Make(OperatorOr, le, ge)
+	interpMust(t, err)
+	clause = interpPin(t, m, clause)
+	arithmetic, err := m.ArithmeticFamilyID()
+	interpMust(t, err)
+
+	axiom := interpTheoryLemma(t, m, arithmetic, "assign-bounds", clause, nil, "-1/2")
+	coefficients, err := w.AssignBoundsCoefficients(axiom)
+	interpMust(t, err)
+	if len(coefficients) != 2 || coefficients[0].RatString() != "2" || coefficients[1].RatString() != "1" {
+		t.Fatal("assign-bounds axiom coefficients", coefficients)
+	}
+	terms, err := w.AssignBoundsCoefficientTerms(axiom)
+	interpMust(t, err)
+	if len(terms) != 2 {
+		t.Fatal("assign-bounds term count", len(terms))
+	}
+	for i, want := range []string{"2", "1"} {
+		if got, e := w.StringOfNumeral(terms[i]); e != nil || got != want {
+			t.Fatal("assign-bounds term", i, got, e)
+		}
+	}
+
+	premise, err := m.MkProofAsserted(ge)
+	interpMust(t, err)
+	premise = interpPin(t, m, premise)
+	rule := interpTheoryLemma(t, m, arithmetic, "assign-bounds", clause, []ast.ASTHandle{premise}, "-1/2")
+	coefficients, err = w.AssignBoundsRuleCoefficients(rule)
+	interpMust(t, err)
+	if len(coefficients) != 2 || coefficients[0].RatString() != "2" || coefficients[1].RatString() != "1" {
+		t.Fatal("assign-bounds rule coefficients", coefficients)
+	}
+	ruleTerms, err := w.AssignBoundsRuleCoefficientTerms(rule)
+	interpMust(t, err)
+	if len(ruleTerms) != 2 {
+		t.Fatal("assign-bounds rule term count", len(ruleTerms))
+	}
+
+	farkas := interpTheoryLemma(t, m, arithmetic, "farkas", clause, nil, "-1/2")
+	farkasTerms, err := w.FarkasCoefficientTerms(farkas)
+	interpMust(t, err)
+	gomoryTerms, err := w.GomoryCutCoefficientTerms(farkas)
+	interpMust(t, err)
+	if len(farkasTerms) != 1 || len(gomoryTerms) != 1 {
+		t.Fatal("coefficient term overloads", len(farkasTerms), len(gomoryTerms))
+	}
+}

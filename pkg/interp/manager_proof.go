@@ -257,6 +257,137 @@ func (m *Manager) GomoryCutCoefficients(proof ast.ASTHandle) ([]*big.Rat, error)
 	return m.theoryLemmaCoefficients(proof, true)
 }
 
+func (m *Manager) inequalityHasNegativeOrientation(inequality ast.ASTHandle) (bool, error) {
+	isNot, body, err := m.ast.IsNot(inequality)
+	if err != nil {
+		return false, err
+	}
+	target := inequality
+	if isNot {
+		target = body
+	}
+	op, err := m.Operator(target)
+	if err != nil {
+		return false, err
+	}
+	if isNot {
+		return op == OperatorLE || op == OperatorLT, nil
+	}
+	return op == OperatorGE || op == OperatorGT, nil
+}
+
+func (m *Manager) assignBoundsCoefficients(proof ast.ASTHandle, rule bool) (result []*big.Rat, err error) {
+	parameters, err := m.proofParameters(proof)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { err = errors.Join(err, m.releaseParameters(parameters)) }()
+	if len(parameters) < 2 {
+		return nil, NewError("Bad Farkas coefficient")
+	}
+	conclusion, err := m.Conclusion(proof)
+	if err != nil {
+		return nil, err
+	}
+	consequence, err := m.Arg(conclusion, 0)
+	if err != nil {
+		return nil, err
+	}
+	consequenceNegative, err := m.inequalityHasNegativeOrientation(consequence)
+	if err != nil {
+		return nil, err
+	}
+	result = make([]*big.Rat, len(parameters)-1)
+	result[0] = new(big.Rat).SetInt64(1)
+	for i := 2; i < len(parameters); i++ {
+		value, e := m.rationalParameter(parameters[i])
+		if e != nil {
+			return nil, e
+		}
+		var inequality ast.ASTHandle
+		if rule {
+			premise, e := m.Premise(proof, uint32(i-2))
+			if e != nil {
+				return nil, e
+			}
+			inequality, e = m.Conclusion(premise)
+			if e != nil {
+				return nil, e
+			}
+		} else {
+			inequality, e = m.Arg(conclusion, uint32(i-1))
+			if e != nil {
+				return nil, e
+			}
+		}
+		negative, e := m.inequalityHasNegativeOrientation(inequality)
+		if e != nil {
+			return nil, e
+		}
+		if negative != consequenceNegative {
+			value.Neg(value)
+		}
+		if value.Sign() < 0 {
+			value.Neg(value)
+		}
+		result[i-1] = value
+	}
+	normalizeCoefficientDenominators(result)
+	return result, nil
+}
+
+func (m *Manager) AssignBoundsCoefficients(proof ast.ASTHandle) ([]*big.Rat, error) {
+	return m.assignBoundsCoefficients(proof, false)
+}
+
+func (m *Manager) AssignBoundsRuleCoefficients(proof ast.ASTHandle) ([]*big.Rat, error) {
+	return m.assignBoundsCoefficients(proof, true)
+}
+
+func (m *Manager) coefficientTerms(values []*big.Rat) ([]ast.ASTHandle, error) {
+	result := make([]ast.ASTHandle, len(values))
+	for i, value := range values {
+		term, err := m.MakeInt(value)
+		if err != nil {
+			return nil, err
+		}
+		result[i] = term
+	}
+	return result, nil
+}
+
+func (m *Manager) FarkasCoefficientTerms(proof ast.ASTHandle) ([]ast.ASTHandle, error) {
+	values, err := m.FarkasCoefficients(proof)
+	if err != nil {
+		return nil, err
+	}
+	return m.coefficientTerms(values)
+}
+
+func (m *Manager) AssignBoundsCoefficientTerms(proof ast.ASTHandle) ([]ast.ASTHandle, error) {
+	values, err := m.AssignBoundsCoefficients(proof)
+	if err != nil {
+		return nil, err
+	}
+	return m.coefficientTerms(values)
+}
+
+func (m *Manager) AssignBoundsRuleCoefficientTerms(proof ast.ASTHandle) ([]ast.ASTHandle, error) {
+	values, err := m.AssignBoundsRuleCoefficients(proof)
+	if err != nil {
+		return nil, err
+	}
+	return m.coefficientTerms(values)
+}
+
+func (m *Manager) GomoryCutCoefficientTerms(proof ast.ASTHandle) ([]ast.ASTHandle, error) {
+	values, err := m.GomoryCutCoefficients(proof)
+	if err != nil {
+		return nil, err
+	}
+	return m.coefficientTerms(values)
+}
+
 func (m *Manager) IsFarkasCoefficientNegative(proof ast.ASTHandle, index uint32) (result bool, err error) {
 	parameters, err := m.proofParameters(proof)
 	if err != nil {
