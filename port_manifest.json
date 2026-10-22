@@ -116776,7 +116776,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -116795,7 +116795,8 @@
         "TestSMTSequenceStructuredModelValues",
         "TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms",
         "TestSMTSequenceTheoryAtBoundaryAxioms",
-        "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms"
+        "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms",
+        "TestSMTSequenceTheoryIndexAxioms"
       ],
       "conditionals": [
         {
@@ -117325,6 +117326,12 @@
           "tests": ["TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms"]
         },
         {
+          "name": "str.indexof containment, empty-source, empty-needle, offset boundary, zero-offset witness and suffix-search axioms (src/smt/theory_seq.cpp:3150-3252)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_index.go",
+          "tests": ["TestSMTSequenceTheoryIndexAxioms"]
+        },
+        {
           "name": "int.to.str empty iff negative, nonnegative round trip through str.to.int, and str.to.int lower bound (src/smt/theory_seq.cpp:2298-2321,2410-2440)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_conversion.go",
@@ -117356,7 +117363,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -117375,7 +117382,8 @@
         "TestSMTSequenceStructuredModelValues",
         "TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms",
         "TestSMTSequenceTheoryAtBoundaryAxioms",
-        "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms"
+        "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms",
+        "TestSMTSequenceTheoryIndexAxioms"
       ],
       "conditionals": [
         {
@@ -117477,6 +117485,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_extract.go",
           "tests": ["TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms"]
+        },
+        {
+          "name": "str.indexof boundary, witness and suffix-search declarations",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_index.go",
+          "tests": ["TestSMTSequenceTheoryIndexAxioms"]
         },
         {
           "name": "retained integer/string conversion arithmetic, empty-value and round-trip constraints",

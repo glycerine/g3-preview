@@ -625,6 +625,102 @@ func TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryIndexAxioms(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		offset string
+		empty  bool
+		absent bool
+		want   string
+	}{
+		{name: "negative-offset", offset: "-1", want: "-1"},
+		{name: "empty-needle", offset: "0", empty: true, want: "0"},
+		{name: "absent", offset: "0", absent: true, want: "-1"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			empty, err := m.MkString("")
+			astTestMust(t, err)
+			sort, err := m.GetSort(empty)
+			astTestMust(t, err)
+			source, err := m.MkConst(astTestSymbol(t, m, "sequence-index-source-"+test.name), sort)
+			astTestMust(t, err)
+			needle := empty
+			if !test.empty {
+				needle, err = m.MkConst(astTestSymbol(t, m, "sequence-index-needle-"+test.name), sort)
+				astTestMust(t, err)
+			}
+			offset, err := m.ArithmeticIntegerNumeralText(test.offset)
+			astTestMust(t, err)
+			index, err := m.MkSequenceIndex(source, needle, offset)
+			astTestMust(t, err)
+			want, err := m.ArithmeticIntegerNumeralText(test.want)
+			astTestMust(t, err)
+			equality, err := m.MkEq(index, want)
+			astTestMust(t, err)
+			notEquality, err := m.MkNot(equality)
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			if test.absent {
+				contains, makeErr := m.MkSequenceContains(source, needle)
+				astTestMust(t, makeErr)
+				notContains, makeErr := m.MkNot(contains)
+				astTestMust(t, makeErr)
+				astTestMust(t, solver.Assert(notContains))
+			}
+			astTestMust(t, solver.Assert(notEquality))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("index boundary result", status)
+			}
+		})
+	}
+
+	m, modelConfig := smtModelGeneratorFixture(t)
+	empty, err := m.MkString("")
+	astTestMust(t, err)
+	sort, err := m.GetSort(empty)
+	astTestMust(t, err)
+	source, err := m.MkConst(astTestSymbol(t, m, "sequence-index-witness-source"), sort)
+	astTestMust(t, err)
+	needle, err := m.MkConst(astTestSymbol(t, m, "sequence-index-witness-needle"), sort)
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	index, err := m.MkSequenceIndex(source, needle, zero)
+	astTestMust(t, err)
+	contains, err := m.MkSequenceContains(source, needle)
+	astTestMust(t, err)
+	prefixName, err := m.Symbols.Intern("seq.indexof_left")
+	astTestMust(t, err)
+	prefix, err := m.MkSequenceSkolem(prefixName, []ast.ASTHandle{source, needle}, sort)
+	astTestMust(t, err)
+	prefixLength, err := m.MkSequenceLength(prefix)
+	astTestMust(t, err)
+	indexLength, err := m.MkEq(index, prefixLength)
+	astTestMust(t, err)
+	notIndexLength, err := m.MkNot(indexLength)
+	astTestMust(t, err)
+	emptyNeedle, err := m.MkEq(needle, empty)
+	astTestMust(t, err)
+	notEmptyNeedle, err := m.MkNot(emptyNeedle)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(contains))
+	astTestMust(t, solver.Assert(notEmptyNeedle))
+	astTestMust(t, solver.Assert(notIndexLength))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("zero-offset index witness", status)
+	}
+}
+
 func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name  string
