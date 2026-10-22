@@ -10,7 +10,7 @@ type SMTJustification interface{ smtJustification() }
 
 // SMTClause is completed by the smt_clause port. Its pointer identity is the
 // payload stored by compact Boolean justifications.
-type SMTClause struct{}
+type SMTClause struct{ placeholder byte }
 
 type SMTBooleanJustificationKind uint8
 

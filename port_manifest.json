@@ -114159,9 +114159,14 @@
       "path": "src/smt/watch_list.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/watch_list.go"
+      ],
+      "tests": [
+        "TestSMTWatchListTypedRegionsAndRemoval",
+        "TestSMTWatchListCompactionResetAndGuards"
+      ],
       "conditionals": [
         {
           "line": 24,
@@ -114214,19 +114219,38 @@
           "text": "SASSERT(prev == begin);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "allocation growth replacement, clause and literal removal",
+          "status": "ported",
+          "go_target": "pkg/smtcore/watch_list.go",
+          "tests": [
+            "TestSMTWatchListTypedRegionsAndRemoval",
+            "TestSMTWatchListCompactionResetAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The watch list owns its slice storage and borrows clause pointers; literals are inline values."
+      ],
+      "deviations": [
+        "Separate typed Go slices replace manually aligned shared byte storage and allocator growth."
+      ]
     },
     {
       "path": "src/smt/watch_list.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/watch_list.go"
+      ],
+      "tests": [
+        "TestSMTWatchListTypedRegionsAndRemoval",
+        "TestSMTWatchListCompactionResetAndGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -114267,11 +114291,25 @@
           "text": "SASSERT(new_end <= end_clause());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "size, reset, clause and literal views, find, insert, remove, and clause-end compaction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/watch_list.go",
+          "tests": [
+            "TestSMTWatchListTypedRegionsAndRemoval",
+            "TestSMTWatchListCompactionResetAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Returned clause and literal slices are borrowed mutable views used by the future propagation loop."
+      ],
+      "deviations": [
+        "Go slice lengths replace byte offsets and iterator pointers; SetClauseCount preserves the source in-place compaction operation."
+      ]
     },
     {
       "path": "src/solver/CMakeLists.txt",
