@@ -125845,6 +125845,8 @@
         "pkg/tactic/tactic_or_else_test.go",
         "pkg/tactic/tactic_repeat.go",
         "pkg/tactic/tactic_repeat_test.go",
+        "pkg/tactic/tactic_try_for.go",
+        "pkg/tactic/tactic_try_for_test.go",
         "pkg/tactic/tactic_unary.go",
         "pkg/tactic/tactic_unary_test.go"
       ],
@@ -125866,6 +125868,8 @@
         "TestRepeatStopsAtGoalFixpointAndMaximumDepth",
         "TestRepeatComposesModelConvertersInApplicationOrder",
         "TestRepeatRecursesAcrossProducedSubgoals",
+        "TestTryForCancelsChildAndRestoresResourceLimit",
+        "TestTryForDisabledIntervalsApplyNormally",
         "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
@@ -126123,6 +126127,15 @@
           ]
         },
         {
+          "name": "try_for scoped timeout cancellation and translated wrapper (tactical.cpp:1130-1156)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_try_for.go",
+          "tests": [
+            "TestTryForCancelsChildAndRestoresResourceLimit",
+            "TestTryForDisabledIntervalsApplyNormally"
+          ]
+        },
+        {
           "name": "unary tactical lifecycle, fail_if_branching result refusal and generic cleanup wrapper (tactical.cpp:886-927,1077-1128)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_unary.go",
@@ -126148,6 +126161,7 @@
         "pkg/tactic/tactic_conditional.go",
         "pkg/tactic/tactic_or_else.go",
         "pkg/tactic/tactic_repeat.go",
+        "pkg/tactic/tactic_try_for.go",
         "pkg/tactic/tactic_unary.go"
       ],
       "tests": [
@@ -126168,6 +126182,8 @@
         "TestRepeatStopsAtGoalFixpointAndMaximumDepth",
         "TestRepeatComposesModelConvertersInApplicationOrder",
         "TestRepeatRecursesAcrossProducedSubgoals",
+        "TestTryForCancelsChildAndRestoresResourceLimit",
+        "TestTryForDisabledIntervalsApplyNormally",
         "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
@@ -126233,6 +126249,15 @@
             "TestRepeatStopsAtGoalFixpointAndMaximumDepth",
             "TestRepeatComposesModelConvertersInApplicationOrder",
             "TestRepeatRecursesAcrossProducedSubgoals"
+          ]
+        },
+        {
+          "name": "typed try-for constructor with scoped resource-limit cancellation",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_try_for.go",
+          "tests": [
+            "TestTryForCancelsChildAndRestoresResourceLimit",
+            "TestTryForDisabledIntervalsApplyNormally"
           ]
         },
         {
