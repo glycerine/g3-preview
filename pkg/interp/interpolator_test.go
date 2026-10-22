@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -165,6 +166,76 @@ func TestInterpolationFrameReducerSequenceAndGuards(t *testing.T) {
 	if _, _, err = reducer.Reduce(parts, []int{ScopeTop}, proof); !errors.Is(err, ast.ErrASTDomain) {
 		t.Fatal("parent length guard", err)
 	}
+}
+
+func TestInterpolationProofTreeAndSolverOrchestration(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	boolean, err := manager.BoolType()
+	interpMust(t, err)
+	p, err := manager.MakeVariable("orchestration-p", boolean)
+	interpMust(t, err)
+	p = interpPin(t, m, p)
+	notP, err := manager.MkNot(p)
+	interpMust(t, err)
+	notP = interpPin(t, m, notP)
+	positive, err := m.MkProofAsserted(p)
+	interpMust(t, err)
+	positive = interpPin(t, m, positive)
+	negative, err := m.MkProofAsserted(notP)
+	interpMust(t, err)
+	negative = interpPin(t, m, negative)
+	proof, err := m.MkProofUnitResolution([]ast.ASTHandle{positive, negative})
+	interpMust(t, err)
+	proof = interpPin(t, m, proof)
+
+	flat, err := ProofInterpolantsFlat(manager, proof, []ast.ASTHandle{p, notP}, nil, nil, nil)
+	interpMust(t, err)
+	if len(flat) != 1 {
+		t.Fatal("flat interpolants", len(flat))
+	}
+	for i := range flat {
+		interpMust(t, m.DelRef(&flat[i]))
+	}
+	markedP, err := manager.Make(OperatorInterp, p)
+	interpMust(t, err)
+	markedNotP, err := manager.Make(OperatorInterp, notP)
+	interpMust(t, err)
+	tree, err := manager.Make(OperatorAnd, markedP, markedNotP)
+	interpMust(t, err)
+	tree = interpPin(t, m, tree)
+	treeResults, err := TreeInterpolants(manager, proof, nil, tree, nil)
+	interpMust(t, err)
+	if len(treeResults) != 2 {
+		t.Fatal("tree interpolants", len(treeResults))
+	}
+	for i := range treeResults {
+		interpMust(t, m.DelRef(&treeResults[i]))
+	}
+
+	target, err := newInterpolationScriptSolver(m, lbool.False)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, target.Close()) })
+	interpMust(t, target.SetProof(proof))
+	status, constraints, solved, mdl, err := SolveTree(manager, target, tree, true, nil)
+	interpMust(t, err)
+	if status != lbool.False || len(constraints) != 2 || len(solved) != 2 || mdl != nil {
+		t.Fatal("solver interpolation", status, len(constraints), len(solved), mdl)
+	}
+	for i := range solved {
+		interpMust(t, m.DelRef(&solved[i]))
+	}
+	satisfiable, err := newInterpolationScriptSolver(m, lbool.True)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, satisfiable.Close()) })
+	modelValue, err := model.NewModelCore(m)
+	interpMust(t, err)
+	interpMust(t, satisfiable.SetModel(modelValue))
+	status, constraints, solved, mdl, err = SolveTree(manager, satisfiable, tree, true, nil)
+	interpMust(t, err)
+	if status != lbool.True || len(constraints) != 2 || solved != nil || mdl == nil {
+		t.Fatal("solver model", status, len(constraints), solved, mdl)
+	}
+	interpMust(t, mdl.DecRef())
 }
 
 func TestFullTranslationProofAnalysisAndResolution(t *testing.T) {

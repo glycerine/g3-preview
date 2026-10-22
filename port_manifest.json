@@ -40722,16 +40722,18 @@
       "path": "src/interp/iz3interp.cpp",
       "component": "interp",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/interp/interpolator.go"
+        "pkg/interp/interpolator.go",
+        "pkg/interp/orchestration.go"
       ],
       "tests": [
         "TestInterpolationOptionsErrorsAndLinearParents",
         "TestInterpolationProofAssumptionsDeduplicateDAG",
         "TestInterpolationCollectAndAssertConjuncts",
         "TestInterpolationFrameReducerTreeAndRestoration",
-        "TestInterpolationFrameReducerSequenceAndGuards"
+        "TestInterpolationFrameReducerSequenceAndGuards",
+        "TestInterpolationProofTreeAndSolverOrchestration"
       ],
       "conditionals": [
         {
@@ -40811,9 +40813,11 @@
         },
         {
           "name": "proof translation, proof interpolation, tree-position reconstruction, and public solver orchestration",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/interp/orchestration.go",
+          "tests": [
+            "TestInterpolationProofTreeAndSolverOrchestration"
+          ]
         }
       ],
       "ownership": [
@@ -40827,12 +40831,14 @@
       "path": "src/interp/iz3interp.h",
       "component": "interp",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/interp/interpolator.go"
+        "pkg/interp/interpolator.go",
+        "pkg/interp/orchestration.go"
       ],
       "tests": [
-        "TestInterpolationOptionsErrorsAndLinearParents"
+        "TestInterpolationOptionsErrorsAndLinearParents",
+        "TestInterpolationProofTreeAndSolverOrchestration"
       ],
       "conditionals": [
         {
@@ -40857,13 +40863,15 @@
         },
         {
           "name": "proof-, tree-, and solver-based interpolation entry points",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/interp/orchestration.go",
+          "tests": [
+            "TestInterpolationProofTreeAndSolverOrchestration"
+          ]
         }
       ],
       "ownership": [
-        "Options owns native Go strings and map entries; interpolation entry-point ownership remains pending with the implementation."
+        "Options owns native Go strings and map entries. Public interpolation results are caller-owned ASTRef roots; an acquired SAT model carries one caller-owned reference."
       ],
       "deviations": []
     },
