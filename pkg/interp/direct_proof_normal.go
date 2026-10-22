@@ -110,6 +110,118 @@ func (p *DirectProofInterpolator) isNormalInequality(proof ast.ASTHandle) (bool,
 	return p.isInequality(proof)
 }
 
+func (p *DirectProofInterpolator) isNormalWrapper(proof ast.ASTHandle) (bool, error) {
+	op, err := p.base.manager.Operator(proof)
+	if err != nil || op != OperatorUninterpreted {
+		return false, err
+	}
+	declaration, err := p.base.manager.Symbol(proof)
+	return declaration == p.normal, err
+}
+
+func (p *DirectProofInterpolator) sumNormalInequalities(first, coefficient, second ast.ASTHandle, aProof, bProof *ast.ASTHandle) (ast.ASTHandle, error) {
+	firstInequality, firstChain, err := p.destructNormal(first)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	secondInequality, secondChain, err := p.destructNormal(second)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	truth, err := p.base.manager.Make(OperatorTrue)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	dummyA, dummyB := truth, truth
+	firstInequality, err = p.sumConditionalInequality(firstInequality, coefficient, secondInequality, &dummyA, &dummyB)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	chain, err := p.mergeNormalChains(firstChain, secondChain, aProof, bProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	empty, err := p.base.manager.IsTrue(chain)
+	if err != nil || empty {
+		return firstInequality, err
+	}
+	return p.makeNormal(firstInequality, chain)
+}
+
+func (p *DirectProofInterpolator) normalizeProofTerm(term ast.ASTHandle) (ast.ASTHandle, error) {
+	truth, err := p.base.manager.Make(OperatorTrue)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	aProof, bProof := truth, truth
+	current := term
+	op, err := p.base.manager.Operator(current)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if op == OperatorAnd {
+		aProof, err = p.base.manager.Arg(current, 0)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		current, err = p.base.manager.Arg(current, 1)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		op, err = p.base.manager.Operator(current)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
+	if op == OperatorImplies {
+		bProof, err = p.base.manager.Arg(current, 0)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		current, err = p.base.manager.Arg(current, 1)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
+	normal, err := p.isNormalWrapper(current)
+	if err != nil || !normal {
+		return term, err
+	}
+	inequality, chain, err := p.destructNormal(current)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	replacements := make(map[ast.ASTHandle]ast.ASTHandle)
+	for {
+		empty, e := p.base.manager.IsTrue(chain)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if empty {
+			break
+		}
+		step, rest, e := p.normalChainParts(chain)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		left, right, _, e := p.normalStepParts(step)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		replacements[left] = right
+		chain = rest
+	}
+	inequality, err = p.base.manager.Substitute(replacements, inequality)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result, err := p.base.manager.MkImplies(bProof, inequality)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.MkAnd(aProof, result)
+}
+
 func (p *DirectProofInterpolator) mergeNormalChains(first, second ast.ASTHandle, aProof, bProof *ast.ASTHandle) (ast.ASTHandle, error) {
 	transitive := make(map[ast.ASTHandle]ast.ASTHandle)
 	result, err := p.mergeNormalChainsRecursive(first, second, transitive, aProof, bProof)

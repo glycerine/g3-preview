@@ -110,7 +110,11 @@ func (p *DirectProofInterpolator) simplifyProofTerm(expression ast.ASTHandle) (a
 		memo[current] = result
 		return result, nil
 	}
-	return simplify(expression)
+	result, err := simplify(expression)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.normalizeProofTerm(result)
 }
 
 func (p *DirectProofInterpolator) SimplifyProofTerm(expression ast.ASTHandle) (ast.ASTHandle, error) {

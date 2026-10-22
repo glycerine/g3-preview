@@ -41615,6 +41615,7 @@
         "TestDirectProofRewriteApplicationAndSideSplit",
         "TestDirectProofDisjointNormalChainMerge",
         "TestDirectProofNormalChainMixedRepresentativeMerge",
+        "TestDirectProofNormalInequalitySumAndFinalSubstitution",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41847,9 +41848,10 @@
             "TestDirectProofArithmeticNormalVocabulary",
             "TestDirectProofRewriteApplicationAndSideSplit",
             "TestDirectProofDisjointNormalChainMerge",
-            "TestDirectProofNormalChainMixedRepresentativeMerge"
+            "TestDirectProofNormalChainMixedRepresentativeMerge",
+            "TestDirectProofNormalInequalitySumAndFinalSubstitution"
           ],
-          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, nested coefficient distribution, ordinary sum/congruence/modus-ponens rotation, arithmetic normal-form vocabulary and chain merging, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Normal-form arithmetic reduction plus leq2eq/eq2leq rotation remain pending."
+          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary and normal-form conditional inequality summation, nested coefficient distribution, ordinary sum/congruence/modus-ponens rotation, arithmetic normal-form vocabulary, chain merging, and final substitution, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Rewrite-chain-to-normal arithmetic reduction, arithmetic modus ponens, and leq2eq/eq2leq rotation remain pending."
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
@@ -41942,6 +41944,7 @@
         "TestDirectProofRewriteApplicationAndSideSplit",
         "TestDirectProofDisjointNormalChainMerge",
         "TestDirectProofNormalChainMixedRepresentativeMerge",
+        "TestDirectProofNormalInequalitySumAndFinalSubstitution",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],

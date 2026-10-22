@@ -102,6 +102,17 @@ func (p *DirectProofInterpolator) sumConditionalInequality(current, coefficient,
 		}
 		return current, e
 	}
+	currentNormal, err := p.isNormalWrapper(current)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	additionNormal, err := p.isNormalWrapper(addition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if currentNormal || additionNormal {
+		return p.sumNormalInequalities(current, coefficient, addition, aProof, bProof)
+	}
 	inequality, err := p.isInequality(addition)
 	if err != nil {
 		return ast.ASTHandle{}, err
@@ -152,7 +163,7 @@ func (p *DirectProofInterpolator) simplifySum(args []ast.ASTHandle) (ast.ASTHand
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	valid, err := p.isInequality(inequality)
+	valid, err := p.isNormalInequality(inequality)
 	if err != nil || !valid {
 		if err != nil {
 			return ast.ASTHandle{}, err
