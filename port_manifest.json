@@ -41675,41 +41675,41 @@
       "path": "src/math/automata/CMakeLists.txt",
       "component": "math",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/math/automata/automaton.go", "pkg/math/automata/symbolic.go"],
+      "tests": ["TestAutomatonSequenceUnionConcatOptionalAndReverse", "TestSymbolicProductDifferenceAndEpsilonRemoval"],
       "registrations": [
         {
           "line": 1,
           "text": "z3_add_component(automata"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery and compilation replace the CMake automata component registration."]
     },
     {
       "path": "src/math/automata/automaton.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "status": "ported",
+      "go_targets": ["pkg/math/automata/automaton.go", "pkg/math/automata/automaton_test.go"],
+      "tests": ["TestAutomatonSequenceUnionConcatOptionalAndReverse", "TestAutomatonEpsilonClosureFinalLoopsAndSequence"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "concrete unsigned automaton instantiation", "status": "ported", "go_target": "pkg/math/automata/automaton.go", "tests": ["TestAutomatonSequenceUnionConcatOptionalAndReverse"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The source's explicit automaton<unsigned> instantiation is the concrete uint32 condition-handle Automaton."]
     },
     {
       "path": "src/math/automata/automaton.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/math/automata/automaton.go", "pkg/math/automata/automaton_test.go"],
+      "tests": ["TestAutomatonSequenceUnionConcatOptionalAndReverse", "TestAutomatonEpsilonClosureFinalLoopsAndSequence", "TestAutomatonEmptyEpsilonCloneSinkAndDisplay"],
       "conditionals": [
         {
           "line": 21,
@@ -41774,19 +41774,19 @@
           "text": "SASSERT(m_todo.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "construction, cloning, union, optional, concatenation, reverse, final-state mutation, epsilon closure/compression, sequence and sink queries, moves, and display", "status": "ported", "go_target": "pkg/math/automata/automaton.go", "tests": ["TestAutomatonSequenceUnionConcatOptionalAndReverse", "TestAutomatonEpsilonClosureFinalLoopsAndSequence", "TestAutomatonEmptyEpsilonCloneSinkAndDisplay"]}],
+      "ownership": ["Automata own their Go move/final/adjacency slices and borrow stable uint32 condition handles from the supplying algebra or consumer table."],
+      "deviations": ["A Move carries an explicit Epsilon flag so condition handle zero remains usable. Compress computes the complete epsilon-equivalent graph and rebuilds inverse links instead of preserving the source's stale inverse links after dead-state sinkification."]
     },
     {
       "path": "src/math/automata/boolean_algebra.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/math/automata/symbolic.go", "pkg/math/automata/symbolic_test.go"],
+      "tests": ["TestSymbolicDeterminizeComplementAndTotal", "TestSymbolicProductDifferenceAndEpsilonRemoval"],
       "conditionals": [
         {
           "line": 21,
@@ -41797,19 +41797,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "false, true, conjunction, disjunction, complement, and satisfiability operations", "status": "ported", "go_target": "pkg/math/automata/symbolic.go", "tests": ["TestSymbolicDeterminizeComplementAndTotal"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["BooleanAlgebra is typed over concrete uint32 condition handles. BitsetAlgebra supplies a complete finite-alphabet implementation for direct use and tests; AST consumers can maintain a typed handle table."]
     },
     {
       "path": "src/math/automata/symbolic_automata.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/math/automata/symbolic.go", "pkg/math/automata/symbolic_test.go"],
+      "tests": ["TestSymbolicDeterminizeComplementAndTotal", "TestSymbolicProductDifferenceAndEpsilonRemoval", "TestSymbolicMinimizeEquivalentFinalStates"],
       "conditionals": [
         {
           "line": 21,
@@ -41820,19 +41820,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "symbolic totalization, determinization, complement, product, difference, epsilon removal, and minimization API", "status": "ported", "go_target": "pkg/math/automata/symbolic.go", "tests": ["TestSymbolicDeterminizeComplementAndTotal", "TestSymbolicProductDifferenceAndEpsilonRemoval", "TestSymbolicMinimizeEquivalentFinalStates"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The typed condition-handle API replaces the C++ template and ref-count manager without introducing Go generics or untyped values."]
     },
     {
       "path": "src/math/automata/symbolic_automata_def.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/math/automata/symbolic.go", "pkg/math/automata/symbolic_test.go"],
+      "tests": ["TestSymbolicDeterminizeComplementAndTotal", "TestSymbolicProductDifferenceAndEpsilonRemoval", "TestSymbolicMinimizeEquivalentFinalStates"],
       "conditionals": [
         {
           "line": 21,
@@ -41843,11 +41843,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "minterm subset construction, totalization, Boolean product/difference, reverse reachability pruning, and partition refinement", "status": "ported", "go_target": "pkg/math/automata/symbolic.go", "tests": ["TestSymbolicDeterminizeComplementAndTotal", "TestSymbolicProductDifferenceAndEpsilonRemoval", "TestSymbolicMinimizeEquivalentFinalStates"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Totalization retains the source transitions before adding missing-condition edges; the C++ body contains a TBD comment and returns only the new edges. RemoveEpsilons was declared but had no definition; the Go implementation supplies the language-preserving operation. Minimization uses equivalent Boolean partition refinement over the concrete handle algebra."]
     },
     {
       "path": "src/math/euclid/CMakeLists.txt",
