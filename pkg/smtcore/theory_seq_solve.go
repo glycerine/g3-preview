@@ -265,16 +265,42 @@ func (t *SMTSequenceTheory) solveUnitWord(left, right []ast.ASTHandle, dependenc
 	return false, nil
 }
 
-func (t *SMTSequenceTheory) cancelWordBoundaries(left, right []ast.ASTHandle) ([]ast.ASTHandle, []ast.ASTHandle, bool, bool, error) {
+func (t *SMTSequenceTheory) equalWordParts(left, right ast.ASTHandle, dependency *smtSequenceDependency) (bool, *smtSequenceDependency) {
+	if left == right {
+		return true, dependency
+	}
 	state, err := t.State()
 	if err != nil {
-		return nil, nil, false, false, err
+		return false, dependency
+	}
+	leftNode, rightNode := state.context.enodes[left], state.context.enodes[right]
+	if leftNode == nil || rightNode == nil || leftNode.Root() != rightNode.Root() {
+		return false, dependency
+	}
+	equality := t.dependencies.Leaf(smtSequenceAssumption{left: leftNode, right: rightNode})
+	return true, t.dependencies.Join(dependency, equality)
+}
+
+func (t *SMTSequenceTheory) cancelWordBoundaries(left, right []ast.ASTHandle, dependency *smtSequenceDependency) ([]ast.ASTHandle, []ast.ASTHandle, *smtSequenceDependency, bool, bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return nil, nil, dependency, false, false, err
 	}
 	changed := false
-	for len(left) != 0 && len(right) != 0 && left[0] == right[0] {
+	for len(left) != 0 && len(right) != 0 {
+		equal, updated := t.equalWordParts(left[0], right[0], dependency)
+		if !equal {
+			break
+		}
+		dependency = updated
 		left, right, changed = left[1:], right[1:], true
 	}
-	for len(left) != 0 && len(right) != 0 && left[len(left)-1] == right[len(right)-1] {
+	for len(left) != 0 && len(right) != 0 {
+		equal, updated := t.equalWordParts(left[len(left)-1], right[len(right)-1], dependency)
+		if !equal {
+			break
+		}
+		dependency = updated
 		left, right, changed = left[:len(left)-1], right[:len(right)-1], true
 	}
 	for _, front := range []bool{true, false} {
@@ -287,11 +313,11 @@ func (t *SMTSequenceTheory) cancelWordBoundaries(left, right []ast.ASTHandle) ([
 		}
 		leftText, leftString, textErr := state.manager.SequenceStringValue(left[li])
 		if textErr != nil {
-			return nil, nil, false, false, textErr
+			return nil, nil, dependency, false, false, textErr
 		}
 		rightText, rightString, textErr := state.manager.SequenceStringValue(right[ri])
 		if textErr != nil {
-			return nil, nil, false, false, textErr
+			return nil, nil, dependency, false, false, textErr
 		}
 		if !leftString || !rightString {
 			continue
@@ -307,7 +333,7 @@ func (t *SMTSequenceTheory) cancelWordBoundaries(left, right []ast.ASTHandle) ([
 			}
 		}
 		if common == 0 {
-			return left, right, changed, true, nil
+			return left, right, dependency, changed, true, nil
 		}
 		changed = true
 		if front {
@@ -320,7 +346,7 @@ func (t *SMTSequenceTheory) cancelWordBoundaries(left, right []ast.ASTHandle) ([
 		} else {
 			left[li], err = state.manager.MkString(leftText)
 			if err != nil {
-				return nil, nil, false, false, err
+				return nil, nil, dependency, false, false, err
 			}
 		}
 		if rightText == "" {
@@ -328,11 +354,11 @@ func (t *SMTSequenceTheory) cancelWordBoundaries(left, right []ast.ASTHandle) ([
 		} else {
 			right[ri], err = state.manager.MkString(rightText)
 			if err != nil {
-				return nil, nil, false, false, err
+				return nil, nil, dependency, false, false, err
 			}
 		}
 	}
-	return left, right, changed, false, nil
+	return left, right, dependency, changed, false, nil
 }
 
 func (t *SMTSequenceTheory) removeEquation(index int) error {
@@ -367,7 +393,7 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 			return false, err
 		}
 		dependency = rightDependency
-		left, right, changed, conflict, err := t.cancelWordBoundaries(left, right)
+		left, right, dependency, changed, conflict, err := t.cancelWordBoundaries(left, right, dependency)
 		if err != nil {
 			return false, err
 		}

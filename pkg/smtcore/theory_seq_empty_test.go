@@ -299,6 +299,38 @@ func TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution(t *testing.T)
 	}
 }
 
+func TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-enode-cancel-x"), sort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-enode-cancel-y"), sort)
+	astTestMust(t, err)
+	left, err := m.MkSequenceConcat(x, a)
+	astTestMust(t, err)
+	right, err := m.MkSequenceConcat(y, b)
+	astTestMust(t, err)
+	variablesEqual, err := m.MkEq(x, y)
+	astTestMust(t, err)
+	wordsEqual, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(variablesEqual))
+	astTestMust(t, solver.Assert(wordsEqual))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("equivalent e-node boundary cancellation", status)
+	}
+}
+
 func TestSMTSequenceTheoryConcreteRelationConflicts(t *testing.T) {
 	for _, test := range []struct {
 		name  string

@@ -116789,6 +116789,7 @@
         "TestSMTSequenceTheoryConcreteWordDisequationConflict",
         "TestSMTSequenceTheoryConcreteNonContainsConflict",
         "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution",
+        "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries",
         "TestSMTSequenceTheoryConcreteRelationConflicts",
         "TestSMTSequenceTheoryLengthAxioms",
         "TestSMTSequenceTheoryIntegerStringAxioms",
@@ -117286,10 +117287,10 @@
           "tests": ["TestSMTSequenceTheoryConcreteNonContainsConflict"]
         },
         {
-          "name": "queued equation expansion, concat flattening, empty removal, adjacent string folding, exact and string-boundary cancellation, variable/occurs recognition, unit solutions, dependency-preserving equality propagation, solved removal and residual replacement (src/smt/theory_seq.cpp:1341-1533,2856-3066)",
+          "name": "queued equation expansion, concat flattening, empty removal, adjacent string folding, exact, e-graph-equivalent and string-boundary cancellation, variable/occurs recognition, unit solutions, dependency-preserving equality propagation, solved removal and residual replacement (src/smt/theory_seq.cpp:1341-1533,2856-3066)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_solve.go",
-          "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryConcreteWordEquationConflict"]
+          "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict"]
         },
         {
           "name": "scoped assigned prefix/suffix/contains atoms and concrete relation checking after solution expansion (src/smt/theory_seq.cpp:3927-4010 and m_atoms scope limits)",
@@ -117390,6 +117391,7 @@
         "TestSMTSequenceTheoryConcreteWordDisequationConflict",
         "TestSMTSequenceTheoryConcreteNonContainsConflict",
         "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution",
+        "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries",
         "TestSMTSequenceTheoryConcreteRelationConflicts",
         "TestSMTSequenceTheoryLengthAxioms",
         "TestSMTSequenceTheoryIntegerStringAxioms",
@@ -117461,10 +117463,10 @@
           "tests": ["TestSMTSequenceTheoryConcreteWordEquationConflict"]
         },
         {
-          "name": "symbolic word canonicalization, boundary cancellation, occurs checks, unit solution insertion and explained e-graph propagation",
+          "name": "symbolic word canonicalization, exact and e-graph boundary cancellation, occurs checks, unit solution insertion and explained e-graph propagation",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_solve.go",
-          "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution"]
+          "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries"]
         },
         {
           "name": "scoped assigned relation ownership and concrete prefix, suffix and contains checks",
