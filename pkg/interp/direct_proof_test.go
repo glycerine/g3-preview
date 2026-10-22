@@ -759,3 +759,31 @@ func TestDirectProofNoProofResolutionLocalization(t *testing.T) {
 		t.Fatal("no localization variable recorded")
 	}
 }
+
+func TestDirectProofEquivalenceChainSymmetrySimplification(t *testing.T) {
+	_, manager, base, p, _ := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	negativeP, err := manager.MkNot(p)
+	interpMust(t, err)
+	equality, err := manager.Make(OperatorIff, p, negativeP)
+	interpMust(t, err)
+	chain, err := direct.makeLocalRewrite(TermA, equality)
+	interpMust(t, err)
+	proof, err := direct.makeSymbol(direct.symmetry, chain)
+	interpMust(t, err)
+	result, err := direct.SimplifyProofTerm(proof)
+	interpMust(t, err)
+	_, rewrite, err := direct.chainParts(result)
+	interpMust(t, err)
+	reversed, err := manager.Arg(rewrite, 2)
+	interpMust(t, err)
+	left, err := manager.Arg(reversed, 0)
+	interpMust(t, err)
+	right, err := manager.Arg(reversed, 1)
+	interpMust(t, err)
+	if left != negativeP || right != p {
+		t.Fatal("reversed equivalence chain", left, right, negativeP, p)
+	}
+}
