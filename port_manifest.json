@@ -106463,9 +106463,15 @@
       "path": "src/smt/smt_implied_equalities.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_implied_equalities.go",
+        "pkg/smtcore/smt_implied_equalities_test.go"
+      ],
+      "tests": [
+        "TestSMTSolverImpliedEqualitiesPartitionsByProofAndSort",
+        "TestSMTSolverImpliedEqualitiesUnsatAndEmptyInputs"
+      ],
       "conditionals": [
         {
           "line": 386,
@@ -106502,19 +106508,46 @@
           "text": "SASSERT(model.get());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Sort partition, exact pairwise counterexample checks, union-find class construction, unsatisfiable-context handling and solver-scope restoration (src/smt/smt_implied_equalities.cpp:54-137,321-379)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_implied_equalities.go",
+          "tests": [
+            "TestSMTSolverImpliedEqualitiesPartitionsByProofAndSort",
+            "TestSMTSolverImpliedEqualitiesUnsatAndEmptyInputs"
+          ]
+        },
+        {
+          "name": "Model-value bucketing, array extensionality probes, conditional array-value reduction and timing counters (src/smt/smt_implied_equalities.cpp:139-319)",
+          "status": "unported"
+        },
+        {
+          "name": "Disabled experimental max-SAT and partition-refinement implementations (src/smt/smt_implied_equalities.cpp:386-575)",
+          "status": "dead"
+        }
+      ],
+      "ownership": [
+        "The query temporarily owns AST references for every input term, owns sort partitions and union-find slices, and restores every solver scope before releasing those references."
+      ],
+      "deviations": [
+        "The initial retained implementation always uses the source exact quadratic fallback instead of model-value bucketing. This preserves results while performing more solver checks."
+      ]
     },
     {
       "path": "src/smt/smt_implied_equalities.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_implied_equalities.go"
+      ],
+      "tests": [
+        "TestSMTSolverImpliedEqualitiesPartitionsByProofAndSort",
+        "TestSMTSolverImpliedEqualitiesUnsatAndEmptyInputs"
+      ],
       "conditionals": [
         {
           "line": 23,
@@ -106525,11 +106558,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "implied_equalities solver query surface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_implied_equalities.go",
+          "tests": [
+            "TestSMTSolverImpliedEqualitiesPartitionsByProofAndSort",
+            "TestSMTSolverImpliedEqualitiesUnsatAndEmptyInputs"
+          ]
+        }
+      ],
+      "ownership": [
+        "Returned class identifiers own a Go slice; input AST handles are borrowed and held by temporary references for the duration of nested solver checks."
+      ],
+      "deviations": [
+        "The Go surface is an SMTSolver method so manager and solver ownership cannot be mismatched."
+      ]
     },
     {
       "path": "src/smt/smt_internalizer.cpp",
