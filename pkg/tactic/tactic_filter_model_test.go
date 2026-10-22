@@ -3,14 +3,58 @@
 package tactic
 
 import (
+	"bytes"
 	"fmt"
-	"github.com/glycerine/g3/pkg/model"
-	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestTacticFilterModelDisplayAndTranslate(t *testing.T) {
+	from := astTestManager(t)
+	to, err := ast.NewASTManager(ast.ASTManagerConfig{
+		Symbols: from.Symbols, Numerals: from.NumeralService(), Budget: from.Budget(),
+	})
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, to.Close()) })
+	c, err := NewFilterModel(from)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, c.Close()) })
+	b, err := from.MkBoolSort()
+	satOK(t, err)
+	a, err := from.MkConst(astTestSymbol(t, from, "filter-translated"), b)
+	satOK(t, err)
+	d, err := from.GetDecl(a)
+	satOK(t, err)
+	satOK(t, c.Insert(d))
+	var display bytes.Buffer
+	satOK(t, c.Display(&display))
+	if got, want := display.String(), "(filter-model-converter filter-translated)\n"; got != want {
+		t.Fatalf("display = %q; want %q", got, want)
+	}
+	translator, err := ast.NewASTTranslation(from, to, true)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, translator.Close()) })
+	translated, err := c.Translate(translator)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, translated.Close()) })
+	want, err := translator.Translate(d)
+	satOK(t, err)
+	if translated.manager != to || len(translated.declarations) != 1 || translated.declarations[0] != want {
+		t.Fatal("translated filter declaration")
+	}
+	display.Reset()
+	satOK(t, translated.Display(&display))
+	if got, want := display.String(), "(filter-model-converter filter-translated)\n"; got != want {
+		t.Fatalf("translated display = %q; want %q", got, want)
+	}
+	if _, err = translated.Translate(translator); err != ast.ErrASTHandle {
+		t.Fatal("wrong-manager translation accepted", err)
+	}
+}
 
 func TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks(t *testing.T) {
 	m := astTestManager(t)

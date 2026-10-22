@@ -122575,10 +122575,11 @@
       "path": "src/tactic/filter_model_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/tactic_filter_model.go",
         "pkg/tactic/tactic_filter_model_trace.go",
+        "pkg/tactic/tactic_filter_model_test.go",
         "pkg/tactic/tactic_filter_model_trace_test.go",
         "pkg/model/model_v2_display.go"
       ],
@@ -122588,7 +122589,8 @@
         "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
         "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
         "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
-        "TestTacticFilterModelAssignmentUsesNativeIDRecycle"
+        "TestTacticFilterModelAssignmentUsesNativeIDRecycle",
+        "TestTacticFilterModelDisplayAndTranslate"
       ],
       "assertions": [
         {
@@ -122596,8 +122598,8 @@
           "text": "SASSERT(fi);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "reached filter_mc before and after model_v2_pp TRACE at filter_model_converter.cpp:26,51 plus ordered filter display; concrete constant and function graph snapshots",
@@ -122608,7 +122610,7 @@
         },
         {
           "name": "operator()(model_ref&, unsigned) constants, function graph filtering/copy and universes",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/tactic_filter_model.go",
           "go_targets": ["pkg/model/model_filter_allocation.go", "pkg/tactic/tactic_filter_model_memory_trace_debug_test.go"],
           "tests": [
@@ -122628,23 +122630,32 @@
             "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
             "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership"
           ]
+        },
+        {
+          "name": "display and translate",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_filter_model.go",
+          "tests": [
+            "TestTacticFilterModelDisplayAndTranslate"
+          ]
         }
       ],
       "ownership": [
         "Filter declarations are stored in a native owning []ASTHandle slice, preserving duplicate INCs and forward consumed-DEC cleanup. Membership uses a local Go map independent of shared AST marks. Replacement model publishes after constant/function/universe copying; before publication, a successful incoming model INC belongs to the output reference's pending receipt if old-model destruction stops. Truly unacquired owners are cleaned on error. Native append adds no custom vector/mark-trail reservation."
       ],
       "deviations": [
-        "Original function filtering/copy loop is now integrated, using active function declaration order and independent FunctionInterpretation copies. AST translation, display/TRACE and broader ownership/failure campaigns remain unported or unqualified; no whole converter or public solver API completion is credited. Go errors before model acquisition retire the reached replacement owner; a stopped old-model deletion leaves the already-acquired replacement with the output reference for owning cleanup."
+        "Original function filtering/copy loop uses active function declaration order and independent FunctionInterpretation copies. Display writes through io.Writer and translation returns Go errors while retaining translated declarations explicitly. Go errors before model acquisition retire the reached replacement owner; a stopped old-model deletion leaves the already-acquired replacement with the output reference for owning cleanup."
       ]
     },
     {
       "path": "src/tactic/filter_model_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/tactic_filter_model.go",
         "pkg/tactic/tactic_filter_model_trace.go",
+        "pkg/tactic/tactic_filter_model_test.go",
         "pkg/tactic/tactic_filter_model_trace_test.go",
         "pkg/model/model_v2_display.go"
       ],
@@ -122654,7 +122665,8 @@
         "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
         "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
         "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
-        "TestTacticFilterModelAssignmentUsesNativeIDRecycle"
+        "TestTacticFilterModelAssignmentUsesNativeIDRecycle",
+        "TestTacticFilterModelDisplayAndTranslate"
       ],
       "conditionals": [
         {
@@ -122666,8 +122678,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "reached filter_mc before and after model_v2_pp TRACE at filter_model_converter.cpp:26,51 plus ordered filter display; concrete constant and function graph snapshots",
@@ -122685,13 +122697,24 @@
             "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
             "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership"
           ]
+        },
+        {
+          "name": "indexed model/label application, display, translate and destruction",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_filter_model.go",
+          "go_targets": ["pkg/tactic/tactic_filter_model_trace.go"],
+          "tests": [
+            "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
+            "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
+            "TestTacticFilterModelDisplayAndTranslate"
+          ]
         }
       ],
       "ownership": [
         "Filter declarations are stored in a native owning []ASTHandle slice, preserving duplicate INCs and forward consumed-DEC cleanup. Membership uses a local Go map independent of shared AST marks. Replacement model publishes after constant/function/universe copying; before publication, a successful incoming model INC belongs to the output reference pending receipt if old-model destruction stops. Truly unacquired owners are cleaned on error. Native append adds no custom vector/mark-trail reservation."
       ],
       "deviations": [
-        "Original function filtering/copy loop is now integrated, using active function declaration order and independent FunctionInterpretation copies. AST translation, display/TRACE and broader ownership/failure campaigns remain unported or unqualified; no whole converter or public solver API completion is credited. Go errors before model acquisition retire the reached replacement owner; a stopped old-model deletion leaves the already-acquired replacement with the output reference for owning cleanup."
+        "Original function filtering/copy loop uses active function declaration order and independent FunctionInterpretation copies. Display writes through io.Writer and translation returns Go errors while retaining translated declarations explicitly. Go errors before model acquisition retire the reached replacement owner; a stopped old-model deletion leaves the already-acquired replacement with the output reference for owning cleanup."
       ]
     },
     {

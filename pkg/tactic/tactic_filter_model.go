@@ -4,6 +4,7 @@ package tactic
 
 import (
 	"errors"
+	"io"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -13,7 +14,6 @@ import (
 )
 
 // Original filter converter copies unmarked constants/functions and universes.
-// AST translation and display remain unported.
 type tacticFilterModelConverter struct {
 	tacticConverterBase
 	manager      *ast.ASTManager
@@ -142,6 +142,47 @@ func (c *tacticFilterModelConverter) ApplyModel(out *ModelRef, _ uint32) (err er
 func (c *tacticFilterModelConverter) ApplyUnindexed(out *ModelRef) error {
 	return c.ApplyModel(out, 0)
 }
+
+func (c *tacticFilterModelConverter) Display(out io.Writer) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if out == nil {
+		return ast.ErrASTHandle
+	}
+	return c.displayFilter(out)
+}
+
+func (c *tacticFilterModelConverter) Translate(translator *ast.ASTTranslation) (_ *tacticFilterModelConverter, err error) {
+	if err = c.open(); err != nil {
+		return nil, err
+	}
+	if translator == nil || translator.From() != c.manager || translator.To() == nil {
+		return nil, ast.ErrASTHandle
+	}
+	result, err := NewFilterModel(translator.To())
+	if err != nil {
+		return nil, err
+	}
+	published := false
+	defer func() {
+		if !published {
+			err = errors.Join(err, result.Close())
+		}
+	}()
+	for _, declaration := range c.declarations {
+		translated, e := translator.Translate(declaration)
+		if e != nil {
+			return nil, e
+		}
+		if e = result.Insert(translated); e != nil {
+			return nil, e
+		}
+	}
+	published = true
+	return result, nil
+}
+
 func (c *tacticFilterModelConverter) ApplyLabels(_ *ModelLabels, _ uint32) error {
 	return c.open()
 }
