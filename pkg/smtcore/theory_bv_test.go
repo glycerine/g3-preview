@@ -188,7 +188,7 @@ func TestSMTBitVectorExpandsNewEquality(t *testing.T) {
 	}
 }
 
-func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
+func TestSMTBitVectorDivisionByZeroValueIsUninterpreted(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
 	one, err := m.BitVectorNumeralUint64(1, 4)
 	astTestMust(t, err)
@@ -205,8 +205,8 @@ func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
 	astTestMust(t, solver.Assert(equality))
 	status, err := solver.CheckSat(nil)
 	astTestMust(t, err)
-	if status != lbool.Undef {
-		t.Fatal("unsupported BV operation", status)
+	if status != lbool.True {
+		t.Fatal("uninterpreted BV division-by-zero value", status)
 	}
 }
 

@@ -113714,7 +113714,7 @@
         "TestSMTBitVectorUnsignedMulOverflowCircuit",
         "TestSMTBitVectorSignedMulBounds",
         "TestSMTBitVectorPublishesNumeralModelValue",
-        "TestSMTBitVectorUnsupportedOperationGivesUnknown"
+        "TestSMTBitVectorDivisionByZeroValueIsUninterpreted"
       ],
       "conditionals": [
         {
@@ -114086,7 +114086,7 @@
         "TestSMTBitVectorUnsignedMulOverflowCircuit",
         "TestSMTBitVectorSignedMulBounds",
         "TestSMTBitVectorPublishesNumeralModelValue",
-        "TestSMTBitVectorUnsupportedOperationGivesUnknown"
+        "TestSMTBitVectorDivisionByZeroValueIsUninterpreted"
       ],
       "conditionals": [
         {

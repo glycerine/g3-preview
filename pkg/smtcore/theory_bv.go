@@ -1143,7 +1143,11 @@ func (t *SMTBitVectorTheory) bitsFor(expression ast.ASTHandle) ([]ast.ASTHandle,
 		bits, handled, err = t.operationBits(expression, op)
 		if err == nil && !handled {
 			bits, err = t.symbolicBits(expression, width)
-			t.unsupported = true
+			// The source leaves its five division-by-zero value functions
+			// uninterpreted and includes them in the generated model.
+			if op < 12 || op > 16 {
+				t.unsupported = true
+			}
 		}
 	} else {
 		bits, err = t.symbolicBits(expression, width)
