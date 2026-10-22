@@ -100893,7 +100893,7 @@
       "path": "src/smt/params/qi_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_qi_params.go",
         "pkg/smtcore/util_smt_qi_params_source_test.go"
@@ -100911,12 +100911,12 @@
         "TestSMTQIEveryGoCostReplacementReservation",
         "TestSMTQIFailedCostDoesNotPublishLaterScalarDefaults"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Fourteen getter/publications, one lexical helper and twenty-two endl insertion chains (src/smt/params/qi_params.cpp:22-65)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_qi_params.go",
           "tests": [
             "TestSMTQILiteralDefaultsUninitializedEMatchingAndGoText",
@@ -100933,7 +100933,7 @@
         },
         {
           "name": "Actual cost/new_gen construction before later scalar initializer publication; failed-cost diagnostic prefix (src/smt/params/qi_params.h:32-104)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_qi_params.go",
           "tests": [
             "TestSMTQIFailedCostDoesNotPublishLaterScalarDefaults"
@@ -100956,7 +100956,7 @@
       "path": "src/smt/params/qi_params.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_qi_params.go",
         "pkg/smtcore/util_smt_qi_params_source_test.go",
@@ -100992,12 +100992,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Twenty-two source members, literal uninitialized ematching, Go string construction and update body (src/smt/params/qi_params.h:31-109)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_qi_params.go",
           "tests": [
             "TestSMTQILiteralDefaultsUninitializedEMatchingAndGoText",
@@ -101014,7 +101014,7 @@
         },
         {
           "name": "Actual cost/new_gen construction before later scalar initializer publication; failed-cost diagnostic prefix (src/smt/params/qi_params.h:32-104)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_qi_params.go",
           "tests": [
             "TestSMTQIFailedCostDoesNotPublishLaterScalarDefaults"
@@ -101022,7 +101022,7 @@
         },
         {
           "name": "Compiler-generated concrete parent/QI owned copy and assignment (src/smt/params/qi_params.h:31-109)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_params_copy_source.go",
           "tests": [
             "TestSMTParamsCopyConstructorPreservesAllBasesAndBorrowedPointerWithoutGetters",
