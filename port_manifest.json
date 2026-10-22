@@ -112959,19 +112959,22 @@
       "path": "src/solver/combined_solver_params.hpp",
       "component": "solver",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/solver/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/solver/combined_solver_params.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestCombinedSolverParamsDefaultsGlobalAndLocalPrecedence",
+        "TestCombinedSolverParamDescriptors"
       ],
       "conditionals": [
         {
@@ -112983,8 +112986,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
@@ -113000,10 +113003,19 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "constructor-time combined_solver module snapshot and solver2_timeout, ignore_solver1 and solver2_unknown getters",
+          "status": "ported",
+          "go_target": "pkg/solver/combined_solver_params.go",
+          "tests": [
+            "TestCombinedSolverParamsDefaultsGlobalAndLocalPrecedence",
+            "TestCombinedSolverParamDescriptors"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes preserve the static catalog. The runtime facade borrows local parameters, owns one combined_solver module snapshot and uses resumable tracked destruction."
       ],
       "deviations": []
     },
@@ -113011,13 +113023,34 @@
       "path": "src/solver/combined_solver_params.pyg",
       "component": "solver",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/combined_solver_params.go",
+        "pkg/solver/gparams_catalog_collectors.go"
+      ],
+      "tests": [
+        "TestCombinedSolverParamsDefaultsGlobalAndLocalPrecedence",
+        "TestCombinedSolverParamDescriptors"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "three combined_solver parameter declarations, defaults, documentation and generated accessors",
+          "status": "ported",
+          "go_target": "pkg/solver/combined_solver_params.go",
+          "go_targets": [
+            "pkg/solver/gparams_catalog_collectors.go"
+          ],
+          "tests": [
+            "TestCombinedSolverParamsDefaultsGlobalAndLocalPrecedence",
+            "TestCombinedSolverParamDescriptors"
+          ]
+        }
+      ],
+      "ownership": [
+        "Generated scalar declarations own no dynamic values; the concrete facade owns its acquired global module snapshot."
+      ],
       "deviations": []
     },
     {
