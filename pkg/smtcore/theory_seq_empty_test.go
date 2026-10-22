@@ -264,6 +264,39 @@ func TestSMTSequenceTheoryConcreteWordDisequationConflict(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryReducedWordDisequationConflict(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	ab, err := m.MkString("ab")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-reduced-diseq-x"), sort)
+	astTestMust(t, err)
+	xa, err := m.MkSequenceConcat(x, a)
+	astTestMust(t, err)
+	left, err := m.MkSequenceConcat(xa, b)
+	astTestMust(t, err)
+	right, err := m.MkSequenceConcat(x, ab)
+	astTestMust(t, err)
+	equality, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	disequality, err := m.MkNot(equality)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(disequality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("associatively equal words satisfied a disequality", status)
+	}
+}
+
 func TestSMTSequenceTheoryConcreteNonContainsConflict(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	abc, err := m.MkString("abc")

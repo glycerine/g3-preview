@@ -879,6 +879,13 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if conflict {
 		return SMTFinalCheckContinue, nil
 	}
+	conflict, err = t.checkReducedDisequations()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if conflict {
+		return SMTFinalCheckContinue, nil
+	}
 	progress, err = t.checkSequenceExtensionality()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err

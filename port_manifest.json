@@ -117285,10 +117285,10 @@
           "tests": ["TestSMTSequenceTheoryConcreteWordEquationConflict"]
         },
         {
-          "name": "asserted disequality capture and concrete word re-expansion conflict with SAT-literal dependencies (src/smt/theory_seq.cpp:4086-4106 and solve_ne retained concrete case)",
+          "name": "asserted disequality capture, concrete word re-expansion, solution expansion, concat flattening, literal folding and equal-boundary reduction conflicts with SAT-literal dependencies (src/smt/theory_seq.cpp:1841-2013,4086-4106)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
-          "tests": ["TestSMTSequenceTheoryConcreteWordDisequationConflict"]
+          "tests": ["TestSMTSequenceTheoryConcreteWordDisequationConflict", "TestSMTSequenceTheoryReducedWordDisequationConflict"]
         },
         {
           "name": "false contains re-expansion and concrete substring conflict with assignment and equality dependencies (src/smt/theory_seq.cpp solve_nc/assign_eh retained concrete case)",
