@@ -104489,6 +104489,7 @@
         "TestSMTClauseSimplificationDropsFalseTailLiteral",
         "TestSMTClauseSimplificationDeletesSatisfiedReasonSafely",
         "TestSMTClauseSimplificationRetainsProofReasons",
+        "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
@@ -105445,7 +105446,7 @@
           ]
         },
         {
-          "name": "Boolean decisions, first-UIP conflict learning, non-chronological backjumping, propagation, timeout/cancellation/resource/memory and conflict-limit checks, and final-check search control",
+          "name": "Boolean decisions, first-UIP conflict learning, non-chronological backjumping, propagation, fast and timed slow progress sampling, timeout/cancellation/resource/memory and conflict-limit checks, and final-check search control",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_search.go",
           "tests": [
@@ -105455,7 +105456,8 @@
             "TestSMTKernelSearchReportsCancellationAndResourceLimit",
             "TestSMTKernelSearchReportsTimeout",
             "TestSMTKernelSearchReportsMemoryWatermark",
-            "TestSMTSolverStopsAtConfiguredConflictLimit"
+            "TestSMTSolverStopsAtConfiguredConflictLimit",
+            "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals"
           ]
         },
         {

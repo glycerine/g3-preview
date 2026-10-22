@@ -74,7 +74,7 @@ func smtDecisionLiteral(variable int32, phase lbool.LBool) SMTLiteral {
 	return NewSMTLiteral(variable, phase == lbool.False)
 }
 
-func (k *SMTKernel) searchResourceLimitExceeded(timer *stopwatch.Timer) (bool, error) {
+func (k *SMTKernel) searchResourceLimitExceeded(timer *stopwatch.Timer, nextProgressSample *uint32) (bool, error) {
 	timedOut, err := timer.MSTimeout(k.smtState.Timeout)
 	if err != nil {
 		return false, err
@@ -82,6 +82,26 @@ func (k *SMTKernel) searchResourceLimitExceeded(timer *stopwatch.Timer) (bool, e
 	if timedOut {
 		k.lastFailure = SMTFailureTimeout
 		return true, nil
+	}
+	if k.callback != nil {
+		k.callback.FastProgressSample()
+		if k.smtState.ProgressSamplingFreq > 0 {
+			if nextProgressSample == nil {
+				return false, ast.ErrASTHandle
+			}
+			due, sampleErr := timer.MSTimeout(*nextProgressSample + 1)
+			if sampleErr != nil {
+				return false, sampleErr
+			}
+			if due {
+				k.callback.SlowProgressSample()
+				seconds, sampleErr := timer.GetSeconds()
+				if sampleErr != nil {
+					return false, sampleErr
+				}
+				*nextProgressSample = uint32(seconds*1000) + k.smtState.ProgressSamplingFreq
+			}
+		}
 	}
 	exceeded, err := k.manager.Canceled()
 	if err != nil {
@@ -122,6 +142,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 	baseLevel := k.internalizer.scopeLevel
 	conflictBase := k.internalizer.statistics.NumConflicts
 	restarts := newSMTRestartState(k.smtState)
+	var nextProgressSample uint32
 	timer, err := stopwatch.NewTimer(k.timerClock)
 	if err != nil {
 		return lbool.Undef, err
@@ -145,15 +166,12 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		k.internalizer.endSearchPersistence()
 	}()
 	for {
-		exceeded, err := k.searchResourceLimitExceeded(timer)
+		exceeded, err := k.searchResourceLimitExceeded(timer, &nextProgressSample)
 		if err != nil {
 			return lbool.Undef, err
 		}
 		if exceeded {
 			return lbool.Undef, nil
-		}
-		if k.callback != nil {
-			k.callback.FastProgressSample()
 		}
 		consistent, err := k.internalizer.PropagateCore()
 		if err != nil {
@@ -221,7 +239,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			}
 			continue
 		}
-		exceeded, err = k.searchResourceLimitExceeded(timer)
+		exceeded, err = k.searchResourceLimitExceeded(timer, &nextProgressSample)
 		if err != nil {
 			return lbool.Undef, err
 		}

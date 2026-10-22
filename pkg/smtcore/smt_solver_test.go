@@ -854,3 +854,28 @@ func TestSMTSolverForwardsFastProgressSamples(t *testing.T) {
 		t.Fatal("detached progress callback", before, recorder.fast)
 	}
 }
+
+func TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals(t *testing.T) {
+	m := astTestManager(t)
+	kernel, err := NewSMTKernel(m, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, kernel.Close()) })
+	var now uint64
+	kernel.timerClock = func() (uint64, error) {
+		now += 2_000_000
+		return now, nil
+	}
+	kernel.smtState.ProgressSamplingFreq = 1
+	recorder := &smtSolverProgressRecorder{}
+	astTestMust(t, kernel.SetProgressCallback(recorder))
+	a := smtRelevancyBool(t, m, "smt-slow-progress-a")
+	b := smtRelevancyBool(t, m, "smt-slow-progress-b")
+	formula, err := m.MkOr(a, b)
+	astTestMust(t, err)
+	astTestMust(t, kernel.Assert(formula, ast.ASTHandle{}))
+	status, err := kernel.Check()
+	astTestMust(t, err)
+	if status != lbool.True || recorder.fast == 0 || recorder.slow == 0 {
+		t.Fatal("progress callback", status, recorder.fast, recorder.slow)
+	}
+}
