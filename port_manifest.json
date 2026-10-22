@@ -101899,7 +101899,7 @@
       "path": "src/smt/params/theory_pb_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_pb_params.go",
         "pkg/smtcore/util_smt_pb_params_source_test.go"
@@ -101912,12 +101912,12 @@
         "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "One lexical helper, UInt then three Bool publications, four separate endl insertion chains (src/smt/params/theory_pb_params.cpp:22-37)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_pb_params.go",
           "tests": [
             "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
@@ -101940,7 +101940,7 @@
       "path": "src/smt/params/theory_pb_params.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_pb_params.go",
         "pkg/smtcore/util_smt_pb_params_source_test.go"
@@ -101963,12 +101963,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Four literal defaults; constructor has no update (src/smt/params/theory_pb_params.h:25-39)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_pb_params.go",
           "tests": [
             "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
@@ -101991,7 +101991,7 @@
       "path": "src/smt/params/theory_str_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_str_params.go",
         "pkg/smtcore/util_smt_str_params_source_test.go"
@@ -102003,12 +102003,12 @@
         "TestSMTStrEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTStrNullGlobalIncompleteConstructorAndOwnerEligibility"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "One lexical smt helper and seventeen ordered RHS publications (src/smt/params/theory_str_params.cpp:21-40)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_str_params.go",
           "tests": [
             "TestSMTStrSeventeenLiteralDefaultsAndMandatoryConstructorUpdate",
@@ -102030,7 +102030,7 @@
       "path": "src/smt/params/theory_str_params.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_str_params.go",
         "pkg/smtcore/util_smt_str_params_source_test.go"
@@ -102052,12 +102052,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Seventeen scalar defaults then mandatory constructor update (src/smt/params/theory_str_params.h:25-143)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_str_params.go",
           "tests": [
             "TestSMTStrSeventeenLiteralDefaultsAndMandatoryConstructorUpdate",
