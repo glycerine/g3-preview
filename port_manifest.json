@@ -85209,41 +85209,41 @@
       "path": "src/parsers/util/CMakeLists.txt",
       "component": "parsers",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/parsers/util/scanner.go", "pkg/parsers/util/simple_parser.go", "pkg/parsers/util/cost_parser.go", "pkg/parsers/util/pattern_validation.go", "pkg/parsers/util/parser_params.go"],
+      "tests": ["TestScannerSMT2TokensNumbersSymbolsStringsAndComments", "TestCostParserSourceExpressionAndVariableReset", "TestPatternValidatorVariablesCoverageAndForbiddenOperators"],
       "registrations": [
         {
           "line": 1,
           "text": "z3_add_component(parser_util"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery and compilation replace the parser_util CMake component registration."]
     },
     {
       "path": "src/parsers/util/cost_parser.cpp",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/parsers/util/cost_parser.go", "pkg/parsers/util/simple_parser_test.go", "pkg/ast/ast_arith_numeral_rat.go"],
+      "tests": ["TestCostParserSourceExpressionAndVariableReset"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "Boolean/arithmetic builtin registration, exact numerals, real variables, and variable reset", "status": "ported", "go_target": "pkg/parsers/util/cost_parser.go", "tests": ["TestCostParserSourceExpressionAndVariableReset"]}],
+      "ownership": ["CostParser owns AST references for its created variables and releases them in reverse order on reset/close."],
+      "deviations": ["ArithmeticNumeralRat keeps the AST manager's numeral service internal while accepting the scanner's idiomatic math/big.Rat value."]
     },
     {
       "path": "src/parsers/util/cost_parser.h",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/parsers/util/cost_parser.go", "pkg/parsers/util/simple_parser_test.go"],
+      "tests": ["TestCostParserSourceExpressionAndVariableReset"],
       "conditionals": [
         {
           "line": 19,
@@ -85254,21 +85254,23 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "cost parser construction, numeral callbacks, indexed variable creation, reset, and close", "status": "ported", "go_target": "pkg/parsers/util/cost_parser.go", "tests": ["TestCostParserSourceExpressionAndVariableReset"]}],
+      "ownership": ["The embedded SimpleParser borrows the AST manager; the cost-variable reference slice owns only variables created by this parser."],
       "deviations": []
     },
     {
       "path": "src/parsers/util/parser_params.hpp",
       "component": "parsers",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/parsers/util/gparams_catalog_collectors.go",
+        "pkg/parsers/util/parser_params.go",
+        "pkg/parsers/util/parser_params_test.go",
         "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
@@ -85276,7 +85278,8 @@
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestParserParamsDefaultsSnapshotAndLocalPrecedence"
       ],
       "conditionals": [
         {
@@ -85288,11 +85291,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and generated parser parameter accessors",
           "status": "ported",
           "go_target": "pkg/parsers/util/gparams_catalog_collectors.go",
           "tests": [
@@ -85305,23 +85308,24 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
-        }
+        },
+        {"name": "constructor snapshot and three generated Boolean getters", "status": "ported", "go_target": "pkg/parsers/util/parser_params.go", "tests": ["TestParserParamsDefaultsSnapshotAndLocalPrecedence"]}
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All 458 ordered metadata rows are independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md. ParserParams borrows the local ParamsRef and owns its constructor-time parser module snapshot."
       ],
-      "deviations": []
+      "deviations": ["ParserParams borrows the local ParamsRef and owns the constructor-time parser module snapshot with tracked cleanup."]
     },
     {
       "path": "src/parsers/util/parser_params.pyg",
       "component": "parsers",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "status": "ported",
+      "go_targets": ["pkg/parsers/util/gparams_catalog_collectors.go", "pkg/parsers/util/parser_params.go", "pkg/parsers/util/parser_params_test.go"],
+      "tests": ["TestParserParamsDefaultsSnapshotAndLocalPrecedence"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "parser module descriptor rows and generated accessors", "status": "ported", "go_target": "pkg/parsers/util/parser_params.go", "tests": ["TestParserParamsDefaultsSnapshotAndLocalPrecedence"]}],
       "ownership": [],
       "deviations": []
     },
@@ -85329,22 +85333,22 @@
       "path": "src/parsers/util/pattern_validation.cpp",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/parsers/util/pattern_validation.go", "pkg/parsers/util/pattern_validation_test.go"],
+      "tests": ["TestPatternValidatorVariablesCoverageAndForbiddenOperators"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "tree traversal, forbidden declaration checks, free/new variable checks, coverage, and diagnostics", "status": "ported", "go_target": "pkg/parsers/util/pattern_validation.go", "tests": ["TestPatternValidatorVariablesCoverageAndForbiddenOperators"]}],
+      "ownership": ["Validation borrows the AST DAG and manager and owns only its traversal slice and found-variable map."],
+      "deviations": ["Warnings are written to the caller's io.Writer, preserving source text and line/position without a process-global warning sink."]
     },
     {
       "path": "src/parsers/util/pattern_validation.h",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/parsers/util/pattern_validation.go", "pkg/parsers/util/pattern_validation_test.go"],
+      "tests": ["TestPatternValidatorVariablesCoverageAndForbiddenOperators"],
       "conditionals": [
         {
           "line": 19,
@@ -85355,38 +85359,38 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "PatternValidator construction and full/new-binding validation entry points", "status": "ported", "go_target": "pkg/parsers/util/pattern_validation.go", "tests": ["TestPatternValidatorVariablesCoverageAndForbiddenOperators"]}],
+      "ownership": ["The validator borrows its manager and warning writer."],
       "deviations": []
     },
     {
       "path": "src/parsers/util/scanner.cpp",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/parsers/util/scanner.go", "pkg/parsers/util/scanner_test.go"],
+      "tests": ["TestScannerSMT2TokensNumbersSymbolsStringsAndComments", "TestScannerLegacyNegativeParametersAndBitVectorCompatibility", "TestScannerErrorsAreTerminal"],
       "assertions": [
         {
           "line": 50,
           "text": "SASSERT(m_bpos > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "buffered character input, unread, comments, quoted symbols, identifiers/parameters, exact numbers, strings, bit-vector literals, and token dispatch", "status": "ported", "go_target": "pkg/parsers/util/scanner.go", "tests": ["TestScannerSMT2TokensNumbersSymbolsStringsAndComments", "TestScannerLegacyNegativeParametersAndBitVectorCompatibility", "TestScannerErrorsAreTerminal"]}],
+      "ownership": ["Scanner owns its bufio.Reader, lexical strings, parameter slice and exact math/big.Rat token value while borrowing input and diagnostic writers."],
+      "deviations": ["bufio.Reader replaces the source's manual 1KiB buffer and interactive special case while retaining one-rune unread semantics."]
     },
     {
       "path": "src/parsers/util/scanner.h",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/parsers/util/scanner.go", "pkg/parsers/util/scanner_test.go"],
+      "tests": ["TestScannerSMT2TokensNumbersSymbolsStringsAndComments", "TestScannerLegacyNegativeParametersAndBitVectorCompatibility", "TestScannerErrorsAreTerminal"],
       "conditionals": [
         {
           "line": 19,
@@ -85397,19 +85401,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "token enum, scanner construction, position/value accessors, parameter access, and Scan", "status": "ported", "go_target": "pkg/parsers/util/scanner.go", "tests": ["TestScannerSMT2TokensNumbersSymbolsStringsAndComments"]}],
+      "ownership": ["Number, identifier and parameter accessors return independent Go values or slices."],
       "deviations": []
     },
     {
       "path": "src/parsers/util/simple_parser.cpp",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/parsers/util/simple_parser.go", "pkg/parsers/util/simple_parser_test.go"],
+      "tests": ["TestSimpleParserBuiltinVariablesAndFailures", "TestCostParserSourceExpressionAndVariableReset"],
       "assertions": [
         {
           "line": 34,
@@ -85428,19 +85432,19 @@
           "text": "SASSERT(!m_vars.contains(s));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "builtin/variable registration, recursive expression parsing, reset, string/file/reader entry points, and syntax refusal", "status": "ported", "go_target": "pkg/parsers/util/simple_parser.go", "tests": ["TestSimpleParserBuiltinVariablesAndFailures", "TestCostParserSourceExpressionAndVariableReset"]}],
+      "ownership": ["Each parse owns temporary AST references for constructed subexpressions, creates an independent result reference, and releases the temporary trail in reverse order on success or failure."],
+      "deviations": ["Duplicate registration returns a Go error in place of source assertions; syntax errors retain the source false result and write parser error to the configurable warning writer."]
     },
     {
       "path": "src/parsers/util/simple_parser.h",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/parsers/util/simple_parser.go", "pkg/parsers/util/simple_parser_test.go"],
+      "tests": ["TestSimpleParserBuiltinVariablesAndFailures", "TestCostParserSourceExpressionAndVariableReset"],
       "conditionals": [
         {
           "line": 19,
@@ -85451,11 +85455,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "SimpleParser public registration/reset/parse API and typed numeral hooks", "status": "ported", "go_target": "pkg/parsers/util/simple_parser.go", "tests": ["TestSimpleParserBuiltinVariablesAndFailures"]}],
+      "ownership": ["SimpleParser borrows registered variables and the AST manager; Parse returns an owning ASTRef."],
+      "deviations": ["Typed function fields replace the two protected C++ virtual numeral methods for the single retained CostParser specialization."]
     },
     {
       "path": "src/qe/CMakeLists.txt",
