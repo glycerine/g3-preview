@@ -100655,9 +100655,14 @@
       "path": "src/smt/old_interval.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/old_interval_extended.go"
+      ],
+      "tests": [
+        "TestSMTExtendedRationalArithmeticAndUndefinedInfinity",
+        "TestSMTExtendedRationalZeroInfinityPowerAndNegation"
+      ],
       "conditionals": [
         {
           "line": 293,
@@ -100852,7 +100857,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "ext_numeral arithmetic, order, inverse, power and display",
+          "status": "ported",
+          "go_target": "pkg/smtcore/old_interval_extended.go",
+          "tests": [
+            "TestSMTExtendedRationalArithmeticAndUndefinedInfinity",
+            "TestSMTExtendedRationalZeroInfinityPowerAndNegation"
+          ]
+        },
+        {
+          "name": "old_interval arithmetic and dependencies",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -100860,9 +100881,14 @@
       "path": "src/smt/old_interval.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/old_interval_extended.go"
+      ],
+      "tests": [
+        "TestSMTExtendedRationalArithmeticAndUndefinedInfinity",
+        "TestSMTExtendedRationalZeroInfinityPowerAndNegation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -100889,7 +100915,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "ext_numeral interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/old_interval_extended.go",
+          "tests": [
+            "TestSMTExtendedRationalArithmeticAndUndefinedInfinity",
+            "TestSMTExtendedRationalZeroInfinityPowerAndNegation"
+          ]
+        },
+        {
+          "name": "old_interval interface",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
