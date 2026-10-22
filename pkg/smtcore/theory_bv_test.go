@@ -161,6 +161,33 @@ func TestSMTBitVectorExpandsDynamicDisequality(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorExpandsNewEquality(t *testing.T) {
+	m, family, solver := smtBVSolver(t)
+	family, err := m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	zero, err := m.BitVectorNumeralUint64(0, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "bv-new-eq-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "bv-new-eq-right"), sort)
+	astTestMust(t, err)
+	state := solver.kernel.internalizer
+	astTestMust(t, state.Internalize(left, false))
+	astTestMust(t, state.Internalize(right, false))
+	leftNode, rightNode := state.context.enodes[left], state.context.enodes[right]
+	theory, ok := state.theories[family].(*SMTBitVectorTheory)
+	if !ok || theory == nil {
+		t.Fatal("missing bit-vector theory")
+	}
+	before := len(state.Clauses())
+	astTestMust(t, theory.NewEquality(leftNode.TheoryVar(family), rightNode.TheoryVar(family)))
+	if len(state.Clauses()) <= before || theory.statistics.eqDynamic == 0 {
+		t.Fatal("new equality did not publish bit equivalence", before, len(state.Clauses()), theory.statistics.eqDynamic)
+	}
+}
+
 func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
 	one, err := m.BitVectorNumeralUint64(1, 4)

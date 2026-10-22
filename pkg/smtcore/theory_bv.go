@@ -1418,7 +1418,18 @@ func (t *SMTBitVectorTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHan
 	return err
 }
 
-func (*SMTBitVectorTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error { return nil }
+func (t *SMTBitVectorTheory) NewEquality(left, right SMTTheoryVar) error {
+	leftNode, err := t.Enode(left)
+	if err != nil {
+		return err
+	}
+	rightNode, err := t.Enode(right)
+	if err != nil {
+		return err
+	}
+	_, err = t.MkEqualityLiteral(leftNode.owner, rightNode.owner, true)
+	return err
+}
 
 func (t *SMTBitVectorTheory) NewDisequality(left, right SMTTheoryVar) error {
 	leftNode, err := t.Enode(left)
