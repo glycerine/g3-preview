@@ -113638,22 +113638,43 @@
       "path": "src/smt/theory_opt.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/theory_opt.go"
+      ],
+      "tests": [
+        "TestSMTTheoryOptimizationLinearAndNumeralRecognition"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "wrapped-numeral recognition and iterative linear arithmetic traversal",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_opt.go",
+          "tests": [
+            "TestSMTTheoryOptimizationLinearAndNumeralRecognition"
+          ]
+        }
+      ],
+      "ownership": [
+        "The optimization utility borrows its AST manager; its work stack and visited map are native call-local Go owners."
+      ],
+      "deviations": [
+        "Concrete arithmetic operator identifiers replace arith_util predicates, while preserving wrapper peeling, foreign-family leaves and multiplication coefficient selection."
+      ]
     },
     {
       "path": "src/smt/theory_opt.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_opt.go"
+      ],
+      "tests": [
+        "TestSMTTheoryOptimizationLinearAndNumeralRecognition"
+      ],
       "conditionals": [
         {
           "line": 25,
@@ -113664,11 +113685,30 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_linear and is_numeral helpers",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_opt.go",
+          "tests": [
+            "TestSMTTheoryOptimizationLinearAndNumeralRecognition"
+          ]
+        },
+        {
+          "name": "value, maximize and add_objective virtual contract",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The helper borrows expressions. The future objective contract must return concrete owned infinite-rational and blocker values from retained arithmetic-theory consumers."
+      ],
+      "deviations": [
+        "No speculative universal optimizer interface is added before a retained Go arithmetic-theory consumer fixes the concrete ownership contract."
+      ]
     },
     {
       "path": "src/smt/theory_pb.cpp",
