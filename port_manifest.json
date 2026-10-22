@@ -112923,22 +112923,80 @@
       "path": "src/solver/combined_solver.cpp",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/combined_solver.go"
+      ],
+      "tests": [
+        "TestCombinedSolverDelayedInitializationAndIncrementalRouting",
+        "TestCombinedSolverAssumptionsAndTrackedAssertionsForceSecond",
+        "TestCombinedSolverUnknownPolicyAndTimedFallback",
+        "TestCombinedSolverRealTimeoutCancellationIsScoped",
+        "TestCombinedSolverFactoryOwnsFactoriesAndBuildsPair",
+        "TestCombinedSolverTranslationPreservesState"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "combined solver construction, delayed assertion mirroring, incremental switching, assertion/scoping operations and parameter updates",
+          "status": "ported",
+          "go_target": "pkg/solver/combined_solver.go",
+          "tests": [
+            "TestCombinedSolverDelayedInitializationAndIncrementalRouting",
+            "TestCombinedSolverAssumptionsAndTrackedAssertionsForceSecond"
+          ]
+        },
+        {
+          "name": "check-sat first/second selection, assumption forcing, quantifier-aware unknown fallback and scoped timeout cancellation",
+          "status": "ported",
+          "go_target": "pkg/solver/combined_solver.go",
+          "tests": [
+            "TestCombinedSolverUnknownPolicyAndTimedFallback",
+            "TestCombinedSolverRealTimeoutCancellationIsScoped"
+          ]
+        },
+        {
+          "name": "consequences, progress, assertion/assumption access, display, statistics and selected result forwarding",
+          "status": "ported",
+          "go_target": "pkg/solver/combined_solver.go",
+          "tests": [
+            "TestCombinedSolverDelayedInitializationAndIncrementalRouting",
+            "TestCombinedSolverAssumptionsAndTrackedAssertionsForceSecond"
+          ]
+        },
+        {
+          "name": "translation and owning combined solver factory",
+          "status": "ported",
+          "go_target": "pkg/solver/combined_solver.go",
+          "tests": [
+            "TestCombinedSolverFactoryOwnsFactoriesAndBuildsPair",
+            "TestCombinedSolverTranslationPreservesState"
+          ]
+        }
+      ],
+      "ownership": [
+        "CombinedSolver owns one reference to each child solver and an independent parameter snapshot; Close releases second before first after retiring parameters.",
+        "The factory owns both child factories and closes them in reverse construction order. Timed checks balance exactly one resource-limit cancellation when the timer fires."
+      ],
+      "deviations": [
+        "CombinedSolverConfig supplies explicit parameter/global services, target configuration and an injectable timed runner. The default timed runner uses a Go timer and the same resource-limit cancel counter as the source scoped timer."
+      ]
     },
     {
       "path": "src/solver/combined_solver.h",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/combined_solver.go"
+      ],
+      "tests": [
+        "TestCombinedSolverDelayedInitializationAndIncrementalRouting",
+        "TestCombinedSolverUnknownPolicyAndTimedFallback",
+        "TestCombinedSolverFactoryOwnsFactoriesAndBuildsPair",
+        "TestCombinedSolverTranslationPreservesState"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -112949,10 +113007,22 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_combined_solver and mk_combined_solver_factory declarations",
+          "status": "ported",
+          "go_target": "pkg/solver/combined_solver.go",
+          "tests": [
+            "TestCombinedSolverDelayedInitializationAndIncrementalRouting",
+            "TestCombinedSolverFactoryOwnsFactoriesAndBuildsPair"
+          ]
+        }
+      ],
+      "ownership": [
+        "Typed constructors retain solver inputs; the factory takes ownership of both factory inputs until Close."
+      ],
       "deviations": []
     },
     {
