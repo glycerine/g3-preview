@@ -41851,9 +41851,10 @@
             "TestDirectProofDisjointNormalChainMerge",
             "TestDirectProofNormalChainMixedRepresentativeMerge",
             "TestDirectProofNormalInequalitySumAndFinalSubstitution",
-            "TestDirectProofRotatedLeqToEqSimplification"
+            "TestDirectProofRotatedLeqToEqSimplification",
+            "TestDirectProofRotatedEqToLeqSimplification"
           ],
-          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary and normal-form conditional inequality summation, nested coefficient distribution, ordinary sum/congruence/modus-ponens and leq2eq rotation, arithmetic normal-form vocabulary, chain merging, and final substitution, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Rewrite-chain-to-normal arithmetic reduction, arithmetic modus ponens, and eq2leq rotation remain pending."
+          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary and normal-form conditional inequality summation, nested coefficient distribution, ordinary sum/congruence/modus-ponens, leq2eq, and eq2leq rotation including mixed arithmetic movers, arithmetic normal-form vocabulary, chain merging, and final substitution, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Rewrite-chain-to-normal arithmetic reduction and arithmetic modus ponens remain pending."
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",

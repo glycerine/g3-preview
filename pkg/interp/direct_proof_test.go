@@ -1372,3 +1372,61 @@ func TestDirectProofRotatedLeqToEqSimplification(t *testing.T) {
 		t.Fatal("rotated leq2eq", declaration, e)
 	}
 }
+
+func TestDirectProofRotatedEqToLeqSimplification(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	integer, err := manager.IntType()
+	interpMust(t, err)
+	x, err := manager.MakeVariable("rot-eq2leq-x", integer)
+	interpMust(t, err)
+	x = interpPin(t, m, x)
+	y, err := manager.MakeVariable("rot-eq2leq-y", integer)
+	interpMust(t, err)
+	y = interpPin(t, m, y)
+	base, err := NewBase(manager, []ast.ASTHandle{x, y}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+
+	for _, test := range []struct {
+		name  string
+		left  ast.ASTHandle
+		right ast.ASTHandle
+	}{
+		{name: "unmixed", left: x, right: y},
+		{name: "mixed-left", left: func() ast.ASTHandle {
+			mixed, e := manager.Make(OperatorPlus, x, y)
+			interpMust(t, e)
+			return mixed
+		}(), right: x},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			equality, e := manager.Make(OperatorEqual, test.left, test.right)
+			interpMust(t, e)
+			rewrite, e := direct.makeRewrite(TermA, direct.topPosition, truth, equality)
+			interpMust(t, e)
+			chain, e := direct.chainCons(truth, rewrite)
+			interpMust(t, e)
+			inequality, e := manager.Make(OperatorLE, test.left, test.right)
+			interpMust(t, e)
+			negativeInequality, e := manager.MkNot(inequality)
+			interpMust(t, e)
+			placeholder, e := direct.placeholder(negativeInequality)
+			interpMust(t, e)
+			proof, e := direct.makeSymbol(direct.eqToLeq, chain, placeholder)
+			interpMust(t, e)
+			proof, e = direct.makeSymbol(direct.rotateSum, negativeInequality, proof)
+			interpMust(t, e)
+			result, e := direct.SimplifyProofTerm(proof)
+			interpMust(t, e)
+			valid, e := direct.isInequality(result)
+			if e != nil || !valid {
+				t.Fatal("rotated eq2leq result", result, e)
+			}
+		})
+	}
+}

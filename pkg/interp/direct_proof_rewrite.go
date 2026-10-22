@@ -926,6 +926,8 @@ func (p *DirectProofInterpolator) simplifyRotation(args []ast.ASTHandle) (ast.AS
 		return p.simplifyRotatedModusPonens(placeholder, args[1])
 	case p.leqToEq:
 		return p.simplifyRotatedLeqToEq(placeholder, args[0], args[1])
+	case p.eqToLeq:
+		return p.simplifyRotatedEqToLeq(placeholder, args[0], args[1])
 	default:
 		return ast.ASTHandle{}, ProofError{}
 	}
