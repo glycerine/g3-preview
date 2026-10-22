@@ -7,11 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-type smtTestJustification struct{}
-
-func (*smtTestJustification) smtJustification()             {}
-func (*smtTestJustification) InRegion() bool                { return false }
-func (*smtTestJustification) Release(*ast.ASTManager) error { return nil }
+type smtTestJustification struct{ SMTJustificationBase }
 
 func TestSMTCompactBooleanAndEqualityJustifications(t *testing.T) {
 	if NullSMTBooleanJustification().Kind() != SMTBooleanJustificationClause || NewSMTBooleanAxiom().Kind() != SMTBooleanJustificationAxiom {

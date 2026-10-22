@@ -9,6 +9,11 @@ import "github.com/glycerine/g3/pkg/ast"
 type SMTJustification interface {
 	smtJustification()
 	InRegion() bool
+	IsMarked() bool
+	SetMarked(bool) error
+	MarkAntecedents(SMTAntecedentMarker) error
+	FromTheory() SMTTheoryID
+	Name() string
 	Release(*ast.ASTManager) error
 }
 

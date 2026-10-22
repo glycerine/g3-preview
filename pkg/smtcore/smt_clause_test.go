@@ -11,12 +11,12 @@ import (
 )
 
 type smtClauseTestJustification struct {
+	SMTJustificationBase
 	region   bool
 	releases int
 }
 
-func (*smtClauseTestJustification) smtJustification() {}
-func (j *smtClauseTestJustification) InRegion() bool  { return j.region }
+func (j *smtClauseTestJustification) InRegion() bool { return j.region }
 func (j *smtClauseTestJustification) Release(*ast.ASTManager) error {
 	j.releases++
 	return nil

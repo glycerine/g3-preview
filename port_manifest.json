@@ -105945,9 +105945,16 @@
       "path": "src/smt/smt_justification.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_justification.go",
+        "pkg/smtcore/smt_justification_theory.go"
+      ],
+      "tests": [
+        "TestSMTJustificationBaseUnitAndSimpleAntecedents",
+        "TestSMTJustificationEqualityAntecedentRecords",
+        "TestSMTTheoryJustificationParameterExpressionAndProofOwnership"
+      ],
       "conditionals": [
         {
           "line": 252,
@@ -106040,19 +106047,50 @@
           "text": "SASSERT(!in_region());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "proof-wrapper ownership; unit-resolution, equality, simple, extended, theory and theory-lemma construction, release and antecedent marking",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_justification.go",
+          "go_targets": ["pkg/smtcore/smt_justification_theory.go"],
+          "tests": [
+            "TestSMTJustificationBaseUnitAndSimpleAntecedents",
+            "TestSMTJustificationEqualityAntecedentRecords",
+            "TestSMTTheoryJustificationParameterExpressionAndProofOwnership"
+          ]
+        },
+        {
+          "name": "proof construction and antecedent-to-proof collection for all concrete justifications",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Justification literal/equality slices are owned; enodes and antecedent links are borrowed except that a heap unit-resolution wrapper owns its heap antecedent release responsibility.",
+        "Proof wrappers retain their proof AST, theory records own copied AST parameters, and theory lemmas retain expression ASTs independently of Boolean-variable lifetime."
+      ],
+      "deviations": [
+        "A typed SMTAntecedentMarker carries dependency marking until the concrete conflict resolver is complete. Proof construction remains open and keeps this unit partial."
+      ]
     },
     {
       "path": "src/smt/smt_justification.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_justification.go",
+        "pkg/smtcore/smt_justification_theory.go",
+        "pkg/smtcore/smt_justification_refs.go"
+      ],
+      "tests": [
+        "TestSMTJustificationBaseUnitAndSimpleAntecedents",
+        "TestSMTJustificationEqualityAntecedentRecords",
+        "TestSMTTheoryJustificationParameterExpressionAndProofOwnership"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -106077,11 +106115,36 @@
           "text": "SASSERT(n1 != n2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "base mark, region, theory and name interface plus all concrete justification payloads, antecedents and cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_justification.go",
+          "go_targets": [
+            "pkg/smtcore/smt_justification_theory.go",
+            "pkg/smtcore/smt_justification_refs.go"
+          ],
+          "tests": [
+            "TestSMTJustificationBaseUnitAndSimpleAntecedents",
+            "TestSMTJustificationEqualityAntecedentRecords",
+            "TestSMTTheoryJustificationParameterExpressionAndProofOwnership"
+          ]
+        },
+        {
+          "name": "abstract and concrete mk_proof interface and debug proof display",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Region placement is represented as lifecycle metadata; Go slices own copied literal and equality records, while explicit AST references and parameter copies preserve source lifetime obligations."
+      ],
+      "deviations": [
+        "The typed marker interface replaces a direct dependency on the unfinished conflict-resolution class. Proof APIs remain open."
+      ]
     },
     {
       "path": "src/smt/smt_kernel.cpp",
