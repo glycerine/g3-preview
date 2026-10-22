@@ -48,8 +48,10 @@ type SMTQIInstance struct {
 	fingerprint *SMTFingerprint
 	quantifier  ast.ASTHandle
 	lemma       ast.ASTRef
+	proof       ast.ASTRef
 	generation  uint32
 	reducedTrue bool
+	hasProof    bool
 	closed      bool
 }
 
@@ -82,6 +84,16 @@ func (i *SMTQIInstance) Lemma() (ast.ASTHandle, error) {
 	return i.manager.RefGet(i.lemma)
 }
 
+func (i *SMTQIInstance) Proof() (ast.ASTHandle, error) {
+	if i == nil || i.manager == nil || i.closed {
+		return ast.ASTHandle{}, ast.ErrASTHandle
+	}
+	if !i.hasProof {
+		return ast.ASTHandle{}, nil
+	}
+	return i.manager.RefGet(i.proof)
+}
+
 func (i *SMTQIInstance) Close() error {
 	if i == nil || i.manager == nil {
 		return ast.ErrASTHandle
@@ -90,8 +102,11 @@ func (i *SMTQIInstance) Close() error {
 		return nil
 	}
 	var err error
+	if i.hasProof {
+		err = errors.Join(err, i.manager.DelRef(&i.proof))
+	}
 	if !i.reducedTrue {
-		err = i.manager.DelRef(&i.lemma)
+		err = errors.Join(err, i.manager.DelRef(&i.lemma))
 	}
 	i.closed = err == nil
 	return err
@@ -153,6 +168,20 @@ func (b *SMTQIInstanceBuilder) Prepare(entry SMTQIQueueEntry) (*SMTQIPreparedIns
 }
 
 func (b *SMTQIInstanceBuilder) Finish(prepared *SMTQIPreparedInstance, simplified ast.ASTHandle, stat *SMTQuantifierStat, scope uint32) (*SMTQIInstance, error) {
+	if b == nil || b.manager == nil {
+		return nil, ast.ErrASTHandle
+	}
+	proofs, err := b.manager.ProofsEnabled()
+	if err != nil {
+		return nil, err
+	}
+	if proofs {
+		return nil, ast.ErrASTDomain
+	}
+	return b.finishLemma(prepared, simplified, stat, scope)
+}
+
+func (b *SMTQIInstanceBuilder) finishLemma(prepared *SMTQIPreparedInstance, simplified ast.ASTHandle, stat *SMTQuantifierStat, scope uint32) (*SMTQIInstance, error) {
 	if b == nil || b.manager == nil || prepared == nil || prepared.manager != b.manager || prepared.closed || prepared.alreadySatisfied || stat == nil {
 		return nil, ast.ErrASTDomain
 	}
@@ -224,5 +253,109 @@ func (b *SMTQIInstanceBuilder) Finish(prepared *SMTQIPreparedInstance, simplifie
 	if err != nil {
 		return nil, err
 	}
+	return result, nil
+}
+
+// FinishWithProof constructs the source quantifier-instantiation proof after
+// the enclosing context has rewritten the prepared instance. rewriteProof is
+// the context rewriter's proof that Instance() equals simplified.
+func (b *SMTQIInstanceBuilder) FinishWithProof(prepared *SMTQIPreparedInstance, simplified, rewriteProof ast.ASTHandle, stat *SMTQuantifierStat, scope uint32) (*SMTQIInstance, error) {
+	if b == nil || b.manager == nil {
+		return nil, ast.ErrASTHandle
+	}
+	proofs, err := b.manager.ProofsEnabled()
+	if err != nil {
+		return nil, err
+	}
+	if !proofs {
+		return b.finishLemma(prepared, simplified, stat, scope)
+	}
+	result, err := b.finishLemma(prepared, simplified, stat, scope)
+	if err != nil || result.reducedTrue {
+		return result, err
+	}
+	instance, err := prepared.Instance()
+	if err != nil {
+		_ = result.Close()
+		return nil, err
+	}
+	lemma, err := result.Lemma()
+	if err != nil {
+		_ = result.Close()
+		return nil, err
+	}
+	negatedQuantifier, err := b.manager.MkNot(prepared.quantifier)
+	if err != nil {
+		_ = result.Close()
+		return nil, err
+	}
+	bareLemma, err := b.manager.MkOr(negatedQuantifier, instance)
+	if err != nil {
+		_ = result.Close()
+		return nil, err
+	}
+	bindings := make([]ast.ASTHandle, len(prepared.entry.Fingerprint.args))
+	for index, binding := range prepared.entry.Fingerprint.args {
+		if binding == nil || binding.owner.IsNull() {
+			_ = result.Close()
+			return nil, ast.ErrASTDomain
+		}
+		bindings[index] = binding.owner
+	}
+	proof, err := b.manager.MkProofQuantInstantiation(bareLemma, bindings)
+	if err != nil {
+		_ = result.Close()
+		return nil, err
+	}
+	if bareLemma != lemma {
+		if instance == simplified {
+			rewrite, err := b.manager.MkProofRewrite(bareLemma, lemma)
+			if err != nil {
+				_ = result.Close()
+				return nil, err
+			}
+			proof, err = b.manager.MkProofModusPonens(proof, rewrite)
+			if err != nil {
+				_ = result.Close()
+				return nil, err
+			}
+		} else {
+			if rewriteProof.IsNull() {
+				_ = result.Close()
+				return nil, ast.ErrASTDomain
+			}
+			bareSimplifiedLemma, err := b.manager.MkOr(negatedQuantifier, simplified)
+			if err != nil {
+				_ = result.Close()
+				return nil, err
+			}
+			congruence, err := b.manager.MkProofCongruence(bareLemma, bareSimplifiedLemma, []ast.ASTHandle{rewriteProof})
+			if err != nil {
+				_ = result.Close()
+				return nil, err
+			}
+			rewrite, err := b.manager.MkProofRewrite(bareSimplifiedLemma, lemma)
+			if err != nil {
+				_ = result.Close()
+				return nil, err
+			}
+			transitivity, err := b.manager.MkProofTransitivity(congruence, rewrite)
+			if err != nil {
+				_ = result.Close()
+				return nil, err
+			}
+			proof, err = b.manager.MkProofModusPonens(proof, transitivity)
+			if err != nil {
+				_ = result.Close()
+				return nil, err
+			}
+		}
+	}
+	result.proof, err = b.manager.NewRef(proof)
+	if err != nil {
+		_ = result.Close()
+		return nil, err
+	}
+	result.hasProof = true
 	return result, nil
 }

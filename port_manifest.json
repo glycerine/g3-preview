@@ -102344,7 +102344,8 @@
         "TestSMTQICostModelPublishesSourceVariablesAndNewGeneration",
         "TestSMTQICostModelInvalidFunctionsUseSourceFallbacks",
         "TestSMTQIInstancePrepareSubstituteAndBuildFlattenedLemma",
-        "TestSMTQIInstanceSatisfiedAndReducedTrueShortCircuits"
+        "TestSMTQIInstanceSatisfiedAndReducedTrueShortCircuits",
+        "TestSMTQIInstanceQuantifierInstantiationProof"
       ],
       "conditionals": [
         {
@@ -102429,7 +102430,15 @@
           ]
         },
         {
-          "name": "context theory-rewriter invocation, quantifier-instantiation proof construction and context internalization",
+          "name": "quantifier-instantiation proof, rewrite/congruence/transitivity normalization and modus ponens",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_qi_instance.go",
+          "tests": [
+            "TestSMTQIInstanceQuantifierInstantiationProof"
+          ]
+        },
+        {
+          "name": "context theory-rewriter invocation and context internalization",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -102459,7 +102468,8 @@
         "TestSMTQICostModelPublishesSourceVariablesAndNewGeneration",
         "TestSMTQICostModelInvalidFunctionsUseSourceFallbacks",
         "TestSMTQIInstancePrepareSubstituteAndBuildFlattenedLemma",
-        "TestSMTQIInstanceSatisfiedAndReducedTrueShortCircuits"
+        "TestSMTQIInstanceSatisfiedAndReducedTrueShortCircuits",
+        "TestSMTQIInstanceQuantifierInstantiationProof"
       ],
       "conditionals": [
         {

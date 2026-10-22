@@ -131,3 +131,64 @@ func TestSMTQIInstanceSatisfiedAndReducedTrueShortCircuits(t *testing.T) {
 	}
 	astTestMust(t, result.Close())
 }
+
+func TestSMTQIInstanceQuantifierInstantiationProof(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, boolean)
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{boolean}, Names: []symbol.Symbol{astTestSymbol(t, m, "qi-proof-x")}, Body: variable, Weight: 2,
+	})
+	astTestMust(t, err)
+	_, binding := smtEnodeConstant(t, m, 2100, boolean, 0)
+	context, err := NewSMTCheckerContext(m)
+	astTestMust(t, err)
+	builder := smtQIInstanceBuilder(t, m, context)
+	entry := SMTQIQueueEntry{Fingerprint: &SMTFingerprint{data: quantifier, args: []*SMTEnode{binding}}, Cost: 2, Generation: 1, Instantiated: true}
+	prepared, err := builder.Prepare(entry)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, prepared.Close()) })
+	instance, err := prepared.Instance()
+	astTestMust(t, err)
+	stat := &SMTQuantifierStat{}
+	result, err := builder.FinishWithProof(prepared, instance, ast.ASTHandle{}, stat, 0)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, result.Close()) })
+	lemma, err := result.Lemma()
+	astTestMust(t, err)
+	proof, err := result.Proof()
+	astTestMust(t, err)
+	fact, err := m.GetProofFact(proof)
+	astTestMust(t, err)
+	if proof.IsNull() || fact != lemma {
+		t.Fatal("quantifier instantiation proof fact", proof, fact, lemma)
+	}
+	var proofLemma ast.ASTHandle
+	var bindings []ast.ASTHandle
+	matched, err := m.MatchProofQuantInstantiation(proof, &proofLemma, &bindings)
+	astTestMust(t, err)
+	if !matched || proofLemma != lemma || len(bindings) != 1 || bindings[0] != binding.owner {
+		t.Fatal("quantifier instantiation proof parameters", matched, proofLemma, bindings)
+	}
+	negated, err := m.MkNot(instance)
+	astTestMust(t, err)
+	simplified, err := m.MkNot(negated)
+	astTestMust(t, err)
+	rewriteProof, err := m.MkProofRewrite(instance, simplified)
+	astTestMust(t, err)
+	rewritten, err := builder.FinishWithProof(prepared, simplified, rewriteProof, &SMTQuantifierStat{}, 0)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, rewritten.Close()) })
+	rewrittenLemma, err := rewritten.Lemma()
+	astTestMust(t, err)
+	rewrittenProof, err := rewritten.Proof()
+	astTestMust(t, err)
+	rewrittenFact, err := m.GetProofFact(rewrittenProof)
+	astTestMust(t, err)
+	if rewrittenFact != rewrittenLemma {
+		t.Fatal("rewrite congruence proof chain", rewrittenFact, rewrittenLemma)
+	}
+}
