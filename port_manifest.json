@@ -41606,6 +41606,7 @@
         "TestDirectProofExcludedMiddleAndCongruenceSimplification",
         "TestDirectProofPredicateModusPonensSimplification",
         "TestDirectProofUnsplitModusPonensSimplification",
+        "TestDirectProofNestedSumCoefficientDistribution",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41830,9 +41831,10 @@
             "TestDirectProofEqualityChainContradiction",
             "TestDirectProofExcludedMiddleAndCongruenceSimplification",
             "TestDirectProofPredicateModusPonensSimplification",
-            "TestDirectProofUnsplitModusPonensSimplification"
+            "TestDirectProofUnsplitModusPonensSimplification",
+            "TestDirectProofNestedSumCoefficientDistribution"
           ],
-          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Specialized rotation, nested/normal arithmetic sums, and arithmetic modus-ponens remain pending."
+          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, nested coefficient distribution, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Specialized rotation, normal-form arithmetic sums, and arithmetic modus-ponens remain pending."
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
@@ -41916,6 +41918,7 @@
         "TestDirectProofExcludedMiddleAndCongruenceSimplification",
         "TestDirectProofPredicateModusPonensSimplification",
         "TestDirectProofUnsplitModusPonensSimplification",
+        "TestDirectProofNestedSumCoefficientDistribution",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],

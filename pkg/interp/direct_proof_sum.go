@@ -117,7 +117,15 @@ func (p *DirectProofInterpolator) simplifySum(args []ast.ASTHandle) (ast.ASTHand
 				return ast.ASTHandle{}, e
 			}
 			if declaration == p.sum {
-				return ast.ASTHandle{}, ProofError{}
+				one, e := p.base.manager.MakeIntText("1")
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				distributed, e := p.distributeSumCoefficient(args[1], args[2])
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				return p.makeSymbol(p.sum, args[0], one, distributed)
 			}
 		}
 	}
@@ -146,4 +154,95 @@ func (p *DirectProofInterpolator) simplifySum(args []ast.ASTHandle) (ast.ASTHand
 		return ast.ASTHandle{}, err
 	}
 	return p.base.manager.MkAnd(aProof, conditional)
+}
+
+func (p *DirectProofInterpolator) distributeSumCoefficient(coefficient, expression ast.ASTHandle) (ast.ASTHandle, error) {
+	op, err := p.base.manager.Operator(expression)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if op == OperatorUninterpreted {
+		declaration, e := p.base.manager.Symbol(expression)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if declaration == p.sum {
+			first, e := p.base.manager.Arg(expression, 0)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			innerCoefficient, e := p.base.manager.Arg(expression, 1)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			third, e := p.base.manager.Arg(expression, 2)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			first, e = p.distributeSumCoefficient(coefficient, first)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			thirdOp, e := p.base.manager.Operator(third)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			if thirdOp == OperatorUninterpreted {
+				thirdDeclaration, symbolErr := p.base.manager.Symbol(third)
+				if symbolErr != nil {
+					return ast.ASTHandle{}, symbolErr
+				}
+				if thirdDeclaration == p.sum {
+					innerCoefficient, e = p.base.manager.Make(OperatorTimes, coefficient, innerCoefficient)
+					if e != nil {
+						return ast.ASTHandle{}, e
+					}
+					third, e = p.distributeSumCoefficient(innerCoefficient, third)
+					if e != nil {
+						return ast.ASTHandle{}, e
+					}
+					one, e := p.base.manager.MakeIntText("1")
+					if e != nil {
+						return ast.ASTHandle{}, e
+					}
+					return p.makeSymbol(p.sum, first, one, third)
+				}
+			}
+			innerCoefficient, e = p.base.manager.Make(OperatorTimes, coefficient, innerCoefficient)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			return p.makeSymbol(p.sum, first, innerCoefficient, third)
+		}
+	}
+	if op == OperatorLE {
+		left, e := p.base.manager.Arg(expression, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		right, e := p.base.manager.Arg(expression, 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		leftValue, leftNumeral, e := p.base.manager.Numeral(left)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		rightValue, rightNumeral, e := p.base.manager.Numeral(right)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if leftNumeral && rightNumeral && leftValue.Sign() == 0 && rightValue.Sign() == 0 {
+			return expression, nil
+		}
+	}
+	zero, err := p.base.manager.MakeIntText("0")
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	base, err := p.base.manager.Make(OperatorLE, zero, zero)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.makeSymbol(p.sum, base, coefficient, expression)
 }

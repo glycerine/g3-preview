@@ -977,3 +977,43 @@ func TestDirectProofUnsplitModusPonensSimplification(t *testing.T) {
 		t.Fatal("unsplit modus-ponens simplification")
 	}
 }
+
+func TestDirectProofNestedSumCoefficientDistribution(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	integer, err := manager.IntType()
+	interpMust(t, err)
+	x, err := manager.MakeVariable("nested-sum-x", integer)
+	interpMust(t, err)
+	x = interpPin(t, m, x)
+	zero, err := manager.MakeIntText("0")
+	interpMust(t, err)
+	one, err := manager.MakeIntText("1")
+	interpMust(t, err)
+	two, err := manager.MakeIntText("2")
+	interpMust(t, err)
+	inequality, err := manager.Make(OperatorLE, zero, x)
+	interpMust(t, err)
+	inequality = interpPin(t, m, inequality)
+	base, err := NewBase(manager, []ast.ASTHandle{inequality}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	inner, err := direct.makeSymbol(direct.sum, inequality, one, truth)
+	interpMust(t, err)
+	outer, err := direct.makeSymbol(direct.sum, inequality, two, inner)
+	interpMust(t, err)
+	result, err := direct.SimplifyProofTerm(outer)
+	interpMust(t, err)
+	if declaration, e := manager.Symbol(result); e != nil || declaration != direct.sum {
+		t.Fatal("distributed outer sum", declaration, e)
+	}
+	coefficient, err := manager.Arg(result, 1)
+	interpMust(t, err)
+	if coefficient != one {
+		t.Fatal("distributed outer coefficient", coefficient, one)
+	}
+}

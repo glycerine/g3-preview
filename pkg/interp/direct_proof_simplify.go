@@ -97,6 +97,12 @@ func (p *DirectProofInterpolator) simplifyProofTerm(expression ast.ASTHandle) (a
 			result, err = p.base.manager.Clone(current, args)
 		}
 		if err != nil {
+			var proofError ProofError
+			if declaration == p.sum && errors.As(err, &proofError) {
+				result, err = p.base.manager.Clone(current, args)
+			}
+		}
+		if err != nil {
 			return ast.ASTHandle{}, err
 		}
 		memo[current] = result
