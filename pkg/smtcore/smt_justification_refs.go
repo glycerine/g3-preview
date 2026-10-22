@@ -6,11 +6,11 @@ import "github.com/glycerine/g3/pkg/ast"
 
 // SMTJustification is the typed base implemented by retained concrete SMT
 // justification objects. It mirrors the source abstract justification class.
-type SMTJustification interface{ smtJustification() }
-
-// SMTClause is completed by the smt_clause port. Its pointer identity is the
-// payload stored by compact Boolean justifications.
-type SMTClause struct{ placeholder byte }
+type SMTJustification interface {
+	smtJustification()
+	InRegion() bool
+	Release(*ast.ASTManager) error
+}
 
 type SMTBooleanJustificationKind uint8
 

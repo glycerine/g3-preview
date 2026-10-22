@@ -9,7 +9,9 @@ import (
 
 type smtTestJustification struct{}
 
-func (*smtTestJustification) smtJustification() {}
+func (*smtTestJustification) smtJustification()             {}
+func (*smtTestJustification) InRegion() bool                { return false }
+func (*smtTestJustification) Release(*ast.ASTManager) error { return nil }
 
 func TestSMTCompactBooleanAndEqualityJustifications(t *testing.T) {
 	if NullSMTBooleanJustification().Kind() != SMTBooleanJustificationClause || NewSMTBooleanAxiom().Kind() != SMTBooleanJustificationAxiom {

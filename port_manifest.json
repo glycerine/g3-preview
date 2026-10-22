@@ -103063,9 +103063,14 @@
       "path": "src/smt/smt_clause.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_clause.go"
+      ],
+      "tests": [
+        "TestSMTClauseConstructionAtomsActivityDisplayAndClose",
+        "TestSMTClauseMutationAndConstructionGuards"
+      ],
       "assertions": [
         {
           "line": 30,
@@ -103108,19 +103113,38 @@
           "text": "SASSERT(m_reinit || get_atom(i) == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "construction, saved-atom ownership, deallocation, atom release, and verbose/compact display",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_clause.go",
+          "tests": [
+            "TestSMTClauseConstructionAtomsActivityDisplayAndClose",
+            "TestSMTClauseMutationAndConstructionGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The clause owns its literal and optional saved-atom slices, retains each saved AST expression, owns a heap lemma justification, and borrows region justifications on auxiliary clauses."
+      ],
+      "deviations": [
+        "Typed fields and Go slices replace the manually aligned variable-size allocation; Close preserves deletion-callback, justification, and saved-atom release order."
+      ]
     },
     {
       "path": "src/smt/smt_clause.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_clause.go"
+      ],
+      "tests": [
+        "TestSMTClauseConstructionAtomsActivityDisplayAndClose",
+        "TestSMTClauseMutationAndConstructionGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -103185,11 +103209,31 @@
           "text": "SASSERT(!m_deleted);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "clause kinds, literal mutation/views, watches, reinitialization flags, activity, callbacks, justification, saved atoms, deletion and display",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_clause.go",
+          "tests": [
+            "TestSMTClauseConstructionAtomsActivityDisplayAndClose",
+            "TestSMTClauseMutationAndConstructionGuards"
+          ]
+        },
+        {
+          "name": "erase_atom declaration without a source definition or retained caller",
+          "status": "dead_deleted",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Literals are inline owned values; saved atoms are retained AST handles; the deletion handler is borrowed and invoked at most once."
+      ],
+      "deviations": [
+        "Native slices replace begin/end iterators, and pointer identity replaces get_ptr_hash consumers. The unimplemented and unreferenced erase_atom declaration is not ported."
+      ]
     },
     {
       "path": "src/smt/smt_conflict_resolution.cpp",
