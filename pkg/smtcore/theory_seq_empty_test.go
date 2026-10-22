@@ -1036,6 +1036,42 @@ func TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryExtractOversizedPrefixIsSource(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	value, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(value)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-prefix-source"), sort)
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	two, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	extract, err := m.MkSequenceExtract(x, zero, two)
+	astTestMust(t, err)
+	length, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	lengthOne, err := m.MkEq(length, one)
+	astTestMust(t, err)
+	definition, err := m.MkEq(extract, x)
+	astTestMust(t, err)
+	notDefinition, err := m.MkNot(definition)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(lengthOne))
+	astTestMust(t, solver.Assert(notDefinition))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("oversized zero-offset extract differs from source", status)
+	}
+}
+
 func TestSMTSequenceTheoryIndexAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name   string

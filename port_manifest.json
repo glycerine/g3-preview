@@ -116805,6 +116805,7 @@
         "TestSMTSequenceTheoryNegativeBoundaryWitnesses",
         "TestSMTSequenceTheoryAtBoundaryAxioms",
         "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms",
+        "TestSMTSequenceTheoryExtractOversizedPrefixIsSource",
         "TestSMTSequenceTheoryIndexAxioms",
         "TestSMTSequenceTheoryReplaceAxioms",
         "TestSMTSequenceTheoryRegexMembershipReduction"
@@ -117361,10 +117362,10 @@
           "tests": ["TestSMTSequenceTheoryAtBoundaryAxioms"]
         },
         {
-          "name": "general seq.extract negative-offset, out-of-bounds and nonpositive-length empty results plus in-bounds decomposition and exact or truncated result length (src/smt/theory_seq.cpp:3586-3649)",
+          "name": "general seq.extract negative-offset, out-of-bounds and nonpositive-length empty results plus in-bounds decomposition, exact or truncated result length, and zero-offset prefix specialization including oversized source identity (src/smt/theory_seq.cpp:3586-3649,3701-3718)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_extract.go",
-          "tests": ["TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms"]
+          "tests": ["TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms", "TestSMTSequenceTheoryExtractOversizedPrefixIsSource"]
         },
         {
           "name": "str.indexof containment, empty-source, empty-needle, offset boundary, zero-offset witness and suffix-search axioms (src/smt/theory_seq.cpp:3150-3252)",

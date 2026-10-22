@@ -132,5 +132,46 @@ func (t *SMTSequenceTheory) addExtractAxioms(expression ast.ASTHandle) error {
 	if err != nil {
 		return err
 	}
-	return t.pushSequenceImplication(append(valid, pastRemaining), truncatedLength)
+	if err = t.pushSequenceImplication(append(valid, pastRemaining), truncatedLength); err != nil {
+		return err
+	}
+	offsetText, offsetInteger, offsetNumeral, err := state.manager.ArithmeticNumeralText(offset)
+	if err != nil || !offsetNumeral || !offsetInteger || offsetText != "0" {
+		return err
+	}
+	requestedNonnegative, err := state.manager.MkArithmeticGE(requested, zero)
+	if err != nil {
+		return err
+	}
+	prefixDefinition, err := state.manager.MkSequenceConcat(expression, suffix)
+	if err != nil {
+		return err
+	}
+	prefixDecomposition, err := state.manager.MkEq(sequence, prefixDefinition)
+	if err != nil {
+		return err
+	}
+	prefixValid := []ast.ASTHandle{requestedNonnegative, withinRemaining}
+	if err = t.pushSequenceImplication(prefixValid, prefixDecomposition); err != nil {
+		return err
+	}
+	if err = t.pushSequenceImplication(prefixValid, exactLength); err != nil {
+		return err
+	}
+	suffixLength, err := state.manager.MkSequenceLength(suffix)
+	if err != nil {
+		return err
+	}
+	suffixExact, err := state.manager.MkEq(suffixLength, postLength)
+	if err != nil {
+		return err
+	}
+	if err = t.pushSequenceImplication(prefixValid, suffixExact); err != nil {
+		return err
+	}
+	fullSequence, err := state.manager.MkEq(expression, sequence)
+	if err != nil {
+		return err
+	}
+	return t.pushSequenceImplication([]ast.ASTHandle{pastRemaining}, fullSequence)
 }
