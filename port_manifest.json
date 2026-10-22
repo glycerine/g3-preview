@@ -40558,9 +40558,13 @@
       "path": "src/interp/iz3hash.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "platform_replacement",
+      "go_targets": [
+        "pkg/interp/scopes.go"
+      ],
+      "tests": [
+        "TestInterpolationScopesCopyAndInvalidParentGuards"
+      ],
       "conditionals": [
         {
           "line": 29,
@@ -40579,11 +40583,15 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Go maps own their entries and comparable typed keys directly; no bucket-list nodes or iterator-preservation ownership remains."
+      ],
+      "deviations": [
+        "Native Go maps replace this interpolation-local C++ hash table implementation; project algorithms do not depend on bucket order."
+      ]
     },
     {
       "path": "src/interp/iz3interp.cpp",
@@ -41302,9 +41310,15 @@
       "path": "src/interp/iz3scopes.cpp",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/scopes.go"
+      ],
+      "tests": [
+        "TestInterpolationScopesLinearRanges",
+        "TestInterpolationScopesTreeRanges",
+        "TestInterpolationScopesCopyAndInvalidParentGuards"
+      ],
       "conditionals": [
         {
           "line": 53,
@@ -41319,19 +41333,46 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "compact tree/sequence LCA and GCD, range union/intersection, membership, overlap, containment, addition, and nearest-frame selection",
+          "status": "ported",
+          "go_target": "pkg/interp/scopes.go",
+          "tests": [
+            "TestInterpolationScopesLinearRanges",
+            "TestInterpolationScopesTreeRanges"
+          ]
+        },
+        {
+          "name": "FULL_TREE alternative representation and memo tables",
+          "status": "reference_only",
+          "go_target": "pkg/interp/scopes.go",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Scopes owns a copied Go parent slice and ScopeRange values contain no external references."
+      ],
+      "deviations": [
+        "Malformed parent relations and invalid nodes return errors instead of triggering C++ assertions.",
+        "The disabled FULL_TREE branch has no build definition or retained source consumer and is not ported."
+      ]
     },
     {
       "path": "src/interp/iz3scopes.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/scopes.go"
+      ],
+      "tests": [
+        "TestInterpolationScopesLinearRanges",
+        "TestInterpolationScopesTreeRanges",
+        "TestInterpolationScopesCopyAndInvalidParentGuards"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -41374,11 +41415,32 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Scopes construction/initialization and retained compact ScopeRange API",
+          "status": "ported",
+          "go_target": "pkg/interp/scopes.go",
+          "tests": [
+            "TestInterpolationScopesLinearRanges",
+            "TestInterpolationScopesTreeRanges",
+            "TestInterpolationScopesCopyAndInvalidParentGuards"
+          ]
+        },
+        {
+          "name": "FULL_TREE declarations and range hashing specialization",
+          "status": "reference_only",
+          "go_target": "pkg/interp/scopes.go",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The Go owner copies parent input; compact ranges are plain values and comparable native map keys."
+      ],
+      "deviations": [
+        "The always-disabled range_add branch and unselected FULL_TREE representation remain reference-only."
+      ]
     },
     {
       "path": "src/interp/iz3secondary.h",
