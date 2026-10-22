@@ -254,3 +254,88 @@ func TestFullTranslationProofAnalysisAndResolution(t *testing.T) {
 	interpMust(t, err)
 	interpMust(t, m.DelRef(&interpolant))
 }
+
+func TestFullTranslationEliminatesCommutativityWrappers(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	boolean, err := manager.BoolType()
+	interpMust(t, err)
+	p, err := manager.MakeVariable("commute-p", boolean)
+	interpMust(t, err)
+	p = interpPin(t, m, p)
+	q, err := manager.MakeVariable("commute-q", boolean)
+	interpMust(t, err)
+	q = interpPin(t, m, q)
+	base, err := NewBase(manager, []ast.ASTHandle{p, q}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	translation, err := NewFullTranslation(base)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, translation.Close()) })
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+
+	formula, err := manager.Make(OperatorIff, p, q)
+	interpMust(t, err)
+	formula = interpPin(t, m, formula)
+	commutativity, err := m.MkProofCommutativity(formula)
+	interpMust(t, err)
+	commutativity = interpPin(t, m, commutativity)
+	memo := newTranslationMemo()
+	commuted, err := translation.translateMain(commutativity, false, direct, memo)
+	interpMust(t, err)
+	if marked, e := translation.isCommuted(commuted); e != nil || !marked {
+		t.Fatal("commutativity marker", marked, e)
+	}
+
+	symmetry, err := m.MkProofSymmetry(commutativity)
+	interpMust(t, err)
+	symmetry = interpPin(t, m, symmetry)
+	symmetric, err := translation.translateMain(symmetry, false, direct, memo)
+	interpMust(t, err)
+	if marked, e := translation.isCommuted(symmetric); e != nil || !marked {
+		t.Fatal("symmetric commutativity marker", marked, e)
+	}
+
+	transitivity, err := m.MkProofTransitivity(commutativity, symmetry)
+	interpMust(t, err)
+	transitivity = interpPin(t, m, transitivity)
+	transitive, err := translation.translateMain(transitivity, false, direct, memo)
+	interpMust(t, err)
+	if marked, e := translation.isCommuted(transitive); e != nil || !marked {
+		t.Fatal("transitive commutativity marker", marked, e)
+	}
+
+	commutedConclusion, err := manager.Conclusion(commutativity)
+	interpMust(t, err)
+	left, err := manager.Arg(commutedConclusion, 0)
+	interpMust(t, err)
+	right, err := manager.Arg(commutedConclusion, 1)
+	interpMust(t, err)
+	notLeft, err := manager.MkNot(left)
+	interpMust(t, err)
+	notRight, err := manager.MkNot(right)
+	interpMust(t, err)
+	iffDeclaration, err := m.GetDecl(commutedConclusion)
+	interpMust(t, err)
+	monotonicity, err := m.MkProofMonotonicity(iffDeclaration, notLeft, notRight, []ast.ASTHandle{commutativity})
+	interpMust(t, err)
+	monotonicity = interpPin(t, m, monotonicity)
+	monotone, err := translation.translateMain(monotonicity, false, direct, memo)
+	interpMust(t, err)
+	if marked, e := translation.isCommuted(monotone); e != nil || !marked {
+		t.Fatal("monotone commutativity marker", marked, e)
+	}
+
+	hypothesis, err := m.MkProofHypothesis(left)
+	interpMust(t, err)
+	hypothesis = interpPin(t, m, hypothesis)
+	modusPonens, err := m.MkProofModusPonens(hypothesis, commutativity)
+	interpMust(t, err)
+	modusPonens = interpPin(t, m, modusPonens)
+	translated, err := translation.translateMain(modusPonens, false, direct, memo)
+	interpMust(t, err)
+	if marked, e := translation.isCommuted(translated); e != nil || marked {
+		t.Fatal("modus ponens must consume marker", marked, e)
+	}
+}

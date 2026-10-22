@@ -212,11 +212,25 @@ func (t *FullTranslation) translateMain(proof ast.ASTHandle, expectClause bool, 
 			return ast.ASTHandle{}, e
 		}
 	}
+	commuted := make([]bool, len(premises))
+	for i := range premises {
+		commuted[i], err = t.isCommuted(premises[i])
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		if commuted[i] && rule != ast.ASTPrTransitivity && rule != ast.ASTPrModusPonens && rule != ast.ASTPrSymmetry && rule != ast.ASTPrMonotonicity {
+			return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
+		}
+	}
 	var result ast.ASTHandle
 	switch rule {
-	case ast.ASTPrTransitivity, ast.ASTPrTransitivityStar:
+	case ast.ASTPrTransitivity:
 		if len(premises) < 2 {
 			return ast.ASTHandle{}, ProofError{}
+		}
+		if commuted[0] || commuted[1] {
+			result, err = t.makeCommutedTransitivity(proof, premises, direct, memo)
+			break
 		}
 		x, e := t.base.manager.Arg(premiseConclusions[0], 0)
 		if e != nil {
@@ -245,20 +259,67 @@ func (t *FullTranslation) translateMain(proof ast.ASTHandle, expectClause bool, 
 				return ast.ASTHandle{}, e
 			}
 		}
+	case ast.ASTPrTransitivityStar:
+		if len(premises) < 2 {
+			return ast.ASTHandle{}, ProofError{}
+		}
+		x, e := t.base.manager.Arg(premiseConclusions[0], 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		y, e := t.base.manager.Arg(premiseConclusions[0], 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		z, e := t.base.manager.Arg(premiseConclusions[1], 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		result, err = direct.MakeTransitivity(x, y, z, premises[0], premises[1])
+		for i := 2; err == nil && i < len(premises); i++ {
+			y = z
+			z, err = t.base.manager.Arg(premiseConclusions[i], 1)
+			if err == nil {
+				result, err = direct.MakeTransitivity(x, y, z, result, premises[i])
+			}
+		}
 	case ast.ASTPrQuantIntro, ast.ASTPrMonotonicity:
-		result, err = direct.MakeCongruences(premiseConclusions, conclusion, premises)
+		if rule == ast.ASTPrMonotonicity && len(commuted) == 1 && commuted[0] {
+			left, e := t.base.manager.Arg(conclusion, 0)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			op, e := t.base.manager.Operator(left)
+			if e != nil || op != OperatorNot {
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
+			}
+			result, err = t.makeCommutedMonotonicity(premises[0], direct)
+		} else {
+			result, err = direct.MakeCongruences(premiseConclusions, conclusion, premises)
+		}
 	case ast.ASTPrReflexivity:
 		result, err = direct.MakeReflexivity(conclusion)
 	case ast.ASTPrSymmetry:
 		if len(premises) != 1 {
 			return ast.ASTHandle{}, ProofError{}
 		}
-		result, err = direct.MakeSymmetry(conclusion, premiseConclusions[0], premises[0])
+		if commuted[0] {
+			result, err = t.makeCommutedSymmetry(premises[0], direct)
+		} else {
+			result, err = direct.MakeSymmetry(conclusion, premiseConclusions[0], premises[0])
+		}
 	case ast.ASTPrModusPonens:
 		if len(premises) != 2 {
 			return ast.ASTHandle{}, ProofError{}
 		}
-		result, err = direct.MakeModusPonens(premiseConclusions[1], premises[0], premises[1])
+		if commuted[1] {
+			result, err = t.makeCommutedModusPonens(proof, premises, direct)
+		} else {
+			result, err = direct.MakeModusPonens(premiseConclusions[1], premises[0], premises[1])
+		}
 	case ast.ASTPrTheoryLemma:
 		result, err = t.translateTheoryLemma(proof, conclusion, premises, premiseConclusions, direct)
 	case ast.ASTPrHypothesis:
@@ -278,6 +339,20 @@ func (t *FullTranslation) translateMain(proof ast.ASTHandle, expectClause bool, 
 			return ast.ASTHandle{}, ProofError{}
 		}
 		result = premises[0]
+	case ast.ASTPrCommutativity:
+		left, e := t.base.manager.Arg(conclusion, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		equivalence, e := t.base.manager.Make(OperatorIff, left, left)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		reflexivity, e := direct.MakeReflexivity(equivalence)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		result, err = t.makeCommuted(reflexivity, equivalence)
 	case ast.ASTPrIffFalse:
 		local, e := t.base.IsLocal(conclusion)
 		if e != nil {

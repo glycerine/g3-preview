@@ -42225,10 +42225,12 @@
       "go_targets": [
         "pkg/interp/translation_analysis.go",
         "pkg/interp/translation_arithmetic.go",
+        "pkg/interp/translation_commute.go",
         "pkg/interp/translation_rules.go"
       ],
       "tests": [
         "TestFullTranslationProofAnalysisAndResolution",
+        "TestFullTranslationEliminatesCommutativityWrappers",
         "TestFullTranslationArithmeticHelpers",
         "TestFullTranslationTriangleEqualityTheoryLemma",
         "TestFullTranslationAssignBoundsTheoryLemma",
@@ -42415,7 +42417,15 @@
           ]
         },
         {
-          "name": "commuted proof idioms plus equality-propagation and mystery arithmetic translation",
+          "name": "commuted transitivity, monotonicity, symmetry, modus ponens, and proof twisting",
+          "status": "ported",
+          "go_target": "pkg/interp/translation_commute.go",
+          "tests": [
+            "TestFullTranslationEliminatesCommutativityWrappers"
+          ]
+        },
+        {
+          "name": "equality-propagation and mystery arithmetic translation",
           "status": "unported"
         }
       ],
