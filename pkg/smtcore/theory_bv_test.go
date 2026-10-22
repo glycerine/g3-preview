@@ -399,6 +399,40 @@ func TestSMTBitVectorExpandsNewEquality(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorCongruentTermsPropagateBits(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	zero, err := m.BitVectorNumeralUint64(0, 2)
+	astTestMust(t, err)
+	sort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	a, err := m.MkConst(astTestSymbol(t, m, "bv-congruence-a"), sort)
+	astTestMust(t, err)
+	b, err := m.MkConst(astTestSymbol(t, m, "bv-congruence-b"), sort)
+	astTestMust(t, err)
+	function, err := m.MkFuncDecl(astTestSymbol(t, m, "bv-congruence-f"), []ast.ASTHandle{sort}, sort, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	fa, err := m.MkApp(function, []ast.ASTHandle{a})
+	astTestMust(t, err)
+	fb, err := m.MkApp(function, []ast.ASTHandle{b})
+	astTestMust(t, err)
+	faBit, err := m.MkBitVectorBit2Bool(0, fa)
+	astTestMust(t, err)
+	fbBit, err := m.MkBitVectorBit2Bool(0, fb)
+	astTestMust(t, err)
+	notFBBit, err := m.MkNot(fbBit)
+	astTestMust(t, err)
+	equalArguments, err := m.MkEq(a, b)
+	astTestMust(t, err)
+	for _, assertion := range []ast.ASTHandle{faBit, notFBBit, equalArguments} {
+		astTestMust(t, solver.Assert(assertion))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("congruent bit-vector terms retained unequal bits", status)
+	}
+}
+
 func TestSMTBitVectorDivisionByZeroValueIsUninterpreted(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
 	one, err := m.BitVectorNumeralUint64(1, 4)

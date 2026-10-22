@@ -113694,7 +113694,7 @@
       "path": "src/smt/theory_bv.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_bv.go"
       ],
@@ -113709,6 +113709,7 @@
         "TestSMTBitVectorPublishesStaticDisequality",
         "TestSMTBitVectorDiscoversFixedEquality",
         "TestSMTBitVectorExpandsNewEquality",
+        "TestSMTBitVectorCongruentTermsPropagateBits",
         "TestSMTBitVectorUnsignedDivisionCircuit",
         "TestSMTBitVectorSignedDivisionCircuits",
         "TestSMTBitVectorOrdinaryDivisionFamily",
@@ -114066,17 +114067,80 @@
           "text": "SASSERT(!already_found[it->m_idx]);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "bit-vector variables, little-endian bits, numerals, mkbv, arithmetic, division, bitwise, concatenation, extraction, extension, reduction, comparison, shifts and rotations",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "tests": [
+            "TestSMTBitVectorNumeralEquality",
+            "TestSMTBitVectorAdditionCircuit",
+            "TestSMTBitVectorUnsignedDivisionCircuit",
+            "TestSMTBitVectorSignedDivisionCircuits",
+            "TestSMTBitVectorMultiplicationCircuit",
+            "TestSMTBitVectorShiftCircuit",
+            "TestSMTBitVectorExtendedRotateCircuit"
+          ]
+        },
+        {
+          "name": "bit2bool, signed and unsigned comparisons, multiplication bounds, carry and xor3 Boolean atoms",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "tests": [
+            "TestSMTBitVectorNumeralBit2Bool",
+            "TestSMTBitVectorExtendedBooleanGates",
+            "TestSMTBitVectorUnsignedComparisonCircuit",
+            "TestSMTBitVectorUnsignedMulOverflowCircuit",
+            "TestSMTBitVectorSignedMulBounds"
+          ]
+        },
+        {
+          "name": "static and dynamic disequalities, explicit and congruence equalities, and fixed-value equality discovery",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "tests": [
+            "TestSMTBitVectorExpandsDynamicDisequality",
+            "TestSMTBitVectorPublishesStaticDisequality",
+            "TestSMTBitVectorDiscoversFixedEquality",
+            "TestSMTBitVectorExpandsNewEquality",
+            "TestSMTBitVectorCongruentTermsPropagateBits"
+          ]
+        },
+        {
+          "name": "bv2int and int2bv bridges, relevancy, lazy comparison bridges, blast limit, enode reflection/congruence parameters, model values, division-by-zero interpretations, statistics and scoped cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "tests": [
+            "TestSMTBitVectorToIntAxiom",
+            "TestSMTIntToBitVectorAxiom",
+            "TestSMTBitVectorRelevantTermMarksBits",
+            "TestSMTBitVectorLazyComparisonBridge",
+            "TestSMTBitVectorBlastLimitGivesUnknown",
+            "TestSMTBitVectorEnodeConfiguration",
+            "TestSMTBitVectorPublishesNumeralModelValue",
+            "TestSMTBitVectorDivisionByZeroValueIsUninterpreted",
+            "TestSMTBitVectorCloseReleasesBitOwners"
+          ]
+        },
+        {
+          "name": "trace display and debug-only invariant printers/checkers without retained consumers",
+          "status": "dead_deleted"
+        }
+      ],
+      "ownership": [
+        "The theory borrows the SMT internalizer, manager and enodes. It owns scoped AST references for published bit vectors and delayed lazy bridge definitions, releases temporary circuit roots after internalization, and releases all remaining roots on scope pop or close."
+      ],
+      "deviations": [
+        "Go SAT equivalence clauses replace the source imperative bit-assignment and union-find propagation queues while preserving equality, congruence, conflict and backtracking semantics. Go slices, maps and math/big values replace source vectors, tables and numerals. Diagnostic display and Z3DEBUG invariant routines have no retained consumer."
+      ]
     },
     {
       "path": "src/smt/theory_bv.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_bv.go"
       ],
@@ -114091,6 +114155,7 @@
         "TestSMTBitVectorPublishesStaticDisequality",
         "TestSMTBitVectorDiscoversFixedEquality",
         "TestSMTBitVectorExpandsNewEquality",
+        "TestSMTBitVectorCongruentTermsPropagateBits",
         "TestSMTBitVectorUnsignedDivisionCircuit",
         "TestSMTBitVectorSignedDivisionCircuits",
         "TestSMTBitVectorOrdinaryDivisionFamily",
@@ -114144,11 +114209,34 @@
           "text": "void after_merge_eh(theory_var r1, theory_var r2, theory_var v1, theory_var v2) { SASSERT(check_zero_one_bits(r1)); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "theory_bv state, atom records, internalization callbacks, equality and disequality callbacks, relevancy, scopes, final check, model and statistics hooks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "tests": [
+            "TestSMTBitVectorExtendedBooleanGates",
+            "TestSMTBitVectorExpandsDynamicDisequality",
+            "TestSMTBitVectorDiscoversFixedEquality",
+            "TestSMTBitVectorCongruentTermsPropagateBits",
+            "TestSMTBitVectorLazyComparisonBridge",
+            "TestSMTBitVectorPublishesNumeralModelValue",
+            "TestSMTBitVectorCloseReleasesBitOwners"
+          ]
+        },
+        {
+          "name": "debug-only display and invariant helpers without retained consumers",
+          "status": "dead_deleted"
+        }
+      ],
+      "ownership": [
+        "Concrete Go maps and slices own bit metadata and scope trails; ASTRef values own every expression that must outlive its immediate constructor call. SMTTheoryBase remains the borrowed theory-variable and enode adapter."
+      ],
+      "deviations": [
+        "The source bit-atom occurrence lists, region allocation, union-find merge auxiliaries and custom justifications are represented by guarded SAT clauses and the shared Go congruence/equality machinery. This removes pointer-region storage while retaining reached solver behavior."
+      ]
     },
     {
       "path": "src/smt/theory_datatype.cpp",
