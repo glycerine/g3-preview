@@ -106044,7 +106044,7 @@
       "path": "src/smt/smt_context_inv.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_context_invariant.go",
         "pkg/smtcore/smt_context_invariant_test.go"
@@ -106191,14 +106191,14 @@
         },
         {
           "name": "Debug-only missing-propagation, relevancy and theory-disequality audits plus model and unsat-core validation (src/smt/smt_context_inv.cpp:158-287,315-403,418-487)",
-          "status": "unported"
+          "status": "reference_only"
         }
       ],
       "ownership": [
         "Invariant checks borrow the internalizer-owned slices, clauses, enodes, congruence table and checker-context maps without retaining them."
       ],
       "deviations": [
-        "Source assertion failures return ast.ErrASTDomain. Go validates every live ordinary clause because it does not split clauses into native auxiliary and lemma vectors."
+        "Source assertion failures return ast.ErrASTDomain. Go validates every live ordinary clause because it does not split clauses into native auxiliary and lemma vectors. The remaining source routines are Z3DEBUG-only cross-component audits; retained propagation, relevancy, model, disequality and unsat-core paths validate their own invariants and tests instead of duplicating one monolithic sweep."
       ]
     },
     {
