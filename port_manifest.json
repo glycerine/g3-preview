@@ -2848,7 +2848,7 @@
       "path": "src/ackermannization/ackermannization_params.hpp",
       "component": "ackermannization",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
@@ -102942,14 +102942,14 @@
         "The concrete scheduler borrows fingerprint pointers and quantifier AST handles; native slices own entry values, scope limits, lemma handles, and instantiated-entry indexes. SMTQICostModel owns parser variables and parsed AST references and borrows the AST manager and warning service. Prepared instances and completed lemmas own explicit AST references until Close."
       ],
       "deviations": [
-        "Scheduling is separated from quantifier lemma construction so the unfinished quantifier manager and SMT context can consume ready entries directly. The source delayed-summary maximum update uses minimum and is preserved."
+        "Scheduling, cost evaluation, and quantifier lemma construction are separately owned Go components composed by the quantifier manager. The source delayed-summary maximum update uses minimum and is preserved."
       ]
     },
     {
       "path": "src/smt/qi_queue.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_qi_queue_schedule.go",
         "pkg/smtcore/smt_qi_cost.go",
@@ -102991,16 +102991,18 @@
         },
         {
           "name": "full quantifier-manager/context-owned queue construction, setup and instance materialization interface",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_qi_instance.go",
+          "tests": [
+            "TestSMTInternalizerConsumesMaterializedQuantifierInstance"
+          ]
         }
       ],
       "ownership": [
         "SMTQIQueueSchedule owns its queue and rollback storage while borrowing fingerprints and AST lemma handles."
       ],
       "deviations": [
-        "The scheduler exposes selected ready entries as native Go slices for the future concrete quantifier manager to instantiate."
+        "The source monolithic constructor and setup interface is replaced by NewSMTQIQueueSchedule, NewSMTQICostModel, NewSMTQIInstanceBuilder, and SMTInternalizerState.InternalizeQIInstance; native Go slices transfer selected ready entries between those concrete owners."
       ]
     },
     {
