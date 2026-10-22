@@ -181,6 +181,36 @@ func TestSMTDatatypeRecursiveOccursCheck(t *testing.T) {
 	}
 }
 
+func TestSMTDatatypeInfiniteRecognizerSplit(t *testing.T) {
+	m, _, solver := smtDatatypeSolver(t)
+	sorts, err := m.MkDatatypes([]ast.DatatypeDefinition{{
+		Name: astTestSymbol(t, m, "smt-split-nat"),
+		Constructors: []ast.DatatypeConstructorDefinition{
+			{Name: astTestSymbol(t, m, "smt-split-zero"), Recognizer: astTestSymbol(t, m, "smt-split-is-zero")},
+			{Name: astTestSymbol(t, m, "smt-split-succ"), Recognizer: astTestSymbol(t, m, "smt-split-is-succ"), Accessors: []ast.DatatypeAccessorDefinition{{Name: astTestSymbol(t, m, "smt-split-pred"), Recursive: true}}},
+		},
+	}})
+	astTestMust(t, err)
+	constructors, err := m.DatatypeConstructors(sorts[0])
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "smt-split-x"), sorts[0])
+	astTestMust(t, err)
+	for _, constructor := range constructors {
+		recognizer, recErr := m.DatatypeConstructorRecognizer(constructor)
+		astTestMust(t, recErr)
+		atom, recErr := m.MkApp(recognizer, []ast.ASTHandle{x})
+		astTestMust(t, recErr)
+		negated, recErr := m.MkNot(atom)
+		astTestMust(t, recErr)
+		astTestMust(t, solver.Assert(negated))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("infinite datatype escaped every constructor", status)
+	}
+}
+
 func TestSMTDatatypeUpdateFieldAxioms(t *testing.T) {
 	for _, matching := range []bool{true, false} {
 		t.Run(map[bool]string{true: "matching-constructor", false: "identity"}[matching], func(t *testing.T) {

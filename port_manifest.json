@@ -114261,7 +114261,8 @@
         "TestSMTDatatypeRecursiveOccursCheck",
         "TestSMTDatatypeUpdateFieldAxioms",
         "TestSMTDatatypeQFDTSetup",
-        "TestSMTDatatypeConstructorModelValue"
+        "TestSMTDatatypeConstructorModelValue",
+        "TestSMTDatatypeInfiniteRecognizerSplit"
       ],
       "assertions": [
         {
@@ -114493,7 +114494,8 @@
         "TestSMTDatatypeRecursiveOccursCheck",
         "TestSMTDatatypeUpdateFieldAxioms",
         "TestSMTDatatypeQFDTSetup",
-        "TestSMTDatatypeConstructorModelValue"
+        "TestSMTDatatypeConstructorModelValue",
+        "TestSMTDatatypeInfiniteRecognizerSplit"
       ],
       "conditionals": [
         {

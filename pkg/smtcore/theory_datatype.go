@@ -11,8 +11,8 @@ import (
 )
 
 type smtDatatypeScope struct {
-	initialized, reconstructed int
-	unsupported                bool
+	initialized, reconstructed, recognizers, splits int
+	unsupported                                     bool
 }
 
 type smtDatatypeStatistics struct {
@@ -27,6 +27,10 @@ type SMTDatatypeTheory struct {
 	initializedTrail   []ast.ASTHandle
 	reconstructed      map[ast.ASTHandle]bool
 	reconstructedTrail []ast.ASTHandle
+	recognizerValues   map[ast.ASTHandle]bool
+	recognizerTrail    []ast.ASTHandle
+	caseSplits         map[ast.ASTHandle]bool
+	caseSplitTrail     []ast.ASTHandle
 	scopes             []smtDatatypeScope
 	unsupported        bool
 	statistics         smtDatatypeStatistics
@@ -38,9 +42,11 @@ func NewSMTDatatypeTheory(family ast.FamilyID) (*SMTDatatypeTheory, error) {
 		return nil, err
 	}
 	return &SMTDatatypeTheory{
-		SMTTheoryBase: base,
-		initialized:   make(map[ast.ASTHandle]bool),
-		reconstructed: make(map[ast.ASTHandle]bool),
+		SMTTheoryBase:    base,
+		initialized:      make(map[ast.ASTHandle]bool),
+		reconstructed:    make(map[ast.ASTHandle]bool),
+		recognizerValues: make(map[ast.ASTHandle]bool),
+		caseSplits:       make(map[ast.ASTHandle]bool),
 	}, nil
 }
 
@@ -98,6 +104,9 @@ func (t *SMTDatatypeTheory) recognizerLiteral(constructor, value ast.ASTHandle) 
 }
 
 func (t *SMTDatatypeTheory) publishCases(value, sort ast.ASTHandle) error {
+	if t.caseSplits[value] {
+		return nil
+	}
 	state, _ := t.State()
 	constructors, err := state.manager.DatatypeConstructors(sort)
 	if err != nil || len(constructors) == 0 {
@@ -123,6 +132,8 @@ func (t *SMTDatatypeTheory) publishCases(value, sort ast.ASTHandle) error {
 			}
 		}
 	}
+	t.caseSplits[value] = true
+	t.caseSplitTrail = append(t.caseSplitTrail, value)
 	t.statistics.splits++
 	return nil
 }
@@ -362,6 +373,13 @@ func (t *SMTDatatypeTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		if err = t.ensureVariable(node.arguments[0]); err != nil {
 			return false, err
 		}
+		if operation == ast.ASTDatatypeRecognizer || operation == ast.ASTDatatypeIs {
+			value := node.arguments[0].owner
+			if !t.recognizerValues[value] {
+				t.recognizerValues[value] = true
+				t.recognizerTrail = append(t.recognizerTrail, value)
+			}
+		}
 		if operation == ast.ASTDatatypeAccessor {
 			if err = t.attachVariable(node); err != nil {
 				return false, err
@@ -460,7 +478,10 @@ func (t *SMTDatatypeTheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {
 		return err
 	}
-	t.scopes = append(t.scopes, smtDatatypeScope{len(t.initializedTrail), len(t.reconstructedTrail), t.unsupported})
+	t.scopes = append(t.scopes, smtDatatypeScope{
+		initialized: len(t.initializedTrail), reconstructed: len(t.reconstructedTrail),
+		recognizers: len(t.recognizerTrail), splits: len(t.caseSplitTrail), unsupported: t.unsupported,
+	})
 	return nil
 }
 
@@ -476,8 +497,16 @@ func (t *SMTDatatypeTheory) PopScopes(count uint32) error {
 	for _, expression := range t.reconstructedTrail[scope.reconstructed:] {
 		delete(t.reconstructed, expression)
 	}
+	for _, expression := range t.recognizerTrail[scope.recognizers:] {
+		delete(t.recognizerValues, expression)
+	}
+	for _, expression := range t.caseSplitTrail[scope.splits:] {
+		delete(t.caseSplits, expression)
+	}
 	t.initializedTrail = t.initializedTrail[:scope.initialized]
 	t.reconstructedTrail = t.reconstructedTrail[:scope.reconstructed]
+	t.recognizerTrail = t.recognizerTrail[:scope.recognizers]
+	t.caseSplitTrail = t.caseSplitTrail[:scope.splits]
 	t.unsupported = scope.unsupported
 	t.scopes = t.scopes[:level]
 	return t.SMTTheoryBase.PopScopes(count)
@@ -517,6 +546,20 @@ func (t *SMTDatatypeTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 			return SMTFinalCheckContinue, nil
 		}
 		constructors[root], declarations[root] = node, declaration
+	}
+	for expression := range t.recognizerValues {
+		node := state.context.enodes[expression]
+		if node == nil || constructors[node.root] != nil || t.caseSplits[expression] {
+			continue
+		}
+		sort, sortErr := state.manager.GetSort(expression)
+		if sortErr != nil {
+			return SMTFinalCheckGiveUp, sortErr
+		}
+		if splitErr := t.publishCases(expression, sort); splitErr != nil {
+			return SMTFinalCheckGiveUp, splitErr
+		}
+		return SMTFinalCheckContinue, nil
 	}
 	t.statistics.occursChecks++
 	visiting := make(map[*SMTEnode]int)
