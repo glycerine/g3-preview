@@ -116813,6 +116813,7 @@
         "TestSMTSequenceStructuredModelValues",
         "TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms",
         "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches",
+        "TestSMTSequenceTheoryNonContainsPropagatesToTail",
         "TestSMTSequenceTheoryNegativeBoundaryWitnesses",
         "TestSMTSequenceTheoryAtBoundaryAxioms",
         "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms",
@@ -117326,10 +117327,10 @@
           "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes", "TestSMTSequenceTheoryConcreteRelationConflicts"]
         },
         {
-          "name": "positive prefix, suffix and contains Skolem witnesses plus false-relation nonempty implications and non-containment prefix/suffix exclusions (src/smt/theory_seq.cpp:3927-4010,4464-4546,4707-4725)",
+          "name": "positive prefix, suffix and contains Skolem witnesses plus false-relation nonempty implications, non-containment prefix/suffix exclusions, and lazy non-containment propagation through the decomposed source tail (src/smt/theory_seq.cpp:3927-4010,4464-4546,4707-4739)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
-          "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms", "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches"]
+          "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms", "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches", "TestSMTSequenceTheoryNonContainsPropagatesToTail"]
         },
         {
           "name": "negative prefix and suffix shared-segment mismatch witnesses with distinct element or exhausted-container alternatives (src/smt/theory_seq.cpp:4464-4546)",

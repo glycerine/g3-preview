@@ -1144,6 +1144,45 @@ func TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryNonContainsPropagatesToTail(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	needle, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(needle)
+	astTestMust(t, err)
+	source, err := m.MkConst(astTestSymbol(t, m, "sequence-noncontains-tail-source"), sort)
+	astTestMust(t, err)
+	empty, err := m.MkSequenceEmpty(sort)
+	astTestMust(t, err)
+	sourceEmpty, err := m.MkEq(source, empty)
+	astTestMust(t, err)
+	sourceNonempty, err := m.MkNot(sourceEmpty)
+	astTestMust(t, err)
+	contains, err := m.MkSequenceContains(source, needle)
+	astTestMust(t, err)
+	notContains, err := m.MkNot(contains)
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	tailName, err := m.Symbols.Intern("seq.tail")
+	astTestMust(t, err)
+	tail, err := m.MkSequenceSkolem(tailName, []ast.ASTHandle{source, zero}, sort)
+	astTestMust(t, err)
+	tailContains, err := m.MkSequenceContains(tail, needle)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(sourceNonempty))
+	astTestMust(t, solver.Assert(notContains))
+	astTestMust(t, solver.Assert(tailContains))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("negative containment did not propagate to the source tail", status)
+	}
+}
+
 func TestSMTSequenceTheoryNegativeBoundaryWitnesses(t *testing.T) {
 	for _, suffix := range []bool{false, true} {
 		name := "prefix"

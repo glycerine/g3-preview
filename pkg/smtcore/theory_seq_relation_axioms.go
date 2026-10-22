@@ -16,6 +16,65 @@ func (t *SMTSequenceTheory) relationSkolem(name string, arguments []ast.ASTHandl
 	return state.manager.MkSequenceSkolem(symbol, arguments, sort)
 }
 
+func (t *SMTSequenceTheory) addNegativeContainsStep(expression ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	source, needle, matched, err := state.manager.SequenceBinaryOperationArguments(expression, 5)
+	if err != nil || !matched {
+		if err != nil {
+			return err
+		}
+		return ast.ErrASTDomain
+	}
+	if err = t.addSequenceCoherenceAxiom(source); err != nil {
+		return err
+	}
+	sort, err := state.manager.GetSort(source)
+	if err != nil {
+		return err
+	}
+	empty, err := state.manager.MkSequenceEmpty(sort)
+	if err != nil {
+		return err
+	}
+	sourceEmpty, err := state.manager.MkEq(source, empty)
+	if err != nil {
+		return err
+	}
+	zero, err := t.integer(0)
+	if err != nil {
+		return err
+	}
+	tail, err := t.relationSkolem("seq.tail", []ast.ASTHandle{source, zero}, sort)
+	if err != nil {
+		return err
+	}
+	tailContains, err := state.manager.MkSequenceContains(tail, needle)
+	if err != nil {
+		return err
+	}
+	notTailContains, err := state.manager.MkNot(tailContains)
+	if err != nil {
+		return err
+	}
+	step, err := state.manager.MkOr(sourceEmpty, notTailContains)
+	if err != nil {
+		return err
+	}
+	notContains, err := state.manager.MkNot(expression)
+	if err != nil {
+		return err
+	}
+	constraint, err := state.manager.MkImplies(notContains, step)
+	if err != nil {
+		return err
+	}
+	t.trackInternalTerms(tail, tailContains)
+	return t.axioms.Push(constraint)
+}
+
 func (t *SMTSequenceTheory) addRelationAxioms(expression ast.ASTHandle, operation int32) error {
 	state, err := t.State()
 	if err != nil {

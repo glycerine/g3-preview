@@ -547,6 +547,9 @@ func (t *SMTSequenceTheory) Assign(variable int32, value bool) error {
 		return err
 	}
 	if op == 5 && !value {
+		if err = t.addNegativeContainsStep(expression); err != nil {
+			return err
+		}
 		return t.nonContains.Push(expression, dependency)
 	}
 	return nil
