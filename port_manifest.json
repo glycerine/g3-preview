@@ -113510,7 +113510,8 @@
         "TestSMTArrayDefaultStoreLargeDomain",
         "TestSMTArrayDefaultStoreFiniteDomain",
         "TestSMTArrayPublishesModelValues",
-        "TestSMTArrayConstructorModelValue"
+        "TestSMTArrayConstructorModelValue",
+        "TestSMTArrayAsArrayReadAxiom"
       ],
       "conditionals": [
         {

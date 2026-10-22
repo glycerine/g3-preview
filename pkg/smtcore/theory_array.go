@@ -153,6 +153,8 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 			return false, fmt.Errorf("array select-store axiom: %w", err)
 		}
 	case ast.ASTArrayOpConst, ast.ASTArrayOpExt, ast.ASTArrayOpMap:
+	case ast.ASTArrayOpAsArray:
+		t.unsupported = true
 	case ast.ASTArrayOpDefault:
 		if err = t.assertDefaultAxiom(expression); err != nil {
 			return false, fmt.Errorf("array default axiom: %w", err)
@@ -234,6 +236,37 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 	}
 	if op == ast.ASTArrayOpMap {
 		return t.assertSelectMapAxiom(selectExpression, array)
+	}
+	if op == ast.ASTArrayOpAsArray {
+		function, functionErr := state.manager.AsArrayFunction(array)
+		if functionErr != nil {
+			return functionErr
+		}
+		count, countErr := state.manager.GetNumArgs(selectExpression)
+		if countErr != nil || count < 2 {
+			return countErr
+		}
+		arguments := make([]ast.ASTHandle, 0, count-1)
+		for index := uint32(1); index < count; index++ {
+			argument, argErr := state.manager.GetArg(selectExpression, index)
+			if argErr != nil {
+				return argErr
+			}
+			arguments = append(arguments, argument)
+		}
+		value, appErr := state.manager.MkApp(function, arguments)
+		if appErr != nil {
+			return appErr
+		}
+		literal, equalityErr := t.MkEqualityLiteral(selectExpression, value, true)
+		if equalityErr != nil {
+			return equalityErr
+		}
+		if equalityErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); equalityErr != nil {
+			return fmt.Errorf("as-array select axiom: %w", equalityErr)
+		}
+		t.statistics.selectAsArray++
+		return nil
 	}
 	if op != ast.ASTArrayOpStore {
 		return nil
@@ -464,6 +497,28 @@ func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) err
 			return valueErr
 		}
 		value, err = state.manager.MkIte(condition, storedValue, baseDefault)
+	case ast.ASTArrayOpAsArray:
+		function, functionErr := state.manager.AsArrayFunction(array)
+		if functionErr != nil {
+			return functionErr
+		}
+		arity, arityErr := state.manager.GetArity(function)
+		if arityErr != nil {
+			return arityErr
+		}
+		arguments := make([]ast.ASTHandle, 0, arity)
+		for index := uint32(0); index < arity; index++ {
+			sort, domainErr := state.manager.GetDomain(function, index)
+			if domainErr != nil {
+				return domainErr
+			}
+			epsilon, epsilonErr := t.arrayEpsilon(sort)
+			if epsilonErr != nil {
+				return epsilonErr
+			}
+			arguments = append(arguments, epsilon)
+		}
+		value, err = state.manager.MkApp(function, arguments)
 	default:
 		return nil
 	}
@@ -484,6 +539,8 @@ func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) err
 		t.statistics.defaultMap++
 	case ast.ASTArrayOpStore:
 		t.statistics.defaultStore++
+	case ast.ASTArrayOpAsArray:
+		t.statistics.defaultAsArray++
 	}
 	return nil
 }
