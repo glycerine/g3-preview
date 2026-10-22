@@ -115034,22 +115034,29 @@
       "path": "src/smt/theory_dense_diff_logic.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"],
+      "tests": ["TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict", "TestSMTRealDiffTheoryStrictCycleConflict"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "integer and real dense-difference explicit instantiations",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_diff_logic_integer.go; pkg/smtcore/theory_diff_logic_real.go",
+          "tests": ["TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict", "TestSMTRealDiffTheoryStrictCycleConflict"]
+        }
+      ],
+      "ownership": ["Go uses concrete integer and real graph solvers rather than C++ template instantiations."],
+      "deviations": ["The retained arbitrary-precision graph solvers cover both source small-integer and multiprecision instantiations without duplicating representation-specific classes."]
     },
     {
       "path": "src/smt/theory_dense_diff_logic.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"],
+      "tests": ["TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation", "TestSMTRealDiffTheoryAtomUsesInfinitesimalComplement"],
       "conditionals": [
         {
           "line": 21,
@@ -115074,19 +115081,22 @@
           "text": "SASSERT(is_connected(source, target));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "dense difference atom, edge, matrix-closure, propagation, scope, conflict and model declarations", "status": "platform_replacement", "go_target": "pkg/smtcore/theory_diff_logic_integer.go; pkg/smtcore/theory_diff_logic_real.go", "tests": ["TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation", "TestSMTRealDiffTheoryAtomUsesInfinitesimalComplement"]},
+        {"name": "theory_opt objective declarations", "status": "unported", "go_target": null, "tests": []}
+      ],
+      "ownership": ["The concrete Go difference theories own graph edges, assertions, scopes and model state while borrowing context enodes."],
+      "deviations": ["Sparse incremental graph closure replaces the dense all-pairs matrix; it preserves satisfiability, propagation explanations and model values. Objective callbacks remain open."]
     },
     {
       "path": "src/smt/theory_dense_diff_logic_def.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"],
+      "tests": ["TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict", "TestSMTRealDiffTheoryStrictCycleConflict", "TestSMTRealDiffTheoryBuildsFiniteModelValues"],
       "conditionals": [
         {
           "line": 19,
@@ -115231,11 +115241,14 @@
           "text": "SASSERT(is_sat != l_false);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "difference-term internalization, complementary bounds, incremental negative-cycle detection, equality adapter, scope rollback, propagation antecedents and model construction", "status": "platform_replacement", "go_target": "pkg/smtcore/theory_diff_logic_integer.go; pkg/smtcore/theory_diff_logic_real.go", "tests": ["TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict", "TestSMTRealDiffTheoryStrictCycleConflict", "TestSMTRealDiffTheoryBuildsFiniteModelValues"]},
+        {"name": "linear objective internalization, infinitesimal maximize and blocker construction", "status": "unported", "go_target": null, "tests": []}
+      ],
+      "ownership": ["Go slices and maps own the concrete graph, bound literals, predecessor explanations and scoped assertion trail."],
+      "deviations": ["The source Floyd-Warshall matrix and fixnum specializations are replaced by the retained exact graph algorithms. Optimization objectives remain open."]
     },
     {
       "path": "src/smt/theory_diff_logic.cpp",
