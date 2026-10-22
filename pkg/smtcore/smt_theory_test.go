@@ -16,6 +16,9 @@ type smtInternalizerTestTheory struct {
 	}
 	canPropagate, propagationCalled bool
 	relevant                        []ast.ASTHandle
+	setupCalls, searchCalls         int
+	restartCalls, finalCheckCalls   int
+	finalStatus                     SMTFinalCheckStatus
 }
 
 func (t *smtInternalizerTestTheory) DefaultInternalizer() bool { return false }
@@ -106,6 +109,26 @@ func (t *smtInternalizerTestTheory) Relevant(expression ast.ASTHandle) error {
 	return nil
 }
 
+func (t *smtInternalizerTestTheory) Setup() error {
+	t.setupCalls++
+	return nil
+}
+
+func (t *smtInternalizerTestTheory) InitializeSearch() error {
+	t.searchCalls++
+	return nil
+}
+
+func (t *smtInternalizerTestTheory) Restart() error {
+	t.restartCalls++
+	return nil
+}
+
+func (t *smtInternalizerTestTheory) FinalCheck() (SMTFinalCheckStatus, error) {
+	t.finalCheckCalls++
+	return t.finalStatus, nil
+}
+
 func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {
 	m := astTestManager(t)
 	family, err := m.RegisterArithmeticPlugin()
@@ -115,6 +138,11 @@ func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {
 	theory := &smtInternalizerTestTheory{SMTTheoryBase: base}
 	_, _, state := smtInternalizerFixture(t, m, nil)
 	astTestMust(t, state.RegisterTheory(theory))
+	astTestMust(t, state.InitializeTheorySearch())
+	astTestMust(t, state.RestartTheories())
+	if theory.setupCalls != 1 || theory.searchCalls != 1 || theory.restartCalls != 1 {
+		t.Fatal("theory setup/search lifecycle", theory.setupCalls, theory.searchCalls, theory.restartCalls)
+	}
 
 	integer, err := m.MkFamilySort(family, 1, nil)
 	astTestMust(t, err)
@@ -156,6 +184,18 @@ func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {
 	}
 	if len(theory.relevant) != 2 || theory.relevant[0] != atom || theory.relevant[1] != term {
 		t.Fatal("theory relevancy callback", theory.relevant)
+	}
+	theory.finalStatus = SMTFinalCheckGiveUp
+	status, err := state.FinalCheckTheories()
+	astTestMust(t, err)
+	if status != SMTFinalCheckGiveUp || len(state.IncompleteTheories()) != 1 {
+		t.Fatal("theory give-up final check", status, state.IncompleteTheories())
+	}
+	theory.finalStatus = SMTFinalCheckContinue
+	status, err = state.FinalCheckTheories()
+	astTestMust(t, err)
+	if status != SMTFinalCheckContinue || theory.finalCheckCalls != 2 || state.Statistics().NumFinalChecks != 2 {
+		t.Fatal("theory continuing final check", status, theory.finalCheckCalls, state.Statistics())
 	}
 	equality, err := m.MkEq(term, term)
 	astTestMust(t, err)

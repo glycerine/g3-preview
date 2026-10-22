@@ -24,6 +24,10 @@ type SMTTheoryInternalizer interface {
 	Relevant(ast.ASTHandle) error
 	CanPropagate() bool
 	Propagate() error
+	Setup() error
+	InitializeSearch() error
+	Restart() error
+	FinalCheck() (SMTFinalCheckStatus, error)
 	PushScope() error
 	PopScopes(uint32) error
 }
@@ -65,6 +69,12 @@ func (*SMTTheoryBase) UseDisequalities() bool       { return true }
 func (*SMTTheoryBase) CanPropagate() bool           { return false }
 func (*SMTTheoryBase) Propagate() error             { return nil }
 func (*SMTTheoryBase) Relevant(ast.ASTHandle) error { return nil }
+func (*SMTTheoryBase) Setup() error                 { return nil }
+func (*SMTTheoryBase) InitializeSearch() error      { return nil }
+func (*SMTTheoryBase) Restart() error               { return nil }
+func (*SMTTheoryBase) FinalCheck() (SMTFinalCheckStatus, error) {
+	return SMTFinalCheckDone, nil
+}
 
 func (t *SMTTheoryBase) State() (*SMTInternalizerState, error) {
 	if t == nil || t.state == nil {

@@ -102,6 +102,9 @@ type SMTInternalizerState struct {
 	generation            uint32
 	scopeLevel            uint32
 	statistics            SMTContextStatistics
+	finalCheckIndex       int
+	incompleteTheories    []SMTTheoryInternalizer
+	theoriesSetup         bool
 	closed                bool
 }
 
@@ -127,7 +130,7 @@ func (s *SMTInternalizerState) RegisterTheory(theory SMTTheoryInternalizer) erro
 	if err := s.open(); err != nil {
 		return err
 	}
-	if theory == nil || theory.FamilyID() == ast.NullFamilyID || theory.FamilyID() == s.manager.BasicFamilyID() || s.theories[theory.FamilyID()] != nil || len(s.scopes) != 0 {
+	if theory == nil || theory.FamilyID() == ast.NullFamilyID || theory.FamilyID() == s.manager.BasicFamilyID() || s.theories[theory.FamilyID()] != nil || len(s.scopes) != 0 || s.theoriesSetup {
 		return ast.ErrASTDomain
 	}
 	if err := theory.Initialize(s); err != nil {

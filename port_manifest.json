@@ -103979,7 +103979,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_boolean_propagation.go",
-        "pkg/smtcore/smt_theory_propagation.go"
+        "pkg/smtcore/smt_theory_propagation.go",
+        "pkg/smtcore/smt_theory_lifecycle.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -104923,6 +104924,14 @@
           "tests": [
             "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
           ]
+        },
+        {
+          "name": "ordered theory setup, search initialization, restart, and round-robin final checks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_lifecycle.go",
+          "tests": [
+            "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+          ]
         }
       ],
       "ownership": [
@@ -104940,7 +104949,8 @@
       "go_targets": [
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/smtcore/smt_boolean_propagation.go",
-        "pkg/smtcore/smt_theory_propagation.go"
+        "pkg/smtcore/smt_theory_propagation.go",
+        "pkg/smtcore/smt_theory_lifecycle.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -105121,6 +105131,14 @@
           "name": "theory-atom assignment cursor, relevancy callbacks, and propagation fixed-point interface",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_theory_propagation.go",
+          "tests": [
+            "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+          ]
+        },
+        {
+          "name": "registered theory setup/search lifecycle, final-check cursor, and incomplete-theory results",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_lifecycle.go",
           "tests": [
             "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
           ]
@@ -108357,6 +108375,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_theory.go",
+        "pkg/smtcore/smt_theory_lifecycle.go",
         "pkg/smtcore/smt_theory_propagation.go"
       ],
       "tests": [
@@ -108421,6 +108440,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_theory.go",
+        "pkg/smtcore/smt_theory_lifecycle.go",
         "pkg/smtcore/smt_theory_propagation.go"
       ],
       "tests": [
@@ -108467,7 +108487,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "typed internalize-atom, internalize-term, equality, sort-constraint, default-internalizer, theory-variable, scope, assignment, relevancy, core equality/disequality event, and propagation interface",
+          "name": "typed internalization, theory-variable, scope, assignment, relevancy, equality/disequality event, propagation, setup, search initialization, restart, and final-check interface",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_theory.go",
           "tests": [
@@ -108476,7 +108496,7 @@
           ]
         },
         {
-          "name": "restart, final-check, conflict, display, model, validation, assumptions, statistics, and fresh-theory interface",
+          "name": "conflict, display, model, validation, assumptions, statistics, reset/flush, and fresh-theory interface",
           "status": "unported",
           "go_target": null,
           "tests": []
