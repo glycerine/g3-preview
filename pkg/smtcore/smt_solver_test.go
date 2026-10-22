@@ -350,3 +350,39 @@ func TestSMTSolverTranslatesBaseKernelAndTrackedAssertions(t *testing.T) {
 		t.Fatal("translated tracked assertion", status)
 	}
 }
+
+func TestSMTSolverSetupRejectsReachedUnsupportedArithmetic(t *testing.T) {
+	m := astTestManager(t)
+	arithmetic, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, s.Close())
+		astTestMust(t, params.Close())
+	})
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("unused arithmetic setup", status)
+	}
+	one, err := m.ArithmeticRealNumeralText("1")
+	astTestMust(t, err)
+	two, err := m.ArithmeticRealNumeralText("2")
+	astTestMust(t, err)
+	comparison, err := m.MkFamilyApp(arithmetic, smtArithOpLT, nil, []ast.ASTHandle{one, two})
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(comparison))
+	status, err = s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.Undef {
+		t.Fatal("unsupported arithmetic reported a definite result", status)
+	}
+	reason, err := s.ReasonUnknown()
+	astTestMust(t, err)
+	if reason != "(incomplete (theory arithmetic))" {
+		t.Fatal("unsupported arithmetic reason", reason)
+	}
+}

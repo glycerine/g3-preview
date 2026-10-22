@@ -77,6 +77,11 @@ func NewSMTSolver(m *ast.ASTManager, p *uparams.ParamsRef, logic string, config 
 		_ = config.Params.Del(&value)
 		return nil, err
 	}
+	if err = smtInstallRetainedSetup(kernel, m, logic); err != nil {
+		_ = kernel.Close()
+		_ = config.Params.Del(&value)
+		return nil, err
+	}
 	s := &SMTSolver{manager: m, config: config, kernel: kernel, params: value, logic: logicSymbol}
 	s.self = s
 	s.named, err = solver.NewNamedAssertions(m, s)

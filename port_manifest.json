@@ -108724,9 +108724,13 @@
       "path": "src/smt/smt_setup.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_setup.go"
+      ],
+      "tests": [
+        "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic"
+      ],
       "assertions": [
         {
           "line": 49,
@@ -108741,19 +108745,42 @@
           "text": "SASSERT(!m_already_configured);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "explicit arithmetic and array logic classification with conservative incomplete-theory installation",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "tests": [
+            "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic"
+          ]
+        },
+        {
+          "name": "static-feature auto configuration, concrete arithmetic, array, bit-vector, datatype, finite-domain, sequence, string, pseudo-Boolean, and floating-point theory selection",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The kernel owns its theory registry; setup creates concrete dummy-theory values for reached theory families whose full solvers remain unavailable."
+      ],
+      "deviations": [
+        "Until the concrete arithmetic and array theories are ported, explicit logics install SMTDummyTheory so reached theory expressions return source-style incompleteness instead of an unsound propositional SAT result."
+      ]
     },
     {
       "path": "src/smt/smt_setup.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_setup.go"
+      ],
+      "tests": [
+        "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -108764,11 +108791,30 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained explicit-logic setup entry point",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "tests": [
+            "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic"
+          ]
+        },
+        {
+          "name": "complete setup state, configuration modes, feature-driven overloads, and all concrete theory setup helpers",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The retained setup helper borrows its kernel and AST manager and publishes created theory implementations into the kernel registry."
+      ],
+      "deviations": [
+        "The initial Go surface is a direct setup function rather than a persistent setup object because only construction-time explicit-logic routing is currently consumed."
+      ]
     },
     {
       "path": "src/smt/smt_solver.cpp",
@@ -108785,6 +108831,7 @@
         "TestSMTSolverReasonUnknownUsesKernelFailure",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
+        "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
         "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
       ],
       "assertions": [
