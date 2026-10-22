@@ -153,7 +153,21 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 		if emptyErr != nil {
 			return false, emptyErr
 		}
-		if leftExpression == rightExpression || ((operation == 3 || operation == 4) && leftEmpty) || (operation == 5 && rightEmpty) {
+		exactTrue := leftExpression == rightExpression || ((operation == 3 || operation == 4) && leftEmpty) || (operation == 5 && rightEmpty)
+		if operation == 3 || operation == 4 {
+			containerLeft, containerRight, concat, concatErr := state.manager.SequenceConcatParts(rightExpression)
+			if concatErr != nil {
+				return false, concatErr
+			}
+			exactTrue = exactTrue || (concat && operation == 3 && leftExpression == containerLeft) || (concat && operation == 4 && leftExpression == containerRight)
+		} else if operation == 5 {
+			containerLeft, containerRight, concat, concatErr := state.manager.SequenceConcatParts(leftExpression)
+			if concatErr != nil {
+				return false, concatErr
+			}
+			exactTrue = exactTrue || concat && (rightExpression == containerLeft || rightExpression == containerRight)
+		}
+		if exactTrue {
 			truth, makeErr := state.manager.MkTrue()
 			if makeErr != nil {
 				return false, makeErr

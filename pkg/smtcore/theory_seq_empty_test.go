@@ -1813,6 +1813,39 @@ func TestSMTSequenceTheoryGroundOperationsAreComplete(t *testing.T) {
 		name  string
 		build func(*testing.T, *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle)
 	}{
+		{name: "concat-left-prefix", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-concat-prefix-x")
+			y := astTestStringConst(t, m, "sequence-exact-concat-prefix-y")
+			word, err := m.MkSequenceConcat(x, y)
+			astTestMust(t, err)
+			operation, err := m.MkSequencePrefix(x, word)
+			astTestMust(t, err)
+			truth, err := m.MkTrue()
+			astTestMust(t, err)
+			return operation, truth
+		}},
+		{name: "concat-right-suffix", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-concat-suffix-x")
+			y := astTestStringConst(t, m, "sequence-exact-concat-suffix-y")
+			word, err := m.MkSequenceConcat(x, y)
+			astTestMust(t, err)
+			operation, err := m.MkSequenceSuffix(y, word)
+			astTestMust(t, err)
+			truth, err := m.MkTrue()
+			astTestMust(t, err)
+			return operation, truth
+		}},
+		{name: "concat-operand-contained", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-concat-contains-x")
+			y := astTestStringConst(t, m, "sequence-exact-concat-contains-y")
+			word, err := m.MkSequenceConcat(x, y)
+			astTestMust(t, err)
+			operation, err := m.MkSequenceContains(word, y)
+			astTestMust(t, err)
+			truth, err := m.MkTrue()
+			astTestMust(t, err)
+			return operation, truth
+		}},
 		{name: "reflexive-prefix", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
 			x := astTestStringConst(t, m, "sequence-exact-reflexive-prefix-x")
 			operation, err := m.MkSequencePrefix(x, x)
