@@ -11,8 +11,8 @@ import (
 )
 
 type smtArrayScope struct {
-	stores, selects, defaults int
-	unsupported               bool
+	stores, selects, defaults, epsilons int
+	unsupported                         bool
 }
 
 // SMTArrayTheory internalizes core read-over-write, constant-array, and
@@ -22,6 +22,8 @@ type SMTArrayTheory struct {
 	*SMTTheoryBase
 	stores, selects, defaults             map[ast.ASTHandle]bool
 	storeTrail, selectTrail, defaultTrail []ast.ASTHandle
+	epsilons                              map[ast.ASTHandle]ast.ASTHandle
+	epsilonTrail                          []ast.ASTHandle
 	scopes                                []smtArrayScope
 	unsupported                           bool
 }
@@ -36,6 +38,7 @@ func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
 		stores:        make(map[ast.ASTHandle]bool),
 		selects:       make(map[ast.ASTHandle]bool),
 		defaults:      make(map[ast.ASTHandle]bool),
+		epsilons:      make(map[ast.ASTHandle]ast.ASTHandle),
 	}, nil
 }
 
@@ -399,15 +402,51 @@ func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) err
 		if largeErr != nil {
 			return largeErr
 		}
-		if !large {
-			t.unsupported = true
-			return nil
-		}
 		base, argErr := state.manager.GetArg(array, 0)
 		if argErr != nil {
 			return argErr
 		}
-		value, err = state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpDefault, nil, []ast.ASTHandle{base})
+		baseDefault, defaultErr := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpDefault, nil, []ast.ASTHandle{base})
+		if defaultErr != nil {
+			return defaultErr
+		}
+		if large {
+			value = baseDefault
+			break
+		}
+		count, countErr := state.manager.GetNumArgs(array)
+		if countErr != nil || count < 3 {
+			return countErr
+		}
+		conditions := make([]ast.ASTHandle, 0, count-2)
+		for index := uint32(1); index+1 < count; index++ {
+			location, locationErr := state.manager.GetArg(array, index)
+			if locationErr != nil {
+				return locationErr
+			}
+			sort, sortErr := state.manager.GetSort(location)
+			if sortErr != nil {
+				return sortErr
+			}
+			epsilon, epsilonErr := t.arrayEpsilon(sort)
+			if epsilonErr != nil {
+				return epsilonErr
+			}
+			equal, equalErr := state.manager.MkEq(epsilon, location)
+			if equalErr != nil {
+				return equalErr
+			}
+			conditions = append(conditions, equal)
+		}
+		condition, conditionErr := state.manager.MkAndArray(conditions)
+		if conditionErr != nil {
+			return conditionErr
+		}
+		storedValue, valueErr := state.manager.GetArg(array, count-1)
+		if valueErr != nil {
+			return valueErr
+		}
+		value, err = state.manager.MkIte(condition, storedValue, baseDefault)
 	default:
 		return nil
 	}
@@ -422,6 +461,20 @@ func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) err
 		return fmt.Errorf("array default value axiom: %w", err)
 	}
 	return nil
+}
+
+func (t *SMTArrayTheory) arrayEpsilon(sort ast.ASTHandle) (ast.ASTHandle, error) {
+	if epsilon := t.epsilons[sort]; !epsilon.IsNull() {
+		return epsilon, nil
+	}
+	state, _ := t.State()
+	epsilon, err := state.manager.MkFreshConst("epsilon", sort)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	t.epsilons[sort] = epsilon
+	t.epsilonTrail = append(t.epsilonTrail, sort)
+	return epsilon, nil
 }
 
 func (t *SMTArrayTheory) arrayHasLargeDomain(array ast.ASTHandle) (bool, error) {
@@ -538,7 +591,7 @@ func (t *SMTArrayTheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {
 		return err
 	}
-	t.scopes = append(t.scopes, smtArrayScope{len(t.storeTrail), len(t.selectTrail), len(t.defaultTrail), t.unsupported})
+	t.scopes = append(t.scopes, smtArrayScope{len(t.storeTrail), len(t.selectTrail), len(t.defaultTrail), len(t.epsilonTrail), t.unsupported})
 	return nil
 }
 
@@ -557,9 +610,13 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	for _, expression := range t.defaultTrail[scope.defaults:] {
 		delete(t.defaults, expression)
 	}
+	for _, sort := range t.epsilonTrail[scope.epsilons:] {
+		delete(t.epsilons, sort)
+	}
 	t.storeTrail = t.storeTrail[:scope.stores]
 	t.selectTrail = t.selectTrail[:scope.selects]
 	t.defaultTrail = t.defaultTrail[:scope.defaults]
+	t.epsilonTrail = t.epsilonTrail[:scope.epsilons]
 	t.unsupported = scope.unsupported
 	t.scopes = t.scopes[:level]
 	return t.SMTTheoryBase.PopScopes(count)

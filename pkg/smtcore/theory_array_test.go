@@ -310,3 +310,43 @@ func TestSMTArrayDefaultStoreLargeDomain(t *testing.T) {
 		t.Fatal("large-domain store changed default", status)
 	}
 }
+
+func TestSMTArrayDefaultStoreFiniteDomain(t *testing.T) {
+	m := astTestManager(t)
+	family, err := m.RegisterArrayPlugin()
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	arraySort, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), boolean)
+	astTestMust(t, err)
+	base, err := m.MkConst(astTestSymbol(t, m, "finite-default-store-base"), arraySort)
+	astTestMust(t, err)
+	index, err := m.MkConst(astTestSymbol(t, m, "finite-default-store-index"), boolean)
+	astTestMust(t, err)
+	value, err := m.MkConst(astTestSymbol(t, m, "finite-default-store-value"), boolean)
+	astTestMust(t, err)
+	stored, err := m.MkFamilyApp(family, ast.ASTArrayOpStore, nil, []ast.ASTHandle{base, index, value})
+	astTestMust(t, err)
+	storedDefault, err := m.MkFamilyApp(family, ast.ASTArrayOpDefault, nil, []ast.ASTHandle{stored})
+	astTestMust(t, err)
+	baseDefault, err := m.MkFamilyApp(family, ast.ASTArrayOpDefault, nil, []ast.ASTHandle{base})
+	astTestMust(t, err)
+	baseValue, err := m.MkEq(baseDefault, value)
+	astTestMust(t, err)
+	storedValue, err := m.MkEq(storedDefault, value)
+	astTestMust(t, err)
+	storedNotValue, err := m.MkNot(storedValue)
+	astTestMust(t, err)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()); astTestMust(t, params.Close()) })
+	astTestMust(t, solver.Assert(baseValue))
+	astTestMust(t, solver.Assert(storedNotValue))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("finite-domain store default ITE", status)
+	}
+}

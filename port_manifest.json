@@ -113507,7 +113507,8 @@
       "tests": [
         "TestSMTArrayMapRead",
         "TestSMTArrayDefaultConstAndMap",
-        "TestSMTArrayDefaultStoreLargeDomain"
+        "TestSMTArrayDefaultStoreLargeDomain",
+        "TestSMTArrayDefaultStoreFiniteDomain"
       ],
       "conditionals": [
         {
