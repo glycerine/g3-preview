@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -31,6 +32,7 @@ type SMTKernel struct {
 	lastFailure  SMTFailure
 	unknown      string
 	labels       []usymbol.Symbol
+	callback     solver.ProgressCallback
 	closed       bool
 }
 
@@ -318,6 +320,14 @@ func (k *SMTKernel) Labels() ([]usymbol.Symbol, error) {
 		return nil, err
 	}
 	return append([]usymbol.Symbol(nil), k.labels...), nil
+}
+
+func (k *SMTKernel) SetProgressCallback(callback solver.ProgressCallback) error {
+	if err := k.open(); err != nil {
+		return err
+	}
+	k.callback = callback
+	return nil
 }
 
 // Proof returns the kernel-owned proof from the latest unsatisfiable check.

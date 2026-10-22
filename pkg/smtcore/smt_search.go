@@ -45,6 +45,9 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		}
 	}()
 	for {
+		if k.callback != nil {
+			k.callback.FastProgressSample()
+		}
 		consistent, err := k.internalizer.PropagateCore()
 		if err != nil {
 			return lbool.Undef, fmt.Errorf("smt search propagate: %w", err)

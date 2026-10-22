@@ -386,3 +386,31 @@ func TestSMTSolverSetupRejectsReachedUnsupportedArithmetic(t *testing.T) {
 		t.Fatal("unsupported arithmetic reason", reason)
 	}
 }
+
+type smtSolverProgressRecorder struct{ fast, slow uint32 }
+
+func (r *smtSolverProgressRecorder) FastProgressSample() { r.fast++ }
+func (r *smtSolverProgressRecorder) SlowProgressSample() { r.slow++ }
+
+func TestSMTSolverForwardsFastProgressSamples(t *testing.T) {
+	m, s := smtSolverFixture(t)
+	a := smtRelevancyBool(t, m, "smt-progress-a")
+	b := smtRelevancyBool(t, m, "smt-progress-b")
+	formula, err := m.MkOr(a, b)
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(formula))
+	recorder := &smtSolverProgressRecorder{}
+	astTestMust(t, s.SetProgressCallback(recorder))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True || recorder.fast == 0 || recorder.slow != 0 {
+		t.Fatal("progress callback", status, recorder.fast, recorder.slow)
+	}
+	before := recorder.fast
+	astTestMust(t, s.SetProgressCallback(nil))
+	_, err = s.CheckSat(nil)
+	astTestMust(t, err)
+	if recorder.fast != before {
+		t.Fatal("detached progress callback", before, recorder.fast)
+	}
+}

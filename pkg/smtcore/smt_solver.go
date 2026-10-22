@@ -490,7 +490,7 @@ func (s *SMTSolver) SetProgressCallback(callback solver.ProgressCallback) error 
 		return err
 	}
 	s.callback = callback
-	return nil
+	return s.kernel.SetProgressCallback(callback)
 }
 
 func (s *SMTSolver) DisplayCore(out io.Writer) error { return solver.DefaultDisplay(s, out, nil) }

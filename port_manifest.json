@@ -107066,7 +107066,8 @@
         "TestSMTKernelScopesRestoreAssertionsAndContext",
         "TestSMTSolverPublishesKernelUnsatProof",
         "TestSMTSolverReasonUnknownUsesKernelFailure",
-        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
+        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
+        "TestSMTSolverForwardsFastProgressSamples"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -107125,6 +107126,14 @@
           ]
         },
         {
+          "name": "fast search progress callback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_search.go",
+          "tests": [
+            "TestSMTSolverForwardsFastProgressSamples"
+          ]
+        },
+        {
           "name": "copy and reset, consequences, mutexes, preferred SAT, model, labels, guessed literals, display, cancellation, and parameter updates",
           "status": "unported",
           "go_target": null,
@@ -107159,7 +107168,8 @@
         "TestSMTKernelScopesRestoreAssertionsAndContext",
         "TestSMTSolverPublishesKernelUnsatProof",
         "TestSMTSolverReasonUnknownUsesKernelFailure",
-        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
+        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
+        "TestSMTSolverForwardsFastProgressSamples"
       ],
       "conditionals": [
         {
@@ -107225,6 +107235,14 @@
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
             "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
+          ]
+        },
+        {
+          "name": "fast search progress callback access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverForwardsFastProgressSamples"
           ]
         },
         {
@@ -108836,6 +108854,7 @@
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
         "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
+        "TestSMTSolverForwardsFastProgressSamples",
         "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
       ],
       "assertions": [
@@ -108891,7 +108910,15 @@
           ]
         },
         {
-          "name": "registered theory-plugin copying, model exposure, consequence and mutex solving, progress sampling, and unsat-core minimization and pattern extension",
+          "name": "search-loop fast progress callback sampling",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverForwardsFastProgressSamples"
+          ]
+        },
+        {
+          "name": "registered theory-plugin copying, model exposure, consequence and mutex solving, timed slow progress sampling, and unsat-core minimization and pattern extension",
           "status": "unported",
           "go_target": null,
           "tests": []
