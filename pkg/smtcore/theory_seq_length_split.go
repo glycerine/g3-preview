@@ -278,7 +278,11 @@ func (t *SMTSequenceTheory) branchLeadingVariableOverlap(left, right []ast.ASTHa
 				if makeErr != nil {
 					return false, makeErr
 				}
-				arguments := []ast.ASTHandle{left[0], right[0]}
+				emptyPrefix, makeErr := state.manager.MkSequenceEmpty(sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				arguments := []ast.ASTHandle{left[0], emptyPrefix, right[0]}
 				shared, makeErr := t.relationSkolem("seq.left", arguments, sort)
 				if makeErr != nil {
 					return false, makeErr
