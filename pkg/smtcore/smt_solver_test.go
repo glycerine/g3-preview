@@ -827,6 +827,50 @@ func TestSMTSolverSetupUsesLinearRealArithmetic(t *testing.T) {
 	}
 }
 
+func TestSMTSolverCollectsAndResetsLinearArithmeticStatistics(t *testing.T) {
+	m := astTestManager(t)
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	one, err := m.ArithmeticRealNumeralText("1")
+	astTestMust(t, err)
+	realSort, err := m.GetSort(one)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "linear-statistics-x"), realSort)
+	astTestMust(t, err)
+	bound, err := m.MkFamilyApp(family, smtArithOpLE, nil, []ast.ASTHandle{x, one})
+	astTestMust(t, err)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
+	astTestMust(t, s.Assert(bound))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("statistics arithmetic status", status)
+	}
+	stats := statistics.New()
+	astTestMust(t, s.CollectStatistics(stats))
+	found := false
+	for index := 0; index < stats.Size(); index++ {
+		if stats.Key(index) == "arith add rows" {
+			found = stats.IsUint(index) && stats.UintValue(index) != 0
+		}
+	}
+	if !found {
+		t.Fatal("missing arithmetic statistics")
+	}
+	astTestMust(t, s.kernel.ResetStatistics())
+	stats.Reset()
+	astTestMust(t, s.CollectStatistics(stats))
+	for index := 0; index < stats.Size(); index++ {
+		if stats.Key(index) == "arith add rows" {
+			t.Fatal("arithmetic statistics survived reset")
+		}
+	}
+}
+
 func TestSMTSolverLinearArithmeticEqualityAdapter(t *testing.T) {
 	for _, disequality := range []bool{false, true} {
 		name := "equality"

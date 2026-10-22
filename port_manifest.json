@@ -113067,9 +113067,15 @@
       "path": "src/smt/theory_arith_pp.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_kernel.go"
+      ],
+      "tests": [
+        "TestSMTSolverCollectsAndResetsLinearArithmeticStatistics"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113092,11 +113098,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "collect_statistics arithmetic counters and equality-adapter count",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTSolverCollectsAndResetsLinearArithmeticStatistics"
+          ]
+        },
+        {
+          "name": "tableau, variable, bound, atom, interval, and SMT-LIB diagnostic display helpers",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The retained public solver statistics path collects arithmetic theory counters through a concrete optional Go interface. Trace-only arithmetic tableau renderers have no current Go caller and remain unported."
+      ]
     },
     {
       "path": "src/smt/theory_array.cpp",

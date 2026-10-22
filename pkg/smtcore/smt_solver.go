@@ -241,6 +241,15 @@ func (s *SMTSolver) CollectStatistics(dst *statistics.Statistics) error {
 		return arena.ErrInvalidSlot
 	}
 	collectSMTKernelStatistics(dst, s.kernel.Statistics())
+	for _, theory := range s.kernel.internalizer.theories {
+		if collector, ok := theory.(interface {
+			CollectStatistics(*statistics.Statistics) error
+		}); ok {
+			if err := collector.CollectStatistics(dst); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 

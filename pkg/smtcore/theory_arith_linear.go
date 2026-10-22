@@ -1,7 +1,7 @@
 // Source: retained linear rational fragment of src/smt/theory_arith.h,
 // src/smt/theory_arith_core.h, src/smt/theory_arith_core_def.h, and the
 // retained fragments of src/smt/theory_arith_int.h and
-// src/smt/theory_arith_eq.h.
+// src/smt/theory_arith_eq.h, plus statistics from src/smt/theory_arith_pp.h.
 package smtcore
 
 import (
@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/simplex"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 type smtLinearForm struct {
@@ -81,6 +82,11 @@ type smtLinearIntegerBranch struct {
 	value    big.Rat
 }
 
+type smtLinearArithmeticStatistics struct {
+	conflicts, addRows, pivots, assertLower, assertUpper uint64
+	fixedEqualities, offsetEqualities, branches          uint64
+}
+
 // SMTLinearArithmeticTheory is the rational linear specialization of the
 // source arithmetic theory. Each comparison gets a tableau row for its linear
 // polynomial; Boolean assignments select its lower or upper infinitesimal
@@ -101,6 +107,7 @@ type SMTLinearArithmeticTheory struct {
 	integer          bool
 	delta            big.Rat
 	equalityAdapter  *smtArithmeticEqualityAdapter
+	statistics       smtLinearArithmeticStatistics
 }
 
 func NewSMTLinearArithmeticTheory(family ast.FamilyID) (*SMTLinearArithmeticTheory, error) {
@@ -399,6 +406,9 @@ func (t *SMTLinearArithmeticTheory) InternalizeTerm(expression ast.ASTHandle) (b
 	if err != nil {
 		return false, err
 	}
+	if _, found := t.definitions[variable]; !found {
+		t.statistics.addRows++
+	}
 	t.definitions[variable] = form
 	return true, nil
 }
@@ -453,6 +463,9 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 	}
 	t.atomByBool[variable] = len(t.atoms)
 	t.atoms = append(t.atoms, smtLinearArithmeticAtom{variable: variable, form: form, op: op, supported: linear})
+	if linear {
+		t.statistics.addRows++
+	}
 	return true, nil
 }
 
@@ -462,6 +475,12 @@ func (t *SMTLinearArithmeticTheory) Assign(variable int32, truth bool) error {
 		return ast.ErrASTDomain
 	}
 	t.atoms[index].truth = truth
+	lower, _ := smtLinearAtomBound(&t.atoms[index], truth, t.integer)
+	if lower {
+		t.statistics.assertLower++
+	} else {
+		t.statistics.assertUpper++
+	}
 	t.assertions = append(t.assertions, smtIntegerDiffAssertion{atom: index, truth: truth})
 	return nil
 }
@@ -625,6 +644,9 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 				smtLinearAssertionLiteral(firstAtom, firstAssertion),
 				smtLinearAssertionLiteral(secondAtom, secondAssertion),
 			})
+			if propagated {
+				t.statistics.offsetEqualities++
+			}
 			if propagateErr != nil || propagated {
 				return propagated, propagateErr
 			}
@@ -667,6 +689,9 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 			}
 			literals := append(append([]SMTLiteral(nil), fixed[first].literals...), fixed[second].literals...)
 			propagated, propagateErr := t.propagateEquality(state, fixed[first].variable, fixed[second].variable, literals)
+			if propagated {
+				t.statistics.fixedEqualities++
+			}
 			if propagateErr != nil || propagated {
 				return propagated, propagateErr
 			}
@@ -713,6 +738,9 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 				continue
 			}
 			propagated, propagateErr := t.propagateEquality(state, variables[0], variables[1], literals)
+			if propagated {
+				t.statistics.offsetEqualities++
+			}
 			if propagateErr != nil || propagated {
 				return propagated, propagateErr
 			}
@@ -734,6 +762,9 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 			}
 			propagated, propagateErr := t.propagateEquality(
 				state, t.simplexVariables[first], t.simplexVariables[second], nil)
+			if propagated {
+				t.statistics.offsetEqualities++
+			}
 			if propagateErr != nil || propagated {
 				return propagated, propagateErr
 			}
@@ -851,6 +882,7 @@ func (t *SMTLinearArithmeticTheory) buildSimplex(branches []smtLinearIntegerBran
 	if err != nil {
 		return nil, lbool.Undef, err
 	}
+	t.statistics.pivots += solver.Stats.NumPivots
 	return solver, status, nil
 }
 
@@ -879,6 +911,7 @@ func (t *SMTLinearArithmeticTheory) integerFeasible(branches []smtLinearIntegerB
 		t.solver = solver
 		return lbool.True, nil
 	}
+	t.statistics.branches++
 	var floor big.Int
 	floor.Quo(value.Num(), value.Denom())
 	if value.Sign() < 0 && new(big.Int).Rem(value.Num(), value.Denom()).Sign() != 0 {
@@ -913,6 +946,7 @@ func (t *SMTLinearArithmeticTheory) Propagate() error {
 	if err != nil || feasible || state.inconsistent {
 		return err
 	}
+	t.statistics.conflicts++
 	literals := make([]SMTLiteral, 0, len(t.assertions))
 	for _, assertion := range t.assertions {
 		literal := NewSMTLiteral(t.atoms[assertion.atom].variable, false)
@@ -1008,6 +1042,7 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 				if len(literals) == 0 {
 					return SMTFinalCheckGiveUp, nil
 				}
+				t.statistics.conflicts++
 				if stateErr = state.SetTheoryConflict(t.FamilyID(), literals); stateErr != nil {
 					return SMTFinalCheckGiveUp, stateErr
 				}
@@ -1078,6 +1113,29 @@ func (t *SMTLinearArithmeticTheory) NewDisequality(left, right SMTTheoryVar) err
 	return t.equalityAdapter.MkAxioms(left, right)
 }
 func (*SMTLinearArithmeticTheory) Name() string { return "arithmetic" }
+
+func (t *SMTLinearArithmeticTheory) CollectStatistics(target *statistics.Statistics) error {
+	if t == nil || target == nil {
+		return ast.ErrASTHandle
+	}
+	target.UpdateUint64("arith conflicts", t.statistics.conflicts)
+	target.UpdateUint64("arith add rows", t.statistics.addRows)
+	target.UpdateUint64("arith pivots", t.statistics.pivots)
+	target.UpdateUint64("arith assert lower", t.statistics.assertLower)
+	target.UpdateUint64("arith assert upper", t.statistics.assertUpper)
+	target.UpdateUint64("arith fixed eqs", t.statistics.fixedEqualities)
+	target.UpdateUint64("arith offset eqs", t.statistics.offsetEqualities)
+	target.UpdateUint64("arith ineq splits", t.statistics.branches)
+	target.UpdateUint64("arith eq adapter", t.equalityAdapter.NumAxioms())
+	return nil
+}
+
+func (t *SMTLinearArithmeticTheory) ResetStatistics() {
+	if t != nil {
+		t.statistics = smtLinearArithmeticStatistics{}
+		t.equalityAdapter.ResetStatistics()
+	}
+}
 
 func (t *SMTLinearArithmeticTheory) InitializeModel(generator *SMTModelGenerator) error {
 	state, err := t.State()

@@ -657,6 +657,11 @@ func (k *SMTKernel) ResetStatistics() error {
 		return err
 	}
 	k.internalizer.statistics.Reset()
+	for _, theory := range k.internalizer.theories {
+		if resetter, ok := theory.(interface{ ResetStatistics() }); ok {
+			resetter.ResetStatistics()
+		}
+	}
 	return nil
 }
 

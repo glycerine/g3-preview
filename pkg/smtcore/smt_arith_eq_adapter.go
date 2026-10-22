@@ -179,3 +179,9 @@ func (a *smtArithmeticEqualityAdapter) NumAxioms() uint64 {
 	}
 	return a.numAxioms
 }
+
+func (a *smtArithmeticEqualityAdapter) ResetStatistics() {
+	if a != nil {
+		a.numAxioms = 0
+	}
+}
