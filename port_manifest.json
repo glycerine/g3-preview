@@ -41293,9 +41293,14 @@
       "path": "src/interp/iz3proof.cpp",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/proof.go"
+      ],
+      "tests": [
+        "TestInterpolationProofRetainedLemmaSelectionAndOwnership",
+        "TestInterpolationProofGuardsAndClose"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -41470,19 +41475,43 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained full-translator lemma construction and per-frame interpolant selection/simplification",
+          "status": "ported",
+          "go_target": "pkg/interp/proof.go",
+          "tests": [
+            "TestInterpolationProofRetainedLemmaSelectionAndOwnership",
+            "TestInterpolationProofGuardsAndClose"
+          ]
+        },
+        {
+          "name": "legacy intermediate assumption, hypothesis, theory, axiom, resolution, equality, copy, factorization, and recursive display machinery",
+          "status": "dead_deleted",
+          "reason": "The retained IZ3_TRANSLATE_FULL implementation directly computes each interpolant through iz3proof_itp and creates one lemma; no retained source consumer constructs or inspects these intermediate iz3proof node variants."
+        }
+      ],
+      "ownership": [
+        "InterpolationProof borrows Base, owns ASTRef roots for every stored conclusion and interpolant, and returns a caller-owned ASTRef from Interpolate."
+      ],
+      "deviations": [
+        "The concrete Go proof type implements only the live lemma specialization selected by IZ3_TRANSLATE_FULL; disabled proof checking/factorization and debugger-only printing are omitted."
+      ]
     },
     {
       "path": "src/interp/iz3proof.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/proof.go"
+      ],
+      "tests": [
+        "TestInterpolationProofRetainedLemmaSelectionAndOwnership",
+        "TestInterpolationProofGuardsAndClose"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -41509,11 +41538,30 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained proof node, proof_error, lemma construction, result selection, and ownership surface",
+          "status": "ported",
+          "go_target": "pkg/interp/proof.go",
+          "tests": [
+            "TestInterpolationProofRetainedLemmaSelectionAndOwnership",
+            "TestInterpolationProofGuardsAndClose"
+          ]
+        },
+        {
+          "name": "unreached legacy intermediate proof-node API",
+          "status": "dead_deleted",
+          "reason": "No retained source consumer reaches the generic iz3proof node interface under the active full direct-interpolation translator."
+        }
+      ],
+      "ownership": [
+        "The Go facade is copy-guarded, borrows Base, owns its stored AST roots, and releases them in reverse order."
+      ],
+      "deviations": [
+        "Concrete Go code replaces the unused generic legacy proof-node surface with the sole live lemma representation."
+      ]
     },
     {
       "path": "src/interp/iz3proof_itp.cpp",
