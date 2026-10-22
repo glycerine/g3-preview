@@ -98428,9 +98428,14 @@
       "path": "src/smt/cached_var_subst.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/cached_var_subst.go"
+      ],
+      "tests": [
+        "TestSMTCachedVarSubstitutionSourceOrderCacheAndReset",
+        "TestSMTCachedVarSubstitutionGuards"
+      ],
       "assertions": [
         {
           "line": 57,
@@ -98441,19 +98446,38 @@
           "text": "SASSERT(entry->get_data().m_value == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "key equality, constructor, reset, and cached substitution operator",
+          "status": "ported",
+          "go_target": "pkg/smtcore/cached_var_subst.go",
+          "tests": [
+            "TestSMTCachedVarSubstitutionSourceOrderCacheAndReset",
+            "TestSMTCachedVarSubstitutionGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each cache entry owns AST references for its quantifier, binding owners, and result; enodes and call arguments are borrowed. Reset releases every cache-owned reference."
+      ],
+      "deviations": [
+        "Native typed maps, slices, and explicit AST references replace raw flexible keys, region allocation, and the C++ map. Failed substitutions are never published, preserving the source rollback invariant without a transient null entry."
+      ]
     },
     {
       "path": "src/smt/cached_var_subst.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/cached_var_subst.go"
+      ],
+      "tests": [
+        "TestSMTCachedVarSubstitutionSourceOrderCacheAndReset",
+        "TestSMTCachedVarSubstitutionGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -98464,11 +98488,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "cached_var_subst interface and quantifier/binding key",
+          "status": "ported",
+          "go_target": "pkg/smtcore/cached_var_subst.go",
+          "tests": [
+            "TestSMTCachedVarSubstitutionSourceOrderCacheAndReset"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTCachedVarSubstitution owns its AST substitution engine and cache records and borrows its AST manager."
+      ],
+      "deviations": [
+        "The concrete retained key uses quantifier AST handles and SMTEnode owners rather than an unused generic pointer payload."
+      ]
     },
     {
       "path": "src/smt/cost_evaluator.cpp",
