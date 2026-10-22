@@ -113193,7 +113193,7 @@
       "path": "src/smt/theory_array.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_array.go",
         "pkg/smtcore/smt_setup.go"
@@ -113291,17 +113291,34 @@
           "text": "SASSERT(m_find.get_num_vars() == get_num_vars());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "store/select internalization, read-over-write axioms, equality-class propagation and extensionality",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "tests": ["TestSMTArrayReadOverWrite", "TestSMTArrayReadOverWriteThroughEquality", "TestSMTArrayExtensionality"]
+        },
+        {
+          "name": "scoped theory lifecycle, final-check incompleteness guard and statistics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "tests": ["TestSMTArrayAsArrayReadAxiom"]
+        }
+      ],
+      "ownership": [
+        "SMTArrayTheory owns concrete Go maps and scoped trails for observed terms, instantiated constructor pairs and epsilon constants while borrowing manager-owned AST handles and context-owned enodes."
+      ],
+      "deviations": [
+        "Guarded eager SAT axioms and shared egraph roots replace native delayed axiom queues, relevancy-triggered parent lists and the private union-find. The source as-array incompleteness guard is preserved. Trace-only display routines and tunable scheduling heuristics have no retained Go consumer."
+      ]
     },
     {
       "path": "src/smt/theory_array.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_array.go"
       ],
@@ -113318,17 +113335,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete retained array theory lifecycle, axiom propagation, scoping, final-check and statistics interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "tests": ["TestSMTArrayReadOverWrite", "TestSMTArrayReadOverWriteThroughEquality", "TestSMTArrayExtensionality", "TestSMTArrayAsArrayReadAxiom"]
+        }
+      ],
+      "ownership": [
+        "The Go theory owns typed maps and slices in place of source var_data allocation, trail stacks and union-find storage."
+      ],
+      "deviations": [
+        "The public Go theory interface replaces C++ inheritance and nested manual trail types."
+      ]
     },
     {
       "path": "src/smt/theory_array_base.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_array.go"
       ],
@@ -113489,17 +113517,34 @@
           "text": "SASSERT(get_context().is_relevant(select));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "store, conditional read-over-write and extensionality axiom construction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "tests": ["TestSMTArrayReadOverWrite", "TestSMTArrayReadOverWriteThroughEquality", "TestSMTArrayExtensionality"]
+        },
+        {
+          "name": "array model initialization, observed-select propagation and lookup-table value construction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "tests": ["TestSMTArrayPublishesModelValues", "TestSMTArrayModelPreservesObservedSelect", "TestSMTArrayModelPreservesObservedDefault", "TestSMTArrayConstructorModelValue"]
+        }
+      ],
+      "ownership": [
+        "The theory borrows AST and enode identities, owns observer and axiom-pair trails, and transfers auxiliary function interpretations to ProtoModel during table-value construction."
+      ],
+      "deviations": [
+        "Native fingerprint tables and delayed propagation queues are represented by scoped typed pair maps and eager guarded clauses. Go model procedures depend directly on canonical enode roots and register auxiliary functions through ProtoModel. Native interface-equality scheduling has no retained cross-theory array-sort consumer."
+      ]
     },
     {
       "path": "src/smt/theory_array_base.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_array.go"
       ],
@@ -113516,17 +113561,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete retained base axiom, scope, statistics and model-value interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "tests": ["TestSMTArrayReadOverWrite", "TestSMTArrayExtensionality", "TestSMTArrayModelPreservesObservedSelect", "TestSMTArrayModelPreservesObservedDefault"]
+        }
+      ],
+      "ownership": [
+        "Go slices, maps and model-value dependency records replace native vectors, pointer tables and manually allocated value procedures."
+      ],
+      "deviations": [
+        "Queue scheduling and pointer-container helpers are subsumed by eager clauses and the shared SMT/model infrastructure."
+      ]
     },
     {
       "path": "src/smt/theory_array_full.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_array.go"
       ],
@@ -113683,17 +113739,40 @@
           "text": "SASSERT(store->get_num_args() >= 3);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "map, const and as-array select axioms including propagation through equal arrays",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "tests": ["TestSMTArrayMapRead", "TestSMTArrayConstantRead", "TestSMTArrayAsArrayReadAxiom"]
+        },
+        {
+          "name": "const, map, store and as-array default axioms with finite-domain epsilon handling",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "tests": ["TestSMTArrayDefaultConstAndMap", "TestSMTArrayDefaultThroughEquality", "TestSMTArrayDefaultStoreLargeDomain", "TestSMTArrayDefaultStoreFiniteDomain"]
+        },
+        {
+          "name": "full array model values for constructors, observed reads and explicit defaults",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "tests": ["TestSMTArrayPublishesModelValues", "TestSMTArrayModelPreservesObservedSelect", "TestSMTArrayModelPreservesObservedDefault", "TestSMTArrayConstructorModelValue"]
+        }
+      ],
+      "ownership": [
+        "Scoped Go maps own epsilon and constructor-observer fingerprints. Array table procedures own dependency slices until auxiliary function interpretations transfer to ProtoModel."
+      ],
+      "deviations": [
+        "Eager guarded clauses replace source parent-map, parent-default and delayed-equality worklists. Source as-array terms still install sound read/default axioms and deliberately force an incomplete final-check result."
+      ]
     },
     {
       "path": "src/smt/theory_array_full.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_array.go"
       ],
@@ -113710,11 +113789,22 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete retained full-array internalization, constructor axiom and scoped metadata interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "tests": ["TestSMTArrayMapRead", "TestSMTArrayDefaultConstAndMap", "TestSMTArrayDefaultThroughEquality", "TestSMTArrayAsArrayReadAxiom", "TestSMTArrayModelPreservesObservedSelect", "TestSMTArrayModelPreservesObservedDefault"]
+        }
+      ],
+      "ownership": [
+        "SMTArrayTheory owns concrete typed metadata rather than separately allocated var_data_full records."
+      ],
+      "deviations": [
+        "C++ inheritance and manual per-variable allocation collapse into one concrete Go array theory."
+      ]
     },
     {
       "path": "src/smt/theory_bv.cpp",
