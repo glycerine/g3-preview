@@ -21,7 +21,11 @@ import (
 type ProofConverter interface {
 	IncRef() error
 	DecRef() error
-	Convert([]ast.ASTHandle, ast.ASTRef) error
+	Convert(*ast.ASTManager, []ast.ASTHandle, ast.ASTRef) error
+	Translate(*ast.ASTTranslation) (ProofConverter, error)
+	Cancel() error
+	Display(io.Writer) error
+	Close() error
 }
 
 // Tactic is the source tactic virtual surface used by execution and tacticals.
