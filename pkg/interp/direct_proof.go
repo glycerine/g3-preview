@@ -34,6 +34,7 @@ type DirectProofInterpolator struct {
 	congruence            ast.ASTHandle
 	modusPonens           ast.ASTHandle
 	concat                ast.ASTHandle
+	addPosition           ast.ASTHandle
 	rewriteA              ast.ASTHandle
 	rewriteB              ast.ASTHandle
 	standForall           ast.ASTHandle
@@ -100,6 +101,9 @@ func NewDirectProofInterpolator(base *Base, scope ScopeRange, weak bool) (result
 		return nil, err
 	}
 	if p.concat, err = p.newFunction("@concat", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
+		return nil, err
+	}
+	if p.addPosition, err = p.newFunction("@add_pos", []ast.ASTHandle{integer, boolean}, boolean); err != nil {
 		return nil, err
 	}
 	if p.rewriteA, err = p.newFunction("@rewrite_A", []ast.ASTHandle{boolean, boolean, boolean}, boolean); err != nil {

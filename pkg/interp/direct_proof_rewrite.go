@@ -2,7 +2,11 @@
 // and trivial mixed-rule interpolation.
 package interp
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"strconv"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
 
 func (p *DirectProofInterpolator) isEquivalence(term ast.ASTHandle) (bool, error) {
 	op, err := p.base.manager.Operator(term)
@@ -115,6 +119,56 @@ func (p *DirectProofInterpolator) reverseChain(chain ast.ASTHandle) (ast.ASTHand
 	}
 }
 
+func (p *DirectProofInterpolator) rewriteFields(rewrite ast.ASTHandle) (side TermSide, position, condition, equality ast.ASTHandle, err error) {
+	declaration, err := p.base.manager.Symbol(rewrite)
+	if err != nil {
+		return TermMixed, ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	switch declaration {
+	case p.rewriteA:
+		side = TermA
+	case p.rewriteB:
+		side = TermB
+	default:
+		return TermMixed, ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, ProofError{}
+	}
+	position, err = p.base.manager.Arg(rewrite, 0)
+	if err != nil {
+		return TermMixed, ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	condition, err = p.base.manager.Arg(rewrite, 1)
+	if err != nil {
+		return TermMixed, ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	equality, err = p.base.manager.Arg(rewrite, 2)
+	return side, position, condition, equality, err
+}
+
+func (p *DirectProofInterpolator) positionAdd(index int64, position ast.ASTHandle) (ast.ASTHandle, error) {
+	indexTerm, err := p.base.manager.MakeIntText(strconv.FormatInt(index, 10))
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.makeSymbol(p.addPosition, indexTerm, position)
+}
+
+func (p *DirectProofInterpolator) positionIndex(position ast.ASTHandle) (int64, ast.ASTHandle, error) {
+	declaration, err := p.base.manager.Symbol(position)
+	if err != nil || declaration != p.addPosition {
+		return 0, ast.ASTHandle{}, ProofError{}
+	}
+	indexTerm, err := p.base.manager.Arg(position, 0)
+	if err != nil {
+		return 0, ast.ASTHandle{}, err
+	}
+	index, matched, err := p.base.manager.Numeral(indexTerm)
+	if err != nil || !matched || !index.IsInt() || !index.Num().IsInt64() {
+		return 0, ast.ASTHandle{}, ProofError{}
+	}
+	rest, err := p.base.manager.Arg(position, 1)
+	return index.Num().Int64(), rest, err
+}
+
 func (p *DirectProofInterpolator) isEquivalenceChain(chain ast.ASTHandle) (bool, error) {
 	for {
 		empty, err := p.base.manager.IsTrue(chain)
@@ -145,6 +199,166 @@ func (p *DirectProofInterpolator) isEquivalenceChain(chain ast.ASTHandle) (bool,
 	}
 }
 
+func (p *DirectProofInterpolator) isNegationChain(chain ast.ASTHandle) (bool, error) {
+	for {
+		empty, err := p.base.manager.IsTrue(chain)
+		if err != nil || empty {
+			return false, err
+		}
+		rest, last, err := p.chainParts(chain)
+		if err != nil {
+			return false, err
+		}
+		restEmpty, err := p.base.manager.IsTrue(rest)
+		if err != nil {
+			return false, err
+		}
+		if restEmpty {
+			_, _, _, equality, e := p.rewriteFields(last)
+			if e != nil {
+				return false, e
+			}
+			right, e := p.base.manager.Arg(equality, 1)
+			if e != nil {
+				return false, e
+			}
+			op, e := p.base.manager.Operator(right)
+			return op == OperatorNot, e
+		}
+		chain = rest
+	}
+}
+
+func (p *DirectProofInterpolator) reverseBinary(term ast.ASTHandle) (ast.ASTHandle, error) {
+	op, err := p.base.manager.Operator(term)
+	if err != nil || (op != OperatorEqual && op != OperatorIff) {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	left, err := p.base.manager.Arg(term, 0)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	right, err := p.base.manager.Arg(term, 1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.Make(op, right, left)
+}
+
+func (p *DirectProofInterpolator) commuteNegationChain(chain ast.ASTHandle) (ast.ASTHandle, error) {
+	empty, err := p.base.manager.IsTrue(chain)
+	if err != nil || empty {
+		return chain, err
+	}
+	rest, last, err := p.chainParts(chain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	side, position, condition, equality, err := p.rewriteFields(last)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	restEmpty, err := p.base.manager.IsTrue(rest)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if restEmpty {
+		left, e := p.base.manager.Arg(equality, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		right, e := p.base.manager.Arg(equality, 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		rightOp, e := p.base.manager.Operator(right)
+		if e != nil || rightOp != OperatorNot {
+			return ast.ASTHandle{}, ProofError{}
+		}
+		body, e := p.base.manager.Arg(right, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		body, e = p.reverseBinary(body)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		right, e = p.base.manager.Make(OperatorNot, body)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		equalityOp, e := p.base.manager.Operator(equality)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		equality, e = p.base.manager.Make(equalityOp, left, right)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		last, e = p.makeRewrite(side, position, condition, equality)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.chainCons(rest, last)
+	}
+	if position == p.topPosition {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	index, positionRest, err := p.positionIndex(position)
+	if err != nil || index != 0 {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	if positionRest == p.topPosition {
+		left, e := p.base.manager.Arg(equality, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		right, e := p.base.manager.Arg(equality, 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		left, e = p.reverseBinary(left)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		right, e = p.reverseBinary(right)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		equality, e = p.base.manager.Make(OperatorIff, left, right)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		last, e = p.makeRewrite(side, position, condition, equality)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+	} else {
+		innerIndex, innerRest, e := p.positionIndex(positionRest)
+		if e != nil || (innerIndex != 0 && innerIndex != 1) {
+			return ast.ASTHandle{}, ProofError{}
+		}
+		innerIndex = 1 - innerIndex
+		positionRest, e = p.positionAdd(innerIndex, innerRest)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		position, e = p.positionAdd(0, positionRest)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		last, e = p.makeRewrite(side, position, condition, equality)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+	}
+	rest, err = p.commuteNegationChain(rest)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.chainCons(rest, last)
+}
+
 func (p *DirectProofInterpolator) simplifySymmetry(args []ast.ASTHandle) (ast.ASTHandle, error) {
 	if len(args) != 1 {
 		return ast.ASTHandle{}, ast.ErrASTDomain
@@ -173,10 +387,18 @@ func (p *DirectProofInterpolator) simplifySymmetry(args []ast.ASTHandle) (ast.AS
 		}
 	}
 	equivalence, err := p.isEquivalenceChain(chain)
-	if err != nil || !equivalence {
-		return ast.ASTHandle{}, ProofError{}
+	if err != nil {
+		return ast.ASTHandle{}, err
 	}
-	chain, err = p.reverseChain(chain)
+	if equivalence {
+		chain, err = p.reverseChain(chain)
+	} else {
+		negation, e := p.isNegationChain(chain)
+		if e != nil || !negation {
+			return ast.ASTHandle{}, ProofError{}
+		}
+		chain, err = p.commuteNegationChain(chain)
+	}
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}

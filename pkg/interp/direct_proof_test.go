@@ -787,3 +787,37 @@ func TestDirectProofEquivalenceChainSymmetrySimplification(t *testing.T) {
 		t.Fatal("reversed equivalence chain", left, right, negativeP, p)
 	}
 }
+
+func TestDirectProofNegationChainSymmetrySimplification(t *testing.T) {
+	_, manager, base, p, _ := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	negativeP, err := manager.MkNot(p)
+	interpMust(t, err)
+	equality, err := manager.Make(OperatorIff, p, negativeP)
+	interpMust(t, err)
+	negativeEquality, err := manager.MkNot(equality)
+	interpMust(t, err)
+	chain, err := direct.makeLocalRewrite(TermA, negativeEquality)
+	interpMust(t, err)
+	proof, err := direct.makeSymbol(direct.symmetry, chain)
+	interpMust(t, err)
+	result, err := direct.SimplifyProofTerm(proof)
+	interpMust(t, err)
+	_, rewrite, err := direct.chainParts(result)
+	interpMust(t, err)
+	rewritten, err := manager.Arg(rewrite, 2)
+	interpMust(t, err)
+	right, err := manager.Arg(rewritten, 1)
+	interpMust(t, err)
+	body, err := manager.Arg(right, 0)
+	interpMust(t, err)
+	left, err := manager.Arg(body, 0)
+	interpMust(t, err)
+	other, err := manager.Arg(body, 1)
+	interpMust(t, err)
+	if left != negativeP || other != p {
+		t.Fatal("commuted negation chain", left, other, negativeP, p)
+	}
+}
