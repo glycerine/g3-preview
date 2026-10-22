@@ -91,6 +91,7 @@ type SMTLinearArithmeticTheory struct {
 	solver           *simplex.Solver
 	simplexVariables []uint32
 	nextSimplex      uint32
+	definitions      map[SMTTheoryVar]smtLinearForm
 	atoms            []smtLinearArithmeticAtom
 	atomByBool       map[int32]int
 	assertions       []smtIntegerDiffAssertion
@@ -119,6 +120,8 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		SMTTheoryBase: base,
 		solver:        simplex.NewSolver(nil),
 		atomByBool:    make(map[int32]int),
+		definitions:   make(map[SMTTheoryVar]smtLinearForm),
+		nextSimplex:   1,
 		integer:       integer,
 	}
 	t.equalityAdapter, err = newSMTArithmeticEqualityAdapter(base)
@@ -353,23 +356,51 @@ func (t *SMTLinearArithmeticTheory) linearize(expression ast.ASTHandle) (smtLine
 }
 
 func (t *SMTLinearArithmeticTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error) {
-	_, linear, err := t.linearize(expression)
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	count, err := state.manager.GetNumArgs(expression)
+	if err != nil {
+		return false, err
+	}
+	for index := uint32(0); index < count; index++ {
+		argument, argumentErr := state.manager.GetArg(expression, index)
+		if argumentErr != nil {
+			return false, argumentErr
+		}
+		if argumentErr = state.Internalize(argument, false); argumentErr != nil {
+			return false, argumentErr
+		}
+	}
+	form, linear, err := t.linearize(expression)
 	if err == nil && !linear {
 		t.unsupported = true
-		state, stateErr := t.State()
-		if stateErr != nil {
-			return false, stateErr
-		}
 		node := state.context.enodes[expression]
 		if node == nil {
-			node, stateErr = state.MkEnode(expression, false, false, true)
+			node, err = state.MkEnode(expression, false, false, true)
 		}
-		if stateErr == nil && !t.IsAttachedToVariable(node) {
-			_, stateErr = t.createVariable(node)
+		if err == nil && !t.IsAttachedToVariable(node) {
+			_, err = t.createVariable(node)
 		}
-		return stateErr == nil, stateErr
+		return err == nil, err
 	}
-	return linear, err
+	if err != nil {
+		return false, err
+	}
+	node := state.context.enodes[expression]
+	if node == nil {
+		node, err = state.MkEnode(expression, false, false, true)
+		if err != nil {
+			return false, err
+		}
+	}
+	variable, err := t.createVariable(node)
+	if err != nil {
+		return false, err
+	}
+	t.definitions[variable] = form
+	return true, nil
 }
 
 func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool, error) {
@@ -489,6 +520,19 @@ func smtLinearFormsOpposite(first, second *smtLinearForm) bool {
 		}
 		constant.Neg(other)
 		if coefficient.Cmp(&constant) != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func smtLinearFormsEqual(first, second *smtLinearForm) bool {
+	if first == nil || second == nil || len(first.terms) != len(second.terms) || first.constant.Cmp(&second.constant) != 0 {
+		return false
+	}
+	for variable, coefficient := range first.terms {
+		other := second.terms[variable]
+		if other == nil || coefficient.Cmp(other) != 0 {
 			return false
 		}
 	}
@@ -674,6 +718,27 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 			}
 		}
 	}
+	definitionVariables := make([]int, 0, len(t.definitions))
+	for variable := range t.definitions {
+		definitionVariables = append(definitionVariables, int(variable))
+	}
+	sort.Ints(definitionVariables)
+	for firstIndex, rawFirst := range definitionVariables {
+		first := SMTTheoryVar(rawFirst)
+		firstForm := t.definitions[first]
+		for _, rawSecond := range definitionVariables[firstIndex+1:] {
+			second := SMTTheoryVar(rawSecond)
+			secondForm := t.definitions[second]
+			if !smtLinearFormsEqual(&firstForm, &secondForm) {
+				continue
+			}
+			propagated, propagateErr := t.propagateEquality(
+				state, t.simplexVariables[first], t.simplexVariables[second], nil)
+			if propagateErr != nil || propagated {
+				return propagated, propagateErr
+			}
+		}
+	}
 	return false, nil
 }
 
@@ -689,6 +754,44 @@ func (t *SMTLinearArithmeticTheory) buildSimplex(branches []smtLinearIntegerBran
 	solver := simplex.NewSolver(nil)
 	for variable := uint32(0); variable < t.nextSimplex; variable++ {
 		solver.EnsureVariable(variable)
+	}
+	one := simplex.RationalInfinitesimal(big.NewRat(1, 1))
+	if err := solver.SetLower(0, one); err != nil {
+		return nil, lbool.Undef, err
+	}
+	if err := solver.SetUpper(0, one); err != nil {
+		return nil, lbool.Undef, err
+	}
+	definitionVariables := make([]int, 0, len(t.definitions))
+	for variable := range t.definitions {
+		definitionVariables = append(definitionVariables, int(variable))
+	}
+	sort.Ints(definitionVariables)
+	for _, rawVariable := range definitionVariables {
+		variable := SMTTheoryVar(rawVariable)
+		if int(variable) >= len(t.simplexVariables) {
+			continue
+		}
+		form := t.definitions[variable]
+		base := t.simplexVariables[variable]
+		variables := []uint32{base}
+		coefficients := []big.Rat{*big.NewRat(1, 1)}
+		ordered := make([]uint32, 0, len(form.terms))
+		for term := range form.terms {
+			ordered = append(ordered, term)
+		}
+		sort.Slice(ordered, func(i, j int) bool { return ordered[i] < ordered[j] })
+		for _, term := range ordered {
+			variables = append(variables, term)
+			coefficients = append(coefficients, *new(big.Rat).Neg(form.terms[term]))
+		}
+		if form.constant.Sign() != 0 {
+			variables = append(variables, 0)
+			coefficients = append(coefficients, *new(big.Rat).Neg(&form.constant))
+		}
+		if _, err := solver.AddRationalRow(base, variables, coefficients); err != nil {
+			return nil, lbool.Undef, err
+		}
 	}
 	for index := range t.atoms {
 		atom := &t.atoms[index]
@@ -854,6 +957,11 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 		return err
 	}
 	t.simplexVariables = t.simplexVariables[:t.NumVariables()]
+	for variable := range t.definitions {
+		if int(variable) >= t.NumVariables() {
+			delete(t.definitions, variable)
+		}
+	}
 	return func() error { _, err := t.rebuild(); return err }()
 }
 

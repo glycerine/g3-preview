@@ -110917,7 +110917,9 @@
         "TestSMTSolverPublishesStrictLinearRealModel",
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
         "TestSMTSolverLinearArithmeticEqualityAdapter",
-        "TestSMTSolverUFLinearArithmeticCongruence"
+        "TestSMTSolverUFLinearArithmeticCongruence",
+        "TestSMTLinearArithmeticStandaloneTermDefinition",
+        "TestSMTLinearArithmeticEqualDefinitionRows"
       ],
       "conditionals": [
         {
@@ -111527,6 +111529,8 @@
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
+        "TestSMTLinearArithmeticStandaloneTermDefinition",
+        "TestSMTLinearArithmeticEqualDefinitionRows",
         "TestSMTSolverSetupUsesLinearRealArithmetic",
         "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
         "TestSMTSolverPublishesStrictLinearRealModel"
@@ -112269,6 +112273,15 @@
           "tests": [
             "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge"
           ]
+        },
+        {
+          "name": "affine arithmetic term internalization, constant column, scoped definition rows, and equivalent-row equality propagation",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTLinearArithmeticStandaloneTermDefinition",
+            "TestSMTLinearArithmeticEqualDefinitionRows"
+          ]
         }
       ],
       "ownership": [],
@@ -112310,7 +112323,8 @@
       "tests": [
         "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
         "TestSMTSolverLinearArithmeticPropagatesFixedEquality",
-        "TestSMTSolverLinearArithmeticPropagatesOffsetEquality"
+        "TestSMTSolverLinearArithmeticPropagatesOffsetEquality",
+        "TestSMTLinearArithmeticEqualDefinitionRows"
       ],
       "conditionals": [
         {
@@ -112418,13 +112432,14 @@
           "tests": [
             "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
             "TestSMTSolverLinearArithmeticPropagatesFixedEquality",
-            "TestSMTSolverLinearArithmeticPropagatesOffsetEquality"
+            "TestSMTSolverLinearArithmeticPropagatesOffsetEquality",
+            "TestSMTLinearArithmeticEqualDefinitionRows"
           ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The linear specialization recognizes active opposite bound pairs and substitutes fixed monomials directly instead of maintaining the source row-id offset index. Cross-row offset matching beyond asserted equality rows remains to be ported."
+        "The linear specialization recognizes active opposite bound pairs, substitutes fixed monomials, and compares affine definition rows directly instead of maintaining the source row-id offset index."
       ]
     },
     {
