@@ -270,6 +270,13 @@ func TestDirectProofLocalArithmeticRules(t *testing.T) {
 	if declaration != direct.rotateSum {
 		t.Fatal("mixed leq-to-eq rotation", declaration, direct.rotateSum)
 	}
+	mixedPremise, err := direct.MakeHypothesis(mixed)
+	interpMust(t, err)
+	mixedFarkas, err := direct.MakeFarkas(falsehood, []ast.ASTHandle{mixedPremise}, []ast.ASTHandle{mixed}, []ast.ASTHandle{one})
+	interpMust(t, err)
+	if mixedFarkas.IsNull() {
+		t.Fatal("mixed Farkas returned null proof")
+	}
 }
 
 func TestDirectProofFinalSimplificationOwnership(t *testing.T) {

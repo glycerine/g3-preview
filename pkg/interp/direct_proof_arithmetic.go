@@ -11,22 +11,45 @@ func (p *DirectProofInterpolator) MakeFarkas(conclusion ast.ASTHandle, premises,
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
 	var aCoefficients, aInequalities []ast.ASTHandle
+	var mixedLiterals []ast.ASTHandle
 	for i, literal := range premiseConclusions {
 		side, err := p.TermSide(literal)
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}
-		if side == TermMixed {
-			return ast.ASTHandle{}, ProofError{}
-		}
 		if side == TermA {
 			aCoefficients = append(aCoefficients, coefficients[i])
 			aInequalities = append(aInequalities, literal)
+		} else if side == TermMixed {
+			mixedLiterals = append(mixedLiterals, literal)
 		}
 	}
 	result, err := p.base.manager.SumInequalities(aCoefficients, aInequalities, true)
 	if err != nil {
 		return ast.ASTHandle{}, err
+	}
+	for i, literal := range premiseConclusions {
+		side, e := p.TermSide(literal)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if side != TermMixed {
+			continue
+		}
+		placeholder, e := p.placeholder(literal)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		result, e = p.makeSymbol(p.sum, result, coefficients[i], placeholder)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+	}
+	if len(mixedLiterals) != 0 {
+		result, err = p.makeContraNode(result, mixedLiterals, -1)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
 	}
 	resolutionConclusion := make([]ast.ASTHandle, len(premiseConclusions))
 	for i := range premiseConclusions {
