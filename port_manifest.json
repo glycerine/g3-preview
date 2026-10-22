@@ -112309,7 +112309,8 @@
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
-        "TestSMTSolverLinearArithmeticPropagatesFixedEquality"
+        "TestSMTSolverLinearArithmeticPropagatesFixedEquality",
+        "TestSMTSolverLinearArithmeticPropagatesOffsetEquality"
       ],
       "conditionals": [
         {
@@ -112411,18 +112412,19 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "fixed-variable equality and zero-offset-row equality propagation with theory antecedents",
+          "name": "fixed-variable, zero-offset-row, and fixed-monomial offset equality propagation with theory antecedents",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_linear.go",
           "tests": [
             "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
-            "TestSMTSolverLinearArithmeticPropagatesFixedEquality"
+            "TestSMTSolverLinearArithmeticPropagatesFixedEquality",
+            "TestSMTSolverLinearArithmeticPropagatesOffsetEquality"
           ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The current linear specialization recognizes active opposite bound pairs directly. General offset-row indexing with additional fixed monomials remains to be ported."
+        "The linear specialization recognizes active opposite bound pairs and substitutes fixed monomials directly instead of maintaining the source row-id offset index. Cross-row offset matching beyond asserted equality rows remains to be ported."
       ]
     },
     {

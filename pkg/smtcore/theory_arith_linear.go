@@ -628,6 +628,52 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 			}
 		}
 	}
+	for firstIndex, firstAssertion := range t.assertions {
+		firstAtom := &t.atoms[firstAssertion.atom]
+		firstForm, firstOK := smtLinearNormalizedLE(firstAtom, firstAssertion)
+		if !firstOK {
+			continue
+		}
+		for _, secondAssertion := range t.assertions[firstIndex+1:] {
+			secondAtom := &t.atoms[secondAssertion.atom]
+			secondForm, secondOK := smtLinearNormalizedLE(secondAtom, secondAssertion)
+			if !secondOK || !smtLinearFormsOpposite(&firstForm, &secondForm) {
+				continue
+			}
+			remaining := firstForm.clone()
+			literals := []SMTLiteral{
+				smtLinearAssertionLiteral(firstAtom, firstAssertion),
+				smtLinearAssertionLiteral(secondAtom, secondAssertion),
+			}
+			for _, value := range fixed {
+				coefficient := remaining.terms[value.variable]
+				if coefficient == nil {
+					continue
+				}
+				var contribution big.Rat
+				contribution.Mul(coefficient, &value.value)
+				remaining.constant.Add(&remaining.constant, &contribution)
+				delete(remaining.terms, value.variable)
+				literals = append(literals, value.literals...)
+			}
+			if remaining.constant.Sign() != 0 || len(remaining.terms) != 2 {
+				continue
+			}
+			variables := make([]uint32, 0, 2)
+			coefficients := make([]*big.Rat, 0, 2)
+			for variable, coefficient := range remaining.terms {
+				variables = append(variables, variable)
+				coefficients = append(coefficients, coefficient)
+			}
+			if coefficients[0].Sign() == 0 || coefficients[0].Cmp(new(big.Rat).Neg(coefficients[1])) != 0 {
+				continue
+			}
+			propagated, propagateErr := t.propagateEquality(state, variables[0], variables[1], literals)
+			if propagateErr != nil || propagated {
+				return propagated, propagateErr
+			}
+		}
+	}
 	return false, nil
 }
 
