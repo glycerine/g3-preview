@@ -108793,7 +108793,8 @@
         "pkg/smtcore/smt_setup.go"
       ],
       "tests": [
-        "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic"
+        "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
+        "TestSMTSolverSetupUsesIntegerDifferenceLogic"
       ],
       "assertions": [
         {
@@ -108813,11 +108814,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "explicit arithmetic and array logic classification with conservative incomplete-theory installation",
+          "name": "explicit arithmetic and array logic classification, concrete QF_IDL/QF_UFIDL theory selection, and conservative incomplete-theory installation for remaining arithmetic and array logics (src/smt/smt_setup.cpp:64-123,327-337,396-409)",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
-            "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic"
+            "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
+            "TestSMTSolverSetupUsesIntegerDifferenceLogic"
           ]
         },
         {
@@ -108828,10 +108830,10 @@
         }
       ],
       "ownership": [
-        "The kernel owns its theory registry; setup creates concrete dummy-theory values for reached theory families whose full solvers remain unavailable."
+        "The kernel owns its theory registry; setup creates the concrete integer difference theory for QF_IDL/QF_UFIDL and dummy-theory values for reached families whose solvers remain unavailable."
       ],
       "deviations": [
-        "Until the concrete arithmetic and array theories are ported, explicit logics install SMTDummyTheory so reached theory expressions return source-style incompleteness instead of an unsound propositional SAT result."
+        "QF_IDL and QF_UFIDL use the retained integer difference theory. Other incomplete arithmetic and array logics install SMTDummyTheory so reached expressions return source-style incompleteness instead of an unsound propositional SAT result."
       ]
     },
     {
@@ -108843,7 +108845,8 @@
         "pkg/smtcore/smt_setup.go"
       ],
       "tests": [
-        "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic"
+        "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
+        "TestSMTSolverSetupUsesIntegerDifferenceLogic"
       ],
       "conditionals": [
         {
@@ -108863,7 +108866,8 @@
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
-            "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic"
+            "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
+            "TestSMTSolverSetupUsesIntegerDifferenceLogic"
           ]
         },
         {
@@ -113239,7 +113243,8 @@
       "tests": [
         "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
         "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
-        "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback"
+        "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback",
+        "TestSMTSolverSetupUsesIntegerDifferenceLogic"
       ],
       "conditionals": [
         {
@@ -113261,7 +113266,8 @@
           "tests": [
             "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
             "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
-            "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback"
+            "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback",
+            "TestSMTSolverSetupUsesIntegerDifferenceLogic"
           ]
         },
         {
@@ -113290,7 +113296,8 @@
       "tests": [
         "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
         "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
-        "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback"
+        "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback",
+        "TestSMTSolverSetupUsesIntegerDifferenceLogic"
       ],
       "conditionals": [
         {
@@ -113442,7 +113449,8 @@
           "tests": [
             "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
             "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
-            "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback"
+            "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback",
+            "TestSMTSolverSetupUsesIntegerDifferenceLogic"
           ]
         },
         {

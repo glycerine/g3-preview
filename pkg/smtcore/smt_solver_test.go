@@ -387,6 +387,47 @@ func TestSMTSolverSetupRejectsReachedUnsupportedArithmetic(t *testing.T) {
 	}
 }
 
+func TestSMTSolverSetupUsesIntegerDifferenceLogic(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		second int64
+		want   lbool.LBool
+	}{
+		{name: "feasible", second: 1, want: lbool.True},
+		{name: "negative-cycle", second: -1, want: lbool.False},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m := astTestManager(t)
+			family, err := m.RegisterArithmeticPlugin()
+			astTestMust(t, err)
+			integer, err := m.MkFamilySort(family, 1, nil)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "solver-idl-x"), integer)
+			astTestMust(t, err)
+			y, err := m.MkConst(astTestSymbol(t, m, "solver-idl-y"), integer)
+			astTestMust(t, err)
+			params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, "QF_IDL", SMTSolverConfig{Params: params})
+			astTestMust(t, err)
+			t.Cleanup(func() {
+				astTestMust(t, solver.Close())
+				astTestMust(t, params.Close())
+			})
+			fixture := smtIntegerDiffFixture{manager: m, family: family, sort: integer, x: x, y: y}
+			first := fixture.bound(t, smtArithOpLE, x, y, 0)
+			second := fixture.bound(t, smtArithOpLE, y, x, test.second)
+			astTestMust(t, solver.Assert(first))
+			astTestMust(t, solver.Assert(second))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != test.want {
+				t.Fatal("integer difference-logic result", status, test.want)
+			}
+		})
+	}
+}
+
 type smtSolverProgressRecorder struct{ fast, slow uint32 }
 
 func (r *smtSolverProgressRecorder) FastProgressSample() { r.fast++ }

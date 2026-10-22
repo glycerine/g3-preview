@@ -41,7 +41,16 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 		if err != nil {
 			return err
 		}
-		if err = install(family, "arithmetic"); err != nil {
+		if logic == "QF_IDL" || logic == "QF_UFIDL" {
+			theory, theoryErr := NewSMTIntegerDiffTheory(family)
+			if theoryErr != nil {
+				return theoryErr
+			}
+			err = kernel.RegisterTheory(theory)
+		} else {
+			err = install(family, "arithmetic")
+		}
+		if err != nil {
 			return err
 		}
 	}

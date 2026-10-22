@@ -553,3 +553,5 @@ func (t *SMTIntegerDiffTheory) Graph() *SMTRationalDiffGraph {
 	}
 	return t.graph
 }
+
+func (*SMTIntegerDiffTheory) Name() string { return "difference-logic" }
