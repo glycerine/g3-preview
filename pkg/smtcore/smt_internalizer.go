@@ -81,7 +81,13 @@ func (s *SMTInternalizerState) Clauses() []SMTInternalizedClause {
 	result := make([]SMTInternalizedClause, len(s.clauses))
 	for index := range s.clauses {
 		result[index] = s.clauses[index]
-		result[index].Literals = append([]SMTLiteral(nil), s.clauses[index].Literals...)
+		literals := s.clauses[index].Literals
+		if s.clauses[index].clause != nil {
+			literals = s.clauses[index].clause.Literals()
+		}
+		result[index].Literals = append([]SMTLiteral(nil), literals...)
+		result[index].clause = nil
+		result[index].owner = nil
 	}
 	return result
 }
@@ -89,36 +95,7 @@ func (s *SMTInternalizerState) Clauses() []SMTInternalizedClause {
 func (s *SMTInternalizerState) Inconsistent() bool { return s != nil && s.inconsistent }
 
 func (s *SMTInternalizerState) assignLiteral(literal SMTLiteral) error {
-	if literal == SMTTrueLiteral {
-		return nil
-	}
-	if literal == SMTFalseLiteral {
-		s.inconsistent = true
-		return nil
-	}
-	variable := literal.Var()
-	want := lbool.True
-	if literal.Sign() {
-		want = lbool.False
-	}
-	current, err := s.Assignment(NewSMTLiteral(variable, false))
-	if err != nil {
-		return err
-	}
-	if current != lbool.Undef && current != want {
-		s.inconsistent = true
-		return nil
-	}
-	if current == want {
-		return nil
-	}
-	if err = s.SetAssignment(variable, want); err != nil {
-		return err
-	}
-	if s.relevancy != nil {
-		return s.relevancy.AssignmentEvent(s.boolExpr[variable], want == lbool.True)
-	}
-	return nil
+	return s.AssignLiteral(literal, NewSMTBooleanAxiom())
 }
 
 func (s *SMTInternalizerState) addClause(literals []SMTLiteral, root bool, proof ast.ASTHandle) error {
@@ -153,19 +130,21 @@ func (s *SMTInternalizerState) addClause(literals []SMTLiteral, root bool, proof
 		seen[literal] = struct{}{}
 		kept = append(kept, literal)
 	}
+	s.statistics.NumMkLits += uint32(len(kept))
 	if len(kept) == 0 {
 		s.inconsistent = true
+		s.conflict = NewSMTBooleanAxiom()
+		s.statistics.NumConflicts++
 		return nil
 	}
 	if len(kept) == 1 {
 		return s.assignLiteral(kept[0])
 	}
-	if !proof.IsNull() {
-		if err := s.manager.IncRef(proof); err != nil {
-			return err
-		}
+	clause, owner, err := s.makeClause(kept, proof)
+	if err != nil {
+		return err
 	}
-	s.clauses = append(s.clauses, SMTInternalizedClause{Literals: kept, Root: root, Proof: proof})
+	s.clauses = append(s.clauses, SMTInternalizedClause{Literals: kept, Root: root, Proof: proof, clause: clause, owner: owner})
 	s.statistics.NumMkClause++
 	if len(kept) == 2 {
 		s.statistics.NumMkBinClause++

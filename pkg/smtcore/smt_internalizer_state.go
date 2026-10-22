@@ -16,12 +16,17 @@ type smtInternalizerScope struct {
 	assignmentLimit int
 	clauseLimit     int
 	theoryLimit     int
+	assignedLimit   int
+	propagationHead int
 	inconsistent    bool
+	conflict        SMTBooleanJustification
 }
 
 type smtInternalizerAssignmentTrail struct {
-	variable int32
-	value    lbool.LBool
+	variable      int32
+	value         lbool.LBool
+	justification SMTBooleanJustification
+	scopeLevel    uint32
 }
 
 type smtInternalizerTheoryTrail struct {
@@ -36,6 +41,8 @@ type SMTInternalizedClause struct {
 	Literals []SMTLiteral
 	Root     bool
 	Proof    ast.ASTHandle
+	clause   *SMTClause
+	owner    SMTJustification
 }
 
 type SMTInternalizerCongruence struct {
@@ -66,6 +73,9 @@ type SMTInternalizerState struct {
 	assignmentTrail  []smtInternalizerAssignmentTrail
 	theoryTrail      []smtInternalizerTheoryTrail
 	clauses          []SMTInternalizedClause
+	assignedLiterals []SMTLiteral
+	propagationHead  int
+	conflict         SMTBooleanJustification
 	inconsistent     bool
 	generation       uint32
 	scopeLevel       uint32
@@ -292,7 +302,9 @@ func (s *SMTInternalizerState) SetAssignment(variable int32, value lbool.LBool) 
 		return nil
 	}
 	if len(s.scopes) != 0 {
-		s.assignmentTrail = append(s.assignmentTrail, smtInternalizerAssignmentTrail{variable: variable, value: old})
+		s.assignmentTrail = append(s.assignmentTrail, smtInternalizerAssignmentTrail{
+			variable: variable, value: old, justification: s.booleanData[variable].Justification(), scopeLevel: s.booleanData[variable].ScopeLevel,
+		})
 	}
 	s.assignment[positive.Index()] = value
 	s.assignment[positive.Negated().Index()] = value.Negated()
@@ -399,6 +411,7 @@ func (s *SMTInternalizerState) PushScope() error {
 	s.scopes = append(s.scopes, smtInternalizerScope{
 		booleanLimit: len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending),
 		assignmentLimit: len(s.assignmentTrail), clauseLimit: len(s.clauses), theoryLimit: len(s.theoryTrail), inconsistent: s.inconsistent,
+		assignedLimit: len(s.assignedLiterals), propagationHead: s.propagationHead, conflict: s.conflict,
 	})
 	if s.relevancy != nil {
 		if err := s.relevancy.PushScope(); err != nil {
@@ -482,10 +495,30 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		positive := NewSMTLiteral(entry.variable, false)
 		s.assignment[positive.Index()] = entry.value
 		s.assignment[positive.Negated().Index()] = entry.value.Negated()
+		s.booleanData[entry.variable].SetJustification(entry.justification)
+		s.booleanData[entry.variable].ScopeLevel = entry.scopeLevel
 		if err := s.context.SetAssignment(s.boolExpr[entry.variable], entry.value); err != nil {
 			return err
 		}
 	}
+	if scope.assignedLimit < 0 || scope.assignedLimit > len(s.assignedLiterals) {
+		return ast.ErrASTDomain
+	}
+	s.assignedLiterals = s.assignedLiterals[:scope.assignedLimit]
+	if scope.propagationHead < 0 || scope.propagationHead > len(s.assignedLiterals) {
+		return ast.ErrASTDomain
+	}
+	s.propagationHead = scope.propagationHead
+	if scope.clauseLimit < 0 || scope.clauseLimit > len(s.clauses) {
+		return ast.ErrASTDomain
+	}
+	for index := len(s.clauses); index > scope.clauseLimit; index-- {
+		if err := s.closeClause(&s.clauses[index-1]); err != nil {
+			return err
+		}
+	}
+	s.statistics.NumDelClause += uint32(len(s.clauses) - scope.clauseLimit)
+	s.clauses = s.clauses[:scope.clauseLimit]
 	for len(s.enodeStack) > scope.enodeLimit {
 		node := s.enodeStack[len(s.enodeStack)-1]
 		if err := s.unregisterEnode(node); err != nil {
@@ -530,21 +563,8 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		return ast.ErrASTDomain
 	}
 	s.pending = s.pending[:scope.pendingLimit]
-	if scope.clauseLimit < 0 || scope.clauseLimit > len(s.clauses) {
-		return ast.ErrASTDomain
-	}
-	for index := len(s.clauses); index > scope.clauseLimit; index-- {
-		proof := s.clauses[index-1].Proof
-		if !proof.IsNull() {
-			if err := s.manager.DecRef(proof); err != nil {
-				return err
-			}
-			s.clauses[index-1].Proof = ast.ASTHandle{}
-		}
-	}
-	s.statistics.NumDelClause += uint32(len(s.clauses) - scope.clauseLimit)
-	s.clauses = s.clauses[:scope.clauseLimit]
 	s.inconsistent = scope.inconsistent
+	s.conflict = scope.conflict
 	return nil
 }
 

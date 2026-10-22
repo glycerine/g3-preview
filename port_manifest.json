@@ -103976,9 +103976,13 @@
       "path": "src/smt/smt_context.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_boolean_propagation.go"
+      ],
+      "tests": [
+        "TestSMTInternalizerWatchedClausePropagationAndRollback"
+      ],
       "conditionals": [
         {
           "line": 77,
@@ -104893,17 +104897,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Boolean assignment queue and two-watched-clause propagation and conflict detection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_boolean_propagation.go",
+          "tests": [
+            "TestSMTInternalizerWatchedClausePropagationAndRollback"
+          ]
+        }
+      ],
+      "ownership": [
+        "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
+      ],
+      "deviations": [
+        "Binary-clause specialization and the remaining logical-context search loop are not part of this slice."
+      ]
     },
     {
       "path": "src/smt/smt_context.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_boolean_propagation.go"
+      ],
+      "tests": [
+        "TestSMTInternalizerWatchedClausePropagationAndRollback"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -105058,9 +105080,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Boolean assignment, watch, clause, conflict, and propagation state consumed by internalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_boolean_propagation.go",
+          "tests": [
+            "TestSMTInternalizerWatchedClausePropagationAndRollback"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTInternalizerState owns the concrete slices and clause objects for this context subset."
+      ],
+      "deviations": [
+        "The complete context interface, search queues, theory propagation, conflict resolution, model state, and lifecycle remain unported."
+      ]
     },
     {
       "path": "src/smt/smt_context_inv.cpp",
@@ -105928,6 +105963,7 @@
         "pkg/smtcore/smt_internalizer_order.go",
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/smtcore/smt_internalizer.go",
+        "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_theory.go"
       ],
       "tests": [
@@ -105940,7 +105976,8 @@
         "TestSMTInternalizerQuantifierRegistrationAndDefaultAssertion",
         "TestSMTInternalizerConsumesMaterializedQuantifierInstance",
         "TestSMTInternalizerDeepAssertionUsesTopologicalPrepass",
-        "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+        "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
+        "TestSMTInternalizerWatchedClausePropagationAndRollback"
       ],
       "conditionals": [
         {
@@ -106334,7 +106371,15 @@
           "tests": []
         },
         {
-          "name": "watched-clause propagation, conflict justifications, proof-producing unit assignment, and clause garbage collection",
+          "name": "auxiliary-clause simplification and construction, two-watch registration and movement, Boolean propagation, clause conflict justification, and scoped clause cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_boolean_propagation.go",
+          "tests": [
+            "TestSMTInternalizerWatchedClausePropagationAndRollback"
+          ]
+        },
+        {
+          "name": "binary-clause optimization, learned and auxiliary-lemma watch selection and reinitialization, proof-producing gate and root clauses, and clause garbage collection",
           "status": "unported",
           "go_target": null,
           "tests": []

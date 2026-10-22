@@ -196,3 +196,71 @@ func TestSMTInternalizerDeepAssertionUsesTopologicalPrepass(t *testing.T) {
 		t.Fatal("deep assertion root assignment", value, err)
 	}
 }
+
+func TestSMTInternalizerWatchedClausePropagationAndRollback(t *testing.T) {
+	m := astTestManager(t)
+	a := smtRelevancyBool(t, m, "propagate-a")
+	b := smtRelevancyBool(t, m, "propagate-b")
+	c := smtRelevancyBool(t, m, "propagate-c")
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	for _, expression := range []ast.ASTHandle{a, b, c} {
+		astTestMust(t, state.Internalize(expression, true))
+	}
+	aLiteral, err := state.Literal(a)
+	astTestMust(t, err)
+	bLiteral, err := state.Literal(b)
+	astTestMust(t, err)
+	cLiteral, err := state.Literal(c)
+	astTestMust(t, err)
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.addClause([]SMTLiteral{aLiteral, bLiteral, cLiteral}, false, ast.ASTHandle{}))
+	if len(state.watches[aLiteral.Negated().Index()].Clauses()) != 1 || len(state.watches[bLiteral.Negated().Index()].Clauses()) != 1 {
+		t.Fatal("initial clause watches")
+	}
+	astTestMust(t, state.AssignLiteral(aLiteral.Negated(), NewSMTBooleanAxiom()))
+	consistent, err := state.Propagate()
+	astTestMust(t, err)
+	if !consistent || len(state.watches[aLiteral.Negated().Index()].Clauses()) != 0 || len(state.watches[cLiteral.Negated().Index()].Clauses()) != 1 {
+		t.Fatal("moved clause watch", consistent)
+	}
+	astTestMust(t, state.AssignLiteral(bLiteral.Negated(), NewSMTBooleanAxiom()))
+	consistent, err = state.Propagate()
+	astTestMust(t, err)
+	if !consistent {
+		t.Fatal("unexpected propagation conflict")
+	}
+	if value, err := state.Assignment(cLiteral); err != nil || value != lbool.True {
+		t.Fatal("unit propagation", value, err)
+	}
+	if clause, ok := state.booleanData[cLiteral.Var()].Justification().Clause(); !ok || clause == nil {
+		t.Fatal("clause propagation justification")
+	}
+	if state.Statistics().NumPropagations != 1 {
+		t.Fatal("propagation statistics", state.Statistics())
+	}
+	astTestMust(t, state.PopScopes(1))
+	for _, literal := range []SMTLiteral{aLiteral, bLiteral, cLiteral} {
+		if value, err := state.Assignment(literal); err != nil || value != lbool.Undef {
+			t.Fatal("assignment rollback", literal, value, err)
+		}
+		if len(state.watches[literal.Negated().Index()].Clauses()) != 0 {
+			t.Fatal("watch rollback", literal)
+		}
+	}
+
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.addClause([]SMTLiteral{aLiteral, bLiteral}, false, ast.ASTHandle{}))
+	astTestMust(t, state.AssignLiteral(aLiteral.Negated(), NewSMTBooleanAxiom()))
+	astTestMust(t, state.AssignLiteral(bLiteral.Negated(), NewSMTBooleanAxiom()))
+	consistent, err = state.Propagate()
+	astTestMust(t, err)
+	conflict, found := state.Conflict()
+	clause, clauseConflict := conflict.Clause()
+	if consistent || !found || !clauseConflict || clause == nil || state.Statistics().NumConflicts != 1 {
+		t.Fatal("watched clause conflict", consistent, found, conflict.Kind(), state.Statistics())
+	}
+	astTestMust(t, state.PopScopes(1))
+	if state.Inconsistent() {
+		t.Fatal("conflict scope rollback")
+	}
+}
