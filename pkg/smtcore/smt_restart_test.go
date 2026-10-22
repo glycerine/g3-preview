@@ -48,7 +48,7 @@ func TestSMTRestartBacktracksAndPreservesLearnedClause(t *testing.T) {
 	kernel.smtState.RestartStrategy = 3
 	state := kernel.internalizer
 	astTestMust(t, state.beginSearchPersistence(0, kernel.smtState))
-	defer state.endSearchPersistence()
+	defer func() { astTestMust(t, state.endSearchPersistence()) }()
 	for range 3 {
 		astTestMust(t, state.PushScope())
 	}

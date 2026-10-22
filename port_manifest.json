@@ -104490,6 +104490,7 @@
         "TestSMTClauseSimplificationDeletesSatisfiedReasonSafely",
         "TestSMTClauseSimplificationRetainsProofReasons",
         "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals",
+        "TestSMTDelayedUnitBackjumpGuard",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
@@ -105461,7 +105462,7 @@
           ]
         },
         {
-          "name": "persistent learned clauses and units, adaptive restart scheduling, restart backtracking, and proof-preserving base-clause simplification",
+          "name": "persistent and delayed learned clauses and units, adaptive restart scheduling, restart backtracking, and proof-preserving base-clause simplification",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_restart.go",
           "tests": [
@@ -105471,7 +105472,8 @@
             "TestSMTRestartBacktracksAndPreservesLearnedClause",
             "TestSMTClauseSimplificationDropsFalseTailLiteral",
             "TestSMTClauseSimplificationDeletesSatisfiedReasonSafely",
-            "TestSMTClauseSimplificationRetainsProofReasons"
+            "TestSMTClauseSimplificationRetainsProofReasons",
+            "TestSMTDelayedUnitBackjumpGuard"
           ]
         },
         {

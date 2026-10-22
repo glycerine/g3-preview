@@ -36,12 +36,25 @@ func (s *SMTInternalizerState) beginSearchPersistence(base uint32, params SMTPar
 	return nil
 }
 
-func (s *SMTInternalizerState) endSearchPersistence() {
+func (s *SMTInternalizerState) endSearchPersistence() (result error) {
 	s.searching = false
 	s.searchBaseLevel = 0
 	s.searchAgility = 0
 	s.searchAgilityFactor = 0
 	s.searchRestartAdaptive = false
+	kept := 0
+	for index := range s.learnedUnits {
+		if s.learnedUnits[index].installedLevel == s.learnedUnits[index].ownerLevel {
+			result = errors.Join(result, s.releaseLearnedUnit(&s.learnedUnits[index]))
+			continue
+		}
+		if kept != index {
+			s.learnedUnits[kept] = s.learnedUnits[index]
+		}
+		kept++
+	}
+	s.learnedUnits = s.learnedUnits[:kept]
+	return result
 }
 
 func (s *SMTInternalizerState) retainProof(proof ast.ASTHandle) (ast.ASTHandle, error) {

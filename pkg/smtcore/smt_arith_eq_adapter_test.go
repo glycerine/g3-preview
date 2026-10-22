@@ -51,7 +51,7 @@ func TestSMTArithmeticEqualityAdapterRecreatesSearchAxiomsAtRestart(t *testing.T
 	params := SMTParamsState{AgilityFactor: 0.9999, RestartAdaptive: true}
 	astTestMust(t, f.state.InitializeTheorySearch())
 	astTestMust(t, f.state.beginSearchPersistence(0, params))
-	defer f.state.endSearchPersistence()
+	defer func() { astTestMust(t, f.state.endSearchPersistence()) }()
 	astTestMust(t, f.state.PushScope())
 	astTestMust(t, f.state.enqueueTheoryEquality(f.family, left, right))
 	astTestMust(t, f.state.PropagateTheoryEvents())

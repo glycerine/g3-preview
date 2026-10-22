@@ -135,6 +135,23 @@ func (k *SMTKernel) searchResourceLimitExceeded(timer *stopwatch.Timer, nextProg
 	return false, nil
 }
 
+func (k *SMTKernel) learnedBackjumpLevel(resolution SMTConflictResolution, baseLevel uint32) (uint32, error) {
+	level := resolution.NewScopeLevel
+	if !k.smtState.DelayUnits || len(resolution.Lemma) != 1 || resolution.ConflictLevel <= baseLevel+1 ||
+		k.internalizer.quantifiers == nil || k.internalizer.quantifiers.Empty() ||
+		uint32(len(k.internalizer.learnedUnits)) >= k.smtState.DelayUnitsThreshold {
+		return level, nil
+	}
+	proofs, err := k.manager.ProofsEnabled()
+	if err != nil {
+		return 0, err
+	}
+	if !proofs {
+		level = resolution.ConflictLevel - 1
+	}
+	return level, nil
+}
+
 // search runs the retained CDCL control loop. Learned clauses are installed at
 // the computed backjump scope and therefore participate in the next propagation
 // pass instead of re-exploring the conflicting branch.
@@ -163,7 +180,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 				result = lbool.Undef
 			}
 		}
-		k.internalizer.endSearchPersistence()
+		resultErr = errors.Join(resultErr, k.internalizer.endSearchPersistence())
 	}()
 	for {
 		exceeded, err := k.searchResourceLimitExceeded(timer, &nextProgressSample)
@@ -200,7 +217,11 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 				}
 				return lbool.False, nil
 			}
-			if resolution.NewScopeLevel < baseLevel || resolution.NewScopeLevel >= k.internalizer.scopeLevel {
+			newScopeLevel, err := k.learnedBackjumpLevel(resolution, baseLevel)
+			if err != nil {
+				return lbool.Undef, err
+			}
+			if newScopeLevel < baseLevel || newScopeLevel >= k.internalizer.scopeLevel {
 				return lbool.Undef, ast.ErrASTDomain
 			}
 			proof, proofErr := resolver.LemmaProof()
@@ -211,7 +232,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			if err != nil {
 				return lbool.Undef, err
 			}
-			if err = k.internalizer.PopScopes(k.internalizer.scopeLevel - resolution.NewScopeLevel); err != nil {
+			if err = k.internalizer.PopScopes(k.internalizer.scopeLevel - newScopeLevel); err != nil {
 				err = errors.Join(err, k.internalizer.releaseLemmaAtoms(retained))
 				return lbool.Undef, fmt.Errorf("smt search backjump: %w", err)
 			}

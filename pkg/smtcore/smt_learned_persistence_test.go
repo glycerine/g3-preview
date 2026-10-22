@@ -14,7 +14,7 @@ func TestSMTLearnedClauseSurvivesSearchBacktrack(t *testing.T) {
 	second := smtRelevancyBool(t, m, "persistent-clause-second")
 
 	astTestMust(t, state.beginSearchPersistence(0, SMTParamsState{}))
-	defer state.endSearchPersistence()
+	defer func() { astTestMust(t, state.endSearchPersistence()) }()
 	astTestMust(t, state.PushScope())
 	for _, expression := range []ast.ASTHandle{first, second} {
 		astTestMust(t, state.Internalize(expression, true))
@@ -82,7 +82,10 @@ func TestSMTLearnedUnitSurvivesSearchBacktrackAndExpiresWithBase(t *testing.T) {
 		t.Fatal("learned unit installation level", state.learnedUnits[0].installedLevel)
 	}
 
-	state.endSearchPersistence()
+	astTestMust(t, state.endSearchPersistence())
+	if len(state.learnedUnits) != 0 {
+		t.Fatal("settled learned unit retained search-only ownership")
+	}
 	astTestMust(t, state.PopScopes(1))
 	if len(state.learnedUnits) != 0 {
 		t.Fatal("learned unit outlived its user base scope")
