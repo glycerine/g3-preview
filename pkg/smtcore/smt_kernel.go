@@ -186,24 +186,32 @@ func (k *SMTKernel) ScopeLevel() uint32 {
 	return uint32(len(k.scopes))
 }
 
-func (k *SMTKernel) Check() (lbool.LBool, error) {
+func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 	if err := k.open(); err != nil {
-		return lbool.Undef, err
+		return nil, err
 	}
 	if err := k.internalizer.SetupTheories(); err != nil {
-		return lbool.Undef, fmt.Errorf("smt kernel setup theories: %w", err)
+		return nil, fmt.Errorf("smt kernel setup theories: %w", err)
 	}
 	if err := k.internalizePending(); err != nil {
-		return lbool.Undef, fmt.Errorf("smt kernel internalize assertions: %w", err)
+		return nil, fmt.Errorf("smt kernel internalize assertions: %w", err)
 	}
 	if err := k.internalizer.InitializeTheorySearch(); err != nil {
-		return lbool.Undef, fmt.Errorf("smt kernel initialize theory search: %w", err)
+		return nil, fmt.Errorf("smt kernel initialize theory search: %w", err)
 	}
 	queue, err := NewSMTActivityCaseSplitQueue(k.internalizer)
 	if err != nil {
-		return lbool.Undef, fmt.Errorf("smt kernel case split queue: %w", err)
+		return nil, fmt.Errorf("smt kernel case split queue: %w", err)
 	}
 	k.internalizer.statistics.NumChecks++
+	return queue, nil
+}
+
+func (k *SMTKernel) Check() (lbool.LBool, error) {
+	queue, err := k.prepareCheck()
+	if err != nil {
+		return lbool.Undef, err
+	}
 	return k.search(queue)
 }
 

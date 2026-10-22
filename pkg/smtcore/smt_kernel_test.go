@@ -143,6 +143,46 @@ func TestSMTKernelFlattenedAssertionsOwnDerivedProofs(t *testing.T) {
 	}
 }
 
+func TestSMTKernelAssumptionsValidateCheckAndRollback(t *testing.T) {
+	m := astTestManager(t)
+	a := smtRelevancyBool(t, m, "kernel-assumption-a")
+	b := smtRelevancyBool(t, m, "kernel-assumption-b")
+	clause, err := m.MkOr(a, b)
+	astTestMust(t, err)
+	notA, err := m.MkNot(a)
+	astTestMust(t, err)
+	notB, err := m.MkNot(b)
+	astTestMust(t, err)
+	kernel := smtTestKernel(t, m)
+	astTestMust(t, kernel.Assert(clause, ast.ASTHandle{}))
+	result, err := kernel.CheckAssumptions([]ast.ASTHandle{notA, notB})
+	astTestMust(t, err)
+	if result != lbool.False {
+		t.Fatal("contradictory assumptions", result)
+	}
+	state, err := kernel.Internalizer()
+	astTestMust(t, err)
+	for _, expression := range []ast.ASTHandle{a, b} {
+		literal, literalErr := state.Literal(expression)
+		astTestMust(t, literalErr)
+		value, assignmentErr := state.Assignment(literal)
+		astTestMust(t, assignmentErr)
+		data, dataErr := state.BooleanData(literal.Var())
+		astTestMust(t, dataErr)
+		if value != lbool.Undef || data.Assumption {
+			t.Fatal("assumption state leaked", expression, value, data.Assumption)
+		}
+	}
+	result, err = kernel.Check()
+	astTestMust(t, err)
+	if result != lbool.True {
+		t.Fatal("base formula after assumption rollback", result)
+	}
+	if _, err = kernel.CheckAssumptions([]ast.ASTHandle{clause}); err == nil {
+		t.Fatal("compound assumption accepted")
+	}
+}
+
 func TestSMTKernelScopesRestoreAssertionsAndContext(t *testing.T) {
 	m := astTestManager(t)
 	atom := smtRelevancyBool(t, m, "kernel-scope-atom")

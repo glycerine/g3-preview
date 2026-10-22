@@ -104094,12 +104094,14 @@
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_theory_lifecycle.go",
-        "pkg/smtcore/smt_search.go"
+        "pkg/smtcore/smt_search.go",
+        "pkg/smtcore/smt_assumptions.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
-        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat"
+        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelAssumptionsValidateCheckAndRollback"
       ],
       "conditionals": [
         {
@@ -105056,6 +105058,14 @@
             "TestSMTKernelAssertionCheckAndDecisionClause",
             "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat"
           ]
+        },
+        {
+          "name": "propositional assumption validation, scoped initialization and flags, checking, and rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_assumptions.go",
+          "tests": [
+            "TestSMTKernelAssumptionsValidateCheckAndRollback"
+          ]
         }
       ],
       "ownership": [
@@ -105075,12 +105085,14 @@
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_theory_lifecycle.go",
-        "pkg/smtcore/smt_search.go"
+        "pkg/smtcore/smt_search.go",
+        "pkg/smtcore/smt_assumptions.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
-        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat"
+        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelAssumptionsValidateCheckAndRollback"
       ],
       "conditionals": [
         {
@@ -105276,6 +105288,14 @@
           "tests": [
             "TestSMTKernelAssertionCheckAndDecisionClause",
             "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat"
+          ]
+        },
+        {
+          "name": "propositional assumption validation, temporary scope, per-variable marker, and rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_assumptions.go",
+          "tests": [
+            "TestSMTKernelAssumptionsValidateCheckAndRollback"
           ]
         }
       ],
@@ -106807,13 +106827,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_kernel.go",
-        "pkg/smtcore/smt_asserted_formulas.go"
+        "pkg/smtcore/smt_asserted_formulas.go",
+        "pkg/smtcore/smt_assumptions.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
         "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
+        "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTKernelScopesRestoreAssertionsAndContext"
       ],
       "methods_audited": true,
@@ -106832,7 +106854,15 @@
           ]
         },
         {
-          "name": "copy and reset, assumptions, consequences, mutexes, preferred SAT, model, proof, unsat core, failure reason, labels, guessed literals, display, cancellation, and parameter updates",
+          "name": "propositional assumption validation and scoped checking",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_assumptions.go",
+          "tests": [
+            "TestSMTKernelAssumptionsValidateCheckAndRollback"
+          ]
+        },
+        {
+          "name": "copy and reset, consequences, mutexes, preferred SAT, model, proof, unsat core, failure reason, labels, guessed literals, display, cancellation, and parameter updates",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -106852,13 +106882,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_kernel.go",
-        "pkg/smtcore/smt_asserted_formulas.go"
+        "pkg/smtcore/smt_asserted_formulas.go",
+        "pkg/smtcore/smt_assumptions.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
         "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
+        "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTKernelScopesRestoreAssertionsAndContext"
       ],
       "conditionals": [
@@ -106887,7 +106919,15 @@
           ]
         },
         {
-          "name": "translation, reset, assumptions and derived queries, model/proof/core results, diagnostics, display, cancellation, and parameter interface",
+          "name": "propositional assumption checking",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_assumptions.go",
+          "tests": [
+            "TestSMTKernelAssumptionsValidateCheckAndRollback"
+          ]
+        },
+        {
+          "name": "translation, reset, derived queries, model/proof/core results, diagnostics, display, cancellation, and parameter interface",
           "status": "unported",
           "go_target": null,
           "tests": []
