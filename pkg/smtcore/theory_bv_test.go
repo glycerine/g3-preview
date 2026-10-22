@@ -76,7 +76,7 @@ func TestSMTBitVectorNumeralBit2Bool(t *testing.T) {
 	}
 }
 
-func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
+func TestSMTBitVectorAdditionCircuit(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
 	one, err := m.BitVectorNumeralUint64(1, 4)
 	astTestMust(t, err)
@@ -90,6 +90,40 @@ func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
 	astTestMust(t, err)
 	equality, err := m.MkEq(sum, right)
 	astTestMust(t, err)
+	leftValue, err := m.MkEq(left, one)
+	astTestMust(t, err)
+	two, err := m.BitVectorNumeralUint64(2, 4)
+	astTestMust(t, err)
+	rightValue, err := m.MkEq(right, two)
+	astTestMust(t, err)
+	wrongRightValue, err := m.MkNot(rightValue)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(equality))
+	astTestMust(t, solver.Assert(leftValue))
+	astTestMust(t, solver.Assert(wrongRightValue))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("BV addition circuit", status)
+	}
+}
+
+func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	one, err := m.BitVectorNumeralUint64(1, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(one)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "unsupported-div-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "unsupported-div-right"), sort)
+	astTestMust(t, err)
+	division, err := m.MkBitVectorPolynomialMul(sort, ast.SliceArguments([]ast.ASTHandle{left, right}))
+	astTestMust(t, err)
+	astTestMust(t, m.IncRef(division))
+	equality, err := m.MkEq(division, left)
+	astTestMust(t, err)
+	astTestMust(t, m.DecRef(division))
 	astTestMust(t, solver.Assert(equality))
 	status, err := solver.CheckSat(nil)
 	astTestMust(t, err)

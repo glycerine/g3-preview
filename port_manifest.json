@@ -113701,6 +113701,7 @@
       "tests": [
         "TestSMTBitVectorNumeralEquality",
         "TestSMTBitVectorNumeralBit2Bool",
+        "TestSMTBitVectorAdditionCircuit",
         "TestSMTBitVectorUnsupportedOperationGivesUnknown"
       ],
       "conditionals": [
@@ -114060,6 +114061,7 @@
       "tests": [
         "TestSMTBitVectorNumeralEquality",
         "TestSMTBitVectorNumeralBit2Bool",
+        "TestSMTBitVectorAdditionCircuit",
         "TestSMTBitVectorUnsupportedOperationGivesUnknown"
       ],
       "conditionals": [
