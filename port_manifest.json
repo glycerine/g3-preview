@@ -103813,7 +103813,7 @@
       "path": "src/smt/smt_conflict_resolution.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_conflict_antecedents.go",
         "pkg/smtcore/smt_conflict_levels.go",
@@ -104225,14 +104225,14 @@
         "The resolver owns its most recent lemma proof through an ASTRef and releases or replaces it across Close and Resolve."
       ],
       "deviations": [
-        "Dynamic-ack callbacks are recorded as typed congruence/equality-use events until the concrete manager is connected. Recursive Go calls replace the source explicit proof todo stack. The constructor's watch-list reference has no source read after initialization and requires no Go storage."
+        "Dynamic-Ack callbacks feed the concrete pair/triple manager during conflict expansion. Recursive Go calls replace the source explicit proof todo stack. The constructor's watch-list reference has no source read after initialization and requires no Go storage."
       ]
     },
     {
       "path": "src/smt/smt_conflict_resolution.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_conflict_antecedents.go",
         "pkg/smtcore/smt_conflict_levels.go",
@@ -104322,8 +104322,8 @@
           ]
         },
         {
-          "name": "resolver-owned proof accessor and unused constructor watch-list reference",
-          "status": "partial",
+          "name": "resolver-owned proof accessor",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_conflict_resolver.go",
           "go_targets": [
             "pkg/smtcore/smt_conflict_proof.go"
@@ -104334,6 +104334,12 @@
             "TestSMTConflictProofBuildsEqualityRootAndConflictJustifications",
             "TestSMTConflictProofBuildsCongruenceEquality"
           ]
+        },
+        {
+          "name": "unused constructor watch-list reference",
+          "status": "reference_only",
+          "go_target": null,
+          "tests": []
         }
       ],
       "ownership": [
@@ -104437,7 +104443,7 @@
         "Mutex extraction borrows the current internalizer Boolean expressions and clause/watch graph; returned rows own Go slices and borrow canonical AST handles."
       ],
       "deviations": [
-        "Until the binary-clause storage optimization is ported, mutex extraction reads two-literal ordinary clauses in addition to the source literal-watch region and feeds the same literal edges to util/cliques."
+        "Mutex extraction reads both compact literal watches and ordinary two-literal clauses because proof mode and parameter changes can leave either representation in the retained context; both feed the same literal edges to util/cliques."
       ]
     },
     {
@@ -107420,7 +107426,7 @@
       "path": "src/smt/smt_justification.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_justification.go",
         "pkg/smtcore/smt_justification_theory.go",
@@ -107490,7 +107496,7 @@
         },
         {
           "name": "debug proof display",
-          "status": "unported",
+          "status": "reference_only",
           "go_target": null,
           "tests": []
         }
@@ -107499,7 +107505,7 @@
         "Region placement is represented as lifecycle metadata; Go slices own copied literal and equality records, while explicit AST references and parameter copies preserve source lifetime obligations."
       ],
       "deviations": [
-        "The typed marker interface replaces a direct class dependency. A resolver-local typed dispatcher replaces the virtual proof API. Debug-only proof display remains open."
+        "The typed marker interface replaces a direct class dependency. A resolver-local typed dispatcher replaces the virtual proof API. No retained consumer invokes the debug-only proof display virtual."
       ]
     },
     {
