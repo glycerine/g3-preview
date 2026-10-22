@@ -90,6 +90,10 @@ func (r *TacticResult) prepare(m *ast.ASTManager) error {
 	r.manager = m
 	return r.Reset()
 }
+
+// Prepare resets a result for a tactic implemented in another package. It is
+// the package boundary counterpart of tactic's result-buffer initialization.
+func (r *TacticResult) Prepare(m *ast.ASTManager) error { return r.prepare(m) }
 func (r *TacticResult) AddGoal(g *Goal) error {
 	if r == nil || r.closed || g == nil || g.manager != r.manager {
 		return ast.ErrASTHandle

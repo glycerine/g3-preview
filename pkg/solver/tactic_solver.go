@@ -511,17 +511,26 @@ func (s *TacticSolver) Translate(m *ast.ASTManager, p *uparams.ParamsRef) (Solve
 	if err != nil {
 		return nil, err
 	}
+	values, err := s.assertionHandles()
+	if err != nil {
+		_ = next.Close()
+		return nil, err
+	}
+	if m == s.manager {
+		for _, h := range values {
+			if err = next.Assert(h); err != nil {
+				_ = next.Close()
+				return nil, err
+			}
+		}
+		return next, nil
+	}
 	tr, err := ast.NewASTTranslation(s.manager, m, false)
 	if err != nil {
 		_ = next.Close()
 		return nil, err
 	}
 	defer tr.Close()
-	values, err := s.assertionHandles()
-	if err != nil {
-		_ = next.Close()
-		return nil, err
-	}
 	for _, h := range values {
 		v, e := tr.Translate(h)
 		if e != nil {

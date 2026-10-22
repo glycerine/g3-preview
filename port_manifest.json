@@ -113294,9 +113294,18 @@
       "path": "src/solver/solver2tactic.cpp",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/solver_tactic.go",
+        "pkg/tactic/tactic_base.go"
+      ],
+      "tests": [
+        "TestExtractClausesAndDependenciesNormalizesAndPins",
+        "TestSolverTacticSATProducesModelConverter",
+        "TestSolverTacticUNSATRestoresCoreAndProof",
+        "TestSolverTacticUnknownBecomesTacticException",
+        "TestSolverTacticCrossManagerTranslation"
+      ],
       "assertions": [
         {
           "line": 46,
@@ -113307,19 +113316,57 @@
           "text": "SASSERT(clause.size() > 1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "extract_clauses_and_dependencies Boolean reuse, fresh proxy normalization, clause construction and model filtering",
+          "status": "ported",
+          "go_target": "pkg/solver/solver_tactic.go",
+          "tests": [
+            "TestExtractClausesAndDependenciesNormalizesAndPins",
+            "TestSolverTacticUNSATRestoresCoreAndProof"
+          ]
+        },
+        {
+          "name": "solver2tactic construction, parameters, SAT/UNSAT/unknown application, model/proof/core converters, statistics, callbacks and translation",
+          "status": "ported",
+          "go_target": "pkg/solver/solver_tactic.go",
+          "go_targets": [
+            "pkg/tactic/tactic_base.go"
+          ],
+          "tests": [
+            "TestSolverTacticSATProducesModelConverter",
+            "TestSolverTacticUNSATRestoresCoreAndProof",
+            "TestSolverTacticUnknownBecomesTacticException",
+            "TestSolverTacticCrossManagerTranslation"
+          ]
+        }
+      ],
+      "ownership": [
+        "ClauseExtraction pins every published clause, assumption and distinct mapped dependency through solver completion and owns one reference to its optional filter converter.",
+        "SolverTactic owns its parameter snapshot and one solver reference. Each application owns the translated local solver and extraction until result values have acquired independent converter and dependency references."
+      ],
+      "deviations": [
+        "Source assertion-only malformed dependency checks are typed domain errors in every Go build. Native maps and slices replace obj_map, ptr_vector and expr_ref_vector.",
+        "SolverTacticConfig supplies the explicit parameter owner and cross-manager target configuration required by the split Go packages."
+      ]
     },
     {
       "path": "src/solver/solver2tactic.h",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/solver_tactic.go"
+      ],
+      "tests": [
+        "TestExtractClausesAndDependenciesNormalizesAndPins",
+        "TestSolverTacticSATProducesModelConverter",
+        "TestSolverTacticUNSATRestoresCoreAndProof",
+        "TestSolverTacticUnknownBecomesTacticException",
+        "TestSolverTacticCrossManagerTranslation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113330,10 +113377,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_solver2tactic and extract_clauses_and_dependencies declarations",
+          "status": "ported",
+          "go_target": "pkg/solver/solver_tactic.go",
+          "tests": [
+            "TestExtractClausesAndDependenciesNormalizesAndPins",
+            "TestSolverTacticSATProducesModelConverter",
+            "TestSolverTacticUNSATRestoresCoreAndProof",
+            "TestSolverTacticUnknownBecomesTacticException",
+            "TestSolverTacticCrossManagerTranslation"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete exported ClauseExtraction owner replaces source output containers and exposes Close; NewSolverTactic retains its input solver."
+      ],
       "deviations": []
     },
     {
