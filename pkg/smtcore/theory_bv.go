@@ -29,6 +29,7 @@ type SMTBitVectorTheory struct {
 	bits        map[ast.ASTHandle][]ast.ASTHandle
 	bitOwners   map[ast.ASTHandle]ast.ASTRef
 	bitTrail    []ast.ASTHandle
+	temporary   []ast.ASTRef
 	scopes      []smtBVScope
 	unsupported bool
 }
@@ -118,6 +119,35 @@ func (t *SMTBitVectorTheory) argumentBits(expression ast.ASTHandle) ([][]ast.AST
 	return result, nil
 }
 
+func (t *SMTBitVectorTheory) retainTemporary(bits []ast.ASTHandle) error {
+	if len(bits) == 0 {
+		return ast.ErrASTDomain
+	}
+	state, _ := t.State()
+	assembled, err := state.manager.MkBitVectorFromBits(bits)
+	if err != nil {
+		return err
+	}
+	owner, err := state.manager.NewRef(assembled)
+	if err != nil {
+		return err
+	}
+	t.temporary = append(t.temporary, owner)
+	return nil
+}
+
+func (t *SMTBitVectorTheory) releaseTemporary() (result error) {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	for i := range t.temporary {
+		result = errors.Join(result, state.manager.DelRef(&t.temporary[i]))
+	}
+	t.temporary = t.temporary[:0]
+	return result
+}
+
 func (t *SMTBitVectorTheory) mapUnary(bits []ast.ASTHandle, operation func(ast.ASTHandle) (ast.ASTHandle, error)) ([]ast.ASTHandle, error) {
 	result := make([]ast.ASTHandle, len(bits))
 	for i := range bits {
@@ -127,7 +157,7 @@ func (t *SMTBitVectorTheory) mapUnary(bits []ast.ASTHandle, operation func(ast.A
 			return nil, err
 		}
 	}
-	return result, nil
+	return result, t.retainTemporary(result)
 }
 
 func (t *SMTBitVectorTheory) mapBinary(left, right []ast.ASTHandle, operation func(ast.ASTHandle, ast.ASTHandle) (ast.ASTHandle, error)) ([]ast.ASTHandle, error) {
@@ -142,7 +172,7 @@ func (t *SMTBitVectorTheory) mapBinary(left, right []ast.ASTHandle, operation fu
 			return nil, err
 		}
 	}
-	return result, nil
+	return result, t.retainTemporary(result)
 }
 
 func (t *SMTBitVectorTheory) boolNot(value ast.ASTHandle) (ast.ASTHandle, error) {
@@ -240,7 +270,7 @@ func (t *SMTBitVectorTheory) reduceBits(bits []ast.ASTHandle, and bool) (ast.AST
 			return ast.ASTHandle{}, err
 		}
 	}
-	return result, nil
+	return result, t.retainTemporary([]ast.ASTHandle{result})
 }
 
 func (t *SMTBitVectorTheory) unsignedLE(left, right []ast.ASTHandle) (ast.ASTHandle, error) {
@@ -270,7 +300,7 @@ func (t *SMTBitVectorTheory) unsignedLE(left, right []ast.ASTHandle) (ast.ASTHan
 			return ast.ASTHandle{}, gateErr
 		}
 	}
-	return result, nil
+	return result, t.retainTemporary([]ast.ASTHandle{result})
 }
 
 func (t *SMTBitVectorTheory) addBits(left, right []ast.ASTHandle) ([]ast.ASTHandle, error) {
@@ -315,7 +345,101 @@ func (t *SMTBitVectorTheory) addBits(left, right []ast.ASTHandle) ([]ast.ASTHand
 			return nil, gateErr
 		}
 	}
-	return result, nil
+	return result, t.retainTemporary(result)
+}
+
+func (t *SMTBitVectorTheory) subtractBits(left, right []ast.ASTHandle) ([]ast.ASTHandle, ast.ASTHandle, error) {
+	if len(left) == 0 || len(left) != len(right) {
+		return nil, ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	state, _ := t.State()
+	carry, err := state.manager.MkTrue()
+	if err != nil {
+		return nil, ast.ASTHandle{}, err
+	}
+	result := make([]ast.ASTHandle, len(left))
+	for i := range left {
+		notRight, gateErr := t.boolNot(right[i])
+		if gateErr != nil {
+			return nil, ast.ASTHandle{}, gateErr
+		}
+		partial, gateErr := t.boolXor(left[i], notRight)
+		if gateErr != nil {
+			return nil, ast.ASTHandle{}, gateErr
+		}
+		result[i], gateErr = t.boolXor(partial, carry)
+		if gateErr != nil {
+			return nil, ast.ASTHandle{}, gateErr
+		}
+		first, gateErr := t.boolAnd(left[i], notRight)
+		if gateErr != nil {
+			return nil, ast.ASTHandle{}, gateErr
+		}
+		second, gateErr := t.boolAnd(left[i], carry)
+		if gateErr != nil {
+			return nil, ast.ASTHandle{}, gateErr
+		}
+		third, gateErr := t.boolAnd(notRight, carry)
+		if gateErr != nil {
+			return nil, ast.ASTHandle{}, gateErr
+		}
+		carry, gateErr = t.boolOr(first, second)
+		if gateErr == nil {
+			carry, gateErr = t.boolOr(carry, third)
+		}
+		if gateErr != nil {
+			return nil, ast.ASTHandle{}, gateErr
+		}
+	}
+	retained := append(append([]ast.ASTHandle(nil), result...), carry)
+	return result, carry, t.retainTemporary(retained)
+}
+
+func (t *SMTBitVectorTheory) unsignedDivRem(left, right []ast.ASTHandle) ([]ast.ASTHandle, []ast.ASTHandle, error) {
+	if len(left) == 0 || len(left) != len(right) {
+		return nil, nil, ast.ErrASTDomain
+	}
+	state, _ := t.State()
+	width := len(left)
+	partial := make([]ast.ASTHandle, width)
+	partial[0] = left[width-1]
+	var err error
+	for i := 1; i < width; i++ {
+		partial[i], err = state.manager.MkFalse()
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+	quotient := make([]ast.ASTHandle, width)
+	for stage := 0; stage < width; stage++ {
+		difference, carry, subtractErr := t.subtractBits(partial, right)
+		if subtractErr != nil {
+			return nil, nil, subtractErr
+		}
+		quotient[width-stage-1] = carry
+		next := make([]ast.ASTHandle, width)
+		if stage+1 < width {
+			next[0] = left[width-stage-2]
+			for i := 1; i < width; i++ {
+				next[i], err = state.manager.MkIte(carry, difference[i-1], partial[i-1])
+				if err != nil {
+					return nil, nil, err
+				}
+			}
+		} else {
+			for i := range next {
+				next[i], err = state.manager.MkIte(carry, difference[i], partial[i])
+				if err != nil {
+					return nil, nil, err
+				}
+			}
+		}
+		if err = t.retainTemporary(next); err != nil {
+			return nil, nil, err
+		}
+		partial = next
+	}
+	return quotient, partial, nil
 }
 
 func (t *SMTBitVectorTheory) negateBits(bits []ast.ASTHandle) ([]ast.ASTHandle, error) {
@@ -501,6 +625,15 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 	case 6:
 		bits, err := t.acBits(arguments, t.multiplyBits)
 		return bits, true, err
+	case 18, 20:
+		if len(arguments) != 2 {
+			return nil, true, ast.ErrASTDomain
+		}
+		quotient, remainder, err := t.unsignedDivRem(arguments[0], arguments[1])
+		if operation == 20 {
+			return remainder, true, err
+		}
+		return quotient, true, err
 	case 30, 31, 33:
 		gate := t.boolAnd
 		if operation == 31 {
@@ -672,14 +805,18 @@ func (t *SMTBitVectorTheory) bitsFor(expression ast.ASTHandle) ([]ast.ASTHandle,
 		bits, err = t.symbolicBits(expression, width)
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(err, t.releaseTemporary())
 	}
 	assembled, err := state.manager.MkBitVectorFromBits(bits)
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(err, t.releaseTemporary())
 	}
 	owner, err := state.manager.NewRef(assembled)
 	if err != nil {
+		return nil, errors.Join(err, t.releaseTemporary())
+	}
+	if err = t.releaseTemporary(); err != nil {
+		_ = state.manager.DelRef(&owner)
 		return nil, err
 	}
 	// Publish before internalizing bit2bool atoms, whose owner lookup comes

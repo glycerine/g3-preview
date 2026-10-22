@@ -118,7 +118,7 @@ func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
 	astTestMust(t, err)
 	right, err := m.MkConst(astTestSymbol(t, m, "unsupported-div-right"), sort)
 	astTestMust(t, err)
-	division, err := m.MkBitVectorUDivInternal(left, right)
+	division, err := m.MkBitVectorSRem(left, right)
 	astTestMust(t, err)
 	astTestMust(t, m.IncRef(division))
 	equality, err := m.MkEq(division, left)
@@ -129,6 +129,40 @@ func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
 	astTestMust(t, err)
 	if status != lbool.Undef {
 		t.Fatal("unsupported BV operation", status)
+	}
+}
+
+func TestSMTBitVectorUnsignedDivisionCircuit(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	two, err := m.BitVectorNumeralUint64(2, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(two)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "bv-div-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "bv-div-right"), sort)
+	astTestMust(t, err)
+	quotient, err := m.MkBitVectorUDivInternal(left, right)
+	astTestMust(t, err)
+	six, err := m.BitVectorNumeralUint64(6, 4)
+	astTestMust(t, err)
+	three, err := m.BitVectorNumeralUint64(3, 4)
+	astTestMust(t, err)
+	leftValue, err := m.MkEq(left, six)
+	astTestMust(t, err)
+	rightValue, err := m.MkEq(right, two)
+	astTestMust(t, err)
+	quotientValue, err := m.MkEq(quotient, three)
+	astTestMust(t, err)
+	wrongQuotient, err := m.MkNot(quotientValue)
+	astTestMust(t, err)
+	for _, assertion := range []ast.ASTHandle{leftValue, rightValue, wrongQuotient} {
+		astTestMust(t, solver.Assert(assertion))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("unsigned division circuit", status)
 	}
 }
 
