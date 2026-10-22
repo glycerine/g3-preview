@@ -9,9 +9,11 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -41,7 +43,9 @@ type SMTKernel struct {
 	callback         solver.ProgressCallback
 	modelConfig      model.ModelEvaluatorConfig
 	generated        *model.Model
+	preprocessor     *rewriter.TheoryRewriter
 	produceModel     bool
+	preprocess       bool
 	closed           bool
 }
 
@@ -75,6 +79,37 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 		return nil, errors.Join(err, internalizer.Close())
 	}
 	return &SMTKernel{manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof}, nil
+}
+
+// ConfigurePreprocessing installs the source theory-rewrite pass used before
+// asserted formulas enter the retained formula stack. It must be configured
+// before the first assertion is stored.
+func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) error {
+	if err := k.open(); err != nil {
+		return err
+	}
+	if len(k.assertions) != 0 || k.assertedHead != 0 || len(k.scopes) != 0 || k.preprocessor != nil {
+		return ast.ErrASTDomain
+	}
+	if context == nil || globals == nil || context.SymbolsField != k.manager.Symbols || globals.Context != context {
+		return uparams.ErrParamsOwner
+	}
+	name := "preprocess"
+	enabled, err := context.GetBoolName(params, &name, true)
+	if err != nil {
+		return err
+	}
+	if !enabled {
+		k.preprocess = false
+		return nil
+	}
+	value, err := rewriter.NewTheoryRewriter(k.manager, context, globals, params)
+	if err != nil {
+		return err
+	}
+	k.preprocessor = value
+	k.preprocess = true
+	return nil
 }
 
 func (k *SMTKernel) open() error {
@@ -131,6 +166,16 @@ func (k *SMTKernel) Assert(formula, proof ast.ASTHandle) error {
 			if err != nil {
 				return err
 			}
+		}
+	}
+	formula, proof, err = k.preprocessAssertion(formula, proof)
+	if err != nil {
+		return err
+	}
+	if k.preprocess {
+		defer k.manager.DecRef(formula)
+		if !proof.IsNull() {
+			defer k.manager.DecRef(proof)
 		}
 	}
 	limit := len(k.assertions)
@@ -491,6 +536,13 @@ func (k *SMTKernel) Close() error {
 	result = errors.Join(result, k.clearGeneratedModel())
 	result = errors.Join(result, k.clearUnsatCore())
 	result = errors.Join(result, k.manager.DelRef(&k.unsatProof))
+	if k.preprocessor != nil {
+		if err := k.preprocessor.Close(); err != nil {
+			result = errors.Join(result, err)
+		} else {
+			k.preprocessor = nil
+		}
+	}
 	result = errors.Join(result, k.internalizer.Close())
 	for index := len(k.assertions); index > 0; index-- {
 		assertion := &k.assertions[index-1]

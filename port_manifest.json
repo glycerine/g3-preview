@@ -98434,13 +98434,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_asserted_formulas.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_solver.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
-        "TestSMTKernelScopesRestoreAssertionsAndContext"
+        "TestSMTKernelScopesRestoreAssertionsAndContext",
+        "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices"
       ],
       "conditionals": [
         {
@@ -98516,7 +98518,15 @@
           ]
         },
         {
-          "name": "preprocessing, reduction pipeline, substitutions, macros, value propagation, NNF/CNF, quantifier transforms, statistics, and display",
+          "name": "parameter-controlled assertion-time theory rewriting with proof composition",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_formulas.go",
+          "tests": [
+            "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices"
+          ]
+        },
+        {
+          "name": "pending-formula reduction pipeline, substitutions, macros, value propagation, NNF/CNF, quantifier transforms, statistics, and display",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -98536,13 +98546,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_asserted_formulas.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_solver.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
-        "TestSMTKernelScopesRestoreAssertionsAndContext"
+        "TestSMTKernelScopesRestoreAssertionsAndContext",
+        "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices"
       ],
       "conditionals": [
         {
@@ -98569,7 +98581,15 @@
           ]
         },
         {
-          "name": "setup, reset, preprocessing and rewriter access, macros, inconsistency proof, statistics, and display",
+          "name": "parameter-controlled assertion-time theory rewriting and rewriter ownership",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_formulas.go",
+          "tests": [
+            "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices"
+          ]
+        },
+        {
+          "name": "setup, reset, pending-formula reductions, macros, inconsistency proof, statistics, and display",
           "status": "unported",
           "go_target": null,
           "tests": []

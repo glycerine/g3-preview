@@ -91,3 +91,55 @@ func (k *SMTKernel) pushAssertion(formula, proof ast.ASTHandle) error {
 	}
 	return k.appendAssertion(formula, proof)
 }
+
+func (k *SMTKernel) preprocessAssertion(formula, proof ast.ASTHandle) (result, resultProof ast.ASTHandle, err error) {
+	if !k.preprocess || k.preprocessor == nil {
+		return formula, proof, nil
+	}
+	resultRef, err := k.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	defer func() { err = errors.Join(err, k.manager.DelRef(&resultRef)) }()
+	proofRef, err := k.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	defer func() { err = errors.Join(err, k.manager.DelRef(&proofRef)) }()
+	proofs, err := k.manager.ProofsEnabled()
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	if proofs {
+		err = k.preprocessor.RewriteWithProof(formula, resultRef, proofRef)
+	} else {
+		err = k.preprocessor.Rewrite(formula, resultRef)
+	}
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	result, err = k.manager.RefGet(resultRef)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	resultProof = proof
+	if proofs && result != formula {
+		rewriteProof, getErr := k.manager.RefGet(proofRef)
+		if getErr != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, getErr
+		}
+		resultProof, err = k.manager.MkProofModusPonens(proof, rewriteProof)
+	}
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	if err = k.manager.IncRef(result); err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	if !resultProof.IsNull() {
+		if err = k.manager.IncRef(resultProof); err != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, errors.Join(err, k.manager.DecRef(result))
+		}
+	}
+	return result, resultProof, nil
+}

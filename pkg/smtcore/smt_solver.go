@@ -21,6 +21,7 @@ import (
 
 type SMTSolverConfig struct {
 	Params         *uparams.ParamsContext
+	Globals        *uparams.GlobalParamsService
 	Quantifiers    *SMTQuantifierRegistry
 	ModelEvaluator model.ModelEvaluatorConfig
 	TargetConfig   func(*ast.ASTManager) (SMTSolverConfig, error)
@@ -47,10 +48,39 @@ type SMTSolver struct {
 	callback      solver.ProgressCallback
 	references    uint32
 	produceModels bool
+	ownedCatalog  *uparams.GlobalParamsCatalog
+	ownedGlobals  *uparams.GlobalParamsService
 	closed        bool
 }
 
 var _ solver.Solver = (*SMTSolver)(nil)
+
+func smtSolverGlobals(m *ast.ASTManager, config SMTSolverConfig) (*uparams.GlobalParamsService, *uparams.GlobalParamsCatalog, error) {
+	if config.Globals != nil {
+		if config.Globals.Context != config.Params {
+			return nil, nil, uparams.ErrParamsOwner
+		}
+		return config.Globals, nil, config.Globals.CheckOpen()
+	}
+	if globals := config.ModelEvaluator.Globals; globals != nil && globals.Context == config.Params {
+		return globals, nil, globals.CheckOpen()
+	}
+	if globals := uparams.BorrowProcessGlobalParamsService(); globals != nil && globals.Context == config.Params {
+		return globals, nil, globals.CheckOpen()
+	}
+	catalog, err := uparams.NewGlobalParamsCatalog(m.Symbols, uparams.GlobalParamsCatalogConfig{Budget: m.Budget()})
+	if err != nil {
+		return nil, nil, err
+	}
+	globals, err := uparams.NewGlobalParamsService(m.Symbols, config.Params, uparams.GlobalParamsConfig{Budget: m.Budget(), Catalog: catalog})
+	if err != nil {
+		return nil, catalog, err
+	}
+	if err = globals.InitializeSource(); err != nil {
+		return globals, catalog, err
+	}
+	return globals, catalog, nil
+}
 
 func NewSMTSolver(m *ast.ASTManager, p *uparams.ParamsRef, logic string, config SMTSolverConfig) (*SMTSolver, error) {
 	if m == nil || config.Params == nil {
@@ -65,32 +95,51 @@ func NewSMTSolver(m *ast.ASTManager, p *uparams.ParamsRef, logic string, config 
 			return nil, err
 		}
 	}
+	globals, ownedCatalog, err := smtSolverGlobals(m, config)
+	if err != nil {
+		if globals != nil {
+			err = errors.Join(err, globals.Close())
+		}
+		if ownedCatalog != nil {
+			err = errors.Join(err, ownedCatalog.Close())
+		}
+		return nil, errors.Join(err, config.Params.Del(&value))
+	}
+	ownedGlobals := globals
+	if ownedCatalog == nil {
+		ownedGlobals = nil
+	}
+	cleanupServices := func(cause error) error {
+		if ownedGlobals != nil {
+			cause = errors.Join(cause, ownedGlobals.Close())
+		}
+		if ownedCatalog != nil {
+			cause = errors.Join(cause, ownedCatalog.Close())
+		}
+		return cause
+	}
 	logicSymbol := usymbol.Symbol{}
-	var err error
 	if logic != "" {
 		logicSymbol, err = m.Symbols.Intern(logic)
 		if err != nil {
-			_ = config.Params.Del(&value)
-			return nil, err
+			return nil, cleanupServices(errors.Join(err, config.Params.Del(&value)))
 		}
 	}
 	kernel, err := NewSMTKernel(m, config.Quantifiers)
 	if err != nil {
-		_ = config.Params.Del(&value)
-		return nil, err
+		return nil, cleanupServices(errors.Join(err, config.Params.Del(&value)))
+	}
+	if err = kernel.ConfigurePreprocessing(config.Params, globals, &value); err != nil {
+		return nil, cleanupServices(errors.Join(err, kernel.Close(), config.Params.Del(&value)))
 	}
 	if err = smtInstallRetainedSetup(kernel, m, logic); err != nil {
-		_ = kernel.Close()
-		_ = config.Params.Del(&value)
-		return nil, err
+		return nil, cleanupServices(errors.Join(err, kernel.Close(), config.Params.Del(&value)))
 	}
-	s := &SMTSolver{manager: m, config: config, kernel: kernel, params: value, logic: logicSymbol}
+	s := &SMTSolver{manager: m, config: config, kernel: kernel, params: value, logic: logicSymbol, ownedCatalog: ownedCatalog, ownedGlobals: ownedGlobals}
 	s.self = s
 	s.named, err = solver.NewNamedAssertions(m, s)
 	if err != nil {
-		_ = kernel.Close()
-		_ = config.Params.Del(&value)
-		return nil, err
+		return nil, cleanupServices(errors.Join(err, kernel.Close(), config.Params.Del(&value)))
 	}
 	return s, nil
 }
@@ -684,11 +733,19 @@ func (s *SMTSolver) Close() error {
 	result = errors.Join(result, s.restoreTracked(0))
 	result = errors.Join(result, s.kernel.Close())
 	result = errors.Join(result, s.config.Params.Del(&s.params))
+	if s.ownedGlobals != nil {
+		result = errors.Join(result, s.ownedGlobals.Close())
+	}
+	if s.ownedCatalog != nil {
+		result = errors.Join(result, s.ownedCatalog.Close())
+	}
 	if result == nil {
 		s.named = nil
 		s.kernel = nil
 		s.callback = nil
 		s.manager = nil
+		s.ownedGlobals = nil
+		s.ownedCatalog = nil
 		s.closed = true
 	}
 	return result

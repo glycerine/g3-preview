@@ -76,6 +76,43 @@ func TestSMTSolverKernelFacadeAssertionsScopesAndResults(t *testing.T) {
 	}
 }
 
+func TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices(t *testing.T) {
+	m := astTestManager(t)
+	context, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, context.Close()) })
+	a := smtRelevancyBool(t, m, "smt-preprocess-a")
+	notA, err := m.MkNot(a)
+	astTestMust(t, err)
+	double, err := m.MkNot(notA)
+	astTestMust(t, err)
+
+	s, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: context})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	astTestMust(t, s.Assert(double))
+	assertion, err := s.Assertion(0)
+	astTestMust(t, err)
+	if assertion != a {
+		t.Fatal("assertion was not theory-rewritten", assertion, a)
+	}
+
+	local, err := context.NewValue()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, context.Del(&local)) })
+	name := "preprocess"
+	astTestMust(t, context.SetBoolName(&local, &name, false))
+	raw, err := NewSMTSolver(m, &local, "QF_UF", SMTSolverConfig{Params: context})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, raw.Close()) })
+	astTestMust(t, raw.Assert(double))
+	assertion, err = raw.Assertion(0)
+	astTestMust(t, err)
+	if assertion != double {
+		t.Fatal("disabled preprocessing changed assertion", assertion, double)
+	}
+}
+
 func TestSMTSolverPublishesGeneratedModel(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	s, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
@@ -474,11 +511,13 @@ func TestSMTSolverSetupRejectsReachedUnsupportedArithmetic(t *testing.T) {
 	if status != lbool.True {
 		t.Fatal("unused arithmetic setup", status)
 	}
-	one, err := m.ArithmeticRealNumeralText("1")
-	astTestMust(t, err)
 	two, err := m.ArithmeticRealNumeralText("2")
 	astTestMust(t, err)
-	comparison, err := m.MkFamilyApp(arithmetic, smtArithOpLT, nil, []ast.ASTHandle{one, two})
+	realSort, err := m.GetSort(two)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "unsupported-lra-x"), realSort)
+	astTestMust(t, err)
+	comparison, err := m.MkFamilyApp(arithmetic, smtArithOpLT, nil, []ast.ASTHandle{x, two})
 	astTestMust(t, err)
 	astTestMust(t, s.Assert(comparison))
 	status, err = s.CheckSat(nil)
