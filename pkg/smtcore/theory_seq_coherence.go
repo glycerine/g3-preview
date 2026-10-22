@@ -4,11 +4,11 @@ package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 
-func (t *SMTSequenceTheory) trackCoherenceTerms(expressions ...ast.ASTHandle) {
+func (t *SMTSequenceTheory) trackInternalTerms(expressions ...ast.ASTHandle) {
 	for _, expression := range expressions {
-		if _, found := t.coherence[expression]; !found {
-			t.coherence[expression] = struct{}{}
-			t.coherenceLog = append(t.coherenceLog, expression)
+		if _, found := t.internalTerms[expression]; !found {
+			t.internalTerms[expression] = struct{}{}
+			t.internalLog = append(t.internalLog, expression)
 		}
 	}
 }
@@ -69,6 +69,6 @@ func (t *SMTSequenceTheory) addSequenceCoherenceAxiom(expression ast.ASTHandle) 
 	if err != nil {
 		return err
 	}
-	t.trackCoherenceTerms(head, tail, unit, word)
+	t.trackInternalTerms(head, tail, unit, word)
 	return t.axioms.Push(coherence)
 }

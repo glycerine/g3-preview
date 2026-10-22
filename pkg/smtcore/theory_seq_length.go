@@ -161,7 +161,7 @@ func (t *SMTSequenceTheory) addLengthAxiom(length ast.ASTHandle) error {
 	if err != nil {
 		return err
 	}
-	t.trackCoherenceTerms(head, unit)
+	t.trackInternalTerms(head, unit)
 	if err = t.axioms.Push(fixedOne); err != nil {
 		return err
 	}

@@ -92,7 +92,7 @@ func (t *SMTSequenceTheory) addSpecialExtractAxioms(expression, sequence, offset
 		if makeErr != nil {
 			return makeErr
 		}
-		t.trackCoherenceTerms(head, unit, word, witness)
+		t.trackInternalTerms(head, unit, word, witness)
 	} else {
 		last, makeErr := t.relationSkolem("seq.last", []ast.ASTHandle{sequence}, elementSort)
 		if makeErr != nil {
@@ -107,7 +107,7 @@ func (t *SMTSequenceTheory) addSpecialExtractAxioms(expression, sequence, offset
 		if makeErr != nil {
 			return makeErr
 		}
-		t.trackCoherenceTerms(last, unit, word, witness)
+		t.trackInternalTerms(last, unit, word, witness)
 	}
 	if err != nil {
 		return err

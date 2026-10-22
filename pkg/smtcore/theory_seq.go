@@ -17,20 +17,20 @@ import (
 // not yet been installed set unsupported; FinalCheck then reports give-up.
 type SMTSequenceTheory struct {
 	*SMTTheoryBase
-	dependencies *smtSequenceDependencyManager
-	solutions    *smtSequenceSolutionMap
-	exclusions   *smtSequenceExclusionTable
-	equations    *smtSequenceEquationQueue
-	disequations *smtSequenceDisequationQueue
-	nonContains  *smtSequenceNonContainsQueue
-	relations    *smtSequenceRelationQueue
-	axioms       *smtSequenceAxiomQueue
-	coherence    map[ast.ASTHandle]struct{}
-	coherenceLog []ast.ASTHandle
-	coherenceLim []int
-	nextEquation uint32
-	unsupported  uint32
-	limits       []uint32
+	dependencies  *smtSequenceDependencyManager
+	solutions     *smtSequenceSolutionMap
+	exclusions    *smtSequenceExclusionTable
+	equations     *smtSequenceEquationQueue
+	disequations  *smtSequenceDisequationQueue
+	nonContains   *smtSequenceNonContainsQueue
+	relations     *smtSequenceRelationQueue
+	axioms        *smtSequenceAxiomQueue
+	internalTerms map[ast.ASTHandle]struct{}
+	internalLog   []ast.ASTHandle
+	internalLim   []int
+	nextEquation  uint32
+	unsupported   uint32
+	limits        []uint32
 }
 
 func NewSMTSequenceTheory(family ast.FamilyID) (*SMTSequenceTheory, error) {
@@ -38,7 +38,7 @@ func NewSMTSequenceTheory(family ast.FamilyID) (*SMTSequenceTheory, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &SMTSequenceTheory{SMTTheoryBase: base, coherence: make(map[ast.ASTHandle]struct{})}, nil
+	return &SMTSequenceTheory{SMTTheoryBase: base, internalTerms: make(map[ast.ASTHandle]struct{})}, nil
 }
 
 func (t *SMTSequenceTheory) Initialize(state *SMTInternalizerState) error {
@@ -235,6 +235,27 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 	if err != nil || !own {
 		return false, err
 	}
+	regexReduced := false
+	if op == 12 {
+		regexReduced, err = t.addRegexMembershipAxiom(expression)
+		if err != nil {
+			return false, err
+		}
+		if regexReduced {
+			state, argumentErr := t.State()
+			if argumentErr != nil {
+				return false, argumentErr
+			}
+			regexExpression, argumentErr := state.manager.GetArg(expression, 1)
+			if argumentErr != nil {
+				return false, argumentErr
+			}
+			t.trackInternalTerms(expression)
+			if argumentErr = t.trackRegexTree(regexExpression); argumentErr != nil {
+				return false, argumentErr
+			}
+		}
+	}
 	if err = t.ensureVariable(expression); err != nil {
 		return false, err
 	}
@@ -262,10 +283,6 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		if err = t.addReplaceAxioms(expression); err != nil {
 			return false, err
 		}
-	} else if op == 12 {
-		if err = t.addRegexMembershipAxiom(expression); err != nil {
-			return false, err
-		}
 	} else if op == 27 {
 		if err = t.addIntToStringAxioms(expression); err != nil {
 			return false, err
@@ -279,8 +296,8 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 	if err != nil {
 		return false, err
 	}
-	_, coherence := t.coherence[expression]
-	if !value && !coherence {
+	_, internal := t.internalTerms[expression]
+	if !value && !internal {
 		if err = t.markUnsupported(); err != nil {
 			return false, err
 		}
@@ -307,6 +324,9 @@ func (t *SMTSequenceTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHand
 		}
 	}
 	if regex {
+		if _, exact := t.internalTerms[node.Owner()]; exact {
+			return nil
+		}
 		return t.markUnsupported()
 	}
 	variable, err := t.sequenceVariable(node.Owner())
@@ -593,7 +613,7 @@ func (t *SMTSequenceTheory) PushScope() error {
 		return err
 	}
 	t.limits = append(t.limits, t.unsupported)
-	t.coherenceLim = append(t.coherenceLim, len(t.coherenceLog))
+	t.internalLim = append(t.internalLim, len(t.internalLog))
 	return nil
 }
 
@@ -603,7 +623,7 @@ func (t *SMTSequenceTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.limits) - int(count)
 	unsupported := t.limits[level]
-	coherenceLimit := t.coherenceLim[level]
+	internalLimit := t.internalLim[level]
 	if err := t.solutions.PopScopes(count); err != nil {
 		return err
 	}
@@ -630,11 +650,11 @@ func (t *SMTSequenceTheory) PopScopes(count uint32) error {
 	}
 	t.unsupported = unsupported
 	t.limits = t.limits[:level]
-	for i := len(t.coherenceLog) - 1; i >= coherenceLimit; i-- {
-		delete(t.coherence, t.coherenceLog[i])
+	for i := len(t.internalLog) - 1; i >= internalLimit; i-- {
+		delete(t.internalTerms, t.internalLog[i])
 	}
-	t.coherenceLog = t.coherenceLog[:coherenceLimit]
-	t.coherenceLim = t.coherenceLim[:level]
+	t.internalLog = t.internalLog[:internalLimit]
+	t.internalLim = t.internalLim[:level]
 	return nil
 }
 
@@ -968,9 +988,9 @@ func (t *SMTSequenceTheory) Close() (result error) {
 	t.relations = nil
 	t.axioms = nil
 	t.dependencies = nil
-	t.coherence = nil
-	t.coherenceLog = nil
-	t.coherenceLim = nil
+	t.internalTerms = nil
+	t.internalLog = nil
+	t.internalLim = nil
 	t.limits = nil
 	if result != nil {
 		return fmt.Errorf("sequence theory state: %w", result)

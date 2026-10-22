@@ -1339,6 +1339,32 @@ func TestSMTSequenceTheoryReplaceAxioms(t *testing.T) {
 }
 
 func TestSMTSequenceTheoryRegexMembershipReduction(t *testing.T) {
+	t.Run("singleton-sat", func(t *testing.T) {
+		m, modelConfig := smtModelGeneratorFixture(t)
+		literal, err := m.MkString("ab")
+		astTestMust(t, err)
+		sort, err := m.GetSort(literal)
+		astTestMust(t, err)
+		x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-singleton-sat"), sort)
+		astTestMust(t, err)
+		regex, err := m.MkSequenceToRegex(literal)
+		astTestMust(t, err)
+		membership, err := m.MkSequenceInRegex(x, regex)
+		astTestMust(t, err)
+		equality, err := m.MkEq(x, literal)
+		astTestMust(t, err)
+		solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, solver.Close()) })
+		astTestMust(t, solver.Assert(membership))
+		astTestMust(t, solver.Assert(equality))
+		status, err := solver.CheckSat(nil)
+		astTestMust(t, err)
+		if status != lbool.True {
+			t.Fatal("exact singleton membership remained incomplete", status)
+		}
+	})
+
 	t.Run("singleton-symbolic", func(t *testing.T) {
 		m, modelConfig := smtModelGeneratorFixture(t)
 		literal, err := m.MkString("ab")

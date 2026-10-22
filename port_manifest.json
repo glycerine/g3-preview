@@ -117387,7 +117387,7 @@
           "tests": ["TestSMTSequenceTheoryReplaceAxioms"]
         },
         {
-          "name": "regular-language membership reduction through the retained Go regex automaton builder, including concrete automata and symbolic singleton languages (src/smt/theory_seq.cpp:3391-3445,4166-4191)",
+          "name": "regular-language membership reduction through the retained Go regex automaton builder, including concrete automata, symbolic singleton languages, scoped exact-regex term tracking and definitive satisfiability for exact reductions (src/smt/theory_seq.cpp:3391-3445,4166-4191)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_regex.go",
           "tests": ["TestSMTSequenceTheoryRegexMembershipReduction"]
