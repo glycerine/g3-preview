@@ -116776,10 +116776,12 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
-        "TestSMTSequenceExclusionTableCanonicalPairsAndScopes"
+        "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
+        "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
+        "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"
       ],
       "conditionals": [
         {
@@ -117225,14 +117227,21 @@
           "tests": ["TestSMTSequenceExclusionTableCanonicalPairsAndScopes"]
         },
         {
-          "name": "remaining sequence equality, length, containment, regex, propagation, branching and model algorithms",
+          "name": "sequence term and atom internalization, theory-variable attachment, literal-value equality conflicts, scoped equality and disequality state, final-check boundary, and model-value factory hooks (src/smt/theory_seq.cpp:2225-2255,2616-2785,4053-4130)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq.go",
+          "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"]
+        },
+        {
+          "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [
-        "The solution and exclusion trails own AST references for every stored key and value; maps and dependency nodes borrow those live trail values, and reverse scope rollback releases them after restoring prior mappings."
+        "The solution and exclusion trails own AST references for every stored key and value; maps and dependency nodes borrow those live trail values, and reverse scope rollback releases them after restoring prior mappings.",
+        "SMTSequenceTheory owns its scoped solution and exclusion tables and borrows e-graph nodes and SAT literals; registered SequenceFactory lifetime is owned by ProtoModel."
       ],
       "deviations": [
         "Concrete Go maps replace obj_map and pair hash tables. Dependency joins use an immutable concrete assumption DAG and iterative stable linearization rather than the native scoped_dependency_manager template."
@@ -117243,10 +117252,12 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
-        "TestSMTSequenceExclusionTableCanonicalPairsAndScopes"
+        "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
+        "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
+        "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"
       ],
       "conditionals": [
         {
@@ -117278,14 +117289,21 @@
           "tests": ["TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes", "TestSMTSequenceExclusionTableCanonicalPairsAndScopes"]
         },
         {
-          "name": "remaining sequence theory state and solver declarations",
+          "name": "incremental sequence-theory shell, internalization, equality/disequality callbacks, scope lifecycle, final-check boundary, and model hooks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq.go",
+          "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"]
+        },
+        {
+          "name": "remaining word-equation, arithmetic, containment, regular-language, propagation and branching declarations",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [
-        "Concrete solution and exclusion owners retain their AST handles through ASTRef trails and borrow e-graph nodes and SAT literals in immutable dependency assumptions."
+        "Concrete solution and exclusion owners retain their AST handles through ASTRef trails and borrow e-graph nodes and SAT literals in immutable dependency assumptions.",
+        "SMTSequenceTheory owns the concrete scoped state objects and borrows its initialized SMT context through SMTTheoryBase."
       ],
       "deviations": [
         "Go slices and maps replace scoped native vectors and hash tables; source-private templates are represented only for the live sequence instantiation."

@@ -64,15 +64,61 @@ func TestSMTSequenceLogicsInstallSafeCheckpointTheory(t *testing.T) {
 			t.Cleanup(func() { astTestMust(t, solver.Close()) })
 			family, err := m.SequenceFamilyID()
 			astTestMust(t, err)
-			if _, ok := solver.kernel.internalizer.theories[family].(*SMTEmptySequenceTheory); !ok {
-				t.Fatal("sequence checkpoint theory was not installed")
+			if _, ok := solver.kernel.internalizer.theories[family].(*SMTSequenceTheory); !ok {
+				t.Fatal("sequence theory was not installed")
 			}
 			astTestMust(t, solver.Assert(equality))
 			status, err := solver.CheckSat(nil)
 			astTestMust(t, err)
-			if status != lbool.Undef {
-				t.Fatal("incomplete sequence checkpoint returned a definitive result", status)
+			if status != lbool.True {
+				t.Fatal("sequence equality fragment did not return sat", status)
 			}
 		})
+	}
+}
+
+func TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary(t *testing.T) {
+	for _, logic := range []string{"QF_S", "ALL"} {
+		t.Run(logic, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			a, err := m.MkString("a")
+			astTestMust(t, err)
+			b, err := m.MkString("b")
+			astTestMust(t, err)
+			equality, err := m.MkEq(a, b)
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, logic, SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.Assert(equality))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("distinct sequence literals", status)
+			}
+		})
+	}
+
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-symbolic-part"), sort)
+	astTestMust(t, err)
+	concat, err := m.MkSequenceConcat(y, a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-unsupported"), sort)
+	astTestMust(t, err)
+	equality, err := m.MkEq(x, concat)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(equality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.Undef {
+		t.Fatal("unported concatenation returned a definitive result", status)
 	}
 }

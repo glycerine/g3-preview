@@ -165,7 +165,7 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 		if err != nil {
 			return err
 		}
-		theory, theoryErr := NewSMTEmptySequenceTheory(family)
+		theory, theoryErr := NewSMTSequenceTheory(family)
 		if theoryErr != nil {
 			return theoryErr
 		}
