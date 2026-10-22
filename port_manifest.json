@@ -40302,19 +40302,21 @@
       "path": "src/interp/interp_params.hpp",
       "component": "interp",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/smtcore/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/interp/params.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestInterpParamsDefaultsModuleAndLocalPrecedence"
       ],
       "conditionals": [
         {
@@ -40326,8 +40328,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
@@ -40343,10 +40345,19 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "interp_params constructor snapshot plus profile and check generated getters",
+          "status": "ported",
+          "go_target": "pkg/interp/params.go",
+          "tests": [
+            "TestInterpParamsDefaultsModuleAndLocalPrecedence"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md.",
+        "Params borrows its caller-owned local value, owns the constructor-time interp module snapshot, and releases that snapshot through tracked retryable cleanup."
       ],
       "deviations": []
     },
@@ -40354,13 +40365,29 @@
       "path": "src/interp/interp_params.pyg",
       "component": "interp",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/params.go",
+        "pkg/smtcore/gparams_catalog_collectors.go"
+      ],
+      "tests": [
+        "TestInterpParamsDefaultsModuleAndLocalPrecedence"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "interp module declarations, literal defaults, descriptions, and generated profile/check getters",
+          "status": "ported",
+          "go_target": "pkg/interp/params.go",
+          "tests": [
+            "TestInterpParamsDefaultsModuleAndLocalPrecedence"
+          ]
+        }
+      ],
+      "ownership": [
+        "The generated facade borrows local parameters and owns one immutable global-module snapshot."
+      ],
       "deviations": []
     },
     {
@@ -40493,9 +40520,13 @@
       "path": "src/interp/iz3exception.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/exception.go"
+      ],
+      "tests": [
+        "TestInterpolationErrorMatchesDefaultExceptionContract"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -40506,10 +40537,21 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "iz3_exception construction and inherited default_exception classification",
+          "status": "ported",
+          "go_target": "pkg/interp/exception.go",
+          "tests": [
+            "TestInterpolationErrorMatchesDefaultExceptionContract"
+          ]
+        }
+      ],
+      "ownership": [
+        "Error owns its immutable Go message string."
+      ],
       "deviations": []
     },
     {
@@ -40775,9 +40817,13 @@
       "path": "src/interp/iz3profiling.cpp",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/profiling.go"
+      ],
+      "tests": [
+        "TestInterpolationProfilerNestedAccumulationAndGuards"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -40788,19 +40834,37 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "elapsed clock, output, nested timer nodes, start/stop, tree print, totals, and show_time",
+          "status": "ported",
+          "go_target": "pkg/interp/profiling.go",
+          "tests": [
+            "TestInterpolationProfilerNestedAccumulationAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Profiler explicitly owns its timer tree, names, maps, and insertion-order slices."
+      ],
+      "deviations": [
+        "An explicit Profiler owner replaces process-global mutable timing state; imbalance is returned as an error instead of terminating the process.",
+        "Go insertion order makes equal-level report order deterministic."
+      ]
     },
     {
       "path": "src/interp/iz3profiling.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/profiling.go"
+      ],
+      "tests": [
+        "TestInterpolationProfilerNestedAccumulationAndGuards"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -40811,11 +40875,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "timer_start, timer_stop, print, and show_time declarations",
+          "status": "ported",
+          "go_target": "pkg/interp/profiling.go",
+          "tests": [
+            "TestInterpolationProfilerNestedAccumulationAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete Profiler owns all timer state exposed through the header surface."
+      ],
+      "deviations": [
+        "The Go API takes an io.Writer and returns typed errors for invalid or imbalanced use."
+      ]
     },
     {
       "path": "src/interp/iz3proof.cpp",
