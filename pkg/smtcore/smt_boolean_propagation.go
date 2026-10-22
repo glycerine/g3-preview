@@ -70,6 +70,34 @@ func (s *SMTInternalizerState) ConflictLiteral() SMTLiteral {
 	return s.conflictLiteral
 }
 
+// SetTheoryConflict installs a conflict explained by currently asserted
+// theory literals. The justification is owned by the logical context scope.
+func (s *SMTInternalizerState) SetTheoryConflict(theory SMTTheoryID, literals []SMTLiteral) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if theory == SMTNullTheoryID || s.theories[theory] == nil || len(literals) == 0 {
+		return ast.ErrASTDomain
+	}
+	if s.inconsistent {
+		return nil
+	}
+	justification, err := NewSMTTheoryConflictJustification(s.manager, theory, literals, nil)
+	if err != nil {
+		return err
+	}
+	wrapped, err := NewSMTBooleanJustification(justification)
+	if err != nil {
+		_ = justification.Release(s.manager)
+		return err
+	}
+	s.inconsistent = true
+	s.conflict = wrapped
+	s.conflictLiteral = SMTNullLiteral
+	s.statistics.NumConflicts++
+	return nil
+}
+
 func (s *SMTInternalizerState) makeClause(literals []SMTLiteral, kind SMTClauseKind, proof ast.ASTHandle) (*SMTClause, SMTJustification, error) {
 	proofs, err := s.manager.ProofsEnabled()
 	if err != nil {

@@ -113231,9 +113231,16 @@
       "path": "src/smt/theory_diff_logic.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_diff_logic_integer.go",
+        "pkg/smtcore/theory_diff_logic_integer_test.go"
+      ],
+      "tests": [
+        "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
+        "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
+        "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -113245,18 +113252,46 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Integer atom records, graph ownership, assertion queue, scopes, initialization/internalization/assignment/propagation/final-check surface and linear-decomposition helpers (src/smt/theory_diff_logic.h:47-94,133-194,205-220,223-301,341-359,379)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_diff_logic_integer.go",
+          "tests": [
+            "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
+            "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
+            "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback"
+          ]
+        },
+        {
+          "name": "Equality propagation metadata, arithmetic equality adapter, adaptive/implied-bound propagation, model generation, statistics, optimization and real/infinitesimal variants (src/smt/theory_diff_logic.h:95-132,167-176,186-203,247-254,262-270,276-284,298-339,361-378,380-433)",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The theory owns its concrete rational graph, atom and assertion slices, Boolean-variable index map, and scope snapshots. It borrows the initialized SMTInternalizerState and enodes through SMTTheoryBase; graph explanations borrow immutable SMTLiteral values."
+      ],
+      "deviations": [
+        "Only the retained integer instantiation is present. Go slices and maps replace source vectors and u_map, and unsupported arithmetic is recorded for a give-up final check."
+      ]
     },
     {
       "path": "src/smt/theory_diff_logic_def.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_diff_logic_integer.go",
+        "pkg/smtcore/theory_diff_logic_integer_test.go",
+        "pkg/smtcore/smt_boolean_propagation.go",
+        "pkg/smtcore/smt_internalizer_state.go"
+      ],
+      "tests": [
+        "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
+        "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
+        "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -113398,10 +113433,29 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Integer zero initialization, <=/>= atom decomposition and polarity, integer complement edge, assignment queue, scope rollback, final-check give-up, sign decomposition, negative-cycle propagation/conflict, numeral variables and ordinary theory-variable attachment (src/smt/theory_diff_logic_def.h:64-82,153-263,299-373,389-476,536-559,664-701,716-837)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_diff_logic_integer.go",
+          "tests": [
+            "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
+            "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
+            "TestSMTIntegerDiffTheoryUnsupportedTermsAndScopeRollback"
+          ]
+        },
+        {
+          "name": "Binary-bound axioms, equality adapter, adaptive and implied-bound propagation, offset-term equalities, cheap equality propagation, core equality/disequality reflection, reset/model/statistics/display, optimization and simplex integration (remaining src/smt/theory_diff_logic_def.h)",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Negative-cycle conflicts copy their literal antecedents into an SMT theory justification. Scoped graph activation, atoms, assertions, variables and incompleteness state roll back with the SMT context."
+      ],
+      "deviations": [
+        "The concrete port currently accepts integer difference logic only; real strict bounds requiring infinitesimals remain unported. Source assertion-only invalid domains return checked Go errors."
+      ]
     },
     {
       "path": "src/smt/theory_dl.cpp",

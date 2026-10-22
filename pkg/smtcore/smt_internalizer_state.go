@@ -136,11 +136,14 @@ func (s *SMTInternalizerState) RegisterTheory(theory SMTTheoryInternalizer) erro
 	if theory == nil || theory.FamilyID() == ast.NullFamilyID || theory.FamilyID() == s.manager.BasicFamilyID() || s.theories[theory.FamilyID()] != nil || len(s.scopes) != 0 || s.theoriesSetup {
 		return ast.ErrASTDomain
 	}
+	family := theory.FamilyID()
+	s.theories[family] = theory
+	s.theoryOrder = append(s.theoryOrder, theory)
 	if err := theory.Initialize(s); err != nil {
+		delete(s.theories, family)
+		s.theoryOrder = s.theoryOrder[:len(s.theoryOrder)-1]
 		return err
 	}
-	s.theories[theory.FamilyID()] = theory
-	s.theoryOrder = append(s.theoryOrder, theory)
 	return nil
 }
 
