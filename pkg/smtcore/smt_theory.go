@@ -16,6 +16,10 @@ type SMTTheoryInternalizer interface {
 	InternalizeTerm(ast.ASTHandle) (bool, error)
 	ApplySortConstraint(*SMTEnode, ast.ASTHandle) error
 	IsAttachedToVariable(*SMTEnode) bool
+	Enode(SMTTheoryVar) (*SMTEnode, error)
+	UseDisequalities() bool
+	NewEquality(SMTTheoryVar, SMTTheoryVar) error
+	NewDisequality(SMTTheoryVar, SMTTheoryVar) error
 	PushScope() error
 	PopScopes(uint32) error
 }
@@ -53,6 +57,7 @@ func (t *SMTTheoryBase) FamilyID() ast.FamilyID {
 }
 
 func (*SMTTheoryBase) DefaultInternalizer() bool { return true }
+func (*SMTTheoryBase) UseDisequalities() bool    { return true }
 
 func (t *SMTTheoryBase) State() (*SMTInternalizerState, error) {
 	if t == nil || t.state == nil {

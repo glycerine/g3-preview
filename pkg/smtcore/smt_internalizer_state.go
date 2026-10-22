@@ -10,16 +10,20 @@ import (
 )
 
 type smtInternalizerScope struct {
-	booleanLimit    int
-	enodeLimit      int
-	pendingLimit    int
-	assignmentLimit int
-	clauseLimit     int
-	theoryLimit     int
-	assignedLimit   int
-	propagationHead int
-	inconsistent    bool
-	conflict        SMTBooleanJustification
+	booleanLimit     int
+	enodeLimit       int
+	pendingLimit     int
+	assignmentLimit  int
+	clauseLimit      int
+	theoryLimit      int
+	assignedLimit    int
+	propagationHead  int
+	theoryEqLimit    int
+	theoryEqHead     int
+	theoryDiseqLimit int
+	theoryDiseqHead  int
+	inconsistent     bool
+	conflict         SMTBooleanJustification
 }
 
 type smtInternalizerAssignmentTrail struct {
@@ -37,6 +41,11 @@ type smtInternalizerTheoryTrail struct {
 	rootAdded bool
 }
 
+type SMTTheoryPropagation struct {
+	Theory      SMTTheoryID
+	Left, Right SMTTheoryVar
+}
+
 type SMTInternalizedClause struct {
 	Literals []SMTLiteral
 	Root     bool
@@ -52,35 +61,39 @@ type SMTInternalizerCongruence struct {
 }
 
 type SMTInternalizerState struct {
-	manager          *ast.ASTManager
-	context          *SMTCheckerContext
-	congruence       *SMTCongruenceTable
-	quantifiers      *SMTQuantifierRegistry
-	relevancy        *SMTRelevancyPropagator
-	theories         map[ast.FamilyID]SMTTheoryInternalizer
-	theoryOrder      []SMTTheoryInternalizer
-	boolVar          map[ast.ASTHandle]int32
-	boolExpr         []ast.ASTHandle
-	booleanData      []SMTBoolVarData
-	activity         []float64
-	assignment       []lbool.LBool
-	watches          []SMTWatchList
-	booleanStack     []ast.ASTHandle
-	enodeStack       []*SMTEnode
-	scopes           []smtInternalizerScope
-	cachedGeneration map[ast.ASTHandle]uint32
-	pending          []SMTInternalizerCongruence
-	assignmentTrail  []smtInternalizerAssignmentTrail
-	theoryTrail      []smtInternalizerTheoryTrail
-	clauses          []SMTInternalizedClause
-	assignedLiterals []SMTLiteral
-	propagationHead  int
-	conflict         SMTBooleanJustification
-	inconsistent     bool
-	generation       uint32
-	scopeLevel       uint32
-	statistics       SMTContextStatistics
-	closed           bool
+	manager               *ast.ASTManager
+	context               *SMTCheckerContext
+	congruence            *SMTCongruenceTable
+	quantifiers           *SMTQuantifierRegistry
+	relevancy             *SMTRelevancyPropagator
+	theories              map[ast.FamilyID]SMTTheoryInternalizer
+	theoryOrder           []SMTTheoryInternalizer
+	boolVar               map[ast.ASTHandle]int32
+	boolExpr              []ast.ASTHandle
+	booleanData           []SMTBoolVarData
+	activity              []float64
+	assignment            []lbool.LBool
+	watches               []SMTWatchList
+	booleanStack          []ast.ASTHandle
+	enodeStack            []*SMTEnode
+	scopes                []smtInternalizerScope
+	cachedGeneration      map[ast.ASTHandle]uint32
+	pending               []SMTInternalizerCongruence
+	assignmentTrail       []smtInternalizerAssignmentTrail
+	theoryTrail           []smtInternalizerTheoryTrail
+	theoryEqualities      []SMTTheoryPropagation
+	theoryDisequalities   []SMTTheoryPropagation
+	theoryEqualityHead    int
+	theoryDisequalityHead int
+	clauses               []SMTInternalizedClause
+	assignedLiterals      []SMTLiteral
+	propagationHead       int
+	conflict              SMTBooleanJustification
+	inconsistent          bool
+	generation            uint32
+	scopeLevel            uint32
+	statistics            SMTContextStatistics
+	closed                bool
 }
 
 func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext, quantifiers *SMTQuantifierRegistry) (*SMTInternalizerState, error) {
@@ -127,7 +140,8 @@ func (s *SMTInternalizerState) attachTheoryVariable(node *SMTEnode, theory SMTTh
 	if err := s.open(); err != nil {
 		return err
 	}
-	if node == nil || node.manager != s.manager || theory == SMTNullTheoryID || variable == SMTNullTheoryVar {
+	plugin := s.theories[theory]
+	if node == nil || node.manager != s.manager || theory == SMTNullTheoryID || variable == SMTNullTheoryVar || plugin == nil {
 		return ast.ErrASTDomain
 	}
 	old := node.TheoryVar(theory)
@@ -148,7 +162,24 @@ func (s *SMTInternalizerState) attachTheoryVariable(node *SMTEnode, theory SMTTh
 			}
 			trail.root, trail.rootAdded = root, true
 		}
+		if rootVariable == SMTNullTheoryVar {
+			if err := s.enqueueExistingDisequalities(root, variable, plugin); err != nil {
+				if trail.rootAdded {
+					_ = root.DeleteTheoryVar(theory)
+				}
+				_ = node.DeleteTheoryVar(theory)
+				return err
+			}
+		} else if root != node {
+			if err := s.enqueueTheoryEquality(theory, rootVariable, variable); err != nil {
+				_ = node.DeleteTheoryVar(theory)
+				return err
+			}
+		}
 	} else if err := node.ReplaceTheoryVar(theory, variable); err != nil {
+		return err
+	} else if err := s.enqueueTheoryEquality(theory, variable, old); err != nil {
+		_ = node.ReplaceTheoryVar(theory, old)
 		return err
 	}
 	s.theoryTrail = append(s.theoryTrail, trail)
@@ -412,6 +443,8 @@ func (s *SMTInternalizerState) PushScope() error {
 		booleanLimit: len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending),
 		assignmentLimit: len(s.assignmentTrail), clauseLimit: len(s.clauses), theoryLimit: len(s.theoryTrail), inconsistent: s.inconsistent,
 		assignedLimit: len(s.assignedLiterals), propagationHead: s.propagationHead, conflict: s.conflict,
+		theoryEqLimit: len(s.theoryEqualities), theoryEqHead: s.theoryEqualityHead,
+		theoryDiseqLimit: len(s.theoryDisequalities), theoryDiseqHead: s.theoryDisequalityHead,
 	})
 	if s.relevancy != nil {
 		if err := s.relevancy.PushScope(); err != nil {
@@ -509,6 +542,16 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		return ast.ErrASTDomain
 	}
 	s.propagationHead = scope.propagationHead
+	if scope.theoryEqLimit < 0 || scope.theoryEqLimit > len(s.theoryEqualities) || scope.theoryEqHead < 0 || scope.theoryEqHead > scope.theoryEqLimit {
+		return ast.ErrASTDomain
+	}
+	s.theoryEqualities = s.theoryEqualities[:scope.theoryEqLimit]
+	s.theoryEqualityHead = scope.theoryEqHead
+	if scope.theoryDiseqLimit < 0 || scope.theoryDiseqLimit > len(s.theoryDisequalities) || scope.theoryDiseqHead < 0 || scope.theoryDiseqHead > scope.theoryDiseqLimit {
+		return ast.ErrASTDomain
+	}
+	s.theoryDisequalities = s.theoryDisequalities[:scope.theoryDiseqLimit]
+	s.theoryDisequalityHead = scope.theoryDiseqHead
 	if scope.clauseLimit < 0 || scope.clauseLimit > len(s.clauses) {
 		return ast.ErrASTDomain
 	}

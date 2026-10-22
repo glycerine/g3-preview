@@ -103978,10 +103978,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_boolean_propagation.go"
+        "pkg/smtcore/smt_boolean_propagation.go",
+        "pkg/smtcore/smt_theory_propagation.go"
       ],
       "tests": [
-        "TestSMTInternalizerWatchedClausePropagationAndRollback"
+        "TestSMTInternalizerWatchedClausePropagationAndRollback",
+        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
       ],
       "conditionals": [
         {
@@ -104905,6 +104907,14 @@
           "tests": [
             "TestSMTInternalizerWatchedClausePropagationAndRollback"
           ]
+        },
+        {
+          "name": "theory equality and disequality propagation queues and plugin delivery",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_propagation.go",
+          "tests": [
+            "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
+          ]
         }
       ],
       "ownership": [
@@ -104921,10 +104931,12 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_internalizer_state.go",
-        "pkg/smtcore/smt_boolean_propagation.go"
+        "pkg/smtcore/smt_boolean_propagation.go",
+        "pkg/smtcore/smt_theory_propagation.go"
       ],
       "tests": [
-        "TestSMTInternalizerWatchedClausePropagationAndRollback"
+        "TestSMTInternalizerWatchedClausePropagationAndRollback",
+        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
       ],
       "conditionals": [
         {
@@ -105087,6 +105099,14 @@
           "go_target": "pkg/smtcore/smt_boolean_propagation.go",
           "tests": [
             "TestSMTInternalizerWatchedClausePropagationAndRollback"
+          ]
+        },
+        {
+          "name": "theory equality and disequality queue state and dispatch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_propagation.go",
+          "tests": [
+            "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
           ]
         }
       ],
@@ -105964,6 +105984,7 @@
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/smtcore/smt_internalizer.go",
         "pkg/smtcore/smt_boolean_propagation.go",
+        "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_theory.go"
       ],
       "tests": [
@@ -105977,7 +105998,8 @@
         "TestSMTInternalizerConsumesMaterializedQuantifierInstance",
         "TestSMTInternalizerDeepAssertionUsesTopologicalPrepass",
         "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
-        "TestSMTInternalizerWatchedClausePropagationAndRollback"
+        "TestSMTInternalizerWatchedClausePropagationAndRollback",
+        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
       ],
       "conditionals": [
         {
@@ -106366,9 +106388,11 @@
         },
         {
           "name": "theory equality and disequality notifications induced by theory-variable attachment",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_propagation.go",
+          "tests": [
+            "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
+          ]
         },
         {
           "name": "auxiliary-clause simplification and construction, two-watch registration and movement, Boolean propagation, clause conflict justification, and scoped clause cleanup",
@@ -108316,10 +108340,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_theory.go"
+        "pkg/smtcore/smt_theory.go",
+        "pkg/smtcore/smt_theory_propagation.go"
       ],
       "tests": [
-        "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+        "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
+        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
       ],
       "assertions": [
         {
@@ -108351,6 +108377,14 @@
           ]
         },
         {
+          "name": "core-to-theory equality and disequality event delivery consumed by attachment",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_propagation.go",
+          "tests": [
+            "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
+          ]
+        },
+        {
           "name": "display helpers, equality assumption helpers, reset, and equality-atom construction",
           "status": "unported",
           "go_target": null,
@@ -108370,10 +108404,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_theory.go"
+        "pkg/smtcore/smt_theory.go",
+        "pkg/smtcore/smt_theory_propagation.go"
       ],
       "tests": [
-        "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+        "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
+        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
       ],
       "conditionals": [
         {
@@ -108415,15 +108451,16 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "typed internalize-atom, internalize-term, equality, sort-constraint, default-internalizer, theory-variable, and scope interface",
+          "name": "typed internalize-atom, internalize-term, equality, sort-constraint, default-internalizer, theory-variable, scope, and core equality/disequality event interface",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_theory.go",
           "tests": [
-            "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+            "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
+            "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
           ]
         },
         {
-          "name": "assignment, equality and disequality events, relevancy, propagation, restart, final-check, conflict, display, model, validation, assumptions, statistics, and fresh-theory interface",
+          "name": "assignment, relevancy, theory-owned propagation, restart, final-check, conflict, display, model, validation, assumptions, statistics, and fresh-theory interface",
           "status": "unported",
           "go_target": null,
           "tests": []

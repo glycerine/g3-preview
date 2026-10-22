@@ -9,6 +9,7 @@ import (
 type smtInternalizerTestTheory struct {
 	*SMTTheoryBase
 	atoms, equalities, terms, sortConstraints int
+	newEqualities, newDisequalities           []SMTTheoryPropagation
 }
 
 func (t *smtInternalizerTestTheory) DefaultInternalizer() bool { return false }
@@ -64,6 +65,16 @@ func (t *smtInternalizerTestTheory) ApplySortConstraint(*SMTEnode, ast.ASTHandle
 	return nil
 }
 
+func (t *smtInternalizerTestTheory) NewEquality(left, right SMTTheoryVar) error {
+	t.newEqualities = append(t.newEqualities, SMTTheoryPropagation{Theory: t.FamilyID(), Left: left, Right: right})
+	return nil
+}
+
+func (t *smtInternalizerTestTheory) NewDisequality(left, right SMTTheoryVar) error {
+	t.newDisequalities = append(t.newDisequalities, SMTTheoryPropagation{Theory: t.FamilyID(), Left: left, Right: right})
+	return nil
+}
+
 func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {
 	m := astTestManager(t)
 	family, err := m.RegisterArithmeticPlugin()
@@ -108,5 +119,65 @@ func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {
 	astTestMust(t, state.PopScopes(1))
 	if theory.NumVariables() != 0 || node.TheoryVar(family) != SMTNullTheoryVar || state.context.enodes[term] != nil {
 		t.Fatal("theory scope rollback", theory.NumVariables(), node.TheoryVar(family), state.context.enodes[term])
+	}
+}
+
+func TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents(t *testing.T) {
+	m := astTestManager(t)
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	base, err := NewSMTTheoryBase(family)
+	astTestMust(t, err)
+	theory := &smtInternalizerTestTheory{SMTTheoryBase: base}
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.RegisterTheory(theory))
+	integer, err := m.MkFamilySort(family, 1, nil)
+	astTestMust(t, err)
+	astTestMust(t, state.PushScope())
+
+	_, root := smtEnodeConstant(t, m, 2260, integer, 0)
+	_, member := smtEnodeConstant(t, m, 2261, integer, 0)
+	root.root, root.next, root.classSize = root, member, 2
+	member.root, member.next = root, root
+	rootVariable, err := theory.CreateVariable(root)
+	astTestMust(t, err)
+	memberVariable, err := theory.CreateVariable(member)
+	astTestMust(t, err)
+	pendingEqualities := state.PendingTheoryEqualities()
+	if len(pendingEqualities) != 1 || pendingEqualities[0].Left != rootVariable || pendingEqualities[0].Right != memberVariable {
+		t.Fatal("theory equality queue", pendingEqualities)
+	}
+	astTestMust(t, state.PropagateTheoryEvents())
+	if len(theory.newEqualities) != 1 || len(state.PendingTheoryEqualities()) != 0 {
+		t.Fatal("theory equality delivery", theory.newEqualities, state.PendingTheoryEqualities())
+	}
+
+	leftOwner, _ := smtEnodeConstant(t, m, 2262, integer, 0)
+	rightOwner, _ := smtEnodeConstant(t, m, 2263, integer, 0)
+	astTestMust(t, state.Internalize(leftOwner, false))
+	astTestMust(t, state.Internalize(rightOwner, false))
+	leftNode, rightNode := state.context.enodes[leftOwner], state.context.enodes[rightOwner]
+	equality, err := m.MkEq(leftOwner, rightOwner)
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(equality, true))
+	equalityLiteral, err := state.Literal(equality)
+	astTestMust(t, err)
+	astTestMust(t, state.AssignLiteral(equalityLiteral.Negated(), NewSMTBooleanAxiom()))
+	rightVariable, err := theory.CreateVariable(rightNode)
+	astTestMust(t, err)
+	leftVariable, err := theory.CreateVariable(leftNode)
+	astTestMust(t, err)
+	pendingDisequalities := state.PendingTheoryDisequalities()
+	if len(pendingDisequalities) != 1 || pendingDisequalities[0].Left != leftVariable || pendingDisequalities[0].Right != rightVariable {
+		t.Fatal("theory disequality queue", pendingDisequalities)
+	}
+	astTestMust(t, state.PropagateTheoryEvents())
+	if len(theory.newDisequalities) != 1 || len(state.PendingTheoryDisequalities()) != 0 {
+		t.Fatal("theory disequality delivery", theory.newDisequalities, state.PendingTheoryDisequalities())
+	}
+
+	astTestMust(t, state.PopScopes(1))
+	if theory.NumVariables() != 0 || root.TheoryVar(family) != SMTNullTheoryVar || member.TheoryVar(family) != SMTNullTheoryVar || len(state.PendingTheoryEqualities()) != 0 || len(state.PendingTheoryDisequalities()) != 0 {
+		t.Fatal("theory event scope rollback")
 	}
 }
