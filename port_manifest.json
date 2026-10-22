@@ -100898,7 +100898,7 @@
         "Two actual generated helpers are acquired in declaration order smt then rewriter; the borrowed local ParamsRef is read at each getter, and an older live helper remains readable while the younger helper exists. Exact returned module references are the only acquisition authority. Source destruction runs rewriter then smt; the first younger stopped destructor protects the unread older frame, retains immutable body/source history and exact decrement receipt, and is distinct from explicit owning Close. Embedded common fields are charged once in enclosing reflected wrappers; actual lexical frame cold allocations have no native stack-allocation credit."
       ],
       "deviations": [
-        "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial."
+        "The registered SMT kernel now owns the complete smt_params embedding, installs dynamic-Ack scalar state during construction, and applies later updates without discarding occurrence or clause state. Native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial."
       ]
     },
     {
@@ -100980,7 +100980,7 @@
         "The concrete generated helper owner is embedded once in the actual reflected parameter wrapper header; each reached lexical helper frame charges its actual cold fields, borrows the local ParamsRef pointer and acquires its module reference only at the returned SourceGetModuleName result. Source DelTracked executes before return; any stopped destructor retains its exact decrement receipt for separate owning Close. Caller contexts/global services remain borrowed."
       ],
       "deviations": [
-        "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial."
+        "The registered SMT kernel now owns the complete smt_params embedding, installs dynamic-Ack scalar state during construction, and applies later updates without discarding occurrence or clause state. Native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial."
       ]
     },
     {
@@ -101691,7 +101691,7 @@
         "Nine implicit default-empty bases use their existing same constructor engines with embedded headers charged only by the actual parent header. Seventy preceding local initializer publications, final symbol(auto) member acquisition, and local-only constructor body retain their exact initialized frontier. Local smt/model helper declarations and nested array update use real borrowed reference acquisitions; younger source stops protect older helper/base lifetimes, while explicit owning Close drains exact retained leaves before embedded base owners and the parent header."
       ],
       "deviations": [
-        "No registered SMT context/kernel driver credit. Scalar base embedding into complete smt_params and native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial.",
+        "The registered SMT kernel now owns the complete smt_params embedding, installs dynamic-Ack scalar state during construction, and applies later updates without discarding occurrence or clause state. Native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial.",
         "No complete SMT context, generated-helper/generator, native global/locale/boolalpha or registered SMT driver completion credit. The standalone facade and lexical-frame reflected cold charges are explicit Go ownership representation rather than native scalar/stack allocations. Disabled array registration is erased; Array constructor never reads params or performs update.",
         "No registered SMT context/kernel driver or whole generated helper/generator/global/locale/boolalpha completion credit. The seven literal defaults are followed by mandatory update, including source constructor false hi_div0 replaced by generated rewriter true. Invalid/cross-owner or incomplete-object, signed TLS overflow and native global-null lifetime conditions are explicitly guarded Go domains, not valid native OOM/undefined-behavior equivalence. Numeric test collector callbacks are unreachable configuration anchors, not injected source failure leaves.",
         "No complete smt_params/context/kernel, registered SMT driver, whole generated helper/generator or native global/locale/boolalpha completion credit. Incomplete constructors return an explicitly diagnostic owner; Display/Update refuse before output/body while State can inspect actual initialized/published prefix. Cross-owner/null-global/closed/copy guards are precise Go domain evidence, not native null dereference equivalence. Source enum casts use fixed-width representation and signed ostream insertion; valid-enumerator oracle cases are distinct from out-of-domain conversion profiles.",
@@ -109514,7 +109514,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_solver.go"
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_dyn_ack_manager.go"
       ],
       "tests": [
         "TestSMTSolverKernelFacadeAssertionsScopesAndResults",
@@ -109564,10 +109566,12 @@
         },
         {
           "name": "parameter storage and update",
-          "status": "partial",
-          "go_target": "pkg/smtcore/smt_solver.go",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
-            "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
+            "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites",
+            "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
+            "TestSMTSolverDisablesBinaryClauseOptimizationForProofs"
           ]
         },
         {

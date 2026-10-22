@@ -121,6 +121,78 @@ func TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices(t *testing.T)
 	}
 }
 
+func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
+	m := astTestManager(t)
+	context, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	local, err := context.NewValue()
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, context.Del(&local))
+		astTestMust(t, context.Close())
+	})
+	setUInt := func(name string, value uint32) {
+		astTestMust(t, context.SetUIntName(&local, &name, value))
+	}
+	setBool := func(name string, value bool) {
+		astTestMust(t, context.SetBoolName(&local, &name, value))
+	}
+	setDouble := func(name string, value float64) {
+		astTestMust(t, context.SetDoubleName(&local, &name, value))
+	}
+	setUInt("dack", 2)
+	setBool("dack.eq", true)
+	setDouble("dack.factor", 0.25)
+	setUInt("dack.threshold", 7)
+	setUInt("dack.gc", 23)
+	setDouble("dack.gc_inv_decay", 0.75)
+
+	solver, err := NewSMTSolver(m, &local, "QF_UF", SMTSolverConfig{Params: context})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	internalizer := solver.kernel.internalizer
+	manager := internalizer.dynamicAck
+	if !internalizer.binaryClauseOptimization || manager.strategy != dynAckConflictResolution || !manager.equalities ||
+		manager.pairs.threshold != 7 || manager.triples.threshold != 7 || manager.schedule.gcEvery != 23 ||
+		manager.schedule.factor != 0.25 || manager.pairs.decay != 0.75 {
+		t.Fatal("constructor did not install SMT parameters", internalizer.binaryClauseOptimization, manager.strategy, manager.equalities,
+			manager.pairs.threshold, manager.triples.threshold, manager.schedule.gcEvery, manager.schedule.factor, manager.pairs.decay)
+	}
+	maintenance := internalizer.clauseMaintenance
+	if maintenance != defaultSMTClauseMaintenanceConfig() || internalizer.lemmaGCThreshold != maintenance.Initial {
+		t.Fatal("constructor did not install clause-maintenance defaults", maintenance, internalizer.lemmaGCThreshold)
+	}
+
+	setUInt("dack", 0)
+	setBool("dack.eq", false)
+	setDouble("dack.factor", 0.5)
+	setUInt("dack.threshold", 11)
+	setUInt("dack.gc", 47)
+	setDouble("dack.gc_inv_decay", 0.5)
+	astTestMust(t, solver.UpdateParams(&local))
+	if manager != internalizer.dynamicAck || manager.strategy != dynAckDisabled || manager.equalities ||
+		manager.pairs.threshold != 11 || manager.triples.threshold != 11 || manager.schedule.gcEvery != 47 ||
+		manager.schedule.factor != 0.5 || manager.pairs.decay != 0.5 {
+		t.Fatal("parameter update replaced or failed to update dynamic-Ack state")
+	}
+}
+
+func TestSMTSolverDisablesBinaryClauseOptimizationForProofs(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	context, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: context})
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, solver.Close())
+		astTestMust(t, context.Close())
+	})
+	if solver.kernel.internalizer.binaryClauseOptimization {
+		t.Fatal("proof-producing solver enabled compact binary clauses")
+	}
+}
+
 func TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	a := smtRelevancyBool(t, m, "smt-propagate-a")

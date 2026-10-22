@@ -270,6 +270,16 @@ func (s *SMTParams) State() (SMTParamsState, error) {
 	}
 	return s.state, nil
 }
+
+// DynamicAckState exposes the embedded dyn_ack_params base used by the SMT
+// context. The returned value is a scalar snapshot and does not borrow the
+// parameter owner.
+func (s *SMTParams) DynamicAckState() (SMTDynAckState, error) {
+	if e := s.open(); e != nil {
+		return SMTDynAckState{}, e
+	}
+	return s.dyn.State()
+}
 func (s *SMTParams) sourceStop() error {
 	if s.DestructorCause != nil {
 		return s.DestructorCause

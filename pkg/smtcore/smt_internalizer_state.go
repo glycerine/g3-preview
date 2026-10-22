@@ -190,6 +190,15 @@ func (s *SMTInternalizerState) ConfigureDynamicAck(config SMTDynAckState) error 
 	return nil
 }
 
+// UpdateDynamicAck changes the source scalar parameters without discarding
+// occurrence counts, pending candidates, or installed dynamic-Ack clauses.
+func (s *SMTInternalizerState) UpdateDynamicAck(config SMTDynAckState) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	return s.dynamicAck.updateConfig(config)
+}
+
 func (s *SMTInternalizerState) RegisterTheory(theory SMTTheoryInternalizer) error {
 	if err := s.open(); err != nil {
 		return err

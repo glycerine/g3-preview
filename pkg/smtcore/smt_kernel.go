@@ -46,6 +46,7 @@ type SMTKernel struct {
 	preprocessor     *rewriter.TheoryRewriter
 	paramContext     *uparams.ParamsContext
 	paramGlobals     *uparams.GlobalParamsService
+	smtParams        *SMTParams
 	preprocessState  SMTPreprocessorState
 	produceModel     bool
 	preprocess       bool
@@ -104,7 +105,7 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	if err := k.open(); err != nil {
 		return err
 	}
-	if len(k.assertions) != 0 || k.assertedHead != 0 || len(k.scopes) != 0 || k.preprocessor != nil {
+	if len(k.assertions) != 0 || k.assertedHead != 0 || len(k.scopes) != 0 || k.preprocessor != nil || k.smtParams != nil {
 		return ast.ErrASTDomain
 	}
 	if context == nil || globals == nil || context.SymbolsField != k.manager.Symbols || globals.Context != context {
@@ -112,6 +113,49 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	}
 	k.paramContext = context
 	k.paramGlobals = globals
+	full, err := NewSMTParams(context, params, globals, k.manager.Budget())
+	if err != nil {
+		if full != nil {
+			err = errors.Join(err, full.Close())
+		}
+		return err
+	}
+	// smt_solver constructs smt_params and its context first, then invokes the
+	// full updt_params overload. That second step updates embedded bases such as
+	// dyn_ack_params, whose constructors intentionally saw an empty params_ref.
+	if err = full.Update(params); err != nil {
+		return errors.Join(err, full.Close())
+	}
+	fullState, err := full.State()
+	if err != nil {
+		return errors.Join(err, full.Close())
+	}
+	dynamic, err := full.DynamicAckState()
+	if err != nil {
+		return errors.Join(err, full.Close())
+	}
+	proofs, err := k.manager.ProofsEnabled()
+	if err != nil {
+		return errors.Join(err, full.Close())
+	}
+	if err = k.internalizer.SetBinaryClauseOptimization(fullState.BinaryClauseOpt && !proofs); err != nil {
+		return errors.Join(err, full.Close())
+	}
+	if err = k.internalizer.ConfigureDynamicAck(dynamic); err != nil {
+		return errors.Join(err, full.Close())
+	}
+	maintenance := SMTClauseMaintenanceConfig{
+		Strategy: fullState.LemmaGcStrategy, Half: fullState.LemmaGcHalf,
+		Recent: fullState.RecentLemmasSize, Initial: fullState.LemmaGcInitial,
+		Factor: fullState.LemmaGcFactor, InverseDecay: fullState.InvClauseDecay,
+		NewOldRatio: fullState.NewOldRatio, NewActivity: fullState.NewClauseActivity,
+		OldActivity: fullState.OldClauseActivity, NewRelevancy: fullState.NewClauseRelevancy,
+		OldRelevancy: fullState.OldClauseRelevancy,
+	}
+	if err = k.internalizer.ConfigureClauseMaintenance(maintenance); err != nil {
+		return errors.Join(err, full.Close())
+	}
+	k.smtParams = full
 	state, err := k.readPreprocessorState(context, globals, params)
 	if err != nil {
 		return err
@@ -141,8 +185,18 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err := k.open(); err != nil {
 		return err
 	}
-	if k.paramContext == nil || k.paramGlobals == nil {
+	if k.paramContext == nil || k.paramGlobals == nil || k.smtParams == nil {
 		return uparams.ErrParamsOwner
+	}
+	if err := k.smtParams.Update(params); err != nil {
+		return err
+	}
+	dynamic, err := k.smtParams.DynamicAckState()
+	if err != nil {
+		return err
+	}
+	if err = k.internalizer.UpdateDynamicAck(dynamic); err != nil {
+		return err
 	}
 	name := "preprocess"
 	enabled, err := k.paramContext.GetBoolName(params, &name, true)
@@ -611,6 +665,9 @@ func (k *SMTKernel) Close() error {
 		}
 	}
 	result = errors.Join(result, k.internalizer.Close())
+	if k.smtParams != nil {
+		result = errors.Join(result, k.smtParams.Close())
+	}
 	for index := len(k.assertions); index > 0; index-- {
 		assertion := &k.assertions[index-1]
 		if !assertion.Proof.IsNull() {
@@ -625,6 +682,7 @@ func (k *SMTKernel) Close() error {
 		k.relevancy = nil
 		k.paramContext = nil
 		k.paramGlobals = nil
+		k.smtParams = nil
 		k.preprocessState = SMTPreprocessorState{}
 		k.manager = nil
 		k.closed = true

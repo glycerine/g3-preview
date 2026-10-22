@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"errors"
+	"math"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -98,6 +99,26 @@ func newSMTDynAckManager(state *SMTInternalizerState, config SMTDynAckState) (*s
 
 func defaultSMTDynAckState() SMTDynAckState {
 	return SMTDynAckState{Strategy: uint32(dynAckRoot), Factor: 0.1, Threshold: 10, GC: 2000, GCInverseDecay: 0.8}
+}
+
+// updateConfig preserves occurrence and instantiated-clause state while
+// changing the scalar dyn_ack_params values read live by the C++ manager.
+func (m *smtDynAckManager) updateConfig(config SMTDynAckState) error {
+	if m == nil || m.closed || m.pairs == nil || m.triples == nil || m.schedule == nil ||
+		!validDynAckStrategy(dynAckStrategy(config.Strategy)) ||
+		math.IsNaN(config.Factor) || math.IsInf(config.Factor, 0) || config.Factor < 0 ||
+		math.IsNaN(config.GCInverseDecay) || math.IsInf(config.GCInverseDecay, 0) ||
+		config.GCInverseDecay < 0 || config.GCInverseDecay > 1 {
+		return ast.ErrASTDomain
+	}
+	m.strategy = dynAckStrategy(config.Strategy)
+	m.equalities = config.Equalities
+	m.pairs.threshold = config.Threshold
+	m.pairs.decay = config.GCInverseDecay
+	m.triples.threshold = config.Threshold
+	m.schedule.gcEvery = config.GC
+	m.schedule.factor = config.Factor
+	return nil
 }
 
 func (m *smtDynAckManager) equalityLiteral(first, second ast.ASTHandle) (SMTLiteral, error) {
