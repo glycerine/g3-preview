@@ -218,6 +218,58 @@ func (p *DirectProofInterpolator) localizeTerm(term ast.ASTHandle, scope ScopeRa
 	return variable, proof, nil
 }
 
+// MakeAxiom localizes every literal over the full proof range before applying
+// the source axiom interpolation rule.
+func (p *DirectProofInterpolator) MakeAxiom(conclusion []ast.ASTHandle) (ast.ASTHandle, error) {
+	return p.MakeAxiomInRange(conclusion, FullScopeRange())
+}
+
+// MakeAxiomInRange localizes an axiom clause to the requested source range and
+// transports the resulting assumption through each localization equality.
+func (p *DirectProofInterpolator) MakeAxiomInRange(conclusion []ast.ASTHandle, scope ScopeRange) (ast.ASTHandle, error) {
+	if err := p.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	localized := make([]ast.ASTHandle, len(conclusion))
+	equalities := make([]ast.ASTHandle, 0, len(conclusion))
+	proofs := make([]ast.ASTHandle, 0, len(conclusion))
+	for i, literal := range conclusion {
+		var proof ast.ASTHandle
+		var err error
+		localized[i], proof, err = p.localizeTerm(literal, scope)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		literalScope, err := p.base.ASTScope(localized[i])
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		scope, err = p.base.scopes.RangeGLB(scope, literalScope)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		if localized[i] != literal {
+			equality, e := p.makeEquivalence(localized[i], literal)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			equalities = append(equalities, equality)
+			proofs = append(proofs, proof)
+		}
+	}
+	interpolation, err := p.MakeAssumption(scope.Max(), localized)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	for i, equality := range equalities {
+		interpolation, err = p.MakeModusPonens(equality, interpolation, proofs[i])
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
+	return interpolation, nil
+}
+
 func (p *DirectProofInterpolator) freshLocalizationVariable(term ast.ASTHandle, frame int) (ast.ASTHandle, error) {
 	sort, err := p.base.manager.Type(term)
 	if err != nil {

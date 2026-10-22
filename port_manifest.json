@@ -41596,6 +41596,7 @@
         "TestDirectProofTrivialInterpolationRewriteChains",
         "TestDirectProofMixedModusPonens",
         "TestDirectProofLocalToMixedCongruenceAndTransitivity",
+        "TestDirectProofLocalizedAxioms",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41818,7 +41819,7 @@
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
-          "status": "partial",
+          "status": "ported",
           "go_targets": [
             "pkg/interp/direct_proof_resolution.go",
             "pkg/interp/direct_proof_arithmetic.go",
@@ -41830,9 +41831,9 @@
             "TestDirectProofLocalArithmeticRules",
             "TestDirectProofLocalEqualityRules",
             "TestDirectProofMixedModusPonens",
-            "TestDirectProofLocalToMixedCongruenceAndTransitivity"
-          ],
-          "reason": "Local and mixed modus ponens, single/multi-premise congruence, local-to-mixed congruence rewrites, local and mixed transitivity, local/mixed symmetry, Farkas, leq2eq, eq2leq, and cut rules are ported. Localized axioms remain pending."
+            "TestDirectProofLocalToMixedCongruenceAndTransitivity",
+            "TestDirectProofLocalizedAxioms"
+          ]
         },
         {
           "name": "term localization, quantification, and final interpolation",
@@ -41859,7 +41860,7 @@
       "path": "src/interp/iz3proof_itp.h",
       "component": "interp",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/interp/direct_proof.go",
         "pkg/interp/direct_proof_resolution.go",
@@ -41888,6 +41889,7 @@
         "TestDirectProofTrivialInterpolationRewriteChains",
         "TestDirectProofMixedModusPonens",
         "TestDirectProofLocalToMixedCongruenceAndTransitivity",
+        "TestDirectProofLocalizedAxioms",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41940,7 +41942,8 @@
           "tests": [
             "TestDirectProofTrivialInterpolationRewriteChains",
             "TestDirectProofMixedModusPonens",
-            "TestDirectProofLocalToMixedCongruenceAndTransitivity"
+            "TestDirectProofLocalToMixedCongruenceAndTransitivity",
+            "TestDirectProofLocalizedAxioms"
           ]
         },
         {
@@ -41957,10 +41960,21 @@
           ]
         },
         {
-          "name": "remaining direct interpolation proof-rule surface",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
+          "name": "complete direct interpolation proof-rule interface",
+          "status": "ported",
+          "go_targets": [
+            "pkg/interp/direct_proof.go",
+            "pkg/interp/direct_proof_resolution.go",
+            "pkg/interp/direct_proof_arithmetic.go",
+            "pkg/interp/direct_proof_equality.go",
+            "pkg/interp/direct_proof_localization.go",
+            "pkg/interp/direct_proof_finalize.go"
+          ],
+          "tests": [
+            "TestDirectProofLocalEqualityRules",
+            "TestDirectProofLocalToMixedCongruenceAndTransitivity",
+            "TestDirectProofLocalizedAxioms"
+          ]
         }
       ],
       "ownership": [

@@ -703,3 +703,25 @@ func TestDirectProofLocalToMixedCongruenceAndTransitivity(t *testing.T) {
 		t.Fatal("mixed transitivity", op, e)
 	}
 }
+
+func TestDirectProofLocalizedAxioms(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	aAxiom, err := direct.MakeAxiom([]ast.ASTHandle{p})
+	interpMust(t, err)
+	if no, e := manager.IsFalse(aAxiom); e != nil || !no {
+		t.Fatal("A axiom", no, e)
+	}
+	bAxiom, err := direct.MakeAxiom([]ast.ASTHandle{q})
+	interpMust(t, err)
+	if yes, e := manager.IsTrue(bAxiom); e != nil || !yes {
+		t.Fatal("B axiom", yes, e)
+	}
+	localized, err := direct.MakeAxiomInRange([]ast.ASTHandle{q}, DownwardScopeRange(0))
+	interpMust(t, err)
+	if localized.IsNull() || len(direct.localizationVariables) != 1 {
+		t.Fatal("localized axiom", localized, direct.localizationVariables)
+	}
+}
