@@ -116782,7 +116782,8 @@
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
         "TestSMTSequenceEquationQueueMutationAndScopedRestore",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
-        "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"
+        "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary",
+        "TestSMTSequenceTheoryConcreteWordEquationConflict"
       ],
       "conditionals": [
         {
@@ -117240,6 +117241,12 @@
           "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"]
         },
         {
+          "name": "solution-map expansion of queued concat leaves and concrete string-word conflict detection with dependency explanations (src/smt/theory_seq.cpp:1341-1533,2856-3066)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq.go",
+          "tests": ["TestSMTSequenceTheoryConcreteWordEquationConflict"]
+        },
+        {
           "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
           "status": "unported",
           "go_target": null,
@@ -117265,7 +117272,8 @@
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
         "TestSMTSequenceEquationQueueMutationAndScopedRestore",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
-        "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"
+        "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary",
+        "TestSMTSequenceTheoryConcreteWordEquationConflict"
       ],
       "conditionals": [
         {
@@ -117307,6 +117315,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
           "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"]
+        },
+        {
+          "name": "queued word-equation expansion through scoped solutions and concrete conflict explanations",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq.go",
+          "tests": ["TestSMTSequenceTheoryConcreteWordEquationConflict"]
         },
         {
           "name": "remaining word-equation, arithmetic, containment, regular-language, propagation and branching declarations",

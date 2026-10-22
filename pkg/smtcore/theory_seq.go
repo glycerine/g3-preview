@@ -260,6 +260,30 @@ func (t *SMTSequenceTheory) concreteDistinct(left, right ast.ASTHandle) (bool, b
 	return false, leftEmpty && rightEmpty, nil
 }
 
+func (t *SMTSequenceTheory) setDependencyConflict(dependency *smtSequenceDependency) error {
+	assumptions := t.dependencies.Linearize(dependency)
+	literals := make([]SMTLiteral, 0, len(assumptions))
+	seen := make(map[SMTLiteral]struct{})
+	for _, assumption := range assumptions {
+		if assumption.literal == SMTNullLiteral {
+			return t.markUnsupported()
+		}
+		if _, found := seen[assumption.literal]; found {
+			continue
+		}
+		seen[assumption.literal] = struct{}{}
+		literals = append(literals, assumption.literal)
+	}
+	if len(literals) == 0 {
+		return t.markUnsupported()
+	}
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	return state.SetTheoryConflict(t.FamilyID(), literals)
+}
+
 func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) error {
 	leftNode, err := t.Enode(leftVar)
 	if err != nil {
@@ -314,19 +338,7 @@ func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) error {
 		return err
 	}
 	if distinct {
-		assumptions := t.dependencies.Linearize(dependency)
-		literals := make([]SMTLiteral, 0, len(assumptions))
-		for _, assumption := range assumptions {
-			if assumption.literal == SMTNullLiteral {
-				return t.markUnsupported()
-			}
-			literals = append(literals, assumption.literal)
-		}
-		state, stateErr := t.State()
-		if stateErr != nil {
-			return stateErr
-		}
-		return state.SetTheoryConflict(t.FamilyID(), literals)
+		return t.setDependencyConflict(dependency)
 	}
 	if bothConcrete {
 		return nil
@@ -408,9 +420,89 @@ func (t *SMTSequenceTheory) PopScopes(count uint32) error {
 	return nil
 }
 
+func (t *SMTSequenceTheory) concreteString(expression ast.ASTHandle, dependency *smtSequenceDependency, visiting map[ast.ASTHandle]struct{}) (string, bool, *smtSequenceDependency, error) {
+	state, err := t.State()
+	if err != nil {
+		return "", false, dependency, err
+	}
+	if _, found := visiting[expression]; found {
+		return "", false, dependency, nil
+	}
+	visiting[expression] = struct{}{}
+	defer delete(visiting, expression)
+	representative, foundDependency, err := t.solutions.Find(expression)
+	if err != nil {
+		return "", false, dependency, err
+	}
+	dependency = t.dependencies.Join(dependency, foundDependency)
+	if representative != expression {
+		return t.concreteString(representative, dependency, visiting)
+	}
+	if text, matched, textErr := state.manager.SequenceStringValue(expression); textErr != nil || matched {
+		return text, matched, dependency, textErr
+	}
+	left, right, concat, err := state.manager.SequenceConcatParts(expression)
+	if err != nil || !concat {
+		return "", false, dependency, err
+	}
+	leftText, leftConcrete, dependency, err := t.concreteString(left, dependency, visiting)
+	if err != nil || !leftConcrete {
+		return "", false, dependency, err
+	}
+	rightText, rightConcrete, dependency, err := t.concreteString(right, dependency, visiting)
+	if err != nil || !rightConcrete {
+		return "", false, dependency, err
+	}
+	return leftText + rightText, true, dependency, nil
+}
+
+func (t *SMTSequenceTheory) concreteWord(parts []ast.ASTHandle, dependency *smtSequenceDependency) (string, bool, *smtSequenceDependency, error) {
+	var result string
+	for _, part := range parts {
+		text, concrete, updated, err := t.concreteString(part, dependency, make(map[ast.ASTHandle]struct{}))
+		if err != nil || !concrete {
+			return "", false, updated, err
+		}
+		dependency = updated
+		result += text
+	}
+	return result, true, dependency, nil
+}
+
+func (t *SMTSequenceTheory) checkConcreteEquations() (bool, error) {
+	for index := 0; index < t.equations.Len(); index++ {
+		_, left, right, dependency, err := t.equations.At(index)
+		if err != nil {
+			return false, err
+		}
+		leftText, leftConcrete, dependency, err := t.concreteWord(left, dependency)
+		if err != nil {
+			return false, err
+		}
+		rightText, rightConcrete, dependency, err := t.concreteWord(right, dependency)
+		if err != nil {
+			return false, err
+		}
+		if leftConcrete && rightConcrete && leftText != rightText {
+			if err = t.setDependencyConflict(dependency); err != nil {
+				return false, err
+			}
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if _, err := t.State(); err != nil {
 		return SMTFinalCheckGiveUp, err
+	}
+	conflict, err := t.checkConcreteEquations()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if conflict {
+		return SMTFinalCheckContinue, nil
 	}
 	if t.unsupported != 0 {
 		return SMTFinalCheckGiveUp, nil

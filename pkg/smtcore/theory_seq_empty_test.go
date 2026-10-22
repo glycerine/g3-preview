@@ -122,3 +122,33 @@ func TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary(t *testing.T) {
 		t.Fatal("unported concatenation returned a definitive result", status)
 	}
 }
+
+func TestSMTSequenceTheoryConcreteWordEquationConflict(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	ba, err := m.MkString("ba")
+	astTestMust(t, err)
+	c, err := m.MkString("c")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-word-x"), sort)
+	astTestMust(t, err)
+	word, err := m.MkSequenceConcat(x, a)
+	astTestMust(t, err)
+	wordEquality, err := m.MkEq(word, ba)
+	astTestMust(t, err)
+	valueEquality, err := m.MkEq(x, c)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(wordEquality))
+	astTestMust(t, solver.Assert(valueEquality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("concrete sequence word conflict", status)
+	}
+}
