@@ -107695,9 +107695,16 @@
       "path": "src/smt/smt_relevancy.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_relevancy.go"
+      ],
+      "tests": [
+        "TestSMTRelevancyBooleanConnectivePropagation",
+        "TestSMTRelevancySharedAssignmentWatches",
+        "TestSMTRelevancyDependenciesWatchesScopesAndEqualityClasses",
+        "TestSMTRelevancyDisabledAndTermITEHandler"
+      ],
       "conditionals": [
         {
           "line": 529,
@@ -107834,19 +107841,59 @@
           "text": "SASSERT(is_relevant(n->get_owner()));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "expression and equality-class marking with structural and queued handler propagation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevancy.go",
+          "tests": [
+            "TestSMTRelevancyBooleanConnectivePropagation",
+            "TestSMTRelevancyDependenciesWatchesScopesAndEqualityClasses"
+          ]
+        },
+        {
+          "name": "typed dependency, conjunction, disjunction, Boolean ITE, and term ITE assignment watches",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevancy.go",
+          "tests": [
+            "TestSMTRelevancySharedAssignmentWatches",
+            "TestSMTRelevancyDisabledAndTermITEHandler"
+          ]
+        },
+        {
+          "name": "scope rollback, relevant-expression reporting, and debug invariant checks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevancy.go",
+          "tests": [
+            "TestSMTRelevancyDependenciesWatchesScopesAndEqualityClasses",
+            "TestSMTRelevancySharedAssignmentWatches",
+            "TestSMTRelevancyDisabledAndTermITEHandler"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTRelevancyPropagator borrows its concrete checker context and AST manager; native maps and slices own handler records, watch lists, scopes, and ordered relevance events."
+      ],
+      "deviations": [
+        "The source region-allocated virtual handlers are closed typed Go records for the retained handler kinds. Context relevant_eh notification is exposed as ordered DrainNewlyRelevant events for the eventual context owner."
+      ]
     },
     {
       "path": "src/smt/smt_relevancy.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_relevancy.go"
+      ],
+      "tests": [
+        "TestSMTRelevancyBooleanConnectivePropagation",
+        "TestSMTRelevancySharedAssignmentWatches",
+        "TestSMTRelevancyDependenciesWatchesScopesAndEqualityClasses",
+        "TestSMTRelevancyDisabledAndTermITEHandler"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -107865,11 +107912,27 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "relevancy propagator construction, queries, dependency helpers, watches, propagation, assignment events, and scopes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevancy.go",
+          "tests": [
+            "TestSMTRelevancyBooleanConnectivePropagation",
+            "TestSMTRelevancySharedAssignmentWatches",
+            "TestSMTRelevancyDependenciesWatchesScopesAndEqualityClasses",
+            "TestSMTRelevancyDisabledAndTermITEHandler"
+          ]
+        }
+      ],
+      "ownership": [
+        "The propagator borrows context-owned AST and enode state and owns concrete Go handler values; no C++ region or polymorphic callback lifetime is reproduced."
+      ],
+      "deviations": [
+        "Invalid source assertion states return Go errors. The retained internalizer uses concrete AddAndWatches, AddOrWatches, AddITEWatches, and AddTermITEWatches methods instead of exposing a universal callback interface."
+      ]
     },
     {
       "path": "src/smt/smt_setup.cpp",
