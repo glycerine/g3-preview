@@ -15,12 +15,21 @@ type smtInternalizerScope struct {
 	pendingLimit    int
 	assignmentLimit int
 	clauseLimit     int
+	theoryLimit     int
 	inconsistent    bool
 }
 
 type smtInternalizerAssignmentTrail struct {
 	variable int32
 	value    lbool.LBool
+}
+
+type smtInternalizerTheoryTrail struct {
+	node      *SMTEnode
+	root      *SMTEnode
+	theory    SMTTheoryID
+	old       SMTTheoryVar
+	rootAdded bool
 }
 
 type SMTInternalizedClause struct {
@@ -41,6 +50,8 @@ type SMTInternalizerState struct {
 	congruence       *SMTCongruenceTable
 	quantifiers      *SMTQuantifierRegistry
 	relevancy        *SMTRelevancyPropagator
+	theories         map[ast.FamilyID]SMTTheoryInternalizer
+	theoryOrder      []SMTTheoryInternalizer
 	boolVar          map[ast.ASTHandle]int32
 	boolExpr         []ast.ASTHandle
 	booleanData      []SMTBoolVarData
@@ -53,6 +64,7 @@ type SMTInternalizerState struct {
 	cachedGeneration map[ast.ASTHandle]uint32
 	pending          []SMTInternalizerCongruence
 	assignmentTrail  []smtInternalizerAssignmentTrail
+	theoryTrail      []smtInternalizerTheoryTrail
 	clauses          []SMTInternalizedClause
 	inconsistent     bool
 	generation       uint32
@@ -73,10 +85,64 @@ func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext
 		manager: manager, context: context, congruence: table, quantifiers: quantifiers,
 		boolVar: make(map[ast.ASTHandle]int32), boolExpr: make([]ast.ASTHandle, 1), booleanData: make([]SMTBoolVarData, 1),
 		activity: make([]float64, 1), assignment: []lbool.LBool{lbool.True, lbool.False}, watches: make([]SMTWatchList, 2),
-		cachedGeneration: make(map[ast.ASTHandle]uint32),
+		cachedGeneration: make(map[ast.ASTHandle]uint32), theories: make(map[ast.FamilyID]SMTTheoryInternalizer),
 	}
 	state.booleanData[0].Initialize(0)
 	return state, nil
+}
+
+func (s *SMTInternalizerState) RegisterTheory(theory SMTTheoryInternalizer) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if theory == nil || theory.FamilyID() == ast.NullFamilyID || theory.FamilyID() == s.manager.BasicFamilyID() || s.theories[theory.FamilyID()] != nil || len(s.scopes) != 0 {
+		return ast.ErrASTDomain
+	}
+	if err := theory.Initialize(s); err != nil {
+		return err
+	}
+	s.theories[theory.FamilyID()] = theory
+	s.theoryOrder = append(s.theoryOrder, theory)
+	return nil
+}
+
+func (s *SMTInternalizerState) Theory(family ast.FamilyID) SMTTheoryInternalizer {
+	if s == nil {
+		return nil
+	}
+	return s.theories[family]
+}
+
+func (s *SMTInternalizerState) attachTheoryVariable(node *SMTEnode, theory SMTTheoryID, variable SMTTheoryVar) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if node == nil || node.manager != s.manager || theory == SMTNullTheoryID || variable == SMTNullTheoryVar {
+		return ast.ErrASTDomain
+	}
+	old := node.TheoryVar(theory)
+	trail := smtInternalizerTheoryTrail{node: node, theory: theory, old: old}
+	if old == SMTNullTheoryVar {
+		root := node.root
+		if root == nil {
+			return ast.ErrASTDomain
+		}
+		rootVariable := root.TheoryVar(theory)
+		if err := node.AddTheoryVar(theory, variable); err != nil {
+			return err
+		}
+		if root != node && rootVariable == SMTNullTheoryVar {
+			if err := root.AddTheoryVar(theory, variable); err != nil {
+				_ = node.DeleteTheoryVar(theory)
+				return err
+			}
+			trail.root, trail.rootAdded = root, true
+		}
+	} else if err := node.ReplaceTheoryVar(theory, variable); err != nil {
+		return err
+	}
+	s.theoryTrail = append(s.theoryTrail, trail)
+	return nil
 }
 
 func (s *SMTInternalizerState) open() error {
@@ -332,10 +398,22 @@ func (s *SMTInternalizerState) PushScope() error {
 	}
 	s.scopes = append(s.scopes, smtInternalizerScope{
 		booleanLimit: len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending),
-		assignmentLimit: len(s.assignmentTrail), clauseLimit: len(s.clauses), inconsistent: s.inconsistent,
+		assignmentLimit: len(s.assignmentTrail), clauseLimit: len(s.clauses), theoryLimit: len(s.theoryTrail), inconsistent: s.inconsistent,
 	})
 	if s.relevancy != nil {
 		if err := s.relevancy.PushScope(); err != nil {
+			s.scopes = s.scopes[:len(s.scopes)-1]
+			return err
+		}
+	}
+	for index, theory := range s.theoryOrder {
+		if err := theory.PushScope(); err != nil {
+			for undo := index - 1; undo >= 0; undo-- {
+				_ = s.theoryOrder[undo].PopScopes(1)
+			}
+			if s.relevancy != nil {
+				_ = s.relevancy.PopScopes(1)
+			}
 			s.scopes = s.scopes[:len(s.scopes)-1]
 			return err
 		}
@@ -375,6 +453,26 @@ func (s *SMTInternalizerState) unregisterEnode(node *SMTEnode) error {
 }
 
 func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
+	if scope.theoryLimit < 0 || scope.theoryLimit > len(s.theoryTrail) {
+		return ast.ErrASTDomain
+	}
+	for len(s.theoryTrail) > scope.theoryLimit {
+		index := len(s.theoryTrail) - 1
+		entry := s.theoryTrail[index]
+		s.theoryTrail = s.theoryTrail[:index]
+		if entry.old == SMTNullTheoryVar {
+			if err := entry.node.DeleteTheoryVar(entry.theory); err != nil {
+				return err
+			}
+			if entry.rootAdded {
+				if err := entry.root.DeleteTheoryVar(entry.theory); err != nil {
+					return err
+				}
+			}
+		} else if err := entry.node.ReplaceTheoryVar(entry.theory, entry.old); err != nil {
+			return err
+		}
+	}
 	if scope.assignmentLimit < 0 || scope.assignmentLimit > len(s.assignmentTrail) {
 		return ast.ErrASTDomain
 	}
@@ -466,6 +564,11 @@ func (s *SMTInternalizerState) PopScopes(count uint32) error {
 			return err
 		}
 	}
+	for index := len(s.theoryOrder) - 1; index >= 0; index-- {
+		if err := s.theoryOrder[index].PopScopes(count); err != nil {
+			return err
+		}
+	}
 	s.scopes = s.scopes[:level]
 	s.scopeLevel = uint32(level)
 	return nil
@@ -486,6 +589,9 @@ func (s *SMTInternalizerState) Close() error {
 		return nil
 	}
 	var result error
+	if len(s.scopes) != 0 {
+		result = errors.Join(result, s.PopScopes(uint32(len(s.scopes))))
+	}
 	result = errors.Join(result, s.popTo(smtInternalizerScope{}))
 	result = errors.Join(result, s.congruence.Close())
 	if result == nil {

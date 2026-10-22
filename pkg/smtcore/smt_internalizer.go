@@ -47,6 +47,29 @@ func (s *SMTInternalizerState) basicOperation(expression ast.ASTHandle) (int32, 
 	return op, err == nil, err
 }
 
+func (s *SMTInternalizerState) expressionTheory(expression ast.ASTHandle) (SMTTheoryInternalizer, error) {
+	family, err := s.manager.GetFamilyID(expression)
+	if err != nil {
+		return nil, err
+	}
+	return s.theories[family], nil
+}
+
+func (s *SMTInternalizerState) applySortConstraint(expression ast.ASTHandle, node *SMTEnode) error {
+	sort, err := s.manager.GetSort(expression)
+	if err != nil {
+		return err
+	}
+	family, err := s.manager.GetFamilyID(sort)
+	if err != nil {
+		return err
+	}
+	if theory := s.theories[family]; theory != nil {
+		return theory.ApplySortConstraint(node, sort)
+	}
+	return nil
+}
+
 func smtInternalizerGateOperation(operation int32) bool {
 	return operation == ast.ASTOpAnd || operation == ast.ASTOpOr || operation == ast.ASTOpIff || operation == ast.ASTOpIte
 }
@@ -229,6 +252,30 @@ func (s *SMTInternalizerState) internalizeFormula(expression ast.ASTHandle, gate
 	if basic && op == ast.ASTOpDistinct {
 		return s.internalizeDistinct(expression, gateContext)
 	}
+	if !basic {
+		theory, err := s.expressionTheory(expression)
+		if err != nil {
+			return err
+		}
+		if theory != nil {
+			handled, err := theory.InternalizeAtom(expression, gateContext)
+			if err != nil {
+				return err
+			}
+			if handled {
+				variable, found := s.boolVar[expression]
+				if !found {
+					return ast.ErrASTDomain
+				}
+				if !gateContext {
+					if err = s.ensureBooleanEnode(expression, variable, true, true, false); err != nil {
+						return err
+					}
+				}
+				return nil
+			}
+		}
+	}
 	if err = s.internalizeFormulaCore(expression, gateContext); err != nil {
 		return err
 	}
@@ -239,6 +286,23 @@ func (s *SMTInternalizerState) internalizeFormula(expression ast.ASTHandle, gate
 			return err
 		}
 		data.SetEquality()
+		left, err := s.manager.GetArg(expression, 0)
+		if err != nil {
+			return err
+		}
+		sort, err := s.manager.GetSort(left)
+		if err != nil {
+			return err
+		}
+		family, err := s.manager.GetFamilyID(sort)
+		if err != nil {
+			return err
+		}
+		if theory := s.theories[family]; theory != nil {
+			if err = theory.InternalizeEquality(expression, variable); err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }
@@ -455,7 +519,20 @@ func (s *SMTInternalizerState) addGateConstraints(expression ast.ASTHandle, oper
 }
 
 func (s *SMTInternalizerState) internalizeTerm(expression ast.ASTHandle) error {
-	if s.context.enodes[expression] != nil {
+	if node := s.context.enodes[expression]; node != nil {
+		theory, err := s.expressionTheory(expression)
+		if err != nil {
+			return err
+		}
+		if theory != nil && !theory.IsAttachedToVariable(node) {
+			handled, err := theory.InternalizeTerm(expression)
+			if err != nil {
+				return err
+			}
+			if handled && !theory.IsAttachedToVariable(node) {
+				return ast.ErrASTDomain
+			}
+		}
 		return nil
 	}
 	op, basic, err := s.basicOperation(expression)
@@ -464,6 +541,23 @@ func (s *SMTInternalizerState) internalizeTerm(expression ast.ASTHandle) error {
 	}
 	if basic && op == ast.ASTOpIte {
 		return s.internalizeTermITE(expression)
+	}
+	theory, err := s.expressionTheory(expression)
+	if err != nil {
+		return err
+	}
+	if theory != nil {
+		handled, err := theory.InternalizeTerm(expression)
+		if err != nil {
+			return err
+		}
+		if handled {
+			node := s.context.enodes[expression]
+			if node == nil || !theory.IsAttachedToVariable(node) {
+				return ast.ErrASTDomain
+			}
+			return s.applySortConstraint(expression, node)
+		}
 	}
 	count, err := s.manager.GetNumArgs(expression)
 	if err != nil {
@@ -478,8 +572,11 @@ func (s *SMTInternalizerState) internalizeTerm(expression ast.ASTHandle) error {
 			return err
 		}
 	}
-	_, err = s.MkEnode(expression, false, false, true)
-	return err
+	node, err := s.MkEnode(expression, false, false, true)
+	if err != nil {
+		return err
+	}
+	return s.applySortConstraint(expression, node)
 }
 
 func (s *SMTInternalizerState) internalizeTermITE(expression ast.ASTHandle) error {
@@ -550,6 +647,13 @@ func (s *SMTInternalizerState) preInternalizeDeep(expression ast.ASTHandle) erro
 	for existing := range s.boolVar {
 		if err = order.SetBooleanInternalized(existing, true); err != nil {
 			return err
+		}
+	}
+	for _, theory := range s.theoryOrder {
+		if !theory.DefaultInternalizer() {
+			if err = order.SetNonDefaultFamily(theory.FamilyID(), true); err != nil {
+				return err
+			}
 		}
 	}
 	items, err := order.Sort(expression)

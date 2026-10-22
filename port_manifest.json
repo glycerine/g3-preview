@@ -105927,7 +105927,8 @@
       "go_targets": [
         "pkg/smtcore/smt_internalizer_order.go",
         "pkg/smtcore/smt_internalizer_state.go",
-        "pkg/smtcore/smt_internalizer.go"
+        "pkg/smtcore/smt_internalizer.go",
+        "pkg/smtcore/smt_theory.go"
       ],
       "tests": [
         "TestSMTInternalizationOrderBooleanGateContextsAndNotElision",
@@ -105938,7 +105939,8 @@
         "TestSMTInternalizerTermITEEqualityClausesAndRelevancy",
         "TestSMTInternalizerQuantifierRegistrationAndDefaultAssertion",
         "TestSMTInternalizerConsumesMaterializedQuantifierInstance",
-        "TestSMTInternalizerDeepAssertionUsesTopologicalPrepass"
+        "TestSMTInternalizerDeepAssertionUsesTopologicalPrepass",
+        "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
       ],
       "conditionals": [
         {
@@ -106319,6 +106321,14 @@
         },
         {
           "name": "theory atom and term callbacks, sort constraints, and theory-variable attachment and replacement",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory.go",
+          "tests": [
+            "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+          ]
+        },
+        {
+          "name": "theory equality and disequality notifications induced by theory-variable attachment",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -106340,11 +106350,11 @@
       ],
       "ownership": [
         "SMTInternalizationOrder borrows the AST manager and checker context; native maps and slices own traversal colors, theory-family configuration, and returned order values.",
-        "SMTInternalizerState owns references for registered Boolean expressions, enode owners, and retained clause proofs; it owns its congruence table, variable arrays, watch lists, scopes, clauses, assignment trail, and pending congruence records, and borrows the checker context and optional relevancy propagator and quantifier registry."
+        "SMTInternalizerState owns references for registered Boolean expressions, enode owners, and retained clause proofs; it owns its congruence table, variable arrays, watch lists, scopes, clauses, assignment and theory-variable trails, registered theory order, and pending congruence records, and borrows the checker context, registered theory plugins, and optional relevancy propagator and quantifier registry."
       ],
       "deviations": [
-        "Default-internalizer selection is stored as concrete family configuration until SMT theory registration owns it. Source nondefault theory families remain top-down boundaries in the ordering pass.",
-        "Internalized logical clauses are retained as concrete typed records for the future DPLL watch and justification layer; the port does not introduce a universal callback adapter while the concrete theory interface is unfinished."
+        "Registered theories now supply default-internalizer selection; nondefault theory families remain top-down boundaries in the ordering pass.",
+        "Internalized logical clauses are retained as concrete typed records for the future DPLL watch and justification layer."
       ]
     },
     {
@@ -108259,9 +108269,13 @@
       "path": "src/smt/smt_theory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_theory.go"
+      ],
+      "tests": [
+        "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+      ],
       "assertions": [
         {
           "line": 26,
@@ -108280,19 +108294,42 @@
           "text": "SASSERT(num_scopes <= scope_lvl);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "context initialization, theory-variable creation and lookup, and scope push/pop",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory.go",
+          "tests": [
+            "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+          ]
+        },
+        {
+          "name": "display helpers, equality assumption helpers, reset, and equality-atom construction",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "SMTTheoryBase borrows its registered internalizer state and enodes; native slices own the theory-variable index and scope limits."
+      ],
+      "deviations": [
+        "Only methods consumed by the current internalizer are exposed; search and model consumers remain with their source units."
+      ]
     },
     {
       "path": "src/smt/smt_theory.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_theory.go"
+      ],
+      "tests": [
+        "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -108329,11 +108366,30 @@
           "text": "SASSERT(r != null_theory_var);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "typed internalize-atom, internalize-term, equality, sort-constraint, default-internalizer, theory-variable, and scope interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory.go",
+          "tests": [
+            "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+          ]
+        },
+        {
+          "name": "assignment, equality and disequality events, relevancy, propagation, restart, final-check, conflict, display, model, validation, assumptions, statistics, and fresh-theory interface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The typed theory interface borrows AST handles and internalizer-owned enodes; SMTTheoryBase owns only Go slices of borrowed enode pointers and scope limits."
+      ],
+      "deviations": [
+        "The interface grows with concrete retained context consumers instead of predeclaring callback adapters for unported search and model stages."
+      ]
     },
     {
       "path": "src/smt/smt_theory_var_list.h",
