@@ -15,7 +15,7 @@ func smtTestKernel(t *testing.T, manager *ast.ASTManager) *SMTKernel {
 	return kernel
 }
 
-func TestSMTKernelAssertionCheckAndIncompleteClause(t *testing.T) {
+func TestSMTKernelAssertionCheckAndDecisionClause(t *testing.T) {
 	m := astTestManager(t)
 	atom := smtRelevancyBool(t, m, "kernel-atom")
 	kernel := smtTestKernel(t, m)
@@ -34,8 +34,19 @@ func TestSMTKernelAssertionCheckAndIncompleteClause(t *testing.T) {
 	astTestMust(t, other.Assert(disjunction, ast.ASTHandle{}))
 	result, err = other.Check()
 	astTestMust(t, err)
-	if result != lbool.Undef {
-		t.Fatal("decision-requiring clause must remain unknown", result)
+	if result != lbool.True || other.Statistics().NumDecisions == 0 {
+		t.Fatal("decision-requiring clause", result, other.Statistics())
+	}
+	internalizer, err := other.Internalizer()
+	astTestMust(t, err)
+	for _, expression := range []ast.ASTHandle{a, b} {
+		literal, literalErr := internalizer.Literal(expression)
+		astTestMust(t, literalErr)
+		value, assignmentErr := internalizer.Assignment(literal)
+		astTestMust(t, assignmentErr)
+		if value != lbool.Undef {
+			t.Fatal("search decision leaked after check", expression, value)
+		}
 	}
 
 	falseExpression, err := m.MkFalse()
@@ -46,6 +57,34 @@ func TestSMTKernelAssertionCheckAndIncompleteClause(t *testing.T) {
 	astTestMust(t, err)
 	if result != lbool.False || !unsat.Inconsistent() {
 		t.Fatal("false assertion check", result, unsat.Inconsistent())
+	}
+}
+
+func TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat(t *testing.T) {
+	m := astTestManager(t)
+	a := smtRelevancyBool(t, m, "kernel-unsat-a")
+	b := smtRelevancyBool(t, m, "kernel-unsat-b")
+	notA, err := m.MkNot(a)
+	astTestMust(t, err)
+	notB, err := m.MkNot(b)
+	astTestMust(t, err)
+	clauses := make([]ast.ASTHandle, 4)
+	clauses[0], err = m.MkOr(a, b)
+	astTestMust(t, err)
+	clauses[1], err = m.MkOr(notA, b)
+	astTestMust(t, err)
+	clauses[2], err = m.MkOr(a, notB)
+	astTestMust(t, err)
+	clauses[3], err = m.MkOr(notA, notB)
+	astTestMust(t, err)
+	kernel := smtTestKernel(t, m)
+	for _, clause := range clauses {
+		astTestMust(t, kernel.Assert(clause, ast.ASTHandle{}))
+	}
+	result, err := kernel.Check()
+	astTestMust(t, err)
+	if result != lbool.False || kernel.Statistics().NumDecisions < 2 {
+		t.Fatal("search did not exhaust contradictory branches", result, kernel.Statistics())
 	}
 }
 

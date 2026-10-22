@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -170,55 +171,25 @@ func (k *SMTKernel) ScopeLevel() uint32 {
 	return uint32(len(k.scopes))
 }
 
-func (k *SMTKernel) clausesSatisfied() (bool, error) {
-	for _, clause := range k.internalizer.clauses {
-		satisfied := false
-		for _, literal := range clause.clause.Literals() {
-			value, err := k.internalizer.Assignment(literal)
-			if err != nil {
-				return false, err
-			}
-			if value == lbool.True {
-				satisfied = true
-				break
-			}
-		}
-		if !satisfied {
-			return false, nil
-		}
-	}
-	return true, nil
-}
-
 func (k *SMTKernel) Check() (lbool.LBool, error) {
 	if err := k.open(); err != nil {
 		return lbool.Undef, err
 	}
 	if err := k.internalizer.SetupTheories(); err != nil {
-		return lbool.Undef, err
+		return lbool.Undef, fmt.Errorf("smt kernel setup theories: %w", err)
 	}
 	if err := k.internalizePending(); err != nil {
-		return lbool.Undef, err
+		return lbool.Undef, fmt.Errorf("smt kernel internalize assertions: %w", err)
 	}
-	consistent, err := k.internalizer.PropagateCore()
+	if err := k.internalizer.InitializeTheorySearch(); err != nil {
+		return lbool.Undef, fmt.Errorf("smt kernel initialize theory search: %w", err)
+	}
+	queue, err := NewSMTActivityCaseSplitQueue(k.internalizer)
 	if err != nil {
-		return lbool.Undef, err
+		return lbool.Undef, fmt.Errorf("smt kernel case split queue: %w", err)
 	}
-	if !consistent {
-		return lbool.False, nil
-	}
-	satisfied, err := k.clausesSatisfied()
-	if err != nil || !satisfied {
-		return lbool.Undef, err
-	}
-	status, err := k.internalizer.FinalCheckTheories()
-	if err != nil {
-		return lbool.Undef, err
-	}
-	if status != SMTFinalCheckDone {
-		return lbool.Undef, nil
-	}
-	return lbool.True, nil
+	k.internalizer.statistics.NumChecks++
+	return k.search(queue)
 }
 
 func (k *SMTKernel) Inconsistent() bool {

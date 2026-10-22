@@ -102715,9 +102715,13 @@
       "path": "src/smt/smt_case_split_queue.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_case_split_queue.go"
+      ],
+      "tests": [
+        "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase"
+      ],
       "conditionals": [
         {
           "line": 680,
@@ -102867,18 +102871,41 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "activity-based selection of the greatest-activity unassigned variable and source phase preference",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_queue.go",
+          "tests": [
+            "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase"
+          ]
+        },
+        {
+          "name": "delayed, cached-relevancy, relevancy, relevancy-activity, goal, and theory-aware queue strategies and random selection",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The concrete activity selector borrows the internalizer and owns no AST handles or Boolean variables."
+      ],
+      "deviations": [
+        "The retained activity strategy scans Go slices instead of porting the C++ heap implementation; deterministic variable order resolves equal activities."
+      ]
     },
     {
       "path": "src/smt/smt_case_split_queue.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_case_split_queue.go"
+      ],
+      "tests": [
+        "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -102889,11 +102916,30 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "next case split consumed by the retained activity-based search",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_queue.go",
+          "tests": [
+            "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase"
+          ]
+        },
+        {
+          "name": "event, lifecycle, display, and theory-aware branching interfaces for unretained queue strategies",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The concrete selector borrows the internalizer for the duration of a synchronous kernel check."
+      ],
+      "deviations": [
+        "Go exposes the one concrete retained strategy instead of a universal interface for unused C++ implementations."
+      ]
     },
     {
       "path": "src/smt/smt_cg_table.cpp",
@@ -103980,11 +104026,13 @@
       "go_targets": [
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_theory_propagation.go",
-        "pkg/smtcore/smt_theory_lifecycle.go"
+        "pkg/smtcore/smt_theory_lifecycle.go",
+        "pkg/smtcore/smt_search.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
-        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
+        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
+        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat"
       ],
       "conditionals": [
         {
@@ -104932,13 +104980,22 @@
           "tests": [
             "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
           ]
+        },
+        {
+          "name": "Boolean decisions, scoped chronological backtracking, propagation, and final-check search control",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_search.go",
+          "tests": [
+            "TestSMTKernelAssertionCheckAndDecisionClause",
+            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat"
+          ]
         }
       ],
       "ownership": [
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
       ],
       "deviations": [
-        "Binary-clause specialization and the remaining logical-context search loop are not part of this slice."
+        "Conflict analysis, clause learning, non-chronological backjumping, restarts, resource limits, and binary-clause specialization remain unported."
       ]
     },
     {
@@ -104950,11 +105007,13 @@
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_theory_propagation.go",
-        "pkg/smtcore/smt_theory_lifecycle.go"
+        "pkg/smtcore/smt_theory_lifecycle.go",
+        "pkg/smtcore/smt_search.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
-        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
+        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
+        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat"
       ],
       "conditionals": [
         {
@@ -105142,13 +105201,22 @@
           "tests": [
             "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
           ]
+        },
+        {
+          "name": "decision scope and chronological Boolean search control consumed by the kernel",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_search.go",
+          "tests": [
+            "TestSMTKernelAssertionCheckAndDecisionClause",
+            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat"
+          ]
         }
       ],
       "ownership": [
         "SMTInternalizerState owns the concrete slices and clause objects for this context subset."
       ],
       "deviations": [
-        "The complete context interface, search queues, theory propagation, conflict resolution, model state, and lifecycle remain unported."
+        "The complete context interface, conflict resolution, clause learning, model state, and remaining lifecycle operations remain unported."
       ]
     },
     {
@@ -106674,18 +106742,20 @@
         "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
-        "TestSMTKernelAssertionCheckAndIncompleteClause",
+        "TestSMTKernelAssertionCheckAndDecisionClause",
+        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
         "TestSMTKernelScopesRestoreAssertionsAndContext"
       ],
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
-          "name": "construction and close, assertion storage, formula access, push/pop, scope level, inconsistency, setup and conservative check, statistics, and internalizer access",
+          "name": "construction and close, assertion storage, formula access, push/pop, scope level, inconsistency, Boolean search check, statistics, and internalizer access",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
-            "TestSMTKernelAssertionCheckAndIncompleteClause",
+            "TestSMTKernelAssertionCheckAndDecisionClause",
+            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
             "TestSMTKernelScopesRestoreAssertionsAndContext"
           ]
         },
@@ -106700,7 +106770,7 @@
         "SMTKernel owns formula and proof references for asserted entries and owns its checker, relevancy propagator, and internalizer lifecycle."
       ],
       "deviations": [
-        "Check returns undef whenever unresolved clauses require a SAT decision; the decision/search loop remains in smt_context.cpp."
+        "Check uses chronological DPLL search and returns undef when a theory gives up or requests continuation without observable progress; model retention and conflict learning remain unported."
       ]
     },
     {
@@ -106712,7 +106782,8 @@
         "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
-        "TestSMTKernelAssertionCheckAndIncompleteClause",
+        "TestSMTKernelAssertionCheckAndDecisionClause",
+        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
         "TestSMTKernelScopesRestoreAssertionsAndContext"
       ],
       "conditionals": [
@@ -106729,11 +106800,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "assertion, formula, scope, inconsistency, conservative check, statistics, and concrete context facade",
+          "name": "assertion, formula, scope, inconsistency, Boolean search check, statistics, and concrete context facade",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
-            "TestSMTKernelAssertionCheckAndIncompleteClause",
+            "TestSMTKernelAssertionCheckAndDecisionClause",
+            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
             "TestSMTKernelScopesRestoreAssertionsAndContext"
           ]
         },
@@ -106748,7 +106820,7 @@
         "Public formula and assertion views are borrowed AST handles; the kernel retains the underlying references until pop or close."
       ],
       "deviations": [
-        "The Go facade exposes errors directly and remains conservative until the full context search driver is present."
+        "The Go facade exposes errors directly; theory incompleteness and final-check continuation without progress produce undef."
       ]
     },
     {
