@@ -1043,3 +1043,31 @@ func TestDirectProofRotatedOrdinarySumSimplification(t *testing.T) {
 		t.Fatal("rotated ordinary sum", op, e)
 	}
 }
+
+func TestDirectProofRotatedCongruenceSimplification(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	literal, err := manager.Make(OperatorIff, p, q)
+	interpMust(t, err)
+	negativeP, err := manager.MkNot(p)
+	interpMust(t, err)
+	equality, err := manager.Make(OperatorIff, p, negativeP)
+	interpMust(t, err)
+	chain, err := direct.makeLocalRewrite(TermA, equality)
+	interpMust(t, err)
+	zero, err := manager.MakeIntText("0")
+	interpMust(t, err)
+	placeholder, err := direct.placeholder(literal)
+	interpMust(t, err)
+	proof, err := direct.makeSymbol(direct.congruence, chain, zero, placeholder)
+	interpMust(t, err)
+	proof, err = direct.makeSymbol(direct.rotateSum, literal, proof)
+	interpMust(t, err)
+	result, err := direct.SimplifyProofTerm(proof)
+	interpMust(t, err)
+	if declaration, e := manager.Symbol(result); e != nil || declaration != direct.concat {
+		t.Fatal("rotated congruence", declaration, e)
+	}
+}

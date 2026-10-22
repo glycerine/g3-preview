@@ -92,7 +92,7 @@ func (p *DirectProofInterpolator) simplifyProofTerm(expression ast.ASTHandle) (a
 		case op == OperatorUninterpreted && !hasPlaceholder && declaration == p.modusPonens:
 			result, err = p.simplifyModusPonens(args)
 		case op == OperatorUninterpreted && !hasPlaceholder && declaration == p.rotateSum:
-			result, err = p.simplifyRotatedSum(args)
+			result, err = p.simplifyRotation(args)
 		case op == OperatorUninterpreted && !hasPlaceholder && (declaration == p.leqToEq || declaration == p.eqToLeq):
 			return ast.ASTHandle{}, ProofError{}
 		default:

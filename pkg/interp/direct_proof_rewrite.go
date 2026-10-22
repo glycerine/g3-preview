@@ -787,6 +787,71 @@ func (p *DirectProofInterpolator) simplifyCongruence(args []ast.ASTHandle) (ast.
 	return p.base.manager.MkAnd(aProof, result)
 }
 
+func (p *DirectProofInterpolator) simplifyRotatedCongruence(placeholder ast.ASTHandle, proof ast.ASTHandle) (ast.ASTHandle, error) {
+	third, err := p.base.manager.Arg(proof, 2)
+	if err != nil || third != placeholder {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	chain, err := p.base.manager.Arg(proof, 0)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	empty, err := p.base.manager.IsTrue(chain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if empty {
+		return chain, nil
+	}
+	positionTerm, err := p.base.manager.Arg(proof, 1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	position, matched, err := p.base.manager.Numeral(positionTerm)
+	if err != nil || !matched || !position.IsInt() || !position.Num().IsInt64() || position.Sign() < 0 {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	condition, err := p.base.manager.Make(OperatorTrue)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	chain, err = p.separateRewriteCondition(chain, &condition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	chain, err = p.chainPositionAdd(position.Num().Int64(), chain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.MkImplies(condition, chain)
+}
+
+func (p *DirectProofInterpolator) simplifyRotation(args []ast.ASTHandle) (ast.ASTHandle, error) {
+	if len(args) != 2 {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	placeholder, err := p.placeholder(args[0])
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	op, err := p.base.manager.Operator(args[1])
+	if err != nil || op != OperatorUninterpreted {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	declaration, err := p.base.manager.Symbol(args[1])
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	switch declaration {
+	case p.sum:
+		return p.simplifyRotatedSum(args)
+	case p.congruence:
+		return p.simplifyRotatedCongruence(placeholder, args[1])
+	default:
+		return ast.ASTHandle{}, ProofError{}
+	}
+}
+
 func (p *DirectProofInterpolator) separateRewriteCondition(term ast.ASTHandle, condition *ast.ASTHandle) (ast.ASTHandle, error) {
 	op, err := p.base.manager.Operator(term)
 	if err != nil || op != OperatorImplies {
