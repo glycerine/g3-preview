@@ -5,6 +5,7 @@ package smtcore
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
@@ -595,11 +596,53 @@ func (t *SMTSequenceTheory) checkConcreteDisequations() (bool, error) {
 	return false, nil
 }
 
+func (t *SMTSequenceTheory) checkConcreteNonContains() (bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	for index := 0; index < t.nonContains.Len(); index++ {
+		expression, dependency, entryErr := t.nonContains.At(index)
+		if entryErr != nil {
+			return false, entryErr
+		}
+		left, right, matched, partsErr := state.manager.SequenceBinaryOperationArguments(expression, 5)
+		if partsErr != nil {
+			return false, partsErr
+		}
+		if !matched {
+			return false, ast.ErrASTDomain
+		}
+		leftText, leftConcrete, dependency, entryErr := t.concreteString(left, dependency, make(map[ast.ASTHandle]struct{}))
+		if entryErr != nil {
+			return false, entryErr
+		}
+		rightText, rightConcrete, dependency, entryErr := t.concreteString(right, dependency, make(map[ast.ASTHandle]struct{}))
+		if entryErr != nil {
+			return false, entryErr
+		}
+		if leftConcrete && rightConcrete && strings.Contains(leftText, rightText) {
+			if entryErr = t.setDependencyConflict(dependency); entryErr != nil {
+				return false, entryErr
+			}
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if _, err := t.State(); err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
 	conflict, err := t.checkConcreteEquations()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if conflict {
+		return SMTFinalCheckContinue, nil
+	}
+	conflict, err = t.checkConcreteNonContains()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}

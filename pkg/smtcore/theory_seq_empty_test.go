@@ -184,3 +184,31 @@ func TestSMTSequenceTheoryConcreteWordDisequationConflict(t *testing.T) {
 		t.Fatal("concrete sequence word disequality conflict", status)
 	}
 }
+
+func TestSMTSequenceTheoryConcreteNonContainsConflict(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	abc, err := m.MkString("abc")
+	astTestMust(t, err)
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	sort, err := m.GetSort(abc)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-contains-x"), sort)
+	astTestMust(t, err)
+	contains, err := m.MkSequenceContains(x, b)
+	astTestMust(t, err)
+	notContains, err := m.MkNot(contains)
+	astTestMust(t, err)
+	valueEquality, err := m.MkEq(x, abc)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(notContains))
+	astTestMust(t, solver.Assert(valueEquality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("concrete non-contains conflict", status)
+	}
+}

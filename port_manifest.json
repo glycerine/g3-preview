@@ -116786,7 +116786,8 @@
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
         "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary",
         "TestSMTSequenceTheoryConcreteWordEquationConflict",
-        "TestSMTSequenceTheoryConcreteWordDisequationConflict"
+        "TestSMTSequenceTheoryConcreteWordDisequationConflict",
+        "TestSMTSequenceTheoryConcreteNonContainsConflict"
       ],
       "conditionals": [
         {
@@ -117268,6 +117269,12 @@
           "tests": ["TestSMTSequenceTheoryConcreteWordDisequationConflict"]
         },
         {
+          "name": "false contains re-expansion and concrete substring conflict with assignment and equality dependencies (src/smt/theory_seq.cpp solve_nc/assign_eh retained concrete case)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq.go",
+          "tests": ["TestSMTSequenceTheoryConcreteNonContainsConflict"]
+        },
+        {
           "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
           "status": "unported",
           "go_target": null,
@@ -117297,7 +117304,8 @@
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
         "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary",
         "TestSMTSequenceTheoryConcreteWordEquationConflict",
-        "TestSMTSequenceTheoryConcreteWordDisequationConflict"
+        "TestSMTSequenceTheoryConcreteWordDisequationConflict",
+        "TestSMTSequenceTheoryConcreteNonContainsConflict"
       ],
       "conditionals": [
         {
