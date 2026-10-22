@@ -41592,7 +41592,8 @@
         "TestDirectProofGenericSymbolicSimplification",
         "TestDirectProofOrdinarySumSimplification",
         "TestDirectProofLocalEqualityRules",
-        "TestDirectProofLocalizationQuantifierInsertion"
+        "TestDirectProofLocalizationQuantifierInsertion",
+        "TestDirectProofRecursiveAtomicLocalization"
       ],
       "conditionals": [
         {
@@ -41819,13 +41820,16 @@
         },
         {
           "name": "term localization, quantification, and final interpolation",
-          "status": "partial",
-          "go_target": "pkg/interp/direct_proof_finalize.go",
+          "status": "ported",
+          "go_targets": [
+            "pkg/interp/direct_proof_localization.go",
+            "pkg/interp/direct_proof_finalize.go"
+          ],
           "tests": [
             "TestDirectProofFinalSimplificationOwnership",
-            "TestDirectProofLocalizationQuantifierInsertion"
-          ],
-          "reason": "Final strong simplification, caller-owned result publication, localization-variable creation, reverse existential/universal insertion, and universal closure are ported; recursive term localization and localized proof construction remain pending."
+            "TestDirectProofLocalizationQuantifierInsertion",
+            "TestDirectProofRecursiveAtomicLocalization"
+          ]
         }
       ],
       "ownership": [
@@ -41864,7 +41868,8 @@
         "TestDirectProofGenericSymbolicSimplification",
         "TestDirectProofOrdinarySumSimplification",
         "TestDirectProofLocalEqualityRules",
-        "TestDirectProofLocalizationQuantifierInsertion"
+        "TestDirectProofLocalizationQuantifierInsertion",
+        "TestDirectProofRecursiveAtomicLocalization"
       ],
       "conditionals": [
         {
@@ -41907,16 +41912,19 @@
         },
         {
           "name": "final interpolation declaration",
-          "status": "partial",
-          "go_target": "pkg/interp/direct_proof_finalize.go",
+          "status": "ported",
+          "go_targets": [
+            "pkg/interp/direct_proof_localization.go",
+            "pkg/interp/direct_proof_finalize.go"
+          ],
           "tests": [
             "TestDirectProofFinalSimplificationOwnership",
-            "TestDirectProofLocalizationQuantifierInsertion"
-          ],
-          "reason": "Final simplification, localization quantifier insertion, and universal closure are implemented; recursive term localization remains pending."
+            "TestDirectProofLocalizationQuantifierInsertion",
+            "TestDirectProofRecursiveAtomicLocalization"
+          ]
         },
         {
-          "name": "remaining direct interpolation proof-rule surface and final result",
+          "name": "remaining direct interpolation proof-rule surface",
           "status": "unported",
           "go_target": "",
           "tests": []

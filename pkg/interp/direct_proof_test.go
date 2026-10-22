@@ -362,6 +362,38 @@ func TestDirectProofLocalizationQuantifierInsertion(t *testing.T) {
 	}
 }
 
+func TestDirectProofRecursiveAtomicLocalization(t *testing.T) {
+	_, manager, base, _, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	localized, proof, err := direct.localizeTerm(q, DownwardScopeRange(0))
+	interpMust(t, err)
+	if localized == q || localized.IsNull() || proof.IsNull() {
+		t.Fatal("atomic localization", localized, proof, q)
+	}
+	again, againProof, err := direct.localizeTerm(q, DownwardScopeRange(0))
+	interpMust(t, err)
+	if again != localized || againProof != proof {
+		t.Fatal("localization memo", again, againProof, localized, proof)
+	}
+	if len(direct.localizationVariables) != 1 || direct.localizationVariables[0].term != q {
+		t.Fatal("atomic localization metadata", direct.localizationVariables)
+	}
+	notQ, err := manager.MkNot(q)
+	interpMust(t, err)
+	localizedNot, compositeProof, err := direct.localizeTerm(notQ, DownwardScopeRange(0))
+	interpMust(t, err)
+	if compositeProof.IsNull() {
+		t.Fatal("composite localization proof")
+	}
+	argument, err := manager.Arg(localizedNot, 0)
+	interpMust(t, err)
+	if argument != localized || len(direct.localizationVariables) != 1 {
+		t.Fatal("recursive localization", localizedNot, argument, localized, direct.localizationVariables)
+	}
+}
+
 func TestDirectProofTermSubstitutionAndBarriers(t *testing.T) {
 	_, manager, base, p, q := directProofFixture(t)
 	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)

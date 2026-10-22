@@ -14,6 +14,210 @@ type localizationVariable struct {
 	frame    int
 }
 
+type localizationMaps struct {
+	terms  map[ast.ASTHandle]ast.ASTHandle
+	proofs map[ast.ASTHandle]ast.ASTHandle
+}
+
+func (p *DirectProofInterpolator) mapsForLocalization(scope ScopeRange) (*localizationMaps, error) {
+	contained, err := p.base.scopes.RangeContained(scope, p.scope)
+	if err != nil {
+		return nil, err
+	}
+	intersects, err := p.base.scopes.RangesIntersect(scope, p.scope)
+	if err != nil {
+		return nil, err
+	}
+	if !contained && intersects {
+		scope = FullScopeRange()
+	}
+	maps := p.localizationMaps[scope]
+	if maps == nil {
+		maps = &localizationMaps{terms: make(map[ast.ASTHandle]ast.ASTHandle), proofs: make(map[ast.ASTHandle]ast.ASTHandle)}
+		p.localizationMaps[scope] = maps
+	}
+	return maps, nil
+}
+
+func (p *DirectProofInterpolator) makeReflexiveInterpolation(term ast.ASTHandle) (ast.ASTHandle, error) {
+	side, err := p.TermSide(term)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if side == TermA {
+		return p.base.manager.Make(OperatorFalse)
+	}
+	return p.base.manager.Make(OperatorTrue)
+}
+
+func (p *DirectProofInterpolator) localizeTerm(term ast.ASTHandle, scope ScopeRange) (localized, proof ast.ASTHandle, resultErr error) {
+	maps, err := p.mapsForLocalization(scope)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	original := term
+	proof, err = p.makeReflexiveInterpolation(term)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	if cached, found := maps.terms[term]; found {
+		useCached := true
+		sort, e := p.base.manager.Type(term)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		boolean, e := p.base.manager.IsBoolType(sort)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		if boolean {
+			cachedScope, e := p.base.ASTScope(cached)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+			useCached, e = p.base.scopes.RangesIntersect(cachedScope, scope)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+		}
+		if useCached {
+			return cached, maps.proofs[term], nil
+		}
+	}
+	args, err := p.base.manager.Args(term)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	if len(args) != 0 {
+		argumentScope := scope
+		op, e := p.base.manager.Operator(term)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		if op == OperatorUninterpreted {
+			declaration, e := p.base.manager.Symbol(term)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+			symbolScope, e := p.base.SymbolRange(declaration)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+			intersects, e := p.base.scopes.RangesIntersect(symbolScope, scope)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+			if intersects {
+				argumentScope, e = p.base.scopes.RangeGLB(symbolScope, scope)
+				if e != nil {
+					return ast.ASTHandle{}, ast.ASTHandle{}, e
+				}
+			} else {
+				argumentScope = symbolScope
+			}
+		} else if op == OperatorSelect {
+			arrayScope, e := p.base.ASTScope(args[0])
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+			if !arrayScope.IsEmpty() {
+				intersects, e := p.base.scopes.RangesIntersect(arrayScope, scope)
+				if e != nil {
+					return ast.ASTHandle{}, ast.ASTHandle{}, e
+				}
+				if intersects {
+					argumentScope, e = p.base.scopes.RangeGLB(arrayScope, scope)
+					if e != nil {
+						return ast.ASTHandle{}, ast.ASTHandle{}, e
+					}
+				} else {
+					argumentScope = arrayScope
+				}
+			}
+		}
+		var equalities, proofs []ast.ASTHandle
+		for i, argument := range args {
+			localizedArgument, argumentProof, e := p.localizeTerm(argument, argumentScope)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+			args[i] = localizedArgument
+			argumentASTScope, e := p.base.ASTScope(localizedArgument)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+			argumentScope, e = p.base.scopes.RangeGLB(argumentScope, argumentASTScope)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+			if localizedArgument != argument {
+				equality, e := p.makeEquivalence(localizedArgument, argument)
+				if e != nil {
+					return ast.ASTHandle{}, ast.ASTHandle{}, e
+				}
+				equalities = append(equalities, equality)
+				proofs = append(proofs, argumentProof)
+			}
+		}
+		term, err = p.base.manager.Clone(term, args)
+		if err != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, err
+		}
+		if len(proofs) != 0 {
+			conclusion, e := p.makeEquivalence(term, original)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+			proof, e = p.MakeCongruences(equalities, conclusion, proofs)
+			if e != nil {
+				return ast.ASTHandle{}, ast.ASTHandle{}, e
+			}
+		}
+	}
+	maps.terms[original], maps.proofs[original] = term, proof
+	termScope, err := p.base.ASTScope(term)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	intersects, err := p.base.scopes.RangesIntersect(termScope, scope)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	if intersects {
+		return term, proof, nil
+	}
+	frame, err := p.base.scopes.RangeNear(termScope, scope)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	variable, err := p.freshLocalizationVariable(term, frame)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	maps.terms[original] = variable
+	equivalence, err := p.makeEquivalence(variable, term)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	assumption, err := p.MakeAssumption(frame, []ast.ASTHandle{equivalence})
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	proof, err = p.MakeTransitivity(variable, term, original, assumption, proof)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	maps.proofs[original] = proof
+	if !scope.IsFull() {
+		full, e := p.mapsForLocalization(FullScopeRange())
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		full.terms[original], full.proofs[original] = variable, proof
+	}
+	return variable, proof, nil
+}
+
 func (p *DirectProofInterpolator) freshLocalizationVariable(term ast.ASTHandle, frame int) (ast.ASTHandle, error) {
 	sort, err := p.base.manager.Type(term)
 	if err != nil {

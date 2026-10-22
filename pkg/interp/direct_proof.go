@@ -38,6 +38,7 @@ type DirectProofInterpolator struct {
 	noProof               ast.ASTHandle
 	placeholders          map[ast.ASTHandle]ast.ASTHandle
 	localizationVariables []localizationVariable
+	localizationMaps      map[ScopeRange]*localizationMaps
 	owned                 []ast.ASTRef
 	closed                bool
 }
@@ -46,7 +47,7 @@ func NewDirectProofInterpolator(base *Base, scope ScopeRange, weak bool) (result
 	if base == nil || base.open() != nil {
 		return nil, ast.ErrASTHandle
 	}
-	p := &DirectProofInterpolator{base: base, scope: scope, placeholders: make(map[ast.ASTHandle]ast.ASTHandle)}
+	p := &DirectProofInterpolator{base: base, scope: scope, placeholders: make(map[ast.ASTHandle]ast.ASTHandle), localizationMaps: make(map[ScopeRange]*localizationMaps)}
 	p.self = p
 	// The selected source constructor deliberately forces weak=false even when
 	// requested. Preserve that behavior until the disabled weak implementation
@@ -159,6 +160,7 @@ func (p *DirectProofInterpolator) Close() (result error) {
 	p.owned = nil
 	p.placeholders = nil
 	p.localizationVariables = nil
+	p.localizationMaps = nil
 	p.closed = true
 	return result
 }
