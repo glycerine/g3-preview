@@ -37,9 +37,13 @@ type DirectProofInterpolator struct {
 	addPosition           ast.ASTHandle
 	rewriteA              ast.ASTHandle
 	rewriteB              ast.ASTHandle
+	normalStep            ast.ASTHandle
+	normalChain           ast.ASTHandle
+	normal                ast.ASTHandle
 	standForall           ast.ASTHandle
 	standExists           ast.ASTHandle
 	noProof               ast.ASTHandle
+	epsilon               ast.ASTHandle
 	topPosition           ast.ASTHandle
 	placeholders          map[ast.ASTHandle]ast.ASTHandle
 	localizationVariables []localizationVariable
@@ -112,6 +116,15 @@ func NewDirectProofInterpolator(base *Base, scope ScopeRange, weak bool) (result
 	if p.rewriteB, err = p.newFunction("@rewrite_B", []ast.ASTHandle{boolean, boolean, boolean}, boolean); err != nil {
 		return nil, err
 	}
+	if p.normalStep, err = p.newFunction("@normal_step", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
+		return nil, err
+	}
+	if p.normalChain, err = p.newFunction("@normal_chain", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
+		return nil, err
+	}
+	if p.normal, err = p.newFunction("@normal", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
+		return nil, err
+	}
 	if p.standForall, err = p.newFunction("@sforall", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
 		return nil, err
 	}
@@ -122,6 +135,12 @@ func NewDirectProofInterpolator(base *Base, scope ScopeRange, weak bool) (result
 		return nil, err
 	}
 	if err = p.hold(p.noProof); err != nil {
+		return nil, err
+	}
+	if p.epsilon, err = manager.MakeVariable("@eps", integer); err != nil {
+		return nil, err
+	}
+	if err = p.hold(p.epsilon); err != nil {
 		return nil, err
 	}
 	if p.topPosition, err = manager.MakeVariable("@top_pos", boolean); err != nil {

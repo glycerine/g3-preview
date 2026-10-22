@@ -1100,3 +1100,46 @@ func TestDirectProofRotatedModusPonensSimplification(t *testing.T) {
 		}
 	}
 }
+
+func TestDirectProofArithmeticNormalVocabulary(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	integer, err := manager.IntType()
+	interpMust(t, err)
+	x, err := manager.MakeVariable("normal-x", integer)
+	interpMust(t, err)
+	x = interpPin(t, m, x)
+	y, err := manager.MakeVariable("normal-y", integer)
+	interpMust(t, err)
+	y = interpPin(t, m, y)
+	base, err := NewBase(manager, []ast.ASTHandle{x, y}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	step, err := direct.makeNormalStep(x, y, truth)
+	interpMust(t, err)
+	chain, err := direct.consNormal(step, truth)
+	interpMust(t, err)
+	zero, err := manager.MakeIntText("0")
+	interpMust(t, err)
+	inequality, err := manager.Make(OperatorLE, zero, x)
+	interpMust(t, err)
+	normal, err := direct.makeNormal(inequality, chain)
+	interpMust(t, err)
+	if yes, e := direct.isNormalInequality(normal); e != nil || !yes {
+		t.Fatal("normal inequality", yes, e)
+	}
+	gotInequality, gotChain, err := direct.destructNormal(normal)
+	interpMust(t, err)
+	if gotInequality != inequality || gotChain != chain {
+		t.Fatal("normal destruct", gotInequality, gotChain, inequality, chain)
+	}
+	left, right, proof, err := direct.normalStepParts(step)
+	interpMust(t, err)
+	if left != x || right != y || proof != truth {
+		t.Fatal("normal step", left, right, proof)
+	}
+}

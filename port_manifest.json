@@ -41579,6 +41579,7 @@
         "pkg/interp/direct_proof_sum.go",
         "pkg/interp/direct_proof_equality.go",
         "pkg/interp/direct_proof_rewrite.go",
+        "pkg/interp/direct_proof_normal.go",
         "pkg/interp/direct_proof_localization.go"
       ],
       "tests": [
@@ -41610,6 +41611,7 @@
         "TestDirectProofRotatedOrdinarySumSimplification",
         "TestDirectProofRotatedCongruenceSimplification",
         "TestDirectProofRotatedModusPonensSimplification",
+        "TestDirectProofArithmeticNormalVocabulary",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41838,9 +41840,10 @@
             "TestDirectProofNestedSumCoefficientDistribution",
             "TestDirectProofRotatedOrdinarySumSimplification",
             "TestDirectProofRotatedCongruenceSimplification",
-            "TestDirectProofRotatedModusPonensSimplification"
+            "TestDirectProofRotatedModusPonensSimplification",
+            "TestDirectProofArithmeticNormalVocabulary"
           ],
-          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, nested coefficient distribution, ordinary sum/congruence/modus-ponens rotation, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Normal-form arithmetic sums, arithmetic modus-ponens, and leq2eq/eq2leq rotation remain pending."
+          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, nested coefficient distribution, ordinary sum/congruence/modus-ponens rotation, arithmetic normal-form vocabulary, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Normal-chain merging and arithmetic reduction plus leq2eq/eq2leq rotation remain pending."
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
@@ -41897,6 +41900,7 @@
         "pkg/interp/direct_proof_sum.go",
         "pkg/interp/direct_proof_equality.go",
         "pkg/interp/direct_proof_rewrite.go",
+        "pkg/interp/direct_proof_normal.go",
         "pkg/interp/direct_proof_localization.go"
       ],
       "tests": [
@@ -41928,6 +41932,7 @@
         "TestDirectProofRotatedOrdinarySumSimplification",
         "TestDirectProofRotatedCongruenceSimplification",
         "TestDirectProofRotatedModusPonensSimplification",
+        "TestDirectProofArithmeticNormalVocabulary",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
