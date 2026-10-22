@@ -116775,9 +116775,12 @@
       "path": "src/smt/theory_seq.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/smtcore/theory_seq_state.go"],
+      "tests": [
+        "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
+        "TestSMTSequenceExclusionTableCanonicalPairsAndScopes"
+      ],
       "conditionals": [
         {
           "line": 675,
@@ -117207,18 +117210,44 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "solution_map update, root lookup, dependency-preserving transitive find, cache reset, overwrite and scoped rollback (src/smt/theory_seq.cpp:58-150)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_state.go",
+          "tests": ["TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes"]
+        },
+        {
+          "name": "exclusion_table canonical unordered pairs, duplicate suppression and scoped rollback (src/smt/theory_seq.cpp:158-185)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_state.go",
+          "tests": ["TestSMTSequenceExclusionTableCanonicalPairsAndScopes"]
+        },
+        {
+          "name": "remaining sequence equality, length, containment, regex, propagation, branching and model algorithms",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The solution and exclusion trails own AST references for every stored key and value; maps and dependency nodes borrow those live trail values, and reverse scope rollback releases them after restoring prior mappings."
+      ],
+      "deviations": [
+        "Concrete Go maps replace obj_map and pair hash tables. Dependency joins use an immutable concrete assumption DAG and iterative stable linearization rather than the native scoped_dependency_manager template."
+      ]
     },
     {
       "path": "src/smt/theory_seq.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/smtcore/theory_seq_state.go"],
+      "tests": [
+        "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
+        "TestSMTSequenceExclusionTableCanonicalPairsAndScopes"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -117240,10 +117269,27 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "assumption dependencies, scoped solution_map and exclusion_table state declarations",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_state.go",
+          "tests": ["TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes", "TestSMTSequenceExclusionTableCanonicalPairsAndScopes"]
+        },
+        {
+          "name": "remaining sequence theory state and solver declarations",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Concrete solution and exclusion owners retain their AST handles through ASTRef trails and borrow e-graph nodes and SAT literals in immutable dependency assumptions."
+      ],
+      "deviations": [
+        "Go slices and maps replace scoped native vectors and hash tables; source-private templates are represented only for the live sequence instantiation."
+      ]
     },
     {
       "path": "src/smt/theory_seq_empty.h",
