@@ -222,3 +222,55 @@ func TestSMTBitVectorShiftCircuit(t *testing.T) {
 		t.Fatal("shift circuit", status)
 	}
 }
+
+func TestSMTBitVectorPublishesNumeralModelValue(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	family, err := m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	five, err := m.BitVectorNumeralUint64(5, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(five)
+	astTestMust(t, err)
+	value, err := m.MkConst(astTestSymbol(t, m, "bv-model-value"), sort)
+	astTestMust(t, err)
+	context, err := NewSMTCheckerContext(m)
+	astTestMust(t, err)
+	state, err := NewSMTInternalizerState(m, context, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, state.Close()) })
+	theory, err := NewSMTBitVectorTheory(family)
+	astTestMust(t, err)
+	astTestMust(t, state.RegisterTheory(theory))
+	astTestMust(t, state.Internalize(value, false))
+	for index := uint32(0); index < 4; index++ {
+		bit, bitErr := m.MkBitVectorBit2Bool(index, value)
+		astTestMust(t, bitErr)
+		astTestMust(t, state.Internalize(bit, true))
+		variable, found := state.BoolVar(bit)
+		if !found {
+			t.Fatal("missing BV model bit", index)
+		}
+		literal := NewSMTLiteral(variable, false)
+		if index == 1 || index == 3 {
+			literal = literal.Negated()
+		}
+		astTestMust(t, state.AssignLiteral(literal, NewSMTBooleanAxiom()))
+	}
+	astTestMust(t, context.SetRelevant(value, true))
+	generator, err := NewSMTModelGenerator(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, generator.Close()) })
+	astTestMust(t, generator.SetContext(context))
+	astTestMust(t, generator.InitializeModel(modelConfig))
+	astTestMust(t, generator.BuildStateValues(state))
+	node := context.enodes[value]
+	interpretation, err := generator.Value(node)
+	astTestMust(t, err)
+	text, matched, err := m.BitVectorNumeralText(interpretation)
+	astTestMust(t, err)
+	if !matched || text != "5" {
+		t.Fatal("BV model value", text, matched)
+	}
+}

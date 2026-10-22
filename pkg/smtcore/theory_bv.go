@@ -7,6 +7,8 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 const (
@@ -960,5 +962,57 @@ func (t *SMTBitVectorTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 }
 
 func (*SMTBitVectorTheory) Name() string { return "bv" }
+
+func (t *SMTBitVectorTheory) InitializeModel(generator *SMTModelGenerator) error {
+	state, err := t.State()
+	if err != nil || generator == nil || generator.manager != state.manager || generator.model == nil {
+		if err != nil {
+			return err
+		}
+		return ast.ErrASTDomain
+	}
+	factory, err := protomodel.NewBitVectorFactory(generator.manager)
+	if err != nil {
+		return err
+	}
+	return generator.RegisterFactory(factory)
+}
+
+func (t *SMTBitVectorTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
+	if node == nil || generator == nil || !t.IsAttachedToVariable(node) || generator.model == nil {
+		return nil, ast.ErrASTDomain
+	}
+	state, err := t.State()
+	if err != nil {
+		return nil, err
+	}
+	bits, err := t.bitsFor(node.owner)
+	if err != nil {
+		return nil, err
+	}
+	value := new(big.Int)
+	for i, bit := range bits {
+		literal, literalErr := state.Literal(bit)
+		if literalErr != nil {
+			return nil, literalErr
+		}
+		assignment, assignmentErr := state.Assignment(literal)
+		if assignmentErr != nil {
+			return nil, assignmentErr
+		}
+		if assignment == lbool.True {
+			value.SetBit(value, i, 1)
+		}
+	}
+	factory, ok := generator.model.Factory(t.FamilyID()).(*protomodel.BitVectorFactory)
+	if !ok || factory == nil {
+		return nil, ast.ErrASTDomain
+	}
+	numeral, err := factory.MkNumValue(new(big.Rat).SetInt(value), uint32(len(bits)))
+	if err != nil {
+		return nil, err
+	}
+	return NewSMTExpressionValueProcedure(numeral)
+}
 
 var _ SMTTheoryInternalizer = (*SMTBitVectorTheory)(nil)

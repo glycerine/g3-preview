@@ -113705,6 +113705,7 @@
         "TestSMTBitVectorMultiplicationCircuit",
         "TestSMTBitVectorUnsignedComparisonCircuit",
         "TestSMTBitVectorShiftCircuit",
+        "TestSMTBitVectorPublishesNumeralModelValue",
         "TestSMTBitVectorUnsupportedOperationGivesUnknown"
       ],
       "conditionals": [
@@ -114068,6 +114069,7 @@
         "TestSMTBitVectorMultiplicationCircuit",
         "TestSMTBitVectorUnsignedComparisonCircuit",
         "TestSMTBitVectorShiftCircuit",
+        "TestSMTBitVectorPublishesNumeralModelValue",
         "TestSMTBitVectorUnsupportedOperationGivesUnknown"
       ],
       "conditionals": [
