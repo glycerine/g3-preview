@@ -6,6 +6,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 func smtBVSolver(t *testing.T) (*ast.ASTManager, ast.FamilyID, *SMTSolver) {
@@ -105,6 +106,25 @@ func TestSMTBitVectorAdditionCircuit(t *testing.T) {
 	astTestMust(t, err)
 	if status != lbool.False {
 		t.Fatal("BV addition circuit", status)
+	}
+	stats := statistics.New()
+	astTestMust(t, solver.CollectStatistics(stats))
+	found := false
+	for i := 0; i < stats.Size(); i++ {
+		if stats.Key(i) == "bv dynamic eqs" {
+			found = stats.IsUint(i) && stats.UintValue(i) != 0
+		}
+	}
+	if !found {
+		t.Fatal("missing BV equality statistics")
+	}
+	astTestMust(t, solver.kernel.ResetStatistics())
+	stats.Reset()
+	astTestMust(t, solver.CollectStatistics(stats))
+	for i := 0; i < stats.Size(); i++ {
+		if stats.Key(i) == "bv dynamic eqs" {
+			t.Fatal("BV statistics survived reset")
+		}
 	}
 }
 

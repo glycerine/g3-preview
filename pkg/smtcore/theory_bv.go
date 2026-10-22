@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 const (
@@ -19,6 +20,11 @@ const (
 type smtBVScope struct {
 	bits        int
 	unsupported bool
+}
+
+type smtBVStatistics struct {
+	conflicts, diseqStatic, diseqDynamic uint64
+	bit2core, theoryToCoreEq, eqDynamic  uint64
 }
 
 // SMTBitVectorTheory retains the source theory's little-endian Boolean-bit
@@ -32,6 +38,7 @@ type SMTBitVectorTheory struct {
 	temporary   []ast.ASTRef
 	scopes      []smtBVScope
 	unsupported bool
+	statistics  smtBVStatistics
 }
 
 func NewSMTBitVectorTheory(family ast.FamilyID) (*SMTBitVectorTheory, error) {
@@ -1128,6 +1135,7 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 		if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal, defined.Negated()}); err != nil {
 			return false, err
 		}
+		t.statistics.bit2core++
 	}
 	return true, nil
 }
@@ -1227,7 +1235,11 @@ func (t *SMTBitVectorTheory) InternalizeEquality(expression ast.ASTHandle, varia
 	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal.Negated(), defined}); err != nil {
 		return err
 	}
-	return state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal, defined.Negated()})
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal, defined.Negated()}); err != nil {
+		return err
+	}
+	t.statistics.eqDynamic++
+	return nil
 }
 
 func (t *SMTBitVectorTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHandle) error {
@@ -1287,6 +1299,25 @@ func (t *SMTBitVectorTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 }
 
 func (*SMTBitVectorTheory) Name() string { return "bv" }
+
+func (t *SMTBitVectorTheory) CollectStatistics(target *statistics.Statistics) error {
+	if t == nil || target == nil {
+		return ast.ErrASTHandle
+	}
+	target.UpdateUint64("bv conflicts", t.statistics.conflicts)
+	target.UpdateUint64("bv diseqs", t.statistics.diseqStatic)
+	target.UpdateUint64("bv dynamic diseqs", t.statistics.diseqDynamic)
+	target.UpdateUint64("bv bit2core", t.statistics.bit2core)
+	target.UpdateUint64("bv->core eq", t.statistics.theoryToCoreEq)
+	target.UpdateUint64("bv dynamic eqs", t.statistics.eqDynamic)
+	return nil
+}
+
+func (t *SMTBitVectorTheory) ResetStatistics() {
+	if t != nil {
+		t.statistics = smtBVStatistics{}
+	}
+}
 
 func (t *SMTBitVectorTheory) InitializeModel(generator *SMTModelGenerator) error {
 	state, err := t.State()
