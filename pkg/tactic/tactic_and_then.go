@@ -94,11 +94,17 @@ func (t *andThenTactic) Apply(g *Goal, out *TacticResult) (result error) {
 	if err := t.first.Apply(g, first); err != nil {
 		return err
 	}
+	return composeTacticResults(g, out, first, t.second.Apply)
+}
+
+type tacticApplyFunc func(*Goal, *TacticResult) error
+
+func composeTacticResults(g *Goal, out, first *TacticResult, applySecond tacticApplyFunc) (result error) {
 	if len(first.Goals) == 0 {
 		return ast.ErrASTDomain
 	}
 	if len(first.Goals) != 1 {
-		return t.applyMultiple(g, out, first)
+		return composeMultipleTacticResults(g, out, first, applySecond)
 	}
 	models, err := g.ModelsEnabled()
 	if err != nil {
@@ -115,7 +121,7 @@ func (t *andThenTactic) Apply(g *Goal, out *TacticResult) (result error) {
 	}
 	second := &TacticResult{}
 	defer func() { result = errors.Join(result, second.Close()) }()
-	if err = t.second.Apply(first.Goals[0], second); err != nil {
+	if err = applySecond(first.Goals[0], second); err != nil {
 		return err
 	}
 	first.transferBorrowedGoalOwnershipTo(second)
@@ -160,7 +166,7 @@ func (t *andThenTactic) Apply(g *Goal, out *TacticResult) (result error) {
 	return nil
 }
 
-func (t *andThenTactic) applyMultiple(g *Goal, out, first *TacticResult) (result error) {
+func composeMultipleTacticResults(g *Goal, out, first *TacticResult, applySecond tacticApplyFunc) (result error) {
 	models, err := g.ModelsEnabled()
 	if err != nil {
 		return err
@@ -189,7 +195,7 @@ func (t *andThenTactic) applyMultiple(g *Goal, out, first *TacticResult) (result
 	for subgoalIndex, subgoal := range first.Goals {
 		branch := &TacticResult{}
 		branches = append(branches, branch)
-		if err = t.second.Apply(subgoal, branch); err != nil {
+		if err = applySecond(subgoal, branch); err != nil {
 			return err
 		}
 		first.transferBorrowedGoalOwnershipTo(branch)
@@ -201,7 +207,7 @@ func (t *andThenTactic) applyMultiple(g *Goal, out, first *TacticResult) (result
 				return err
 			}
 			if models {
-				if err = t.publishSATModel(g, out, first.ModelConverter, branch.ModelConverter, uint32(subgoalIndex)); err != nil {
+				if err = publishComposedSATModel(g, out, first.ModelConverter, branch.ModelConverter, uint32(subgoalIndex)); err != nil {
 					return err
 				}
 			}
@@ -317,7 +323,7 @@ func (t *andThenTactic) applyMultiple(g *Goal, out, first *TacticResult) (result
 	return nil
 }
 
-func (t *andThenTactic) publishSATModel(g *Goal, out *TacticResult, first, second ModelConverter, index uint32) (result error) {
+func publishComposedSATModel(g *Goal, out *TacticResult, first, second ModelConverter, index uint32) (result error) {
 	md, err := model.NewModel(g.manager)
 	if err != nil {
 		return err

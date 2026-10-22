@@ -13,6 +13,7 @@ type unaryTacticKind uint8
 const (
 	unaryFailIfBranching unaryTacticKind = iota
 	unaryClean
+	unaryRepeat
 )
 
 type unaryTactic struct {
@@ -42,6 +43,10 @@ func NewFailIfBranchingTactic(child Tactic, threshold uint32) (Tactic, error) {
 
 func NewCleanTactic(child Tactic) (Tactic, error) {
 	return newUnaryTactic(unaryClean, child, 0)
+}
+
+func NewRepeatTactic(child Tactic, maximumDepth uint32) (Tactic, error) {
+	return newUnaryTactic(unaryRepeat, child, maximumDepth)
 }
 
 func (t *unaryTactic) open() error {
@@ -76,6 +81,12 @@ func (t *unaryTactic) DecRef() error {
 func (t *unaryTactic) Apply(g *Goal, out *TacticResult) error {
 	if err := t.open(); err != nil {
 		return err
+	}
+	if g == nil || out == nil {
+		return ast.ErrASTHandle
+	}
+	if t.kind == unaryRepeat {
+		return t.repeatAt(0, g, out)
 	}
 	if err := t.child.Apply(g, out); err != nil {
 		return err

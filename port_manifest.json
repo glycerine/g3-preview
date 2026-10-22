@@ -125843,6 +125843,8 @@
         "pkg/tactic/tactic_and_then_test.go",
         "pkg/tactic/tactic_or_else.go",
         "pkg/tactic/tactic_or_else_test.go",
+        "pkg/tactic/tactic_repeat.go",
+        "pkg/tactic/tactic_repeat_test.go",
         "pkg/tactic/tactic_unary.go",
         "pkg/tactic/tactic_unary_test.go"
       ],
@@ -125861,6 +125863,9 @@
         "TestAndThenJoinsAllUnsatDependencies",
         "TestOrElseRestoresGoalAfterTacticFailure",
         "TestOrElseLastFailureAndSkipIfFailed",
+        "TestRepeatStopsAtGoalFixpointAndMaximumDepth",
+        "TestRepeatComposesModelConvertersInApplicationOrder",
+        "TestRepeatRecursesAcrossProducedSubgoals",
         "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
@@ -126108,6 +126113,16 @@
           ]
         },
         {
+          "name": "repeat application to fixpoint or maximum depth, recursive subgoal fanout and converter composition (tactical.cpp:927-1075)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_repeat.go",
+          "tests": [
+            "TestRepeatStopsAtGoalFixpointAndMaximumDepth",
+            "TestRepeatComposesModelConvertersInApplicationOrder",
+            "TestRepeatRecursesAcrossProducedSubgoals"
+          ]
+        },
+        {
           "name": "unary tactical lifecycle, fail_if_branching result refusal and generic cleanup wrapper (tactical.cpp:886-927,1077-1128)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_unary.go",
@@ -126132,6 +126147,7 @@
         "pkg/tactic/tactic_and_then.go",
         "pkg/tactic/tactic_conditional.go",
         "pkg/tactic/tactic_or_else.go",
+        "pkg/tactic/tactic_repeat.go",
         "pkg/tactic/tactic_unary.go"
       ],
       "tests": [
@@ -126149,6 +126165,9 @@
         "TestConditionalTacticsGoalProductionGuards",
         "TestOrElseRestoresGoalAfterTacticFailure",
         "TestOrElseLastFailureAndSkipIfFailed",
+        "TestRepeatStopsAtGoalFixpointAndMaximumDepth",
+        "TestRepeatComposesModelConvertersInApplicationOrder",
+        "TestRepeatRecursesAcrossProducedSubgoals",
         "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
@@ -126204,6 +126223,16 @@
           "tests": [
             "TestOrElseRestoresGoalAfterTacticFailure",
             "TestOrElseLastFailureAndSkipIfFailed"
+          ]
+        },
+        {
+          "name": "typed repeat constructor with source maximum-depth semantics",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_repeat.go",
+          "tests": [
+            "TestRepeatStopsAtGoalFixpointAndMaximumDepth",
+            "TestRepeatComposesModelConvertersInApplicationOrder",
+            "TestRepeatRecursesAcrossProducedSubgoals"
           ]
         },
         {
