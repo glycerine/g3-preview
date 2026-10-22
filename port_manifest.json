@@ -125822,14 +125822,17 @@
         "pkg/tactic/tactic_conditional.go",
         "pkg/tactic/tactic_conditional_test.go",
         "pkg/tactic/tactic_or_else.go",
-        "pkg/tactic/tactic_or_else_test.go"
+        "pkg/tactic/tactic_or_else_test.go",
+        "pkg/tactic/tactic_unary.go",
+        "pkg/tactic/tactic_unary_test.go"
       ],
       "tests": [
         "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
         "TestConditionalTacticsChooseWhenAndFailIf",
         "TestConditionalTacticsGoalProductionGuards",
         "TestOrElseRestoresGoalAfterTacticFailure",
-        "TestOrElseLastFailureAndSkipIfFailed"
+        "TestOrElseLastFailureAndSkipIfFailed",
+        "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
         {
@@ -126058,6 +126061,14 @@
             "TestOrElseRestoresGoalAfterTacticFailure",
             "TestOrElseLastFailureAndSkipIfFailed"
           ]
+        },
+        {
+          "name": "unary tactical lifecycle, fail_if_branching result refusal and generic cleanup wrapper (tactical.cpp:886-927,1077-1128)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_unary.go",
+          "tests": [
+            "TestFailIfBranchingAndCleanTacticals"
+          ]
         }
       ],
       "ownership": [
@@ -126074,14 +126085,16 @@
         "pkg/tactic/arith/propagate_ineq_clean.go",
         "pkg/tactic/arith/propagate_ineq_clean_test.go",
         "pkg/tactic/tactic_conditional.go",
-        "pkg/tactic/tactic_or_else.go"
+        "pkg/tactic/tactic_or_else.go",
+        "pkg/tactic/tactic_unary.go"
       ],
       "tests": [
         "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
         "TestConditionalTacticsChooseWhenAndFailIf",
         "TestConditionalTacticsGoalProductionGuards",
         "TestOrElseRestoresGoalAfterTacticFailure",
-        "TestOrElseLastFailureAndSkipIfFailed"
+        "TestOrElseLastFailureAndSkipIfFailed",
+        "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
         {
@@ -126120,6 +126133,14 @@
           "tests": [
             "TestOrElseRestoresGoalAfterTacticFailure",
             "TestOrElseLastFailureAndSkipIfFailed"
+          ]
+        },
+        {
+          "name": "typed fail-if-branching and cleanup tactical constructors",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_unary.go",
+          "tests": [
+            "TestFailIfBranchingAndCleanTacticals"
           ]
         }
       ],
