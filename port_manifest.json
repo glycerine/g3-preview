@@ -123902,11 +123902,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_probe.go",
+        "pkg/tactic/tactic_probe_composition_test.go",
         "pkg/tactic/tactic_probe_memory_test.go",
         "pkg/smtcore/tactic_manager_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
+        "TestProbeArithmeticComparisonBooleanAndOwnership",
+        "TestProbeGoalProductionConfiguration",
         "TestMemoryProbeReadsSharedProcessAllocation"
       ],
       "assertions": [
@@ -123933,9 +123936,27 @@
           "tests": [
             "TestMemoryProbeReadsSharedProcessAllocation"
           ]
+        },
+        {
+          "name": "constant, Boolean, comparison and arithmetic probe factories/evaluation with source short-circuit behavior (probe.cpp:58-208)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_probe.go",
+          "tests": [
+            "TestProbeArithmeticComparisonBooleanAndOwnership"
+          ]
+        },
+        {
+          "name": "proof, model and unsat-core production probes (probe.cpp:426-460)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_probe.go",
+          "tests": [
+            "TestProbeGoalProductionConfiguration"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Composed probes retain each child independently, including duplicate operands, and release child references before their own budget reservation on final close."
+      ],
       "deviations": []
     },
     {
@@ -123945,12 +123966,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_probe.go",
+        "pkg/tactic/tactic_probe_composition_test.go",
         "pkg/tactic/tactic_probe_memory_test.go",
         "pkg/smtcore/tactic_manager_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
         "TestTacticManagerDestructorFinalizesTacticsBeforeProbes",
+        "TestProbeArithmeticComparisonBooleanAndOwnership",
+        "TestProbeGoalProductionConfiguration",
         "TestMemoryProbeReadsSharedProcessAllocation"
       ],
       "conditionals": [
@@ -123979,9 +124003,20 @@
           "tests": [
             "TestMemoryProbeReadsSharedProcessAllocation"
           ]
+        },
+        {
+          "name": "typed constructors for constant, Boolean, comparison, arithmetic and goal-production probes (probe.h:57-109)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_probe.go",
+          "tests": [
+            "TestProbeArithmeticComparisonBooleanAndOwnership",
+            "TestProbeGoalProductionConfiguration"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Concrete Go probes preserve intrusive child ownership with explicit independent references and deterministic recursive close."
+      ],
       "deviations": []
     },
     {
