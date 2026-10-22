@@ -105249,6 +105249,15 @@
           "tests": [
             "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
           ]
+        },
+        {
+          "name": "satisfiable terminal-point model generation before decision-scope rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_search.go",
+          "tests": [
+            "TestSMTSolverPublishesGeneratedModel",
+            "TestSMTSolverPublishesIntegerDifferenceModel"
+          ]
         }
       ],
       "ownership": [
@@ -105490,6 +105499,15 @@
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
             "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
+          ]
+        },
+        {
+          "name": "owned generated-model result preserved across search-scope rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverPublishesGeneratedModel",
+            "TestSMTSolverPublishesIntegerDifferenceModel"
           ]
         }
       ],
@@ -107177,7 +107195,16 @@
           ]
         },
         {
-          "name": "copy and reset, consequences, mutexes, preferred SAT, model, labels, guessed literals, display, cancellation, and parameter updates",
+          "name": "owned satisfiable model generation, retention, replacement and access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverPublishesGeneratedModel",
+            "TestSMTSolverPublishesIntegerDifferenceModel"
+          ]
+        },
+        {
+          "name": "copy and reset, consequences, mutexes, preferred SAT, guessed literals, display, cancellation, and parameter updates",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -107289,7 +107316,16 @@
           ]
         },
         {
-          "name": "translation, reset, derived queries, model results, labels, other diagnostics, display, cancellation, and parameter interface",
+          "name": "owned satisfiable model configuration, result access and cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverPublishesGeneratedModel",
+            "TestSMTSolverPublishesIntegerDifferenceModel"
+          ]
+        },
+        {
+          "name": "translation, reset, derived queries, labels, other diagnostics, display, cancellation, and parameter interface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -109050,7 +109086,16 @@
           ]
         },
         {
-          "name": "registered theory-plugin copying, model exposure, consequence and mutex solving, timed slow progress sampling, and unsat-core minimization and pattern extension",
+          "name": "satisfiable kernel-model publication through check-sat results and AcquireModel",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverPublishesGeneratedModel",
+            "TestSMTSolverPublishesIntegerDifferenceModel"
+          ]
+        },
+        {
+          "name": "registered theory-plugin copying, consequence and mutex solving, timed slow progress sampling, and unsat-core minimization and pattern extension",
           "status": "unported",
           "go_target": null,
           "tests": []

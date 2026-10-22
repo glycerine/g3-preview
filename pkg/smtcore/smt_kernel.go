@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -33,6 +34,9 @@ type SMTKernel struct {
 	unknown      string
 	labels       []usymbol.Symbol
 	callback     solver.ProgressCallback
+	modelConfig  model.ModelEvaluatorConfig
+	generated    *model.Model
+	produceModel bool
 	closed       bool
 }
 
@@ -222,6 +226,9 @@ func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 }
 
 func (k *SMTKernel) Check() (lbool.LBool, error) {
+	if err := k.clearGeneratedModel(); err != nil {
+		return lbool.Undef, err
+	}
 	if err := k.clearUnsatCore(); err != nil {
 		return lbool.Undef, err
 	}
@@ -235,6 +242,65 @@ func (k *SMTKernel) Check() (lbool.LBool, error) {
 		return lbool.Undef, err
 	}
 	return k.search(queue)
+}
+
+func (k *SMTKernel) ConfigureModelGeneration(enabled bool, config model.ModelEvaluatorConfig) error {
+	if err := k.open(); err != nil {
+		return err
+	}
+	k.produceModel = enabled
+	k.modelConfig = config
+	return nil
+}
+
+func (k *SMTKernel) buildGeneratedModel() error {
+	if !k.produceModel {
+		return nil
+	}
+	generator, err := NewSMTModelGenerator(k.manager)
+	if err != nil {
+		return err
+	}
+	fail := func(cause error) error { return errors.Join(cause, generator.Close()) }
+	if err = generator.SetContext(k.checker); err != nil {
+		return fail(err)
+	}
+	if err = generator.InitializeModel(k.modelConfig); err != nil {
+		return fail(err)
+	}
+	if err = generator.BuildStateValues(k.internalizer); err != nil {
+		return fail(err)
+	}
+	generated, err := generator.FinalModel()
+	if err != nil {
+		return fail(err)
+	}
+	if err = generator.Close(); err != nil {
+		return errors.Join(err, generated.Close())
+	}
+	if err = generated.Core().IncRef(); err != nil {
+		return errors.Join(err, generated.Close())
+	}
+	k.generated = generated
+	return nil
+}
+
+func (k *SMTKernel) clearGeneratedModel() error {
+	if k == nil || k.generated == nil {
+		return nil
+	}
+	consumed, err := k.generated.Core().DecRefConsumed()
+	if consumed {
+		k.generated = nil
+	}
+	return err
+}
+
+func (k *SMTKernel) GeneratedModel() *model.ModelCore {
+	if k == nil || k.generated == nil {
+		return nil
+	}
+	return k.generated.Core()
 }
 
 func (k *SMTKernel) LastFailure() (SMTFailure, error) {
@@ -359,6 +425,7 @@ func (k *SMTKernel) Close() error {
 		return nil
 	}
 	var result error
+	result = errors.Join(result, k.clearGeneratedModel())
 	result = errors.Join(result, k.clearUnsatCore())
 	result = errors.Join(result, k.manager.DelRef(&k.unsatProof))
 	result = errors.Join(result, k.internalizer.Close())

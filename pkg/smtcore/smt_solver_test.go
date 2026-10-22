@@ -76,6 +76,72 @@ func TestSMTSolverKernelFacadeAssertionsScopesAndResults(t *testing.T) {
 	}
 }
 
+func TestSMTSolverPublishesGeneratedModel(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	s, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	astTestMust(t, s.SetProduceModels(true))
+	constant := smtRelevancyBool(t, m, "smt-solver-model-constant")
+	astTestMust(t, s.Assert(constant))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("model check status", status)
+	}
+	generated, err := s.AcquireModel()
+	astTestMust(t, err)
+	if generated == nil {
+		t.Fatal("satisfiable solver omitted generated model")
+	}
+	t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
+	declaration, err := m.GetDecl(constant)
+	astTestMust(t, err)
+	value, err := generated.ConstantInterpretation(declaration)
+	astTestMust(t, err)
+	if !m.IsTrue(value) {
+		t.Fatal("generated Boolean interpretation", value)
+	}
+}
+
+func TestSMTSolverPublishesIntegerDifferenceModel(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	integer, err := m.MkFamilySort(family, 1, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "solver-model-idl-x"), integer)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "solver-model-idl-y"), integer)
+	astTestMust(t, err)
+	s, err := NewSMTSolver(m, nil, "QF_IDL", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	astTestMust(t, s.SetProduceModels(true))
+	fixture := smtIntegerDiffFixture{manager: m, family: family, sort: integer, x: x, y: y}
+	astTestMust(t, s.Assert(fixture.bound(t, smtArithOpLE, x, y, 2)))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("integer model status", status)
+	}
+	generated, err := s.AcquireModel()
+	astTestMust(t, err)
+	if generated == nil {
+		t.Fatal("integer solver omitted generated model")
+	}
+	t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
+	for _, expression := range []ast.ASTHandle{x, y} {
+		declaration, declarationErr := m.GetDecl(expression)
+		astTestMust(t, declarationErr)
+		value, valueErr := generated.ConstantInterpretation(declaration)
+		astTestMust(t, valueErr)
+		if value.IsNull() {
+			t.Fatal("missing integer model interpretation", expression)
+		}
+	}
+}
+
 func TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	a := smtRelevancyBool(t, m, "smt-solver-tracked-a")

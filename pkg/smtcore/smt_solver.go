@@ -19,9 +19,10 @@ import (
 )
 
 type SMTSolverConfig struct {
-	Params       *uparams.ParamsContext
-	Quantifiers  *SMTQuantifierRegistry
-	TargetConfig func(*ast.ASTManager) (SMTSolverConfig, error)
+	Params         *uparams.ParamsContext
+	Quantifiers    *SMTQuantifierRegistry
+	ModelEvaluator model.ModelEvaluatorConfig
+	TargetConfig   func(*ast.ASTManager) (SMTSolverConfig, error)
 }
 
 type smtTrackedAssertion struct {
@@ -296,7 +297,9 @@ func (s *SMTSolver) SetProduceModels(value bool) error {
 		return err
 	}
 	s.produceModels = value
-	return nil
+	config := s.config.ModelEvaluator
+	config.Params = &s.params
+	return s.kernel.ConfigureModelGeneration(value, config)
 }
 
 func (s *SMTSolver) AssertFormula(formula ast.ASTHandle) error {
@@ -403,6 +406,11 @@ func (s *SMTSolver) CheckSatCore(assumptions []ast.ASTHandle) (lbool.LBool, erro
 	}
 	if err = result.SetStatus(status); err != nil {
 		return lbool.Undef, err
+	}
+	if status == lbool.True && s.produceModels {
+		if err = result.SetModel(s.kernel.GeneratedModel()); err != nil {
+			return lbool.Undef, err
+		}
 	}
 	if status == lbool.Undef {
 		reason, reasonErr := s.kernel.ReasonUnknown()
@@ -532,7 +540,10 @@ func (s *SMTSolver) Translate(manager *ast.ASTManager, params *uparams.ParamsRef
 	if err != nil {
 		return nil, err
 	}
-	next.produceModels = s.produceModels
+	if err = next.SetProduceModels(s.produceModels); err != nil {
+		_ = next.Close()
+		return nil, err
+	}
 	translate := func(value ast.ASTHandle) (ast.ASTHandle, error) { return value, nil }
 	var translation *ast.ASTTranslation
 	if manager != s.manager {
@@ -627,7 +638,10 @@ func (f *smtSolverFactory) New(m *ast.ASTManager, p *uparams.ParamsRef, _, model
 	if err != nil {
 		return nil, err
 	}
-	value.produceModels = models
+	if err = value.SetProduceModels(models); err != nil {
+		_ = value.Close()
+		return nil, err
+	}
 	return value, nil
 }
 
