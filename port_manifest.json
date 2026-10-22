@@ -98221,9 +98221,15 @@
       "path": "src/smt/arith_eq_adapter.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_arith_eq_adapter.go",
+        "pkg/smtcore/smt_arith_eq_adapter_test.go"
+      ],
+      "tests": [
+        "TestSMTArithmeticEqualityAdapterEventsAndScopes",
+        "TestSMTRealDifferenceEqualityEventAdapter"
+      ],
       "assertions": [
         {
           "line": 84,
@@ -98242,19 +98248,43 @@
           "text": "SASSERT(ctx.lit_internalized(ge));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Canonical pair filtering, equality atom internalization, triangle bound axioms, equality/disequality callbacks, scoped duplicate suppression and axiom count (src/smt/arith_eq_adapter.cpp:83-239,265-267)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arith_eq_adapter.go",
+          "tests": [
+            "TestSMTArithmeticEqualityAdapterEventsAndScopes",
+            "TestSMTRealDifferenceEqualityEventAdapter"
+          ]
+        },
+        {
+          "name": "Restart recreation, optional binary-bound parameter, relevancy callback and diagnostic display (src/smt/arith_eq_adapter.cpp:49-81,240-263,269-279)",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The adapter borrows its owning SMTTheoryBase and enodes, owns canonical AST-handle pairs, and removes pairs when their theory scope is popped."
+      ],
+      "deviations": [
+        "Go search keeps internalized clauses across restart, so retained difference-theory consumers do not require source restart-pair reconstruction. Default AddBinaryBounds is false. Relevancy is managed by the shared SMT relevancy propagator."
+      ]
     },
     {
       "path": "src/smt/arith_eq_adapter.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_arith_eq_adapter.go",
+        "pkg/smtcore/smt_arith_eq_adapter_test.go"
+      ],
+      "tests": [
+        "TestSMTArithmeticEqualityAdapterEventsAndScopes",
+        "TestSMTRealDifferenceEqualityEventAdapter"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -98265,11 +98295,29 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained concrete adapter state and equality/disequality event surface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arith_eq_adapter.go",
+          "tests": [
+            "TestSMTArithmeticEqualityAdapterEventsAndScopes",
+            "TestSMTRealDifferenceEqualityEventAdapter"
+          ]
+        },
+        {
+          "name": "Statistics collection and debug display surface",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The adapter owns its Go map, insertion trail, scope limits, and counter and borrows the owner theory."
+      ],
+      "deviations": [
+        "A concrete non-template adapter serves the retained integer and real difference theories."
+      ]
     },
     {
       "path": "src/smt/arith_eq_solver.cpp",

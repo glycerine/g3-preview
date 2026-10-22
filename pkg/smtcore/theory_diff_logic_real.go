@@ -450,6 +450,11 @@ func (t *SMTRealDiffTheory) PushScope() error {
 		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
+	if err := t.equalityAdapter.PushScope(); err != nil {
+		_ = t.realGraph.Pop(1)
+		_ = t.SMTTheoryBase.PopScopes(1)
+		return err
+	}
 	t.realScopes = append(t.realScopes, smtIntegerDiffScope{len(t.realAtoms), len(t.realAssertions), t.realAssertionHead, t.realNonDifference})
 	return nil
 }
@@ -468,6 +473,9 @@ func (t *SMTRealDiffTheory) PopScopes(count uint32) error {
 	t.realAssertionHead = scope.head
 	t.realNonDifference = scope.nonDifference
 	t.realScopes = t.realScopes[:level]
+	if err := t.equalityAdapter.PopScopes(count); err != nil {
+		return err
+	}
 	if err := t.realGraph.Pop(count); err != nil {
 		return err
 	}
@@ -551,8 +559,12 @@ func (t *SMTRealDiffTheory) InternalizeEquality(expression ast.ASTHandle, variab
 	return state.addClause([]SMTLiteral{equality, lowerLiteral.Negated(), upperLiteral.Negated()}, false, ast.ASTHandle{})
 }
 
-func (*SMTRealDiffTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error    { return nil }
-func (*SMTRealDiffTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error { return nil }
+func (t *SMTRealDiffTheory) NewEquality(left, right SMTTheoryVar) error {
+	return t.equalityAdapter.MkAxioms(left, right)
+}
+func (t *SMTRealDiffTheory) NewDisequality(left, right SMTTheoryVar) error {
+	return t.equalityAdapter.MkAxioms(left, right)
+}
 
 func (t *SMTRealDiffTheory) Graph() *SMTInfRationalDiffGraph {
 	if t == nil {

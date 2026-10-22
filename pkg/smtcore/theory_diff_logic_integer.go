@@ -31,14 +31,15 @@ type smtIntegerDiffScope struct {
 // is an integer numeral. Unsupported arithmetic is recorded for final check.
 type SMTIntegerDiffTheory struct {
 	*SMTTheoryBase
-	graph         *SMTRationalDiffGraph
-	zero          SMTTheoryVar
-	atoms         []smtIntegerDiffAtom
-	atomByBool    map[int32]int
-	assertions    []smtIntegerDiffAssertion
-	assertionHead int
-	scopes        []smtIntegerDiffScope
-	nonDifference bool
+	graph           *SMTRationalDiffGraph
+	zero            SMTTheoryVar
+	atoms           []smtIntegerDiffAtom
+	atomByBool      map[int32]int
+	assertions      []smtIntegerDiffAssertion
+	assertionHead   int
+	scopes          []smtIntegerDiffScope
+	nonDifference   bool
+	equalityAdapter *smtArithmeticEqualityAdapter
 }
 
 func NewSMTIntegerDiffTheory(family ast.FamilyID) (*SMTIntegerDiffTheory, error) {
@@ -46,12 +47,17 @@ func NewSMTIntegerDiffTheory(family ast.FamilyID) (*SMTIntegerDiffTheory, error)
 	if err != nil {
 		return nil, err
 	}
-	return &SMTIntegerDiffTheory{
+	theory := &SMTIntegerDiffTheory{
 		SMTTheoryBase: base,
 		graph:         NewSMTRationalDiffGraph(),
 		zero:          SMTNullTheoryVar,
 		atomByBool:    make(map[int32]int),
-	}, nil
+	}
+	theory.equalityAdapter, err = newSMTArithmeticEqualityAdapter(base)
+	if err != nil {
+		return nil, err
+	}
+	return theory, nil
 }
 
 func (t *SMTIntegerDiffTheory) Initialize(state *SMTInternalizerState) error {
@@ -631,6 +637,11 @@ func (t *SMTIntegerDiffTheory) PushScope() error {
 		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
+	if err := t.equalityAdapter.PushScope(); err != nil {
+		_ = t.graph.Pop(1)
+		_ = t.SMTTheoryBase.PopScopes(1)
+		return err
+	}
 	t.scopes = append(t.scopes, smtIntegerDiffScope{len(t.atoms), len(t.assertions), t.assertionHead, t.nonDifference})
 	return nil
 }
@@ -649,6 +660,9 @@ func (t *SMTIntegerDiffTheory) PopScopes(count uint32) error {
 	t.assertionHead = scope.head
 	t.nonDifference = scope.nonDifference
 	t.scopes = t.scopes[:level]
+	if err := t.equalityAdapter.PopScopes(count); err != nil {
+		return err
+	}
 	if err := t.graph.Pop(count); err != nil {
 		return err
 	}
@@ -731,8 +745,12 @@ func (t *SMTIntegerDiffTheory) InternalizeEquality(expression ast.ASTHandle, var
 	}
 	return state.addClause([]SMTLiteral{equality, lowerLiteral.Negated(), upperLiteral.Negated()}, false, ast.ASTHandle{})
 }
-func (*SMTIntegerDiffTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error    { return nil }
-func (*SMTIntegerDiffTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error { return nil }
+func (t *SMTIntegerDiffTheory) NewEquality(left, right SMTTheoryVar) error {
+	return t.equalityAdapter.MkAxioms(left, right)
+}
+func (t *SMTIntegerDiffTheory) NewDisequality(left, right SMTTheoryVar) error {
+	return t.equalityAdapter.MkAxioms(left, right)
+}
 
 func (t *SMTIntegerDiffTheory) Graph() *SMTRationalDiffGraph {
 	if t == nil {
