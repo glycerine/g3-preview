@@ -10,6 +10,11 @@ type smtInternalizerTestTheory struct {
 	*SMTTheoryBase
 	atoms, equalities, terms, sortConstraints int
 	newEqualities, newDisequalities           []SMTTheoryPropagation
+	assignments                               []struct {
+		variable int32
+		value    bool
+	}
+	canPropagate, propagationCalled bool
 }
 
 func (t *smtInternalizerTestTheory) DefaultInternalizer() bool { return false }
@@ -32,7 +37,11 @@ func (t *smtInternalizerTestTheory) InternalizeAtom(expression ast.ASTHandle, ga
 			return false, err
 		}
 	}
-	if _, err = state.MkBoolVar(expression); err != nil {
+	variable, err := state.MkBoolVar(expression)
+	if err != nil {
+		return false, err
+	}
+	if err = state.SetVariableTheory(variable, t.FamilyID()); err != nil {
 		return false, err
 	}
 	t.atoms++
@@ -75,6 +84,22 @@ func (t *smtInternalizerTestTheory) NewDisequality(left, right SMTTheoryVar) err
 	return nil
 }
 
+func (t *smtInternalizerTestTheory) Assign(variable int32, value bool) error {
+	t.assignments = append(t.assignments, struct {
+		variable int32
+		value    bool
+	}{variable: variable, value: value})
+	return nil
+}
+
+func (t *smtInternalizerTestTheory) CanPropagate() bool { return t.canPropagate }
+
+func (t *smtInternalizerTestTheory) Propagate() error {
+	t.propagationCalled = true
+	t.canPropagate = false
+	return nil
+}
+
 func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {
 	m := astTestManager(t)
 	family, err := m.RegisterArithmeticPlugin()
@@ -109,6 +134,18 @@ func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {
 	node := state.context.enodes[term]
 	if node == nil || theory.atoms != 1 || theory.terms != 1 || theory.sortConstraints != 1 || theory.NumVariables() != 1 || !theory.IsAttachedToVariable(node) {
 		t.Fatal("theory atom/term internalization", theory.atoms, theory.terms, theory.sortConstraints, theory.NumVariables(), node)
+	}
+	atomLiteral, err := state.Literal(atom)
+	astTestMust(t, err)
+	astTestMust(t, state.AssignLiteral(atomLiteral, NewSMTBooleanAxiom()))
+	theory.canPropagate = true
+	consistent, err := state.PropagateCore()
+	astTestMust(t, err)
+	if !consistent || !theory.propagationCalled {
+		t.Fatal("theory propagation fixed point", consistent, theory.propagationCalled)
+	}
+	if len(theory.assignments) != 1 || theory.assignments[0].variable != atomLiteral.Var() || !theory.assignments[0].value {
+		t.Fatal("theory assignment callback", theory.assignments)
 	}
 	equality, err := m.MkEq(term, term)
 	astTestMust(t, err)

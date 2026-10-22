@@ -113,3 +113,62 @@ func (s *SMTInternalizerState) PropagateTheoryEvents() error {
 	}
 	return nil
 }
+
+func (s *SMTInternalizerState) PropagateTheoryAssignments() error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	for s.atomPropagationHead < len(s.assignedLiterals) {
+		literal := s.assignedLiterals[s.atomPropagationHead]
+		variable := literal.Var()
+		data, err := s.BooleanData(variable)
+		if err != nil {
+			return err
+		}
+		if data.IsTheoryAtom() {
+			plugin := s.theories[data.Theory()]
+			if plugin == nil {
+				return ast.ErrASTDomain
+			}
+			if err = plugin.Assign(variable, !literal.Sign()); err != nil {
+				return err
+			}
+		}
+		s.atomPropagationHead++
+	}
+	return nil
+}
+
+// PropagateCore runs the retained logical-context queues to a fixed point.
+func (s *SMTInternalizerState) PropagateCore() (bool, error) {
+	if err := s.open(); err != nil {
+		return false, err
+	}
+	for {
+		consistent, err := s.Propagate()
+		if err != nil || !consistent {
+			return consistent, err
+		}
+		if err = s.PropagateTheoryAssignments(); err != nil {
+			return false, err
+		}
+		if err = s.PropagateTheoryEvents(); err != nil {
+			return false, err
+		}
+		theoryProgress := false
+		for _, plugin := range s.theoryOrder {
+			if plugin.CanPropagate() {
+				theoryProgress = true
+				if err = plugin.Propagate(); err != nil {
+					return false, err
+				}
+			}
+		}
+		if s.inconsistent {
+			return false, nil
+		}
+		if s.propagationHead == len(s.assignedLiterals) && s.atomPropagationHead == len(s.assignedLiterals) && s.theoryEqualityHead == len(s.theoryEqualities) && s.theoryDisequalityHead == len(s.theoryDisequalities) && !theoryProgress {
+			return true, nil
+		}
+	}
+}

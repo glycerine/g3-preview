@@ -22,6 +22,8 @@ type smtInternalizerScope struct {
 	theoryEqHead     int
 	theoryDiseqLimit int
 	theoryDiseqHead  int
+	atomHead         int
+	notifyLimit      int
 	inconsistent     bool
 	conflict         SMTBooleanJustification
 }
@@ -39,6 +41,11 @@ type smtInternalizerTheoryTrail struct {
 	theory    SMTTheoryID
 	old       SMTTheoryVar
 	rootAdded bool
+}
+
+type smtInternalizerNotifyTrail struct {
+	variable int32
+	theory   SMTTheoryID
 }
 
 type SMTTheoryPropagation struct {
@@ -85,6 +92,8 @@ type SMTInternalizerState struct {
 	theoryDisequalities   []SMTTheoryPropagation
 	theoryEqualityHead    int
 	theoryDisequalityHead int
+	atomPropagationHead   int
+	notifyTrail           []smtInternalizerNotifyTrail
 	clauses               []SMTInternalizedClause
 	assignedLiterals      []SMTLiteral
 	propagationHead       int
@@ -134,6 +143,19 @@ func (s *SMTInternalizerState) Theory(family ast.FamilyID) SMTTheoryInternalizer
 		return nil
 	}
 	return s.theories[family]
+}
+
+func (s *SMTInternalizerState) SetVariableTheory(variable int32, theory SMTTheoryID) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if variable < SMTFirstBoolVar || int(variable) >= len(s.booleanData) || theory == SMTNullTheoryID || s.theories[theory] == nil || s.booleanData[variable].IsTheoryAtom() {
+		return ast.ErrASTDomain
+	}
+	if s.scopeLevel > s.booleanData[variable].InternalLevel() {
+		s.notifyTrail = append(s.notifyTrail, smtInternalizerNotifyTrail{variable: variable, theory: s.booleanData[variable].Theory()})
+	}
+	return s.booleanData[variable].SetNotifyTheory(theory)
 }
 
 func (s *SMTInternalizerState) attachTheoryVariable(node *SMTEnode, theory SMTTheoryID, variable SMTTheoryVar) error {
@@ -445,6 +467,7 @@ func (s *SMTInternalizerState) PushScope() error {
 		assignedLimit: len(s.assignedLiterals), propagationHead: s.propagationHead, conflict: s.conflict,
 		theoryEqLimit: len(s.theoryEqualities), theoryEqHead: s.theoryEqualityHead,
 		theoryDiseqLimit: len(s.theoryDisequalities), theoryDiseqHead: s.theoryDisequalityHead,
+		atomHead: s.atomPropagationHead, notifyLimit: len(s.notifyTrail),
 	})
 	if s.relevancy != nil {
 		if err := s.relevancy.PushScope(); err != nil {
@@ -552,6 +575,21 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	}
 	s.theoryDisequalities = s.theoryDisequalities[:scope.theoryDiseqLimit]
 	s.theoryDisequalityHead = scope.theoryDiseqHead
+	if scope.atomHead < 0 || scope.atomHead > len(s.assignedLiterals) || scope.notifyLimit < 0 || scope.notifyLimit > len(s.notifyTrail) {
+		return ast.ErrASTDomain
+	}
+	s.atomPropagationHead = scope.atomHead
+	for len(s.notifyTrail) > scope.notifyLimit {
+		index := len(s.notifyTrail) - 1
+		entry := s.notifyTrail[index]
+		s.notifyTrail = s.notifyTrail[:index]
+		s.booleanData[entry.variable].ResetNotifyTheory()
+		if entry.theory != SMTNullTheoryID {
+			if err := s.booleanData[entry.variable].SetNotifyTheory(entry.theory); err != nil {
+				return err
+			}
+		}
+	}
 	if scope.clauseLimit < 0 || scope.clauseLimit > len(s.clauses) {
 		return ast.ErrASTDomain
 	}

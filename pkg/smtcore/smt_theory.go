@@ -20,6 +20,9 @@ type SMTTheoryInternalizer interface {
 	UseDisequalities() bool
 	NewEquality(SMTTheoryVar, SMTTheoryVar) error
 	NewDisequality(SMTTheoryVar, SMTTheoryVar) error
+	Assign(int32, bool) error
+	CanPropagate() bool
+	Propagate() error
 	PushScope() error
 	PopScopes(uint32) error
 }
@@ -58,6 +61,8 @@ func (t *SMTTheoryBase) FamilyID() ast.FamilyID {
 
 func (*SMTTheoryBase) DefaultInternalizer() bool { return true }
 func (*SMTTheoryBase) UseDisequalities() bool    { return true }
+func (*SMTTheoryBase) CanPropagate() bool        { return false }
+func (*SMTTheoryBase) Propagate() error          { return nil }
 
 func (t *SMTTheoryBase) State() (*SMTInternalizerState, error) {
 	if t == nil || t.state == nil {
