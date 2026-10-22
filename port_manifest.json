@@ -101730,7 +101730,7 @@
       "path": "src/smt/params/theory_bv_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_bv_params.go",
         "pkg/smtcore/util_smt_bv_params_source_test.go",
@@ -101748,12 +101748,12 @@
         "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
         "TestSMTBVNullGlobalsConstructorPrefixAndForeignLocalGetter"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Two helper declarations, three RHS/publications, reverse lexical DT and seven literal ostream endl chains (src/smt/params/theory_bv_params.cpp:23-40)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_bv_params.go",
           "tests": [
             "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
@@ -101780,7 +101780,7 @@
       "path": "src/smt/params/theory_bv_params.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_bv_params.go",
         "pkg/smtcore/util_smt_bv_params_source_test.go",
@@ -101808,12 +101808,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Seven scalar defaults then actual constructor update and incomplete object eligibility (src/smt/params/theory_bv_params.h:24-50)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_bv_params.go",
           "tests": [
             "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
