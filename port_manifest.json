@@ -102345,7 +102345,8 @@
         "TestSMTQICostModelInvalidFunctionsUseSourceFallbacks",
         "TestSMTQIInstancePrepareSubstituteAndBuildFlattenedLemma",
         "TestSMTQIInstanceSatisfiedAndReducedTrueShortCircuits",
-        "TestSMTQIInstanceQuantifierInstantiationProof"
+        "TestSMTQIInstanceQuantifierInstantiationProof",
+        "TestSMTQIInstanceMaterializeInvokesTheoryRewriter"
       ],
       "conditionals": [
         {
@@ -102438,7 +102439,15 @@
           ]
         },
         {
-          "name": "context theory-rewriter invocation and context internalization",
+          "name": "context theory-rewriter invocation and materialized lemma completion",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_qi_instance.go",
+          "tests": [
+            "TestSMTQIInstanceMaterializeInvokesTheoryRewriter"
+          ]
+        },
+        {
+          "name": "context internalize_instance integration",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -102469,7 +102478,8 @@
         "TestSMTQICostModelInvalidFunctionsUseSourceFallbacks",
         "TestSMTQIInstancePrepareSubstituteAndBuildFlattenedLemma",
         "TestSMTQIInstanceSatisfiedAndReducedTrueShortCircuits",
-        "TestSMTQIInstanceQuantifierInstantiationProof"
+        "TestSMTQIInstanceQuantifierInstantiationProof",
+        "TestSMTQIInstanceMaterializeInvokesTheoryRewriter"
       ],
       "conditionals": [
         {

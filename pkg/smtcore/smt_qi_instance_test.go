@@ -77,6 +77,47 @@ func TestSMTQIInstancePrepareSubstituteAndBuildFlattenedLemma(t *testing.T) {
 	}
 }
 
+func TestSMTQIInstanceMaterializeInvokesTheoryRewriter(t *testing.T) {
+	m := astTestManager(t)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, boolean)
+	astTestMust(t, err)
+	negated, err := m.MkNot(variable)
+	astTestMust(t, err)
+	body, err := m.MkNot(negated)
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{boolean}, Names: []symbol.Symbol{astTestSymbol(t, m, "qi-materialize-x")}, Body: body,
+	})
+	astTestMust(t, err)
+	bindingOwner, binding := smtEnodeConstant(t, m, 2085, boolean, 4)
+	context, err := NewSMTCheckerContext(m)
+	astTestMust(t, err)
+	builder := smtQIInstanceBuilder(t, m, context)
+	entry := SMTQIQueueEntry{Fingerprint: &SMTFingerprint{data: quantifier, args: []*SMTEnode{binding}}, Cost: 2, Generation: 4, Instantiated: true}
+	prepared, err := builder.Prepare(entry)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, prepared.Close()) })
+	stat := &SMTQuantifierStat{}
+	result, err := builder.Materialize(prepared, smtQuickTheoryRewriter(t, m), stat, 1)
+	astTestMust(t, err)
+	if result == nil {
+		t.Fatal("materialization omitted instance")
+	}
+	t.Cleanup(func() { astTestMust(t, result.Close()) })
+	lemma, err := result.Lemma()
+	astTestMust(t, err)
+	if count, err := m.GetNumArgs(lemma); err != nil || count != 2 {
+		t.Fatal("materialized lemma", count, err)
+	}
+	rewritten, err := m.GetArg(lemma, 1)
+	astTestMust(t, err)
+	if rewritten != bindingOwner || stat.NumInstances() != 1 {
+		t.Fatal("theory rewrite or statistics", rewritten, bindingOwner, stat.NumInstances())
+	}
+}
+
 func TestSMTQIInstanceSatisfiedAndReducedTrueShortCircuits(t *testing.T) {
 	m := astTestManager(t)
 	sort, err := m.MkSort(astTestSymbol(t, m, "QIInstanceSort"), ast.ASTSortInfo{})

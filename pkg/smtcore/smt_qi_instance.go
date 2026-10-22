@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 )
 
 type SMTQIPreparedInstance struct {
@@ -165,6 +166,58 @@ func (b *SMTQIInstanceBuilder) Prepare(entry SMTQIQueueEntry) (*SMTQIPreparedIns
 		return nil, errors.Join(err, prepared.Close())
 	}
 	return prepared, nil
+}
+
+// Materialize invokes the context theory rewriter and completes the source
+// instance lemma. A nil result means the current context already satisfies the
+// substituted body.
+func (b *SMTQIInstanceBuilder) Materialize(prepared *SMTQIPreparedInstance, rw *rewriter.TheoryRewriter, stat *SMTQuantifierStat, scope uint32) (result *SMTQIInstance, err error) {
+	if b == nil || b.manager == nil || prepared == nil || prepared.manager != b.manager || prepared.closed || rw == nil || rw.Manager() != b.manager || stat == nil {
+		return nil, ast.ErrASTDomain
+	}
+	if prepared.alreadySatisfied {
+		return nil, nil
+	}
+	instance, err := prepared.Instance()
+	if err != nil {
+		return nil, err
+	}
+	simplified, err := b.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return nil, err
+	}
+	defer func() { err = errors.Join(err, b.manager.DelRef(&simplified)) }()
+	proofs, err := b.manager.ProofsEnabled()
+	if err != nil {
+		return nil, err
+	}
+	if !proofs {
+		if err = rw.Rewrite(instance, simplified); err != nil {
+			return nil, err
+		}
+		rewritten, err := b.manager.RefGet(simplified)
+		if err != nil {
+			return nil, err
+		}
+		return b.Finish(prepared, rewritten, stat, scope)
+	}
+	rewriteProof, err := b.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return nil, err
+	}
+	defer func() { err = errors.Join(err, b.manager.DelRef(&rewriteProof)) }()
+	if err = rw.RewriteWithProof(instance, simplified, rewriteProof); err != nil {
+		return nil, err
+	}
+	rewritten, err := b.manager.RefGet(simplified)
+	if err != nil {
+		return nil, err
+	}
+	proof, err := b.manager.RefGet(rewriteProof)
+	if err != nil {
+		return nil, err
+	}
+	return b.FinishWithProof(prepared, rewritten, proof, stat, scope)
 }
 
 func (b *SMTQIInstanceBuilder) Finish(prepared *SMTQIPreparedInstance, simplified ast.ASTHandle, stat *SMTQuantifierStat, scope uint32) (*SMTQIInstance, error) {
