@@ -178,6 +178,9 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 	if err != nil {
 		return lbool.Undef, errors.Join(err, timer.Close())
 	}
+	if err = k.internalizer.resetBooleanActivityCache(); err != nil {
+		return lbool.Undef, errors.Join(err, resolver.Close(), timer.Close())
+	}
 	if err = k.internalizer.beginSearchPersistence(baseLevel, k.smtState); err != nil {
 		return lbool.Undef, errors.Join(err, resolver.Close(), timer.Close())
 	}

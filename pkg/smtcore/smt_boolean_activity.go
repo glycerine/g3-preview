@@ -59,3 +59,14 @@ func (s *SMTInternalizerState) releaseBooleanActivityCache() (result error) {
 	s.activityCache = nil
 	return result
 }
+
+// resetBooleanActivityCache implements cact_case_split_queue::init_search_eh:
+// cached activity only connects variables deleted and recreated during one
+// search. Each subsequent search starts with an empty cache.
+func (s *SMTInternalizerState) resetBooleanActivityCache() (result error) {
+	for expression := range s.activityCache {
+		result = errors.Join(result, s.manager.DecRef(expression))
+	}
+	s.activityCache = make(map[ast.ASTHandle]float64)
+	return result
+}

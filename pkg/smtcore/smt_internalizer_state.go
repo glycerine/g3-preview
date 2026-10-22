@@ -785,7 +785,7 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	for len(s.booleanStack) > scope.booleanLimit {
 		expression := s.booleanStack[len(s.booleanStack)-1]
 		variable := s.boolVar[expression]
-		if s.caseSplitStrategy == 2 {
+		if s.caseSplitStrategy == 2 && s.searching && s.activity[variable] > 0 {
 			if err := s.cacheBooleanActivity(expression, s.activity[variable]); err != nil {
 				return err
 			}

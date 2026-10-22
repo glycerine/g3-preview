@@ -217,6 +217,8 @@ func TestSMTActivityCaseSplitQueueCachesReinternalizedActivity(t *testing.T) {
 	params := SMTParamsState{InvDecay: 1.052, CaseSplitStrategy: 2}
 	astTestMust(t, state.configureBooleanHeuristics(params))
 	expression := smtRelevancyBool(t, m, "cached-reinternalized-activity")
+	astTestMust(t, state.beginSearchPersistence(state.scopeLevel, params))
+	t.Cleanup(func() { astTestMust(t, state.endSearchPersistence()) })
 	astTestMust(t, state.PushScope())
 	astTestMust(t, state.Internalize(expression, true))
 	variable, _ := state.BoolVar(expression)
@@ -229,5 +231,46 @@ func TestSMTActivityCaseSplitQueueCachesReinternalizedActivity(t *testing.T) {
 	variable, _ = state.BoolVar(expression)
 	if state.activity[variable] != 17 {
 		t.Fatal("reinternalized variable lost cached activity", state.activity[variable])
+	}
+}
+
+func TestSMTActivityCaseSplitQueueCachesOnlyPositiveSearchActivity(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	params := SMTParamsState{InvDecay: 1.052, CaseSplitStrategy: 2}
+	astTestMust(t, state.configureBooleanHeuristics(params))
+
+	outside := smtRelevancyBool(t, m, "outside-search-cache")
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.Internalize(outside, true))
+	outsideVar, _ := state.BoolVar(outside)
+	state.activity[outsideVar] = 23
+	astTestMust(t, state.PopScopes(1))
+	if len(state.activityCache) != 0 {
+		t.Fatal("cached variable removed outside search")
+	}
+
+	astTestMust(t, state.beginSearchPersistence(state.scopeLevel, params))
+	zero := smtRelevancyBool(t, m, "zero-search-cache")
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.Internalize(zero, true))
+	astTestMust(t, state.PopScopes(1))
+	if len(state.activityCache) != 0 {
+		t.Fatal("cached nonpositive search activity")
+	}
+
+	positive := smtRelevancyBool(t, m, "positive-search-cache")
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.Internalize(positive, true))
+	positiveVar, _ := state.BoolVar(positive)
+	state.activity[positiveVar] = 9
+	astTestMust(t, state.PopScopes(1))
+	if len(state.activityCache) != 1 {
+		t.Fatal("positive search activity was not cached")
+	}
+	astTestMust(t, state.endSearchPersistence())
+	astTestMust(t, state.resetBooleanActivityCache())
+	if len(state.activityCache) != 0 {
+		t.Fatal("new search retained old activity cache")
 	}
 }
