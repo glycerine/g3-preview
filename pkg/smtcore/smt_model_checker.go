@@ -15,11 +15,25 @@ import (
 // ordinary quantifier queue, so proof construction and internalization remain
 // centralized in SMTQIInstanceBuilder.
 type SMTModelChecker struct {
-	manager  *ast.ASTManager
-	state    *SMTInternalizerState
-	registry *SMTQuantifierRegistry
-	maxCexs  uint32
-	closed   bool
+	manager    *ast.ASTManager
+	state      *SMTInternalizerState
+	registry   *SMTQuantifierRegistry
+	maxCexs    uint32
+	valueTerms map[ast.ASTHandle]ast.ASTHandle
+	closed     bool
+}
+
+func (c *SMTModelChecker) SetCandidateTerms(rootValues map[*SMTEnode]ast.ASTHandle) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	c.valueTerms = make(map[ast.ASTHandle]ast.ASTHandle, len(rootValues))
+	for root, value := range rootValues {
+		if root != nil && !value.IsNull() {
+			c.valueTerms[value] = root.owner
+		}
+	}
+	return nil
 }
 
 func NewSMTModelChecker(state *SMTInternalizerState, maxCexs uint32) (*SMTModelChecker, error) {
@@ -67,6 +81,9 @@ func (c *SMTModelChecker) universe(model *protomodel.ProtoModel, sort ast.ASTHan
 }
 
 func (c *SMTModelChecker) bindingNode(value ast.ASTHandle) (*SMTEnode, error) {
+	if term := c.valueTerms[value]; !term.IsNull() {
+		value = term
+	}
 	if node := c.state.context.enodes[value]; node != nil {
 		return node.root, nil
 	}
@@ -211,6 +228,7 @@ func (c *SMTModelChecker) Close() error {
 	c.closed = true
 	c.state = nil
 	c.registry = nil
+	c.valueTerms = nil
 	c.manager = nil
 	return nil
 }

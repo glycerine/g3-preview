@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
@@ -211,12 +212,12 @@ func (q *SMTQuantifierManager) instantiate(entries []SMTQIQueueEntry) (resultErr
 	for _, entry := range entries {
 		prepared, err := q.builder.Prepare(entry)
 		if err != nil {
-			return err
+			return fmt.Errorf("prepare quantified instance: %w", err)
 		}
 		instance, err := q.builder.MaterializeAndInternalize(prepared, q.rewriter, q.registry.statistics[entry.Fingerprint.data], q.state.scopeLevel, q.state)
 		err = errors.Join(err, prepared.Close())
 		if err != nil {
-			return err
+			return fmt.Errorf("materialize quantified instance: %w", err)
 		}
 		if instance == nil {
 			continue
@@ -350,16 +351,28 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 		if err != nil {
 			return SMTFinalCheckGiveUp, err
 		}
+		if err = q.modelChecker.SetCandidateTerms(generator.rootValues); err != nil {
+			return SMTFinalCheckGiveUp, errors.Join(err, generator.Close())
+		}
 		modelSatisfied, checkErr := q.modelChecker.Check(generator.model, q.activeQuantifiers())
-		checkErr = errors.Join(checkErr, generator.Close())
 		if checkErr != nil {
-			return SMTFinalCheckGiveUp, checkErr
+			return SMTFinalCheckGiveUp, errors.Join(checkErr, generator.Close())
 		}
 		if !modelSatisfied {
-			if err = q.Propagate(); err != nil {
+			entries, scheduleErr := q.registry.schedule.ScheduleNew(map[*SMTFingerprint]bool{})
+			if scheduleErr == nil {
+				scheduleErr = q.instantiate(entries)
+			}
+			if scheduleErr != nil {
+				return SMTFinalCheckGiveUp, errors.Join(scheduleErr, generator.Close())
+			}
+			if err = generator.Close(); err != nil {
 				return SMTFinalCheckGiveUp, err
 			}
 			return SMTFinalCheckContinue, nil
+		}
+		if err = generator.Close(); err != nil {
+			return SMTFinalCheckGiveUp, err
 		}
 	}
 	return SMTFinalCheckDone, nil

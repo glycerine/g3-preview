@@ -108466,7 +108466,8 @@
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
-        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
+        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
+        "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
       "assertions": [
         {
@@ -108522,11 +108523,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "finite-universe binding enumeration, candidate-model evaluation, counterexample deduplication and queue insertion",
+          "name": "finite-universe binding enumeration, model-value-to-context-term recovery, candidate-model evaluation, counterexample deduplication and queue insertion",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_checker.go",
           "tests": [
-            "TestSMTModelCheckerFindsFiniteBooleanCounterexample"
+            "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
+            "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
           ]
         },
         {
@@ -108562,7 +108564,8 @@
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
-        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
+        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
+        "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
       "conditionals": [
         {
@@ -109404,7 +109407,8 @@
         "TestSMTQuantifierManagerPropagatesAndScopesQueuedInstances",
         "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
         "TestSMTSolverInstallsQuantifierManagerAndEMatches",
-        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
+        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
+        "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
       "assertions": [
         {
@@ -109513,7 +109517,8 @@
         "TestSMTQuantifierManagerPropagatesAndScopesQueuedInstances",
         "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
         "TestSMTSolverInstallsQuantifierManagerAndEMatches",
-        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
+        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
+        "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
       "conditionals": [
         {

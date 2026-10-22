@@ -84,6 +84,37 @@ func TestSMTSolverMBQIFindsPatternlessBooleanCounterexample(t *testing.T) {
 	}
 }
 
+func TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample(t *testing.T) {
+	m, s := smtSolverFixture(t)
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "solver-mbqi-sort"), nil)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	predicate, err := m.MkFuncDecl(astTestSymbol(t, m, "solver-mbqi-p"), []ast.ASTHandle{sort}, boolean, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	body, err := m.MkApp(predicate, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []usymbol.Symbol{astTestSymbol(t, m, "solver-mbqi-u")}, Body: body,
+	})
+	astTestMust(t, err)
+	constant, err := m.MkConst(astTestSymbol(t, m, "solver-mbqi-a"), sort)
+	astTestMust(t, err)
+	application, err := m.MkApp(predicate, []ast.ASTHandle{constant})
+	astTestMust(t, err)
+	negated, err := m.MkNot(application)
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(quantifier))
+	astTestMust(t, s.Assert(negated))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("uninterpreted-universe counterexample was not instantiated", status)
+	}
+}
+
 func TestSMTSolverKernelFacadeAssertionsScopesAndResults(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	a := smtRelevancyBool(t, m, "smt-solver-a")
