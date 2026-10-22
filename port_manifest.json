@@ -116776,14 +116776,16 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
         "TestSMTSequenceEquationQueueMutationAndScopedRestore",
+        "TestSMTSequenceDisequationQueueScopesAndOwnedCases",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
         "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary",
-        "TestSMTSequenceTheoryConcreteWordEquationConflict"
+        "TestSMTSequenceTheoryConcreteWordEquationConflict",
+        "TestSMTSequenceTheoryConcreteWordDisequationConflict"
       ],
       "conditionals": [
         {
@@ -117235,6 +117237,12 @@
           "tests": ["TestSMTSequenceEquationQueueMutationAndScopedRestore"]
         },
         {
+          "name": "ne records, owned alternative word pairs, explanation literals, and scoped disequation rollback (src/smt/theory_seq.h:141-184; scoped_vector<ne>)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_disequations.go",
+          "tests": ["TestSMTSequenceDisequationQueueScopesAndOwnedCases"]
+        },
+        {
           "name": "sequence term and atom internalization, theory-variable attachment, literal-value equality conflicts, scoped equality and disequality state, final-check boundary, and model-value factory hooks (src/smt/theory_seq.cpp:2225-2255,2616-2785,4053-4130)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
@@ -117245,6 +117253,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
           "tests": ["TestSMTSequenceTheoryConcreteWordEquationConflict"]
+        },
+        {
+          "name": "asserted disequality capture and concrete word re-expansion conflict with SAT-literal dependencies (src/smt/theory_seq.cpp:4086-4106 and solve_ne retained concrete case)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq.go",
+          "tests": ["TestSMTSequenceTheoryConcreteWordDisequationConflict"]
         },
         {
           "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
@@ -117266,14 +117280,16 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
         "TestSMTSequenceEquationQueueMutationAndScopedRestore",
+        "TestSMTSequenceDisequationQueueScopesAndOwnedCases",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
         "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary",
-        "TestSMTSequenceTheoryConcreteWordEquationConflict"
+        "TestSMTSequenceTheoryConcreteWordEquationConflict",
+        "TestSMTSequenceTheoryConcreteWordDisequationConflict"
       ],
       "conditionals": [
         {
@@ -117309,6 +117325,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_equations.go",
           "tests": ["TestSMTSequenceEquationQueueMutationAndScopedRestore"]
+        },
+        {
+          "name": "owned disequation records, alternative word pairs, explanation literals and concrete scoped queue",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_disequations.go",
+          "tests": ["TestSMTSequenceDisequationQueueScopesAndOwnedCases", "TestSMTSequenceTheoryConcreteWordDisequationConflict"]
         },
         {
           "name": "incremental sequence-theory shell, internalization, equality/disequality callbacks, scope lifecycle, final-check boundary, and model hooks",
@@ -201523,8 +201545,8 @@
       "component": "util",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_equations.go"],
-      "tests": ["TestSMTSequenceEquationQueueMutationAndScopedRestore"],
+      "go_targets": ["pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go"],
+      "tests": ["TestSMTSequenceEquationQueueMutationAndScopedRestore", "TestSMTSequenceDisequationQueueScopesAndOwnedCases"],
       "conditionals": [
         {
           "line": 19,
@@ -201585,7 +201607,13 @@
           "tests": ["TestSMTSequenceEquationQueueMutationAndScopedRestore"]
         },
         {
-          "name": "remaining theory_seq scoped_vector<ne> and <nc> concrete instantiations",
+          "name": "SMT theory_seq scoped_vector<ne> owned records, push_back, size and nested push_scope/pop_scope",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_disequations.go",
+          "tests": ["TestSMTSequenceDisequationQueueScopesAndOwnedCases"]
+        },
+        {
+          "name": "remaining theory_seq scoped_vector<ne> indexed replacement/pop and scoped_vector<nc> concrete instantiation",
           "status": "unported"
         },
         {
@@ -201594,7 +201622,7 @@
         }
       ],
       "ownership": [
-        "The Go equation specialization owns ASTRef roots in its live records and nested snapshots. Scope pop releases the current and younger snapshots before transferring the target snapshot into live storage. The remaining native ne/nc specializations are not yet represented."
+        "The Go equation and disequation specializations own ASTRef roots in their live records and nested snapshots. Scope pop releases the current and younger snapshots before transferring the target snapshot into live storage. The remaining native nc specialization is not yet represented."
       ],
       "deviations": [
         "The retained eq instantiation uses a concrete typed Go queue and owned per-scope snapshots instead of porting the general C++ template and its copy-on-write index trail. The observable indexed mutation and rollback behavior is preserved; ne/nc remain pending."
