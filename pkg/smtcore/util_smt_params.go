@@ -281,6 +281,29 @@ func (s *SMTParams) DynamicAckState() (SMTDynAckState, error) {
 	return s.dyn.State()
 }
 
+// QuantifierState exposes the embedded qi_params snapshot consumed by the
+// retained quantifier manager.
+func (s *SMTParams) QuantifierState() (SMTQIState, error) {
+	if e := s.open(); e != nil {
+		return SMTQIState{}, e
+	}
+	return s.qi.State()
+}
+
+func (s *SMTParams) QuantifierCostText() (string, error) {
+	if e := s.open(); e != nil {
+		return "", e
+	}
+	return s.qi.CostText()
+}
+
+func (s *SMTParams) QuantifierNewGenerationText() (string, error) {
+	if e := s.open(); e != nil {
+		return "", e
+	}
+	return s.qi.NewGenerationText()
+}
+
 // ArithmeticState exposes the embedded theory_arith_params snapshot consumed
 // by retained arithmetic theory implementations.
 func (s *SMTParams) ArithmeticState() (SMTArithState, error) {

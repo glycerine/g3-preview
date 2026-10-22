@@ -111,6 +111,15 @@ func (s *SMTQIParams) CostText() (string, error) {
 	}
 	return s.cost, nil
 }
+func (s *SMTQIParams) NewGenerationText() (string, error) {
+	if e := s.open(); e != nil {
+		return "", e
+	}
+	if !s.constructorReady {
+		return "", uparams.ErrParamsPrecondition
+	}
+	return s.newGen, nil
+}
 func (s *SMTQIParams) SetEmatching(v bool) error {
 	if e := s.open(); e != nil {
 		return e

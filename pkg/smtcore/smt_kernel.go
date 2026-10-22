@@ -44,6 +44,7 @@ type SMTKernel struct {
 	modelConfig      model.ModelEvaluatorConfig
 	generated        *model.Model
 	preprocessor     *rewriter.TheoryRewriter
+	quantifierCosts  *SMTQICostModel
 	paramContext     *uparams.ParamsContext
 	paramGlobals     *uparams.GlobalParamsService
 	smtParams        *SMTParams
@@ -152,6 +153,10 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	if err != nil {
 		return errors.Join(err, full.Close())
 	}
+	quantifiers, err := full.QuantifierState()
+	if err != nil {
+		return errors.Join(err, full.Close())
+	}
 	proofs, err := k.manager.ProofsEnabled()
 	if err != nil {
 		return errors.Join(err, full.Close())
@@ -191,17 +196,54 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	if err != nil {
 		return err
 	}
-	if !enabled {
-		k.preprocess = false
-		return nil
-	}
 	value, err := rewriter.NewTheoryRewriter(k.manager, context, globals, params)
 	if err != nil {
 		return err
 	}
 	k.preprocessor = value
-	k.preprocess = true
+	k.preprocess = enabled
+	if err = k.configureQuantifiers(full, fullState, quantifiers); err != nil {
+		return err
+	}
 	return nil
+}
+
+func (k *SMTKernel) configureQuantifiers(full *SMTParams, state SMTParamsState, qi SMTQIState) error {
+	if k == nil || k.internalizer == nil || k.preprocessor == nil || full == nil {
+		return ast.ErrASTHandle
+	}
+	if k.internalizer.quantifierManager != nil {
+		return ast.ErrASTDomain
+	}
+	if k.internalizer.quantifiers == nil {
+		costText, err := full.QuantifierCostText()
+		if err != nil {
+			return err
+		}
+		newGenerationText, err := full.QuantifierNewGenerationText()
+		if err != nil {
+			return err
+		}
+		costs, err := NewSMTQICostModel(k.manager, costText, newGenerationText, nil)
+		if err != nil {
+			return err
+		}
+		schedule := NewSMTQIQueueSchedule(float32(qi.EagerThreshold), float32(qi.LazyThreshold), qi.ConservativeFinalCheck)
+		registry, err := NewSMTQuantifierRegistry(k.manager, schedule, costs, qi.MaxInstances)
+		if err != nil {
+			return errors.Join(err, costs.Close())
+		}
+		k.internalizer.quantifiers = registry
+		k.quantifierCosts = costs
+	}
+	_, err := NewSMTQuantifierManager(k.internalizer, k.preprocessor, SMTQuantifierManagerConfig{
+		Ematching:    state.Ematching,
+		PromoteUnsat: qi.PromoteUnsat,
+		QuickUnsat:   qi.QuickChecker >= 1,
+		QuickNotSat:  qi.QuickChecker >= 2,
+		LazyQuick:    qi.LazyQuickChecker,
+	})
+	return err
 }
 
 // UpdateParams refreshes the assertion rewriter and the hidden preprocessing
@@ -742,6 +784,9 @@ func (k *SMTKernel) Close() error {
 		}
 	}
 	result = errors.Join(result, k.internalizer.Close())
+	if k.quantifierCosts != nil {
+		result = errors.Join(result, k.quantifierCosts.Close())
+	}
 	if k.smtParams != nil {
 		result = errors.Join(result, k.smtParams.Close())
 	}
@@ -762,6 +807,7 @@ func (k *SMTKernel) Close() error {
 		k.smtParams = nil
 		k.smtState = SMTParamsState{}
 		k.preprocessState = SMTPreprocessorState{}
+		k.quantifierCosts = nil
 		k.manager = nil
 		k.closed = true
 	}
