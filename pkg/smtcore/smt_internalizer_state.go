@@ -26,6 +26,7 @@ type smtInternalizerScope struct {
 	notifyLimit      int
 	inconsistent     bool
 	conflict         SMTBooleanJustification
+	conflictLiteral  SMTLiteral
 }
 
 type smtInternalizerAssignmentTrail struct {
@@ -98,6 +99,7 @@ type SMTInternalizerState struct {
 	assignedLiterals      []SMTLiteral
 	propagationHead       int
 	conflict              SMTBooleanJustification
+	conflictLiteral       SMTLiteral
 	inconsistent          bool
 	generation            uint32
 	scopeLevel            uint32
@@ -121,6 +123,7 @@ func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext
 		boolVar: make(map[ast.ASTHandle]int32), boolExpr: make([]ast.ASTHandle, 1), booleanData: make([]SMTBoolVarData, 1),
 		activity: make([]float64, 1), assignment: []lbool.LBool{lbool.True, lbool.False}, watches: make([]SMTWatchList, 2),
 		cachedGeneration: make(map[ast.ASTHandle]uint32), theories: make(map[ast.FamilyID]SMTTheoryInternalizer),
+		conflictLiteral: SMTNullLiteral,
 	}
 	state.booleanData[0].Initialize(0)
 	return state, nil
@@ -468,7 +471,8 @@ func (s *SMTInternalizerState) PushScope() error {
 		booleanLimit: len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending),
 		assignmentLimit: len(s.assignmentTrail), clauseLimit: len(s.clauses), theoryLimit: len(s.theoryTrail), inconsistent: s.inconsistent,
 		assignedLimit: len(s.assignedLiterals), propagationHead: s.propagationHead, conflict: s.conflict,
-		theoryEqLimit: len(s.theoryEqualities), theoryEqHead: s.theoryEqualityHead,
+		conflictLiteral: s.conflictLiteral,
+		theoryEqLimit:   len(s.theoryEqualities), theoryEqHead: s.theoryEqualityHead,
 		theoryDiseqLimit: len(s.theoryDisequalities), theoryDiseqHead: s.theoryDisequalityHead,
 		atomHead: s.atomPropagationHead, notifyLimit: len(s.notifyTrail),
 	})
@@ -649,6 +653,7 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	s.pending = s.pending[:scope.pendingLimit]
 	s.inconsistent = scope.inconsistent
 	s.conflict = scope.conflict
+	s.conflictLiteral = scope.conflictLiteral
 	return nil
 }
 

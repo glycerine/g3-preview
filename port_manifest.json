@@ -103585,7 +103585,9 @@
         "TestSMTConflictJustificationMaximumAssignmentLevels",
         "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification",
         "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel",
-        "TestSMTConflictResolverMinimizesImpliedLemmaLiteral"
+        "TestSMTConflictResolverMinimizesImpliedLemmaLiteral",
+        "TestSMTKernelAssumptionsValidateCheckAndRollback",
+        "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
       ],
       "conditionals": [
         {
@@ -103946,7 +103948,16 @@
           ]
         },
         {
-          "name": "structural subsumption and unsat-core extraction",
+          "name": "assumption unsat-core extraction through Boolean and theory justifications",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_resolver.go",
+          "tests": [
+            "TestSMTKernelAssumptionsValidateCheckAndRollback",
+            "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
+          ]
+        },
+        {
+          "name": "structural subsumption",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -103962,7 +103973,7 @@
         "The antecedent expander owns its work queues, duplicate set and emitted event history; justifications and enodes are borrowed and temporary justification marks are always cleared."
       ],
       "deviations": [
-        "Dynamic-ack callbacks are recorded as typed congruence/equality-use events until the concrete manager is connected. Structural subsumption, proof generation, and unsat-core extraction remain open."
+        "Dynamic-ack callbacks are recorded as typed congruence/equality-use events until the concrete manager is connected. Structural subsumption and proof generation remain open."
       ]
     },
     {
@@ -103982,7 +103993,9 @@
         "TestSMTConflictJustificationMaximumAssignmentLevels",
         "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification",
         "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel",
-        "TestSMTConflictResolverMinimizesImpliedLemmaLiteral"
+        "TestSMTConflictResolverMinimizesImpliedLemmaLiteral",
+        "TestSMTKernelAssumptionsValidateCheckAndRollback",
+        "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
       ],
       "conditionals": [
         {
@@ -104043,7 +104056,16 @@
           ]
         },
         {
-          "name": "proof accessors, structural subsumption, and unsat-core interface",
+          "name": "assumption unsat-core result interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_resolver.go",
+          "tests": [
+            "TestSMTKernelAssumptionsValidateCheckAndRollback",
+            "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
+          ]
+        },
+        {
+          "name": "proof accessors and structural subsumption interface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -105112,7 +105134,7 @@
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
       ],
       "deviations": [
-        "Structural subsumption, conflict proofs, unsat-core extraction, restarts, resource limits, and binary-clause specialization remain unported."
+        "Structural subsumption, conflict proofs, restarts, resource limits, and binary-clause specialization remain unported."
       ]
     },
     {
@@ -106877,6 +106899,7 @@
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
+        "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
         "TestSMTKernelScopesRestoreAssertionsAndContext"
       ],
       "methods_audited": true,
@@ -106903,7 +106926,16 @@
           ]
         },
         {
-          "name": "copy and reset, consequences, mutexes, preferred SAT, model, proof, unsat core, failure reason, labels, guessed literals, display, cancellation, and parameter updates",
+          "name": "owned sorted assumption unsat-core result",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_assumptions.go",
+          "tests": [
+            "TestSMTKernelAssumptionsValidateCheckAndRollback",
+            "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
+          ]
+        },
+        {
+          "name": "copy and reset, consequences, mutexes, preferred SAT, model, proof, failure reason, labels, guessed literals, display, cancellation, and parameter updates",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -106932,6 +106964,7 @@
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
+        "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
         "TestSMTKernelScopesRestoreAssertionsAndContext"
       ],
       "conditionals": [
@@ -106968,7 +107001,16 @@
           ]
         },
         {
-          "name": "translation, reset, derived queries, model/proof/core results, diagnostics, display, cancellation, and parameter interface",
+          "name": "owned assumption unsat-core access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_assumptions.go",
+          "tests": [
+            "TestSMTKernelAssumptionsValidateCheckAndRollback",
+            "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
+          ]
+        },
+        {
+          "name": "translation, reset, derived queries, model/proof results, diagnostics, display, cancellation, and parameter interface",
           "status": "unported",
           "go_target": null,
           "tests": []

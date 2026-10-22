@@ -20,6 +20,7 @@ func (s *SMTInternalizerState) AssignLiteral(literal SMTLiteral, justification S
 		if literal == SMTFalseLiteral {
 			s.inconsistent = true
 			s.conflict = justification
+			s.conflictLiteral = SMTNullLiteral
 			s.statistics.NumConflicts++
 			return nil
 		}
@@ -35,6 +36,7 @@ func (s *SMTInternalizerState) AssignLiteral(literal SMTLiteral, justification S
 	if value == lbool.False {
 		s.inconsistent = true
 		s.conflict = justification
+		s.conflictLiteral = literal
 		s.statistics.NumConflicts++
 		return nil
 	}
@@ -59,6 +61,13 @@ func (s *SMTInternalizerState) Conflict() (SMTBooleanJustification, bool) {
 		return NullSMTBooleanJustification(), false
 	}
 	return s.conflict, true
+}
+
+func (s *SMTInternalizerState) ConflictLiteral() SMTLiteral {
+	if s == nil || !s.inconsistent {
+		return SMTNullLiteral
+	}
+	return s.conflictLiteral
 }
 
 func (s *SMTInternalizerState) makeClause(literals []SMTLiteral, kind SMTClauseKind, proof ast.ASTHandle) (*SMTClause, SMTJustification, error) {
@@ -200,6 +209,7 @@ func (s *SMTInternalizerState) Propagate() (bool, error) {
 				}
 				s.inconsistent = true
 				s.conflict = NewSMTBooleanClause(clause)
+				s.conflictLiteral = SMTNullLiteral
 				s.statistics.NumConflicts++
 				return false, nil
 			}

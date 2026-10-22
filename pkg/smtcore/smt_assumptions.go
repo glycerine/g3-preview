@@ -5,6 +5,7 @@ package smtcore
 import (
 	"errors"
 	"fmt"
+	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -50,6 +51,9 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 	if err := k.open(); err != nil {
 		return lbool.Undef, err
 	}
+	if err := k.clearUnsatCore(); err != nil {
+		return lbool.Undef, err
+	}
 	for index, assumption := range assumptions {
 		valid, err := k.validAssumption(assumption)
 		if err != nil {
@@ -77,6 +81,7 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 		return lbool.Undef, err
 	}
 	assumptionVariables := make([]int32, 0, len(assumptions))
+	k.assumptions = make(map[SMTLiteral]ast.ASTHandle, len(assumptions))
 	defer func() {
 		for _, variable := range assumptionVariables {
 			if variable >= SMTFirstBoolVar && int(variable) < len(k.internalizer.booleanData) {
@@ -84,6 +89,7 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 			}
 		}
 		resultErr = errors.Join(resultErr, k.internalizer.PopScopes(1))
+		k.assumptions = nil
 		if resultErr != nil {
 			result = lbool.Undef
 		}
@@ -113,7 +119,69 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 		if literal.Var() >= SMTFirstBoolVar {
 			k.internalizer.booleanData[literal.Var()].Assumption = true
 			assumptionVariables = append(assumptionVariables, literal.Var())
+			k.assumptions[literal] = assumption
 		}
 	}
 	return k.search(queue)
+}
+
+func (k *SMTKernel) clearUnsatCore() error {
+	if k == nil || k.manager == nil {
+		return ast.ErrASTHandle
+	}
+	var result error
+	for _, expression := range k.unsatCore {
+		result = errors.Join(result, k.manager.DecRef(expression))
+	}
+	k.unsatCore = nil
+	return result
+}
+
+func (k *SMTKernel) captureUnsatCore(resolver *SMTConflictResolver, conflict SMTBooleanJustification, notLiteral SMTLiteral) error {
+	if len(k.assumptions) == 0 {
+		return nil
+	}
+	literals, err := resolver.UnsatCore(conflict, notLiteral)
+	if err != nil {
+		return err
+	}
+	type coreEntry struct {
+		expression ast.ASTHandle
+		id         uint32
+	}
+	seen := make(map[ast.ASTHandle]struct{}, len(literals))
+	entries := make([]coreEntry, 0, len(literals))
+	for _, literal := range literals {
+		expression, found := k.assumptions[literal]
+		if !found {
+			expression, found = k.assumptions[literal.Negated()]
+		}
+		if !found {
+			return ast.ErrASTDomain
+		}
+		if _, duplicate := seen[expression]; duplicate {
+			continue
+		}
+		id, idErr := k.manager.GetASTID(expression)
+		if idErr != nil {
+			return idErr
+		}
+		seen[expression] = struct{}{}
+		entries = append(entries, coreEntry{expression: expression, id: id})
+	}
+	sort.Slice(entries, func(i, j int) bool { return entries[i].id < entries[j].id })
+	for _, entry := range entries {
+		if err = k.manager.IncRef(entry.expression); err != nil {
+			return errors.Join(err, k.clearUnsatCore())
+		}
+		k.unsatCore = append(k.unsatCore, entry.expression)
+	}
+	return nil
+}
+
+func (k *SMTKernel) UnsatCore() []ast.ASTHandle {
+	if k == nil {
+		return nil
+	}
+	return append([]ast.ASTHandle(nil), k.unsatCore...)
 }

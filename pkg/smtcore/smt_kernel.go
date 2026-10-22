@@ -23,6 +23,8 @@ type SMTKernel struct {
 	assertions   []SMTKernelAssertion
 	assertedHead int
 	scopes       []int
+	unsatCore    []ast.ASTHandle
+	assumptions  map[SMTLiteral]ast.ASTHandle
 	closed       bool
 }
 
@@ -208,6 +210,9 @@ func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 }
 
 func (k *SMTKernel) Check() (lbool.LBool, error) {
+	if err := k.clearUnsatCore(); err != nil {
+		return lbool.Undef, err
+	}
 	queue, err := k.prepareCheck()
 	if err != nil {
 		return lbool.Undef, err
@@ -234,6 +239,7 @@ func (k *SMTKernel) Close() error {
 		return nil
 	}
 	var result error
+	result = errors.Join(result, k.clearUnsatCore())
 	result = errors.Join(result, k.internalizer.Close())
 	for index := len(k.assertions); index > 0; index-- {
 		assertion := &k.assertions[index-1]

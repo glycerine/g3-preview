@@ -160,6 +160,10 @@ func TestSMTKernelAssumptionsValidateCheckAndRollback(t *testing.T) {
 	if result != lbool.False {
 		t.Fatal("contradictory assumptions", result)
 	}
+	core := kernel.UnsatCore()
+	if len(core) != 2 || core[0] != notA || core[1] != notB {
+		t.Fatal("assumption unsat core", core, notA, notB)
+	}
 	state, err := kernel.Internalizer()
 	astTestMust(t, err)
 	for _, expression := range []ast.ASTHandle{a, b} {
@@ -178,8 +182,26 @@ func TestSMTKernelAssumptionsValidateCheckAndRollback(t *testing.T) {
 	if result != lbool.True {
 		t.Fatal("base formula after assumption rollback", result)
 	}
+	if len(kernel.UnsatCore()) != 0 {
+		t.Fatal("ordinary check did not clear unsat core")
+	}
 	if _, err = kernel.CheckAssumptions([]ast.ASTHandle{clause}); err == nil {
 		t.Fatal("compound assumption accepted")
+	}
+}
+
+func TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral(t *testing.T) {
+	m := astTestManager(t)
+	a := smtRelevancyBool(t, m, "kernel-core-a")
+	notA, err := m.MkNot(a)
+	astTestMust(t, err)
+	kernel := smtTestKernel(t, m)
+	astTestMust(t, kernel.Assert(a, ast.ASTHandle{}))
+	result, err := kernel.CheckAssumptions([]ast.ASTHandle{notA})
+	astTestMust(t, err)
+	core := kernel.UnsatCore()
+	if result != lbool.False || len(core) != 1 || core[0] != notA {
+		t.Fatal("directly contradicting assumption core", result, core)
 	}
 }
 

@@ -53,11 +53,15 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			if !found {
 				return lbool.Undef, ast.ErrASTDomain
 			}
-			resolution, err := resolver.Resolve(conflict, SMTNullLiteral, baseLevel)
+			conflictLiteral := k.internalizer.ConflictLiteral()
+			resolution, err := resolver.Resolve(conflict, conflictLiteral, baseLevel)
 			if err != nil {
 				return lbool.Undef, fmt.Errorf("smt search resolve conflict: %w", err)
 			}
 			if !resolution.Resolved {
+				if err = k.captureUnsatCore(resolver, conflict, conflictLiteral); err != nil {
+					return lbool.Undef, err
+				}
 				return lbool.False, nil
 			}
 			if resolution.NewScopeLevel < baseLevel || resolution.NewScopeLevel >= k.internalizer.scopeLevel {

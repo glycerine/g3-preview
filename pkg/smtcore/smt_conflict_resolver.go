@@ -3,7 +3,10 @@
 // finalize_resolve().
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
+)
 
 type SMTConflictResolution struct {
 	Resolved           bool
@@ -147,6 +150,112 @@ func NewSMTConflictResolver(state *SMTInternalizerState) (*SMTConflictResolver, 
 		return nil, ast.ErrASTHandle
 	}
 	return &SMTConflictResolver{state: state, expander: NewSMTAntecedentExpander()}, nil
+}
+
+// UnsatCore traces a base conflict back through Boolean and theory
+// justifications and returns only assumption literals.
+func (r *SMTConflictResolver) UnsatCore(conflict SMTBooleanJustification, notLiteral SMTLiteral) ([]SMTLiteral, error) {
+	if r == nil || r.state == nil || r.expander == nil || r.state.open() != nil {
+		return nil, ast.ErrASTHandle
+	}
+	seen := make([]bool, len(r.state.booleanData))
+	queue := make([]SMTLiteral, 0)
+	core := make([]SMTLiteral, 0)
+	add := func(literal SMTLiteral) error {
+		variable := literal.Var()
+		if variable < SMTFirstBoolVar || int(variable) >= len(seen) {
+			return ast.ErrASTDomain
+		}
+		if !seen[variable] {
+			seen[variable] = true
+			queue = append(queue, literal)
+		}
+		return nil
+	}
+	var expand func(SMTLiteral, SMTBooleanJustification) error
+	expand = func(consequent SMTLiteral, justification SMTBooleanJustification) error {
+		switch justification.Kind() {
+		case SMTBooleanJustificationClause:
+			clause, ok := justification.Clause()
+			if !ok || clause == nil {
+				return ast.ErrASTDomain
+			}
+			start := 0
+			if consequent != SMTFalseLiteral {
+				if clause.literals[0] == consequent {
+					start = 1
+				} else if len(clause.literals) > 1 && clause.literals[1] == consequent {
+					if err := add(clause.literals[0].Negated()); err != nil {
+						return err
+					}
+					start = 2
+				} else {
+					return ast.ErrASTDomain
+				}
+			}
+			for _, literal := range clause.literals[start:] {
+				if err := add(literal.Negated()); err != nil {
+					return err
+				}
+			}
+			if clause.justification != nil {
+				antecedents, err := r.expander.ExpandJustification(clause.justification)
+				if err != nil {
+					return err
+				}
+				for _, literal := range antecedents {
+					if err = add(literal); err != nil {
+						return err
+					}
+				}
+			}
+		case SMTBooleanJustificationBinaryClause:
+			literal, ok := justification.Literal()
+			if !ok {
+				return ast.ErrASTDomain
+			}
+			return add(literal)
+		case SMTBooleanJustificationAxiom:
+		case SMTBooleanJustificationObject:
+			object, ok := justification.Justification()
+			if !ok || object == nil {
+				return ast.ErrASTDomain
+			}
+			antecedents, err := r.expander.ExpandJustification(object)
+			if err != nil {
+				return err
+			}
+			for _, literal := range antecedents {
+				if err = add(literal); err != nil {
+					return err
+				}
+			}
+		default:
+			return ast.ErrASTDomain
+		}
+		return nil
+	}
+	if notLiteral != SMTNullLiteral {
+		if err := add(notLiteral); err != nil {
+			return nil, err
+		}
+	}
+	if err := expand(SMTFalseLiteral, conflict); err != nil {
+		return nil, err
+	}
+	for head := 0; head < len(queue); head++ {
+		literal := queue[head]
+		variable := literal.Var()
+		if r.state.booleanData[variable].Assumption {
+			core = append(core, literal)
+			continue
+		}
+		assigned := NewSMTLiteral(variable, r.state.assignment[NewSMTLiteral(variable, false).Index()] != lbool.True)
+		if err := expand(assigned, r.state.booleanData[variable].Justification()); err != nil {
+			return nil, err
+		}
+	}
+	return core, nil
 }
 
 func (r *SMTConflictResolver) levels() []uint32 {

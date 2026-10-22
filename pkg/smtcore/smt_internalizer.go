@@ -138,6 +138,7 @@ func (s *SMTInternalizerState) addClauseKind(literals []SMTLiteral, root bool, k
 	if len(kept) == 0 {
 		s.inconsistent = true
 		s.conflict = NewSMTBooleanAxiom()
+		s.conflictLiteral = SMTNullLiteral
 		s.statistics.NumConflicts++
 		return nil
 	}
