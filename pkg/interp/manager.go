@@ -6,6 +6,8 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	astrewriter "github.com/glycerine/g3/pkg/ast/rewriter"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -68,6 +70,8 @@ type Manager struct {
 	ast        *ast.ASTManager
 	arithmetic ast.FamilyID
 	array      ast.FamilyID
+	simplifier *astrewriter.TheoryRewriter
+	strong     *astrewriter.TheoryRewriter
 	closed     bool
 }
 
@@ -91,6 +95,42 @@ func NewManager(m *ast.ASTManager) (*Manager, error) {
 	return r, nil
 }
 
+// NewManagerWithParams equips the wrapper with the two source theory-rewriter
+// configurations used by z3_simplify and z3_really_simplify.
+func NewManagerWithParams(m *ast.ASTManager, context *uparams.ParamsContext, globals *uparams.GlobalParamsService) (result *Manager, resultErr error) {
+	result, err := NewManager(m)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if resultErr != nil {
+			resultErr = errors.Join(resultErr, result.Close())
+			result = nil
+		}
+	}()
+	result.simplifier, err = astrewriter.NewTheoryRewriter(m, context, globals, nil)
+	if err != nil {
+		return nil, err
+	}
+	parameters, err := context.NewValue()
+	if err != nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, context.Del(&parameters)) }()
+	som, sortSums := "som", "sort_sums"
+	if err = context.SetBoolName(&parameters, &som, true); err != nil {
+		return nil, err
+	}
+	if err = context.SetBoolName(&parameters, &sortSums, true); err != nil {
+		return nil, err
+	}
+	result.strong, err = astrewriter.NewTheoryRewriter(m, context, globals, &parameters)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (m *Manager) open() error {
 	if m == nil || m.self != m || m.closed || m.ast == nil {
 		return ast.ErrASTHandle
@@ -99,12 +139,23 @@ func (m *Manager) open() error {
 	return err
 }
 
-func (m *Manager) Close() error {
+func (m *Manager) Close() (result error) {
 	if m == nil || m.self != m {
 		return ast.ErrASTHandle
 	}
+	if m.closed {
+		return nil
+	}
+	if m.strong != nil {
+		result = errors.Join(result, m.strong.Close())
+		m.strong = nil
+	}
+	if m.simplifier != nil {
+		result = errors.Join(result, m.simplifier.Close())
+		m.simplifier = nil
+	}
 	m.closed = true
-	return nil
+	return result
 }
 
 func (m *Manager) ASTManager() (*ast.ASTManager, error) {

@@ -40690,7 +40690,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/interp/manager.go",
-        "pkg/interp/manager_proof.go"
+        "pkg/interp/manager_proof.go",
+        "pkg/interp/manager_rewrite.go"
       ],
       "tests": [
         "TestInterpolationManagerOperatorConstructionAndAccess",
@@ -40702,6 +40703,8 @@
         "TestInterpolationManagerTheoryCoefficientNormalization",
         "TestInterpolationManagerTriangleEqualityKinds",
         "TestInterpolationManagerAssignBoundsAndCoefficientTerms",
+        "TestInterpolationManagerTheorySimplifiers",
+        "TestInterpolationManagerSimplifierConfigurationGuard",
         "TestInterpolationManagerBorrowAndCopyGuards"
       ],
       "conditionals": [
@@ -40797,7 +40800,16 @@
           ]
         },
         {
-          "name": "rewriting, linear combinations, integer division, free-variable universal closure, and controlling-equality quantifier optimization",
+          "name": "default and sum-of-monomials theory rewriting",
+          "status": "ported",
+          "go_target": "pkg/interp/manager_rewrite.go",
+          "tests": [
+            "TestInterpolationManagerTheorySimplifiers",
+            "TestInterpolationManagerSimplifierConfigurationGuard"
+          ]
+        },
+        {
+          "name": "linear combinations, integer division, free-variable universal closure, and controlling-equality quantifier optimization",
           "status": "unported",
           "tests": []
         }
@@ -40806,7 +40818,7 @@
         "The wrapper borrows ASTManager. Returned handles follow the Go AST package contract: consumers pin handles stored beyond the immediate operation. Full manager ownership audit remains open."
       ],
       "deviations": [
-        "Native Go maps replace source operator lookup tables and source ast_r temporaries are represented by checked ASTHandle values."
+        "Native Go maps replace source operator lookup tables. Structural operations use checked ASTHandle values; theory rewriting returns owning ASTRef values because rewritten roots can otherwise be reclaimed before caller pinning."
       ]
     },
     {
@@ -40816,7 +40828,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/interp/manager.go",
-        "pkg/interp/manager_proof.go"
+        "pkg/interp/manager_proof.go",
+        "pkg/interp/manager_rewrite.go"
       ],
       "tests": [
         "TestInterpolationManagerOperatorConstructionAndAccess",
@@ -40828,6 +40841,8 @@
         "TestInterpolationManagerTheoryCoefficientNormalization",
         "TestInterpolationManagerTriangleEqualityKinds",
         "TestInterpolationManagerAssignBoundsAndCoefficientTerms",
+        "TestInterpolationManagerTheorySimplifiers",
+        "TestInterpolationManagerSimplifierConfigurationGuard",
         "TestInterpolationManagerBorrowAndCopyGuards"
       ],
       "conditionals": [
@@ -40868,7 +40883,16 @@
           ]
         },
         {
-          "name": "remaining arithmetic algorithms, rewriting, universal closure, and optimized-quantification declarations",
+          "name": "default and sum-of-monomials theory rewriting declarations",
+          "status": "ported",
+          "go_target": "pkg/interp/manager_rewrite.go",
+          "tests": [
+            "TestInterpolationManagerTheorySimplifiers",
+            "TestInterpolationManagerSimplifierConfigurationGuard"
+          ]
+        },
+        {
+          "name": "remaining arithmetic algorithms, universal closure, and optimized-quantification declarations",
           "status": "unported",
           "tests": []
         }
