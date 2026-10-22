@@ -112832,22 +112832,48 @@
       "path": "src/solver/check_sat_result.cpp",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/check_sat_result.go",
+        "pkg/solver/check_sat_result_test.go"
+      ],
+      "tests": [
+        "TestSimpleCheckSatResultStatusCoreProofModelAndStatistics",
+        "TestSimpleCheckSatResultReasonsLabelsAndReferenceLifetime"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "event-handler reason selection and complete simple_check_sat_result implementation (check_sat_result.cpp:21-72)",
+          "status": "ported",
+          "go_target": "pkg/solver/check_sat_result.go",
+          "tests": [
+            "TestSimpleCheckSatResultStatusCoreProofModelAndStatistics",
+            "TestSimpleCheckSatResultReasonsLabelsAndReferenceLifetime"
+          ]
+        }
+      ],
+      "ownership": [
+        "The simple result owns independent AST references for its core and proof and a retained model reference; copied statistics, labels and reason strings use Go values."
+      ],
+      "deviations": [
+        "EventCaller is passed directly because the retained Go control EventHandler intentionally exposes only event delivery, not mutable caller state."
+      ]
     },
     {
       "path": "src/solver/check_sat_result.h",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/check_sat_result.go",
+        "pkg/solver/check_sat_result_test.go"
+      ],
+      "tests": [
+        "TestSimpleCheckSatResultStatusCoreProofModelAndStatistics",
+        "TestSimpleCheckSatResultReasonsLabelsAndReferenceLifetime"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -112864,11 +112890,34 @@
           "text": "void dec_ref() { SASSERT(m_ref_count > 0); m_ref_count--; if (m_ref_count == 0) dealloc(this); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "check_sat_result virtual status, statistics, core, model, proof, reason, label and manager surface with reference lifetime (check_sat_result.h:38-65)",
+          "status": "ported",
+          "go_target": "pkg/solver/check_sat_result.go",
+          "tests": [
+            "TestSimpleCheckSatResultStatusCoreProofModelAndStatistics",
+            "TestSimpleCheckSatResultReasonsLabelsAndReferenceLifetime"
+          ]
+        },
+        {
+          "name": "simple_check_sat_result storage and complete overrides (check_sat_result.h:70-88)",
+          "status": "ported",
+          "go_target": "pkg/solver/check_sat_result.go",
+          "tests": [
+            "TestSimpleCheckSatResultStatusCoreProofModelAndStatistics",
+            "TestSimpleCheckSatResultReasonsLabelsAndReferenceLifetime"
+          ]
+        }
+      ],
+      "ownership": [
+        "Final DecRef retires the result, while Close supports the direct Go owner. ASTRef cells preserve core and proof pins through stopped cleanup, and acquired models carry an explicit independent reference."
+      ],
+      "deviations": [
+        "UnsatCore and Labels return copied slices of borrowed scalar handles and symbols rather than exposing C++ output vectors. AcquireModel names its owning-reference transfer explicitly."
+      ]
     },
     {
       "path": "src/solver/combined_solver.cpp",
@@ -113029,9 +113078,14 @@
       "path": "src/solver/progress_callback.h",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/check_sat_result.go",
+        "pkg/solver/check_sat_result_test.go"
+      ],
+      "tests": [
+        "TestProgressCallbackSurface"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113042,10 +113096,21 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "fast and slow progress callback virtual dispatch (progress_callback.h:21-31)",
+          "status": "ported",
+          "go_target": "pkg/solver/check_sat_result.go",
+          "tests": [
+            "TestProgressCallbackSurface"
+          ]
+        }
+      ],
+      "ownership": [
+        "ProgressCallback is borrowed by solvers; the interface owns no resources."
+      ],
       "deviations": []
     },
     {
