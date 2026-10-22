@@ -112813,8 +112813,10 @@
       "path": "src/solver/CMakeLists.txt",
       "component": "solver",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": [
+        "pkg/solver/solver.go"
+      ],
       "tests": [],
       "registrations": [
         {
@@ -112822,11 +112824,13 @@
           "text": "z3_add_component(solver"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go package discovery and compilation replace the solver CMake component, preserve pkg/solver, and compile the retained solver sources without generated build registration."
+      ]
     },
     {
       "path": "src/solver/check_sat_result.cpp",
@@ -113666,7 +113670,7 @@
       "path": "src/solver/solver_pool.cpp",
       "component": "solver",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -113725,17 +113729,25 @@
           "text": "SASSERT(ps);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "pool_solver virtual partitions and solver_pool allocation, reset, refresh and statistics",
+          "status": "reference_only",
+          "reason": "No retained source file includes solver_pool.h or constructs solver_pool/pool_solver; the only external source mention is the CMake source listing."
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Dormant solver-pool code is retained as reference material and is not exposed through an unused universal Go adapter."
+      ]
     },
     {
       "path": "src/solver/solver_pool.h",
       "component": "solver",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -113748,11 +113760,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "solver_pool declaration, statistics, mk_solver and reset_solver",
+          "status": "reference_only",
+          "reason": "No retained source consumer includes this header or names solver_pool."
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The unused declaration remains reference-only under retained-consumer porting policy."
+      ]
     },
     {
       "path": "src/solver/tactic2solver.cpp",
