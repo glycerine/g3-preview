@@ -142,6 +142,34 @@ func TestSMTDatatypeConstructorAccessor(t *testing.T) {
 	}
 }
 
+func TestSMTDatatypeDistinctConstructorsConflict(t *testing.T) {
+	m, _, solver := smtDatatypeSolver(t)
+	sorts, err := m.MkDatatypes([]ast.DatatypeDefinition{{
+		Name: astTestSymbol(t, m, "smt-distinct-color"),
+		Constructors: []ast.DatatypeConstructorDefinition{
+			{Name: astTestSymbol(t, m, "smt-distinct-red"), Recognizer: astTestSymbol(t, m, "smt-distinct-is-red")},
+			{Name: astTestSymbol(t, m, "smt-distinct-blue"), Recognizer: astTestSymbol(t, m, "smt-distinct-is-blue")},
+		},
+	}})
+	astTestMust(t, err)
+	constructors, err := m.DatatypeConstructors(sorts[0])
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "smt-distinct-x"), sorts[0])
+	astTestMust(t, err)
+	for _, constructor := range constructors {
+		value, valueErr := m.MkApp(constructor, nil)
+		astTestMust(t, valueErr)
+		equality, valueErr := m.MkEq(x, value)
+		astTestMust(t, valueErr)
+		astTestMust(t, solver.Assert(equality))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("distinct datatype constructors shared a value", status)
+	}
+}
+
 func TestSMTDatatypeRecursiveOccursCheck(t *testing.T) {
 	for _, cyclic := range []bool{false, true} {
 		t.Run(map[bool]string{false: "finite-value", true: "cycle"}[cyclic], func(t *testing.T) {
@@ -195,19 +223,33 @@ func TestSMTDatatypeInfiniteRecognizerSplit(t *testing.T) {
 	astTestMust(t, err)
 	x, err := m.MkConst(astTestSymbol(t, m, "smt-split-x"), sorts[0])
 	astTestMust(t, err)
-	for _, constructor := range constructors {
+	negated := make([]ast.ASTHandle, len(constructors))
+	for i, constructor := range constructors {
 		recognizer, recErr := m.DatatypeConstructorRecognizer(constructor)
 		astTestMust(t, recErr)
 		atom, recErr := m.MkApp(recognizer, []ast.ASTHandle{x})
 		astTestMust(t, recErr)
-		negated, recErr := m.MkNot(atom)
+		negated[i], recErr = m.MkNot(atom)
 		astTestMust(t, recErr)
-		astTestMust(t, solver.Assert(negated))
 	}
+	astTestMust(t, solver.Assert(negated[0]))
 	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("infinite datatype could not select remaining constructor", status)
+	}
+	astTestMust(t, solver.Push())
+	astTestMust(t, solver.Assert(negated[1]))
+	status, err = solver.CheckSat(nil)
 	astTestMust(t, err)
 	if status != lbool.False {
 		t.Fatal("infinite datatype escaped every constructor", status)
+	}
+	astTestMust(t, solver.Pop(1))
+	status, err = solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("datatype split state did not roll back", status)
 	}
 }
 

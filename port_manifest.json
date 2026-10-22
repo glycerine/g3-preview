@@ -114251,7 +114251,7 @@
       "path": "src/smt/theory_datatype.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_datatype.go"
       ],
@@ -114262,7 +114262,8 @@
         "TestSMTDatatypeUpdateFieldAxioms",
         "TestSMTDatatypeQFDTSetup",
         "TestSMTDatatypeConstructorModelValue",
-        "TestSMTDatatypeInfiniteRecognizerSplit"
+        "TestSMTDatatypeInfiniteRecognizerSplit",
+        "TestSMTDatatypeDistinctConstructorsConflict"
       ],
       "assertions": [
         {
@@ -114474,17 +114475,40 @@
           "text": "SASSERT(r != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor, accessor, recognizer and update-field internalization with exclusive and exhaustive constructor axioms",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype.go",
+          "tests": ["TestSMTDatatypeRecognizerCases", "TestSMTDatatypeConstructorAccessor", "TestSMTDatatypeUpdateFieldAxioms"]
+        },
+        {
+          "name": "constructor disjointness, recursive occurs checking, lazy infinite-sort splitting and scoped rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype.go",
+          "tests": ["TestSMTDatatypeDistinctConstructorsConflict", "TestSMTDatatypeRecursiveOccursCheck", "TestSMTDatatypeInfiniteRecognizerSplit"]
+        },
+        {
+          "name": "datatype model-factory registration and constructor value procedures",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype.go",
+          "tests": ["TestSMTDatatypeConstructorModelValue"]
+        }
+      ],
+      "ownership": [
+        "Concrete Go maps and slices own initialized-value, recognizer, reconstruction and case-split trails. AST handles and enodes remain borrowed from the manager and SMT context; the model generator owns registered datatype values."
+      ],
+      "deviations": [
+        "Guarded SAT clauses and shared egraph roots replace source var_data, union-find, region justifications and recognizer arrays. Accessor result enodes receive attach-only theory variables to satisfy the Go handled-term contract without eager recursive case expansion. Invalid source assertion states return Go errors."
+      ]
     },
     {
       "path": "src/smt/theory_datatype.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_datatype.go"
       ],
@@ -114495,7 +114519,8 @@
         "TestSMTDatatypeUpdateFieldAxioms",
         "TestSMTDatatypeQFDTSetup",
         "TestSMTDatatypeConstructorModelValue",
-        "TestSMTDatatypeInfiniteRecognizerSplit"
+        "TestSMTDatatypeInfiniteRecognizerSplit",
+        "TestSMTDatatypeDistinctConstructorsConflict"
       ],
       "conditionals": [
         {
@@ -114507,11 +114532,22 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete retained datatype theory lifecycle, internalization, propagation, final-check and model interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype.go",
+          "tests": ["TestSMTDatatypeRecognizerCases", "TestSMTDatatypeConstructorAccessor", "TestSMTDatatypeUpdateFieldAxioms", "TestSMTDatatypeRecursiveOccursCheck", "TestSMTDatatypeInfiniteRecognizerSplit", "TestSMTDatatypeDistinctConstructorsConflict", "TestSMTDatatypeConstructorModelValue"]
+        }
+      ],
+      "ownership": [
+        "SMTDatatypeTheory owns concrete Go metadata and scope trails while borrowing manager-owned AST handles and context-owned enodes."
+      ],
+      "deviations": [
+        "The public Go theory interface replaces C++ inheritance, nested trail classes and manual allocation."
+      ]
     },
     {
       "path": "src/smt/theory_dense_diff_logic.cpp",
