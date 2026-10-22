@@ -83,3 +83,28 @@ func TestSMTCoreEqualityCongruencePropagation(t *testing.T) {
 		t.Fatal("congruence contradiction", status)
 	}
 }
+
+func TestSMTCoreEqualityPropagatesBooleanCongruence(t *testing.T) {
+	manager, solver := smtSolverFixture(t)
+	sort, values := smtUFConstants(t, manager, "core-bool-cg-", 2)
+	boolean, err := manager.MkBoolSort()
+	astTestMust(t, err)
+	predicate, err := manager.MkFuncDecl(astTestSymbol(t, manager, "core-bool-cg-p"), []ast.ASTHandle{sort}, boolean, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	pa, err := manager.MkApp(predicate, []ast.ASTHandle{values[0]})
+	astTestMust(t, err)
+	pb, err := manager.MkApp(predicate, []ast.ASTHandle{values[1]})
+	astTestMust(t, err)
+	ab, err := manager.MkEq(values[0], values[1])
+	astTestMust(t, err)
+	notPB, err := manager.MkNot(pb)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(ab))
+	astTestMust(t, solver.Assert(pa))
+	astTestMust(t, solver.Assert(notPB))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("Boolean congruence contradiction", status)
+	}
+}

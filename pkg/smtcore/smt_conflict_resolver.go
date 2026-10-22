@@ -158,7 +158,22 @@ func NewSMTConflictResolver(state *SMTInternalizerState) (*SMTConflictResolver, 
 	if err != nil {
 		return nil, err
 	}
-	return &SMTConflictResolver{state: state, expander: NewSMTAntecedentExpander(), lemmaProof: proof}, nil
+	expander := NewSMTAntecedentExpander()
+	for variable := int32(SMTFirstBoolVar); int(variable) < len(state.booleanData); variable++ {
+		if !state.booleanData[variable].IsENode() {
+			continue
+		}
+		node := state.context.enodes[state.boolExpr[variable]]
+		if node == nil {
+			_ = state.manager.DelRef(&proof)
+			return nil, ast.ErrASTDomain
+		}
+		if err = expander.SetENodeLiteral(node, NewSMTLiteral(variable, false)); err != nil {
+			_ = state.manager.DelRef(&proof)
+			return nil, err
+		}
+	}
+	return &SMTConflictResolver{state: state, expander: expander, lemmaProof: proof}, nil
 }
 
 // LemmaProof returns the resolver-owned proof produced by the most recent

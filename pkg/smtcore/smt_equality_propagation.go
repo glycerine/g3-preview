@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func cloneSMTTheoryVariables(source SMTTheoryVarList) SMTTheoryVarList {
@@ -209,6 +210,55 @@ func (s *SMTInternalizerState) propagateTrueEqualities() error {
 	return nil
 }
 
+func (s *SMTInternalizerState) propagateBooleanClass(root *SMTEnode) error {
+	if root == nil || !root.boolean {
+		return nil
+	}
+	var source *SMTEnode
+	value := lbool.Undef
+	for node := root; ; node = node.next {
+		if variable, found := s.boolVar[node.owner]; found {
+			assigned, err := s.Assignment(NewSMTLiteral(variable, false))
+			if err != nil {
+				return err
+			}
+			if assigned != lbool.Undef {
+				source, value = node, assigned
+				break
+			}
+		}
+		if node.next == root {
+			break
+		}
+	}
+	if source == nil {
+		return nil
+	}
+	for node := root; ; node = node.next {
+		if variable, found := s.boolVar[node.owner]; found && node != source {
+			literal := NewSMTLiteral(variable, value == lbool.False)
+			justification, err := NewSMTModusPonensIffJustification(source, node)
+			if err != nil {
+				return err
+			}
+			wrapped, err := NewSMTBooleanJustification(justification)
+			if err != nil {
+				return err
+			}
+			if err = s.AssignLiteral(literal, wrapped); err != nil {
+				return err
+			}
+			if s.inconsistent {
+				return nil
+			}
+		}
+		if node.next == root {
+			break
+		}
+	}
+	return nil
+}
+
 func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification SMTEqualityJustification) error {
 	if left == nil || right == nil || left.manager != s.manager || right.manager != s.manager {
 		return ast.ErrASTDomain
@@ -250,6 +300,12 @@ func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification 
 	}
 	r1.next, r2.next = r2.next, r1.next
 	r2.classSize += r1.classSize
+	if err := s.propagateBooleanClass(r2); err != nil {
+		return fmt.Errorf("propagate Boolean equality class: %w", err)
+	}
+	if s.inconsistent {
+		return nil
+	}
 	if err := s.remapDisequalities(); err != nil {
 		return fmt.Errorf("remap disequalities: %w", err)
 	}

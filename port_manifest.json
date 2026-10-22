@@ -104367,7 +104367,8 @@
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
-        "TestSMTCoreEqualityCongruencePropagation"
+        "TestSMTCoreEqualityCongruencePropagation",
+        "TestSMTCoreEqualityPropagatesBooleanCongruence"
       ],
       "conditionals": [
         {
@@ -105352,12 +105353,13 @@
           ]
         },
         {
-          "name": "equality and disequality propagation, union-find class merging, transitivity proofs, congruence closure, theory-variable notification, and scoped rollback",
+          "name": "equality and disequality propagation, union-find class merging, transitivity proofs, congruence closure, Boolean-class assignment propagation, theory-variable notification, and scoped rollback",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_equality_propagation.go",
           "tests": [
             "TestSMTCoreEqualityTransitivityAndScopeRollback",
             "TestSMTCoreEqualityCongruencePropagation",
+            "TestSMTCoreEqualityPropagatesBooleanCongruence",
             "TestSMTSolverImpliedEqualitiesPartitionsByProofAndSort"
           ]
         }
@@ -105391,7 +105393,8 @@
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
-        "TestSMTCoreEqualityCongruencePropagation"
+        "TestSMTCoreEqualityCongruencePropagation",
+        "TestSMTCoreEqualityPropagatesBooleanCongruence"
       ],
       "conditionals": [
         {
@@ -105616,12 +105619,13 @@
           ]
         },
         {
-          "name": "equality-class, disequality, congruence queue, proof forest, and rollback state",
+          "name": "equality-class, disequality, congruence queue, proof forest, Boolean-class propagation, and rollback state",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_equality_propagation.go",
           "tests": [
             "TestSMTCoreEqualityTransitivityAndScopeRollback",
-            "TestSMTCoreEqualityCongruencePropagation"
+            "TestSMTCoreEqualityCongruencePropagation",
+            "TestSMTCoreEqualityPropagatesBooleanCongruence"
           ]
         }
       ],
@@ -106638,7 +106642,8 @@
         "TestSMTBinaryClauseOptimizationDefersScopedClauses",
         "TestSMTKernelEnablesBinaryClausesUnlessProofsAreEnabled",
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
-        "TestSMTCoreEqualityCongruencePropagation"
+        "TestSMTCoreEqualityCongruencePropagation",
+        "TestSMTCoreEqualityPropagatesBooleanCongruence"
       ],
       "conditionals": [
         {
@@ -107060,7 +107065,8 @@
           "go_target": "pkg/smtcore/smt_equality_propagation.go",
           "tests": [
             "TestSMTCoreEqualityTransitivityAndScopeRollback",
-            "TestSMTCoreEqualityCongruencePropagation"
+            "TestSMTCoreEqualityCongruencePropagation",
+            "TestSMTCoreEqualityPropagatesBooleanCongruence"
           ]
         },
         {
