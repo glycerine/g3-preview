@@ -131,6 +131,23 @@ func (t *SMTTheoryBase) OldNumVariables(scopes uint32) (int, error) {
 	return t.limits[len(t.limits)-int(scopes)], nil
 }
 
+// MkEqualityLiteral is theory::mk_eq: construct and internalize an equality in
+// the requested gate context, then return its Boolean literal.
+func (t *SMTTheoryBase) MkEqualityLiteral(left, right ast.ASTHandle, gateContext bool) (SMTLiteral, error) {
+	state, err := t.State()
+	if err != nil {
+		return SMTNullLiteral, err
+	}
+	equality, err := state.manager.MkEq(left, right)
+	if err != nil {
+		return SMTNullLiteral, err
+	}
+	if err = state.Internalize(equality, gateContext); err != nil {
+		return SMTNullLiteral, err
+	}
+	return state.Literal(equality)
+}
+
 func (t *SMTTheoryBase) PushScope() error {
 	if _, err := t.State(); err != nil {
 		return err

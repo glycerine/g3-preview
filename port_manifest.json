@@ -109975,7 +109975,8 @@
       ],
       "tests": [
         "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
-        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
+        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
+        "TestSMTTheoryBaseConstructsEqualityLiteral"
       ],
       "assertions": [
         {
@@ -110015,7 +110016,15 @@
           ]
         },
         {
-          "name": "display helpers, equality assumption helpers, reset, and equality-atom construction",
+          "name": "equality-atom construction and literal internalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory.go",
+          "tests": [
+            "TestSMTTheoryBaseConstructsEqualityLiteral"
+          ]
+        },
+        {
+          "name": "display helpers, shared equality assumptions, and reset",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -110040,7 +110049,8 @@
       ],
       "tests": [
         "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
-        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
+        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
+        "TestSMTTheoryBaseConstructsEqualityLiteral"
       ],
       "conditionals": [
         {
@@ -110082,12 +110092,13 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "typed internalization, theory-variable, scope, assignment, relevancy, equality/disequality event, propagation, setup, search initialization, restart, and final-check interface",
+          "name": "typed internalization, theory-variable, scope, assignment, relevancy, equality/disequality event, equality-literal construction, propagation, setup, search initialization, restart, and final-check interface",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_theory.go",
           "tests": [
             "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
-            "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
+            "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
+            "TestSMTTheoryBaseConstructsEqualityLiteral"
           ]
         },
         {

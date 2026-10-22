@@ -274,3 +274,28 @@ func TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents(t *testing.T) {
 		t.Fatal("theory event scope rollback")
 	}
 }
+
+func TestSMTTheoryBaseConstructsEqualityLiteral(t *testing.T) {
+	m := astTestManager(t)
+	_, values := smtUFConstants(t, m, "theory-equality-literal-", 2)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	family, err := m.GetFamilyID(values[0])
+	astTestMust(t, err)
+	if family == ast.NullFamilyID {
+		family = 71
+	}
+	base, err := NewSMTTheoryBase(family)
+	astTestMust(t, err)
+	astTestMust(t, base.Initialize(state))
+	literal, err := base.MkEqualityLiteral(values[0], values[1], false)
+	astTestMust(t, err)
+	if literal == SMTNullLiteral || literal.Sign() {
+		t.Fatal("equality literal", literal)
+	}
+	equality, err := m.MkEq(values[0], values[1])
+	astTestMust(t, err)
+	variable, found := state.BoolVar(equality)
+	if !found || variable != literal.Var() || state.context.enodes[values[0]] == nil || state.context.enodes[values[1]] == nil {
+		t.Fatal("equality internalization", variable, found, literal)
+	}
+}
