@@ -90,7 +90,7 @@ func (d SMTModelValueDependency) FreshValue() (*SMTExtraFreshValue, error) {
 // been evaluated in the order returned by Dependencies.
 type SMTModelValueProcedure interface {
 	Dependencies() []SMTModelValueDependency
-	MakeValue([]ast.ASTHandle) (ast.ASTHandle, error)
+	MakeValue(*SMTModelGenerator, []ast.ASTHandle) (ast.ASTHandle, error)
 	IsFresh() bool
 }
 
@@ -104,8 +104,8 @@ func NewSMTExpressionValueProcedure(value ast.ASTHandle) (*SMTExpressionValuePro
 }
 
 func (*SMTExpressionValueProcedure) Dependencies() []SMTModelValueDependency { return nil }
-func (p *SMTExpressionValueProcedure) MakeValue(values []ast.ASTHandle) (ast.ASTHandle, error) {
-	if p == nil || p.value.IsNull() || len(values) != 0 {
+func (p *SMTExpressionValueProcedure) MakeValue(generator *SMTModelGenerator, values []ast.ASTHandle) (ast.ASTHandle, error) {
+	if p == nil || generator == nil || p.value.IsNull() || len(values) != 0 {
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
 	return p.value, nil
@@ -130,8 +130,8 @@ func (p *SMTFreshValueProcedure) Dependencies() []SMTModelValueDependency {
 	}
 	return []SMTModelValueDependency{p.dependency}
 }
-func (p *SMTFreshValueProcedure) MakeValue(values []ast.ASTHandle) (ast.ASTHandle, error) {
-	if p == nil || len(values) != 1 || values[0].IsNull() {
+func (p *SMTFreshValueProcedure) MakeValue(generator *SMTModelGenerator, values []ast.ASTHandle) (ast.ASTHandle, error) {
+	if p == nil || generator == nil || len(values) != 1 || values[0].IsNull() {
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
 	return values[0], nil

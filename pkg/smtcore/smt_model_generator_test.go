@@ -5,6 +5,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
+	"github.com/glycerine/g3/pkg/util/cooperate"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 type smtModelDependencyProcedure struct {
@@ -14,7 +18,7 @@ type smtModelDependencyProcedure struct {
 func (p *smtModelDependencyProcedure) Dependencies() []SMTModelValueDependency {
 	return append([]SMTModelValueDependency(nil), p.dependencies...)
 }
-func (*smtModelDependencyProcedure) MakeValue([]ast.ASTHandle) (ast.ASTHandle, error) {
+func (*smtModelDependencyProcedure) MakeValue(*SMTModelGenerator, []ast.ASTHandle) (ast.ASTHandle, error) {
 	return ast.ASTHandle{}, nil
 }
 func (*smtModelDependencyProcedure) IsFresh() bool { return false }
@@ -104,5 +108,66 @@ func TestSMTModelGeneratorRejectsDependencyCycle(t *testing.T) {
 	astTestMust(t, err)
 	if _, err = generator.topSortSources(nodes, procedures); !errors.Is(err, ast.ErrASTDomain) {
 		t.Fatal("dependency cycle", err)
+	}
+}
+
+func smtModelGeneratorFixture(t *testing.T) (*ast.ASTManager, model.ModelEvaluatorConfig) {
+	t.Helper()
+	symbols, numerals, budget := astTestOwners(t)
+	context, err := uparams.NewParamsContext(symbols, numerals, uparams.ParamsConfig{Budget: budget})
+	astTestMust(t, err)
+	catalog, err := uparams.NewGlobalParamsCatalog(symbols, uparams.GlobalParamsCatalogConfig{Budget: budget})
+	astTestMust(t, err)
+	globals, err := uparams.NewGlobalParamsService(symbols, context, uparams.GlobalParamsConfig{Budget: budget, Catalog: catalog})
+	astTestMust(t, err)
+	astTestMust(t, globals.InitializeSource())
+	params, err := context.NewValue()
+	astTestMust(t, err)
+	memory, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget})
+	astTestMust(t, err)
+	cooperation, err := cooperate.NewCooperation(budget)
+	astTestMust(t, err)
+	manager, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numerals, Budget: budget})
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, manager.Close())
+		astTestMust(t, cooperation.Close())
+		astTestMust(t, memory.Close())
+		astTestMust(t, context.Del(&params))
+		astTestMust(t, globals.Close())
+		astTestMust(t, catalog.Close())
+		astTestMust(t, context.Close())
+	})
+	return manager, model.ModelEvaluatorConfig{Context: context, Globals: globals, Params: &params, Memory: memory, Cooperation: cooperation}
+}
+
+func TestSMTModelGeneratorBuildsAndPinsRootValues(t *testing.T) {
+	m, config := smtModelGeneratorFixture(t)
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "model-build-sort"), nil)
+	astTestMust(t, err)
+	expression, err := m.MkConst(astTestSymbol(t, m, "model-build-root"), sort)
+	astTestMust(t, err)
+	value, err := m.MkModelValue(0, sort)
+	astTestMust(t, err)
+	context, err := NewSMTCheckerContext(m)
+	astTestMust(t, err)
+	state, err := NewSMTInternalizerState(m, context, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, state.Close()) })
+	node, err := state.MkEnode(expression, false, false, true)
+	astTestMust(t, err)
+	procedure, err := NewSMTExpressionValueProcedure(value)
+	astTestMust(t, err)
+	generator, err := NewSMTModelGenerator(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, generator.Close()) })
+	astTestMust(t, generator.SetContext(context))
+	astTestMust(t, generator.InitializeModel(config))
+	astTestMust(t, generator.BuildValues([]*SMTEnode{node}, map[*SMTEnode]SMTModelValueProcedure{node: procedure}))
+	if got, getErr := generator.Value(node); getErr != nil || got != value {
+		t.Fatal("built root value", got, getErr)
+	}
+	if err = generator.BuildValues([]*SMTEnode{node}, map[*SMTEnode]SMTModelValueProcedure{node: procedure}); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("duplicate build", err)
 	}
 }

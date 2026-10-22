@@ -31,10 +31,12 @@ func TestSMTModelValueDependenciesAndProcedures(t *testing.T) {
 
 	wrapper, err := NewSMTExpressionValueProcedure(value)
 	astTestMust(t, err)
+	generator, err := NewSMTModelGenerator(m)
+	astTestMust(t, err)
 	if wrapper.IsFresh() || len(wrapper.Dependencies()) != 0 {
 		t.Fatal("expression procedure metadata")
 	}
-	if got, makeErr := wrapper.MakeValue(nil); makeErr != nil || got != value {
+	if got, makeErr := wrapper.MakeValue(generator, nil); makeErr != nil || got != value {
 		t.Fatal("expression procedure", got, makeErr)
 	}
 
@@ -44,10 +46,10 @@ func TestSMTModelValueDependenciesAndProcedures(t *testing.T) {
 	if !freshProcedure.IsFresh() || len(dependencies) != 1 || !dependencies[0].IsFreshValue() {
 		t.Fatal("fresh procedure metadata", dependencies)
 	}
-	if got, makeErr := freshProcedure.MakeValue([]ast.ASTHandle{value}); makeErr != nil || got != value {
+	if got, makeErr := freshProcedure.MakeValue(generator, []ast.ASTHandle{value}); makeErr != nil || got != value {
 		t.Fatal("fresh procedure", got, makeErr)
 	}
-	if _, makeErr := freshProcedure.MakeValue(nil); !errors.Is(makeErr, ast.ErrASTDomain) {
+	if _, makeErr := freshProcedure.MakeValue(generator, nil); !errors.Is(makeErr, ast.ErrASTDomain) {
 		t.Fatal("fresh procedure arity", makeErr)
 	}
 }

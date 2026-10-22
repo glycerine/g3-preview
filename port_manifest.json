@@ -108039,7 +108039,8 @@
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
-        "TestSMTModelGeneratorRejectsDependencyCycle"
+        "TestSMTModelGeneratorRejectsDependencyCycle",
+        "TestSMTModelGeneratorBuildsAndPinsRootValues"
       ],
       "assertions": [
         {
@@ -108179,21 +108180,22 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Generator construction, fresh placeholder allocation, source identity, implicit same-sort fresh dependencies and dependency topological ordering (src/smt/smt_model_generator.cpp:25-45,137-307,466-472)",
+          "name": "Generator construction, proto-model initialization, fresh placeholder allocation, source identity, implicit same-sort fresh dependencies, dependency topological ordering, ordered root-value construction/registration and lookup (src/smt/smt_model_generator.cpp:25-58,137-402,466-485)",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_generator.go",
           "tests": [
             "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
-            "TestSMTModelGeneratorRejectsDependencyCycle"
+            "TestSMTModelGeneratorRejectsDependencyCycle",
+            "TestSMTModelGeneratorBuildsAndPinsRootValues"
           ]
         },
         {
-          "name": "Proto-model initialization, Boolean/enode value construction, interpretation installation, theory finalization, macros and complete model assembly (remaining src/smt/smt_model_generator.cpp)",
+          "name": "Theory procedure discovery, fallback value selection, Boolean/function interpretation installation, theory finalization, macros and complete model assembly (remaining src/smt/smt_model_generator.cpp)",
           "status": "unported"
         }
       ],
       "ownership": [
-        "The generator owns fresh placeholder objects and source-ordering state while borrowing the AST manager, enode roots and theory-created model-value procedures."
+        "The generator owns its proto-model, pinned constructed AST values, fresh placeholder objects, root-value map and source-ordering state while borrowing the AST manager, context, enode roots and theory-created model-value procedures."
       ],
       "deviations": [
         "The source iterative color traversal is expressed as a concrete recursive Go DFS with identical dependency-before-source order. A dependency cycle returns ast.ErrASTDomain instead of relying on a debug assertion."
@@ -108213,6 +108215,7 @@
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
         "TestSMTModelGeneratorRejectsDependencyCycle",
+        "TestSMTModelGeneratorBuildsAndPinsRootValues",
         "TestSMTModelValueDependenciesAndProcedures",
         "TestSMTModelValueEnodeDependencyCanonicalizesRoot"
       ],
@@ -108252,12 +108255,13 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Generator-owned fresh source collection and dependency-ordering state (src/smt/smt_model_generator.h:177-209,212-214)",
+          "name": "Generator-owned context/proto-model state, fresh sources, root values, pinned ASTs, factory/value access and dependency ordering (src/smt/smt_model_generator.h:177-219,222-225)",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_generator.go",
           "tests": [
             "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
-            "TestSMTModelGeneratorRejectsDependencyCycle"
+            "TestSMTModelGeneratorRejectsDependencyCycle",
+            "TestSMTModelGeneratorBuildsAndPinsRootValues"
           ]
         },
         {
@@ -108270,7 +108274,7 @@
           ]
         },
         {
-          "name": "Context attachment, proto-model/factory/value registration, Boolean/function interpretations, theory finalization and model construction (remaining src/smt/smt_model_generator.h:177-232)",
+          "name": "Boolean/function interpretations, theory finalization, hidden declarations and complete model construction (remaining src/smt/smt_model_generator.h:177-232)",
           "status": "unported"
         }
       ],
