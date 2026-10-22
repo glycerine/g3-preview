@@ -125833,7 +125833,7 @@
       "path": "src/tactic/tactical.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/arith/propagate_ineq_clean.go",
         "pkg/tactic/arith/propagate_ineq_clean_test.go",
@@ -125845,6 +125845,8 @@
         "pkg/tactic/tactic_and_then_test.go",
         "pkg/tactic/tactic_or_else.go",
         "pkg/tactic/tactic_or_else_test.go",
+        "pkg/tactic/tactic_parallel.go",
+        "pkg/tactic/tactic_parallel_test.go",
         "pkg/tactic/tactic_repeat.go",
         "pkg/tactic/tactic_repeat_test.go",
         "pkg/tactic/tactic_try_for.go",
@@ -125877,6 +125879,7 @@
         "TestUsingParamsAppliesStoredOverridesAtConstructionAndUpdate",
         "TestAnnotateTacticVerboseScopeIncludesFailureExit",
         "TestAnnotateTacticVerbosityGate",
+        "TestParallelCombinatorsUseSingleGoroutineSourceBranches",
         "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
@@ -126071,8 +126074,8 @@
           "text": "SASSERT(m_p);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete cleanup_tactical for propagate-ineqs: successful application then cleanup and translated wrapper (tactical.cpp:1107-1128)",
@@ -126160,6 +126163,14 @@
           ]
         },
         {
+          "name": "par and par_and_then constructors and execution through the selected _NO_OMP_ sequential branches (tactical.cpp:462-884)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_parallel.go",
+          "tests": [
+            "TestParallelCombinatorsUseSingleGoroutineSourceBranches"
+          ]
+        },
+        {
           "name": "unary tactical lifecycle, fail_if_branching result refusal and generic cleanup wrapper (tactical.cpp:886-927,1077-1128)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_unary.go",
@@ -126169,15 +126180,19 @@
         }
       ],
       "ownership": [
-        "Conditional tacticals retain each child and probe independently and release them in source member order on the final intrusive reference."
+        "Binary, n-ary, unary and conditional tacticals retain each child and probe independently and release them in source member order on the final intrusive reference.",
+        "Repeat transfers owned intermediate goals into recursive results and composes model, proof and dependency ownership in source order.",
+        "Using-params owns a copied params_ref and releases it after its child; timeout and annotation wrappers borrow process services only for Apply."
       ],
-      "deviations": []
+      "deviations": [
+        "The current single-goroutine Go port selects the source _NO_OMP_ branches for par and par_and_then; OpenMP worker, manager-translation and winner-cancellation code is excluded by the active platform profile."
+      ]
     },
     {
       "path": "src/tactic/tactical.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/arith/propagate_ineq_clean.go",
         "pkg/tactic/arith/propagate_ineq_clean_test.go",
@@ -126185,6 +126200,7 @@
         "pkg/tactic/tactic_and_then.go",
         "pkg/tactic/tactic_conditional.go",
         "pkg/tactic/tactic_or_else.go",
+        "pkg/tactic/tactic_parallel.go",
         "pkg/tactic/tactic_repeat.go",
         "pkg/tactic/tactic_try_for.go",
         "pkg/tactic/tactic_using_params.go",
@@ -126213,6 +126229,7 @@
         "TestUsingParamsAppliesStoredOverridesAtConstructionAndUpdate",
         "TestAnnotateTacticVerboseScopeIncludesFailureExit",
         "TestAnnotateTacticVerbosityGate",
+        "TestParallelCombinatorsUseSingleGoroutineSourceBranches",
         "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
@@ -126225,8 +126242,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete clean(tactic*) declaration instantiated by propagate-ineqs factory",
@@ -126307,6 +126324,14 @@
           ]
         },
         {
+          "name": "typed par and par-and-then constructors for the selected single-goroutine source branches",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_parallel.go",
+          "tests": [
+            "TestParallelCombinatorsUseSingleGoroutineSourceBranches"
+          ]
+        },
+        {
           "name": "typed fail-if-branching and cleanup tactical constructors",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_unary.go",
@@ -126316,9 +126341,12 @@
         }
       ],
       "ownership": [
-        "Typed constructors preserve the source intrusive ownership of probe and tactic operands."
+        "Typed constructors preserve the source intrusive ownership of probe and tactic operands.",
+        "The using-params constructor receives its explicit Go ParamsContext and owns a copied ParamsRef until final release."
       ],
-      "deviations": []
+      "deviations": [
+        "The current single-goroutine Go port exposes par and par-and-then with their source _NO_OMP_ sequential behavior."
+      ]
     },
     {
       "path": "src/tactic/ufbv/CMakeLists.txt",
