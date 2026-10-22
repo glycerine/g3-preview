@@ -105631,9 +105631,13 @@
       "path": "src/smt/smt_context_stat.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_context_stat.go"
+      ],
+      "tests": [
+        "TestSMTContextStatisticsClauseOccurrencesLevelsAndProfile"
+      ],
       "assertions": [
         {
           "line": 74,
@@ -105644,11 +105648,24 @@
           "text": "SASSERT(n <= m_assigned_literals.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "lemma activity average, literal/variable/minimum occurrence profiles, assigned literals per level and profile dispatch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_context_stat.go",
+          "tests": [
+            "TestSMTContextStatisticsClauseOccurrencesLevelsAndProfile"
+          ]
+        }
+      ],
+      "ownership": [
+        "All counters, histograms and traversal stacks are call-local Go values; clauses, Boolean expressions and writers are borrowed."
+      ],
+      "deviations": [
+        "The combined resolution/subsumption profile deliberately preserves the source implementation's stderr output even when another writer is supplied."
+      ]
     },
     {
       "path": "src/smt/smt_enode.cpp",
