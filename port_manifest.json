@@ -101512,7 +101512,7 @@
       "path": "src/smt/params/theory_arith_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_arith_params.go",
         "pkg/smtcore/util_smt_arith_params_source_test.go"
@@ -101526,12 +101526,12 @@
         "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Fifteen smt getter/publications before rewriter helper declaration, final eq2ineq, reverse lexical DT and forty-six ostream endl chains (src/smt/params/theory_arith_params.cpp:23-94)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_arith_params.go",
           "tests": [
             "TestSMTArithAllFortySixLiteralDefaults",
@@ -101555,7 +101555,7 @@
       "path": "src/smt/params/theory_arith_params.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_arith_params.go",
         "pkg/smtcore/util_smt_arith_params_source_test.go"
@@ -101579,12 +101579,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Forty-six declaration-order scalar defaults and mandatory constructor update (src/smt/params/theory_arith_params.h:53-164)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_arith_params.go",
           "tests": [
             "TestSMTArithAllFortySixLiteralDefaults",
