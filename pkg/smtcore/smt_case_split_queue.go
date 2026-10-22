@@ -16,7 +16,7 @@ type SMTActivityCaseSplitQueue struct {
 	phaseSelection, cachingOn, cachingOff uint32
 	randomVariableFrequency               float64
 	strategy                              uint32
-	activeVariableLimit                   int
+	activeCreationLimit                   uint64
 	phaseCounter                          uint32
 	cacheEnabled, phaseDefault            bool
 }
@@ -37,7 +37,7 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	q.cachingOff = state.PhaseCachingOff
 	q.randomVariableFrequency = state.RandomVarFreq
 	q.strategy = state.CaseSplitStrategy
-	q.activeVariableLimit = len(q.state.boolExpr)
+	q.activeCreationLimit = q.state.nextBooleanCreation
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
@@ -126,18 +126,14 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 		}
 	}
 	if next == SMTNullBoolVar {
-		limit := len(q.state.boolExpr)
-		if q.strategy == 1 && q.activeVariableLimit < limit {
-			limit = q.activeVariableLimit
-		}
 		var err error
-		next, err = q.highestActivity(limit)
+		next, err = q.highestActivity(q.activeCreationLimit)
 		if err != nil {
 			return SMTNullBoolVar, lbool.Undef, err
 		}
-		if next == SMTNullBoolVar && q.strategy == 1 && limit < len(q.state.boolExpr) {
-			q.activeVariableLimit = len(q.state.boolExpr)
-			next, err = q.highestActivity(q.activeVariableLimit)
+		if next == SMTNullBoolVar && q.strategy == 1 && q.activeCreationLimit < q.state.nextBooleanCreation {
+			q.activeCreationLimit = q.state.nextBooleanCreation
+			next, err = q.highestActivity(q.activeCreationLimit)
 			if err != nil {
 				return SMTNullBoolVar, lbool.Undef, err
 			}
@@ -176,10 +172,13 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 	return next, lbool.False, nil
 }
 
-func (q *SMTActivityCaseSplitQueue) highestActivity(limit int) (int32, error) {
+func (q *SMTActivityCaseSplitQueue) highestActivity(creationLimit uint64) (int32, error) {
 	next := SMTNullBoolVar
 	best := 0.0
-	for variable := int32(SMTFirstBoolVar); int(variable) < limit; variable++ {
+	for variable := int32(SMTFirstBoolVar); int(variable) < len(q.state.boolExpr); variable++ {
+		if q.strategy == 1 && q.state.booleanCreation[variable] > creationLimit {
+			continue
+		}
 		value, err := q.state.Assignment(NewSMTLiteral(variable, false))
 		if err != nil {
 			return SMTNullBoolVar, err

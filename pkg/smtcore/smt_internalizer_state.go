@@ -103,6 +103,8 @@ type SMTInternalizerState struct {
 	boolVar                  map[ast.ASTHandle]int32
 	boolExpr                 []ast.ASTHandle
 	booleanData              []SMTBoolVarData
+	booleanCreation          []uint64
+	nextBooleanCreation      uint64
 	activity                 []float64
 	activityIncrement        float64
 	activityInverseDecay     float64
@@ -167,7 +169,7 @@ func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext
 	}
 	state := &SMTInternalizerState{
 		manager: manager, context: context, congruence: table, quantifiers: quantifiers,
-		boolVar: make(map[ast.ASTHandle]int32), boolExpr: make([]ast.ASTHandle, 1), booleanData: make([]SMTBoolVarData, 1),
+		boolVar: make(map[ast.ASTHandle]int32), boolExpr: make([]ast.ASTHandle, 1), booleanData: make([]SMTBoolVarData, 1), booleanCreation: make([]uint64, 1),
 		activity: make([]float64, 1), assignment: []lbool.LBool{lbool.True, lbool.False}, watches: make([]SMTWatchList, 2),
 		cachedGeneration: make(map[ast.ASTHandle]uint32), theories: make(map[ast.FamilyID]SMTTheoryInternalizer),
 		disequalityReasons:    make(map[smtEnodePairKey]SMTLiteral),
@@ -414,6 +416,8 @@ func (s *SMTInternalizerState) MkBoolVar(expression ast.ASTHandle) (int32, error
 	data := SMTBoolVarData{}
 	data.Initialize(s.scopeLevel)
 	s.booleanData = append(s.booleanData, data)
+	s.nextBooleanCreation++
+	s.booleanCreation = append(s.booleanCreation, s.nextBooleanCreation)
 	initialActivity := 0.0
 	if s.randomInitialActivity == 2 || s.randomInitialActivity == 1 && s.searching {
 		initialActivity = -float64(s.random.Next()%1000) / 1000
@@ -807,6 +811,7 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		s.boolExpr[variable] = ast.ASTHandle{}
 		s.boolExpr = s.boolExpr[:variable]
 		s.booleanData = s.booleanData[:variable]
+		s.booleanCreation = s.booleanCreation[:variable]
 		s.activity = s.activity[:variable]
 		s.assignment = s.assignment[:2*variable]
 		s.watches = s.watches[:2*variable]

@@ -179,6 +179,7 @@ func TestSMTActivityCaseSplitQueueDelaysSearchVariables(t *testing.T) {
 	astTestMust(t, queue.ConfigurePhases(params))
 	astTestMust(t, state.beginSearchPersistence(0, params))
 	defer func() { astTestMust(t, state.endSearchPersistence()) }()
+	astTestMust(t, state.PushScope())
 	search := smtRelevancyBool(t, m, "delayed-variable-search")
 	astTestMust(t, state.Internalize(search, true))
 	searchVar, _ := state.BoolVar(search)
@@ -195,6 +196,19 @@ func TestSMTActivityCaseSplitQueueDelaysSearchVariables(t *testing.T) {
 	if selected != searchVar {
 		t.Fatal("delayed pool was not promoted", selected, searchVar)
 	}
+
+	astTestMust(t, state.PopScopes(1))
+	astTestMust(t, state.PushScope())
+	replacement := smtRelevancyBool(t, m, "delayed-variable-replacement")
+	astTestMust(t, state.Internalize(replacement, true))
+	replacementVar, _ := state.BoolVar(replacement)
+	state.activity[replacementVar] = 200
+	selected, _, err = queue.NextCaseSplit()
+	astTestMust(t, err)
+	if selected != baseVar {
+		t.Fatal("reused variable index bypassed delayed pool", selected, baseVar)
+	}
+	astTestMust(t, state.PopScopes(1))
 }
 
 func TestSMTActivityCaseSplitQueueCachesReinternalizedActivity(t *testing.T) {
