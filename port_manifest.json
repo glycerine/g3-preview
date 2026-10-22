@@ -108180,7 +108180,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Generator construction, proto-model initialization, fresh placeholder allocation, source identity, implicit same-sort fresh dependencies, dependency topological ordering, ordered root-value construction/registration and lookup (src/smt/smt_model_generator.cpp:25-58,137-402,466-485)",
+          "name": "Generator construction, proto-model and theory-factory initialization, relevant enode-root procedure discovery, fallback/fresh/theory/Boolean value selection, fresh placeholder allocation, source identity, dependency topological ordering, ordered root-value construction/registration and lookup (src/smt/smt_model_generator.cpp:25-58,61-135,137-402,466-485)",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_generator.go",
           "tests": [
@@ -108190,7 +108190,7 @@
           ]
         },
         {
-          "name": "Theory procedure discovery, fallback value selection, Boolean/function interpretation installation, theory finalization, macros and complete model assembly (remaining src/smt/smt_model_generator.cpp)",
+          "name": "Boolean constant interpretation installation, uninterpreted function interpretations, theory finalization, existing model-value registration, macros and complete final-model assembly (remaining src/smt/smt_model_generator.cpp)",
           "status": "unported"
         }
       ],
@@ -108255,7 +108255,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Generator-owned context/proto-model state, fresh sources, root values, pinned ASTs, factory/value access and dependency ordering (src/smt/smt_model_generator.h:177-219,222-225)",
+          "name": "Generator-owned context/proto-model state, relevant-root procedure discovery, fresh sources, root values, pinned ASTs, factory/value access and dependency ordering (src/smt/smt_model_generator.h:177-225)",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_generator.go",
           "tests": [

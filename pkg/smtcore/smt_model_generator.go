@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 type SMTModelGenerator struct {
@@ -188,6 +189,105 @@ func (g *SMTModelGenerator) BuildValues(roots []*SMTEnode, procedures map[*SMTEn
 		g.rootValues[node] = value
 	}
 	return nil
+}
+
+func (g *SMTModelGenerator) discoverValueProcedures(state *SMTInternalizerState) ([]*SMTEnode, map[*SMTEnode]SMTModelValueProcedure, error) {
+	if err := g.open(); err != nil {
+		return nil, nil, err
+	}
+	if state == nil || state.manager != g.manager || state.context != g.context || g.model == nil {
+		return nil, nil, ast.ErrASTDomain
+	}
+	for _, theory := range state.theoryOrder {
+		if modelTheory, ok := theory.(SMTModelValueTheory); ok {
+			if err := modelTheory.InitializeModel(g); err != nil {
+				return nil, nil, err
+			}
+		}
+	}
+	booleanSort, err := g.manager.MkBoolSort()
+	if err != nil {
+		return nil, nil, err
+	}
+	roots := make([]*SMTEnode, 0, len(state.enodeStack))
+	procedures := make(map[*SMTEnode]SMTModelValueProcedure)
+	for _, node := range state.enodeStack {
+		if node == nil || node.root != node || !g.context.relevant[node.owner] {
+			continue
+		}
+		roots = append(roots, node)
+		sort, sortErr := g.manager.GetSort(node.owner)
+		if sortErr != nil {
+			return nil, nil, sortErr
+		}
+		var procedure SMTModelValueProcedure
+		if sort == booleanSort {
+			assignment := g.context.assignments[node.owner]
+			if assignment == lbool.Undef {
+				return nil, nil, ast.ErrASTDomain
+			}
+			value, valueErr := g.manager.MkFalse()
+			if assignment == lbool.True {
+				value, valueErr = g.manager.MkTrue()
+			}
+			if valueErr != nil {
+				return nil, nil, valueErr
+			}
+			procedure, valueErr = NewSMTExpressionValueProcedure(value)
+			if valueErr != nil {
+				return nil, nil, valueErr
+			}
+		} else {
+			family, familyErr := g.manager.GetFamilyID(sort)
+			if familyErr != nil {
+				return nil, nil, familyErr
+			}
+			theory := state.theories[family]
+			if modelTheory, ok := theory.(SMTModelValueTheory); ok {
+				if node.TheoryVar(family) != SMTNullTheoryVar {
+					procedure, familyErr = modelTheory.ModelValue(node, g)
+				} else {
+					fresh, freshErr := g.MkExtraFreshValue(sort)
+					if freshErr != nil {
+						return nil, nil, freshErr
+					}
+					procedure, familyErr = NewSMTFreshValueProcedure(fresh)
+				}
+				if familyErr != nil {
+					return nil, nil, familyErr
+				}
+			} else {
+				unique, uniqueErr := g.manager.IsUniqueValue(node.owner)
+				if uniqueErr != nil {
+					return nil, nil, uniqueErr
+				}
+				value := node.owner
+				if !unique {
+					value, uniqueErr = g.model.FreshValue(sort)
+					if uniqueErr != nil || value.IsNull() {
+						if uniqueErr != nil {
+							return nil, nil, uniqueErr
+						}
+						return nil, nil, ast.ErrASTDomain
+					}
+				}
+				procedure, uniqueErr = NewSMTExpressionValueProcedure(value)
+				if uniqueErr != nil {
+					return nil, nil, uniqueErr
+				}
+			}
+		}
+		procedures[node] = procedure
+	}
+	return roots, procedures, nil
+}
+
+func (g *SMTModelGenerator) BuildStateValues(state *SMTInternalizerState) error {
+	roots, procedures, err := g.discoverValueProcedures(state)
+	if err != nil {
+		return err
+	}
+	return g.BuildValues(roots, procedures)
 }
 
 func (g *SMTModelGenerator) Value(node *SMTEnode) (ast.ASTHandle, error) {
