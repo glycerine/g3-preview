@@ -670,18 +670,68 @@ func (t *SMTIntegerDiffTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	return SMTFinalCheckDone, nil
 }
 
-func (t *SMTIntegerDiffTheory) InternalizeEquality(ast.ASTHandle, int32) error {
-	t.nonDifference = true
-	return nil
+func (t *SMTIntegerDiffTheory) InternalizeEquality(expression ast.ASTHandle, variable int32) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	left, err := state.manager.GetArg(expression, 0)
+	if err != nil {
+		return err
+	}
+	right, err := state.manager.GetArg(expression, 1)
+	if err != nil {
+		return err
+	}
+	minusOne, err := state.manager.ArithmeticNumeralRat(big.NewRat(-1, 1), true)
+	if err != nil {
+		return err
+	}
+	negativeRight, err := state.manager.MkFamilyApp(t.FamilyID(), smtArithOpMul, nil, []ast.ASTHandle{minusOne, right})
+	if err != nil {
+		return err
+	}
+	difference, err := state.manager.MkFamilyApp(t.FamilyID(), smtArithOpAdd, nil, []ast.ASTHandle{left, negativeRight})
+	if err != nil {
+		return err
+	}
+	zero, err := state.manager.ArithmeticNumeralRat(new(big.Rat), true)
+	if err != nil {
+		return err
+	}
+	lower, err := state.manager.MkFamilyApp(t.FamilyID(), smtArithOpLE, nil, []ast.ASTHandle{difference, zero})
+	if err != nil {
+		return err
+	}
+	upper, err := state.manager.MkFamilyApp(t.FamilyID(), smtArithOpGE, nil, []ast.ASTHandle{difference, zero})
+	if err != nil {
+		return err
+	}
+	if err = state.Internalize(lower, true); err != nil {
+		return err
+	}
+	if err = state.Internalize(upper, true); err != nil {
+		return err
+	}
+	lowerLiteral, err := state.Literal(lower)
+	if err != nil {
+		return err
+	}
+	upperLiteral, err := state.Literal(upper)
+	if err != nil {
+		return err
+	}
+	equality := NewSMTLiteral(variable, false)
+	if err = state.addClause([]SMTLiteral{equality.Negated(), lowerLiteral}, false, ast.ASTHandle{}); err != nil {
+		return err
+	}
+	if err = state.addClause([]SMTLiteral{equality.Negated(), upperLiteral}, false, ast.ASTHandle{}); err != nil {
+		return err
+	}
+	return state.addClause([]SMTLiteral{equality, lowerLiteral.Negated(), upperLiteral.Negated()}, false, ast.ASTHandle{})
 }
-func (t *SMTIntegerDiffTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error {
-	t.nonDifference = true
-	return nil
-}
-func (t *SMTIntegerDiffTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error {
-	t.nonDifference = true
-	return nil
-}
+func (*SMTIntegerDiffTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error    { return nil }
+func (*SMTIntegerDiffTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error { return nil }
 
 func (t *SMTIntegerDiffTheory) Graph() *SMTRationalDiffGraph {
 	if t == nil {

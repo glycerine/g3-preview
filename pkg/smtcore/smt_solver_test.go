@@ -428,6 +428,34 @@ func TestSMTSolverSetupUsesIntegerDifferenceLogic(t *testing.T) {
 	}
 }
 
+func TestSMTSolverIntegerDifferenceEqualityAdapter(t *testing.T) {
+	m := astTestManager(t)
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	integer, err := m.MkFamilySort(family, 1, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "solver-idl-eq-x"), integer)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "solver-idl-eq-y"), integer)
+	astTestMust(t, err)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_IDL", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()); astTestMust(t, params.Close()) })
+	equality, err := m.MkEq(x, y)
+	astTestMust(t, err)
+	fixture := smtIntegerDiffFixture{manager: m, family: family, sort: integer, x: x, y: y}
+	strict := fixture.bound(t, smtArithOpLE, x, y, -1)
+	astTestMust(t, solver.Assert(equality))
+	astTestMust(t, solver.Assert(strict))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("equality and strict difference", status)
+	}
+}
+
 type smtSolverProgressRecorder struct{ fast, slow uint32 }
 
 func (r *smtSolverProgressRecorder) FastProgressSample() { r.fast++ }
