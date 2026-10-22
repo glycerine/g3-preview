@@ -93,6 +93,7 @@
         "ast_arith_names.go",
         "ast_arith_numeral.go",
         "ast_arith_numeral_invocation.go",
+        "ast_arith_numeral_rat.go",
         "ast_arith_numeral_read.go",
         "ast_arith_numeral_text.go",
         "ast_arith_plugin.go",
@@ -159,6 +160,7 @@
         "ast_bv_not_numerals.go",
         "ast_bv_numeral.go",
         "ast_bv_numeral_identity.go",
+        "ast_bv_numeral_rat.go",
         "ast_bv_numeral_read.go",
         "ast_bv_numeral_scope.go",
         "ast_bv_numeral_sort.go",
@@ -336,6 +338,7 @@
         "ast_mark_doc.go",
         "ast_mark_fast.go",
         "ast_mark_node.go",
+        "ast_model_value.go",
         "ast_num_nodes.go",
         "ast_num_occurs.go",
         "ast_numeric_util_families.go",
@@ -870,6 +873,72 @@
       "production_files": [
         "default_process.go",
         "generated_params.go"
+      ]
+    },
+    {
+      "package": "interp",
+      "imports": [
+        "ast",
+        "ast/rewriter",
+        "model",
+        "solver",
+        "util/lbool",
+        "util/messages",
+        "util/params",
+        "util/symbol",
+        "util/z3exception"
+      ],
+      "production_files": [
+        "base.go",
+        "base_simplify.go",
+        "base_solver.go",
+        "base_tree.go",
+        "checker.go",
+        "direct_proof.go",
+        "direct_proof_arithmetic.go",
+        "direct_proof_chain_arithmetic.go",
+        "direct_proof_eq2leq.go",
+        "direct_proof_equality.go",
+        "direct_proof_finalize.go",
+        "direct_proof_localization.go",
+        "direct_proof_mixed_resolution.go",
+        "direct_proof_normal.go",
+        "direct_proof_resolution.go",
+        "direct_proof_rewrite.go",
+        "direct_proof_simplify.go",
+        "direct_proof_substitution.go",
+        "direct_proof_sum.go",
+        "exception.go",
+        "interpolator.go",
+        "manager.go",
+        "manager_arithmetic.go",
+        "manager_print.go",
+        "manager_proof.go",
+        "manager_quantifier.go",
+        "manager_rewrite.go",
+        "manager_substitution.go",
+        "orchestration.go",
+        "params.go",
+        "pp.go",
+        "profiling.go",
+        "proof.go",
+        "scopes.go",
+        "translation_analysis.go",
+        "translation_arithmetic.go",
+        "translation_commute.go",
+        "translation_idioms.go",
+        "translation_reconstruct.go",
+        "translation_rules.go"
+      ]
+    },
+    {
+      "package": "math/automata",
+      "imports": [
+        "util/lbool"
+      ],
+      "production_files": [
+        "automaton.go",
+        "symbolic.go"
       ]
     },
     {
@@ -1540,6 +1609,7 @@
       ],
       "production_files": [
         "matrix.go",
+        "model_based_opt.go",
         "simplex.go"
       ]
     },
@@ -1939,10 +2009,16 @@
     {
       "package": "parsers/util",
       "imports": [
+        "ast",
         "util/params"
       ],
       "production_files": [
-        "gparams_catalog_collectors.go"
+        "cost_parser.go",
+        "gparams_catalog_collectors.go",
+        "parser_params.go",
+        "pattern_validation.go",
+        "scanner.go",
+        "simple_parser.go"
       ]
     },
     {
@@ -2200,10 +2276,16 @@
       "imports": [
         "arena",
         "ast",
+        "ast/normal_forms",
         "ast/pattern",
+        "ast/rewriter",
         "ast/rewriter/bit_blaster",
+        "parsers/util",
+        "util/approx",
         "util/cmdexception",
         "util/diagnostic",
+        "util/hash",
+        "util/lbool",
         "util/memory",
         "util/params",
         "util/symbol",
@@ -2211,14 +2293,41 @@
         "util/z3exception"
       ],
       "production_files": [
+        "cached_var_subst.go",
+        "cost_evaluator.go",
+        "elim_term_ite.go",
+        "fingerprints.go",
         "gparams_catalog_collectors.go",
         "param_datatype_refs.go",
         "pattern_inference_rewriter.go",
+        "smt_almost_cg_table.go",
+        "smt_asserted_formulas.go",
+        "smt_assumptions.go",
+        "smt_boolean_propagation.go",
+        "smt_case_split_queue.go",
+        "smt_cg_table.go",
+        "smt_checker.go",
+        "smt_clause.go",
+        "smt_conflict_antecedents.go",
+        "smt_conflict_levels.go",
+        "smt_conflict_proof.go",
+        "smt_conflict_resolver.go",
         "smt_dyn_ack_pairs.go",
         "smt_dyn_ack_schedule.go",
         "smt_dyn_ack_triples.go",
+        "smt_enode_aux.go",
+        "smt_enode_core.go",
+        "smt_enode_trail.go",
+        "smt_internalizer.go",
+        "smt_internalizer_order.go",
+        "smt_internalizer_state.go",
+        "smt_justification.go",
+        "smt_justification_refs.go",
+        "smt_justification_theory.go",
+        "smt_kernel.go",
         "smt_literal.go",
         "smt_literal_approx_set.go",
+        "smt_literal_display.go",
         "smt_model_finder_hint_cycle.go",
         "smt_model_finder_hint_greedy.go",
         "smt_model_finder_hint_indexes.go",
@@ -2226,9 +2335,24 @@
         "smt_model_finder_hint_search.go",
         "smt_model_finder_hint_trace.go",
         "smt_model_finder_quantifier_set.go",
+        "smt_qi_cost.go",
+        "smt_qi_instance.go",
+        "smt_qi_queue_schedule.go",
+        "smt_quantifier_registry.go",
+        "smt_quantifier_stat.go",
+        "smt_quick_checker.go",
+        "smt_relevancy.go",
+        "smt_relevant_expr.go",
+        "smt_search.go",
+        "smt_theory.go",
+        "smt_theory_lifecycle.go",
+        "smt_theory_propagation.go",
+        "smt_types.go",
+        "smt_value_sort.go",
         "source_debug_off.go",
         "tactic_command.go",
         "tactic_manager.go",
+        "uses_theory.go",
         "util_cmd_exception.go",
         "util_cmd_exception_nodebug.go",
         "util_context_params.go",
@@ -2246,16 +2370,55 @@
         "util_smt_pb_params.go",
         "util_smt_preprocessor_params.go",
         "util_smt_qi_params.go",
-        "util_smt_str_params.go"
+        "util_smt_str_params.go",
+        "watch_list.go"
+      ]
+    },
+    {
+      "package": "smtcore/proto_model",
+      "imports": [
+        "arena",
+        "ast",
+        "ast/rewriter",
+        "model",
+        "util/symbol"
+      ],
+      "production_files": [
+        "array_factory.go",
+        "cleanup.go",
+        "datatype_factory.go",
+        "factory.go",
+        "proto_model.go",
+        "structured.go"
       ]
     },
     {
       "package": "solver",
       "imports": [
-        "util/params"
+        "arena",
+        "ast",
+        "model",
+        "tactic",
+        "util/control",
+        "util/diagnostic",
+        "util/lbool",
+        "util/messages",
+        "util/params",
+        "util/statistics",
+        "util/symbol",
+        "util/z3exception"
       ],
       "production_files": [
-        "gparams_catalog_collectors.go"
+        "check_sat_result.go",
+        "combined_solver.go",
+        "combined_solver_params.go",
+        "gparams_catalog_collectors.go",
+        "mus.go",
+        "named_assertions.go",
+        "smt_logics.go",
+        "solver.go",
+        "solver_tactic.go",
+        "tactic_solver.go"
       ]
     },
     {
@@ -2264,10 +2427,14 @@
         "arena",
         "ast",
         "ast/fpa",
+        "ast/rewriter",
         "model",
         "model/fpa",
+        "util/control",
         "util/diagnostic",
+        "util/lbool",
         "util/memory",
+        "util/messages",
         "util/params",
         "util/stopwatch",
         "util/symbol",
@@ -2275,8 +2442,17 @@
         "util/z3exception"
       ],
       "production_files": [
+        "equiv_proof_converter.go",
         "fpa2bv_model_converter.go",
+        "goal_shared_occurrences.go",
+        "horn_subsume_model_converter.go",
+        "proof_converter.go",
+        "replace_proof_converter.go",
         "source_debug_off.go",
+        "tactic_and_then.go",
+        "tactic_annotate.go",
+        "tactic_base.go",
+        "tactic_conditional.go",
         "tactic_exception.go",
         "tactic_extension_model.go",
         "tactic_extension_model_trace.go",
@@ -2287,13 +2463,22 @@
         "tactic_goal_inequality_memory_trace.go",
         "tactic_goal_num_occurs.go",
         "tactic_goal_ownership.go",
+        "tactic_goal_util.go",
         "tactic_model_converter.go",
         "tactic_model_to_model.go",
+        "tactic_or_else.go",
         "tactic_package_boundary.go",
+        "tactic_parallel.go",
         "tactic_probe.go",
+        "tactic_probe_structural.go",
+        "tactic_repeat.go",
         "tactic_report.go",
+        "tactic_sine.go",
         "tactic_stored_model.go",
-        "tactic_stored_model_memory_trace.go"
+        "tactic_stored_model_memory_trace.go",
+        "tactic_try_for.go",
+        "tactic_unary.go",
+        "tactic_using_params.go"
       ]
     },
     {

@@ -38857,14 +38857,15 @@
       "path": "src/cmd_context/tactic_manager.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/tactic_manager.go"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
-        "TestTacticManagerCopiedForeignAndClosedGuards"
+        "TestTacticManagerCopiedForeignAndClosedGuards",
+        "TestTacticManagerDestructorFinalizesTacticsBeforeProbes"
       ],
       "conditionals": [
         {
@@ -38876,11 +38877,27 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tactic_manager destruction, insertion, lookup, counts, indexed access and ordered iteration surface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/tactic_manager.go",
+          "tests": [
+            "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
+            "TestTacticManagerSourceProbeReferencesAndStructuralValues",
+            "TestTacticManagerCopiedForeignAndClosedGuards",
+            "TestTacticManagerDestructorFinalizesTacticsBeforeProbes"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager owns tactic and probe descriptors in insertion-ordered native slices. Lookup dictionaries carry scalar slice indices. Counts plus checked indexed access preserve both source iterator ranges without exposing mutable backing storage."
+      ],
+      "deviations": [
+        "Source begin/end pointer iterators map to checked count and indexed access over the same insertion-ordered slices."
+      ]
     },
     {
       "path": "src/duality/CMakeLists.txt",
