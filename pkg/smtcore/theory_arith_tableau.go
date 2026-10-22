@@ -156,6 +156,66 @@ type smtArithmeticColumn struct {
 	firstFree int
 }
 
+type smtArithmeticTableau struct {
+	rows      []smtArithmeticRow
+	columns   []smtArithmeticColumn
+	rowScopes []map[SMTTheoryVar]bool
+}
+
+func (t *smtArithmeticTableau) addVariable() SMTTheoryVar {
+	variable := SMTTheoryVar(len(t.columns))
+	t.columns = append(t.columns, newSMTArithmeticColumn())
+	return variable
+}
+
+func (t *smtArithmeticTableau) makeRow() int {
+	row := len(t.rows)
+	t.rows = append(t.rows, newSMTArithmeticRow())
+	return row
+}
+
+func (t *smtArithmeticTableau) pushRowScope() {
+	t.rowScopes = append(t.rowScopes, make(map[SMTTheoryVar]bool))
+}
+func (t *smtArithmeticTableau) popRowScope() bool {
+	if len(t.rowScopes) == 0 {
+		return false
+	}
+	clear(t.rowScopes[len(t.rowScopes)-1])
+	t.rowScopes = t.rowScopes[:len(t.rowScopes)-1]
+	return true
+}
+
+func (t *smtArithmeticTableau) addRowEntry(rowID int, coefficient *big.Rat, variable SMTTheoryVar, invert bool) error {
+	if rowID < 0 || rowID >= len(t.rows) || coefficient == nil || variable < 0 || int(variable) >= len(t.columns) || len(t.rowScopes) == 0 {
+		return ast.ErrASTDomain
+	}
+	row, column := &t.rows[rowID], &t.columns[variable]
+	variables := t.rowScopes[len(t.rowScopes)-1]
+	if variables[variable] {
+		index := row.indexOf(variable)
+		if index < 0 {
+			return ast.ErrASTDomain
+		}
+		if invert {
+			row.entries[index].coefficient.Sub(&row.entries[index].coefficient, coefficient)
+		} else {
+			row.entries[index].coefficient.Add(&row.entries[index].coefficient, coefficient)
+		}
+		return nil
+	}
+	variables[variable] = true
+	rowIndex, rowEntry := row.addEntry()
+	columnIndex, columnEntry := column.addEntry()
+	rowEntry.variable, rowEntry.columnIndex = variable, columnIndex
+	rowEntry.coefficient.Set(coefficient)
+	if invert {
+		rowEntry.coefficient.Neg(&rowEntry.coefficient)
+	}
+	columnEntry.rowID, columnEntry.rowIndex = rowID, rowIndex
+	return nil
+}
+
 func newSMTArithmeticColumn() smtArithmeticColumn { return smtArithmeticColumn{firstFree: -1} }
 
 func (c *smtArithmeticColumn) reset() {

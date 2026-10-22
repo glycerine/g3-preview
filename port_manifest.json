@@ -111477,9 +111477,13 @@
       "path": "src/smt/theory_arith_core.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_arith_tableau.go"
+      ],
+      "tests": [
+        "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -112210,7 +112214,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "row_vars scope and add_row_entry row/column insertion with duplicate coefficient merge",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_tableau.go",
+          "tests": [
+            "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },

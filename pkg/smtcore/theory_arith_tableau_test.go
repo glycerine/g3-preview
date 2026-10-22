@@ -120,3 +120,37 @@ func TestSMTArithmeticColumnHoleReuseAndSingletonCompression(t *testing.T) {
 		t.Fatal("column reset")
 	}
 }
+
+func TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge(t *testing.T) {
+	var tableau smtArithmeticTableau
+	first, second := tableau.addVariable(), tableau.addVariable()
+	row := tableau.makeRow()
+	if err := tableau.addRowEntry(row, big.NewRat(1, 1), first, false); err == nil {
+		t.Fatal("entry accepted without row scope")
+	}
+	tableau.pushRowScope()
+	if err := tableau.addRowEntry(row, big.NewRat(2, 1), first, false); err != nil {
+		t.Fatal(err)
+	}
+	if err := tableau.addRowEntry(row, big.NewRat(3, 1), first, true); err != nil {
+		t.Fatal(err)
+	}
+	if err := tableau.addRowEntry(row, big.NewRat(5, 2), second, false); err != nil {
+		t.Fatal(err)
+	}
+	if tableau.rows[row].size != 2 || tableau.rows[row].entries[tableau.rows[row].indexOf(first)].coefficient.Cmp(big.NewRat(-1, 1)) != 0 {
+		t.Fatal("duplicate coefficient merge")
+	}
+	for variable := range tableau.columns {
+		if tableau.columns[variable].size != 1 {
+			t.Fatal("duplicate allocated extra column entry", variable)
+		}
+		entry := tableau.columns[variable].firstEntry()
+		if entry == nil || tableau.rows[entry.rowID].entries[entry.rowIndex].variable != SMTTheoryVar(variable) {
+			t.Fatal("tableau cross index", variable)
+		}
+	}
+	if !tableau.popRowScope() || tableau.popRowScope() {
+		t.Fatal("row scope stack")
+	}
+}
