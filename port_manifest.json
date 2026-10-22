@@ -104861,9 +104861,14 @@
       "path": "src/smt/smt_enode.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_enode_core.go"
+      ],
+      "tests": [
+        "TestSMTEnodeConstructionParentsFlagsAndTheoryVariables",
+        "TestSMTEnodeCongruenceCommutationEqualityClassAndMarks"
+      ],
       "conditionals": [
         {
           "line": 126,
@@ -105000,19 +105005,44 @@
           "text": "SASSERT(new_capacity > m_capacity);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "enode initialization, theory-variable operations, minimum generation, congruence, max generation, and mark clearing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_enode_core.go",
+          "tests": [
+            "TestSMTEnodeConstructionParentsFlagsAndTheoryVariables",
+            "TestSMTEnodeCongruenceCommutationEqualityClassAndMarks"
+          ]
+        },
+        {
+          "name": "context-trailed generation and label updates, deletion callback, debug invariants, label display, and tmp_enode",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "SMTEnode borrows its AST owner and child nodes; native Go slices own argument and parent pointer lists, and linked theory-variable cells are reclaimed by Go after unlinking."
+      ],
+      "deviations": [
+        "Flexible-array and region placement storage are represented by concrete Go fields and slices. Context trail integration and temporary congruence keys remain open."
+      ]
     },
     {
       "path": "src/smt/smt_enode.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_enode_core.go"
+      ],
+      "tests": [
+        "TestSMTEnodeConstructionParentsFlagsAndTheoryVariables",
+        "TestSMTEnodeCongruenceCommutationEqualityClassAndMarks"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -105081,11 +105111,31 @@
           "text": "SASSERT(m_lbl_hash >= 0 && static_cast<unsigned>(m_lbl_hash) < approx_set_traits<unsigned long long>::capacity);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "transitivity record, enode scalar/accessor interface, theory-variable list, parent and argument views, congruence helpers",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_enode_core.go",
+          "tests": [
+            "TestSMTEnodeConstructionParentsFlagsAndTheoryVariables",
+            "TestSMTEnodeCongruenceCommutationEqualityClassAndMarks"
+          ]
+        },
+        {
+          "name": "context-only mutation friends, label hash interface, debug invariant interface, and tmp_enode interface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The enclosing SMT context owns concrete nodes; all node-to-node links and AST handles are borrowed."
+      ],
+      "deviations": [
+        "Go pointer identity replaces raw enode addresses, and copied slices expose argument and parent views without porting STL iterators."
+      ]
     },
     {
       "path": "src/smt/smt_eq_justification.h",
