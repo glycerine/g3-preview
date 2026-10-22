@@ -93,3 +93,69 @@ func TestSMTArithmeticBoundTrailEncoding(t *testing.T) {
 		t.Fatal("lower bound trail encoding")
 	}
 }
+
+func TestSMTArithmeticEqualityBoundAndAccumulation(t *testing.T) {
+	root := &SMTEnode{}
+	left, right := &SMTEnode{root: root}, &SMTEnode{root: root}
+	value := newSMTArithmeticValue(big.NewRat(3, 1), nil)
+	equality, err := newSMTArithmeticEqualityBound(2, &value, smtArithmeticLowerBound, left, right)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out smtArithmeticAntecedents
+	if err = equality.pushJustification(&out, big.NewRat(4, 1), true); err != nil {
+		t.Fatal(err)
+	}
+	if len(out.equalities) != 1 || out.equalityCoefficients[0].Cmp(big.NewRat(4, 1)) != 0 {
+		t.Fatal("equality antecedent")
+	}
+	wrong := &SMTEnode{}
+	wrong.root = wrong
+	if _, err = newSMTArithmeticEqualityBound(2, &value, smtArithmeticLowerBound, left, wrong); err == nil {
+		t.Fatal("different equality roots accepted")
+	}
+	atom, err := newSMTArithmeticAtom(8, 2, &value, smtArithmeticLowerAtom)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = atom.assign(true, newSMTArithmeticValuePtr(0, 1)); err != nil {
+		t.Fatal(err)
+	}
+	target := &smtArithmeticDerivedBound{}
+	seenLiterals := make(map[int32]bool)
+	seenEqualities := make(map[SMTEnodePair]bool)
+	if err = smtAccumulateArithmeticJustification(atom, target, big.NewRat(2, 1), false, seenLiterals, seenEqualities); err != nil {
+		t.Fatal(err)
+	}
+	if err = smtAccumulateArithmeticJustification(atom, target, big.NewRat(3, 1), false, seenLiterals, seenEqualities); err != nil {
+		t.Fatal(err)
+	}
+	if len(target.literals) != 1 {
+		t.Fatal("non-proof accumulation did not suppress duplicate")
+	}
+}
+
+func TestSMTNormalizeArithmeticIntegerBound(t *testing.T) {
+	for _, row := range []struct {
+		rational *big.Rat
+		epsilon  int64
+		kind     smtArithmeticBoundKind
+		want     int64
+	}{
+		{big.NewRat(3, 2), 0, smtArithmeticLowerBound, 2},
+		{big.NewRat(3, 2), 0, smtArithmeticUpperBound, 1},
+		{big.NewRat(-3, 2), 0, smtArithmeticLowerBound, -1},
+		{big.NewRat(-3, 2), 0, smtArithmeticUpperBound, -2},
+		{big.NewRat(2, 1), 1, smtArithmeticLowerBound, 3},
+		{big.NewRat(2, 1), -1, smtArithmeticUpperBound, 1},
+	} {
+		value := newSMTArithmeticValue(row.rational, big.NewRat(row.epsilon, 1))
+		got, err := smtNormalizeArithmeticIntegerBound(&value, row.kind)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got.rational.Cmp(big.NewRat(row.want, 1)) != 0 || got.infinitesimal.Sign() != 0 {
+			t.Fatalf("normalize %s eps %d kind %d = %s", row.rational, row.epsilon, row.kind, &got.rational)
+		}
+	}
+}

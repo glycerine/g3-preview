@@ -106,6 +106,27 @@ type smtArithmeticBoundJustification interface {
 	pushJustification(*smtArithmeticAntecedents, *big.Rat, bool) error
 }
 
+type smtArithmeticEqualityBound struct {
+	smtArithmeticBound
+	left, right *SMTEnode
+}
+
+func newSMTArithmeticEqualityBound(variable SMTTheoryVar, value *smtArithmeticValue, kind smtArithmeticBoundKind, left, right *SMTEnode) (*smtArithmeticEqualityBound, error) {
+	if variable < 0 || value == nil || kind > smtArithmeticUpperBound || left == nil || right == nil || left.Root() != right.Root() {
+		return nil, ast.ErrASTDomain
+	}
+	result := &smtArithmeticEqualityBound{left: left, right: right}
+	result.variable, result.kind = variable, kind
+	result.value.set(value)
+	return result, nil
+}
+func (b *smtArithmeticEqualityBound) pushJustification(out *smtArithmeticAntecedents, coefficient *big.Rat, proofs bool) error {
+	if b == nil || out == nil || b.left == nil || b.right == nil || b.left.Root() != b.right.Root() {
+		return ast.ErrASTDomain
+	}
+	return out.pushEquality(SMTEnodePair{First: b.left, Second: b.right}, coefficient, proofs)
+}
+
 type smtArithmeticAtom struct {
 	smtArithmeticBound
 	boolean   SMTBoolVar
@@ -153,6 +174,18 @@ type smtArithmeticDerivedBound struct {
 	smtArithmeticBound
 	literals   []SMTLiteral
 	equalities []SMTEnodePair
+}
+
+func (b *smtArithmeticDerivedBound) pushLiteral(literal SMTLiteral, _ *big.Rat) error {
+	b.literals = append(b.literals, literal)
+	return nil
+}
+func (b *smtArithmeticDerivedBound) pushEquality(pair SMTEnodePair, _ *big.Rat) error {
+	if pair.First == nil || pair.Second == nil {
+		return ast.ErrASTDomain
+	}
+	b.equalities = append(b.equalities, pair)
+	return nil
 }
 
 func (b *smtArithmeticDerivedBound) pushJustification(out *smtArithmeticAntecedents, coefficient *big.Rat, proofs bool) error {
@@ -225,6 +258,78 @@ func (b *smtArithmeticJustifiedDerivedBound) pushJustification(out *smtArithmeti
 		}
 	}
 	return nil
+}
+
+type smtArithmeticDerivedTarget interface {
+	pushLiteral(SMTLiteral, *big.Rat) error
+	pushEquality(SMTEnodePair, *big.Rat) error
+}
+
+func smtAccumulateArithmeticJustification(source smtArithmeticBoundJustification, target smtArithmeticDerivedTarget, coefficient *big.Rat, proofs bool, literals map[int32]bool, equalities map[SMTEnodePair]bool) error {
+	if source == nil || target == nil || coefficient == nil || literals == nil || equalities == nil {
+		return ast.ErrASTDomain
+	}
+	var antecedents smtArithmeticAntecedents
+	if err := source.pushJustification(&antecedents, coefficient, proofs); err != nil {
+		return err
+	}
+	for index, literal := range antecedents.literals {
+		if literals[literal.Index()] {
+			continue
+		}
+		value := new(big.Rat)
+		if proofs {
+			value.Set(antecedents.literalCoefficients[index])
+		} else {
+			literals[literal.Index()] = true
+		}
+		if err := target.pushLiteral(literal, value); err != nil {
+			return err
+		}
+	}
+	for index, equality := range antecedents.equalities {
+		if equalities[equality] {
+			continue
+		}
+		value := new(big.Rat)
+		if proofs {
+			value.Set(antecedents.equalityCoefficients[index])
+		} else {
+			equalities[equality] = true
+		}
+		if err := target.pushEquality(equality, value); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func smtRatFloor(value *big.Rat) *big.Int {
+	quotient, remainder := new(big.Int).QuoRem(value.Num(), value.Denom(), new(big.Int))
+	if value.Sign() < 0 && remainder.Sign() != 0 {
+		quotient.Sub(quotient, big.NewInt(1))
+	}
+	return quotient
+}
+func smtNormalizeArithmeticIntegerBound(value *smtArithmeticValue, kind smtArithmeticBoundKind) (smtArithmeticValue, error) {
+	if value == nil || value.infinity.Sign() != 0 || kind > smtArithmeticUpperBound {
+		return smtArithmeticValue{}, ast.ErrASTDomain
+	}
+	floor := smtRatFloor(&value.rational)
+	integral := value.rational.IsInt()
+	result := newSMTArithmeticValue(nil, nil)
+	if kind == smtArithmeticLowerBound {
+		result.rational.SetInt(floor)
+		if !integral || value.infinitesimal.Sign() > 0 {
+			result.rational.Add(&result.rational, big.NewRat(1, 1))
+		}
+	} else {
+		result.rational.SetInt(floor)
+		if integral && value.infinitesimal.Sign() < 0 {
+			result.rational.Sub(&result.rational, big.NewRat(1, 1))
+		}
+	}
+	return result, nil
 }
 
 type smtArithmeticVariableKind uint8

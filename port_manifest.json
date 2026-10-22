@@ -110885,7 +110885,9 @@
         "TestSMTArithmeticColumnHoleReuseAndSingletonCompression",
         "TestSMTArithmeticValueLexicographicAndAtomComplements",
         "TestSMTArithmeticAntecedentAndDerivedCoefficients",
-        "TestSMTArithmeticBoundTrailEncoding"
+        "TestSMTArithmeticBoundTrailEncoding",
+        "TestSMTArithmeticEqualityBoundAndAccumulation",
+        "TestSMTNormalizeArithmeticIntegerBound"
       ],
       "conditionals": [
         {
@@ -111019,7 +111021,9 @@
           "tests": [
             "TestSMTArithmeticValueLexicographicAndAtomComplements",
             "TestSMTArithmeticAntecedentAndDerivedCoefficients",
-            "TestSMTArithmeticBoundTrailEncoding"
+            "TestSMTArithmeticBoundTrailEncoding",
+            "TestSMTArithmeticEqualityBoundAndAccumulation",
+            "TestSMTNormalizeArithmeticIntegerBound"
           ]
         }
       ],
@@ -111044,7 +111048,9 @@
         "TestSMTFarkasSplitDisconnectedLiterals",
         "TestSMTArithmeticValueLexicographicAndAtomComplements",
         "TestSMTArithmeticAntecedentAndDerivedCoefficients",
-        "TestSMTArithmeticBoundTrailEncoding"
+        "TestSMTArithmeticBoundTrailEncoding",
+        "TestSMTArithmeticEqualityBoundAndAccumulation",
+        "TestSMTNormalizeArithmeticIntegerBound"
       ],
       "conditionals": [
         {
@@ -111452,6 +111458,15 @@
             "TestSMTArithmeticValueLexicographicAndAtomComplements",
             "TestSMTArithmeticAntecedentAndDerivedCoefficients",
             "TestSMTArithmeticBoundTrailEncoding"
+          ]
+        },
+        {
+          "name": "equality-bound root validation, justification accumulation and integer bound normalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_bounds.go",
+          "tests": [
+            "TestSMTArithmeticEqualityBoundAndAccumulation",
+            "TestSMTNormalizeArithmeticIntegerBound"
           ]
         }
       ],
