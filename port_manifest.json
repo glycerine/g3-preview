@@ -42229,7 +42229,8 @@
       ],
       "tests": [
         "TestFullTranslationProofAnalysisAndResolution",
-        "TestFullTranslationArithmeticHelpers"
+        "TestFullTranslationArithmeticHelpers",
+        "TestFullTranslationTriangleEqualityTheoryLemma"
       ],
       "conditionals": [
         {
@@ -42381,6 +42382,14 @@
           ]
         },
         {
+          "name": "Farkas, leq2eq, eq2leq, and array theory-lemma translation",
+          "status": "ported",
+          "go_target": "pkg/interp/translation_rules.go",
+          "tests": [
+            "TestFullTranslationTriangleEqualityTheoryLemma"
+          ]
+        },
+        {
           "name": "retained identity Quantify behavior",
           "status": "ported",
           "go_target": "pkg/interp/translation_analysis.go",
@@ -42402,7 +42411,7 @@
           ]
         },
         {
-          "name": "commuted proof idioms and specialized arithmetic and array theory-lemma translation",
+          "name": "commuted proof idioms plus GCD-test, assign-bounds, Gomory-cut, equality-propagation, and mystery arithmetic translation",
           "status": "unported"
         }
       ],

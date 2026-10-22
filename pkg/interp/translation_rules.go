@@ -258,6 +258,8 @@ func (t *FullTranslation) translateMain(proof ast.ASTHandle, expectClause bool, 
 			return ast.ASTHandle{}, ProofError{}
 		}
 		result, err = direct.MakeModusPonens(premiseConclusions[1], premises[0], premises[1])
+	case ast.ASTPrTheoryLemma:
+		result, err = t.translateTheoryLemma(proof, conclusion, premises, premiseConclusions, direct)
 	case ast.ASTPrHypothesis:
 		result, err = direct.MakeHypothesis(conclusion)
 	case ast.ASTPrQuantInst, ast.ASTPrDefAxiom:
@@ -305,6 +307,143 @@ func (t *FullTranslation) translateMain(proof ast.ASTHandle, expectClause bool, 
 	}
 	cache[proof] = result
 	return result, nil
+}
+
+func (t *FullTranslation) findStore(term ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	op, err := t.base.manager.Operator(term)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	if op == OperatorStore {
+		return term, true, nil
+	}
+	arguments, err := t.base.manager.Args(term)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	for _, argument := range arguments {
+		if store, found, e := t.findStore(argument); e != nil || found {
+			return store, found, e
+		}
+	}
+	return ast.ASTHandle{}, false, nil
+}
+
+func (t *FullTranslation) translateTheoryLemma(proof, conclusion ast.ASTHandle, premises, premiseConclusions []ast.ASTHandle, direct *DirectProofInterpolator) (ast.ASTHandle, error) {
+	theory, err := t.base.manager.TheoryLemmaTheory(proof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if theory == ArrayTheory {
+		literals, e := t.clauseLiterals(conclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		store, found, e := t.findStore(conclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if !found {
+			return direct.MakeAxiom(literals)
+		}
+		scope, e := t.base.ASTScope(store)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return direct.MakeAxiomInRange(literals, scope)
+	}
+	if theory != ArithTheory {
+		return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
+	}
+	kind, err := t.base.manager.TheoryLemmaKind(proof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	switch kind {
+	case FarkasKind:
+		coefficients, e := t.base.manager.FarkasCoefficientTerms(proof)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		proofs := append([]ast.ASTHandle(nil), premises...)
+		conclusions := append([]ast.ASTHandle(nil), premiseConclusions...)
+		if len(proofs) == 0 {
+			arguments, e := t.base.manager.Args(conclusion)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			if len(coefficients) != len(arguments) {
+				return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
+			}
+			for _, argument := range arguments {
+				literal, e := t.base.manager.MkNot(argument)
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				conclusions = append(conclusions, literal)
+				hypothesis, e := direct.MakeHypothesis(literal)
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				proofs = append(proofs, hypothesis)
+			}
+		}
+		return direct.MakeFarkas(conclusion, proofs, conclusions, coefficients)
+	case Leq2EqKind:
+		equality, e := t.base.manager.Arg(conclusion, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		x, e := t.base.manager.Arg(equality, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		y, e := t.base.manager.Arg(equality, 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		firstNegative, e := t.base.manager.Arg(conclusion, 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		first, e := t.base.manager.Arg(firstNegative, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		secondNegative, e := t.base.manager.Arg(conclusion, 2)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		second, e := t.base.manager.Arg(secondNegative, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return direct.MakeLeqToEq(x, y, first, second)
+	case Eq2LeqKind:
+		negativeEquality, e := t.base.manager.Arg(conclusion, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		equality, e := t.base.manager.Arg(negativeEquality, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		x, e := t.base.manager.Arg(equality, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		y, e := t.base.manager.Arg(equality, 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		inequality, e := t.base.manager.Arg(conclusion, 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return direct.MakeEqToLeq(x, y, inequality)
+	default:
+		return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
+	}
 }
 
 // Translate computes one direct interpolant per retained frame boundary and
