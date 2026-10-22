@@ -11,8 +11,8 @@ import (
 )
 
 type smtArrayScope struct {
-	stores, selects int
-	unsupported     bool
+	stores, selects, defaults int
+	unsupported               bool
 }
 
 // SMTArrayTheory internalizes core read-over-write, constant-array, and
@@ -20,10 +20,10 @@ type smtArrayScope struct {
 // later retained slices.
 type SMTArrayTheory struct {
 	*SMTTheoryBase
-	stores, selects         map[ast.ASTHandle]bool
-	storeTrail, selectTrail []ast.ASTHandle
-	scopes                  []smtArrayScope
-	unsupported             bool
+	stores, selects, defaults             map[ast.ASTHandle]bool
+	storeTrail, selectTrail, defaultTrail []ast.ASTHandle
+	scopes                                []smtArrayScope
+	unsupported                           bool
 }
 
 func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
@@ -35,6 +35,7 @@ func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
 		SMTTheoryBase: base,
 		stores:        make(map[ast.ASTHandle]bool),
 		selects:       make(map[ast.ASTHandle]bool),
+		defaults:      make(map[ast.ASTHandle]bool),
 	}, nil
 }
 
@@ -59,7 +60,7 @@ func (t *SMTArrayTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool
 	if op, array, err := t.arrayOperation(expression); err != nil {
 		return false, err
 	} else if array {
-		if op == ast.ASTArrayOpSelect {
+		if op == ast.ASTArrayOpSelect || op == ast.ASTArrayOpDefault {
 			_, termErr := t.InternalizeTerm(expression)
 			if termErr != nil {
 				return false, fmt.Errorf("array select atom: %w", termErr)
@@ -140,6 +141,10 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 			return false, fmt.Errorf("array select-store axiom: %w", err)
 		}
 	case ast.ASTArrayOpConst, ast.ASTArrayOpExt, ast.ASTArrayOpMap:
+	case ast.ASTArrayOpDefault:
+		if err = t.assertDefaultAxiom(expression); err != nil {
+			return false, fmt.Errorf("array default axiom: %w", err)
+		}
 	default:
 		t.unsupported = true
 	}
@@ -344,6 +349,70 @@ func (t *SMTArrayTheory) assertSelectMapAxiom(selectExpression, arrayMap ast.AST
 	return nil
 }
 
+func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) error {
+	if t.defaults[defaultExpression] {
+		return nil
+	}
+	t.defaults[defaultExpression] = true
+	t.defaultTrail = append(t.defaultTrail, defaultExpression)
+	state, _ := t.State()
+	array, err := state.manager.GetArg(defaultExpression, 0)
+	if err != nil {
+		return err
+	}
+	op, isArray, err := t.arrayOperation(array)
+	if err != nil || !isArray {
+		return err
+	}
+	var value ast.ASTHandle
+	switch op {
+	case ast.ASTArrayOpConst:
+		value, err = state.manager.GetArg(array, 0)
+	case ast.ASTArrayOpMap:
+		declaration, declErr := state.manager.GetDecl(array)
+		if declErr != nil {
+			return declErr
+		}
+		function, functionErr := state.manager.ArrayMapFunction(declaration)
+		if functionErr != nil {
+			return functionErr
+		}
+		count, countErr := state.manager.GetNumArgs(array)
+		if countErr != nil {
+			return countErr
+		}
+		arguments := make([]ast.ASTHandle, 0, count)
+		for index := uint32(0); index < count; index++ {
+			input, argErr := state.manager.GetArg(array, index)
+			if argErr != nil {
+				return argErr
+			}
+			inputDefault, defaultErr := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpDefault, nil, []ast.ASTHandle{input})
+			if defaultErr != nil {
+				return defaultErr
+			}
+			arguments = append(arguments, inputDefault)
+		}
+		value, err = state.manager.MkApp(function, arguments)
+	case ast.ASTArrayOpStore:
+		t.unsupported = true
+		return nil
+	default:
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	literal, err := t.MkEqualityLiteral(defaultExpression, value, true)
+	if err != nil {
+		return err
+	}
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); err != nil {
+		return fmt.Errorf("array default value axiom: %w", err)
+	}
+	return nil
+}
+
 func (t *SMTArrayTheory) InternalizeEquality(expression ast.ASTHandle, variable int32) error {
 	state, err := t.State()
 	if err != nil {
@@ -417,7 +486,7 @@ func (t *SMTArrayTheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {
 		return err
 	}
-	t.scopes = append(t.scopes, smtArrayScope{len(t.storeTrail), len(t.selectTrail), t.unsupported})
+	t.scopes = append(t.scopes, smtArrayScope{len(t.storeTrail), len(t.selectTrail), len(t.defaultTrail), t.unsupported})
 	return nil
 }
 
@@ -433,8 +502,12 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	for _, expression := range t.selectTrail[scope.selects:] {
 		delete(t.selects, expression)
 	}
+	for _, expression := range t.defaultTrail[scope.defaults:] {
+		delete(t.defaults, expression)
+	}
 	t.storeTrail = t.storeTrail[:scope.stores]
 	t.selectTrail = t.selectTrail[:scope.selects]
+	t.defaultTrail = t.defaultTrail[:scope.defaults]
 	t.unsupported = scope.unsupported
 	t.scopes = t.scopes[:level]
 	return t.SMTTheoryBase.PopScopes(count)

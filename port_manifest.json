@@ -113505,7 +113505,8 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
-        "TestSMTArrayMapRead"
+        "TestSMTArrayMapRead",
+        "TestSMTArrayDefaultConstAndMap"
       ],
       "conditionals": [
         {

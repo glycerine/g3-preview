@@ -212,3 +212,62 @@ func TestSMTArrayMapRead(t *testing.T) {
 		t.Fatal("mapped array read disequality", status)
 	}
 }
+
+func TestSMTArrayDefaultConstAndMap(t *testing.T) {
+	for _, mapCase := range []bool{false, true} {
+		name := "const"
+		if mapCase {
+			name = "map"
+		}
+		t.Run(name, func(t *testing.T) {
+			m := astTestManager(t)
+			family, err := m.RegisterArrayPlugin()
+			astTestMust(t, err)
+			boolean, err := m.MkBoolSort()
+			astTestMust(t, err)
+			indexSort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "default-array-index"), nil)
+			astTestMust(t, err)
+			arraySort, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{indexSort}), boolean)
+			astTestMust(t, err)
+			value, err := m.MkConst(astTestSymbol(t, m, "default-array-value"), boolean)
+			astTestMust(t, err)
+			array := ast.ASTHandle{}
+			want := value
+			if mapCase {
+				input, makeErr := m.MkConst(astTestSymbol(t, m, "default-map-input"), arraySort)
+				astTestMust(t, makeErr)
+				function, makeErr := m.MkFuncDecl(astTestSymbol(t, m, "default-map-function"), []ast.ASTHandle{boolean}, boolean, ast.ASTFuncDeclInfo{})
+				astTestMust(t, makeErr)
+				array, makeErr = m.MkArrayMap(function, ast.SliceArguments([]ast.ASTHandle{input}))
+				astTestMust(t, makeErr)
+				inputDefault, makeErr := m.MkFamilyApp(family, ast.ASTArrayOpDefault, nil, []ast.ASTHandle{input})
+				astTestMust(t, makeErr)
+				want, makeErr = m.MkApp(function, []ast.ASTHandle{inputDefault})
+				astTestMust(t, makeErr)
+			} else {
+				parameter, makeErr := m.NewParameterAST(arraySort)
+				astTestMust(t, makeErr)
+				array, makeErr = m.MkFamilyApp(family, ast.ASTArrayOpConst, []ast.ASTParameter{parameter}, []ast.ASTHandle{value})
+				astTestMust(t, makeErr)
+				astTestMust(t, m.DelParameter(&parameter))
+			}
+			actual, err := m.MkFamilyApp(family, ast.ASTArrayOpDefault, nil, []ast.ASTHandle{array})
+			astTestMust(t, err)
+			equality, err := m.MkEq(actual, want)
+			astTestMust(t, err)
+			disequality, err := m.MkNot(equality)
+			astTestMust(t, err)
+			params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: params})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()); astTestMust(t, params.Close()) })
+			astTestMust(t, solver.Assert(disequality))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("array default disequality", status)
+			}
+		})
+	}
+}
