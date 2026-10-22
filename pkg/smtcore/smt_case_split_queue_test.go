@@ -114,3 +114,32 @@ func TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases(t *testing.T) 
 		t.Fatal("invalid phase strategy", err)
 	}
 }
+
+func TestSMTActivityCaseSplitQueueForgetsConservativeConflictPhases(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	expression := smtRelevancyBool(t, m, "case-split-conservative")
+	astTestMust(t, state.Internalize(expression, true))
+	variable, _ := state.BoolVar(expression)
+	queue, err := NewSMTActivityCaseSplitQueue(state)
+	astTestMust(t, err)
+	config := SMTParamsState{PhaseSelection: 3, PhaseCachingOn: 400, PhaseCachingOff: 100}
+	astTestMust(t, queue.ConfigurePhases(config))
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.AssignLiteral(NewSMTLiteral(variable, false), NewSMTBooleanAxiom()))
+	if !state.booleanData[variable].PhaseAvailable {
+		t.Fatal("assignment did not cache its phase")
+	}
+	astTestMust(t, queue.PrepareConflict())
+	if state.booleanData[variable].PhaseAvailable {
+		t.Fatal("conservative conflict retained current-level phase")
+	}
+
+	state.booleanData[variable].PhaseAvailable = true
+	config.PhaseSelection = 2
+	astTestMust(t, queue.ConfigurePhases(config))
+	astTestMust(t, queue.PrepareConflict())
+	if !state.booleanData[variable].PhaseAvailable {
+		t.Fatal("ordinary caching discarded current-level phase")
+	}
+}

@@ -56,6 +56,26 @@ func (q *SMTActivityCaseSplitQueue) RecordConflict() {
 	}
 }
 
+func (q *SMTActivityCaseSplitQueue) PrepareConflict() error {
+	if q == nil || q.state == nil {
+		return ast.ErrASTHandle
+	}
+	if q.phaseSelection != 3 && q.phaseSelection != 4 {
+		return nil
+	}
+	start := 0
+	if q.state.scopeLevel != 0 {
+		if len(q.state.scopes) == 0 {
+			return ast.ErrASTDomain
+		}
+		start = q.state.scopes[len(q.state.scopes)-1].assignedLimit
+	}
+	for _, literal := range q.state.assignedLiterals[start:] {
+		q.state.booleanData[literal.Var()].PhaseAvailable = false
+	}
+	return nil
+}
+
 func (q *SMTActivityCaseSplitQueue) occurrencePhase(variable int32) bool {
 	positive, negative := 0, 0
 	for i := range q.state.clauses {

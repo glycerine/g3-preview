@@ -205,6 +205,9 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			return lbool.Undef, fmt.Errorf("smt search propagate: %w", err)
 		}
 		if !consistent {
+			if err = queue.PrepareConflict(); err != nil {
+				return lbool.Undef, fmt.Errorf("smt search prepare conflict: %w", err)
+			}
 			conflict, found := k.internalizer.Conflict()
 			if !found {
 				return lbool.Undef, ast.ErrASTDomain
