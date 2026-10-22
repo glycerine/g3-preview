@@ -2,7 +2,11 @@
 // arithmetic, empty-string and round-trip constraints.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"math/big"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
 
 func (t *SMTSequenceTheory) addIntToStringAxioms(expression ast.ASTHandle) error {
 	state, err := t.State()
@@ -81,7 +85,10 @@ func (t *SMTSequenceTheory) addIntToStringAxioms(expression ast.ASTHandle) error
 	if err != nil {
 		return err
 	}
-	return t.axioms.Push(digitsOnlyWhenNonnegative)
+	if err = t.axioms.Push(digitsOnlyWhenNonnegative); err != nil {
+		return err
+	}
+	return t.addConcreteIntToStringAxiom(expression, integer, back)
 }
 
 func (t *SMTSequenceTheory) addStringToIntAxioms(expression ast.ASTHandle) error {
@@ -123,7 +130,10 @@ func (t *SMTSequenceTheory) addStringToIntAxioms(expression ast.ASTHandle) error
 	if err != nil {
 		return err
 	}
-	return t.axioms.Push(equivalence)
+	if err = t.axioms.Push(equivalence); err != nil {
+		return err
+	}
+	return t.addConcreteStringToIntAxiom(expression, sequence)
 }
 
 func (t *SMTSequenceTheory) numericStringMembership(sequence ast.ASTHandle) (ast.ASTHandle, error) {
@@ -148,4 +158,69 @@ func (t *SMTSequenceTheory) numericStringMembership(sequence ast.ASTHandle) (ast
 		return ast.ASTHandle{}, err
 	}
 	return state.manager.MkSequenceInRegex(sequence, digits)
+}
+
+func (t *SMTSequenceTheory) addConcreteIntToStringAxiom(expression, integer, roundTrip ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	text, integral, matched, err := state.manager.ArithmeticNumeralText(integer)
+	if err != nil || !matched || !integral {
+		return err
+	}
+	value, ok := new(big.Int).SetString(text, 10)
+	if !ok {
+		return ast.ErrASTDomain
+	}
+	result := ""
+	if value.Sign() >= 0 {
+		result = value.String()
+	}
+	stringValue, err := state.manager.MkString(result)
+	if err != nil {
+		return err
+	}
+	equality, err := state.manager.MkEq(expression, stringValue)
+	if err != nil {
+		return err
+	}
+	t.trackInternalTerms(expression, roundTrip)
+	return t.axioms.Push(equality)
+}
+
+func (t *SMTSequenceTheory) addConcreteStringToIntAxiom(expression, sequence ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	text, matched, err := state.manager.SequenceStringValue(sequence)
+	if err != nil || !matched {
+		return err
+	}
+	value := new(big.Int).SetInt64(-1)
+	if text != "" {
+		digits := true
+		for index := 0; index < len(text); index++ {
+			if text[index] < '0' || text[index] > '9' {
+				digits = false
+				break
+			}
+		}
+		if digits {
+			if _, ok := value.SetString(text, 10); !ok {
+				return ast.ErrASTDomain
+			}
+		}
+	}
+	numeral, err := state.manager.ArithmeticIntegerNumeralText(value.String())
+	if err != nil {
+		return err
+	}
+	equality, err := state.manager.MkEq(expression, numeral)
+	if err != nil {
+		return err
+	}
+	t.trackInternalTerms(expression)
+	return t.axioms.Push(equality)
 }

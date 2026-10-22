@@ -1590,6 +1590,32 @@ func TestSMTSequenceTheoryIntegerStringAxioms(t *testing.T) {
 			astTestMust(t, err)
 			return []ast.ASTHandle{nonnegative}
 		}},
+		{name: "ground-itos-value", build: func(t *testing.T, m *ast.ASTManager) []ast.ASTHandle {
+			twelve, err := m.ArithmeticIntegerNumeralText("12")
+			astTestMust(t, err)
+			converted, err := m.MkIntToString(twelve)
+			astTestMust(t, err)
+			text, err := m.MkString("12")
+			astTestMust(t, err)
+			equality, err := m.MkEq(converted, text)
+			astTestMust(t, err)
+			wrong, err := m.MkNot(equality)
+			astTestMust(t, err)
+			return []ast.ASTHandle{wrong}
+		}},
+		{name: "ground-stoi-leading-zero-value", build: func(t *testing.T, m *ast.ASTManager) []ast.ASTHandle {
+			text, err := m.MkString("0012")
+			astTestMust(t, err)
+			converted, err := m.MkStringToInt(text)
+			astTestMust(t, err)
+			twelve, err := m.ArithmeticIntegerNumeralText("12")
+			astTestMust(t, err)
+			equality, err := m.MkEq(converted, twelve)
+			astTestMust(t, err)
+			wrong, err := m.MkNot(equality)
+			astTestMust(t, err)
+			return []ast.ASTHandle{wrong}
+		}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			m, modelConfig := smtModelGeneratorFixture(t)
@@ -1606,6 +1632,45 @@ func TestSMTSequenceTheoryIntegerStringAxioms(t *testing.T) {
 				t.Fatal("integer/string axiom contradiction", status)
 			}
 		})
+	}
+}
+
+func TestSMTSequenceTheoryGroundIntegerStringConversionsAreComplete(t *testing.T) {
+	for _, build := range []func(*testing.T, *ast.ASTManager) ast.ASTHandle{
+		func(t *testing.T, m *ast.ASTManager) ast.ASTHandle {
+			value, err := m.ArithmeticIntegerNumeralText("123456789012345678901234567890")
+			astTestMust(t, err)
+			converted, err := m.MkIntToString(value)
+			astTestMust(t, err)
+			expected, err := m.MkString("123456789012345678901234567890")
+			astTestMust(t, err)
+			equality, err := m.MkEq(converted, expected)
+			astTestMust(t, err)
+			return equality
+		},
+		func(t *testing.T, m *ast.ASTManager) ast.ASTHandle {
+			value, err := m.MkString("000000000000000000000000000042")
+			astTestMust(t, err)
+			converted, err := m.MkStringToInt(value)
+			astTestMust(t, err)
+			expected, err := m.ArithmeticIntegerNumeralText("42")
+			astTestMust(t, err)
+			equality, err := m.MkEq(converted, expected)
+			astTestMust(t, err)
+			return equality
+		},
+	} {
+		m, modelConfig := smtModelGeneratorFixture(t)
+		solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+		astTestMust(t, err)
+		assertion := build(t, m)
+		astTestMust(t, solver.Assert(assertion))
+		status, err := solver.CheckSat(nil)
+		astTestMust(t, err)
+		astTestMust(t, solver.Close())
+		if status != lbool.True {
+			t.Fatal("exact ground conversion remained incomplete", status)
+		}
 	}
 }
 
