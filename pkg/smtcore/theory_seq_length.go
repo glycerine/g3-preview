@@ -107,6 +107,29 @@ func (t *SMTSequenceTheory) addLengthAxiom(length ast.ASTHandle) error {
 	if err = t.axioms.Push(nonnegative); err != nil {
 		return err
 	}
+	zeroLength, err := state.manager.MkEq(length, zero)
+	if err != nil {
+		return err
+	}
+	sort, err := state.manager.GetSort(argument)
+	if err != nil {
+		return err
+	}
+	empty, err := state.manager.MkSequenceEmpty(sort)
+	if err != nil {
+		return err
+	}
+	emptyArgument, err := state.manager.MkEq(argument, empty)
+	if err != nil {
+		return err
+	}
+	emptyExactlyZero, err := state.manager.MkEq(zeroLength, emptyArgument)
+	if err != nil {
+		return err
+	}
+	if err = t.axioms.Push(emptyExactlyZero); err != nil {
+		return err
+	}
 	integer, itos, err := state.manager.SequenceIntToStringArgument(argument)
 	if err != nil || !itos {
 		return err

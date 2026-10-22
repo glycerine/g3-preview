@@ -117310,7 +117310,7 @@
           "tests": ["TestSMTSequenceTheoryLengthAxioms"]
         },
         {
-          "name": "exact length axioms for concat, unit, empty, string, arbitrary sequence non-negativity and int.to.str lower bound (src/smt/theory_seq.cpp:3313-3360)",
+          "name": "exact length axioms for concat, unit, empty, string, arbitrary sequence non-negativity, zero-length iff empty, and int.to.str lower bound (src/smt/theory_seq.cpp:627-633,3313-3360)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_length.go",
           "tests": ["TestSMTSequenceTheoryLengthAxioms"]
@@ -117485,7 +117485,7 @@
           "tests": ["TestSMTSequenceTheoryLengthAxioms"]
         },
         {
-          "name": "retained exact length-axiom generation",
+          "name": "retained exact length-axiom generation including zero-length iff empty",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_length.go",
           "tests": ["TestSMTSequenceTheoryLengthAxioms"]

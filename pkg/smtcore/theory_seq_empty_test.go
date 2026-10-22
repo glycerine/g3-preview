@@ -936,6 +936,27 @@ func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
 			astTestMust(t, err)
 			return result
 		}},
+		{name: "zero-iff-empty", build: func(t *testing.T, m *ast.ASTManager) ast.ASTHandle {
+			empty, err := m.MkString("")
+			astTestMust(t, err)
+			sort, err := m.GetSort(empty)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "sequence-zero-length-x"), sort)
+			astTestMust(t, err)
+			length, err := m.MkSequenceLength(x)
+			astTestMust(t, err)
+			zero, err := m.ArithmeticIntegerNumeralText("0")
+			astTestMust(t, err)
+			zeroLength, err := m.MkEq(length, zero)
+			astTestMust(t, err)
+			emptyValue, err := m.MkEq(x, empty)
+			astTestMust(t, err)
+			notEmpty, err := m.MkNot(emptyValue)
+			astTestMust(t, err)
+			result, err := m.MkAnd(zeroLength, notEmpty)
+			astTestMust(t, err)
+			return result
+		}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			m, modelConfig := smtModelGeneratorFixture(t)
