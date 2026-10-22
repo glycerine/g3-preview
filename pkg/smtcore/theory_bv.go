@@ -4,9 +4,11 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -261,6 +263,28 @@ func (t *SMTBitVectorTheory) boolIff(left, right ast.ASTHandle) (ast.ASTHandle, 
 	return state.manager.MkIff(left, right)
 }
 
+func (t *SMTBitVectorTheory) boolIte(condition, thenValue, elseValue ast.ASTHandle) (ast.ASTHandle, error) {
+	state, _ := t.State()
+	out, err := state.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = rewriter.SimplifyBooleanGateConfigured(
+		state.manager, ast.ASTOpIte,
+		[]ast.ASTHandle{condition, thenValue, elseValue}, out, true, false,
+	); err != nil {
+		_ = state.manager.DelRef(&out)
+		return ast.ASTHandle{}, err
+	}
+	value, err := state.manager.RefGet(out)
+	if err != nil {
+		_ = state.manager.DelRef(&out)
+		return ast.ASTHandle{}, err
+	}
+	t.temporary = append(t.temporary, out)
+	return value, nil
+}
+
 func (t *SMTBitVectorTheory) reduceBits(bits []ast.ASTHandle, and bool) (ast.ASTHandle, error) {
 	if len(bits) == 0 {
 		return ast.ASTHandle{}, ast.ErrASTDomain
@@ -302,7 +326,7 @@ func (t *SMTBitVectorTheory) unsignedLE(left, right []ast.ASTHandle) (ast.ASTHan
 		if gateErr != nil {
 			return ast.ASTHandle{}, gateErr
 		}
-		result, gateErr = state.manager.MkIte(equal, result, less)
+		result, gateErr = t.boolIte(equal, result, less)
 		if gateErr != nil {
 			return ast.ASTHandle{}, gateErr
 		}
@@ -428,14 +452,14 @@ func (t *SMTBitVectorTheory) unsignedDivRem(left, right []ast.ASTHandle) ([]ast.
 		if stage+1 < width {
 			next[0] = left[width-stage-2]
 			for i := 1; i < width; i++ {
-				next[i], err = state.manager.MkIte(carry, difference[i-1], partial[i-1])
+				next[i], err = t.boolIte(carry, difference[i-1], partial[i-1])
 				if err != nil {
 					return nil, nil, err
 				}
 			}
 		} else {
 			for i := range next {
-				next[i], err = state.manager.MkIte(carry, difference[i], partial[i])
+				next[i], err = t.boolIte(carry, difference[i], partial[i])
 				if err != nil {
 					return nil, nil, err
 				}
@@ -517,7 +541,6 @@ func (t *SMTBitVectorTheory) extendedRotateBits(bits, amountBits []ast.ASTHandle
 			return nil, valueErr
 		}
 	}
-	state, _ := t.State()
 	result := make([]ast.ASTHandle, len(bits))
 	for index := range result {
 		result[index] = bits[index]
@@ -526,7 +549,7 @@ func (t *SMTBitVectorTheory) extendedRotateBits(bits, amountBits []ast.ASTHandle
 			if left {
 				source = (len(bits) + index - amount) % len(bits)
 			}
-			result[index], err = state.manager.MkIte(equalities[amount], bits[source], result[index])
+			result[index], err = t.boolIte(equalities[amount], bits[source], result[index])
 			if err != nil {
 				return nil, err
 			}
@@ -689,7 +712,7 @@ func (t *SMTBitVectorTheory) shiftBits(bits, amount []ast.ASTHandle, operation i
 		}
 		for i := range result {
 			var err error
-			result[i], err = state.manager.MkIte(condition, shifted[i], result[i])
+			result[i], err = t.boolIte(condition, shifted[i], result[i])
 			if err != nil {
 				return nil, err
 			}
@@ -1181,9 +1204,9 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	if err != nil {
 		return false, err
 	}
-	for _, bit := range bits {
+	for index, bit := range bits {
 		if err = state.Internalize(bit, true); err != nil {
-			return false, err
+			return false, fmt.Errorf("bit-vector bit %d: %w", index, err)
 		}
 	}
 	return true, nil
