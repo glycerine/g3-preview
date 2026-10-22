@@ -147,14 +147,10 @@ func (t *SMTSequenceTheory) rejectImpossibleCyclicBinaryEquation(left, right []a
 	return false, nil
 }
 
-func (t *SMTSequenceTheory) branchTwoVariableFixedWordEquation(left, right []ast.ASTHandle) (bool, error) {
+func (t *SMTSequenceTheory) branchVariableFixedWordEquation(left, right []ast.ASTHandle) (bool, error) {
 	for pass := 0; pass < 2; pass++ {
-		if len(left) == 2 && len(right) == 1 {
+		if len(left) > 1 && len(right) == 1 {
 			firstVariable, err := t.sequenceVariable(left[0])
-			if err != nil {
-				return false, err
-			}
-			secondVariable, err := t.sequenceVariable(left[1])
 			if err != nil {
 				return false, err
 			}
@@ -166,7 +162,15 @@ func (t *SMTSequenceTheory) branchTwoVariableFixedWordEquation(left, right []ast
 			if textErr != nil {
 				return false, textErr
 			}
-			if firstVariable && secondVariable && fixed {
+			if firstVariable && fixed {
+				sort, makeErr := state.manager.GetSort(left[0])
+				if makeErr != nil {
+					return false, makeErr
+				}
+				restWord, makeErr := t.makeWord(left[1:], sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
 				alternatives := make([]ast.ASTHandle, 0, len(word)+1)
 				for split := 0; split <= len(word); split++ {
 					prefix, makeErr := state.manager.MkString(word[:split])
@@ -181,7 +185,7 @@ func (t *SMTSequenceTheory) branchTwoVariableFixedWordEquation(left, right []ast
 					if makeErr != nil {
 						return false, makeErr
 					}
-					secondEquality, makeErr := state.manager.MkEq(left[1], suffix)
+					secondEquality, makeErr := state.manager.MkEq(restWord, suffix)
 					if makeErr != nil {
 						return false, makeErr
 					}
@@ -192,10 +196,6 @@ func (t *SMTSequenceTheory) branchTwoVariableFixedWordEquation(left, right []ast
 					alternatives = append(alternatives, alternative)
 				}
 				choices, makeErr := state.manager.MkOrArray(alternatives)
-				if makeErr != nil {
-					return false, makeErr
-				}
-				sort, makeErr := state.manager.GetSort(left[0])
 				if makeErr != nil {
 					return false, makeErr
 				}

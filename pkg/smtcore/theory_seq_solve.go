@@ -448,7 +448,7 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if err != nil || rejected {
 			return rejected, err
 		}
-		branched, err := t.branchTwoVariableFixedWordEquation(left, right)
+		branched, err := t.branchVariableFixedWordEquation(left, right)
 		if err != nil || branched {
 			return branched, err
 		}

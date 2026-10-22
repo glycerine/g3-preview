@@ -117303,10 +117303,10 @@
           "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict"]
         },
         {
-          "name": "complete fixed-string binary word-equation branching with finite prefix-overlap alternatives, exhaustive two-variable splits against a fixed word and an unbounded shared-tail Skolem family, plus exact rejection of self-referential fixed tails with unequal lengths or no cyclic rotation (src/smt/theory_seq.cpp:335-790,1554-1763)",
+          "name": "complete fixed-string binary word-equation branching with finite prefix-overlap alternatives, exhaustive incremental variable-prefix splits against a fixed word and an unbounded shared-tail Skolem family, plus exact rejection of self-referential fixed tails with unequal lengths or no cyclic rotation (src/smt/theory_seq.cpp:335-790,1554-1763)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_binary.go",
-          "tests": ["TestSMTSequenceTheoryBranchesBinaryUnitEquation", "TestSMTSequenceTheoryBranchesFixedStringOverlaps", "TestSMTSequenceTheoryBranchesTwoVariablesAcrossFixedWord", "TestSMTSequenceTheoryRejectsImpossibleCyclicBinaryEquations"]
+          "tests": ["TestSMTSequenceTheoryBranchesBinaryUnitEquation", "TestSMTSequenceTheoryBranchesFixedStringOverlaps", "TestSMTSequenceTheoryBranchesTwoVariablesAcrossFixedWord", "TestSMTSequenceTheoryBranchesVariablePrefixAcrossFixedWord", "TestSMTSequenceTheoryRejectsImpossibleCyclicBinaryEquations"]
         },
         {
           "name": "scoped assigned prefix/suffix/contains atoms and concrete relation checking after solution expansion (src/smt/theory_seq.cpp:3927-4010 and m_atoms scope limits)",

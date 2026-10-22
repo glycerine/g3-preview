@@ -726,6 +726,50 @@ func TestSMTSequenceTheoryBranchesTwoVariablesAcrossFixedWord(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryBranchesVariablePrefixAcrossFixedWord(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	fixed, err := m.MkString("ab")
+	astTestMust(t, err)
+	sort, err := m.GetSort(fixed)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-fixed-prefix-x"), sort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-fixed-prefix-y"), sort)
+	astTestMust(t, err)
+	z, err := m.MkConst(astTestSymbol(t, m, "sequence-fixed-prefix-z"), sort)
+	astTestMust(t, err)
+	rest, err := m.MkSequenceConcat(y, z)
+	astTestMust(t, err)
+	word, err := m.MkSequenceConcat(x, rest)
+	astTestMust(t, err)
+	wordEquality, err := m.MkEq(word, fixed)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(wordEquality))
+	for split := 0; split <= 2; split++ {
+		prefix, makeErr := m.MkString("ab"[:split])
+		astTestMust(t, makeErr)
+		suffix, makeErr := m.MkString("ab"[split:])
+		astTestMust(t, makeErr)
+		xEquality, makeErr := m.MkEq(x, prefix)
+		astTestMust(t, makeErr)
+		restEquality, makeErr := m.MkEq(rest, suffix)
+		astTestMust(t, makeErr)
+		alternative, makeErr := m.MkAnd(xEquality, restEquality)
+		astTestMust(t, makeErr)
+		excluded, makeErr := m.MkNot(alternative)
+		astTestMust(t, makeErr)
+		astTestMust(t, solver.Assert(excluded))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("fixed word prefix split alternatives were incomplete", status)
+	}
+}
+
 func TestSMTSequenceTheoryRejectsImpossibleCyclicBinaryEquations(t *testing.T) {
 	for _, test := range []struct {
 		name  string
