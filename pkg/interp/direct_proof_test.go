@@ -169,8 +169,8 @@ func TestDirectProofLocalResolutionAndSymmetry(t *testing.T) {
 	}
 	mixed, err := manager.Make(OperatorEqual, p, q)
 	interpMust(t, err)
-	if _, err = direct.MakeResolution(mixed, nil, truth, falsehood); !errors.As(err, new(ProofError)) {
-		t.Fatal("mixed resolution boundary", err)
+	if resolved, e := direct.MakeResolution(mixed, nil, truth, falsehood); e != nil || resolved != falsehood {
+		t.Fatal("mixed resolution traversal", resolved, e)
 	}
 	if _, err = direct.MakeSymmetry(mixed, mixed, truth); !errors.As(err, new(ProofError)) {
 		t.Fatal("mixed symmetry boundary", err)
@@ -387,5 +387,21 @@ func TestDirectProofContraRecognitionAndResolvents(t *testing.T) {
 		if proof != direct.noProof {
 			t.Fatal("no-proof resolvent", proof, direct.noProof)
 		}
+	}
+	positiveConjunction, err := direct.makeContraNode(truth, []ast.ASTHandle{equality, p}, 1)
+	interpMust(t, err)
+	negativeConjunction, err := direct.makeContraNode(truth, []ast.ASTHandle{negativeEquality, q}, 0)
+	interpMust(t, err)
+	positiveEntries, err := manager.Args(positiveConjunction)
+	interpMust(t, err)
+	negativeEntries, err := manager.Args(negativeConjunction)
+	interpMust(t, err)
+	merged, err := direct.resolveContradictions(positiveEntries[1], positiveConjunction, negativeEntries[1], negativeConjunction)
+	interpMust(t, err)
+	if op, e := manager.Operator(merged); e != nil || op != OperatorAnd {
+		t.Fatal("normal-form contradiction merge", op, e)
+	}
+	if count, e := manager.NumArgs(merged); e != nil || count != 3 {
+		t.Fatal("normal-form resolvent size", count, e)
 	}
 }

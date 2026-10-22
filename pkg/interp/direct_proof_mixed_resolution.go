@@ -127,3 +127,192 @@ func (p *DirectProofInterpolator) collectContraResolvents(from uint32, pivot1, p
 	}
 	return nil
 }
+
+func (p *DirectProofInterpolator) getLiteralAtom(literal ast.ASTHandle) (ast.ASTHandle, error) {
+	op, err := p.base.manager.Operator(literal)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if op == OperatorNot {
+		return p.base.manager.Arg(literal, 0)
+	}
+	return literal, nil
+}
+
+func (p *DirectProofInterpolator) resolveArithmetic(pivot ast.ASTHandle, conclusion []ast.ASTHandle, premise1, premise2 ast.ASTHandle) (ast.ASTHandle, error) {
+	atom, err := p.getLiteralAtom(pivot)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negativePivot, err := p.base.manager.MkNot(atom)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	op, err := p.base.manager.Operator(pivot)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if op != OperatorNot {
+		premise1, premise2 = premise2, premise1
+	}
+	if op == OperatorEqual {
+		left, e := p.base.manager.Arg(pivot, 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		right, e := p.base.manager.Arg(pivot, 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		leftOp, e := p.base.manager.Operator(left)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		rightOp, e := p.base.manager.Operator(right)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if leftOp == OperatorSelect && rightOp == OperatorSelect {
+			negativePivot, err = p.base.manager.MkNot(negativePivot)
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			premise1, premise2 = premise2, premise1
+		}
+	}
+	return p.resolveArithmeticFirst(make(map[ast.ASTHandle]ast.ASTHandle), negativePivot, premise1, premise2)
+}
+
+func (p *DirectProofInterpolator) recurseResolutionTerm(current ast.ASTHandle, recurse func(ast.ASTHandle) (ast.ASTHandle, error)) (ast.ASTHandle, bool, error) {
+	op, err := p.base.manager.Operator(current)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	if op == OperatorAnd || op == OperatorOr || op == OperatorImplies {
+		args, e := p.base.manager.Args(current)
+		if e != nil {
+			return ast.ASTHandle{}, false, e
+		}
+		for i := range args {
+			args[i], e = recurse(args[i])
+			if e != nil {
+				return ast.ASTHandle{}, false, e
+			}
+		}
+		result, e := p.base.manager.Clone(current, args)
+		return result, true, e
+	}
+	if op == OperatorUninterpreted {
+		declaration, e := p.base.manager.Symbol(current)
+		if e != nil {
+			return ast.ASTHandle{}, false, e
+		}
+		if declaration == p.standForall || declaration == p.standExists {
+			binding, e := p.base.manager.Arg(current, 0)
+			if e != nil {
+				return ast.ASTHandle{}, false, e
+			}
+			body, e := p.base.manager.Arg(current, 1)
+			if e != nil {
+				return ast.ASTHandle{}, false, e
+			}
+			body, e = recurse(body)
+			if e != nil {
+				return ast.ASTHandle{}, false, e
+			}
+			result, e := p.makeSymbol(declaration, binding, body)
+			return result, true, e
+		}
+	}
+	return current, false, nil
+}
+
+func (p *DirectProofInterpolator) resolveArithmeticFirst(memo map[ast.ASTHandle]ast.ASTHandle, negativePivot, interpolation1, interpolation2 ast.ASTHandle) (ast.ASTHandle, error) {
+	if result, found := memo[interpolation1]; found {
+		return result, nil
+	}
+	pivot1, found, err := p.contraPivot(negativePivot, interpolation1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var result ast.ASTHandle
+	if found {
+		result, err = p.resolveArithmeticSecond(make(map[ast.ASTHandle]ast.ASTHandle), pivot1, interpolation1, interpolation2)
+	} else {
+		result, _, err = p.recurseResolutionTerm(interpolation1, func(child ast.ASTHandle) (ast.ASTHandle, error) {
+			return p.resolveArithmeticFirst(memo, negativePivot, child, interpolation2)
+		})
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	memo[interpolation1] = result
+	return result, nil
+}
+
+func (p *DirectProofInterpolator) resolveArithmeticSecond(memo map[ast.ASTHandle]ast.ASTHandle, pivot1, conjunction1, interpolation2 ast.ASTHandle) (ast.ASTHandle, error) {
+	if result, found := memo[interpolation2]; found {
+		return result, nil
+	}
+	literal, err := p.base.manager.Arg(pivot1, 1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	target, err := p.base.manager.MkNot(literal)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	pivot2, found, err := p.contraPivot(target, interpolation2)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var result ast.ASTHandle
+	if found {
+		result, err = p.resolveContradictions(pivot1, conjunction1, pivot2, interpolation2)
+	} else {
+		result, _, err = p.recurseResolutionTerm(interpolation2, func(child ast.ASTHandle) (ast.ASTHandle, error) {
+			return p.resolveArithmeticSecond(memo, pivot1, conjunction1, child)
+		})
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	memo[interpolation2] = result
+	return result, nil
+}
+
+func (p *DirectProofInterpolator) resolveContradictions(pivot1, conjunction1, pivot2, conjunction2 ast.ASTHandle) (ast.ASTHandle, error) {
+	proof1, err := p.base.manager.Arg(pivot1, 0)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	proof2, err := p.base.manager.Arg(pivot2, 0)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if proof1 == p.noProof && proof2 == p.noProof {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	if proof1 == p.noProof {
+		pivot1, conjunction1, pivot2, conjunction2 = pivot2, conjunction2, pivot1, conjunction1
+	}
+	var resolvent []ast.ASTHandle
+	if err = p.collectContraResolvents(0, pivot1, pivot2, conjunction2, &resolvent); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = p.collectContraResolvents(1, pivot2, pivot1, conjunction1, &resolvent); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negativeEqualities, err := p.countNegativeEqualities(resolvent)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if negativeEqualities > 1 || len(resolvent) == 0 {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	if len(resolvent) == 1 {
+		// This path invokes the source's custom symbolic proof simplifier.
+		return ast.ASTHandle{}, ProofError{}
+	}
+	return p.base.manager.Make(OperatorAnd, resolvent...)
+}

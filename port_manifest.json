@@ -41767,9 +41767,13 @@
         },
         {
           "name": "resolution and arithmetic proof-term reduction",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/interp/direct_proof_mixed_resolution.go",
+          "tests": [
+            "TestDirectProofLocalResolutionAndSymmetry",
+            "TestDirectProofContraRecognitionAndResolvents"
+          ],
+          "reason": "Polarity normalization, recursive Boolean and stand-in quantifier traversal, contradiction matching, and multi-literal normal-form merging are ported. Single-resolvent symbolic simplification and the no-proof localization branch remain pending."
         },
         {
           "name": "symbolic proof-term substitution, rotation-pivot protection, and rewrite-chain barriers",

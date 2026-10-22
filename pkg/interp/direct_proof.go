@@ -31,6 +31,8 @@ type DirectProofInterpolator struct {
 	eqToLeq      ast.ASTHandle
 	excludedMid  ast.ASTHandle
 	concat       ast.ASTHandle
+	standForall  ast.ASTHandle
+	standExists  ast.ASTHandle
 	noProof      ast.ASTHandle
 	placeholders map[ast.ASTHandle]ast.ASTHandle
 	owned        []ast.ASTRef
@@ -81,6 +83,12 @@ func NewDirectProofInterpolator(base *Base, scope ScopeRange, weak bool) (result
 		return nil, err
 	}
 	if p.concat, err = p.newFunction("@concat", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
+		return nil, err
+	}
+	if p.standForall, err = p.newFunction("@sforall", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
+		return nil, err
+	}
+	if p.standExists, err = p.newFunction("@sexists", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
 		return nil, err
 	}
 	if p.noProof, err = manager.MakeVariable("@nop", boolean); err != nil {

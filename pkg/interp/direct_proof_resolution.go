@@ -20,7 +20,8 @@ func (p *DirectProofInterpolator) MakeResolution(pivot ast.ASTHandle, conclusion
 	case TermB:
 		return p.keep(p.base.manager.MkAnd(premise1, premise2))
 	default:
-		return ast.ASTHandle{}, ProofError{}
+		result, err := p.resolveArithmetic(pivot, conclusion, premise1, premise2)
+		return p.keep(result, err)
 	}
 }
 
