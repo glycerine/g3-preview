@@ -303,6 +303,29 @@ func TestSMTSolverFindsBinaryClauseMutexes(t *testing.T) {
 	}
 }
 
+func TestSMTSolverPreferredSATReturnsConflictingPreferenceCores(t *testing.T) {
+	m, s := smtSolverFixture(t)
+	a := smtRelevancyBool(t, m, "smt-preferred-a")
+	b := smtRelevancyBool(t, m, "smt-preferred-b")
+	both, err := m.MkAnd(a, b)
+	astTestMust(t, err)
+	notBoth, err := m.MkNot(both)
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(notBoth))
+	status, cores, err := s.PreferredSAT([]ast.ASTHandle{a, b})
+	astTestMust(t, err)
+	if status != lbool.True || len(cores) != 1 || len(cores[0]) != 2 {
+		t.Fatal("preferred SAT result", status, cores)
+	}
+	seen := map[ast.ASTHandle]bool{}
+	for _, expression := range cores[0] {
+		seen[expression] = true
+	}
+	if !seen[a] || !seen[b] {
+		t.Fatal("preferred SAT core", cores)
+	}
+}
+
 func TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	a := smtRelevancyBool(t, m, "smt-solver-tracked-a")

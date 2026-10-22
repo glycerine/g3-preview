@@ -617,8 +617,46 @@ func (s *SMTSolver) FindMutexes(variables []ast.ASTHandle) (lbool.LBool, [][]ast
 	return lbool.True, mutexes, nil
 }
 
-func (s *SMTSolver) PreferredSAT([]ast.ASTHandle) (lbool.LBool, [][]ast.ASTHandle, error) {
-	return solver.DefaultPreferredSAT(s)
+func (s *SMTSolver) PreferredSAT(preferred []ast.ASTHandle) (lbool.LBool, [][]ast.ASTHandle, error) {
+	if err := s.open(); err != nil {
+		return lbool.Undef, nil, err
+	}
+	status, err := s.CheckSat(nil)
+	if err != nil || status != lbool.True || len(preferred) == 0 {
+		return status, nil, err
+	}
+	allowed := make(map[ast.ASTHandle]struct{}, len(preferred))
+	for _, expression := range preferred {
+		allowed[expression] = struct{}{}
+	}
+	accepted := make([]ast.ASTHandle, 0, len(preferred))
+	cores := make([][]ast.ASTHandle, 0)
+	for _, expression := range preferred {
+		trial := append(append([]ast.ASTHandle(nil), accepted...), expression)
+		status, err = s.CheckSat(trial)
+		if err != nil || status == lbool.Undef {
+			return status, cores, err
+		}
+		if status == lbool.True {
+			accepted = append(accepted, expression)
+			continue
+		}
+		core, coreErr := s.UnsatCore()
+		if coreErr != nil {
+			return lbool.Undef, cores, coreErr
+		}
+		filtered := make([]ast.ASTHandle, 0, len(core))
+		for _, member := range core {
+			if _, found := allowed[member]; found {
+				filtered = append(filtered, member)
+			}
+		}
+		if len(filtered) != 0 {
+			cores = append(cores, filtered)
+		}
+	}
+	status, err = s.CheckSat(accepted)
+	return status, cores, err
 }
 
 func (s *SMTSolver) SetProgressCallback(callback solver.ProgressCallback) error {

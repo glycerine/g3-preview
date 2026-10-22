@@ -107468,7 +107468,8 @@
         "TestSMTKernelDisplayStatisticsResetAndCancellation",
         "TestSMTSolverDerivesBooleanConsequences",
         "TestSMTSolverFindsBinaryClauseMutexes",
-        "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions"
+        "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
+        "TestSMTSolverPreferredSATReturnsConflictingPreferenceCores"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -107586,7 +107587,15 @@
           ]
         },
         {
-          "name": "copy and reset, and preferred SAT",
+          "name": "greedy preferred SAT with assumption conflict cores",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverPreferredSATReturnsConflictingPreferenceCores"
+          ]
+        },
+        {
+          "name": "copy and reset",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -107629,7 +107638,8 @@
         "TestSMTKernelDisplayStatisticsResetAndCancellation",
         "TestSMTSolverDerivesBooleanConsequences",
         "TestSMTSolverFindsBinaryClauseMutexes",
-        "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions"
+        "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
+        "TestSMTSolverPreferredSATReturnsConflictingPreferenceCores"
       ],
       "conditionals": [
         {
@@ -107750,7 +107760,15 @@
           ]
         },
         {
-          "name": "reset, preferred SAT, and remaining diagnostics",
+          "name": "preferred SAT query with returned assumption conflict cores",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverPreferredSATReturnsConflictingPreferenceCores"
+          ]
+        },
+        {
+          "name": "reset and remaining diagnostics",
           "status": "unported",
           "go_target": null,
           "tests": []
