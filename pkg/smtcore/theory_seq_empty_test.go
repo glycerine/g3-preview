@@ -587,6 +587,62 @@ func TestSMTSequenceTheoryFixedLengthOneDecomposition(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryNativeWordVariableClassification(t *testing.T) {
+	m := astTestManager(t)
+	literal, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(literal)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-variable-classification-x"), sort)
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	extract, err := m.MkSequenceExtract(x, zero, one)
+	astTestMust(t, err)
+	at, err := m.MkSequenceAt(x, zero)
+	astTestMust(t, err)
+	replace, err := m.MkSequenceReplace(x, literal, x)
+	astTestMust(t, err)
+	concat, err := m.MkSequenceConcat(x, literal)
+	astTestMust(t, err)
+	converted, err := m.MkIntToString(one)
+	astTestMust(t, err)
+	skolemName, err := m.Symbols.Intern("sequence.variable.classification.skolem")
+	astTestMust(t, err)
+	skolem, err := m.MkSequenceSkolem(skolemName, []ast.ASTHandle{x}, sort)
+	astTestMust(t, err)
+	family, err := m.SequenceFamilyID()
+	astTestMust(t, err)
+	theory, err := NewSMTSequenceTheory(family)
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.RegisterTheory(theory))
+	for _, test := range []struct {
+		name       string
+		expression ast.ASTHandle
+		want       bool
+	}{
+		{name: "uninterpreted", expression: x, want: true},
+		{name: "extract", expression: extract, want: true},
+		{name: "at", expression: at, want: true},
+		{name: "replace", expression: replace, want: true},
+		{name: "internal-skolem", expression: skolem},
+		{name: "literal", expression: literal},
+		{name: "concat", expression: concat},
+		{name: "int-to-string", expression: converted},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			got, variableErr := theory.sequenceVariable(test.expression)
+			astTestMust(t, variableErr)
+			if got != test.want {
+				t.Fatal("word-variable classification", got, test.want)
+			}
+		})
+	}
+}
+
 func TestSMTSequenceTheoryBranchesBinaryUnitEquation(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	a, err := m.MkString("a")

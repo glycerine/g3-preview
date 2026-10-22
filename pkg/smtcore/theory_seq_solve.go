@@ -109,7 +109,19 @@ func (t *SMTSequenceTheory) sequenceVariable(expression ast.ASTHandle) (bool, er
 		return false, err
 	}
 	if family == t.FamilyID() {
-		return false, nil
+		operation, own, operationErr := t.operation(expression)
+		if operationErr != nil {
+			return false, operationErr
+		}
+		if !own {
+			return false, nil
+		}
+		switch operation {
+		case ast.ASTSequenceOpUnit, ast.ASTSequenceOpEmpty, ast.ASTSequenceOpConcat, ast.ASTSequenceOpStringConst, 27:
+			return false, nil
+		default:
+			return operation == 6 || operation == 7 || operation == 8, nil
+		}
 	}
 	op, basic, err := state.basicOperation(expression)
 	if err != nil {
