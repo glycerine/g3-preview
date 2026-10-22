@@ -2178,7 +2178,7 @@
       "path": "scripts/mk_genfile_common.py",
       "component": "scripts",
       "role": "reference_tool",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_module_params_source.go",
         "pkg/smtcore/util_smt_qi_params_source_test.go"
@@ -100664,7 +100664,10 @@
         "TestSMTExtendedRationalArithmeticAndUndefinedInfinity",
         "TestSMTExtendedRationalZeroInfinityPowerAndNegation",
         "TestSMTOldIntervalAddSubtractContainsAndDependencies",
-        "TestSMTOldIntervalInverseAndPower"
+        "TestSMTOldIntervalInverseAndPower",
+        "TestSMTOldIntervalMultiplicationSignTable",
+        "TestSMTOldIntervalMultiplyOpenZeroAndDivide",
+        "TestSMTOldIntervalMultiplicationClosedOracle"
       ],
       "conditionals": [
         {
@@ -100858,8 +100861,8 @@
           "text": "SASSERT(other.m_upper.is_neg() || (other.m_upper.is_zero() && other.m_upper_open));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "ext_numeral arithmetic, order, inverse, power and display",
@@ -100872,22 +100875,33 @@
         },
         {
           "name": "old_interval arithmetic and dependencies",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/old_interval.go",
           "tests": [
             "TestSMTOldIntervalAddSubtractContainsAndDependencies",
-            "TestSMTOldIntervalInverseAndPower"
+            "TestSMTOldIntervalInverseAndPower",
+            "TestSMTOldIntervalMultiplicationSignTable",
+            "TestSMTOldIntervalMultiplyOpenZeroAndDivide",
+            "TestSMTOldIntervalMultiplicationClosedOracle"
           ]
+        },
+        {
+          "name": "declared scalar operator*= has no definition and no retained source call site",
+          "status": "dead_deleted"
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Intervals borrow their concrete arithmetic-bound dependency manager and dependency nodes; rational endpoints are independently owned big.Rat values."
+      ],
+      "deviations": [
+        "Undefined extended-infinity combinations and division by an interval containing zero return a typed Go domain error instead of relying on source assertions."
+      ]
     },
     {
       "path": "src/smt/old_interval.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/old_interval_extended.go",
         "pkg/smtcore/old_interval.go"
@@ -100896,7 +100910,10 @@
         "TestSMTExtendedRationalArithmeticAndUndefinedInfinity",
         "TestSMTExtendedRationalZeroInfinityPowerAndNegation",
         "TestSMTOldIntervalAddSubtractContainsAndDependencies",
-        "TestSMTOldIntervalInverseAndPower"
+        "TestSMTOldIntervalInverseAndPower",
+        "TestSMTOldIntervalMultiplicationSignTable",
+        "TestSMTOldIntervalMultiplyOpenZeroAndDivide",
+        "TestSMTOldIntervalMultiplicationClosedOracle"
       ],
       "conditionals": [
         {
@@ -100922,8 +100939,8 @@
           "text": "rational const & get_upper_value() const { SASSERT(!plus_infinity()); return m_upper.to_rational(); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "ext_numeral interface",
@@ -100936,16 +100953,23 @@
         },
         {
           "name": "old_interval interface",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/old_interval.go",
           "tests": [
             "TestSMTOldIntervalAddSubtractContainsAndDependencies",
-            "TestSMTOldIntervalInverseAndPower"
+            "TestSMTOldIntervalInverseAndPower",
+            "TestSMTOldIntervalMultiplicationSignTable",
+            "TestSMTOldIntervalMultiplyOpenZeroAndDivide",
+            "TestSMTOldIntervalMultiplicationClosedOracle"
           ]
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "The Go interval is a value owner for endpoints and a borrower of search-scoped arithmetic-bound dependency nodes."
+      ],
+      "deviations": [
+        "The source interval macro alias is represented by the concrete smtOldInterval type within package smtcore."
+      ]
     },
     {
       "path": "src/smt/params/CMakeLists.txt",
