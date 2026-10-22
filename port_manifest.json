@@ -107427,9 +107427,14 @@
       "path": "src/smt/smt_quantifier.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_quantifier_registry.go"
+      ],
+      "tests": [
+        "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
+        "TestSMTQuantifierRegistrySourceInstanceLimitScopesAndStackDeletion"
+      ],
       "assertions": [
         {
           "line": 422,
@@ -107440,19 +107445,74 @@
           "text": "SASSERT(m.is_pattern(mp));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "quantifier registration, generated statistics, stack deletion, lookup, enumeration and generation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quantifier_registry.go",
+          "tests": [
+            "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
+            "TestSMTQuantifierRegistrySourceInstanceLimitScopesAndStackDeletion"
+          ]
+        },
+        {
+          "name": "instance limit, generation maximum, scoped fingerprint deduplication, cost calculation and queue insertion",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quantifier_registry.go",
+          "tests": [
+            "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
+            "TestSMTQuantifierRegistrySourceInstanceLimitScopesAndStackDeletion"
+          ]
+        },
+        {
+          "name": "search statistics reset and synchronized fingerprint/queue scopes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quantifier_registry.go",
+          "tests": [
+            "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
+            "TestSMTQuantifierRegistrySourceInstanceLimitScopesAndStackDeletion"
+          ]
+        },
+        {
+          "name": "manager propagation, quick checking, full final-check arbitration and model-check dispatch",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "default plugin MAM/lazy-MAM assignment, equality, relevance, propagation and scope lifecycle",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "default plugin model-finder/model-checker MBQI lifecycle and model adjustment",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "SMTQuantifierRegistry borrows quantifier AST handles, enode bindings, its queue schedule and cost model; it owns native statistic maps, insertion-ordered quantifier slices, and the scoped fingerprint set."
+      ],
+      "deviations": [
+        "The source public add_instance forwarding bug that passes max_generation as max_top_generation is preserved. Plugin dispatch remains with the concrete future MAM/MBQI implementation rather than a generic Go callback interface."
+      ]
     },
     {
       "path": "src/smt/smt_quantifier.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_quantifier_registry.go"
+      ],
+      "tests": [
+        "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
+        "TestSMTQuantifierRegistrySourceInstanceLimitScopesAndStackDeletion"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -107463,11 +107523,31 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "quantifier manager registry, statistic, instance, scope, search-reset and enumeration interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quantifier_registry.go",
+          "tests": [
+            "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
+            "TestSMTQuantifierRegistrySourceInstanceLimitScopesAndStackDeletion"
+          ]
+        },
+        {
+          "name": "concrete default quantifier plugin event, matching, final-check and model-check interface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The registry owns its Go maps and slices while borrowing manager-owned AST handles and SMT enodes."
+      ],
+      "deviations": [
+        "The abstract C++ plugin surface is not reproduced as a universal adapter; retained MAM and MBQI behavior will use concrete typed Go components."
+      ]
     },
     {
       "path": "src/smt/smt_quantifier_instances.h",
