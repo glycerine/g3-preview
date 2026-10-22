@@ -1430,3 +1430,94 @@ func TestDirectProofRotatedEqToLeqSimplification(t *testing.T) {
 		})
 	}
 }
+
+func TestDirectProofRewriteChainArithmeticReduction(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	integer, err := manager.IntType()
+	interpMust(t, err)
+	x, err := manager.MakeVariable("chain-arith-x", integer)
+	interpMust(t, err)
+	x = interpPin(t, m, x)
+	y, err := manager.MakeVariable("chain-arith-y", integer)
+	interpMust(t, err)
+	y = interpPin(t, m, y)
+	base, err := NewBase(manager, []ast.ASTHandle{x, y}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	zero, err := manager.MakeIntText("0")
+	interpMust(t, err)
+	one, err := manager.MakeIntText("1")
+	interpMust(t, err)
+	firstInequality, err := manager.Make(OperatorLE, x, zero)
+	interpMust(t, err)
+	headEquality, err := manager.Make(OperatorIff, truth, firstInequality)
+	interpMust(t, err)
+	head, err := direct.makeRewrite(TermA, direct.topPosition, truth, headEquality)
+	interpMust(t, err)
+	chain, err := direct.chainCons(truth, head)
+	interpMust(t, err)
+	position, err := direct.positionAdd(0, direct.topPosition)
+	interpMust(t, err)
+	tailEquality, err := manager.Make(OperatorEqual, x, y)
+	interpMust(t, err)
+	tail, err := direct.makeRewrite(TermA, position, truth, tailEquality)
+	interpMust(t, err)
+	chain, err = direct.chainCons(chain, tail)
+	interpMust(t, err)
+
+	aProof, bProof := truth, truth
+	converted, err := direct.rewriteChainToNormalInequality(chain, &aProof, &bProof)
+	interpMust(t, err)
+	valid, err := direct.isNormalInequality(converted)
+	if err != nil || !valid {
+		t.Fatal("rewrite-chain inequality", converted, err)
+	}
+	baseInequality, err := manager.Make(OperatorLE, zero, zero)
+	interpMust(t, err)
+	sum, err := direct.simplifySum([]ast.ASTHandle{baseInequality, one, chain})
+	interpMust(t, err)
+	valid, err = direct.isNormalInequality(sum)
+	if err != nil || !valid {
+		t.Fatal("rewrite-chain sum", sum, err)
+	}
+
+	headOnly, err := direct.chainCons(truth, head)
+	interpMust(t, err)
+	modusPonens, err := direct.simplifyModusPonens([]ast.ASTHandle{headOnly, truth, baseInequality})
+	interpMust(t, err)
+	valid, err = direct.isNormalInequality(modusPonens)
+	if err != nil || !valid {
+		t.Fatal("arithmetic modus ponens", modusPonens, err)
+	}
+
+	firstTerm, err := manager.Make(OperatorSub, x, x)
+	interpMust(t, err)
+	structuralInequality, err := manager.Make(OperatorLE, firstTerm, zero)
+	interpMust(t, err)
+	structuralHeadEquality, err := manager.Make(OperatorIff, truth, structuralInequality)
+	interpMust(t, err)
+	structuralHead, err := direct.makeRewrite(TermB, direct.topPosition, truth, structuralHeadEquality)
+	interpMust(t, err)
+	structuralChain, err := direct.chainCons(truth, structuralHead)
+	interpMust(t, err)
+	innerPosition, err := direct.positionAdd(1, direct.topPosition)
+	interpMust(t, err)
+	innerPosition, err = direct.positionAdd(0, innerPosition)
+	interpMust(t, err)
+	structuralTail, err := direct.makeRewrite(TermA, innerPosition, truth, tailEquality)
+	interpMust(t, err)
+	structuralChain, err = direct.chainCons(structuralChain, structuralTail)
+	interpMust(t, err)
+	aProof, bProof = truth, truth
+	converted, err = direct.rewriteChainToNormalInequality(structuralChain, &aProof, &bProof)
+	interpMust(t, err)
+	normal, err := direct.isNormalWrapper(converted)
+	if err != nil || !normal {
+		t.Fatal("structural normal chain", converted, err)
+	}
+}

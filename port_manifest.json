@@ -41567,7 +41567,7 @@
       "path": "src/interp/iz3proof_itp.cpp",
       "component": "interp",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/interp/direct_proof.go",
         "pkg/interp/direct_proof_resolution.go",
@@ -41580,6 +41580,7 @@
         "pkg/interp/direct_proof_equality.go",
         "pkg/interp/direct_proof_rewrite.go",
         "pkg/interp/direct_proof_normal.go",
+        "pkg/interp/direct_proof_chain_arithmetic.go",
         "pkg/interp/direct_proof_localization.go"
       ],
       "tests": [
@@ -41617,6 +41618,8 @@
         "TestDirectProofNormalChainMixedRepresentativeMerge",
         "TestDirectProofNormalInequalitySumAndFinalSubstitution",
         "TestDirectProofRotatedLeqToEqSimplification",
+        "TestDirectProofRotatedEqToLeqSimplification",
+        "TestDirectProofRewriteChainArithmeticReduction",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41828,8 +41831,14 @@
         },
         {
           "name": "rewrite-chain normalization and symbolic proof simplification",
-          "status": "partial",
-          "go_target": "pkg/interp/direct_proof_simplify.go",
+          "status": "ported",
+          "go_targets": [
+            "pkg/interp/direct_proof_simplify.go",
+            "pkg/interp/direct_proof_sum.go",
+            "pkg/interp/direct_proof_rewrite.go",
+            "pkg/interp/direct_proof_normal.go",
+            "pkg/interp/direct_proof_chain_arithmetic.go"
+          ],
           "tests": [
             "TestDirectProofContraRecognitionAndResolvents",
             "TestDirectProofGenericSymbolicSimplification",
@@ -41852,9 +41861,9 @@
             "TestDirectProofNormalChainMixedRepresentativeMerge",
             "TestDirectProofNormalInequalitySumAndFinalSubstitution",
             "TestDirectProofRotatedLeqToEqSimplification",
-            "TestDirectProofRotatedEqToLeqSimplification"
-          ],
-          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary and normal-form conditional inequality summation, nested coefficient distribution, ordinary sum/congruence/modus-ponens, leq2eq, and eq2leq rotation including mixed arithmetic movers, arithmetic normal-form vocabulary, chain merging, and final substitution, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Rewrite-chain-to-normal arithmetic reduction and arithmetic modus ponens remain pending."
+            "TestDirectProofRotatedEqToLeqSimplification",
+            "TestDirectProofRewriteChainArithmeticReduction"
+          ]
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",

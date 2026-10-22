@@ -115,6 +115,22 @@ func (p *DirectProofInterpolator) sumConditionalInequality(current, coefficient,
 		}
 		return current, e
 	}
+	additionOp, err := p.base.manager.Operator(addition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if additionOp == OperatorUninterpreted {
+		declaration, e := p.base.manager.Symbol(addition)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if declaration == p.concat {
+			addition, e = p.rewriteChainToNormalInequality(addition, aProof, bProof)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+		}
+	}
 	currentNormal, err := p.isNormalWrapper(current)
 	if err != nil {
 		return ast.ASTHandle{}, err

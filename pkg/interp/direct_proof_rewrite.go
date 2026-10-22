@@ -967,7 +967,33 @@ func (p *DirectProofInterpolator) simplifyModusPonens(args []ast.ASTHandle) (ast
 		return ast.ASTHandle{}, err
 	}
 	inequality, err := p.isInequality(third)
-	if err != nil || inequality {
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	normalInequality, err := p.isNormalInequality(third)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if normalInequality {
+		converted, e := p.rewriteChainToNormalInequality(chain, &aProof, &bProof)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		one, e := p.base.manager.MakeIntText("1")
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		converted, e = p.sumConditionalInequality(converted, one, third, &aProof, &bProof)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		converted, e = p.base.manager.MkImplies(bProof, converted)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.base.manager.MkAnd(aProof, converted)
+	}
+	if inequality {
 		return ast.ASTHandle{}, ProofError{}
 	}
 	negative, err := p.isNegationChain(chain)
