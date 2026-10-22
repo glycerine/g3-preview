@@ -72,6 +72,8 @@ type Manager struct {
 	array      ast.FamilyID
 	simplifier *astrewriter.TheoryRewriter
 	strong     *astrewriter.TheoryRewriter
+	context    *uparams.ParamsContext
+	globals    *uparams.GlobalParamsService
 	closed     bool
 }
 
@@ -112,6 +114,7 @@ func NewManagerWithParams(m *ast.ASTManager, context *uparams.ParamsContext, glo
 	if err != nil {
 		return nil, err
 	}
+	result.context, result.globals = context, globals
 	parameters, err := context.NewValue()
 	if err != nil {
 		return nil, err

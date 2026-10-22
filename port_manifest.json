@@ -40394,9 +40394,18 @@
       "path": "src/interp/iz3base.cpp",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/interp/base.go",
+        "pkg/interp/base_simplify.go",
+        "pkg/interp/base_tree.go"
+      ],
+      "tests": [
+        "TestInterpolationBaseRangesScopesFramesAndOptions",
+        "TestInterpolationBaseSimplification",
+        "TestInterpolationBaseCopyCloseAndGuards",
+        "TestInterpolationBaseTreeToParentsRepresentation"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -40442,18 +40451,52 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "problem initialization, frame and symbol ranges, lazy expression scopes, weak option, simplification, printing, and tree-to-parent conversion",
+          "status": "ported",
+          "go_targets": [
+            "pkg/interp/base.go",
+            "pkg/interp/base_simplify.go",
+            "pkg/interp/base_tree.go"
+          ],
+          "tests": [
+            "TestInterpolationBaseRangesScopesFramesAndOptions",
+            "TestInterpolationBaseSimplification",
+            "TestInterpolationBaseCopyCloseAndGuards",
+            "TestInterpolationBaseTreeToParentsRepresentation"
+          ]
+        },
+        {
+          "name": "solver-backed satisfiability/model evaluation helper",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Base borrows Manager and owns ASTRef roots for constraints, theory formulas, and memoized simplification results; Close releases them in reverse order."
+      ],
+      "deviations": [
+        "File-name printing is exposed as an io.Writer operation; callers own file creation and closure. The inactive check_interp body is not ported."
+      ]
     },
     {
       "path": "src/interp/iz3base.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/interp/base.go",
+        "pkg/interp/base_simplify.go",
+        "pkg/interp/base_tree.go"
+      ],
+      "tests": [
+        "TestInterpolationBaseRangesScopesFramesAndOptions",
+        "TestInterpolationBaseSimplification",
+        "TestInterpolationBaseCopyCloseAndGuards",
+        "TestInterpolationBaseTreeToParentsRepresentation"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -40465,10 +40508,35 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "base state, ranges/scopes, options, simplification, printing, frame lookup, and tree conversion declarations",
+          "status": "ported",
+          "go_targets": [
+            "pkg/interp/base.go",
+            "pkg/interp/base_simplify.go",
+            "pkg/interp/base_tree.go"
+          ],
+          "tests": [
+            "TestInterpolationBaseRangesScopesFramesAndOptions",
+            "TestInterpolationBaseSimplification",
+            "TestInterpolationBaseCopyCloseAndGuards",
+            "TestInterpolationBaseTreeToParentsRepresentation"
+          ]
+        },
+        {
+          "name": "solver-backed satisfiability/model evaluation and derived clause interpolation hook",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Base is copy-guarded, borrows Manager and owns persistent ASTRef roots for all stored AST handles."
+      ],
+      "deviations": [
+        "The abstract C++ interpolate_clause hook will be represented by the concrete retained translator interface rather than a panic-only base method."
+      ]
     },
     {
       "path": "src/interp/iz3checker.cpp",
