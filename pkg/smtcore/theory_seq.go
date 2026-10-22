@@ -853,7 +853,14 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if _, err := t.State(); err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
-	progress, err := t.addFixedLengthDecomposition()
+	progress, err := t.addLengthLowerBoundDecomposition()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if progress {
+		return SMTFinalCheckContinue, nil
+	}
+	progress, err = t.addFixedLengthDecomposition()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}

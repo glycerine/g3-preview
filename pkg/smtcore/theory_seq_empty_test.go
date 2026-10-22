@@ -639,6 +639,64 @@ func TestSMTSequenceTheoryFixedLengthDecomposition(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryLengthLowerBoundDecomposition(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	value, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(value)
+	astTestMust(t, err)
+	elementSort, sequence, err := m.SequenceSortElement(sort)
+	astTestMust(t, err)
+	if !sequence {
+		t.Fatal("string sort is not a sequence")
+	}
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-lower-bound-x"), sort)
+	astTestMust(t, err)
+	length, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	two, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	lowerBound, err := m.MkArithmeticGE(length, two)
+	astTestMust(t, err)
+	nthName, err := m.Symbols.Intern("seq.nth")
+	astTestMust(t, err)
+	parts := make([]ast.ASTHandle, 0, 3)
+	for index := 0; index < 2; index++ {
+		position, makeErr := m.ArithmeticIntegerNumeralText(strconv.Itoa(index))
+		astTestMust(t, makeErr)
+		element, makeErr := m.MkSequenceSkolem(nthName, []ast.ASTHandle{x, position}, elementSort)
+		astTestMust(t, makeErr)
+		unit, makeErr := m.MkSequenceUnit(element)
+		astTestMust(t, makeErr)
+		parts = append(parts, unit)
+	}
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	tailName, err := m.Symbols.Intern("seq.tail")
+	astTestMust(t, err)
+	remainder, err := m.MkSequenceSkolem(tailName, []ast.ASTHandle{x, one}, sort)
+	astTestMust(t, err)
+	parts = append(parts, remainder)
+	tail, err := m.MkSequenceConcat(parts[1], parts[2])
+	astTestMust(t, err)
+	word, err := m.MkSequenceConcat(parts[0], tail)
+	astTestMust(t, err)
+	definition, err := m.MkEq(x, word)
+	astTestMust(t, err)
+	notDefinition, err := m.MkNot(definition)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(lowerBound))
+	astTestMust(t, solver.Assert(notDefinition))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("length lower bound lacks required prefix decomposition", status)
+	}
+}
+
 func TestSMTSequenceTheoryNativeWordVariableClassification(t *testing.T) {
 	m := astTestManager(t)
 	literal, err := m.MkString("a")

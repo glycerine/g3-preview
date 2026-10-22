@@ -9,6 +9,142 @@ import (
 
 const smtSequenceMaximumFixedDecomposition = 2048
 
+func smtSequenceIntegerLowerBound(value *big.Rat, epsilonSign int) (uint64, bool) {
+	if value == nil || value.Sign() < 0 {
+		return 0, false
+	}
+	quotient := new(big.Int)
+	remainder := new(big.Int)
+	quotient.QuoRem(value.Num(), value.Denom(), remainder)
+	if remainder.Sign() != 0 || epsilonSign > 0 {
+		quotient.Add(quotient, big.NewInt(1))
+	}
+	return quotient.Uint64(), quotient.IsUint64()
+}
+
+func (t *SMTSequenceTheory) addLengthLowerBoundDecomposition() (bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	arithmeticFamily, err := state.manager.ArithmeticFamilyID()
+	if err != nil {
+		return false, err
+	}
+	arithmetic, ok := state.Theory(arithmeticFamily).(*SMTLinearArithmeticTheory)
+	if !ok {
+		return false, nil
+	}
+	intervals, err := arithmetic.linearVariableIntervals()
+	if err != nil {
+		return false, err
+	}
+	seen := make(map[ast.ASTHandle]struct{})
+	for _, node := range t.variables {
+		if node == nil {
+			continue
+		}
+		expression := node.Owner()
+		if _, found := seen[expression]; found {
+			continue
+		}
+		seen[expression] = struct{}{}
+		variable, variableErr := t.sequenceVariable(expression)
+		if variableErr != nil {
+			return false, variableErr
+		}
+		if !variable {
+			continue
+		}
+		length, makeErr := state.manager.MkSequenceLength(expression)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		interval, evaluated, intervalErr := arithmetic.polynomialInterval(length, intervals)
+		if intervalErr != nil {
+			return false, intervalErr
+		}
+		if !evaluated || interval.minusInfinity() {
+			continue
+		}
+		lower, lowerErr := interval.lowerValue()
+		if lowerErr != nil {
+			return false, lowerErr
+		}
+		epsilonSign := 0
+		if interval.lowerOpen {
+			epsilonSign = 1
+		}
+		count, integral := smtSequenceIntegerLowerBound(lower, epsilonSign)
+		if !integral || count == 0 || count >= smtSequenceMaximumFixedDecomposition {
+			continue
+		}
+		sort, makeErr := state.manager.GetSort(expression)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		elementSort, sequence, makeErr := state.manager.SequenceSortElement(sort)
+		if makeErr != nil || !sequence {
+			if makeErr != nil {
+				return false, makeErr
+			}
+			return false, ast.ErrASTDomain
+		}
+		parts := make([]ast.ASTHandle, 0, int(count)+1)
+		internal := make([]ast.ASTHandle, 0, int(count)*2+2)
+		var lastPosition ast.ASTHandle
+		for index := uint64(0); index < count; index++ {
+			position, positionErr := t.integer(index)
+			if positionErr != nil {
+				return false, positionErr
+			}
+			lastPosition = position
+			element, positionErr := t.relationSkolem("seq.nth", []ast.ASTHandle{expression, position}, elementSort)
+			if positionErr != nil {
+				return false, positionErr
+			}
+			unit, positionErr := state.manager.MkSequenceUnit(element)
+			if positionErr != nil {
+				return false, positionErr
+			}
+			parts = append(parts, unit)
+			internal = append(internal, element, unit)
+		}
+		remainder, makeErr := t.relationSkolem("seq.tail", []ast.ASTHandle{expression, lastPosition}, sort)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		parts = append(parts, remainder)
+		word, makeErr := t.makeWord(parts, sort)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		boundValue, makeErr := t.integer(count)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		bound, makeErr := state.manager.MkArithmeticGE(length, boundValue)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		definition, makeErr := state.manager.MkEq(expression, word)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		constraint, makeErr := state.manager.MkImplies(bound, definition)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		if _, found := t.axioms.set[constraint]; found {
+			continue
+		}
+		internal = append(internal, remainder, word)
+		t.trackInternalTerms(internal...)
+		return true, t.axioms.Push(constraint)
+	}
+	return false, nil
+}
+
 func (t *SMTSequenceTheory) addFixedLengthDecomposition() (bool, error) {
 	state, err := t.State()
 	if err != nil {
