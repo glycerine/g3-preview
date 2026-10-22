@@ -248,6 +248,32 @@ func TestSMTBitVectorCloseReleasesBitOwners(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorRelevantTermMarksBits(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	family, err := m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	one, err := m.BitVectorNumeralUint64(1, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(one)
+	astTestMust(t, err)
+	value, err := m.MkConst(astTestSymbol(t, m, "bv-relevant-value"), sort)
+	astTestMust(t, err)
+	state := solver.kernel.internalizer
+	astTestMust(t, state.Internalize(value, false))
+	theory, ok := state.theories[family].(*SMTBitVectorTheory)
+	if !ok || theory == nil || state.relevancy == nil {
+		t.Fatal("missing BV relevancy fixture")
+	}
+	bits, err := theory.bitsFor(value)
+	astTestMust(t, err)
+	astTestMust(t, theory.Relevant(value))
+	for i, bit := range bits {
+		if !state.relevancy.IsRelevant(bit) {
+			t.Fatal("bit was not marked relevant", i)
+		}
+	}
+}
+
 func TestSMTBitVectorToIntAxiom(t *testing.T) {
 	m := astTestManager(t)
 	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})

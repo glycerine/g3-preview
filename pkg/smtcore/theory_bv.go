@@ -1116,6 +1116,11 @@ func (t *SMTBitVectorTheory) bridgeAtom(expression, definition ast.ASTHandle) (b
 	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal, defined.Negated()}); err != nil {
 		return false, err
 	}
+	if state.relevancy != nil {
+		if err = state.relevancy.AddDependency(expression, definition); err != nil {
+			return false, err
+		}
+	}
 	return true, nil
 }
 
@@ -1305,6 +1310,11 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 			return false, err
 		}
 		t.statistics.bit2core++
+		if state.relevancy != nil {
+			if err = state.relevancy.AddDependency(expression, definition); err != nil {
+				return false, err
+			}
+		}
 	}
 	return true, nil
 }
@@ -1523,6 +1533,30 @@ func (t *SMTBitVectorTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHan
 	}
 	_, err = t.CreateVariable(node)
 	return err
+}
+
+func (t *SMTBitVectorTheory) Relevant(expression ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil || state.relevancy == nil {
+		return err
+	}
+	isBV, err := state.manager.IsBitVector(expression)
+	if err != nil {
+		return err
+	}
+	if !isBV {
+		return nil
+	}
+	bits, err := t.bitsFor(expression)
+	if err != nil {
+		return err
+	}
+	for _, bit := range bits {
+		if err = state.relevancy.MarkRelevant(bit); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (t *SMTBitVectorTheory) NewEquality(left, right SMTTheoryVar) error {

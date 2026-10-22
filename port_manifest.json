@@ -113717,7 +113717,8 @@
         "TestSMTBitVectorDivisionByZeroValueIsUninterpreted",
         "TestSMTBitVectorCloseReleasesBitOwners",
         "TestSMTBitVectorToIntAxiom",
-        "TestSMTIntToBitVectorAxiom"
+        "TestSMTIntToBitVectorAxiom",
+        "TestSMTBitVectorRelevantTermMarksBits"
       ],
       "conditionals": [
         {
@@ -114092,7 +114093,8 @@
         "TestSMTBitVectorDivisionByZeroValueIsUninterpreted",
         "TestSMTBitVectorCloseReleasesBitOwners",
         "TestSMTBitVectorToIntAxiom",
-        "TestSMTIntToBitVectorAxiom"
+        "TestSMTIntToBitVectorAxiom",
+        "TestSMTBitVectorRelevantTermMarksBits"
       ],
       "conditionals": [
         {
