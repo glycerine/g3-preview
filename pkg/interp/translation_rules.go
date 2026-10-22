@@ -4,6 +4,7 @@ package interp
 
 import (
 	"errors"
+	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -441,6 +442,8 @@ func (t *FullTranslation) translateTheoryLemma(proof, conclusion ast.ASTHandle, 
 			return ast.ASTHandle{}, e
 		}
 		return direct.MakeEqToLeq(x, y, inequality)
+	case GCDTestKind:
+		return t.translateGCDTest(proof, premises, direct)
 	case AssignBoundsKind:
 		return t.translateAssignBounds(proof, conclusion, premises, premiseConclusions, direct)
 	case GomoryCutKind:
@@ -448,6 +451,189 @@ func (t *FullTranslation) translateTheoryLemma(proof, conclusion ast.ASTHandle, 
 	default:
 		return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
 	}
+}
+
+func (t *FullTranslation) gcdToDivisionRule(proof ast.ASTHandle, positive bool, coefficients []*big.Rat, premises []ast.ASTHandle, direct *DirectProofInterpolator) (ast.ASTHandle, ast.ASTHandle, error) {
+	var selectedProofs, selectedCoefficients, selectedConclusions []ast.ASTHandle
+	start := 0
+	if !positive {
+		start = 1
+	}
+	for i := start; i < len(coefficients); i += 2 {
+		coefficient := coefficients[i]
+		selected := i
+		value := new(big.Rat).Set(coefficient)
+		if coefficient.Sign() < 0 {
+			if i%2 == 0 {
+				selected = i + 1
+			} else {
+				selected = i - 1
+			}
+			if selected < 0 || selected >= len(coefficients) {
+				return ast.ASTHandle{}, ast.ASTHandle{}, ProofError{}
+			}
+			value.Neg(coefficients[selected])
+		}
+		if coefficient.Sign() == 0 {
+			continue
+		}
+		selectedPremise, err := t.base.manager.Premise(proof, uint32(selected))
+		if err != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, err
+		}
+		conclusion, err := t.base.manager.Conclusion(selectedPremise)
+		if err != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, err
+		}
+		term, err := t.base.manager.MakeInt(value)
+		if err != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, err
+		}
+		selectedProofs = append(selectedProofs, premises[selected])
+		selectedCoefficients = append(selectedCoefficients, term)
+		selectedConclusions = append(selectedConclusions, conclusion)
+	}
+	combined, err := t.base.manager.SumInequalities(selectedCoefficients, selectedConclusions, false)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	if len(coefficients) != 0 && coefficients[0].Sign() == 0 {
+		if len(premises) < 2 {
+			return ast.ASTHandle{}, ast.ASTHandle{}, ProofError{}
+		}
+		firstPremise, e := t.base.manager.Premise(proof, 0)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		firstConclusion, e := t.base.manager.Conclusion(firstPremise)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		variable, lower, e := t.BoundedVariable(firstConclusion)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		value, e := t.TermCoefficient(combined, variable)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		extra := 0
+		if (value.Sign() > 0) != lower {
+			extra = 1
+		}
+		value.Abs(value)
+		term, e := t.base.manager.MakeInt(value)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		extraPremise, e := t.base.manager.Premise(proof, uint32(extra))
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		extraConclusion, e := t.base.manager.Conclusion(extraPremise)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+		selectedProofs = append(selectedProofs, premises[extra])
+		selectedCoefficients = append(selectedCoefficients, term)
+		selectedConclusions = append(selectedConclusions, extraConclusion)
+		combined, e = t.base.manager.SumInequalities(selectedCoefficients, selectedConclusions, false)
+		if e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, e
+		}
+	}
+	combined, err = t.NormalizeInequality(combined)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	negative, err := t.base.manager.MkNot(combined)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	hypothesis, err := direct.MakeHypothesis(negative)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	selectedProofs = append(selectedProofs, hypothesis)
+	selectedConclusions = append(selectedConclusions, negative)
+	one, err := t.base.manager.MakeIntText("1")
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	selectedCoefficients = append(selectedCoefficients, one)
+	falsehood, err := t.base.manager.Make(OperatorFalse)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	interpolation, err := direct.MakeFarkas(falsehood, selectedProofs, selectedConclusions, selectedCoefficients)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	left, err := t.base.manager.Arg(combined, 0)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	right, err := t.base.manager.Arg(combined, 1)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	divisor, err := t.GCDOfCoefficients(left)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	left, err = t.ownedIntegerDivision(left, divisor)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	right, err = t.ownedIntegerDivision(right, divisor)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	left, err = t.ownedSimplify(left)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	right, err = t.ownedSimplify(right)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	op, err := t.base.manager.Operator(combined)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	cutConclusion, err := t.base.manager.Make(op, left, right)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	interpolation, err = direct.MakeCutRule(combined, divisor, cutConclusion, interpolation)
+	return interpolation, cutConclusion, err
+}
+
+func (t *FullTranslation) translateGCDTest(proof ast.ASTHandle, premises []ast.ASTHandle, direct *DirectProofInterpolator) (ast.ASTHandle, error) {
+	coefficients, err := t.base.manager.BrokenGCDTestCoefficients(proof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if len(coefficients) != len(premises) {
+		return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
+	}
+	firstProof, firstConclusion, err := t.gcdToDivisionRule(proof, true, coefficients, premises, direct)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	secondProof, secondConclusion, err := t.gcdToDivisionRule(proof, false, coefficients, premises, direct)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	one, err := t.base.manager.MakeIntText("1")
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	falsehood, err := t.base.manager.Make(OperatorFalse)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return direct.MakeFarkas(falsehood, []ast.ASTHandle{firstProof, secondProof}, []ast.ASTHandle{firstConclusion, secondConclusion}, []ast.ASTHandle{one, one})
 }
 
 func (t *FullTranslation) translateAssignBounds(proof, conclusion ast.ASTHandle, premises, premiseConclusions []ast.ASTHandle, direct *DirectProofInterpolator) (ast.ASTHandle, error) {

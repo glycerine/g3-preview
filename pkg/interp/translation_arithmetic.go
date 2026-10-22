@@ -22,6 +22,19 @@ func (t *FullTranslation) ownedSimplify(term ast.ASTHandle) (ast.ASTHandle, erro
 	return result, nil
 }
 
+func (t *FullTranslation) ownedIntegerDivision(left, right ast.ASTHandle) (ast.ASTHandle, error) {
+	ref, err := t.base.manager.MakeIDiv(left, right)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result, err := t.base.manager.ast.RefGet(ref)
+	if err != nil {
+		return ast.ASTHandle{}, errors.Join(err, t.base.manager.ast.DelRef(&ref))
+	}
+	t.owned = append(t.owned, ref)
+	return result, nil
+}
+
 func (t *FullTranslation) linearCoefficients(term ast.ASTHandle) ([]*big.Rat, error) {
 	op, err := t.base.manager.Operator(term)
 	if err != nil {
