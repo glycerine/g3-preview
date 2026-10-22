@@ -23,6 +23,7 @@ type SMTSequenceTheory struct {
 	equations    *smtSequenceEquationQueue
 	disequations *smtSequenceDisequationQueue
 	nonContains  *smtSequenceNonContainsQueue
+	relations    *smtSequenceRelationQueue
 	nextEquation uint32
 	unsupported  uint32
 	limits       []uint32
@@ -37,7 +38,7 @@ func NewSMTSequenceTheory(family ast.FamilyID) (*SMTSequenceTheory, error) {
 }
 
 func (t *SMTSequenceTheory) Initialize(state *SMTInternalizerState) error {
-	if t == nil || t.dependencies != nil || t.solutions != nil || t.exclusions != nil || t.equations != nil || t.disequations != nil || t.nonContains != nil {
+	if t == nil || t.dependencies != nil || t.solutions != nil || t.exclusions != nil || t.equations != nil || t.disequations != nil || t.nonContains != nil || t.relations != nil {
 		return ast.ErrASTHandle
 	}
 	if err := t.SMTTheoryBase.Initialize(state); err != nil {
@@ -79,6 +80,20 @@ func (t *SMTSequenceTheory) Initialize(state *SMTInternalizerState) error {
 		_ = t.equations.Close()
 		_ = t.exclusions.Close()
 		_ = t.solutions.Close()
+		t.disequations = nil
+		t.equations = nil
+		t.exclusions = nil
+		t.solutions = nil
+		return err
+	}
+	t.relations, err = newSMTSequenceRelationQueue(state.manager)
+	if err != nil {
+		_ = t.nonContains.Close()
+		_ = t.disequations.Close()
+		_ = t.equations.Close()
+		_ = t.exclusions.Close()
+		_ = t.solutions.Close()
+		t.nonContains = nil
 		t.disequations = nil
 		t.equations = nil
 		t.exclusions = nil
@@ -421,12 +436,18 @@ func (t *SMTSequenceTheory) Assign(variable int32, value bool) error {
 		}
 		return ast.ErrASTDomain
 	}
-	if op != 5 || value {
+	if op != 3 && op != 4 && op != 5 {
 		return nil
 	}
-	literal := NewSMTLiteral(variable, true)
+	literal := NewSMTLiteral(variable, !value)
 	dependency := t.dependencies.Leaf(smtSequenceAssumption{literal: literal})
-	return t.nonContains.Push(expression, dependency)
+	if err = t.relations.Push(expression, value, dependency); err != nil {
+		return err
+	}
+	if op == 5 && !value {
+		return t.nonContains.Push(expression, dependency)
+	}
+	return nil
 }
 
 func (t *SMTSequenceTheory) PushScope() error {
@@ -463,6 +484,15 @@ func (t *SMTSequenceTheory) PushScope() error {
 		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
+	if err := t.relations.PushScope(); err != nil {
+		_ = t.nonContains.PopScopes(1)
+		_ = t.disequations.PopScopes(1)
+		_ = t.equations.PopScopes(1)
+		_ = t.exclusions.PopScopes(1)
+		_ = t.solutions.PopScopes(1)
+		_ = t.SMTTheoryBase.PopScopes(1)
+		return err
+	}
 	t.limits = append(t.limits, t.unsupported)
 	return nil
 }
@@ -486,6 +516,9 @@ func (t *SMTSequenceTheory) PopScopes(count uint32) error {
 		return err
 	}
 	if err := t.nonContains.PopScopes(count); err != nil {
+		return err
+	}
+	if err := t.relations.PopScopes(count); err != nil {
 		return err
 	}
 	if err := t.SMTTheoryBase.PopScopes(count); err != nil {
@@ -631,11 +664,72 @@ func (t *SMTSequenceTheory) checkConcreteNonContains() (bool, error) {
 	return false, nil
 }
 
+func (t *SMTSequenceTheory) checkConcreteRelations() (bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	for index := 0; index < t.relations.Len(); index++ {
+		expression, asserted, dependency, entryErr := t.relations.At(index)
+		if entryErr != nil {
+			return false, entryErr
+		}
+		op, own, operationErr := t.operation(expression)
+		if operationErr != nil || !own || op < 3 || op > 5 {
+			if operationErr != nil {
+				return false, operationErr
+			}
+			return false, ast.ErrASTDomain
+		}
+		left, right, matched, partsErr := state.manager.SequenceBinaryOperationArguments(expression, op)
+		if partsErr != nil || !matched {
+			if partsErr != nil {
+				return false, partsErr
+			}
+			return false, ast.ErrASTDomain
+		}
+		leftText, leftConcrete, dependency, entryErr := t.concreteString(left, dependency, make(map[ast.ASTHandle]struct{}))
+		if entryErr != nil {
+			return false, entryErr
+		}
+		rightText, rightConcrete, dependency, entryErr := t.concreteString(right, dependency, make(map[ast.ASTHandle]struct{}))
+		if entryErr != nil {
+			return false, entryErr
+		}
+		if !leftConcrete || !rightConcrete {
+			continue
+		}
+		actual := false
+		switch op {
+		case 3:
+			actual = strings.HasPrefix(rightText, leftText)
+		case 4:
+			actual = strings.HasSuffix(rightText, leftText)
+		case 5:
+			actual = strings.Contains(leftText, rightText)
+		}
+		if actual != asserted {
+			if entryErr = t.setDependencyConflict(dependency); entryErr != nil {
+				return false, entryErr
+			}
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if _, err := t.State(); err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
 	conflict, err := t.checkConcreteEquations()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if conflict {
+		return SMTFinalCheckContinue, nil
+	}
+	conflict, err = t.checkConcreteRelations()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
@@ -720,15 +814,16 @@ func (t *SMTSequenceTheory) ModelValue(node *SMTEnode, generator *SMTModelGenera
 }
 
 func (t *SMTSequenceTheory) Close() (result error) {
-	if t == nil || t.solutions == nil || t.exclusions == nil || t.equations == nil || t.disequations == nil || t.nonContains == nil {
+	if t == nil || t.solutions == nil || t.exclusions == nil || t.equations == nil || t.disequations == nil || t.nonContains == nil || t.relations == nil {
 		return ast.ErrASTHandle
 	}
-	result = errors.Join(t.solutions.Close(), t.exclusions.Close(), t.equations.Close(), t.disequations.Close(), t.nonContains.Close())
+	result = errors.Join(t.solutions.Close(), t.exclusions.Close(), t.equations.Close(), t.disequations.Close(), t.nonContains.Close(), t.relations.Close())
 	t.solutions = nil
 	t.exclusions = nil
 	t.equations = nil
 	t.disequations = nil
 	t.nonContains = nil
+	t.relations = nil
 	t.dependencies = nil
 	t.limits = nil
 	if result != nil {

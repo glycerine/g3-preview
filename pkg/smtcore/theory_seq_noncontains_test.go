@@ -26,6 +26,9 @@ func TestSMTSequenceNonContainsQueueAndAssignmentScopes(t *testing.T) {
 	if theory.nonContains.Len() != 1 {
 		t.Fatal("non-contains assignment queue", theory.nonContains.Len())
 	}
+	if theory.relations.Len() != 1 {
+		t.Fatal("relation assignment queue", theory.relations.Len())
+	}
 	expression, dependency, err := theory.nonContains.At(0)
 	astTestMust(t, err)
 	if expression != contains || dependency == nil {
@@ -38,5 +41,8 @@ func TestSMTSequenceNonContainsQueueAndAssignmentScopes(t *testing.T) {
 	astTestMust(t, state.PopScopes(1))
 	if theory.nonContains.Len() != 0 {
 		t.Fatal("non-contains scope rollback", theory.nonContains.Len())
+	}
+	if theory.relations.Len() != 0 {
+		t.Fatal("relation scope rollback", theory.relations.Len())
 	}
 }

@@ -116776,7 +116776,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -116788,7 +116788,8 @@
         "TestSMTSequenceTheoryConcreteWordEquationConflict",
         "TestSMTSequenceTheoryConcreteWordDisequationConflict",
         "TestSMTSequenceTheoryConcreteNonContainsConflict",
-        "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution"
+        "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution",
+        "TestSMTSequenceTheoryConcreteRelationConflicts"
       ],
       "conditionals": [
         {
@@ -117282,6 +117283,12 @@
           "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryConcreteWordEquationConflict"]
         },
         {
+          "name": "scoped assigned prefix/suffix/contains atoms and concrete relation checking after solution expansion (src/smt/theory_seq.cpp:3927-4010 and m_atoms scope limits)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_relations.go",
+          "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes", "TestSMTSequenceTheoryConcreteRelationConflicts"]
+        },
+        {
           "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
           "status": "unported",
           "go_target": null,
@@ -117301,7 +117308,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -117313,7 +117320,8 @@
         "TestSMTSequenceTheoryConcreteWordEquationConflict",
         "TestSMTSequenceTheoryConcreteWordDisequationConflict",
         "TestSMTSequenceTheoryConcreteNonContainsConflict",
-        "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution"
+        "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution",
+        "TestSMTSequenceTheoryConcreteRelationConflicts"
       ],
       "conditionals": [
         {
@@ -117379,6 +117387,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_solve.go",
           "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution"]
+        },
+        {
+          "name": "scoped assigned relation ownership and concrete prefix, suffix and contains checks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_relations.go",
+          "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes", "TestSMTSequenceTheoryConcreteRelationConflicts"]
         },
         {
           "name": "remaining word-equation, arithmetic, containment, regular-language, propagation and branching declarations",

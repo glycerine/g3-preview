@@ -244,3 +244,59 @@ func TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution(t *testing.T)
 		t.Fatal("cancelled word solution did not conflict", status)
 	}
 }
+
+func TestSMTSequenceTheoryConcreteRelationConflicts(t *testing.T) {
+	for _, test := range []struct {
+		name  string
+		op    int32
+		left  string
+		right string
+		value bool
+	}{
+		{name: "prefix-positive", op: 3, left: "bc", right: "abc", value: true},
+		{name: "suffix-negative", op: 4, left: "bc", right: "abc", value: false},
+		{name: "contains-positive", op: 5, left: "abc", right: "z", value: true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			left, err := m.MkString(test.left)
+			astTestMust(t, err)
+			right, err := m.MkString(test.right)
+			astTestMust(t, err)
+			sort, err := m.GetSort(left)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "sequence-relation-"+test.name), sort)
+			astTestMust(t, err)
+			var relation, value ast.ASTHandle
+			switch test.op {
+			case 3:
+				relation, err = m.MkSequencePrefix(left, x)
+				value = right
+			case 4:
+				relation, err = m.MkSequenceSuffix(left, x)
+				value = right
+			case 5:
+				relation, err = m.MkSequenceContains(x, right)
+				value = left
+			}
+			astTestMust(t, err)
+			binding, err := m.MkEq(x, value)
+			astTestMust(t, err)
+			assertion := relation
+			if !test.value {
+				assertion, err = m.MkNot(relation)
+				astTestMust(t, err)
+			}
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.Assert(assertion))
+			astTestMust(t, solver.Assert(binding))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("concrete relation contradiction", status)
+			}
+		})
+	}
+}
