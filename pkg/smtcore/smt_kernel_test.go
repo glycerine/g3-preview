@@ -114,6 +114,24 @@ func TestSMTKernelSearchReportsTimeout(t *testing.T) {
 	}
 }
 
+func TestSMTKernelSearchReportsMemoryWatermark(t *testing.T) {
+	m := astTestManager(t)
+	kernel := smtTestKernel(t, m)
+	runtime := m.NumeralService().RuntimeOwner()
+	astTestMust(t, runtime.SetWatermark(1))
+	t.Cleanup(func() { astTestMust(t, runtime.SetWatermark(0)) })
+	status, err := kernel.Check()
+	astTestMust(t, err)
+	if status != lbool.Undef || kernel.lastFailure != SMTFailureMemory {
+		t.Fatal("memory-limited search", status, kernel.lastFailure)
+	}
+	reason, err := kernel.ReasonUnknown()
+	astTestMust(t, err)
+	if reason != "memout" {
+		t.Fatal("memory-limit reason", reason)
+	}
+}
+
 func TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof(t *testing.T) {
 	m := astTestManager(t)
 	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))

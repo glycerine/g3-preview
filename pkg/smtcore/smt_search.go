@@ -84,15 +84,35 @@ func (k *SMTKernel) searchResourceLimitExceeded(timer *stopwatch.Timer) (bool, e
 		return true, nil
 	}
 	exceeded, err := k.manager.Canceled()
-	if err != nil || !exceeded {
-		return exceeded, err
+	if err != nil {
+		return false, err
 	}
-	if k.manager.Limit.CancelFlag() {
-		k.lastFailure = SMTFailureCanceled
+	if exceeded {
+		if k.manager.Limit.CancelFlag() {
+			k.lastFailure = SMTFailureCanceled
+		} else {
+			k.lastFailure = SMTFailureResourceLimit
+		}
+		return true, nil
+	}
+	runtime := k.manager.NumeralService().RuntimeOwner()
+	if runtime == nil {
+		return false, nil
+	}
+	above := false
+	if process := runtime.ProcessOwner(); process != nil {
+		above = process.AboveWatermark()
 	} else {
-		k.lastFailure = SMTFailureResourceLimit
+		above, err = runtime.AboveWatermark()
+		if err != nil {
+			return false, err
+		}
 	}
-	return true, nil
+	if above {
+		k.lastFailure = SMTFailureMemory
+		return true, nil
+	}
+	return false, nil
 }
 
 // search runs the retained CDCL control loop. Learned clauses are installed at
