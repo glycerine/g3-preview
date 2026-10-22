@@ -1245,6 +1245,65 @@ func TestSMTSolverLinearArithmeticEvaluatesFixedPolynomial(t *testing.T) {
 	}
 }
 
+func TestSMTSolverLinearArithmeticPropagatesPolynomialIntervals(t *testing.T) {
+	for _, test := range []struct {
+		name      string
+		op        int32
+		threshold string
+		want      lbool.LBool
+	}{
+		{name: "proved", op: smtArithOpGT, threshold: "8", want: lbool.True},
+		{name: "refuted", op: smtArithOpLT, threshold: "8", want: lbool.False},
+		{name: "overlap", op: smtArithOpLT, threshold: "9", want: lbool.Undef},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m := astTestManager(t)
+			arithmetic, err := m.RegisterArithmeticPlugin()
+			astTestMust(t, err)
+			params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+			astTestMust(t, err)
+			s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: params})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
+			two, err := m.ArithmeticRealNumeralText("2")
+			astTestMust(t, err)
+			three, err := m.ArithmeticRealNumeralText("3")
+			astTestMust(t, err)
+			four, err := m.ArithmeticRealNumeralText("4")
+			astTestMust(t, err)
+			five, err := m.ArithmeticRealNumeralText("5")
+			astTestMust(t, err)
+			threshold, err := m.ArithmeticRealNumeralText(test.threshold)
+			astTestMust(t, err)
+			realSort, err := m.GetSort(two)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "interval-polynomial-x"), realSort)
+			astTestMust(t, err)
+			y, err := m.MkConst(astTestSymbol(t, m, "interval-polynomial-y"), realSort)
+			astTestMust(t, err)
+			for _, bound := range []struct {
+				variable ast.ASTHandle
+				op       int32
+				value    ast.ASTHandle
+			}{{x, smtArithOpGT, two}, {x, smtArithOpLE, three}, {y, smtArithOpGE, four}, {y, smtArithOpLE, five}} {
+				comparison, makeErr := m.MkFamilyApp(arithmetic, bound.op, nil, []ast.ASTHandle{bound.variable, bound.value})
+				astTestMust(t, makeErr)
+				astTestMust(t, s.Assert(comparison))
+			}
+			product, err := m.MkFamilyApp(arithmetic, smtArithOpMul, nil, []ast.ASTHandle{x, y})
+			astTestMust(t, err)
+			comparison, err := m.MkFamilyApp(arithmetic, test.op, nil, []ast.ASTHandle{product, threshold})
+			astTestMust(t, err)
+			astTestMust(t, s.Assert(comparison))
+			status, err := s.CheckSat(nil)
+			astTestMust(t, err)
+			if status != test.want {
+				t.Fatalf("polynomial interval status %v, want %v", status, test.want)
+			}
+		})
+	}
+}
+
 func TestSMTSolverSetupUsesPartialLinearIntegerArithmetic(t *testing.T) {
 	for _, test := range []struct {
 		name string

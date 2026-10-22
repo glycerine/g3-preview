@@ -112789,6 +112789,7 @@
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
         "TestSMTSolverLinearArithmeticEvaluatesFixedPolynomial",
+        "TestSMTSolverLinearArithmeticPropagatesPolynomialIntervals",
         "TestSMTSolverLinearArithmeticRejectsNonlinearTerms"
       ],
       "conditionals": [
@@ -113083,7 +113084,15 @@
           ]
         },
         {
-          "name": "nonlinear clustering, interval propagation, unfixed assignment repair, Horner and Grobner reasoning",
+          "name": "upward polynomial interval evaluation from active unary linear bounds",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTSolverLinearArithmeticPropagatesPolynomialIntervals"
+          ]
+        },
+        {
+          "name": "nonlinear clustering, downward interval propagation, unfixed assignment repair, Horner and Grobner reasoning",
           "status": "unported",
           "go_target": null,
           "tests": [
@@ -113093,7 +113102,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The retained nonlinear rules recognize products whose non-numeral factors all have even powers and evaluate polynomials exactly when opposing linear bounds fix every variable. Other nonlinear atoms remain unsupported and make CheckSat return unknown."
+        "The retained nonlinear rules recognize even-power products, evaluate fixed polynomials exactly, and evaluate polynomial intervals upward from active unary bounds. Interval conflicts conservatively cite all active linear assertions. Downward propagation, assignment repair, and Grobner reasoning remain unsupported and make CheckSat return unknown when required."
       ]
     },
     {

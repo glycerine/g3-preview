@@ -1098,7 +1098,7 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if t.unsupported {
 		return SMTFinalCheckGiveUp, nil
 	}
-	complete, conflict, err := t.checkFixedNonlinearAssertions()
+	complete, conflict, err := t.checkNonlinearAssertions()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
@@ -1262,31 +1262,193 @@ func (t *SMTLinearArithmeticTheory) fixedPolynomialValue(expression ast.ASTHandl
 	return new(big.Rat).Set(&value.value), append([]SMTLiteral(nil), value.literals...), true, nil
 }
 
-func (t *SMTLinearArithmeticTheory) checkFixedNonlinearAssertions() (bool, bool, error) {
+type smtPolynomialIntervals struct {
+	manager   *smtArithmeticBoundDependencyManager
+	variables map[uint32]*smtOldInterval
+}
+
+func (t *SMTLinearArithmeticTheory) linearVariableIntervals() (*smtPolynomialIntervals, error) {
+	result := &smtPolynomialIntervals{
+		manager:   &smtArithmeticBoundDependencyManager{},
+		variables: make(map[uint32]*smtOldInterval),
+	}
+	type endpoints struct {
+		lower, upper         *big.Rat
+		lowerOpen, upperOpen bool
+	}
+	bounds := make(map[uint32]*endpoints)
+	for _, assertion := range t.assertions {
+		atom := &t.atoms[assertion.atom]
+		if !atom.supported || len(atom.form.terms) != 1 {
+			continue
+		}
+		op := smtLinearEffectiveOp(atom.op, assertion.truth)
+		if op != smtArithOpLE && op != smtArithOpLT && op != smtArithOpGE && op != smtArithOpGT {
+			continue
+		}
+		form := atom.form.clone()
+		if op == smtArithOpGE || op == smtArithOpGT {
+			form.scale(big.NewRat(-1, 1))
+		}
+		open := op == smtArithOpLT || op == smtArithOpGT
+		for variable, coefficient := range form.terms {
+			if coefficient.Sign() == 0 {
+				continue
+			}
+			value := new(big.Rat).Neg(&form.constant)
+			value.Quo(value, coefficient)
+			entry := bounds[variable]
+			if entry == nil {
+				entry = &endpoints{}
+				bounds[variable] = entry
+			}
+			if coefficient.Sign() > 0 {
+				if entry.upper == nil || value.Cmp(entry.upper) < 0 || value.Cmp(entry.upper) == 0 && open {
+					entry.upper, entry.upperOpen = value, open
+				}
+			} else if entry.lower == nil || value.Cmp(entry.lower) > 0 || value.Cmp(entry.lower) == 0 && open {
+				entry.lower, entry.lowerOpen = value, open
+			}
+		}
+	}
+	for variable, entry := range bounds {
+		var interval *smtOldInterval
+		var err error
+		switch {
+		case entry.lower != nil && entry.upper != nil:
+			interval, err = newSMTOldIntervalBounds(result.manager, entry.lower, entry.lowerOpen, nil, entry.upper, entry.upperOpen, nil)
+		case entry.lower != nil:
+			interval, err = newSMTOldIntervalHalfBound(result.manager, entry.lower, entry.lowerOpen, true, nil)
+		case entry.upper != nil:
+			interval, err = newSMTOldIntervalHalfBound(result.manager, entry.upper, entry.upperOpen, false, nil)
+		}
+		if err != nil {
+			return nil, err
+		}
+		result.variables[variable] = interval
+	}
+	return result, nil
+}
+
+func (t *SMTLinearArithmeticTheory) polynomialInterval(expression ast.ASTHandle, intervals *smtPolynomialIntervals) (*smtOldInterval, bool, error) {
+	if value, numeral, err := t.numeral(expression); err != nil || numeral {
+		if err != nil || !numeral {
+			return nil, false, err
+		}
+		result, pointErr := newSMTOldIntervalPoint(intervals.manager, value, nil, nil)
+		return result, pointErr == nil, pointErr
+	}
+	op, arithmetic, err := t.operation(expression)
+	if err != nil {
+		return nil, false, err
+	}
+	state, _ := t.State()
+	if arithmetic {
+		count, countErr := state.manager.GetNumArgs(expression)
+		if countErr != nil {
+			return nil, false, countErr
+		}
+		values := make([]*smtOldInterval, count)
+		for index := uint32(0); index < count; index++ {
+			argument, argErr := state.manager.GetArg(expression, index)
+			if argErr != nil {
+				return nil, false, argErr
+			}
+			value, evaluated, valueErr := t.polynomialInterval(argument, intervals)
+			if valueErr != nil || !evaluated {
+				return nil, evaluated, valueErr
+			}
+			values[index] = value
+		}
+		var result *smtOldInterval
+		switch op {
+		case smtArithOpAdd, smtArithOpSub:
+			result, err = newSMTOldIntervalPoint(intervals.manager, new(big.Rat), nil, nil)
+			for index, value := range values {
+				if err != nil {
+					break
+				}
+				if op == smtArithOpSub && index != 0 {
+					err = result.sub(value)
+				} else {
+					err = result.add(value)
+				}
+			}
+		case smtArithOpUMinus:
+			if count == 1 {
+				result = values[0].clone()
+				result.neg()
+			}
+		case smtArithOpToReal:
+			if count == 1 {
+				result = values[0].clone()
+			}
+		case smtArithOpMul:
+			result, err = newSMTOldIntervalPoint(intervals.manager, big.NewRat(1, 1), nil, nil)
+			for _, value := range values {
+				if err = result.mul(value); err != nil {
+					break
+				}
+			}
+		case smtArithOpDiv:
+			if count == 2 {
+				result = values[0].clone()
+				err = result.div(values[1])
+			}
+		}
+		if err != nil {
+			return nil, false, nil
+		}
+		return result, result != nil, nil
+	}
+	node := state.context.enodes[expression]
+	if node == nil || !t.IsAttachedToVariable(node) {
+		return nil, false, nil
+	}
+	theoryVariable := node.TheoryVar(t.FamilyID())
+	if theoryVariable < 0 || int(theoryVariable) >= len(t.simplexVariables) {
+		return nil, false, nil
+	}
+	variable := t.simplexVariables[theoryVariable]
+	if interval := intervals.variables[variable]; interval != nil {
+		return interval.clone(), true, nil
+	}
+	result, err := newSMTOldInterval(intervals.manager)
+	return result, err == nil, err
+}
+
+func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions() (bool, bool, error) {
 	state, err := t.State()
 	if err != nil {
 		return false, false, err
 	}
 	fixed := t.fixedLinearAssignments()
+	intervals, intervalErr := t.linearVariableIntervals()
+	if intervalErr != nil {
+		return false, false, intervalErr
+	}
 	for _, assertion := range t.assertions {
 		atom := &t.atoms[assertion.atom]
 		if atom.supported || atom.decided {
 			continue
 		}
 		left, leftLiterals, leftFixed, valueErr := t.fixedPolynomialValue(atom.left, fixed)
-		if valueErr != nil || !leftFixed {
+		if valueErr != nil {
 			return false, false, valueErr
 		}
 		right, rightLiterals, rightFixed, valueErr := t.fixedPolynomialValue(atom.right, fixed)
-		if valueErr != nil || !rightFixed {
+		if valueErr != nil {
 			return false, false, valueErr
 		}
-		comparison := left.Cmp(right)
-		truth := (atom.op == smtArithOpLE && comparison <= 0) ||
-			(atom.op == smtArithOpGE && comparison >= 0) ||
-			(atom.op == smtArithOpLT && comparison < 0) ||
-			(atom.op == smtArithOpGT && comparison > 0)
-		if truth != assertion.truth {
+		if leftFixed && rightFixed {
+			comparison := left.Cmp(right)
+			truth := (atom.op == smtArithOpLE && comparison <= 0) ||
+				(atom.op == smtArithOpGE && comparison >= 0) ||
+				(atom.op == smtArithOpLT && comparison < 0) ||
+				(atom.op == smtArithOpGT && comparison > 0)
+			if truth == assertion.truth {
+				continue
+			}
 			t.statistics.conflicts++
 			literals := []SMTLiteral{smtLinearAssertionLiteral(atom, assertion)}
 			literals = append(literals, leftLiterals...)
@@ -1296,6 +1458,44 @@ func (t *SMTLinearArithmeticTheory) checkFixedNonlinearAssertions() (bool, bool,
 			}
 			return true, true, nil
 		}
+		difference, bounded, intervalErr := t.polynomialInterval(atom.left, intervals)
+		if intervalErr != nil {
+			return false, false, intervalErr
+		}
+		rightInterval, rightBounded, intervalErr := t.polynomialInterval(atom.right, intervals)
+		if intervalErr != nil {
+			return false, false, intervalErr
+		}
+		if !bounded || !rightBounded || difference.sub(rightInterval) != nil {
+			return false, false, nil
+		}
+		op := smtLinearEffectiveOp(atom.op, assertion.truth)
+		proved := (op == smtArithOpLE && difference.negative()) ||
+			(op == smtArithOpLT && difference.negativeOne()) ||
+			(op == smtArithOpGE && difference.positive()) ||
+			(op == smtArithOpGT && difference.positiveOne())
+		if proved {
+			continue
+		}
+		refuted := (op == smtArithOpLE && difference.positiveOne()) ||
+			(op == smtArithOpLT && difference.positive()) ||
+			(op == smtArithOpGE && difference.negativeOne()) ||
+			(op == smtArithOpGT && difference.negative())
+		if !refuted {
+			return false, false, nil
+		}
+		t.statistics.conflicts++
+		literals := []SMTLiteral{smtLinearAssertionLiteral(atom, assertion)}
+		for _, linearAssertion := range t.assertions {
+			linearAtom := &t.atoms[linearAssertion.atom]
+			if linearAtom.supported {
+				literals = append(literals, smtLinearAssertionLiteral(linearAtom, linearAssertion))
+			}
+		}
+		if err = state.SetTheoryConflict(t.FamilyID(), literals); err != nil {
+			return false, false, err
+		}
+		return true, true, nil
 	}
 	return true, false, nil
 }
