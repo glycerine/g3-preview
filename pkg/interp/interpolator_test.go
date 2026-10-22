@@ -168,7 +168,7 @@ func TestInterpolationFrameReducerSequenceAndGuards(t *testing.T) {
 }
 
 func TestFullTranslationProofAnalysisAndResolution(t *testing.T) {
-	m, manager := interpProofManagerFixture(t)
+	m, manager := interpRewritingManagerFixture(t)
 	boolean, err := manager.BoolType()
 	interpMust(t, err)
 	p, err := manager.MakeVariable("translation-a", boolean)
@@ -243,4 +243,14 @@ func TestFullTranslationProofAnalysisAndResolution(t *testing.T) {
 	if quantified, e := translation.Quantify(p, DownwardScopeRange(0)); e != nil || quantified != p {
 		t.Fatal("identity quantification", quantified, e)
 	}
+	mixedHypothesis, err := m.MkProofHypothesis(mixed)
+	interpMust(t, err)
+	destination, err := NewInterpolationProof(base)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, destination.Close()) })
+	node, err := translation.Translate(mixedHypothesis, destination)
+	interpMust(t, err)
+	interpolant, err := destination.Interpolate(node, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	interpMust(t, m.DelRef(&interpolant))
 }

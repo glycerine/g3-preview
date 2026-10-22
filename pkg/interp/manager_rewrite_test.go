@@ -75,6 +75,8 @@ func TestFullTranslationArithmeticHelpers(t *testing.T) {
 func interpRewritingManagerFixture(t *testing.T) (*ast.ASTManager, *Manager) {
 	t.Helper()
 	m := interpASTFixture(t)
+	interpMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	interpMust(t, m.RegisterDeclarationPlugins())
 	context, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
 	interpMust(t, err)
 	catalog, err := uparams.NewGlobalParamsCatalog(m.Symbols, uparams.GlobalParamsCatalogConfig{Budget: m.Budget()})

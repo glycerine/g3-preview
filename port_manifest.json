@@ -42224,7 +42224,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/interp/translation_analysis.go",
-        "pkg/interp/translation_arithmetic.go"
+        "pkg/interp/translation_arithmetic.go",
+        "pkg/interp/translation_rules.go"
       ],
       "tests": [
         "TestFullTranslationProofAnalysisAndResolution",
@@ -42393,7 +42394,15 @@
           "reason": "The complete source block at iz3translate.cpp:374-629 is excluded by #if 0 and has no retained caller."
         },
         {
-          "name": "proof-rule translation and final lemma construction",
+          "name": "locality short-circuit, unit resolution, lemma discharge, standard equality and Boolean proof-rule translation, and final precomputed-lemma construction",
+          "status": "ported",
+          "go_target": "pkg/interp/translation_rules.go",
+          "tests": [
+            "TestFullTranslationProofAnalysisAndResolution"
+          ]
+        },
+        {
+          "name": "commuted proof idioms and specialized arithmetic and array theory-lemma translation",
           "status": "unported"
         }
       ],
@@ -42408,7 +42417,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/interp/translation_analysis.go"
+        "pkg/interp/translation_analysis.go",
+        "pkg/interp/translation_rules.go"
       ],
       "tests": [
         "TestFullTranslationProofAnalysisAndResolution"
@@ -42444,7 +42454,12 @@
         },
         {
           "name": "Translate interface behavior",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/interp/translation_rules.go",
+          "tests": [
+            "TestFullTranslationProofAnalysisAndResolution"
+          ],
+          "reason": "The retained locality, unit-resolution, lemma, standard equality/Boolean rule, and final lemma path is ported. Commuted idioms and specialized theory-lemma cases remain pending."
         }
       ],
       "ownership": [
