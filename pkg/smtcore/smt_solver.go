@@ -222,13 +222,16 @@ func (s *SMTSolver) ReasonUnknown() (string, error) {
 		return "", err
 	}
 	if s.result == nil {
-		return "unknown", nil
+		return s.kernel.ReasonUnknown()
 	}
 	return s.result.ReasonUnknown()
 }
 
 func (s *SMTSolver) SetReasonUnknown(v string) error {
 	if err := s.open(); err != nil {
+		return err
+	}
+	if err := s.kernel.SetReasonUnknown(v); err != nil {
 		return err
 	}
 	if s.result == nil {
@@ -394,6 +397,15 @@ func (s *SMTSolver) CheckSatCore(assumptions []ast.ASTHandle) (lbool.LBool, erro
 	}
 	if err = result.SetStatus(status); err != nil {
 		return lbool.Undef, err
+	}
+	if status == lbool.Undef {
+		reason, reasonErr := s.kernel.ReasonUnknown()
+		if reasonErr != nil {
+			return lbool.Undef, reasonErr
+		}
+		if err = result.SetReasonUnknown(reason); err != nil {
+			return lbool.Undef, err
+		}
 	}
 	if status == lbool.False {
 		if err = result.SetUnsatCore(s.kernel.UnsatCore()); err != nil {

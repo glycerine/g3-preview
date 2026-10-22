@@ -12,6 +12,9 @@ func TestSMTCoreTypesFailureFinalCheckAndTheoryVarList(t *testing.T) {
 	if SMTFailureOK != 0 || SMTFailureQuantifiers != 8 {
 		t.Fatal("failure enumeration", SMTFailureOK, SMTFailureQuantifiers)
 	}
+	if SMTFailureOK.String() != "OK" || SMTFailureMemory.String() != "MEMOUT" || SMTFailureConflictLimit.String() != "NUM_CONFLICTS" || SMTFailure(255).String() != "?" {
+		t.Fatal("failure names", SMTFailureOK, SMTFailureMemory, SMTFailureConflictLimit, SMTFailure(255))
+	}
 	tail := NewSMTTheoryVarList(4, 19, nil)
 	head := NewDefaultSMTTheoryVarList()
 	if head.TheoryID() != SMTNullTheoryID || head.TheoryVar() != SMTNullTheoryVar || head.Next() != nil {

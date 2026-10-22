@@ -49,6 +49,31 @@ const (
 	SMTFailureQuantifiers
 )
 
+func (f SMTFailure) String() string {
+	switch f {
+	case SMTFailureOK:
+		return "OK"
+	case SMTFailureUnknown:
+		return "UNKNOWN"
+	case SMTFailureTimeout:
+		return "TIMEOUT"
+	case SMTFailureMemory:
+		return "MEMOUT"
+	case SMTFailureCanceled:
+		return "CANCELED"
+	case SMTFailureConflictLimit:
+		return "NUM_CONFLICTS"
+	case SMTFailureTheory:
+		return "THEORY"
+	case SMTFailureResourceLimit:
+		return "RESOURCE_LIMIT"
+	case SMTFailureQuantifiers:
+		return "QUANTIFIERS"
+	default:
+		return "?"
+	}
+}
+
 // SMTTheoryVarList is the source intrusive list node. Next is borrowed; list
 // storage is owned by the enclosing SMT context.
 type SMTTheoryVarList struct {

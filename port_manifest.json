@@ -105574,9 +105574,15 @@
       "path": "src/smt/smt_context_pp.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_types.go"
+      ],
+      "tests": [
+        "TestSMTSolverReasonUnknownUsesKernelFailure",
+        "TestSMTCoreTypesFailureFinalCheckAndTheoryVarList"
+      ],
       "conditionals": [
         {
           "line": 373,
@@ -105621,11 +105627,31 @@
           "text": "SASSERT(m_manager.has_trace_stream());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "last-failure display names and API reason strings",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverReasonUnknownUsesKernelFailure",
+            "TestSMTCoreTypesFailureFinalCheckAndTheoryVarList"
+          ]
+        },
+        {
+          "name": "context, assignment, enode, theory-variable, asserted-formula, unsat-core, parent-equality, statistics, lemma, and debug-trace displays",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Failure names and reason strings are returned as native Go strings; incomplete-theory objects remain borrowed from the internalizer registry."
+      ],
+      "deviations": [
+        "Theory names are read through the retained optional Name method; unnamed theory implementations preserve the source generic incomplete-theory reason."
+      ]
     },
     {
       "path": "src/smt/smt_context_stat.cpp",
@@ -107014,7 +107040,8 @@
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
         "TestSMTKernelScopesRestoreAssertionsAndContext",
-        "TestSMTSolverPublishesKernelUnsatProof"
+        "TestSMTSolverPublishesKernelUnsatProof",
+        "TestSMTSolverReasonUnknownUsesKernelFailure"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -107057,7 +107084,15 @@
           ]
         },
         {
-          "name": "copy and reset, consequences, mutexes, preferred SAT, model, failure reason, labels, guessed literals, display, cancellation, and parameter updates",
+          "name": "last failure and reason-unknown result",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverReasonUnknownUsesKernelFailure"
+          ]
+        },
+        {
+          "name": "copy and reset, consequences, mutexes, preferred SAT, model, labels, guessed literals, display, cancellation, and parameter updates",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -107089,7 +107124,8 @@
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
         "TestSMTKernelScopesRestoreAssertionsAndContext",
-        "TestSMTSolverPublishesKernelUnsatProof"
+        "TestSMTSolverPublishesKernelUnsatProof",
+        "TestSMTSolverReasonUnknownUsesKernelFailure"
       ],
       "conditionals": [
         {
@@ -107142,7 +107178,15 @@
           ]
         },
         {
-          "name": "translation, reset, derived queries, model results, diagnostics, display, cancellation, and parameter interface",
+          "name": "last failure and reason-unknown access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverReasonUnknownUsesKernelFailure"
+          ]
+        },
+        {
+          "name": "translation, reset, derived queries, model results, labels, other diagnostics, display, cancellation, and parameter interface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -108700,6 +108744,7 @@
         "TestSMTSolverKernelFacadeAssertionsScopesAndResults",
         "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
         "TestSMTSolverPublishesKernelUnsatProof",
+        "TestSMTSolverReasonUnknownUsesKernelFailure",
         "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
       ],
       "assertions": [
@@ -108731,6 +108776,7 @@
             "TestSMTSolverKernelFacadeAssertionsScopesAndResults",
             "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
             "TestSMTSolverPublishesKernelUnsatProof",
+            "TestSMTSolverReasonUnknownUsesKernelFailure",
             "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
           ]
         },
@@ -108743,7 +108789,7 @@
           ]
         },
         {
-          "name": "kernel translation and copy, model exposure, reason and label extraction, consequence and mutex solving, progress sampling, and unsat-core minimization and pattern extension",
+          "name": "kernel translation and copy, model exposure, label extraction, consequence and mutex solving, progress sampling, and unsat-core minimization and pattern extension",
           "status": "unported",
           "go_target": null,
           "tests": []

@@ -5,6 +5,7 @@ package smtcore
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -26,6 +27,8 @@ type SMTKernel struct {
 	unsatCore    []ast.ASTHandle
 	unsatProof   ast.ASTRef
 	assumptions  map[SMTLiteral]ast.ASTHandle
+	lastFailure  SMTFailure
+	unknown      string
 	closed       bool
 }
 
@@ -221,11 +224,64 @@ func (k *SMTKernel) Check() (lbool.LBool, error) {
 	if err := k.manager.ResetRef(k.unsatProof); err != nil {
 		return lbool.Undef, err
 	}
+	k.lastFailure = SMTFailureOK
 	queue, err := k.prepareCheck()
 	if err != nil {
 		return lbool.Undef, err
 	}
 	return k.search(queue)
+}
+
+func (k *SMTKernel) LastFailure() (SMTFailure, error) {
+	if err := k.open(); err != nil {
+		return SMTFailureUnknown, err
+	}
+	return k.lastFailure, nil
+}
+
+func (k *SMTKernel) ReasonUnknown() (string, error) {
+	if err := k.open(); err != nil {
+		return "", err
+	}
+	switch k.lastFailure {
+	case SMTFailureOK, SMTFailureUnknown:
+		return k.unknown, nil
+	case SMTFailureTimeout:
+		return "timeout", nil
+	case SMTFailureMemory:
+		return "memout", nil
+	case SMTFailureCanceled:
+		return "canceled", nil
+	case SMTFailureConflictLimit:
+		return "max-conflicts-reached", nil
+	case SMTFailureTheory:
+		var reason strings.Builder
+		reason.WriteString("(incomplete (theory")
+		for _, theory := range k.internalizer.IncompleteTheories() {
+			if named, ok := theory.(interface{ Name() string }); ok {
+				if name := named.Name(); name != "" {
+					reason.WriteByte(' ')
+					reason.WriteString(name)
+				}
+			}
+		}
+		reason.WriteString("))")
+		return reason.String(), nil
+	case SMTFailureResourceLimit:
+		return "(resource limits reached)", nil
+	case SMTFailureQuantifiers:
+		return "(incomplete quantifiers)", nil
+	default:
+		return "", ast.ErrASTDomain
+	}
+}
+
+func (k *SMTKernel) SetReasonUnknown(message string) error {
+	if err := k.open(); err != nil {
+		return err
+	}
+	k.unknown = message
+	return nil
 }
 
 // Proof returns the kernel-owned proof from the latest unsatisfiable check.

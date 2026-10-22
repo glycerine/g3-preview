@@ -57,6 +57,7 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 	if err := k.manager.ResetRef(k.unsatProof); err != nil {
 		return lbool.Undef, err
 	}
+	k.lastFailure = SMTFailureOK
 	for index, assumption := range assumptions {
 		valid, err := k.validAssumption(assumption)
 		if err != nil {

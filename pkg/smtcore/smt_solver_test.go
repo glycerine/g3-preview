@@ -196,6 +196,37 @@ func TestSMTSolverPublishesKernelUnsatProof(t *testing.T) {
 	}
 }
 
+func TestSMTSolverReasonUnknownUsesKernelFailure(t *testing.T) {
+	m, s := smtSolverFixture(t)
+	astTestMust(t, s.SetReasonUnknown("manual reason"))
+	reason, err := s.ReasonUnknown()
+	astTestMust(t, err)
+	if reason != "manual reason" {
+		t.Fatal("manual reason", reason)
+	}
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	dummy, err := NewSMTDummyTheory(family, "no arithmetic")
+	astTestMust(t, err)
+	astTestMust(t, dummy.Reset())
+	astTestMust(t, s.kernel.RegisterTheory(dummy))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.Undef {
+		t.Fatal("incomplete theory status", status)
+	}
+	reason, err = s.ReasonUnknown()
+	astTestMust(t, err)
+	if reason != "(incomplete (theory no arithmetic))" {
+		t.Fatal("incomplete theory reason", reason)
+	}
+	failure, err := s.kernel.LastFailure()
+	astTestMust(t, err)
+	if failure != SMTFailureTheory || failure.String() != "THEORY" {
+		t.Fatal("last failure", failure)
+	}
+}
+
 func TestSMTSolverFactoryAndUnsupportedKernelPrerequisites(t *testing.T) {
 	m := astTestManager(t)
 	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})

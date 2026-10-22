@@ -108,6 +108,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		case SMTFinalCheckDone:
 			return lbool.True, nil
 		case SMTFinalCheckGiveUp:
+			k.lastFailure = SMTFailureTheory
 			return lbool.Undef, nil
 		case SMTFinalCheckContinue:
 			consistent, err = k.internalizer.PropagateCore()
@@ -118,6 +119,8 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 				continue
 			}
 			if k.internalizer.searchProgress() == before {
+				k.lastFailure = SMTFailureUnknown
+				k.unknown = "theory made no progress"
 				return lbool.Undef, nil
 			}
 		default:
