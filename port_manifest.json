@@ -40789,22 +40789,46 @@
       "path": "src/interp/iz3pp.cpp",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/pp.go"
+      ],
+      "tests": [
+        "TestInterpolationPrettyPrintProblemExactTreeAndNames",
+        "TestInterpolationPrettyPrintDuplicateAndBadTree"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "free declaration collection, constraint naming, assertion output, recursive and/interp tree output, and complete interpolation problem printing",
+          "status": "ported",
+          "go_target": "pkg/interp/pp.go",
+          "tests": [
+            "TestInterpolationPrettyPrintProblemExactTreeAndNames",
+            "TestInterpolationPrettyPrintDuplicateAndBadTree"
+          ]
+        }
+      ],
+      "ownership": [
+        "PrettyPrintProblem borrows its AST manager and handles for one call; native maps own copied generated names and AST printers own their temporary traversal state."
+      ],
+      "deviations": [
+        "Go AST declaration collection and legacy SMT printing replace the source visitor, hash tables, sets, and stream macros."
+      ]
     },
     {
       "path": "src/interp/iz3pp.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/interp/pp.go"
+      ],
+      "tests": [
+        "TestInterpolationPrettyPrintProblemExactTreeAndNames",
+        "TestInterpolationPrettyPrintDuplicateAndBadTree"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -40815,11 +40839,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "iz3pp_bad_tree classification and iz3pp entry point",
+          "status": "ported",
+          "go_target": "pkg/interp/pp.go",
+          "tests": [
+            "TestInterpolationPrettyPrintDuplicateAndBadTree"
+          ]
+        }
+      ],
+      "ownership": [
+        "BadTreeError owns its immutable message and the entry point retains no caller AST handles."
+      ],
+      "deviations": [
+        "The Go entry point accepts io.Writer and propagates writer errors."
+      ]
     },
     {
       "path": "src/interp/iz3profiling.cpp",
