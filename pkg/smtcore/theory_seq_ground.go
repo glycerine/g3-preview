@@ -92,6 +92,28 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 	if err != nil {
 		return false, err
 	}
+	if operation == ast.ASTSequenceOpConcat {
+		left, right, concat, partsErr := state.manager.SequenceConcatParts(expression)
+		if partsErr != nil {
+			return false, partsErr
+		}
+		if concat {
+			leftEmpty, emptyErr := state.manager.IsSequenceEmpty(left)
+			if emptyErr != nil {
+				return false, emptyErr
+			}
+			rightEmpty, emptyErr := state.manager.IsSequenceEmpty(right)
+			if emptyErr != nil {
+				return false, emptyErr
+			}
+			if leftEmpty {
+				return t.pushGroundValue(expression, right)
+			}
+			if rightEmpty {
+				return t.pushGroundValue(expression, left)
+			}
+		}
+	}
 	if operation == ast.ASTSequenceOpUnit || operation == ast.ASTSequenceOpConcat {
 		text, concrete, textErr := t.syntacticGroundString(expression, make(map[ast.ASTHandle]struct{}))
 		if textErr != nil || !concrete {
@@ -142,10 +164,6 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 		return t.pushGroundValue(expression, boolean)
 	}
 	if operation == 8 {
-		text, concrete, textErr := t.groundStringArgument(expression, 0)
-		if textErr != nil || !concrete {
-			return false, textErr
-		}
 		indexExpression, argumentErr := state.manager.GetArg(expression, 1)
 		if argumentErr != nil {
 			return false, argumentErr
@@ -153,6 +171,25 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 		index, numeral, numeralErr := t.groundInteger(indexExpression)
 		if numeralErr != nil || !numeral {
 			return false, numeralErr
+		}
+		if index.Sign() < 0 {
+			sequence, sequenceErr := state.manager.GetArg(expression, 0)
+			if sequenceErr != nil {
+				return false, sequenceErr
+			}
+			sort, sortErr := state.manager.GetSort(sequence)
+			if sortErr != nil {
+				return false, sortErr
+			}
+			empty, emptyErr := state.manager.MkSequenceEmpty(sort)
+			if emptyErr != nil {
+				return false, emptyErr
+			}
+			return t.pushGroundValue(expression, empty)
+		}
+		text, concrete, textErr := t.groundStringArgument(expression, 0)
+		if textErr != nil || !concrete {
+			return false, textErr
 		}
 		result := ""
 		if index.Sign() >= 0 && index.IsInt64() && index.Int64() < int64(len(text)) {
@@ -166,10 +203,6 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 		return t.pushGroundValue(expression, value)
 	}
 	if operation == 6 {
-		text, concrete, textErr := t.groundStringArgument(expression, 0)
-		if textErr != nil || !concrete {
-			return false, textErr
-		}
 		offsetExpression, argumentErr := state.manager.GetArg(expression, 1)
 		if argumentErr != nil {
 			return false, argumentErr
@@ -185,6 +218,25 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 		length, lengthNumeral, numeralErr := t.groundInteger(lengthExpression)
 		if numeralErr != nil || !lengthNumeral {
 			return false, numeralErr
+		}
+		if offset.Sign() < 0 || length.Sign() <= 0 {
+			sequence, sequenceErr := state.manager.GetArg(expression, 0)
+			if sequenceErr != nil {
+				return false, sequenceErr
+			}
+			sort, sortErr := state.manager.GetSort(sequence)
+			if sortErr != nil {
+				return false, sortErr
+			}
+			empty, emptyErr := state.manager.MkSequenceEmpty(sort)
+			if emptyErr != nil {
+				return false, emptyErr
+			}
+			return t.pushGroundValue(expression, empty)
+		}
+		text, concrete, textErr := t.groundStringArgument(expression, 0)
+		if textErr != nil || !concrete {
+			return false, textErr
 		}
 		result := ""
 		if offset.Sign() >= 0 && offset.IsInt64() && length.Sign() > 0 && offset.Int64() < int64(len(text)) {
@@ -203,14 +255,6 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 		return t.pushGroundValue(expression, value)
 	}
 	if operation == 10 {
-		source, sourceConcrete, textErr := t.groundStringArgument(expression, 0)
-		if textErr != nil || !sourceConcrete {
-			return false, textErr
-		}
-		needle, needleConcrete, textErr := t.groundStringArgument(expression, 1)
-		if textErr != nil || !needleConcrete {
-			return false, textErr
-		}
 		offsetExpression, argumentErr := state.manager.GetArg(expression, 2)
 		if argumentErr != nil {
 			return false, argumentErr
@@ -218,6 +262,21 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 		offset, numeral, numeralErr := t.groundInteger(offsetExpression)
 		if numeralErr != nil || !numeral {
 			return false, numeralErr
+		}
+		if offset.Sign() < 0 {
+			minusOne, makeErr := state.manager.ArithmeticIntegerNumeralText("-1")
+			if makeErr != nil {
+				return false, makeErr
+			}
+			return t.pushGroundValue(expression, minusOne)
+		}
+		source, sourceConcrete, textErr := t.groundStringArgument(expression, 0)
+		if textErr != nil || !sourceConcrete {
+			return false, textErr
+		}
+		needle, needleConcrete, textErr := t.groundStringArgument(expression, 1)
+		if textErr != nil || !needleConcrete {
+			return false, textErr
 		}
 		index := int64(-1)
 		if offset.Sign() >= 0 && offset.IsInt64() && offset.Int64() <= int64(len(source)) {

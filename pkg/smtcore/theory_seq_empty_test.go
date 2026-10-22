@@ -23,6 +23,16 @@ func astTestInteger(t *testing.T, manager *ast.ASTManager, value int64) ast.ASTH
 	return result
 }
 
+func astTestStringConst(t *testing.T, manager *ast.ASTManager, name string) ast.ASTHandle {
+	t.Helper()
+	empty := astTestString(t, manager, "")
+	sort, err := manager.GetSort(empty)
+	astTestMust(t, err)
+	result, err := manager.MkConst(astTestSymbol(t, manager, name), sort)
+	astTestMust(t, err)
+	return result
+}
+
 func TestSMTSequenceStructuredModelValues(t *testing.T) {
 	m, config := smtModelGeneratorFixture(t)
 	a, err := m.MkString("a")
@@ -1732,6 +1742,30 @@ func TestSMTSequenceTheoryGroundOperationsAreComplete(t *testing.T) {
 		name  string
 		build func(*testing.T, *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle)
 	}{
+		{name: "concat-empty-identity", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-concat-x")
+			operation, err := m.MkSequenceConcat(astTestString(t, m, ""), x)
+			astTestMust(t, err)
+			return operation, x
+		}},
+		{name: "negative-at", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-at-x")
+			operation, err := m.MkSequenceAt(x, astTestInteger(t, m, -1))
+			astTestMust(t, err)
+			return operation, astTestString(t, m, "")
+		}},
+		{name: "nonpositive-extract", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-extract-x")
+			operation, err := m.MkSequenceExtract(x, astTestInteger(t, m, 4), astTestInteger(t, m, 0))
+			astTestMust(t, err)
+			return operation, astTestString(t, m, "")
+		}},
+		{name: "negative-index", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-index-x")
+			operation, err := m.MkSequenceIndex(x, astTestString(t, m, "needle"), astTestInteger(t, m, -2))
+			astTestMust(t, err)
+			return operation, astTestInteger(t, m, -1)
+		}},
 		{name: "nested-concat", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
 			left, err := m.MkSequenceConcat(astTestString(t, m, "ab"), astTestString(t, m, "cd"))
 			astTestMust(t, err)
