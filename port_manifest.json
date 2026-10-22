@@ -106747,6 +106747,7 @@
         "TestSMTInternalizerEnodeGenerationCongruenceAndRollback",
         "TestSMTInternalizerBooleanGateClausesAndRootAssertions",
         "TestSMTInternalizerBuildsGateAndRootClauseProofs",
+        "TestSMTInternalizerBuildsTheoryAxiomProofs",
         "TestSMTInternalizerImplicationGateWithoutPreprocessing",
         "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
         "TestSMTInternalizerTermITEEqualityClausesAndRelevancy",
@@ -107207,6 +107208,14 @@
           "go_target": "pkg/smtcore/smt_internalizer.go",
           "tests": [
             "TestSMTInternalizerBuildsGateAndRootClauseProofs"
+          ]
+        },
+        {
+          "name": "proof-producing theory axioms with unit-resolution simplification",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer.go",
+          "tests": [
+            "TestSMTInternalizerBuildsTheoryAxiomProofs"
           ]
         },
         {

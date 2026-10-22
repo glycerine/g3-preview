@@ -184,18 +184,18 @@ func (t *SMTRealDiffTheory) addRealBoundAxioms(source, target SMTTheoryVar, weig
 		}
 	}
 	if equal != SMTNullLiteral {
-		if err = state.addClause([]SMTLiteral{equal.Negated(), literal}, false, ast.ASTHandle{}); err != nil {
+		if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equal.Negated(), literal}); err != nil {
 			return err
 		}
-		return state.addClause([]SMTLiteral{literal.Negated(), equal}, false, ast.ASTHandle{})
+		return state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal.Negated(), equal})
 	}
 	if lower != SMTNullLiteral {
-		if err = state.addClause([]SMTLiteral{lower.Negated(), literal}, false, ast.ASTHandle{}); err != nil {
+		if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{lower.Negated(), literal}); err != nil {
 			return err
 		}
 	}
 	if upper != SMTNullLiteral {
-		return state.addClause([]SMTLiteral{literal.Negated(), upper}, false, ast.ASTHandle{})
+		return state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal.Negated(), upper})
 	}
 	return nil
 }
@@ -550,13 +550,13 @@ func (t *SMTRealDiffTheory) InternalizeEquality(expression ast.ASTHandle, variab
 		return err
 	}
 	equality := NewSMTLiteral(variable, false)
-	if err = state.addClause([]SMTLiteral{equality.Negated(), lowerLiteral}, false, ast.ASTHandle{}); err != nil {
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality.Negated(), lowerLiteral}); err != nil {
 		return err
 	}
-	if err = state.addClause([]SMTLiteral{equality.Negated(), upperLiteral}, false, ast.ASTHandle{}); err != nil {
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality.Negated(), upperLiteral}); err != nil {
 		return err
 	}
-	return state.addClause([]SMTLiteral{equality, lowerLiteral.Negated(), upperLiteral.Negated()}, false, ast.ASTHandle{})
+	return state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality, lowerLiteral.Negated(), upperLiteral.Negated()})
 }
 
 func (t *SMTRealDiffTheory) NewEquality(left, right SMTTheoryVar) error {

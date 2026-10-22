@@ -161,15 +161,41 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 			return err
 		}
 	}
+	if justification != nil && len(removedFalse) != 0 {
+		updated, err := NewSMTUnitResolutionJustification(justification.InRegion(), justification, removedFalse)
+		if err != nil {
+			return err
+		}
+		justification = updated
+	}
 	s.statistics.NumMkLits += uint32(len(kept))
 	if len(kept) == 0 {
 		s.inconsistent = true
 		s.conflict = NewSMTBooleanAxiom()
+		if justification != nil {
+			wrapped, err := NewSMTBooleanJustification(justification)
+			if err != nil {
+				return err
+			}
+			s.conflict = wrapped
+			s.ownedJustifications = append(s.ownedJustifications, justification)
+		}
 		s.conflictLiteral = SMTNullLiteral
 		s.statistics.NumConflicts++
 		return nil
 	}
 	if len(kept) == 1 {
+		if justification != nil {
+			wrapped, err := NewSMTBooleanJustification(justification)
+			if err != nil {
+				return err
+			}
+			if err = s.AssignLiteral(kept[0], wrapped); err != nil {
+				return err
+			}
+			s.ownedJustifications = append(s.ownedJustifications, justification)
+			return nil
+		}
 		if !proof.IsNull() {
 			owner, err := NewSMTJustificationProofWrapper(s.manager, proof, false)
 			if err != nil {
@@ -312,6 +338,28 @@ func (s *SMTInternalizerState) selectWatchLiteral(literals []SMTLiteral, startin
 // AddLearnedClause installs a conflict lemma into the current logical scope.
 func (s *SMTInternalizerState) AddLearnedClause(literals []SMTLiteral) error {
 	return s.AddLearnedClauseWithProof(literals, ast.ASTHandle{})
+}
+
+func (s *SMTInternalizerState) addTheoryAxiom(theory SMTTheoryID, literals []SMTLiteral) error {
+	proofs, err := s.manager.ProofsEnabled()
+	if err != nil || !proofs {
+		if err != nil {
+			return err
+		}
+		return s.addClause(literals, false, ast.ASTHandle{})
+	}
+	justification, err := NewSMTTheoryAxiomJustification(s.manager, theory, literals, nil)
+	if err != nil {
+		return err
+	}
+	beforeClauses, beforeOwners := len(s.clauses), len(s.ownedJustifications)
+	if err = s.addClauseKindWithJustificationAndDeleteHandler(literals, false, SMTClauseAux, ast.ASTHandle{}, justification, nil); err != nil {
+		return err
+	}
+	if len(s.clauses) == beforeClauses && len(s.ownedJustifications) == beforeOwners {
+		return justification.Release(s.manager)
+	}
+	return nil
 }
 
 // AddLearnedClauseWithProof installs a conflict lemma and transfers an owned

@@ -156,6 +156,58 @@ func TestSMTInternalizerBuildsGateAndRootClauseProofs(t *testing.T) {
 	astTestMust(t, state.PopScopes(1))
 }
 
+func TestSMTInternalizerBuildsTheoryAxiomProofs(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	family, err := m.ArithmeticFamilyID()
+	astTestMust(t, err)
+	makeLiteral := func(name string) (ast.ASTHandle, SMTLiteral) {
+		expression := smtRelevancyBool(t, m, name)
+		astTestMust(t, state.Internalize(expression, true))
+		variable, found := state.BoolVar(expression)
+		if !found {
+			t.Fatal("missing theory-axiom variable", name)
+		}
+		return expression, NewSMTLiteral(variable, false)
+	}
+	aExpression, a := makeLiteral("theory-axiom-a")
+	bExpression, b := makeLiteral("theory-axiom-b")
+	astTestMust(t, state.addTheoryAxiom(family, []SMTLiteral{a, b}))
+	clause := state.clauses[0].clause
+	builder := &smtConflictProofBuilder{
+		state: state, marked: make(map[int32]struct{}), literal: make(map[SMTLiteral]ast.ASTHandle),
+		objects: make(map[SMTJustification]ast.ASTHandle), equality: make(map[smtEnodePairKey]ast.ASTHandle),
+	}
+	proof, err := builder.clauseProof(clause)
+	astTestMust(t, err)
+	fact, err := m.GetProofFact(proof)
+	astTestMust(t, err)
+	want, err := m.MkOr(aExpression, bExpression)
+	astTestMust(t, err)
+	if fact != want {
+		t.Fatal("theory axiom clause fact", fact, want)
+	}
+
+	_, c := makeLiteral("theory-axiom-c")
+	dExpression, d := makeLiteral("theory-axiom-d")
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.AssignLiteral(c.Negated(), NewSMTBooleanAxiom()))
+	astTestMust(t, state.addTheoryAxiom(family, []SMTLiteral{c, d}))
+	justification, ok := state.booleanData[d.Var()].Justification().Justification()
+	if !ok {
+		t.Fatal("simplified theory axiom lost its justification")
+	}
+	proof, err = builder.objectProof(justification)
+	astTestMust(t, err)
+	fact, err = m.GetProofFact(proof)
+	astTestMust(t, err)
+	if fact != dExpression {
+		t.Fatal("simplified theory axiom fact", fact, dExpression)
+	}
+	astTestMust(t, state.PopScopes(1))
+}
+
 func TestSMTInternalizerTermITEEqualityClausesAndRelevancy(t *testing.T) {
 	m := astTestManager(t)
 	condition := smtRelevancyBool(t, m, "internalize-term-condition")
