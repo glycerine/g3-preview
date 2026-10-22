@@ -139,6 +139,53 @@ func (s *SMTInternalizerState) PropagateTheoryAssignments() error {
 	return nil
 }
 
+func (s *SMTInternalizerState) propagateTheoryRelevancy() error {
+	if s.relevancy == nil {
+		return nil
+	}
+	if err := s.relevancy.Propagate(); err != nil {
+		return err
+	}
+	for _, expression := range s.relevancy.DrainNewlyRelevant() {
+		kind, err := s.manager.GetKind(expression)
+		if err != nil {
+			return err
+		}
+		if kind != ast.ASTApp {
+			continue
+		}
+		notified := make(map[SMTTheoryID]struct{})
+		family, err := s.manager.GetFamilyID(expression)
+		if err != nil {
+			return err
+		}
+		if family != s.manager.BasicFamilyID() {
+			if plugin := s.theories[family]; plugin != nil {
+				if err = plugin.Relevant(expression); err != nil {
+					return err
+				}
+				notified[family] = struct{}{}
+			}
+		}
+		if node := s.context.enodes[expression]; node != nil {
+			for item := &node.theoryVariables; item != nil && item.theory != SMTNullTheoryID; item = item.next {
+				if _, found := notified[item.theory]; found {
+					continue
+				}
+				plugin := s.theories[item.theory]
+				if plugin == nil {
+					return ast.ErrASTDomain
+				}
+				if err = plugin.Relevant(expression); err != nil {
+					return err
+				}
+				notified[item.theory] = struct{}{}
+			}
+		}
+	}
+	return nil
+}
+
 // PropagateCore runs the retained logical-context queues to a fixed point.
 func (s *SMTInternalizerState) PropagateCore() (bool, error) {
 	if err := s.open(); err != nil {
@@ -150,6 +197,9 @@ func (s *SMTInternalizerState) PropagateCore() (bool, error) {
 			return consistent, err
 		}
 		if err = s.PropagateTheoryAssignments(); err != nil {
+			return false, err
+		}
+		if err = s.propagateTheoryRelevancy(); err != nil {
 			return false, err
 		}
 		if err = s.PropagateTheoryEvents(); err != nil {
@@ -167,7 +217,8 @@ func (s *SMTInternalizerState) PropagateCore() (bool, error) {
 		if s.inconsistent {
 			return false, nil
 		}
-		if s.propagationHead == len(s.assignedLiterals) && s.atomPropagationHead == len(s.assignedLiterals) && s.theoryEqualityHead == len(s.theoryEqualities) && s.theoryDisequalityHead == len(s.theoryDisequalities) && !theoryProgress {
+		relevancyDone := s.relevancy == nil || !s.relevancy.CanPropagate()
+		if s.propagationHead == len(s.assignedLiterals) && s.atomPropagationHead == len(s.assignedLiterals) && s.theoryEqualityHead == len(s.theoryEqualities) && s.theoryDisequalityHead == len(s.theoryDisequalities) && relevancyDone && !theoryProgress {
 			return true, nil
 		}
 	}

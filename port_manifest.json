@@ -104917,7 +104917,7 @@
           ]
         },
         {
-          "name": "theory-atom assignment delivery and core/theory propagation fixed point",
+          "name": "theory-atom assignment and relevancy delivery plus core/theory propagation fixed point",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_theory_propagation.go",
           "tests": [
@@ -105118,7 +105118,7 @@
           ]
         },
         {
-          "name": "theory-atom assignment cursor and propagation fixed-point interface",
+          "name": "theory-atom assignment cursor, relevancy callbacks, and propagation fixed-point interface",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_theory_propagation.go",
           "tests": [
@@ -108467,7 +108467,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "typed internalize-atom, internalize-term, equality, sort-constraint, default-internalizer, theory-variable, scope, assignment, core equality/disequality event, and propagation interface",
+          "name": "typed internalize-atom, internalize-term, equality, sort-constraint, default-internalizer, theory-variable, scope, assignment, relevancy, core equality/disequality event, and propagation interface",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_theory.go",
           "tests": [
@@ -108476,7 +108476,7 @@
           ]
         },
         {
-          "name": "relevancy, restart, final-check, conflict, display, model, validation, assumptions, statistics, and fresh-theory interface",
+          "name": "restart, final-check, conflict, display, model, validation, assumptions, statistics, and fresh-theory interface",
           "status": "unported",
           "go_target": null,
           "tests": []

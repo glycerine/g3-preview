@@ -15,6 +15,7 @@ type smtInternalizerTestTheory struct {
 		value    bool
 	}
 	canPropagate, propagationCalled bool
+	relevant                        []ast.ASTHandle
 }
 
 func (t *smtInternalizerTestTheory) DefaultInternalizer() bool { return false }
@@ -100,6 +101,11 @@ func (t *smtInternalizerTestTheory) Propagate() error {
 	return nil
 }
 
+func (t *smtInternalizerTestTheory) Relevant(expression ast.ASTHandle) error {
+	t.relevant = append(t.relevant, expression)
+	return nil
+}
+
 func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {
 	m := astTestManager(t)
 	family, err := m.RegisterArithmeticPlugin()
@@ -138,6 +144,7 @@ func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {
 	atomLiteral, err := state.Literal(atom)
 	astTestMust(t, err)
 	astTestMust(t, state.AssignLiteral(atomLiteral, NewSMTBooleanAxiom()))
+	astTestMust(t, state.markRelevant(atom))
 	theory.canPropagate = true
 	consistent, err := state.PropagateCore()
 	astTestMust(t, err)
@@ -146,6 +153,9 @@ func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {
 	}
 	if len(theory.assignments) != 1 || theory.assignments[0].variable != atomLiteral.Var() || !theory.assignments[0].value {
 		t.Fatal("theory assignment callback", theory.assignments)
+	}
+	if len(theory.relevant) != 2 || theory.relevant[0] != atom || theory.relevant[1] != term {
+		t.Fatal("theory relevancy callback", theory.relevant)
 	}
 	equality, err := m.MkEq(term, term)
 	astTestMust(t, err)
