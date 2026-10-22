@@ -140,6 +140,9 @@ type SMTInternalizerState struct {
 	lemmaGCThreshold         uint32
 	learnedUnits             []smtPersistentLearnedUnit
 	searchBaseLevel          uint32
+	searchAgility            float64
+	searchAgilityFactor      float64
+	searchRestartAdaptive    bool
 	searching                bool
 	closed                   bool
 }

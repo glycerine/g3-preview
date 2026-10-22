@@ -121,6 +121,7 @@ func (k *SMTKernel) searchResourceLimitExceeded(timer *stopwatch.Timer) (bool, e
 func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool, resultErr error) {
 	baseLevel := k.internalizer.scopeLevel
 	conflictBase := k.internalizer.statistics.NumConflicts
+	restarts := newSMTRestartState(k.smtState)
 	timer, err := stopwatch.NewTimer(k.timerClock)
 	if err != nil {
 		return lbool.Undef, err
@@ -129,7 +130,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 	if err != nil {
 		return lbool.Undef, errors.Join(err, timer.Close())
 	}
-	if err = k.internalizer.beginSearchPersistence(baseLevel); err != nil {
+	if err = k.internalizer.beginSearchPersistence(baseLevel, k.smtState); err != nil {
 		return lbool.Undef, errors.Join(err, resolver.Close(), timer.Close())
 	}
 	defer func() {
@@ -208,9 +209,15 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 				return lbool.Undef, fmt.Errorf("smt search collect learned clauses: %w", err)
 			}
 			queue.RecordConflict()
+			restarts.conflicts++
 			if k.internalizer.statistics.NumConflicts-conflictBase > k.smtState.MaxConflicts {
 				k.lastFailure = SMTFailureConflictLimit
 				return lbool.Undef, nil
+			}
+			if restarts.due(k.internalizer.scopeLevel, baseLevel) {
+				if err = k.restartSearch(baseLevel, &restarts); err != nil {
+					return lbool.Undef, fmt.Errorf("smt search restart: %w", err)
+				}
 			}
 			continue
 		}
@@ -231,7 +238,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 				return lbool.Undef, fmt.Errorf("smt search push decision scope: %w", err)
 			}
 			k.internalizer.statistics.NumDecisions++
-			if err = k.internalizer.AssignLiteral(smtDecisionLiteral(variable, phase), NewSMTBooleanAxiom()); err != nil {
+			if err = k.internalizer.assignDecisionLiteral(smtDecisionLiteral(variable, phase)); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search decision: %w", err)
 			}
 			continue

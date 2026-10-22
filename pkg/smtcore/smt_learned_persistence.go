@@ -21,7 +21,7 @@ type smtPreservedLearnedClause struct {
 	activity uint32
 }
 
-func (s *SMTInternalizerState) beginSearchPersistence(base uint32) error {
+func (s *SMTInternalizerState) beginSearchPersistence(base uint32, params SMTParamsState) error {
 	if err := s.open(); err != nil {
 		return err
 	}
@@ -30,12 +30,18 @@ func (s *SMTInternalizerState) beginSearchPersistence(base uint32) error {
 	}
 	s.searching = true
 	s.searchBaseLevel = base
+	s.searchAgility = 0
+	s.searchAgilityFactor = params.AgilityFactor
+	s.searchRestartAdaptive = params.RestartAdaptive
 	return nil
 }
 
 func (s *SMTInternalizerState) endSearchPersistence() {
 	s.searching = false
 	s.searchBaseLevel = 0
+	s.searchAgility = 0
+	s.searchAgilityFactor = 0
+	s.searchRestartAdaptive = false
 }
 
 func (s *SMTInternalizerState) retainProof(proof ast.ASTHandle) (ast.ASTHandle, error) {

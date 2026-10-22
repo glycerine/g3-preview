@@ -13,7 +13,7 @@ func TestSMTLearnedClauseSurvivesSearchBacktrack(t *testing.T) {
 	first := smtRelevancyBool(t, m, "persistent-clause-first")
 	second := smtRelevancyBool(t, m, "persistent-clause-second")
 
-	astTestMust(t, state.beginSearchPersistence(0))
+	astTestMust(t, state.beginSearchPersistence(0, SMTParamsState{}))
 	defer state.endSearchPersistence()
 	astTestMust(t, state.PushScope())
 	for _, expression := range []ast.ASTHandle{first, second} {
@@ -56,7 +56,7 @@ func TestSMTLearnedUnitSurvivesSearchBacktrackAndExpiresWithBase(t *testing.T) {
 	expression := smtRelevancyBool(t, m, "persistent-unit")
 
 	astTestMust(t, state.PushScope())
-	astTestMust(t, state.beginSearchPersistence(1))
+	astTestMust(t, state.beginSearchPersistence(1, SMTParamsState{}))
 	astTestMust(t, state.PushScope())
 	astTestMust(t, state.Internalize(expression, true))
 	variable, found := state.BoolVar(expression)

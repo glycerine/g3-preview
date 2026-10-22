@@ -10,6 +10,14 @@ import (
 )
 
 func (s *SMTInternalizerState) AssignLiteral(literal SMTLiteral, justification SMTBooleanJustification) error {
+	return s.assignLiteralCore(literal, justification, false)
+}
+
+func (s *SMTInternalizerState) assignDecisionLiteral(literal SMTLiteral) error {
+	return s.assignLiteralCore(literal, NewSMTBooleanAxiom(), true)
+}
+
+func (s *SMTInternalizerState) assignLiteralCore(literal SMTLiteral, justification SMTBooleanJustification, decision bool) error {
 	if err := s.open(); err != nil {
 		return err
 	}
@@ -47,10 +55,17 @@ func (s *SMTInternalizerState) AssignLiteral(literal SMTLiteral, justification S
 	if err = s.SetAssignment(literal.Var(), want); err != nil {
 		return err
 	}
-	s.booleanData[literal.Var()].SetJustification(justification)
-	s.booleanData[literal.Var()].ScopeLevel = s.scopeLevel
-	s.booleanData[literal.Var()].PhaseAvailable = true
-	s.booleanData[literal.Var()].Phase = !literal.Sign()
+	data := &s.booleanData[literal.Var()]
+	data.SetJustification(justification)
+	data.ScopeLevel = s.scopeLevel
+	if s.searching && s.searchRestartAdaptive && data.PhaseAvailable {
+		s.searchAgility *= s.searchAgilityFactor
+		if !decision && data.Phase == literal.Sign() {
+			s.searchAgility += 1 - s.searchAgilityFactor
+		}
+	}
+	data.PhaseAvailable = true
+	data.Phase = !literal.Sign()
 	s.assignedLiterals = append(s.assignedLiterals, literal)
 	if s.relevancy != nil {
 		return s.relevancy.AssignmentEvent(s.boolExpr[literal.Var()], want == lbool.True)

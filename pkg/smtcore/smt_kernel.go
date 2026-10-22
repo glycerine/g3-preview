@@ -99,7 +99,10 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 	}
 	return &SMTKernel{
 		manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof,
-		smtState: SMTParamsState{MaxConflicts: ^uint32(0)},
+		smtState: SMTParamsState{
+			MaxConflicts: ^uint32(0), RestartStrategy: 1, RestartInitial: 100, RestartFactor: 1.1,
+			RestartAdaptive: true, AgilityFactor: 0.9999, RestartAgilityThreshold: 0.18,
+		},
 	}, nil
 }
 
