@@ -100659,7 +100659,7 @@
       "path": "src/smt/old_interval.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/old_interval_extended.go",
         "pkg/smtcore/old_interval.go"
