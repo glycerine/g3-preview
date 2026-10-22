@@ -109298,7 +109298,7 @@
       "path": "src/smt/spanning_tree.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -109311,17 +109311,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "threaded and basic spanning-tree template declarations",
+          "status": "reference_only",
+          "go_target": null,
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Only the uninstantiated math/simplex network_flow template includes this header; no retained source consumer reaches either spanning-tree specialization."
+      ]
     },
     {
       "path": "src/smt/spanning_tree_base.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -109334,17 +109343,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "network-flow spanning-tree abstract template interface and vector debug formatter",
+          "status": "reference_only",
+          "go_target": null,
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Only the uninstantiated math/simplex network_flow template reaches this interface; the Go port does not add an unused universal graph adapter or port C++ stream/vector helpers."
+      ]
     },
     {
       "path": "src/smt/spanning_tree_def.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -109499,11 +109517,20 @@
           "text": "SASSERT(tgt == m_pred[src] || src == m_pred[tgt]);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "threaded and basic spanning-tree template algorithms",
+          "status": "reference_only",
+          "go_target": null,
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "No retained source unit instantiates these algorithms: their sole consumer is the reference-only math/simplex network_flow template."
+      ]
     },
     {
       "path": "src/smt/tactic/CMakeLists.txt",
