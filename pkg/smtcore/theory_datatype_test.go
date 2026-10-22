@@ -95,3 +95,42 @@ func TestSMTDatatypeConstructorAccessor(t *testing.T) {
 		t.Fatal("constructor accessor ignored its argument", status)
 	}
 }
+
+func TestSMTDatatypeRecursiveOccursCheck(t *testing.T) {
+	for _, cyclic := range []bool{false, true} {
+		t.Run(map[bool]string{false: "finite-value", true: "cycle"}[cyclic], func(t *testing.T) {
+			m, _, solver := smtDatatypeSolver(t)
+			sorts, err := m.MkDatatypes([]ast.DatatypeDefinition{{
+				Name: astTestSymbol(t, m, "smt-nat"),
+				Constructors: []ast.DatatypeConstructorDefinition{
+					{Name: astTestSymbol(t, m, "smt-zero"), Recognizer: astTestSymbol(t, m, "smt-is-zero")},
+					{Name: astTestSymbol(t, m, "smt-succ"), Recognizer: astTestSymbol(t, m, "smt-is-succ"), Accessors: []ast.DatatypeAccessorDefinition{{Name: astTestSymbol(t, m, "smt-pred"), Recursive: true}}},
+				},
+			}})
+			astTestMust(t, err)
+			constructors, err := m.DatatypeConstructors(sorts[0])
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "smt-nat-x"), sorts[0])
+			astTestMust(t, err)
+			argument, err := m.MkApp(constructors[0], nil)
+			astTestMust(t, err)
+			if cyclic {
+				argument = x
+			}
+			successor, err := m.MkApp(constructors[1], []ast.ASTHandle{argument})
+			astTestMust(t, err)
+			equality, err := m.MkEq(x, successor)
+			astTestMust(t, err)
+			astTestMust(t, solver.Assert(equality))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			want := lbool.True
+			if cyclic {
+				want = lbool.False
+			}
+			if status != want {
+				t.Fatal("recursive datatype status", status, "want", want)
+			}
+		})
+	}
+}

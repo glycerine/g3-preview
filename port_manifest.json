@@ -114248,7 +114248,8 @@
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
-        "TestSMTDatatypeConstructorAccessor"
+        "TestSMTDatatypeConstructorAccessor",
+        "TestSMTDatatypeRecursiveOccursCheck"
       ],
       "assertions": [
         {
@@ -114476,7 +114477,8 @@
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
-        "TestSMTDatatypeConstructorAccessor"
+        "TestSMTDatatypeConstructorAccessor",
+        "TestSMTDatatypeRecursiveOccursCheck"
       ],
       "conditionals": [
         {

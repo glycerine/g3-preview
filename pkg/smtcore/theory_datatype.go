@@ -13,13 +13,11 @@ type smtDatatypeScope struct {
 }
 
 type smtDatatypeStatistics struct {
-	constructorAxioms, accessorAxioms, splits uint64
+	constructorAxioms, accessorAxioms, splits, occursChecks uint64
 }
 
 // SMTDatatypeTheory encodes constructor cases with recognizer clauses and
 // publishes reconstruction and accessor equalities through the shared egraph.
-// Recursive occurs checking is added separately; reached recursive sorts make
-// final check give up until that check is available.
 type SMTDatatypeTheory struct {
 	*SMTTheoryBase
 	initialized        map[ast.ASTHandle]bool
@@ -164,11 +162,19 @@ func (t *SMTDatatypeTheory) publishConstructor(value, constructor ast.ASTHandle)
 	return nil
 }
 
-func (t *SMTDatatypeTheory) ensureVariable(node *SMTEnode) error {
-	if t.IsAttachedToVariable(node) || t.initialized[node.owner] {
+func (t *SMTDatatypeTheory) attachVariable(node *SMTEnode) error {
+	if t.IsAttachedToVariable(node) {
 		return nil
 	}
-	if _, err := t.CreateVariable(node); err != nil {
+	_, err := t.CreateVariable(node)
+	return err
+}
+
+func (t *SMTDatatypeTheory) ensureVariable(node *SMTEnode) error {
+	if t.initialized[node.owner] {
+		return nil
+	}
+	if err := t.attachVariable(node); err != nil {
 		return err
 	}
 	t.initialized[node.owner] = true
@@ -178,13 +184,14 @@ func (t *SMTDatatypeTheory) ensureVariable(node *SMTEnode) error {
 	if err != nil {
 		return err
 	}
-	if recursive, recursiveErr := state.manager.DatatypeIsRecursive(sort); recursiveErr != nil {
-		return recursiveErr
-	} else if recursive {
-		t.unsupported = true
-	}
-	if err = t.publishCases(node.owner, sort); err != nil {
+	infinite, err := state.manager.SortIsInfinite(sort)
+	if err != nil {
 		return err
+	}
+	if !infinite {
+		if err = t.publishCases(node.owner, sort); err != nil {
+			return err
+		}
 	}
 	constructor, matched, err := state.manager.DatatypeConstructorApp(node.owner)
 	if err != nil {
@@ -276,6 +283,15 @@ func (t *SMTDatatypeTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		if err = t.ensureVariable(node.arguments[0]); err != nil {
 			return false, err
 		}
+		sort, sortErr := state.manager.GetSort(expression)
+		if sortErr != nil {
+			return false, sortErr
+		}
+		if family, familyErr := state.manager.GetFamilyID(sort); familyErr == nil && family == t.FamilyID() {
+			if err = t.attachVariable(node); err != nil {
+				return false, err
+			}
+		}
 	}
 	return true, nil
 }
@@ -333,6 +349,15 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 	if err != nil {
 		return err
 	}
+	valueConstructor, isConstructor, err := state.manager.DatatypeConstructorApp(value)
+	if err != nil {
+		return err
+	}
+	if isConstructor && valueConstructor == constructor {
+		t.reconstructed[expression] = true
+		t.reconstructedTrail = append(t.reconstructedTrail, expression)
+		return nil
+	}
 	accessors, err := state.manager.DatatypeConstructorAccessors(constructor)
 	if err != nil {
 		return err
@@ -387,6 +412,113 @@ func (t *SMTDatatypeTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if t.unsupported {
 		return SMTFinalCheckGiveUp, nil
 	}
+	state, err := t.State()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	constructors := make(map[*SMTEnode]*SMTEnode)
+	declarations := make(map[*SMTEnode]ast.ASTHandle)
+	for expression := range t.initialized {
+		node := state.context.enodes[expression]
+		if node == nil {
+			continue
+		}
+		declaration, matched, declarationErr := state.manager.DatatypeConstructorApp(expression)
+		if declarationErr != nil {
+			return SMTFinalCheckGiveUp, declarationErr
+		}
+		if !matched {
+			continue
+		}
+		root := node.root
+		if prior := constructors[root]; prior != nil && declarations[root] != declaration {
+			equality, equalityErr := t.MkEqualityLiteral(prior.owner, node.owner, true)
+			if equalityErr != nil {
+				return SMTFinalCheckGiveUp, equalityErr
+			}
+			if equalityErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality.Negated()}); equalityErr != nil {
+				return SMTFinalCheckGiveUp, equalityErr
+			}
+			return SMTFinalCheckContinue, nil
+		}
+		constructors[root], declarations[root] = node, declaration
+	}
+	t.statistics.occursChecks++
+	visiting := make(map[*SMTEnode]int)
+	finished := make(map[*SMTEnode]bool)
+	incoming := make(map[*SMTEnode]*SMTEnode)
+	path := make([]*SMTEnode, 0)
+	var cycle []*SMTEnode
+	var visit func(*SMTEnode) error
+	visit = func(root *SMTEnode) error {
+		if finished[root] || cycle != nil {
+			return nil
+		}
+		if start, found := visiting[root]; found {
+			cycle = append([]*SMTEnode(nil), path[start:]...)
+			return nil
+		}
+		constructor := constructors[root]
+		if constructor == nil {
+			finished[root] = true
+			return nil
+		}
+		visiting[root] = len(path)
+		path = append(path, root)
+		for _, argument := range constructor.arguments {
+			sort, sortErr := state.manager.GetSort(argument.owner)
+			if sortErr != nil {
+				return sortErr
+			}
+			family, familyErr := state.manager.GetFamilyID(sort)
+			if familyErr != nil {
+				return familyErr
+			}
+			if family == t.FamilyID() {
+				target := argument.root
+				if _, active := visiting[target]; active || !finished[target] {
+					incoming[target] = argument
+				}
+				if visitErr := visit(target); visitErr != nil {
+					return visitErr
+				}
+			}
+			if cycle != nil {
+				break
+			}
+		}
+		path = path[:len(path)-1]
+		delete(visiting, root)
+		finished[root] = true
+		return nil
+	}
+	for root := range constructors {
+		if err = visit(root); err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
+		if cycle != nil {
+			break
+		}
+	}
+	if cycle != nil {
+		clause := make([]SMTLiteral, 0, len(cycle))
+		for _, root := range cycle {
+			constructor := constructors[root]
+			argument := incoming[root]
+			if constructor == nil || argument == nil {
+				return SMTFinalCheckGiveUp, ast.ErrASTDomain
+			}
+			equality, equalityErr := t.MkEqualityLiteral(argument.owner, constructor.owner, true)
+			if equalityErr != nil {
+				return SMTFinalCheckGiveUp, equalityErr
+			}
+			clause = append(clause, equality.Negated())
+		}
+		if err = state.addTheoryAxiom(t.FamilyID(), clause); err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
+		return SMTFinalCheckContinue, nil
+	}
 	return SMTFinalCheckDone, nil
 }
 
@@ -399,6 +531,7 @@ func (t *SMTDatatypeTheory) CollectStatistics(target *statistics.Statistics) err
 	target.UpdateUint64("datatype splits", t.statistics.splits)
 	target.UpdateUint64("datatype constructor ax", t.statistics.constructorAxioms)
 	target.UpdateUint64("datatype accessor ax", t.statistics.accessorAxioms)
+	target.UpdateUint64("datatype occurs check", t.statistics.occursChecks)
 	return nil
 }
 
