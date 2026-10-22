@@ -41602,6 +41602,8 @@
         "TestDirectProofNegationChainSymmetrySimplification",
         "TestDirectProofRewriteChainAbsorption",
         "TestDirectProofPredicateChainContradiction",
+        "TestDirectProofEqualityChainContradiction",
+        "TestDirectProofExcludedMiddleAndCongruenceSimplification",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41822,9 +41824,11 @@
             "TestDirectProofEquivalenceChainSymmetrySimplification",
             "TestDirectProofNegationChainSymmetrySimplification",
             "TestDirectProofRewriteChainAbsorption",
-            "TestDirectProofPredicateChainContradiction"
+            "TestDirectProofPredicateChainContradiction",
+            "TestDirectProofEqualityChainContradiction",
+            "TestDirectProofExcludedMiddleAndCongruenceSimplification"
           ],
-          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, equivalence/negation-chain symmetry, normalized chain concatenation, and predicate-chain contradiction reduction are ported. Specialized rotation, nested/normal arithmetic sums, excluded-middle, congruence, modus-ponens, and equality-chain contradiction reduction remain pending."
+          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, and congruence are ported. Specialized rotation, nested/normal arithmetic sums, and modus-ponens simplification remain pending."
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
@@ -41904,6 +41908,8 @@
         "TestDirectProofNegationChainSymmetrySimplification",
         "TestDirectProofRewriteChainAbsorption",
         "TestDirectProofPredicateChainContradiction",
+        "TestDirectProofEqualityChainContradiction",
+        "TestDirectProofExcludedMiddleAndCongruenceSimplification",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],

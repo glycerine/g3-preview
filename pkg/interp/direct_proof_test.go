@@ -874,3 +874,54 @@ func TestDirectProofPredicateChainContradiction(t *testing.T) {
 		t.Fatal("predicate chain contradiction", op, e)
 	}
 }
+
+func TestDirectProofEqualityChainContradiction(t *testing.T) {
+	_, manager, base, p, _ := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	negativeP, err := manager.MkNot(p)
+	interpMust(t, err)
+	equality, err := manager.Make(OperatorIff, p, negativeP)
+	interpMust(t, err)
+	negativeEquality, err := manager.MkNot(equality)
+	interpMust(t, err)
+	negativeChain, err := direct.makeLocalRewrite(TermA, negativeEquality)
+	interpMust(t, err)
+	positiveChain, err := direct.makeLocalRewrite(TermB, equality)
+	interpMust(t, err)
+	result, err := direct.contradictChains(negativeChain, positiveChain)
+	interpMust(t, err)
+	if op, e := manager.Operator(result); e != nil || op != OperatorNot {
+		t.Fatal("equality chain contradiction", op, e)
+	}
+}
+
+func TestDirectProofExcludedMiddleAndCongruenceSimplification(t *testing.T) {
+	_, manager, base, p, _ := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	negativeP, err := manager.MkNot(p)
+	interpMust(t, err)
+	equality, err := manager.Make(OperatorIff, p, negativeP)
+	interpMust(t, err)
+	negativeEquality, err := manager.MkNot(equality)
+	interpMust(t, err)
+	positiveChain, err := direct.makeLocalRewrite(TermB, equality)
+	interpMust(t, err)
+	negativeChain, err := direct.makeLocalRewrite(TermA, negativeEquality)
+	interpMust(t, err)
+	excludedMiddle, err := direct.makeSymbol(direct.excludedMid, equality, positiveChain, negativeChain)
+	interpMust(t, err)
+	if result, e := direct.SimplifyProofTerm(excludedMiddle); e != nil || result.IsNull() {
+		t.Fatal("excluded-middle simplification", result, e)
+	}
+	zero, err := manager.MakeIntText("0")
+	interpMust(t, err)
+	congruence, err := direct.makeSymbol(direct.congruence, positiveChain, zero, negativeChain)
+	interpMust(t, err)
+	if result, e := direct.SimplifyProofTerm(congruence); e != nil || result.IsNull() {
+		t.Fatal("congruence simplification", result, e)
+	}
+}

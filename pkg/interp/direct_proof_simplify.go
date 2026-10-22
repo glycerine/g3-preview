@@ -85,7 +85,11 @@ func (p *DirectProofInterpolator) simplifyProofTerm(expression ast.ASTHandle) (a
 			result, err = p.simplifySum(args)
 		case op == OperatorUninterpreted && !hasPlaceholder && declaration == p.symmetry:
 			result, err = p.simplifySymmetry(args)
-		case op == OperatorUninterpreted && !hasPlaceholder && (declaration == p.rotateSum || declaration == p.leqToEq || declaration == p.eqToLeq || declaration == p.excludedMid):
+		case op == OperatorUninterpreted && !hasPlaceholder && declaration == p.excludedMid:
+			result, err = p.simplifyExcludedMiddle(args)
+		case op == OperatorUninterpreted && !hasPlaceholder && declaration == p.congruence:
+			result, err = p.simplifyCongruence(args)
+		case op == OperatorUninterpreted && !hasPlaceholder && (declaration == p.rotateSum || declaration == p.leqToEq || declaration == p.eqToLeq):
 			return ast.ASTHandle{}, ProofError{}
 		default:
 			result, err = p.base.manager.Clone(current, args)
