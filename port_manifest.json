@@ -98584,27 +98584,31 @@
       "path": "src/smt/database.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Dead-source audit: no retained source file includes src/smt/database.h or references its g_pattern_database symbol, and no SMT build specification generates or compiles it. The live pattern database is the distinct src/ast/pattern/database.smt2 input consumed by ast/pattern/pattern_inference.cpp."
+      ]
     },
     {
       "path": "src/smt/database.smt",
       "component": "smt",
       "role": "reference_support",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Dead-source audit: this stale database input has no retained build or runtime consumer. Pattern inference uses src/ast/pattern/database.smt2, whose content differs from this file and is already represented by the Go pattern database asset."
+      ]
     },
     {
       "path": "src/smt/diff_logic.h",
@@ -103061,28 +103065,68 @@
       "path": "src/smt/smt_checker.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_checker.go"
+      ],
+      "tests": [
+        "TestSMTCheckerBooleanAssignmentsAndStructure",
+        "TestSMTCheckerEqualityDisequalityBindingsAndCongruence"
+      ],
       "assertions": [
         {
           "line": 44,
           "text": "SASSERT(m_manager.is_bool(n));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "assignment-aware Boolean connective satisfiability and unsatisfiability checks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_checker.go",
+          "tests": [
+            "TestSMTCheckerBooleanAssignmentsAndStructure"
+          ]
+        },
+        {
+          "name": "bound variable, internalized enode, recursive congruence, equality and disequality checks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_checker.go",
+          "tests": [
+            "TestSMTCheckerEqualityDisequalityBindingsAndCongruence"
+          ]
+        },
+        {
+          "name": "per-query truth and enode caches with reset after is_sat and is_unsat",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_checker.go",
+          "tests": [
+            "TestSMTCheckerBooleanAssignmentsAndStructure",
+            "TestSMTCheckerEqualityDisequalityBindingsAndCongruence"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTChecker borrows its concrete checker context, AST handles, enodes, and per-call binding slice; native maps own only query caches and context indexes."
+      ],
+      "deviations": [
+        "The context queries used by the source checker are one concrete Go context component. Congruence lookup scans declaration-indexed enodes and compares equality-class roots, preserving the retained behavior without a universal solver adapter."
+      ]
     },
     {
       "path": "src/smt/smt_checker.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_checker.go"
+      ],
+      "tests": [
+        "TestSMTCheckerBooleanAssignmentsAndStructure",
+        "TestSMTCheckerEqualityDisequalityBindingsAndCongruence"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -103093,11 +103137,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "checker construction, is_sat and is_unsat interface with concrete enode bindings",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_checker.go",
+          "tests": [
+            "TestSMTCheckerBooleanAssignmentsAndStructure",
+            "TestSMTCheckerEqualityDisequalityBindingsAndCongruence"
+          ]
+        }
+      ],
+      "ownership": [
+        "The checker context borrows its AST manager and registered enodes; the caller retains binding ownership for the duration of each synchronous query."
+      ],
+      "deviations": [
+        "Public Go checks return errors for invalid handles, non-Boolean queries, and source assertion violations."
+      ]
     },
     {
       "path": "src/smt/smt_clause.cpp",
