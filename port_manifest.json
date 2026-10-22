@@ -113167,9 +113167,14 @@
       "path": "src/smt/theory_array.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_array.go",
+        "pkg/smtcore/smt_setup.go"
+      ],
+      "tests": [
+        "TestSMTArrayReadOverWrite"
+      ],
       "assertions": [
         {
           "line": 51,
@@ -113270,9 +113275,13 @@
       "path": "src/smt/theory_array.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_array.go"
+      ],
+      "tests": [
+        "TestSMTArrayReadOverWrite"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113293,9 +113302,13 @@
       "path": "src/smt/theory_array_base.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_array.go"
+      ],
+      "tests": [
+        "TestSMTArrayReadOverWrite"
+      ],
       "conditionals": [
         {
           "line": 373,
@@ -113458,9 +113471,13 @@
       "path": "src/smt/theory_array_base.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_array.go"
+      ],
+      "tests": [
+        "TestSMTArrayReadOverWrite"
+      ],
       "conditionals": [
         {
           "line": 19,

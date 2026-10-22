@@ -77,7 +77,11 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 		if err != nil {
 			return err
 		}
-		if err = install(family, "array"); err != nil {
+		theory, theoryErr := NewSMTArrayTheory(family)
+		if theoryErr != nil {
+			return theoryErr
+		}
+		if err = kernel.RegisterTheory(theory); err != nil {
 			return err
 		}
 	}
