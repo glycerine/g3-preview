@@ -106835,7 +106835,7 @@
       "path": "src/smt/smt_quantifier_instances.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -106848,11 +106848,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Dead-source audit: recursive searches of retained src/ find no include, construction, or use of quantifier_instances outside this declaration-only header. Its declared constructor, equality, and hash have no definition, and it has no CMake source unit. No Go representation is created for the unreachable flexible-array and heap scaffolding."
+      ]
     },
     {
       "path": "src/smt/smt_quantifier_stat.cpp",
