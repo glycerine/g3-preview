@@ -123899,17 +123899,20 @@
       "path": "src/tactic/probe.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/tactic_probe.go",
         "pkg/tactic/tactic_probe_composition_test.go",
         "pkg/tactic/tactic_probe_memory_test.go",
+        "pkg/tactic/tactic_probe_structural.go",
+        "pkg/tactic/tactic_probe_structural_test.go",
         "pkg/smtcore/tactic_manager_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
         "TestProbeArithmeticComparisonBooleanAndOwnership",
         "TestProbeGoalProductionConfiguration",
+        "TestProbeConstantCountsQuantifiersPatternsAndFragments",
         "TestMemoryProbeReadsSharedProcessAllocation"
       ],
       "assertions": [
@@ -123926,8 +123929,8 @@
           "text": "SASSERT(p2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "memory_probe::operator() reads source process allocation bytes as MiB (probe.cpp:29-37)",
@@ -123952,6 +123955,22 @@
           "tests": [
             "TestProbeGoalProductionConfiguration"
           ]
+        },
+        {
+          "name": "propositional, QF_BV, QF_AUFBV and QF_UFBV structural classifiers (probe.cpp:211-369)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_probe_structural.go",
+          "tests": [
+            "TestProbeConstantCountsQuantifiersPatternsAndFragments"
+          ]
+        },
+        {
+          "name": "Boolean, non-Boolean, arithmetic and bit-vector constant counts plus quantifier and pattern detection (probe.cpp:371-527)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_probe_structural.go",
+          "tests": [
+            "TestProbeConstantCountsQuantifiersPatternsAndFragments"
+          ]
         }
       ],
       "ownership": [
@@ -123963,11 +123982,13 @@
       "path": "src/tactic/probe.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/tactic_probe.go",
         "pkg/tactic/tactic_probe_composition_test.go",
         "pkg/tactic/tactic_probe_memory_test.go",
+        "pkg/tactic/tactic_probe_structural.go",
+        "pkg/tactic/tactic_probe_structural_test.go",
         "pkg/smtcore/tactic_manager_test.go"
       ],
       "tests": [
@@ -123975,6 +123996,7 @@
         "TestTacticManagerDestructorFinalizesTacticsBeforeProbes",
         "TestProbeArithmeticComparisonBooleanAndOwnership",
         "TestProbeGoalProductionConfiguration",
+        "TestProbeConstantCountsQuantifiersPatternsAndFragments",
         "TestMemoryProbeReadsSharedProcessAllocation"
       ],
       "conditionals": [
@@ -123993,12 +124015,12 @@
           "text": "void dec_ref() { SASSERT(m_ref_count > 0); --m_ref_count; if (m_ref_count == 0) dealloc(this); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "mk_memory_probe concrete factory/evaluation; generated registration remains open (probe.h:60,65)",
-          "status": "partial",
+          "name": "constant, memory, depth, size and expression-count probe declarations (probe.h:57-65)",
+          "status": "ported",
           "go_target": "pkg/tactic/tactic_probe.go",
           "tests": [
             "TestMemoryProbeReadsSharedProcessAllocation"
@@ -124011,6 +124033,14 @@
           "tests": [
             "TestProbeArithmeticComparisonBooleanAndOwnership",
             "TestProbeGoalProductionConfiguration"
+          ]
+        },
+        {
+          "name": "constant-count, configuration, quantifier/pattern and logic-fragment probe declarations (probe.h:67-109)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_probe_structural.go",
+          "tests": [
+            "TestProbeConstantCountsQuantifiersPatternsAndFragments"
           ]
         }
       ],

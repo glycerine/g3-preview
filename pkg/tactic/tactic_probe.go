@@ -36,6 +36,16 @@ const (
 	ProbeProduceProofs
 	ProbeProduceModels
 	ProbeProduceUnsatCores
+	ProbeNumConsts
+	ProbeNumBoolConsts
+	ProbeNumArithmeticConsts
+	ProbeNumBitVectorConsts
+	ProbeHasQuantifier
+	ProbeHasPattern
+	ProbeIsPropositional
+	ProbeIsQFBitVector
+	ProbeIsQFArrayUFBitVector
+	ProbeIsQFUFBitVector
 )
 
 // Concrete source probe classes share cold reference metadata. Each Eval
@@ -53,7 +63,7 @@ type Probe struct {
 }
 
 func NewProbe(b *arena.Budget, kind ProbeKind, value float64) (*Probe, error) {
-	if b == nil || kind > ProbeProduceUnsatCores || kind > ProbeMemory && kind < ProbeProduceProofs {
+	if b == nil || kind > ProbeIsQFUFBitVector || kind > ProbeMemory && kind < ProbeProduceProofs {
 		return nil, ast.ErrASTDomain
 	}
 	n := uint64(reflect.TypeOf(Probe{}).Size())
@@ -194,6 +204,18 @@ func (p *Probe) Eval(g *Goal) (float64, error) {
 	case ProbeProduceUnsatCores:
 		enabled, e := g.UnsatCoresEnabled()
 		return boolProbeValue(enabled), e
+	case ProbeNumConsts, ProbeNumBoolConsts, ProbeNumArithmeticConsts, ProbeNumBitVectorConsts:
+		count, e := p.countConstants(g)
+		return float64(count), e
+	case ProbeHasQuantifier:
+		yes, e := p.goalHasQuantifier(g)
+		return boolProbeValue(yes), e
+	case ProbeHasPattern:
+		yes, e := p.goalHasPattern(g)
+		return boolProbeValue(yes), e
+	case ProbeIsPropositional, ProbeIsQFBitVector, ProbeIsQFArrayUFBitVector, ProbeIsQFUFBitVector:
+		yes, e := p.goalInFragment(g)
+		return boolProbeValue(yes), e
 	case ProbeNot:
 		left, e := p.left.Eval(g)
 		return boolProbeValue(!ProbeIsTrue(left)), e
