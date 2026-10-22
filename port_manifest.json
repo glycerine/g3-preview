@@ -108179,9 +108179,15 @@
       "path": "src/smt/smt_model_generator.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_model_value.go",
+        "pkg/smtcore/smt_model_value_test.go"
+      ],
+      "tests": [
+        "TestSMTModelValueDependenciesAndProcedures",
+        "TestSMTModelValueEnodeDependencyCanonicalizesRoot"
+      ],
       "conditionals": [
         {
           "line": 28,
@@ -108215,10 +108221,28 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Extra fresh-value placeholders, canonical enode/fresh dependency union, model-value procedure contract, expression wrapper and fresh-value procedure (src/smt/smt_model_generator.h:67-175)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_value.go",
+          "tests": [
+            "TestSMTModelValueDependenciesAndProcedures",
+            "TestSMTModelValueEnodeDependencyCanonicalizesRoot"
+          ]
+        },
+        {
+          "name": "Model generator state, dependency topological ordering, factory/value registration, Boolean/function interpretations, theory finalization and model construction (src/smt/smt_model_generator.h:177-232)",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Model-value procedures and dependencies borrow AST handles, enodes and generator-owned fresh placeholders. The future generator owns and pins the referenced AST values and sorts, matching the source m_asts owner."
+      ],
+      "deviations": [
+        "The source tagged dependency union is represented by explicit Go fields and checked accessors. Invalid assertion domains return ast.ErrASTDomain."
+      ]
     },
     {
       "path": "src/smt/smt_quantifier.cpp",
