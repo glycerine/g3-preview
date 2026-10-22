@@ -98731,7 +98731,9 @@
       "tests": [
         "TestSMTRationalDiffGraphFeasibleActivationAndAssignment",
         "TestSMTRationalDiffGraphNegativeCycleExplanationAndRollback",
-        "TestSMTRationalDiffGraphScopesAndDomainGuards"
+        "TestSMTRationalDiffGraphScopesAndDomainGuards",
+        "TestSMTRationalDiffGraphZeroNormalizationAndEdgeAccessors",
+        "TestSMTRationalDiffGraphDirectAndTwoHopSubsumption"
       ],
       "conditionals": [
         {
@@ -99105,17 +99107,19 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete rational dl_edge and sparse dl_graph variable/edge construction, indexed-heap assignment repair, incremental activation, negative-cycle explanation traversal and scope rollback (src/smt/diff_logic.h:39-559,751-788)",
+          "name": "Concrete rational dl_edge and sparse dl_graph variable/edge construction, indexed-heap assignment repair, incremental activation, negative-cycle explanation traversal, scope rollback, zero normalization and direct/two-hop subsumption (src/smt/diff_logic.h:39-559,751-828,1640-1747)",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_diff_graph_rational.go",
           "tests": [
             "TestSMTRationalDiffGraphFeasibleActivationAndAssignment",
             "TestSMTRationalDiffGraphNegativeCycleExplanationAndRollback",
-            "TestSMTRationalDiffGraphScopesAndDomainGuards"
+            "TestSMTRationalDiffGraphScopesAndDomainGuards",
+            "TestSMTRationalDiffGraphZeroNormalizationAndEdgeAccessors",
+            "TestSMTRationalDiffGraphDirectAndTwoHopSubsumption"
           ]
         },
         {
-          "name": "Cycle shortcut pruning, zero normalization, display, reachability, SCC equality propagation, implied-bound discovery and lazy explanations (src/smt/diff_logic.h:562-1834)",
+          "name": "Cycle shortcut pruning, display, reachability, SCC equality propagation, general implied-bound discovery and lazy explanations (src/smt/diff_logic.h:562-750,829-1639,1748-1834)",
           "status": "unported"
         },
         {

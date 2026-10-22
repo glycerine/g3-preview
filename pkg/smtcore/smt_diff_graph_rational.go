@@ -321,6 +321,168 @@ func (g *SMTRationalDiffGraph) Assignment(variable int32) (*big.Rat, error) {
 	return new(big.Rat).Set(&g.assignment[variable]), nil
 }
 
+func (g *SMTRationalDiffGraph) EdgeSource(id int32) (int32, error) {
+	if !g.validEdge(id) {
+		return -1, errSMTDiffGraphDomain
+	}
+	return g.edges[id].source, nil
+}
+
+func (g *SMTRationalDiffGraph) EdgeTarget(id int32) (int32, error) {
+	if !g.validEdge(id) {
+		return -1, errSMTDiffGraphDomain
+	}
+	return g.edges[id].target, nil
+}
+
+func (g *SMTRationalDiffGraph) EdgeWeight(id int32) (*big.Rat, error) {
+	if !g.validEdge(id) {
+		return nil, errSMTDiffGraphDomain
+	}
+	return new(big.Rat).Set(&g.edges[id].weight), nil
+}
+
+func (g *SMTRationalDiffGraph) EdgeExplanation(id int32) (SMTLiteral, error) {
+	if !g.validEdge(id) {
+		return SMTNullLiteral, errSMTDiffGraphDomain
+	}
+	return g.edges[id].explanation, nil
+}
+
+func (g *SMTRationalDiffGraph) EdgeEnabled(id int32) (bool, error) {
+	if !g.validEdge(id) {
+		return false, errSMTDiffGraphDomain
+	}
+	return g.edges[id].enabled, nil
+}
+
+// SetToZero translates every assignment by the selected value. Difference
+// constraints are translation invariant, so feasibility is preserved.
+func (g *SMTRationalDiffGraph) SetToZero(variable int32) error {
+	if !g.validVariable(variable) || !g.IsFeasible() {
+		return errSMTDiffGraphDomain
+	}
+	if g.assignment[variable].Sign() == 0 {
+		return nil
+	}
+	var offset big.Rat
+	offset.Set(&g.assignment[variable])
+	for index := range g.assignment {
+		g.assignment[index].Sub(&g.assignment[index], &offset)
+	}
+	return nil
+}
+
+// SetPairToZero implements the source helper for disconnected variables. If
+// translation does not zero both values, zero-weight edges join the components.
+func (g *SMTRationalDiffGraph) SetPairToZero(first, second int32) error {
+	if !g.validVariable(first) || !g.validVariable(second) || !g.IsFeasible() {
+		return errSMTDiffGraphDomain
+	}
+	selected := second
+	if g.assignment[first].Sign() != 0 {
+		selected = first
+	}
+	if err := g.SetToZero(selected); err != nil {
+		return err
+	}
+	if g.assignment[first].Sign() == 0 && g.assignment[second].Sign() == 0 {
+		return nil
+	}
+	zero := new(big.Rat)
+	forward, err := g.AddEdge(first, second, zero, SMTNullLiteral)
+	if err != nil {
+		return err
+	}
+	if feasible, err := g.EnableEdge(forward); err != nil || !feasible {
+		if err != nil {
+			return err
+		}
+		return errSMTDiffGraphDomain
+	}
+	backward, err := g.AddEdge(second, first, zero, SMTNullLiteral)
+	if err != nil {
+		return err
+	}
+	if feasible, err := g.EnableEdge(backward); err != nil || !feasible {
+		if err != nil {
+			return err
+		}
+		return errSMTDiffGraphDomain
+	}
+	return nil
+}
+
+// FindDirectlySubsumed returns disabled parallel edges whose bounds are no
+// stronger than the selected edge. It preserves source adjacency order.
+func (g *SMTRationalDiffGraph) FindDirectlySubsumed(id int32) ([]int32, error) {
+	if !g.validEdge(id) {
+		return nil, errSMTDiffGraphDomain
+	}
+	edge := &g.edges[id]
+	result := make([]int32, 0)
+	candidates := g.outEdges[edge.source]
+	useOutgoing := len(candidates) < len(g.inEdges[edge.target])
+	if !useOutgoing {
+		candidates = g.inEdges[edge.target]
+	}
+	for _, candidateID := range candidates {
+		g.propagationCost++
+		candidate := &g.edges[candidateID]
+		matches := candidate.target == edge.target
+		if !useOutgoing {
+			matches = candidate.source == edge.source
+		}
+		if candidateID != id && !candidate.enabled && matches && candidate.weight.Cmp(&edge.weight) >= 0 {
+			result = append(result, candidateID)
+		}
+	}
+	return result, nil
+}
+
+// FindTwoHopSubsumed extends direct subsumption through one enabled incoming
+// edge at the source and one enabled outgoing edge at the destination.
+func (g *SMTRationalDiffGraph) FindTwoHopSubsumed(id int32) ([]int32, error) {
+	if !g.validEdge(id) {
+		return nil, errSMTDiffGraphDomain
+	}
+	result, err := g.FindDirectlySubsumed(id)
+	if err != nil {
+		return nil, err
+	}
+	edge := &g.edges[id]
+	var combined big.Rat
+	for _, prefixID := range g.inEdges[edge.source] {
+		prefix := &g.edges[prefixID]
+		if !prefix.enabled || prefix.source == edge.target {
+			continue
+		}
+		combined.Add(&prefix.weight, &edge.weight)
+		for _, candidateID := range g.outEdges[prefix.source] {
+			g.propagationCost++
+			candidate := &g.edges[candidateID]
+			if !candidate.enabled && candidate.target == edge.target && candidate.weight.Cmp(&combined) >= 0 {
+				result = append(result, candidateID)
+			}
+		}
+	}
+	for _, suffixID := range g.outEdges[edge.target] {
+		suffix := &g.edges[suffixID]
+		if !suffix.enabled || suffix.target == edge.source {
+			continue
+		}
+		combined.Add(&suffix.weight, &edge.weight)
+		for _, candidateID := range g.inEdges[suffix.target] {
+			g.propagationCost++
+			candidate := &g.edges[candidateID]
+			if !candidate.enabled && candidate.source == edge.source && candidate.weight.Cmp(&combined) >= 0 {
+				result = append(result, candidateID)
+			}
+		}
+	}
+	return result, nil
+}
+
 func (g *SMTRationalDiffGraph) NumNodes() int {
 	if g == nil {
 		return 0

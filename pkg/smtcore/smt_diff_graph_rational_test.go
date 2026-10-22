@@ -115,3 +115,99 @@ func TestSMTRationalDiffGraphScopesAndDomainGuards(t *testing.T) {
 		t.Fatal("incident variable reset guard", err)
 	}
 }
+
+func TestSMTRationalDiffGraphZeroNormalizationAndEdgeAccessors(t *testing.T) {
+	g := NewSMTRationalDiffGraph()
+	for variable := int32(0); variable < 4; variable++ {
+		if err := g.InitVariable(variable); err != nil {
+			t.Fatal(err)
+		}
+	}
+	first, err := g.AddEdge(0, 1, diffRat(-2), NewSMTLiteral(11, false))
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := g.AddEdge(2, 3, diffRat(-5), NewSMTLiteral(12, true))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, edge := range []int32{first, second} {
+		if feasible, enableErr := g.EnableEdge(edge); enableErr != nil || !feasible {
+			t.Fatal(feasible, enableErr)
+		}
+	}
+	if err = g.SetPairToZero(1, 3); err != nil {
+		t.Fatal(err)
+	}
+	firstValue, err := g.Assignment(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	secondValue, err := g.Assignment(3)
+	if err != nil || firstValue.Cmp(secondValue) != 0 {
+		t.Fatal("pair normalization", firstValue, secondValue, err)
+	}
+	if g.NumEdges() != 4 || !g.IsFeasible() {
+		t.Fatal("joining equality edges", g.NumEdges())
+	}
+	source, err := g.EdgeSource(first)
+	if err != nil || source != 0 {
+		t.Fatal(source, err)
+	}
+	target, err := g.EdgeTarget(first)
+	if err != nil || target != 1 {
+		t.Fatal(target, err)
+	}
+	weight, err := g.EdgeWeight(first)
+	if err != nil || weight.Cmp(diffRat(-2)) != 0 {
+		t.Fatal(weight, err)
+	}
+	weight.SetInt64(99)
+	weight, _ = g.EdgeWeight(first)
+	if weight.Cmp(diffRat(-2)) != 0 {
+		t.Fatal("edge weight escaped graph ownership", weight)
+	}
+	literal, err := g.EdgeExplanation(second)
+	if err != nil || literal != NewSMTLiteral(12, true) {
+		t.Fatal(literal, err)
+	}
+}
+
+func TestSMTRationalDiffGraphDirectAndTwoHopSubsumption(t *testing.T) {
+	g := NewSMTRationalDiffGraph()
+	for variable := int32(0); variable < 4; variable++ {
+		if err := g.InitVariable(variable); err != nil {
+			t.Fatal(err)
+		}
+	}
+	add := func(source, target int32, weight int64, enabled bool) int32 {
+		t.Helper()
+		id, err := g.AddEdge(source, target, diffRat(weight), SMTNullLiteral)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if enabled {
+			feasible, enableErr := g.EnableEdge(id)
+			if enableErr != nil || !feasible {
+				t.Fatal(feasible, enableErr)
+			}
+		}
+		return id
+	}
+	bridge := add(0, 1, 2, true)
+	parallel := add(0, 1, 3, false)
+	_ = add(0, 1, 1, false)
+	_ = add(2, 0, 1, true)
+	prefix := add(2, 1, 4, false)
+	_ = add(1, 3, 1, true)
+	suffix := add(0, 3, 4, false)
+
+	direct, err := g.FindDirectlySubsumed(bridge)
+	if err != nil || !reflect.DeepEqual(direct, []int32{parallel}) {
+		t.Fatal("direct subsumption", direct, err)
+	}
+	twoHop, err := g.FindTwoHopSubsumed(bridge)
+	if err != nil || !reflect.DeepEqual(twoHop, []int32{parallel, prefix, suffix}) {
+		t.Fatal("two-hop subsumption", twoHop, err)
+	}
+}
