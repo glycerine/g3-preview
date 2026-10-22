@@ -125835,6 +125835,12 @@
         "TestAndThenSingleGoalAndDecidedShortcut",
         "TestAndThenNarySourceOrder",
         "TestAndThenComposesSingleGoalModelConverters",
+        "TestAndThenFansOutAcrossMultipleSubgoals",
+        "TestAndThenPartitionsMultipleSubgoalModelConverters",
+        "TestAndThenCollapsesAllUnsatSubgoals",
+        "TestAndThenReturnsFirstDecidedSatSubgoal",
+        "TestAndThenBuildsProofForAllUnsatSubgoals",
+        "TestAndThenJoinsAllUnsatDependencies",
         "TestOrElseRestoresGoalAfterTacticFailure",
         "TestOrElseLastFailureAndSkipIfFailed",
         "TestFailIfBranchingAndCleanTacticals"
@@ -126043,13 +126049,19 @@
           ]
         },
         {
-          "name": "and_then construction, lifecycle, decided short-circuit and single-subgoal converter/core composition (tactical.cpp:26-145,216-271)",
-          "status": "partial",
+          "name": "and_then construction, lifecycle, single and multiple subgoal execution, converter partitioning, decided-SAT selection and all-UNSAT proof/core collapse (tactical.cpp:26-271)",
+          "status": "ported",
           "go_target": "pkg/tactic/tactic_and_then.go",
           "tests": [
             "TestAndThenSingleGoalAndDecidedShortcut",
             "TestAndThenNarySourceOrder",
-            "TestAndThenComposesSingleGoalModelConverters"
+            "TestAndThenComposesSingleGoalModelConverters",
+            "TestAndThenFansOutAcrossMultipleSubgoals",
+            "TestAndThenPartitionsMultipleSubgoalModelConverters",
+            "TestAndThenCollapsesAllUnsatSubgoals",
+            "TestAndThenReturnsFirstDecidedSatSubgoal",
+            "TestAndThenBuildsProofForAllUnsatSubgoals",
+            "TestAndThenJoinsAllUnsatDependencies"
           ]
         },
         {
@@ -126109,6 +126121,12 @@
         "TestAndThenSingleGoalAndDecidedShortcut",
         "TestAndThenNarySourceOrder",
         "TestAndThenComposesSingleGoalModelConverters",
+        "TestAndThenFansOutAcrossMultipleSubgoals",
+        "TestAndThenPartitionsMultipleSubgoalModelConverters",
+        "TestAndThenCollapsesAllUnsatSubgoals",
+        "TestAndThenReturnsFirstDecidedSatSubgoal",
+        "TestAndThenBuildsProofForAllUnsatSubgoals",
+        "TestAndThenJoinsAllUnsatDependencies",
         "TestConditionalTacticsChooseWhenAndFailIf",
         "TestConditionalTacticsGoalProductionGuards",
         "TestOrElseRestoresGoalAfterTacticFailure",
@@ -126137,13 +126155,19 @@
           ]
         },
         {
-          "name": "typed variadic and-then construction; multi-subgoal execution remains open",
-          "status": "partial",
+          "name": "typed variadic and-then construction and complete sequential subgoal execution",
+          "status": "ported",
           "go_target": "pkg/tactic/tactic_and_then.go",
           "tests": [
             "TestAndThenSingleGoalAndDecidedShortcut",
             "TestAndThenNarySourceOrder",
-            "TestAndThenComposesSingleGoalModelConverters"
+            "TestAndThenComposesSingleGoalModelConverters",
+            "TestAndThenFansOutAcrossMultipleSubgoals",
+            "TestAndThenPartitionsMultipleSubgoalModelConverters",
+            "TestAndThenCollapsesAllUnsatSubgoals",
+            "TestAndThenReturnsFirstDecidedSatSubgoal",
+            "TestAndThenBuildsProofForAllUnsatSubgoals",
+            "TestAndThenJoinsAllUnsatDependencies"
           ]
         },
         {

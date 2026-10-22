@@ -121,6 +121,45 @@ func (r *TacticResult) moveGoalsFrom(source *TacticResult) error {
 	return nil
 }
 
+func (r *TacticResult) appendMovedGoalsFrom(source *TacticResult) error {
+	if r == nil || source == nil || source.manager == nil || r.closed {
+		return ast.ErrASTHandle
+	}
+	if r.manager == nil {
+		r.manager = source.manager
+	}
+	if r.manager != source.manager {
+		return ast.ErrASTHandle
+	}
+	r.Goals = append(r.Goals, source.Goals...)
+	r.goalOwned = append(r.goalOwned, source.goalOwned...)
+	for i := range source.Goals {
+		source.Goals[i] = nil
+		source.goalOwned[i] = false
+	}
+	source.Goals = source.Goals[:0]
+	source.goalOwned = source.goalOwned[:0]
+	return nil
+}
+
+func (r *TacticResult) transferBorrowedGoalOwnershipTo(target *TacticResult) {
+	if r == nil || target == nil {
+		return
+	}
+	for i, goal := range r.Goals {
+		if !r.goalOwned[i] {
+			continue
+		}
+		for j, candidate := range target.Goals {
+			if candidate == goal && !target.goalOwned[j] {
+				r.goalOwned[i] = false
+				target.goalOwned[j] = true
+				break
+			}
+		}
+	}
+}
+
 // TakeGoal transfers a directly owned goal to the result. AddGoal records a
 // borrowed goal, which is the correct operation for skip and similar tactics.
 func (r *TacticResult) TakeGoal(g *Goal) error {

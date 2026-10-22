@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -97,7 +98,7 @@ func (t *andThenTactic) Apply(g *Goal, out *TacticResult) (result error) {
 		return ast.ErrASTDomain
 	}
 	if len(first.Goals) != 1 {
-		return ast.ErrASTDomain
+		return t.applyMultiple(g, out, first)
 	}
 	models, err := g.ModelsEnabled()
 	if err != nil {
@@ -117,6 +118,7 @@ func (t *andThenTactic) Apply(g *Goal, out *TacticResult) (result error) {
 	if err = t.second.Apply(first.Goals[0], second); err != nil {
 		return err
 	}
+	first.transferBorrowedGoalOwnershipTo(second)
 	if err = out.moveGoalsFrom(second); err != nil {
 		return err
 	}
@@ -156,6 +158,194 @@ func (t *andThenTactic) Apply(g *Goal, out *TacticResult) (result error) {
 		}
 	}
 	return nil
+}
+
+func (t *andThenTactic) applyMultiple(g *Goal, out, first *TacticResult) (result error) {
+	models, err := g.ModelsEnabled()
+	if err != nil {
+		return err
+	}
+	proofs, err := g.ProofsEnabled()
+	if err != nil {
+		return err
+	}
+	cores, err := g.UnsatCoresEnabled()
+	if err != nil {
+		return err
+	}
+	if err = out.prepare(g.manager); err != nil {
+		return err
+	}
+	modelConverters := make([]ModelConverter, 0, len(first.Goals))
+	proofConverters := make([]ProofConverter, 0, len(first.Goals))
+	sizes := make([]uint32, 0, len(first.Goals))
+	branches := make([]*TacticResult, 0, len(first.Goals))
+	defer func() {
+		for _, branch := range branches {
+			result = errors.Join(result, branch.Close())
+		}
+	}()
+	core := first.Core
+	for subgoalIndex, subgoal := range first.Goals {
+		branch := &TacticResult{}
+		branches = append(branches, branch)
+		if err = t.second.Apply(subgoal, branch); err != nil {
+			return err
+		}
+		first.transferBorrowedGoalOwnershipTo(branch)
+		if branch.DecidedSat() {
+			if err = out.Reset(); err != nil {
+				return err
+			}
+			if err = out.appendMovedGoalsFrom(branch); err != nil {
+				return err
+			}
+			if models {
+				if err = t.publishSATModel(g, out, first.ModelConverter, branch.ModelConverter, uint32(subgoalIndex)); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+		if branch.DecidedUnsat() {
+			if models {
+				modelConverters = append(modelConverters, nil)
+			}
+			if proofs {
+				proof, err := branch.Goals[0].Proof(0)
+				if err != nil {
+					return err
+				}
+				converter, err := NewStoredProofConverter(g.manager, proof)
+				if err != nil {
+					return err
+				}
+				proofConverters = append(proofConverters, converter)
+			}
+			if models || proofs {
+				sizes = append(sizes, 0)
+			}
+			if cores {
+				dependency, err := branch.Goals[0].Dependency(0)
+				if err != nil {
+					return err
+				}
+				core, err = g.manager.DependencyJoin(core, dependency)
+				if err != nil {
+					return err
+				}
+			}
+			continue
+		}
+		if models {
+			modelConverters = append(modelConverters, branch.ModelConverter)
+		}
+		if proofs {
+			proofConverters = append(proofConverters, branch.ProofConverter)
+		}
+		if models || proofs {
+			sizes = append(sizes, uint32(len(branch.Goals)))
+		}
+		if cores {
+			core, err = g.manager.DependencyJoin(core, branch.Core)
+			if err != nil {
+				return err
+			}
+		}
+		if err = out.appendMovedGoalsFrom(branch); err != nil {
+			return err
+		}
+	}
+	if len(out.Goals) == 0 {
+		if err = g.ResetAll(); err != nil {
+			return err
+		}
+		var proof ast.ASTHandle
+		if proofs {
+			defer func() {
+				for _, converter := range proofConverters {
+					if converter != nil {
+						result = errors.Join(result, converter.Close())
+					}
+				}
+			}()
+			proofRef, err := g.manager.NewRef(ast.ASTHandle{})
+			if err != nil {
+				return err
+			}
+			defer func() { result = errors.Join(result, g.manager.DelRef(&proofRef)) }()
+			if err = ApplyProofConverters(g.manager, first.ProofConverter, proofConverters, proofRef); err != nil {
+				return err
+			}
+			proof, err = g.manager.RefGet(proofRef)
+			if err != nil {
+				return err
+			}
+		}
+		falsity, err := g.manager.MkFalse()
+		if err != nil {
+			return err
+		}
+		if err = g.AssertWithProof(falsity, proof, core); err != nil {
+			return err
+		}
+		return out.AddGoal(g)
+	}
+	if models {
+		combined, err := concatTacticModelSubgoals(g.manager.Budget(), first.ModelConverter, modelConverters, sizes)
+		if err != nil {
+			return err
+		}
+		if err = out.SetModelConverter(combined); err != nil {
+			return err
+		}
+	}
+	if proofs {
+		combined, err := ConcatStarProofConverters(g.manager.Budget(), first.ProofConverter, proofConverters, sizes)
+		if err != nil {
+			return err
+		}
+		if err = out.SetProofConverter(combined); err != nil {
+			return err
+		}
+	}
+	if cores {
+		if err = out.SetCore(core); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t *andThenTactic) publishSATModel(g *Goal, out *TacticResult, first, second ModelConverter, index uint32) (result error) {
+	md, err := model.NewModel(g.manager)
+	if err != nil {
+		return err
+	}
+	ref := &ModelRef{}
+	defer func() { result = errors.Join(result, ref.Close()) }()
+	if err = ref.Set(md.Core()); err != nil {
+		return err
+	}
+	if second != nil {
+		if err = second.ApplyModel(ref, 0); err != nil {
+			return err
+		}
+	}
+	if first != nil {
+		if err = first.ApplyModel(ref, index); err != nil {
+			return err
+		}
+	}
+	value, err := ref.Get()
+	if err != nil {
+		return err
+	}
+	stored, err := NewStoredModel(value)
+	if err != nil {
+		return err
+	}
+	return out.SetModelConverter(stored)
 }
 
 func (t *andThenTactic) each(action func(Tactic) error) error {
