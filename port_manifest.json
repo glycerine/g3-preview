@@ -114242,9 +114242,14 @@
       "path": "src/smt/theory_datatype.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_datatype.go"
+      ],
+      "tests": [
+        "TestSMTDatatypeRecognizerCases",
+        "TestSMTDatatypeConstructorAccessor"
+      ],
       "assertions": [
         {
           "line": 40,
@@ -114465,9 +114470,14 @@
       "path": "src/smt/theory_datatype.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_datatype.go"
+      ],
+      "tests": [
+        "TestSMTDatatypeRecognizerCases",
+        "TestSMTDatatypeConstructorAccessor"
+      ],
       "conditionals": [
         {
           "line": 19,
