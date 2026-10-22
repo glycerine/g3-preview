@@ -24,7 +24,7 @@ func TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel(t *testing.T) {
 	astTestMust(t, state.AssignLiteral(la, NewSMTBooleanAxiom()))
 	astTestMust(t, state.PushScope())
 	astTestMust(t, state.AssignLiteral(lb, NewSMTBooleanAxiom()))
-	reason, err := NewSMTClause(m, []SMTLiteral{lc, la.Negated()}, SMTClauseAux, nil, nil, false, nil)
+	reason, err := NewSMTClause(m, []SMTLiteral{lc, la.Negated()}, SMTClauseLearned, nil, nil, false, nil)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, reason.Close()) })
 	astTestMust(t, state.AssignLiteral(lc, NewSMTBooleanClause(reason)))
@@ -44,6 +44,9 @@ func TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel(t *testing.T) {
 		if got.Lemma[i] != want[i] {
 			t.Fatal("lemma", got.Lemma, want)
 		}
+	}
+	if activity, activityErr := reason.Activity(); activityErr != nil || activity != 2 {
+		t.Fatal("resolved lemma activity", activity, activityErr)
 	}
 }
 

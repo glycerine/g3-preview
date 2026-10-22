@@ -383,6 +383,11 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 			if !ok || clause == nil {
 				return ast.ErrASTDomain
 			}
+			if clause.IsLemma() {
+				if err := clause.IncrementActivity(); err != nil {
+					return err
+				}
+			}
 			start := 0
 			if consequent != SMTFalseLiteral {
 				if clause.literals[0] == consequent {

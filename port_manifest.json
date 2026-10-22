@@ -104175,7 +104175,7 @@
           ]
         },
         {
-          "name": "assignment-level analysis and FUIP resolution with learned lemma and backjump-level calculation",
+          "name": "assignment-level analysis and FUIP resolution with learned-lemma activity and backjump-level calculation",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_conflict_resolver.go",
           "tests": [
