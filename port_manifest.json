@@ -113340,9 +113340,15 @@
       "path": "src/solver/solver_na2as.cpp",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/named_assertions.go",
+        "pkg/solver/named_assertions_test.go"
+      ],
+      "tests": [
+        "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions",
+        "TestNamedAssertionsWithAssumptionsAndInvalidTag"
+      ],
       "assertions": [
         {
           "line": 38,
@@ -113357,19 +113363,58 @@
           "text": "SASSERT(n <= lvl);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tracked assertion validation, source trace, assumption pin and implication forwarding (solver_na2as.cpp:27-49)",
+          "status": "ported",
+          "go_target": "pkg/solver/named_assertions.go",
+          "tests": [
+            "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions",
+            "TestNamedAssertionsWithAssumptionsAndInvalidTag"
+          ]
+        },
+        {
+          "name": "temporary assumption append/restore for check-sat and consequences (solver_na2as.cpp:51-72)",
+          "status": "ported",
+          "go_target": "pkg/solver/named_assertions.go",
+          "tests": [
+            "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions",
+            "TestNamedAssertionsWithAssumptionsAndInvalidTag"
+          ]
+        },
+        {
+          "name": "default mutex result and named-assumption push/pop restoration (solver_na2as.cpp:74-103)",
+          "status": "ported",
+          "go_target": "pkg/solver/named_assertions.go",
+          "tests": [
+            "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each retained named assumption owns an ASTRef; temporary assumptions are pinned for exactly one operation and restored in reverse order.",
+        "The adapter borrows its manager, concrete core and optional trace owner."
+      ],
+      "deviations": [
+        "Invalid tracked labels and pop depths return explicit Go domain/bounds errors at the reached source assertions.",
+        "NamedAssertionCore is a concrete typed derived-solver boundary replacing C++ protected virtual methods."
+      ]
     },
     {
       "path": "src/solver/solver_na2as.h",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/named_assertions.go",
+        "pkg/solver/named_assertions_test.go"
+      ],
+      "tests": [
+        "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions",
+        "TestNamedAssertionsWithAssumptionsAndInvalidTag"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -113380,11 +113425,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete named-assertion adapter surface and derived core boundary (solver_na2as.h:27-54)",
+          "status": "ported",
+          "go_target": "pkg/solver/named_assertions.go",
+          "tests": [
+            "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions",
+            "TestNamedAssertionsWithAssumptionsAndInvalidTag"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native ASTRef slices replace expr_ref_vector and native uint32 slices replace scope vectors; Close releases every retained label."
+      ],
+      "deviations": [
+        "WithAssumptions supplies the source get_consequences append/restore scope to concrete Go solvers without exposing inheritance."
+      ]
     },
     {
       "path": "src/solver/solver_pool.cpp",
