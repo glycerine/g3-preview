@@ -105092,7 +105092,16 @@
           ]
         },
         {
-          "name": "context-trailed generation and label updates, deletion callback, debug invariants, label display, and tmp_enode",
+          "name": "deletion callback, transitivity and parent-congruence checks, debug invariants, label display, and tmp_enode",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_enode_aux.go",
+          "tests": [
+            "TestSMTEnodeTemporaryKeyInvariantDisplayAndDeletion",
+            "TestSMTEnodeEqualityClassInvariantAndTransitivityCycleGuard"
+          ]
+        },
+        {
+          "name": "context-trailed generation and label updates",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -105102,7 +105111,7 @@
         "SMTEnode borrows its AST owner and child nodes; native Go slices own argument and parent pointer lists, and linked theory-variable cells are reclaimed by Go after unlinking."
       ],
       "deviations": [
-        "Flexible-array and region placement storage are represented by concrete Go fields and slices. Context trail integration and temporary congruence keys remain open."
+        "Flexible-array and region placement storage are represented by concrete Go fields and slices. Context trail integration remains open."
       ]
     },
     {
@@ -105111,11 +105120,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_enode_core.go"
+        "pkg/smtcore/smt_enode_core.go",
+        "pkg/smtcore/smt_enode_aux.go"
       ],
       "tests": [
         "TestSMTEnodeConstructionParentsFlagsAndTheoryVariables",
-        "TestSMTEnodeCongruenceCommutationEqualityClassAndMarks"
+        "TestSMTEnodeCongruenceCommutationEqualityClassAndMarks",
+        "TestSMTEnodeTemporaryKeyInvariantDisplayAndDeletion",
+        "TestSMTEnodeEqualityClassInvariantAndTransitivityCycleGuard"
       ],
       "conditionals": [
         {
@@ -105198,7 +105210,16 @@
           ]
         },
         {
-          "name": "context-only mutation friends, label hash interface, debug invariant interface, and tmp_enode interface",
+          "name": "debug invariant and tmp_enode interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_enode_aux.go",
+          "tests": [
+            "TestSMTEnodeTemporaryKeyInvariantDisplayAndDeletion",
+            "TestSMTEnodeEqualityClassInvariantAndTransitivityCycleGuard"
+          ]
+        },
+        {
+          "name": "context-only mutation friends and label hash interface",
           "status": "unported",
           "go_target": null,
           "tests": []
