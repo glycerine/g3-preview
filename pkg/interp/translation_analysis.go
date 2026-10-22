@@ -4,6 +4,7 @@ package interp
 
 import (
 	"errors"
+	"math"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -24,6 +25,7 @@ type FullTranslation struct {
 	hypotheses          map[ast.ASTHandle]map[ast.ASTHandle]struct{}
 	equivalences        map[ast.ASTHandle]translationEquivalence
 	equivalencesVisited map[ast.ASTHandle]bool
+	locality            map[ast.ASTHandle]int
 	closed              bool
 }
 
@@ -37,6 +39,7 @@ func NewFullTranslation(base *Base) (result *FullTranslation, resultErr error) {
 		hypotheses:          make(map[ast.ASTHandle]map[ast.ASTHandle]struct{}),
 		equivalences:        make(map[ast.ASTHandle]translationEquivalence),
 		equivalencesVisited: make(map[ast.ASTHandle]bool),
+		locality:            make(map[ast.ASTHandle]int),
 	}
 	t.self = t
 	defer func() {
@@ -81,8 +84,204 @@ func (t *FullTranslation) Close() (result error) {
 	t.hypotheses = nil
 	t.equivalences = nil
 	t.equivalencesVisited = nil
+	t.locality = nil
 	t.closed = true
 	return result
+}
+
+func (t *FullTranslation) scanSkolemsRecursive(proof ast.ASTHandle, frame int, memo map[ast.ASTHandle]int) (int, error) {
+	if result, found := memo[proof]; found {
+		return result, nil
+	}
+	result := math.MaxInt
+	memo[proof] = result
+	rule, err := t.base.manager.ProofRule(proof)
+	if err != nil {
+		return 0, err
+	}
+	switch rule {
+	case ast.ASTPrAsserted:
+		conclusion, e := t.base.manager.Conclusion(proof)
+		if e != nil {
+			return 0, e
+		}
+		result, err = t.base.FrameOfAssertion(conclusion)
+	case ast.ASTPrSkolemize:
+		conclusion, e := t.base.manager.Conclusion(proof)
+		if e != nil {
+			return 0, e
+		}
+		quantified, e := t.base.manager.Arg(conclusion, 0)
+		if e != nil {
+			return 0, e
+		}
+		op, e := t.base.manager.Operator(quantified)
+		if e != nil {
+			return 0, e
+		}
+		if op == OperatorNot {
+			quantified, e = t.base.manager.Arg(quantified, 0)
+			if e != nil {
+				return 0, e
+			}
+		}
+		scope, e := t.base.ASTScope(quantified)
+		if e != nil {
+			return 0, e
+		}
+		if scope.IsEmpty() {
+			return 0, NewError("can't skolemize")
+		}
+		inside, e := t.base.scopes.InRange(frame, scope)
+		if e != nil {
+			return 0, e
+		}
+		if frame == math.MaxInt || !inside {
+			frame = scope.Max()
+		}
+		if frame >= t.frames {
+			frame = t.frames - 1
+		}
+		skolem, e := t.base.manager.Arg(conclusion, 1)
+		if e != nil {
+			return 0, e
+		}
+		err = t.base.addFrameRange(frame, skolem)
+	case ast.ASTPrModusPonensOEq:
+		first, e := t.base.manager.Premise(proof, 0)
+		if e != nil {
+			return 0, e
+		}
+		frame, e = t.scanSkolemsRecursive(first, frame, memo)
+		if e != nil {
+			return 0, e
+		}
+		second, e := t.base.manager.Premise(proof, 1)
+		if e != nil {
+			return 0, e
+		}
+		_, err = t.scanSkolemsRecursive(second, frame, memo)
+	default:
+		count, e := t.base.manager.NumPremises(proof)
+		if e != nil {
+			return 0, e
+		}
+		for i := uint32(0); i < count; i++ {
+			premise, e := t.base.manager.Premise(proof, i)
+			if e != nil {
+				return 0, e
+			}
+			value, e := t.scanSkolemsRecursive(premise, frame, memo)
+			if e != nil {
+				return 0, e
+			}
+			if result == math.MaxInt || result == value {
+				result = value
+			} else if value != math.MaxInt {
+				result = -1
+			}
+		}
+	}
+	memo[proof] = result
+	return result, err
+}
+
+func (t *FullTranslation) ScanSkolems(proof ast.ASTHandle) error {
+	if err := t.open(); err != nil {
+		return err
+	}
+	_, err := t.scanSkolemsRecursive(proof, math.MaxInt, make(map[ast.ASTHandle]int))
+	return err
+}
+
+func (t *FullTranslation) localityRecursive(proof ast.ASTHandle) (int, error) {
+	if result, found := t.locality[proof]; found {
+		return result, nil
+	}
+	result := math.MaxInt
+	// Match the source's insert-before-recursion memo behavior.
+	t.locality[proof] = result
+	rule, err := t.base.manager.ProofRule(proof)
+	if err != nil {
+		return 0, err
+	}
+	if rule == ast.ASTPrAsserted {
+		conclusion, e := t.base.manager.Conclusion(proof)
+		if e != nil {
+			return 0, e
+		}
+		result, err = t.base.FrameOfAssertion(conclusion)
+	} else if rule != ast.ASTPrQuantInst {
+		count, e := t.base.manager.NumPremises(proof)
+		if e != nil {
+			return 0, e
+		}
+		for i := uint32(0); i < count; i++ {
+			premise, e := t.base.manager.Premise(proof, i)
+			if e != nil {
+				return 0, e
+			}
+			value, e := t.localityRecursive(premise)
+			if e != nil {
+				return 0, e
+			}
+			if result == math.MaxInt || result == value {
+				result = value
+			} else if value != math.MaxInt {
+				result = -1
+			}
+		}
+	}
+	t.locality[proof] = result
+	return result, err
+}
+
+func (t *FullTranslation) Locality(proof ast.ASTHandle) (int, error) {
+	if err := t.open(); err != nil {
+		return 0, err
+	}
+	result, err := t.localityRecursive(proof)
+	if err != nil || result == -1 {
+		return result, err
+	}
+	conclusion, err := t.base.manager.Conclusion(proof)
+	if err != nil {
+		return 0, err
+	}
+	scope, err := t.base.ASTScope(conclusion)
+	if err != nil {
+		return 0, err
+	}
+	if !scope.IsEmpty() {
+		hypotheses, e := t.proofHypotheses(proof)
+		if e != nil {
+			return 0, e
+		}
+		for hypothesis := range hypotheses {
+			hypothesisScope, e := t.base.ASTScope(hypothesis)
+			if e != nil {
+				return 0, e
+			}
+			scope, e = t.base.scopes.RangeGLB(scope, hypothesisScope)
+			if e != nil {
+				return 0, e
+			}
+		}
+	}
+	if result == math.MaxInt {
+		if scope.IsEmpty() {
+			return -1, nil
+		}
+		return scope.Max(), nil
+	}
+	inside, err := t.base.scopes.InRange(result, scope)
+	if err != nil {
+		return 0, err
+	}
+	if !inside {
+		return -1, nil
+	}
+	return result, nil
 }
 
 func cloneHandleSet(source map[ast.ASTHandle]struct{}) map[ast.ASTHandle]struct{} {

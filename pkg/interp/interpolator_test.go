@@ -229,4 +229,15 @@ func TestFullTranslationProofAnalysisAndResolution(t *testing.T) {
 	if err != nil || len(empty) != 0 {
 		t.Fatal("false clause", empty, err)
 	}
+	assertedP, err := m.MkProofAsserted(p)
+	interpMust(t, err)
+	if locality, e := translation.Locality(assertedP); e != nil || locality != 0 {
+		t.Fatal("asserted locality", locality, e)
+	}
+	assertedQ, err := m.MkProofAsserted(q)
+	interpMust(t, err)
+	if locality, e := translation.Locality(assertedQ); e != nil || locality != 1 {
+		t.Fatal("second asserted locality", locality, e)
+	}
+	interpMust(t, translation.ScanSkolems(assertedP))
 }

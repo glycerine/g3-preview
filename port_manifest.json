@@ -42362,7 +42362,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "translator state ownership, hypothesis DAGs, local equivalence discovery, clause extraction, and unit-resolution reconstruction",
+          "name": "translator state ownership, skolem and locality scans, hypothesis DAGs, local equivalence discovery, clause extraction, and unit-resolution reconstruction",
           "status": "ported",
           "go_target": "pkg/interp/translation_analysis.go",
           "tests": [
@@ -42370,7 +42370,7 @@
           ]
         },
         {
-          "name": "locality and skolem scans, localization and quantification, proof-rule translation, and final lemma construction",
+          "name": "localization and quantification, proof-rule translation, and final lemma construction",
           "status": "unported"
         }
       ],
