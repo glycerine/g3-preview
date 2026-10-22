@@ -103279,9 +103279,13 @@
       "path": "src/smt/smt_conflict_resolution.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/smtcore/smt_conflict_antecedents.go"],
+      "tests": [
+        "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
+        "TestSMTAntecedentExpanderTransitivityEquationsAndCommonAncestor",
+        "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities"
+      ],
       "conditionals": [
         {
           "line": 911,
@@ -103602,19 +103606,50 @@
           "text": "SASSERT(m_ctx.get_assign_level(c_var) == search_lvl);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "transitivity common ancestor, equality-justification expansion, recursive justification/equality work queues, duplicate suppression and public antecedent extraction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_antecedents.go",
+          "tests": [
+            "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
+            "TestSMTAntecedentExpanderTransitivityEquationsAndCommonAncestor",
+            "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities"
+          ]
+        },
+        {
+          "name": "assignment-level analysis, FUIP resolution, lemma minimization and unsat-core extraction",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "literal, equality, justification and conflict proof construction",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The antecedent expander owns its work queues, duplicate set and emitted event history; justifications and enodes are borrowed and temporary justification marks are always cleared."
+      ],
+      "deviations": [
+        "Dynamic-ack callbacks are recorded as typed congruence/equality-use events until the concrete manager is connected. Remaining resolution and proof phases keep the source unit partial."
+      ]
     },
     {
       "path": "src/smt/smt_conflict_resolution.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/smtcore/smt_conflict_antecedents.go"],
+      "tests": [
+        "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
+        "TestSMTAntecedentExpanderTransitivityEquationsAndCommonAncestor",
+        "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -103635,11 +103670,32 @@
           "text": "SASSERT(m_antecedents);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "typed antecedent marker and justification/equality-to-literal expansion interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_antecedents.go",
+          "tests": [
+            "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
+            "TestSMTAntecedentExpanderTransitivityEquationsAndCommonAncestor",
+            "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities"
+          ]
+        },
+        {
+          "name": "full conflict resolver construction, resolve, lemma/proof accessors, minimization and unsat-core interface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The future resolver will borrow context, parameters, assignment trail and watches; the completed expander owns only native Go work storage."
+      ],
+      "deviations": [
+        "The standalone expander isolates the context-independent front of conflict resolution while the context-dependent FUIP and proof state remain open."
+      ]
     },
     {
       "path": "src/smt/smt_consequences.cpp",
