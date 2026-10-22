@@ -108458,9 +108458,13 @@
       "path": "src/smt/smt_model_checker.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_model_checker.go"
+      ],
+      "tests": [
+        "TestSMTModelCheckerFindsFiniteBooleanCounterexample"
+      ],
       "assertions": [
         {
           "line": 56,
@@ -108511,19 +108515,48 @@
           "text": "SASSERT(md != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "finite-universe binding enumeration, candidate-model evaluation, counterexample deduplication and queue insertion",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "tests": [
+            "TestSMTModelCheckerFindsFiniteBooleanCounterexample"
+          ]
+        },
+        {
+          "name": "auxiliary SMT context, skolem restrictions, blocking clauses, inverse-term extraction and recursive-function checking",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "candidate-model final-check dispatch, iteration growth and restart publication",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "SMTModelChecker borrows the internalizer, registry and candidate proto-model. Temporary instantiated and evaluated expressions are held by checked AST references and released before returning."
+      ],
+      "deviations": [
+        "The current concrete checker enumerates Boolean and proto-model universes directly. The source auxiliary solver path for infinite or incomplete instantiation sets remains open."
+      ]
     },
     {
       "path": "src/smt/smt_model_checker.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_model_checker.go"
+      ],
+      "tests": [
+        "TestSMTModelCheckerFindsFiniteBooleanCounterexample"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -108534,10 +108567,27 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete finite model-check interface and bounded counterexample publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "tests": [
+            "TestSMTModelCheckerFindsFiniteBooleanCounterexample"
+          ]
+        },
+        {
+          "name": "auxiliary-context and model-finder integration surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The Go checker has explicit borrowed state and registry pointers and no region-allocated flexible-array instances; ordinary slices carry binding values and enodes."
+      ],
       "deviations": []
     },
     {
