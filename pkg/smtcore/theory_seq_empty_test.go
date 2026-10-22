@@ -821,6 +821,63 @@ func TestSMTSequenceTheoryReplaceAxioms(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryRegexMembershipReduction(t *testing.T) {
+	t.Run("singleton-symbolic", func(t *testing.T) {
+		m, modelConfig := smtModelGeneratorFixture(t)
+		literal, err := m.MkString("ab")
+		astTestMust(t, err)
+		sort, err := m.GetSort(literal)
+		astTestMust(t, err)
+		x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-singleton"), sort)
+		astTestMust(t, err)
+		regex, err := m.MkSequenceToRegex(literal)
+		astTestMust(t, err)
+		membership, err := m.MkSequenceInRegex(x, regex)
+		astTestMust(t, err)
+		equality, err := m.MkEq(x, literal)
+		astTestMust(t, err)
+		disequality, err := m.MkNot(equality)
+		astTestMust(t, err)
+		solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, solver.Close()) })
+		astTestMust(t, solver.Assert(membership))
+		astTestMust(t, solver.Assert(disequality))
+		status, err := solver.CheckSat(nil)
+		astTestMust(t, err)
+		if status != lbool.False {
+			t.Fatal("singleton membership reduction", status)
+		}
+	})
+
+	t.Run("concrete-union-rejection", func(t *testing.T) {
+		m, modelConfig := smtModelGeneratorFixture(t)
+		input, err := m.MkString("c")
+		astTestMust(t, err)
+		a, err := m.MkString("a")
+		astTestMust(t, err)
+		b, err := m.MkString("b")
+		astTestMust(t, err)
+		ra, err := m.MkSequenceToRegex(a)
+		astTestMust(t, err)
+		rb, err := m.MkSequenceToRegex(b)
+		astTestMust(t, err)
+		union, err := m.MkRegexUnion(ra, rb)
+		astTestMust(t, err)
+		membership, err := m.MkSequenceInRegex(input, union)
+		astTestMust(t, err)
+		solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, solver.Close()) })
+		astTestMust(t, solver.Assert(membership))
+		status, err := solver.CheckSat(nil)
+		astTestMust(t, err)
+		if status != lbool.False {
+			t.Fatal("concrete regex rejection", status)
+		}
+	})
+}
+
 func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name  string
