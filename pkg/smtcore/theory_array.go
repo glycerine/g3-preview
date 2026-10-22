@@ -395,8 +395,19 @@ func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) err
 		}
 		value, err = state.manager.MkApp(function, arguments)
 	case ast.ASTArrayOpStore:
-		t.unsupported = true
-		return nil
+		large, largeErr := t.arrayHasLargeDomain(array)
+		if largeErr != nil {
+			return largeErr
+		}
+		if !large {
+			t.unsupported = true
+			return nil
+		}
+		base, argErr := state.manager.GetArg(array, 0)
+		if argErr != nil {
+			return argErr
+		}
+		value, err = state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpDefault, nil, []ast.ASTHandle{base})
 	default:
 		return nil
 	}
@@ -411,6 +422,47 @@ func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) err
 		return fmt.Errorf("array default value axiom: %w", err)
 	}
 	return nil
+}
+
+func (t *SMTArrayTheory) arrayHasLargeDomain(array ast.ASTHandle) (bool, error) {
+	state, _ := t.State()
+	sort, err := state.manager.GetSort(array)
+	if err != nil {
+		return false, err
+	}
+	cardinality := uint64(1)
+	for index := uint32(0); ; index++ {
+		declaration, declErr := state.manager.MkArrayExtDecl(sort, index)
+		if errors.Is(declErr, ast.ErrASTDomain) {
+			break
+		}
+		if declErr != nil {
+			return false, declErr
+		}
+		domain, rangeErr := state.manager.GetRange(declaration)
+		if rangeErr != nil {
+			return false, rangeErr
+		}
+		size, sizeErr := state.manager.GetSortSize(domain)
+		if sizeErr != nil {
+			return false, sizeErr
+		}
+		if size.IsInfinite() || size.IsVeryBig() {
+			return true, nil
+		}
+		value, valueErr := size.Size()
+		if valueErr != nil {
+			return false, valueErr
+		}
+		if value == 0 {
+			return false, nil
+		}
+		if cardinality >= 1<<20 || value >= (1<<20+cardinality-1)/cardinality {
+			return true, nil
+		}
+		cardinality *= value
+	}
+	return cardinality >= 1<<20, nil
 }
 
 func (t *SMTArrayTheory) InternalizeEquality(expression ast.ASTHandle, variable int32) error {
