@@ -104459,6 +104459,7 @@
         "TestSMTInternalizerInstallsLearnedClauseInCurrentScope",
         "TestSMTInternalizerLearnedClausePreservesFalseAntecedents",
         "TestSMTInternalizerLearnedClauseRetainsProof",
+        "TestSMTSearchReinternalizesLearnedClauseAtomsAfterBackjump",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
@@ -106758,6 +106759,7 @@
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
         "TestSMTInternalizerLearnedClausePreservesFalseAntecedents",
         "TestSMTInternalizerLearnedClauseRetainsProof",
+        "TestSMTSearchReinternalizesLearnedClauseAtomsAfterBackjump",
         "TestSMTDynamicAckManagerBuildsPairAndTripleClauses",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTBinaryClauseOptimizationPropagationAndInvariant",
@@ -107219,7 +107221,15 @@
           ]
         },
         {
-          "name": "search-scope clause reinitialization and clause garbage collection",
+          "name": "learned-clause atom retention and reinternalization across search backjump",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_search.go",
+          "tests": [
+            "TestSMTSearchReinternalizesLearnedClauseAtomsAfterBackjump"
+          ]
+        },
+        {
+          "name": "persistent clause reinitialization stacks and clause garbage collection",
           "status": "unported",
           "go_target": null,
           "tests": []

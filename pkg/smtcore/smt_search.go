@@ -15,6 +15,53 @@ type smtSearchProgress struct {
 	equalities, disequalities    int
 }
 
+type smtRetainedLemmaAtom struct {
+	expression ast.ASTHandle
+	sign       bool
+}
+
+func (s *SMTInternalizerState) retainLemmaAtoms(literals []SMTLiteral) ([]smtRetainedLemmaAtom, error) {
+	atoms := make([]smtRetainedLemmaAtom, 0, len(literals))
+	for _, literal := range literals {
+		expression, err := s.BoolExpression(literal.Var())
+		if err != nil {
+			_ = s.releaseLemmaAtoms(atoms)
+			return nil, err
+		}
+		if err = s.manager.IncRef(expression); err != nil {
+			_ = s.releaseLemmaAtoms(atoms)
+			return nil, err
+		}
+		atoms = append(atoms, smtRetainedLemmaAtom{expression: expression, sign: literal.Sign()})
+	}
+	return atoms, nil
+}
+
+func (s *SMTInternalizerState) releaseLemmaAtoms(atoms []smtRetainedLemmaAtom) (result error) {
+	for index := len(atoms) - 1; index >= 0; index-- {
+		result = errors.Join(result, s.manager.DecRef(atoms[index].expression))
+	}
+	return result
+}
+
+func (s *SMTInternalizerState) reinternalizeLemmaAtoms(atoms []smtRetainedLemmaAtom) ([]SMTLiteral, error) {
+	literals := make([]SMTLiteral, len(atoms))
+	for index, atom := range atoms {
+		if err := s.Internalize(atom.expression, true); err != nil {
+			return nil, err
+		}
+		literal, err := s.Literal(atom.expression)
+		if err != nil {
+			return nil, err
+		}
+		if atom.sign {
+			literal = literal.Negated()
+		}
+		literals[index] = literal
+	}
+	return literals, nil
+}
+
 func (s *SMTInternalizerState) searchProgress() smtSearchProgress {
 	return smtSearchProgress{
 		variables: len(s.boolExpr), clauses: len(s.clauses), assigned: len(s.assignedLiterals),
@@ -82,8 +129,25 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			if proofErr != nil {
 				return lbool.Undef, proofErr
 			}
+			var retained []smtRetainedLemmaAtom
+			if resolution.InternalScopeLevel > resolution.NewScopeLevel {
+				retained, err = k.internalizer.retainLemmaAtoms(resolution.Lemma)
+				if err != nil {
+					return lbool.Undef, err
+				}
+			}
 			if err = k.internalizer.PopScopes(k.internalizer.scopeLevel - resolution.NewScopeLevel); err != nil {
+				if len(retained) != 0 {
+					err = errors.Join(err, k.internalizer.releaseLemmaAtoms(retained))
+				}
 				return lbool.Undef, fmt.Errorf("smt search backjump: %w", err)
+			}
+			if len(retained) != 0 {
+				resolution.Lemma, err = k.internalizer.reinternalizeLemmaAtoms(retained)
+				err = errors.Join(err, k.internalizer.releaseLemmaAtoms(retained))
+				if err != nil {
+					return lbool.Undef, fmt.Errorf("smt search reinternalize learned clause: %w", err)
+				}
 			}
 			if err = k.internalizer.AddLearnedClauseWithProof(resolution.Lemma, proof); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search learn clause: %w", err)

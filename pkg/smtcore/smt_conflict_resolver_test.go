@@ -139,6 +139,36 @@ func TestSMTInternalizerLearnedClauseRetainsProof(t *testing.T) {
 	}
 }
 
+func TestSMTSearchReinternalizesLearnedClauseAtomsAfterBackjump(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	expression := smtRelevancyBool(t, m, "learned-reinternalize")
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.Internalize(expression, true))
+	variable, found := state.BoolVar(expression)
+	if !found {
+		t.Fatal("missing scoped learned-clause atom")
+	}
+	literal := NewSMTLiteral(variable, true)
+	atoms, err := state.retainLemmaAtoms([]SMTLiteral{literal})
+	astTestMust(t, err)
+	astTestMust(t, state.PopScopes(1))
+	if _, found = state.BoolVar(expression); found {
+		t.Fatal("scoped atom survived backjump")
+	}
+	restored, err := state.reinternalizeLemmaAtoms(atoms)
+	astTestMust(t, err)
+	astTestMust(t, state.releaseLemmaAtoms(atoms))
+	if len(restored) != 1 || !restored[0].Sign() {
+		t.Fatal("reinternalized learned literal", restored)
+	}
+	data, err := state.BooleanData(restored[0].Var())
+	astTestMust(t, err)
+	if data.InternalLevel() != 0 {
+		t.Fatal("reinternalized atom scope", data.InternalLevel())
+	}
+}
+
 func TestSMTConflictResolverMinimizesImpliedLemmaLiteral(t *testing.T) {
 	m := astTestManager(t)
 	_, _, state := smtInternalizerFixture(t, m, nil)
