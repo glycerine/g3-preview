@@ -615,6 +615,43 @@ func TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches(t *testing.T) {
+	for _, boundary := range []string{"prefix", "suffix"} {
+		t.Run(boundary, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			empty, err := m.MkString("")
+			astTestMust(t, err)
+			sort, err := m.GetSort(empty)
+			astTestMust(t, err)
+			haystack, err := m.MkConst(astTestSymbol(t, m, "sequence-nc-haystack-"+boundary), sort)
+			astTestMust(t, err)
+			needle, err := m.MkConst(astTestSymbol(t, m, "sequence-nc-needle-"+boundary), sort)
+			astTestMust(t, err)
+			contains, err := m.MkSequenceContains(haystack, needle)
+			astTestMust(t, err)
+			notContains, err := m.MkNot(contains)
+			astTestMust(t, err)
+			var relation ast.ASTHandle
+			if boundary == "prefix" {
+				relation, err = m.MkSequencePrefix(needle, haystack)
+			} else {
+				relation, err = m.MkSequenceSuffix(needle, haystack)
+			}
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.Assert(notContains))
+			astTestMust(t, solver.Assert(relation))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("non-containment boundary match", status)
+			}
+		})
+	}
+}
+
 func TestSMTSequenceTheoryAtBoundaryAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name  string

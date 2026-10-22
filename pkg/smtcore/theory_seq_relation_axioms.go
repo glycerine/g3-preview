@@ -112,5 +112,30 @@ func (t *SMTSequenceTheory) addRelationAxioms(expression ast.ASTHandle, operatio
 	if err != nil {
 		return err
 	}
-	return t.axioms.Push(guard)
+	if err = t.axioms.Push(guard); err != nil {
+		return err
+	}
+	if operation != 5 {
+		return nil
+	}
+	prefix, err := state.manager.MkSequencePrefix(right, left)
+	if err != nil {
+		return err
+	}
+	notPrefix, err := state.manager.MkNot(prefix)
+	if err != nil {
+		return err
+	}
+	if err = t.pushSequenceImplication([]ast.ASTHandle{notRelation}, notPrefix); err != nil {
+		return err
+	}
+	suffix, err := state.manager.MkSequenceSuffix(right, left)
+	if err != nil {
+		return err
+	}
+	notSuffix, err := state.manager.MkNot(suffix)
+	if err != nil {
+		return err
+	}
+	return t.pushSequenceImplication([]ast.ASTHandle{notRelation}, notSuffix)
 }

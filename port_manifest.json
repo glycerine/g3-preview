@@ -116798,6 +116798,7 @@
         "TestSMTSequenceTheoryIntegerStringAxioms",
         "TestSMTSequenceStructuredModelValues",
         "TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms",
+        "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches",
         "TestSMTSequenceTheoryAtBoundaryAxioms",
         "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms",
         "TestSMTSequenceTheoryIndexAxioms",
@@ -117308,10 +117309,10 @@
           "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes", "TestSMTSequenceTheoryConcreteRelationConflicts"]
         },
         {
-          "name": "positive prefix, suffix and contains Skolem witnesses plus false-relation nonempty implications (src/smt/theory_seq.cpp:3927-4010,4464-4546)",
+          "name": "positive prefix, suffix and contains Skolem witnesses plus false-relation nonempty implications and non-containment prefix/suffix exclusions (src/smt/theory_seq.cpp:3927-4010,4464-4546,4707-4725)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
-          "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms"]
+          "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms", "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches"]
         },
         {
           "name": "deduplicated owned axiom queue, propagation head and scoped replay (src/smt/theory_seq.cpp:3068-3108)",
@@ -117409,6 +117410,7 @@
         "TestSMTSequenceTheoryIntegerStringAxioms",
         "TestSMTSequenceStructuredModelValues",
         "TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms",
+        "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches",
         "TestSMTSequenceTheoryAtBoundaryAxioms",
         "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms",
         "TestSMTSequenceTheoryIndexAxioms",
@@ -117493,10 +117495,10 @@
           "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes", "TestSMTSequenceTheoryConcreteRelationConflicts"]
         },
         {
-          "name": "prefix, suffix and contains witness and nonempty axiom declarations",
+          "name": "prefix, suffix and contains witness, nonempty and non-containment boundary-exclusion declarations",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
-          "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms"]
+          "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms", "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches"]
         },
         {
           "name": "owned scoped axiom queue and propagation lifecycle",
