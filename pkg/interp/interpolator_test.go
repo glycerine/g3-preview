@@ -326,6 +326,17 @@ func TestFullTranslationEliminatesCommutativityWrappers(t *testing.T) {
 	if marked, e := translation.isCommuted(monotone); e != nil || !marked {
 		t.Fatal("monotone commutativity marker", marked, e)
 	}
+	negativeHypothesis, err := m.MkProofHypothesis(notLeft)
+	interpMust(t, err)
+	negativeHypothesis = interpPin(t, m, negativeHypothesis)
+	negativeSymmetry, err := m.MkProofModusPonens(negativeHypothesis, monotonicity)
+	interpMust(t, err)
+	negativeSymmetry = interpPin(t, m, negativeSymmetry)
+	negativeTranslated, err := translation.translateMain(negativeSymmetry, false, direct, memo)
+	interpMust(t, err)
+	if marked, e := translation.isCommuted(negativeTranslated); e != nil || marked {
+		t.Fatal("disequality symmetry must consume marker", marked, e)
+	}
 
 	hypothesis, err := m.MkProofHypothesis(left)
 	interpMust(t, err)
@@ -338,4 +349,54 @@ func TestFullTranslationEliminatesCommutativityWrappers(t *testing.T) {
 	if marked, e := translation.isCommuted(translated); e != nil || marked {
 		t.Fatal("modus ponens must consume marker", marked, e)
 	}
+}
+
+func TestFullTranslationRewritesClauseByMonotonicity(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	boolean, err := manager.BoolType()
+	interpMust(t, err)
+	makeVariable := func(name string) ast.ASTHandle {
+		value, e := manager.MakeVariable(name, boolean)
+		interpMust(t, e)
+		return interpPin(t, m, value)
+	}
+	p := makeVariable("rewrite-clause-p")
+	q := makeVariable("rewrite-clause-q")
+	r := makeVariable("rewrite-clause-r")
+	frame0, err := manager.Make(OperatorAnd, p, q)
+	interpMust(t, err)
+	frame1, err := manager.Make(OperatorAnd, r, q)
+	interpMust(t, err)
+	base, err := NewBase(manager, []ast.ASTHandle{frame0, frame1}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	translation, err := NewFullTranslation(base)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, translation.Close()) })
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	firstClause, err := manager.Make(OperatorOr, p, q)
+	interpMust(t, err)
+	secondClause, err := manager.Make(OperatorOr, r, q)
+	interpMust(t, err)
+	equivalence, err := manager.Make(OperatorIff, p, r)
+	interpMust(t, err)
+	equivalenceProof, err := m.MkProofHypothesis(equivalence)
+	interpMust(t, err)
+	equivalenceProof = interpPin(t, m, equivalenceProof)
+	congruence, err := m.MkProofCongruence(firstClause, secondClause, []ast.ASTHandle{equivalenceProof})
+	interpMust(t, err)
+	congruence = interpPin(t, m, congruence)
+	clauseProof, err := m.MkProofHypothesis(firstClause)
+	interpMust(t, err)
+	clauseProof = interpPin(t, m, clauseProof)
+	modusPonens, err := m.MkProofModusPonens(clauseProof, congruence)
+	interpMust(t, err)
+	modusPonens = interpPin(t, m, modusPonens)
+	result, err := translation.translateMain(modusPonens, true, direct, newTranslationMemo())
+	interpMust(t, err)
+	interpolant, err := direct.Interpolate(result)
+	interpMust(t, err)
+	interpMust(t, m.DelRef(&interpolant))
 }

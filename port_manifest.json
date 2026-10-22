@@ -42221,17 +42221,19 @@
       "path": "src/interp/iz3translate.cpp",
       "component": "interp",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/interp/translation_analysis.go",
         "pkg/interp/translation_arithmetic.go",
         "pkg/interp/translation_commute.go",
+        "pkg/interp/translation_idioms.go",
         "pkg/interp/translation_reconstruct.go",
         "pkg/interp/translation_rules.go"
       ],
       "tests": [
         "TestFullTranslationProofAnalysisAndResolution",
         "TestFullTranslationEliminatesCommutativityWrappers",
+        "TestFullTranslationRewritesClauseByMonotonicity",
         "TestFullTranslationArithmeticHelpers",
         "TestFullTranslationReconstructsEqualityPropagationWithDual",
         "TestFullTranslationReconstructsMysteryArithmeticFromProof",
@@ -42369,8 +42371,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "translator state ownership, skolem and locality scans, hypothesis DAGs, local equivalence discovery, clause extraction, and unit-resolution reconstruction",
@@ -42438,7 +42440,23 @@
         },
         {
           "name": "retained rewrite-clause, combined equality-propagation, and specialized modus-ponens proof idioms",
-          "status": "unported"
+          "status": "ported",
+          "go_target": "pkg/interp/translation_idioms.go",
+          "tests": [
+            "TestFullTranslationEliminatesCommutativityWrappers",
+            "TestFullTranslationRewritesClauseByMonotonicity",
+            "TestFullTranslationReconstructsEqualityPropagationWithDual"
+          ]
+        },
+        {
+          "name": "interactive proof-printing, literal tracing, and out-of-scope debugger helpers",
+          "status": "reference_only",
+          "reason": "These routines only call one another or the explicit bottom-of-file debugger entry points; the retained translation factory and production translation path never call them."
+        },
+        {
+          "name": "unused recursive num_lits helper",
+          "status": "reference_only",
+          "reason": "The helper has no caller outside its own recursion."
         }
       ],
       "ownership": [
@@ -42450,7 +42468,7 @@
       "path": "src/interp/iz3translate.h",
       "component": "interp",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/interp/translation_analysis.go",
         "pkg/interp/translation_rules.go"
@@ -42468,8 +42486,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained full-translation construction and lifetime",
@@ -42489,12 +42507,11 @@
         },
         {
           "name": "Translate interface behavior",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/interp/translation_rules.go",
           "tests": [
             "TestFullTranslationProofAnalysisAndResolution"
-          ],
-          "reason": "The retained locality, unit-resolution, lemma, standard equality/Boolean rule, and final lemma path is ported. Commuted idioms and specialized theory-lemma cases remain pending."
+          ]
         }
       ],
       "ownership": [

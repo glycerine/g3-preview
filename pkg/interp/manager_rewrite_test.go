@@ -294,6 +294,20 @@ func TestFullTranslationReconstructsEqualityPropagationWithDual(t *testing.T) {
 	if call != 10 {
 		t.Fatal("dual reconstruction solver calls", call)
 	}
+	reflexivity, err := m.MkProofReflexivity(x)
+	interpMust(t, err)
+	reflexivity = interpPin(t, m, reflexivity)
+	chain, err := m.MkProofTransitivity(reflexivity, lemma)
+	interpMust(t, err)
+	chain = interpPin(t, m, chain)
+	combined, err := translation.combineEqualityPropagation(chain, direct, newTranslationMemo())
+	interpMust(t, err)
+	combinedInterpolant, err := direct.Interpolate(combined)
+	interpMust(t, err)
+	interpMust(t, m.DelRef(&combinedInterpolant))
+	if call != 20 {
+		t.Fatal("combined equality propagation solver calls", call)
+	}
 }
 
 func TestFullTranslationReconstructsMysteryArithmeticFromProof(t *testing.T) {
