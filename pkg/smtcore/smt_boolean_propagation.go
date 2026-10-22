@@ -61,7 +61,7 @@ func (s *SMTInternalizerState) Conflict() (SMTBooleanJustification, bool) {
 	return s.conflict, true
 }
 
-func (s *SMTInternalizerState) makeClause(literals []SMTLiteral, proof ast.ASTHandle) (*SMTClause, SMTJustification, error) {
+func (s *SMTInternalizerState) makeClause(literals []SMTLiteral, kind SMTClauseKind, proof ast.ASTHandle) (*SMTClause, SMTJustification, error) {
 	proofs, err := s.manager.ProofsEnabled()
 	if err != nil {
 		return nil, nil, err
@@ -73,9 +73,9 @@ func (s *SMTInternalizerState) makeClause(literals []SMTLiteral, proof ast.ASTHa
 			return nil, nil, err
 		}
 	} else if proofs {
-		owner = &SMTJustificationBase{heap: false}
+		owner = &SMTJustificationBase{heap: kind != SMTClauseAux}
 	}
-	clause, err := NewSMTClause(s.manager, literals, SMTClauseAux, owner, nil, false, nil)
+	clause, err := NewSMTClause(s.manager, literals, kind, owner, nil, false, nil)
 	if err != nil {
 		if owner != nil {
 			err = errors.Join(err, owner.Release(s.manager))

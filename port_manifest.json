@@ -98346,7 +98346,7 @@
         "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
-        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelConflictLearningProvesBooleanUnsat",
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelScopesRestoreAssertionsAndContext"
@@ -98411,7 +98411,7 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_formulas.go",
           "tests": [
-            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+            "TestSMTKernelConflictLearningProvesBooleanUnsat",
             "TestSMTKernelFlattensNegatedDisjunctionAssertion",
             "TestSMTKernelFlattenedAssertionsOwnDerivedProofs"
           ]
@@ -98448,7 +98448,7 @@
         "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
-        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelConflictLearningProvesBooleanUnsat",
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelScopesRestoreAssertionsAndContext"
@@ -98471,7 +98471,7 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_formulas.go",
           "tests": [
-            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+            "TestSMTKernelConflictLearningProvesBooleanUnsat",
             "TestSMTKernelFlattensNegatedDisjunctionAssertion",
             "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
             "TestSMTKernelScopesRestoreAssertionsAndContext"
@@ -104120,7 +104120,8 @@
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
-        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelConflictLearningProvesBooleanUnsat",
+        "TestSMTInternalizerInstallsLearnedClauseInCurrentScope",
         "TestSMTKernelAssumptionsValidateCheckAndRollback"
       ],
       "conditionals": [
@@ -105071,12 +105072,13 @@
           ]
         },
         {
-          "name": "Boolean decisions, scoped chronological backtracking, propagation, and final-check search control",
+          "name": "Boolean decisions, first-UIP conflict learning, non-chronological backjumping, propagation, and final-check search control",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_search.go",
           "tests": [
             "TestSMTKernelAssertionCheckAndDecisionClause",
-            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat"
+            "TestSMTKernelConflictLearningProvesBooleanUnsat",
+            "TestSMTInternalizerInstallsLearnedClauseInCurrentScope"
           ]
         },
         {
@@ -105092,7 +105094,7 @@
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
       ],
       "deviations": [
-        "Conflict analysis, clause learning, non-chronological backjumping, restarts, resource limits, and binary-clause specialization remain unported."
+        "Lemma minimization, conflict proofs, unsat-core extraction, restarts, resource limits, and binary-clause specialization remain unported."
       ]
     },
     {
@@ -105111,7 +105113,7 @@
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
-        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelConflictLearningProvesBooleanUnsat",
         "TestSMTKernelAssumptionsValidateCheckAndRollback"
       ],
       "conditionals": [
@@ -105302,12 +105304,13 @@
           ]
         },
         {
-          "name": "decision scope and chronological Boolean search control consumed by the kernel",
+          "name": "decision scopes, learned clauses, first-UIP backjumping, and Boolean search control consumed by the kernel",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_search.go",
           "tests": [
             "TestSMTKernelAssertionCheckAndDecisionClause",
-            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat"
+            "TestSMTKernelConflictLearningProvesBooleanUnsat",
+            "TestSMTInternalizerInstallsLearnedClauseInCurrentScope"
           ]
         },
         {
@@ -105323,7 +105326,7 @@
         "SMTInternalizerState owns the concrete slices and clause objects for this context subset."
       ],
       "deviations": [
-        "The complete context interface, conflict resolution, clause learning, model state, and remaining lifecycle operations remain unported."
+        "The complete context interface, lemma minimization, conflict proofs, model state, and remaining lifecycle operations remain unported."
       ]
     },
     {
@@ -106852,7 +106855,7 @@
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
-        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelConflictLearningProvesBooleanUnsat",
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
@@ -106867,7 +106870,7 @@
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
             "TestSMTKernelAssertionCheckAndDecisionClause",
-            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+            "TestSMTKernelConflictLearningProvesBooleanUnsat",
             "TestSMTKernelFlattensNegatedDisjunctionAssertion",
             "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
             "TestSMTKernelScopesRestoreAssertionsAndContext"
@@ -106892,7 +106895,7 @@
         "SMTKernel owns formula and proof references for asserted entries and owns its checker, relevancy propagator, and internalizer lifecycle."
       ],
       "deviations": [
-        "Check uses chronological DPLL search and returns undef when a theory gives up or requests continuation without observable progress; model retention and conflict learning remain unported."
+        "Check uses first-UIP learning and backjumping and returns undef when a theory gives up or requests continuation without observable progress; model retention remains unported."
       ]
     },
     {
@@ -106907,7 +106910,7 @@
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
-        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelConflictLearningProvesBooleanUnsat",
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
@@ -106932,7 +106935,7 @@
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
             "TestSMTKernelAssertionCheckAndDecisionClause",
-            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+            "TestSMTKernelConflictLearningProvesBooleanUnsat",
             "TestSMTKernelFlattensNegatedDisjunctionAssertion",
             "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
             "TestSMTKernelScopesRestoreAssertionsAndContext"

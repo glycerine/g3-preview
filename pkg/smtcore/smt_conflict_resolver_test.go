@@ -44,3 +44,28 @@ func TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel(t *testing.T) {
 		}
 	}
 }
+
+func TestSMTInternalizerInstallsLearnedClauseInCurrentScope(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	variables := make([]SMTLiteral, 3)
+	for index := range variables {
+		expression := smtRelevancyBool(t, m, "learned-clause-"+string(rune('a'+index)))
+		astTestMust(t, state.Internalize(expression, true))
+		variable, found := state.BoolVar(expression)
+		if !found {
+			t.Fatal("missing learned-clause variable", index)
+		}
+		variables[index] = NewSMTLiteral(variable, false)
+	}
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.AddLearnedClause(variables))
+	clauses := state.Clauses()
+	if len(clauses) != 1 || state.clauses[0].clause.Kind() != SMTClauseLearned {
+		t.Fatal("learned clause kind", clauses)
+	}
+	astTestMust(t, state.PopScopes(1))
+	if len(state.Clauses()) != 0 {
+		t.Fatal("learned clause survived its logical scope")
+	}
+}

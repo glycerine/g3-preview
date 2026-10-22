@@ -60,7 +60,7 @@ func TestSMTKernelAssertionCheckAndDecisionClause(t *testing.T) {
 	}
 }
 
-func TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat(t *testing.T) {
+func TestSMTKernelConflictLearningProvesBooleanUnsat(t *testing.T) {
 	m := astTestManager(t)
 	a := smtRelevancyBool(t, m, "kernel-unsat-a")
 	b := smtRelevancyBool(t, m, "kernel-unsat-b")
@@ -83,8 +83,8 @@ func TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat(t *testing.T) {
 	astTestMust(t, kernel.Assert(formula, ast.ASTHandle{}))
 	result, err := kernel.Check()
 	astTestMust(t, err)
-	if result != lbool.False || kernel.Statistics().NumDecisions < 2 {
-		t.Fatal("search did not exhaust contradictory branches", result, kernel.Statistics())
+	if result != lbool.False || kernel.Statistics().NumDecisions == 0 || kernel.Statistics().NumConflicts < 2 {
+		t.Fatal("search did not learn from contradictory branches", result, kernel.Statistics())
 	}
 }
 

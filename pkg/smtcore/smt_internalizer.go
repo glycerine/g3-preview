@@ -99,6 +99,10 @@ func (s *SMTInternalizerState) assignLiteral(literal SMTLiteral) error {
 }
 
 func (s *SMTInternalizerState) addClause(literals []SMTLiteral, root bool, proof ast.ASTHandle) error {
+	return s.addClauseKind(literals, root, SMTClauseAux, proof)
+}
+
+func (s *SMTInternalizerState) addClauseKind(literals []SMTLiteral, root bool, kind SMTClauseKind, proof ast.ASTHandle) error {
 	if s.inconsistent {
 		return nil
 	}
@@ -140,7 +144,7 @@ func (s *SMTInternalizerState) addClause(literals []SMTLiteral, root bool, proof
 	if len(kept) == 1 {
 		return s.assignLiteral(kept[0])
 	}
-	clause, owner, err := s.makeClause(kept, proof)
+	clause, owner, err := s.makeClause(kept, kind, proof)
 	if err != nil {
 		return err
 	}
@@ -150,6 +154,17 @@ func (s *SMTInternalizerState) addClause(literals []SMTLiteral, root bool, proof
 		s.statistics.NumMkBinClause++
 	}
 	return nil
+}
+
+// AddLearnedClause installs a conflict lemma into the current logical scope.
+func (s *SMTInternalizerState) AddLearnedClause(literals []SMTLiteral) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if len(literals) == 0 {
+		return ast.ErrASTDomain
+	}
+	return s.addClauseKind(literals, false, SMTClauseLearned, ast.ASTHandle{})
 }
 
 func (s *SMTInternalizerState) markRelevant(expression ast.ASTHandle) error {
