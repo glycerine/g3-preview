@@ -113117,22 +113117,45 @@
       "path": "src/solver/smt_logics.cpp",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/smt_logics.go",
+        "pkg/solver/smt_logics_test.go"
+      ],
+      "tests": [
+        "TestSMTLogicsSourceMembership"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "supported-logic recognition and reals, arithmetic, bit-vector, array, sequence, string, floating-point, UF, Horn, pseudo-Boolean and datatype membership (smt_logics.cpp:23-158)",
+          "status": "ported",
+          "go_target": "pkg/solver/smt_logics.go",
+          "tests": [
+            "TestSMTLogicsSourceMembership"
+          ]
+        }
+      ],
+      "ownership": [
+        "Logic recognition reads immutable Go strings and owns no resources."
+      ],
+      "deviations": [
+        "Go strings replace interned source symbols because recognition depends only on exact spelling."
+      ]
     },
     {
       "path": "src/solver/smt_logics.h",
       "component": "solver",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/solver/smt_logics.go",
+        "pkg/solver/smt_logics_test.go"
+      ],
+      "tests": [
+        "TestSMTLogicsSourceMembership"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113143,11 +113166,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "complete smt_logics static recognition surface including ALL and QF_FD inline predicates (smt_logics.h:21-38)",
+          "status": "ported",
+          "go_target": "pkg/solver/smt_logics.go",
+          "tests": [
+            "TestSMTLogicsSourceMembership"
+          ]
+        }
+      ],
+      "ownership": [
+        "All predicates are pure and borrow their string arguments."
+      ],
+      "deviations": [
+        "Package functions replace the source stateless class."
+      ]
     },
     {
       "path": "src/solver/solver.cpp",
