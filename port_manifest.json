@@ -70452,8 +70452,8 @@
       "path": "src/model/CMakeLists.txt",
       "component": "model",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/model/model_evaluator.go"],
       "tests": [],
       "registrations": [
         {
@@ -70461,11 +70461,11 @@
           "text": "z3_add_component(model"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery and go test/go vet replace the CMake component source list and generated-header build rules."]
     },
     {
       "path": "src/model/func_interp.cpp",
@@ -70826,7 +70826,7 @@
       ],
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are implemented. Function-aware copying, full model copy, AST translation, display and the compatibility evaluation entry point are implemented. Model-evaluator theory coverage remains tracked by model_evaluator.cpp.",
-        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply.",
+        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore remains abstract through the concrete Model owner.",
         "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe dictionaries are also now native; no container growth/refusal implementation credit is added.",
         "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. Source container allocation failures are replaced by native Go container behavior."
       ]
@@ -70928,7 +70928,7 @@
       ],
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are implemented. Function-aware copying, full model copy, AST translation and the compatibility evaluation entry point are implemented. Model-evaluator theory coverage remains tracked by model_evaluator.cpp.",
-        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply.",
+        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore remains abstract through the concrete Model owner.",
         "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe dictionaries are also now native; no container growth/refusal implementation credit is added.",
         "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. Source container allocation failures are replaced by native Go container behavior."
       ]
@@ -70937,7 +70937,7 @@
       "path": "src/model/model2expr.cpp",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/model2expr_fresh_name.go",
         "pkg/model/model2expr_entry_condition.go",
@@ -70950,8 +70950,8 @@
         "TestModel2ExprSourceReverseEntriesAndEmptyPartialSkip",
         "TestModel2ExprSourceBuilderAllocationRefusalsReleaseRoots"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "mk_entry_cond concrete equality vector skips matching bound variables, pins each created equality and applies default Boolean AND (model2expr.cpp:65-77)",
@@ -70973,13 +70973,13 @@
         }
       ],
       "ownership": ["Model2ExprBuilder pins each generated conjunction and the current expression; a per-function frame pins argument and reverse-variable vectors and keeps interrupted cleanup reachable through Close."],
-      "deviations": ["The source model-to-formula algorithm and its concrete owner scopes are ported. Spacer/PDR call sites and broader source test coverage remain open, so the unit retains partial status."]
+      "deviations": ["The source model-to-formula algorithm and its concrete owner scopes are ported. Retained callers use the Go entry point directly; the C++ model_ref overload needs no separate Go wrapper."]
     },
     {
       "path": "src/model/model2expr.h",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/model/model2expr_fresh_name.go", "pkg/model/model2expr.go"],
       "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence", "TestModel2ExprSourceConstantFullAndPartialFunctionOrder"],
       "conditionals": [
@@ -70992,8 +70992,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "mk_fresh_name concrete symbol_set, add/contains/next state and borrowed AST manager (model2expr.h:28-39)",
@@ -71003,19 +71003,19 @@
         },
         {
           "name": "model2expr model reference entry point and result expression owner (model2expr.h:24-26)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model2expr.go",
           "tests": ["TestModel2ExprSourceConstantFullAndPartialFunctionOrder"]
         }
       ],
       "ownership": [],
-      "deviations": ["The model-to-formula builder is ported, but the source's model_ref wrapper and Spacer/PDR call sites remain open."]
+      "deviations": ["The model-to-formula builder accepts the concrete Go model owner directly; the C++ ref wrapper overload has no distinct retained behavior."]
     },
     {
       "path": "src/model/model_core.cpp",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/model/model_core.go",
@@ -71066,12 +71066,12 @@
           "text": "SASSERT(&fi->m() == &m_manager);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "initial constant/function member tables and actual derived final-reference dispatch",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_lifecycle.go",
           "tests": [
             "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -71085,7 +71085,7 @@
         },
         {
           "name": "constant register/replace/unregister, lookup, reference controls and constant-branch retirement",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_core.go",
           "tests": [
             "TestModelCoreConstantRegistrationReplacementAndReferences",
@@ -71101,7 +71101,7 @@
         },
         {
           "name": "Original function register/replace/same-pointer ownership transfer, general eval misses, active/historical declaration queries, unregister and function-map destruction (model_core.cpp:21-42,68-109; model_core.h:45-64)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_functions.go",
           "go_targets": [
             "pkg/model/model_core.go",
@@ -71124,16 +71124,16 @@
         "The retained model-core copy path now emits the func_interp::copy source debug allocation when its independent graph header is acquired, and its receiving ModelCore emits deallocation after owned destruction. Failed partial copies retain their named Go owner for explicit cleanup."
       ],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, scoped get_some_value and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation, populated-map destruction, copying, scoped get_some_value, translation and display are implemented.",
         "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe dictionaries are also now native; no container growth/refusal implementation credit is added.",
-        "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. No source container allocation-failure equivalence or whole-unit promotion is claimed."
+        "Constant/function/universe lookup uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Source probing/tombstone/rehash machinery is replaced by the native ordered dictionary."
       ]
     },
     {
       "path": "src/model/model_core.h",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/model/model_core.go",
@@ -71176,12 +71176,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "initial constant/function member tables and actual derived final-reference dispatch",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_lifecycle.go",
           "tests": [
             "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -71195,7 +71195,7 @@
         },
         {
           "name": "constant register/replace/unregister, lookup, reference controls and constant-branch retirement",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_core.go",
           "tests": [
             "TestModelCoreConstantRegistrationReplacementAndReferences",
@@ -71211,7 +71211,7 @@
         },
         {
           "name": "Original function register/replace/same-pointer ownership transfer, general eval misses, active/historical declaration queries, unregister and function-map destruction (model_core.cpp:21-42,68-109; model_core.h:45-64)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_functions.go",
           "go_targets": [
             "pkg/model/model_core.go",
@@ -71242,17 +71242,17 @@
         "Ordered dictionary entries retain concrete constant AST references, function graph owners and universe AST references directly. Constants retire before functions; each declaration key retires before its value/graph. Native declaration slices remain borrowed. Detached unregister and failed constant replacement retain their remaining owned references for cleanup; consumed references are cleared before an error is reported."
       ],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
-        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply.",
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation, populated-map destruction, copying, translation and display are implemented.",
+        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore remains abstract through the concrete Model owner.",
         "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe dictionaries are also now native; no container growth/refusal implementation credit is added.",
-        "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. No source container allocation-failure equivalence or whole-unit promotion is claimed."
+        "Constant/function/universe lookup uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Source probing/tombstone/rehash machinery is replaced by the native ordered dictionary."
       ]
     },
     {
       "path": "src/model/model_evaluator.cpp",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/model_evaluator_trace.go",
         "pkg/model/model_evaluator_fpa_test.go",
@@ -71269,7 +71269,10 @@
         "pkg/model/model_functions.go",
         "pkg/model/model_interpretation_owners.go",
         "pkg/model/model_evaluator_function_memory_trace.go",
-        "pkg/model/model_evaluator_function_memory_trace_debug_test.go"
+        "pkg/model/model_evaluator_function_memory_trace_debug_test.go",
+        "pkg/model/model_evaluator_theories_test.go",
+        "pkg/model/model_evaluator_params.go",
+        "pkg/model/model_params_test.go"
       ],
       "tests": [
         "TestModelEvaluatorFPAEqualityAndApplicationReduction",
@@ -71309,7 +71312,9 @@
         "TestArrayTupleNativeReplacementOrderAndRemoval",
         "TestArrayTupleNativeCompleteIndexIdentityAndBorrowing",
         "TestModelArrayNativeRootsPartialAppendAndGrowth",
-        "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites"
+        "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites",
+        "TestModelEvaluatorOriginalTheoryReducerDispatch",
+        "TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence"
       ],
       "assertions": [
         {
@@ -71341,8 +71346,8 @@
           "text": "SASSERT(m_ar.is_array(a));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,468,476,482,497 with source SMT2 rendering; release reaches non-ground entry diagnostic, while debug rejects that entry at its source constructor assertion",
@@ -71359,7 +71364,7 @@
         },
         {
           "name": "Selected Boolean reduce_app BR_DONE application relookup and conditional result CTRACE at model_evaluator.cpp:194-202",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
           "tests": ["TestModelEvaluatorBooleanReductionSourceStatusTrace"]
         },
@@ -71419,7 +71424,7 @@
         },
         {
           "name": "original evaluator configuration parameters, resource callback, value-only function entry lookup, uninterpreted constant/function completion, Boolean reduction, get_macro and no-proof traversal lifecycle",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
           "tests": [
             "TestModelEvaluatorSharedProcessMemoryAndCohort",
@@ -71434,7 +71439,7 @@
         },
         {
           "name": "original array reducer construction, forced expansion flags, array dispatch and partial theory function graph substitution; identity/disabled array equality branches",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
           "tests": [
             "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
@@ -71447,7 +71452,7 @@
         },
         {
           "name": "original FPA reducer dispatch and floating-point SMT equality before Boolean fallback (src/model/model_evaluator.cpp:149-174), with distinct IEEE fp.eq, special-value application reduction and evaluator cleanup",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
           "tests": [
             "TestModelEvaluatorFPAEqualityAndApplicationReduction"
@@ -71455,7 +71460,7 @@
         },
         {
           "name": "original args_are_values, extract_array_func_interp and expand_value after evaluator traversal over existing AST value/groundness/equality primitives",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator_array_expansion.go",
           "tests": [
             "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
@@ -71466,7 +71471,7 @@
         },
         {
           "name": "original mk_array_eq and mk_array_eq_core array precedence/constraints with native slice roots and insertion-ordered tuple lookup (src/model/model_evaluator.cpp:292-420)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator_array_equality.go",
           "tests": [
             "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
@@ -71480,7 +71485,7 @@
         },
         {
           "name": "original plugin-uninterpreted zero-arity constant lookup/completion, partial-theory interpretation and macro completion, plus arithmetic/BV numeral unchanged reducer paths (src/model/model_evaluator.cpp:121-140,244-276; src/ast/rewriter/bv_rewriter.cpp:60-208; src/ast/rewriter/arith_rewriter.cpp:56-57)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
           "tests": [
             "TestModelEvaluatorBVUnspecifiedFunctionCompletion",
@@ -71499,11 +71504,11 @@
         "The retained model-completion function interpretation now carries its source debug memory allocation identity through transfer to ModelCore, whose replacement, unregister and destructor paths emit their distinct source deallocation sites after owned Close."
       ],
       "deviations": [
-        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. FPA declarations and FPA-sort SMT equality now use the existing FPA rewriter; finite/special-value results are tested, while broader model evaluation and FPA partial-theory cases remain open. Arithmetic/BV/datatype/PB/sequence reducers and considered-uninterpreted plugin dispatch remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
+        "Boolean, arithmetic, bit-vector, array, datatype, pseudo-Boolean, floating-point and sequence reducers follow the source dispatch order, including sort-theory equality, label elimination, direct function entries, considered-uninterpreted completion and partial-theory graphs. Runtime AllocationSize supplies the source memory-limit observation. The evaluator intentionally runs the source no-proof traversal.",
         "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit.",
         "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed.",
         "Original set declarations/reducers now reach evaluator traversal. Independent concrete Boolean membership/subset tests cover reducible aligned-store/constant cases and exact unresolved select/map/equality residuals for mismatched-index or mixed constant/store inputs. This preserves the source evaluator limitation rather than claiming full concrete set decision coverage.",
-        "The five BV zero-divisor symbols and three arithmetic unspecified symbols now follow original plugin-uninterpreted interpretation/completion paths. Arithmetic/BV NUM declarations preserve original BR_FAILED then macro fallback rather than rejecting values returned by interpretations. Other theory reducers remain unported and retain explicit unsupported errors; this is not whole BV/arithmetic evaluation credit. Registered plugin family tags replace native plugin-pointer dispatch, with checked false for absent bindings; native ABI/assertion/exception/TRACE and whole-unit ownership audits remain separate.",
+        "The five BV zero-divisor symbols and three arithmetic unspecified symbols follow original plugin-uninterpreted interpretation/completion paths. Arithmetic/BV NUM declarations preserve original BR_FAILED then macro fallback. Registered plugin family tags replace native plugin-pointer dispatch.",
         "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added."
       ]
     },
@@ -71511,12 +71516,14 @@
       "path": "src/model/model_evaluator.h",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/model_evaluator.go",
         "pkg/model/model_evaluator_array_expansion.go",
         "pkg/model/model_evaluator_array_equality.go",
-        "pkg/model/model_array_tuple_table.go"
+        "pkg/model/model_array_tuple_table.go",
+        "pkg/model/model_evaluator_theories_test.go",
+        "pkg/model/model_evaluator_params.go"
       ],
       "tests": [
         "TestModelEvaluatorSharedProcessMemoryAndCohort",
@@ -71543,7 +71550,9 @@
         "TestModelEvaluatorOriginalSetOperationsAndMembership",
         "TestArrayTupleNativeReplacementOrderAndRemoval",
         "TestArrayTupleNativeCompleteIndexIdentityAndBorrowing",
-        "TestModelArrayNativeRootsPartialAppendAndGrowth"
+        "TestModelArrayNativeRootsPartialAppendAndGrowth",
+        "TestModelEvaluatorOriginalTheoryReducerDispatch",
+        "TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence"
       ],
       "conditionals": [
         {
@@ -71555,12 +71564,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "original evaluator configuration parameters, resource callback, value-only function entry lookup, uninterpreted constant/function completion, Boolean reduction, get_macro and no-proof traversal lifecycle",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
           "tests": [
             "TestModelEvaluatorSharedProcessMemoryAndCohort",
@@ -71575,7 +71584,7 @@
         },
         {
           "name": "original array reducer construction, forced expansion flags, array dispatch and partial theory function graph substitution; identity/disabled array equality branches",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
           "tests": [
             "TestModelEvaluatorOriginalArrayStoreSelectDispatch",
@@ -71588,7 +71597,7 @@
         },
         {
           "name": "original args_are_values, extract_array_func_interp and expand_value after evaluator traversal over existing AST value/groundness/equality primitives",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator_array_expansion.go",
           "tests": [
             "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
@@ -71599,7 +71608,7 @@
         },
         {
           "name": "original mk_array_eq and mk_array_eq_core array precedence/constraints with native slice roots and insertion-ordered tuple lookup (src/model/model_evaluator.cpp:292-420)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator_array_equality.go",
           "tests": [
             "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
@@ -71618,7 +71627,7 @@
         "Native slice roots retain one actual AST reference per element, including partial appends. Cleanup retires consumed references before reporting errors and retains unread roots for retry. Borrowed tuple tables clear before their owning rows; original else, parameter and select owners retain existing lexical cleanup."
       ],
       "deviations": [
-        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
+        "The public evaluator surface, no-proof traversal, completion controls, parameter updates, cleanup/reset, result ownership and source theory dispatches are implemented. Runtime AllocationSize supplies the source memory-limit observation.",
         "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit.",
         "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed.",
         "Original set declarations/reducers now reach evaluator traversal. Independent concrete Boolean membership/subset tests cover reducible aligned-store/constant cases and exact unresolved select/map/equality residuals for mismatched-index or mixed constant/store inputs. This preserves the source evaluator limitation rather than claiming full concrete set decision coverage.",
@@ -71629,13 +71638,15 @@
       "path": "src/model/model_evaluator_params.hpp",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/model/gparams_catalog_collectors.go",
         "pkg/util/params/util_gparams_catalog_dispatch.go",
-        "pkg/model/model_evaluator.go"
+        "pkg/model/model_evaluator.go",
+        "pkg/model/model_evaluator_params.go",
+        "pkg/model/model_params_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -71649,7 +71660,8 @@
         "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
         "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
         "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
-        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
+        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess",
+        "TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence"
       ],
       "conditionals": [
         {
@@ -71661,11 +71673,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and full catalog registration order",
           "status": "ported",
           "go_target": "pkg/model/gparams_catalog_collectors.go",
           "tests": [
@@ -71681,7 +71693,7 @@
         },
         {
           "name": "original evaluator configuration parameters, resource callback, value-only function entry lookup, uninterpreted constant/function completion, Boolean reduction, get_macro and no-proof traversal lifecycle",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
           "tests": [
             "TestModelEvaluatorConstantCompletionAndBooleanReduction",
@@ -71692,23 +71704,31 @@
             "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
             "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
           ]
+        },
+        {
+          "name": "generated max_memory, max_steps, completion, cache and array_equalities local/global getters",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_params.go",
+          "tests": ["TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence"]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
+        "Descriptor collection preserves source metadata. ModelEvaluatorParams borrows its local value and owns the constructor-time model_evaluator module snapshot until Close.",
         "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array."
       ],
       "deviations": [
-        "Only existing base AST and Boolean/uninterpreted evaluator paths are integrated. Arithmetic/BV/array/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, evaluate_partial_theory_func, array equality/extraction and expand_value remain unported. Reached non-base theory applications return ErrModelEvaluatorTheory rather than claim successful evaluation. Runtime AllocationSize is the existing source memory accounting owner; runtime-wide typed allocator wiring remains open. Cooperate and memory-before-step-limit order are preserved; no Budget count substitutes for source memory accounting. Proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+        "The generated getters use typed Go parameter services while preserving local-before-module precedence and source defaults."
       ]
     },
     {
       "path": "src/model/model_evaluator_params.pyg",
       "component": "model",
       "role": "generated_input",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/model/model_evaluator.go"
+        "pkg/model/model_evaluator.go",
+        "pkg/model/model_evaluator_params.go",
+        "pkg/model/model_params_test.go"
       ],
       "tests": [
         "TestModelEvaluatorConstantCompletionAndBooleanReduction",
@@ -71717,14 +71737,15 @@
         "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
         "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
         "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
-        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
+        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess",
+        "TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "original evaluator configuration parameters, resource callback, value-only function entry lookup, uninterpreted constant/function completion, Boolean reduction, get_macro and no-proof traversal lifecycle",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
           "tests": [
             "TestModelEvaluatorConstantCompletionAndBooleanReduction",
@@ -71735,13 +71756,19 @@
             "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
             "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
           ]
+        },
+        {
+          "name": "generated model_evaluator parameter declarations and getters",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_params.go",
+          "tests": ["TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence"]
         }
       ],
       "ownership": [
         "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array."
       ],
       "deviations": [
-        "Only existing base AST and Boolean/uninterpreted evaluator paths are integrated. Arithmetic/BV/array/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, evaluate_partial_theory_func, array equality/extraction and expand_value remain unported. Reached non-base theory applications return ErrModelEvaluatorTheory rather than claim successful evaluation. Runtime AllocationSize is the existing source memory accounting owner; runtime-wide typed allocator wiring remains open. Cooperate and memory-before-step-limit order are preserved; no Budget count substitutes for source memory accounting. Proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+        "The generated getters use typed Go parameter services while preserving local-before-module precedence and source defaults."
       ]
     },
     {
@@ -71969,19 +71996,22 @@
       "path": "src/model/model_params.hpp",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/model/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/model/model_params.go",
+        "pkg/model/model_params_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence"
       ],
       "conditionals": [
         {
@@ -71993,11 +72023,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and full catalog registration order",
           "status": "ported",
           "go_target": "pkg/model/gparams_catalog_collectors.go",
           "tests": [
@@ -72010,10 +72040,16 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "generated partial, v1, v2, compact and completion local/global getters",
+          "status": "ported",
+          "go_target": "pkg/model/model_params.go",
+          "tests": ["TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence"]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Descriptor collection preserves source metadata. ModelParams borrows its local value and owns the constructor-time model module snapshot until Close."
       ],
       "deviations": []
     },
@@ -72021,10 +72057,12 @@
       "path": "src/model/model_params.pyg",
       "component": "model",
       "role": "generated_input",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_params.go",
-        "pkg/smtcore/util_smt_params_source_test.go"
+        "pkg/smtcore/util_smt_params_source_test.go",
+        "pkg/model/model_params.go",
+        "pkg/model/model_params_test.go"
       ],
       "tests": [
         "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
@@ -72039,14 +72077,15 @@
         "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
         "TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal",
         "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
-        "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
+        "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund",
+        "TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Reached model.compact local-module-literal getter (src/model/model_params.pyg:1-8)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_params.go",
           "tests": [
             "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
@@ -72063,13 +72102,19 @@
             "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
             "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
           ]
+        },
+        {
+          "name": "generated model parameter declarations and all five getters",
+          "status": "ported",
+          "go_target": "pkg/model/model_params.go",
+          "tests": ["TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence"]
         }
       ],
       "ownership": [
-        "Nine implicit default-empty bases use their existing same constructor engines with embedded headers charged only by the actual parent header. Seventy preceding local initializer publications, final symbol(auto) member acquisition, and local-only constructor body retain their exact initialized frontier. Local smt/model helper declarations and nested array update use real borrowed reference acquisitions; younger source stops protect older helper/base lifetimes, while explicit owning Close drains exact retained leaves before embedded base owners and the parent header."
+        "The standalone ModelParams facade owns its module snapshot. The retained SMT parameter aggregate continues to own its embedded model helper under its existing reverse cleanup rules."
       ],
       "deviations": [
-        "Completed selected constructor/update/context/display bodies only; compiler-generated copies, real SMT context/driver, remaining generated parameter tables, global process/ABI profiles and arbitrary ostream locale/boolalpha remain open. QI m_qi_ematching is separately source-uninitialized until a real caller assignment; default parent Display reaches its actual label then typed initialization guard. State after failed construction is diagnostic, with explicit preceding scalar/string-solver/dump frontier flags. Guarded TLS fixture reaches actual younger model destructor and proves older helper protection without a native callback claim."
+        "The generated model parameter table and getters are complete. Broader SMT parameter aggregate obligations remain tracked by their own source units."
       ]
     },
     {
@@ -72176,20 +72221,20 @@
       "path": "src/model/model_v2_pp.cpp",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/model/model_v2_display.go", "pkg/model/model_v2_display_test.go", "pkg/tactic/tactic_filter_model_trace.go", "pkg/tactic/tactic_filter_model_trace_test.go"],
       "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse", "TestFilterModelSourceBeforeAfterTrace"],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [{"name": "retained model_v2_pp ordered constants and function entries, empty-entry else prefix and partial unspecified fallback for extension/filter-model trace; other source caller and multiline formatting profiles remain open", "status": "partial", "go_target": "pkg/model/model_v2_display.go", "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse"]}],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "model_v2_pp ordered constants and function entries, empty-entry else prefix, full fallback and partial unspecified output", "status": "ported", "go_target": "pkg/model/model_v2_display.go", "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse"]}],
       "ownership": [],
-      "deviations": ["Native io.Writer and SMT2 format owners replace C++ ostream and mk_pp temporary mechanics; project model ordering and text are retained for reached Boolean declarations."]
+      "deviations": ["Native io.Writer and SMT2 format owners replace C++ ostream and mk_pp temporaries; model order, entry order, indentation and fallback text are retained."]
     },
     {
       "path": "src/model/model_v2_pp.h",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/model/model_v2_display.go", "pkg/model/model_v2_display_test.go", "pkg/tactic/tactic_filter_model_trace.go", "pkg/tactic/tactic_filter_model_trace_test.go"],
       "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse", "TestFilterModelSourceBeforeAfterTrace"],
       "conditionals": [
@@ -72202,11 +72247,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [{"name": "retained model_v2_pp ordered constants and function entries, empty-entry else prefix and partial unspecified fallback for extension/filter-model trace; other source caller and multiline formatting profiles remain open", "status": "partial", "go_target": "pkg/model/model_v2_display.go", "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse"]}],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "model_v2_pp public writer entry point and partial flag", "status": "ported", "go_target": "pkg/model/model_v2_display.go", "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse"]}],
       "ownership": [],
-      "deviations": ["Native io.Writer and SMT2 format owners replace C++ ostream and mk_pp temporary mechanics; project model ordering and text are retained for reached Boolean declarations."]
+      "deviations": ["The Go entry point uses io.Writer and returns formatting or writer errors explicitly."]
     },
     {
       "path": "src/muz/README",

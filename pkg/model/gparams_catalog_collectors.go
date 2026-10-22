@@ -52,6 +52,16 @@ func catalogCollectModelParams(d *uparams.ParamDescrs) error {
 	return nil
 }
 
+// ModelEvaluatorParameterDescriptions is model_evaluator::get_param_descrs.
+func ModelEvaluatorParameterDescriptions(d *uparams.ParamDescrs) error {
+	return catalogCollectModelEvaluatorParams(d)
+}
+
+// ModelParameterDescriptions is model_params::collect_param_descrs.
+func ModelParameterDescriptions(d *uparams.ParamDescrs) error {
+	return catalogCollectModelParams(d)
+}
+
 func init() {
 	uparams.RegisterGlobalParamsCollector("catalogCollectModelEvaluatorParams", catalogCollectModelEvaluatorParams)
 	uparams.RegisterGlobalParamsCollector("catalogCollectModelParams", catalogCollectModelParams)

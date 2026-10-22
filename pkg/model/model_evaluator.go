@@ -17,7 +17,7 @@ import (
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
-var ErrModelEvaluatorTheory = errors.New("g3: model evaluator theory reducer is not ported")
+var ErrModelEvaluatorTheory = errors.New("g3: model evaluator has no reducer for the theory")
 
 // ModelEvaluatorConfig supplies the source's borrowed process services. Memory
 // is the original raw allocation accounting owner; typed runtime-wide allocator
@@ -31,8 +31,7 @@ type ModelEvaluatorConfig struct {
 	Trace       *diagnostic.TraceTags
 }
 
-// ModelEvaluator runs the original no-proof traversal and selected evaluator_cfg
-// branches. Theory reducers and array value expansion are still being ported.
+// ModelEvaluator runs the original no-proof traversal and evaluator_cfg.
 type ModelEvaluator struct {
 	self          *ModelEvaluator
 	model         *ModelCore
@@ -48,17 +47,24 @@ type evaluatorConfiguration struct {
 	expansion arrayExpansion
 	equality  arrayEquality
 	rewriter.DefaultConfiguration
-	owner                              *ModelEvaluator
-	boolean                            *rewriter.BoolRewriter
-	array                              *rewriter.ArrayRewriter
-	fpa                                *rewriter.FPARewriter
-	arrayFamily                        ast.FamilyID
-	substitution                       *rewriter.VarSubstitution
-	params                             uparams.ModuleParamsOwner
-	pending                            *FunctionInterpretation
-	maxMemory                          uint64
-	maxSteps                           uint32
-	completion, cache, arrayEqualities bool
+	owner                               *ModelEvaluator
+	boolean                             *rewriter.BoolRewriter
+	arithmetic                          *rewriter.ArithRewriter
+	bitVector                           *rewriter.BVRewriter
+	array                               *rewriter.ArrayRewriter
+	datatype                            *rewriter.DatatypeRewriter
+	pseudoBoolean                       *rewriter.PseudoBooleanRewriter
+	fpa                                 *rewriter.FPARewriter
+	sequence                            *rewriter.SequenceRewriter
+	arithmeticFamily, bitVectorFamily   ast.FamilyID
+	arrayFamily, datatypeFamily         ast.FamilyID
+	pseudoBooleanFamily, sequenceFamily ast.FamilyID
+	substitution                        *rewriter.VarSubstitution
+	params                              uparams.ModuleParamsOwner
+	pending                             *FunctionInterpretation
+	maxMemory                           uint64
+	maxSteps                            uint32
+	completion, cache, arrayEqualities  bool
 }
 
 func NewModelEvaluator(md *ModelCore, s ModelEvaluatorConfig) (*ModelEvaluator, error) {
@@ -112,7 +118,42 @@ func (ev *ModelEvaluator) init(p *uparams.ParamsRef) error {
 	if e != nil {
 		return e
 	}
+	ev.cfg.arithmetic, e = rewriter.NewArithRewriter(ev.model.manager, ev.services.Context, ev.services.Globals, p)
+	if e != nil {
+		return e
+	}
+	legacy, e := ev.services.Globals.Manager()
+	if e != nil {
+		return e
+	}
+	ev.cfg.bitVector, e = rewriter.NewBVRewriter(ev.model.manager, ev.services.Context, legacy, p)
+	if e != nil {
+		return e
+	}
 	ev.cfg.array, e = rewriter.NewArrayRewriter(ev.model.manager, ev.services.Context, ev.services.Globals, p)
+	if e != nil {
+		return e
+	}
+	if _, e = ev.model.manager.RegisterDatatypePlugin(); e != nil {
+		return e
+	}
+	ev.cfg.datatype, e = rewriter.NewDatatypeRewriter(ev.model.manager)
+	if e != nil {
+		return e
+	}
+	ev.cfg.pseudoBoolean, e = rewriter.NewPseudoBooleanRewriter(ev.model.manager)
+	if e != nil {
+		return e
+	}
+	ev.cfg.sequence, e = rewriter.NewSequenceRewriter(ev.model.manager)
+	if e != nil {
+		return e
+	}
+	ev.cfg.arithmeticFamily, e = ev.model.manager.ArithmeticFamilyID()
+	if e != nil {
+		return e
+	}
+	ev.cfg.bitVectorFamily, e = ev.model.manager.BitVectorUtilityFamilyID()
 	if e != nil {
 		return e
 	}
@@ -120,7 +161,22 @@ func (ev *ModelEvaluator) init(p *uparams.ParamsRef) error {
 	if e != nil {
 		return e
 	}
+	ev.cfg.datatypeFamily, e = ev.model.manager.DatatypeFamilyID()
+	if e != nil {
+		return e
+	}
+	ev.cfg.pseudoBooleanFamily, e = ev.model.manager.RegisterPseudoBooleanPlugin()
+	if e != nil {
+		return e
+	}
+	ev.cfg.sequenceFamily, e = ev.model.manager.SequenceFamilyID()
+	if e != nil {
+		return e
+	}
 	if e = ev.cfg.boolean.SetFlat(true); e != nil {
+		return e
+	}
+	if e = ev.cfg.bitVector.SetMkBVToNumeral(true); e != nil {
 		return e
 	}
 	if e = ev.cfg.array.SetExpandSelectStore(true); e != nil {
@@ -149,6 +205,14 @@ func (ev *ModelEvaluator) open() error {
 		return uparams.ErrParamsPrecondition
 	}
 	return ev.model.open()
+}
+
+// Manager returns the borrowed manager used by this evaluator.
+func (ev *ModelEvaluator) Manager() (*ast.ASTManager, error) {
+	if err := ev.open(); err != nil {
+		return nil, err
+	}
+	return ev.model.manager, nil
 }
 func (ev *ModelEvaluator) Evaluate(t ast.ASTHandle, out ast.ASTRef) error {
 	if e := ev.open(); e != nil {
@@ -240,17 +304,37 @@ func (ev *ModelEvaluator) closeImp() error {
 	if e := ev.cfg.params.CloseHelpers(); e != nil {
 		return e
 	}
+	ev.cfg.sequence = nil
 	if ev.cfg.fpa != nil {
 		if e := ev.cfg.fpa.Close(); e != nil {
 			return e
 		}
 		ev.cfg.fpa = nil
 	}
+	if ev.cfg.pseudoBoolean != nil {
+		if e := ev.cfg.pseudoBoolean.Close(); e != nil {
+			return e
+		}
+		ev.cfg.pseudoBoolean = nil
+	}
+	ev.cfg.datatype = nil
 	if ev.cfg.array != nil {
 		if e := ev.cfg.array.Close(); e != nil {
 			return e
 		}
 		ev.cfg.array = nil
+	}
+	if ev.cfg.bitVector != nil {
+		if e := ev.cfg.bitVector.Close(); e != nil {
+			return e
+		}
+		ev.cfg.bitVector = nil
+	}
+	if ev.cfg.arithmetic != nil {
+		if e := ev.cfg.arithmetic.Close(); e != nil {
+			return e
+		}
+		ev.cfg.arithmetic = nil
 	}
 	if ev.cfg.boolean != nil {
 		if e := ev.cfg.boolean.Close(); e != nil {
@@ -462,7 +546,34 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 				return rewriter.RewriteFailed, e
 			}
 			// The source consults the sort's theory equality reducer first.
-			if sortFamily == c.arrayFamily {
+			if sortFamily == c.arithmeticFamily {
+				right, e := args.At(1)
+				if e != nil {
+					return rewriter.RewriteFailed, e
+				}
+				status, e := c.arithmetic.MkEqCore(arg, right, out)
+				if e != nil || status != rewriter.RewriteFailed {
+					return status, e
+				}
+			} else if sortFamily == c.bitVectorFamily {
+				right, e := args.At(1)
+				if e != nil {
+					return rewriter.RewriteFailed, e
+				}
+				status, e := c.bitVector.RewriteEquality(arg, right, out)
+				if e != nil || status != rewriter.RewriteFailed {
+					return status, e
+				}
+			} else if sortFamily == c.datatypeFamily {
+				right, e := args.At(1)
+				if e != nil {
+					return rewriter.RewriteFailed, e
+				}
+				status, e := c.datatype.RewriteEquality(arg, right, out)
+				if e != nil || status != rewriter.RewriteFailed {
+					return status, e
+				}
+			} else if sortFamily == c.arrayFamily {
 				right, e := args.At(1)
 				if e != nil {
 					return rewriter.RewriteFailed, e
@@ -481,6 +592,15 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 					return rewriter.RewriteFailed, e
 				}
 				status, e := rw.MkEqCore(arg, right, out)
+				if e != nil || status != rewriter.RewriteFailed {
+					return status, e
+				}
+			} else if sortFamily == c.sequenceFamily {
+				right, e := args.At(1)
+				if e != nil {
+					return rewriter.RewriteFailed, e
+				}
+				status, e := c.sequence.RewriteEquality(arg, right, out)
 				if e != nil || status != rewriter.RewriteFailed {
 					return status, e
 				}
@@ -504,6 +624,14 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 		}
 		return final, nil
 	}
+	if fid == c.arithmeticFamily {
+		status, e := c.arithmetic.MkAppCore(d, args, out)
+		return c.finishTheoryReduction(status, e, d, args, out, proof)
+	}
+	if fid == c.bitVectorFamily {
+		status, e := c.bitVector.RewriteApp(d, args, out)
+		return c.finishTheoryReduction(status, e, d, args, out, proof)
+	}
 	if fid == c.arrayFamily {
 		status, e := c.array.MkAppCore(d, args, out)
 		if e != nil {
@@ -520,6 +648,14 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 			return rewriter.RewriteFailed, e
 		}
 		return final, nil
+	}
+	if fid == c.datatypeFamily {
+		status, e := c.datatype.RewriteApp(d, args, out)
+		return c.finishTheoryReduction(status, e, d, args, out, proof)
+	}
+	if fid == c.pseudoBooleanFamily {
+		status, e := c.pseudoBoolean.RewriteApp(d, args, out)
+		return c.finishTheoryReduction(status, e, d, args, out, proof)
 	}
 	if fpaFamily != ast.NullFamilyID && fid == fpaFamily {
 		rw, e := c.fpaRewriter()
@@ -541,6 +677,10 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 			return rewriter.RewriteFailed, e
 		}
 		return final, nil
+	}
+	if fid == c.sequenceFamily {
+		status, e := c.sequence.RewriteApp(d, args, out)
+		return c.finishTheoryReduction(status, e, d, args, out, proof)
 	}
 	if fid == 1 && args.Count() == 1 {
 		value, e := args.At(0)
@@ -587,6 +727,23 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 		return rewriter.Rewrite1, nil
 	}
 	return rewriter.RewriteFailed, nil
+}
+
+func (c *evaluatorConfiguration) finishTheoryReduction(status rewriter.RewriteStatus, err error, d ast.ASTHandle, args ast.AppArguments, out, proof ast.ASTRef) (rewriter.RewriteStatus, error) {
+	if err != nil {
+		return rewriter.RewriteFailed, err
+	}
+	if status == rewriter.RewriteFailed {
+		return status, nil
+	}
+	final, err := c.evaluateReducedApp(status, out)
+	if err != nil || status == rewriter.RewriteDone && final == rewriter.Rewrite1 {
+		return final, err
+	}
+	if err = c.traceReduceStatus(final, out); err != nil {
+		return rewriter.RewriteFailed, err
+	}
+	return final, nil
 }
 
 func (c *evaluatorConfiguration) fpaRewriter() (*rewriter.FPARewriter, error) {
