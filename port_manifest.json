@@ -116675,8 +116675,10 @@
       "path": "src/tactic/CMakeLists.txt",
       "component": "tactic",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": [
+        "pkg/tactic/tactic_base.go"
+      ],
       "tests": [],
       "registrations": [
         {
@@ -116684,11 +116686,13 @@
           "text": "z3_add_component(tactic"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go package discovery replaces the top-level tactic CMake component and preserves the pkg/tactic package boundary; imports express the source ast and model component dependencies."
+      ]
     },
     {
       "path": "src/tactic/aig/CMakeLists.txt",
@@ -123487,9 +123491,16 @@
       "path": "src/tactic/horn_subsume_model_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/horn_subsume_model_converter.go",
+        "pkg/tactic/horn_subsume_model_converter_test.go"
+      ],
+      "tests": [
+        "TestHornSubsumeMkHornRepeatedVariablesAndClauseRecognition",
+        "TestHornSubsumeApplyDefaultsAndReverseDisjunction",
+        "TestHornSubsumeDelayedTranslationAndInheritedOperations"
+      ],
       "assertions": [
         {
           "line": 104,
@@ -123508,19 +123519,64 @@
           "text": "SASSERT(m.is_bool(body));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "delayed and immediate insert overloads with Boolean conjunction reduction",
+          "status": "ported",
+          "go_target": "pkg/tactic/horn_subsume_model_converter.go",
+          "tests": [
+            "TestHornSubsumeDelayedTranslationAndInheritedOperations",
+            "TestHornSubsumeApplyDefaultsAndReverseDisjunction"
+          ]
+        },
+        {
+          "name": "mk_horn head/body conversion and closed forall implication recognition",
+          "status": "ported",
+          "go_target": "pkg/tactic/horn_subsume_model_converter.go",
+          "tests": [
+            "TestHornSubsumeMkHornRepeatedVariablesAndClauseRecognition"
+          ]
+        },
+        {
+          "name": "default-false body predicates and reverse model reconstruction",
+          "status": "ported",
+          "go_target": "pkg/tactic/horn_subsume_model_converter.go",
+          "tests": [
+            "TestHornSubsumeApplyDefaultsAndReverseDisjunction"
+          ]
+        },
+        {
+          "name": "immediate-entry translation with source omission of delayed entries",
+          "status": "ported",
+          "go_target": "pkg/tactic/horn_subsume_model_converter.go",
+          "tests": [
+            "TestHornSubsumeDelayedTranslationAndInheritedOperations"
+          ]
+        }
+      ],
+      "ownership": [
+        "Predicate declarations, bodies and delayed head/body applications have independent AST pins. MkHorn returns an owning AST reference for its constructed body. Model function interpretations transfer ownership only after successful registration, and Close follows reverse source member order."
+      ],
+      "deviations": [
+        "Implicit process-global evaluator and rewrite services are explicit typed constructor inputs. Native slices and maps replace source reference vectors and expression traversal marks while preserving encounter and reverse-application order."
+      ]
     },
     {
       "path": "src/tactic/horn_subsume_model_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/horn_subsume_model_converter.go",
+        "pkg/tactic/horn_subsume_model_converter_test.go"
+      ],
+      "tests": [
+        "TestHornSubsumeMkHornRepeatedVariablesAndClauseRecognition",
+        "TestHornSubsumeApplyDefaultsAndReverseDisjunction",
+        "TestHornSubsumeDelayedTranslationAndInheritedOperations"
+      ],
       "conditionals": [
         {
           "line": 35,
@@ -123531,11 +123587,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "horn_subsume_model_converter retained public surface and model_converter overrides",
+          "status": "ported",
+          "go_target": "pkg/tactic/horn_subsume_model_converter.go",
+          "tests": [
+            "TestHornSubsumeMkHornRepeatedVariablesAndClauseRecognition",
+            "TestHornSubsumeApplyDefaultsAndReverseDisjunction",
+            "TestHornSubsumeDelayedTranslationAndInheritedOperations"
+          ]
+        }
+      ],
+      "ownership": [
+        "HornSubsumeModelConverter embeds the reference-counted converter owner, borrows its AST manager and process services, and explicitly owns every stored AST entry and its theory rewriter."
+      ],
+      "deviations": [
+        "Go names distinguish the source overloads: Insert, InsertConjunction, InsertDefinition, MkHorn and MkHornClause."
+      ]
     },
     {
       "path": "src/tactic/model_converter.cpp",
