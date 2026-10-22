@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -415,5 +416,51 @@ func TestSMTArrayPublishesModelValues(t *testing.T) {
 	astTestMust(t, err)
 	if leftValue.IsNull() || rightValue.IsNull() || leftValue == rightValue {
 		t.Fatal("array model did not separate disequal roots", leftValue, rightValue)
+	}
+}
+
+func TestSMTArrayConstructorModelValue(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	family, err := m.RegisterArrayPlugin()
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	arraySort, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), boolean)
+	astTestMust(t, err)
+	base, err := m.MkConst(astTestSymbol(t, m, "constructor-model-base"), arraySort)
+	astTestMust(t, err)
+	index, err := m.MkConst(astTestSymbol(t, m, "constructor-model-index"), boolean)
+	astTestMust(t, err)
+	value, err := m.MkConst(astTestSymbol(t, m, "constructor-model-value"), boolean)
+	astTestMust(t, err)
+	stored, err := m.MkFamilyApp(family, ast.ASTArrayOpStore, nil, []ast.ASTHandle{base, index, value})
+	astTestMust(t, err)
+	selected, err := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{stored, index})
+	astTestMust(t, err)
+	equality, err := m.MkEq(selected, value)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.SetProduceModels(true))
+	astTestMust(t, solver.Assert(equality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("array constructor model status", status)
+	}
+	generated, err := solver.AcquireModel()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
+	out := astTestPin(t, m, ast.ASTHandle{})
+	evaluator, err := model.NewModelEvaluator(generated, modelConfig)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, evaluator.Close()) })
+	astTestMust(t, evaluator.SetModelCompletion(true))
+	astTestMust(t, evaluator.Evaluate(equality, out))
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	if !m.IsTrue(result) {
+		t.Fatal("constructor-aware array model falsified store read", result)
 	}
 }

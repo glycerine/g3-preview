@@ -699,6 +699,27 @@ func (t *SMTArrayTheory) InitializeModel(generator *SMTModelGenerator) error {
 	return generator.RegisterFactory(factory)
 }
 
+type smtArrayConstructorValueProcedure struct {
+	declaration  ast.ASTHandle
+	dependencies []SMTModelValueDependency
+}
+
+func (p *smtArrayConstructorValueProcedure) Dependencies() []SMTModelValueDependency {
+	if p == nil {
+		return nil
+	}
+	return append([]SMTModelValueDependency(nil), p.dependencies...)
+}
+
+func (p *smtArrayConstructorValueProcedure) MakeValue(generator *SMTModelGenerator, values []ast.ASTHandle) (ast.ASTHandle, error) {
+	if p == nil || generator == nil || p.declaration.IsNull() || len(values) != len(p.dependencies) {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	return generator.manager.MkApp(p.declaration, values)
+}
+
+func (*smtArrayConstructorValueProcedure) IsFresh() bool { return false }
+
 func (t *SMTArrayTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
 	if node == nil || generator == nil || !t.IsAttachedToVariable(node) || generator.model == nil {
 		return nil, ast.ErrASTDomain
@@ -706,6 +727,24 @@ func (t *SMTArrayTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator
 	sort, err := generator.manager.GetSort(node.owner)
 	if err != nil {
 		return nil, err
+	}
+	if op, array, operationErr := t.arrayOperation(node.owner); operationErr != nil {
+		return nil, operationErr
+	} else if array && (op == ast.ASTArrayOpConst || op == ast.ASTArrayOpStore || op == ast.ASTArrayOpMap) {
+		declaration, declarationErr := generator.manager.GetDecl(node.owner)
+		if declarationErr != nil {
+			return nil, declarationErr
+		}
+		arguments := node.Arguments()
+		dependencies := make([]SMTModelValueDependency, 0, len(arguments))
+		for _, argument := range arguments {
+			dependency, dependencyErr := NewSMTEnodeValueDependency(argument)
+			if dependencyErr != nil {
+				return nil, dependencyErr
+			}
+			dependencies = append(dependencies, dependency)
+		}
+		return &smtArrayConstructorValueProcedure{declaration: declaration, dependencies: dependencies}, nil
 	}
 	value, err := generator.model.FreshValue(sort)
 	if err != nil {
