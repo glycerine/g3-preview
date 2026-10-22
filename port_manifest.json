@@ -40687,9 +40687,15 @@
       "path": "src/interp/iz3mgr.cpp",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/interp/manager.go"
+      ],
+      "tests": [
+        "TestInterpolationManagerOperatorConstructionAndAccess",
+        "TestInterpolationManagerBooleanSimplifiers",
+        "TestInterpolationManagerBorrowAndCopyGuards"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -40758,17 +40764,42 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "operator construction/classification, application construction, argument access, symbol/type access, variable construction, and Boolean simplifying constructors",
+          "status": "ported",
+          "go_target": "pkg/interp/manager.go",
+          "tests": [
+            "TestInterpolationManagerOperatorConstructionAndAccess",
+            "TestInterpolationManagerBooleanSimplifiers"
+          ]
+        },
+        {
+          "name": "quantifier construction/cloning, proof metadata, printing, rewriting, arithmetic coefficients, linear combinations, integer division, substitution, and quantifier optimization",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The wrapper borrows ASTManager. Returned handles follow the Go AST package contract: consumers pin handles stored beyond the immediate operation. Full manager ownership audit remains open."
+      ],
+      "deviations": [
+        "Native Go maps replace source operator lookup tables and source ast_r temporaries are represented by checked ASTHandle values."
+      ]
     },
     {
       "path": "src/interp/iz3mgr.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/interp/manager.go"
+      ],
+      "tests": [
+        "TestInterpolationManagerOperatorConstructionAndAccess",
+        "TestInterpolationManagerBooleanSimplifiers",
+        "TestInterpolationManagerBorrowAndCopyGuards"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -40781,8 +40812,26 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "Operator vocabulary, borrowed manager facade, structural accessors, construction surface, predicates, and Boolean simplifying constructors",
+          "status": "ported",
+          "go_target": "pkg/interp/manager.go",
+          "tests": [
+            "TestInterpolationManagerOperatorConstructionAndAccess",
+            "TestInterpolationManagerBooleanSimplifiers",
+            "TestInterpolationManagerBorrowAndCopyGuards"
+          ]
+        },
+        {
+          "name": "remaining numeral, quantifier, proof, arithmetic, substitution, and display declarations",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Manager is a copy-guarded borrowed facade; persistent consumers remain responsible for explicit ASTRef ownership. Full header audit remains open."
+      ],
       "deviations": []
     },
     {
@@ -41483,7 +41532,7 @@
       "path": "src/interp/iz3secondary.h",
       "component": "interp",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -41496,11 +41545,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "abstract secondary prover interpolation interface",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "No source class implements this interface, and the retained interpolation path explicitly states that secondary provers are unsupported and passes nullptr."
+      ]
     },
     {
       "path": "src/interp/iz3translate.cpp",
