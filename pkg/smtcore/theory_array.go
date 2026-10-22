@@ -8,8 +8,10 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/statistics"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 type smtArrayScope struct {
@@ -132,13 +134,8 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 			return false, fmt.Errorf("array term argument %d: %w", index, argErr)
 		}
 	}
-	sort, err := state.manager.GetSort(expression)
-	if err != nil {
-		return false, err
-	}
-	handled := false
-	if family, familyErr := state.manager.GetFamilyID(sort); familyErr == nil && family == t.FamilyID() {
-		handled = true
+	handled := op == ast.ASTArrayOpStore || op == ast.ASTArrayOpSelect || op == ast.ASTArrayOpConst || op == ast.ASTArrayOpExt || op == ast.ASTArrayOpMap || op == ast.ASTArrayOpAsArray || op == ast.ASTArrayOpDefault
+	if handled {
 		node := state.context.enodes[expression]
 		if node == nil {
 			node, err = state.MkEnode(expression, false, false, true)
@@ -913,6 +910,165 @@ func (p *smtArrayConstructorValueProcedure) MakeValue(generator *SMTModelGenerat
 
 func (*smtArrayConstructorValueProcedure) IsFresh() bool { return false }
 
+type smtArrayTableValueProcedure struct {
+	sort, rangeSort, fallback ast.ASTHandle
+	domain                    []ast.ASTHandle
+	dependencies              []SMTModelValueDependency
+	entries                   int
+	fallbackValue             bool
+}
+
+func (p *smtArrayTableValueProcedure) Dependencies() []SMTModelValueDependency {
+	if p == nil {
+		return nil
+	}
+	return append([]SMTModelValueDependency(nil), p.dependencies...)
+}
+
+func (p *smtArrayTableValueProcedure) MakeValue(generator *SMTModelGenerator, values []ast.ASTHandle) (value ast.ASTHandle, err error) {
+	if p == nil || generator == nil || generator.model == nil || p.sort.IsNull() || len(p.domain) == 0 || len(values) != len(p.dependencies) {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	declaration, err := generator.manager.MkFreshFuncDecl(usymbol.Symbol{}, usymbol.Symbol{}, p.domain, p.rangeSort)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	interpretation, err := model.NewFunctionInterpretation(generator.manager, uint32(len(p.domain)))
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	owned := true
+	defer func() {
+		if owned {
+			err = errors.Join(err, interpretation.Close())
+		}
+	}()
+	position := 0
+	fallback := p.fallback
+	if p.fallbackValue {
+		fallback = values[position]
+		position++
+	}
+	if fallback.IsNull() {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	if err = interpretation.SetElse(fallback); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	for entry := 0; entry < p.entries; entry++ {
+		arguments := append([]ast.ASTHandle(nil), values[position:position+len(p.domain)]...)
+		position += len(p.domain)
+		if err = interpretation.InsertEntry(arguments, values[position]); err != nil {
+			return ast.ASTHandle{}, err
+		}
+		position++
+	}
+	if position != len(values) {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	if err = generator.model.RegisterAuxFunction(declaration, interpretation); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	owned = false
+	return generator.manager.MkAsArray(declaration)
+}
+
+func (*smtArrayTableValueProcedure) IsFresh() bool { return false }
+
+func (t *SMTArrayTheory) arrayTableModelValue(node *SMTEnode, generator *SMTModelGenerator, sort ast.ASTHandle) (SMTModelValueProcedure, error) {
+	state, err := t.State()
+	if err != nil {
+		return nil, err
+	}
+	arity, err := generator.manager.ArrayArity(sort)
+	if err != nil || arity == 0 {
+		if err != nil {
+			return nil, err
+		}
+		return nil, ast.ErrASTDomain
+	}
+	domain := make([]ast.ASTHandle, arity)
+	for index := uint32(0); index < arity; index++ {
+		domain[index], err = generator.manager.ArrayDomain(sort, index)
+		if err != nil {
+			return nil, err
+		}
+	}
+	rangeSort, err := generator.manager.ArrayRange(sort)
+	if err != nil {
+		return nil, err
+	}
+	procedure := &smtArrayTableValueProcedure{sort: sort, rangeSort: rangeSort, domain: domain}
+	for _, defaultExpression := range t.defaultTrail {
+		if !generator.context.relevant[defaultExpression] {
+			continue
+		}
+		array, argErr := generator.manager.GetArg(defaultExpression, 0)
+		if argErr != nil {
+			return nil, argErr
+		}
+		arrayNode, defaultNode := state.context.enodes[array], state.context.enodes[defaultExpression]
+		if arrayNode == nil || defaultNode == nil || arrayNode.root != node.root {
+			continue
+		}
+		dependency, dependencyErr := NewSMTEnodeValueDependency(defaultNode)
+		if dependencyErr != nil {
+			return nil, dependencyErr
+		}
+		procedure.dependencies = append(procedure.dependencies, dependency)
+		procedure.fallbackValue = true
+		break
+	}
+	if !procedure.fallbackValue {
+		procedure.fallback, err = generator.SomeValue(rangeSort)
+		if err != nil {
+			return nil, err
+		}
+	}
+	for _, selectExpression := range t.selectTrail {
+		if !generator.context.relevant[selectExpression] {
+			continue
+		}
+		array, argErr := generator.manager.GetArg(selectExpression, 0)
+		if argErr != nil {
+			return nil, argErr
+		}
+		arrayNode, selectNode := state.context.enodes[array], state.context.enodes[selectExpression]
+		if arrayNode == nil || selectNode == nil || arrayNode.root != node.root {
+			continue
+		}
+		count, countErr := generator.manager.GetNumArgs(selectExpression)
+		if countErr != nil || count != arity+1 {
+			if countErr != nil {
+				return nil, countErr
+			}
+			return nil, ast.ErrASTDomain
+		}
+		for index := uint32(1); index < count; index++ {
+			argument, argumentErr := generator.manager.GetArg(selectExpression, index)
+			if argumentErr != nil {
+				return nil, argumentErr
+			}
+			argumentNode := state.context.enodes[argument]
+			if argumentNode == nil {
+				return nil, ast.ErrASTDomain
+			}
+			dependency, dependencyErr := NewSMTEnodeValueDependency(argumentNode)
+			if dependencyErr != nil {
+				return nil, dependencyErr
+			}
+			procedure.dependencies = append(procedure.dependencies, dependency)
+		}
+		dependency, dependencyErr := NewSMTEnodeValueDependency(selectNode)
+		if dependencyErr != nil {
+			return nil, dependencyErr
+		}
+		procedure.dependencies = append(procedure.dependencies, dependency)
+		procedure.entries++
+	}
+	return procedure, nil
+}
+
 func (t *SMTArrayTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
 	if node == nil || generator == nil || !t.IsAttachedToVariable(node) || generator.model == nil {
 		return nil, ast.ErrASTDomain
@@ -939,15 +1095,5 @@ func (t *SMTArrayTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator
 		}
 		return &smtArrayConstructorValueProcedure{declaration: declaration, dependencies: dependencies}, nil
 	}
-	value, err := generator.model.FreshValue(sort)
-	if err != nil {
-		return nil, err
-	}
-	if value.IsNull() {
-		value, err = generator.SomeValue(sort)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return NewSMTExpressionValueProcedure(value)
+	return t.arrayTableModelValue(node, generator, sort)
 }
