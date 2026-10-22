@@ -102435,22 +102435,29 @@
       "path": "src/smt/smt_almost_cg_table.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/smt_almost_cg_table.go"],
+      "tests": ["TestSMTAlmostCongruenceTableGroupsSpecialRoots"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "almost-congruence comparison, reset, insertion, erasure and lookup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_almost_cg_table.go",
+          "tests": ["TestSMTAlmostCongruenceTableGroupsSpecialRoots"]
+        }
+      ],
+      "ownership": ["The table owns group and list slices and borrows all enode pointers."],
+      "deviations": ["A linear slice of equivalence groups replaces the region-allocated hash buckets while preserving equivalence and source list-prepend order."]
     },
     {
       "path": "src/smt/smt_almost_cg_table.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/smt_almost_cg_table.go"],
+      "tests": ["TestSMTAlmostCongruenceTableGroupsSpecialRoots"],
       "conditionals": [
         {
           "line": 19,
@@ -102461,11 +102468,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "construction, special-root reset, reset, insert, erase, find and empty query",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_almost_cg_table.go",
+          "tests": ["TestSMTAlmostCongruenceTableGroupsSpecialRoots"]
+        }
+      ],
+      "ownership": ["Special roots, keys and grouped values are borrowed enode pointers."],
+      "deviations": ["Find returns a copied Go slice instead of exposing a region list node chain."]
     },
     {
       "path": "src/smt/smt_b_justification.h",
@@ -102759,9 +102773,9 @@
       "path": "src/smt/smt_cg_table.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/smt_cg_table.go"],
+      "tests": ["TestSMTCongruenceTableExactCommutativeInsertFindEraseReset"],
       "conditionals": [
         {
           "line": 25,
@@ -102858,19 +102872,32 @@
           "text": "SASSERT(m_func_decl2id.find(n->get_decl(), tid_prime) && tid == tid_prime);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "active declaration table creation, declaration indexing, reset, no-op display and debug invariant",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_cg_table.go",
+          "tests": ["TestSMTCongruenceTableExactCommutativeInsertFindEraseReset"]
+        },
+        {
+          "name": "disabled preprocessor branch containing the legacy single-table implementation",
+          "status": "dead_deleted",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": ["The table retains each indexed function declaration and borrows stored enodes."],
+      "deviations": ["Declaration-keyed Go slices replace four specialized native hash-table layouts; equality and commutativity behavior is preserved without porting hash-container internals."]
     },
     {
       "path": "src/smt/smt_cg_table.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/smt_cg_table.go"],
+      "tests": ["TestSMTCongruenceTableExactCommutativeInsertFindEraseReset"],
       "conditionals": [
         {
           "line": 19,
@@ -103011,11 +103038,24 @@
           "text": "SASSERT(n->get_num_args() > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "active per-declaration congruence table insert, erase, contains, find, pointer containment and reset interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_cg_table.go",
+          "tests": ["TestSMTCongruenceTableExactCommutativeInsertFindEraseReset"]
+        },
+        {
+          "name": "disabled preprocessor branch containing the legacy table interface",
+          "status": "dead_deleted",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": ["The manager is borrowed; declaration references are owned until Reset or Close; enode pointers are borrowed."],
+      "deviations": ["Go map keys use AST handles and buckets use slices; linear bucket comparison calls the concrete enode congruence algorithm and avoids porting native tagged table pointers."]
     },
     {
       "path": "src/smt/smt_checker.cpp",
