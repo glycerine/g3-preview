@@ -98228,7 +98228,8 @@
       ],
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
-        "TestSMTRealDifferenceEqualityEventAdapter"
+        "TestSMTRealDifferenceEqualityEventAdapter",
+        "TestSMTArithmeticEqualityAdapterRecreatesSearchAxiomsAtRestart"
       ],
       "assertions": [
         {
@@ -98261,7 +98262,15 @@
           ]
         },
         {
-          "name": "Restart recreation, optional binary-bound parameter, relevancy callback and diagnostic display (src/smt/arith_eq_adapter.cpp:49-81,240-263,269-279)",
+          "name": "Search initialization and restart recreation for base-level arithmetic pairs (src/smt/arith_eq_adapter.cpp:240-263)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arith_eq_adapter.go",
+          "tests": [
+            "TestSMTArithmeticEqualityAdapterRecreatesSearchAxiomsAtRestart"
+          ]
+        },
+        {
+          "name": "Optional binary-bound parameter, relevancy callback and diagnostic display (src/smt/arith_eq_adapter.cpp:49-81,210-218,269-279)",
           "status": "unported"
         }
       ],
@@ -98269,7 +98278,7 @@
         "The adapter borrows its owning SMTTheoryBase and enodes, owns canonical AST-handle pairs, and removes pairs when their theory scope is popped."
       ],
       "deviations": [
-        "Go search keeps internalized clauses across restart, so retained difference-theory consumers do not require source restart-pair reconstruction. Default AddBinaryBounds is false. Relevancy is managed by the shared SMT relevancy propagator."
+        "Default AddBinaryBounds is false. Relevancy is managed by the shared SMT relevancy propagator."
       ]
     },
     {
@@ -98283,7 +98292,8 @@
       ],
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
-        "TestSMTRealDifferenceEqualityEventAdapter"
+        "TestSMTRealDifferenceEqualityEventAdapter",
+        "TestSMTArithmeticEqualityAdapterRecreatesSearchAxiomsAtRestart"
       ],
       "conditionals": [
         {
@@ -104453,6 +104463,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_boolean_propagation.go",
+        "pkg/smtcore/smt_clause_simplification.go",
+        "pkg/smtcore/smt_learned_persistence.go",
+        "pkg/smtcore/smt_restart.go",
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_theory_lifecycle.go",
         "pkg/smtcore/smt_search.go",
@@ -104469,6 +104482,13 @@
         "TestSMTInternalizerLearnedClausePreservesFalseAntecedents",
         "TestSMTInternalizerLearnedClauseRetainsProof",
         "TestSMTSearchReinternalizesLearnedClauseAtomsAfterBackjump",
+        "TestSMTLearnedClauseSurvivesSearchBacktrack",
+        "TestSMTLearnedUnitSurvivesSearchBacktrackAndExpiresWithBase",
+        "TestSMTRestartSchedulesMatchSource",
+        "TestSMTRestartBacktracksAndPreservesLearnedClause",
+        "TestSMTClauseSimplificationDropsFalseTailLiteral",
+        "TestSMTClauseSimplificationDeletesSatisfiedReasonSafely",
+        "TestSMTClauseSimplificationRetainsProofReasons",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
@@ -105439,6 +105459,20 @@
           ]
         },
         {
+          "name": "persistent learned clauses and units, adaptive restart scheduling, restart backtracking, and proof-preserving base-clause simplification",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_restart.go",
+          "tests": [
+            "TestSMTLearnedClauseSurvivesSearchBacktrack",
+            "TestSMTLearnedUnitSurvivesSearchBacktrackAndExpiresWithBase",
+            "TestSMTRestartSchedulesMatchSource",
+            "TestSMTRestartBacktracksAndPreservesLearnedClause",
+            "TestSMTClauseSimplificationDropsFalseTailLiteral",
+            "TestSMTClauseSimplificationDeletesSatisfiedReasonSafely",
+            "TestSMTClauseSimplificationRetainsProofReasons"
+          ]
+        },
+        {
           "name": "propositional assumption validation, scoped initialization and flags, checking, and rollback",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_assumptions.go",
@@ -105488,7 +105522,7 @@
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
       ],
       "deviations": [
-        "Structural subsumption and restarts remain unported."
+        "Structural subsumption remains unported."
       ]
     },
     {

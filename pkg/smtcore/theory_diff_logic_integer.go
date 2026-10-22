@@ -685,6 +685,14 @@ func (t *SMTIntegerDiffTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	return SMTFinalCheckDone, nil
 }
 
+func (t *SMTIntegerDiffTheory) InitializeSearch() error {
+	return t.equalityAdapter.InitializeSearch()
+}
+
+func (t *SMTIntegerDiffTheory) Restart() error {
+	return t.equalityAdapter.Restart()
+}
+
 func (t *SMTIntegerDiffTheory) InternalizeEquality(expression ast.ASTHandle, variable int32) error {
 	state, err := t.State()
 	if err != nil {

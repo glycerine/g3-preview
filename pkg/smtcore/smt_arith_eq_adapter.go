@@ -17,6 +17,7 @@ type smtArithmeticEqualityAdapter struct {
 	processed map[smtArithmeticEqualityPair]struct{}
 	trail     []smtArithmeticEqualityPair
 	limits    []int
+	restart   []smtArithmeticEqualityPair
 	numAxioms uint64
 }
 
@@ -84,6 +85,49 @@ func (a *smtArithmeticEqualityAdapter) MkAxioms(left, right SMTTheoryVar) error 
 		return err
 	}
 	a.numAxioms++
+	if state.searching && state.scopeLevel > state.searchBaseLevel &&
+		leftNode.InternalScopeLevel() <= state.searchBaseLevel && rightNode.InternalScopeLevel() <= state.searchBaseLevel {
+		a.restart = append(a.restart, pair)
+	}
+	return nil
+}
+
+func (a *smtArithmeticEqualityAdapter) InitializeSearch() error {
+	if a == nil || a.owner == nil {
+		return ast.ErrASTHandle
+	}
+	a.restart = nil
+	return nil
+}
+
+func (a *smtArithmeticEqualityAdapter) Restart() error {
+	if a == nil || a.owner == nil {
+		return ast.ErrASTHandle
+	}
+	state, err := a.owner.State()
+	if err != nil {
+		return err
+	}
+	pairs := append([]smtArithmeticEqualityPair(nil), a.restart...)
+	a.restart = nil
+	for _, pair := range pairs {
+		if state.inconsistent {
+			break
+		}
+		left := state.context.enodes[pair.first]
+		right := state.context.enodes[pair.second]
+		if left == nil || right == nil {
+			return ast.ErrASTDomain
+		}
+		leftVar := left.TheoryVar(a.owner.FamilyID())
+		rightVar := right.TheoryVar(a.owner.FamilyID())
+		if leftVar == SMTNullTheoryVar || rightVar == SMTNullTheoryVar {
+			return ast.ErrASTDomain
+		}
+		if err = a.MkAxioms(leftVar, rightVar); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
