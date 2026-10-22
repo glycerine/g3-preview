@@ -113706,6 +113706,7 @@
         "TestSMTBitVectorMultiplicationCircuit",
         "TestSMTBitVectorUnsignedComparisonCircuit",
         "TestSMTBitVectorShiftCircuit",
+        "TestSMTBitVectorExtendedRotateCircuit",
         "TestSMTBitVectorPublishesNumeralModelValue",
         "TestSMTBitVectorUnsupportedOperationGivesUnknown"
       ],
@@ -114071,6 +114072,7 @@
         "TestSMTBitVectorMultiplicationCircuit",
         "TestSMTBitVectorUnsignedComparisonCircuit",
         "TestSMTBitVectorShiftCircuit",
+        "TestSMTBitVectorExtendedRotateCircuit",
         "TestSMTBitVectorPublishesNumeralModelValue",
         "TestSMTBitVectorUnsupportedOperationGivesUnknown"
       ],

@@ -442,6 +442,92 @@ func (t *SMTBitVectorTheory) unsignedDivRem(left, right []ast.ASTHandle) ([]ast.
 	return quotient, partial, nil
 }
 
+func (t *SMTBitVectorTheory) unsignedBits(value uint64, width int) ([]ast.ASTHandle, error) {
+	state, _ := t.State()
+	result := make([]ast.ASTHandle, width)
+	for i := range result {
+		var err error
+		result[i], err = state.manager.MkBoolVal(value&(uint64(1)<<uint(i)) != 0)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return result, nil
+}
+
+func (t *SMTBitVectorTheory) equalBits(left, right []ast.ASTHandle) (ast.ASTHandle, error) {
+	if len(left) == 0 || len(left) != len(right) {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	equalities := make([]ast.ASTHandle, len(left))
+	for i := range equalities {
+		var err error
+		equalities[i], err = t.boolIff(left[i], right[i])
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
+	return t.reduceBits(equalities, true)
+}
+
+func (t *SMTBitVectorTheory) rotateBits(bits []ast.ASTHandle, amount uint64, left bool) ([]ast.ASTHandle, error) {
+	if len(bits) == 0 {
+		return nil, ast.ErrASTDomain
+	}
+	width := uint64(len(bits))
+	amount %= width
+	result := make([]ast.ASTHandle, len(bits))
+	for i := range result {
+		source := (uint64(i) + amount) % width
+		if left {
+			source = (width + uint64(i) - amount) % width
+		}
+		result[i] = bits[source]
+	}
+	return result, nil
+}
+
+func (t *SMTBitVectorTheory) extendedRotateBits(bits, amountBits []ast.ASTHandle, left bool) ([]ast.ASTHandle, error) {
+	if len(bits) == 0 || len(bits) != len(amountBits) {
+		return nil, ast.ErrASTDomain
+	}
+	widthBits, err := t.unsignedBits(uint64(len(bits)), len(bits))
+	if err != nil {
+		return nil, err
+	}
+	_, masked, err := t.unsignedDivRem(amountBits, widthBits)
+	if err != nil {
+		return nil, err
+	}
+	equalities := make([]ast.ASTHandle, len(bits))
+	for amount := range equalities {
+		value, valueErr := t.unsignedBits(uint64(amount), len(bits))
+		if valueErr != nil {
+			return nil, valueErr
+		}
+		equalities[amount], valueErr = t.equalBits(masked, value)
+		if valueErr != nil {
+			return nil, valueErr
+		}
+	}
+	state, _ := t.State()
+	result := make([]ast.ASTHandle, len(bits))
+	for index := range result {
+		result[index] = bits[index]
+		for amount := 1; amount < len(bits); amount++ {
+			source := (index + amount) % len(bits)
+			if left {
+				source = (len(bits) + index - amount) % len(bits)
+			}
+			result[index], err = state.manager.MkIte(equalities[amount], bits[source], result[index])
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return result, t.retainTemporary(result)
+}
+
 func (t *SMTBitVectorTheory) negateBits(bits []ast.ASTHandle) ([]ast.ASTHandle, error) {
 	state, _ := t.State()
 	inverted, err := t.mapUnary(bits, t.boolNot)
@@ -733,6 +819,22 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 			return nil, true, ast.ErrASTDomain
 		}
 		bits, err := t.shiftBits(arguments[0], arguments[1], operation)
+		return bits, true, err
+	case 48, 49:
+		if len(arguments) != 1 {
+			return nil, true, ast.ErrASTDomain
+		}
+		amount, err := t.parameter(expression, 0)
+		if err != nil {
+			return nil, true, err
+		}
+		bits, err := t.rotateBits(arguments[0], uint64(amount), operation == 48)
+		return bits, true, err
+	case 50, 51:
+		if len(arguments) != 2 || len(arguments[0]) != len(arguments[1]) {
+			return nil, true, ast.ErrASTDomain
+		}
+		bits, err := t.extendedRotateBits(arguments[0], arguments[1], operation == 50)
 		return bits, true, err
 	default:
 		return nil, false, nil

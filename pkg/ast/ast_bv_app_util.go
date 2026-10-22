@@ -61,6 +61,14 @@ func (m *ASTManager) MkBitVectorLSHR(left, right ASTHandle) (ASTHandle, error) {
 	return m.mkBitVectorUtilityApp(46, []ASTHandle{left, right})
 }
 
+func (m *ASTManager) MkBitVectorExtendedRotateLeft(value, amount ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(50, []ASTHandle{value, amount})
+}
+
+func (m *ASTManager) MkBitVectorExtendedRotateRight(value, amount ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(51, []ASTHandle{value, amount})
+}
+
 // The source overflow utility intentionally passes its operands in reverse order.
 func (m *ASTManager) MkBitVectorSignedMulNoOverflow(left, right ASTHandle) (ASTHandle, error) {
 	return m.mkBitVectorUtilityApp(53, []ASTHandle{right, left})

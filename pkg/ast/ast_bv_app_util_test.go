@@ -32,6 +32,8 @@ func TestASTBitVectorOriginalApplicationConstructors(t *testing.T) {
 		{45, false, m.MkBitVectorSHL},
 		{47, false, m.MkBitVectorASHR},
 		{46, false, m.MkBitVectorLSHR},
+		{50, false, m.MkBitVectorExtendedRotateLeft},
+		{51, false, m.MkBitVectorExtendedRotateRight},
 		{53, true, m.MkBitVectorSignedMulNoOverflow},
 		{54, true, m.MkBitVectorSignedMulNoUnderflow},
 		{52, true, m.MkBitVectorUnsignedMulNoOverflow},

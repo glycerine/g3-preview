@@ -308,3 +308,32 @@ func TestSMTBitVectorPublishesNumeralModelValue(t *testing.T) {
 		t.Fatal("BV model value", text, matched)
 	}
 }
+
+func TestSMTBitVectorExtendedRotateCircuit(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	one, err := m.BitVectorNumeralUint64(1, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(one)
+	astTestMust(t, err)
+	value, err := m.MkConst(astTestSymbol(t, m, "bv-rotate-value"), sort)
+	astTestMust(t, err)
+	rotated, err := m.MkBitVectorExtendedRotateLeft(value, one)
+	astTestMust(t, err)
+	nine, err := m.BitVectorNumeralUint64(9, 4)
+	astTestMust(t, err)
+	three, err := m.BitVectorNumeralUint64(3, 4)
+	astTestMust(t, err)
+	valueConstraint, err := m.MkEq(value, nine)
+	astTestMust(t, err)
+	rotateConstraint, err := m.MkEq(rotated, three)
+	astTestMust(t, err)
+	wrongRotation, err := m.MkNot(rotateConstraint)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(valueConstraint))
+	astTestMust(t, solver.Assert(wrongRotation))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("extended rotate circuit", status)
+	}
+}
