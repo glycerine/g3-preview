@@ -106958,7 +106958,7 @@
       "path": "src/smt/smt_implied_equalities.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_implied_equalities.go",
         "pkg/smtcore/smt_implied_equalities_test.go"
@@ -107017,7 +107017,12 @@
         },
         {
           "name": "Model-value bucketing, array extensionality probes, conditional array-value reduction and timing counters (src/smt/smt_implied_equalities.cpp:139-319)",
-          "status": "unported"
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_implied_equalities.go",
+          "tests": [
+            "TestSMTSolverImpliedEqualitiesPartitionsByProofAndSort",
+            "TestSMTSolverImpliedEqualitiesUnsatAndEmptyInputs"
+          ]
         },
         {
           "name": "Disabled experimental max-SAT and partition-refinement implementations (src/smt/smt_implied_equalities.cpp:386-575)",
@@ -107028,7 +107033,7 @@
         "The query temporarily owns AST references for every input term, owns sort partitions and union-find slices, and restores every solver scope before releasing those references."
       ],
       "deviations": [
-        "The initial retained implementation always uses the source exact quadratic fallback instead of model-value bucketing. This preserves results while performing more solver checks."
+        "Go always uses the source exact quadratic fallback instead of model-value bucketing, array probing and timing-only optimization. It preserves implied-equality classes for every retained sort while performing more solver checks."
       ]
     },
     {
