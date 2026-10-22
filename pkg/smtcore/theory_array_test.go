@@ -370,3 +370,50 @@ func TestSMTArrayDefaultStoreFiniteDomain(t *testing.T) {
 		t.Fatal("finite-domain store default ITE", status)
 	}
 }
+
+func TestSMTArrayPublishesModelValues(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArrayPlugin()
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	indexSort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "model-array-index"), nil)
+	astTestMust(t, err)
+	arraySort, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{indexSort}), boolean)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "model-array-left"), arraySort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "model-array-right"), arraySort)
+	astTestMust(t, err)
+	equality, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	disequality, err := m.MkNot(equality)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.SetProduceModels(true))
+	astTestMust(t, solver.Assert(disequality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("array model status", status)
+	}
+	generated, err := solver.AcquireModel()
+	astTestMust(t, err)
+	if generated == nil {
+		t.Fatal("array solver omitted model")
+	}
+	t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
+	leftDeclaration, err := m.GetDecl(left)
+	astTestMust(t, err)
+	rightDeclaration, err := m.GetDecl(right)
+	astTestMust(t, err)
+	leftValue, err := generated.ConstantInterpretation(leftDeclaration)
+	astTestMust(t, err)
+	rightValue, err := generated.ConstantInterpretation(rightDeclaration)
+	astTestMust(t, err)
+	if leftValue.IsNull() || rightValue.IsNull() || leftValue == rightValue {
+		t.Fatal("array model did not separate disequal roots", leftValue, rightValue)
+	}
+}

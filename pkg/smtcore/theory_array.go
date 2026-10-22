@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
@@ -681,4 +682,40 @@ func (t *SMTArrayTheory) ResetStatistics() {
 	if t != nil {
 		t.statistics = smtArrayStatistics{}
 	}
+}
+
+func (t *SMTArrayTheory) InitializeModel(generator *SMTModelGenerator) error {
+	state, err := t.State()
+	if err != nil || generator == nil || generator.manager != state.manager || generator.model == nil {
+		if err != nil {
+			return err
+		}
+		return ast.ErrASTDomain
+	}
+	factory, err := protomodel.NewArrayFactory(generator.model)
+	if err != nil {
+		return err
+	}
+	return generator.RegisterFactory(factory)
+}
+
+func (t *SMTArrayTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
+	if node == nil || generator == nil || !t.IsAttachedToVariable(node) || generator.model == nil {
+		return nil, ast.ErrASTDomain
+	}
+	sort, err := generator.manager.GetSort(node.owner)
+	if err != nil {
+		return nil, err
+	}
+	value, err := generator.model.FreshValue(sort)
+	if err != nil {
+		return nil, err
+	}
+	if value.IsNull() {
+		value, err = generator.SomeValue(sort)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return NewSMTExpressionValueProcedure(value)
 }

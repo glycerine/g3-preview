@@ -113508,7 +113508,8 @@
         "TestSMTArrayMapRead",
         "TestSMTArrayDefaultConstAndMap",
         "TestSMTArrayDefaultStoreLargeDomain",
-        "TestSMTArrayDefaultStoreFiniteDomain"
+        "TestSMTArrayDefaultStoreFiniteDomain",
+        "TestSMTArrayPublishesModelValues"
       ],
       "conditionals": [
         {
