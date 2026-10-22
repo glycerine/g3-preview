@@ -193,6 +193,51 @@ func TestSMTSolverDisablesBinaryClauseOptimizationForProofs(t *testing.T) {
 	}
 }
 
+func TestSMTSolverStopsAtConfiguredConflictLimit(t *testing.T) {
+	m := astTestManager(t)
+	context, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	local, err := context.NewValue()
+	astTestMust(t, err)
+	key := "max_conflicts"
+	astTestMust(t, context.SetUIntName(&local, &key, 0))
+	solver, err := NewSMTSolver(m, &local, "QF_UF", SMTSolverConfig{Params: context})
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, solver.Close())
+		astTestMust(t, context.Del(&local))
+		astTestMust(t, context.Close())
+	})
+	a := smtRelevancyBool(t, m, "conflict-limit-a")
+	b := smtRelevancyBool(t, m, "conflict-limit-b")
+	notA, err := m.MkNot(a)
+	astTestMust(t, err)
+	notB, err := m.MkNot(b)
+	astTestMust(t, err)
+	clauses := make([]ast.ASTHandle, 4)
+	clauses[0], err = m.MkOr(a, b)
+	astTestMust(t, err)
+	clauses[1], err = m.MkOr(notA, b)
+	astTestMust(t, err)
+	clauses[2], err = m.MkOr(a, notB)
+	astTestMust(t, err)
+	clauses[3], err = m.MkOr(notA, notB)
+	astTestMust(t, err)
+	formula, err := m.MkAndArgs(clauses)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(formula))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.Undef || solver.kernel.lastFailure != SMTFailureConflictLimit {
+		t.Fatal("conflict limit", status, solver.kernel.lastFailure, solver.kernel.Statistics())
+	}
+	reason, err := solver.ReasonUnknown()
+	astTestMust(t, err)
+	if reason != "max-conflicts-reached" {
+		t.Fatal("conflict-limit reason", reason)
+	}
+}
+
 func TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	a := smtRelevancyBool(t, m, "smt-propagate-a")

@@ -47,6 +47,7 @@ type SMTKernel struct {
 	paramContext     *uparams.ParamsContext
 	paramGlobals     *uparams.GlobalParamsService
 	smtParams        *SMTParams
+	smtState         SMTParamsState
 	preprocessState  SMTPreprocessorState
 	produceModel     bool
 	preprocess       bool
@@ -95,7 +96,10 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 	if err != nil {
 		return nil, errors.Join(err, internalizer.Close())
 	}
-	return &SMTKernel{manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof}, nil
+	return &SMTKernel{
+		manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof,
+		smtState: SMTParamsState{MaxConflicts: ^uint32(0)},
+	}, nil
 }
 
 // ConfigurePreprocessing installs the source theory-rewrite pass used before
@@ -156,6 +160,7 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 		return errors.Join(err, full.Close())
 	}
 	k.smtParams = full
+	k.smtState = fullState
 	state, err := k.readPreprocessorState(context, globals, params)
 	if err != nil {
 		return err
@@ -191,6 +196,10 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err := k.smtParams.Update(params); err != nil {
 		return err
 	}
+	paramsState, err := k.smtParams.State()
+	if err != nil {
+		return err
+	}
 	dynamic, err := k.smtParams.DynamicAckState()
 	if err != nil {
 		return err
@@ -198,6 +207,7 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err = k.internalizer.UpdateDynamicAck(dynamic); err != nil {
 		return err
 	}
+	k.smtState = paramsState
 	name := "preprocess"
 	enabled, err := k.paramContext.GetBoolName(params, &name, true)
 	if err != nil {
@@ -683,6 +693,7 @@ func (k *SMTKernel) Close() error {
 		k.paramContext = nil
 		k.paramGlobals = nil
 		k.smtParams = nil
+		k.smtState = SMTParamsState{}
 		k.preprocessState = SMTPreprocessorState{}
 		k.manager = nil
 		k.closed = true

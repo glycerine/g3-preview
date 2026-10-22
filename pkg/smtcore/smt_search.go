@@ -73,11 +73,25 @@ func smtDecisionLiteral(variable int32, phase lbool.LBool) SMTLiteral {
 	return NewSMTLiteral(variable, phase == lbool.False)
 }
 
+func (k *SMTKernel) searchResourceLimitExceeded() (bool, error) {
+	exceeded, err := k.manager.Canceled()
+	if err != nil || !exceeded {
+		return exceeded, err
+	}
+	if k.manager.Limit.CancelFlag() {
+		k.lastFailure = SMTFailureCanceled
+	} else {
+		k.lastFailure = SMTFailureResourceLimit
+	}
+	return true, nil
+}
+
 // search runs the retained CDCL control loop. Learned clauses are installed at
 // the computed backjump scope and therefore participate in the next propagation
 // pass instead of re-exploring the conflicting branch.
 func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool, resultErr error) {
 	baseLevel := k.internalizer.scopeLevel
+	conflictBase := k.internalizer.statistics.NumConflicts
 	resolver, err := NewSMTConflictResolver(k.internalizer)
 	if err != nil {
 		return lbool.Undef, err
@@ -92,6 +106,13 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		}
 	}()
 	for {
+		exceeded, err := k.searchResourceLimitExceeded()
+		if err != nil {
+			return lbool.Undef, err
+		}
+		if exceeded {
+			return lbool.Undef, nil
+		}
 		if k.callback != nil {
 			k.callback.FastProgressSample()
 		}
@@ -155,7 +176,18 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			if err = k.internalizer.recordConflictForClauseMaintenance(); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search collect learned clauses: %w", err)
 			}
+			if k.internalizer.statistics.NumConflicts-conflictBase > k.smtState.MaxConflicts {
+				k.lastFailure = SMTFailureConflictLimit
+				return lbool.Undef, nil
+			}
 			continue
+		}
+		exceeded, err = k.searchResourceLimitExceeded()
+		if err != nil {
+			return lbool.Undef, err
+		}
+		if exceeded {
+			return lbool.Undef, nil
 		}
 
 		variable, phase, err := queue.NextCaseSplit()

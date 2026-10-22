@@ -10,13 +10,14 @@ import (
 )
 
 type smtDynAckManager struct {
-	state      *SMTInternalizerState
-	pairs      *dynAckPairState
-	triples    *dynAckTripleState
-	schedule   *dynAckSchedule
-	strategy   dynAckStrategy
-	equalities bool
-	closed     bool
+	state        *SMTInternalizerState
+	pairs        *dynAckPairState
+	triples      *dynAckTripleState
+	schedule     *dynAckSchedule
+	strategy     dynAckStrategy
+	equalities   bool
+	conflictBase uint32
+	closed       bool
 }
 
 // smtDynamicAckJustification is the non-region proof owner attached to a
@@ -119,6 +120,14 @@ func (m *smtDynAckManager) updateConfig(config SMTDynAckState) error {
 	m.schedule.gcEvery = config.GC
 	m.schedule.factor = config.Factor
 	return nil
+}
+
+func (m *smtDynAckManager) initSearch() error {
+	if m == nil || m.closed || m.state == nil {
+		return ast.ErrASTHandle
+	}
+	m.conflictBase = m.state.statistics.NumConflicts
+	return m.schedule.initSearch()
 }
 
 func (m *smtDynAckManager) equalityLiteral(first, second ast.ASTHandle) (SMTLiteral, error) {
@@ -229,7 +238,8 @@ func (m *smtDynAckManager) propagate() (bool, error) {
 	if m == nil || m.closed || m.state == nil {
 		return false, ast.ErrASTHandle
 	}
-	candidates, err := m.schedule.propagate(m.state.statistics.NumConflicts, m.strategy)
+	conflicts := m.state.statistics.NumConflicts - m.conflictBase
+	candidates, err := m.schedule.propagate(conflicts, m.strategy)
 	if err != nil {
 		return false, err
 	}

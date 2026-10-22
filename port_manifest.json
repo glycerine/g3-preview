@@ -105416,13 +105416,15 @@
           ]
         },
         {
-          "name": "Boolean decisions, first-UIP conflict learning, non-chronological backjumping, propagation, and final-check search control",
+          "name": "Boolean decisions, first-UIP conflict learning, non-chronological backjumping, propagation, cancellation/resource and conflict-limit checks, and final-check search control",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_search.go",
           "tests": [
             "TestSMTKernelAssertionCheckAndDecisionClause",
             "TestSMTKernelConflictLearningProvesBooleanUnsat",
-            "TestSMTInternalizerInstallsLearnedClauseInCurrentScope"
+            "TestSMTInternalizerInstallsLearnedClauseInCurrentScope",
+            "TestSMTKernelSearchReportsCancellationAndResourceLimit",
+            "TestSMTSolverStopsAtConfiguredConflictLimit"
           ]
         },
         {
@@ -105475,7 +105477,7 @@
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
       ],
       "deviations": [
-        "Structural subsumption, restarts, and resource limits remain unported."
+        "Structural subsumption, restarts, timeout sampling, and the memory high-watermark check remain unported."
       ]
     },
     {
@@ -105694,13 +105696,15 @@
           ]
         },
         {
-          "name": "decision scopes, learned clauses, first-UIP backjumping, and Boolean search control consumed by the kernel",
+          "name": "decision scopes, learned clauses, first-UIP backjumping, cancellation/resource and conflict-limit state, and Boolean search control consumed by the kernel",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_search.go",
           "tests": [
             "TestSMTKernelAssertionCheckAndDecisionClause",
             "TestSMTKernelConflictLearningProvesBooleanUnsat",
-            "TestSMTInternalizerInstallsLearnedClauseInCurrentScope"
+            "TestSMTInternalizerInstallsLearnedClauseInCurrentScope",
+            "TestSMTKernelSearchReportsCancellationAndResourceLimit",
+            "TestSMTSolverStopsAtConfiguredConflictLimit"
           ]
         },
         {
@@ -107615,11 +107619,14 @@
           ]
         },
         {
-          "name": "parameter updates propagated to assertion preprocessing",
+          "name": "owned smt_params construction and updates propagated to assertion preprocessing, dynamic Ackermannization, binary clauses, lemma maintenance, and conflict limits",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
-            "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices"
+            "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices",
+            "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
+            "TestSMTSolverDisablesBinaryClauseOptimizationForProofs",
+            "TestSMTSolverStopsAtConfiguredConflictLimit"
           ]
         },
         {
@@ -107795,11 +107802,13 @@
           ]
         },
         {
-          "name": "parameter interface propagated to assertion preprocessing",
+          "name": "owned smt_params interface propagated to assertion preprocessing and retained context search configuration",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
-            "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices"
+            "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices",
+            "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
+            "TestSMTSolverStopsAtConfiguredConflictLimit"
           ]
         },
         {

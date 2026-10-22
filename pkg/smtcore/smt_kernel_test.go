@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -55,6 +56,37 @@ func TestSMTKernelDisplayStatisticsResetAndCancellation(t *testing.T) {
 	astTestMust(t, err)
 	if !canceled {
 		t.Fatal("kernel missed manager cancellation")
+	}
+}
+
+func TestSMTKernelSearchReportsCancellationAndResourceLimit(t *testing.T) {
+	m := astTestManager(t)
+	kernel := smtTestKernel(t, m)
+	m.Limit.Cancel()
+	status, err := kernel.Check()
+	astTestMust(t, err)
+	if status != lbool.Undef || kernel.lastFailure != SMTFailureCanceled {
+		t.Fatal("canceled search", status, kernel.lastFailure)
+	}
+	reason, err := kernel.ReasonUnknown()
+	astTestMust(t, err)
+	if reason != "canceled" {
+		t.Fatal("canceled reason", reason)
+	}
+	m.Limit.ResetCancel()
+
+	scope, err := control.NewLimitScope(&m.Limit, 1)
+	astTestMust(t, err)
+	defer scope.Close()
+	status, err = kernel.Check()
+	astTestMust(t, err)
+	if status != lbool.Undef || kernel.lastFailure != SMTFailureResourceLimit {
+		t.Fatal("resource-limited search", status, kernel.lastFailure)
+	}
+	reason, err = kernel.ReasonUnknown()
+	astTestMust(t, err)
+	if reason != "(resource limits reached)" {
+		t.Fatal("resource-limit reason", reason)
 	}
 }
 
