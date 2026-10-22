@@ -164,3 +164,58 @@ func TestSimplexDeleteBaseAndNonbasicRows(t *testing.T) {
 		t.Fatal("basic deletion retained row")
 	}
 }
+
+func addSourceInequality(t *testing.T, s *Solver, a, b, bound int64, equality bool) {
+	t.Helper()
+	slack := s.NumVariables()
+	one := slack + 1
+	if slack < 2 {
+		slack = 2
+		one = 3
+	}
+	zero := RationalInfinitesimal(rat(0, 1))
+	oneValue := RationalInfinitesimal(rat(1, 1))
+	if err := s.SetLower(slack, zero); err != nil {
+		t.Fatal(err)
+	}
+	if equality {
+		if err := s.SetUpper(slack, zero); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := s.SetLower(one, oneValue); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.SetUpper(one, oneValue); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.AddIntegerRow(slack, []uint32{0, 1, slack, one}, []big.Int{*big.NewInt(a), *big.NewInt(b), *big.NewInt(-1), *big.NewInt(-bound)}); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSimplexRetainedSourceFeasibilityCases(t *testing.T) {
+	tests := []struct {
+		name string
+		rows [][4]int64
+		want lbool.LBool
+	}{
+		{"lower-bounds", [][4]int64{{1, 0, 1, 0}, {0, 1, 1, 0}, {1, 1, 1, 0}}, lbool.True},
+		{"inconsistent-equality", [][4]int64{{1, 0, 1, 0}, {0, 1, 1, 0}, {1, 1, 1, 1}}, lbool.False},
+		{"upper-bounds-equality", [][4]int64{{-1, 0, -1, 0}, {0, -1, -1, 0}, {1, 1, 1, 1}}, lbool.True},
+		{"mixed-bounds-equality", [][4]int64{{1, 0, 1, 0}, {0, -1, -1, 0}, {1, 1, 1, 1}}, lbool.True},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			s := NewSolver(nil)
+			s.EnsureVariable(1)
+			for _, row := range test.rows {
+				addSourceInequality(t, s, row[0], row[1], row[2], row[3] != 0)
+			}
+			got, err := s.MakeFeasible()
+			if err != nil || got != test.want {
+				t.Fatal("feasibility", got, err)
+			}
+		})
+	}
+}

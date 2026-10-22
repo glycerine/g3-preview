@@ -80,6 +80,28 @@ func TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay(t *testing.T) {
 	}
 }
 
+func TestSparseMatrixRationalGCDScansPastUnitPrefix(t *testing.T) {
+	var m Matrix
+	r := m.NewRow()
+	if err := m.AddRational(r, rat(1, 1), 0); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.AddRational(r, rat(1, 2), 1); err != nil {
+		t.Fatal(err)
+	}
+	g, err := m.GCDNormalize(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if g.Cmp(rat(1, 2)) != 0 {
+		t.Fatal("gcd", g)
+	}
+	entries, _ := m.Entries(r)
+	if entries[0].Coefficient.Cmp(rat(2, 1)) != 0 || entries[1].Coefficient.Cmp(rat(1, 1)) != 0 {
+		t.Fatal("normalized", entries)
+	}
+}
+
 func TestSparseMatrixIntegerEntryAndCancellation(t *testing.T) {
 	var m Matrix
 	r0, r1 := m.NewRow(), m.NewRow()

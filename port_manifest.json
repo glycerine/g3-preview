@@ -65287,28 +65287,28 @@
       "path": "src/math/simplex/CMakeLists.txt",
       "component": "math",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/math/simplex/matrix.go", "pkg/math/simplex/simplex.go", "pkg/math/simplex/model_based_opt.go"],
+      "tests": ["TestSimplexRetainedSourceFeasibilityCases", "TestModelBasedOptMaximizeSourceExamples"],
       "registrations": [
         {
           "line": 1,
           "text": "z3_add_component(simplex"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery and compilation replace the CMake component registration; the package contains the retained sparse tableau, simplex solver, and model-based optimizer source units."]
     },
     {
       "path": "src/math/simplex/model_based_opt.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/math/simplex/model_based_opt.go", "pkg/math/simplex/model_based_opt_test.go"],
+      "tests": ["TestModelBasedOptMaximizeSourceExamples", "TestModelBasedOptStrictAndUnbounded", "TestModelBasedOptProjectRealBounds", "TestModelBasedOptProjectIntegerEqualityAndModulo", "TestModelBasedOptProjectIntegerNonUnitBounds"],
       "assertions": [
         {
           "line": 53,
@@ -65455,19 +65455,19 @@
           "text": "SASSERT(m_rows[row_id1].m_alive);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "model-based maximize, projection, integer cuts, modular/equality elimination, row lifecycle, and display", "status": "ported", "go_target": "pkg/math/simplex/model_based_opt.go", "tests": ["TestModelBasedOptMaximizeSourceExamples", "TestModelBasedOptProjectIntegerNonUnitBounds"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The concrete Go implementation uses math/big.Rat values and ordinary slices while preserving exact local maximization, strict-bound infinitesimals, model-guided real/integer projection, equality solving, divisibility substitution, integer cuts, row retirement, and live-row extraction."]
     },
     {
       "path": "src/math/simplex/model_based_opt.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/math/simplex/model_based_opt.go", "pkg/math/simplex/model_based_opt_test.go"],
+      "tests": ["TestModelBasedOptMaximizeSourceExamples", "TestModelBasedOptStrictAndUnbounded", "TestModelBasedOptProjectRealBounds", "TestModelBasedOptProjectIntegerEqualityAndModulo", "TestModelBasedOptProjectIntegerNonUnitBounds"],
       "conditionals": [
         {
           "line": 21,
@@ -65478,11 +65478,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "concrete model-based optimization types and public operations", "status": "ported", "go_target": "pkg/math/simplex/model_based_opt.go", "tests": ["TestModelBasedOptStrictAndUnbounded", "TestModelBasedOptProjectIntegerEqualityAndModulo"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["ModelBasedOpt, LinearTerm, OptRow, Optimum, Relation, Project, Maximize, LiveRows, and display methods provide the retained concrete API without C++ template or stream adapters."]
     },
     {
       "path": "src/math/simplex/network_flow.h",
@@ -65604,22 +65604,22 @@
       "path": "src/math/simplex/simplex.cpp",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/math/simplex/simplex.go", "pkg/math/simplex/simplex_test.go"],
-      "tests": ["TestSimplexFeasiblePivotAndValues", "TestSimplexMinimizeBoundedAndUnbounded"],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "tests": ["TestSimplexFeasiblePivotAndValues", "TestSimplexMinimizeBoundedAndUnbounded", "TestSimplexRetainedSourceFeasibilityCases"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "retained exact integer and rational simplex instantiations", "status": "ported", "go_target": "pkg/math/simplex/simplex.go", "tests": ["TestSimplexRetainedSourceFeasibilityCases", "TestSimplexMinimizeBoundedAndUnbounded"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["One exact math/big.Rat tableau implements both retained mpz and mpq instantiations; integer rows are the denominator-one entry path."]
     },
     {
       "path": "src/math/simplex/simplex.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/math/simplex/simplex.go", "pkg/math/simplex/simplex_test.go"],
-      "tests": ["TestSimplexFeasiblePivotAndValues", "TestSimplexInfeasibleFixedNonbasicAndWitnessRow", "TestSimplexInfinitesimalStrictBounds", "TestSimplexIntegerRowFacadeAndReset", "TestSimplexMinimizeBoundedAndUnbounded", "TestSimplexDeleteBaseAndNonbasicRows"],
+      "tests": ["TestSimplexFeasiblePivotAndValues", "TestSimplexInfeasibleFixedNonbasicAndWitnessRow", "TestSimplexInfinitesimalStrictBounds", "TestSimplexIntegerRowFacadeAndReset", "TestSimplexMinimizeBoundedAndUnbounded", "TestSimplexDeleteBaseAndNonbasicRows", "TestSimplexRetainedSourceFeasibilityCases"],
       "conditionals": [
         {
           "line": 32,
@@ -65630,19 +65630,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "solver bounds, rows, feasibility, minimization, deletion, reset, values, statistics, and display API", "status": "ported", "go_target": "pkg/math/simplex/simplex.go", "tests": ["TestSimplexFeasiblePivotAndValues", "TestSimplexInfeasibleFixedNonbasicAndWitnessRow", "TestSimplexMinimizeBoundedAndUnbounded"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Solver is the concrete retained exact tableau API. Go errors replace assertion-only invalid-handle behavior, and Stats replaces the source statistics accumulator adapter."]
     },
     {
       "path": "src/math/simplex/simplex_def.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/math/simplex/simplex.go", "pkg/math/simplex/simplex_test.go"],
-      "tests": ["TestSimplexFeasiblePivotAndValues", "TestSimplexInfeasibleFixedNonbasicAndWitnessRow", "TestSimplexInfinitesimalStrictBounds", "TestSimplexMinimizeBoundedAndUnbounded", "TestSimplexDeleteBaseAndNonbasicRows"],
+      "tests": ["TestSimplexFeasiblePivotAndValues", "TestSimplexInfeasibleFixedNonbasicAndWitnessRow", "TestSimplexInfinitesimalStrictBounds", "TestSimplexMinimizeBoundedAndUnbounded", "TestSimplexDeleteBaseAndNonbasicRows", "TestSimplexRetainedSourceFeasibilityCases"],
       "conditionals": [
         {
           "line": 22,
@@ -65843,19 +65843,19 @@
           "text": "SASSERT(s != it->m_var || m.eq(m_vars[s].m_base_coeff, it->m_coeff));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "tableau feasibility pivots, value propagation, primal minimization, Bland default selection, and invariants", "status": "ported", "go_target": "pkg/math/simplex/simplex.go", "tests": ["TestSimplexRetainedSourceFeasibilityCases", "TestSimplexDeleteBaseAndNonbasicRows"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The source default pivot strategy is the smallest-variable strategy, implemented deterministically with a Go map plus sorted selection. The dormant greatest/least-error strategies and random tie choice are not reached by retained consumers."]
     },
     {
       "path": "src/math/simplex/sparse_matrix.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/math/simplex/matrix.go", "pkg/math/simplex/matrix_test.go"],
-      "tests": ["TestSparseMatrixRowArithmeticColumnsAndReuse", "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay", "TestSparseMatrixIntegerEntryAndCancellation"],
+      "tests": ["TestSparseMatrixRowArithmeticColumnsAndReuse", "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay", "TestSparseMatrixRationalGCDScansPastUnitPrefix", "TestSparseMatrixIntegerEntryAndCancellation"],
       "conditionals": [
         {
           "line": 19,
@@ -65866,19 +65866,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "concrete sparse matrix rows, entries, column traversal, arithmetic, deletion, normalization, reset, and display API", "status": "ported", "go_target": "pkg/math/simplex/matrix.go", "tests": ["TestSparseMatrixRowArithmeticColumnsAndReuse", "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Matrix uses exact math/big.Rat coefficients, slices, and explicit column row identifiers. Returned entries are copied because Go has no safe analogue of the source mutable intrusive iterators."]
     },
     {
       "path": "src/math/simplex/sparse_matrix_def.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/math/simplex/matrix.go", "pkg/math/simplex/matrix_test.go"],
-      "tests": ["TestSparseMatrixRowArithmeticColumnsAndReuse", "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay", "TestSparseMatrixIntegerEntryAndCancellation"],
+      "tests": ["TestSparseMatrixRowArithmeticColumnsAndReuse", "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay", "TestSparseMatrixRationalGCDScansPastUnitPrefix", "TestSparseMatrixIntegerEntryAndCancellation"],
       "conditionals": [
         {
           "line": 21,
@@ -65999,11 +65999,11 @@
           "text": "SASSERT(dead.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "sparse row insertion, addition, multiplication, cancellation, column maintenance, recycling, normalization, and well-formed checks", "status": "ported", "go_target": "pkg/math/simplex/matrix.go", "tests": ["TestSparseMatrixRationalGCDScansPastUnitPrefix", "TestSparseMatrixIntegerEntryAndCancellation"]}],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Sparse row arithmetic, cancellation, column maintenance, row recycling, normalization, display, reset, and well-formed checks are implemented for the two retained exact numeral paths. Dead internal entry-slot compaction is represented by ordinary Go slice removal."]
     },
     {
       "path": "src/math/subpaving/CMakeLists.txt",

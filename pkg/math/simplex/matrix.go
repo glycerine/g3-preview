@@ -230,9 +230,6 @@ func (m *Matrix) GCDNormalize(r Row) (*big.Rat, error) {
 			num = gcdInt(num, c.Num())
 		}
 		den = lcmInt(den, c.Denom())
-		if num.Cmp(big.NewInt(1)) == 0 && den.Cmp(big.NewInt(1)) == 0 {
-			break
-		}
 	}
 	if num.Sign() == 0 {
 		return big.NewRat(1, 1), nil
