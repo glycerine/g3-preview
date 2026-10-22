@@ -1335,3 +1335,40 @@ func TestDirectProofNormalInequalitySumAndFinalSubstitution(t *testing.T) {
 		t.Fatal("normalized inequality sum", op, e)
 	}
 }
+
+func TestDirectProofRotatedLeqToEqSimplification(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	integer, err := manager.IntType()
+	interpMust(t, err)
+	x, err := manager.MakeVariable("rot-leq2eq-x", integer)
+	interpMust(t, err)
+	x = interpPin(t, m, x)
+	y, err := manager.MakeVariable("rot-leq2eq-y", integer)
+	interpMust(t, err)
+	y = interpPin(t, m, y)
+	base, err := NewBase(manager, []ast.ASTHandle{x, y}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	equality, err := manager.Make(OperatorEqual, x, y)
+	interpMust(t, err)
+	negativeEquality, err := manager.MkNot(equality)
+	interpMust(t, err)
+	placeholder, err := direct.placeholder(negativeEquality)
+	interpMust(t, err)
+	xLeqY, err := manager.Make(OperatorLE, x, y)
+	interpMust(t, err)
+	yLeqX, err := manager.Make(OperatorLE, y, x)
+	interpMust(t, err)
+	proof, err := direct.makeSymbol(direct.leqToEq, placeholder, xLeqY, yLeqX)
+	interpMust(t, err)
+	proof, err = direct.makeSymbol(direct.rotateSum, negativeEquality, proof)
+	interpMust(t, err)
+	result, err := direct.SimplifyProofTerm(proof)
+	interpMust(t, err)
+	if declaration, e := manager.Symbol(result); e != nil || declaration != direct.concat {
+		t.Fatal("rotated leq2eq", declaration, e)
+	}
+}

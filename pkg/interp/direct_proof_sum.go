@@ -22,6 +22,19 @@ func (p *DirectProofInterpolator) ownedIntegerDivision(left, right ast.ASTHandle
 	return result, nil
 }
 
+func (p *DirectProofInterpolator) ownedSimplify(term ast.ASTHandle) (ast.ASTHandle, error) {
+	ref, err := p.base.manager.ReallySimplify(term)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result, err := p.base.manager.ast.RefGet(ref)
+	if err != nil {
+		return ast.ASTHandle{}, errors.Join(err, p.base.manager.ast.DelRef(&ref))
+	}
+	p.owned = append(p.owned, ref)
+	return result, nil
+}
+
 func (p *DirectProofInterpolator) isInequality(term ast.ASTHandle) (bool, error) {
 	op, err := p.base.manager.Operator(term)
 	if err != nil {
@@ -405,4 +418,309 @@ func (p *DirectProofInterpolator) simplifyRotatedSum(args []ast.ASTHandle) (ast.
 		return ast.ASTHandle{}, err
 	}
 	return p.base.manager.MkAnd(aProof, result)
+}
+
+func (p *DirectProofInterpolator) roundInequality(inequality ast.ASTHandle) (ast.ASTHandle, error) {
+	normal, err := p.isNormalWrapper(inequality)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if normal {
+		body, chain, e := p.destructNormal(inequality)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		body, e = p.roundInequality(body)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.makeNormal(body, chain)
+	}
+	valid, err := p.isInequality(inequality)
+	if err != nil || !valid {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	inequality, err = p.base.manager.SimplifyInequality(inequality)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	op, err := p.base.manager.Operator(inequality)
+	if err != nil || op != OperatorLT {
+		return inequality, err
+	}
+	left, err := p.base.manager.Arg(inequality, 0)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	right, err := p.base.manager.Arg(inequality, 1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	one, err := p.base.manager.MakeIntText("1")
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	right, err = p.base.manager.Make(OperatorSub, right, one)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.Make(OperatorLE, left, right)
+}
+
+func (p *DirectProofInterpolator) inequalityRight(inequality ast.ASTHandle) (ast.ASTHandle, error) {
+	op, err := p.base.manager.Operator(inequality)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if op == OperatorImplies {
+		body, e := p.base.manager.Arg(inequality, 1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.inequalityRight(body)
+	}
+	if op != OperatorLE && op != OperatorLT {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	return p.base.manager.Arg(inequality, 1)
+}
+
+func (p *DirectProofInterpolator) simplifyRotatedLeqToEq(placeholder, negativeEquality, proof ast.ASTHandle) (ast.ASTHandle, error) {
+	first, err := p.base.manager.Arg(proof, 0)
+	if err != nil || first != placeholder {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	equality, err := p.base.manager.Arg(negativeEquality, 0)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	x, err := p.base.manager.Arg(equality, 0)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	y, err := p.base.manager.Arg(equality, 1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	truth, err := p.base.manager.Make(OperatorTrue)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	aProof1, bProof1 := truth, truth
+	xLeqY, err := p.base.manager.Arg(proof, 1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	xLeqY, err = p.destructConditionalInequality(xLeqY, &aProof1, &bProof1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	yLeqX, err := p.base.manager.Arg(proof, 2)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	yLeqX, err = p.destructConditionalInequality(yLeqX, &aProof1, &bProof1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	xLeqY, err = p.roundInequality(xLeqY)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	yLeqX, err = p.roundInequality(yLeqX)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	zero, err := p.base.manager.MakeIntText("0")
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negativeOne, err := p.base.manager.MakeIntText("-1")
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	one, err := p.base.manager.MakeIntText("1")
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	firstCondition, err := p.base.manager.Make(OperatorLE, zero, zero)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	firstCondition, err = p.sumConditionalInequality(firstCondition, negativeOne, xLeqY, &aProof1, &bProof1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	firstCondition, err = p.sumConditionalInequality(firstCondition, negativeOne, yLeqX, &aProof1, &bProof1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	firstCondition, err = p.ownedSimplify(firstCondition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	firstCondition, err = p.base.manager.MkAnd(bProof1, firstCondition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	firstCondition, err = p.base.manager.MkImplies(aProof1, firstCondition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	aProof2, bProof2 := truth, truth
+	secondCondition, err := p.base.manager.Make(OperatorLE, zero, zero)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	secondCondition, err = p.sumConditionalInequality(secondCondition, one, xLeqY, &aProof2, &bProof2)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	secondCondition, err = p.sumConditionalInequality(secondCondition, one, yLeqX, &aProof2, &bProof2)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	secondCondition, err = p.ownedSimplify(secondCondition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	// Preserve the selected source's use of the first condition pair here.
+	secondCondition, err = p.base.manager.MkAnd(aProof1, secondCondition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	secondCondition, err = p.base.manager.MkImplies(bProof1, secondCondition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	xRight, err := p.inequalityRight(xLeqY)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	yRight, err := p.inequalityRight(yLeqX)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	makePair := func(firstSide TermSide, firstPosition ast.ASTHandle, firstLeft, firstRight, secondLeft, secondRight ast.ASTHandle) (ast.ASTHandle, error) {
+		firstEquality, e := p.base.manager.Make(OperatorEqual, firstLeft, firstRight)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		firstRewrite, e := p.makeRewrite(firstSide, firstPosition, firstCondition, firstEquality)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		secondEquality, e := p.base.manager.Make(OperatorEqual, secondLeft, secondRight)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		secondSide := TermA
+		if firstSide == TermA {
+			secondSide = TermB
+		}
+		secondRewrite, e := p.makeRewrite(secondSide, p.topPosition, secondCondition, secondEquality)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		chain, e := p.chainCons(truth, firstRewrite)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.chainCons(chain, secondRewrite)
+	}
+	yValue, yNumeral, err := p.base.manager.Numeral(y)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	xOp, err := p.base.manager.Operator(x)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if yNumeral && yValue.Sign() == 0 && xOp == OperatorPlus {
+		xArgs, e := p.base.manager.Args(x)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if len(xArgs) == 2 {
+			for index := 0; index < 2; index++ {
+				side, e := p.TermSide(xArgs[index])
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				if side == TermA {
+					iteration, e := p.base.manager.Make(OperatorPlus, xArgs[index], xRight)
+					if e != nil {
+						return ast.ASTHandle{}, e
+					}
+					iteration, e = p.ownedSimplify(iteration)
+					if e != nil {
+						return ast.ASTHandle{}, e
+					}
+					position, e := p.positionAdd(int64(index), p.topPosition)
+					if e != nil {
+						return ast.ASTHandle{}, e
+					}
+					updated := []ast.ASTHandle{xArgs[0], xArgs[1]}
+					updated[index] = iteration
+					whole, e := p.base.manager.Make(OperatorPlus, updated...)
+					if e != nil {
+						return ast.ASTHandle{}, e
+					}
+					return makePair(TermA, position, xArgs[index], iteration, whole, y)
+				}
+			}
+		}
+	}
+	xSide, err := p.TermSide(x)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if xSide == TermA {
+		iteration, e := p.base.manager.Make(OperatorPlus, x, xRight)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		iteration, e = p.ownedSimplify(iteration)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return makePair(TermA, p.topPosition, x, iteration, iteration, y)
+	}
+	ySide, err := p.TermSide(y)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if ySide == TermA {
+		iteration, e := p.base.manager.Make(OperatorPlus, y, yRight)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		iteration, e = p.ownedSimplify(iteration)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		// This source branch emits the B rewrite first and the A rewrite second.
+		firstEquality, e := p.base.manager.Make(OperatorEqual, x, iteration)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		firstRewrite, e := p.makeRewrite(TermB, p.topPosition, secondCondition, firstEquality)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		secondEquality, e := p.base.manager.Make(OperatorEqual, iteration, y)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		secondRewrite, e := p.makeRewrite(TermA, p.topPosition, firstCondition, secondEquality)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		chain, e := p.chainCons(truth, firstRewrite)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.chainCons(chain, secondRewrite)
+	}
+	return ast.ASTHandle{}, ProofError{}
 }
