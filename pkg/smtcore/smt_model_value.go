@@ -101,6 +101,12 @@ type SMTModelValueTheory interface {
 	ModelValue(*SMTEnode, *SMTModelGenerator) (SMTModelValueProcedure, error)
 }
 
+// SMTModelFunctionTheory is the optional source include_func_interp hook.
+// The C++ theory base excludes its declarations unless a concrete theory opts in.
+type SMTModelFunctionTheory interface {
+	IncludeFunctionInterpretation(ast.ASTHandle) bool
+}
+
 type SMTExpressionValueProcedure struct{ value ast.ASTHandle }
 
 func NewSMTExpressionValueProcedure(value ast.ASTHandle) (*SMTExpressionValueProcedure, error) {

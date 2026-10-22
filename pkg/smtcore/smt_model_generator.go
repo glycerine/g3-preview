@@ -290,7 +290,10 @@ func (g *SMTModelGenerator) BuildStateValues(state *SMTInternalizerState) error 
 	if err = g.BuildValues(roots, procedures); err != nil {
 		return err
 	}
-	return g.publishConstantInterpretations(state)
+	if err = g.publishConstantInterpretations(state); err != nil {
+		return err
+	}
+	return g.publishFunctionInterpretations(state)
 }
 
 func (g *SMTModelGenerator) uninterpretedConstant(expression ast.ASTHandle) (ast.ASTHandle, bool, error) {
@@ -368,6 +371,75 @@ func (g *SMTModelGenerator) publishConstantInterpretations(state *SMTInternalize
 			if err = g.model.Core().RegisterConstant(declaration, value); err != nil {
 				return err
 			}
+		}
+	}
+	return nil
+}
+
+func (g *SMTModelGenerator) includeFunctionInterpretation(state *SMTInternalizerState, declaration ast.ASTHandle) (bool, error) {
+	family, err := g.manager.GetFamilyID(declaration)
+	if err != nil {
+		return false, err
+	}
+	if family == ast.NullFamilyID {
+		return true, nil
+	}
+	if family == g.manager.BasicFamilyID() {
+		return false, nil
+	}
+	theory := state.theories[family]
+	if theory == nil {
+		return true, nil
+	}
+	modelTheory, ok := theory.(SMTModelFunctionTheory)
+	return ok && modelTheory.IncludeFunctionInterpretation(declaration), nil
+}
+
+func (g *SMTModelGenerator) publishFunctionInterpretations(state *SMTInternalizerState) error {
+	if g.model == nil {
+		return ast.ErrASTDomain
+	}
+	for _, node := range state.enodeStack {
+		if node == nil || node.NumArgs() == 0 || !node.IsCongruenceRoot() || !g.context.relevant[node.owner] {
+			continue
+		}
+		include, err := g.includeFunctionInterpretation(state, node.declaration)
+		if err != nil {
+			return err
+		}
+		if !include {
+			continue
+		}
+		result := g.rootValues[node.root]
+		if result.IsNull() {
+			return ast.ErrASTDomain
+		}
+		arguments := make([]ast.ASTHandle, len(node.arguments))
+		for index, argument := range node.arguments {
+			if argument == nil || argument.root == nil {
+				return ast.ErrASTDomain
+			}
+			arguments[index] = g.rootValues[argument.root]
+			if arguments[index].IsNull() {
+				return ast.ErrASTDomain
+			}
+		}
+		interpretation, err := g.model.Core().FunctionInterpretation(node.declaration)
+		if err != nil {
+			return err
+		}
+		if interpretation == nil {
+			interpretation, err = model.NewFunctionInterpretation(g.manager, node.NumArgs())
+			if err != nil {
+				return err
+			}
+			if err = g.model.Core().RegisterFunction(node.declaration, interpretation); err != nil {
+				_ = interpretation.Close()
+				return err
+			}
+		}
+		if err = interpretation.InsertNewEntry(arguments, result); err != nil {
+			return err
 		}
 	}
 	return nil

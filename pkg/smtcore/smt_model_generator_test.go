@@ -207,3 +207,47 @@ func TestSMTModelGeneratorPublishesBooleanConstant(t *testing.T) {
 		t.Fatal("Boolean model interpretation", value)
 	}
 }
+
+func TestSMTModelGeneratorPublishesFunctionInterpretation(t *testing.T) {
+	m, config := smtModelGeneratorFixture(t)
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "model-function-sort"), nil)
+	astTestMust(t, err)
+	argument, err := m.MkConst(astTestSymbol(t, m, "model-function-argument"), sort)
+	astTestMust(t, err)
+	declaration, err := m.MkFuncDecl(astTestSymbol(t, m, "model-function"), []ast.ASTHandle{sort}, sort, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	application, err := m.MkApp(declaration, []ast.ASTHandle{argument})
+	astTestMust(t, err)
+	context, err := NewSMTCheckerContext(m)
+	astTestMust(t, err)
+	state, err := NewSMTInternalizerState(m, context, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, state.Close()) })
+	_, err = state.MkEnode(argument, false, false, true)
+	astTestMust(t, err)
+	applicationNode, err := state.MkEnode(application, false, false, true)
+	astTestMust(t, err)
+	astTestMust(t, context.SetRelevant(argument, true))
+	astTestMust(t, context.SetRelevant(application, true))
+	generator, err := NewSMTModelGenerator(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, generator.Close()) })
+	astTestMust(t, generator.SetContext(context))
+	astTestMust(t, generator.InitializeModel(config))
+	astTestMust(t, generator.BuildStateValues(state))
+	want, err := generator.Value(applicationNode)
+	astTestMust(t, err)
+	finalModel, err := generator.FinalModel()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, finalModel.Close()) })
+	interpretation, err := finalModel.Core().FunctionInterpretation(declaration)
+	astTestMust(t, err)
+	if interpretation == nil || interpretation.NumEntries() != 1 {
+		t.Fatal("function interpretation entries", interpretation)
+	}
+	entry, err := interpretation.Entry(0)
+	astTestMust(t, err)
+	if got, entryErr := entry.Result(); entryErr != nil || got != want {
+		t.Fatal("function interpretation result", got, entryErr)
+	}
+}
