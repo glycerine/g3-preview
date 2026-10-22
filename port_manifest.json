@@ -123260,12 +123260,26 @@
       "path": "src/tactic/goal_util.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/tactic_goal_util.go",
+        "pkg/tactic/tactic_goal_util_test.go"
+      ],
+      "tests": [
+        "TestGoalHasTermITE"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "goal-wide non-Boolean ITE detection",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal_util.go",
+          "tests": [
+            "TestGoalHasTermITE"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -123273,9 +123287,13 @@
       "path": "src/tactic/goal_util.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/tactic_goal_util.go"
+      ],
+      "tests": [
+        "TestGoalHasTermITE"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -123286,9 +123304,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "HasTermITE goal query",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal_util.go",
+          "tests": [
+            "TestGoalHasTermITE"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
