@@ -41576,7 +41576,8 @@
         "pkg/interp/direct_proof_substitution.go",
         "pkg/interp/direct_proof_mixed_resolution.go",
         "pkg/interp/direct_proof_simplify.go",
-        "pkg/interp/direct_proof_sum.go"
+        "pkg/interp/direct_proof_sum.go",
+        "pkg/interp/direct_proof_equality.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41588,7 +41589,8 @@
         "TestDirectProofTermSubstitutionAndBarriers",
         "TestDirectProofContraRecognitionAndResolvents",
         "TestDirectProofGenericSymbolicSimplification",
-        "TestDirectProofOrdinarySumSimplification"
+        "TestDirectProofOrdinarySumSimplification",
+        "TestDirectProofLocalEqualityRules"
       ],
       "conditionals": [
         {
@@ -41746,7 +41748,7 @@
           ]
         },
         {
-          "name": "local A/B resolution and local symmetry",
+          "name": "local A/B resolution and local/mixed symmetry",
           "status": "ported",
           "go_target": "pkg/interp/direct_proof_resolution.go",
           "tests": [
@@ -41800,9 +41802,18 @@
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_targets": [
+            "pkg/interp/direct_proof_resolution.go",
+            "pkg/interp/direct_proof_arithmetic.go",
+            "pkg/interp/direct_proof_equality.go"
+          ],
+          "tests": [
+            "TestDirectProofLocalResolutionAndSymmetry",
+            "TestDirectProofLocalArithmeticRules",
+            "TestDirectProofLocalEqualityRules"
+          ],
+          "reason": "Local modus ponens, congruence, and transitivity plus local/mixed symmetry, Farkas, leq2eq, eq2leq, and cut rules are ported. Mixed modus ponens/congruence/transitivity and localized axioms remain pending."
         },
         {
           "name": "term localization, quantification, and final interpolation",
@@ -41834,7 +41845,8 @@
         "pkg/interp/direct_proof_substitution.go",
         "pkg/interp/direct_proof_mixed_resolution.go",
         "pkg/interp/direct_proof_simplify.go",
-        "pkg/interp/direct_proof_sum.go"
+        "pkg/interp/direct_proof_sum.go",
+        "pkg/interp/direct_proof_equality.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41846,7 +41858,8 @@
         "TestDirectProofTermSubstitutionAndBarriers",
         "TestDirectProofContraRecognitionAndResolvents",
         "TestDirectProofGenericSymbolicSimplification",
-        "TestDirectProofOrdinarySumSimplification"
+        "TestDirectProofOrdinarySumSimplification",
+        "TestDirectProofLocalEqualityRules"
       ],
       "conditionals": [
         {
@@ -41872,7 +41885,7 @@
           ]
         },
         {
-          "name": "local A/B resolution and symmetry declarations",
+          "name": "local A/B resolution and local/mixed symmetry declarations",
           "status": "ported",
           "go_target": "pkg/interp/direct_proof_resolution.go",
           "tests": [

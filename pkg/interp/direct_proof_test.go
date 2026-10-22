@@ -172,8 +172,14 @@ func TestDirectProofLocalResolutionAndSymmetry(t *testing.T) {
 	if resolved, e := direct.MakeResolution(mixed, nil, truth, falsehood); e != nil || resolved != falsehood {
 		t.Fatal("mixed resolution traversal", resolved, e)
 	}
-	if _, err = direct.MakeSymmetry(mixed, mixed, truth); !errors.As(err, new(ProofError)) {
-		t.Fatal("mixed symmetry boundary", err)
+	reversed, err := manager.Make(OperatorEqual, q, p)
+	interpMust(t, err)
+	mixedPremise, err := direct.MakeHypothesis(mixed)
+	interpMust(t, err)
+	mixedSymmetry, err := direct.MakeSymmetry(reversed, mixed, mixedPremise)
+	interpMust(t, err)
+	if mixedSymmetry.IsNull() {
+		t.Fatal("mixed symmetry returned null proof")
 	}
 }
 
@@ -484,5 +490,31 @@ func TestDirectProofOrdinarySumSimplification(t *testing.T) {
 	interpMust(t, err)
 	if got != want {
 		t.Fatal("ordinary sum simplification", got, want)
+	}
+}
+
+func TestDirectProofLocalEqualityRules(t *testing.T) {
+	_, manager, base, p, _ := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	equivalence, err := manager.Make(OperatorIff, p, p)
+	interpMust(t, err)
+	modusPonens, err := direct.MakeModusPonens(equivalence, truth, truth)
+	interpMust(t, err)
+	if yes, e := manager.IsTrue(modusPonens); e != nil || !yes {
+		t.Fatal("local modus ponens", yes, e)
+	}
+	congruence, err := direct.MakeCongruence(equivalence, equivalence, truth)
+	interpMust(t, err)
+	if yes, e := manager.IsTrue(congruence); e != nil || !yes {
+		t.Fatal("local congruence", yes, e)
+	}
+	transitivity, err := direct.MakeTransitivity(p, p, p, truth, truth)
+	interpMust(t, err)
+	if yes, e := manager.IsTrue(transitivity); e != nil || !yes {
+		t.Fatal("local transitivity", yes, e)
 	}
 }
