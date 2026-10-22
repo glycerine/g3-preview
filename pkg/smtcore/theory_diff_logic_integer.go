@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 )
 
 type smtIntegerDiffAtom struct {
@@ -741,3 +742,44 @@ func (t *SMTIntegerDiffTheory) Graph() *SMTRationalDiffGraph {
 }
 
 func (*SMTIntegerDiffTheory) Name() string { return "difference-logic" }
+
+func (t *SMTIntegerDiffTheory) InitializeModel(generator *SMTModelGenerator) error {
+	if t == nil || generator == nil {
+		return ast.ErrASTHandle
+	}
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	if generator.manager != state.manager {
+		return ast.ErrASTDomain
+	}
+	factory, err := protomodel.NewArithmeticFactory(state.manager)
+	if err != nil {
+		return err
+	}
+	return generator.RegisterFactory(factory)
+}
+
+func (t *SMTIntegerDiffTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
+	if t == nil || generator == nil || node == nil || !t.IsAttachedToVariable(node) {
+		return nil, ast.ErrASTDomain
+	}
+	state, err := t.State()
+	if err != nil {
+		return nil, err
+	}
+	if generator.manager != state.manager {
+		return nil, ast.ErrASTDomain
+	}
+	variable := node.TheoryVar(t.FamilyID())
+	value, err := t.graph.Assignment(int32(variable))
+	if err != nil {
+		return nil, err
+	}
+	numeral, err := state.manager.ArithmeticNumeralRat(value, true)
+	if err != nil {
+		return nil, err
+	}
+	return NewSMTExpressionValueProcedure(numeral)
+}

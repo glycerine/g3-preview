@@ -94,6 +94,13 @@ type SMTModelValueProcedure interface {
 	IsFresh() bool
 }
 
+// SMTModelValueTheory is the retained model-generation surface implemented by
+// theories that assign concrete values to their enode roots.
+type SMTModelValueTheory interface {
+	InitializeModel(*SMTModelGenerator) error
+	ModelValue(*SMTEnode, *SMTModelGenerator) (SMTModelValueProcedure, error)
+}
+
 type SMTExpressionValueProcedure struct{ value ast.ASTHandle }
 
 func NewSMTExpressionValueProcedure(value ast.ASTHandle) (*SMTExpressionValueProcedure, error) {

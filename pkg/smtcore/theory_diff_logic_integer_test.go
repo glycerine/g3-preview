@@ -232,3 +232,55 @@ func TestSMTIntegerDiffTheoryParallelBoundAxioms(t *testing.T) {
 		}
 	}
 }
+
+func TestSMTIntegerDiffTheoryBuildsModelValues(t *testing.T) {
+	m, config := smtModelGeneratorFixture(t)
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	integer, err := m.MkFamilySort(family, 1, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "model-idl-x"), integer)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "model-idl-y"), integer)
+	astTestMust(t, err)
+	context, err := NewSMTCheckerContext(m)
+	astTestMust(t, err)
+	state, err := NewSMTInternalizerState(m, context, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, state.Close()) })
+	theory, err := NewSMTIntegerDiffTheory(family)
+	astTestMust(t, err)
+	astTestMust(t, state.RegisterTheory(theory))
+	fixture := smtIntegerDiffFixture{manager: m, family: family, state: state, theory: theory, sort: integer, x: x, y: y}
+	bound := fixture.bound(t, smtArithOpLE, x, y, -2)
+	astTestMust(t, state.Internalize(bound, true))
+	variable, _ := state.BoolVar(bound)
+	astTestMust(t, state.AssignLiteral(NewSMTLiteral(variable, false), NewSMTBooleanAxiom()))
+	astTestMust(t, state.PropagateTheoryAssignments())
+	astTestMust(t, theory.Propagate())
+	generator, err := NewSMTModelGenerator(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, generator.Close()) })
+	astTestMust(t, generator.SetContext(context))
+	astTestMust(t, generator.InitializeModel(config))
+	astTestMust(t, theory.InitializeModel(generator))
+	xNode, yNode := context.enodes[x], context.enodes[y]
+	xProcedure, err := theory.ModelValue(xNode, generator)
+	astTestMust(t, err)
+	yProcedure, err := theory.ModelValue(yNode, generator)
+	astTestMust(t, err)
+	astTestMust(t, generator.BuildValues([]*SMTEnode{xNode, yNode}, map[*SMTEnode]SMTModelValueProcedure{xNode: xProcedure, yNode: yProcedure}))
+	xValue, err := generator.Value(xNode)
+	astTestMust(t, err)
+	yValue, err := generator.Value(yNode)
+	astTestMust(t, err)
+	xText, _, xMatched, err := m.ArithmeticNumeralText(xValue)
+	astTestMust(t, err)
+	yText, _, yMatched, err := m.ArithmeticNumeralText(yValue)
+	astTestMust(t, err)
+	xRat, xOK := new(big.Rat).SetString(xText)
+	yRat, yOK := new(big.Rat).SetString(yText)
+	if !xMatched || !yMatched || !xOK || !yOK || new(big.Rat).Sub(xRat, yRat).Cmp(big.NewRat(-2, 1)) > 0 {
+		t.Fatal("difference model values", xText, yText)
+	}
+}
