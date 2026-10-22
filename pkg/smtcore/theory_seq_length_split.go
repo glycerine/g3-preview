@@ -56,8 +56,10 @@ func (t *SMTSequenceTheory) exactSequenceLength(expression ast.ASTHandle) (uint6
 }
 
 func (t *SMTSequenceTheory) fixedLengthPartition(parts []ast.ASTHandle, front bool) ([]uint64, bool, error) {
-	lengths := make([]uint64, len(parts))
-	for index := range parts {
+	// The final part remains on the residual side of every proper split, so its
+	// length need not be fixed.
+	lengths := make([]uint64, len(parts)-1)
+	for index := range lengths {
 		partIndex := index
 		if !front {
 			partIndex = len(parts) - 1 - index
@@ -73,14 +75,14 @@ func (t *SMTSequenceTheory) fixedLengthPartition(parts []ast.ASTHandle, front bo
 
 func smtSequenceEqualPartition(left, right []uint64) (int, int, bool) {
 	var leftSum, rightSum uint64
-	for leftCount, rightCount := 0, 0; leftCount < len(left)-1 || rightCount < len(right)-1; {
-		if leftSum <= rightSum && leftCount < len(left)-1 {
+	for leftCount, rightCount := 0, 0; leftCount < len(left) || rightCount < len(right); {
+		if leftSum <= rightSum && leftCount < len(left) {
 			if left[leftCount] > math.MaxUint64-leftSum {
 				return 0, 0, false
 			}
 			leftSum += left[leftCount]
 			leftCount++
-		} else if rightCount < len(right)-1 {
+		} else if rightCount < len(right) {
 			if right[rightCount] > math.MaxUint64-rightSum {
 				return 0, 0, false
 			}
