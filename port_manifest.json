@@ -104193,9 +104193,14 @@
       "path": "src/smt/smt_consequences.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_solver.go"
+      ],
+      "tests": [
+        "TestSMTSolverDerivesBooleanConsequences",
+        "TestSMTSolverFindsBinaryClauseMutexes"
+      ],
       "assertions": [
         {
           "line": 145,
@@ -104251,10 +104256,35 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "model-guided retained consequence extraction through solver counterexample checks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverDerivesBooleanConsequences"
+          ]
+        },
+        {
+          "name": "binary-clause implication graph and max-clique mutex extraction (src/smt/smt_consequences.cpp:578-611)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverFindsBinaryClauseMutexes"
+          ]
+        },
+        {
+          "name": "context-native antecedent tracking, tuned fixed-value consequence search and preferred SAT (remaining src/smt/smt_consequences.cpp)",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Mutex extraction borrows the current internalizer Boolean expressions and clause/watch graph; returned rows own Go slices and borrow canonical AST handles."
+      ],
+      "deviations": [
+        "Until the binary-clause storage optimization is ported, mutex extraction reads two-literal ordinary clauses in addition to the source literal-watch region and feeds the same literal edges to util/cliques."
+      ]
     },
     {
       "path": "src/smt/smt_context.cpp",
@@ -109103,7 +109133,15 @@
           ]
         },
         {
-          "name": "registered theory-plugin copying, mutex solving, timed slow progress sampling, and unsat-core minimization and pattern extension",
+          "name": "binary-clause mutex extraction through the retained max-clique algorithm",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverFindsBinaryClauseMutexes"
+          ]
+        },
+        {
+          "name": "registered theory-plugin copying, timed slow progress sampling, and unsat-core minimization and pattern extension",
           "status": "unported",
           "go_target": null,
           "tests": []

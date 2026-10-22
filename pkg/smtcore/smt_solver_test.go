@@ -159,6 +159,29 @@ func TestSMTSolverDerivesBooleanConsequences(t *testing.T) {
 	}
 }
 
+func TestSMTSolverFindsBinaryClauseMutexes(t *testing.T) {
+	m, s := smtSolverFixture(t)
+	a := smtRelevancyBool(t, m, "smt-mutex-a")
+	b := smtRelevancyBool(t, m, "smt-mutex-b")
+	notA, err := m.MkNot(a)
+	astTestMust(t, err)
+	notB, err := m.MkNot(b)
+	astTestMust(t, err)
+	clause, err := m.MkOr(notA, notB)
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(clause))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("mutex setup status", status)
+	}
+	status, mutexes, err := s.FindMutexes([]ast.ASTHandle{a, b})
+	astTestMust(t, err)
+	if status != lbool.True || len(mutexes) != 1 || len(mutexes[0]) != 2 {
+		t.Fatal("binary mutexes", status, mutexes)
+	}
+}
+
 func TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	a := smtRelevancyBool(t, m, "smt-solver-tracked-a")
@@ -371,8 +394,8 @@ func TestSMTSolverFactoryAndUnsupportedKernelPrerequisites(t *testing.T) {
 	if status, _, err := s.GetConsequences(nil, nil); status != lbool.Undef || !errors.Is(err, ast.ErrASTDomain) {
 		t.Fatal("kernel consequences prerequisite", status, err)
 	}
-	if status, _, err := s.FindMutexes(nil); status != lbool.Undef || !errors.Is(err, ast.ErrASTDomain) {
-		t.Fatal("kernel mutex prerequisite", status, err)
+	if status, mutexes, err := s.FindMutexes(nil); status != lbool.True || err != nil || len(mutexes) != 0 {
+		t.Fatal("empty kernel mutex query", status, mutexes, err)
 	}
 	if err = s.Pop(1); !errors.Is(err, arena.ErrBounds) {
 		t.Fatal("scope underflow", err)

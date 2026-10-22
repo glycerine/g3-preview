@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/solver"
+	"github.com/glycerine/g3/pkg/util/cliques"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -494,11 +495,74 @@ func (s *SMTSolver) GetConsequences(assumptions []ast.ASTHandle, variables []ast
 	})
 }
 
-func (s *SMTSolver) FindMutexes([]ast.ASTHandle) (lbool.LBool, [][]ast.ASTHandle, error) {
+func (s *SMTSolver) FindMutexes(variables []ast.ASTHandle) (lbool.LBool, [][]ast.ASTHandle, error) {
 	if err := s.open(); err != nil {
 		return lbool.Undef, nil, err
 	}
-	return lbool.Undef, nil, ast.ErrASTDomain
+	state := s.kernel.internalizer
+	literals := make([]uint32, 0, len(variables))
+	for _, expression := range variables {
+		atom := expression
+		negative := false
+		isNot, argument, err := s.manager.IsNot(expression)
+		if err != nil {
+			return lbool.Undef, nil, err
+		}
+		if isNot {
+			atom, negative = argument, true
+		}
+		variable, found := state.boolVar[atom]
+		if !found {
+			continue
+		}
+		literals = append(literals, uint32(NewSMTLiteral(variable, negative).Index()))
+	}
+	finder := cliques.New()
+	// The retained internalizer still stores binary clauses in the ordinary
+	// two-watch region. Feed those same clause edges to max_cliques directly.
+	for index := range state.clauses {
+		clause := state.clauses[index].clause
+		if clause == nil || clause.Deleted() || len(clause.Literals()) != 2 {
+			continue
+		}
+		pair := clause.Literals()
+		if err := finder.AddEdge(uint32(pair[0].Index()), uint32(pair[1].Index())); err != nil {
+			return lbool.Undef, nil, err
+		}
+	}
+	for index := range state.watches {
+		for _, watched := range state.watches[index].Literals() {
+			left, right := uint32(index)^1, uint32(watched.Index())
+			if left < right {
+				if err := finder.AddEdge(left, right); err != nil {
+					return lbool.Undef, nil, err
+				}
+			}
+		}
+	}
+	rows, err := finder.Cliques(literals)
+	if err != nil {
+		return lbool.Undef, nil, err
+	}
+	mutexes := make([][]ast.ASTHandle, len(rows))
+	for i, row := range rows {
+		mutexes[i] = make([]ast.ASTHandle, len(row))
+		for j, index := range row {
+			literal := SMTLiteralFromIndex(int32(index))
+			if literal.Var() < SMTFirstBoolVar || int(literal.Var()) >= len(state.boolExpr) {
+				return lbool.Undef, nil, ast.ErrASTDomain
+			}
+			expression := state.boolExpr[literal.Var()]
+			if literal.Sign() {
+				expression, err = s.manager.MkNot(expression)
+				if err != nil {
+					return lbool.Undef, nil, err
+				}
+			}
+			mutexes[i][j] = expression
+		}
+	}
+	return lbool.True, mutexes, nil
 }
 
 func (s *SMTSolver) PreferredSAT([]ast.ASTHandle) (lbool.LBool, [][]ast.ASTHandle, error) {
