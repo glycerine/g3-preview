@@ -448,6 +448,49 @@ func TestSMTSequenceTheoryExposesExtensionalityEquality(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryFixedLengthOneDecomposition(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	value, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(value)
+	astTestMust(t, err)
+	elementSort, sequence, err := m.SequenceSortElement(sort)
+	astTestMust(t, err)
+	if !sequence {
+		t.Fatal("string sort is not a sequence")
+	}
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-fixed-one-x"), sort)
+	astTestMust(t, err)
+	length, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	lengthOne, err := m.MkEq(length, one)
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	headName, err := m.Symbols.Intern("seq.nth")
+	astTestMust(t, err)
+	head, err := m.MkSequenceSkolem(headName, []ast.ASTHandle{x, zero}, elementSort)
+	astTestMust(t, err)
+	unit, err := m.MkSequenceUnit(head)
+	astTestMust(t, err)
+	singleton, err := m.MkEq(x, unit)
+	astTestMust(t, err)
+	notSingleton, err := m.MkNot(singleton)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(lengthOne))
+	astTestMust(t, solver.Assert(notSingleton))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("fixed length one sequence is not a singleton", status)
+	}
+}
+
 func TestSMTSequenceTheoryBranchesBinaryUnitEquation(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	a, err := m.MkString("a")

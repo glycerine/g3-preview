@@ -116793,6 +116793,7 @@
         "TestSMTSequenceTheoryReducesEqualLengthBoundaries",
         "TestSMTSequenceTheoryLengthCoherenceDecomposition",
         "TestSMTSequenceTheoryExposesExtensionalityEquality",
+        "TestSMTSequenceTheoryFixedLengthOneDecomposition",
         "TestSMTSequenceTheoryBranchesBinaryUnitEquation",
         "TestSMTSequenceTheoryBranchesFixedStringOverlaps",
         "TestSMTSequenceTheoryConcreteRelationConflicts",
@@ -117340,6 +117341,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_coherence.go",
           "tests": ["TestSMTSequenceTheoryLengthCoherenceDecomposition"]
+        },
+        {
+          "name": "demand-driven fixed-length-one singleton decomposition using the stable seq.nth witness (src/smt/theory_seq.cpp fixed_length and mk_decompose)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_length.go",
+          "tests": ["TestSMTSequenceTheoryFixedLengthOneDecomposition"]
         },
         {
           "name": "relevant symbolic sequence root extensionality through an equality case split, excluding pairs already equal or disequal (src/smt/theory_seq.cpp check_extensionality)",

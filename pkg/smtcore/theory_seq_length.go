@@ -130,12 +130,43 @@ func (t *SMTSequenceTheory) addLengthAxiom(length ast.ASTHandle) error {
 	if err = t.axioms.Push(emptyExactlyZero); err != nil {
 		return err
 	}
-	integer, itos, err := state.manager.SequenceIntToStringArgument(argument)
-	if err != nil || !itos {
-		return err
-	}
 	one, err := t.integer(1)
 	if err != nil {
+		return err
+	}
+	oneLength, err := state.manager.MkEq(length, one)
+	if err != nil {
+		return err
+	}
+	elementSort, sequence, err := state.manager.SequenceSortElement(sort)
+	if err != nil {
+		return err
+	}
+	if !sequence {
+		return ast.ErrASTDomain
+	}
+	head, err := t.relationSkolem("seq.nth", []ast.ASTHandle{argument, zero}, elementSort)
+	if err != nil {
+		return err
+	}
+	unit, err := state.manager.MkSequenceUnit(head)
+	if err != nil {
+		return err
+	}
+	singleton, err := state.manager.MkEq(argument, unit)
+	if err != nil {
+		return err
+	}
+	fixedOne, err := state.manager.MkImplies(oneLength, singleton)
+	if err != nil {
+		return err
+	}
+	t.trackCoherenceTerms(head, unit)
+	if err = t.axioms.Push(fixedOne); err != nil {
+		return err
+	}
+	integer, itos, err := state.manager.SequenceIntToStringArgument(argument)
+	if err != nil || !itos {
 		return err
 	}
 	integerNonnegative, err := state.manager.MkArithmeticGE(integer, zero)

@@ -4,6 +4,15 @@ package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 
+func (t *SMTSequenceTheory) trackCoherenceTerms(expressions ...ast.ASTHandle) {
+	for _, expression := range expressions {
+		if _, found := t.coherence[expression]; !found {
+			t.coherence[expression] = struct{}{}
+			t.coherenceLog = append(t.coherenceLog, expression)
+		}
+	}
+}
+
 // addSequenceCoherenceAxiom gives every symbolic sequence its source-level
 // empty-or-cons decomposition.  The two Skolems are stable ASTs, so later
 // arithmetic bounds and word-equation rules can refer to the same head and
@@ -60,11 +69,6 @@ func (t *SMTSequenceTheory) addSequenceCoherenceAxiom(expression ast.ASTHandle) 
 	if err != nil {
 		return err
 	}
-	for _, internal := range []ast.ASTHandle{head, tail, unit, word} {
-		if _, found := t.coherence[internal]; !found {
-			t.coherence[internal] = struct{}{}
-			t.coherenceLog = append(t.coherenceLog, internal)
-		}
-	}
+	t.trackCoherenceTerms(head, tail, unit, word)
 	return t.axioms.Push(coherence)
 }
