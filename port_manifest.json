@@ -101608,7 +101608,7 @@
       "path": "src/smt/params/theory_array_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_array_params.go",
         "pkg/util/params/util_module_params_source.go",
@@ -101627,12 +101627,12 @@
         "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
         "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Literal weak then extensional RHS/publication, source module-reference destructor and nine separate ostream endl chains (src/smt/params/theory_array_params.cpp:22-40)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_array_params.go",
           "tests": [
             "TestSMTArrayConstructorElevenDefaultsDoesNotUpdate",
@@ -101645,7 +101645,7 @@
         },
         {
           "name": "Concrete simultaneous generated-helper frame engine, older reads and strict younger source stop before older DT (scripts/mk_genfile_common.py:895-939; src/smt/params/theory_bv_params.cpp:24-29)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_module_params_source.go",
           "tests": [
             "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
@@ -101670,7 +101670,7 @@
       "path": "src/smt/params/theory_array_params.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_array_params.go",
         "pkg/util/params/util_module_params_source.go",
@@ -101702,12 +101702,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Eleven declaration-order scalar defaults; constructor performs no update; disabled registration erased (src/smt/params/theory_array_params.h:24-75)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_array_params.go",
           "tests": [
             "TestSMTArrayConstructorElevenDefaultsDoesNotUpdate",
