@@ -41574,7 +41574,8 @@
         "pkg/interp/direct_proof_arithmetic.go",
         "pkg/interp/direct_proof_finalize.go",
         "pkg/interp/direct_proof_substitution.go",
-        "pkg/interp/direct_proof_mixed_resolution.go"
+        "pkg/interp/direct_proof_mixed_resolution.go",
+        "pkg/interp/direct_proof_simplify.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41584,7 +41585,8 @@
         "TestDirectProofLocalArithmeticRules",
         "TestDirectProofFinalSimplificationOwnership",
         "TestDirectProofTermSubstitutionAndBarriers",
-        "TestDirectProofContraRecognitionAndResolvents"
+        "TestDirectProofContraRecognitionAndResolvents",
+        "TestDirectProofGenericSymbolicSimplification"
       ],
       "conditionals": [
         {
@@ -41785,9 +41787,13 @@
         },
         {
           "name": "rewrite-chain normalization and symbolic proof simplification",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/interp/direct_proof_simplify.go",
+          "tests": [
+            "TestDirectProofContraRecognitionAndResolvents",
+            "TestDirectProofGenericSymbolicSimplification"
+          ],
+          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, and single-resolvent reduction are ported. Specialized rotation, arithmetic sum, equality-rule, excluded-middle, congruence, modus-ponens, and rewrite-chain normalization remain pending."
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
@@ -41823,7 +41829,8 @@
         "pkg/interp/direct_proof_arithmetic.go",
         "pkg/interp/direct_proof_finalize.go",
         "pkg/interp/direct_proof_substitution.go",
-        "pkg/interp/direct_proof_mixed_resolution.go"
+        "pkg/interp/direct_proof_mixed_resolution.go",
+        "pkg/interp/direct_proof_simplify.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
@@ -41833,7 +41840,8 @@
         "TestDirectProofLocalArithmeticRules",
         "TestDirectProofFinalSimplificationOwnership",
         "TestDirectProofTermSubstitutionAndBarriers",
-        "TestDirectProofContraRecognitionAndResolvents"
+        "TestDirectProofContraRecognitionAndResolvents",
+        "TestDirectProofGenericSymbolicSimplification"
       ],
       "conditionals": [
         {

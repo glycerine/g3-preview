@@ -311,8 +311,11 @@ func (p *DirectProofInterpolator) resolveContradictions(pivot1, conjunction1, pi
 		return ast.ASTHandle{}, ProofError{}
 	}
 	if len(resolvent) == 1 {
-		// This path invokes the source's custom symbolic proof simplifier.
-		return ast.ASTHandle{}, ProofError{}
+		proof, e := p.base.manager.Arg(resolvent[0], 0)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.simplifyProofTerm(proof)
 	}
 	return p.base.manager.Make(OperatorAnd, resolvent...)
 }

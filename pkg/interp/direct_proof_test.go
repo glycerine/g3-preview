@@ -404,4 +404,40 @@ func TestDirectProofContraRecognitionAndResolvents(t *testing.T) {
 	if count, e := manager.NumArgs(merged); e != nil || count != 3 {
 		t.Fatal("normal-form resolvent size", count, e)
 	}
+	singleLeft, err := direct.makeContraNode(truth, []ast.ASTHandle{equality}, 1)
+	interpMust(t, err)
+	singleRight, err := direct.makeContraNode(truth, []ast.ASTHandle{negativeEquality}, 0)
+	interpMust(t, err)
+	leftEntries, err := manager.Args(singleLeft)
+	interpMust(t, err)
+	rightEntries, err := manager.Args(singleRight)
+	interpMust(t, err)
+	single, err := direct.resolveContradictions(leftEntries[1], singleLeft, rightEntries[1], singleRight)
+	interpMust(t, err)
+	if yes, e := manager.IsTrue(single); e != nil || !yes {
+		t.Fatal("single resolvent simplification", yes, e)
+	}
+}
+
+func TestDirectProofGenericSymbolicSimplification(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	term, err := manager.Make(OperatorAnd, p, truth)
+	interpMust(t, err)
+	term, err = direct.SimplifyProofTerm(term)
+	interpMust(t, err)
+	if term != p {
+		t.Fatal("boolean proof simplification", term, p)
+	}
+	equality, err := manager.Make(OperatorEqual, q, q)
+	interpMust(t, err)
+	equality, err = direct.SimplifyProofTerm(equality)
+	interpMust(t, err)
+	if yes, e := manager.IsTrue(equality); e != nil || !yes {
+		t.Fatal("equality proof simplification", yes, e)
+	}
 }
