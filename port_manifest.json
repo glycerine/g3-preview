@@ -105937,7 +105937,8 @@
         "TestSMTInternalizerBooleanGateClausesAndRootAssertions",
         "TestSMTInternalizerTermITEEqualityClausesAndRelevancy",
         "TestSMTInternalizerQuantifierRegistrationAndDefaultAssertion",
-        "TestSMTInternalizerConsumesMaterializedQuantifierInstance"
+        "TestSMTInternalizerConsumesMaterializedQuantifierInstance",
+        "TestSMTInternalizerDeepAssertionUsesTopologicalPrepass"
       ],
       "conditionals": [
         {
@@ -106312,7 +106313,8 @@
             "TestSMTInternalizerBooleanGateClausesAndRootAssertions",
             "TestSMTInternalizerTermITEEqualityClausesAndRelevancy",
             "TestSMTInternalizerQuantifierRegistrationAndDefaultAssertion",
-            "TestSMTInternalizerConsumesMaterializedQuantifierInstance"
+            "TestSMTInternalizerConsumesMaterializedQuantifierInstance",
+            "TestSMTInternalizerDeepAssertionUsesTopologicalPrepass"
           ]
         },
         {
@@ -106329,9 +106331,11 @@
         },
         {
           "name": "deep-expression topological ordering invocation from the assertion entry point",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer.go",
+          "tests": [
+            "TestSMTInternalizerDeepAssertionUsesTopologicalPrepass"
+          ]
         }
       ],
       "ownership": [

@@ -9,6 +9,8 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
+const smtDeepExpressionThreshold uint32 = 1024
+
 func (s *SMTInternalizerState) SetRelevancy(propagator *SMTRelevancyPropagator) error {
 	if err := s.open(); err != nil {
 		return err
@@ -536,6 +538,46 @@ func (s *SMTInternalizerState) internalizeTermITE(expression ast.ASTHandle) erro
 	return nil
 }
 
+func (s *SMTInternalizerState) preInternalizeDeep(expression ast.ASTHandle) error {
+	depth, err := s.manager.GetDepth(expression)
+	if err != nil || depth <= smtDeepExpressionThreshold {
+		return err
+	}
+	order, err := NewSMTInternalizationOrder(s.manager, s.context)
+	if err != nil {
+		return err
+	}
+	for existing := range s.boolVar {
+		if err = order.SetBooleanInternalized(existing, true); err != nil {
+			return err
+		}
+	}
+	items, err := order.Sort(expression)
+	if err != nil {
+		return err
+	}
+	for _, item := range items {
+		kind, err := s.manager.GetKind(item.Expression)
+		if err != nil {
+			return err
+		}
+		if kind == ast.ASTApp {
+			family, err := s.manager.GetFamilyID(item.Expression)
+			if err != nil {
+				return err
+			}
+			// Concrete theory internalizers retain the source top-down walk.
+			if family != ast.NullFamilyID && family != s.manager.BasicFamilyID() {
+				continue
+			}
+		}
+		if err = s.Internalize(item.Expression, item.GateContext); err != nil {
+			return fmt.Errorf("pre-internalize deep expression: %w", err)
+		}
+	}
+	return nil
+}
+
 func (s *SMTInternalizerState) Assert(expression, proof ast.ASTHandle, generation uint32) error {
 	previousGeneration := s.generation
 	if err := s.SetGeneration(generation); err != nil {
@@ -548,6 +590,9 @@ func (s *SMTInternalizerState) Assert(expression, proof ast.ASTHandle, generatio
 			return err
 		}
 		return ast.ErrASTDomain
+	}
+	if err = s.preInternalizeDeep(expression); err != nil {
+		return err
 	}
 	op, basic, err := s.basicOperation(expression)
 	if err != nil {

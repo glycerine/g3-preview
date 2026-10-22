@@ -163,3 +163,36 @@ func TestSMTInternalizerConsumesMaterializedQuantifierInstance(t *testing.T) {
 		t.Fatal("instance generation", state.Statistics().MaxGeneration, instance.Generation())
 	}
 }
+
+func TestSMTInternalizerDeepAssertionUsesTopologicalPrepass(t *testing.T) {
+	m := astTestManager(t)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	info, err := m.NewFuncDeclInfo(ast.NullFamilyID, -1, nil, ast.ASTFuncFlags{}, false)
+	astTestMust(t, err)
+	wrapper, err := m.MkFuncDeclWithInfo(astTestSymbol(t, m, "internalize-deep-wrapper"), []ast.ASTHandle{boolean}, boolean, info)
+	astTestMust(t, err)
+	astTestMust(t, m.DelFuncDeclInfo(&info))
+	expression := smtRelevancyBool(t, m, "internalize-deep-leaf")
+	for depth := uint32(0); depth <= smtDeepExpressionThreshold; depth++ {
+		expression, err = m.MkApp(wrapper, []ast.ASTHandle{expression})
+		astTestMust(t, err)
+	}
+	actualDepth, err := m.GetDepth(expression)
+	astTestMust(t, err)
+	if actualDepth <= smtDeepExpressionThreshold {
+		t.Fatal("fixture is not deep", actualDepth)
+	}
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.Assert(expression, ast.ASTHandle{}, 3))
+	if len(state.boolVar) != int(smtDeepExpressionThreshold)+2 {
+		t.Fatal("deep assertion internalization count", len(state.boolVar))
+	}
+	rootVariable, found := state.BoolVar(expression)
+	if !found {
+		t.Fatal("deep assertion root was not internalized")
+	}
+	if value, err := state.Assignment(NewSMTLiteral(rootVariable, false)); err != nil || value != lbool.True {
+		t.Fatal("deep assertion root assignment", value, err)
+	}
+}
