@@ -98736,7 +98736,8 @@
         "TestSMTRationalDiffGraphDirectAndTwoHopSubsumption",
         "TestSMTRationalDiffGraphLazySubsumptionExplanationTimestamp",
         "TestSMTRationalDiffGraphZeroSCCReachabilityAndTraversal",
-        "TestSMTRationalDiffGraphAssignmentMutationTimestampAndReset"
+        "TestSMTRationalDiffGraphAssignmentMutationTimestampAndReset",
+        "TestSMTRationalDiffGraphShortestZeroPathStrictTimestamp"
       ],
       "conditionals": [
         {
@@ -99110,7 +99111,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete rational dl_edge and sparse dl_graph construction, indexed-heap assignment repair, activation, negative cycles, scopes, zero normalization, edge lookup, undirected traversal, reset, zero-edge SCC/successors, direct/two-hop subsumption and timestamp-bounded lazy explanations (src/smt/diff_logic.h:39-559,751-845,905-1224,1640-1834)",
+          "name": "Concrete rational dl_edge and sparse dl_graph construction, indexed-heap assignment repair, activation, negative cycles, scopes, zero normalization, edge lookup, undirected traversal, reset, zero-edge SCC/successors and shortest paths, direct/two-hop subsumption and timestamp-bounded lazy explanations (src/smt/diff_logic.h:39-559,751-845,905-1224,1278-1355,1640-1834)",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_diff_graph_rational.go",
           "tests": [
@@ -99121,11 +99122,12 @@
             "TestSMTRationalDiffGraphDirectAndTwoHopSubsumption",
             "TestSMTRationalDiffGraphLazySubsumptionExplanationTimestamp",
             "TestSMTRationalDiffGraphZeroSCCReachabilityAndTraversal",
-            "TestSMTRationalDiffGraphAssignmentMutationTimestampAndReset"
+            "TestSMTRationalDiffGraphAssignmentMutationTimestampAndReset",
+            "TestSMTRationalDiffGraphShortestZeroPathStrictTimestamp"
           ]
         },
         {
-          "name": "Cycle shortcut pruning, graph display/enumeration, SCC equality propagation and general implied-bound discovery (src/smt/diff_logic.h:562-750,846-904,1225-1639)",
+          "name": "Cycle shortcut pruning, graph display/enumeration, explanation debug checks and general implied-bound discovery (src/smt/diff_logic.h:562-750,846-904,1225-1277,1356-1639)",
           "status": "unported"
         },
         {

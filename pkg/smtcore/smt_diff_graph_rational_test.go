@@ -333,3 +333,35 @@ func TestSMTRationalDiffGraphAssignmentMutationTimestampAndReset(t *testing.T) {
 		t.Fatal("reset state")
 	}
 }
+
+func TestSMTRationalDiffGraphShortestZeroPathStrictTimestamp(t *testing.T) {
+	g := NewSMTRationalDiffGraph()
+	for variable := int32(0); variable < 3; variable++ {
+		if err := g.InitVariable(variable); err != nil {
+			t.Fatal(err)
+		}
+	}
+	firstLiteral := NewSMTLiteral(41, false)
+	secondLiteral := NewSMTLiteral(42, true)
+	for index, edge := range []struct {
+		source, target int32
+		literal        SMTLiteral
+	}{{0, 1, firstLiteral}, {1, 2, secondLiteral}} {
+		id, err := g.AddEdge(edge.source, edge.target, diffRat(0), edge.literal)
+		if err != nil {
+			t.Fatal(err)
+		}
+		feasible, err := g.EnableEdge(id)
+		if err != nil || !feasible || g.Timestamp() != uint32(index+1) {
+			t.Fatal(feasible, err, g.Timestamp())
+		}
+	}
+	explanation, found, err := g.FindShortestZeroEdgePath(0, 2, 2)
+	if err != nil || !found || !reflect.DeepEqual(explanation, []SMTLiteral{secondLiteral, firstLiteral}) {
+		t.Fatal(explanation, found, err)
+	}
+	explanation, found, err = g.FindShortestZeroEdgePath(0, 2, 1)
+	if err != nil || found || explanation != nil {
+		t.Fatal("strict timestamp", explanation, found, err)
+	}
+}

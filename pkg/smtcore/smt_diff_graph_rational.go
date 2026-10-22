@@ -562,6 +562,52 @@ func (g *SMTRationalDiffGraph) ComputeZeroSuccessors(variable int32) ([]int32, e
 	return result, nil
 }
 
+type smtRationalDiffBFSElement struct {
+	variable    int32
+	parentIndex int
+	edgeID      int32
+}
+
+// FindShortestZeroEdgePath performs the source breadth-first search over
+// enabled normalized-zero edges older than timestamp. Explanations follow the
+// source callback order: final edge first, then predecessors toward source.
+func (g *SMTRationalDiffGraph) FindShortestZeroEdgePath(source, target int32, timestamp uint32) ([]SMTLiteral, bool, error) {
+	if !g.validVariable(source) || !g.validVariable(target) {
+		return nil, false, errSMTDiffGraphDomain
+	}
+	queue := []smtRationalDiffBFSElement{{variable: source, parentIndex: -1, edgeID: -1}}
+	marked := make([]bool, len(g.assignment))
+	marked[source] = true
+	for head := 0; head < len(queue); head++ {
+		current := queue[head]
+		for _, edgeID := range g.outEdges[current.variable] {
+			edge := &g.edges[edgeID]
+			if !edge.enabled || edge.timestamp >= timestamp {
+				continue
+			}
+			var gamma big.Rat
+			g.setGamma(edge, &gamma)
+			if gamma.Sign() != 0 {
+				continue
+			}
+			if edge.target == target {
+				result := []SMTLiteral{edge.explanation}
+				parent := head
+				for parent >= 0 && queue[parent].edgeID != -1 {
+					result = append(result, g.edges[queue[parent].edgeID].explanation)
+					parent = queue[parent].parentIndex
+				}
+				return result, true, nil
+			}
+			if !marked[edge.target] {
+				marked[edge.target] = true
+				queue = append(queue, smtRationalDiffBFSElement{variable: edge.target, parentIndex: head, edgeID: edgeID})
+			}
+		}
+	}
+	return nil, false, nil
+}
+
 func (g *SMTRationalDiffGraph) IncrementAssignment(variable int32, increment *big.Rat) error {
 	if !g.validVariable(variable) || increment == nil {
 		return errSMTDiffGraphDomain
