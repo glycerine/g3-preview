@@ -116776,7 +116776,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_disequality_solve.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_extensionality.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_extract_special.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_ground.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_disequality_solve.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_fixed_length.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_extensionality.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_extract_special.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_ground.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -116796,6 +116796,7 @@
         "TestSMTSequenceTheoryLengthCoherenceDecomposition",
         "TestSMTSequenceTheoryExposesExtensionalityEquality",
         "TestSMTSequenceTheoryFixedLengthOneDecomposition",
+        "TestSMTSequenceTheoryFixedLengthDecomposition",
         "TestSMTSequenceTheoryNativeWordVariableClassification",
         "TestSMTSequenceTheoryBranchesBinaryUnitEquation",
         "TestSMTSequenceTheoryRejectsIncompatibleCyclicUnits",
@@ -117363,6 +117364,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_length.go",
           "tests": ["TestSMTSequenceTheoryFixedLengthOneDecomposition"]
+        },
+        {
+          "name": "exact fixed nonnegative length decomposition into stable indexed seq.nth units using linear-arithmetic bounds or e-graph numeral equality, capped at the native 2048-element coherence threshold (src/smt/theory_seq.cpp:851-999)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_fixed_length.go",
+          "tests": ["TestSMTSequenceTheoryFixedLengthDecomposition"]
         },
         {
           "name": "relevant symbolic sequence root extensionality through an equality case split, excluding pairs already equal or disequal (src/smt/theory_seq.cpp check_extensionality)",
