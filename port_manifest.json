@@ -102325,9 +102325,13 @@
       "path": "src/smt/smt_b_justification.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_justification_refs.go"
+      ],
+      "tests": [
+        "TestSMTCompactBooleanAndEqualityJustifications"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -102356,19 +102360,36 @@
           "text": "SASSERT(get_kind() == BIN_CLAUSE);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "compact Boolean justification variants and payload accessors",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_justification_refs.go",
+          "tests": [
+            "TestSMTCompactBooleanAndEqualityJustifications"
+          ]
+        }
+      ],
+      "ownership": [
+        "The typed union borrows clause and justification targets and stores binary literals inline."
+      ],
+      "deviations": [
+        "A concrete Go discriminant and typed fields replace low-bit pointer tagging."
+      ]
     },
     {
       "path": "src/smt/smt_bool_var_data.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_justification_refs.go"
+      ],
+      "tests": [
+        "TestSMTBoolVarDataSourceFlagTransitions"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -102385,11 +102406,24 @@
           "text": "SASSERT(thid > 0 && thid <= 255);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "initialization, justification, scope, phase, atom, theory, enode, quantifier, equality, and case-split flags",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_justification_refs.go",
+          "tests": [
+            "TestSMTBoolVarDataSourceFlagTransitions"
+          ]
+        }
+      ],
+      "ownership": [
+        "The record stores an inline borrowed compact justification and owns no referenced clause or justification object."
+      ],
+      "deviations": [
+        "Go fields replace implementation-specific C++ bitfields; the source notify-theory assertion is a checked domain error."
+      ]
     },
     {
       "path": "src/smt/smt_case_split_queue.cpp",
@@ -104985,9 +105019,13 @@
       "path": "src/smt/smt_eq_justification.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_justification_refs.go"
+      ],
+      "tests": [
+        "TestSMTCompactBooleanAndEqualityJustifications"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -105012,11 +105050,24 @@
           "text": "bool used_commutativity() const { SASSERT(get_kind() == CONGRUENCE); return UNBOXINT(m_data) != 0; }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "axiom, congruence, equation, and fallback equality justification variants",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_justification_refs.go",
+          "tests": [
+            "TestSMTCompactBooleanAndEqualityJustifications"
+          ]
+        }
+      ],
+      "ownership": [
+        "The typed union stores literals and commutativity inline and borrows fallback justification targets."
+      ],
+      "deviations": [
+        "A concrete Go discriminant and typed fields replace low-bit pointer tagging."
+      ]
     },
     {
       "path": "src/smt/smt_failure.h",
