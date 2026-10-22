@@ -181,6 +181,17 @@ func TestDirectProofLocalResolutionAndSymmetry(t *testing.T) {
 	if mixedSymmetry.IsNull() {
 		t.Fatal("mixed symmetry returned null proof")
 	}
+	notP, err := manager.MkNot(p)
+	interpMust(t, err)
+	notQ, err := manager.MkNot(q)
+	interpMust(t, err)
+	congruentConclusion, err := manager.Make(OperatorEqual, notP, notQ)
+	interpMust(t, err)
+	mixedCongruence, err := direct.MakeCongruence(mixed, congruentConclusion, mixedPremise)
+	interpMust(t, err)
+	if mixedCongruence.IsNull() {
+		t.Fatal("mixed congruence returned null proof")
+	}
 }
 
 func TestDirectProofLocalArithmeticRules(t *testing.T) {

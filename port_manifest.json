@@ -41813,7 +41813,7 @@
             "TestDirectProofLocalArithmeticRules",
             "TestDirectProofLocalEqualityRules"
           ],
-          "reason": "Local modus ponens, single/multi-premise congruence, and transitivity plus local/mixed symmetry, Farkas, leq2eq, eq2leq, and cut rules are ported. Mixed modus ponens/congruence/transitivity and localized axioms remain pending."
+          "reason": "Local modus ponens, single/multi-premise congruence, and transitivity plus direct mixed-premise congruence, local/mixed symmetry, Farkas, leq2eq, eq2leq, and cut rules are ported. Mixed modus ponens/transitivity, local-to-mixed congruence rewrites, and localized axioms remain pending."
         },
         {
           "name": "term localization, quantification, and final interpolation",

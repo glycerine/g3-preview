@@ -31,6 +31,7 @@ type DirectProofInterpolator struct {
 	eqToLeq      ast.ASTHandle
 	excludedMid  ast.ASTHandle
 	symmetry     ast.ASTHandle
+	congruence   ast.ASTHandle
 	concat       ast.ASTHandle
 	standForall  ast.ASTHandle
 	standExists  ast.ASTHandle
@@ -84,6 +85,9 @@ func NewDirectProofInterpolator(base *Base, scope ScopeRange, weak bool) (result
 		return nil, err
 	}
 	if p.symmetry, err = p.newFunction("@symm", []ast.ASTHandle{boolean}, boolean); err != nil {
+		return nil, err
+	}
+	if p.congruence, err = p.newFunction("@cong", []ast.ASTHandle{boolean, integer, boolean}, boolean); err != nil {
 		return nil, err
 	}
 	if p.concat, err = p.newFunction("@concat", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {

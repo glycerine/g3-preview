@@ -2,7 +2,11 @@
 // congruence, and transitivity rules.
 package interp
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"strconv"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
 
 func (p *DirectProofInterpolator) makeEquivalence(left, right ast.ASTHandle) (ast.ASTHandle, error) {
 	sort, err := p.base.manager.Type(left)
@@ -108,6 +112,37 @@ func (p *DirectProofInterpolator) MakeCongruence(premiseConclusion, conclusion, 
 	conclusionSide, err := p.TermSide(conclusion)
 	if err != nil {
 		return ast.ASTHandle{}, err
+	}
+	if premiseSide == TermMixed && conclusionSide == TermMixed {
+		position, e := p.findCongruencePosition(premiseConclusion, conclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		premisePlaceholder, e := p.placeholder(premiseConclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		positionTerm, e := p.base.manager.MakeIntText(strconv.Itoa(position))
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		negatedConclusion, e := p.base.manager.MkNot(conclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		conclusionPlaceholder, e := p.placeholder(negatedConclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		proof, e := p.makeSymbol(p.congruence, premisePlaceholder, positionTerm, conclusionPlaceholder)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		interpolation, e := p.makeContraNode(proof, []ast.ASTHandle{premiseConclusion, negatedConclusion}, -1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.MakeResolution(premiseConclusion, []ast.ASTHandle{conclusion}, interpolation, premise)
 	}
 	if premiseSide == TermMixed || conclusionSide == TermMixed {
 		return ast.ASTHandle{}, ProofError{}
