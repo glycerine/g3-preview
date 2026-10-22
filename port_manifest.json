@@ -41571,14 +41571,16 @@
       "go_targets": [
         "pkg/interp/direct_proof.go",
         "pkg/interp/direct_proof_resolution.go",
-        "pkg/interp/direct_proof_arithmetic.go"
+        "pkg/interp/direct_proof_arithmetic.go",
+        "pkg/interp/direct_proof_finalize.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
         "TestDirectProofHypothesisReflexivityAndContra",
         "TestDirectProofArithmeticHypothesisAndGuards",
         "TestDirectProofLocalResolutionAndSymmetry",
-        "TestDirectProofLocalArithmeticRules"
+        "TestDirectProofLocalArithmeticRules",
+        "TestDirectProofFinalSimplificationOwnership"
       ],
       "conditionals": [
         {
@@ -41771,9 +41773,12 @@
         },
         {
           "name": "term localization, quantification, and final interpolation",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/interp/direct_proof_finalize.go",
+          "tests": [
+            "TestDirectProofFinalSimplificationOwnership"
+          ],
+          "reason": "Final strong simplification, caller-owned result publication, and universal closure are ported; localization-variable introduction and quantifier insertion remain pending."
         }
       ],
       "ownership": [
@@ -41791,14 +41796,16 @@
       "go_targets": [
         "pkg/interp/direct_proof.go",
         "pkg/interp/direct_proof_resolution.go",
-        "pkg/interp/direct_proof_arithmetic.go"
+        "pkg/interp/direct_proof_arithmetic.go",
+        "pkg/interp/direct_proof_finalize.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
         "TestDirectProofHypothesisReflexivityAndContra",
         "TestDirectProofArithmeticHypothesisAndGuards",
         "TestDirectProofLocalResolutionAndSymmetry",
-        "TestDirectProofLocalArithmeticRules"
+        "TestDirectProofLocalArithmeticRules",
+        "TestDirectProofFinalSimplificationOwnership"
       ],
       "conditionals": [
         {
@@ -41838,6 +41845,15 @@
           "tests": [
             "TestDirectProofLocalArithmeticRules"
           ]
+        },
+        {
+          "name": "final interpolation declaration",
+          "status": "partial",
+          "go_target": "pkg/interp/direct_proof_finalize.go",
+          "tests": [
+            "TestDirectProofFinalSimplificationOwnership"
+          ],
+          "reason": "The final simplification and universal closure are implemented; localization quantifier insertion remains pending."
         },
         {
           "name": "remaining direct interpolation proof-rule surface and final result",

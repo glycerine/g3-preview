@@ -253,3 +253,33 @@ func TestDirectProofLocalArithmeticRules(t *testing.T) {
 		t.Fatal("mixed arithmetic boundary", err)
 	}
 }
+
+func TestDirectProofFinalSimplificationOwnership(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	boolean, err := manager.BoolType()
+	interpMust(t, err)
+	p, err := manager.MakeVariable("final-proof-p", boolean)
+	interpMust(t, err)
+	p = interpPin(t, m, p)
+	base, err := NewBase(manager, []ast.ASTHandle{p}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	proof, err := manager.Make(OperatorAnd, p, truth)
+	interpMust(t, err)
+	result, err := direct.Interpolate(proof)
+	interpMust(t, err)
+	interpMust(t, direct.Close())
+	got, err := m.RefGet(result)
+	interpMust(t, err)
+	if got != p {
+		t.Fatal("final simplified proof", got, p)
+	}
+	interpMust(t, m.DelRef(&result))
+	if _, err = direct.Interpolate(proof); !errors.Is(err, ast.ErrASTHandle) {
+		t.Fatal("closed finalizer guard", err)
+	}
+}
