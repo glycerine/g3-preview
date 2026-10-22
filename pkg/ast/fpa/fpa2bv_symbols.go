@@ -119,6 +119,23 @@ func (c *Converter) MkConst(declaration ast.ASTHandle) (ast.ASTHandle, error) {
 	if !matched {
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
+	if c.constantFactory != nil {
+		result, factoryErr := c.constantFactory(declaration)
+		if factoryErr != nil {
+			return ast.ASTHandle{}, factoryErr
+		}
+		resultSort, factoryErr := c.manager.GetSort(result)
+		if factoryErr != nil || resultSort != sort {
+			if factoryErr != nil {
+				return ast.ASTHandle{}, factoryErr
+			}
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
+		if factoryErr = c.cacheInsert(c.constants, declaration, result); factoryErr != nil {
+			return ast.ASTHandle{}, factoryErr
+		}
+		return result, nil
+	}
 	var sign, exponent, significand ast.ASTHandle
 	if ast.ASTSourceDebug {
 		name, err := c.manager.GetASTName(declaration)
@@ -206,6 +223,23 @@ func (c *Converter) MkRMConst(declaration ast.ASTHandle) (ast.ASTHandle, error) 
 	matched, err := c.manager.IsRoundingModeSort(sort)
 	if err != nil || !matched {
 		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	if c.roundingFactory != nil {
+		result, factoryErr := c.roundingFactory(declaration)
+		if factoryErr != nil {
+			return ast.ASTHandle{}, factoryErr
+		}
+		resultSort, factoryErr := c.manager.GetSort(result)
+		if factoryErr != nil || resultSort != sort {
+			if factoryErr != nil {
+				return ast.ASTHandle{}, factoryErr
+			}
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
+		if factoryErr = c.cacheInsert(c.roundingConstants, declaration, result); factoryErr != nil {
+			return ast.ASTHandle{}, factoryErr
+		}
+		return result, nil
 	}
 	bvSort, err := c.manager.BitVectorSort(3)
 	if err != nil {

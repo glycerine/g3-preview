@@ -1183,6 +1183,57 @@ func TestConverterSymbolCachesAssertionsAndReset(t *testing.T) {
 	}
 }
 
+func TestConverterSMTConstantFactoriesOverrideFreshSymbols(t *testing.T) {
+	m, c := fixture(t)
+	floatSort, err := m.FloatingPointSort(8, 24)
+	must(t, err)
+	rmSort, err := m.RoundingModeSort()
+	must(t, err)
+	floatConstant := declaration(t, m, "theory-float", nil, floatSort)
+	rmConstant := declaration(t, m, "theory-rm", nil, rmSort)
+	wantFloat, err := m.MkFPAZeroOfSort(floatSort, false)
+	must(t, err)
+	family, err := m.ExistingFloatingPointFamilyID()
+	must(t, err)
+	wantRM, err := m.MkFamilyApp(family, ast.FPAOpRMNearestEven, nil, nil)
+	must(t, err)
+	floatCalls, rmCalls := 0, 0
+	must(t, c.SetConstantFactories(
+		func(decl ast.ASTHandle) (ast.ASTHandle, error) {
+			if decl != floatConstant {
+				return ast.ASTHandle{}, ast.ErrASTDomain
+			}
+			floatCalls++
+			return wantFloat, nil
+		},
+		func(decl ast.ASTHandle) (ast.ASTHandle, error) {
+			if decl != rmConstant {
+				return ast.ASTHandle{}, ast.ErrASTDomain
+			}
+			rmCalls++
+			return wantRM, nil
+		},
+	))
+	for i := 0; i < 2; i++ {
+		got, e := c.MkConst(floatConstant)
+		must(t, e)
+		if got != wantFloat {
+			t.Fatal("floating factory result", got, wantFloat)
+		}
+		got, e = c.MkRMConst(rmConstant)
+		must(t, e)
+		if got != wantRM {
+			t.Fatal("rounding factory result", got, wantRM)
+		}
+	}
+	if floatCalls != 1 || rmCalls != 1 || len(c.ExtraAssertions()) != 0 {
+		t.Fatal("factory cache or standalone assertion leaked", floatCalls, rmCalls, len(c.ExtraAssertions()))
+	}
+	if e := c.SetConstantFactories(nil, nil); !errors.Is(e, ast.ErrASTDomain) {
+		t.Fatal("factory replacement after cache", e)
+	}
+}
+
 func TestConverterMinMaxSpecialCasesAndStableUnspecifiedZeros(t *testing.T) {
 	m, c := fixture(t)
 	sort, err := m.FloatingPointSort(8, 24)

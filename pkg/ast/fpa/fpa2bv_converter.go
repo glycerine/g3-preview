@@ -33,6 +33,8 @@ type Converter struct {
 	extraAssertions   []ast.ASTHandle
 	header            uint64
 	highUnspecified   bool
+	constantFactory   func(ast.ASTHandle) (ast.ASTHandle, error)
+	roundingFactory   func(ast.ASTHandle) (ast.ASTHandle, error)
 	closed            bool
 }
 
@@ -67,6 +69,24 @@ func NewConverter(m *ast.ASTManager) (owner *Converter, result error) {
 	return owner, nil
 }
 
+// SetConstantFactories installs the source theory_fpa converter overrides.
+// Nil callbacks retain the standalone tactic converter's fresh-constant path.
+// Factories are borrowed and must remain valid until replaced or Close.
+func (c *Converter) SetConstantFactories(
+	floating func(ast.ASTHandle) (ast.ASTHandle, error),
+	rounding func(ast.ASTHandle) (ast.ASTHandle, error),
+) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if len(c.constants) != 0 || len(c.roundingConstants) != 0 {
+		return ast.ErrASTDomain
+	}
+	c.constantFactory = floating
+	c.roundingFactory = rounding
+	return nil
+}
+
 // SetHighUnspecified selects the source converter's deterministic high value
 // for otherwise unspecified floating-point conversions.
 func (c *Converter) SetHighUnspecified(value bool) error {
@@ -94,6 +114,8 @@ func (c *Converter) Close() error {
 	c.manager.Budget().Release(c.header)
 	c.header = 0
 	c.manager = nil
+	c.constantFactory = nil
+	c.roundingFactory = nil
 	c.self = nil
 	return result
 }
