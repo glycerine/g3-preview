@@ -14,7 +14,13 @@ import (
 
 type smtArrayScope struct {
 	stores, selects, defaults, epsilons int
+	selectAxioms, defaultAxioms         int
 	unsupported                         bool
+}
+
+type smtArrayAxiomPair struct {
+	observer ast.ASTHandle
+	array    ast.ASTHandle
 }
 
 type smtArrayStatistics struct {
@@ -23,13 +29,14 @@ type smtArrayStatistics struct {
 	defaultConst, defaultAsArray, selectAsArray, eqSplits uint64
 }
 
-// SMTArrayTheory internalizes core read-over-write, constant-array, and
-// extensionality axioms. Maps, defaults, and model construction are added by
-// later retained slices.
+// SMTArrayTheory internalizes read-over-write, constant-array, map, default,
+// as-array, and extensionality axioms and constructs retained array models.
 type SMTArrayTheory struct {
 	*SMTTheoryBase
 	stores, selects, defaults             map[ast.ASTHandle]bool
 	storeTrail, selectTrail, defaultTrail []ast.ASTHandle
+	selectAxioms, defaultAxioms           map[smtArrayAxiomPair]bool
+	selectAxiomTrail, defaultAxiomTrail   []smtArrayAxiomPair
 	epsilons                              map[ast.ASTHandle]ast.ASTHandle
 	epsilonTrail                          []ast.ASTHandle
 	scopes                                []smtArrayScope
@@ -47,6 +54,8 @@ func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
 		stores:        make(map[ast.ASTHandle]bool),
 		selects:       make(map[ast.ASTHandle]bool),
 		defaults:      make(map[ast.ASTHandle]bool),
+		selectAxioms:  make(map[smtArrayAxiomPair]bool),
+		defaultAxioms: make(map[smtArrayAxiomPair]bool),
 		epsilons:      make(map[ast.ASTHandle]ast.ASTHandle),
 	}, nil
 }
@@ -205,18 +214,50 @@ func (t *SMTArrayTheory) assertStoreAxiom(store ast.ASTHandle) error {
 }
 
 func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle) error {
-	if t.selects[selectExpression] {
-		return nil
+	if !t.selects[selectExpression] {
+		t.selects[selectExpression] = true
+		t.selectTrail = append(t.selectTrail, selectExpression)
 	}
-	t.selects[selectExpression] = true
-	t.selectTrail = append(t.selectTrail, selectExpression)
 	state, _ := t.State()
 	array, err := state.manager.GetArg(selectExpression, 0)
 	if err != nil {
 		return err
 	}
+	return t.assertSelectAxiom(selectExpression, array)
+}
+
+func (t *SMTArrayTheory) assertSelectAxiom(selectExpression, array ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	pair := smtArrayAxiomPair{observer: selectExpression, array: array}
+	if t.selectAxioms[pair] {
+		return nil
+	}
 	op, isArray, err := t.arrayOperation(array)
 	if err != nil || !isArray {
+		return err
+	}
+	if op != ast.ASTArrayOpConst && op != ast.ASTArrayOpMap && op != ast.ASTArrayOpAsArray && op != ast.ASTArrayOpStore {
+		return nil
+	}
+	t.selectAxioms[pair] = true
+	t.selectAxiomTrail = append(t.selectAxiomTrail, pair)
+	observedArray, err := state.manager.GetArg(selectExpression, 0)
+	if err != nil {
+		return err
+	}
+	guard := make([]SMTLiteral, 0, 1)
+	if observedArray != array {
+		equal, equalityErr := t.MkEqualityLiteral(observedArray, array, true)
+		if equalityErr != nil {
+			return equalityErr
+		}
+		guard = append(guard, equal.Negated())
+	}
+	selectCount, err := state.manager.GetNumArgs(selectExpression)
+	if err != nil || selectCount < 2 {
 		return err
 	}
 	if op == ast.ASTArrayOpConst {
@@ -228,14 +269,15 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 		if equalityErr != nil {
 			return equalityErr
 		}
-		if equalityErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); equalityErr != nil {
+		clause := append(guard, literal)
+		if equalityErr = state.addTheoryAxiom(t.FamilyID(), clause); equalityErr != nil {
 			return fmt.Errorf("constant array select axiom: %w", equalityErr)
 		}
 		t.statistics.selectConst++
 		return nil
 	}
 	if op == ast.ASTArrayOpMap {
-		return t.assertSelectMapAxiom(selectExpression, array)
+		return t.assertSelectMapAxiom(selectExpression, array, guard)
 	}
 	if op == ast.ASTArrayOpAsArray {
 		function, functionErr := state.manager.AsArrayFunction(array)
@@ -262,7 +304,8 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 		if equalityErr != nil {
 			return equalityErr
 		}
-		if equalityErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); equalityErr != nil {
+		clause := append(guard, literal)
+		if equalityErr = state.addTheoryAxiom(t.FamilyID(), clause); equalityErr != nil {
 			return fmt.Errorf("as-array select axiom: %w", equalityErr)
 		}
 		t.statistics.selectAsArray++
@@ -270,10 +313,6 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 	}
 	if op != ast.ASTArrayOpStore {
 		return nil
-	}
-	selectCount, err := state.manager.GetNumArgs(selectExpression)
-	if err != nil {
-		return err
 	}
 	storeCount, err := state.manager.GetNumArgs(array)
 	if err != nil || storeCount != selectCount+1 {
@@ -335,7 +374,8 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 		if equalityErr != nil {
 			return equalityErr
 		}
-		if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{antecedent, consequence}); err != nil {
+		clause := append(append(guard[:0:0], guard...), antecedent, consequence)
+		if err = state.addTheoryAxiom(t.FamilyID(), clause); err != nil {
 			return fmt.Errorf("array conditional store axiom: %w", err)
 		}
 		added = true
@@ -346,7 +386,7 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 	return nil
 }
 
-func (t *SMTArrayTheory) assertSelectMapAxiom(selectExpression, arrayMap ast.ASTHandle) error {
+func (t *SMTArrayTheory) assertSelectMapAxiom(selectExpression, arrayMap ast.ASTHandle, guard []SMTLiteral) error {
 	state, _ := t.State()
 	mapDeclaration, err := state.manager.GetDecl(arrayMap)
 	if err != nil {
@@ -395,7 +435,8 @@ func (t *SMTArrayTheory) assertSelectMapAxiom(selectExpression, arrayMap ast.AST
 	if err != nil {
 		return err
 	}
-	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); err != nil {
+	clause := append(guard, literal)
+	if err = state.addTheoryAxiom(t.FamilyID(), clause); err != nil {
 		return fmt.Errorf("array map select axiom: %w", err)
 	}
 	t.statistics.mapAxiom++
@@ -403,19 +444,47 @@ func (t *SMTArrayTheory) assertSelectMapAxiom(selectExpression, arrayMap ast.AST
 }
 
 func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) error {
-	if t.defaults[defaultExpression] {
-		return nil
+	if !t.defaults[defaultExpression] {
+		t.defaults[defaultExpression] = true
+		t.defaultTrail = append(t.defaultTrail, defaultExpression)
 	}
-	t.defaults[defaultExpression] = true
-	t.defaultTrail = append(t.defaultTrail, defaultExpression)
 	state, _ := t.State()
 	array, err := state.manager.GetArg(defaultExpression, 0)
 	if err != nil {
 		return err
 	}
+	return t.assertDefaultAxiomForArray(defaultExpression, array)
+}
+
+func (t *SMTArrayTheory) assertDefaultAxiomForArray(defaultExpression, array ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	pair := smtArrayAxiomPair{observer: defaultExpression, array: array}
+	if t.defaultAxioms[pair] {
+		return nil
+	}
 	op, isArray, err := t.arrayOperation(array)
 	if err != nil || !isArray {
 		return err
+	}
+	if op != ast.ASTArrayOpConst && op != ast.ASTArrayOpMap && op != ast.ASTArrayOpStore && op != ast.ASTArrayOpAsArray {
+		return nil
+	}
+	t.defaultAxioms[pair] = true
+	t.defaultAxiomTrail = append(t.defaultAxiomTrail, pair)
+	observedArray, err := state.manager.GetArg(defaultExpression, 0)
+	if err != nil {
+		return err
+	}
+	guard := make([]SMTLiteral, 0, 1)
+	if observedArray != array {
+		equal, equalityErr := t.MkEqualityLiteral(observedArray, array, true)
+		if equalityErr != nil {
+			return equalityErr
+		}
+		guard = append(guard, equal.Negated())
 	}
 	var value ast.ASTHandle
 	switch op {
@@ -529,7 +598,8 @@ func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) err
 	if err != nil {
 		return err
 	}
-	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); err != nil {
+	clause := append(guard, literal)
+	if err = state.addTheoryAxiom(t.FamilyID(), clause); err != nil {
 		return fmt.Errorf("array default value axiom: %w", err)
 	}
 	switch op {
@@ -656,9 +726,59 @@ func (t *SMTArrayTheory) InternalizeEquality(expression ast.ASTHandle, variable 
 	t.statistics.extensionality++
 	return nil
 }
-func (*SMTArrayTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error    { return nil }
+func (t *SMTArrayTheory) NewEquality(left, right SMTTheoryVar) error {
+	if _, err := t.Enode(left); err != nil {
+		return err
+	}
+	if _, err := t.Enode(right); err != nil {
+		return err
+	}
+	return t.instantiateEquivalentArrayAxioms()
+}
 func (*SMTArrayTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error { return nil }
 func (*SMTArrayTheory) Assign(int32, bool) error                        { return nil }
+
+func (t *SMTArrayTheory) instantiateEquivalentArrayAxioms() error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	for _, observer := range t.selectTrail {
+		array, argErr := state.manager.GetArg(observer, 0)
+		if argErr != nil {
+			return argErr
+		}
+		arrayNode := state.context.enodes[array]
+		if arrayNode == nil {
+			continue
+		}
+		for _, candidate := range t.variables {
+			if candidate != nil && candidate.root == arrayNode.root {
+				if err = t.assertSelectAxiom(observer, candidate.owner); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	for _, observer := range t.defaultTrail {
+		array, argErr := state.manager.GetArg(observer, 0)
+		if argErr != nil {
+			return argErr
+		}
+		arrayNode := state.context.enodes[array]
+		if arrayNode == nil {
+			continue
+		}
+		for _, candidate := range t.variables {
+			if candidate != nil && candidate.root == arrayNode.root {
+				if err = t.assertDefaultAxiomForArray(observer, candidate.owner); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
 
 func (t *SMTArrayTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHandle) error {
 	state, err := t.State()
@@ -677,7 +797,15 @@ func (t *SMTArrayTheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {
 		return err
 	}
-	t.scopes = append(t.scopes, smtArrayScope{len(t.storeTrail), len(t.selectTrail), len(t.defaultTrail), len(t.epsilonTrail), t.unsupported})
+	t.scopes = append(t.scopes, smtArrayScope{
+		stores:        len(t.storeTrail),
+		selects:       len(t.selectTrail),
+		defaults:      len(t.defaultTrail),
+		epsilons:      len(t.epsilonTrail),
+		selectAxioms:  len(t.selectAxiomTrail),
+		defaultAxioms: len(t.defaultAxiomTrail),
+		unsupported:   t.unsupported,
+	})
 	return nil
 }
 
@@ -699,10 +827,18 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	for _, sort := range t.epsilonTrail[scope.epsilons:] {
 		delete(t.epsilons, sort)
 	}
+	for _, pair := range t.selectAxiomTrail[scope.selectAxioms:] {
+		delete(t.selectAxioms, pair)
+	}
+	for _, pair := range t.defaultAxiomTrail[scope.defaultAxioms:] {
+		delete(t.defaultAxioms, pair)
+	}
 	t.storeTrail = t.storeTrail[:scope.stores]
 	t.selectTrail = t.selectTrail[:scope.selects]
 	t.defaultTrail = t.defaultTrail[:scope.defaults]
 	t.epsilonTrail = t.epsilonTrail[:scope.epsilons]
+	t.selectAxiomTrail = t.selectAxiomTrail[:scope.selectAxioms]
+	t.defaultAxiomTrail = t.defaultAxiomTrail[:scope.defaultAxioms]
 	t.unsupported = scope.unsupported
 	t.scopes = t.scopes[:level]
 	return t.SMTTheoryBase.PopScopes(count)
