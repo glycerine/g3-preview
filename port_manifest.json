@@ -98474,22 +98474,46 @@
       "path": "src/smt/cost_evaluator.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/cost_evaluator.go"
+      ],
+      "tests": [
+        "TestSMTCostEvaluatorSourceLanguageAndReverseVariables",
+        "TestSMTCostEvaluatorNumeralDivisionAndFallbackWarnings"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "cost_evaluator::eval and operator()",
+          "status": "ported",
+          "go_target": "pkg/smtcore/cost_evaluator.go",
+          "tests": [
+            "TestSMTCostEvaluatorSourceLanguageAndReverseVariables",
+            "TestSMTCostEvaluatorNumeralDivisionAndFallbackWarnings"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTCostEvaluator borrows the AST manager, warning service, expression handles, and per-call argument slice."
+      ],
+      "deviations": [
+        "Checked Go AST accessors and explicit errors replace unchecked C++ downcasts; valid unsupported expressions retain the warning and 1.0 fallback."
+      ]
     },
     {
       "path": "src/smt/cost_evaluator.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/cost_evaluator.go"
+      ],
+      "tests": [
+        "TestSMTCostEvaluatorSourceLanguageAndReverseVariables",
+        "TestSMTCostEvaluatorNumeralDivisionAndFallbackWarnings"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -98500,11 +98524,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "cost_evaluator interface and reverse de Bruijn argument convention",
+          "status": "ported",
+          "go_target": "pkg/smtcore/cost_evaluator.go",
+          "tests": [
+            "TestSMTCostEvaluatorSourceLanguageAndReverseVariables"
+          ]
+        }
+      ],
+      "ownership": [
+        "The evaluator retains borrowed services only for its enclosing SMT queue lifetime."
+      ],
+      "deviations": [
+        "The Go call returns AST and warning-stream errors instead of relying on unchecked source preconditions."
+      ]
     },
     {
       "path": "src/smt/database.h",
