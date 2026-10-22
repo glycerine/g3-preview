@@ -2150,6 +2150,18 @@ func (t *SMTBitVectorTheory) ModelValue(node *SMTEnode, generator *SMTModelGener
 	}
 	value := new(big.Int)
 	for i, bit := range bits {
+		if state.manager.IsFalse(bit) {
+			continue
+		}
+		if state.manager.IsTrue(bit) {
+			value.SetBit(value, i, 1)
+			continue
+		}
+		if _, found := state.BoolVar(bit); !found {
+			// A late theory witness can expose a symbolic bit after relevancy
+			// propagation has finished. It is unconstrained, so choose zero.
+			continue
+		}
 		literal, literalErr := state.Literal(bit)
 		if literalErr != nil {
 			return nil, literalErr

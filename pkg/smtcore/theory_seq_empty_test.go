@@ -367,6 +367,55 @@ func TestSMTSequenceTheoryReducesEqualLengthBoundaries(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryLengthCoherenceDecomposition(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	value, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(value)
+	astTestMust(t, err)
+	elementSort, sequence, err := m.SequenceSortElement(sort)
+	astTestMust(t, err)
+	if !sequence {
+		t.Fatal("string sort is not a sequence")
+	}
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-coherence-x"), sort)
+	astTestMust(t, err)
+	empty, err := m.MkSequenceEmpty(sort)
+	astTestMust(t, err)
+	xEmpty, err := m.MkEq(x, empty)
+	astTestMust(t, err)
+	xNonempty, err := m.MkNot(xEmpty)
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	headName, err := m.Symbols.Intern("seq.nth")
+	astTestMust(t, err)
+	head, err := m.MkSequenceSkolem(headName, []ast.ASTHandle{x, zero}, elementSort)
+	astTestMust(t, err)
+	tailName, err := m.Symbols.Intern("seq.tail")
+	astTestMust(t, err)
+	tail, err := m.MkSequenceSkolem(tailName, []ast.ASTHandle{x, zero}, sort)
+	astTestMust(t, err)
+	unit, err := m.MkSequenceUnit(head)
+	astTestMust(t, err)
+	word, err := m.MkSequenceConcat(unit, tail)
+	astTestMust(t, err)
+	decomposition, err := m.MkEq(x, word)
+	astTestMust(t, err)
+	notDecomposition, err := m.MkNot(decomposition)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(xNonempty))
+	astTestMust(t, solver.Assert(notDecomposition))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("nonempty sequence lacks head-tail decomposition", status)
+	}
+}
+
 func TestSMTSequenceTheoryBranchesBinaryUnitEquation(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	a, err := m.MkString("a")

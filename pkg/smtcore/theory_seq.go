@@ -25,6 +25,9 @@ type SMTSequenceTheory struct {
 	nonContains  *smtSequenceNonContainsQueue
 	relations    *smtSequenceRelationQueue
 	axioms       *smtSequenceAxiomQueue
+	coherence    map[ast.ASTHandle]struct{}
+	coherenceLog []ast.ASTHandle
+	coherenceLim []int
 	nextEquation uint32
 	unsupported  uint32
 	limits       []uint32
@@ -35,7 +38,7 @@ func NewSMTSequenceTheory(family ast.FamilyID) (*SMTSequenceTheory, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &SMTSequenceTheory{SMTTheoryBase: base}, nil
+	return &SMTSequenceTheory{SMTTheoryBase: base, coherence: make(map[ast.ASTHandle]struct{})}, nil
 }
 
 func (t *SMTSequenceTheory) Initialize(state *SMTInternalizerState) error {
@@ -276,7 +279,8 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 	if err != nil {
 		return false, err
 	}
-	if !value {
+	_, coherence := t.coherence[expression]
+	if !value && !coherence {
 		if err = t.markUnsupported(); err != nil {
 			return false, err
 		}
@@ -304,6 +308,13 @@ func (t *SMTSequenceTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHand
 	}
 	if regex {
 		return t.markUnsupported()
+	}
+	variable, err := t.sequenceVariable(node.Owner())
+	if err != nil {
+		return err
+	}
+	if variable {
+		return t.addSequenceCoherenceAxiom(node.Owner())
 	}
 	return nil
 }
@@ -582,6 +593,7 @@ func (t *SMTSequenceTheory) PushScope() error {
 		return err
 	}
 	t.limits = append(t.limits, t.unsupported)
+	t.coherenceLim = append(t.coherenceLim, len(t.coherenceLog))
 	return nil
 }
 
@@ -591,6 +603,7 @@ func (t *SMTSequenceTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.limits) - int(count)
 	unsupported := t.limits[level]
+	coherenceLimit := t.coherenceLim[level]
 	if err := t.solutions.PopScopes(count); err != nil {
 		return err
 	}
@@ -617,6 +630,11 @@ func (t *SMTSequenceTheory) PopScopes(count uint32) error {
 	}
 	t.unsupported = unsupported
 	t.limits = t.limits[:level]
+	for i := len(t.coherenceLog) - 1; i >= coherenceLimit; i-- {
+		delete(t.coherence, t.coherenceLog[i])
+	}
+	t.coherenceLog = t.coherenceLog[:coherenceLimit]
+	t.coherenceLim = t.coherenceLim[:level]
 	return nil
 }
 
@@ -868,7 +886,21 @@ func (t *SMTSequenceTheory) InitializeModel(generator *SMTModelGenerator) error 
 	if err != nil {
 		return err
 	}
-	return generator.RegisterFactory(factory)
+	if err = generator.RegisterFactory(factory); err != nil {
+		return err
+	}
+	bitVectorFamily, err := state.manager.BitVectorUtilityFamilyID()
+	if err != nil {
+		return err
+	}
+	if generator.model.Factory(bitVectorFamily) != nil {
+		return nil
+	}
+	bitVectorFactory, err := protomodel.NewBitVectorFactory(state.manager)
+	if err != nil {
+		return err
+	}
+	return generator.RegisterFactory(bitVectorFactory)
 }
 
 func (t *SMTSequenceTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
@@ -929,6 +961,9 @@ func (t *SMTSequenceTheory) Close() (result error) {
 	t.relations = nil
 	t.axioms = nil
 	t.dependencies = nil
+	t.coherence = nil
+	t.coherenceLog = nil
+	t.coherenceLim = nil
 	t.limits = nil
 	if result != nil {
 		return fmt.Errorf("sequence theory state: %w", result)
