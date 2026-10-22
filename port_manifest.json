@@ -124415,28 +124415,58 @@
       "path": "src/tactic/sine_filter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/tactic_sine.go",
+        "pkg/tactic/tactic_sine_test.go",
+        "pkg/tactic/tactic_filter_model.go"
+      ],
+      "tests": [
+        "TestSineTacticSelectsLastConnectedComponent",
+        "TestSineTacticQuantifierPatternGating"
+      ],
       "assertions": [
         {
           "line": 71,
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "sine_tactic lifecycle, translation, no-op parameter/statistic callbacks and goal application",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_sine.go",
+          "tests": ["TestSineTacticSelectsLastConnectedComponent"]
+        },
+        {
+          "name": "uninterpreted-declaration graph construction, universal-pattern gating and last-form connected-component selection",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_sine.go",
+          "tests": ["TestSineTacticSelectsLastConnectedComponent", "TestSineTacticQuantifierPatternGating"]
+        },
+        {
+          "name": "sine TRACE records at filter stages",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_sine.go",
+          "tests": ["TestSineTacticSelectsLastConnectedComponent"]
+        }
+      ],
+      "ownership": [
+        "Selected formulas acquire temporary AST references before goal reset and release them after reassertion. The result retains the borrowed input goal and an owning reference to the newly created filter model converter."
+      ],
+      "deviations": [
+        "Native Go maps and slices replace source object maps, hash tables, pair tables and pointer vectors while preserving stack order and declaration/formula identity. The private find_constants helper is unreachable in the source unit and is intentionally omitted."
+      ]
     },
     {
       "path": "src/tactic/sine_filter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/tactic/tactic_sine.go", "pkg/tactic/tactic_sine_test.go"],
+      "tests": ["TestSineTacticSelectsLastConnectedComponent", "TestSineTacticQuantifierPatternGating"],
       "conditionals": [
         {
           "line": 19,
@@ -124447,11 +124477,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_sine_tactic factory and retained tactic surface",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_sine.go",
+          "tests": ["TestSineTacticSelectsLastConnectedComponent", "TestSineTacticQuantifierPatternGating"]
+        }
+      ],
+      "ownership": ["The concrete tactic borrows its AST manager and uses explicit reference-count lifetime through the Tactic interface."],
+      "deviations": ["The generated tactic registration is represented by the typed NewSineTactic constructor; registry wiring belongs to retained command consumers."]
     },
     {
       "path": "src/tactic/sls/CMakeLists.txt",
