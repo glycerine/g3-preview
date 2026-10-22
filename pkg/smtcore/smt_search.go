@@ -60,6 +60,13 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 				return lbool.Undef, fmt.Errorf("smt search resolve conflict: %w", err)
 			}
 			if !resolution.Resolved {
+				proof, proofErr := resolver.LemmaProof()
+				if proofErr != nil {
+					return lbool.Undef, proofErr
+				}
+				if err = k.manager.SetRef(k.unsatProof, proof); err != nil {
+					return lbool.Undef, err
+				}
 				if err = k.captureUnsatCore(resolver, conflict, conflictLiteral); err != nil {
 					return lbool.Undef, err
 				}

@@ -54,6 +54,9 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 	if err := k.clearUnsatCore(); err != nil {
 		return lbool.Undef, err
 	}
+	if err := k.manager.ResetRef(k.unsatProof); err != nil {
+		return lbool.Undef, err
+	}
 	for index, assumption := range assumptions {
 		valid, err := k.validAssumption(assumption)
 		if err != nil {
@@ -72,9 +75,6 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 		return lbool.Undef, err
 	}
 	if !consistent || len(assumptions) == 0 {
-		if !consistent {
-			return lbool.False, nil
-		}
 		return k.search(queue)
 	}
 	if err = k.internalizer.PushScope(); err != nil {

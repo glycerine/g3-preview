@@ -24,6 +24,7 @@ type SMTKernel struct {
 	assertedHead int
 	scopes       []int
 	unsatCore    []ast.ASTHandle
+	unsatProof   ast.ASTRef
 	assumptions  map[SMTLiteral]ast.ASTHandle
 	closed       bool
 }
@@ -44,7 +45,11 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 	if err = internalizer.SetRelevancy(relevancy); err != nil {
 		return nil, errors.Join(err, internalizer.Close())
 	}
-	return &SMTKernel{manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer}, nil
+	proof, err := manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return nil, errors.Join(err, internalizer.Close())
+	}
+	return &SMTKernel{manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof}, nil
 }
 
 func (k *SMTKernel) open() error {
@@ -213,11 +218,24 @@ func (k *SMTKernel) Check() (lbool.LBool, error) {
 	if err := k.clearUnsatCore(); err != nil {
 		return lbool.Undef, err
 	}
+	if err := k.manager.ResetRef(k.unsatProof); err != nil {
+		return lbool.Undef, err
+	}
 	queue, err := k.prepareCheck()
 	if err != nil {
 		return lbool.Undef, err
 	}
 	return k.search(queue)
+}
+
+// Proof returns the kernel-owned proof from the latest unsatisfiable check.
+// It is null when proof generation is disabled or the latest check did not
+// establish unsatisfiability.
+func (k *SMTKernel) Proof() (ast.ASTHandle, error) {
+	if err := k.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return k.manager.RefGet(k.unsatProof)
 }
 
 func (k *SMTKernel) Inconsistent() bool {
@@ -240,6 +258,7 @@ func (k *SMTKernel) Close() error {
 	}
 	var result error
 	result = errors.Join(result, k.clearUnsatCore())
+	result = errors.Join(result, k.manager.DelRef(&k.unsatProof))
 	result = errors.Join(result, k.internalizer.Close())
 	for index := len(k.assertions); index > 0; index-- {
 		assertion := &k.assertions[index-1]

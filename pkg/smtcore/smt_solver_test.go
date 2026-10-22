@@ -139,6 +139,63 @@ func TestSMTInternalizerImplicationGateWithoutPreprocessing(t *testing.T) {
 	}
 }
 
+func TestSMTSolverPublishesKernelUnsatProof(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	s, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, s.Close())
+		astTestMust(t, params.Close())
+	})
+	falsity, err := m.MkFalse()
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(falsity))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("false assertion status", status)
+	}
+	proof, err := s.Proof()
+	astTestMust(t, err)
+	if proof.IsNull() {
+		t.Fatal("missing unsat proof")
+	}
+	fact, err := m.GetProofFact(proof)
+	astTestMust(t, err)
+	if fact != falsity {
+		t.Fatal("unsat proof fact", fact, falsity)
+	}
+
+	other := smtTestKernel(t, m)
+	a := smtRelevancyBool(t, m, "smt-proof-reset-a")
+	notA, err := m.MkNot(a)
+	astTestMust(t, err)
+	astTestMust(t, other.Assert(a, ast.ASTHandle{}))
+	status, err = other.CheckAssumptions([]ast.ASTHandle{notA})
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("assumption proof status", status)
+	}
+	proof, err = other.Proof()
+	astTestMust(t, err)
+	if proof.IsNull() {
+		t.Fatal("missing assumption conflict proof")
+	}
+	status, err = other.Check()
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("post-conflict status", status)
+	}
+	proof, err = other.Proof()
+	astTestMust(t, err)
+	if !proof.IsNull() {
+		t.Fatal("stale unsat proof", proof)
+	}
+}
+
 func TestSMTSolverFactoryAndUnsupportedKernelPrerequisites(t *testing.T) {
 	m := astTestManager(t)
 	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})

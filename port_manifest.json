@@ -107003,7 +107003,8 @@
       "go_targets": [
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_asserted_formulas.go",
-        "pkg/smtcore/smt_assumptions.go"
+        "pkg/smtcore/smt_assumptions.go",
+        "pkg/smtcore/smt_search.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -107012,7 +107013,8 @@
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
-        "TestSMTKernelScopesRestoreAssertionsAndContext"
+        "TestSMTKernelScopesRestoreAssertionsAndContext",
+        "TestSMTSolverPublishesKernelUnsatProof"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -107047,14 +107049,22 @@
           ]
         },
         {
-          "name": "copy and reset, consequences, mutexes, preferred SAT, model, proof, failure reason, labels, guessed literals, display, cancellation, and parameter updates",
+          "name": "owned terminal unsat proof result",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_search.go",
+          "tests": [
+            "TestSMTSolverPublishesKernelUnsatProof"
+          ]
+        },
+        {
+          "name": "copy and reset, consequences, mutexes, preferred SAT, model, failure reason, labels, guessed literals, display, cancellation, and parameter updates",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [
-        "SMTKernel owns formula and proof references for asserted entries and owns its checker, relevancy propagator, and internalizer lifecycle."
+        "SMTKernel owns formula and proof references for asserted entries, the latest terminal unsat proof reference, and its checker, relevancy propagator, and internalizer lifecycle."
       ],
       "deviations": [
         "Check uses first-UIP learning and backjumping and returns undef when a theory gives up or requests continuation without observable progress; model retention remains unported."
@@ -107068,7 +107078,8 @@
       "go_targets": [
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_asserted_formulas.go",
-        "pkg/smtcore/smt_assumptions.go"
+        "pkg/smtcore/smt_assumptions.go",
+        "pkg/smtcore/smt_search.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -107077,7 +107088,8 @@
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
-        "TestSMTKernelScopesRestoreAssertionsAndContext"
+        "TestSMTKernelScopesRestoreAssertionsAndContext",
+        "TestSMTSolverPublishesKernelUnsatProof"
       ],
       "conditionals": [
         {
@@ -107122,14 +107134,22 @@
           ]
         },
         {
-          "name": "translation, reset, derived queries, model/proof results, diagnostics, display, cancellation, and parameter interface",
+          "name": "owned terminal unsat proof access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverPublishesKernelUnsatProof"
+          ]
+        },
+        {
+          "name": "translation, reset, derived queries, model results, diagnostics, display, cancellation, and parameter interface",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [
-        "Public formula and assertion views are borrowed AST handles; the kernel retains the underlying references until pop or close."
+        "Public formula, assertion, and proof views are borrowed AST handles; the kernel retains the underlying references until reset, pop, or close."
       ],
       "deviations": [
         "The Go facade exposes errors directly; theory incompleteness and final-check continuation without progress produce undef."
@@ -108679,6 +108699,7 @@
       "tests": [
         "TestSMTSolverKernelFacadeAssertionsScopesAndResults",
         "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
+        "TestSMTSolverPublishesKernelUnsatProof",
         "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
       ],
       "assertions": [
@@ -108709,6 +108730,7 @@
           "tests": [
             "TestSMTSolverKernelFacadeAssertionsScopesAndResults",
             "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
+            "TestSMTSolverPublishesKernelUnsatProof",
             "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
           ]
         },
@@ -108721,7 +108743,7 @@
           ]
         },
         {
-          "name": "kernel translation and copy, model and final proof exposure, reason and label extraction, consequence and mutex solving, progress sampling, and unsat-core minimization and pattern extension",
+          "name": "kernel translation and copy, model exposure, reason and label extraction, consequence and mutex solving, progress sampling, and unsat-core minimization and pattern extension",
           "status": "unported",
           "go_target": null,
           "tests": []
