@@ -19,6 +19,8 @@ type SMTSequenceTheory struct {
 	dependencies *smtSequenceDependencyManager
 	solutions    *smtSequenceSolutionMap
 	exclusions   *smtSequenceExclusionTable
+	equations    *smtSequenceEquationQueue
+	nextEquation uint32
 	unsupported  uint32
 	limits       []uint32
 }
@@ -32,7 +34,7 @@ func NewSMTSequenceTheory(family ast.FamilyID) (*SMTSequenceTheory, error) {
 }
 
 func (t *SMTSequenceTheory) Initialize(state *SMTInternalizerState) error {
-	if t == nil || t.dependencies != nil || t.solutions != nil || t.exclusions != nil {
+	if t == nil || t.dependencies != nil || t.solutions != nil || t.exclusions != nil || t.equations != nil {
 		return ast.ErrASTHandle
 	}
 	if err := t.SMTTheoryBase.Initialize(state); err != nil {
@@ -47,6 +49,14 @@ func (t *SMTSequenceTheory) Initialize(state *SMTInternalizerState) error {
 	t.exclusions, err = newSMTSequenceExclusionTable(state.manager)
 	if err != nil {
 		_ = t.solutions.Close()
+		t.solutions = nil
+		return err
+	}
+	t.equations, err = newSMTSequenceEquationQueue(state.manager)
+	if err != nil {
+		_ = t.exclusions.Close()
+		_ = t.solutions.Close()
+		t.exclusions = nil
 		t.solutions = nil
 		return err
 	}
@@ -261,6 +271,32 @@ func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) error {
 	}
 	literal := t.equalityLiteral(leftNode.Owner(), rightNode.Owner())
 	dependency := t.dependencies.Leaf(smtSequenceAssumption{left: leftNode, right: rightNode, literal: literal})
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	leftConcat, err := state.manager.IsSequenceConcat(leftNode.Owner())
+	if err != nil {
+		return err
+	}
+	rightConcat, err := state.manager.IsSequenceConcat(rightNode.Owner())
+	if err != nil {
+		return err
+	}
+	if leftConcat || rightConcat {
+		leftParts, flattenErr := state.manager.SequenceFlattenConcat(leftNode.Owner())
+		if flattenErr != nil {
+			return flattenErr
+		}
+		rightParts, flattenErr := state.manager.SequenceFlattenConcat(rightNode.Owner())
+		if flattenErr != nil {
+			return flattenErr
+		}
+		if flattenErr = t.equations.Push(t.nextEquation, leftParts, rightParts, dependency); flattenErr != nil {
+			return flattenErr
+		}
+		t.nextEquation++
+	}
 	left, leftDependency, err := t.solutions.Find(leftNode.Owner())
 	if err != nil {
 		return err
@@ -331,9 +367,18 @@ func (t *SMTSequenceTheory) PushScope() error {
 		return err
 	}
 	if err := t.solutions.PushScope(); err != nil {
+		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
 	if err := t.exclusions.PushScope(); err != nil {
+		_ = t.solutions.PopScopes(1)
+		_ = t.SMTTheoryBase.PopScopes(1)
+		return err
+	}
+	if err := t.equations.PushScope(); err != nil {
+		_ = t.exclusions.PopScopes(1)
+		_ = t.solutions.PopScopes(1)
+		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
 	t.limits = append(t.limits, t.unsupported)
@@ -350,6 +395,9 @@ func (t *SMTSequenceTheory) PopScopes(count uint32) error {
 		return err
 	}
 	if err := t.exclusions.PopScopes(count); err != nil {
+		return err
+	}
+	if err := t.equations.PopScopes(count); err != nil {
 		return err
 	}
 	if err := t.SMTTheoryBase.PopScopes(count); err != nil {
@@ -421,12 +469,13 @@ func (t *SMTSequenceTheory) ModelValue(node *SMTEnode, generator *SMTModelGenera
 }
 
 func (t *SMTSequenceTheory) Close() (result error) {
-	if t == nil || t.solutions == nil || t.exclusions == nil {
+	if t == nil || t.solutions == nil || t.exclusions == nil || t.equations == nil {
 		return ast.ErrASTHandle
 	}
-	result = errors.Join(t.solutions.Close(), t.exclusions.Close())
+	result = errors.Join(t.solutions.Close(), t.exclusions.Close(), t.equations.Close())
 	t.solutions = nil
 	t.exclusions = nil
+	t.equations = nil
 	t.dependencies = nil
 	t.limits = nil
 	if result != nil {

@@ -116776,10 +116776,11 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
+        "TestSMTSequenceEquationQueueMutationAndScopedRestore",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
         "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"
       ],
@@ -117227,6 +117228,12 @@
           "tests": ["TestSMTSequenceExclusionTableCanonicalPairsAndScopes"]
         },
         {
+          "name": "eq records and scoped equation-vector push, indexed replacement, pop and nested rollback (src/smt/theory_seq.h:113-139; scoped_vector<eq>)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_equations.go",
+          "tests": ["TestSMTSequenceEquationQueueMutationAndScopedRestore"]
+        },
+        {
           "name": "sequence term and atom internalization, theory-variable attachment, literal-value equality conflicts, scoped equality and disequality state, final-check boundary, and model-value factory hooks (src/smt/theory_seq.cpp:2225-2255,2616-2785,4053-4130)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
@@ -117252,10 +117259,11 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
+        "TestSMTSequenceEquationQueueMutationAndScopedRestore",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
         "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"
       ],
@@ -117287,6 +117295,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_state.go",
           "tests": ["TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes", "TestSMTSequenceExclusionTableCanonicalPairsAndScopes"]
+        },
+        {
+          "name": "owned equation records and concrete scoped equation queue",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_equations.go",
+          "tests": ["TestSMTSequenceEquationQueueMutationAndScopedRestore"]
         },
         {
           "name": "incremental sequence-theory shell, internalization, equality/disequality callbacks, scope lifecycle, final-check boundary, and model hooks",
@@ -201494,9 +201508,9 @@
       "path": "src/util/scoped_vector.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/smtcore/theory_seq_equations.go"],
+      "tests": ["TestSMTSequenceEquationQueueMutationAndScopedRestore"],
       "conditionals": [
         {
           "line": 19,
@@ -201545,11 +201559,19 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "SMT theory_seq scoped_vector<eq>, <ne> and <nc> push_scope/pop_scope with source index-update trail and copy-on-write element storage (theory_seq.cpp:4115-4130; scoped_vector.h:37-65)",
-          "status": "unported"
+          "name": "SMT theory_seq scoped_vector<eq> push_scope/pop_scope and owned snapshot restoration (theory_seq.cpp:4115-4130; scoped_vector.h:37-65)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_equations.go",
+          "tests": ["TestSMTSequenceEquationQueueMutationAndScopedRestore"]
         },
         {
-          "name": "SMT theory_seq indexed reads, set, push_back, pop_back, size and empty for equation, disequality and non-contains queues (theory_seq.cpp:325-2515; scoped_vector.h:69-140)",
+          "name": "SMT theory_seq indexed reads, set, push_back, pop_back, size and empty for the equation queue (theory_seq.cpp:325-2515; scoped_vector.h:69-140)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_equations.go",
+          "tests": ["TestSMTSequenceEquationQueueMutationAndScopedRestore"]
+        },
+        {
+          "name": "remaining theory_seq scoped_vector<ne> and <nc> concrete instantiations",
           "status": "unported"
         },
         {
@@ -201558,10 +201580,10 @@
         }
       ],
       "ownership": [
-        "The three theory_seq values own their concrete eq/ne/nc element histories. A scope records logical size, element length and index-trail length; pop restores index mappings in reverse order, shrinks owned element storage, then publishes the prior logical size. No SMT theory_seq Go owner exists yet."
+        "The Go equation specialization owns ASTRef roots in its live records and nested snapshots. Scope pop releases the current and younger snapshots before transferring the target snapshot into live storage. The remaining native ne/nc specializations are not yet represented."
       ],
       "deviations": [
-        "No Go adapter is retained. The live theory-sequence specialization belongs to unported SMT code and should be implemented there with concrete typed slices and scope indices."
+        "The retained eq instantiation uses a concrete typed Go queue and owned per-scope snapshots instead of porting the general C++ template and its copy-on-write index trail. The observable indexed mutation and rollback behavior is preserved; ne/nc remain pending."
       ]
     },
     {
