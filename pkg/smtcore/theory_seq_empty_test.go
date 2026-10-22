@@ -714,6 +714,69 @@ func TestSMTSequenceTheoryRejectsIncompatibleCyclicUnits(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryBranchesVariableAcrossFixedUnitWord(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	truth, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	falsehood, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	first, err := m.MkSequenceUnit(truth)
+	astTestMust(t, err)
+	second, err := m.MkSequenceUnit(falsehood)
+	astTestMust(t, err)
+	sort, err := m.GetSort(first)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-unit-split-x"), sort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-unit-split-y"), sort)
+	astTestMust(t, err)
+	left, err := m.MkSequenceConcat(x, y)
+	astTestMust(t, err)
+	right, err := m.MkSequenceConcat(first, second)
+	astTestMust(t, err)
+	wordEquality, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "ALL", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(wordEquality))
+	parts := []ast.ASTHandle{first, second}
+	word := func(parts []ast.ASTHandle) (ast.ASTHandle, error) {
+		if len(parts) == 0 {
+			return m.MkSequenceEmpty(sort)
+		}
+		result := parts[len(parts)-1]
+		var makeErr error
+		for index := len(parts) - 2; index >= 0; index-- {
+			result, makeErr = m.MkSequenceConcat(parts[index], result)
+			if makeErr != nil {
+				return ast.ASTHandle{}, makeErr
+			}
+		}
+		return result, nil
+	}
+	for split := 0; split <= len(parts); split++ {
+		prefix, makeErr := word(parts[:split])
+		astTestMust(t, makeErr)
+		suffix, makeErr := word(parts[split:])
+		astTestMust(t, makeErr)
+		xEquality, makeErr := m.MkEq(x, prefix)
+		astTestMust(t, makeErr)
+		yEquality, makeErr := m.MkEq(y, suffix)
+		astTestMust(t, makeErr)
+		alternative, makeErr := m.MkAnd(xEquality, yEquality)
+		astTestMust(t, makeErr)
+		excluded, makeErr := m.MkNot(alternative)
+		astTestMust(t, makeErr)
+		astTestMust(t, solver.Assert(excluded))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("fixed unit-word variable splits", status)
+	}
+}
+
 func TestSMTSequenceTheoryBranchesFixedStringOverlaps(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	a, err := m.MkString("abc")

@@ -116799,6 +116799,7 @@
         "TestSMTSequenceTheoryNativeWordVariableClassification",
         "TestSMTSequenceTheoryBranchesBinaryUnitEquation",
         "TestSMTSequenceTheoryRejectsIncompatibleCyclicUnits",
+        "TestSMTSequenceTheoryBranchesVariableAcrossFixedUnitWord",
         "TestSMTSequenceTheoryBranchesFixedStringOverlaps",
         "TestSMTSequenceTheoryBranchesTwoVariablesAcrossFixedWord",
         "TestSMTSequenceTheoryBranchesVariablePrefixAcrossFixedWord",
@@ -117313,10 +117314,10 @@
           "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict", "TestSMTSequenceTheoryNativeWordVariableClassification"]
         },
         {
-          "name": "complete fixed-string binary word-equation branching with finite prefix-overlap alternatives, exhaustive incremental variable-prefix splits against a fixed word and an unbounded shared-tail Skolem family, exact rejection of self-referential fixed tails with unequal lengths or no cyclic rotation, and cyclic unit-element compatibility constraints (src/smt/theory_seq.cpp:335-790,1554-1763)",
+          "name": "complete fixed-string binary word-equation branching with finite prefix-overlap alternatives, exhaustive variable-prefix splits against fixed string and generic seq.unit words, an unbounded shared-tail Skolem family, exact rejection of self-referential fixed tails with unequal lengths or no cyclic rotation, and cyclic unit-element compatibility constraints (src/smt/theory_seq.cpp:335-790,1554-1763)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_binary.go",
-          "tests": ["TestSMTSequenceTheoryBranchesBinaryUnitEquation", "TestSMTSequenceTheoryRejectsIncompatibleCyclicUnits", "TestSMTSequenceTheoryBranchesFixedStringOverlaps", "TestSMTSequenceTheoryBranchesTwoVariablesAcrossFixedWord", "TestSMTSequenceTheoryBranchesVariablePrefixAcrossFixedWord", "TestSMTSequenceTheoryRejectsImpossibleCyclicBinaryEquations"]
+          "tests": ["TestSMTSequenceTheoryBranchesBinaryUnitEquation", "TestSMTSequenceTheoryRejectsIncompatibleCyclicUnits", "TestSMTSequenceTheoryBranchesVariableAcrossFixedUnitWord", "TestSMTSequenceTheoryBranchesFixedStringOverlaps", "TestSMTSequenceTheoryBranchesTwoVariablesAcrossFixedWord", "TestSMTSequenceTheoryBranchesVariablePrefixAcrossFixedWord", "TestSMTSequenceTheoryRejectsImpossibleCyclicBinaryEquations"]
         },
         {
           "name": "scoped assigned prefix/suffix/contains atoms and concrete relation checking after solution expansion (src/smt/theory_seq.cpp:3927-4010 and m_atoms scope limits)",

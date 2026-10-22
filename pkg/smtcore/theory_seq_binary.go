@@ -241,6 +241,90 @@ func (t *SMTSequenceTheory) constrainCyclicUnitEquation(left, right []ast.ASTHan
 	return false, nil
 }
 
+func (t *SMTSequenceTheory) branchVariableFixedUnitWordEquation(left, right []ast.ASTHandle) (bool, error) {
+	for pass := 0; pass < 2; pass++ {
+		if len(left) > 1 && len(right) != 0 {
+			firstVariable, err := t.sequenceVariable(left[0])
+			if err != nil {
+				return false, err
+			}
+			state, stateErr := t.State()
+			if stateErr != nil {
+				return false, stateErr
+			}
+			allUnits := true
+			for _, part := range right {
+				if _, unit, unitErr := state.manager.SequenceUnitArgument(part); unitErr != nil {
+					return false, unitErr
+				} else if !unit {
+					allUnits = false
+					break
+				}
+			}
+			if firstVariable && allUnits {
+				sort, makeErr := state.manager.GetSort(left[0])
+				if makeErr != nil {
+					return false, makeErr
+				}
+				restWord, makeErr := t.makeWord(left[1:], sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				alternatives := make([]ast.ASTHandle, 0, len(right)+1)
+				for split := 0; split <= len(right); split++ {
+					prefix, wordErr := t.makeWord(right[:split], sort)
+					if wordErr != nil {
+						return false, wordErr
+					}
+					suffix, wordErr := t.makeWord(right[split:], sort)
+					if wordErr != nil {
+						return false, wordErr
+					}
+					firstEquality, makeErr := state.manager.MkEq(left[0], prefix)
+					if makeErr != nil {
+						return false, makeErr
+					}
+					restEquality, makeErr := state.manager.MkEq(restWord, suffix)
+					if makeErr != nil {
+						return false, makeErr
+					}
+					alternative, makeErr := state.manager.MkAnd(firstEquality, restEquality)
+					if makeErr != nil {
+						return false, makeErr
+					}
+					alternatives = append(alternatives, alternative)
+				}
+				choices, makeErr := state.manager.MkOrArray(alternatives)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				leftWord, makeErr := t.makeWord(left, sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				rightWord, makeErr := t.makeWord(right, sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				equality, makeErr := state.manager.MkEq(leftWord, rightWord)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				constraint, makeErr := state.manager.MkImplies(equality, choices)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				if _, found := t.axioms.set[constraint]; found {
+					return false, nil
+				}
+				return true, t.axioms.Push(constraint)
+			}
+		}
+		left, right = right, left
+	}
+	return false, nil
+}
+
 func (t *SMTSequenceTheory) branchVariableFixedWordEquation(left, right []ast.ASTHandle) (bool, error) {
 	for pass := 0; pass < 2; pass++ {
 		if len(left) > 1 && len(right) == 1 {
