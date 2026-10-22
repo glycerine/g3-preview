@@ -322,7 +322,10 @@ func (s *SMTSolver) UpdateParams(p *uparams.ParamsRef) error {
 		empty := s.config.Params.EmptyValue()
 		p = &empty
 	}
-	return s.config.Params.Copy(&s.params, p)
+	if err := s.config.Params.Copy(&s.params, p); err != nil {
+		return err
+	}
+	return s.kernel.UpdateParams(&s.params)
 }
 
 func (s *SMTSolver) Params() (*uparams.ParamsRef, error) {

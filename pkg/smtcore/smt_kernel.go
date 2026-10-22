@@ -44,6 +44,8 @@ type SMTKernel struct {
 	modelConfig      model.ModelEvaluatorConfig
 	generated        *model.Model
 	preprocessor     *rewriter.TheoryRewriter
+	paramContext     *uparams.ParamsContext
+	paramGlobals     *uparams.GlobalParamsService
 	produceModel     bool
 	preprocess       bool
 	closed           bool
@@ -94,6 +96,8 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	if context == nil || globals == nil || context.SymbolsField != k.manager.Symbols || globals.Context != context {
 		return uparams.ErrParamsOwner
 	}
+	k.paramContext = context
+	k.paramGlobals = globals
 	name := "preprocess"
 	enabled, err := context.GetBoolName(params, &name, true)
 	if err != nil {
@@ -110,6 +114,41 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	k.preprocessor = value
 	k.preprocess = true
 	return nil
+}
+
+// UpdateParams refreshes the assertion rewriter and the hidden preprocessing
+// switch using the kernel's borrowed parameter services.
+func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
+	if err := k.open(); err != nil {
+		return err
+	}
+	if k.paramContext == nil || k.paramGlobals == nil {
+		return uparams.ErrParamsOwner
+	}
+	name := "preprocess"
+	enabled, err := k.paramContext.GetBoolName(params, &name, true)
+	if err != nil {
+		return err
+	}
+	if !enabled {
+		if k.preprocessor != nil {
+			if err = k.preprocessor.Close(); err != nil {
+				return err
+			}
+			k.preprocessor = nil
+		}
+		k.preprocess = false
+		return nil
+	}
+	if k.preprocessor == nil {
+		k.preprocessor, err = rewriter.NewTheoryRewriter(k.manager, k.paramContext, k.paramGlobals, params)
+	} else {
+		err = k.preprocessor.UpdateParams(params)
+	}
+	if err == nil {
+		k.preprocess = true
+	}
+	return err
 }
 
 func (k *SMTKernel) open() error {
@@ -556,6 +595,8 @@ func (k *SMTKernel) Close() error {
 		k.internalizer = nil
 		k.checker = nil
 		k.relevancy = nil
+		k.paramContext = nil
+		k.paramGlobals = nil
 		k.manager = nil
 		k.closed = true
 	}

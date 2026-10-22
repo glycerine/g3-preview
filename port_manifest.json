@@ -107516,7 +107516,15 @@
           ]
         },
         {
-          "name": "copy and reset, consequences, mutexes, preferred SAT, and parameter updates",
+          "name": "parameter updates propagated to assertion preprocessing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices"
+          ]
+        },
+        {
+          "name": "copy and reset, consequences, mutexes, and preferred SAT",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -107659,7 +107667,15 @@
           ]
         },
         {
-          "name": "translation, reset, derived queries, labels, other diagnostics, and parameter interface",
+          "name": "parameter interface propagated to assertion preprocessing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices"
+          ]
+        },
+        {
+          "name": "translation, reset, derived queries, labels, and other diagnostics",
           "status": "unported",
           "go_target": null,
           "tests": []

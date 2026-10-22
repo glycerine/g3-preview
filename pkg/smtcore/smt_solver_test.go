@@ -111,6 +111,14 @@ func TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices(t *testing.T)
 	if assertion != double {
 		t.Fatal("disabled preprocessing changed assertion", assertion, double)
 	}
+	astTestMust(t, context.SetBoolName(&local, &name, true))
+	astTestMust(t, raw.UpdateParams(&local))
+	astTestMust(t, raw.Assert(double))
+	assertion, err = raw.Assertion(1)
+	astTestMust(t, err)
+	if assertion != a {
+		t.Fatal("updated preprocessing did not rewrite assertion", assertion, a)
+	}
 }
 
 func TestSMTSolverPublishesGeneratedModel(t *testing.T) {
