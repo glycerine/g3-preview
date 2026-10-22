@@ -161,6 +161,37 @@ func TestSMTBitVectorExpandsDynamicDisequality(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorPublishesStaticDisequality(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	zero, err := m.BitVectorNumeralUint64(0, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	value, err := m.MkConst(astTestSymbol(t, m, "bv-static-diseq-value"), sort)
+	astTestMust(t, err)
+	complement, err := m.MkBitVectorNot(value)
+	astTestMust(t, err)
+	equality, err := m.MkEq(value, complement)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(equality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("static bit-vector disequality", status)
+	}
+	stats := statistics.New()
+	astTestMust(t, solver.CollectStatistics(stats))
+	found := false
+	for i := 0; i < stats.Size(); i++ {
+		if stats.Key(i) == "bv diseqs" {
+			found = stats.IsUint(i) && stats.UintValue(i) != 0
+		}
+	}
+	if !found {
+		t.Fatal("missing static bit-vector disequality statistic")
+	}
+}
+
 func TestSMTBitVectorExpandsNewEquality(t *testing.T) {
 	m, family, solver := smtBVSolver(t)
 	family, err := m.RegisterBitVectorPlugin()

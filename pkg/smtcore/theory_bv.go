@@ -1192,6 +1192,58 @@ func (t *SMTBitVectorTheory) bitsFor(expression ast.ASTHandle) ([]ast.ASTHandle,
 	return bits, nil
 }
 
+func (t *SMTBitVectorTheory) publishStaticDisequalities(expression ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	bits := t.bits[expression]
+	if len(bits) == 0 {
+		return nil
+	}
+	for other, otherBits := range t.bits {
+		if other == expression || len(otherBits) != len(bits) {
+			continue
+		}
+		complementary := false
+		available := true
+		for i := range bits {
+			left, literalErr := state.Literal(bits[i])
+			if literalErr != nil {
+				if errors.Is(literalErr, ast.ErrASTDomain) {
+					available = false
+					break
+				}
+				return literalErr
+			}
+			right, literalErr := state.Literal(otherBits[i])
+			if literalErr != nil {
+				if errors.Is(literalErr, ast.ErrASTDomain) {
+					available = false
+					break
+				}
+				return literalErr
+			}
+			if left == right.Negated() {
+				complementary = true
+				break
+			}
+		}
+		if !available || !complementary {
+			continue
+		}
+		equality, equalityErr := t.MkEqualityLiteral(expression, other, true)
+		if equalityErr != nil {
+			return equalityErr
+		}
+		if equalityErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality.Negated()}); equalityErr != nil {
+			return equalityErr
+		}
+		t.statistics.diseqStatic++
+	}
+	return nil
+}
+
 func (t *SMTBitVectorTheory) bit2BoolIndex(expression ast.ASTHandle) (uint32, error) {
 	state, _ := t.State()
 	declaration, err := state.manager.GetDecl(expression)
@@ -1453,6 +1505,9 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 		if err = state.Internalize(bit, true); err != nil {
 			return false, fmt.Errorf("bit-vector bit %d: %w", index, err)
 		}
+	}
+	if err = t.publishStaticDisequalities(expression); err != nil {
+		return false, err
 	}
 	if op == 57 {
 		argument, argErr := state.manager.GetArg(expression, 0)
