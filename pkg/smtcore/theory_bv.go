@@ -34,14 +34,15 @@ type smtBVStatistics struct {
 // without a bit definition makes final-check report incompleteness.
 type SMTBitVectorTheory struct {
 	*SMTTheoryBase
-	bits        map[ast.ASTHandle][]ast.ASTHandle
-	bitOwners   map[ast.ASTHandle]ast.ASTRef
-	bitTrail    []ast.ASTHandle
-	temporary   []ast.ASTRef
-	scopes      []smtBVScope
-	unsupported bool
-	statistics  smtBVStatistics
-	config      SMTBVState
+	bits             map[ast.ASTHandle][]ast.ASTHandle
+	bitOwners        map[ast.ASTHandle]ast.ASTRef
+	bitTrail         []ast.ASTHandle
+	temporary        []ast.ASTRef
+	scopes           []smtBVScope
+	unsupported      bool
+	statistics       smtBVStatistics
+	config           SMTBVState
+	discoveringFixed bool
 }
 
 func (t *SMTBitVectorTheory) ConfigureBitVector(config SMTBVState) error {
@@ -1326,6 +1327,28 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 	if err != nil {
 		return false, err
 	}
+	variable, found := state.boolVar[expression]
+	if !found {
+		variable, err = state.MkBoolVar(expression)
+		if err != nil {
+			return false, err
+		}
+	}
+	data, err := state.BooleanData(variable)
+	if err != nil {
+		return false, err
+	}
+	if !data.IsTheoryAtom() {
+		if err = state.SetVariableTheory(variable, t.FamilyID()); err != nil {
+			return false, err
+		}
+	}
+	// Publish this atom before internalizing its owner. If the owner creates
+	// this same bit while building its circuit, the recursive visit observes
+	// the existing Boolean variable and terminates.
+	if err = state.Internalize(owner, false); err != nil {
+		return false, err
+	}
 	bits, err := t.bitsFor(owner)
 	if err != nil {
 		return false, err
@@ -1340,22 +1363,6 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 	definition := bits[index]
 	if definition != expression {
 		if err = state.Internalize(definition, true); err != nil {
-			return false, err
-		}
-	}
-	variable, found := state.boolVar[expression]
-	if !found {
-		variable, err = state.MkBoolVar(expression)
-		if err != nil {
-			return false, err
-		}
-	}
-	data, err := state.BooleanData(variable)
-	if err != nil {
-		return false, err
-	}
-	if !data.IsTheoryAtom() {
-		if err = state.SetVariableTheory(variable, t.FamilyID()); err != nil {
 			return false, err
 		}
 	}
@@ -1716,7 +1723,91 @@ func (t *SMTBitVectorTheory) NewDisequality(left, right SMTTheoryVar) error {
 	return state.addTheoryAxiom(t.FamilyID(), clause)
 }
 
-func (*SMTBitVectorTheory) Assign(int32, bool) error { return nil }
+func (t *SMTBitVectorTheory) fixedAssignment(bits []ast.ASTHandle) (*big.Int, []SMTLiteral, bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return nil, nil, false, err
+	}
+	value := new(big.Int)
+	antecedents := make([]SMTLiteral, 0, len(bits))
+	for i, bit := range bits {
+		literal, literalErr := state.Literal(bit)
+		if literalErr != nil {
+			return nil, nil, false, literalErr
+		}
+		assignment, assignmentErr := state.Assignment(literal)
+		if assignmentErr != nil {
+			return nil, nil, false, assignmentErr
+		}
+		switch assignment {
+		case lbool.Undef:
+			return nil, nil, false, nil
+		case lbool.True:
+			value.SetBit(value, i, 1)
+			antecedents = append(antecedents, literal)
+		case lbool.False:
+			antecedents = append(antecedents, literal.Negated())
+		}
+	}
+	return value, antecedents, true, nil
+}
+
+func (t *SMTBitVectorTheory) Assign(int32, bool) (result error) {
+	if t.discoveringFixed {
+		return nil
+	}
+	t.discoveringFixed = true
+	defer func() { t.discoveringFixed = false }()
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	type fixedTerm struct {
+		expression  ast.ASTHandle
+		antecedents []SMTLiteral
+	}
+	fixed := make(map[string]fixedTerm)
+	for expression, bits := range t.bits {
+		node := state.context.enodes[expression]
+		if node == nil || !t.IsAttachedToVariable(node) {
+			continue
+		}
+		value, antecedents, complete, fixedErr := t.fixedAssignment(bits)
+		if fixedErr != nil {
+			return fixedErr
+		}
+		if !complete {
+			continue
+		}
+		key := fmt.Sprintf("%d:%s", len(bits), value.String())
+		prior, found := fixed[key]
+		if !found {
+			fixed[key] = fixedTerm{expression, antecedents}
+			continue
+		}
+		priorNode := state.context.enodes[prior.expression]
+		if priorNode == nil || priorNode.root == node.root {
+			continue
+		}
+		equality, equalityErr := t.MkEqualityLiteral(prior.expression, expression, true)
+		if equalityErr != nil {
+			return equalityErr
+		}
+		clause := make([]SMTLiteral, 1, 1+len(prior.antecedents)+len(antecedents))
+		clause[0] = equality
+		for _, antecedent := range prior.antecedents {
+			clause = append(clause, antecedent.Negated())
+		}
+		for _, antecedent := range antecedents {
+			clause = append(clause, antecedent.Negated())
+		}
+		if equalityErr = state.addTheoryAxiom(t.FamilyID(), clause); equalityErr != nil {
+			return equalityErr
+		}
+		t.statistics.theoryToCoreEq++
+	}
+	return nil
+}
 
 func (t *SMTBitVectorTheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {

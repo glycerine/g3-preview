@@ -192,6 +192,47 @@ func TestSMTBitVectorPublishesStaticDisequality(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorDiscoversFixedEquality(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	zero, err := m.BitVectorNumeralUint64(0, 2)
+	astTestMust(t, err)
+	sort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "bv-fixed-eq-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "bv-fixed-eq-right"), sort)
+	astTestMust(t, err)
+	assertions := make([]ast.ASTHandle, 0, 4)
+	for _, value := range []ast.ASTHandle{left, right} {
+		low, bitErr := m.MkBitVectorBit2Bool(0, value)
+		astTestMust(t, bitErr)
+		high, bitErr := m.MkBitVectorBit2Bool(1, value)
+		astTestMust(t, bitErr)
+		notHigh, bitErr := m.MkNot(high)
+		astTestMust(t, bitErr)
+		assertions = append(assertions, low, notHigh)
+	}
+	for _, assertion := range assertions {
+		astTestMust(t, solver.Assert(assertion))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("fixed bit-vector equality", status)
+	}
+	stats := statistics.New()
+	astTestMust(t, solver.CollectStatistics(stats))
+	found := false
+	for i := 0; i < stats.Size(); i++ {
+		if stats.Key(i) == "bv->core eq" {
+			found = stats.IsUint(i) && stats.UintValue(i) != 0
+		}
+	}
+	if !found {
+		t.Fatal("missing fixed bit-vector equality statistic")
+	}
+}
+
 func TestSMTBitVectorExpandsNewEquality(t *testing.T) {
 	m, family, solver := smtBVSolver(t)
 	family, err := m.RegisterBitVectorPlugin()
