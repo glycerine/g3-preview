@@ -2848,7 +2848,7 @@
       "path": "src/ackermannization/ackermannization_params.hpp",
       "component": "ackermannization",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
@@ -102880,7 +102880,7 @@
       "path": "src/smt/qi_queue.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_qi_queue_schedule.go",
         "pkg/smtcore/smt_qi_cost.go",
