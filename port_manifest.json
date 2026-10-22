@@ -116776,7 +116776,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -116789,7 +116789,8 @@
         "TestSMTSequenceTheoryConcreteWordDisequationConflict",
         "TestSMTSequenceTheoryConcreteNonContainsConflict",
         "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution",
-        "TestSMTSequenceTheoryConcreteRelationConflicts"
+        "TestSMTSequenceTheoryConcreteRelationConflicts",
+        "TestSMTSequenceTheoryLengthAxioms"
       ],
       "conditionals": [
         {
@@ -117289,6 +117290,18 @@
           "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes", "TestSMTSequenceTheoryConcreteRelationConflicts"]
         },
         {
+          "name": "deduplicated owned axiom queue, propagation head and scoped replay (src/smt/theory_seq.cpp:3068-3108)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_axioms.go",
+          "tests": ["TestSMTSequenceTheoryLengthAxioms"]
+        },
+        {
+          "name": "exact length axioms for concat, unit, empty, string, arbitrary sequence non-negativity and int.to.str lower bound (src/smt/theory_seq.cpp:3313-3360)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_length.go",
+          "tests": ["TestSMTSequenceTheoryLengthAxioms"]
+        },
+        {
           "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
           "status": "unported",
           "go_target": null,
@@ -117308,7 +117321,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -117321,7 +117334,8 @@
         "TestSMTSequenceTheoryConcreteWordDisequationConflict",
         "TestSMTSequenceTheoryConcreteNonContainsConflict",
         "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution",
-        "TestSMTSequenceTheoryConcreteRelationConflicts"
+        "TestSMTSequenceTheoryConcreteRelationConflicts",
+        "TestSMTSequenceTheoryLengthAxioms"
       ],
       "conditionals": [
         {
@@ -117393,6 +117407,18 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_relations.go",
           "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes", "TestSMTSequenceTheoryConcreteRelationConflicts"]
+        },
+        {
+          "name": "owned scoped axiom queue and propagation lifecycle",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_axioms.go",
+          "tests": ["TestSMTSequenceTheoryLengthAxioms"]
+        },
+        {
+          "name": "retained exact length-axiom generation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_length.go",
+          "tests": ["TestSMTSequenceTheoryLengthAxioms"]
         },
         {
           "name": "remaining word-equation, arithmetic, containment, regular-language, propagation and branching declarations",

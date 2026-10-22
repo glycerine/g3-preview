@@ -31,6 +31,14 @@ func (m *ASTManager) MkArithmeticPower(base, exponent ASTHandle) (ASTHandle, err
 	return m.arithmeticApp(18, base, exponent)
 }
 
+func (m *ASTManager) MkArithmeticLE(left, right ASTHandle) (ASTHandle, error) {
+	return m.arithmeticApp(2, left, right)
+}
+
+func (m *ASTManager) MkArithmeticGE(left, right ASTHandle) (ASTHandle, error) {
+	return m.arithmeticApp(3, left, right)
+}
+
 // ArithmeticRealNumeralText constructs a real numeral from source-compatible
 // rational text.
 func (m *ASTManager) arithmeticNumeralFromText(text string, integer bool) (result ASTHandle, resultErr error) {

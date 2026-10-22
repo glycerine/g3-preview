@@ -300,3 +300,78 @@ func TestSMTSequenceTheoryConcreteRelationConflicts(t *testing.T) {
 		})
 	}
 }
+
+func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
+	for _, test := range []struct {
+		name  string
+		build func(*testing.T, *ast.ASTManager) ast.ASTHandle
+	}{
+		{name: "string", build: func(t *testing.T, m *ast.ASTManager) ast.ASTHandle {
+			value, err := m.MkString("abc")
+			astTestMust(t, err)
+			length, err := m.MkSequenceLength(value)
+			astTestMust(t, err)
+			three, err := m.ArithmeticIntegerNumeralText("3")
+			astTestMust(t, err)
+			equality, err := m.MkEq(length, three)
+			astTestMust(t, err)
+			result, err := m.MkNot(equality)
+			astTestMust(t, err)
+			return result
+		}},
+		{name: "concat", build: func(t *testing.T, m *ast.ASTManager) ast.ASTHandle {
+			literal, err := m.MkString("ab")
+			astTestMust(t, err)
+			sort, err := m.GetSort(literal)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "sequence-length-x"), sort)
+			astTestMust(t, err)
+			word, err := m.MkSequenceConcat(x, literal)
+			astTestMust(t, err)
+			wordLength, err := m.MkSequenceLength(word)
+			astTestMust(t, err)
+			xLength, err := m.MkSequenceLength(x)
+			astTestMust(t, err)
+			two, err := m.ArithmeticIntegerNumeralText("2")
+			astTestMust(t, err)
+			sum, err := m.MkArithmeticAdd(xLength, two)
+			astTestMust(t, err)
+			equality, err := m.MkEq(wordLength, sum)
+			astTestMust(t, err)
+			result, err := m.MkNot(equality)
+			astTestMust(t, err)
+			return result
+		}},
+		{name: "nonnegative", build: func(t *testing.T, m *ast.ASTManager) ast.ASTHandle {
+			empty, err := m.MkString("")
+			astTestMust(t, err)
+			sort, err := m.GetSort(empty)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "sequence-nonnegative-x"), sort)
+			astTestMust(t, err)
+			length, err := m.MkSequenceLength(x)
+			astTestMust(t, err)
+			zero, err := m.ArithmeticIntegerNumeralText("0")
+			astTestMust(t, err)
+			nonnegative, err := m.MkArithmeticGE(length, zero)
+			astTestMust(t, err)
+			result, err := m.MkNot(nonnegative)
+			astTestMust(t, err)
+			return result
+		}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			assertion := test.build(t, m)
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.Assert(assertion))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("sequence length axiom contradiction", status)
+			}
+		})
+	}
+}

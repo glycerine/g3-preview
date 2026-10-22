@@ -24,6 +24,7 @@ type SMTSequenceTheory struct {
 	disequations *smtSequenceDisequationQueue
 	nonContains  *smtSequenceNonContainsQueue
 	relations    *smtSequenceRelationQueue
+	axioms       *smtSequenceAxiomQueue
 	nextEquation uint32
 	unsupported  uint32
 	limits       []uint32
@@ -38,7 +39,7 @@ func NewSMTSequenceTheory(family ast.FamilyID) (*SMTSequenceTheory, error) {
 }
 
 func (t *SMTSequenceTheory) Initialize(state *SMTInternalizerState) error {
-	if t == nil || t.dependencies != nil || t.solutions != nil || t.exclusions != nil || t.equations != nil || t.disequations != nil || t.nonContains != nil || t.relations != nil {
+	if t == nil || t.dependencies != nil || t.solutions != nil || t.exclusions != nil || t.equations != nil || t.disequations != nil || t.nonContains != nil || t.relations != nil || t.axioms != nil {
 		return ast.ErrASTHandle
 	}
 	if err := t.SMTTheoryBase.Initialize(state); err != nil {
@@ -93,6 +94,22 @@ func (t *SMTSequenceTheory) Initialize(state *SMTInternalizerState) error {
 		_ = t.equations.Close()
 		_ = t.exclusions.Close()
 		_ = t.solutions.Close()
+		t.nonContains = nil
+		t.disequations = nil
+		t.equations = nil
+		t.exclusions = nil
+		t.solutions = nil
+		return err
+	}
+	t.axioms, err = newSMTSequenceAxiomQueue(state.manager)
+	if err != nil {
+		_ = t.relations.Close()
+		_ = t.nonContains.Close()
+		_ = t.disequations.Close()
+		_ = t.equations.Close()
+		_ = t.exclusions.Close()
+		_ = t.solutions.Close()
+		t.relations = nil
 		t.nonContains = nil
 		t.disequations = nil
 		t.equations = nil
@@ -211,12 +228,17 @@ func (t *SMTSequenceTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (b
 }
 
 func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error) {
-	_, own, err := t.operation(expression)
+	op, own, err := t.operation(expression)
 	if err != nil || !own {
 		return false, err
 	}
 	if err = t.ensureVariable(expression); err != nil {
 		return false, err
+	}
+	if op == 9 {
+		if err = t.addLengthAxiom(expression); err != nil {
+			return false, err
+		}
 	}
 	value, err := t.supportedValue(expression)
 	if err != nil {
@@ -255,6 +277,30 @@ func (t *SMTSequenceTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHand
 }
 
 func (*SMTSequenceTheory) UseDisequalities() bool { return true }
+
+func (t *SMTSequenceTheory) CanPropagate() bool {
+	return t != nil && t.axioms != nil && t.axioms.Pending()
+}
+
+func (t *SMTSequenceTheory) Propagate() error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	for t.axioms.Pending() && !state.Inconsistent() {
+		expression, frontErr := t.axioms.Front()
+		if frontErr != nil {
+			return frontErr
+		}
+		if frontErr = t.assertConstraint(expression); frontErr != nil {
+			return frontErr
+		}
+		if frontErr = t.axioms.Advance(); frontErr != nil {
+			return frontErr
+		}
+	}
+	return nil
+}
 
 func (t *SMTSequenceTheory) equalityLiteral(left, right ast.ASTHandle) SMTLiteral {
 	state, err := t.State()
@@ -493,6 +539,16 @@ func (t *SMTSequenceTheory) PushScope() error {
 		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
+	if err := t.axioms.PushScope(); err != nil {
+		_ = t.relations.PopScopes(1)
+		_ = t.nonContains.PopScopes(1)
+		_ = t.disequations.PopScopes(1)
+		_ = t.equations.PopScopes(1)
+		_ = t.exclusions.PopScopes(1)
+		_ = t.solutions.PopScopes(1)
+		_ = t.SMTTheoryBase.PopScopes(1)
+		return err
+	}
 	t.limits = append(t.limits, t.unsupported)
 	return nil
 }
@@ -519,6 +575,9 @@ func (t *SMTSequenceTheory) PopScopes(count uint32) error {
 		return err
 	}
 	if err := t.relations.PopScopes(count); err != nil {
+		return err
+	}
+	if err := t.axioms.PopScopes(count); err != nil {
 		return err
 	}
 	if err := t.SMTTheoryBase.PopScopes(count); err != nil {
@@ -814,16 +873,17 @@ func (t *SMTSequenceTheory) ModelValue(node *SMTEnode, generator *SMTModelGenera
 }
 
 func (t *SMTSequenceTheory) Close() (result error) {
-	if t == nil || t.solutions == nil || t.exclusions == nil || t.equations == nil || t.disequations == nil || t.nonContains == nil || t.relations == nil {
+	if t == nil || t.solutions == nil || t.exclusions == nil || t.equations == nil || t.disequations == nil || t.nonContains == nil || t.relations == nil || t.axioms == nil {
 		return ast.ErrASTHandle
 	}
-	result = errors.Join(t.solutions.Close(), t.exclusions.Close(), t.equations.Close(), t.disequations.Close(), t.nonContains.Close(), t.relations.Close())
+	result = errors.Join(t.solutions.Close(), t.exclusions.Close(), t.equations.Close(), t.disequations.Close(), t.nonContains.Close(), t.relations.Close(), t.axioms.Close())
 	t.solutions = nil
 	t.exclusions = nil
 	t.equations = nil
 	t.disequations = nil
 	t.nonContains = nil
 	t.relations = nil
+	t.axioms = nil
 	t.dependencies = nil
 	t.limits = nil
 	if result != nil {
