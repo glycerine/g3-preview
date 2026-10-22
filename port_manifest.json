@@ -70471,7 +70471,7 @@
       "path": "src/model/func_interp.cpp",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/function_entry.go",
         "pkg/model/function_interpretation.go",
@@ -70480,7 +70480,9 @@
         "pkg/model/function_interpretation_test.go",
         "pkg/model/model_copy.go",
         "pkg/model/model_evaluator_function_memory_trace.go",
-        "pkg/model/model_evaluator_function_memory_trace_debug_test.go"
+        "pkg/model/model_evaluator_function_memory_trace_debug_test.go",
+        "pkg/model/model_translation.go",
+        "pkg/model/model_translation_test.go"
       ],
       "tests": [
         "TestFunctionInterpretationEntriesReplaceAndReferences",
@@ -70491,7 +70493,8 @@
         "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
         "TestFunctionInterpretationCopyEntriesAndOwningOutput",
         "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
-        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
+        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer",
+        "TestModelTranslationConstantsFunctionsUniversesAndOrder"
       ],
       "assertions": [
         {
@@ -70515,12 +70518,12 @@
           "text": "SASSERT(eqs.size() == m_arity);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete func_entry construction, retained argument/result references, equality lookup, result replacement and ascending destruction (func_interp.cpp:24-69)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/function_entry.go",
           "go_targets": [
             "pkg/model/function_interpretation_test.go"
@@ -70537,7 +70540,7 @@
         },
         {
           "name": "Original ordered function graph insertion/copy/cache reset, ITE entry peeling, direct-order var_subst fallback, constant/partial/simple queries, compression and ITE interpretation (func_interp.cpp:71-326)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/function_interpretation.go",
           "go_targets": [
             "pkg/model/function_interpretation_expr.go",
@@ -70577,6 +70580,12 @@
             "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
             "TestFunctionInterpretationNativeOccurrenceGrowthAndEmptyResult"
           ]
+        },
+        {
+          "name": "func_interp::translate preserves graph entry order, arguments, results, arity and fallback (func_interp.cpp:328-341)",
+          "status": "ported",
+          "go_target": "pkg/model/model_translation.go",
+          "tests": ["TestModelTranslationConstantsFunctionsUniversesAndOrder"]
         }
       ],
       "ownership": [
@@ -70584,7 +70593,7 @@
         "The retained model-core copy path now emits the func_interp::copy source debug allocation when its independent graph header is acquired, and its receiving ModelCore emits deallocation after owned destruction. Failed partial copies retain their named Go owner for explicit cleanup."
       ],
       "deviations": [
-        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and selected evaluator paths are now integrated; full theory evaluator completion remains pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; a native Go map holds borrowed AST handles and uint32 counts without simulated C++ probing or arena charges.",
+        "Selected concrete AST/Budget representation; native small_object_allocator ABI and allocator pooling are replaced by Go ownership plus the existing Budget checks. Existing AST equality/value theory dispatch qualifications apply. Function registration in model_core and selected evaluator paths are integrated; full theory evaluator completion remains tracked by model_evaluator.cpp. The var_subst is_well_sorted debug predicates remain a dependency qualification. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; a native Go map holds borrowed AST handles and uint32 counts without simulated C++ probing or arena charges.",
         "Function interpretation and else-peeling scratch use direct native []ASTHandle slices for variables, equality terms and indexed arguments. Removed the functionArgumentVector wrapper; borrowed scratch acquires no extra AST reference and has no custom Budget backing refusal. Existing owning entries, cache/fallback references, source entry recognition, reset/reuse and reverse ITE construction order remain."
       ]
     },
@@ -70592,13 +70601,15 @@
       "path": "src/model/func_interp.h",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/function_entry.go",
         "pkg/model/function_interpretation.go",
         "pkg/model/function_interpretation_expr.go",
         "pkg/model/function_interpretation_counts.go",
-        "pkg/model/function_interpretation_test.go"
+        "pkg/model/function_interpretation_test.go",
+        "pkg/model/model_translation.go",
+        "pkg/model/model_translation_test.go"
       ],
       "tests": [
         "TestFunctionInterpretationEntriesReplaceAndReferences",
@@ -70608,7 +70619,8 @@
         "TestFunctionInterpretationMultiArgumentPeelingAndElseMiss",
         "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
         "TestFunctionInterpretationCopyEntriesAndOwningOutput",
-        "TestModelEvaluatorFunctionEntriesMacrosAndCompletion"
+        "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
+        "TestModelTranslationConstantsFunctionsUniversesAndOrder"
       ],
       "conditionals": [
         {
@@ -70620,12 +70632,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete func_entry construction, retained argument/result references, equality lookup, result replacement and ascending destruction (func_interp.cpp:24-69)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/function_entry.go",
           "go_targets": [
             "pkg/model/function_interpretation_test.go"
@@ -70642,7 +70654,7 @@
         },
         {
           "name": "Original ordered function graph insertion/copy/cache reset, ITE entry peeling, direct-order var_subst fallback, constant/partial/simple queries, compression and ITE interpretation (func_interp.cpp:71-326)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/function_interpretation.go",
           "go_targets": [
             "pkg/model/function_interpretation_expr.go",
@@ -70682,13 +70694,19 @@
             "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
             "TestFunctionInterpretationNativeOccurrenceGrowthAndEmptyResult"
           ]
+        },
+        {
+          "name": "func_interp::translate declaration and ownership surface (func_interp.h:110)",
+          "status": "ported",
+          "go_target": "pkg/model/model_translation.go",
+          "tests": ["TestModelTranslationConstantsFunctionsUniversesAndOrder"]
         }
       ],
       "ownership": [
         "Each entry owns a concrete ground handle array and result; result INC precedes old-result DEC. Entry/graph headers and actual arrays/vector backing are charged to the manager Budget. Parent retains failed unpublished constructors for owning cleanup; graph destruction retires published entries, else and cache before pending owning cleanup. Cached ITE has its own reference; explicit output ASTRefs survive graph close. EvalElse constructs and closes the original VarSubstitution lexical owner with direct index order."
       ],
       "deviations": [
-        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and selected evaluator paths are now integrated; full theory evaluator completion remains pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; a native Go map holds borrowed AST handles and uint32 counts without simulated C++ probing or arena charges.",
+        "Selected concrete AST/Budget representation; native small_object_allocator ABI and allocator pooling are replaced by Go ownership plus the existing Budget checks. Existing AST equality/value theory dispatch qualifications apply. Function registration in model_core and selected evaluator paths are integrated; full theory evaluator completion remains tracked by model_evaluator.cpp. The var_subst is_well_sorted debug predicates remain a dependency qualification. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; a native Go map holds borrowed AST handles and uint32 counts without simulated C++ probing or arena charges.",
         "Function interpretation and else-peeling scratch use direct native []ASTHandle slices for variables, equality terms and indexed arguments. Removed the functionArgumentVector wrapper; borrowed scratch acquires no extra AST reference and has no custom Budget backing refusal. Existing owning entries, cache/fallback references, source entry recognition, reset/reuse and reverse ITE construction order remain."
       ]
     },
@@ -70696,7 +70714,7 @@
       "path": "src/model/model.cpp",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/model/model_core.go",
@@ -70706,7 +70724,11 @@
         "pkg/model/model_native_lookup_test.go",
         "pkg/model/function_interpretation.go",
         "pkg/model/model_evaluator_function_memory_trace.go",
-        "pkg/model/model_evaluator_function_memory_trace_debug_test.go"
+        "pkg/model/model_evaluator_function_memory_trace_debug_test.go",
+        "pkg/model/model_eval.go",
+        "pkg/model/model_translation.go",
+        "pkg/model/model_translation_test.go",
+        "pkg/model/model_printers.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -70722,7 +70744,9 @@
         "TestModelCopyEveryReservationFailureRetainsCleanupOwner",
         "TestModelFunctionCopyReplacementAndSelfCopy",
         "TestModelNativeDictionaryGrowthCopyOrderAndReinsert",
-        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
+        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer",
+        "TestModelTranslationConstantsFunctionsUniversesAndOrder",
+        "TestModelCompatibilityEvaluateCompletion"
       ],
       "assertions": [
         {
@@ -70734,12 +70758,12 @@
           "text": "SASSERT(u);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "derived construction, universe ownership/query/copy and virtual final-reference destruction",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_lifecycle.go",
           "tests": [
             "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -70782,6 +70806,18 @@
             "TestModelNativeDictionaryGrowthCopyOrderAndReinsert",
             "TestModelCopyMemoryWrapperSuccessfulAndRefusedHeader"
           ]
+        },
+        {
+          "name": "model::eval backward-compatible model-evaluator entry point and completion flag (model.cpp:69-81)",
+          "status": "ported",
+          "go_target": "pkg/model/model_eval.go",
+          "tests": ["TestModelCompatibilityEvaluateCompletion"]
+        },
+        {
+          "name": "model::translate constants, function graphs and universes in source dictionary order (model.cpp:152-182)",
+          "status": "ported",
+          "go_target": "pkg/model/model_translation.go",
+          "tests": ["TestModelTranslationConstantsFunctionsUniversesAndOrder"]
         }
       ],
       "ownership": [
@@ -70789,23 +70825,26 @@
         "The retained model-core copy path now emits the func_interp::copy source debug allocation when its independent graph header is acquired, and its receiving ModelCore emits deallocation after owned destruction. Failed partial copies retain their named Go owner for explicit cleanup."
       ],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are implemented. Function-aware copying, full model copy, AST translation, display and the compatibility evaluation entry point are implemented. Model-evaluator theory coverage remains tracked by model_evaluator.cpp.",
         "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply.",
         "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe dictionaries are also now native; no container growth/refusal implementation credit is added.",
-        "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. No source container allocation-failure equivalence or whole-unit promotion is claimed."
+        "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. Source container allocation failures are replaced by native Go container behavior."
       ]
     },
     {
       "path": "src/model/model.h",
       "component": "model",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/model/model_value.go",
         "pkg/model/model_copy.go",
         "pkg/model/model_interpretation_owners.go",
-        "pkg/model/model_native_lookup_test.go"
+        "pkg/model/model_native_lookup_test.go",
+        "pkg/model/model_eval.go",
+        "pkg/model/model_translation.go",
+        "pkg/model/model_translation_test.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -70819,7 +70858,9 @@
         "TestModelCopyConstantsFunctionsUniversesAndIndependentGraphs",
         "TestModelCopyEveryReservationFailureRetainsCleanupOwner",
         "TestModelFunctionCopyReplacementAndSelfCopy",
-        "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
+        "TestModelNativeDictionaryGrowthCopyOrderAndReinsert",
+        "TestModelTranslationConstantsFunctionsUniversesAndOrder",
+        "TestModelCompatibilityEvaluateCompletion"
       ],
       "conditionals": [
         {
@@ -70831,12 +70872,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "derived construction, universe ownership/query/copy and virtual final-reference destruction",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_lifecycle.go",
           "tests": [
             "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -70870,16 +70911,26 @@
             "TestModelNativeDictionaryGrowthCopyOrderAndReinsert",
             "TestModelCopyMemoryWrapperSuccessfulAndRefusedHeader"
           ]
+        },
+        {
+          "name": "model evaluation and translation public declarations (model.h:42-59)",
+          "status": "ported",
+          "go_target": "pkg/model/model_eval.go",
+          "go_targets": ["pkg/model/model_translation.go"],
+          "tests": [
+            "TestModelCompatibilityEvaluateCompletion",
+            "TestModelTranslationConstantsFunctionsUniversesAndOrder"
+          ]
         }
       ],
       "ownership": [
         "Ordered dictionary entries retain concrete constant AST references, function graph owners and universe AST references directly. Constants retire before functions; each declaration key retires before its value/graph. Native declaration slices remain borrowed. Detached unregister and failed constant replacement retain their remaining owned references for cleanup; consumed references are cleared before an error is reported."
       ],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are implemented. Function-aware copying, full model copy, AST translation and the compatibility evaluation entry point are implemented. Model-evaluator theory coverage remains tracked by model_evaluator.cpp.",
         "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply.",
         "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe dictionaries are also now native; no container growth/refusal implementation credit is added.",
-        "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. No source container allocation-failure equivalence or whole-unit promotion is claimed."
+        "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. Source container allocation failures are replaced by native Go container behavior."
       ]
     },
     {
