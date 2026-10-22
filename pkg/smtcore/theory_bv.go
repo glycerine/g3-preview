@@ -332,6 +332,84 @@ func (t *SMTBitVectorTheory) negateBits(bits []ast.ASTHandle) ([]ast.ASTHandle, 
 	return t.addBits(inverted, one)
 }
 
+func (t *SMTBitVectorTheory) multiplyBits(left, right []ast.ASTHandle) ([]ast.ASTHandle, error) {
+	if len(left) == 0 || len(left) != len(right) {
+		return nil, ast.ErrASTDomain
+	}
+	state, _ := t.State()
+	result := make([]ast.ASTHandle, len(left))
+	var err error
+	for i := range result {
+		result[i], err = state.manager.MkFalse()
+		if err != nil {
+			return nil, err
+		}
+	}
+	for shift := range right {
+		row := make([]ast.ASTHandle, len(left))
+		for i := range row {
+			if i < shift {
+				row[i], err = state.manager.MkFalse()
+			} else {
+				row[i], err = t.boolAnd(left[i-shift], right[shift])
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+		result, err = t.addBits(result, row)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return result, nil
+}
+
+func (t *SMTBitVectorTheory) shiftBits(bits, amount []ast.ASTHandle, operation int32) ([]ast.ASTHandle, error) {
+	if len(bits) == 0 || len(amount) == 0 {
+		return nil, ast.ErrASTDomain
+	}
+	state, _ := t.State()
+	result := append([]ast.ASTHandle(nil), bits...)
+	for stage, condition := range amount {
+		shift := len(bits)
+		if stage < 63 {
+			candidate := uint64(1) << uint(stage)
+			if candidate < uint64(len(bits)) {
+				shift = int(candidate)
+			}
+		}
+		shifted := make([]ast.ASTHandle, len(bits))
+		for i := range shifted {
+			source := i - shift
+			if operation != 45 {
+				source = i + shift
+			}
+			if source >= 0 && source < len(result) {
+				shifted[i] = result[source]
+				continue
+			}
+			var err error
+			if operation == 47 {
+				shifted[i] = result[len(result)-1]
+			} else {
+				shifted[i], err = state.manager.MkFalse()
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+		for i := range result {
+			var err error
+			result[i], err = state.manager.MkIte(condition, shifted[i], result[i])
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return result, nil
+}
+
 func (t *SMTBitVectorTheory) acBits(arguments [][]ast.ASTHandle, operation func([]ast.ASTHandle, []ast.ASTHandle) ([]ast.ASTHandle, error)) ([]ast.ASTHandle, error) {
 	if len(arguments) < 2 {
 		return nil, ast.ErrASTDomain
@@ -417,6 +495,9 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 			return nil, true, err
 		}
 		bits, err := t.addBits(arguments[0], negated)
+		return bits, true, err
+	case 6:
+		bits, err := t.acBits(arguments, t.multiplyBits)
 		return bits, true, err
 	case 30, 31, 33:
 		gate := t.boolAnd
@@ -512,6 +593,12 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 		}
 		bit, err := t.reduceBits(equalities, true)
 		return []ast.ASTHandle{bit}, true, err
+	case 45, 46, 47:
+		if len(arguments) != 2 || len(arguments[0]) != len(arguments[1]) {
+			return nil, true, ast.ErrASTDomain
+		}
+		bits, err := t.shiftBits(arguments[0], arguments[1], operation)
+		return bits, true, err
 	default:
 		return nil, false, nil
 	}

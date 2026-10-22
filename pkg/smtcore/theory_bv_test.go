@@ -118,7 +118,7 @@ func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
 	astTestMust(t, err)
 	right, err := m.MkConst(astTestSymbol(t, m, "unsupported-div-right"), sort)
 	astTestMust(t, err)
-	division, err := m.MkBitVectorPolynomialMul(sort, ast.SliceArguments([]ast.ASTHandle{left, right}))
+	division, err := m.MkBitVectorUDivInternal(left, right)
 	astTestMust(t, err)
 	astTestMust(t, m.IncRef(division))
 	equality, err := m.MkEq(division, left)
@@ -129,6 +129,40 @@ func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
 	astTestMust(t, err)
 	if status != lbool.Undef {
 		t.Fatal("unsupported BV operation", status)
+	}
+}
+
+func TestSMTBitVectorMultiplicationCircuit(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	two, err := m.BitVectorNumeralUint64(2, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(two)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "bv-mul-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "bv-mul-right"), sort)
+	astTestMust(t, err)
+	product, err := m.MkBitVectorMul(left, right)
+	astTestMust(t, err)
+	three, err := m.BitVectorNumeralUint64(3, 4)
+	astTestMust(t, err)
+	six, err := m.BitVectorNumeralUint64(6, 4)
+	astTestMust(t, err)
+	leftValue, err := m.MkEq(left, two)
+	astTestMust(t, err)
+	rightValue, err := m.MkEq(right, three)
+	astTestMust(t, err)
+	productValue, err := m.MkEq(product, six)
+	astTestMust(t, err)
+	wrongProduct, err := m.MkNot(productValue)
+	astTestMust(t, err)
+	for _, assertion := range []ast.ASTHandle{leftValue, rightValue, wrongProduct} {
+		astTestMust(t, solver.Assert(assertion))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("multiplication circuit", status)
 	}
 }
 
@@ -157,5 +191,34 @@ func TestSMTBitVectorUnsignedComparisonCircuit(t *testing.T) {
 	astTestMust(t, err)
 	if status != lbool.False {
 		t.Fatal("unsigned comparison circuit", status)
+	}
+}
+
+func TestSMTBitVectorShiftCircuit(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	one, err := m.BitVectorNumeralUint64(1, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(one)
+	astTestMust(t, err)
+	value, err := m.MkConst(astTestSymbol(t, m, "bv-shift-value"), sort)
+	astTestMust(t, err)
+	shifted, err := m.MkBitVectorSHL(value, one)
+	astTestMust(t, err)
+	three, err := m.BitVectorNumeralUint64(3, 4)
+	astTestMust(t, err)
+	six, err := m.BitVectorNumeralUint64(6, 4)
+	astTestMust(t, err)
+	valueConstraint, err := m.MkEq(value, three)
+	astTestMust(t, err)
+	shiftConstraint, err := m.MkEq(shifted, six)
+	astTestMust(t, err)
+	wrongShift, err := m.MkNot(shiftConstraint)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(valueConstraint))
+	astTestMust(t, solver.Assert(wrongShift))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("shift circuit", status)
 	}
 }
