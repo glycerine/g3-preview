@@ -40689,7 +40689,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/interp/manager.go"
+        "pkg/interp/manager.go",
+        "pkg/interp/manager_proof.go"
       ],
       "tests": [
         "TestInterpolationManagerOperatorConstructionAndAccess",
@@ -40697,6 +40698,9 @@
         "TestInterpolationManagerBooleanSimplifiers",
         "TestInterpolationManagerOccursSubstitutionAndFreeVariables",
         "TestInterpolationManagerDisplayAndPrettyFormatting",
+        "TestInterpolationManagerProofMetadataAndTheoryKinds",
+        "TestInterpolationManagerTheoryCoefficientNormalization",
+        "TestInterpolationManagerTriangleEqualityKinds",
         "TestInterpolationManagerBorrowAndCopyGuards"
       ],
       "conditionals": [
@@ -40781,7 +40785,17 @@
           ]
         },
         {
-          "name": "proof metadata, rewriting, theory-lemma coefficient extraction, linear combinations, integer division, free-variable universal closure, and controlling-equality quantifier optimization",
+          "name": "proof rule/premise/conclusion readers, theory and lemma classification, and Farkas, broken-GCD, and Gomory coefficient extraction",
+          "status": "ported",
+          "go_target": "pkg/interp/manager_proof.go",
+          "tests": [
+            "TestInterpolationManagerProofMetadataAndTheoryKinds",
+            "TestInterpolationManagerTheoryCoefficientNormalization",
+            "TestInterpolationManagerTriangleEqualityKinds"
+          ]
+        },
+        {
+          "name": "rewriting, assign-bounds coefficient extraction, linear combinations, integer division, free-variable universal closure, and controlling-equality quantifier optimization",
           "status": "unported",
           "tests": []
         }
@@ -40799,7 +40813,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/interp/manager.go"
+        "pkg/interp/manager.go",
+        "pkg/interp/manager_proof.go"
       ],
       "tests": [
         "TestInterpolationManagerOperatorConstructionAndAccess",
@@ -40807,6 +40822,9 @@
         "TestInterpolationManagerBooleanSimplifiers",
         "TestInterpolationManagerOccursSubstitutionAndFreeVariables",
         "TestInterpolationManagerDisplayAndPrettyFormatting",
+        "TestInterpolationManagerProofMetadataAndTheoryKinds",
+        "TestInterpolationManagerTheoryCoefficientNormalization",
+        "TestInterpolationManagerTriangleEqualityKinds",
         "TestInterpolationManagerBorrowAndCopyGuards"
       ],
       "conditionals": [
@@ -40836,7 +40854,17 @@
           ]
         },
         {
-          "name": "remaining proof, arithmetic algorithm, rewriting, universal closure, and optimized-quantification declarations",
+          "name": "proof rule/premise/conclusion readers, theory and lemma classification, and Farkas, broken-GCD, and Gomory coefficient extraction declarations",
+          "status": "ported",
+          "go_target": "pkg/interp/manager_proof.go",
+          "tests": [
+            "TestInterpolationManagerProofMetadataAndTheoryKinds",
+            "TestInterpolationManagerTheoryCoefficientNormalization",
+            "TestInterpolationManagerTriangleEqualityKinds"
+          ]
+        },
+        {
+          "name": "remaining assign-bounds proof coefficients, arithmetic algorithms, rewriting, universal closure, and optimized-quantification declarations",
           "status": "unported",
           "tests": []
         }
