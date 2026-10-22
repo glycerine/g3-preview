@@ -41578,6 +41578,7 @@
         "pkg/interp/direct_proof_simplify.go",
         "pkg/interp/direct_proof_sum.go",
         "pkg/interp/direct_proof_equality.go",
+        "pkg/interp/direct_proof_rewrite.go",
         "pkg/interp/direct_proof_localization.go"
       ],
       "tests": [
@@ -41592,6 +41593,8 @@
         "TestDirectProofGenericSymbolicSimplification",
         "TestDirectProofOrdinarySumSimplification",
         "TestDirectProofLocalEqualityRules",
+        "TestDirectProofTrivialInterpolationRewriteChains",
+        "TestDirectProofMixedModusPonens",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41793,6 +41796,15 @@
           ]
         },
         {
+          "name": "local rewrite-chain construction and trivial mixed-rule interpolation",
+          "status": "ported",
+          "go_target": "pkg/interp/direct_proof_rewrite.go",
+          "tests": [
+            "TestDirectProofTrivialInterpolationRewriteChains",
+            "TestDirectProofMixedModusPonens"
+          ]
+        },
+        {
           "name": "rewrite-chain normalization and symbolic proof simplification",
           "status": "partial",
           "go_target": "pkg/interp/direct_proof_simplify.go",
@@ -41809,14 +41821,16 @@
           "go_targets": [
             "pkg/interp/direct_proof_resolution.go",
             "pkg/interp/direct_proof_arithmetic.go",
-            "pkg/interp/direct_proof_equality.go"
+            "pkg/interp/direct_proof_equality.go",
+            "pkg/interp/direct_proof_rewrite.go"
           ],
           "tests": [
             "TestDirectProofLocalResolutionAndSymmetry",
             "TestDirectProofLocalArithmeticRules",
-            "TestDirectProofLocalEqualityRules"
+            "TestDirectProofLocalEqualityRules",
+            "TestDirectProofMixedModusPonens"
           ],
-          "reason": "Local modus ponens, single/multi-premise congruence, and transitivity plus direct mixed-premise congruence, local/mixed symmetry, Farkas, leq2eq, eq2leq, and cut rules are ported. Mixed modus ponens/transitivity, local-to-mixed congruence rewrites, and localized axioms remain pending."
+          "reason": "Local and mixed modus ponens, single/multi-premise congruence, and local transitivity plus direct mixed-premise congruence, local/mixed symmetry, Farkas, leq2eq, eq2leq, and cut rules are ported. Mixed transitivity, local-to-mixed congruence rewrites, and localized axioms remain pending."
         },
         {
           "name": "term localization, quantification, and final interpolation",
@@ -41854,6 +41868,7 @@
         "pkg/interp/direct_proof_simplify.go",
         "pkg/interp/direct_proof_sum.go",
         "pkg/interp/direct_proof_equality.go",
+        "pkg/interp/direct_proof_rewrite.go",
         "pkg/interp/direct_proof_localization.go"
       ],
       "tests": [
@@ -41868,6 +41883,8 @@
         "TestDirectProofGenericSymbolicSimplification",
         "TestDirectProofOrdinarySumSimplification",
         "TestDirectProofLocalEqualityRules",
+        "TestDirectProofTrivialInterpolationRewriteChains",
+        "TestDirectProofMixedModusPonens",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41911,6 +41928,18 @@
           ]
         },
         {
+          "name": "rewrite-chain declarations and mixed modus-ponens rule surface",
+          "status": "ported",
+          "go_targets": [
+            "pkg/interp/direct_proof_equality.go",
+            "pkg/interp/direct_proof_rewrite.go"
+          ],
+          "tests": [
+            "TestDirectProofTrivialInterpolationRewriteChains",
+            "TestDirectProofMixedModusPonens"
+          ]
+        },
+        {
           "name": "final interpolation declaration",
           "status": "ported",
           "go_targets": [
@@ -41925,7 +41954,7 @@
         },
         {
           "name": "remaining direct interpolation proof-rule surface",
-          "status": "unported",
+          "status": "partial",
           "go_target": "",
           "tests": []
         }

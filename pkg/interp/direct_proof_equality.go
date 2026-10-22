@@ -31,9 +31,6 @@ func (p *DirectProofInterpolator) MakeModusPonens(equivalence, premise1, premise
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	if side == TermMixed {
-		return ast.ASTHandle{}, ProofError{}
-	}
 	left, err := p.base.manager.Arg(equivalence, 0)
 	if err != nil {
 		return ast.ASTHandle{}, err
@@ -41,6 +38,43 @@ func (p *DirectProofInterpolator) MakeModusPonens(equivalence, premise1, premise
 	right, err := p.base.manager.Arg(equivalence, 1)
 	if err != nil {
 		return ast.ASTHandle{}, err
+	}
+	if side == TermMixed {
+		negatedRight, e := p.base.manager.MkNot(right)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		mask := 1 << 2
+		leftOp, e := p.base.manager.Operator(left)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if leftOp == OperatorNot {
+			body, bodyErr := p.base.manager.Arg(left, 0)
+			if bodyErr != nil {
+				return ast.ASTHandle{}, bodyErr
+			}
+			negativeEquivalence, bodyErr := p.isEquivalence(body)
+			if bodyErr != nil {
+				return ast.ASTHandle{}, bodyErr
+			}
+			if negativeEquivalence {
+				mask |= 1
+			}
+		}
+		interpolation, e := p.trivialInterpolation(p.modusPonens, []ast.ASTHandle{left, equivalence, negatedRight}, mask)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		negatedEquivalence, e := p.base.manager.MkNot(equivalence)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		interpolation, e = p.MakeResolution(left, []ast.ASTHandle{right, negatedEquivalence}, interpolation, premise1)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		return p.MakeResolution(equivalence, []ast.ASTHandle{right}, interpolation, premise2)
 	}
 	leftSide, err := p.TermSide(left)
 	if err != nil {

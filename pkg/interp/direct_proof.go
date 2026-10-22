@@ -32,10 +32,14 @@ type DirectProofInterpolator struct {
 	excludedMid           ast.ASTHandle
 	symmetry              ast.ASTHandle
 	congruence            ast.ASTHandle
+	modusPonens           ast.ASTHandle
 	concat                ast.ASTHandle
+	rewriteA              ast.ASTHandle
+	rewriteB              ast.ASTHandle
 	standForall           ast.ASTHandle
 	standExists           ast.ASTHandle
 	noProof               ast.ASTHandle
+	topPosition           ast.ASTHandle
 	placeholders          map[ast.ASTHandle]ast.ASTHandle
 	localizationVariables []localizationVariable
 	localizationMaps      map[ScopeRange]*localizationMaps
@@ -92,7 +96,16 @@ func NewDirectProofInterpolator(base *Base, scope ScopeRange, weak bool) (result
 	if p.congruence, err = p.newFunction("@cong", []ast.ASTHandle{boolean, integer, boolean}, boolean); err != nil {
 		return nil, err
 	}
+	if p.modusPonens, err = p.newFunction("@mp", []ast.ASTHandle{boolean, boolean, boolean}, boolean); err != nil {
+		return nil, err
+	}
 	if p.concat, err = p.newFunction("@concat", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
+		return nil, err
+	}
+	if p.rewriteA, err = p.newFunction("@rewrite_A", []ast.ASTHandle{boolean, boolean, boolean}, boolean); err != nil {
+		return nil, err
+	}
+	if p.rewriteB, err = p.newFunction("@rewrite_B", []ast.ASTHandle{boolean, boolean, boolean}, boolean); err != nil {
 		return nil, err
 	}
 	if p.standForall, err = p.newFunction("@sforall", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
@@ -105,6 +118,12 @@ func NewDirectProofInterpolator(base *Base, scope ScopeRange, weak bool) (result
 		return nil, err
 	}
 	if err = p.hold(p.noProof); err != nil {
+		return nil, err
+	}
+	if p.topPosition, err = manager.MakeVariable("@top_pos", boolean); err != nil {
+		return nil, err
+	}
+	if err = p.hold(p.topPosition); err != nil {
 		return nil, err
 	}
 	return p, nil

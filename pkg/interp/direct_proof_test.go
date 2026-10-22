@@ -601,3 +601,72 @@ func TestDirectProofLocalEqualityRules(t *testing.T) {
 		t.Fatal("local multi-congruence", yes, e)
 	}
 }
+
+func TestDirectProofTrivialInterpolationRewriteChains(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	mixed, err := manager.Make(OperatorIff, p, q)
+	interpMust(t, err)
+	negatedQ, err := manager.MkNot(q)
+	interpMust(t, err)
+	interpolation, err := direct.trivialInterpolation(direct.modusPonens, []ast.ASTHandle{p, mixed, negatedQ}, 1<<1)
+	interpMust(t, err)
+	entries, err := manager.Args(interpolation)
+	interpMust(t, err)
+	if len(entries) != 2 {
+		t.Fatal("mixed conjunct count", len(entries))
+	}
+	proof, err := manager.Arg(entries[0], 0)
+	interpMust(t, err)
+	if declaration, e := manager.Symbol(proof); e != nil || declaration != direct.modusPonens {
+		t.Fatal("mixed rule", declaration, e)
+	}
+	proofArgs, err := manager.Args(proof)
+	interpMust(t, err)
+	for i, want := range []ast.ASTHandle{direct.rewriteA, ast.ASTHandle{}, direct.rewriteB} {
+		if i == 1 {
+			placeholder, e := direct.isPlaceholder(proofArgs[i])
+			if e != nil || !placeholder {
+				t.Fatal("mixed premise placeholder", placeholder, e)
+			}
+			continue
+		}
+		chainDeclaration, e := manager.Symbol(proofArgs[i])
+		interpMust(t, e)
+		if chainDeclaration != direct.concat {
+			t.Fatal("local rewrite chain", i, chainDeclaration)
+		}
+		rewrite, e := manager.Arg(proofArgs[i], 1)
+		interpMust(t, e)
+		rewriteDeclaration, e := manager.Symbol(rewrite)
+		interpMust(t, e)
+		if rewriteDeclaration != want {
+			t.Fatal("local rewrite side", i, rewriteDeclaration, want)
+		}
+	}
+	rotated, err := manager.Arg(entries[1], 0)
+	interpMust(t, err)
+	if declaration, e := manager.Symbol(rotated); e != nil || declaration != direct.rotateSum {
+		t.Fatal("compressed rotation mask", declaration, e)
+	}
+}
+
+func TestDirectProofMixedModusPonens(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	equivalence, err := manager.Make(OperatorIff, p, q)
+	interpMust(t, err)
+	premise1, err := direct.MakeHypothesis(p)
+	interpMust(t, err)
+	premise2, err := direct.MakeHypothesis(equivalence)
+	interpMust(t, err)
+	result, err := direct.MakeModusPonens(equivalence, premise1, premise2)
+	interpMust(t, err)
+	if op, e := manager.Operator(result); e != nil || op != OperatorAnd {
+		t.Fatal("mixed modus ponens", op, e)
+	}
+}
