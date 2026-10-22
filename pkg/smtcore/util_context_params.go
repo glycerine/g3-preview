@@ -43,6 +43,28 @@ func NewContextParamsWithAllocationHook(c *uparams.ParamsContext, g *uparams.Glo
 	return newContextParams(c, g, b, onAllocated)
 }
 
+// Clone is the compiler-generated context_params copy used by api::context.
+// It copies the current scalar and string values without rereading globals.
+func (s *ContextParams) Clone() (*ContextParams, error) {
+	if e := s.open(); e != nil {
+		return nil, e
+	}
+	if !s.ready {
+		return nil, uparams.ErrParamsPrecondition
+	}
+	n := uint64(reflect.TypeOf(ContextParams{}).Size())
+	if e := s.budget.Reserve(n); e != nil {
+		return nil, e
+	}
+	copy := &ContextParams{
+		context: s.context, globals: s.globals, budget: s.budget,
+		dotProof: s.dotProof, traceFile: s.traceFile, state: s.state,
+		header: n, ready: true,
+	}
+	copy.self = copy
+	return copy, nil
+}
+
 func newContextParams(c *uparams.ParamsContext, g *uparams.GlobalParamsService, b *arena.Budget, onAllocated func(*ContextParams)) (*ContextParams, error) {
 	if c == nil || g == nil || b == nil || g.CheckOwner(c, b) != nil {
 		return nil, uparams.ErrParamsOwner

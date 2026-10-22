@@ -37798,7 +37798,7 @@
       "path": "src/cmd_context/context_params.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
@@ -37818,6 +37818,7 @@
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
         "TestGlobalParamsCatalogDispatcherFaultRoots",
         "TestContextParamsDefaultConstructorAndGlobalUpdate",
+        "TestContextParamsCompilerCopyIsIndependentAndKeepsCurrentValues",
         "TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings",
         "TestContextParamsGoStringSnapshotsAndCStringBoundary",
         "TestContextParamsEveryConstructorReservationAndGoStringUnwind",
@@ -37838,11 +37839,11 @@
         "TestContextParamsMkASTManagerActualTraceProofCoercionAndDebugActions",
         "TestContextParamsMkASTManagerEveryReachedConstructorPrefix"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete static context and solver parameter descriptor collection",
           "status": "ported",
           "go_target": "pkg/smtcore/gparams_catalog_collectors.go",
           "tests": [
@@ -37858,7 +37859,7 @@
         },
         {
           "name": "Actual context defaults, direct/global ordered updates and rlimit scalar (src/cmd_context/context_params.cpp:26-40,137-156)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_context_params.go",
           "tests": [
             "TestContextParamsDefaultConstructorAndGlobalUpdate",
@@ -37872,7 +37873,7 @@
         },
         {
           "name": "Literal context set/parse, default parameter merge and ordered solver outputs (src/cmd_context/context_params.cpp:42-135,158-196)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_context_params_methods_source.go",
           "tests": [
             "TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing",
@@ -37890,17 +37891,25 @@
         },
         {
           "name": "Actual mk_ast_manager trace/proof/coercions/debug construction chain (src/cmd_context/context_params.cpp:198-209)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_context_params_ast_source.go",
           "tests": [
             "TestContextParamsMkASTManagerActualTraceProofCoercionAndDebugActions",
             "TestContextParamsMkASTManagerEveryReachedConstructorPrefix"
           ]
+        },
+        {
+          "name": "compiler-generated context_params copy retained by api::context",
+          "status": "ported",
+          "go_target": "pkg/smtcore/util_context_params.go",
+          "tests": [
+            "TestContextParamsCompilerCopyIsIndependentAndKeepsCurrentValues"
+          ]
         }
       ],
       "ownership": [
         "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
-        "Actual two default std::string members construct in declaration order before twelve constructor-body scalar assignments; constructor then reaches global gparams::get_ref and the same direct update engine. UInt/Bool/string getter RHS values publish in literal source order, including inner well_sorted_check fallback before outer type_check. No lexical module helper, Params INC, clone or snapshot is invented. The reflected context wrapper charges both embedded inline strings once; external/pending arrays are actual qiOwnedString engine allocations. Constructor failure traverses completed strings trace-file then dot-proof before return; owning Close separately drains unjoined arrays.",
+        "Actual two default std::string members construct in declaration order before twelve constructor-body scalar assignments; constructor then reaches global gparams::get_ref and the same direct update engine. UInt/Bool/string getter RHS values publish in literal source order, including inner well_sorted_check fallback before outer type_check. The compiler-copy replacement allocates an independent owner and snapshots scalar and Go-string values without rereading globals. Constructor failure traverses completed strings trace-file then dot-proof before return; owning Close separately drains unjoined arrays.",
         "Source setters use exact ASCII normalization and field routes, sequential strcmp branches, strlen then all-digit classification and selected LP64 strtol saturation followed by unsigned32 cast. Unknown-key value is unread; a native Go string stores the normalized lexical key, while embedded descriptor info/names/text members and the diagnostic bytes.Buffer use their concrete source engines. Context lexical frame storage is real charged metadata, not a simulated native allocation. Merge contains any kind, actual source reference copy then COW SetBool, and return transfers only the actually held temporary. Solver outputs publish in source proofs/model/core order before merge and final params assignment. Failed COW init retains the exact returned ParamsSourceReceipt and actual untransferred POD numeral ParamsSetReceipt before source temporary destruction. Explicit owning close acknowledges younger numeral then older init-held reference; source epilogue never aborts the incomplete POD acquisition. Borrowed caller Params/context/symbol/AST/numeric owners are not adopted. All matched receipts are exact owner/slot/generation/invocation; source/body/own causes remain distinct and first causes sticky.",
         "The actual shared lexical epilogue engine is tested with a real final-reference NUM DT stop in the existing signed-counter guarded Runtime domain: younger source stop protects the older normalized Go key, both body and destructor errors remain joined, and separate matched owning ACK preserves each frame history. No native signed-overflow destruction or high-level callback equivalence is claimed.",
         "Actual child receipt tuples remain immutable after matched owning acknowledgement; separate setAcknowledged/sourceAcknowledged booleans retire authority without clearing owner/slot/generation/invocation. Wrong primitive invocation is rejected by a separate direct CleanupSet call without overwriting acquired parent tuples. Genuine parent first ownCause ErrBounds comes from Close after fully backed NUM Copy and actual append refusal, with both child tuples unchanged; matched retry preserves exact tuples/body/source/own histories and separate ACK bits prevent repeated cleanup. Direct lexical older-key protection is epilogue-engine/signed-counter guard-domain evidence, not public call nesting or driver credit.",
@@ -37910,8 +37919,8 @@
         "Actual borrowed parameter views are converted to native strings at their reached SMT caller before checked numerical text construction/assignment. ParamsStringView.String owns that conversion in the parameter layer; numerical text no longer imports parameter view/error types. Existing null/stale input failures, option publication and lexical cleanup order remain."
       ],
       "deviations": [
-        "Only context constructor, both direct/global updates and scalar rlimit setter/access are implemented here. m_interpolants is never initialized by this source; false Go storage with InterpolantsInitialized=false is diagnostic, not a source default. Failed constructor State is diagnostic and Update rejects it. Source set parsing, descriptor collectors, merge_default_params/get_solver_params, AST-manager construction and compiler-generated copies remain separate obligations. Existing independently ported collector evidence is preserved; no new driver/context/native ABI/global registration credit.",
-        "Selected GNU/LP64 parsing profile and Go-managed text representation are explicit adaptations. Go numeric streams handle character insertion; C-string length precedes reached byte emission. Native global stream locale/formatting and other long-width profiles remain open. Nil/stale/closed/copy/executing guards and unsigned length loops beyond MaxUint32 are Go domain guards, not native continuation credit. Real mk_ast_manager at src/cmd_context/context_params.cpp:198-209, parameter implicit owning copies, complete cmd_context/AST manager/SMT driver and globals remain open; no registered driver assertions added.",
+        "m_interpolants is never initialized by this source; false Go storage with InterpolantsInitialized=false records that fact rather than claiming a source default. Failed-constructor State is diagnostic and mutating calls reject it.",
+        "Selected GNU/LP64 unsigned parsing and Go-managed strings are explicit platform adaptations. C-string inputs preserve their first-NUL boundary. Nil, stale, closed, copied and executing-owner checks are Go domain guards.",
         "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
         "Context trace and proof filenames now use Go strings. Parameter input keeps its C-string NUL boundary; earlier string snapshots survive replacement and close. The AST filename reader supplies a virtual terminator from the Go string. Borrowed parameter provider lifetime and null-input checks remain at the parameter boundary."
       ]
@@ -37920,7 +37929,7 @@
       "path": "src/cmd_context/context_params.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
@@ -37939,6 +37948,7 @@
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
         "TestGlobalParamsCatalogDispatcherFaultRoots",
         "TestContextParamsDefaultConstructorAndGlobalUpdate",
+        "TestContextParamsCompilerCopyIsIndependentAndKeepsCurrentValues",
         "TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings",
         "TestContextParamsEveryConstructorReservationAndGoStringUnwind",
         "TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards",
@@ -37966,11 +37976,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete static context and solver parameter descriptor collection",
           "status": "ported",
           "go_target": "pkg/smtcore/gparams_catalog_collectors.go",
           "tests": [
@@ -37986,7 +37996,7 @@
         },
         {
           "name": "Actual context defaults, direct/global ordered updates and rlimit scalar (src/cmd_context/context_params.h:26-55)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_context_params.go",
           "tests": [
             "TestContextParamsDefaultConstructorAndGlobalUpdate",
@@ -37999,7 +38009,7 @@
         },
         {
           "name": "Literal context set/parse, default parameter merge and ordered solver outputs (src/cmd_context/context_params.h:26-80)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_context_params_methods_source.go",
           "tests": [
             "TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing",
@@ -38014,11 +38024,24 @@
             "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation",
             "TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTuples"
           ]
+        },
+        {
+          "name": "context_params value copy, scalar accessors and AST-manager factory declaration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/util_context_params.go",
+          "go_targets": [
+            "pkg/smtcore/util_context_params_ast_source.go"
+          ],
+          "tests": [
+            "TestContextParamsCompilerCopyIsIndependentAndKeepsCurrentValues",
+            "TestContextParamsMkASTManagerActualTraceProofCoercionAndDebugActions",
+            "TestContextParamsMkASTManagerEveryReachedConstructorPrefix"
+          ]
         }
       ],
       "ownership": [
         "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
-        "Actual two default std::string members construct in declaration order before twelve constructor-body scalar assignments; constructor then reaches global gparams::get_ref and the same direct update engine. UInt/Bool/string getter RHS values publish in literal source order, including inner well_sorted_check fallback before outer type_check. No lexical module helper, Params INC, clone or snapshot is invented. The reflected context wrapper charges both embedded inline strings once; external/pending arrays are actual qiOwnedString engine allocations. Constructor failure traverses completed strings trace-file then dot-proof before return; owning Close separately drains unjoined arrays.",
+        "Actual two default std::string members construct in declaration order before twelve constructor-body scalar assignments; constructor then reaches global gparams::get_ref and the same direct update engine. UInt/Bool/string getter RHS values publish in literal source order, including inner well_sorted_check fallback before outer type_check. The compiler-copy replacement allocates an independent owner and snapshots scalar and Go-string values without rereading globals. Constructor failure traverses completed strings trace-file then dot-proof before return; owning Close separately drains unjoined arrays.",
         "Source setters use exact ASCII normalization and field routes, sequential strcmp branches, strlen then all-digit classification and selected LP64 strtol saturation followed by unsigned32 cast. Unknown-key value is unread; actual lexical owned key, embedded descriptor info/names/text members and inline64 diagnostic buffer use the same concrete source engines. Context lexical frame storage is real charged metadata, not a simulated native allocation. Merge contains any kind, actual source reference copy then COW SetBool, and return transfers only the actually held temporary. Solver outputs publish in source proofs/model/core order before merge and final params assignment. Failed COW init retains the exact returned ParamsSourceReceipt and actual untransferred POD numeral ParamsSetReceipt before source temporary destruction. Explicit owning close acknowledges younger numeral then older init-held reference; source epilogue never aborts the incomplete POD acquisition. Borrowed caller Params/context/symbol/AST/numeric owners are not adopted. All matched receipts are exact owner/slot/generation/invocation; source/body/own causes remain distinct and first causes sticky.",
         "The actual shared lexical epilogue engine is tested with a real final-reference NUM DT stop in the existing signed-counter guarded Runtime domain: younger source stop protects older allocated key storage, both body and destructor errors remain joined, and separate matched owning ACK preserves each frame history. No native signed-overflow destruction or high-level callback equivalence is claimed.",
         "Actual child receipt tuples remain immutable after matched owning acknowledgement; separate setAcknowledged/sourceAcknowledged booleans retire authority without clearing owner/slot/generation/invocation. Wrong primitive invocation is rejected by a separate direct CleanupSet call without overwriting acquired parent tuples. Genuine parent first ownCause ErrBounds comes from Close after fully backed NUM Copy and actual append refusal, with both child tuples unchanged; matched retry preserves exact tuples/body/source/own histories and separate ACK bits prevent repeated cleanup. Direct lexical older-key protection is epilogue-engine/signed-counter guard-domain evidence, not public call nesting or driver credit.",
@@ -38027,8 +38050,8 @@
         "Actual borrowed parameter views are converted to native strings at their reached SMT caller before checked numerical text construction/assignment. ParamsStringView.String owns that conversion in the parameter layer; numerical text no longer imports parameter view/error types. Existing null/stale input failures, option publication and lexical cleanup order remain."
       ],
       "deviations": [
-        "Only context constructor, both direct/global updates and scalar rlimit setter/access are implemented here. m_interpolants is never initialized by this source; false Go storage with InterpolantsInitialized=false is diagnostic, not a source default. Failed constructor State is diagnostic and Update rejects it. Source set parsing, descriptor collectors, merge_default_params/get_solver_params, AST-manager construction and compiler-generated copies remain separate obligations. Existing independently ported collector evidence is preserved; no new driver/context/native ABI/global registration credit.",
-        "Selected GNU/LP64 parsing profile and Go-managed text representation are explicit adaptations. Go numeric streams handle character insertion; C-string length precedes reached byte emission. Native global stream locale/formatting and other long-width profiles remain open. Nil/stale/closed/copy/executing guards and unsigned length loops beyond MaxUint32 are Go domain guards, not native continuation credit. Real mk_ast_manager at src/cmd_context/context_params.cpp:198-209, parameter implicit owning copies, complete cmd_context/AST manager/SMT driver and globals remain open; no registered driver assertions added.",
+        "m_interpolants is never initialized by this source; false Go storage with InterpolantsInitialized=false records that fact rather than claiming a source default. Failed-constructor State is diagnostic and mutating calls reject it.",
+        "Selected GNU/LP64 unsigned parsing and Go-managed strings are explicit platform adaptations. C-string inputs preserve their first-NUL boundary. Nil, stale, closed, copied and executing-owner checks are Go domain guards.",
         "Context trace and proof filenames now use Go strings. Parameter input keeps its C-string NUL boundary; earlier string snapshots survive replacement and close. The AST filename reader supplies a virtual terminator from the Go string. Borrowed parameter provider lifetime and null-input checks remain at the parameter boundary."
       ]
     },

@@ -121,6 +121,37 @@ func TestContextParamsGoStringSnapshotsAndCStringBoundary(t *testing.T) {
 	}
 	contextParamsCold(t, nil, g, b)
 }
+
+func TestContextParamsCompilerCopyIsIndependentAndKeepsCurrentValues(t *testing.T) {
+	c, g, _, b := dynAckSourceFixture(t)
+	source, e := NewContextParams(c, g, b)
+	paramsMust(t, e)
+	key, value := "auto_config", "false"
+	paramsMust(t, source.Set(&key, &value))
+	key, value = "trace_file_name", "copied.log"
+	paramsMust(t, source.Set(&key, &value))
+	copy, e := source.Clone()
+	paramsMust(t, e)
+	defer func() { paramsMust(t, copy.Close()) }()
+	key, value = "auto_config", "true"
+	paramsMust(t, source.Set(&key, &value))
+	key, value = "trace_file_name", "source.log"
+	paramsMust(t, source.Set(&key, &value))
+	paramsMust(t, source.Close())
+	state, e := copy.State()
+	paramsMust(t, e)
+	if state.AutoConfig || copy.TraceFile() != "copied.log" {
+		t.Fatal("compiler copy did not preserve the copied snapshot", state, copy.TraceFile())
+	}
+	key, value = "model", "false"
+	paramsMust(t, copy.Set(&key, &value))
+	state, e = copy.State()
+	paramsMust(t, e)
+	if state.Model {
+		t.Fatal("copied context parameters are not independently mutable")
+	}
+}
+
 func TestContextParamsEveryConstructorReservationAndGoStringUnwind(t *testing.T) {
 	for ordinal := int64(0); ; ordinal++ {
 		c, g, _, b := dynAckSourceFixture(t)
