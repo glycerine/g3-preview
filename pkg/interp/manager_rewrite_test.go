@@ -40,6 +40,36 @@ func TestFullTranslationArithmeticHelpers(t *testing.T) {
 	if err != nil || !valid {
 		t.Fatal("Farkas identity", valid, err)
 	}
+	two, err := manager.MakeIntText("2")
+	interpMust(t, err)
+	four, err := manager.MakeIntText("4")
+	interpMust(t, err)
+	twoX, err := manager.Make(OperatorTimes, two, x)
+	interpMust(t, err)
+	fourY, err := manager.Make(OperatorTimes, four, y)
+	interpMust(t, err)
+	affine, err := manager.Make(OperatorPlus, twoX, fourY)
+	interpMust(t, err)
+	gcd, err := translation.GCDOfCoefficients(affine)
+	interpMust(t, err)
+	if value, numeral, e := manager.Numeral(gcd); e != nil || !numeral || value.Cmp(big.NewRat(2, 1)) != 0 {
+		t.Fatal("coefficient gcd", value, numeral, e)
+	}
+	boundInequality, err := manager.Make(OperatorLE, x, three)
+	interpMust(t, err)
+	bound, lower, err := translation.BoundedVariable(boundInequality)
+	if err != nil || bound != x || lower {
+		t.Fatal("bounded variable", bound, lower, err)
+	}
+	coefficient, err := translation.TermCoefficient(normalized, x)
+	if err != nil || coefficient.Cmp(big.NewRat(1, 1)) != 0 {
+		t.Fatal("term coefficient", coefficient, err)
+	}
+	ratio, err := translation.DivideInequalities(normalized, normalized)
+	interpMust(t, err)
+	if value, numeral, e := manager.Numeral(ratio); e != nil || !numeral || value.Cmp(big.NewRat(1, 1)) != 0 {
+		t.Fatal("inequality ratio", value, numeral, e)
+	}
 }
 
 func interpRewritingManagerFixture(t *testing.T) (*ast.ASTManager, *Manager) {

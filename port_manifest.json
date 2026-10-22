@@ -42372,7 +42372,7 @@
           ]
         },
         {
-          "name": "inequality right-side and affine normalization plus Farkas identity validation",
+          "name": "inequality normalization, Farkas identity validation, coefficient GCD, bound-variable recovery, and integer inequality ratios",
           "status": "ported",
           "go_target": "pkg/interp/translation_arithmetic.go",
           "tests": [
