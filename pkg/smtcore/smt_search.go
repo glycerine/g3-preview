@@ -228,6 +228,11 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		if exceeded {
 			return lbool.Undef, nil
 		}
+		if k.smtState.SimplifyClauses {
+			if err = k.internalizer.simplifyClausesAtBase(baseLevel); err != nil {
+				return lbool.Undef, fmt.Errorf("smt search simplify clauses: %w", err)
+			}
+		}
 
 		variable, phase, err := queue.NextCaseSplit()
 		if err != nil {

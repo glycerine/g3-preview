@@ -89,6 +89,11 @@ func (k *SMTKernel) restartSearch(baseLevel uint32, state *smtRestartState) erro
 			return err
 		}
 	}
+	if k.smtState.SimplifyClauses {
+		if err := k.internalizer.simplifyClausesAtBase(baseLevel); err != nil {
+			return err
+		}
+	}
 	if k.smtState.LemmaGcStrategy == 2 {
 		if err := k.internalizer.garbageCollectLearnedClauses(); err != nil {
 			return err

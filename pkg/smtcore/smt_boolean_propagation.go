@@ -209,6 +209,7 @@ func (s *SMTInternalizerState) Propagate() (bool, error) {
 	for s.propagationHead < len(s.assignedLiterals) {
 		assigned := s.assignedLiterals[s.propagationHead]
 		s.propagationHead++
+		s.simplifyCounter--
 		watch := &s.watches[assigned.Index()]
 		for _, implied := range watch.Literals() {
 			value, err := s.Assignment(implied)

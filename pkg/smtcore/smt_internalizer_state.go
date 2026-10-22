@@ -27,6 +27,7 @@ type smtInternalizerScope struct {
 	theoryDiseqHead    int
 	atomHead           int
 	notifyLimit        int
+	simplifyHead       int
 	inconsistent       bool
 	conflict           SMTBooleanJustification
 	conflictLiteral    SMTLiteral
@@ -138,6 +139,8 @@ type SMTInternalizerState struct {
 	clauseMaintenance        SMTClauseMaintenanceConfig
 	conflictsSinceLemmaGC    uint32
 	lemmaGCThreshold         uint32
+	simplifyHead             int
+	simplifyCounter          int
 	learnedUnits             []smtPersistentLearnedUnit
 	searchBaseLevel          uint32
 	searchAgility            float64
@@ -585,7 +588,7 @@ func (s *SMTInternalizerState) PushScope() error {
 		disequalities:   disequalities, disequalityReasons: reasons,
 		theoryEqLimit: len(s.theoryEqualities), theoryEqHead: s.theoryEqualityHead,
 		theoryDiseqLimit: len(s.theoryDisequalities), theoryDiseqHead: s.theoryDisequalityHead,
-		atomHead: s.atomPropagationHead, notifyLimit: len(s.notifyTrail),
+		atomHead: s.atomPropagationHead, notifyLimit: len(s.notifyTrail), simplifyHead: s.simplifyHead,
 	})
 	if s.relevancy != nil {
 		if err := s.relevancy.PushScope(); err != nil {
@@ -701,6 +704,7 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		return ast.ErrASTDomain
 	}
 	s.propagationHead = scope.propagationHead
+	s.simplifyHead = scope.simplifyHead
 	if scope.theoryEqLimit < 0 || scope.theoryEqLimit > len(s.theoryEqualities) || scope.theoryEqHead < 0 || scope.theoryEqHead > scope.theoryEqLimit {
 		return ast.ErrASTDomain
 	}
