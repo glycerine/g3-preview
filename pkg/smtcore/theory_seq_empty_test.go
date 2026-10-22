@@ -1742,6 +1742,36 @@ func TestSMTSequenceTheoryGroundOperationsAreComplete(t *testing.T) {
 		name  string
 		build func(*testing.T, *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle)
 	}{
+		{name: "empty-prefix", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-prefix-x")
+			operation, err := m.MkSequencePrefix(astTestString(t, m, ""), x)
+			astTestMust(t, err)
+			truth, err := m.MkTrue()
+			astTestMust(t, err)
+			return operation, truth
+		}},
+		{name: "empty-suffix", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-suffix-x")
+			operation, err := m.MkSequenceSuffix(astTestString(t, m, ""), x)
+			astTestMust(t, err)
+			truth, err := m.MkTrue()
+			astTestMust(t, err)
+			return operation, truth
+		}},
+		{name: "contains-empty", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-contains-x")
+			operation, err := m.MkSequenceContains(x, astTestString(t, m, ""))
+			astTestMust(t, err)
+			truth, err := m.MkTrue()
+			astTestMust(t, err)
+			return operation, truth
+		}},
+		{name: "index-empty-at-zero", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-empty-index-x")
+			operation, err := m.MkSequenceIndex(x, astTestString(t, m, ""), astTestInteger(t, m, 0))
+			astTestMust(t, err)
+			return operation, astTestInteger(t, m, 0)
+		}},
 		{name: "concat-empty-identity", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
 			x := astTestStringConst(t, m, "sequence-exact-concat-x")
 			operation, err := m.MkSequenceConcat(astTestString(t, m, ""), x)

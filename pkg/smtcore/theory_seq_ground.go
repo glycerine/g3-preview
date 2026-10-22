@@ -137,6 +137,29 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 		return t.pushGroundValue(expression, value)
 	}
 	if operation >= 3 && operation <= 5 {
+		leftExpression, argumentErr := state.manager.GetArg(expression, 0)
+		if argumentErr != nil {
+			return false, argumentErr
+		}
+		rightExpression, argumentErr := state.manager.GetArg(expression, 1)
+		if argumentErr != nil {
+			return false, argumentErr
+		}
+		leftEmpty, emptyErr := state.manager.IsSequenceEmpty(leftExpression)
+		if emptyErr != nil {
+			return false, emptyErr
+		}
+		rightEmpty, emptyErr := state.manager.IsSequenceEmpty(rightExpression)
+		if emptyErr != nil {
+			return false, emptyErr
+		}
+		if ((operation == 3 || operation == 4) && leftEmpty) || (operation == 5 && rightEmpty) {
+			truth, makeErr := state.manager.MkTrue()
+			if makeErr != nil {
+				return false, makeErr
+			}
+			return t.pushGroundValue(expression, truth)
+		}
 		left, leftConcrete, textErr := t.groundStringArgument(expression, 0)
 		if textErr != nil || !leftConcrete {
 			return false, textErr
@@ -269,6 +292,21 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 				return false, makeErr
 			}
 			return t.pushGroundValue(expression, minusOne)
+		}
+		needleExpression, argumentErr := state.manager.GetArg(expression, 1)
+		if argumentErr != nil {
+			return false, argumentErr
+		}
+		needleEmpty, emptyErr := state.manager.IsSequenceEmpty(needleExpression)
+		if emptyErr != nil {
+			return false, emptyErr
+		}
+		if needleEmpty && offset.Sign() == 0 {
+			zero, makeErr := state.manager.ArithmeticIntegerNumeralText("0")
+			if makeErr != nil {
+				return false, makeErr
+			}
+			return t.pushGroundValue(expression, zero)
 		}
 		source, sourceConcrete, textErr := t.groundStringArgument(expression, 0)
 		if textErr != nil || !sourceConcrete {
