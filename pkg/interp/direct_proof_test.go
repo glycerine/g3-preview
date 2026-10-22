@@ -947,3 +947,33 @@ func TestDirectProofPredicateModusPonensSimplification(t *testing.T) {
 		t.Fatal("predicate modus-ponens simplification")
 	}
 }
+
+func TestDirectProofUnsplitModusPonensSimplification(t *testing.T) {
+	_, manager, base, p, _ := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	negativeP, err := manager.MkNot(p)
+	interpMust(t, err)
+	firstFormula, err := manager.Make(OperatorIff, p, negativeP)
+	interpMust(t, err)
+	secondFormula, err := manager.Make(OperatorIff, negativeP, p)
+	interpMust(t, err)
+	first, err := direct.makeLocalRewrite(TermA, firstFormula)
+	interpMust(t, err)
+	implication, err := manager.Make(OperatorIff, firstFormula, secondFormula)
+	interpMust(t, err)
+	second, err := direct.makeLocalRewrite(TermB, implication)
+	interpMust(t, err)
+	negativeSecond, err := manager.MkNot(secondFormula)
+	interpMust(t, err)
+	third, err := direct.makeLocalRewrite(TermA, negativeSecond)
+	interpMust(t, err)
+	proof, err := direct.makeSymbol(direct.modusPonens, first, second, third)
+	interpMust(t, err)
+	result, err := direct.SimplifyProofTerm(proof)
+	interpMust(t, err)
+	if result.IsNull() {
+		t.Fatal("unsplit modus-ponens simplification")
+	}
+}

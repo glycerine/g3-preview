@@ -828,17 +828,24 @@ func (p *DirectProofInterpolator) simplifyModusPonens(args []ast.ASTHandle) (ast
 	if equivalence {
 		parts, e := p.splitRewriteChain(second)
 		if e != nil {
-			return ast.ASTHandle{}, e
+			if _, proofError := e.(ProofError); !proofError {
+				return ast.ASTHandle{}, e
+			}
+			chain, e = p.simplifyUnsplitModusPonens(first, second)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+		} else {
+			chain, e = p.reverseChain(parts[0])
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			chain, e = p.concatRewriteChains(chain, first)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			chain, err = p.concatRewriteChains(chain, parts[1])
 		}
-		chain, e = p.reverseChain(parts[0])
-		if e != nil {
-			return ast.ASTHandle{}, e
-		}
-		chain, e = p.concatRewriteChains(chain, first)
-		if e != nil {
-			return ast.ASTHandle{}, e
-		}
-		chain, err = p.concatRewriteChains(chain, parts[1])
 	} else {
 		chain, err = p.concatRewriteChains(first, second)
 	}
@@ -871,6 +878,88 @@ func (p *DirectProofInterpolator) simplifyModusPonens(args []ast.ASTHandle) (ast
 		return ast.ASTHandle{}, err
 	}
 	return p.base.manager.MkAnd(aProof, result)
+}
+
+func (p *DirectProofInterpolator) simplifyUnsplitModusPonens(first, second ast.ASTHandle) (ast.ASTHandle, error) {
+	head, tail, err := p.headRewriteChain(second, false)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	parts, err := p.splitRewriteChain(tail)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	headRest, headRewrite, err := p.chainParts(head)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	side, _, condition, _, err := p.rewriteFields(headRewrite)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	left, right, err := p.rewriteEndpoints(headRewrite)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	truth, err := p.base.manager.Make(OperatorTrue)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negativeLeft, err := p.base.manager.MkNot(left)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	premise, err := p.base.manager.Make(OperatorIff, truth, negativeLeft)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	premise, err = p.makeRewrite(side, p.topPosition, condition, premise)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	backChain, err := p.chainCons(truth, premise)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	headRest, err = p.reverseChain(headRest)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	headRest, err = p.chainPositionAdd(0, headRest)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	backChain, err = p.concatRewriteChains(backChain, headRest)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	condition, err = p.contradictChains(backChain, first)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if side == TermA {
+		condition, err = p.base.manager.MkNot(condition)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
+	forward, err := p.makeRewrite(side, p.topPosition, condition, right)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	first, err = p.chainCons(truth, forward)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	chain, err := p.reverseChain(parts[0])
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	chain, err = p.concatRewriteChains(chain, first)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.concatRewriteChains(chain, parts[1])
 }
 
 func (p *DirectProofInterpolator) isEquivalenceChain(chain ast.ASTHandle) (bool, error) {
