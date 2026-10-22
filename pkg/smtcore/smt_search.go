@@ -185,20 +185,28 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		return lbool.Undef, errors.Join(err, resolver.Close(), timer.Close())
 	}
 	defer func() {
-		resultErr = errors.Join(resultErr, resolver.Close())
-		resultErr = errors.Join(resultErr, timer.Close())
+		if closeErr := resolver.Close(); closeErr != nil {
+			resultErr = errors.Join(resultErr, fmt.Errorf("smt search close resolver: %w", closeErr))
+		}
+		if closeErr := timer.Close(); closeErr != nil {
+			resultErr = errors.Join(resultErr, fmt.Errorf("smt search close timer: %w", closeErr))
+		}
 		if count := k.internalizer.scopeLevel - baseLevel; count != 0 {
-			resultErr = errors.Join(resultErr, k.internalizer.PopScopes(count))
+			if popErr := k.internalizer.PopScopes(count); popErr != nil {
+				resultErr = errors.Join(resultErr, fmt.Errorf("smt search restore base scope: %w", popErr))
+			}
 			if resultErr != nil {
 				result = lbool.Undef
 			}
 		}
-		resultErr = errors.Join(resultErr, k.internalizer.endSearchPersistence())
+		if persistenceErr := k.internalizer.endSearchPersistence(); persistenceErr != nil {
+			resultErr = errors.Join(resultErr, fmt.Errorf("smt search end persistence: %w", persistenceErr))
+		}
 	}()
 	for {
 		exceeded, err := k.searchResourceLimitExceeded(timer, &nextProgressSample)
 		if err != nil {
-			return lbool.Undef, err
+			return lbool.Undef, fmt.Errorf("smt search resource check: %w", err)
 		}
 		if exceeded {
 			return lbool.Undef, nil
@@ -213,7 +221,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			}
 			conflict, found := k.internalizer.Conflict()
 			if !found {
-				return lbool.Undef, ast.ErrASTDomain
+				return lbool.Undef, fmt.Errorf("smt search missing conflict: %w", ast.ErrASTDomain)
 			}
 			conflictLiteral := k.internalizer.ConflictLiteral()
 			resolution, err := resolver.Resolve(conflict, conflictLiteral, baseLevel)
@@ -223,30 +231,30 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			if !resolution.Resolved {
 				proof, proofErr := resolver.LemmaProof()
 				if proofErr != nil {
-					return lbool.Undef, proofErr
+					return lbool.Undef, fmt.Errorf("smt search conflict proof: %w", proofErr)
 				}
 				if err = k.manager.SetRef(k.unsatProof, proof); err != nil {
-					return lbool.Undef, err
+					return lbool.Undef, fmt.Errorf("smt search retain unsat proof: %w", err)
 				}
 				if err = k.captureUnsatCore(resolver, conflict, conflictLiteral); err != nil {
-					return lbool.Undef, err
+					return lbool.Undef, fmt.Errorf("smt search capture unsat core: %w", err)
 				}
 				return lbool.False, nil
 			}
 			newScopeLevel, err := k.learnedBackjumpLevel(resolution, baseLevel)
 			if err != nil {
-				return lbool.Undef, err
+				return lbool.Undef, fmt.Errorf("smt search backjump level: %w", err)
 			}
 			if newScopeLevel < baseLevel || newScopeLevel >= k.internalizer.scopeLevel {
-				return lbool.Undef, ast.ErrASTDomain
+				return lbool.Undef, fmt.Errorf("smt search invalid backjump level: %w", ast.ErrASTDomain)
 			}
 			proof, proofErr := resolver.LemmaProof()
 			if proofErr != nil {
-				return lbool.Undef, proofErr
+				return lbool.Undef, fmt.Errorf("smt search lemma proof: %w", proofErr)
 			}
 			retained, err := k.internalizer.retainLemmaAtoms(resolution.Lemma)
 			if err != nil {
-				return lbool.Undef, err
+				return lbool.Undef, fmt.Errorf("smt search retain lemma atoms: %w", err)
 			}
 			if err = k.internalizer.PopScopes(k.internalizer.scopeLevel - newScopeLevel); err != nil {
 				err = errors.Join(err, k.internalizer.releaseLemmaAtoms(retained))
@@ -279,7 +287,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		}
 		exceeded, err = k.searchResourceLimitExceeded(timer, &nextProgressSample)
 		if err != nil {
-			return lbool.Undef, err
+			return lbool.Undef, fmt.Errorf("smt search resource recheck: %w", err)
 		}
 		if exceeded {
 			return lbool.Undef, nil
@@ -313,10 +321,10 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		switch status {
 		case SMTFinalCheckDone:
 			if err = k.captureRelevantLabels(); err != nil {
-				return lbool.Undef, err
+				return lbool.Undef, fmt.Errorf("smt search capture labels: %w", err)
 			}
 			if err = k.captureLiteralResults(baseLevel); err != nil {
-				return lbool.Undef, err
+				return lbool.Undef, fmt.Errorf("smt search capture literal results: %w", err)
 			}
 			if err = k.buildGeneratedModel(); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search build model: %w", err)

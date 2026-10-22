@@ -45,6 +45,8 @@ func smtLogicUsesDatatypes(logic string) bool {
 
 func smtLogicUsesPseudoBooleans(logic string) bool { return logic == "QF_FD" || logic == "ALL" }
 
+func smtLogicUsesDatalog(logic string) bool { return logic == "QF_FD" || logic == "ALL" }
+
 func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic string) error {
 	if kernel == nil || manager == nil {
 		return ast.ErrASTHandle
@@ -141,6 +143,19 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 			return err
 		}
 		theory, theoryErr := NewSMTPseudoBooleanTheory(family)
+		if theoryErr != nil {
+			return theoryErr
+		}
+		if err = kernel.RegisterTheory(theory); err != nil {
+			return err
+		}
+	}
+	if smtLogicUsesDatalog(logic) {
+		family, err := manager.RegisterDatalogPlugin()
+		if err != nil {
+			return err
+		}
+		theory, theoryErr := NewSMTDatalogTheory(family)
 		if theoryErr != nil {
 			return theoryErr
 		}

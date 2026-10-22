@@ -115583,9 +115583,15 @@
       "path": "src/smt/theory_dl.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/theory_dl.go",
+        "pkg/smtcore/proto_model/datalog_factory.go"
+      ],
+      "tests": [
+        "TestSMTDatalogStrictOrderReduction",
+        "TestSMTDatalogNumeralOrderAndModel"
+      ],
       "assertions": [
         {
           "line": 90,
@@ -115604,19 +115610,38 @@
           "text": "SASSERT(sz > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "finite-sort variable attachment, representative and abstraction declarations, numeral and inverse axioms, range bounds, strict-order reduction, scoped constraint rollback, model factory and model values",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dl.go",
+          "tests": [
+            "TestSMTDatalogStrictOrderReduction",
+            "TestSMTDatalogNumeralOrderAndModel"
+          ]
+        }
+      ],
+      "ownership": [
+        "The Go theory owns per-sort declaration handles, scoped constraint markers and theory variables. The datalog model factory pins its registered sorts and values until Close; SMT state, enodes and model generators remain borrowed."
+      ],
+      "deviations": [
+        "The Go reduction uses the minimum nonzero bit-vector width that represents the declared finite domain instead of an unconditional 64 bits. This preserves every finite-domain value and order while avoiding unused Boolean circuitry. Checked Go errors replace source assertions."
+      ]
     },
     {
       "path": "src/smt/theory_dl.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/theory_dl.go"
+      ],
+      "tests": [
+        "TestSMTDatalogStrictOrderReduction",
+        "TestSMTDatalogNumeralOrderAndModel"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -115627,11 +115652,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "datalog theory factory declaration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dl.go",
+          "tests": [
+            "TestSMTDatalogStrictOrderReduction"
+          ]
+        }
+      ],
+      "ownership": [
+        "NewSMTDatalogTheory returns an independent uninitialized Go theory owner for the borrowed datalog family identifier."
+      ],
+      "deviations": [
+        "Go construction returns a typed theory and checked error directly instead of a raw base-class pointer."
+      ]
     },
     {
       "path": "src/smt/theory_dummy.cpp",

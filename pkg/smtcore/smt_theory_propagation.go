@@ -125,18 +125,18 @@ func (s *SMTInternalizerState) PropagateTheoryAssignments() error {
 		variable := literal.Var()
 		data, err := s.BooleanData(variable)
 		if err != nil {
-			return err
+			return fmt.Errorf("assigned literal %d Boolean metadata: %w", variable, err)
 		}
 		if data.IsEquality() {
 			expression := s.boolExpr[variable]
 			leftExpression, leftErr := s.manager.GetArg(expression, 0)
 			rightExpression, rightErr := s.manager.GetArg(expression, 1)
 			if leftErr != nil || rightErr != nil {
-				return ast.ErrASTDomain
+				return fmt.Errorf("assigned equality %d arguments: %w", variable, ast.ErrASTDomain)
 			}
 			left, right := s.context.enodes[leftExpression], s.context.enodes[rightExpression]
 			if left == nil || right == nil {
-				return ast.ErrASTDomain
+				return fmt.Errorf("assigned equality %d enodes: %w", variable, ast.ErrASTDomain)
 			}
 			if literal.Sign() {
 				if err = s.addDisequality(left, right, literal); err != nil {
@@ -152,10 +152,10 @@ func (s *SMTInternalizerState) PropagateTheoryAssignments() error {
 		if data.IsTheoryAtom() {
 			plugin := s.theories[data.Theory()]
 			if plugin == nil {
-				return ast.ErrASTDomain
+				return fmt.Errorf("assigned theory atom %d missing theory %d: %w", variable, data.Theory(), ast.ErrASTDomain)
 			}
 			if err = plugin.Assign(variable, !literal.Sign()); err != nil {
-				return err
+				return fmt.Errorf("assigned theory atom %d theory %d: %w", variable, data.Theory(), err)
 			}
 		}
 		s.atomPropagationHead++
@@ -192,7 +192,7 @@ func (s *SMTInternalizerState) propagateTheoryRelevancy() error {
 		if family != s.manager.BasicFamilyID() {
 			if plugin := s.theories[family]; plugin != nil {
 				if err = plugin.Relevant(expression); err != nil {
-					return err
+					return fmt.Errorf("theory %d relevant expression %d: %w", family, expression.Slot(), err)
 				}
 				notified[family] = struct{}{}
 			}
@@ -207,7 +207,7 @@ func (s *SMTInternalizerState) propagateTheoryRelevancy() error {
 					return ast.ErrASTDomain
 				}
 				if err = plugin.Relevant(expression); err != nil {
-					return err
+					return fmt.Errorf("attached theory %d relevant expression %d: %w", item.theory, expression.Slot(), err)
 				}
 				notified[item.theory] = struct{}{}
 			}
@@ -224,27 +224,30 @@ func (s *SMTInternalizerState) PropagateCore() (bool, error) {
 	for {
 		consistent, err := s.Propagate()
 		if err != nil || !consistent {
-			return consistent, err
+			if err != nil {
+				return consistent, fmt.Errorf("Boolean propagation: %w", err)
+			}
+			return consistent, nil
 		}
 		if err = s.PropagateTheoryAssignments(); err != nil {
-			return false, err
+			return false, fmt.Errorf("theory assignments: %w", err)
 		}
 		if err = s.propagateTheoryRelevancy(); err != nil {
-			return false, err
+			return false, fmt.Errorf("theory relevancy: %w", err)
 		}
 		if err = s.PropagateTheoryEvents(); err != nil {
-			return false, err
+			return false, fmt.Errorf("theory events: %w", err)
 		}
 		dynamicAckProgress, err := s.dynamicAck.propagate()
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("dynamic Ackermann propagation: %w", err)
 		}
 		theoryProgress := false
 		for _, plugin := range s.theoryOrder {
 			if plugin.CanPropagate() {
 				theoryProgress = true
 				if err = plugin.Propagate(); err != nil {
-					return false, err
+					return false, fmt.Errorf("theory %d propagation: %w", plugin.FamilyID(), err)
 				}
 			}
 		}
@@ -252,7 +255,7 @@ func (s *SMTInternalizerState) PropagateCore() (bool, error) {
 		if s.quantifierManager != nil && s.quantifierManager.CanPropagate() {
 			quantifierProgress = true
 			if err = s.quantifierManager.Propagate(); err != nil {
-				return false, err
+				return false, fmt.Errorf("quantifier propagation: %w", err)
 			}
 		}
 		if s.inconsistent {
