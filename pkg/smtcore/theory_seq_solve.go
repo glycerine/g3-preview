@@ -452,7 +452,11 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if len(left) == 0 && len(right) == 0 {
 			return true, t.removeEquation(index)
 		}
-		reduced, err := t.reduceEqualLengthBoundary(left, right, dependency)
+		reduced, err := t.solveZeroLengthBoundary(left, right, dependency)
+		if err != nil || reduced {
+			return reduced, err
+		}
+		reduced, err = t.reduceEqualLengthBoundary(left, right, dependency)
 		if err != nil || reduced {
 			return reduced, err
 		}

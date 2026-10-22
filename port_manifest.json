@@ -117321,7 +117321,7 @@
           "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict", "TestSMTSequenceTheoryNativeWordVariableClassification"]
         },
         {
-          "name": "multi-part prefix and suffix word-equation splitting at arithmetic-proven equal total lengths, with guarded prefix and residual equalities (src/smt/theory_seq.cpp:1574-1691)",
+          "name": "zero-length leading-variable elimination plus multi-part prefix and suffix word-equation splitting at arithmetic-proven equal total lengths, with guarded prefix and residual equalities (src/smt/theory_seq.cpp:544-630,1574-1691)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_length_split.go",
           "tests": ["TestSMTSequenceTheorySplitsFixedLengthPrefixes"]

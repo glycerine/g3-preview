@@ -202,3 +202,35 @@ func (t *SMTSequenceTheory) splitFixedLengthEquation(left, right []ast.ASTHandle
 	}
 	return false, nil
 }
+
+func (t *SMTSequenceTheory) solveZeroLengthBoundary(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
+	for pass := 0; pass < 2; pass++ {
+		if len(left) != 0 {
+			variable, err := t.sequenceVariable(left[0])
+			if err != nil {
+				return false, err
+			}
+			length, exact, err := t.exactSequenceLength(left[0])
+			if err != nil {
+				return false, err
+			}
+			if variable && exact && length == 0 {
+				state, stateErr := t.State()
+				if stateErr != nil {
+					return false, stateErr
+				}
+				sort, sortErr := state.manager.GetSort(left[0])
+				if sortErr != nil {
+					return false, sortErr
+				}
+				empty, makeErr := state.manager.MkSequenceEmpty(sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				return t.addSolution(left[0], empty, dependency)
+			}
+		}
+		left, right = right, left
+	}
+	return false, nil
+}
