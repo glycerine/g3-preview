@@ -65,6 +65,12 @@ type smtLinearArithmeticScope struct {
 	unsupported       bool
 }
 
+type smtLinearIntegerBranch struct {
+	variable uint32
+	lower    bool
+	value    big.Rat
+}
+
 // SMTLinearArithmeticTheory is the rational linear specialization of the
 // source arithmetic theory. Each comparison gets a tableau row for its linear
 // polynomial; Boolean assignments select its lower or upper infinitesimal
@@ -452,6 +458,14 @@ func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth, integer bool) (low
 }
 
 func (t *SMTLinearArithmeticTheory) rebuild() (bool, error) {
+	solver, status, err := t.buildSimplex(nil)
+	if err == nil && status == lbool.True {
+		t.solver = solver
+	}
+	return status == lbool.True, err
+}
+
+func (t *SMTLinearArithmeticTheory) buildSimplex(branches []smtLinearIntegerBranch) (*simplex.Solver, lbool.LBool, error) {
 	solver := simplex.NewSolver(nil)
 	for variable := uint32(0); variable < t.nextSimplex; variable++ {
 		solver.EnsureVariable(variable)
@@ -477,7 +491,7 @@ func (t *SMTLinearArithmeticTheory) rebuild() (bool, error) {
 			coefficients = append(coefficients, *new(big.Rat).Neg(coefficient))
 		}
 		if _, err := solver.AddRationalRow(base, variables, coefficients); err != nil {
-			return false, err
+			return nil, lbool.Undef, err
 		}
 	}
 	for _, assertion := range t.assertions {
@@ -494,18 +508,76 @@ func (t *SMTLinearArithmeticTheory) rebuild() (bool, error) {
 			err = solver.SetUpper(base, bound)
 		}
 		if err != nil {
-			return false, nil
+			return solver, lbool.False, nil
+		}
+	}
+	for index := range branches {
+		branch := &branches[index]
+		bound := simplex.RationalInfinitesimal(&branch.value)
+		var err error
+		if branch.lower {
+			err = solver.SetLower(branch.variable, bound)
+		} else {
+			err = solver.SetUpper(branch.variable, bound)
+		}
+		if err != nil {
+			return solver, lbool.False, nil
 		}
 	}
 	status, err := solver.MakeFeasible()
 	if err != nil {
-		return false, err
+		return nil, lbool.Undef, err
 	}
-	if status == lbool.Undef {
-		return false, ast.ErrASTDomain
+	return solver, status, nil
+}
+
+func (t *SMTLinearArithmeticTheory) fractionalVariable(solver *simplex.Solver) (uint32, *big.Rat, bool) {
+	for _, variable := range t.simplexVariables {
+		value := solver.Value(variable)
+		if value.Epsilon.Sign() != 0 || !value.Main.IsInt() {
+			return variable, new(big.Rat).Set(&value.Main), true
+		}
 	}
-	t.solver = solver
-	return status == lbool.True, nil
+	return 0, nil, false
+}
+
+func (t *SMTLinearArithmeticTheory) integerFeasible(branches []smtLinearIntegerBranch, nodes *uint32) (lbool.LBool, error) {
+	const maxNodes = uint32(1024)
+	if *nodes >= maxNodes {
+		return lbool.Undef, nil
+	}
+	*nodes++
+	solver, status, err := t.buildSimplex(branches)
+	if err != nil || status != lbool.True {
+		return status, err
+	}
+	variable, value, fractional := t.fractionalVariable(solver)
+	if !fractional {
+		t.solver = solver
+		return lbool.True, nil
+	}
+	var floor big.Int
+	floor.Quo(value.Num(), value.Denom())
+	if value.Sign() < 0 && new(big.Int).Rem(value.Num(), value.Denom()).Sign() != 0 {
+		floor.Sub(&floor, big.NewInt(1))
+	}
+	upper := smtLinearIntegerBranch{variable: variable, value: *new(big.Rat).SetInt(&floor)}
+	left := append(append([]smtLinearIntegerBranch(nil), branches...), upper)
+	leftStatus, err := t.integerFeasible(left, nodes)
+	if err != nil || leftStatus == lbool.True {
+		return leftStatus, err
+	}
+	ceil := new(big.Int).Add(&floor, big.NewInt(1))
+	lower := smtLinearIntegerBranch{variable: variable, lower: true, value: *new(big.Rat).SetInt(ceil)}
+	right := append(append([]smtLinearIntegerBranch(nil), branches...), lower)
+	rightStatus, err := t.integerFeasible(right, nodes)
+	if err != nil || rightStatus == lbool.True {
+		return rightStatus, err
+	}
+	if leftStatus == lbool.Undef || rightStatus == lbool.Undef {
+		return lbool.Undef, nil
+	}
+	return lbool.False, nil
 }
 
 func (t *SMTLinearArithmeticTheory) Propagate() error {
@@ -576,10 +648,35 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckGiveUp, nil
 	}
 	if t.integer {
-		for _, variable := range t.simplexVariables {
-			value := t.solver.Value(variable)
-			if !value.Main.IsInt() || value.Epsilon.Sign() != 0 {
+		if _, _, fractional := t.fractionalVariable(t.solver); fractional {
+			var nodes uint32
+			status, err := t.integerFeasible(nil, &nodes)
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			if status == lbool.Undef {
 				return SMTFinalCheckGiveUp, nil
+			}
+			if status == lbool.False {
+				state, stateErr := t.State()
+				if stateErr != nil {
+					return SMTFinalCheckGiveUp, stateErr
+				}
+				literals := make([]SMTLiteral, 0, len(t.assertions))
+				for _, assertion := range t.assertions {
+					literal := NewSMTLiteral(t.atoms[assertion.atom].variable, false)
+					if !assertion.truth {
+						literal = literal.Negated()
+					}
+					literals = append(literals, literal)
+				}
+				if len(literals) == 0 {
+					return SMTFinalCheckGiveUp, nil
+				}
+				if stateErr = state.SetTheoryConflict(t.FamilyID(), literals); stateErr != nil {
+					return SMTFinalCheckGiveUp, stateErr
+				}
+				return SMTFinalCheckContinue, nil
 			}
 		}
 	}

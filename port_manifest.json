@@ -109817,7 +109817,7 @@
         "The kernel owns its theory registry; setup creates concrete real difference, integer difference, linear rational, or partial linear integer theories for QF_RDL, QF_IDL/QF_UFIDL, QF_LRA, and QF_LIA and dummy-theory values for reached families whose solvers remain unavailable."
       ],
       "deviations": [
-        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA uses the retained rational linear simplex specialization, and QF_LIA uses its integer-bound specialization. Fractional QF_LIA models, nonlinear expressions, and other incomplete arithmetic and array logics return source-style incompleteness instead of an unsound result."
+        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA uses the retained rational linear simplex specialization, and QF_LIA uses integer-bound normalization with bounded exact branch-and-bound. Exhausted QF_LIA searches, nonlinear expressions, and other incomplete arithmetic and array logics return source-style incompleteness instead of an unsound result."
       ]
     },
     {
@@ -112561,7 +112561,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "integer strict-bound normalization, integral-model check, and conservative fractional-model refusal",
+          "name": "integer strict-bound normalization, integral-model check, and bounded exact branch-and-bound",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_linear.go",
           "tests": [

@@ -863,6 +863,7 @@ func TestSMTSolverSetupUsesPartialLinearIntegerArithmetic(t *testing.T) {
 		{name: "strict-conflict", want: lbool.False},
 		{name: "parity-conflict", mode: 1, want: lbool.False},
 		{name: "integral-model", mode: 2, want: lbool.True},
+		{name: "branch-to-integral-model", mode: 3, want: lbool.True},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			m := astTestManager(t)
@@ -871,6 +872,8 @@ func TestSMTSolverSetupUsesPartialLinearIntegerArithmetic(t *testing.T) {
 			integer, err := m.MkFamilySort(family, 1, nil)
 			astTestMust(t, err)
 			x, err := m.MkConst(astTestSymbol(t, m, "linear-lia-x"), integer)
+			astTestMust(t, err)
+			y, err := m.MkConst(astTestSymbol(t, m, "linear-lia-y"), integer)
 			astTestMust(t, err)
 			one, err := m.ArithmeticNumeralRat(big.NewRat(1, 1), true)
 			astTestMust(t, err)
@@ -886,6 +889,10 @@ func TestSMTSolverSetupUsesPartialLinearIntegerArithmetic(t *testing.T) {
 				astTestMust(t, err)
 				firstOp = smtArithOpLE
 			} else if test.mode == 2 {
+				firstOp = smtArithOpLE
+			} else if test.mode == 3 {
+				left, err = m.MkFamilyApp(family, smtArithOpAdd, nil, []ast.ASTHandle{x, x, y})
+				astTestMust(t, err)
 				firstOp = smtArithOpLE
 			}
 			first, err := m.MkFamilyApp(family, firstOp, nil, []ast.ASTHandle{left, one})
