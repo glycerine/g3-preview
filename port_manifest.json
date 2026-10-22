@@ -117245,9 +117245,15 @@
       "path": "src/smt/theory_seq_empty.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/theory_seq_empty.go",
+        "pkg/smtcore/proto_model/sequence_factory.go"
+      ],
+      "tests": [
+        "TestSMTEmptySequenceTheoryScopesAndModelFactory",
+        "TestSequenceFactoryCanonicalFreshAndGenericValues"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -117258,11 +117264,29 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "sequence, string and regular-expression canonical values, distinct values, collision-free fresh strings and registered-value delimiter avoidance",
+          "status": "ported",
+          "go_target": "pkg/smtcore/proto_model/sequence_factory.go",
+          "tests": ["TestSequenceFactoryCanonicalFreshAndGenericValues"]
+        },
+        {
+          "name": "empty sequence theory internalization refusal, scoped usage, final-check status, fresh construction and model-factory registration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_empty.go",
+          "tests": ["TestSMTEmptySequenceTheoryScopesAndModelFactory"]
+        }
+      ],
+      "ownership": [
+        "SequenceFactory borrows the proto-model and manager, owns Go string membership and delimiter state, and returns manager-owned canonical AST handles; ProtoModel owns and closes the registered factory.",
+        "SMTEmptySequenceTheory owns its scoped used-state and borrows the SMT context through SMTTheoryBase."
+      ],
+      "deviations": [
+        "The source's unused per-sort unique-sequence prefix map has no retained consumer. Standalone character literals are not exposed by the retained AST surface; character values remain represented through string constants."
+      ]
     },
     {
       "path": "src/smt/theory_str.cpp",
