@@ -106039,19 +106039,22 @@
       "path": "src/smt/smt_literal.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_literal.go",
+        "pkg/smtcore/smt_literal_display.go",
         "pkg/smtcore/smt_literal_source_test.go"
       ],
       "tests": [
         "TestSMTLiteralSignedSentinelsAndSourceOperations",
         "TestSMTLiteralBackwardSubsumptionIndependentFiniteMultisets",
         "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
-        "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
+        "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation",
+        "TestSMTLiteralASTAwareCompactVerboseAndVectorDisplay",
+        "TestSMTLiteralASTAwareDisplayGuardsAndWriterErrors"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Literal numeric ostream insertion and literal nested backward subsumption membership scan",
@@ -106063,22 +106066,32 @@
             "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
             "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation"
           ]
+        },
+        {
+          "name": "AST-aware, compact, vector verbose/compact display and literal negation collection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_literal_display.go",
+          "tests": [
+            "TestSMTLiteralASTAwareCompactVerboseAndVectorDisplay",
+            "TestSMTLiteralASTAwareDisplayGuardsAndWriterErrors"
+          ]
         }
       ],
       "ownership": [
         "Inline four-byte signed literal has no owning payload. Subsumption reads borrowed spans in source order; numeric ostream insertion uses the existing actual stream owner and preserves immediate output/cold graphs at every allocation refusal."
       ],
       "deviations": [
-        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. AST-aware/compact/vector display, neg_literals collection storage, literal approximate set, remaining SMT types and full context/kernel are still continuing dependencies. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported."
+        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. Go slices replace literal vectors and buffers. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported."
       ]
     },
     {
       "path": "src/smt/smt_literal.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_literal.go",
+        "pkg/smtcore/smt_literal_display.go",
         "pkg/smtcore/smt_literal_source_test.go",
         "pkg/smtcore/smt_literal_approx_set.go",
         "pkg/smtcore/smt_literal_approx_set_source_test.go"
@@ -106089,7 +106102,9 @@
         "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
         "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation",
         "TestSMTLiteralApproxSetSource64CollisionAndSentinels",
-        "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra"
+        "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra",
+        "TestSMTLiteralASTAwareCompactVerboseAndVectorDisplay",
+        "TestSMTLiteralASTAwareDisplayGuardsAndWriterErrors"
       ],
       "conditionals": [
         {
@@ -106107,8 +106122,8 @@
           "text": "SASSERT(var() == null_bool_var && !sign());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Signed literal representation, default sentinel, decoding, complement, hash and signed order",
@@ -106129,6 +106144,15 @@
             "TestSMTLiteralApproxSetSource64CollisionAndSentinels",
             "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra"
           ]
+        },
+        {
+          "name": "AST-aware and compact display, literal span display, and negated literal collection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_literal_display.go",
+          "tests": [
+            "TestSMTLiteralASTAwareCompactVerboseAndVectorDisplay",
+            "TestSMTLiteralASTAwareDisplayGuardsAndWriterErrors"
+          ]
         }
       ],
       "ownership": [
@@ -106136,8 +106160,8 @@
         "Concrete inline uint64 specialization owns no payload; range constructor only borrows input literals and preserves source iteration/collision behavior. No generics, ticket, owning wrapper or exact-set replacement."
       ],
       "deviations": [
-        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. AST-aware/compact/vector display, neg_literals collection storage, literal approximate set, remaining SMT types and full context/kernel are still continuing dependencies. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported.",
-        "This closes the complete literal_approx_set specialization, not generic approximate-set families, uint64 unsigned iterator/display/size, literal vector storage, AST-aware display, other SMT types or actual context/conflict-resolution drivers."
+        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. Go slices replace literal vectors and buffers. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported.",
+        "The concrete literal approximate set remains specialized rather than introducing a generic approximate-set family."
       ]
     },
     {
