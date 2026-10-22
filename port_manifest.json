@@ -99931,9 +99931,16 @@
       "path": "src/smt/mam.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_mam.go"
+      ],
+      "tests": [
+        "TestSMTMAMMatchesUnaryAndRepeatedVariablesModuloEquality",
+        "TestSMTMAMJoinsMultiPatternsAndRollsBackPatterns",
+        "TestSMTMAMTracksNestedGroundPatternTermsAsShared",
+        "TestSMTQuantifierManagerEMatchingFeedsInstanceQueue"
+      ],
       "conditionals": [
         {
           "line": 137,
@@ -100618,19 +100625,56 @@
           "text": "SASSERT(approx_subset(r1->get_lbls(), r2->get_lbls()));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "pattern registration, ground-term sharing, matching, rematching, relevance/equality invalidation, scoped rollback and reset",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_mam.go",
+          "tests": [
+            "TestSMTMAMMatchesUnaryAndRepeatedVariablesModuloEquality",
+            "TestSMTMAMJoinsMultiPatternsAndRollsBackPatterns",
+            "TestSMTMAMTracksNestedGroundPatternTermsAsShared",
+            "TestSMTQuantifierManagerEMatchingFeedsInstanceQueue"
+          ]
+        },
+        {
+          "name": "code-tree compiler/interpreter and approximate-label/path indexes",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_mam.go",
+          "tests": [
+            "TestSMTMAMMatchesUnaryAndRepeatedVariablesModuloEquality",
+            "TestSMTMAMJoinsMultiPatternsAndRollsBackPatterns"
+          ]
+        },
+        {
+          "name": "profiling-only counters, code-tree display and Z3DEBUG missing-instance validator",
+          "status": "reference_only",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "SMTMAM borrows the SMT context, registry, pattern AST handles and enodes; native Go slices and maps own pattern order, deduplication, shared-ground membership and scope limits."
+      ],
+      "deviations": [
+        "The Go implementation exhaustively matches registered triggers over relevant congruence classes instead of compiling native instruction trees and approximate-label filters. This preserves bindings, repeated-variable equality, multi-pattern joins, generation bounds, fingerprint deduplication and scoped behavior while replacing source indexing optimizations."
+      ]
     },
     {
       "path": "src/smt/mam.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_mam.go"
+      ],
+      "tests": [
+        "TestSMTMAMMatchesUnaryAndRepeatedVariablesModuloEquality",
+        "TestSMTMAMJoinsMultiPatternsAndRollsBackPatterns",
+        "TestSMTMAMTracksNestedGroundPatternTermsAsShared"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -100649,11 +100693,34 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete add-pattern, scope, match/rematch, work, relevance, equality, reset and shared-term interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_mam.go",
+          "tests": [
+            "TestSMTMAMMatchesUnaryAndRepeatedVariablesModuloEquality",
+            "TestSMTMAMJoinsMultiPatternsAndRollsBackPatterns",
+            "TestSMTMAMTracksNestedGroundPatternTermsAsShared"
+          ]
+        },
+        {
+          "name": "abstract callback surface and debug-only missing-instance hook",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_mam.go",
+          "tests": [
+            "TestSMTQuantifierManagerEMatchingFeedsInstanceQueue"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete Go matcher is owned directly by SMTQuantifierManager and calls its concrete registry rather than storing a universal callback interface."
+      ],
+      "deviations": [
+        "The abstract native MAM class is represented by the one retained concrete Go matcher; debug display and missing-instance validation are omitted."
+      ]
     },
     {
       "path": "src/smt/old_interval.cpp",
@@ -109286,9 +109353,12 @@
         },
         {
           "name": "default plugin MAM/lazy-MAM assignment, equality, relevance, propagation and scope lifecycle",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "tests": [
+            "TestSMTQuantifierManagerEMatchingFeedsInstanceQueue",
+            "TestSMTMAMJoinsMultiPatternsAndRollsBackPatterns"
+          ]
         },
         {
           "name": "default plugin model-finder/model-checker MBQI lifecycle and model adjustment",
@@ -109351,7 +109421,15 @@
           ]
         },
         {
-          "name": "concrete default quantifier plugin matching and model-check interface",
+          "name": "concrete default quantifier plugin matching interface",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "tests": [
+            "TestSMTQuantifierManagerEMatchingFeedsInstanceQueue"
+          ]
+        },
+        {
+          "name": "concrete default quantifier plugin model-check interface",
           "status": "unported",
           "go_target": null,
           "tests": []

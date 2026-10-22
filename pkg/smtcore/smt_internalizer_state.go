@@ -622,8 +622,18 @@ func (s *SMTInternalizerState) PushScope() error {
 			return err
 		}
 	}
+	if s.quantifierManager != nil {
+		if err := s.quantifierManager.PushScope(); err != nil {
+			_ = s.quantifiers.PopScopes(1)
+			s.scopes = s.scopes[:len(s.scopes)-1]
+			return err
+		}
+	}
 	if s.relevancy != nil {
 		if err := s.relevancy.PushScope(); err != nil {
+			if s.quantifierManager != nil {
+				_ = s.quantifierManager.PopScopes(1)
+			}
 			if s.quantifiers != nil {
 				_ = s.quantifiers.PopScopes(1)
 			}
@@ -638,6 +648,9 @@ func (s *SMTInternalizerState) PushScope() error {
 			}
 			if s.relevancy != nil {
 				_ = s.relevancy.PopScopes(1)
+			}
+			if s.quantifierManager != nil {
+				_ = s.quantifierManager.PopScopes(1)
 			}
 			if s.quantifiers != nil {
 				_ = s.quantifiers.PopScopes(1)
@@ -875,6 +888,11 @@ func (s *SMTInternalizerState) PopScopes(count uint32) error {
 	}
 	for index := len(s.theoryOrder) - 1; index >= 0; index-- {
 		if err := s.theoryOrder[index].PopScopes(count); err != nil {
+			return errors.Join(err, s.releasePreservedLearnedClauses(learned))
+		}
+	}
+	if s.quantifierManager != nil {
+		if err := s.quantifierManager.PopScopes(count); err != nil {
 			return errors.Join(err, s.releasePreservedLearnedClauses(learned))
 		}
 	}

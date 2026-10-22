@@ -88,3 +88,36 @@ func TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker(t *testing.T) {
 		t.Fatal("duplicate quick-check instance prevented completion", status)
 	}
 }
+
+func TestSMTQuantifierManagerEMatchingFeedsInstanceQueue(t *testing.T) {
+	m, state, registry, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{Ematching: true})
+	sort, err := m.MkSort(astTestSymbol(t, m, "managed-ematch-sort"), ast.ASTSortInfo{})
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	predicate := smtQuickPredicate(t, m, "managed-ematch-p", sort, boolean)
+	variable, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	body, err := m.MkApp(predicate, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{body})
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{astTestSymbol(t, m, "managed-ematch-x")}, Body: body, Patterns: []ast.ASTHandle{pattern},
+	})
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(quantifier, true))
+	_, binding := smtEnodeConstant(t, m, 2520, sort, 2)
+	astTestMust(t, state.context.RegisterEnode(binding, true))
+	application, _ := smtQuickApplicationNode(t, m, state.context, predicate, binding, true)
+	astTestMust(t, state.context.SetRelevant(quantifier, true))
+	astTestMust(t, state.context.SetAssignment(quantifier, lbool.True))
+	astTestMust(t, state.context.SetAssignment(application, lbool.False))
+	if !manager.CanPropagate() {
+		t.Fatal("active patterned quantifier did not expose matching work")
+	}
+	astTestMust(t, manager.Propagate())
+	if registry.schedule.Stats().Instances != 1 || len(state.Clauses()) == 0 {
+		t.Fatal("E-matching did not materialize its instance", registry.schedule.Stats(), len(state.Clauses()))
+	}
+}

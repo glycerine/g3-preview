@@ -337,6 +337,9 @@ func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification 
 	}
 	r1.next, r2.next = r2.next, r1.next
 	r2.classSize += r1.classSize
+	if s.quantifierManager != nil {
+		s.quantifierManager.mam.AddEquality(r1, r2)
+	}
 	if err := s.propagateBooleanClass(r2); err != nil {
 		return fmt.Errorf("propagate Boolean equality class: %w", err)
 	}

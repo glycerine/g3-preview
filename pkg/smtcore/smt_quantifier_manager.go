@@ -14,21 +14,27 @@ import (
 // the Go SMT context. Pattern matching and model-based checking add instances
 // through Registry; this manager schedules and internalizes those instances.
 type SMTQuantifierManager struct {
-	state        *SMTInternalizerState
-	registry     *SMTQuantifierRegistry
-	rewriter     *rewriter.TheoryRewriter
-	checker      *SMTChecker
-	quick        *SMTQuickChecker
-	substitute   *SMTCachedVarSubstitution
-	builder      *SMTQIInstanceBuilder
-	promoteUnsat bool
-	quickUnsat   bool
-	quickNotSat  bool
-	lazyQuick    bool
-	closed       bool
+	state            *SMTInternalizerState
+	registry         *SMTQuantifierRegistry
+	rewriter         *rewriter.TheoryRewriter
+	checker          *SMTChecker
+	quick            *SMTQuickChecker
+	substitute       *SMTCachedVarSubstitution
+	builder          *SMTQIInstanceBuilder
+	mam              *SMTMAM
+	activated        map[ast.ASTHandle]bool
+	activationTrail  []ast.ASTHandle
+	activationScopes []int
+	promoteUnsat     bool
+	ematching        bool
+	quickUnsat       bool
+	quickNotSat      bool
+	lazyQuick        bool
+	closed           bool
 }
 
 type SMTQuantifierManagerConfig struct {
+	Ematching    bool
 	PromoteUnsat bool
 	QuickUnsat   bool
 	QuickNotSat  bool
@@ -58,9 +64,14 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 	if err != nil {
 		return nil, errors.Join(err, substitute.Close())
 	}
+	mam, err := NewSMTMAM(state, state.quantifiers)
+	if err != nil {
+		return nil, errors.Join(err, substitute.Close())
+	}
 	result := &SMTQuantifierManager{
 		state: state, registry: state.quantifiers, rewriter: rw, checker: checker, quick: quick,
-		substitute: substitute, builder: builder, promoteUnsat: config.PromoteUnsat,
+		substitute: substitute, builder: builder, mam: mam, activated: make(map[ast.ASTHandle]bool),
+		promoteUnsat: config.PromoteUnsat, ematching: config.Ematching,
 		quickUnsat: config.QuickUnsat, quickNotSat: config.QuickNotSat, lazyQuick: config.LazyQuick,
 	}
 	state.quantifierManager = result
@@ -85,7 +96,78 @@ func (q *SMTQuantifierManager) InitSearch() error {
 }
 
 func (q *SMTQuantifierManager) CanPropagate() bool {
-	return q != nil && !q.closed && q.registry != nil && q.registry.schedule.HasWork()
+	if q == nil || q.closed || q.registry == nil {
+		return false
+	}
+	if q.registry.schedule.HasWork() || q.ematching && q.mam.HasWork() {
+		return true
+	}
+	if q.ematching {
+		for _, quantifier := range q.registry.quantifiers {
+			if q.active(quantifier) && !q.activated[quantifier] {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (q *SMTQuantifierManager) activatePatterns() error {
+	if !q.ematching {
+		return nil
+	}
+	for _, quantifier := range q.registry.quantifiers {
+		if !q.active(quantifier) || q.activated[quantifier] {
+			continue
+		}
+		count, err := q.state.manager.GetNumPatterns(quantifier)
+		if err != nil {
+			return err
+		}
+		for i := uint32(0); i < count; i++ {
+			pattern, err := q.state.manager.GetPattern(quantifier, i)
+			if err != nil {
+				return err
+			}
+			if err = q.mam.AddPattern(quantifier, pattern); err != nil {
+				return err
+			}
+		}
+		q.activated[quantifier] = true
+		q.activationTrail = append(q.activationTrail, quantifier)
+	}
+	return nil
+}
+
+func (q *SMTQuantifierManager) PushScope() error {
+	if err := q.open(); err != nil {
+		return err
+	}
+	if err := q.mam.PushScope(); err != nil {
+		return err
+	}
+	q.activationScopes = append(q.activationScopes, len(q.activationTrail))
+	return nil
+}
+
+func (q *SMTQuantifierManager) PopScopes(count uint32) error {
+	if err := q.open(); err != nil {
+		return err
+	}
+	if count == 0 || count > uint32(len(q.activationScopes)) {
+		return ast.ErrASTDomain
+	}
+	level := len(q.activationScopes) - int(count)
+	limit := q.activationScopes[level]
+	if err := q.mam.PopScopes(count); err != nil {
+		return err
+	}
+	for _, quantifier := range q.activationTrail[limit:] {
+		delete(q.activated, quantifier)
+	}
+	q.activationTrail = q.activationTrail[:limit]
+	q.activationScopes = q.activationScopes[:level]
+	return nil
 }
 
 func (q *SMTQuantifierManager) promotedEntries() (map[*SMTFingerprint]bool, error) {
@@ -145,6 +227,14 @@ func (q *SMTQuantifierManager) instantiate(entries []SMTQIQueueEntry) (resultErr
 func (q *SMTQuantifierManager) Propagate() error {
 	if err := q.open(); err != nil {
 		return err
+	}
+	if err := q.activatePatterns(); err != nil {
+		return err
+	}
+	if q.ematching && q.mam.HasWork() {
+		if err := q.mam.Match(); err != nil {
+			return err
+		}
 	}
 	promoted, err := q.promotedEntries()
 	if err != nil {
@@ -209,6 +299,20 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 	if !full {
 		return SMTFinalCheckDone, nil
 	}
+	if err := q.activatePatterns(); err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if q.ematching && q.mam.HasWork() {
+		if err := q.mam.Match(); err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
+		if q.registry.schedule.HasWork() {
+			if err := q.Propagate(); err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			return SMTFinalCheckContinue, nil
+		}
+	}
 	done, entries, err := q.registry.schedule.FinalCheck()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
@@ -245,6 +349,7 @@ func (q *SMTQuantifierManager) Close() error {
 		}
 		q.closed = true
 		q.builder = nil
+		q.mam = nil
 		q.quick = nil
 		q.checker = nil
 		q.rewriter = nil

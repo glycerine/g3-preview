@@ -181,6 +181,9 @@ func (s *SMTInternalizerState) propagateTheoryRelevancy() error {
 		if kind != ast.ASTApp {
 			continue
 		}
+		if s.quantifierManager != nil {
+			s.quantifierManager.mam.Relevant(s.context.enodes[expression])
+		}
 		notified := make(map[SMTTheoryID]struct{})
 		family, err := s.manager.GetFamilyID(expression)
 		if err != nil {
