@@ -103179,11 +103179,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "activity-based selection of the greatest-activity unassigned variable and source phase preference",
+          "name": "activity-based selection of the greatest-activity unassigned variable, cached assignment phases, phase-cache cycling, always-false/true, source-random, and literal-occurrence phase strategies",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_case_split_queue.go",
           "tests": [
-            "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase"
+            "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase",
+            "TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases"
           ]
         },
         {
@@ -103209,7 +103210,8 @@
         "pkg/smtcore/smt_case_split_queue.go"
       ],
       "tests": [
-        "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase"
+        "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase",
+        "TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases"
       ],
       "conditionals": [
         {
@@ -103225,11 +103227,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "next case split consumed by the retained activity-based search",
+          "name": "next case split and configured phase selection consumed by the retained activity-based search",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_case_split_queue.go",
           "tests": [
-            "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase"
+            "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase",
+            "TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases"
           ]
         },
         {

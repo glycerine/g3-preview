@@ -49,6 +49,8 @@ func (s *SMTInternalizerState) AssignLiteral(literal SMTLiteral, justification S
 	}
 	s.booleanData[literal.Var()].SetJustification(justification)
 	s.booleanData[literal.Var()].ScopeLevel = s.scopeLevel
+	s.booleanData[literal.Var()].PhaseAvailable = true
+	s.booleanData[literal.Var()].Phase = !literal.Sign()
 	s.assignedLiterals = append(s.assignedLiterals, literal)
 	if s.relevancy != nil {
 		return s.relevancy.AssignmentEvent(s.boolExpr[literal.Var()], want == lbool.True)

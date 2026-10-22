@@ -414,6 +414,9 @@ func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 	if err != nil {
 		return nil, fmt.Errorf("smt kernel case split queue: %w", err)
 	}
+	if err = queue.ConfigurePhases(k.smtState); err != nil {
+		return nil, fmt.Errorf("smt kernel case split phases: %w", err)
+	}
 	k.internalizer.statistics.NumChecks++
 	return queue, nil
 }
