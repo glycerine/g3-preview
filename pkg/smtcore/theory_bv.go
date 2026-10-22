@@ -1138,6 +1138,8 @@ func (t *SMTBitVectorTheory) bitsFor(expression ast.ASTHandle) ([]ast.ASTHandle,
 	var bits []ast.ASTHandle
 	if own && op == smtBVOpNumeral {
 		bits, err = t.numeralBits(expression, width)
+	} else if own && op == 57 {
+		bits, err = t.symbolicBits(expression, width)
 	} else if own {
 		var handled bool
 		bits, handled, err = t.operationBits(expression, op)
@@ -1327,7 +1329,7 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 		}
 		if isBV, bvErr := state.manager.IsBitVector(argument); bvErr != nil {
 			return false, bvErr
-		} else if isBV {
+		} else if isBV || op == 57 {
 			if argErr = state.Internalize(argument, false); argErr != nil {
 				return false, argErr
 			}
@@ -1404,6 +1406,54 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	for index, bit := range bits {
 		if err = state.Internalize(bit, true); err != nil {
 			return false, fmt.Errorf("bit-vector bit %d: %w", index, err)
+		}
+	}
+	if op == 57 {
+		argument, argErr := state.manager.GetArg(expression, 0)
+		if argErr != nil {
+			return false, argErr
+		}
+		converted, argErr := state.manager.MkBitVectorToInt(expression)
+		if argErr != nil {
+			return false, argErr
+		}
+		integerSort, argErr := state.manager.GetSort(argument)
+		if argErr != nil {
+			return false, argErr
+		}
+		// The source states bv2int(result) = argument mod 2^width. The
+		// equivalent linear-integer form below introduces the quotient so the
+		// retained arithmetic solver can enforce the same relation directly.
+		quotient, argErr := state.manager.MkFreshConst("int2bv-quotient", integerSort)
+		if argErr != nil {
+			return false, argErr
+		}
+		modulus := new(big.Int).Lsh(big.NewInt(1), uint(len(bits)))
+		modulusNumeral, argErr := state.manager.ArithmeticIntegerNumeralText(modulus.String())
+		if argErr != nil {
+			return false, argErr
+		}
+		multiple, argErr := state.manager.MkArithmeticMul(modulusNumeral, quotient)
+		if argErr != nil {
+			return false, argErr
+		}
+		sum, argErr := state.manager.MkArithmeticAdd(converted, multiple)
+		if argErr != nil {
+			return false, argErr
+		}
+		axiom, argErr := state.manager.MkEq(argument, sum)
+		if argErr != nil {
+			return false, argErr
+		}
+		if argErr = state.Internalize(axiom, true); argErr != nil {
+			return false, argErr
+		}
+		literal, argErr := state.Literal(axiom)
+		if argErr != nil {
+			return false, argErr
+		}
+		if argErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); argErr != nil {
+			return false, argErr
 		}
 	}
 	return true, nil

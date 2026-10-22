@@ -111,6 +111,30 @@ func TestASTBitVectorOriginalToIntUtility(t *testing.T) {
 	}
 }
 
+func TestASTBitVectorOriginalIntToBitVectorUtility(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	fid, e := m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	integer, e := m.ArithmeticIntegerNumeralText("19")
+	astTestMust(t, e)
+	astTestPin(t, m, integer)
+	parameter, e := m.NewParameterInt(4)
+	astTestMust(t, e)
+	want, e := m.MkFamilyApp(fid, 57, []ASTParameter{parameter}, []ASTHandle{integer})
+	astTestMust(t, e)
+	astTestPin(t, m, want)
+	astTestMust(t, m.DelParameter(&parameter))
+	got, e := m.MkIntToBitVector(4, integer)
+	astTestMust(t, e)
+	width, e := m.BitVectorSize(got)
+	astTestMust(t, e)
+	if got != want || width != 4 {
+		t.Fatal("int2bv utility identity/range", got, want, width)
+	}
+}
+
 func TestASTBitVectorUtilityEveryColdReservation(t *testing.T) {
 	for _, kind := range []int32{38, 39, 40, 58} {
 		success := false

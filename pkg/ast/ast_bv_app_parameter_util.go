@@ -62,6 +62,11 @@ func (m *ASTManager) MkBitVectorSignExtend(n uint32, arg ASTHandle) (ASTHandle, 
 	return m.bitVectorIntegerParameterApp(38, values[:], arg)
 }
 
+func (m *ASTManager) MkIntToBitVector(width uint32, arg ASTHandle) (ASTHandle, error) {
+	values := [1]astParameterRecord{{Kind: ASTParameterInt, integer: int32(width)}}
+	return m.bitVectorIntegerParameterApp(57, values[:], arg)
+}
+
 func (m *ASTManager) MkBitVectorToInt(arg ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e

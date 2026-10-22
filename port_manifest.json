@@ -113716,7 +113716,8 @@
         "TestSMTBitVectorPublishesNumeralModelValue",
         "TestSMTBitVectorDivisionByZeroValueIsUninterpreted",
         "TestSMTBitVectorCloseReleasesBitOwners",
-        "TestSMTBitVectorToIntAxiom"
+        "TestSMTBitVectorToIntAxiom",
+        "TestSMTIntToBitVectorAxiom"
       ],
       "conditionals": [
         {
@@ -114090,7 +114091,8 @@
         "TestSMTBitVectorPublishesNumeralModelValue",
         "TestSMTBitVectorDivisionByZeroValueIsUninterpreted",
         "TestSMTBitVectorCloseReleasesBitOwners",
-        "TestSMTBitVectorToIntAxiom"
+        "TestSMTBitVectorToIntAxiom",
+        "TestSMTIntToBitVectorAxiom"
       ],
       "conditionals": [
         {
