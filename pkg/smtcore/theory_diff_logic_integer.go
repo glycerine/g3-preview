@@ -232,6 +232,48 @@ func (t *SMTIntegerDiffTheory) addOffset(source, target SMTTheoryVar, value *big
 	return nil
 }
 
+func (t *SMTIntegerDiffTheory) addBoundAxioms(source, target SMTTheoryVar, weight *big.Rat, literal SMTLiteral) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	equal, lower, upper := SMTNullLiteral, SMTNullLiteral, SMTNullLiteral
+	var lowerWeight, upperWeight big.Rat
+	for _, edgeID := range t.graph.outEdges[source] {
+		edge := &t.graph.edges[edgeID]
+		if edge.target != int32(target) || edge.explanation == SMTNullLiteral {
+			continue
+		}
+		switch edge.weight.Cmp(weight) {
+		case 0:
+			equal = edge.explanation
+		case -1:
+			if lower == SMTNullLiteral || edge.weight.Cmp(&lowerWeight) > 0 {
+				lower, lowerWeight = edge.explanation, edge.weight
+			}
+		case 1:
+			if upper == SMTNullLiteral || edge.weight.Cmp(&upperWeight) < 0 {
+				upper, upperWeight = edge.explanation, edge.weight
+			}
+		}
+	}
+	if equal != SMTNullLiteral {
+		if err = state.addClause([]SMTLiteral{equal.Negated(), literal}, false, ast.ASTHandle{}); err != nil {
+			return err
+		}
+		return state.addClause([]SMTLiteral{literal.Negated(), equal}, false, ast.ASTHandle{})
+	}
+	if lower != SMTNullLiteral {
+		if err = state.addClause([]SMTLiteral{lower.Negated(), literal}, false, ast.ASTHandle{}); err != nil {
+			return err
+		}
+	}
+	if upper != SMTNullLiteral {
+		return state.addClause([]SMTLiteral{literal.Negated(), upper}, false, ast.ASTHandle{})
+	}
+	return nil
+}
+
 func (t *SMTIntegerDiffTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error) {
 	state, err := t.State()
 	if err != nil {
@@ -510,6 +552,9 @@ func (t *SMTIntegerDiffTheory) InternalizeAtom(expression ast.ASTHandle, _ bool)
 		return false, err
 	}
 	literal := NewSMTLiteral(variable, false)
+	if err = t.addBoundAxioms(source, target, weight, literal); err != nil {
+		return false, err
+	}
 	positive, err := t.graph.AddEdge(int32(source), int32(target), weight, literal)
 	if err != nil {
 		return false, err

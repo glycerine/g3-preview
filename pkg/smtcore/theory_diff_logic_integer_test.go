@@ -198,3 +198,37 @@ func TestSMTIntegerDiffTheoryOffsetTerm(t *testing.T) {
 		t.Fatal("offset final check", status, finalErr)
 	}
 }
+
+func TestSMTIntegerDiffTheoryParallelBoundAxioms(t *testing.T) {
+	f := newSMTIntegerDiffFixture(t)
+	strong := f.bound(t, smtArithOpLE, f.x, f.y, 5)
+	weak := f.bound(t, smtArithOpLE, f.x, f.y, 7)
+	equal := f.bound(t, smtArithOpGE, f.y, f.x, -5)
+	astTestMust(t, f.state.Internalize(strong, true))
+	astTestMust(t, f.state.Internalize(weak, true))
+	strongVariable, _ := f.state.BoolVar(strong)
+	weakVariable, _ := f.state.BoolVar(weak)
+	strongLiteral := NewSMTLiteral(strongVariable, false)
+	weakLiteral := NewSMTLiteral(weakVariable, false)
+	clauses := f.state.Clauses()
+	if len(clauses) != 1 || len(clauses[0].Literals) != 2 || clauses[0].Literals[0] != strongLiteral.Negated() || clauses[0].Literals[1] != weakLiteral {
+		t.Fatal("strict-to-weak bound axiom", clauses)
+	}
+	astTestMust(t, f.state.Internalize(equal, true))
+	equalVariable, _ := f.state.BoolVar(equal)
+	equalLiteral := NewSMTLiteral(equalVariable, false)
+	clauses = f.state.Clauses()
+	if len(clauses) != 3 {
+		t.Fatal("equal bound equivalence count", clauses)
+	}
+	want := [][]SMTLiteral{
+		{strongLiteral.Negated(), weakLiteral},
+		{strongLiteral.Negated(), equalLiteral},
+		{equalLiteral.Negated(), strongLiteral},
+	}
+	for index := range want {
+		if len(clauses[index].Literals) != 2 || clauses[index].Literals[0] != want[index][0] || clauses[index].Literals[1] != want[index][1] {
+			t.Fatal("parallel bound axiom", index, clauses[index].Literals, want[index])
+		}
+	}
+}
