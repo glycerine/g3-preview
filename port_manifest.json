@@ -41754,7 +41754,7 @@
           ]
         },
         {
-          "name": "local and mixed Farkas construction, local integer cut rules, and local/mixed leq2eq and eq2leq proof terms",
+          "name": "local and mixed Farkas construction, integer cut rules, and leq2eq/eq2leq proof terms",
           "status": "ported",
           "go_target": "pkg/interp/direct_proof_arithmetic.go",
           "tests": [

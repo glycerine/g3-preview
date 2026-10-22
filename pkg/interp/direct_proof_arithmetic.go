@@ -156,7 +156,23 @@ func (p *DirectProofInterpolator) MakeCutRule(tLeqC, divisor, conclusion, premis
 	} else if side == TermB {
 		interpolation, err = p.base.manager.Make(OperatorTrue)
 	} else {
-		return ast.ASTHandle{}, ProofError{}
+		negatedConclusion, e := p.base.manager.MkNot(conclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		first, e := p.placeholder(tLeqC)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		second, e := p.placeholder(negatedConclusion)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		interpolation, e = p.makeSymbol(p.sum, first, divisor, second)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		interpolation, err = p.makeContraNode(interpolation, []ast.ASTHandle{tLeqC, negatedConclusion}, -1)
 	}
 	if err != nil {
 		return ast.ASTHandle{}, err

@@ -277,6 +277,11 @@ func TestDirectProofLocalArithmeticRules(t *testing.T) {
 	if mixedFarkas.IsNull() {
 		t.Fatal("mixed Farkas returned null proof")
 	}
+	mixedCut, err := direct.MakeCutRule(mixed, one, mixed, mixedPremise)
+	interpMust(t, err)
+	if mixedCut.IsNull() {
+		t.Fatal("mixed cut returned null proof")
+	}
 }
 
 func TestDirectProofFinalSimplificationOwnership(t *testing.T) {
