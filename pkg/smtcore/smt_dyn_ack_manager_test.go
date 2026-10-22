@@ -106,3 +106,39 @@ func TestSMTDynamicAckManagerBuildsClauseProof(t *testing.T) {
 	}
 	astTestMust(t, state.PopScopes(1))
 }
+
+func TestSMTDynamicAckClauseDeletionCallbackRunsDuringLemmaGC(t *testing.T) {
+	manager := astTestManager(t)
+	sort, values := smtUFConstants(t, manager, "dynamic-ack-gc-", 3)
+	function, err := manager.MkFuncDecl(astTestSymbol(t, manager, "dynamic-ack-gc-f"), []ast.ASTHandle{sort}, sort, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	applications := make([]ast.ASTHandle, len(values))
+	for index, value := range values {
+		applications[index], err = manager.MkApp(function, []ast.ASTHandle{value})
+		astTestMust(t, err)
+	}
+	_, _, state := smtInternalizerFixture(t, manager, nil)
+	dynamic := defaultSMTDynAckState()
+	dynamic.Threshold = 1
+	dynamic.Factor = 1
+	dynamic.Equalities = true
+	astTestMust(t, state.ConfigureDynamicAck(dynamic))
+	maintenance := defaultSMTClauseMaintenanceConfig()
+	maintenance.Half = true
+	maintenance.Recent = 0
+	astTestMust(t, state.ConfigureClauseMaintenance(maintenance))
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.dynamicAck.schedule.conflictCongruence(applications[0], applications[1], dynAckRoot))
+	astTestMust(t, state.dynamicAck.schedule.usedEquality(applications[0], applications[1], applications[2], true))
+	state.statistics.NumConflicts = 2
+	_, err = state.dynamicAck.propagate()
+	astTestMust(t, err)
+	astTestMust(t, state.garbageCollectLearnedClauses())
+	if len(state.clauses) != 1 || state.statistics.NumDelDynAck != 1 {
+		t.Fatal("dynamic Ackermann lemma collection", len(state.clauses), state.statistics.NumDelDynAck)
+	}
+	astTestMust(t, state.PopScopes(1))
+	if state.statistics.NumDelDynAck != 2 {
+		t.Fatal("remaining dynamic Ackermann deletion", state.statistics.NumDelDynAck)
+	}
+}

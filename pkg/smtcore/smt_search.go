@@ -152,6 +152,9 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			if err = k.internalizer.AddLearnedClauseWithProof(resolution.Lemma, proof); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search learn clause: %w", err)
 			}
+			if err = k.internalizer.recordConflictForClauseMaintenance(); err != nil {
+				return lbool.Undef, fmt.Errorf("smt search collect learned clauses: %w", err)
+			}
 			continue
 		}
 

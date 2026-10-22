@@ -135,6 +135,9 @@ type SMTInternalizerState struct {
 	incompleteTheories       []SMTTheoryInternalizer
 	theoriesSetup            bool
 	binaryClauseOptimization bool
+	clauseMaintenance        SMTClauseMaintenanceConfig
+	conflictsSinceLemmaGC    uint32
+	lemmaGCThreshold         uint32
 	closed                   bool
 }
 
@@ -153,6 +156,8 @@ func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext
 		cachedGeneration: make(map[ast.ASTHandle]uint32), theories: make(map[ast.FamilyID]SMTTheoryInternalizer),
 		disequalityReasons: make(map[smtEnodePairKey]SMTLiteral),
 		conflictLiteral:    SMTNullLiteral,
+		clauseMaintenance:  defaultSMTClauseMaintenanceConfig(),
+		lemmaGCThreshold:   5000,
 	}
 	state.booleanData[0].Initialize(0)
 	dynamicAck, err := newSMTDynAckManager(state, defaultSMTDynAckState())
