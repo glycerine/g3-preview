@@ -113307,7 +113307,8 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
-        "TestSMTArrayReadOverWrite"
+        "TestSMTArrayReadOverWrite",
+        "TestSMTArrayConstantRead"
       ],
       "conditionals": [
         {

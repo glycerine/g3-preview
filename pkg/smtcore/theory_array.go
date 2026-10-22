@@ -194,8 +194,25 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 		return err
 	}
 	op, isArray, err := t.arrayOperation(array)
-	if err != nil || !isArray || op != ast.ASTArrayOpStore {
+	if err != nil || !isArray {
 		return err
+	}
+	if op == ast.ASTArrayOpConst {
+		value, argErr := state.manager.GetArg(array, 0)
+		if argErr != nil {
+			return argErr
+		}
+		literal, equalityErr := t.MkEqualityLiteral(selectExpression, value, true)
+		if equalityErr != nil {
+			return equalityErr
+		}
+		if equalityErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); equalityErr != nil {
+			return fmt.Errorf("constant array select axiom: %w", equalityErr)
+		}
+		return nil
+	}
+	if op != ast.ASTArrayOpStore {
+		return nil
 	}
 	selectCount, err := state.manager.GetNumArgs(selectExpression)
 	if err != nil {
