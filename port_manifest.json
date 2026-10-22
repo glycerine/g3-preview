@@ -103575,14 +103575,16 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_conflict_antecedents.go",
-        "pkg/smtcore/smt_conflict_levels.go"
+        "pkg/smtcore/smt_conflict_levels.go",
+        "pkg/smtcore/smt_conflict_resolver.go"
       ],
       "tests": [
         "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
         "TestSMTAntecedentExpanderTransitivityEquationsAndCommonAncestor",
         "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities",
         "TestSMTConflictJustificationMaximumAssignmentLevels",
-        "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification"
+        "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification",
+        "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel"
       ],
       "conditionals": [
         {
@@ -103927,7 +103929,15 @@
           ]
         },
         {
-          "name": "assignment-level analysis, FUIP resolution, lemma minimization and unsat-core extraction",
+          "name": "assignment-level analysis and FUIP resolution with learned lemma and backjump-level calculation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_resolver.go",
+          "tests": [
+            "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel"
+          ]
+        },
+        {
+          "name": "lemma minimization, structural subsumption, and unsat-core extraction",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -103943,7 +103953,7 @@
         "The antecedent expander owns its work queues, duplicate set and emitted event history; justifications and enodes are borrowed and temporary justification marks are always cleared."
       ],
       "deviations": [
-        "Dynamic-ack callbacks are recorded as typed congruence/equality-use events until the concrete manager is connected. Remaining resolution and proof phases keep the source unit partial."
+        "Dynamic-ack callbacks are recorded as typed congruence/equality-use events until the concrete manager is connected. Minimization, proof generation, and search-loop learning integration remain open."
       ]
     },
     {
@@ -103953,14 +103963,16 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_conflict_antecedents.go",
-        "pkg/smtcore/smt_conflict_levels.go"
+        "pkg/smtcore/smt_conflict_levels.go",
+        "pkg/smtcore/smt_conflict_resolver.go"
       ],
       "tests": [
         "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
         "TestSMTAntecedentExpanderTransitivityEquationsAndCommonAncestor",
         "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities",
         "TestSMTConflictJustificationMaximumAssignmentLevels",
-        "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification"
+        "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification",
+        "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel"
       ],
       "conditionals": [
         {
@@ -104005,7 +104017,15 @@
           ]
         },
         {
-          "name": "full conflict resolver construction, resolve, lemma/proof accessors, minimization and unsat-core interface",
+          "name": "conflict resolver construction, resolve, learned lemma, and scope-level result interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_resolver.go",
+          "tests": [
+            "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel"
+          ]
+        },
+        {
+          "name": "proof accessors, minimization, structural subsumption, and unsat-core interface",
           "status": "unported",
           "go_target": null,
           "tests": []
