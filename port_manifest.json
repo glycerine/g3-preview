@@ -112303,9 +112303,14 @@
       "path": "src/smt/theory_arith_eq.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_arith_linear.go"
+      ],
+      "tests": [
+        "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
+        "TestSMTSolverLinearArithmeticPropagatesFixedEquality"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -112404,9 +112409,21 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "fixed-variable equality and zero-offset-row equality propagation with theory antecedents",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
+            "TestSMTSolverLinearArithmeticPropagatesFixedEquality"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The current linear specialization recognizes active opposite bound pairs directly. General offset-row indexing with additional fixed monomials remains to be ported."
+      ]
     },
     {
       "path": "src/smt/theory_arith_int.h",

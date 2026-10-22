@@ -923,6 +923,86 @@ func TestSMTSolverUFLinearArithmeticCongruence(t *testing.T) {
 	}
 }
 
+func TestSMTSolverLinearArithmeticPropagatesImpliedEquality(t *testing.T) {
+	m := astTestManager(t)
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	realSort, err := m.MkFamilySort(family, 0, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "implied-equality-x"), realSort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "implied-equality-y"), realSort)
+	astTestMust(t, err)
+	function, err := m.MkFuncDecl(astTestSymbol(t, m, "implied-equality-f"), []ast.ASTHandle{realSort}, realSort, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	fx, err := m.MkApp(function, []ast.ASTHandle{x})
+	astTestMust(t, err)
+	fy, err := m.MkApp(function, []ast.ASTHandle{y})
+	astTestMust(t, err)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	s, err := NewSMTSolver(m, nil, "QF_UFLRA", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
+	for _, op := range []int32{smtArithOpLE, smtArithOpGE} {
+		comparison, comparisonErr := m.MkFamilyApp(family, op, nil, []ast.ASTHandle{x, y})
+		astTestMust(t, comparisonErr)
+		astTestMust(t, s.Assert(comparison))
+	}
+	equality, err := m.MkEq(fx, fy)
+	astTestMust(t, err)
+	disequality, err := m.MkNot(equality)
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(disequality))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("implied arithmetic equality", status)
+	}
+}
+
+func TestSMTSolverLinearArithmeticPropagatesFixedEquality(t *testing.T) {
+	m := astTestManager(t)
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	one, err := m.ArithmeticRealNumeralText("1")
+	astTestMust(t, err)
+	realSort, err := m.GetSort(one)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "fixed-equality-x"), realSort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "fixed-equality-y"), realSort)
+	astTestMust(t, err)
+	function, err := m.MkFuncDecl(astTestSymbol(t, m, "fixed-equality-f"), []ast.ASTHandle{realSort}, realSort, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	fx, err := m.MkApp(function, []ast.ASTHandle{x})
+	astTestMust(t, err)
+	fy, err := m.MkApp(function, []ast.ASTHandle{y})
+	astTestMust(t, err)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	s, err := NewSMTSolver(m, nil, "QF_UFLRA", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
+	for _, expression := range []ast.ASTHandle{x, y} {
+		for _, op := range []int32{smtArithOpLE, smtArithOpGE} {
+			comparison, comparisonErr := m.MkFamilyApp(family, op, nil, []ast.ASTHandle{expression, one})
+			astTestMust(t, comparisonErr)
+			astTestMust(t, s.Assert(comparison))
+		}
+	}
+	equality, err := m.MkEq(fx, fy)
+	astTestMust(t, err)
+	disequality, err := m.MkNot(equality)
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(disequality))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("fixed arithmetic equality", status)
+	}
+}
+
 func TestSMTSolverLinearArithmeticRejectsNonlinearTerms(t *testing.T) {
 	m := astTestManager(t)
 	arithmetic, err := m.RegisterArithmeticPlugin()

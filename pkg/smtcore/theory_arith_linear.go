@@ -1,6 +1,7 @@
 // Source: retained linear rational fragment of src/smt/theory_arith.h,
 // src/smt/theory_arith_core.h, src/smt/theory_arith_core_def.h, and the
-// retained integer-bound fragment of src/smt/theory_arith_int.h.
+// retained fragments of src/smt/theory_arith_int.h and
+// src/smt/theory_arith_eq.h.
 package smtcore
 
 import (
@@ -19,6 +20,15 @@ type smtLinearForm struct {
 }
 
 func newSMTLinearForm() smtLinearForm { return smtLinearForm{terms: make(map[uint32]*big.Rat)} }
+
+func (f *smtLinearForm) clone() smtLinearForm {
+	result := newSMTLinearForm()
+	result.constant.Set(&f.constant)
+	for variable, coefficient := range f.terms {
+		result.terms[variable] = new(big.Rat).Set(coefficient)
+	}
+	return result
+}
 
 func (f *smtLinearForm) addTerm(variable uint32, coefficient *big.Rat) {
 	if coefficient.Sign() == 0 {
@@ -431,19 +441,7 @@ func (t *SMTLinearArithmeticTheory) CanPropagate() bool {
 
 func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth, integer bool) (lower bool, value simplex.Infinitesimal) {
 	value.Main.Neg(&atom.form.constant)
-	op := atom.op
-	if !truth {
-		switch op {
-		case smtArithOpLE:
-			op = smtArithOpGT
-		case smtArithOpLT:
-			op = smtArithOpGE
-		case smtArithOpGE:
-			op = smtArithOpLT
-		case smtArithOpGT:
-			op = smtArithOpLE
-		}
-	}
+	op := smtLinearEffectiveOp(atom.op, truth)
 	lower = op == smtArithOpGE || op == smtArithOpGT
 	if integer && op == smtArithOpGT {
 		value.Main.Add(&value.Main, big.NewRat(1, 1))
@@ -455,6 +453,182 @@ func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth, integer bool) (low
 		value.Epsilon.SetInt64(-1)
 	}
 	return lower, value
+}
+
+func smtLinearEffectiveOp(op int32, truth bool) int32 {
+	if truth {
+		return op
+	}
+	switch op {
+	case smtArithOpLE:
+		return smtArithOpGT
+	case smtArithOpLT:
+		return smtArithOpGE
+	case smtArithOpGE:
+		return smtArithOpLT
+	case smtArithOpGT:
+		return smtArithOpLE
+	default:
+		return op
+	}
+}
+
+func smtLinearFormsOpposite(first, second *smtLinearForm) bool {
+	if first == nil || second == nil || len(first.terms) != len(second.terms) {
+		return false
+	}
+	var constant big.Rat
+	constant.Neg(&second.constant)
+	if first.constant.Cmp(&constant) != 0 {
+		return false
+	}
+	for variable, coefficient := range first.terms {
+		other := second.terms[variable]
+		if other == nil {
+			return false
+		}
+		constant.Neg(other)
+		if coefficient.Cmp(&constant) != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func (t *SMTLinearArithmeticTheory) theoryVariable(simplexVariable uint32) (SMTTheoryVar, bool) {
+	for variable, candidate := range t.simplexVariables {
+		if candidate == simplexVariable {
+			return SMTTheoryVar(variable), true
+		}
+	}
+	return SMTNullTheoryVar, false
+}
+
+func smtLinearAssertionLiteral(atom *smtLinearArithmeticAtom, assertion smtIntegerDiffAssertion) SMTLiteral {
+	return NewSMTLiteral(atom.variable, !assertion.truth)
+}
+
+func (t *SMTLinearArithmeticTheory) propagateEquality(state *SMTInternalizerState, first, second uint32, literals []SMTLiteral) (bool, error) {
+	leftVariable, leftOK := t.theoryVariable(first)
+	rightVariable, rightOK := t.theoryVariable(second)
+	if !leftOK || !rightOK {
+		return false, nil
+	}
+	left, leftErr := t.Enode(leftVariable)
+	right, rightErr := t.Enode(rightVariable)
+	if leftErr != nil || rightErr != nil {
+		return false, ast.ErrASTDomain
+	}
+	if left.Root() == right.Root() {
+		return false, nil
+	}
+	justification, err := NewSMTExtTheoryEqualityPropagationJustification(
+		state.manager, t.FamilyID(), literals, nil, left, right, nil)
+	if err != nil {
+		return false, err
+	}
+	if err = state.addEquality(left, right, NewSMTEqualityJustification(justification)); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func smtLinearNormalizedLE(atom *smtLinearArithmeticAtom, assertion smtIntegerDiffAssertion) (smtLinearForm, bool) {
+	op := smtLinearEffectiveOp(atom.op, assertion.truth)
+	if !atom.supported || op != smtArithOpLE && op != smtArithOpGE {
+		return smtLinearForm{}, false
+	}
+	form := atom.form.clone()
+	if op == smtArithOpGE {
+		form.scale(big.NewRat(-1, 1))
+	}
+	return form, true
+}
+
+func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	for firstIndex, firstAssertion := range t.assertions {
+		firstAtom := &t.atoms[firstAssertion.atom]
+		firstForm, firstOK := smtLinearNormalizedLE(firstAtom, firstAssertion)
+		if !firstOK {
+			continue
+		}
+		if firstForm.constant.Sign() != 0 || len(firstForm.terms) != 2 {
+			continue
+		}
+		for _, secondAssertion := range t.assertions[firstIndex+1:] {
+			secondAtom := &t.atoms[secondAssertion.atom]
+			secondForm, secondOK := smtLinearNormalizedLE(secondAtom, secondAssertion)
+			if !secondOK {
+				continue
+			}
+			if !smtLinearFormsOpposite(&firstForm, &secondForm) {
+				continue
+			}
+			variables := make([]uint32, 0, 2)
+			coefficients := make([]*big.Rat, 0, 2)
+			for variable, coefficient := range firstForm.terms {
+				variables = append(variables, variable)
+				coefficients = append(coefficients, coefficient)
+			}
+			if coefficients[0].Sign() == 0 || coefficients[0].Cmp(new(big.Rat).Neg(coefficients[1])) != 0 {
+				continue
+			}
+			propagated, propagateErr := t.propagateEquality(state, variables[0], variables[1], []SMTLiteral{
+				smtLinearAssertionLiteral(firstAtom, firstAssertion),
+				smtLinearAssertionLiteral(secondAtom, secondAssertion),
+			})
+			if propagateErr != nil || propagated {
+				return propagated, propagateErr
+			}
+		}
+	}
+	type fixedVariable struct {
+		variable uint32
+		value    big.Rat
+		literals []SMTLiteral
+	}
+	fixed := make([]fixedVariable, 0)
+	for firstIndex, firstAssertion := range t.assertions {
+		firstAtom := &t.atoms[firstAssertion.atom]
+		firstForm, firstOK := smtLinearNormalizedLE(firstAtom, firstAssertion)
+		if !firstOK || len(firstForm.terms) != 1 {
+			continue
+		}
+		for _, secondAssertion := range t.assertions[firstIndex+1:] {
+			secondAtom := &t.atoms[secondAssertion.atom]
+			secondForm, secondOK := smtLinearNormalizedLE(secondAtom, secondAssertion)
+			if !secondOK || !smtLinearFormsOpposite(&firstForm, &secondForm) {
+				continue
+			}
+			for variable, coefficient := range firstForm.terms {
+				var value big.Rat
+				value.Neg(&firstForm.constant)
+				value.Quo(&value, coefficient)
+				fixed = append(fixed, fixedVariable{variable: variable, value: value, literals: []SMTLiteral{
+					smtLinearAssertionLiteral(firstAtom, firstAssertion),
+					smtLinearAssertionLiteral(secondAtom, secondAssertion),
+				}})
+			}
+			break
+		}
+	}
+	for first := range fixed {
+		for second := first + 1; second < len(fixed); second++ {
+			if fixed[first].variable == fixed[second].variable || fixed[first].value.Cmp(&fixed[second].value) != 0 {
+				continue
+			}
+			literals := append(append([]SMTLiteral(nil), fixed[first].literals...), fixed[second].literals...)
+			propagated, propagateErr := t.propagateEquality(state, fixed[first].variable, fixed[second].variable, literals)
+			if propagateErr != nil || propagated {
+				return propagated, propagateErr
+			}
+		}
+	}
+	return false, nil
 }
 
 func (t *SMTLinearArithmeticTheory) rebuild() (bool, error) {
@@ -646,6 +820,13 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	}
 	if t.unsupported {
 		return SMTFinalCheckGiveUp, nil
+	}
+	propagated, err := t.propagateImpliedEqualities()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if propagated {
+		return SMTFinalCheckContinue, nil
 	}
 	if t.integer {
 		if _, _, fractional := t.fractionalVariable(t.solver); fractional {
