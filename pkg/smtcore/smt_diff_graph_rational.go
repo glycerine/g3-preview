@@ -356,6 +356,243 @@ func (g *SMTRationalDiffGraph) EdgeEnabled(id int32) (bool, error) {
 	return g.edges[id].enabled, nil
 }
 
+func (g *SMTRationalDiffGraph) MinimumEnabledEdge(source, target int32) (*big.Rat, SMTLiteral, bool, error) {
+	if !g.validVariable(source) || !g.validVariable(target) {
+		return nil, SMTNullLiteral, false, errSMTDiffGraphDomain
+	}
+	var weight big.Rat
+	explanation := SMTNullLiteral
+	found := false
+	for _, edgeID := range g.outEdges[source] {
+		edge := &g.edges[edgeID]
+		if edge.enabled && edge.target == target && (!found || edge.weight.Cmp(&weight) < 0) {
+			weight.Set(&edge.weight)
+			explanation = edge.explanation
+			found = true
+		}
+	}
+	if !found {
+		return nil, SMTNullLiteral, false, nil
+	}
+	return &weight, explanation, true, nil
+}
+
+func (g *SMTRationalDiffGraph) FindEdge(source, target int32) (int32, bool, error) {
+	if !g.validVariable(source) || !g.validVariable(target) {
+		return -1, false, errSMTDiffGraphDomain
+	}
+	for _, edgeID := range g.outEdges[source] {
+		if g.edges[edgeID].target == target {
+			return edgeID, true, nil
+		}
+	}
+	return -1, false, nil
+}
+
+func (g *SMTRationalDiffGraph) NeighborsUndirected(variable int32) ([]int32, error) {
+	if !g.validVariable(variable) {
+		return nil, errSMTDiffGraphDomain
+	}
+	result := make([]int32, 0, len(g.outEdges[variable])+len(g.inEdges[variable]))
+	for _, edgeID := range g.outEdges[variable] {
+		result = append(result, g.edges[edgeID].target)
+	}
+	for _, edgeID := range g.inEdges[variable] {
+		result = append(result, g.edges[edgeID].source)
+	}
+	return result, nil
+}
+
+// DFSUndirectedThread returns the source traversal's cyclic discovery thread.
+func (g *SMTRationalDiffGraph) DFSUndirectedThread(start int32) ([]int32, error) {
+	if !g.validVariable(start) {
+		return nil, errSMTDiffGraphDomain
+	}
+	thread := make([]int32, len(g.assignment))
+	discovered := make([]bool, len(g.assignment))
+	explored := make([]bool, len(g.assignment))
+	stack := []int32{start}
+	discovered[start] = true
+	previous := start
+	for len(stack) != 0 {
+		current := stack[len(stack)-1]
+		neighbors, err := g.NeighborsUndirected(current)
+		if err != nil || len(neighbors) == 0 {
+			return nil, errSMTDiffGraphDomain
+		}
+		found := false
+		for _, next := range neighbors {
+			if !discovered[next] && !explored[next] {
+				thread[previous] = next
+				previous = next
+				discovered[next] = true
+				stack = append(stack, next)
+				found = true
+				break
+			}
+		}
+		if !found {
+			explored[current] = true
+			stack = stack[:len(stack)-1]
+		}
+	}
+	thread[previous] = start
+	return thread, nil
+}
+
+func (g *SMTRationalDiffGraph) BFSUndirected(start int32) (parents, depths []int32, err error) {
+	if !g.validVariable(start) {
+		return nil, nil, errSMTDiffGraphDomain
+	}
+	parents = make([]int32, len(g.assignment))
+	depths = make([]int32, len(g.assignment))
+	parents[start] = -1
+	visited := make([]bool, len(g.assignment))
+	visited[start] = true
+	queue := []int32{start}
+	for len(queue) != 0 {
+		current := queue[0]
+		queue = queue[1:]
+		neighbors, neighborErr := g.NeighborsUndirected(current)
+		if neighborErr != nil || len(neighbors) == 0 {
+			return nil, nil, errSMTDiffGraphDomain
+		}
+		for _, next := range neighbors {
+			if !visited[next] {
+				parents[next] = current
+				depths[next] = depths[current] + 1
+				visited[next] = true
+				queue = append(queue, next)
+			}
+		}
+	}
+	return parents, depths, nil
+}
+
+// ComputeZeroEdgeSCC runs the source Gabow-style DFS over enabled edges whose
+// normalized weight is zero. Singleton components retain the source -1 ID.
+func (g *SMTRationalDiffGraph) ComputeZeroEdgeSCC() ([]int32, error) {
+	if g == nil || !g.IsFeasible() {
+		return nil, errSMTDiffGraphDomain
+	}
+	count := len(g.assignment)
+	dfsTime := make([]int32, count)
+	component := make([]int32, count)
+	unfinishedSet := make([]bool, count)
+	for index := range dfsTime {
+		dfsTime[index], component[index] = -1, -1
+	}
+	roots := make([]int32, 0, count)
+	unfinished := make([]int32, 0, count)
+	nextTime, nextComponent := int32(0), int32(0)
+	var visit func(int32)
+	visit = func(variable int32) {
+		dfsTime[variable] = nextTime
+		nextTime++
+		unfinishedSet[variable] = true
+		unfinished = append(unfinished, variable)
+		roots = append(roots, variable)
+		for _, edgeID := range g.outEdges[variable] {
+			edge := &g.edges[edgeID]
+			if !edge.enabled {
+				continue
+			}
+			var gamma big.Rat
+			g.setGamma(edge, &gamma)
+			if gamma.Sign() != 0 {
+				continue
+			}
+			target := edge.target
+			if dfsTime[target] == -1 {
+				visit(target)
+			} else if unfinishedSet[target] {
+				for dfsTime[roots[len(roots)-1]] > dfsTime[target] {
+					roots = roots[:len(roots)-1]
+				}
+			}
+		}
+		if variable == roots[len(roots)-1] {
+			size := 0
+			last := int32(-1)
+			for last != variable {
+				last = unfinished[len(unfinished)-1]
+				unfinished = unfinished[:len(unfinished)-1]
+				unfinishedSet[last] = false
+				component[last] = nextComponent
+				size++
+			}
+			if size == 1 {
+				component[last] = -1
+			} else {
+				nextComponent++
+			}
+			roots = roots[:len(roots)-1]
+		}
+	}
+	for variable := int32(0); int(variable) < count; variable++ {
+		if dfsTime[variable] == -1 {
+			visit(variable)
+		}
+	}
+	return component, nil
+}
+
+func (g *SMTRationalDiffGraph) ComputeZeroSuccessors(variable int32) ([]int32, error) {
+	if !g.validVariable(variable) {
+		return nil, errSMTDiffGraphDomain
+	}
+	seen := make([]bool, len(g.assignment))
+	seen[variable] = true
+	result := []int32{variable}
+	for index := 0; index < len(result); index++ {
+		current := result[index]
+		for _, edgeID := range g.outEdges[current] {
+			edge := &g.edges[edgeID]
+			if !edge.enabled {
+				continue
+			}
+			var gamma big.Rat
+			g.setGamma(edge, &gamma)
+			if gamma.Sign() == 0 && !seen[edge.target] {
+				seen[edge.target] = true
+				result = append(result, edge.target)
+			}
+		}
+	}
+	return result, nil
+}
+
+func (g *SMTRationalDiffGraph) IncrementAssignment(variable int32, increment *big.Rat) error {
+	if !g.validVariable(variable) || increment == nil {
+		return errSMTDiffGraphDomain
+	}
+	g.assignment[variable].Add(&g.assignment[variable], increment)
+	return nil
+}
+
+func (g *SMTRationalDiffGraph) SetAssignment(variable int32, value *big.Rat) error {
+	if !g.validVariable(variable) || value == nil {
+		return errSMTDiffGraphDomain
+	}
+	g.assignment[variable].Set(value)
+	return nil
+}
+
+func (g *SMTRationalDiffGraph) Timestamp() uint32 {
+	if g == nil {
+		return 0
+	}
+	return g.timestamp
+}
+
+func (g *SMTRationalDiffGraph) Reset() {
+	if g == nil {
+		return
+	}
+	*g = SMTRationalDiffGraph{lastEnabledEdge: -1}
+	g.heap.graph = g
+}
+
 // SetToZero translates every assignment by the selected value. Difference
 // constraints are translation invariant, so feasibility is preserved.
 func (g *SMTRationalDiffGraph) SetToZero(variable int32) error {

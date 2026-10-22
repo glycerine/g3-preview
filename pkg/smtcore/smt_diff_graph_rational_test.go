@@ -248,3 +248,88 @@ func TestSMTRationalDiffGraphLazySubsumptionExplanationTimestamp(t *testing.T) {
 		t.Fatal("disabled bridge guard", err)
 	}
 }
+
+func TestSMTRationalDiffGraphZeroSCCReachabilityAndTraversal(t *testing.T) {
+	g := NewSMTRationalDiffGraph()
+	for variable := int32(0); variable < 4; variable++ {
+		if err := g.InitVariable(variable); err != nil {
+			t.Fatal(err)
+		}
+	}
+	add := func(source, target int32, weight int64, literal SMTLiteral, enabled bool) int32 {
+		t.Helper()
+		id, err := g.AddEdge(source, target, diffRat(weight), literal)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if enabled {
+			feasible, enableErr := g.EnableEdge(id)
+			if enableErr != nil || !feasible {
+				t.Fatal(feasible, enableErr)
+			}
+		}
+		return id
+	}
+	firstLiteral := NewSMTLiteral(31, false)
+	_ = add(0, 1, 0, firstLiteral, true)
+	_ = add(1, 0, 0, NewSMTLiteral(32, false), true)
+	_ = add(1, 2, 1, NewSMTLiteral(33, false), true)
+	disabled := add(2, 3, 0, NewSMTLiteral(34, false), false)
+
+	components, err := g.ComputeZeroEdgeSCC()
+	if err != nil || components[0] < 0 || components[0] != components[1] || components[2] != -1 || components[3] != -1 {
+		t.Fatal("zero SCC", components, err)
+	}
+	successors, err := g.ComputeZeroSuccessors(0)
+	if err != nil || !reflect.DeepEqual(successors, []int32{0, 1}) {
+		t.Fatal("zero successors", successors, err)
+	}
+	weight, explanation, found, err := g.MinimumEnabledEdge(0, 1)
+	if err != nil || !found || weight.Sign() != 0 || explanation != firstLiteral {
+		t.Fatal("minimum edge", weight, explanation, found, err)
+	}
+	id, found, err := g.FindEdge(2, 3)
+	if err != nil || !found || id != disabled {
+		t.Fatal("disabled edge lookup", id, found, err)
+	}
+	neighbors, err := g.NeighborsUndirected(2)
+	if err != nil || !reflect.DeepEqual(neighbors, []int32{3, 1}) {
+		t.Fatal("undirected neighbor order", neighbors, err)
+	}
+	thread, err := g.DFSUndirectedThread(0)
+	if err != nil || thread[0] != 1 || thread[1] != 2 || thread[2] != 3 || thread[3] != 0 {
+		t.Fatal("DFS discovery thread", thread, err)
+	}
+	parents, depths, err := g.BFSUndirected(0)
+	if err != nil || !reflect.DeepEqual(parents, []int32{-1, 0, 1, 2}) || !reflect.DeepEqual(depths, []int32{0, 1, 2, 3}) {
+		t.Fatal("BFS", parents, depths, err)
+	}
+}
+
+func TestSMTRationalDiffGraphAssignmentMutationTimestampAndReset(t *testing.T) {
+	g := NewSMTRationalDiffGraph()
+	if err := g.InitVariable(0); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.SetAssignment(0, diffRat(4)); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.IncrementAssignment(0, diffRat(-3)); err != nil {
+		t.Fatal(err)
+	}
+	value, err := g.Assignment(0)
+	if err != nil || value.Cmp(diffRat(1)) != 0 {
+		t.Fatal(value, err)
+	}
+	id, err := g.AddEdge(0, 0, diffRat(0), SMTNullLiteral)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if feasible, enableErr := g.EnableEdge(id); enableErr != nil || !feasible || g.Timestamp() != 1 {
+		t.Fatal(feasible, g.Timestamp(), enableErr)
+	}
+	g.Reset()
+	if g.NumNodes() != 0 || g.NumEdges() != 0 || g.Timestamp() != 0 || !g.IsFeasible() {
+		t.Fatal("reset state")
+	}
+}
