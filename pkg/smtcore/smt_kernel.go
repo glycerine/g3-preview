@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/solver"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -45,6 +46,7 @@ type SMTKernel struct {
 	generated        *model.Model
 	preprocessor     *rewriter.TheoryRewriter
 	quantifierCosts  *SMTQICostModel
+	modelCooperation *cooperate.Cooperation
 	paramContext     *uparams.ParamsContext
 	paramGlobals     *uparams.GlobalParamsService
 	smtParams        *SMTParams
@@ -202,6 +204,15 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	}
 	k.preprocessor = value
 	k.preprocess = enabled
+	if k.modelConfig.Memory == nil {
+		k.modelCooperation, err = cooperate.NewCooperation(k.manager.Budget())
+		if err != nil {
+			return err
+		}
+		k.modelConfig = model.ModelEvaluatorConfig{
+			Context: context, Globals: globals, Memory: k.manager.NumeralService().RuntimeOwner(), Cooperation: k.modelCooperation,
+		}
+	}
 	if err = k.configureQuantifiers(full, fullState, quantifiers); err != nil {
 		return err
 	}
@@ -237,13 +248,39 @@ func (k *SMTKernel) configureQuantifiers(full *SMTParams, state SMTParamsState, 
 		k.quantifierCosts = costs
 	}
 	_, err := NewSMTQuantifierManager(k.internalizer, k.preprocessor, SMTQuantifierManagerConfig{
-		Ematching:    state.Ematching,
-		PromoteUnsat: qi.PromoteUnsat,
-		QuickUnsat:   qi.QuickChecker >= 1,
-		QuickNotSat:  qi.QuickChecker >= 2,
-		LazyQuick:    qi.LazyQuickChecker,
+		Ematching:      state.Ematching,
+		PromoteUnsat:   qi.PromoteUnsat,
+		QuickUnsat:     qi.QuickChecker >= 1,
+		QuickNotSat:    qi.QuickChecker >= 2,
+		LazyQuick:      qi.LazyQuickChecker,
+		MBQI:           qi.MBQI,
+		MaxCexs:        qi.MaxCexs,
+		CandidateModel: k.buildCandidateModelGenerator,
 	})
 	return err
+}
+
+func (k *SMTKernel) buildCandidateModelGenerator() (*SMTModelGenerator, error) {
+	if err := k.open(); err != nil {
+		return nil, err
+	}
+	generator, err := NewSMTModelGenerator(k.manager)
+	if err != nil {
+		return nil, err
+	}
+	fail := func(cause error) (*SMTModelGenerator, error) {
+		return nil, errors.Join(cause, generator.Close())
+	}
+	if err = generator.SetContext(k.checker); err != nil {
+		return fail(err)
+	}
+	if err = generator.InitializeModel(k.modelConfig); err != nil {
+		return fail(err)
+	}
+	if err = generator.BuildStateValues(k.internalizer); err != nil {
+		return fail(err)
+	}
+	return generator, nil
 }
 
 // UpdateParams refreshes the assertion rewriter and the hidden preprocessing
@@ -787,6 +824,9 @@ func (k *SMTKernel) Close() error {
 	if k.quantifierCosts != nil {
 		result = errors.Join(result, k.quantifierCosts.Close())
 	}
+	if k.modelCooperation != nil {
+		result = errors.Join(result, k.modelCooperation.Close())
+	}
 	if k.smtParams != nil {
 		result = errors.Join(result, k.smtParams.Close())
 	}
@@ -808,6 +848,7 @@ func (k *SMTKernel) Close() error {
 		k.smtState = SMTParamsState{}
 		k.preprocessState = SMTPreprocessorState{}
 		k.quantifierCosts = nil
+		k.modelCooperation = nil
 		k.manager = nil
 		k.closed = true
 	}

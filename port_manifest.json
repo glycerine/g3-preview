@@ -108460,10 +108460,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_model_checker.go"
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_quantifier_manager.go",
+        "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
-        "TestSMTModelCheckerFindsFiniteBooleanCounterexample"
+        "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
+        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
       ],
       "assertions": [
         {
@@ -108534,16 +108537,18 @@
         },
         {
           "name": "candidate-model final-check dispatch, iteration growth and restart publication",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "tests": [
+            "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
+          ]
         }
       ],
       "ownership": [
         "SMTModelChecker borrows the internalizer, registry and candidate proto-model. Temporary instantiated and evaluated expressions are held by checked AST references and released before returning."
       ],
       "deviations": [
-        "The current concrete checker enumerates Boolean and proto-model universes directly. The source auxiliary solver path for infinite or incomplete instantiation sets remains open."
+        "The current concrete checker enumerates Boolean and proto-model universes directly and is dispatched from the production final-check loop. The source auxiliary solver path for infinite or incomplete instantiation sets and iteration-limit growth remain open."
       ]
     },
     {
@@ -108552,10 +108557,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_model_checker.go"
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_quantifier_manager.go"
       ],
       "tests": [
-        "TestSMTModelCheckerFindsFiniteBooleanCounterexample"
+        "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
+        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
       ],
       "conditionals": [
         {
@@ -108580,9 +108587,11 @@
         },
         {
           "name": "auxiliary-context and model-finder integration surface",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "tests": [
+            "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
+          ]
         }
       ],
       "ownership": [
@@ -109394,7 +109403,8 @@
         "TestSMTQuantifierRegistrySourceInstanceLimitScopesAndStackDeletion",
         "TestSMTQuantifierManagerPropagatesAndScopesQueuedInstances",
         "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
-        "TestSMTSolverInstallsQuantifierManagerAndEMatches"
+        "TestSMTSolverInstallsQuantifierManagerAndEMatches",
+        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
       ],
       "assertions": [
         {
@@ -109455,9 +109465,11 @@
         },
         {
           "name": "manager model-check dispatch",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "tests": [
+            "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
+          ]
         },
         {
           "name": "default plugin MAM/lazy-MAM assignment, equality, relevance, propagation and scope lifecycle",
@@ -109470,16 +109482,19 @@
         },
         {
           "name": "default plugin model-finder/model-checker MBQI lifecycle and model adjustment",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "tests": [
+            "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
+            "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
+          ]
         }
       ],
       "ownership": [
         "SMTQuantifierRegistry borrows quantifier AST handles, enode bindings, its queue schedule and cost model; it owns native statistic maps, insertion-ordered quantifier slices, and the scoped fingerprint set. SMTQuantifierManager owns its cached substitution and composes the registry, checker, rewriter, queue and internalizer through concrete typed references. SMTKernel owns the default cost model and closes it after the manager; an explicitly supplied registry retains caller ownership of its cost model."
       ],
       "deviations": [
-        "The source public add_instance forwarding bug that passes max_generation as max_top_generation is preserved. Model-check dispatch remains with the concrete future MBQI implementation rather than a generic Go callback interface."
+        "The source public add_instance forwarding bug that passes max_generation as max_top_generation is preserved. Finite MBQI uses a concrete Go model checker; auxiliary-solver checking and full model-finder adjustment remain open."
       ]
     },
     {
@@ -109497,7 +109512,8 @@
         "TestSMTQuantifierRegistrySourceInstanceLimitScopesAndStackDeletion",
         "TestSMTQuantifierManagerPropagatesAndScopesQueuedInstances",
         "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
-        "TestSMTSolverInstallsQuantifierManagerAndEMatches"
+        "TestSMTSolverInstallsQuantifierManagerAndEMatches",
+        "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
       ],
       "conditionals": [
         {
@@ -109548,9 +109564,12 @@
         },
         {
           "name": "concrete default quantifier plugin model-check interface",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "tests": [
+            "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
+            "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
+          ]
         }
       ],
       "ownership": [

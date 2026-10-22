@@ -22,6 +22,8 @@ type SMTQuantifierManager struct {
 	substitute       *SMTCachedVarSubstitution
 	builder          *SMTQIInstanceBuilder
 	mam              *SMTMAM
+	modelChecker     *SMTModelChecker
+	candidateModel   func() (*SMTModelGenerator, error)
 	activated        map[ast.ASTHandle]bool
 	activationTrail  []ast.ASTHandle
 	activationScopes []int
@@ -30,15 +32,19 @@ type SMTQuantifierManager struct {
 	quickUnsat       bool
 	quickNotSat      bool
 	lazyQuick        bool
+	mbqi             bool
 	closed           bool
 }
 
 type SMTQuantifierManagerConfig struct {
-	Ematching    bool
-	PromoteUnsat bool
-	QuickUnsat   bool
-	QuickNotSat  bool
-	LazyQuick    bool
+	Ematching      bool
+	PromoteUnsat   bool
+	QuickUnsat     bool
+	QuickNotSat    bool
+	LazyQuick      bool
+	MBQI           bool
+	MaxCexs        uint32
+	CandidateModel func() (*SMTModelGenerator, error)
 }
 
 func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRewriter, config SMTQuantifierManagerConfig) (*SMTQuantifierManager, error) {
@@ -73,6 +79,13 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 		substitute: substitute, builder: builder, mam: mam, activated: make(map[ast.ASTHandle]bool),
 		promoteUnsat: config.PromoteUnsat, ematching: config.Ematching,
 		quickUnsat: config.QuickUnsat, quickNotSat: config.QuickNotSat, lazyQuick: config.LazyQuick,
+		mbqi: config.MBQI, candidateModel: config.CandidateModel,
+	}
+	if config.MBQI {
+		result.modelChecker, err = NewSMTModelChecker(state, config.MaxCexs)
+		if err != nil {
+			return nil, errors.Join(err, substitute.Close())
+		}
 	}
 	state.quantifierManager = result
 	return result, nil
@@ -332,7 +345,34 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 			return SMTFinalCheckContinue, nil
 		}
 	}
+	if q.mbqi && q.modelChecker != nil && q.candidateModel != nil {
+		generator, err := q.candidateModel()
+		if err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
+		modelSatisfied, checkErr := q.modelChecker.Check(generator.model, q.activeQuantifiers())
+		checkErr = errors.Join(checkErr, generator.Close())
+		if checkErr != nil {
+			return SMTFinalCheckGiveUp, checkErr
+		}
+		if !modelSatisfied {
+			if err = q.Propagate(); err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			return SMTFinalCheckContinue, nil
+		}
+	}
 	return SMTFinalCheckDone, nil
+}
+
+func (q *SMTQuantifierManager) activeQuantifiers() []ast.ASTHandle {
+	result := make([]ast.ASTHandle, 0, len(q.registry.quantifiers))
+	for _, quantifier := range q.registry.quantifiers {
+		if q.active(quantifier) {
+			result = append(result, quantifier)
+		}
+	}
+	return result
 }
 
 func (q *SMTQuantifierManager) Close() error {
@@ -343,6 +383,9 @@ func (q *SMTQuantifierManager) Close() error {
 		return nil
 	}
 	err := q.substitute.Close()
+	if q.modelChecker != nil {
+		err = errors.Join(err, q.modelChecker.Close())
+	}
 	if err == nil {
 		if q.state.quantifierManager == q {
 			q.state.quantifierManager = nil
@@ -350,6 +393,8 @@ func (q *SMTQuantifierManager) Close() error {
 		q.closed = true
 		q.builder = nil
 		q.mam = nil
+		q.modelChecker = nil
+		q.candidateModel = nil
 		q.quick = nil
 		q.checker = nil
 		q.rewriter = nil

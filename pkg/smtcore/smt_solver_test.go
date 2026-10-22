@@ -66,6 +66,24 @@ func TestSMTSolverInstallsQuantifierManagerAndEMatches(t *testing.T) {
 	}
 }
 
+func TestSMTSolverMBQIFindsPatternlessBooleanCounterexample(t *testing.T) {
+	m, s := smtSolverFixture(t)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, boolean)
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{boolean}, Names: []usymbol.Symbol{astTestSymbol(t, m, "solver-mbqi-x")}, Body: variable,
+	})
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(quantifier))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("model-based counterexample was not instantiated", status)
+	}
+}
+
 func TestSMTSolverKernelFacadeAssertionsScopesAndResults(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	a := smtRelevancyBool(t, m, "smt-solver-a")
