@@ -110172,11 +110172,12 @@
       "path": "src/smt/smt_theory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_theory.go",
         "pkg/smtcore/smt_theory_lifecycle.go",
-        "pkg/smtcore/smt_theory_propagation.go"
+        "pkg/smtcore/smt_theory_propagation.go",
+        "pkg/smtcore/smt_model_value.go"
       ],
       "tests": [
         "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
@@ -110230,7 +110231,7 @@
         },
         {
           "name": "display helpers, shared equality assumptions, and reset",
-          "status": "unported",
+          "status": "reference_only",
           "go_target": null,
           "tests": []
         }
@@ -110239,18 +110240,19 @@
         "SMTTheoryBase borrows its registered internalizer state and enodes; native slices own the theory-variable index and scope limits."
       ],
       "deviations": [
-        "Only methods consumed by the current internalizer are exposed; search and model consumers remain with their source units."
+        "Only methods consumed by the retained internalizer are exposed. Display and shared-assumption helpers have no Go caller; solver state teardown replaces resetting and reusing an attached theory object."
       ]
     },
     {
       "path": "src/smt/smt_theory.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_theory.go",
         "pkg/smtcore/smt_theory_lifecycle.go",
-        "pkg/smtcore/smt_theory_propagation.go"
+        "pkg/smtcore/smt_theory_propagation.go",
+        "pkg/smtcore/smt_model_value.go"
       ],
       "tests": [
         "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
@@ -110308,16 +110310,18 @@
         },
         {
           "name": "conflict, display, model, validation, assumptions, statistics, reset/flush, and fresh-theory interface",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_model_value.go",
+          "tests": [
+            "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
+          ]
         }
       ],
       "ownership": [
         "The typed theory interface borrows AST handles and internalizer-owned enodes; SMTTheoryBase owns only Go slices of borrowed enode pointers and scope limits."
       ],
       "deviations": [
-        "The interface grows with concrete retained context consumers instead of predeclaring callback adapters for unported search and model stages."
+        "Go splits model construction, model finalization, function inclusion, names and statistics into narrow optional interfaces implemented only by theories that consume them. Conflict publication remains on the concrete internalizer state, teardown replaces reset/flush reuse, and display/validation/fresh-theory hooks with no retained caller are omitted."
       ]
     },
     {
