@@ -463,6 +463,60 @@ func TestSMTSequenceTheoryReducesEqualLengthBoundaries(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheorySplitsFixedLengthPrefixes(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-length-prefix-x"), sort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-length-prefix-y"), sort)
+	astTestMust(t, err)
+	z, err := m.MkConst(astTestSymbol(t, m, "sequence-length-prefix-z"), sort)
+	astTestMust(t, err)
+	yz, err := m.MkSequenceConcat(y, z)
+	astTestMust(t, err)
+	left, err := m.MkSequenceConcat(x, a)
+	astTestMust(t, err)
+	rightTail, err := m.MkSequenceConcat(z, b)
+	astTestMust(t, err)
+	right, err := m.MkSequenceConcat(y, rightTail)
+	astTestMust(t, err)
+	wordEquality, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	prefixEquality, err := m.MkEq(x, yz)
+	astTestMust(t, err)
+	notPrefixEquality, err := m.MkNot(prefixEquality)
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	two, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	for _, fixed := range []struct {
+		expression ast.ASTHandle
+		value      ast.ASTHandle
+	}{{x, two}, {y, one}, {z, one}} {
+		length, makeErr := m.MkSequenceLength(fixed.expression)
+		astTestMust(t, makeErr)
+		equality, makeErr := m.MkEq(length, fixed.value)
+		astTestMust(t, makeErr)
+		astTestMust(t, solver.Assert(equality))
+	}
+	astTestMust(t, solver.Assert(wordEquality))
+	astTestMust(t, solver.Assert(notPrefixEquality))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("fixed-length prefix split", status)
+	}
+}
+
 func TestSMTSequenceTheoryLengthCoherenceDecomposition(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	value, err := m.MkString("a")

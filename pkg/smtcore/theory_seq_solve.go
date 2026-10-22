@@ -456,6 +456,10 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if err != nil || reduced {
 			return reduced, err
 		}
+		reduced, err = t.splitFixedLengthEquation(left, right)
+		if err != nil || reduced {
+			return reduced, err
+		}
 		rejected, err := t.rejectImpossibleCyclicBinaryEquation(left, right, dependency)
 		if err != nil || rejected {
 			return rejected, err
