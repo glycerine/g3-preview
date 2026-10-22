@@ -118083,7 +118083,7 @@
       "path": "src/smt/theory_wmaxsat.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -118116,17 +118116,19 @@
           "text": "SASSERT(r.is_int());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "weighted soft-clause registration, rational-weight normalization, cost trails, blocking conflicts, propagation and saved assignments", "status": "reference_only", "tests": []}
+      ],
+      "ownership": ["The native plugin owns auxiliary Boolean references, rational and normalized integer weights, assignment flags, cost trails and statistics while borrowing the MaxSMT filter model converter."],
+      "deviations": ["Only the unretained native src/opt/maxsmt.cpp and src/opt/wmax.cpp engines construct or call this private theory; SMT setup never registers it and the retained Go solver interface has no consumer."]
     },
     {
       "path": "src/smt/theory_wmaxsat.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -118139,11 +118141,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "private weighted-MaxSAT theory declaration, numeral trail and cost comparator", "status": "reference_only", "tests": []}
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["All production consumers are in the unretained native opt component."]
     },
     {
       "path": "src/smt/uses_theory.cpp",
