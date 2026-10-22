@@ -93,6 +93,16 @@ func (e *interpolationValueEvaluator) EvaluateValue(h ast.ASTHandle) (ast.ASTRef
 }
 func (*interpolationValueEvaluator) Close() error { return nil }
 
+type interpolationFixedEvaluator struct {
+	manager *ast.ASTManager
+	value   ast.ASTHandle
+}
+
+func (e *interpolationFixedEvaluator) EvaluateValue(ast.ASTHandle) (ast.ASTRef, error) {
+	return e.manager.NewRef(e.value)
+}
+func (*interpolationFixedEvaluator) Close() error { return nil }
+
 func TestInterpolationBaseSolverUnsatProof(t *testing.T) {
 	m, manager := interpProofManagerFixture(t)
 	boolSort, err := manager.BoolType()
@@ -176,3 +186,4 @@ func TestInterpolationBaseSolverModelValuesAndGuards(t *testing.T) {
 
 var _ solver.Solver = (*interpolationScriptSolver)(nil)
 var _ solver.ConsequenceEvaluator = (*interpolationValueEvaluator)(nil)
+var _ solver.ConsequenceEvaluator = (*interpolationFixedEvaluator)(nil)

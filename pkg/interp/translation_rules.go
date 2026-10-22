@@ -523,6 +523,24 @@ func (t *FullTranslation) translateTheoryLemma(proof, conclusion ast.ASTHandle, 
 		return t.translateAssignBounds(proof, conclusion, premises, premiseConclusions, direct)
 	case GomoryCutKind:
 		return t.translateGomoryCut(proof, conclusion, premises, premiseConclusions, direct)
+	case EqPropagateKind:
+		sourcePremises := make([]ast.ASTHandle, len(premises))
+		for i := range sourcePremises {
+			sourcePremises[i], err = t.base.manager.Premise(proof, uint32(i))
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+		}
+		return t.translateEqualityPropagation(conclusion, sourcePremises, premises, direct)
+	case ArithMysteryKind:
+		sourcePremises := make([]ast.ASTHandle, len(premises))
+		for i := range sourcePremises {
+			sourcePremises[i], err = t.base.manager.Premise(proof, uint32(i))
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+		}
+		return t.reconstructFarkas(sourcePremises, premises, conclusion, direct)
 	default:
 		return ast.ASTHandle{}, UnsupportedProofError{Proof: proof}
 	}

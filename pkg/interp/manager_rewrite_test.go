@@ -5,6 +5,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
+	"github.com/glycerine/g3/pkg/solver"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
@@ -201,6 +204,166 @@ func TestFullTranslationGCDTheoryLemma(t *testing.T) {
 	interpolant, err := direct.Interpolate(result)
 	interpMust(t, err)
 	interpMust(t, m.DelRef(&interpolant))
+}
+
+func TestFullTranslationReconstructsEqualityPropagationWithDual(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	integer, err := manager.IntType()
+	interpMust(t, err)
+	x, err := manager.MakeVariable("translation-eq-propagate-x", integer)
+	interpMust(t, err)
+	x = interpPin(t, m, x)
+	y, err := manager.MakeVariable("translation-eq-propagate-y", integer)
+	interpMust(t, err)
+	y = interpPin(t, m, y)
+	xLeqY, err := manager.Make(OperatorLE, x, y)
+	interpMust(t, err)
+	xLeqY = interpPin(t, m, xLeqY)
+	xGeqY, err := manager.Make(OperatorGE, x, y)
+	interpMust(t, err)
+	xGeqY = interpPin(t, m, xGeqY)
+	base, err := NewBase(manager, []ast.ASTHandle{xLeqY, xGeqY}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	one, err := manager.MakeRealText("1")
+	interpMust(t, err)
+	one = interpPin(t, m, one)
+	proofFact, err := m.MkProofAsserted(xLeqY)
+	interpMust(t, err)
+	proofFact = interpPin(t, m, proofFact)
+	call := 0
+	factory := solver.FactoryFunc(func(got *ast.ASTManager, _ *uparams.ParamsRef, _, _, _ bool, _ string) (solver.Solver, error) {
+		status := lbool.False
+		if call%5 == 4 {
+			status = lbool.True
+		}
+		call++
+		s, e := newInterpolationScriptSolver(got, status)
+		if e != nil {
+			return nil, e
+		}
+		if status == lbool.False {
+			if e = s.SetProof(proofFact); e != nil {
+				return nil, e
+			}
+		} else {
+			md, modelErr := model.NewModelCore(got)
+			if modelErr != nil {
+				return nil, modelErr
+			}
+			if e = s.SetModel(md); e != nil {
+				return nil, e
+			}
+		}
+		return s, nil
+	})
+	evaluator := func(*model.ModelCore) (solver.ConsequenceEvaluator, error) {
+		return &interpolationFixedEvaluator{manager: m, value: one}, nil
+	}
+	interpMust(t, base.ConfigureSolver(factory, evaluator))
+	translation, err := NewFullTranslation(base)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, translation.Close()) })
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	source := make([]ast.ASTHandle, 2)
+	source[0], err = m.MkProofHypothesis(xLeqY)
+	interpMust(t, err)
+	source[0] = interpPin(t, m, source[0])
+	source[1], err = m.MkProofHypothesis(xGeqY)
+	interpMust(t, err)
+	source[1] = interpPin(t, m, source[1])
+	translated := make([]ast.ASTHandle, 2)
+	translated[0], err = direct.MakeHypothesis(xLeqY)
+	interpMust(t, err)
+	translated[1], err = direct.MakeHypothesis(xGeqY)
+	interpMust(t, err)
+	equality, err := manager.Make(OperatorEqual, x, y)
+	interpMust(t, err)
+	arithmetic, err := m.ArithmeticFamilyID()
+	interpMust(t, err)
+	lemma := interpTheoryLemma(t, m, arithmetic, "eq-propagate", equality, source)
+	result, err := translation.translateTheoryLemma(lemma, equality, translated, []ast.ASTHandle{xLeqY, xGeqY}, direct)
+	if err != nil {
+		t.Fatal("equality propagation", err, "solver calls", call)
+	}
+	interpolant, err := direct.Interpolate(result)
+	interpMust(t, err)
+	interpMust(t, m.DelRef(&interpolant))
+	if call != 10 {
+		t.Fatal("dual reconstruction solver calls", call)
+	}
+}
+
+func TestFullTranslationReconstructsMysteryArithmeticFromProof(t *testing.T) {
+	m, manager := interpRewritingManagerFixture(t)
+	integer, err := manager.IntType()
+	interpMust(t, err)
+	x, err := manager.MakeVariable("translation-mystery-x", integer)
+	interpMust(t, err)
+	x = interpPin(t, m, x)
+	y, err := manager.MakeVariable("translation-mystery-y", integer)
+	interpMust(t, err)
+	y = interpPin(t, m, y)
+	inequality, err := manager.Make(OperatorLE, x, y)
+	interpMust(t, err)
+	inequality = interpPin(t, m, inequality)
+	base, err := NewBase(manager, []ast.ASTHandle{x, y}, nil, nil)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, base.Close()) })
+	translation, err := NewFullTranslation(base)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, translation.Close()) })
+	source, err := m.MkProofHypothesis(inequality)
+	interpMust(t, err)
+	source = interpPin(t, m, source)
+	normalized, err := translation.reallyNormalizeInequality(inequality)
+	interpMust(t, err)
+	negated, err := manager.MkNot(inequality)
+	interpMust(t, err)
+	normalizedNegation, err := translation.reallyNormalizeInequality(negated)
+	interpMust(t, err)
+	first, err := m.MkProofHypothesis(normalized)
+	interpMust(t, err)
+	first = interpPin(t, m, first)
+	second, err := m.MkProofHypothesis(normalizedNegation)
+	interpMust(t, err)
+	second = interpPin(t, m, second)
+	falsehood, err := manager.Make(OperatorFalse)
+	interpMust(t, err)
+	arithmetic, err := m.ArithmeticFamilyID()
+	interpMust(t, err)
+	certificate := interpTheoryLemma(t, m, arithmetic, "farkas", falsehood, []ast.ASTHandle{first, second}, "1", "1")
+	checks := 0
+	factory := solver.FactoryFunc(func(got *ast.ASTManager, _ *uparams.ParamsRef, _, _, _ bool, _ string) (solver.Solver, error) {
+		checks++
+		s, e := newInterpolationScriptSolver(got, lbool.False)
+		if e != nil {
+			return nil, e
+		}
+		if e = s.SetProof(certificate); e != nil {
+			return nil, e
+		}
+		return s, nil
+	})
+	interpMust(t, base.ConfigureSolver(factory, nil))
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	translated, err := direct.MakeHypothesis(inequality)
+	interpMust(t, err)
+	mystery, err := m.MkProofTheoryLemma(arithmetic, inequality, []ast.ASTHandle{source}, nil)
+	interpMust(t, err)
+	mystery = interpPin(t, m, mystery)
+	result, err := translation.translateTheoryLemma(mystery, inequality, []ast.ASTHandle{translated}, []ast.ASTHandle{inequality}, direct)
+	interpMust(t, err)
+	interpolant, err := direct.Interpolate(result)
+	interpMust(t, err)
+	interpMust(t, m.DelRef(&interpolant))
+	if checks != 1 {
+		t.Fatal("normalized proof reconstruction checks", checks)
+	}
 }
 
 func interpRewritingManagerFixture(t *testing.T) (*ast.ASTManager, *Manager) {

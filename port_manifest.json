@@ -42226,12 +42226,15 @@
         "pkg/interp/translation_analysis.go",
         "pkg/interp/translation_arithmetic.go",
         "pkg/interp/translation_commute.go",
+        "pkg/interp/translation_reconstruct.go",
         "pkg/interp/translation_rules.go"
       ],
       "tests": [
         "TestFullTranslationProofAnalysisAndResolution",
         "TestFullTranslationEliminatesCommutativityWrappers",
         "TestFullTranslationArithmeticHelpers",
+        "TestFullTranslationReconstructsEqualityPropagationWithDual",
+        "TestFullTranslationReconstructsMysteryArithmeticFromProof",
         "TestFullTranslationTriangleEqualityTheoryLemma",
         "TestFullTranslationAssignBoundsTheoryLemma",
         "TestFullTranslationGCDTheoryLemma"
@@ -42425,7 +42428,16 @@
           ]
         },
         {
-          "name": "equality-propagation and mystery arithmetic translation",
+          "name": "normalized-proof and dual-model Farkas reconstruction, equality propagation, and mystery arithmetic translation",
+          "status": "ported",
+          "go_target": "pkg/interp/translation_reconstruct.go",
+          "tests": [
+            "TestFullTranslationReconstructsEqualityPropagationWithDual",
+            "TestFullTranslationReconstructsMysteryArithmeticFromProof"
+          ]
+        },
+        {
+          "name": "retained rewrite-clause, combined equality-propagation, and specialized modus-ponens proof idioms",
           "status": "unported"
         }
       ],
