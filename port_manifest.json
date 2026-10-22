@@ -122093,8 +122093,10 @@
       "path": "src/tactic/tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/tactic/tactic_base.go",
+        "pkg/tactic/tactic_base_test.go",
         "pkg/tactic/tactic_report.go",
         "pkg/tactic/tactic_report_test.go",
         "pkg/tactic/arith/polynomial_progress_test.go",
@@ -122102,6 +122104,10 @@
         "pkg/tactic/ufbv/rewrite_tactic.go"
       ],
       "tests": [
+        "TestBaseTacticSkipFailUndecidedAndExecCleanup",
+        "TestBaseTacticCheckSatStatusesModelsAndReason",
+        "TestBaseTacticFeatureGuardsAndReferenceLifetime",
+        "TestBaseTacticResultGoalOwnershipAndFactory",
         "TestTacticReportReadsProcessMemoryAndWritesSourceOrder",
         "TestTacticProgressPositiveVerboseGateAndSourceFormat",
         "TestInequalityBuilderPublishesRetainedProgressOnRealGoal",
@@ -122113,8 +122119,8 @@
           "text": "SASSERT(m.is_false(final->form(0)));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "tactic_report conditional construction, CPU stopwatch, process-memory snapshots and source-order verbose output (tactic.cpp:26-61)",
@@ -122131,17 +122137,56 @@
           "tests": [
             "TestTacticProgressPositiveVerboseGateAndSourceFormat"
           ]
+        },
+        {
+          "name": "skip, fail, verbose-report, trace and fail-if-undecided primitive tactics (tactic.cpp:71-165)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_base.go",
+          "tests": [
+            "TestBaseTacticSkipFailUndecidedAndExecCleanup"
+          ]
+        },
+        {
+          "name": "exec statistics reset, application and guaranteed tactic cleanup (tactic.cpp:167-179)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_base.go",
+          "tests": [
+            "TestBaseTacticSkipFailUndecidedAndExecCleanup"
+          ]
+        },
+        {
+          "name": "check_sat result classification, model/label production, proof/core extraction and unknown reasons (tactic.cpp:182-236)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_base.go",
+          "tests": [
+            "TestBaseTacticCheckSatStatusesModelsAndReason"
+          ]
+        },
+        {
+          "name": "proof, unsat-core and model generation guards (tactic.cpp:238-260)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_base.go",
+          "tests": [
+            "TestBaseTacticFeatureGuardsAndReferenceLifetime"
+          ]
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "TacticResult borrows passthrough input goals and explicitly owns goals transferred with TakeGoal; converters and dependencies retain independent references until reset or close.",
+        "Exec borrows its tactic and input goal and always invokes cleanup after a reached application, including error returns."
+      ],
+      "deviations": [
+        "C++ goal_ref_buffer increments a shared goal reference. Go direct Goal values have one explicit Close owner, so AddGoal records a borrow and TakeGoal records ownership transfer."
+      ]
     },
     {
       "path": "src/tactic/tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/tactic/tactic_base.go",
+        "pkg/tactic/tactic_base_test.go",
         "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
         "pkg/tactic/tactic_report.go",
@@ -122150,6 +122195,10 @@
         "pkg/tactic/ufbv/rewrite_tactic.go"
       ],
       "tests": [
+        "TestBaseTacticSkipFailUndecidedAndExecCleanup",
+        "TestBaseTacticCheckSatStatusesModelsAndReason",
+        "TestBaseTacticFeatureGuardsAndReferenceLifetime",
+        "TestBaseTacticResultGoalOwnershipAndFactory",
         "TestUFBVRewriterTranslateOwnsDestinationImplementation",
         "TestUFBVRewriterImpMemoryCleanupSwapAndClose",
         "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate",
@@ -122173,9 +122222,29 @@
           "text": "void dec_ref() { SASSERT(m_ref_count > 0); m_ref_count--; if (m_ref_count == 0) dealloc(this); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "tactic virtual surface, reference lifetime, typed results and execution/check-sat declarations (tactic.h:37-99,150-158)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_base.go",
+          "tests": [
+            "TestBaseTacticSkipFailUndecidedAndExecCleanup",
+            "TestBaseTacticCheckSatStatusesModelsAndReason",
+            "TestBaseTacticFeatureGuardsAndReferenceLifetime",
+            "TestBaseTacticResultGoalOwnershipAndFactory"
+          ]
+        },
+        {
+          "name": "skip/fail/fail-if-undecided/report/trace declarations and tactic factory surface (tactic.h:122-151)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_base.go",
+          "tests": [
+            "TestBaseTacticSkipFailUndecidedAndExecCleanup",
+            "TestBaseTacticResultGoalOwnershipAndFactory"
+          ]
+        },
         {
           "name": "Concrete propagate_ineqs_tactic outer allocations at cpp47 and cpp61 and final tactic.h:43 deallocation through debug memory wrappers",
           "status": "platform_replacement",
@@ -122199,19 +122268,27 @@
           ]
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Concrete tactics own an explicit reference count and retire at the final decrement; result converters and dependencies hold their own retained references.",
+        "Native Go slices replace tactic and goal ref vectors; TacticFactoryFunc replaces source factory-declaration macros with a typed callable adapter."
+      ],
+      "deviations": [
+        "Go interface methods return errors instead of throwing C++ exceptions and maps replace the statistics output accumulator.",
+        "C++ preprocessor factory macros are represented by TacticFactoryFunc rather than generated classes."
+      ]
     },
     {
       "path": "src/tactic/tactic_exception.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/tactic_exception.go",
+        "pkg/tactic/tactic_base_test.go",
         "pkg/math/subpaving/tactic/fast_core_tactic_test.go"
       ],
       "tests": [
+        "TestBaseTacticExceptionMessages",
         "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
       ],
       "conditionals": [
@@ -122224,11 +122301,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "selected tactic_exception copies a caught z3_exception message for the retained MPFF core tactic outer catch (tactic_exception.h:25-34)",
+          "name": "tactic_exception owned message and z3_exception behavior (tactic_exception.h:25-34)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_exception.go",
           "go_targets": [
@@ -122237,10 +122314,22 @@
           "tests": [
             "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
           ]
+        },
+        {
+          "name": "tactic cancellation, memory, scope, step, frame and proof-generation message aliases (tactic_exception.h:34-39)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_exception.go",
+          "tests": [
+            "TestBaseTacticExceptionMessages"
+          ]
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "TacticException owns its immutable Go string value; message aliases reuse immutable util/messages constants."
+      ],
+      "deviations": [
+        "Go error values replace C++ exception throwing and preprocessor message aliases."
+      ]
     },
     {
       "path": "src/tactic/tactical.cpp",
