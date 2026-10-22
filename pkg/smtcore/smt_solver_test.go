@@ -146,13 +146,14 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 	setUInt("dack.threshold", 7)
 	setUInt("dack.gc", 23)
 	setDouble("dack.gc_inv_decay", 0.75)
+	setUInt("relevancy", 0)
 
 	solver, err := NewSMTSolver(m, &local, "QF_UF", SMTSolverConfig{Params: context})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, solver.Close()) })
 	internalizer := solver.kernel.internalizer
 	manager := internalizer.dynamicAck
-	if !internalizer.binaryClauseOptimization || manager.strategy != dynAckConflictResolution || !manager.equalities ||
+	if !internalizer.binaryClauseOptimization || solver.kernel.relevancy.enabled || manager.strategy != dynAckConflictResolution || !manager.equalities ||
 		manager.pairs.threshold != 7 || manager.triples.threshold != 7 || manager.schedule.gcEvery != 23 ||
 		manager.schedule.factor != 0.25 || manager.pairs.decay != 0.75 {
 		t.Fatal("constructor did not install SMT parameters", internalizer.binaryClauseOptimization, manager.strategy, manager.equalities,
@@ -169,8 +170,9 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 	setUInt("dack.threshold", 11)
 	setUInt("dack.gc", 47)
 	setDouble("dack.gc_inv_decay", 0.5)
+	setUInt("relevancy", 2)
 	astTestMust(t, solver.UpdateParams(&local))
-	if manager != internalizer.dynamicAck || manager.strategy != dynAckDisabled || manager.equalities ||
+	if manager != internalizer.dynamicAck || !solver.kernel.relevancy.enabled || manager.strategy != dynAckDisabled || manager.equalities ||
 		manager.pairs.threshold != 11 || manager.triples.threshold != 11 || manager.schedule.gcEvery != 47 ||
 		manager.schedule.factor != 0.5 || manager.pairs.decay != 0.5 {
 		t.Fatal("parameter update replaced or failed to update dynamic-Ack state")

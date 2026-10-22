@@ -160,6 +160,7 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	if err = k.internalizer.ConfigureClauseMaintenance(maintenance); err != nil {
 		return errors.Join(err, full.Close())
 	}
+	k.relevancy.enabled = fullState.RelevancyLvl > 0
 	k.smtParams = full
 	k.smtState = fullState
 	state, err := k.readPreprocessorState(context, globals, params)
@@ -208,6 +209,7 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err = k.internalizer.UpdateDynamicAck(dynamic); err != nil {
 		return err
 	}
+	k.relevancy.enabled = paramsState.RelevancyLvl > 0
 	k.smtState = paramsState
 	name := "preprocess"
 	enabled, err := k.paramContext.GetBoolName(params, &name, true)
