@@ -100793,7 +100793,7 @@
       "path": "src/smt/params/preprocessor_params.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_preprocessor_params.go",
         "pkg/smtcore/util_smt_preprocessor_params_source_test.go"
@@ -100808,12 +100808,12 @@
         "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
         "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete preprocessor bases, local update and thirty-one display chains (src/smt/params/preprocessor_params.cpp:22-61)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_preprocessor_params.go",
           "tests": [
             "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
@@ -100838,7 +100838,7 @@
       "path": "src/smt/params/preprocessor_params.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_preprocessor_params.go",
         "pkg/smtcore/util_smt_preprocessor_params_source_test.go"
@@ -100863,12 +100863,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete preprocessor bases, local update and thirty-one display chains (src/smt/params/preprocessor_params.h:31-81)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_preprocessor_params.go",
           "tests": [
             "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
