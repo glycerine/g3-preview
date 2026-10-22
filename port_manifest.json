@@ -103198,11 +103198,24 @@
             "TestSMTActivityCaseSplitQueueForgetsConservativeConflictPhases",
             "TestSMTActivityCaseSplitQueueHonorsRandomVariableFrequency",
             "TestSMTActivityCaseSplitQueueDelaysSearchVariables",
-            "TestSMTActivityCaseSplitQueueCachesReinternalizedActivity"
+            "TestSMTActivityCaseSplitQueueCachesReinternalizedActivity",
+            "TestSMTActivityCaseSplitQueueCachesOnlyPositiveSearchActivity"
           ]
         },
         {
-          "name": "relevancy, relevancy-activity, goal, and theory-aware queue strategies",
+          "name": "relevancy FIFO, relevancy-activity, and relative-goal-generation queue strategies, including connective-child order, random relevant-activity split, strategy eligibility fallback, and equality-disequality lookahead",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_queue.go",
+          "tests": [
+            "TestSMTRelevantCaseSplitQueueFallbackAndFIFO",
+            "TestSMTRelevantCaseSplitQueueSelectsConnectiveChild",
+            "TestSMTRelevantCaseSplitQueueLooksAheadAtDisequality",
+            "TestSMTRelevantActivityCaseSplitDelaysSearchVariables",
+            "TestSMTRelevantGoalCaseSplitUsesLowestGeneration"
+          ]
+        },
+        {
+          "name": "theory-aware branching queue strategy",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -103212,7 +103225,8 @@
         "The concrete activity selector borrows the internalizer and owns no AST handles or Boolean variables."
       ],
       "deviations": [
-        "The retained activity strategy scans Go slices instead of porting the C++ heap implementation; deterministic variable order resolves equal activities."
+        "The retained activity and generation strategies scan Go slices instead of porting the C++ heap implementations; deterministic source insertion or variable order resolves equal priorities.",
+        "Relevancy queues derive their ordered candidates from the propagator's scoped relevant-expression trail at selection time; this replaces duplicate C++ queue trails while retaining base-before-search order and rollback behavior."
       ]
     },
     {
@@ -103229,7 +103243,13 @@
         "TestSMTActivityCaseSplitQueueForgetsConservativeConflictPhases",
         "TestSMTActivityCaseSplitQueueHonorsRandomVariableFrequency",
         "TestSMTActivityCaseSplitQueueDelaysSearchVariables",
-        "TestSMTActivityCaseSplitQueueCachesReinternalizedActivity"
+        "TestSMTActivityCaseSplitQueueCachesReinternalizedActivity",
+        "TestSMTActivityCaseSplitQueueCachesOnlyPositiveSearchActivity",
+        "TestSMTRelevantCaseSplitQueueFallbackAndFIFO",
+        "TestSMTRelevantCaseSplitQueueSelectsConnectiveChild",
+        "TestSMTRelevantCaseSplitQueueLooksAheadAtDisequality",
+        "TestSMTRelevantActivityCaseSplitDelaysSearchVariables",
+        "TestSMTRelevantGoalCaseSplitUsesLowestGeneration"
       ],
       "conditionals": [
         {
@@ -103258,7 +103278,17 @@
           ]
         },
         {
-          "name": "event, lifecycle, display, and theory-aware branching interfaces for unretained queue strategies",
+          "name": "relevancy event and lifecycle behavior consumed by the retained queue strategies",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_queue.go",
+          "tests": [
+            "TestSMTRelevantCaseSplitQueueFallbackAndFIFO",
+            "TestSMTRelevantActivityCaseSplitDelaysSearchVariables",
+            "TestSMTRelevantGoalCaseSplitUsesLowestGeneration"
+          ]
+        },
+        {
+          "name": "display and theory-aware branching interfaces",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -103268,7 +103298,7 @@
         "The concrete selector borrows the internalizer for the duration of a synchronous kernel check."
       ],
       "deviations": [
-        "Go exposes the one concrete retained strategy instead of a universal interface for unused C++ implementations."
+        "Go exposes one concrete selector over the retained strategies instead of the C++ virtual queue hierarchy."
       ]
     },
     {
@@ -147367,7 +147397,17 @@
           ]
         },
         {
-          "name": "SMT case-split activity, theory-aware activity and relative-goal generation heaps (smt_case_split_queue.cpp:40,61,733)",
+          "name": "SMT case-split activity and relative-goal generation priority behavior (smt_case_split_queue.cpp:40,61,733)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_queue.go",
+          "tests": [
+            "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase",
+            "TestSMTRelevantActivityCaseSplitDelaysSearchVariables",
+            "TestSMTRelevantGoalCaseSplitUsesLowestGeneration"
+          ]
+        },
+        {
+          "name": "SMT theory-aware case-split activity heap (smt_case_split_queue.cpp:1113)",
           "status": "unported"
         },
         {

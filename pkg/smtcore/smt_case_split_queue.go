@@ -3,6 +3,8 @@
 package smtcore
 
 import (
+	"sort"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	z3rand "github.com/glycerine/g3/pkg/util/random"
@@ -17,6 +19,9 @@ type SMTActivityCaseSplitQueue struct {
 	randomVariableFrequency               float64
 	strategy                              uint32
 	activeCreationLimit                   uint64
+	relevantInitialCount                  int
+	relCaseSplitOrder                     uint32
+	lookaheadDiseq                        bool
 	phaseCounter                          uint32
 	cacheEnabled, phaseDefault            bool
 }
@@ -37,7 +42,16 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	q.cachingOff = state.PhaseCachingOff
 	q.randomVariableFrequency = state.RandomVarFreq
 	q.strategy = state.CaseSplitStrategy
+	if q.strategy >= 3 && q.strategy <= 5 && (state.RelevancyLvl < 2 || state.AutoConfig) {
+		q.strategy = 0
+	}
 	q.activeCreationLimit = q.state.nextBooleanCreation
+	q.relCaseSplitOrder = state.RelCaseSplitOrder
+	q.lookaheadDiseq = state.LookaheadDiseq
+	q.relevantInitialCount = 0
+	if q.state.relevancy != nil {
+		q.relevantInitialCount = len(q.state.relevancy.RelevantExpressions())
+	}
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
@@ -111,36 +125,15 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 	if err := q.state.open(); err != nil {
 		return SMTNullBoolVar, lbool.Undef, err
 	}
-	next := SMTNullBoolVar
-	threshold := int(q.randomVariableFrequency * float64(z3rand.Max))
-	if int(q.state.random.Next()) < threshold && len(q.state.boolExpr) != 0 {
-		candidate := int32(q.state.random.Next() % uint32(len(q.state.boolExpr)))
-		if candidate >= SMTFirstBoolVar {
-			value, err := q.state.Assignment(NewSMTLiteral(candidate, false))
-			if err != nil {
-				return SMTNullBoolVar, lbool.Undef, err
-			}
-			if value == lbool.Undef {
-				next = candidate
-			}
-		}
-	}
-	if next == SMTNullBoolVar {
-		var err error
-		next, err = q.highestActivity(q.activeCreationLimit)
-		if err != nil {
-			return SMTNullBoolVar, lbool.Undef, err
-		}
-		if next == SMTNullBoolVar && q.strategy == 1 && q.activeCreationLimit < q.state.nextBooleanCreation {
-			q.activeCreationLimit = q.state.nextBooleanCreation
-			next, err = q.highestActivity(q.activeCreationLimit)
-			if err != nil {
-				return SMTNullBoolVar, lbool.Undef, err
-			}
-		}
+	next, preferred, err := q.selectVariable()
+	if err != nil {
+		return SMTNullBoolVar, lbool.Undef, err
 	}
 	if next == SMTNullBoolVar {
 		return next, lbool.Undef, nil
+	}
+	if preferred != lbool.Undef {
+		return next, preferred, nil
 	}
 	data := &q.state.booleanData[next]
 	if data.IsQuantifier() {
@@ -172,11 +165,316 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 	return next, lbool.False, nil
 }
 
+func (q *SMTActivityCaseSplitQueue) selectVariable() (int32, lbool.LBool, error) {
+	switch q.strategy {
+	case 3:
+		next, phase, err := q.relevantVariable(false, false)
+		if err == nil && next != SMTNullBoolVar && phase != lbool.False && q.lookaheadDiseq && q.selectedEqualityDisequal(next) {
+			phase = lbool.False
+		}
+		return next, phase, err
+	case 4:
+		if next, err := q.randomVariable(0.02); err != nil || next != SMTNullBoolVar {
+			return next, lbool.Undef, err
+		}
+		if next, phase, err := q.relevantVariable(true, false); err != nil || next != SMTNullBoolVar {
+			return next, phase, err
+		}
+		next, err := q.highestActivityRange(q.activeCreationLimit, ^uint64(0))
+		return next, lbool.Undef, err
+	case 5:
+		return q.relevantVariable(false, true)
+	default:
+		next, err := q.randomVariable(q.randomVariableFrequency)
+		if err != nil || next != SMTNullBoolVar {
+			return next, lbool.Undef, err
+		}
+		creationLimit := ^uint64(0)
+		if q.strategy == 1 {
+			creationLimit = q.activeCreationLimit
+		}
+		next, err = q.highestActivity(creationLimit)
+		if err != nil {
+			return SMTNullBoolVar, lbool.Undef, err
+		}
+		if next == SMTNullBoolVar && q.strategy == 1 && q.activeCreationLimit < q.state.nextBooleanCreation {
+			q.activeCreationLimit = q.state.nextBooleanCreation
+			next, err = q.highestActivity(q.activeCreationLimit)
+		}
+		return next, lbool.Undef, err
+	}
+}
+
+func (q *SMTActivityCaseSplitQueue) selectedEqualityDisequal(variable int32) bool {
+	if variable < SMTFirstBoolVar || int(variable) >= len(q.state.boolExpr) {
+		return false
+	}
+	node := q.state.context.enodes[q.state.boolExpr[variable]]
+	if node == nil || !node.IsEquality() || node.NumArgs() != 2 {
+		return false
+	}
+	left, leftErr := node.Arg(0)
+	right, rightErr := node.Arg(1)
+	return leftErr == nil && rightErr == nil && q.extendedDisequal(left, right, 2)
+}
+
+func (q *SMTActivityCaseSplitQueue) extendedDisequal(first, second *SMTEnode, depth uint32) bool {
+	if first == nil || second == nil || first.Root() == second.Root() {
+		return false
+	}
+	firstRoot, secondRoot := first.Root(), second.Root()
+	if firstRoot.IsInterpreted() && secondRoot.IsInterpreted() || q.state.context.isDisequal(firstRoot, secondRoot) {
+		return true
+	}
+	if depth == 0 {
+		return false
+	}
+	if firstRoot.NumParents() > secondRoot.NumParents() {
+		firstRoot, secondRoot = secondRoot, firstRoot
+	}
+	for _, firstParent := range firstRoot.Parents() {
+		if firstParent == nil || firstParent.IsEquality() || !firstParent.IsCongruenceRoot() ||
+			q.state.relevancy != nil && !q.state.relevancy.IsRelevant(firstParent.Owner()) {
+			continue
+		}
+		for _, secondParent := range secondRoot.Parents() {
+			if secondParent == nil || secondParent.IsEquality() || !secondParent.IsCongruenceRoot() ||
+				q.state.relevancy != nil && !q.state.relevancy.IsRelevant(secondParent.Owner()) ||
+				firstParent.Root() == secondParent.Root() || firstParent.Declaration() != secondParent.Declaration() ||
+				firstParent.NumArgs() != secondParent.NumArgs() {
+				continue
+			}
+			almostCongruent := true
+			for index := uint32(0); index < firstParent.NumArgs(); index++ {
+				firstArg, firstErr := firstParent.Arg(index)
+				secondArg, secondErr := secondParent.Arg(index)
+				if firstErr != nil || secondErr != nil {
+					almostCongruent = false
+					break
+				}
+				firstArg, secondArg = firstArg.Root(), secondArg.Root()
+				if firstArg == secondArg {
+					continue
+				}
+				firstOriginal := firstArg == firstRoot || firstArg == secondRoot
+				secondOriginal := secondArg == firstRoot || secondArg == secondRoot
+				if !firstOriginal || !secondOriginal {
+					almostCongruent = false
+					break
+				}
+			}
+			if almostCongruent && q.extendedDisequal(firstParent, secondParent, depth-1) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (q *SMTActivityCaseSplitQueue) randomVariable(frequency float64) (int32, error) {
+	threshold := int(frequency * float64(z3rand.Max))
+	if int(q.state.random.Next()) >= threshold || len(q.state.boolExpr) == 0 {
+		return SMTNullBoolVar, nil
+	}
+	candidate := int32(q.state.random.Next() % uint32(len(q.state.boolExpr)))
+	if candidate < SMTFirstBoolVar {
+		return SMTNullBoolVar, nil
+	}
+	value, err := q.state.Assignment(NewSMTLiteral(candidate, false))
+	if err != nil || value != lbool.Undef {
+		return SMTNullBoolVar, err
+	}
+	return candidate, nil
+}
+
+type smtRelevantCaseSplit struct {
+	expression ast.ASTHandle
+	index      int
+	generation uint32
+	search     bool
+}
+
+func (q *SMTActivityCaseSplitQueue) relevantVariable(baseOnly, generationOrder bool) (int32, lbool.LBool, error) {
+	if q.state.relevancy == nil {
+		return SMTNullBoolVar, lbool.Undef, nil
+	}
+	expressions := q.state.relevancy.RelevantExpressions()
+	entries := make([]smtRelevantCaseSplit, 0, len(expressions))
+	for index, expression := range expressions {
+		search := index >= q.relevantInitialCount
+		if variable, found := q.state.BoolVar(expression); found {
+			search = q.state.booleanCreation[variable] > q.activeCreationLimit
+		}
+		if baseOnly && search {
+			continue
+		}
+		entry := smtRelevantCaseSplit{expression: expression, index: index, search: search}
+		if generationOrder && search {
+			generation, err := q.expressionGeneration(expression)
+			if err != nil {
+				return SMTNullBoolVar, lbool.Undef, err
+			}
+			entry.generation = generation
+		}
+		entries = append(entries, entry)
+	}
+	if generationOrder {
+		sort.SliceStable(entries, func(i, j int) bool {
+			if entries[i].search != entries[j].search {
+				return !entries[i].search
+			}
+			if entries[i].search && entries[i].generation != entries[j].generation {
+				return entries[i].generation < entries[j].generation
+			}
+			return entries[i].index < entries[j].index
+		})
+	}
+	for _, entry := range entries {
+		next, phase, usable, err := q.relevantCandidate(entry.expression)
+		if err != nil {
+			return SMTNullBoolVar, lbool.Undef, err
+		}
+		if usable {
+			return next, phase, nil
+		}
+	}
+	return SMTNullBoolVar, lbool.Undef, nil
+}
+
+func (q *SMTActivityCaseSplitQueue) relevantCandidate(expression ast.ASTHandle) (int32, lbool.LBool, bool, error) {
+	boolean, err := q.state.isBoolean(expression)
+	if err != nil || !boolean {
+		return SMTNullBoolVar, lbool.Undef, false, err
+	}
+	op, basic, err := q.state.basicOperation(expression)
+	if err != nil {
+		return SMTNullBoolVar, lbool.Undef, false, err
+	}
+	isOr, isAnd := basic && op == ast.ASTOpOr, basic && op == ast.ASTOpAnd
+	variable, internalized := q.state.BoolVar(expression)
+	if !internalized && !isOr {
+		return SMTNullBoolVar, lbool.Undef, false, nil
+	}
+	value := lbool.True
+	if internalized {
+		value, err = q.state.Assignment(NewSMTLiteral(variable, false))
+		if err != nil {
+			return SMTNullBoolVar, lbool.Undef, false, err
+		}
+	}
+	if isOr && value == lbool.True || isAnd && value == lbool.False {
+		child, found, err := q.relevantChild(expression, value)
+		if err != nil || !found {
+			return SMTNullBoolVar, lbool.Undef, false, err
+		}
+		literal, err := q.state.Literal(child)
+		if err != nil {
+			if err = q.state.Internalize(child, false); err != nil {
+				return SMTNullBoolVar, lbool.Undef, false, err
+			}
+			literal, err = q.state.Literal(child)
+		}
+		if err != nil {
+			return SMTNullBoolVar, lbool.Undef, false, err
+		}
+		phase := lbool.True
+		if literal.Sign() {
+			phase = lbool.False
+		}
+		return literal.Var(), phase, true, nil
+	}
+	if internalized && value == lbool.Undef {
+		return variable, lbool.Undef, true, nil
+	}
+	return SMTNullBoolVar, lbool.Undef, false, nil
+}
+
+func (q *SMTActivityCaseSplitQueue) relevantChild(parent ast.ASTHandle, parentValue lbool.LBool) (ast.ASTHandle, bool, error) {
+	count, err := q.state.manager.GetNumArgs(parent)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	undefined := make([]ast.ASTHandle, 0, count)
+	for index := uint32(0); index < count; index++ {
+		child, err := q.state.manager.GetArg(parent, index)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		literal, err := q.state.Literal(child)
+		if err != nil {
+			continue
+		}
+		value, err := q.state.Assignment(literal)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		if value == parentValue {
+			return ast.ASTHandle{}, false, nil
+		}
+		if value == lbool.Undef {
+			if q.relCaseSplitOrder != 0 || len(undefined) == 0 {
+				undefined = append(undefined, child)
+			}
+		}
+	}
+	if len(undefined) == 0 {
+		return ast.ASTHandle{}, false, nil
+	}
+	if q.relCaseSplitOrder == 1 && len(undefined) > 1 {
+		return undefined[q.state.random.Next()%uint32(len(undefined))], true, nil
+	}
+	return undefined[len(undefined)-1], true, nil
+}
+
+func (q *SMTActivityCaseSplitQueue) expressionGeneration(expression ast.ASTHandle) (uint32, error) {
+	stack := []ast.ASTHandle{expression}
+	seen := make(map[ast.ASTHandle]bool)
+	var maximum uint32
+	for len(stack) != 0 {
+		current := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if seen[current] {
+			continue
+		}
+		seen[current] = true
+		if node := q.state.context.enodes[current]; node != nil {
+			if node.Generation() > maximum {
+				maximum = node.Generation()
+			}
+			continue
+		}
+		kind, err := q.state.manager.GetKind(current)
+		if err != nil {
+			return 0, err
+		}
+		if kind != ast.ASTApp {
+			continue
+		}
+		count, err := q.state.manager.GetNumArgs(current)
+		if err != nil {
+			return 0, err
+		}
+		for index := uint32(0); index < count; index++ {
+			child, err := q.state.manager.GetArg(current, index)
+			if err != nil {
+				return 0, err
+			}
+			stack = append(stack, child)
+		}
+	}
+	return maximum, nil
+}
+
 func (q *SMTActivityCaseSplitQueue) highestActivity(creationLimit uint64) (int32, error) {
+	return q.highestActivityRange(0, creationLimit)
+}
+
+func (q *SMTActivityCaseSplitQueue) highestActivityRange(creationAfter, creationLimit uint64) (int32, error) {
 	next := SMTNullBoolVar
 	best := 0.0
 	for variable := int32(SMTFirstBoolVar); int(variable) < len(q.state.boolExpr); variable++ {
-		if q.strategy == 1 && q.state.booleanCreation[variable] > creationLimit {
+		creation := q.state.booleanCreation[variable]
+		if creation <= creationAfter || creation > creationLimit {
 			continue
 		}
 		value, err := q.state.Assignment(NewSMTLiteral(variable, false))

@@ -274,3 +274,189 @@ func TestSMTActivityCaseSplitQueueCachesOnlyPositiveSearchActivity(t *testing.T)
 		t.Fatal("new search retained old activity cache")
 	}
 }
+
+func TestSMTRelevantCaseSplitQueueFallbackAndFIFO(t *testing.T) {
+	m := astTestManager(t)
+	_, relevance, state := smtInternalizerFixture(t, m, nil)
+	first := smtRelevancyBool(t, m, "relevant-fifo-first")
+	second := smtRelevancyBool(t, m, "relevant-fifo-second")
+	astTestMust(t, state.Internalize(first, true))
+	astTestMust(t, state.Internalize(second, true))
+	firstVar, _ := state.BoolVar(first)
+	secondVar, _ := state.BoolVar(second)
+	state.activity[secondVar] = 100
+	astTestMust(t, relevance.MarkRelevant(first))
+
+	queue, err := NewSMTActivityCaseSplitQueue(state)
+	astTestMust(t, err)
+	params := SMTParamsState{CaseSplitStrategy: 3, RelevancyLvl: 2, AutoConfig: false, PhaseSelection: 0}
+	astTestMust(t, queue.ConfigurePhases(params))
+	selected, _, err := queue.NextCaseSplit()
+	astTestMust(t, err)
+	if selected != firstVar {
+		t.Fatal("relevance FIFO ignored relevant variable", selected, firstVar)
+	}
+
+	params.AutoConfig = true
+	astTestMust(t, queue.ConfigurePhases(params))
+	selected, _, err = queue.NextCaseSplit()
+	astTestMust(t, err)
+	if selected != secondVar || queue.strategy != 0 {
+		t.Fatal("automatic configuration did not fall back to activity", selected, queue.strategy)
+	}
+	params.AutoConfig = false
+	params.RelevancyLvl = 1
+	astTestMust(t, queue.ConfigurePhases(params))
+	if queue.strategy != 0 {
+		t.Fatal("low relevancy level did not fall back to activity", queue.strategy)
+	}
+}
+
+func TestSMTRelevantCaseSplitQueueSelectsConnectiveChild(t *testing.T) {
+	for _, order := range []uint32{0, 2} {
+		t.Run(string(rune('0'+order)), func(t *testing.T) {
+			m := astTestManager(t)
+			_, relevance, state := smtInternalizerFixture(t, m, nil)
+			first := smtRelevancyBool(t, m, "relevant-child-first")
+			second := smtRelevancyBool(t, m, "relevant-child-second")
+			parent, err := m.MkOr(first, second)
+			astTestMust(t, err)
+			astTestMust(t, state.Internalize(parent, true))
+			parentVar, _ := state.BoolVar(parent)
+			firstVar, _ := state.BoolVar(first)
+			secondVar, _ := state.BoolVar(second)
+			astTestMust(t, state.SetAssignment(parentVar, lbool.True))
+			astTestMust(t, relevance.MarkRelevant(parent))
+			queue, err := NewSMTActivityCaseSplitQueue(state)
+			astTestMust(t, err)
+			params := SMTParamsState{CaseSplitStrategy: 3, RelevancyLvl: 2, AutoConfig: false, RelCaseSplitOrder: order}
+			astTestMust(t, queue.ConfigurePhases(params))
+			selected, phase, err := queue.NextCaseSplit()
+			astTestMust(t, err)
+			want := firstVar
+			if order == 2 {
+				want = secondVar
+			}
+			if selected != want || phase != lbool.True {
+				t.Fatal("connective child order or phase", selected, phase, want)
+			}
+		})
+	}
+	t.Run("later-satisfying-child", func(t *testing.T) {
+		m := astTestManager(t)
+		_, relevance, state := smtInternalizerFixture(t, m, nil)
+		first := smtRelevancyBool(t, m, "relevant-child-undef")
+		second := smtRelevancyBool(t, m, "relevant-child-true")
+		parent, err := m.MkOr(first, second)
+		astTestMust(t, err)
+		astTestMust(t, state.Internalize(parent, true))
+		parentVar, _ := state.BoolVar(parent)
+		secondVar, _ := state.BoolVar(second)
+		astTestMust(t, state.SetAssignment(parentVar, lbool.True))
+		astTestMust(t, state.SetAssignment(secondVar, lbool.True))
+		astTestMust(t, relevance.MarkRelevant(parent))
+		queue, err := NewSMTActivityCaseSplitQueue(state)
+		astTestMust(t, err)
+		params := SMTParamsState{CaseSplitStrategy: 3, RelevancyLvl: 2, AutoConfig: false, RelCaseSplitOrder: 0}
+		astTestMust(t, queue.ConfigurePhases(params))
+		selected, _, err := queue.NextCaseSplit()
+		astTestMust(t, err)
+		if selected != SMTNullBoolVar {
+			t.Fatal("OR with a true child produced a redundant split", selected)
+		}
+	})
+}
+
+func TestSMTRelevantCaseSplitQueueLooksAheadAtDisequality(t *testing.T) {
+	m := astTestManager(t)
+	_, values := smtUFConstants(t, m, "relevant-lookahead-", 2)
+	equality, err := m.MkEq(values[0], values[1])
+	astTestMust(t, err)
+	context, relevance, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.Internalize(equality, false))
+	variable, found := state.BoolVar(equality)
+	if !found {
+		t.Fatal("equality was not Boolean-internalized")
+	}
+	left, right := context.enodes[values[0]], context.enodes[values[1]]
+	if left == nil || right == nil {
+		t.Fatal("equality arguments were not e-internalized")
+	}
+	astTestMust(t, context.SetDisequal(left, right, true))
+	astTestMust(t, relevance.MarkRelevant(equality))
+	queue, err := NewSMTActivityCaseSplitQueue(state)
+	astTestMust(t, err)
+	params := SMTParamsState{CaseSplitStrategy: 3, RelevancyLvl: 2, AutoConfig: false, PhaseSelection: 1, LookaheadDiseq: true}
+	astTestMust(t, queue.ConfigurePhases(params))
+	selected, phase, err := queue.NextCaseSplit()
+	astTestMust(t, err)
+	if selected != variable || phase != lbool.False {
+		t.Fatal("known disequality did not force the equality false", selected, phase, variable)
+	}
+}
+
+func TestSMTRelevantActivityCaseSplitDelaysSearchVariables(t *testing.T) {
+	m := astTestManager(t)
+	_, relevance, state := smtInternalizerFixture(t, m, nil)
+	base := smtRelevancyBool(t, m, "relevant-activity-base")
+	astTestMust(t, state.Internalize(base, true))
+	baseVar, _ := state.BoolVar(base)
+	astTestMust(t, relevance.MarkRelevant(base))
+	params := SMTParamsState{CaseSplitStrategy: 4, RelevancyLvl: 2, AutoConfig: false, PhaseSelection: 0}
+	queue, err := NewSMTActivityCaseSplitQueue(state)
+	astTestMust(t, err)
+	astTestMust(t, queue.ConfigurePhases(params))
+	astTestMust(t, state.beginSearchPersistence(state.scopeLevel, params))
+	t.Cleanup(func() { astTestMust(t, state.endSearchPersistence()) })
+	search := smtRelevancyBool(t, m, "relevant-activity-search")
+	astTestMust(t, state.Internalize(search, true))
+	searchVar, _ := state.BoolVar(search)
+	state.activity[searchVar] = 100
+
+	selected, _, err := queue.NextCaseSplit()
+	astTestMust(t, err)
+	if selected != baseVar {
+		t.Fatal("search activity bypassed relevant base variable", selected, baseVar)
+	}
+	astTestMust(t, state.SetAssignment(baseVar, lbool.False))
+	selected, _, err = queue.NextCaseSplit()
+	astTestMust(t, err)
+	if selected != searchVar {
+		t.Fatal("search activity was not selected after base relevance", selected, searchVar)
+	}
+}
+
+func TestSMTRelevantGoalCaseSplitUsesLowestGeneration(t *testing.T) {
+	m := astTestManager(t)
+	_, relevance, state := smtInternalizerFixture(t, m, nil)
+	params := SMTParamsState{CaseSplitStrategy: 5, RelevancyLvl: 2, AutoConfig: false, PhaseSelection: 0}
+	queue, err := NewSMTActivityCaseSplitQueue(state)
+	astTestMust(t, err)
+	astTestMust(t, queue.ConfigurePhases(params))
+	astTestMust(t, state.beginSearchPersistence(state.scopeLevel, params))
+	t.Cleanup(func() { astTestMust(t, state.endSearchPersistence()) })
+
+	astTestMust(t, state.SetGeneration(9))
+	high := smtRelevancyBool(t, m, "relevant-goal-high")
+	astTestMust(t, state.Internalize(high, true))
+	_, err = state.MkEnode(high, false, false, true)
+	astTestMust(t, err)
+	highVar, _ := state.BoolVar(high)
+	astTestMust(t, relevance.MarkRelevant(high))
+	astTestMust(t, state.SetGeneration(2))
+	low := smtRelevancyBool(t, m, "relevant-goal-low")
+	astTestMust(t, state.Internalize(low, true))
+	_, err = state.MkEnode(low, false, false, true)
+	astTestMust(t, err)
+	lowVar, _ := state.BoolVar(low)
+	astTestMust(t, relevance.MarkRelevant(low))
+
+	if state.context.enodes[high] == nil || state.context.enodes[low] == nil {
+		t.Fatal("generation candidates were not e-internalized")
+	}
+	selected, _, err := queue.NextCaseSplit()
+	astTestMust(t, err)
+	if selected != lowVar || selected == highVar {
+		t.Fatal("goal relevance ignored lower generation", selected, lowVar, highVar)
+	}
+}
