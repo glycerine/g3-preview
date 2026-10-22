@@ -8,7 +8,7 @@ func smtLogicUsesArithmetic(logic string) bool {
 	switch logic {
 	case "QF_RDL", "QF_IDL", "QF_UFIDL", "QF_LRA", "QF_LIA", "QF_UFLIA", "QF_UFLRA",
 		"QF_AUFLIA", "AUFLIA", "AUFLIRA", "AUFNIRA", "AUFLIA+", "AUFLIA-", "AUFLIRA+",
-		"AUFLIRA-", "AUFNIRA+", "AUFNIRA-", "UFNIA", "UFLRA", "LRA", "QF_BVRE":
+		"AUFLIRA-", "AUFNIRA+", "AUFNIRA-", "UFNIA", "UFLRA", "LRA", "QF_BVRE", "QF_S", "ALL":
 		return true
 	default:
 		return false
@@ -51,6 +51,10 @@ func smtLogicUsesFloatingPoint(logic string) bool {
 	return logic == "QF_FPBV" || logic == "QF_BVFP" || logic == "ALL"
 }
 
+func smtLogicUsesSequences(logic string) bool {
+	return logic == "QF_BVRE" || logic == "QF_S" || logic == "ALL"
+}
+
 func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic string) error {
 	if kernel == nil || manager == nil {
 		return ast.ErrASTHandle
@@ -85,7 +89,7 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 				return theoryErr
 			}
 			err = kernel.RegisterTheory(theory)
-		} else if logic == "QF_LIA" || logic == "QF_UFLIA" || logic == "QF_BVRE" {
+		} else if logic == "QF_LIA" || logic == "QF_UFLIA" || logic == "QF_BVRE" || logic == "QF_S" {
 			theory, theoryErr := NewSMTLinearIntegerArithmeticTheory(family)
 			if theoryErr != nil {
 				return theoryErr
@@ -140,6 +144,28 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 			return err
 		}
 		theory, theoryErr := NewSMTFloatingPointTheory(family)
+		if theoryErr != nil {
+			return theoryErr
+		}
+		if err = kernel.RegisterTheory(theory); err != nil {
+			return err
+		}
+	}
+	if smtLogicUsesSequences(logic) {
+		if _, err := manager.RegisterArithmeticPlugin(); err != nil {
+			return err
+		}
+		if _, err := manager.RegisterBitVectorPlugin(); err != nil {
+			return err
+		}
+		if _, err := manager.RegisterArrayPlugin(); err != nil {
+			return err
+		}
+		family, err := manager.RegisterSequencePlugin()
+		if err != nil {
+			return err
+		}
+		theory, theoryErr := NewSMTEmptySequenceTheory(family)
 		if theoryErr != nil {
 			return theoryErr
 		}

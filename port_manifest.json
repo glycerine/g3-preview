@@ -110041,7 +110041,8 @@
         "TestSMTSolverPublishesStrictRealDifferenceModel",
         "TestSMTDatatypeQFDTSetup",
         "TestSMTPseudoBooleanQFFDExactCardinality",
-        "TestSMTFloatingPointIEEEAndStructuralEqualities"
+        "TestSMTFloatingPointIEEEAndStructuralEqualities",
+        "TestSMTSequenceLogicsInstallSafeCheckpointTheory"
       ],
       "assertions": [
         {
@@ -110082,7 +110083,8 @@
           "tests": [
             "TestSMTDatatypeQFDTSetup",
             "TestSMTPseudoBooleanQFFDExactCardinality",
-            "TestSMTFloatingPointIEEEAndStructuralEqualities"
+            "TestSMTFloatingPointIEEEAndStructuralEqualities",
+            "TestSMTSequenceLogicsInstallSafeCheckpointTheory"
           ]
         },
         {
@@ -110114,7 +110116,7 @@
         "The kernel owns its theory registry; setup creates concrete real difference, integer difference, linear rational, or partial linear integer theories for QF_RDL, QF_IDL/QF_UFIDL, QF_LRA/QF_UFLRA, and QF_LIA/QF_UFLIA and dummy-theory values for reached families whose solvers remain unavailable."
       ],
       "deviations": [
-        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics return source-style incompleteness instead of an unsound result."
+        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory. QF_BVRE, QF_S and ALL install the scoped empty sequence checkpoint until theory_seq is complete, so reached sequence expressions return source-style incompleteness. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics likewise return incompleteness instead of an unsound result."
       ]
     },
     {
@@ -110132,7 +110134,8 @@
         "TestSMTSolverLinearArithmeticEqualityAdapter",
         "TestSMTSolverUFLinearArithmeticCongruence",
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
-        "TestSMTSolverSetupUsesRealDifferenceLogic"
+        "TestSMTSolverSetupUsesRealDifferenceLogic",
+        "TestSMTSequenceLogicsInstallSafeCheckpointTheory"
       ],
       "conditionals": [
         {
@@ -110158,7 +110161,8 @@
             "TestSMTSolverLinearArithmeticEqualityAdapter",
             "TestSMTSolverUFLinearArithmeticCongruence",
             "TestSMTSolverSetupUsesIntegerDifferenceLogic",
-            "TestSMTSolverSetupUsesRealDifferenceLogic"
+            "TestSMTSolverSetupUsesRealDifferenceLogic",
+            "TestSMTSequenceLogicsInstallSafeCheckpointTheory"
           ]
         },
         {
@@ -110172,7 +110176,7 @@
         "The retained setup helper borrows its kernel and AST manager and publishes created theory implementations into the kernel registry."
       ],
       "deviations": [
-        "The initial Go surface is a direct setup function rather than a persistent setup object because only construction-time explicit-logic routing is currently consumed."
+        "The Go surface is a direct setup function rather than a persistent setup object because only construction-time explicit-logic routing is currently consumed. Sequence logics install SMTEmptySequenceTheory as a safe give-up checkpoint until the concrete sequence solver replaces it."
       ]
     },
     {
@@ -117252,6 +117256,7 @@
       ],
       "tests": [
         "TestSMTEmptySequenceTheoryScopesAndModelFactory",
+        "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
         "TestSequenceFactoryCanonicalFreshAndGenericValues"
       ],
       "conditionals": [
@@ -117277,7 +117282,7 @@
           "name": "empty sequence theory internalization refusal, scoped usage, final-check status, fresh construction and model-factory registration",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_empty.go",
-          "tests": ["TestSMTEmptySequenceTheoryScopesAndModelFactory"]
+          "tests": ["TestSMTEmptySequenceTheoryScopesAndModelFactory", "TestSMTSequenceLogicsInstallSafeCheckpointTheory"]
         }
       ],
       "ownership": [
