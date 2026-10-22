@@ -40690,6 +40690,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/interp/manager.go",
+        "pkg/interp/manager_arithmetic.go",
         "pkg/interp/manager_proof.go",
         "pkg/interp/manager_rewrite.go"
       ],
@@ -40705,6 +40706,8 @@
         "TestInterpolationManagerAssignBoundsAndCoefficientTerms",
         "TestInterpolationManagerTheorySimplifiers",
         "TestInterpolationManagerSimplifierConfigurationGuard",
+        "TestInterpolationManagerLinearCombinations",
+        "TestInterpolationManagerIntegerDivisionDecomposition",
         "TestInterpolationManagerBorrowAndCopyGuards"
       ],
       "conditionals": [
@@ -40809,7 +40812,16 @@
           ]
         },
         {
-          "name": "linear combinations, integer division, free-variable universal closure, and controlling-equality quantifier optimization",
+          "name": "linear combinations, inequality sums, and integer-division decomposition",
+          "status": "ported",
+          "go_target": "pkg/interp/manager_arithmetic.go",
+          "tests": [
+            "TestInterpolationManagerLinearCombinations",
+            "TestInterpolationManagerIntegerDivisionDecomposition"
+          ]
+        },
+        {
+          "name": "free-variable universal closure and controlling-equality quantifier optimization",
           "status": "unported",
           "tests": []
         }
@@ -40828,6 +40840,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/interp/manager.go",
+        "pkg/interp/manager_arithmetic.go",
         "pkg/interp/manager_proof.go",
         "pkg/interp/manager_rewrite.go"
       ],
@@ -40843,6 +40856,8 @@
         "TestInterpolationManagerAssignBoundsAndCoefficientTerms",
         "TestInterpolationManagerTheorySimplifiers",
         "TestInterpolationManagerSimplifierConfigurationGuard",
+        "TestInterpolationManagerLinearCombinations",
+        "TestInterpolationManagerIntegerDivisionDecomposition",
         "TestInterpolationManagerBorrowAndCopyGuards"
       ],
       "conditionals": [
@@ -40892,7 +40907,16 @@
           ]
         },
         {
-          "name": "remaining arithmetic algorithms, universal closure, and optimized-quantification declarations",
+          "name": "linear combinations, inequality sums, and integer-division decomposition declarations",
+          "status": "ported",
+          "go_target": "pkg/interp/manager_arithmetic.go",
+          "tests": [
+            "TestInterpolationManagerLinearCombinations",
+            "TestInterpolationManagerIntegerDivisionDecomposition"
+          ]
+        },
+        {
+          "name": "remaining universal closure and optimized-quantification declarations",
           "status": "unported",
           "tests": []
         }
