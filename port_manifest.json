@@ -98723,9 +98723,16 @@
       "path": "src/smt/diff_logic.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_diff_graph_rational.go",
+        "pkg/smtcore/smt_diff_graph_rational_test.go"
+      ],
+      "tests": [
+        "TestSMTRationalDiffGraphFeasibleActivationAndAssignment",
+        "TestSMTRationalDiffGraphNegativeCycleExplanationAndRollback",
+        "TestSMTRationalDiffGraphScopesAndDomainGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -99096,9 +99103,32 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete rational dl_edge and sparse dl_graph variable/edge construction, indexed-heap assignment repair, incremental activation, negative-cycle explanation traversal and scope rollback (src/smt/diff_logic.h:39-559,751-788)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_diff_graph_rational.go",
+          "tests": [
+            "TestSMTRationalDiffGraphFeasibleActivationAndAssignment",
+            "TestSMTRationalDiffGraphNegativeCycleExplanationAndRollback",
+            "TestSMTRationalDiffGraphScopesAndDomainGuards"
+          ]
+        },
+        {
+          "name": "Cycle shortcut pruning, zero normalization, display, reachability, SCC equality propagation, implied-bound discovery and lazy explanations (src/smt/diff_logic.h:562-1834)",
+          "status": "unported"
+        },
+        {
+          "name": "Concrete infinitesimal-rational graph instantiation used by real difference logic",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Graph slices own copied big.Rat assignments, weights and search values. Edge explanations borrow immutable SMTLiteral values. Scope rollback retires enabled edges before truncating adjacency and edge storage."
+      ],
+      "deviations": [
+        "The first retained concrete instantiation uses math/big.Rat values directly. No template or STL container is ported; the real-difference-logic infinitesimal instantiation remains open. Invalid source assertion domains return errSMTDiffGraphDomain."
+      ]
     },
     {
       "path": "src/smt/dyn_ack.cpp",
