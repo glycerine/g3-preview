@@ -72016,22 +72016,22 @@
       "path": "src/model/model_pp.cpp",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/model/model_printers.go"],
+      "tests": ["TestModelDebugPrinterSourceOrderAndFunctionGraph"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "model_pp ordered uninterpreted sorts, constants and nested function-entry conditionals", "status": "ported", "go_target": "pkg/model/model_printers.go", "tests": ["TestModelDebugPrinterSourceOrderAndFunctionGraph"]}],
+      "ownership": ["The printer borrows the model and parameter services. Each temporary format stream is closed before return; io.Writer errors are returned to the caller."],
+      "deviations": ["Go io.Writer and the ported SMT2 format renderer replace std::ostream and C++ format temporaries while retaining source declaration and entry order."]
     },
     {
       "path": "src/model/model_pp.h",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/model/model_printers.go"],
+      "tests": ["TestModelDebugPrinterSourceOrderAndFunctionGraph"],
       "conditionals": [
         {
           "line": 20,
@@ -72042,19 +72042,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "model_pp public debugging-printer entry point", "status": "ported", "go_target": "pkg/model/model_printers.go", "tests": ["TestModelDebugPrinterSourceOrderAndFunctionGraph"]}],
+      "ownership": ["WriteDebug borrows its ModelCore, io.Writer, ParamsContext and GlobalParamsService."],
+      "deviations": ["The Go entry point returns writer and formatting errors explicitly."]
     },
     {
       "path": "src/model/model_smt2_pp.cpp",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/model/model_printers.go"],
+      "tests": ["TestModelSMT2PrinterUniversesQuotedNamesAndDependencyOrder"],
       "assertions": [
         {
           "line": 66,
@@ -72077,19 +72077,25 @@
           "text": "SASSERT(!f_entry_conds.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "pp_indent and SMT2 symbol quoting", "status": "ported", "go_target": "pkg/model/model_printers.go", "tests": ["TestModelSMT2PrinterUniversesQuotedNamesAndDependencyOrder"]},
+        {"name": "uninterpreted-universe comments, element declarations and finite cardinality constraint", "status": "ported", "go_target": "pkg/model/model_printers.go", "tests": ["TestModelSMT2PrinterUniversesQuotedNamesAndDependencyOrder"]},
+        {"name": "constant define-fun rendering", "status": "ported", "go_target": "pkg/model/model_printers.go", "tests": ["TestModelSMT2PrinterUniversesQuotedNamesAndDependencyOrder"]},
+        {"name": "sort_fun_decls dependency-before-dependent traversal", "status": "ported", "go_target": "pkg/model/model_printers.go", "tests": ["TestModelSMT2PrinterUniversesQuotedNamesAndDependencyOrder"]},
+        {"name": "function signatures, bound-variable rendering, ordered entry ITEs and partial fallback", "status": "ported", "go_target": "pkg/model/model_printers.go", "tests": ["TestModelSMT2PrinterUniversesQuotedNamesAndDependencyOrder"]}
+      ],
+      "ownership": ["The printer borrows model graphs and services. Function dependency sets contain borrowed handles; temporary Go slices and maps require no explicit release, and every temporary numeric stream is closed."],
+      "deviations": ["Native Go strings and io.Writer replace C++ format trees at the model layout layer. Nested AST expressions and sorts still use the ported source SMT2 renderer. Dependency-set iteration is stabilized by model registration order because Go map iteration is intentionally unspecified."]
     },
     {
       "path": "src/model/model_smt2_pp.h",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/model/model_printers.go"],
+      "tests": ["TestModelSMT2PrinterUniversesQuotedNamesAndDependencyOrder"],
       "conditionals": [
         {
           "line": 20,
@@ -72100,11 +72106,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "model_smt2_pp public model entry point with explicit indentation", "status": "ported", "go_target": "pkg/model/model_printers.go", "tests": ["TestModelSMT2PrinterUniversesQuotedNamesAndDependencyOrder"]}],
+      "ownership": ["WriteSMT2 borrows its ModelCore, io.Writer and parameter services."],
+      "deviations": ["The two C++ printer-context overloads collapse into one typed Go service entry point."]
     },
     {
       "path": "src/model/model_v2_pp.cpp",
