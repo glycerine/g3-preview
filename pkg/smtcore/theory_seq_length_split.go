@@ -2,6 +2,7 @@
 package smtcore
 
 import (
+	"math"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -74,9 +75,15 @@ func smtSequenceEqualPartition(left, right []uint64) (int, int, bool) {
 	var leftSum, rightSum uint64
 	for leftCount, rightCount := 0, 0; leftCount < len(left)-1 || rightCount < len(right)-1; {
 		if leftSum <= rightSum && leftCount < len(left)-1 {
+			if left[leftCount] > math.MaxUint64-leftSum {
+				return 0, 0, false
+			}
 			leftSum += left[leftCount]
 			leftCount++
 		} else if rightCount < len(right)-1 {
+			if right[rightCount] > math.MaxUint64-rightSum {
+				return 0, 0, false
+			}
 			rightSum += right[rightCount]
 			rightCount++
 		} else {
