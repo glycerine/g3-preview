@@ -1813,6 +1813,30 @@ func TestSMTSequenceTheoryGroundOperationsAreComplete(t *testing.T) {
 		name  string
 		build func(*testing.T, *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle)
 	}{
+		{name: "reflexive-prefix", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-reflexive-prefix-x")
+			operation, err := m.MkSequencePrefix(x, x)
+			astTestMust(t, err)
+			truth, err := m.MkTrue()
+			astTestMust(t, err)
+			return operation, truth
+		}},
+		{name: "reflexive-suffix", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-reflexive-suffix-x")
+			operation, err := m.MkSequenceSuffix(x, x)
+			astTestMust(t, err)
+			truth, err := m.MkTrue()
+			astTestMust(t, err)
+			return operation, truth
+		}},
+		{name: "reflexive-contains", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
+			x := astTestStringConst(t, m, "sequence-exact-reflexive-contains-x")
+			operation, err := m.MkSequenceContains(x, x)
+			astTestMust(t, err)
+			truth, err := m.MkTrue()
+			astTestMust(t, err)
+			return operation, truth
+		}},
 		{name: "replace-pattern-with-itself", build: func(t *testing.T, m *ast.ASTManager) (ast.ASTHandle, ast.ASTHandle) {
 			x := astTestStringConst(t, m, "sequence-exact-replace-source-x")
 			pattern := astTestStringConst(t, m, "sequence-exact-replace-pattern-x")

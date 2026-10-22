@@ -153,7 +153,7 @@ func (t *SMTSequenceTheory) addGroundOperationAxiom(expression ast.ASTHandle, op
 		if emptyErr != nil {
 			return false, emptyErr
 		}
-		if ((operation == 3 || operation == 4) && leftEmpty) || (operation == 5 && rightEmpty) {
+		if leftExpression == rightExpression || ((operation == 3 || operation == 4) && leftEmpty) || (operation == 5 && rightEmpty) {
 			truth, makeErr := state.manager.MkTrue()
 			if makeErr != nil {
 				return false, makeErr

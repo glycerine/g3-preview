@@ -117405,7 +117405,7 @@
           "tests": ["TestSMTSequenceStructuredModelValues"]
         },
         {
-          "name": "complete ground evaluation for nested string concat, length, prefix, suffix, contains, at, extract, indexof and replace, plus exact symbolic empty-relation identities, concat-empty, replace-pattern-with-itself, negative-index, empty-needle zero-index and nonpositive-extract boundary results with arbitrary-precision index guards and definitive satisfiability (src/smt/theory_seq.cpp:3137-3285,3313-3740,4464-4725)",
+          "name": "complete ground evaluation for nested string concat, length, prefix, suffix, contains, at, extract, indexof and replace, plus exact symbolic reflexive and empty-relation identities, concat-empty, replace-pattern-with-itself, negative-index, empty-needle zero-index and nonpositive-extract boundary results with arbitrary-precision index guards and definitive satisfiability (src/smt/theory_seq.cpp:3137-3285,3313-3740,4464-4725)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_ground.go",
           "tests": ["TestSMTSequenceTheoryGroundOperationsAreComplete"]
