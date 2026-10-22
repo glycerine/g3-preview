@@ -105569,9 +105569,15 @@
       "path": "src/smt/smt_for_each_relevant_expr.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_relevant_expr.go"
+      ],
+      "tests": [
+        "TestSMTCheckAtLabelsSourcePolarityPaths",
+        "TestSMTRelevantExprTraversalChoosesJustifyingBranchesAndCaches",
+        "TestSMTRelevantExprLabelCollectors"
+      ],
       "assertions": [
         {
           "line": 152,
@@ -105582,19 +105588,54 @@
           "text": "SASSERT(is_relevant(arg));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "polarity-sensitive at-label path checker",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevant_expr.go",
+          "tests": [
+            "TestSMTCheckAtLabelsSourcePolarityPaths"
+          ]
+        },
+        {
+          "name": "relevant expression traversal with assignment-directed and, or, and ite children",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevant_expr.go",
+          "tests": [
+            "TestSMTRelevantExprTraversalChoosesJustifyingBranchesAndCaches"
+          ]
+        },
+        {
+          "name": "relevant positive label-literal and polarity-matched label collectors",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevant_expr.go",
+          "tests": [
+            "TestSMTRelevantExprLabelCollectors"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTRelevantExprContext borrows its AST manager and stores AST handles as context-owned relevance, internalization, assignment, and traversal-cache keys."
+      ],
+      "deviations": [
+        "The source virtual visitor hierarchy is represented by one typed AST-handle visitor and explicit label collection methods; the later SMT context can own and update this concrete state component."
+      ]
     },
     {
       "path": "src/smt/smt_for_each_relevant_expr.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_relevant_expr.go"
+      ],
+      "tests": [
+        "TestSMTCheckAtLabelsSourcePolarityPaths",
+        "TestSMTRelevantExprTraversalChoosesJustifyingBranchesAndCaches",
+        "TestSMTRelevantExprLabelCollectors"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -105605,11 +105646,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "check_at_labels, for_each_relevant_expr, and concrete label collector interfaces",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevant_expr.go",
+          "tests": [
+            "TestSMTCheckAtLabelsSourcePolarityPaths",
+            "TestSMTRelevantExprTraversalChoosesJustifyingBranchesAndCaches",
+            "TestSMTRelevantExprLabelCollectors"
+          ]
+        }
+      ],
+      "ownership": [
+        "The traversal borrows context AST handles and owns its native Go cache and work slices."
+      ],
+      "deviations": [
+        "Go methods return errors for source assertions and unreachable assignment states."
+      ]
     },
     {
       "path": "src/smt/smt_implied_equalities.cpp",
