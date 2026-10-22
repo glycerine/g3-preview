@@ -98727,7 +98727,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_diff_graph_rational.go",
-        "pkg/smtcore/smt_diff_graph_rational_test.go"
+        "pkg/smtcore/smt_diff_graph_rational_test.go",
+        "pkg/smtcore/smt_diff_graph_inf_rational.go",
+        "pkg/smtcore/smt_diff_graph_inf_rational_test.go"
       ],
       "tests": [
         "TestSMTRationalDiffGraphFeasibleActivationAndAssignment",
@@ -98738,7 +98740,10 @@
         "TestSMTRationalDiffGraphLazySubsumptionExplanationTimestamp",
         "TestSMTRationalDiffGraphZeroSCCReachabilityAndTraversal",
         "TestSMTRationalDiffGraphAssignmentMutationTimestampAndReset",
-        "TestSMTRationalDiffGraphShortestZeroPathStrictTimestamp"
+        "TestSMTRationalDiffGraphShortestZeroPathStrictTimestamp",
+        "TestSMTInfRationalLexicographicOrder",
+        "TestSMTInfRationalDiffGraphStrictNegativeCycle",
+        "TestSMTInfRationalDiffGraphAssignmentScopeAndNormalization"
       ],
       "conditionals": [
         {
@@ -99133,14 +99138,20 @@
         },
         {
           "name": "Concrete infinitesimal-rational graph instantiation used by real difference logic",
-          "status": "unported"
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_diff_graph_inf_rational.go",
+          "tests": [
+            "TestSMTInfRationalLexicographicOrder",
+            "TestSMTInfRationalDiffGraphStrictNegativeCycle",
+            "TestSMTInfRationalDiffGraphAssignmentScopeAndNormalization"
+          ]
         }
       ],
       "ownership": [
-        "Graph slices own copied big.Rat assignments, weights and search values. Edge explanations borrow immutable SMTLiteral values. Scope rollback retires enabled edges before truncating adjacency and edge storage."
+        "Graph slices own copied big.Rat or concrete infinitesimal-rational assignments, weights and search values. Edge explanations borrow immutable SMTLiteral values. Scope rollback retires enabled edges before truncating adjacency and edge storage."
       ],
       "deviations": [
-        "The first retained concrete instantiation uses math/big.Rat values directly. No template or STL container is ported; the real-difference-logic infinitesimal instantiation remains open. Invalid source assertion domains return errSMTDiffGraphDomain."
+        "The retained concrete instantiations use math/big.Rat values directly or a pair of owned big.Rat values ordered lexicographically. No template or STL container is ported. The infinitesimal graph exposes only operations reached by real difference logic. Invalid source assertion domains return errSMTDiffGraphDomain."
       ]
     },
     {
