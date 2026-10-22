@@ -552,6 +552,9 @@ func (t *SMTSequenceTheory) Assign(variable int32, value bool) error {
 		}
 		return t.nonContains.Push(expression, dependency)
 	}
+	if op == 3 && !value {
+		return t.addNegativePrefixStep(expression)
+	}
 	return nil
 }
 

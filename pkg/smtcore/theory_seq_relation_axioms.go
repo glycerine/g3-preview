@@ -75,6 +75,95 @@ func (t *SMTSequenceTheory) addNegativeContainsStep(expression ast.ASTHandle) er
 	return t.axioms.Push(constraint)
 }
 
+func (t *SMTSequenceTheory) addNegativePrefixStep(expression ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	boundary, container, matched, err := state.manager.SequenceBinaryOperationArguments(expression, 3)
+	if err != nil || !matched {
+		if err != nil {
+			return err
+		}
+		return ast.ErrASTDomain
+	}
+	if err = t.addSequenceCoherenceAxiom(boundary); err != nil {
+		return err
+	}
+	if err = t.addSequenceCoherenceAxiom(container); err != nil {
+		return err
+	}
+	sort, err := state.manager.GetSort(boundary)
+	if err != nil {
+		return err
+	}
+	elementSort, sequence, err := state.manager.SequenceSortElement(sort)
+	if err != nil || !sequence {
+		if err != nil {
+			return err
+		}
+		return ast.ErrASTDomain
+	}
+	empty, err := state.manager.MkSequenceEmpty(sort)
+	if err != nil {
+		return err
+	}
+	containerEmpty, err := state.manager.MkEq(container, empty)
+	if err != nil {
+		return err
+	}
+	zero, err := t.integer(0)
+	if err != nil {
+		return err
+	}
+	boundaryHead, err := t.relationSkolem("seq.nth", []ast.ASTHandle{boundary, zero}, elementSort)
+	if err != nil {
+		return err
+	}
+	containerHead, err := t.relationSkolem("seq.nth", []ast.ASTHandle{container, zero}, elementSort)
+	if err != nil {
+		return err
+	}
+	boundaryTail, err := t.relationSkolem("seq.tail", []ast.ASTHandle{boundary, zero}, sort)
+	if err != nil {
+		return err
+	}
+	containerTail, err := t.relationSkolem("seq.tail", []ast.ASTHandle{container, zero}, sort)
+	if err != nil {
+		return err
+	}
+	headsEqual, err := state.manager.MkEq(boundaryHead, containerHead)
+	if err != nil {
+		return err
+	}
+	headsDistinct, err := state.manager.MkNot(headsEqual)
+	if err != nil {
+		return err
+	}
+	tailPrefix, err := state.manager.MkSequencePrefix(boundaryTail, containerTail)
+	if err != nil {
+		return err
+	}
+	notTailPrefix, err := state.manager.MkNot(tailPrefix)
+	if err != nil {
+		return err
+	}
+	step, err := state.manager.MkOrArray([]ast.ASTHandle{containerEmpty, headsDistinct, notTailPrefix})
+	if err != nil {
+		return err
+	}
+	notPrefix, err := state.manager.MkNot(expression)
+	if err != nil {
+		return err
+	}
+	constraint, err := state.manager.MkImplies(notPrefix, step)
+	if err != nil {
+		return err
+	}
+	t.trackInternalTerms(boundaryHead, containerHead, boundaryTail, containerTail, tailPrefix)
+	return t.axioms.Push(constraint)
+}
+
 func (t *SMTSequenceTheory) addRelationAxioms(expression ast.ASTHandle, operation int32) error {
 	state, err := t.State()
 	if err != nil {
