@@ -473,6 +473,118 @@ func (t *SMTBitVectorTheory) unsignedDivRem(left, right []ast.ASTHandle) ([]ast.
 	return quotient, partial, nil
 }
 
+func (t *SMTBitVectorTheory) muxBits(condition ast.ASTHandle, whenTrue, whenFalse []ast.ASTHandle) ([]ast.ASTHandle, error) {
+	if len(whenTrue) == 0 || len(whenTrue) != len(whenFalse) {
+		return nil, ast.ErrASTDomain
+	}
+	notCondition, err := t.boolNot(condition)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]ast.ASTHandle, len(whenTrue))
+	for i := range result {
+		selectedTrue, gateErr := t.boolAnd(condition, whenTrue[i])
+		if gateErr != nil {
+			return nil, gateErr
+		}
+		selectedFalse, gateErr := t.boolAnd(notCondition, whenFalse[i])
+		if gateErr != nil {
+			return nil, gateErr
+		}
+		result[i], gateErr = t.boolOr(selectedTrue, selectedFalse)
+		if gateErr != nil {
+			return nil, gateErr
+		}
+	}
+	return result, t.retainTemporary(result)
+}
+
+func (t *SMTBitVectorTheory) absoluteBits(bits []ast.ASTHandle) ([]ast.ASTHandle, error) {
+	if len(bits) == 0 {
+		return nil, ast.ErrASTDomain
+	}
+	negated, err := t.negateBits(bits)
+	if err != nil {
+		return nil, err
+	}
+	return t.muxBits(bits[len(bits)-1], negated, bits)
+}
+
+func (t *SMTBitVectorTheory) signedDivRemMod(left, right []ast.ASTHandle) ([]ast.ASTHandle, []ast.ASTHandle, []ast.ASTHandle, error) {
+	if len(left) == 0 || len(left) != len(right) {
+		return nil, nil, nil, ast.ErrASTDomain
+	}
+	absLeft, err := t.absoluteBits(left)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	absRight, err := t.absoluteBits(right)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	unsignedQuotient, unsignedRemainder, err := t.unsignedDivRem(absLeft, absRight)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	negatedQuotient, err := t.negateBits(unsignedQuotient)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	sameSign, err := t.boolIff(left[len(left)-1], right[len(right)-1])
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	quotient, err := t.muxBits(sameSign, unsignedQuotient, negatedQuotient)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	negatedRemainder, err := t.negateBits(unsignedRemainder)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	remainder, err := t.muxBits(left[len(left)-1], negatedRemainder, unsignedRemainder)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	negativeRemainderPlusDivisor, err := t.addBits(negatedRemainder, right)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	remainderPlusDivisor, err := t.addBits(unsignedRemainder, right)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	negativeDivisorCases, err := t.muxBits(right[len(right)-1], negatedRemainder, negativeRemainderPlusDivisor)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	positiveDividendCases, err := t.muxBits(right[len(right)-1], remainderPlusDivisor, unsignedRemainder)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	modulusBody, err := t.muxBits(left[len(left)-1], negativeDivisorCases, positiveDividendCases)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	state, _ := t.State()
+	zero := make([]ast.ASTHandle, len(left))
+	for i := range zero {
+		zero[i], err = state.manager.MkFalse()
+		if err != nil {
+			return nil, nil, nil, err
+		}
+	}
+	remainderIsZero, err := t.equalBits(unsignedRemainder, zero)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	modulus, err := t.muxBits(remainderIsZero, unsignedRemainder, modulusBody)
+	return quotient, remainder, modulus, err
+}
+
 func (t *SMTBitVectorTheory) unsignedBits(value uint64, width int) ([]ast.ASTHandle, error) {
 	state, _ := t.State()
 	result := make([]ast.ASTHandle, width)
@@ -810,6 +922,19 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 	case 6:
 		bits, err := t.acBits(arguments, t.multiplyBits)
 		return bits, true, err
+	case 17, 19, 21:
+		if len(arguments) != 2 {
+			return nil, true, ast.ErrASTDomain
+		}
+		quotient, remainder, modulus, err := t.signedDivRemMod(arguments[0], arguments[1])
+		switch operation {
+		case 17:
+			return quotient, true, err
+		case 19:
+			return remainder, true, err
+		default:
+			return modulus, true, err
+		}
 	case 18, 20:
 		if len(arguments) != 2 {
 			return nil, true, ast.ErrASTDomain

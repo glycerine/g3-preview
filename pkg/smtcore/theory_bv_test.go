@@ -136,9 +136,7 @@ func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
 	astTestMust(t, err)
 	left, err := m.MkConst(astTestSymbol(t, m, "unsupported-div-left"), sort)
 	astTestMust(t, err)
-	right, err := m.MkConst(astTestSymbol(t, m, "unsupported-div-right"), sort)
-	astTestMust(t, err)
-	division, err := m.MkBitVectorSRem(left, right)
+	division, err := m.MkBitVectorSRemZero(left)
 	astTestMust(t, err)
 	astTestMust(t, m.IncRef(division))
 	equality, err := m.MkEq(division, left)
@@ -183,6 +181,62 @@ func TestSMTBitVectorUnsignedDivisionCircuit(t *testing.T) {
 	astTestMust(t, err)
 	if status != lbool.False {
 		t.Fatal("unsigned division circuit", status)
+	}
+}
+
+func TestSMTBitVectorSignedDivisionCircuits(t *testing.T) {
+	for _, test := range []struct {
+		name        string
+		left, right uint64
+		want        uint64
+		build       func(*ast.ASTManager, ast.ASTHandle, ast.ASTHandle) (ast.ASTHandle, error)
+	}{
+		{"division", 9, 3, 14, func(m *ast.ASTManager, a, b ast.ASTHandle) (ast.ASTHandle, error) {
+			return m.MkBitVectorSDivInternal(a, b)
+		}},
+		{"remainder", 9, 3, 15, func(m *ast.ASTManager, a, b ast.ASTHandle) (ast.ASTHandle, error) {
+			return m.MkBitVectorSRemInternal(a, b)
+		}},
+		{"modulus", 9, 3, 2, func(m *ast.ASTManager, a, b ast.ASTHandle) (ast.ASTHandle, error) {
+			return m.MkBitVectorSModInternal(a, b)
+		}},
+		{"negative-divisor-modulus", 7, 13, 14, func(m *ast.ASTManager, a, b ast.ASTHandle) (ast.ASTHandle, error) {
+			return m.MkBitVectorSModInternal(a, b)
+		}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, _, solver := smtBVSolver(t)
+			leftValue, err := m.BitVectorNumeralUint64(test.left, 4)
+			astTestMust(t, err)
+			sort, err := m.GetSort(leftValue)
+			astTestMust(t, err)
+			left, err := m.MkConst(astTestSymbol(t, m, "bv-signed-div-left"), sort)
+			astTestMust(t, err)
+			right, err := m.MkConst(astTestSymbol(t, m, "bv-signed-div-right"), sort)
+			astTestMust(t, err)
+			operation, err := test.build(m, left, right)
+			astTestMust(t, err)
+			rightValue, err := m.BitVectorNumeralUint64(test.right, 4)
+			astTestMust(t, err)
+			want, err := m.BitVectorNumeralUint64(test.want, 4)
+			astTestMust(t, err)
+			leftEquality, err := m.MkEq(left, leftValue)
+			astTestMust(t, err)
+			rightEquality, err := m.MkEq(right, rightValue)
+			astTestMust(t, err)
+			resultEquality, err := m.MkEq(operation, want)
+			astTestMust(t, err)
+			wrongResult, err := m.MkNot(resultEquality)
+			astTestMust(t, err)
+			for _, assertion := range []ast.ASTHandle{leftEquality, rightEquality, wrongResult} {
+				astTestMust(t, solver.Assert(assertion))
+			}
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("signed division-family circuit", status)
+			}
+		})
 	}
 }
 

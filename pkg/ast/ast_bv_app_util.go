@@ -33,6 +33,24 @@ func (m *ASTManager) MkBitVectorUDivInternal(left, right ASTHandle) (ASTHandle, 
 	return m.mkBitVectorUtilityApp(18, []ASTHandle{left, right})
 }
 
+func (m *ASTManager) MkBitVectorSDivInternal(left, right ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(17, []ASTHandle{left, right})
+}
+
+func (m *ASTManager) MkBitVectorSRemInternal(left, right ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(19, []ASTHandle{left, right})
+}
+
+func (m *ASTManager) MkBitVectorSModInternal(left, right ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(21, []ASTHandle{left, right})
+}
+
+// MkBitVectorSRemZero is the source's uninterpreted value for signed
+// remainder by zero.
+func (m *ASTManager) MkBitVectorSRemZero(arg ASTHandle) (ASTHandle, error) {
+	return m.mkBitVectorUtilityApp(14, []ASTHandle{arg})
+}
+
 func (m *ASTManager) MkBitVectorSRem(left, right ASTHandle) (ASTHandle, error) {
 	return m.mkBitVectorUtilityApp(9, []ASTHandle{left, right})
 }

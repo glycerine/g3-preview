@@ -26,6 +26,10 @@ func TestASTBitVectorOriginalApplicationConstructors(t *testing.T) {
 		{23, false, m.MkBitVectorSLE},
 		{10, false, m.MkBitVectorURem},
 		{9, false, m.MkBitVectorSRem},
+		{17, false, m.MkBitVectorSDivInternal},
+		{18, false, m.MkBitVectorUDivInternal},
+		{19, false, m.MkBitVectorSRemInternal},
+		{21, false, m.MkBitVectorSModInternal},
 		{4, false, m.MkBitVectorAdd},
 		{5, false, m.MkBitVectorSub},
 		{6, false, m.MkBitVectorMul},
@@ -69,7 +73,7 @@ func TestASTBitVectorOriginalApplicationConstructors(t *testing.T) {
 	for _, test := range []struct {
 		kind  int32
 		build func(ASTHandle) (ASTHandle, error)
-	}{{32, m.MkBitVectorNot}, {3, m.MkBitVectorNeg}} {
+	}{{32, m.MkBitVectorNot}, {3, m.MkBitVectorNeg}, {14, m.MkBitVectorSRemZero}} {
 		expected, e := m.MkFamilyApp(fid, test.kind, nil, []ASTHandle{x})
 		astTestMust(t, e)
 		astTestPin(t, m, expected)
