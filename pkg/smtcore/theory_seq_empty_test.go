@@ -721,6 +721,106 @@ func TestSMTSequenceTheoryIndexAxioms(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryReplaceAxioms(t *testing.T) {
+	t.Run("empty-needle", func(t *testing.T) {
+		m, modelConfig := smtModelGeneratorFixture(t)
+		empty, err := m.MkString("")
+		astTestMust(t, err)
+		sort, err := m.GetSort(empty)
+		astTestMust(t, err)
+		source, err := m.MkConst(astTestSymbol(t, m, "sequence-replace-empty-source"), sort)
+		astTestMust(t, err)
+		replacement, err := m.MkConst(astTestSymbol(t, m, "sequence-replace-empty-value"), sort)
+		astTestMust(t, err)
+		result, err := m.MkSequenceReplace(source, empty, replacement)
+		astTestMust(t, err)
+		word, err := m.MkSequenceConcat(replacement, source)
+		astTestMust(t, err)
+		equality, err := m.MkEq(result, word)
+		astTestMust(t, err)
+		contradiction, err := m.MkNot(equality)
+		astTestMust(t, err)
+		solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, solver.Close()) })
+		astTestMust(t, solver.Assert(contradiction))
+		status, err := solver.CheckSat(nil)
+		astTestMust(t, err)
+		if status != lbool.False {
+			t.Fatal("empty needle replacement", status)
+		}
+	})
+
+	for _, found := range []bool{false, true} {
+		name := "absent"
+		if found {
+			name = "found"
+		}
+		t.Run(name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			empty, err := m.MkString("")
+			astTestMust(t, err)
+			sort, err := m.GetSort(empty)
+			astTestMust(t, err)
+			source, err := m.MkConst(astTestSymbol(t, m, "sequence-replace-source-"+name), sort)
+			astTestMust(t, err)
+			needle, err := m.MkConst(astTestSymbol(t, m, "sequence-replace-needle-"+name), sort)
+			astTestMust(t, err)
+			replacement, err := m.MkConst(astTestSymbol(t, m, "sequence-replace-value-"+name), sort)
+			astTestMust(t, err)
+			result, err := m.MkSequenceReplace(source, needle, replacement)
+			astTestMust(t, err)
+			contains, err := m.MkSequenceContains(source, needle)
+			astTestMust(t, err)
+			assertion := contains
+			want := source
+			if found {
+				prefixName, makeErr := m.Symbols.Intern("seq.indexof_left")
+				astTestMust(t, makeErr)
+				prefix, makeErr := m.MkSequenceSkolem(prefixName, []ast.ASTHandle{source, needle}, sort)
+				astTestMust(t, makeErr)
+				suffixName, makeErr := m.Symbols.Intern("seq.indexof_right")
+				astTestMust(t, makeErr)
+				suffix, makeErr := m.MkSequenceSkolem(suffixName, []ast.ASTHandle{source, needle}, sort)
+				astTestMust(t, makeErr)
+				tail, makeErr := m.MkSequenceConcat(replacement, suffix)
+				astTestMust(t, makeErr)
+				want, makeErr = m.MkSequenceConcat(prefix, tail)
+				astTestMust(t, makeErr)
+			} else {
+				assertion, err = m.MkNot(contains)
+				astTestMust(t, err)
+			}
+			equality, err := m.MkEq(result, want)
+			astTestMust(t, err)
+			notEquality, err := m.MkNot(equality)
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.Assert(assertion))
+			if found {
+				sourceEmpty, makeErr := m.MkEq(source, empty)
+				astTestMust(t, makeErr)
+				needleEmpty, makeErr := m.MkEq(needle, empty)
+				astTestMust(t, makeErr)
+				notSourceEmpty, makeErr := m.MkNot(sourceEmpty)
+				astTestMust(t, makeErr)
+				notNeedleEmpty, makeErr := m.MkNot(needleEmpty)
+				astTestMust(t, makeErr)
+				astTestMust(t, solver.Assert(notSourceEmpty))
+				astTestMust(t, solver.Assert(notNeedleEmpty))
+			}
+			astTestMust(t, solver.Assert(notEquality))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("replace definition", status)
+			}
+		})
+	}
+}
+
 func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name  string
