@@ -110876,12 +110876,16 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_arith_tableau.go"
+        "pkg/smtcore/theory_arith_tableau.go",
+        "pkg/smtcore/theory_arith_bounds.go"
       ],
       "tests": [
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
         "TestSMTArithmeticRowAndColumnCompressionRepairCrossIndices",
-        "TestSMTArithmeticColumnHoleReuseAndSingletonCompression"
+        "TestSMTArithmeticColumnHoleReuseAndSingletonCompression",
+        "TestSMTArithmeticValueLexicographicAndAtomComplements",
+        "TestSMTArithmeticAntecedentAndDerivedCoefficients",
+        "TestSMTArithmeticBoundTrailEncoding"
       ],
       "conditionals": [
         {
@@ -111007,6 +111011,16 @@
             "TestSMTArithmeticRowAndColumnCompressionRepairCrossIndices",
             "TestSMTArithmeticColumnHoleReuseAndSingletonCompression"
           ]
+        },
+        {
+          "name": "antecedents, bounds, atoms, derived bounds, variable metadata and bound trail declarations",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_bounds.go",
+          "tests": [
+            "TestSMTArithmeticValueLexicographicAndAtomComplements",
+            "TestSMTArithmeticAntecedentAndDerivedCoefficients",
+            "TestSMTArithmeticBoundTrailEncoding"
+          ]
         }
       ],
       "ownership": [],
@@ -111019,14 +111033,18 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_arith_tableau.go",
-        "pkg/smtcore/smt_farkas_util.go"
+        "pkg/smtcore/smt_farkas_util.go",
+        "pkg/smtcore/theory_arith_bounds.go"
       ],
       "tests": [
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
         "TestSMTArithmeticRowAndColumnCompressionRepairCrossIndices",
         "TestSMTArithmeticColumnHoleReuseAndSingletonCompression",
         "TestSMTFarkasIntegerNormalizationAndConsequence",
-        "TestSMTFarkasSplitDisconnectedLiterals"
+        "TestSMTFarkasSplitDisconnectedLiterals",
+        "TestSMTArithmeticValueLexicographicAndAtomComplements",
+        "TestSMTArithmeticAntecedentAndDerivedCoefficients",
+        "TestSMTArithmeticBoundTrailEncoding"
       ],
       "conditionals": [
         {
@@ -111424,6 +111442,16 @@
           "tests": [
             "TestSMTFarkasIntegerNormalizationAndConsequence",
             "TestSMTFarkasSplitDisconnectedLiterals"
+          ]
+        },
+        {
+          "name": "antecedent reset/push, atom assignment complements and derived-bound proof coefficient propagation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_bounds.go",
+          "tests": [
+            "TestSMTArithmeticValueLexicographicAndAtomComplements",
+            "TestSMTArithmeticAntecedentAndDerivedCoefficients",
+            "TestSMTArithmeticBoundTrailEncoding"
           ]
         }
       ],

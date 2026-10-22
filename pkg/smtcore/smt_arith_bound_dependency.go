@@ -7,6 +7,9 @@ package smtcore
 // explanations. Its bound payload is filled by the arithmetic-theory port.
 type smtArithmeticBound struct {
 	variable SMTTheoryVar
+	value    smtArithmeticValue
+	kind     smtArithmeticBoundKind
+	atom     bool
 }
 
 type smtArithmeticBoundDependency struct {
