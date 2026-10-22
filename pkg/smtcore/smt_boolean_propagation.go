@@ -99,20 +99,31 @@ func (s *SMTInternalizerState) SetTheoryConflict(theory SMTTheoryID, literals []
 }
 
 func (s *SMTInternalizerState) makeClause(literals []SMTLiteral, kind SMTClauseKind, proof ast.ASTHandle) (*SMTClause, SMTJustification, error) {
+	return s.makeClauseWithDeleteHandler(literals, kind, proof, nil)
+}
+
+func (s *SMTInternalizerState) makeClauseWithDeleteHandler(literals []SMTLiteral, kind SMTClauseKind, proof ast.ASTHandle, deleteHandler SMTClauseDeleteHandler) (*SMTClause, SMTJustification, error) {
+	return s.makeClauseWithJustificationAndDeleteHandler(literals, kind, proof, nil, deleteHandler)
+}
+
+func (s *SMTInternalizerState) makeClauseWithJustificationAndDeleteHandler(literals []SMTLiteral, kind SMTClauseKind, proof ast.ASTHandle, justification SMTJustification, deleteHandler SMTClauseDeleteHandler) (*SMTClause, SMTJustification, error) {
 	proofs, err := s.manager.ProofsEnabled()
 	if err != nil {
 		return nil, nil, err
 	}
-	var owner SMTJustification
+	if !proof.IsNull() && justification != nil {
+		return nil, nil, ast.ErrASTDomain
+	}
+	owner := justification
 	if !proof.IsNull() {
 		owner, err = NewSMTJustificationProofWrapper(s.manager, proof, true)
 		if err != nil {
 			return nil, nil, err
 		}
-	} else if proofs {
+	} else if proofs && owner == nil {
 		owner = &SMTJustificationBase{heap: kind != SMTClauseAux}
 	}
-	clause, err := NewSMTClause(s.manager, literals, kind, owner, nil, false, nil)
+	clause, err := NewSMTClause(s.manager, literals, kind, owner, deleteHandler, false, nil)
 	if err != nil {
 		if owner != nil {
 			err = errors.Join(err, owner.Release(s.manager))
@@ -159,10 +170,12 @@ func (s *SMTInternalizerState) closeClause(record *SMTInternalizedClause) error 
 		}
 	}
 	var result error
-	if record.owner != nil {
+	// Auxiliary clauses do not own their optional proof justification. Lemma
+	// clauses do, so their record only keeps a non-owning interface reference.
+	if record.owner != nil && !record.clause.IsLemma() {
 		result = errors.Join(result, record.owner.Release(s.manager))
-		record.owner = nil
 	}
+	record.owner = nil
 	result = errors.Join(result, record.clause.Close())
 	record.clause = nil
 	return result

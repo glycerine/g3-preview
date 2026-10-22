@@ -22,6 +22,7 @@ func TestSMTDynamicAckManagerBuildsPairAndTripleClauses(t *testing.T) {
 	config.Factor = 1
 	config.Equalities = true
 	astTestMust(t, state.ConfigureDynamicAck(config))
+	astTestMust(t, state.PushScope())
 	astTestMust(t, state.dynamicAck.schedule.conflictCongruence(applications[0], applications[1], dynAckRoot))
 	astTestMust(t, state.dynamicAck.schedule.usedEquality(applications[0], applications[1], applications[2], true))
 	state.statistics.NumConflicts = 2
@@ -41,4 +42,57 @@ func TestSMTDynamicAckManagerBuildsPairAndTripleClauses(t *testing.T) {
 	if _, found := state.dynamicAck.triples.instantiated[triple]; !found {
 		t.Fatal("triple instantiation was not retained")
 	}
+	astTestMust(t, state.PopScopes(1))
+	if _, found := state.dynamicAck.pairs.instantiated[pair]; found {
+		t.Fatal("deleted pair clause retained its instantiation")
+	}
+	if _, found := state.dynamicAck.triples.instantiated[triple]; found {
+		t.Fatal("deleted triple clause retained its instantiation")
+	}
+	if state.statistics.NumDelDynAck != 2 {
+		t.Fatal("dynamic Ackermann deletion statistics", state.statistics.NumDelDynAck)
+	}
+}
+
+func TestSMTDynamicAckManagerBuildsClauseProof(t *testing.T) {
+	manager := astTestManager(t)
+	astTestMust(t, manager.ToggleProofMode(ast.ASTProofEnabled))
+	sort, values := smtUFConstants(t, manager, "dynamic-ack-proof-", 4)
+	function, err := manager.MkFuncDecl(astTestSymbol(t, manager, "dynamic-ack-proof-f"), []ast.ASTHandle{sort, sort}, sort, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	first, err := manager.MkApp(function, []ast.ASTHandle{values[0], values[1]})
+	astTestMust(t, err)
+	second, err := manager.MkApp(function, []ast.ASTHandle{values[2], values[3]})
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, manager, nil)
+	config := defaultSMTDynAckState()
+	config.Threshold = 1
+	config.Factor = 1
+	astTestMust(t, state.ConfigureDynamicAck(config))
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.dynamicAck.schedule.conflictCongruence(first, second, dynAckRoot))
+	state.statistics.NumConflicts = 1
+	progress, err := state.dynamicAck.propagate()
+	astTestMust(t, err)
+	if !progress || len(state.clauses) != 1 || state.clauses[0].clause == nil {
+		t.Fatal("dynamic Ackermann proof clause", progress, len(state.clauses))
+	}
+	clause := state.clauses[0].clause
+	if _, ok := clause.justification.(*smtDynamicAckJustification); !ok {
+		t.Fatalf("dynamic Ackermann justification %T", clause.justification)
+	}
+	builder := &smtConflictProofBuilder{
+		state: state, marked: make(map[int32]struct{}), literal: make(map[SMTLiteral]ast.ASTHandle),
+		objects: make(map[SMTJustification]ast.ASTHandle), equality: make(map[smtEnodePairKey]ast.ASTHandle),
+	}
+	proof, err := builder.clauseProof(clause)
+	astTestMust(t, err)
+	fact, err := manager.GetProofFact(proof)
+	astTestMust(t, err)
+	want, err := builder.theoryFact(clause.literals)
+	astTestMust(t, err)
+	if fact != want {
+		t.Fatal("dynamic Ackermann proof fact", fact, want)
+	}
+	astTestMust(t, state.PopScopes(1))
 }

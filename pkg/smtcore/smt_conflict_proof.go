@@ -338,6 +338,8 @@ func (b *smtConflictProofBuilder) objectProof(object SMTJustification) (ast.ASTH
 	switch value := object.(type) {
 	case *SMTJustificationProofWrapper:
 		proof, err = value.Proof()
+	case *smtDynamicAckJustification:
+		proof, err = b.dynamicAckProof(value)
 	case *SMTUnitResolutionJustification:
 		if value.Antecedent == nil {
 			return ast.ASTHandle{}, ast.ErrASTDomain
@@ -617,6 +619,89 @@ func (b *smtConflictProofBuilder) objectProof(object SMTJustification) (ast.ASTH
 		b.objects[object] = proof
 	}
 	return proof, err
+}
+
+func (b *smtConflictProofBuilder) dynamicAckProof(justification *smtDynamicAckJustification) (ast.ASTHandle, error) {
+	if justification == nil || justification.first.IsNull() || justification.second.IsNull() {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	count, err := b.state.manager.GetNumArgs(justification.first)
+	if err != nil || count == 0 {
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	otherCount, err := b.state.manager.GetNumArgs(justification.second)
+	if err != nil || otherCount != count {
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	parents := make([]ast.ASTHandle, 0, count)
+	literals := make([]ast.ASTHandle, 0, count+1)
+	seen := make(map[ast.ASTHandle]struct{}, count)
+	for index := uint32(0); index < count; index++ {
+		first, e := b.state.manager.GetArg(justification.first, index)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		second, e := b.state.manager.GetArg(justification.second, index)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if first == second {
+			continue
+		}
+		equality, e := b.state.manager.MkEq(first, second)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		negated, e := b.state.manager.MkNot(equality)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if _, found := seen[negated]; found {
+			continue
+		}
+		seen[negated] = struct{}{}
+		literals = append(literals, negated)
+		hypothesis, e := b.state.manager.MkProofHypothesis(equality)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		parents = append(parents, hypothesis)
+	}
+	if len(parents) == 0 {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	congruence, err := b.state.manager.MkProofCongruence(justification.first, justification.second, parents)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	conclusion, err := b.state.manager.MkEq(justification.first, justification.second)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negatedConclusion, err := b.state.manager.MkNot(conclusion)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negatedHypothesis, err := b.state.manager.MkProofHypothesis(negatedConclusion)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	contradiction, err := b.state.manager.MkProofUnitResolution([]ast.ASTHandle{congruence, negatedHypothesis})
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	literals = append(literals, conclusion)
+	lemma, err := b.state.manager.MkOrArgs(literals)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return b.state.manager.MkProofLemma(contradiction, lemma)
 }
 
 func (r *SMTConflictResolver) conflictProof(conflict SMTBooleanJustification, notLiteral SMTLiteral, lemma []SMTLiteral) (ast.ASTHandle, error) {

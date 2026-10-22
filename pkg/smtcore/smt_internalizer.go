@@ -103,6 +103,14 @@ func (s *SMTInternalizerState) addClause(literals []SMTLiteral, root bool, proof
 }
 
 func (s *SMTInternalizerState) addClauseKind(literals []SMTLiteral, root bool, kind SMTClauseKind, proof ast.ASTHandle) error {
+	return s.addClauseKindWithDeleteHandler(literals, root, kind, proof, nil)
+}
+
+func (s *SMTInternalizerState) addClauseKindWithDeleteHandler(literals []SMTLiteral, root bool, kind SMTClauseKind, proof ast.ASTHandle, deleteHandler SMTClauseDeleteHandler) error {
+	return s.addClauseKindWithJustificationAndDeleteHandler(literals, root, kind, proof, nil, deleteHandler)
+}
+
+func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(literals []SMTLiteral, root bool, kind SMTClauseKind, proof ast.ASTHandle, justification SMTJustification, deleteHandler SMTClauseDeleteHandler) error {
 	if s.inconsistent {
 		return nil
 	}
@@ -158,7 +166,7 @@ func (s *SMTInternalizerState) addClauseKind(literals []SMTLiteral, root bool, k
 		s.statistics.NumMkBinClause++
 		return nil
 	}
-	clause, owner, err := s.makeClause(kept, kind, proof)
+	clause, owner, err := s.makeClauseWithJustificationAndDeleteHandler(kept, kind, proof, justification, deleteHandler)
 	if err != nil {
 		return err
 	}

@@ -18,6 +18,65 @@ type smtDynAckManager struct {
 	closed     bool
 }
 
+// smtDynamicAckJustification is the non-region proof owner attached to a
+// dynamic Ackermann lemma. The pair/triple occurrence state retains both
+// applications for at least as long as the clause remains installed.
+type smtDynamicAckJustification struct {
+	SMTJustificationBase
+	first, second ast.ASTHandle
+}
+
+func newSMTDynamicAckJustification(manager *ast.ASTManager, first, second ast.ASTHandle) (*smtDynamicAckJustification, error) {
+	if manager == nil || first.IsNull() || second.IsNull() || first == second {
+		return nil, ast.ErrASTDomain
+	}
+	firstDecl, err := manager.GetDecl(first)
+	if err != nil {
+		return nil, err
+	}
+	secondDecl, err := manager.GetDecl(second)
+	if err != nil {
+		return nil, err
+	}
+	firstCount, err := manager.GetNumArgs(first)
+	if err != nil {
+		return nil, err
+	}
+	secondCount, err := manager.GetNumArgs(second)
+	if err != nil || firstDecl != secondDecl || firstCount == 0 || firstCount != secondCount {
+		return nil, ast.ErrASTDomain
+	}
+	return &smtDynamicAckJustification{SMTJustificationBase: NewSMTJustificationBase(false), first: first, second: second}, nil
+}
+
+func (*smtDynamicAckJustification) Name() string { return "dyn-ack" }
+
+type smtDynAckPairDeleteHandler struct {
+	manager *smtDynAckManager
+	key     dynAckPair
+}
+
+func (h *smtDynAckPairDeleteHandler) ClauseDeleted(manager *ast.ASTManager, _ *SMTClause) error {
+	if h == nil || h.manager == nil || h.manager.state == nil || manager != h.manager.state.manager {
+		return ast.ErrASTHandle
+	}
+	h.manager.state.statistics.NumDelDynAck++
+	return h.manager.pairs.clauseDeleted(h.key)
+}
+
+type smtDynAckTripleDeleteHandler struct {
+	manager *smtDynAckManager
+	key     dynAckTriple
+}
+
+func (h *smtDynAckTripleDeleteHandler) ClauseDeleted(manager *ast.ASTManager, _ *SMTClause) error {
+	if h == nil || h.manager == nil || h.manager.state == nil || manager != h.manager.state.manager {
+		return ast.ErrASTHandle
+	}
+	h.manager.state.statistics.NumDelDynAck++
+	return h.manager.triples.clauseDeleted(h.key)
+}
+
 func newSMTDynAckManager(state *SMTInternalizerState, config SMTDynAckState) (*smtDynAckManager, error) {
 	if state == nil || state.manager == nil || !validDynAckStrategy(dynAckStrategy(config.Strategy)) {
 		return nil, ast.ErrASTDomain
@@ -91,7 +150,19 @@ func (m *smtDynAckManager) instantiatePair(key dynAckPair) error {
 	if err = m.pairs.markInstantiated(key); err != nil {
 		return err
 	}
-	if err = m.state.addClauseKind(literals, false, SMTClauseAux, ast.ASTHandle{}); err != nil {
+	var justification SMTJustification
+	proofs, err := m.state.manager.ProofsEnabled()
+	if err != nil {
+		return err
+	}
+	if proofs {
+		justification, err = newSMTDynamicAckJustification(m.state.manager, key.first, key.second)
+		if err != nil {
+			return err
+		}
+	}
+	handler := &smtDynAckPairDeleteHandler{manager: m, key: key}
+	if err = m.state.addClauseKindWithJustificationAndDeleteHandler(literals, false, SMTClauseAuxLemma, ast.ASTHandle{}, justification, handler); err != nil {
 		return err
 	}
 	m.state.statistics.NumDynAck++
@@ -114,7 +185,19 @@ func (m *smtDynAckManager) instantiateTriple(key dynAckTriple) error {
 	if err = m.triples.markInstantiated(key); err != nil {
 		return err
 	}
-	if err = m.state.addClauseKind([]SMTLiteral{firstRepresentative.Negated(), secondRepresentative.Negated(), conclusion}, false, SMTClauseAux, ast.ASTHandle{}); err != nil {
+	var justification SMTJustification
+	proofs, err := m.state.manager.ProofsEnabled()
+	if err != nil {
+		return err
+	}
+	if proofs {
+		justification, err = newSMTDynamicAckJustification(m.state.manager, key.first, key.second)
+		if err != nil {
+			return err
+		}
+	}
+	handler := &smtDynAckTripleDeleteHandler{manager: m, key: key}
+	if err = m.state.addClauseKindWithJustificationAndDeleteHandler([]SMTLiteral{firstRepresentative.Negated(), secondRepresentative.Negated(), conclusion}, false, SMTClauseAuxLemma, ast.ASTHandle{}, justification, handler); err != nil {
 		return err
 	}
 	m.state.statistics.NumDynAck++

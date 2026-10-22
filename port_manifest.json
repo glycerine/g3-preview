@@ -99268,7 +99268,7 @@
       "path": "src/smt/dyn_ack.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_dyn_ack_triples.go",
         "pkg/smtcore/smt_dyn_ack_pairs.go",
@@ -99279,7 +99279,8 @@
         "TestDynAckTripleOccurrencesThresholdInstantiationAndReset",
         "TestDynAckPairOccurrencesLiveGCAndOwnedApps",
         "TestDynAckSchedulePairPriorityGCAndCumulativeBudget",
-        "TestSMTDynamicAckManagerBuildsPairAndTripleClauses"
+        "TestSMTDynamicAckManagerBuildsPairAndTripleClauses",
+        "TestSMTDynamicAckManagerBuildsClauseProof"
       ],
       "conditionals": [
         {
@@ -99489,18 +99490,21 @@
           ]
         },
         {
-          "name": "proof-producing dyn_ack_justification and clause-deletion callback after general auxiliary-clause garbage collection",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "proof-producing dyn_ack_justification and clause-deletion callback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_dyn_ack_manager.go",
+          "tests": [
+            "TestSMTDynamicAckManagerBuildsClauseProof",
+            "TestSMTDynamicAckManagerBuildsPairAndTripleClauses"
+          ]
         }
       ],
       "ownership": [
         "The concrete triple app vector retains each first, second and representative AST application once per newly observed row; map/set keys and candidate queue borrow those identities. Search reset releases all retained references in source order.",
-        "The concrete pair app vector retains both application references per new observation row; live GC releases instantiated or decayed rows, and search reset releases remaining rows. Pair maps and candidate queue borrow app identities."
+        "The concrete pair app vector retains both application references per new observation row; live GC releases instantiated or decayed rows, and search reset releases remaining rows. Pair maps, candidate queue, and dynamic-Ackermann proof justifications borrow app identities while their clauses remain installed."
       ],
       "deviations": [
-        "The triple and pair occurrence maps and instantiated sets use native Go maps instead of C++ hashtable storage. The source gc_triples body has no caller and is excluded. Clause-deletion callbacks remain tied to the still-unported general auxiliary-clause garbage collector."
+        "The triple and pair occurrence maps and instantiated sets use native Go maps instead of C++ hashtable storage. The source gc_triples body has no caller and is excluded."
       ]
     },
     {
