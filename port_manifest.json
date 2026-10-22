@@ -41569,12 +41569,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/interp/direct_proof.go"
+        "pkg/interp/direct_proof.go",
+        "pkg/interp/direct_proof_resolution.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
         "TestDirectProofHypothesisReflexivityAndContra",
-        "TestDirectProofArithmeticHypothesisAndGuards"
+        "TestDirectProofArithmeticHypothesisAndGuards",
+        "TestDirectProofLocalResolutionAndSymmetry"
       ],
       "conditionals": [
         {
@@ -41732,6 +41734,14 @@
           ]
         },
         {
+          "name": "local A/B resolution and local symmetry",
+          "status": "ported",
+          "go_target": "pkg/interp/direct_proof_resolution.go",
+          "tests": [
+            "TestDirectProofLocalResolutionAndSymmetry"
+          ]
+        },
+        {
           "name": "resolution and arithmetic proof-term reduction",
           "status": "unported",
           "go_target": "",
@@ -41769,12 +41779,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/interp/direct_proof.go"
+        "pkg/interp/direct_proof.go",
+        "pkg/interp/direct_proof_resolution.go"
       ],
       "tests": [
         "TestDirectProofTermSidesAndAssumptions",
         "TestDirectProofHypothesisReflexivityAndContra",
-        "TestDirectProofArithmeticHypothesisAndGuards"
+        "TestDirectProofArithmeticHypothesisAndGuards",
+        "TestDirectProofLocalResolutionAndSymmetry"
       ],
       "conditionals": [
         {
@@ -41797,6 +41809,14 @@
             "TestDirectProofTermSidesAndAssumptions",
             "TestDirectProofHypothesisReflexivityAndContra",
             "TestDirectProofArithmeticHypothesisAndGuards"
+          ]
+        },
+        {
+          "name": "local A/B resolution and symmetry declarations",
+          "status": "ported",
+          "go_target": "pkg/interp/direct_proof_resolution.go",
+          "tests": [
+            "TestDirectProofLocalResolutionAndSymmetry"
           ]
         },
         {

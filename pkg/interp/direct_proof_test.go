@@ -144,3 +144,35 @@ func TestDirectProofArithmeticHypothesisAndGuards(t *testing.T) {
 		t.Fatal("closed guard", err)
 	}
 }
+
+func TestDirectProofLocalResolutionAndSymmetry(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	falsehood, err := manager.Make(OperatorFalse)
+	interpMust(t, err)
+	resolvedA, err := direct.MakeResolution(p, nil, falsehood, q)
+	interpMust(t, err)
+	if resolvedA != q {
+		t.Fatal("A resolution", resolvedA, q)
+	}
+	resolvedB, err := direct.MakeResolution(q, nil, truth, p)
+	interpMust(t, err)
+	if resolvedB != p {
+		t.Fatal("B resolution", resolvedB, p)
+	}
+	if symmetric, e := direct.MakeSymmetry(p, p, q); e != nil || symmetric != q {
+		t.Fatal("local symmetry", symmetric, e)
+	}
+	mixed, err := manager.Make(OperatorEqual, p, q)
+	interpMust(t, err)
+	if _, err = direct.MakeResolution(mixed, nil, truth, falsehood); !errors.As(err, new(ProofError)) {
+		t.Fatal("mixed resolution boundary", err)
+	}
+	if _, err = direct.MakeSymmetry(mixed, mixed, truth); !errors.As(err, new(ProofError)) {
+		t.Fatal("mixed symmetry boundary", err)
+	}
+}
