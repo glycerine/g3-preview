@@ -131,3 +131,31 @@ func TestSMTBitVectorUnsupportedOperationGivesUnknown(t *testing.T) {
 		t.Fatal("unsupported BV operation", status)
 	}
 }
+
+func TestSMTBitVectorUnsignedComparisonCircuit(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	two, err := m.BitVectorNumeralUint64(2, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(two)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "bv-ule-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "bv-ule-right"), sort)
+	astTestMust(t, err)
+	comparison, err := m.MkBitVectorULE(left, right)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(comparison))
+	one, err := m.BitVectorNumeralUint64(1, 4)
+	astTestMust(t, err)
+	leftValue, err := m.MkEq(left, two)
+	astTestMust(t, err)
+	rightValue, err := m.MkEq(right, one)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(leftValue))
+	astTestMust(t, solver.Assert(rightValue))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("unsigned comparison circuit", status)
+	}
+}

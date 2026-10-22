@@ -202,6 +202,75 @@ func (t *SMTBitVectorTheory) boolXor(left, right ast.ASTHandle) (ast.ASTHandle, 
 	return state.manager.MkXor(left, right)
 }
 
+func (t *SMTBitVectorTheory) boolIff(left, right ast.ASTHandle) (ast.ASTHandle, error) {
+	state, _ := t.State()
+	if left == right {
+		return state.manager.MkTrue()
+	}
+	if state.manager.IsTrue(left) {
+		return right, nil
+	}
+	if state.manager.IsTrue(right) {
+		return left, nil
+	}
+	if state.manager.IsFalse(left) {
+		return t.boolNot(right)
+	}
+	if state.manager.IsFalse(right) {
+		return t.boolNot(left)
+	}
+	return state.manager.MkIff(left, right)
+}
+
+func (t *SMTBitVectorTheory) reduceBits(bits []ast.ASTHandle, and bool) (ast.ASTHandle, error) {
+	if len(bits) == 0 {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	result := bits[0]
+	var err error
+	for i := 1; i < len(bits); i++ {
+		if and {
+			result, err = t.boolAnd(result, bits[i])
+		} else {
+			result, err = t.boolOr(result, bits[i])
+		}
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
+	return result, nil
+}
+
+func (t *SMTBitVectorTheory) unsignedLE(left, right []ast.ASTHandle) (ast.ASTHandle, error) {
+	if len(left) == 0 || len(left) != len(right) {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	state, _ := t.State()
+	result, err := state.manager.MkTrue()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	for i := range left {
+		equal, gateErr := t.boolIff(left[i], right[i])
+		if gateErr != nil {
+			return ast.ASTHandle{}, gateErr
+		}
+		notLeft, gateErr := t.boolNot(left[i])
+		if gateErr != nil {
+			return ast.ASTHandle{}, gateErr
+		}
+		less, gateErr := t.boolAnd(notLeft, right[i])
+		if gateErr != nil {
+			return ast.ASTHandle{}, gateErr
+		}
+		result, gateErr = state.manager.MkIte(equal, result, less)
+		if gateErr != nil {
+			return ast.ASTHandle{}, gateErr
+		}
+	}
+	return result, nil
+}
+
 func (t *SMTBitVectorTheory) addBits(left, right []ast.ASTHandle) ([]ast.ASTHandle, error) {
 	if len(left) == 0 || len(left) != len(right) {
 		return nil, ast.ErrASTDomain
@@ -308,6 +377,20 @@ func (t *SMTBitVectorTheory) parameter(expression ast.ASTHandle, index int) (val
 
 func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation int32) ([]ast.ASTHandle, bool, error) {
 	state, _ := t.State()
+	if operation == 56 {
+		count, err := state.manager.GetNumArgs(expression)
+		if err != nil {
+			return nil, true, err
+		}
+		bits := make([]ast.ASTHandle, count)
+		for i := range bits {
+			bits[i], err = state.manager.GetArg(expression, uint32(i))
+			if err != nil {
+				return nil, true, err
+			}
+		}
+		return bits, true, nil
+	}
 	arguments, err := t.argumentBits(expression)
 	if err != nil {
 		return nil, false, err
@@ -410,9 +493,64 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 			return nil, true, ast.ErrASTDomain
 		}
 		return append([]ast.ASTHandle(nil), arguments[0][low:high+1]...), true, nil
+	case 42, 43:
+		if len(arguments) != 1 {
+			return nil, true, ast.ErrASTDomain
+		}
+		bit, err := t.reduceBits(arguments[0], operation == 43)
+		return []ast.ASTHandle{bit}, true, err
+	case 44:
+		if len(arguments) != 2 || len(arguments[0]) != len(arguments[1]) {
+			return nil, true, ast.ErrASTDomain
+		}
+		equalities := make([]ast.ASTHandle, len(arguments[0]))
+		for i := range equalities {
+			equalities[i], err = t.boolIff(arguments[0][i], arguments[1][i])
+			if err != nil {
+				return nil, true, err
+			}
+		}
+		bit, err := t.reduceBits(equalities, true)
+		return []ast.ASTHandle{bit}, true, err
 	default:
 		return nil, false, nil
 	}
+}
+
+func (t *SMTBitVectorTheory) bridgeAtom(expression, definition ast.ASTHandle) (bool, error) {
+	state, _ := t.State()
+	if err := state.Internalize(definition, true); err != nil {
+		return false, err
+	}
+	variable, found := state.boolVar[expression]
+	var err error
+	if !found {
+		variable, err = state.MkBoolVar(expression)
+		if err != nil {
+			return false, err
+		}
+	}
+	data, err := state.BooleanData(variable)
+	if err != nil {
+		return false, err
+	}
+	if !data.IsTheoryAtom() {
+		if err = state.SetVariableTheory(variable, t.FamilyID()); err != nil {
+			return false, err
+		}
+	}
+	defined, err := state.Literal(definition)
+	if err != nil {
+		return false, err
+	}
+	literal := NewSMTLiteral(variable, false)
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal.Negated(), defined}); err != nil {
+		return false, err
+	}
+	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal, defined.Negated()}); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (t *SMTBitVectorTheory) bitsFor(expression ast.ASTHandle) ([]ast.ASTHandle, error) {
@@ -497,8 +635,34 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (
 		return false, err
 	}
 	if op != smtBVOpBit2Bool {
-		t.unsupported = true
-		return false, nil
+		if op != 22 && op != 23 {
+			t.unsupported = true
+			return false, nil
+		}
+		arguments, argErr := t.argumentBits(expression)
+		if argErr != nil {
+			return false, argErr
+		}
+		if len(arguments) != 2 || len(arguments[0]) == 0 || len(arguments[0]) != len(arguments[1]) {
+			return false, ast.ErrASTDomain
+		}
+		left, right := arguments[0], arguments[1]
+		if op == 23 {
+			left = append([]ast.ASTHandle(nil), left...)
+			right = append([]ast.ASTHandle(nil), right...)
+			left[len(left)-1], argErr = t.boolNot(left[len(left)-1])
+			if argErr == nil {
+				right[len(right)-1], argErr = t.boolNot(right[len(right)-1])
+			}
+			if argErr != nil {
+				return false, argErr
+			}
+		}
+		definition, argErr := t.unsignedLE(left, right)
+		if argErr != nil {
+			return false, argErr
+		}
+		return t.bridgeAtom(expression, definition)
 	}
 	state, _ := t.State()
 	owner, err := state.manager.GetArg(expression, 0)
