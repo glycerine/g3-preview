@@ -36,6 +36,7 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		return lbool.Undef, err
 	}
 	defer func() {
+		resultErr = errors.Join(resultErr, resolver.Close())
 		if count := k.internalizer.scopeLevel - baseLevel; count != 0 {
 			resultErr = errors.Join(resultErr, k.internalizer.PopScopes(count))
 			if resultErr != nil {

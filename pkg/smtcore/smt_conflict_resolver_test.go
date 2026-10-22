@@ -32,6 +32,7 @@ func TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel(t *testing.T) {
 	t.Cleanup(func() { astTestMust(t, conflict.Close()) })
 	resolver, err := NewSMTConflictResolver(state)
 	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, resolver.Close()) })
 	got, err := resolver.Resolve(NewSMTBooleanClause(conflict), SMTNullLiteral, 0)
 	astTestMust(t, err)
 	want := []SMTLiteral{lb.Negated(), la.Negated()}
@@ -93,11 +94,80 @@ func TestSMTConflictResolverMinimizesImpliedLemmaLiteral(t *testing.T) {
 	astTestMust(t, state.AssignLiteral(lb, NewSMTBooleanAxiom()))
 	resolver, err := NewSMTConflictResolver(state)
 	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, resolver.Close()) })
 	marks := make([]bool, len(state.booleanData))
 	marks[av], marks[cv] = true, true
 	lemma, err := resolver.minimizeLemma([]SMTLiteral{lb.Negated(), la.Negated(), lc.Negated()}, marks, resolver.levels(), 0)
 	astTestMust(t, err)
 	if len(lemma) != 2 || lemma[0] != lb.Negated() || lemma[1] != la.Negated() || state.Statistics().NumMinimizedLits != 1 {
 		t.Fatal("minimized lemma", lemma, state.Statistics())
+	}
+}
+
+func TestSMTConflictResolverOwnsFirstUIPProof(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	a := smtRelevancyBool(t, m, "proof-resolve-a")
+	b := smtRelevancyBool(t, m, "proof-resolve-b")
+	c := smtRelevancyBool(t, m, "proof-resolve-c")
+	for _, expression := range []ast.ASTHandle{a, b, c} {
+		astTestMust(t, state.Internalize(expression, true))
+	}
+	av, _ := state.BoolVar(a)
+	bv, _ := state.BoolVar(b)
+	cv, _ := state.BoolVar(c)
+	la, lb, lc := NewSMTLiteral(av, false), NewSMTLiteral(bv, false), NewSMTLiteral(cv, false)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+
+	notA, err := m.MkNot(a)
+	astTestMust(t, err)
+	reasonFact, err := m.MkOr(c, notA)
+	astTestMust(t, err)
+	reasonProof, err := m.MkProofHypothesis(reasonFact)
+	astTestMust(t, err)
+	reasonJustification, err := NewSMTJustificationProofWrapper(m, reasonProof, true)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, reasonJustification.Release(m)) })
+
+	notC, err := m.MkNot(c)
+	astTestMust(t, err)
+	notB, err := m.MkNot(b)
+	astTestMust(t, err)
+	conflictFact, err := m.MkOr(notC, notB)
+	astTestMust(t, err)
+	conflictProof, err := m.MkProofHypothesis(conflictFact)
+	astTestMust(t, err)
+	conflictJustification, err := NewSMTJustificationProofWrapper(m, conflictProof, true)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, conflictJustification.Release(m)) })
+
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.AssignLiteral(la, NewSMTBooleanAxiom()))
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.AssignLiteral(lb, NewSMTBooleanAxiom()))
+	reason, err := NewSMTClause(m, []SMTLiteral{lc, la.Negated()}, SMTClauseAux, reasonJustification, nil, false, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, reason.Close()) })
+	astTestMust(t, state.AssignLiteral(lc, NewSMTBooleanClause(reason)))
+	conflict, err := NewSMTClause(m, []SMTLiteral{lc.Negated(), lb.Negated()}, SMTClauseAux, conflictJustification, nil, false, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, conflict.Close()) })
+
+	resolver, err := NewSMTConflictResolver(state)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, resolver.Close()) })
+	resolution, err := resolver.Resolve(NewSMTBooleanClause(conflict), SMTNullLiteral, 0)
+	astTestMust(t, err)
+	if !resolution.Resolved {
+		t.Fatal("conflict was not resolved")
+	}
+	proof, err := resolver.LemmaProof()
+	astTestMust(t, err)
+	fact, err := m.GetProofFact(proof)
+	astTestMust(t, err)
+	want, err := m.MkOr(notB, notA)
+	astTestMust(t, err)
+	if fact != want {
+		t.Fatal("lemma proof fact", fact, want)
 	}
 }

@@ -4,6 +4,8 @@
 package smtcore
 
 import (
+	"errors"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -17,8 +19,11 @@ type SMTConflictResolution struct {
 }
 
 type SMTConflictResolver struct {
-	state    *SMTInternalizerState
-	expander *SMTAntecedentExpander
+	state      *SMTInternalizerState
+	expander   *SMTAntecedentExpander
+	lemmaProof ast.ASTRef
+	closePhase uint8
+	closed     bool
 }
 
 func (r *SMTConflictResolver) minimizeLemma(lemma []SMTLiteral, marks []bool, levels []uint32, baseLevel uint32) ([]SMTLiteral, error) {
@@ -149,7 +154,42 @@ func NewSMTConflictResolver(state *SMTInternalizerState) (*SMTConflictResolver, 
 	if state == nil || state.open() != nil {
 		return nil, ast.ErrASTHandle
 	}
-	return &SMTConflictResolver{state: state, expander: NewSMTAntecedentExpander()}, nil
+	proof, err := state.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return nil, err
+	}
+	return &SMTConflictResolver{state: state, expander: NewSMTAntecedentExpander(), lemmaProof: proof}, nil
+}
+
+// LemmaProof returns the resolver-owned proof produced by the most recent
+// Resolve call. It is null when proof generation is disabled.
+func (r *SMTConflictResolver) LemmaProof() (ast.ASTHandle, error) {
+	if r == nil || r.state == nil || r.closed {
+		return ast.ASTHandle{}, ast.ErrASTHandle
+	}
+	return r.state.manager.RefGet(r.lemmaProof)
+}
+
+func (r *SMTConflictResolver) Close() error {
+	if r == nil {
+		return ast.ErrASTHandle
+	}
+	if r.closed {
+		return nil
+	}
+	if r.state == nil {
+		return ast.ErrASTHandle
+	}
+	if r.closePhase == 0 {
+		if err := r.state.manager.DelRef(&r.lemmaProof); err != nil {
+			return err
+		}
+		r.closePhase = 1
+	}
+	r.expander = nil
+	r.state = nil
+	r.closed = true
+	return nil
 }
 
 // UnsatCore traces a base conflict back through Boolean and theory
@@ -267,9 +307,13 @@ func (r *SMTConflictResolver) levels() []uint32 {
 }
 
 func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiteral SMTLiteral, baseLevel uint32) (SMTConflictResolution, error) {
-	if r == nil || r.state == nil || r.expander == nil || r.state.open() != nil {
+	if r == nil || r.state == nil || r.expander == nil || r.closed || r.state.open() != nil {
 		return SMTConflictResolution{}, ast.ErrASTHandle
 	}
+	if err := r.state.manager.ResetRef(r.lemmaProof); err != nil {
+		return SMTConflictResolution{}, err
+	}
+	originalConflict := conflict
 	consequent := SMTFalseLiteral
 	if notLiteral != SMTNullLiteral {
 		consequent = notLiteral.Negated()
@@ -281,6 +325,15 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 	}
 	result := SMTConflictResolution{ConflictLevel: conflictLevel}
 	if conflictLevel <= baseLevel {
+		proof, proofErr := r.conflictProof(originalConflict, notLiteral, nil)
+		if proofErr != nil {
+			return SMTConflictResolution{}, proofErr
+		}
+		if !proof.IsNull() {
+			if err = r.state.manager.SetRef(r.lemmaProof, proof); err != nil {
+				return SMTConflictResolution{}, err
+			}
+		}
 		return result, nil
 	}
 	marks := make([]bool, len(r.state.booleanData))
@@ -409,6 +462,15 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 		}
 		if level := r.state.booleanData[variable].InternalLevel(); level > result.InternalScopeLevel {
 			result.InternalScopeLevel = level
+		}
+	}
+	proof, proofErr := r.conflictProof(originalConflict, notLiteral, lemma)
+	if proofErr != nil {
+		return SMTConflictResolution{}, proofErr
+	}
+	if !proof.IsNull() {
+		if err = r.state.manager.SetRef(r.lemmaProof, proof); err != nil {
+			return SMTConflictResolution{}, errors.Join(err, r.state.manager.ResetRef(r.lemmaProof))
 		}
 	}
 	return result, nil

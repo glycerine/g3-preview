@@ -103616,7 +103616,8 @@
       "go_targets": [
         "pkg/smtcore/smt_conflict_antecedents.go",
         "pkg/smtcore/smt_conflict_levels.go",
-        "pkg/smtcore/smt_conflict_resolver.go"
+        "pkg/smtcore/smt_conflict_resolver.go",
+        "pkg/smtcore/smt_conflict_proof.go"
       ],
       "tests": [
         "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
@@ -103625,6 +103626,7 @@
         "TestSMTConflictJustificationMaximumAssignmentLevels",
         "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification",
         "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel",
+        "TestSMTConflictResolverOwnsFirstUIPProof",
         "TestSMTConflictResolverMinimizesImpliedLemmaLiteral",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
@@ -104004,16 +104006,19 @@
         },
         {
           "name": "literal, equality, justification and conflict proof construction",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_conflict_proof.go",
+          "tests": [
+            "TestSMTConflictResolverOwnsFirstUIPProof"
+          ]
         }
       ],
       "ownership": [
-        "The antecedent expander owns its work queues, duplicate set and emitted event history; justifications and enodes are borrowed and temporary justification marks are always cleared."
+        "The antecedent expander owns its work queues, duplicate set and emitted event history; justifications and enodes are borrowed and temporary justification marks are always cleared.",
+        "The resolver owns its most recent lemma proof through an ASTRef and releases or replaces it across Close and Resolve."
       ],
       "deviations": [
-        "Dynamic-ack callbacks are recorded as typed congruence/equality-use events until the concrete manager is connected. Structural subsumption and proof generation remain open."
+        "Dynamic-ack callbacks are recorded as typed congruence/equality-use events until the concrete manager is connected. Boolean/clause and simple theory proof generation is connected; equality proof reconstruction and structural subsumption remain open."
       ]
     },
     {
@@ -104024,7 +104029,8 @@
       "go_targets": [
         "pkg/smtcore/smt_conflict_antecedents.go",
         "pkg/smtcore/smt_conflict_levels.go",
-        "pkg/smtcore/smt_conflict_resolver.go"
+        "pkg/smtcore/smt_conflict_resolver.go",
+        "pkg/smtcore/smt_conflict_proof.go"
       ],
       "tests": [
         "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
@@ -104033,6 +104039,7 @@
         "TestSMTConflictJustificationMaximumAssignmentLevels",
         "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification",
         "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel",
+        "TestSMTConflictResolverOwnsFirstUIPProof",
         "TestSMTConflictResolverMinimizesImpliedLemmaLiteral",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
@@ -104106,16 +104113,21 @@
         },
         {
           "name": "proof accessors and structural subsumption interface",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_conflict_resolver.go",
+          "go_targets": [
+            "pkg/smtcore/smt_conflict_proof.go"
+          ],
+          "tests": [
+            "TestSMTConflictResolverOwnsFirstUIPProof"
+          ]
         }
       ],
       "ownership": [
-        "The future resolver will borrow context, parameters, assignment trail and watches; the completed expander owns only native Go work storage."
+        "The resolver borrows context, parameters, assignment trail and watches; the completed expander owns only native Go work storage. The resolver owns and releases its latest proof AST reference."
       ],
       "deviations": [
-        "The standalone expander isolates the context-independent front of conflict resolution while the context-dependent FUIP and proof state remain open."
+        "The standalone expander isolates the context-independent front of conflict resolution. FUIP resolution and Boolean/simple-theory proof state are connected; equality proof reconstruction and structural subsumption remain open."
       ]
     },
     {
@@ -106725,12 +106737,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_justification.go",
-        "pkg/smtcore/smt_justification_theory.go"
+        "pkg/smtcore/smt_justification_theory.go",
+        "pkg/smtcore/smt_conflict_proof.go"
       ],
       "tests": [
         "TestSMTJustificationBaseUnitAndSimpleAntecedents",
         "TestSMTJustificationEqualityAntecedentRecords",
-        "TestSMTTheoryJustificationParameterExpressionAndProofOwnership"
+        "TestSMTTheoryJustificationParameterExpressionAndProofOwnership",
+        "TestSMTConflictResolverOwnsFirstUIPProof"
       ],
       "conditionals": [
         {
@@ -106840,9 +106854,11 @@
         },
         {
           "name": "proof construction and antecedent-to-proof collection for all concrete justifications",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_conflict_proof.go",
+          "tests": [
+            "TestSMTConflictResolverOwnsFirstUIPProof"
+          ]
         }
       ],
       "ownership": [
@@ -106850,7 +106866,7 @@
         "Proof wrappers retain their proof AST, theory records own copied AST parameters, and theory lemmas retain expression ASTs independently of Boolean-variable lifetime."
       ],
       "deviations": [
-        "A typed SMTAntecedentMarker carries dependency marking until the concrete conflict resolver is complete. Proof construction remains open and keeps this unit partial."
+        "A typed SMTAntecedentMarker carries dependency marking. Proof wrappers, unit resolution, simple theory and theory-lemma proof construction are connected; equality-backed and extended-theory proof construction remain open."
       ]
     },
     {
@@ -106861,12 +106877,14 @@
       "go_targets": [
         "pkg/smtcore/smt_justification.go",
         "pkg/smtcore/smt_justification_theory.go",
-        "pkg/smtcore/smt_justification_refs.go"
+        "pkg/smtcore/smt_justification_refs.go",
+        "pkg/smtcore/smt_conflict_proof.go"
       ],
       "tests": [
         "TestSMTJustificationBaseUnitAndSimpleAntecedents",
         "TestSMTJustificationEqualityAntecedentRecords",
-        "TestSMTTheoryJustificationParameterExpressionAndProofOwnership"
+        "TestSMTTheoryJustificationParameterExpressionAndProofOwnership",
+        "TestSMTConflictResolverOwnsFirstUIPProof"
       ],
       "conditionals": [
         {
@@ -106911,16 +106929,18 @@
         },
         {
           "name": "abstract and concrete mk_proof interface and debug proof display",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_conflict_proof.go",
+          "tests": [
+            "TestSMTConflictResolverOwnsFirstUIPProof"
+          ]
         }
       ],
       "ownership": [
         "Region placement is represented as lifecycle metadata; Go slices own copied literal and equality records, while explicit AST references and parameter copies preserve source lifetime obligations."
       ],
       "deviations": [
-        "The typed marker interface replaces a direct dependency on the unfinished conflict-resolution class. Proof APIs remain open."
+        "The typed marker interface replaces a direct class dependency. Boolean, wrapper, unit-resolution, simple-theory and theory-lemma proof APIs are connected; equality-backed proof APIs and debug display remain open."
       ]
     },
     {
