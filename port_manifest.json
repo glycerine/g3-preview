@@ -125821,6 +125821,8 @@
         "pkg/tactic/arith/propagate_ineq_clean_test.go",
         "pkg/tactic/tactic_conditional.go",
         "pkg/tactic/tactic_conditional_test.go",
+        "pkg/tactic/tactic_and_then.go",
+        "pkg/tactic/tactic_and_then_test.go",
         "pkg/tactic/tactic_or_else.go",
         "pkg/tactic/tactic_or_else_test.go",
         "pkg/tactic/tactic_unary.go",
@@ -125830,6 +125832,9 @@
         "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
         "TestConditionalTacticsChooseWhenAndFailIf",
         "TestConditionalTacticsGoalProductionGuards",
+        "TestAndThenSingleGoalAndDecidedShortcut",
+        "TestAndThenNarySourceOrder",
+        "TestAndThenComposesSingleGoalModelConverters",
         "TestOrElseRestoresGoalAfterTacticFailure",
         "TestOrElseLastFailureAndSkipIfFailed",
         "TestFailIfBranchingAndCleanTacticals"
@@ -126038,6 +126043,16 @@
           ]
         },
         {
+          "name": "and_then construction, lifecycle, decided short-circuit and single-subgoal converter/core composition (tactical.cpp:26-145,216-271)",
+          "status": "partial",
+          "go_target": "pkg/tactic/tactic_and_then.go",
+          "tests": [
+            "TestAndThenSingleGoalAndDecidedShortcut",
+            "TestAndThenNarySourceOrder",
+            "TestAndThenComposesSingleGoalModelConverters"
+          ]
+        },
+        {
           "name": "cond, when, fail_if and fail_if_not application, translation and lifecycle forwarding (tactical.cpp:1225-1305)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_conditional.go",
@@ -126084,12 +126099,16 @@
       "go_targets": [
         "pkg/tactic/arith/propagate_ineq_clean.go",
         "pkg/tactic/arith/propagate_ineq_clean_test.go",
+        "pkg/tactic/tactic_and_then.go",
         "pkg/tactic/tactic_conditional.go",
         "pkg/tactic/tactic_or_else.go",
         "pkg/tactic/tactic_unary.go"
       ],
       "tests": [
         "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
+        "TestAndThenSingleGoalAndDecidedShortcut",
+        "TestAndThenNarySourceOrder",
+        "TestAndThenComposesSingleGoalModelConverters",
         "TestConditionalTacticsChooseWhenAndFailIf",
         "TestConditionalTacticsGoalProductionGuards",
         "TestOrElseRestoresGoalAfterTacticFailure",
@@ -126115,6 +126134,16 @@
           "go_target": "pkg/tactic/arith/propagate_ineq_clean.go",
           "tests": [
             "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
+          ]
+        },
+        {
+          "name": "typed variadic and-then construction; multi-subgoal execution remains open",
+          "status": "partial",
+          "go_target": "pkg/tactic/tactic_and_then.go",
+          "tests": [
+            "TestAndThenSingleGoalAndDecidedShortcut",
+            "TestAndThenNarySourceOrder",
+            "TestAndThenComposesSingleGoalModelConverters"
           ]
         },
         {

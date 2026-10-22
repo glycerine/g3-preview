@@ -1,0 +1,209 @@
+// Source: src/tactic/tactical.cpp:26-271.
+package tactic
+
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/ast"
+	uparams "github.com/glycerine/g3/pkg/util/params"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+)
+
+type andThenTactic struct {
+	self          *andThenTactic
+	first, second Tactic
+	references    uint32
+	closed        bool
+}
+
+func newAndThenTactic(first, second Tactic) (*andThenTactic, error) {
+	if first == nil || second == nil {
+		return nil, ast.ErrASTHandle
+	}
+	if err := first.IncRef(); err != nil {
+		return nil, err
+	}
+	if err := second.IncRef(); err != nil {
+		_ = first.DecRef()
+		return nil, err
+	}
+	t := &andThenTactic{first: first, second: second}
+	t.self = t
+	return t, nil
+}
+
+func NewAndThenTactic(tactics ...Tactic) (Tactic, error) {
+	if len(tactics) == 0 {
+		return nil, ast.ErrASTDomain
+	}
+	if len(tactics) == 1 {
+		return tactics[0], nil
+	}
+	right := tactics[len(tactics)-1]
+	for i := len(tactics) - 2; i >= 0; i-- {
+		combined, err := newAndThenTactic(tactics[i], right)
+		if err != nil {
+			return nil, err
+		}
+		right = combined
+	}
+	return right, nil
+}
+
+func (t *andThenTactic) open() error {
+	if t == nil || t.self != t || t.closed {
+		return arena.ErrClosed
+	}
+	return nil
+}
+func (t *andThenTactic) IncRef() error {
+	if err := t.open(); err != nil {
+		return err
+	}
+	t.references++
+	return nil
+}
+func (t *andThenTactic) DecRef() error {
+	if err := t.open(); err != nil {
+		return err
+	}
+	if t.references == 0 {
+		return arena.ErrBounds
+	}
+	t.references--
+	if t.references != 0 {
+		return nil
+	}
+	t.closed = true
+	err := errors.Join(t.first.DecRef(), t.second.DecRef())
+	t.first, t.second = nil, nil
+	return err
+}
+
+func (t *andThenTactic) Apply(g *Goal, out *TacticResult) (result error) {
+	if err := t.open(); err != nil {
+		return err
+	}
+	if g == nil || out == nil {
+		return ast.ErrASTHandle
+	}
+	first := &TacticResult{}
+	defer func() { result = errors.Join(result, first.Close()) }()
+	if err := t.first.Apply(g, first); err != nil {
+		return err
+	}
+	if len(first.Goals) == 0 {
+		return ast.ErrASTDomain
+	}
+	if len(first.Goals) != 1 {
+		return ast.ErrASTDomain
+	}
+	models, err := g.ModelsEnabled()
+	if err != nil {
+		return err
+	}
+	if first.Goals[0].IsDecided() {
+		if err = out.moveGoalsFrom(first); err != nil {
+			return err
+		}
+		if models && first.ModelConverter != nil {
+			return out.SetModelConverter(first.ModelConverter)
+		}
+		return nil
+	}
+	second := &TacticResult{}
+	defer func() { result = errors.Join(result, second.Close()) }()
+	if err = t.second.Apply(first.Goals[0], second); err != nil {
+		return err
+	}
+	if err = out.moveGoalsFrom(second); err != nil {
+		return err
+	}
+	if models {
+		combined, err := ConcatModels(g.manager.Budget(), first.ModelConverter, second.ModelConverter)
+		if err != nil {
+			return err
+		}
+		if err = out.SetModelConverter(combined); err != nil {
+			return err
+		}
+	}
+	proofs, err := g.ProofsEnabled()
+	if err != nil {
+		return err
+	}
+	if proofs {
+		combined, err := ConcatProofConverters(g.manager.Budget(), first.ProofConverter, second.ProofConverter)
+		if err != nil {
+			return err
+		}
+		if err = out.SetProofConverter(combined); err != nil {
+			return err
+		}
+	}
+	cores, err := g.UnsatCoresEnabled()
+	if err != nil {
+		return err
+	}
+	if cores {
+		combined, err := g.manager.DependencyJoin(first.Core, second.Core)
+		if err != nil {
+			return err
+		}
+		if err = out.SetCore(combined); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t *andThenTactic) each(action func(Tactic) error) error {
+	if err := t.open(); err != nil {
+		return err
+	}
+	return errors.Join(action(t.first), action(t.second))
+}
+func (t *andThenTactic) UpdateParams(p *uparams.ParamsRef) error {
+	return t.each(func(c Tactic) error { return c.UpdateParams(p) })
+}
+func (t *andThenTactic) CollectParamDescrs(p *uparams.ParamDescrs) error {
+	return t.each(func(c Tactic) error { return c.CollectParamDescrs(p) })
+}
+func (t *andThenTactic) CollectStatistics() map[string]float64 {
+	result := make(map[string]float64)
+	if t.open() != nil {
+		return result
+	}
+	for _, child := range []Tactic{t.first, t.second} {
+		for name, value := range child.CollectStatistics() {
+			result[name] += value
+		}
+	}
+	return result
+}
+func (t *andThenTactic) ResetStatistics() error {
+	return t.each(func(c Tactic) error { return c.ResetStatistics() })
+}
+func (t *andThenTactic) Cleanup() error { return t.each(func(c Tactic) error { return c.Cleanup() }) }
+func (t *andThenTactic) Reset() error   { return t.each(func(c Tactic) error { return c.Reset() }) }
+func (t *andThenTactic) SetLogic(l usymbol.Symbol) error {
+	return t.each(func(c Tactic) error { return c.SetLogic(l) })
+}
+func (t *andThenTactic) SetProgressCallback(callback func(uint32)) error {
+	return t.each(func(c Tactic) error { return c.SetProgressCallback(callback) })
+}
+func (t *andThenTactic) Translate(m *ast.ASTManager) (Tactic, error) {
+	if err := t.open(); err != nil {
+		return nil, err
+	}
+	first, err := t.first.Translate(m)
+	if err != nil {
+		return nil, err
+	}
+	second, err := t.second.Translate(m)
+	if err != nil {
+		return nil, err
+	}
+	return newAndThenTactic(first, second)
+}
