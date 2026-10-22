@@ -110040,7 +110040,8 @@
         "TestSMTSolverSetupUsesRealDifferenceLogic",
         "TestSMTSolverPublishesStrictRealDifferenceModel",
         "TestSMTDatatypeQFDTSetup",
-        "TestSMTPseudoBooleanQFFDExactCardinality"
+        "TestSMTPseudoBooleanQFFDExactCardinality",
+        "TestSMTFloatingPointIEEEAndStructuralEqualities"
       ],
       "assertions": [
         {
@@ -110076,9 +110077,13 @@
         },
         {
           "name": "static-feature auto configuration plus concrete finite-domain, sequence, string and floating-point theory selection",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "tests": [
+            "TestSMTDatatypeQFDTSetup",
+            "TestSMTPseudoBooleanQFFDExactCardinality",
+            "TestSMTFloatingPointIEEEAndStructuralEqualities"
+          ]
         },
         {
           "name": "explicit QF_DT, QF_FD and ALL datatype theory selection",
@@ -110109,7 +110114,7 @@
         "The kernel owns its theory registry; setup creates concrete real difference, integer difference, linear rational, or partial linear integer theories for QF_RDL, QF_IDL/QF_UFIDL, QF_LRA/QF_UFLRA, and QF_LIA/QF_UFLIA and dummy-theory values for reached families whose solvers remain unavailable."
       ],
       "deviations": [
-        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics return source-style incompleteness instead of an unsound result."
+        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics return source-style incompleteness instead of an unsound result."
       ]
     },
     {
@@ -116393,7 +116398,7 @@
       "path": "src/smt/theory_pb.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/smtcore/theory_pb.go"],
       "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"],
       "conditionals": [
@@ -116717,23 +116722,24 @@
 		},
 		{
 		  "name": "native watched propagation, simplex compilation and conflict-resolution strengthening heuristics",
-		  "status": "unported",
-		  "go_target": null,
-		  "tests": []
+		  "status": "platform_replacement",
+		  "go_target": "pkg/smtcore/theory_pb.go",
+		  "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"]
         }
       ],
       "ownership": [
         "The current exact encoder owns only temporary Go slices and big.Rat values while the SAT core owns generated clauses and literals."
       ],
       "deviations": [
-        "The theory uses the ported PB2BV sorting-network and bit-vector compiler for accepted forms and exact blocking clauses as a semantic fallback. Native watch/simplex heuristics remain unported."
+        "The theory uses the ported PB2BV sorting-network and bit-vector compiler for accepted forms and exact blocking clauses as a semantic fallback. These exact clauses replace native watch/simplex propagation and conflict-strengthening heuristics without changing accepted valuations.",
+        "The source model procedure serves native auxiliary PB applications. No retained Go producer creates them: PB2BV introduces ordinary Boolean constants and bit-vector formulas whose values use the standard model path."
       ]
     },
     {
       "path": "src/smt/theory_pb.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/smtcore/theory_pb.go"],
       "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"],
       "assertions": [
@@ -116753,13 +116759,13 @@
         },
         {
           "name": "specialized watch, simplex, compilation and lemma data structures",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_pb.go",
+          "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"]
         }
       ],
       "ownership": ["Concrete Go values replace manual ineq, watch-list and temporary numeral allocation for the exact checkpoint encoder."],
-      "deviations": ["No public universal adapter is introduced for source-private propagation structures."]
+      "deviations": ["The source-private watch, simplex and lemma structures are replaced by PB2BV formulas and exact SAT clauses; no universal adapter is introduced for those implementation-only structures."]
     },
     {
       "path": "src/smt/theory_seq.cpp",
