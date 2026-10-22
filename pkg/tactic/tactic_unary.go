@@ -16,6 +16,7 @@ const (
 	unaryRepeat
 	unaryTryFor
 	unaryUsingParams
+	unaryAnnotate
 )
 
 type unaryTactic struct {

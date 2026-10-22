@@ -125839,6 +125839,8 @@
         "pkg/tactic/arith/propagate_ineq_clean_test.go",
         "pkg/tactic/tactic_conditional.go",
         "pkg/tactic/tactic_conditional_test.go",
+        "pkg/tactic/tactic_annotate.go",
+        "pkg/tactic/tactic_annotate_test.go",
         "pkg/tactic/tactic_and_then.go",
         "pkg/tactic/tactic_and_then_test.go",
         "pkg/tactic/tactic_or_else.go",
@@ -125873,6 +125875,8 @@
         "TestTryForCancelsChildAndRestoresResourceLimit",
         "TestTryForDisabledIntervalsApplyNormally",
         "TestUsingParamsAppliesStoredOverridesAtConstructionAndUpdate",
+        "TestAnnotateTacticVerboseScopeIncludesFailureExit",
+        "TestAnnotateTacticVerbosityGate",
         "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
@@ -126147,6 +126151,15 @@
           ]
         },
         {
+          "name": "annotate_tactic verbosity-gated start/done scope around success and failure (tactical.cpp:1190-1223)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_annotate.go",
+          "tests": [
+            "TestAnnotateTacticVerboseScopeIncludesFailureExit",
+            "TestAnnotateTacticVerbosityGate"
+          ]
+        },
+        {
           "name": "unary tactical lifecycle, fail_if_branching result refusal and generic cleanup wrapper (tactical.cpp:886-927,1077-1128)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_unary.go",
@@ -126168,6 +126181,7 @@
       "go_targets": [
         "pkg/tactic/arith/propagate_ineq_clean.go",
         "pkg/tactic/arith/propagate_ineq_clean_test.go",
+        "pkg/tactic/tactic_annotate.go",
         "pkg/tactic/tactic_and_then.go",
         "pkg/tactic/tactic_conditional.go",
         "pkg/tactic/tactic_or_else.go",
@@ -126197,6 +126211,8 @@
         "TestTryForCancelsChildAndRestoresResourceLimit",
         "TestTryForDisabledIntervalsApplyNormally",
         "TestUsingParamsAppliesStoredOverridesAtConstructionAndUpdate",
+        "TestAnnotateTacticVerboseScopeIncludesFailureExit",
+        "TestAnnotateTacticVerbosityGate",
         "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
@@ -126279,6 +126295,15 @@
           "go_target": "pkg/tactic/tactic_using_params.go",
           "tests": [
             "TestUsingParamsAppliesStoredOverridesAtConstructionAndUpdate"
+          ]
+        },
+        {
+          "name": "typed annotate constructor with source verbosity scope",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_annotate.go",
+          "tests": [
+            "TestAnnotateTacticVerboseScopeIncludesFailureExit",
+            "TestAnnotateTacticVerbosityGate"
           ]
         },
         {
