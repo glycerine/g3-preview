@@ -112630,7 +112630,7 @@
       "path": "src/smt/theory_arith_inv.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -112765,11 +112765,18 @@
           "text": "SASSERT(!above_upper(v));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Z3DEBUG-only vector, row, column, assignment, bound, and integrality invariant checks",
+          "status": "dead_deleted"
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Every method in this unit is excluded unless Z3DEBUG is defined and has no retained Go runtime consumer. Focused tableau, simplex, bound, and integer-search tests validate the corresponding mutations without adding a universal debug adapter."
+      ]
     },
     {
       "path": "src/smt/theory_arith_nl.h",
