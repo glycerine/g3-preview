@@ -1072,6 +1072,76 @@ func TestSMTSequenceTheoryExtractOversizedPrefixIsSource(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheorySpecialTailAndDropLastDecompositions(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		offset string
+		tail   bool
+	}{
+		{name: "tail", offset: "1", tail: true},
+		{name: "drop-last", offset: "0"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			value, err := m.MkString("a")
+			astTestMust(t, err)
+			sort, err := m.GetSort(value)
+			astTestMust(t, err)
+			_, sequenceSort, err := m.SequenceSortElement(sort)
+			astTestMust(t, err)
+			if !sequenceSort {
+				t.Fatal("string sort is not a sequence")
+			}
+			x, err := m.MkConst(astTestSymbol(t, m, "sequence-special-extract-"+test.name), sort)
+			astTestMust(t, err)
+			length, err := m.MkSequenceLength(x)
+			astTestMust(t, err)
+			one, err := m.ArithmeticIntegerNumeralText("1")
+			astTestMust(t, err)
+			requested, err := m.MkArithmeticSub(length, one)
+			astTestMust(t, err)
+			offset, err := m.ArithmeticIntegerNumeralText(test.offset)
+			astTestMust(t, err)
+			extract, err := m.MkSequenceExtract(x, offset, requested)
+			astTestMust(t, err)
+			var witness ast.ASTHandle
+			if test.tail {
+				zero, makeErr := m.ArithmeticIntegerNumeralText("0")
+				astTestMust(t, makeErr)
+				name, makeErr := m.Symbols.Intern("seq.tail")
+				astTestMust(t, makeErr)
+				witness, makeErr = m.MkSequenceSkolem(name, []ast.ASTHandle{x, zero}, sort)
+				astTestMust(t, makeErr)
+			} else {
+				name, makeErr := m.Symbols.Intern("seq.first")
+				astTestMust(t, makeErr)
+				witness, makeErr = m.MkSequenceSkolem(name, []ast.ASTHandle{x}, sort)
+				astTestMust(t, makeErr)
+			}
+			definition, err := m.MkEq(extract, witness)
+			astTestMust(t, err)
+			notDefinition, err := m.MkNot(definition)
+			astTestMust(t, err)
+			empty, err := m.MkSequenceEmpty(sort)
+			astTestMust(t, err)
+			emptyEquality, err := m.MkEq(x, empty)
+			astTestMust(t, err)
+			nonempty, err := m.MkNot(emptyEquality)
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.Assert(nonempty))
+			astTestMust(t, solver.Assert(notDefinition))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("special extract lacks direct decomposition", status)
+			}
+		})
+	}
+}
+
 func TestSMTSequenceTheoryIndexAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name   string

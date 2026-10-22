@@ -69,6 +69,9 @@ func (t *SMTSequenceTheory) addExtractAxioms(expression ast.ASTHandle) error {
 			return err
 		}
 	}
+	if err = t.addSpecialExtractAxioms(expression, sequence, offset, requested, sequenceLength, empty); err != nil {
+		return err
+	}
 
 	remaining, err := state.manager.MkArithmeticSub(sequenceLength, offset)
 	if err != nil {
