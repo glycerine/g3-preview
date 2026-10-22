@@ -153,7 +153,7 @@ func (c *tacticFilterModelConverter) Display(out io.Writer) error {
 	return c.displayFilter(out)
 }
 
-func (c *tacticFilterModelConverter) Translate(translator *ast.ASTTranslation) (_ *tacticFilterModelConverter, err error) {
+func (c *tacticFilterModelConverter) Translate(translator *ast.ASTTranslation) (_ ModelConverter, err error) {
 	if err = c.open(); err != nil {
 		return nil, err
 	}

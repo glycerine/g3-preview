@@ -2,6 +2,7 @@ package tactic_test
 
 import (
 	"fmt"
+	"io"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -128,6 +129,19 @@ func (c *modelConverterTestLeaf) ApplyLabels(l *tactic.ModelLabels, i uint32) er
 func (c *modelConverterTestLeaf) Cancel() error {
 	*c.calls = append(*c.calls, "cancel:"+c.name)
 	return nil
+}
+func (c *modelConverterTestLeaf) Display(out io.Writer) error {
+	if c.closed || out == nil {
+		return tactic.ErrModelConverterOwner
+	}
+	_, err := io.WriteString(out, "("+c.name+")\n")
+	return err
+}
+func (c *modelConverterTestLeaf) Translate(translator *ast.ASTTranslation) (tactic.ModelConverter, error) {
+	if c.closed || translator == nil {
+		return nil, tactic.ErrModelConverterOwner
+	}
+	return &modelConverterTestLeaf{name: c.name, calls: c.calls, label: c.label, run: c.run, fail: c.fail}, nil
 }
 func proofTestBool(t *testing.T, m *ast.ASTManager, name string) ast.ASTHandle {
 	t.Helper()

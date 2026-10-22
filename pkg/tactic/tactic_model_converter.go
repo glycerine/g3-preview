@@ -4,9 +4,11 @@ package tactic
 
 import (
 	"errors"
+	"io"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -14,10 +16,7 @@ import (
 var ErrModelConverterOwner = errors.New("model converter: invalid, copied or retired owner")
 var errTacticModelConverterGoal = errors.New("model converter: unreachable goal index or unindexed star application")
 
-// Cold virtual-owner boundary for original model converters. Models currently
-// expose model_core through the original derived lifetime dispatch. Remaining
-// theory evaluation, translation and display remain separate
-// source dependencies. These methods
+// Cold virtual-owner boundary for original model converters. These methods
 // dispatch original converter operations; they never perform a solver check.
 type ModelConverter interface {
 	IncRef() error
@@ -28,6 +27,8 @@ type ModelConverter interface {
 	ApplyUnindexed(*ModelRef) error
 	ApplyLabels(*ModelLabels, uint32) error
 	Cancel() error
+	Display(io.Writer) error
+	Translate(*ast.ASTTranslation) (ModelConverter, error)
 }
 
 // Source owning ref assignment: retain incoming before releasing outgoing.
@@ -353,6 +354,46 @@ func (c *tacticConcatModelConverter) Cancel() error {
 	}
 	return c.first.Cancel()
 }
+func (c *tacticConcatModelConverter) Display(out io.Writer) error {
+	if e := c.open(); e != nil {
+		return e
+	}
+	if out == nil {
+		return ast.ErrASTHandle
+	}
+	if _, e := io.WriteString(out, "(concat-model-converter\n"); e != nil {
+		return e
+	}
+	if e := c.first.Display(out); e != nil {
+		return e
+	}
+	if e := c.second.Display(out); e != nil {
+		return e
+	}
+	_, e := io.WriteString(out, ")\n")
+	return e
+}
+func (c *tacticConcatModelConverter) Translate(translator *ast.ASTTranslation) (_ ModelConverter, err error) {
+	if e := c.open(); e != nil {
+		return nil, e
+	}
+	if translator == nil || translator.To() == nil {
+		return nil, ast.ErrASTHandle
+	}
+	first, err := c.first.Translate(translator)
+	if err != nil {
+		return nil, err
+	}
+	second, err := c.second.Translate(translator)
+	if err != nil {
+		return nil, errors.Join(err, first.Close())
+	}
+	result, err := ConcatModels(translator.To().Budget(), first, second)
+	if err != nil {
+		return nil, errors.Join(err, first.Close(), second.Close())
+	}
+	return result, nil
+}
 func (c *tacticConcatModelConverter) Close() error {
 	if c == nil || c.self != &c.tacticConverterBase {
 		return ErrModelConverterOwner
@@ -524,6 +565,75 @@ func (c *tacticConcatStarModelConverter) Cancel() error {
 		}
 	}
 	return nil
+}
+func (c *tacticConcatStarModelConverter) Display(out io.Writer) error {
+	if e := c.open(); e != nil {
+		return e
+	}
+	if out == nil {
+		return ast.ErrASTHandle
+	}
+	if _, e := io.WriteString(out, "(concat-star-model-converter\n"); e != nil {
+		return e
+	}
+	if c.first != nil {
+		if e := c.first.Display(out); e != nil {
+			return e
+		}
+	}
+	if _, e := io.WriteString(out, "(\n"); e != nil {
+		return e
+	}
+	for _, second := range c.seconds {
+		if second != nil {
+			if e := second.Display(out); e != nil {
+				return e
+			}
+		}
+	}
+	_, e := io.WriteString(out, "))\n")
+	return e
+}
+func (c *tacticConcatStarModelConverter) Translate(translator *ast.ASTTranslation) (_ ModelConverter, err error) {
+	if e := c.open(); e != nil {
+		return nil, e
+	}
+	if translator == nil || translator.To() == nil {
+		return nil, ast.ErrASTHandle
+	}
+	var first ModelConverter
+	if c.first != nil {
+		first, err = c.first.Translate(translator)
+		if err != nil {
+			return nil, err
+		}
+	}
+	seconds := make([]ModelConverter, len(c.seconds))
+	cleanup := func() error {
+		var result error
+		for _, value := range seconds {
+			if value != nil {
+				result = errors.Join(result, value.Close())
+			}
+		}
+		if first != nil {
+			result = errors.Join(result, first.Close())
+		}
+		return result
+	}
+	for i, second := range c.seconds {
+		if second != nil {
+			seconds[i], err = second.Translate(translator)
+			if err != nil {
+				return nil, errors.Join(err, cleanup())
+			}
+		}
+	}
+	result, err := concatTacticModelSubgoals(translator.To().Budget(), first, seconds, c.sizes)
+	if err != nil {
+		return nil, errors.Join(err, cleanup())
+	}
+	return result, nil
 }
 func (c *tacticConcatStarModelConverter) Close() error {
 	if c == nil || c.self != &c.tacticConverterBase {

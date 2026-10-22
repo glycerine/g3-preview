@@ -165,7 +165,7 @@ func (c *tacticExtensionModelConverter) ApplyModel(out *ModelRef, goal uint32) (
 	return c.traceExtensionModel(md, 71)
 }
 
-func (c *tacticExtensionModelConverter) Translate(translator *ast.ASTTranslation) (_ *tacticExtensionModelConverter, err error) {
+func (c *tacticExtensionModelConverter) Translate(translator *ast.ASTTranslation) (_ ModelConverter, err error) {
 	if err = c.open(); err != nil {
 		return nil, err
 	}

@@ -3,14 +3,69 @@
 package tactic
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"reflect"
+	"testing"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
-	"reflect"
-	"testing"
 )
+
+func TestTacticModelConcatDisplayAndTranslate(t *testing.T) {
+	from := astTestManager(t)
+	to, err := ast.NewASTManager(ast.ASTManagerConfig{
+		Symbols: from.Symbols, Numerals: from.NumeralService(), Budget: from.Budget(),
+	})
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, to.Close()) })
+	translator, err := ast.NewASTTranslation(from, to, true)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, translator.Close()) })
+	calls := []string{}
+	first := &modelConverterTestLeaf{name: "first", calls: &calls}
+	second := &modelConverterTestLeaf{name: "second", calls: &calls}
+	combined, err := ConcatModels(from.Budget(), first, second)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, combined.Close()) })
+	var display bytes.Buffer
+	satOK(t, combined.Display(&display))
+	if got, want := display.String(), "(concat-model-converter\n(first)\n(second)\n)\n"; got != want {
+		t.Fatalf("concat display = %q; want %q", got, want)
+	}
+	translated, err := combined.Translate(translator)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, translated.Close()) })
+	display.Reset()
+	satOK(t, translated.Display(&display))
+	if got, want := display.String(), "(concat-model-converter\n(first)\n(second)\n)\n"; got != want {
+		t.Fatalf("translated concat display = %q; want %q", got, want)
+	}
+
+	root := &modelConverterTestLeaf{name: "root", calls: &calls}
+	a := &modelConverterTestLeaf{name: "a", calls: &calls}
+	b := &modelConverterTestLeaf{name: "b", calls: &calls}
+	star, err := concatTacticModelSubgoals(from.Budget(), root, []ModelConverter{a, nil, b}, []uint32{1, 2, 3})
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, star.Close()) })
+	display.Reset()
+	satOK(t, star.Display(&display))
+	starWant := "(concat-star-model-converter\n(root)\n(\n(a)\n(b)\n))\n"
+	if display.String() != starWant {
+		t.Fatalf("star display = %q; want %q", display.String(), starWant)
+	}
+	translatedStar, err := star.Translate(translator)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, translatedStar.Close()) })
+	display.Reset()
+	satOK(t, translatedStar.Display(&display))
+	if display.String() != starWant {
+		t.Fatalf("translated star display = %q; want %q", display.String(), starWant)
+	}
+}
 
 // A virtual-boundary fixture records dispatch and can mutate the actual
 // constant model. It is not a production converter or a solver implementation.
@@ -174,6 +229,19 @@ func (c *modelConverterTestLeaf) ApplyLabels(l *ModelLabels, i uint32) error {
 func (c *modelConverterTestLeaf) Cancel() error {
 	*c.calls = append(*c.calls, "cancel:"+c.name)
 	return nil
+}
+func (c *modelConverterTestLeaf) Display(out io.Writer) error {
+	if c.closed || out == nil {
+		return ErrModelConverterOwner
+	}
+	_, err := io.WriteString(out, "("+c.name+")\n")
+	return err
+}
+func (c *modelConverterTestLeaf) Translate(translator *ast.ASTTranslation) (ModelConverter, error) {
+	if c.closed || translator == nil {
+		return nil, ErrModelConverterOwner
+	}
+	return &modelConverterTestLeaf{name: c.name, calls: c.calls, label: c.label, run: c.run, fail: c.fail}, nil
 }
 
 func TestTacticModelReferenceOwningAliasAndReplacement(t *testing.T) {

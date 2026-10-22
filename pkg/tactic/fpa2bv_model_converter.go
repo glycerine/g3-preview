@@ -146,7 +146,7 @@ func (c *tacticFPA2BVModelConverter) Display(out io.Writer) error {
 	return err
 }
 
-func (c *tacticFPA2BVModelConverter) Translate(translation *ast.ASTTranslation) (*tacticFPA2BVModelConverter, error) {
+func (c *tacticFPA2BVModelConverter) Translate(translation *ast.ASTTranslation) (ModelConverter, error) {
 	if err := c.open(); err != nil {
 		return nil, err
 	}

@@ -120842,7 +120842,7 @@
       "path": "src/tactic/converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/tactic_stored_model_memory_trace.go",
         "pkg/tactic/tactic_model_converter.go",
@@ -120859,6 +120859,7 @@
         "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild",
         "TestTacticModelConcatConsumedChildCleanupResumesWithoutSecondDecrement",
         "TestTacticModelConcatRealStoredChildFinalReleaseNativeIDRecycle",
+        "TestTacticModelConcatDisplayAndTranslate",
         "TestConcatProofConvertersApplyInSourceOrder",
         "TestConcatStarProofConvertersPartitionsSources"
       ],
@@ -120872,8 +120873,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete model2mc factory allocations at model_converter.cpp:167,173 and final converter.h:36 deallocation through debug memory wrappers",
@@ -120882,13 +120883,14 @@
           "tests": ["TestStoredModelMemoryWrapperSourceAllocationAndRelease", "TestStoredModelMemoryWrapperUsesASTProcessDuringFinalize"]
         },
         {
-          "name": "model converter specialisation: counts, concat/star construction, cancellation and destruction",
+          "name": "model converter specialisation: counts, concat/star construction, cancellation, display, translation and destruction",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_model_converter.go",
           "tests": [
             "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
             "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
-            "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+            "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild",
+            "TestTacticModelConcatDisplayAndTranslate"
           ]
         },
         {
@@ -120902,9 +120904,11 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Concrete model and proof concat owners retain children explicitly. Translation constructs fresh typed children and transfers their lifetime to the translated concat owner; failed construction closes every translated child."
+      ],
       "deviations": [
-        "Concrete model- and proof-converter specialisations are ported. Other converter specialisations and broad constructor/destructor failure histories remain unported or deferred. Interfaces reference typed virtual owners, never boxed AST/solver records."
+        "Only the model- and proof-converter template instantiations reached by retained source consumers are ported. Interfaces reference typed virtual owners, never boxed AST/solver records. Native Go slices replace pointer and unsigned vectors."
       ]
     },
     {
@@ -123509,7 +123513,7 @@
       "path": "src/tactic/model_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/tactic_stored_model_memory_trace.go",
         "pkg/model/model_lifecycle.go",
@@ -123539,7 +123543,8 @@
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
         "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
         "TestTacticModelConcatStopsAtChildErrorAndRejectsCopiedOwner",
-        "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+        "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild",
+        "TestTacticModelConcatDisplayAndTranslate"
       ],
       "assertions": [
         {
@@ -123547,8 +123552,8 @@
           "text": "SASSERT(num > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete model2mc factory allocations at model_converter.cpp:167,173 and final converter.h:36 deallocation through debug memory wrappers",
@@ -123558,7 +123563,7 @@
         },
         {
           "name": "model_converter2model original derived allocation, owning assignment, indexed0 application",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_lifecycle.go",
           "go_targets": ["pkg/model/model_converter_allocation.go", "pkg/model/model_converter_memory_trace_debug_test.go"],
           "tests": [
@@ -123593,26 +123598,29 @@
           ]
         },
         {
-          "name": "concat/concat_star model and label application; apply null forwarding",
+          "name": "concat/concat_star model and label application, display and translation; apply null forwarding",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_model_converter.go",
           "tests": [
             "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
             "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
-            "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+            "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild",
+            "TestTacticModelConcatDisplayAndTranslate"
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Model references acquire incoming models before releasing outgoing models. Stored wrappers own one model reference and translated wrappers retain a newly translated derived model. Concat owners retain each child and clean translated children on failed construction."
+      ],
       "deviations": [
-        "Stored wrappers and composition use actual derived lifetime dispatch. Stored-model display and AST translation include constants, function graphs, universes and labels. model_converter2model allocates the original derived model, assigns it before indexed0 application, and preserves the assigned model on converter error; null converter leaves the output unchanged. Concat/star translation and display remain required before the unit is complete."
+        "Stored wrappers and composition use actual derived lifetime dispatch. Stored-model display and AST translation include constants, function graphs, universes and labels. model_converter2model allocates the original derived model, assigns it before indexed0 application, and preserves the assigned model on converter error; null converter leaves the output unchanged. Native Go slices replace source buffers and vectors."
       ]
     },
     {
       "path": "src/tactic/model_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/tactic/tactic_stored_model.go",
@@ -123639,7 +123647,8 @@
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
         "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
         "TestTacticModelConcatStopsAtChildErrorAndRejectsCopiedOwner",
-        "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+        "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild",
+        "TestTacticModelConcatDisplayAndTranslate"
       ],
       "conditionals": [
         {
@@ -123657,12 +123666,12 @@
           "text": "SASSERT(goal_idx == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "model_converter2model original derived allocation, owning assignment, indexed0 application",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/model/model_lifecycle.go",
           "go_targets": ["pkg/model/model_converter_allocation.go", "pkg/model/model_converter_memory_trace_debug_test.go"],
           "tests": [
@@ -123697,19 +123706,22 @@
           ]
         },
         {
-          "name": "cold model converter application/reference declarations",
-          "status": "partial",
+          "name": "typed model converter reference, application, label, cancel, display and translation declarations",
+          "status": "ported",
           "go_target": "pkg/tactic/tactic_model_converter.go",
           "tests": [
             "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
             "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
-            "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+            "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild",
+            "TestTacticModelConcatDisplayAndTranslate"
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The typed ModelConverter interface exposes explicit reference consumption and concrete model, label, display and translation operations. ModelRef and concat owners retain and release their concrete children explicitly."
+      ],
       "deviations": [
-        "Stored wrappers and composition use actual derived lifetime dispatch. Stored-model display and AST translation include constants, function graphs, universes and labels. model_converter2model allocates the original derived model, assigns it before indexed0 application, and preserves the assigned model on converter error; null converter leaves the output unchanged. Concat/star translation and display remain required before the unit is complete."
+        "Stored wrappers and composition use actual derived lifetime dispatch. Stored-model display and AST translation include constants, function graphs, universes and labels. model_converter2model allocates the original derived model, assigns it before indexed0 application, and preserves the assigned model on converter error; null converter leaves the output unchanged. Native Go slices replace source buffers and vectors."
       ]
     },
     {
