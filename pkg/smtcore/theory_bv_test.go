@@ -240,6 +240,40 @@ func TestSMTBitVectorSignedDivisionCircuits(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorOrdinarySignedRemainder(t *testing.T) {
+	m, _, solver := smtBVSolver(t)
+	minusSeven, err := m.BitVectorNumeralUint64(9, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(minusSeven)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "bv-ordinary-srem-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "bv-ordinary-srem-right"), sort)
+	astTestMust(t, err)
+	remainder, err := m.MkBitVectorSRem(left, right)
+	astTestMust(t, err)
+	three, err := m.BitVectorNumeralUint64(3, 4)
+	astTestMust(t, err)
+	minusOne, err := m.BitVectorNumeralUint64(15, 4)
+	astTestMust(t, err)
+	leftValue, err := m.MkEq(left, minusSeven)
+	astTestMust(t, err)
+	rightValue, err := m.MkEq(right, three)
+	astTestMust(t, err)
+	remainderValue, err := m.MkEq(remainder, minusOne)
+	astTestMust(t, err)
+	wrongRemainder, err := m.MkNot(remainderValue)
+	astTestMust(t, err)
+	for _, assertion := range []ast.ASTHandle{leftValue, rightValue, wrongRemainder} {
+		astTestMust(t, solver.Assert(assertion))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("ordinary signed remainder", status)
+	}
+}
+
 func TestSMTBitVectorMultiplicationCircuit(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
 	two, err := m.BitVectorNumeralUint64(2, 4)

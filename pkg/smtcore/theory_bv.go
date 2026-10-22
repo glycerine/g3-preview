@@ -192,6 +192,21 @@ func (t *SMTBitVectorTheory) boolNot(value ast.ASTHandle) (ast.ASTHandle, error)
 	if state.manager.IsFalse(value) {
 		return state.manager.MkTrue()
 	}
+	if kind, err := state.manager.GetKind(value); err != nil {
+		return ast.ASTHandle{}, err
+	} else if kind == ast.ASTApp {
+		family, err := state.manager.GetFamilyID(value)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		op, err := state.manager.GetDeclKind(value)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		if family == state.manager.BasicFamilyID() && op == ast.ASTOpNot {
+			return state.manager.GetArg(value, 0)
+		}
+	}
 	return state.manager.MkNot(value)
 }
 
