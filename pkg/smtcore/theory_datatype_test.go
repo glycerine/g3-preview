@@ -5,6 +5,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 func smtDatatypeSolver(t *testing.T) (*ast.ASTManager, ast.FamilyID, *SMTSolver) {
@@ -16,6 +17,51 @@ func smtDatatypeSolver(t *testing.T) (*ast.ASTManager, ast.FamilyID, *SMTSolver)
 	astTestMust(t, err)
 	astTestMust(t, solver.kernel.RegisterTheory(theory))
 	return m, family, solver
+}
+
+func TestSMTDatatypeQFDTSetup(t *testing.T) {
+	m := astTestManager(t)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_DT", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, solver.Close())
+		astTestMust(t, params.Close())
+	})
+	familySymbol, err := m.Symbols.Intern("datatype")
+	astTestMust(t, err)
+	family, err := m.FamilyIDForSymbol(familySymbol)
+	astTestMust(t, err)
+	if _, ok := solver.kernel.internalizer.theories[family].(*SMTDatatypeTheory); !ok {
+		t.Fatal("QF_DT did not install the datatype theory")
+	}
+	sorts, err := m.MkDatatypes([]ast.DatatypeDefinition{{
+		Name: astTestSymbol(t, m, "smt-qf-dt-color"),
+		Constructors: []ast.DatatypeConstructorDefinition{
+			{Name: astTestSymbol(t, m, "smt-qf-dt-red"), Recognizer: astTestSymbol(t, m, "smt-qf-dt-is-red")},
+			{Name: astTestSymbol(t, m, "smt-qf-dt-blue"), Recognizer: astTestSymbol(t, m, "smt-qf-dt-is-blue")},
+		},
+	}})
+	astTestMust(t, err)
+	constructors, err := m.DatatypeConstructors(sorts[0])
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "smt-qf-dt-x"), sorts[0])
+	astTestMust(t, err)
+	for _, constructor := range constructors {
+		recognizer, recErr := m.DatatypeConstructorRecognizer(constructor)
+		astTestMust(t, recErr)
+		atom, recErr := m.MkApp(recognizer, []ast.ASTHandle{x})
+		astTestMust(t, recErr)
+		negated, recErr := m.MkNot(atom)
+		astTestMust(t, recErr)
+		astTestMust(t, solver.Assert(negated))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("QF_DT setup ignored datatype exhaustiveness", status)
+	}
 }
 
 func TestSMTDatatypeRecognizerCases(t *testing.T) {
@@ -130,6 +176,69 @@ func TestSMTDatatypeRecursiveOccursCheck(t *testing.T) {
 			}
 			if status != want {
 				t.Fatal("recursive datatype status", status, "want", want)
+			}
+		})
+	}
+}
+
+func TestSMTDatatypeUpdateFieldAxioms(t *testing.T) {
+	for _, matching := range []bool{true, false} {
+		t.Run(map[bool]string{true: "matching-constructor", false: "identity"}[matching], func(t *testing.T) {
+			m, family, solver := smtDatatypeSolver(t)
+			boolean, err := m.MkBoolSort()
+			astTestMust(t, err)
+			sorts, err := m.MkDatatypes([]ast.DatatypeDefinition{{
+				Name: astTestSymbol(t, m, "smt-update-value"),
+				Constructors: []ast.DatatypeConstructorDefinition{
+					{Name: astTestSymbol(t, m, "smt-update-empty"), Recognizer: astTestSymbol(t, m, "smt-update-is-empty")},
+					{Name: astTestSymbol(t, m, "smt-update-pair"), Recognizer: astTestSymbol(t, m, "smt-update-is-pair"), Accessors: []ast.DatatypeAccessorDefinition{
+						{Name: astTestSymbol(t, m, "smt-update-first"), Range: boolean},
+						{Name: astTestSymbol(t, m, "smt-update-second"), Range: boolean},
+					}},
+				},
+			}})
+			astTestMust(t, err)
+			constructors, err := m.DatatypeConstructors(sorts[0])
+			astTestMust(t, err)
+			accessors, err := m.DatatypeConstructorAccessors(constructors[1])
+			astTestMust(t, err)
+			parameter, err := m.NewParameterAST(accessors[0])
+			astTestMust(t, err)
+			updateDecl, err := m.MkFamilyFuncDecl(family, ast.ASTDatatypeUpdateField, []ast.ASTParameter{parameter}, []ast.ASTHandle{sorts[0], boolean}, ast.ASTHandle{})
+			astTestMust(t, err)
+			astTestPin(t, m, updateDecl)
+			astTestMust(t, m.DelParameter(&parameter))
+			x, err := m.MkConst(astTestSymbol(t, m, "smt-update-x"), sorts[0])
+			astTestMust(t, err)
+			truth, err := m.MkTrue()
+			astTestMust(t, err)
+			updated, err := m.MkApp(updateDecl, []ast.ASTHandle{x, truth})
+			astTestMust(t, err)
+			recognizerDecl, err := m.DatatypeConstructorRecognizer(constructors[1])
+			astTestMust(t, err)
+			isPair, err := m.MkApp(recognizerDecl, []ast.ASTHandle{x})
+			astTestMust(t, err)
+			if matching {
+				astTestMust(t, solver.Assert(isPair))
+				selected, selectErr := m.MkApp(accessors[0], []ast.ASTHandle{updated})
+				astTestMust(t, selectErr)
+				negated, selectErr := m.MkNot(selected)
+				astTestMust(t, selectErr)
+				astTestMust(t, solver.Assert(negated))
+			} else {
+				notPair, assertionErr := m.MkNot(isPair)
+				astTestMust(t, assertionErr)
+				astTestMust(t, solver.Assert(notPair))
+				equal, assertionErr := m.MkEq(updated, x)
+				astTestMust(t, assertionErr)
+				different, assertionErr := m.MkNot(equal)
+				astTestMust(t, assertionErr)
+				astTestMust(t, solver.Assert(different))
+			}
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("update-field axiom did not conflict", status)
 			}
 		})
 	}

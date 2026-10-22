@@ -34,6 +34,15 @@ func smtLogicUsesBitVectors(logic string) bool {
 	}
 }
 
+func smtLogicUsesDatatypes(logic string) bool {
+	switch logic {
+	case "QF_DT", "QF_FD", "ALL":
+		return true
+	default:
+		return false
+	}
+}
+
 func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic string) error {
 	if kernel == nil || manager == nil {
 		return ast.ErrASTHandle
@@ -104,6 +113,19 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 			return err
 		}
 		theory, theoryErr := NewSMTBitVectorTheory(family)
+		if theoryErr != nil {
+			return theoryErr
+		}
+		if err = kernel.RegisterTheory(theory); err != nil {
+			return err
+		}
+	}
+	if smtLogicUsesDatatypes(logic) {
+		family, err := manager.RegisterDatatypePlugin()
+		if err != nil {
+			return err
+		}
+		theory, theoryErr := NewSMTDatatypeTheory(family)
 		if theoryErr != nil {
 			return theoryErr
 		}

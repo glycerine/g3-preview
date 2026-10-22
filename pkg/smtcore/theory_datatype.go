@@ -3,6 +3,8 @@
 package smtcore
 
 import (
+	"fmt"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
@@ -13,7 +15,7 @@ type smtDatatypeScope struct {
 }
 
 type smtDatatypeStatistics struct {
-	constructorAxioms, accessorAxioms, splits, occursChecks uint64
+	constructorAxioms, accessorAxioms, updateAxioms, splits, occursChecks uint64
 }
 
 // SMTDatatypeTheory encodes constructor cases with recognizer clauses and
@@ -162,6 +164,75 @@ func (t *SMTDatatypeTheory) publishConstructor(value, constructor ast.ASTHandle)
 	return nil
 }
 
+func (t *SMTDatatypeTheory) publishUpdate(node *SMTEnode) error {
+	if len(node.arguments) != 2 {
+		return ast.ErrASTDomain
+	}
+	state, _ := t.State()
+	declaration, err := state.manager.GetDecl(node.owner)
+	if err != nil {
+		return fmt.Errorf("datatype update declaration: %w", err)
+	}
+	updatedAccessor, matched, err := state.manager.DatatypeUpdateAccessor(declaration)
+	if err != nil || !matched {
+		if err != nil {
+			return fmt.Errorf("datatype update accessor: %w", err)
+		}
+		return ast.ErrASTDomain
+	}
+	sort, err := state.manager.GetSort(node.arguments[0].owner)
+	if err != nil {
+		return fmt.Errorf("datatype update base sort: %w", err)
+	}
+	constructors, err := state.manager.DatatypeConstructors(sort)
+	if err != nil {
+		return fmt.Errorf("datatype update constructors: %w", err)
+	}
+	var constructor ast.ASTHandle
+	for _, candidate := range constructors {
+		_, same, indexErr := state.manager.DatatypeAccessorIndex(updatedAccessor, candidate)
+		if indexErr != nil {
+			return fmt.Errorf("datatype update accessor index: %w", indexErr)
+		}
+		if same {
+			constructor = candidate
+			break
+		}
+	}
+	if constructor.IsNull() {
+		return ast.ErrASTDomain
+	}
+	recognizer, _, err := t.recognizerLiteral(constructor, node.arguments[0].owner)
+	if err != nil {
+		return fmt.Errorf("datatype update recognizer: %w", err)
+	}
+	accessors, err := state.manager.DatatypeConstructorAccessors(constructor)
+	if err != nil {
+		return fmt.Errorf("datatype update constructor accessors: %w", err)
+	}
+	for _, accessor := range accessors {
+		selected, selectErr := state.manager.MkApp(accessor, []ast.ASTHandle{node.owner})
+		if selectErr != nil {
+			return fmt.Errorf("datatype update result accessor: %w", selectErr)
+		}
+		right := node.arguments[1].owner
+		if accessor != updatedAccessor {
+			right, selectErr = state.manager.MkApp(accessor, []ast.ASTHandle{node.arguments[0].owner})
+			if selectErr != nil {
+				return fmt.Errorf("datatype update base accessor: %w", selectErr)
+			}
+		}
+		if err = t.equalityAxiom(selected, right, recognizer); err != nil {
+			return fmt.Errorf("datatype update field equality: %w", err)
+		}
+	}
+	if err = t.equalityAxiom(node.owner, node.arguments[0].owner, recognizer.Negated()); err != nil {
+		return fmt.Errorf("datatype update identity: %w", err)
+	}
+	t.statistics.updateAxioms++
+	return nil
+}
+
 func (t *SMTDatatypeTheory) attachVariable(node *SMTEnode) error {
 	if t.IsAttachedToVariable(node) {
 		return nil
@@ -249,6 +320,11 @@ func (t *SMTDatatypeTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		if argumentErr = state.Internalize(argument, false); argumentErr != nil {
 			return false, argumentErr
 		}
+		if state.context.enodes[argument] == nil && (state.manager.IsTrue(argument) || state.manager.IsFalse(argument)) {
+			if _, argumentErr = state.MkEnode(argument, false, true, false); argumentErr != nil {
+				return false, fmt.Errorf("datatype Boolean value enode: %w", argumentErr)
+			}
+		}
 	}
 	node := state.context.enodes[expression]
 	if node == nil {
@@ -258,11 +334,8 @@ func (t *SMTDatatypeTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		}
 		node, err = state.MkEnode(expression, false, boolean, true)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("datatype enode: %w", err)
 		}
-	}
-	if operation == ast.ASTDatatypeUpdateField {
-		t.unsupported = true
 	}
 	if operation == ast.ASTDatatypeConstructor || operation == ast.ASTDatatypeUpdateField {
 		for _, argument := range node.arguments {
@@ -272,22 +345,23 @@ func (t *SMTDatatypeTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 			}
 			if family, familyErr := state.manager.GetFamilyID(sort); familyErr == nil && family == t.FamilyID() {
 				if sortErr = t.ensureVariable(argument); sortErr != nil {
-					return false, sortErr
+					return false, fmt.Errorf("datatype argument variable: %w", sortErr)
 				}
 			}
 		}
 		if err = t.ensureVariable(node); err != nil {
-			return false, err
+			return false, fmt.Errorf("datatype result variable: %w", err)
+		}
+		if operation == ast.ASTDatatypeUpdateField {
+			if err = t.publishUpdate(node); err != nil {
+				return false, err
+			}
 		}
 	} else if len(node.arguments) == 1 {
 		if err = t.ensureVariable(node.arguments[0]); err != nil {
 			return false, err
 		}
-		sort, sortErr := state.manager.GetSort(expression)
-		if sortErr != nil {
-			return false, sortErr
-		}
-		if family, familyErr := state.manager.GetFamilyID(sort); familyErr == nil && family == t.FamilyID() {
+		if operation == ast.ASTDatatypeAccessor {
 			if err = t.attachVariable(node); err != nil {
 				return false, err
 			}
@@ -531,6 +605,7 @@ func (t *SMTDatatypeTheory) CollectStatistics(target *statistics.Statistics) err
 	target.UpdateUint64("datatype splits", t.statistics.splits)
 	target.UpdateUint64("datatype constructor ax", t.statistics.constructorAxioms)
 	target.UpdateUint64("datatype accessor ax", t.statistics.accessorAxioms)
+	target.UpdateUint64("datatype update field ax", t.statistics.updateAxioms)
 	target.UpdateUint64("datatype occurs check", t.statistics.occursChecks)
 	return nil
 }

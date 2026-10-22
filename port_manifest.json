@@ -109780,7 +109780,8 @@
         "TestSMTSolverUFLinearArithmeticCongruence",
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
         "TestSMTSolverSetupUsesRealDifferenceLogic",
-        "TestSMTSolverPublishesStrictRealDifferenceModel"
+        "TestSMTSolverPublishesStrictRealDifferenceModel",
+        "TestSMTDatatypeQFDTSetup"
       ],
       "assertions": [
         {
@@ -109815,10 +109816,18 @@
           ]
         },
         {
-          "name": "static-feature auto configuration, concrete arithmetic, array, bit-vector, datatype, finite-domain, sequence, string, pseudo-Boolean, and floating-point theory selection",
+          "name": "static-feature auto configuration plus concrete finite-domain, sequence, string, pseudo-Boolean, and floating-point theory selection",
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "explicit QF_DT, QF_FD and ALL datatype theory selection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "tests": [
+            "TestSMTDatatypeQFDTSetup"
+          ]
         }
       ],
       "ownership": [
@@ -114249,7 +114258,9 @@
       "tests": [
         "TestSMTDatatypeRecognizerCases",
         "TestSMTDatatypeConstructorAccessor",
-        "TestSMTDatatypeRecursiveOccursCheck"
+        "TestSMTDatatypeRecursiveOccursCheck",
+        "TestSMTDatatypeUpdateFieldAxioms",
+        "TestSMTDatatypeQFDTSetup"
       ],
       "assertions": [
         {
@@ -114478,7 +114489,9 @@
       "tests": [
         "TestSMTDatatypeRecognizerCases",
         "TestSMTDatatypeConstructorAccessor",
-        "TestSMTDatatypeRecursiveOccursCheck"
+        "TestSMTDatatypeRecursiveOccursCheck",
+        "TestSMTDatatypeUpdateFieldAxioms",
+        "TestSMTDatatypeQFDTSetup"
       ],
       "conditionals": [
         {
