@@ -113694,9 +113694,15 @@
       "path": "src/smt/theory_bv.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_bv.go"
+      ],
+      "tests": [
+        "TestSMTBitVectorNumeralEquality",
+        "TestSMTBitVectorNumeralBit2Bool",
+        "TestSMTBitVectorUnsupportedOperationGivesUnknown"
+      ],
       "conditionals": [
         {
           "line": 1124,
@@ -114047,9 +114053,15 @@
       "path": "src/smt/theory_bv.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_bv.go"
+      ],
+      "tests": [
+        "TestSMTBitVectorNumeralEquality",
+        "TestSMTBitVectorNumeralBit2Bool",
+        "TestSMTBitVectorUnsupportedOperationGivesUnknown"
+      ],
       "conditionals": [
         {
           "line": 19,

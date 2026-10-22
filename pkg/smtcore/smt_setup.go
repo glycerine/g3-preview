@@ -25,6 +25,15 @@ func smtLogicUsesArrays(logic string) bool {
 	}
 }
 
+func smtLogicUsesBitVectors(logic string) bool {
+	switch logic {
+	case "QF_BV", "QF_UFBV", "QF_AUFBV", "QF_ABV", "QF_BVRE", "QF_FPBV", "QF_BVFP":
+		return true
+	default:
+		return false
+	}
+}
+
 func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic string) error {
 	if kernel == nil || manager == nil {
 		return ast.ErrASTHandle
@@ -78,6 +87,23 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 			return err
 		}
 		theory, theoryErr := NewSMTArrayTheory(family)
+		if theoryErr != nil {
+			return theoryErr
+		}
+		if err = kernel.RegisterTheory(theory); err != nil {
+			return err
+		}
+	}
+	if smtLogicUsesBitVectors(logic) {
+		name, err := manager.Symbols.Intern("bv")
+		if err != nil {
+			return err
+		}
+		family, err := manager.FamilyIDForSymbol(name)
+		if err != nil {
+			return err
+		}
+		theory, theoryErr := NewSMTBitVectorTheory(family)
 		if theoryErr != nil {
 			return theoryErr
 		}
