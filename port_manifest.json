@@ -41600,6 +41600,7 @@
         "TestDirectProofNoProofResolutionLocalization",
         "TestDirectProofEquivalenceChainSymmetrySimplification",
         "TestDirectProofNegationChainSymmetrySimplification",
+        "TestDirectProofRewriteChainAbsorption",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41818,9 +41819,10 @@
             "TestDirectProofGenericSymbolicSimplification",
             "TestDirectProofOrdinarySumSimplification",
             "TestDirectProofEquivalenceChainSymmetrySimplification",
-            "TestDirectProofNegationChainSymmetrySimplification"
+            "TestDirectProofNegationChainSymmetrySimplification",
+            "TestDirectProofRewriteChainAbsorption"
           ],
-          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, and equivalence/negation-chain symmetry are ported. Specialized rotation, nested/normal arithmetic sums, excluded-middle, congruence, modus-ponens, and full rewrite-chain normalization remain pending."
+          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, equivalence/negation-chain symmetry, rewrite absorption, mover ordering, and normalized chain concatenation are ported. Specialized rotation, nested/normal arithmetic sums, excluded-middle, congruence, modus-ponens, and chain-to-formula reduction remain pending."
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
@@ -41898,6 +41900,7 @@
         "TestDirectProofNoProofResolutionLocalization",
         "TestDirectProofEquivalenceChainSymmetrySimplification",
         "TestDirectProofNegationChainSymmetrySimplification",
+        "TestDirectProofRewriteChainAbsorption",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],

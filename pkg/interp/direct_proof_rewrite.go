@@ -169,6 +169,284 @@ func (p *DirectProofInterpolator) positionIndex(position ast.ASTHandle) (int64, 
 	return index.Num().Int64(), rest, err
 }
 
+func (p *DirectProofInterpolator) positionDifference(first, second ast.ASTHandle) (int, ast.ASTHandle, error) {
+	if first == p.topPosition {
+		if second == p.topPosition {
+			return 0, p.topPosition, nil
+		}
+		return 1, second, nil
+	}
+	if second == p.topPosition {
+		return -1, first, nil
+	}
+	firstIndex, firstRest, err := p.positionIndex(first)
+	if err != nil {
+		return 0, ast.ASTHandle{}, err
+	}
+	secondIndex, secondRest, err := p.positionIndex(second)
+	if err != nil {
+		return 0, ast.ASTHandle{}, err
+	}
+	if firstIndex != secondIndex {
+		return 2, ast.ASTHandle{}, nil
+	}
+	return p.positionDifference(firstRest, secondRest)
+}
+
+func (p *DirectProofInterpolator) substituteAtPosition(term, position, replacement ast.ASTHandle) (ast.ASTHandle, error) {
+	if position == p.topPosition {
+		return replacement, nil
+	}
+	index, rest, err := p.positionIndex(position)
+	if err != nil || index < 0 {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	args, err := p.base.manager.Args(term)
+	if err != nil || index >= int64(len(args)) {
+		return ast.ASTHandle{}, ProofError{}
+	}
+	args[index], err = p.substituteAtPosition(args[index], rest, replacement)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.Clone(term, args)
+}
+
+func (p *DirectProofInterpolator) updateRewrite(rewrite, position, replacement, extraCondition ast.ASTHandle, updateRight bool) (ast.ASTHandle, error) {
+	side, rewritePosition, condition, equality, err := p.rewriteFields(rewrite)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	op, err := p.base.manager.Operator(equality)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	left, err := p.base.manager.Arg(equality, 0)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	right, err := p.base.manager.Arg(equality, 1)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if updateRight {
+		right, err = p.substituteAtPosition(right, position, replacement)
+	} else {
+		left, err = p.substituteAtPosition(left, position, replacement)
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	condition, err = p.base.manager.MkAnd(condition, extraCondition)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	equality, err = p.base.manager.Make(op, left, right)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.makeRewrite(side, rewritePosition, condition, equality)
+}
+
+func (p *DirectProofInterpolator) rewriteEndpoints(rewrite ast.ASTHandle) (left, right ast.ASTHandle, err error) {
+	_, _, _, equality, err := p.rewriteFields(rewrite)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	left, err = p.base.manager.Arg(equality, 0)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, err
+	}
+	right, err = p.base.manager.Arg(equality, 1)
+	return left, right, err
+}
+
+func (p *DirectProofInterpolator) termCommon(term ast.ASTHandle) (bool, error) {
+	scope, err := p.base.ASTScope(term)
+	if err != nil {
+		return false, err
+	}
+	intersects, err := p.base.scopes.RangesIntersect(scope, p.scope)
+	if err != nil {
+		return false, err
+	}
+	contained, err := p.base.scopes.RangeContained(scope, p.scope)
+	return intersects && !contained, err
+}
+
+func (p *DirectProofInterpolator) rewriteMover(rewrite ast.ASTHandle) (leftMover, rightMover, common bool, err error) {
+	left, right, err := p.rewriteEndpoints(rewrite)
+	if err != nil {
+		return false, false, false, err
+	}
+	leftCommon, err := p.termCommon(left)
+	if err != nil {
+		return false, false, false, err
+	}
+	rightCommon, err := p.termCommon(right)
+	if err != nil {
+		return false, false, false, err
+	}
+	return rightCommon && !leftCommon, leftCommon && !rightCommon, leftCommon && rightCommon, nil
+}
+
+func (p *DirectProofInterpolator) rewriteToFormula(rewrite ast.ASTHandle) (ast.ASTHandle, error) {
+	_, _, condition, equality, err := p.rewriteFields(rewrite)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.base.manager.MkImplies(condition, equality)
+}
+
+func (p *DirectProofInterpolator) flipRewrite(rewrite ast.ASTHandle) (ast.ASTHandle, error) {
+	side, position, condition, equality, err := p.rewriteFields(rewrite)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	formula, err := p.rewriteToFormula(rewrite)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	condition, err = p.base.manager.MkImplies(condition, formula)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if side == TermA {
+		side = TermB
+	} else {
+		side = TermA
+	}
+	return p.makeRewrite(side, position, condition, equality)
+}
+
+func (p *DirectProofInterpolator) addRewriteToChain(chain, rewrite ast.ASTHandle) (ast.ASTHandle, error) {
+	empty, err := p.base.manager.IsTrue(chain)
+	if err != nil || empty {
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		return p.chainCons(chain, rewrite)
+	}
+	rest, last, err := p.chainParts(chain)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	lastSide, lastPosition, lastCondition, _, err := p.rewriteFields(last)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	rewriteSide, rewritePosition, rewriteCondition, _, err := p.rewriteFields(rewrite)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if lastSide == rewriteSide {
+		relation, difference, e := p.positionDifference(lastPosition, rewritePosition)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		switch relation {
+		case 1:
+			_, rewriteRight, e := p.rewriteEndpoints(rewrite)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			absorbed, e := p.updateRewrite(last, difference, rewriteRight, rewriteCondition, true)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			return p.addRewriteToChain(rest, absorbed)
+		case 0, -1:
+			lastLeft, _, e := p.rewriteEndpoints(last)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			absorbed, e := p.updateRewrite(rewrite, difference, lastLeft, lastCondition, false)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			return p.addRewriteToChain(rest, absorbed)
+		default:
+			_, lastRightMover, _, e := p.rewriteMover(last)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			rewriteLeftMover, _, _, e := p.rewriteMover(rewrite)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			if (rewriteLeftMover && !lastRightMover) || (lastRightMover && !rewriteLeftMover) {
+				return p.swapChainRewrites(rest, last, rewrite)
+			}
+		}
+	} else {
+		lastLeftMover, lastRightMover, lastCommon, e := p.rewriteMover(last)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		rewriteLeftMover, rewriteRightMover, rewriteCommon, e := p.rewriteMover(rewrite)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if rewriteLeftMover {
+			if lastCommon {
+				last, e = p.flipRewrite(last)
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				chain, e = p.chainCons(rest, last)
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				return p.addRewriteToChain(chain, rewrite)
+			}
+			if !lastLeftMover {
+				return p.swapChainRewrites(rest, last, rewrite)
+			}
+		}
+		if lastRightMover {
+			if rewriteCommon {
+				rewrite, e = p.flipRewrite(rewrite)
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				return p.addRewriteToChain(chain, rewrite)
+			}
+			if !rewriteRightMover {
+				return p.swapChainRewrites(rest, last, rewrite)
+			}
+		}
+	}
+	return p.chainCons(chain, rewrite)
+}
+
+func (p *DirectProofInterpolator) swapChainRewrites(rest, last, rewrite ast.ASTHandle) (ast.ASTHandle, error) {
+	chain, err := p.addRewriteToChain(rest, rewrite)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.chainCons(chain, last)
+}
+
+func (p *DirectProofInterpolator) concatRewriteChains(first, second ast.ASTHandle) (ast.ASTHandle, error) {
+	empty, err := p.base.manager.IsTrue(second)
+	if err != nil || empty {
+		return first, err
+	}
+	empty, err = p.base.manager.IsTrue(first)
+	if err != nil || empty {
+		return second, err
+	}
+	rest, last, err := p.chainParts(second)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	first, err = p.concatRewriteChains(first, rest)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.addRewriteToChain(first, last)
+}
+
 func (p *DirectProofInterpolator) isEquivalenceChain(chain ast.ASTHandle) (bool, error) {
 	for {
 		empty, err := p.base.manager.IsTrue(chain)

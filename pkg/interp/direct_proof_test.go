@@ -821,3 +821,38 @@ func TestDirectProofNegationChainSymmetrySimplification(t *testing.T) {
 		t.Fatal("commuted negation chain", left, other, negativeP, p)
 	}
 }
+
+func TestDirectProofRewriteChainAbsorption(t *testing.T) {
+	_, manager, base, p, _ := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	truth, err := manager.Make(OperatorTrue)
+	interpMust(t, err)
+	negativeP, err := manager.MkNot(p)
+	interpMust(t, err)
+	forward, err := manager.Make(OperatorIff, p, negativeP)
+	interpMust(t, err)
+	backward, err := manager.Make(OperatorIff, negativeP, p)
+	interpMust(t, err)
+	forward, err = direct.makeRewrite(TermA, direct.topPosition, truth, forward)
+	interpMust(t, err)
+	backward, err = direct.makeRewrite(TermA, direct.topPosition, truth, backward)
+	interpMust(t, err)
+	chain, err := direct.chainCons(truth, forward)
+	interpMust(t, err)
+	second, err := direct.chainCons(truth, backward)
+	interpMust(t, err)
+	chain, err = direct.concatRewriteChains(chain, second)
+	interpMust(t, err)
+	rest, rewrite, err := direct.chainParts(chain)
+	interpMust(t, err)
+	if empty, e := manager.IsTrue(rest); e != nil || !empty {
+		t.Fatal("absorbed chain rest", empty, e)
+	}
+	left, right, err := direct.rewriteEndpoints(rewrite)
+	interpMust(t, err)
+	if left != p || right != p {
+		t.Fatal("absorbed rewrite", left, right, p)
+	}
+}
