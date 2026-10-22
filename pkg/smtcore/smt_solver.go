@@ -19,8 +19,9 @@ import (
 )
 
 type SMTSolverConfig struct {
-	Params      *uparams.ParamsContext
-	Quantifiers *SMTQuantifierRegistry
+	Params       *uparams.ParamsContext
+	Quantifiers  *SMTQuantifierRegistry
+	TargetConfig func(*ast.ASTManager) (SMTSolverConfig, error)
 }
 
 type smtTrackedAssertion struct {
@@ -492,11 +493,90 @@ func (s *SMTSolver) Display(out io.Writer, assumptions []ast.ASTHandle) error {
 	return solver.DefaultDisplay(s, out, assumptions)
 }
 
-func (s *SMTSolver) Translate(*ast.ASTManager, *uparams.ParamsRef) (solver.Solver, error) {
+func (s *SMTSolver) Translate(manager *ast.ASTManager, params *uparams.ParamsRef) (solver.Solver, error) {
 	if err := s.open(); err != nil {
 		return nil, err
 	}
-	return nil, ast.ErrASTDomain
+	if manager == nil {
+		return nil, ast.ErrASTHandle
+	}
+	if level, err := s.ScopeLevel(); err != nil {
+		return nil, err
+	} else if level != 0 {
+		return nil, z3exception.NewDefaultException("translation of contexts is only supported at base level")
+	}
+	config := s.config
+	if err := config.Params.CheckServices(manager.Symbols, manager.NumeralService()); err != nil {
+		if config.TargetConfig == nil {
+			return nil, err
+		}
+		config, err = config.TargetConfig(manager)
+		if err != nil {
+			return nil, err
+		}
+	}
+	logic := ""
+	var err error
+	if s.logic != (usymbol.Symbol{}) {
+		logic, err = s.manager.Symbols.String(s.logic)
+		if err != nil {
+			return nil, err
+		}
+	}
+	next, err := NewSMTSolver(manager, params, logic, config)
+	if err != nil {
+		return nil, err
+	}
+	next.produceModels = s.produceModels
+	translate := func(value ast.ASTHandle) (ast.ASTHandle, error) { return value, nil }
+	var translation *ast.ASTTranslation
+	if manager != s.manager {
+		translation, err = ast.NewASTTranslation(s.manager, manager, false)
+		if err != nil {
+			_ = next.Close()
+			return nil, err
+		}
+		defer translation.Close()
+		translate = translation.Translate
+	}
+	for _, assertion := range s.kernel.Assertions() {
+		formula, copyErr := translate(assertion.Formula)
+		if copyErr != nil {
+			_ = next.Close()
+			return nil, copyErr
+		}
+		proof, copyErr := translate(assertion.Proof)
+		if copyErr != nil {
+			_ = next.Close()
+			return nil, copyErr
+		}
+		if copyErr = next.kernel.Assert(formula, proof); copyErr != nil {
+			_ = next.Close()
+			return nil, copyErr
+		}
+	}
+	for _, assertion := range s.tracked {
+		formula, getErr := s.manager.RefGet(assertion.formula)
+		if getErr != nil {
+			_ = next.Close()
+			return nil, getErr
+		}
+		formula, getErr = translate(formula)
+		if getErr != nil {
+			_ = next.Close()
+			return nil, getErr
+		}
+		tag, getErr := translate(assertion.tag)
+		if getErr != nil {
+			_ = next.Close()
+			return nil, getErr
+		}
+		if getErr = next.AssertTracked(formula, tag); getErr != nil {
+			_ = next.Close()
+			return nil, getErr
+		}
+	}
+	return next, nil
 }
 
 func (s *SMTSolver) Close() error {

@@ -108784,6 +108784,7 @@
         "TestSMTSolverPublishesKernelUnsatProof",
         "TestSMTSolverReasonUnknownUsesKernelFailure",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
+        "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
         "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
       ],
       "assertions": [
@@ -108817,6 +108818,7 @@
             "TestSMTSolverPublishesKernelUnsatProof",
             "TestSMTSolverReasonUnknownUsesKernelFailure",
             "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
+            "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
             "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
           ]
         },
@@ -108829,7 +108831,16 @@
           ]
         },
         {
-          "name": "kernel translation and copy, model exposure, consequence and mutex solving, progress sampling, and unsat-core minimization and pattern extension",
+          "name": "base-level kernel assertion, proof, named-assertion, logic, and configuration translation",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
+            "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
+          ]
+        },
+        {
+          "name": "registered theory-plugin copying, model exposure, consequence and mutex solving, progress sampling, and unsat-core minimization and pattern extension",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -108839,7 +108850,8 @@
         "SMTSolver owns its SMTKernel, named-assertion adapter, current check result, copied parameter reference, and retained tracked-formula references; it borrows the AST manager, parameter context, quantifier registry, and progress callback."
       ],
       "deviations": [
-        "Unavailable kernel result facilities return empty ordinary result fields or an explicit domain error; they are not simulated by a universal adapter."
+        "Unavailable kernel result facilities return empty ordinary result fields or an explicit domain error; they are not simulated by a universal adapter.",
+        "Cross-manager translation obtains manager-bound parameter and quantifier services through TargetConfig and preserves the source's duplicate named-implication assertion after copying kernel formulas."
       ]
     },
     {

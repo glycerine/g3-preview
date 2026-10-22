@@ -277,9 +277,14 @@ func TestSMTSolverFactoryAndUnsupportedKernelPrerequisites(t *testing.T) {
 		t.Fatal("factory result", value)
 	}
 	t.Cleanup(func() { astTestMust(t, s.Close()) })
-	if _, err = s.Translate(m, nil); !errors.Is(err, ast.ErrASTDomain) {
-		t.Fatal("kernel translation prerequisite", err)
+	translated, err := s.Translate(m, nil)
+	astTestMust(t, err)
+	astTestMust(t, translated.Close())
+	astTestMust(t, s.Push())
+	if _, err = s.Translate(m, nil); err == nil {
+		t.Fatal("scoped kernel translation accepted")
 	}
+	astTestMust(t, s.Pop(1))
 	if status, _, err := s.GetConsequences(nil, nil); status != lbool.Undef || !errors.Is(err, ast.ErrASTDomain) {
 		t.Fatal("kernel consequences prerequisite", status, err)
 	}
@@ -290,4 +295,58 @@ func TestSMTSolverFactoryAndUnsupportedKernelPrerequisites(t *testing.T) {
 		t.Fatal("scope underflow", err)
 	}
 	var _ solver.Solver = s
+}
+
+func TestSMTSolverTranslatesBaseKernelAndTrackedAssertions(t *testing.T) {
+	source := astTestManager(t)
+	target := astTestManager(t)
+	sourceParams, err := uparams.NewParamsContext(source.Symbols, source.NumeralService(), uparams.ParamsConfig{Budget: source.Budget()})
+	astTestMust(t, err)
+	targetParams, err := uparams.NewParamsContext(target.Symbols, target.NumeralService(), uparams.ParamsConfig{Budget: target.Budget()})
+	astTestMust(t, err)
+	targetConfig := SMTSolverConfig{Params: targetParams}
+	sourceConfig := SMTSolverConfig{Params: sourceParams, TargetConfig: func(manager *ast.ASTManager) (SMTSolverConfig, error) {
+		if manager != target {
+			return SMTSolverConfig{}, ast.ErrASTHandle
+		}
+		return targetConfig, nil
+	}}
+	s, err := NewSMTSolver(source, nil, "QF_UF", sourceConfig)
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, s.Close())
+		astTestMust(t, targetParams.Close())
+		astTestMust(t, sourceParams.Close())
+	})
+	a := smtRelevancyBool(t, source, "smt-translate-a")
+	b := smtRelevancyBool(t, source, "smt-translate-b")
+	tag := smtRelevancyBool(t, source, "smt-translate-tag")
+	astTestMust(t, s.Assert(b))
+	astTestMust(t, s.AssertTracked(a, tag))
+
+	value, err := s.Translate(target, nil)
+	astTestMust(t, err)
+	translated, ok := value.(*SMTSolver)
+	if !ok {
+		t.Fatal("translated solver type", value)
+	}
+	t.Cleanup(func() { astTestMust(t, translated.Close()) })
+	if count, err := translated.NumAssertions(); err != nil || count != 3 {
+		t.Fatal("translated copied and named assertions", count, err)
+	}
+	if count, err := translated.NumAssumptions(); err != nil || count != 1 {
+		t.Fatal("translated named assumptions", count, err)
+	}
+	translation, err := ast.NewASTTranslation(source, target, false)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, translation.Close()) })
+	notA, err := source.MkNot(a)
+	astTestMust(t, err)
+	targetNotA, err := translation.Translate(notA)
+	astTestMust(t, err)
+	status, err := translated.CheckSat([]ast.ASTHandle{targetNotA})
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("translated tracked assertion", status)
+	}
 }
