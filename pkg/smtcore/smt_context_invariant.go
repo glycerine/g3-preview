@@ -54,6 +54,17 @@ func (s *SMTInternalizerState) CheckInvariant() error {
 	}
 	for index := range s.clauses {
 		record := &s.clauses[index]
+		if record.Binary {
+			if record.clause != nil || len(record.Literals) != 2 {
+				return ast.ErrASTDomain
+			}
+			first, second := record.Literals[0], record.Literals[1]
+			if s.watches[first.Negated().Index()].FindLiteral(second) < 0 ||
+				s.watches[second.Negated().Index()].FindLiteral(first) < 0 {
+				return ast.ErrASTDomain
+			}
+			continue
+		}
 		if record.clause == nil || record.clause.Deleted() || len(record.Literals) < 2 {
 			return ast.ErrASTDomain
 		}

@@ -145,6 +145,19 @@ func (s *SMTInternalizerState) addClauseKind(literals []SMTLiteral, root bool, k
 	if len(kept) == 1 {
 		return s.assignLiteral(kept[0])
 	}
+	if len(kept) == 2 && s.binaryClauseOptimization && s.scopeLevel == 0 && (kind == SMTClauseAux || s.relevancy == nil) {
+		first, second := kept[0], kept[1]
+		if err := s.watches[first.Negated().Index()].InsertLiteral(second); err != nil {
+			return err
+		}
+		if err := s.watches[second.Negated().Index()].InsertLiteral(first); err != nil {
+			_ = s.watches[first.Negated().Index()].RemoveLiteral(second)
+			return err
+		}
+		s.clauses = append(s.clauses, SMTInternalizedClause{Literals: kept, Root: root, Binary: true, Proof: proof})
+		s.statistics.NumMkBinClause++
+		return nil
+	}
 	clause, owner, err := s.makeClause(kept, kind, proof)
 	if err != nil {
 		return err

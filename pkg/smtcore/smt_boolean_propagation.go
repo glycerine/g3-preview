@@ -132,7 +132,21 @@ func (s *SMTInternalizerState) makeClause(literals []SMTLiteral, kind SMTClauseK
 }
 
 func (s *SMTInternalizerState) closeClause(record *SMTInternalizedClause) error {
-	if record == nil || record.clause == nil {
+	if record == nil {
+		return nil
+	}
+	if record.Binary {
+		if len(record.Literals) != 2 {
+			return ast.ErrASTDomain
+		}
+		first, second := record.Literals[0], record.Literals[1]
+		if !s.watches[first.Negated().Index()].RemoveLiteral(second) || !s.watches[second.Negated().Index()].RemoveLiteral(first) {
+			return ast.ErrASTDomain
+		}
+		record.Binary = false
+		return nil
+	}
+	if record.clause == nil {
 		return nil
 	}
 	for index := 0; index < 2; index++ {
@@ -166,6 +180,26 @@ func (s *SMTInternalizerState) Propagate() (bool, error) {
 		assigned := s.assignedLiterals[s.propagationHead]
 		s.propagationHead++
 		watch := &s.watches[assigned.Index()]
+		for _, implied := range watch.Literals() {
+			value, err := s.Assignment(implied)
+			if err != nil {
+				return false, err
+			}
+			justification := NewSMTBooleanBinaryClause(assigned)
+			switch value {
+			case lbool.False:
+				s.inconsistent = true
+				s.conflict = justification
+				s.conflictLiteral = implied
+				s.statistics.NumConflicts++
+				return false, nil
+			case lbool.Undef:
+				s.statistics.NumPropagations++
+				if err = s.AssignLiteral(implied, justification); err != nil {
+					return false, err
+				}
+			}
+		}
 		clauses := watch.Clauses()
 		kept := 0
 		for index := 0; index < len(clauses); index++ {

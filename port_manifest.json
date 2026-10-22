@@ -106588,6 +106588,7 @@
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/smtcore/smt_internalizer.go",
         "pkg/smtcore/smt_boolean_propagation.go",
+        "pkg/smtcore/smt_binary_clause_test.go",
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_theory.go"
       ],
@@ -106605,7 +106606,10 @@
         "TestSMTInternalizerDeepAssertionUsesTopologicalPrepass",
         "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
-        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents"
+        "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
+        "TestSMTBinaryClauseOptimizationPropagationAndInvariant",
+        "TestSMTBinaryClauseOptimizationConflictAndEligibility",
+        "TestSMTBinaryClauseOptimizationDefersScopedClauses"
       ],
       "conditionals": [
         {
@@ -107011,7 +107015,17 @@
           ]
         },
         {
-          "name": "binary-clause optimization, learned and auxiliary-lemma watch selection and reinitialization, proof-producing gate and root clauses, and clause garbage collection",
+          "name": "compact binary-clause reciprocal watches, eligibility guards, propagation, conflict justification, invariant validation and cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_boolean_propagation.go",
+          "tests": [
+            "TestSMTBinaryClauseOptimizationPropagationAndInvariant",
+            "TestSMTBinaryClauseOptimizationConflictAndEligibility",
+            "TestSMTBinaryClauseOptimizationDefersScopedClauses"
+          ]
+        },
+        {
+          "name": "learned and auxiliary-lemma watch selection and reinitialization, proof-producing gate and root clauses, and clause garbage collection",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -107032,7 +107046,8 @@
       "deviations": [
         "Registered theories now supply default-internalizer selection; nondefault theory families remain top-down boundaries in the ordering pass.",
         "Internalized logical clauses are retained as concrete typed records for the future DPLL watch and justification layer.",
-        "The retained Go kernel directly encodes implication gates because the C++ preprocessing pass that normally eliminates OP_IMPLIES has not reached this facade; the clauses preserve the source Boolean semantics and conservative relevancy dependencies."
+        "The retained Go kernel directly encodes implication gates because the C++ preprocessing pass that normally eliminates OP_IMPLIES has not reached this facade; the clauses preserve the source Boolean semantics and conservative relevancy dependencies.",
+        "Compact binary clauses are explicitly enabled before internalization. Proof mode rejects the representation, and scoped clauses retain ordinary clause objects so rollback owns their lifetime."
       ]
     },
     {

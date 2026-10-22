@@ -57,6 +57,7 @@ type SMTTheoryPropagation struct {
 type SMTInternalizedClause struct {
 	Literals []SMTLiteral
 	Root     bool
+	Binary   bool
 	Proof    ast.ASTHandle
 	clause   *SMTClause
 	owner    SMTJustification
@@ -69,45 +70,46 @@ type SMTInternalizerCongruence struct {
 }
 
 type SMTInternalizerState struct {
-	manager               *ast.ASTManager
-	context               *SMTCheckerContext
-	congruence            *SMTCongruenceTable
-	quantifiers           *SMTQuantifierRegistry
-	relevancy             *SMTRelevancyPropagator
-	theories              map[ast.FamilyID]SMTTheoryInternalizer
-	theoryOrder           []SMTTheoryInternalizer
-	boolVar               map[ast.ASTHandle]int32
-	boolExpr              []ast.ASTHandle
-	booleanData           []SMTBoolVarData
-	activity              []float64
-	assignment            []lbool.LBool
-	watches               []SMTWatchList
-	booleanStack          []ast.ASTHandle
-	enodeStack            []*SMTEnode
-	scopes                []smtInternalizerScope
-	cachedGeneration      map[ast.ASTHandle]uint32
-	pending               []SMTInternalizerCongruence
-	assignmentTrail       []smtInternalizerAssignmentTrail
-	theoryTrail           []smtInternalizerTheoryTrail
-	theoryEqualities      []SMTTheoryPropagation
-	theoryDisequalities   []SMTTheoryPropagation
-	theoryEqualityHead    int
-	theoryDisequalityHead int
-	atomPropagationHead   int
-	notifyTrail           []smtInternalizerNotifyTrail
-	clauses               []SMTInternalizedClause
-	assignedLiterals      []SMTLiteral
-	propagationHead       int
-	conflict              SMTBooleanJustification
-	conflictLiteral       SMTLiteral
-	inconsistent          bool
-	generation            uint32
-	scopeLevel            uint32
-	statistics            SMTContextStatistics
-	finalCheckIndex       int
-	incompleteTheories    []SMTTheoryInternalizer
-	theoriesSetup         bool
-	closed                bool
+	manager                  *ast.ASTManager
+	context                  *SMTCheckerContext
+	congruence               *SMTCongruenceTable
+	quantifiers              *SMTQuantifierRegistry
+	relevancy                *SMTRelevancyPropagator
+	theories                 map[ast.FamilyID]SMTTheoryInternalizer
+	theoryOrder              []SMTTheoryInternalizer
+	boolVar                  map[ast.ASTHandle]int32
+	boolExpr                 []ast.ASTHandle
+	booleanData              []SMTBoolVarData
+	activity                 []float64
+	assignment               []lbool.LBool
+	watches                  []SMTWatchList
+	booleanStack             []ast.ASTHandle
+	enodeStack               []*SMTEnode
+	scopes                   []smtInternalizerScope
+	cachedGeneration         map[ast.ASTHandle]uint32
+	pending                  []SMTInternalizerCongruence
+	assignmentTrail          []smtInternalizerAssignmentTrail
+	theoryTrail              []smtInternalizerTheoryTrail
+	theoryEqualities         []SMTTheoryPropagation
+	theoryDisequalities      []SMTTheoryPropagation
+	theoryEqualityHead       int
+	theoryDisequalityHead    int
+	atomPropagationHead      int
+	notifyTrail              []smtInternalizerNotifyTrail
+	clauses                  []SMTInternalizedClause
+	assignedLiterals         []SMTLiteral
+	propagationHead          int
+	conflict                 SMTBooleanJustification
+	conflictLiteral          SMTLiteral
+	inconsistent             bool
+	generation               uint32
+	scopeLevel               uint32
+	statistics               SMTContextStatistics
+	finalCheckIndex          int
+	incompleteTheories       []SMTTheoryInternalizer
+	theoriesSetup            bool
+	binaryClauseOptimization bool
+	closed                   bool
 }
 
 func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext, quantifiers *SMTQuantifierRegistry) (*SMTInternalizerState, error) {
@@ -152,6 +154,28 @@ func (s *SMTInternalizerState) Theory(family ast.FamilyID) SMTTheoryInternalizer
 		return nil
 	}
 	return s.theories[family]
+}
+
+// SetBinaryClauseOptimization selects the source compact representation for
+// eligible two-literal clauses. It must be configured before internalization.
+func (s *SMTInternalizerState) SetBinaryClauseOptimization(enabled bool) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if len(s.booleanStack) != 0 || len(s.enodeStack) != 0 || len(s.clauses) != 0 || len(s.scopes) != 0 {
+		return ast.ErrASTDomain
+	}
+	if enabled {
+		proofs, err := s.manager.ProofsEnabled()
+		if err != nil {
+			return err
+		}
+		if proofs {
+			return ast.ErrASTDomain
+		}
+	}
+	s.binaryClauseOptimization = enabled
+	return nil
 }
 
 func (s *SMTInternalizerState) SetVariableTheory(variable int32, theory SMTTheoryID) error {
