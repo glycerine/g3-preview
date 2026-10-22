@@ -41607,6 +41607,7 @@
         "TestDirectProofPredicateModusPonensSimplification",
         "TestDirectProofUnsplitModusPonensSimplification",
         "TestDirectProofNestedSumCoefficientDistribution",
+        "TestDirectProofRotatedOrdinarySumSimplification",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],
@@ -41832,9 +41833,10 @@
             "TestDirectProofExcludedMiddleAndCongruenceSimplification",
             "TestDirectProofPredicateModusPonensSimplification",
             "TestDirectProofUnsplitModusPonensSimplification",
-            "TestDirectProofNestedSumCoefficientDistribution"
+            "TestDirectProofNestedSumCoefficientDistribution",
+            "TestDirectProofRotatedOrdinarySumSimplification"
           ],
-          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, nested coefficient distribution, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Specialized rotation, normal-form arithmetic sums, and arithmetic modus-ponens remain pending."
+          "reason": "Generic recursive equality/Boolean/integer-division simplification, opaque concatenation handling, single-resolvent reduction, ordinary conditional inequality summation, nested coefficient distribution, ordinary rotated sums, equivalence/negation-chain symmetry, normalized chain concatenation, predicate/equality-chain contradiction reduction, excluded-middle, congruence, ordinary modus-ponens, and the unsplittable equality-chain fallback are ported. Normal-form arithmetic sums, arithmetic modus-ponens, and leq2eq/eq2leq/congruence/modus-ponens rotation remain pending."
         },
         {
           "name": "modus ponens, axioms, symmetry, transitivity, congruence, Farkas, leq2eq, eq2leq, and cut rules",
@@ -41919,6 +41921,7 @@
         "TestDirectProofPredicateModusPonensSimplification",
         "TestDirectProofUnsplitModusPonensSimplification",
         "TestDirectProofNestedSumCoefficientDistribution",
+        "TestDirectProofRotatedOrdinarySumSimplification",
         "TestDirectProofLocalizationQuantifierInsertion",
         "TestDirectProofRecursiveAtomicLocalization"
       ],

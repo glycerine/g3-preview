@@ -1017,3 +1017,29 @@ func TestDirectProofNestedSumCoefficientDistribution(t *testing.T) {
 		t.Fatal("distributed outer coefficient", coefficient, one)
 	}
 }
+
+func TestDirectProofRotatedOrdinarySumSimplification(t *testing.T) {
+	_, manager, base, p, q := directProofFixture(t)
+	direct, err := NewDirectProofInterpolator(base, DownwardScopeRange(0), false)
+	interpMust(t, err)
+	t.Cleanup(func() { interpMust(t, direct.Close()) })
+	literal, err := manager.Make(OperatorIff, p, q)
+	interpMust(t, err)
+	placeholder, err := direct.placeholder(literal)
+	interpMust(t, err)
+	zero, err := manager.MakeIntText("0")
+	interpMust(t, err)
+	one, err := manager.MakeIntText("1")
+	interpMust(t, err)
+	zeroInequality, err := manager.Make(OperatorLE, zero, zero)
+	interpMust(t, err)
+	proof, err := direct.makeSymbol(direct.sum, zeroInequality, one, placeholder)
+	interpMust(t, err)
+	proof, err = direct.makeSymbol(direct.rotateSum, literal, proof)
+	interpMust(t, err)
+	result, err := direct.SimplifyProofTerm(proof)
+	interpMust(t, err)
+	if op, e := manager.Operator(result); e != nil || op != OperatorLE {
+		t.Fatal("rotated ordinary sum", op, e)
+	}
+}
