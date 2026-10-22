@@ -46,9 +46,23 @@ type SMTKernel struct {
 	preprocessor     *rewriter.TheoryRewriter
 	paramContext     *uparams.ParamsContext
 	paramGlobals     *uparams.GlobalParamsService
+	preprocessState  SMTPreprocessorState
 	produceModel     bool
 	preprocess       bool
 	closed           bool
+}
+
+func (k *SMTKernel) readPreprocessorState(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) (state SMTPreprocessorState, result error) {
+	value, err := NewSMTPreprocessorParams(context, params, globals, k.manager.Budget())
+	if err != nil {
+		if value != nil {
+			result = errors.Join(err, value.Close())
+			return state, result
+		}
+		return state, err
+	}
+	defer func() { result = errors.Join(result, value.Close()) }()
+	return value.State()
 }
 
 func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (*SMTKernel, error) {
@@ -98,6 +112,11 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	}
 	k.paramContext = context
 	k.paramGlobals = globals
+	state, err := k.readPreprocessorState(context, globals, params)
+	if err != nil {
+		return err
+	}
+	k.preprocessState = state
 	name := "preprocess"
 	enabled, err := context.GetBoolName(params, &name, true)
 	if err != nil {
@@ -130,6 +149,10 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err != nil {
 		return err
 	}
+	state, err := k.readPreprocessorState(k.paramContext, k.paramGlobals, params)
+	if err != nil {
+		return err
+	}
 	if !enabled {
 		if k.preprocessor != nil {
 			if err = k.preprocessor.Close(); err != nil {
@@ -138,6 +161,7 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 			k.preprocessor = nil
 		}
 		k.preprocess = false
+		k.preprocessState = state
 		return nil
 	}
 	if k.preprocessor == nil {
@@ -147,6 +171,7 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	}
 	if err == nil {
 		k.preprocess = true
+		k.preprocessState = state
 	}
 	return err
 }
@@ -240,6 +265,9 @@ func (k *SMTKernel) Assertions() []SMTKernelAssertion {
 }
 
 func (k *SMTKernel) internalizePending() error {
+	if err := k.propagatePendingAssertions(); err != nil {
+		return err
+	}
 	for k.assertedHead < len(k.assertions) {
 		assertion := k.assertions[k.assertedHead]
 		if err := k.internalizer.Assert(assertion.Formula, assertion.Proof, 0); err != nil {
@@ -597,6 +625,7 @@ func (k *SMTKernel) Close() error {
 		k.relevancy = nil
 		k.paramContext = nil
 		k.paramGlobals = nil
+		k.preprocessState = SMTPreprocessorState{}
 		k.manager = nil
 		k.closed = true
 	}

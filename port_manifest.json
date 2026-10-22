@@ -98434,6 +98434,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_asserted_formulas.go",
+        "pkg/smtcore/smt_asserted_propagate.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_solver.go"
       ],
@@ -98442,7 +98443,9 @@
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelScopesRestoreAssertionsAndContext",
-        "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices"
+        "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices",
+        "TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions",
+        "TestSMTSolverValuePropagationComposesProofs"
       ],
       "conditionals": [
         {
@@ -98526,7 +98529,16 @@
           ]
         },
         {
-          "name": "pending-formula reduction pipeline, substitutions, macros, value propagation, NNF/CNF, quantifier transforms, statistics, and display",
+          "name": "two-direction pending value propagation, source expression ordering, committed substitutions, and proof composition",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_propagate.go",
+          "tests": [
+            "TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions",
+            "TestSMTSolverValuePropagationComposesProofs"
+          ]
+        },
+        {
+          "name": "remaining pending-formula reduction passes, macros, NNF/CNF, quantifier transforms, statistics, and display",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -98546,6 +98558,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_asserted_formulas.go",
+        "pkg/smtcore/smt_asserted_propagate.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_solver.go"
       ],
@@ -98554,7 +98567,9 @@
         "TestSMTKernelFlattensNegatedDisjunctionAssertion",
         "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelScopesRestoreAssertionsAndContext",
-        "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices"
+        "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices",
+        "TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions",
+        "TestSMTSolverValuePropagationComposesProofs"
       ],
       "conditionals": [
         {
@@ -98589,7 +98604,16 @@
           ]
         },
         {
-          "name": "setup, reset, pending-formula reductions, macros, inconsistency proof, statistics, and display",
+          "name": "scoped pending value propagation with concrete AST substitution and proof ownership",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_propagate.go",
+          "tests": [
+            "TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions",
+            "TestSMTSolverValuePropagationComposesProofs"
+          ]
+        },
+        {
+          "name": "setup, reset, remaining pending-formula reductions, macros, inconsistency proof, statistics, and display",
           "status": "unported",
           "go_target": null,
           "tests": []

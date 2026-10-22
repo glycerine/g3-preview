@@ -121,6 +121,82 @@ func TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices(t *testing.T)
 	}
 }
 
+func TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions(t *testing.T) {
+	m, s := smtSolverFixture(t)
+	a := smtRelevancyBool(t, m, "smt-propagate-a")
+	b := smtRelevancyBool(t, m, "smt-propagate-b")
+	notA, err := m.MkNot(a)
+	astTestMust(t, err)
+	clause, err := m.MkOr(notA, b)
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(a))
+	astTestMust(t, s.Assert(clause))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("propagated base check", status)
+	}
+	assertion, err := s.Assertion(1)
+	astTestMust(t, err)
+	if assertion != b {
+		t.Fatal("pending assertion was not value-propagated", assertion, b)
+	}
+
+	astTestMust(t, s.Push())
+	notB, err := m.MkNot(b)
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(notB))
+	status, err = s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("committed substitution did not reach scoped assertion", status)
+	}
+	assertion, err = s.Assertion(2)
+	astTestMust(t, err)
+	if !m.IsFalse(assertion) {
+		t.Fatal("scoped assertion was not reduced to false", assertion)
+	}
+	astTestMust(t, s.Pop(1))
+	if count, err := s.NumAssertions(); err != nil || count != 2 {
+		t.Fatal("propagated assertion scope rollback", count, err)
+	}
+}
+
+func TestSMTSolverValuePropagationComposesProofs(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	context, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	s, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: context})
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, s.Close())
+		astTestMust(t, context.Close())
+	})
+	a := smtRelevancyBool(t, m, "smt-proof-propagate-a")
+	b := smtRelevancyBool(t, m, "smt-proof-propagate-b")
+	notA, err := m.MkNot(a)
+	astTestMust(t, err)
+	clause, err := m.MkOr(notA, b)
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(a))
+	astTestMust(t, s.Assert(clause))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("proof propagation status", status)
+	}
+	assertions := s.kernel.Assertions()
+	if len(assertions) != 2 || assertions[1].Formula != b || assertions[1].Proof.IsNull() {
+		t.Fatal("proof propagation result", assertions)
+	}
+	fact, err := m.GetProofFact(assertions[1].Proof)
+	astTestMust(t, err)
+	if fact != b {
+		t.Fatal("propagation proof fact", fact, b)
+	}
+}
+
 func TestSMTSolverPublishesGeneratedModel(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	s, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
