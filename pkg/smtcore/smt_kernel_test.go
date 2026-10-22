@@ -77,14 +77,69 @@ func TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat(t *testing.T) {
 	astTestMust(t, err)
 	clauses[3], err = m.MkOr(notA, notB)
 	astTestMust(t, err)
+	formula, err := m.MkAndArgs(clauses)
+	astTestMust(t, err)
 	kernel := smtTestKernel(t, m)
-	for _, clause := range clauses {
-		astTestMust(t, kernel.Assert(clause, ast.ASTHandle{}))
-	}
+	astTestMust(t, kernel.Assert(formula, ast.ASTHandle{}))
 	result, err := kernel.Check()
 	astTestMust(t, err)
 	if result != lbool.False || kernel.Statistics().NumDecisions < 2 {
 		t.Fatal("search did not exhaust contradictory branches", result, kernel.Statistics())
+	}
+}
+
+func TestSMTKernelFlattensNegatedDisjunctionAssertion(t *testing.T) {
+	m := astTestManager(t)
+	a := smtRelevancyBool(t, m, "kernel-not-or-a")
+	b := smtRelevancyBool(t, m, "kernel-not-or-b")
+	disjunction, err := m.MkOr(a, b)
+	astTestMust(t, err)
+	formula, err := m.MkNot(disjunction)
+	astTestMust(t, err)
+	kernel := smtTestKernel(t, m)
+	astTestMust(t, kernel.Assert(formula, ast.ASTHandle{}))
+	result, err := kernel.Check()
+	astTestMust(t, err)
+	if result != lbool.True || kernel.Statistics().NumDecisions != 0 {
+		t.Fatal("negated disjunction assertion", result, kernel.Statistics())
+	}
+	state, err := kernel.Internalizer()
+	astTestMust(t, err)
+	for _, expression := range []ast.ASTHandle{a, b} {
+		literal, literalErr := state.Literal(expression)
+		astTestMust(t, literalErr)
+		value, assignmentErr := state.Assignment(literal)
+		astTestMust(t, assignmentErr)
+		if value != lbool.False {
+			t.Fatal("negated disjunction child", expression, value)
+		}
+	}
+}
+
+func TestSMTKernelFlattenedAssertionsOwnDerivedProofs(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	a := smtRelevancyBool(t, m, "kernel-proof-a")
+	b := smtRelevancyBool(t, m, "kernel-proof-b")
+	formula, err := m.MkAnd(a, b)
+	astTestMust(t, err)
+	kernel := smtTestKernel(t, m)
+	astTestMust(t, kernel.Assert(formula, ast.ASTHandle{}))
+	assertions := kernel.Assertions()
+	if len(assertions) != 2 {
+		t.Fatal("flattened proof assertions", assertions)
+	}
+	for _, assertion := range assertions {
+		andElim, proofErr := m.IsProofKind(assertion.Proof, ast.ASTPrAndElim)
+		astTestMust(t, proofErr)
+		if !andElim {
+			t.Fatal("missing conjunction-elimination proof", assertion.Proof)
+		}
+	}
+	result, err := kernel.Check()
+	astTestMust(t, err)
+	if result != lbool.True {
+		t.Fatal("proved conjunction", result)
 	}
 }
 

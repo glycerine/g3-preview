@@ -89,16 +89,31 @@ func (k *SMTKernel) Assert(formula, proof ast.ASTHandle) error {
 			return ast.ErrASTDomain
 		}
 	}
-	if err = k.manager.IncRef(formula); err != nil {
-		return err
-	}
-	if !proof.IsNull() {
-		if err = k.manager.IncRef(proof); err != nil {
-			return errors.Join(err, k.manager.DecRef(formula))
+	if proof.IsNull() {
+		proofs, err := k.manager.ProofsEnabled()
+		if err != nil {
+			return err
+		}
+		if proofs {
+			proof, err = k.manager.MkProofAsserted(formula)
+			if err != nil {
+				return err
+			}
 		}
 	}
-	k.assertions = append(k.assertions, SMTKernelAssertion{Formula: formula, Proof: proof})
-	return nil
+	limit := len(k.assertions)
+	if err = k.pushAssertion(formula, proof); err == nil {
+		return nil
+	}
+	for index := len(k.assertions); index > limit; index-- {
+		assertion := &k.assertions[index-1]
+		if !assertion.Proof.IsNull() {
+			err = errors.Join(err, k.manager.DecRef(assertion.Proof))
+		}
+		err = errors.Join(err, k.manager.DecRef(assertion.Formula))
+	}
+	k.assertions = k.assertions[:limit]
+	return err
 }
 
 func (k *SMTKernel) Assertions() []SMTKernelAssertion {

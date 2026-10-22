@@ -98340,9 +98340,17 @@
       "path": "src/smt/asserted_formulas.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_asserted_formulas.go",
+        "pkg/smtcore/smt_kernel.go"
+      ],
+      "tests": [
+        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelFlattensNegatedDisjunctionAssertion",
+        "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
+        "TestSMTKernelScopesRestoreAssertionsAndContext"
+      ],
       "conditionals": [
         {
           "line": 633,
@@ -98396,18 +98404,55 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "push_assertion conjunction and negated-disjunction flattening with derived proofs",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_formulas.go",
+          "tests": [
+            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+            "TestSMTKernelFlattensNegatedDisjunctionAssertion",
+            "TestSMTKernelFlattenedAssertionsOwnDerivedProofs"
+          ]
+        },
+        {
+          "name": "asserted formula ownership, access, commit cursor, and scope rollback consumed by the kernel",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTKernelScopesRestoreAssertionsAndContext"
+          ]
+        },
+        {
+          "name": "preprocessing, reduction pipeline, substitutions, macros, value propagation, NNF/CNF, quantifier transforms, statistics, and display",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The kernel owns references to each flattened formula and its derived proof until pop or close."
+      ],
+      "deviations": [
+        "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager."
+      ]
     },
     {
       "path": "src/smt/asserted_formulas.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_asserted_formulas.go",
+        "pkg/smtcore/smt_kernel.go"
+      ],
+      "tests": [
+        "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelFlattensNegatedDisjunctionAssertion",
+        "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
+        "TestSMTKernelScopesRestoreAssertionsAndContext"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -98418,11 +98463,33 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "assertion insertion and flattening, formula access, ownership, and incremental scopes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_formulas.go",
+          "tests": [
+            "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+            "TestSMTKernelFlattensNegatedDisjunctionAssertion",
+            "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
+            "TestSMTKernelScopesRestoreAssertionsAndContext"
+          ]
+        },
+        {
+          "name": "setup, reset, preprocessing and rewriter access, macros, inconsistency proof, statistics, and display",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Flattened formula and proof handles are explicit owned kernel references; returned assertion handles are borrowed views."
+      ],
+      "deviations": [
+        "The concrete retained subset is integrated with SMTKernel rather than exposed as a preprocessing class."
+      ]
     },
     {
       "path": "src/smt/cached_var_subst.cpp",
@@ -106739,23 +106806,28 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_asserted_formulas.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
         "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelFlattensNegatedDisjunctionAssertion",
+        "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelScopesRestoreAssertionsAndContext"
       ],
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
-          "name": "construction and close, assertion storage, formula access, push/pop, scope level, inconsistency, Boolean search check, statistics, and internalizer access",
+          "name": "construction and close, flattened assertion storage and proofs, formula access, push/pop, scope level, inconsistency, Boolean search check, statistics, and internalizer access",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
             "TestSMTKernelAssertionCheckAndDecisionClause",
             "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+            "TestSMTKernelFlattensNegatedDisjunctionAssertion",
+            "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
             "TestSMTKernelScopesRestoreAssertionsAndContext"
           ]
         },
@@ -106779,11 +106851,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_asserted_formulas.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
         "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+        "TestSMTKernelFlattensNegatedDisjunctionAssertion",
+        "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
         "TestSMTKernelScopesRestoreAssertionsAndContext"
       ],
       "conditionals": [
@@ -106800,12 +106875,14 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "assertion, formula, scope, inconsistency, Boolean search check, statistics, and concrete context facade",
+          "name": "flattened assertion and proof ownership, formula and scope access, inconsistency, Boolean search check, statistics, and concrete context facade",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
             "TestSMTKernelAssertionCheckAndDecisionClause",
             "TestSMTKernelChronologicalBacktrackingProvesBooleanUnsat",
+            "TestSMTKernelFlattensNegatedDisjunctionAssertion",
+            "TestSMTKernelFlattenedAssertionsOwnDerivedProofs",
             "TestSMTKernelScopesRestoreAssertionsAndContext"
           ]
         },
