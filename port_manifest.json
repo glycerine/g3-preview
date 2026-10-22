@@ -116776,7 +116776,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -116792,7 +116792,8 @@
         "TestSMTSequenceTheoryConcreteRelationConflicts",
         "TestSMTSequenceTheoryLengthAxioms",
         "TestSMTSequenceTheoryIntegerStringAxioms",
-        "TestSMTSequenceStructuredModelValues"
+        "TestSMTSequenceStructuredModelValues",
+        "TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms"
       ],
       "conditionals": [
         {
@@ -117292,6 +117293,12 @@
           "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes", "TestSMTSequenceTheoryConcreteRelationConflicts"]
         },
         {
+          "name": "positive prefix, suffix and contains Skolem witnesses plus false-relation nonempty implications (src/smt/theory_seq.cpp:3927-4010,4464-4546)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
+          "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms"]
+        },
+        {
           "name": "deduplicated owned axiom queue, propagation head and scoped replay (src/smt/theory_seq.cpp:3068-3108)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_axioms.go",
@@ -117335,7 +117342,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -117351,7 +117358,8 @@
         "TestSMTSequenceTheoryConcreteRelationConflicts",
         "TestSMTSequenceTheoryLengthAxioms",
         "TestSMTSequenceTheoryIntegerStringAxioms",
-        "TestSMTSequenceStructuredModelValues"
+        "TestSMTSequenceStructuredModelValues",
+        "TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms"
       ],
       "conditionals": [
         {
@@ -117423,6 +117431,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_relations.go",
           "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes", "TestSMTSequenceTheoryConcreteRelationConflicts"]
+        },
+        {
+          "name": "prefix, suffix and contains witness and nonempty axiom declarations",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
+          "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms"]
         },
         {
           "name": "owned scoped axiom queue and propagation lifecycle",

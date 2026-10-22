@@ -355,6 +355,99 @@ func TestSMTSequenceTheoryConcreteRelationConflicts(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms(t *testing.T) {
+	for _, test := range []struct {
+		name      string
+		operation int32
+		skolem    string
+	}{
+		{name: "prefix", operation: 3, skolem: "seq.p.suffix"},
+		{name: "suffix", operation: 4, skolem: "seq.s.prefix"},
+		{name: "contains", operation: 5, skolem: "seq.indexof_left"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			empty, err := m.MkString("")
+			astTestMust(t, err)
+			sort, err := m.GetSort(empty)
+			astTestMust(t, err)
+			left, err := m.MkConst(astTestSymbol(t, m, "sequence-relation-left-"+test.name), sort)
+			astTestMust(t, err)
+			right, err := m.MkConst(astTestSymbol(t, m, "sequence-relation-right-"+test.name), sort)
+			astTestMust(t, err)
+			var relation ast.ASTHandle
+			switch test.operation {
+			case 3:
+				relation, err = m.MkSequencePrefix(left, right)
+			case 4:
+				relation, err = m.MkSequenceSuffix(left, right)
+			case 5:
+				relation, err = m.MkSequenceContains(left, right)
+			}
+			astTestMust(t, err)
+			name, err := m.Symbols.Intern(test.skolem)
+			astTestMust(t, err)
+			first, err := m.MkSequenceSkolem(name, []ast.ASTHandle{left, right}, sort)
+			astTestMust(t, err)
+			var word ast.ASTHandle
+			switch test.operation {
+			case 3:
+				word, err = m.MkSequenceConcat(left, first)
+			case 4:
+				word, err = m.MkSequenceConcat(first, left)
+			case 5:
+				rightName, symbolErr := m.Symbols.Intern("seq.indexof_right")
+				astTestMust(t, symbolErr)
+				last, makeErr := m.MkSequenceSkolem(rightName, []ast.ASTHandle{left, right}, sort)
+				astTestMust(t, makeErr)
+				tail, makeErr := m.MkSequenceConcat(right, last)
+				astTestMust(t, makeErr)
+				word, err = m.MkSequenceConcat(first, tail)
+			}
+			astTestMust(t, err)
+			target := right
+			if test.operation == 5 {
+				target = left
+			}
+			definition, err := m.MkEq(word, target)
+			astTestMust(t, err)
+			notDefinition, err := m.MkNot(definition)
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.Assert(relation))
+			astTestMust(t, solver.Assert(notDefinition))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("relation witness contradiction", status)
+			}
+		})
+	}
+
+	m, modelConfig := smtModelGeneratorFixture(t)
+	empty, err := m.MkString("")
+	astTestMust(t, err)
+	sort, err := m.GetSort(empty)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-empty-prefix-right"), sort)
+	astTestMust(t, err)
+	prefix, err := m.MkSequencePrefix(empty, y)
+	astTestMust(t, err)
+	notPrefix, err := m.MkNot(prefix)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(notPrefix))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("empty sequence is always a prefix", status)
+	}
+}
+
 func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name  string

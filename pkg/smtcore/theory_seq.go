@@ -239,6 +239,10 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		if err = t.addLengthAxiom(expression); err != nil {
 			return false, err
 		}
+	} else if op == 3 || op == 4 || op == 5 {
+		if err = t.addRelationAxioms(expression, op); err != nil {
+			return false, err
+		}
 	} else if op == 27 {
 		if err = t.addIntToStringAxioms(expression); err != nil {
 			return false, err
