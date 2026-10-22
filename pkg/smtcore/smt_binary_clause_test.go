@@ -90,3 +90,22 @@ func TestSMTBinaryClauseOptimizationDefersScopedClauses(t *testing.T) {
 		t.Fatal("scoped ordinary clause survived pop")
 	}
 }
+
+func TestSMTKernelEnablesBinaryClausesUnlessProofsAreEnabled(t *testing.T) {
+	m := astTestManager(t)
+	kernel := smtTestKernel(t, m)
+	state, err := kernel.Internalizer()
+	astTestMust(t, err)
+	if !state.binaryClauseOptimization {
+		t.Fatal("ordinary kernel omitted source-default binary optimization")
+	}
+
+	proofManager := astTestManager(t)
+	astTestMust(t, proofManager.ToggleProofMode(ast.ASTProofEnabled))
+	proofKernel := smtTestKernel(t, proofManager)
+	proofState, err := proofKernel.Internalizer()
+	astTestMust(t, err)
+	if proofState.binaryClauseOptimization {
+		t.Fatal("proof kernel enabled pointer-free binary clauses")
+	}
+}

@@ -106609,7 +106609,8 @@
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTBinaryClauseOptimizationPropagationAndInvariant",
         "TestSMTBinaryClauseOptimizationConflictAndEligibility",
-        "TestSMTBinaryClauseOptimizationDefersScopedClauses"
+        "TestSMTBinaryClauseOptimizationDefersScopedClauses",
+        "TestSMTKernelEnablesBinaryClausesUnlessProofsAreEnabled"
       ],
       "conditionals": [
         {
@@ -107021,7 +107022,8 @@
           "tests": [
             "TestSMTBinaryClauseOptimizationPropagationAndInvariant",
             "TestSMTBinaryClauseOptimizationConflictAndEligibility",
-            "TestSMTBinaryClauseOptimizationDefersScopedClauses"
+            "TestSMTBinaryClauseOptimizationDefersScopedClauses",
+            "TestSMTKernelEnablesBinaryClausesUnlessProofsAreEnabled"
           ]
         },
         {
@@ -107047,7 +107049,7 @@
         "Registered theories now supply default-internalizer selection; nondefault theory families remain top-down boundaries in the ordering pass.",
         "Internalized logical clauses are retained as concrete typed records for the future DPLL watch and justification layer.",
         "The retained Go kernel directly encodes implication gates because the C++ preprocessing pass that normally eliminates OP_IMPLIES has not reached this facade; the clauses preserve the source Boolean semantics and conservative relevancy dependencies.",
-        "Compact binary clauses are explicitly enabled before internalization. Proof mode rejects the representation, and scoped clauses retain ordinary clause objects so rollback owns their lifetime."
+        "NewSMTKernel enables compact binary clauses by source default when proofs are disabled. Proof mode uses ordinary clauses, and scoped clauses retain ordinary clause objects so rollback owns their lifetime."
       ]
     },
     {

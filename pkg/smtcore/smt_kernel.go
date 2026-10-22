@@ -53,6 +53,15 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 	if err != nil {
 		return nil, err
 	}
+	proofs, err := manager.ProofsEnabled()
+	if err != nil {
+		return nil, errors.Join(err, internalizer.Close())
+	}
+	if !proofs {
+		if err = internalizer.SetBinaryClauseOptimization(true); err != nil {
+			return nil, errors.Join(err, internalizer.Close())
+		}
+	}
 	if err = internalizer.SetRelevancy(relevancy); err != nil {
 		return nil, errors.Join(err, internalizer.Close())
 	}
