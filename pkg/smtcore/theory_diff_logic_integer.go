@@ -121,8 +121,8 @@ func (t *SMTIntegerDiffTheory) numeral(expression ast.ASTHandle) (*big.Rat, bool
 	if err != nil {
 		return nil, false, err
 	}
-	text, integer, matched, err := state.manager.ArithmeticNumeralText(expression)
-	if err != nil || !matched || !integer {
+	text, _, matched, err := state.manager.ArithmeticNumeralText(expression)
+	if err != nil || !matched {
 		return nil, false, err
 	}
 	value, ok := new(big.Rat).SetString(text)

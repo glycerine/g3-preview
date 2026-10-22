@@ -108957,7 +108957,9 @@
       ],
       "tests": [
         "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
-        "TestSMTSolverSetupUsesIntegerDifferenceLogic"
+        "TestSMTSolverSetupUsesIntegerDifferenceLogic",
+        "TestSMTSolverSetupUsesRealDifferenceLogic",
+        "TestSMTSolverPublishesStrictRealDifferenceModel"
       ],
       "assertions": [
         {
@@ -108977,12 +108979,14 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "explicit arithmetic and array logic classification, concrete QF_IDL/QF_UFIDL theory selection, and conservative incomplete-theory installation for remaining arithmetic and array logics (src/smt/smt_setup.cpp:64-123,327-337,396-409)",
+          "name": "explicit arithmetic and array logic classification, concrete QF_RDL/QF_IDL/QF_UFIDL theory selection, and conservative incomplete-theory installation for remaining arithmetic and array logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409)",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
             "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
-            "TestSMTSolverSetupUsesIntegerDifferenceLogic"
+            "TestSMTSolverSetupUsesIntegerDifferenceLogic",
+            "TestSMTSolverSetupUsesRealDifferenceLogic",
+            "TestSMTSolverPublishesStrictRealDifferenceModel"
           ]
         },
         {
@@ -108993,10 +108997,10 @@
         }
       ],
       "ownership": [
-        "The kernel owns its theory registry; setup creates the concrete integer difference theory for QF_IDL/QF_UFIDL and dummy-theory values for reached families whose solvers remain unavailable."
+        "The kernel owns its theory registry; setup creates concrete real or integer difference theories for QF_RDL and QF_IDL/QF_UFIDL and dummy-theory values for reached families whose solvers remain unavailable."
       ],
       "deviations": [
-        "QF_IDL and QF_UFIDL use the retained integer difference theory. Other incomplete arithmetic and array logics install SMTDummyTheory so reached expressions return source-style incompleteness instead of an unsound propositional SAT result."
+        "QF_RDL uses the retained real difference theory, while QF_IDL and QF_UFIDL use the retained integer difference theory. Other incomplete arithmetic and array logics install SMTDummyTheory so reached expressions return source-style incompleteness instead of an unsound propositional SAT result."
       ]
     },
     {
@@ -109009,7 +109013,8 @@
       ],
       "tests": [
         "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
-        "TestSMTSolverSetupUsesIntegerDifferenceLogic"
+        "TestSMTSolverSetupUsesIntegerDifferenceLogic",
+        "TestSMTSolverSetupUsesRealDifferenceLogic"
       ],
       "conditionals": [
         {
@@ -109030,7 +109035,8 @@
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
             "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
-            "TestSMTSolverSetupUsesIntegerDifferenceLogic"
+            "TestSMTSolverSetupUsesIntegerDifferenceLogic",
+            "TestSMTSolverSetupUsesRealDifferenceLogic"
           ]
         },
         {
@@ -113410,14 +113416,38 @@
       "path": "src/smt/theory_diff_logic.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_diff_logic_integer.go",
+        "pkg/smtcore/theory_diff_logic_real.go"
+      ],
+      "tests": [
+        "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
+        "TestSMTRealDiffTheoryStrictCycleConflict"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete idl_ext and rdl_ext theory instantiations",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_diff_logic_integer.go; pkg/smtcore/theory_diff_logic_real.go",
+          "tests": [
+            "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
+            "TestSMTRealDiffTheoryStrictCycleConflict"
+          ]
+        },
+        {
+          "name": "Small-integer sidl_ext and srdl_ext template instantiations",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Go uses separate concrete theory types for retained integer and real instantiations; each owns its graph and scoped assertion state."
+      ],
+      "deviations": [
+        "The retained consumers select arbitrary-precision integer and real difference logic. Unreached small-integer template variants and unrelated simplex explicit instantiations are not represented by universal adapters."
+      ]
     },
     {
       "path": "src/smt/theory_diff_logic.h",
@@ -113426,7 +113456,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_diff_logic_integer.go",
-        "pkg/smtcore/theory_diff_logic_integer_test.go"
+        "pkg/smtcore/theory_diff_logic_integer_test.go",
+        "pkg/smtcore/theory_diff_logic_real.go",
+        "pkg/smtcore/theory_diff_logic_real_test.go"
       ],
       "tests": [
         "TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation",
@@ -113436,7 +113468,13 @@
         "TestSMTIntegerDiffTheoryParallelBoundAxioms",
         "TestSMTIntegerDiffTheoryBuildsModelValues",
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
-        "TestSMTSolverIntegerDifferenceEqualityAdapter"
+        "TestSMTSolverIntegerDifferenceEqualityAdapter",
+        "TestSMTRealDiffTheoryAtomUsesInfinitesimalComplement",
+        "TestSMTRealDiffTheoryStrictCycleConflict",
+        "TestSMTRealDiffTheoryBuildsFiniteModelValues",
+        "TestSMTSolverSetupUsesRealDifferenceLogic",
+        "TestSMTSolverPublishesStrictRealDifferenceModel",
+        "TestSMTSolverRealDifferenceEqualityAdapter"
       ],
       "conditionals": [
         {
@@ -113467,15 +113505,28 @@
           ]
         },
         {
-          "name": "Equality propagation metadata, adaptive/implied-bound propagation, statistics, optimization and real/infinitesimal variants (src/smt/theory_diff_logic.h:95-132,167-176,186-203,247-254,276-306,310-339,361-378,380-433)",
+          "name": "Real atom records, infinitesimal graph ownership, assertion queue, scopes, internalization, propagation, final check and model-value construction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_diff_logic_real.go",
+          "tests": [
+            "TestSMTRealDiffTheoryAtomUsesInfinitesimalComplement",
+            "TestSMTRealDiffTheoryStrictCycleConflict",
+            "TestSMTRealDiffTheoryBuildsFiniteModelValues",
+            "TestSMTSolverSetupUsesRealDifferenceLogic",
+            "TestSMTSolverPublishesStrictRealDifferenceModel",
+            "TestSMTSolverRealDifferenceEqualityAdapter"
+          ]
+        },
+        {
+          "name": "Equality propagation metadata, adaptive/implied-bound propagation, statistics and optimization (src/smt/theory_diff_logic.h:95-132,167-176,186-203,247-254,276-306,310-339,361-378,380-433)",
           "status": "unported"
         }
       ],
       "ownership": [
-        "The theory owns its concrete rational graph, atom and assertion slices, Boolean-variable index map, and scope snapshots. It borrows the initialized SMTInternalizerState and enodes through SMTTheoryBase; graph explanations borrow immutable SMTLiteral values."
+        "Each theory owns its concrete rational or infinitesimal-rational graph, atom and assertion slices, Boolean-variable index map, and scope snapshots. It borrows the initialized SMTInternalizerState and enodes through SMTTheoryBase; graph explanations borrow immutable SMTLiteral values."
       ],
       "deviations": [
-        "Only the retained integer instantiation is present. Go slices and maps replace source vectors and u_map, and unsupported arithmetic is recorded for a give-up final check."
+        "The retained arbitrary-precision integer and real instantiations are present. Go slices and maps replace source vectors and u_map, and unsupported arithmetic is recorded for a give-up final check. Both specializations share only arithmetic syntax decomposition; their graph and search state remain concrete and separate."
       ]
     },
     {
@@ -113486,6 +113537,8 @@
       "go_targets": [
         "pkg/smtcore/theory_diff_logic_integer.go",
         "pkg/smtcore/theory_diff_logic_integer_test.go",
+        "pkg/smtcore/theory_diff_logic_real.go",
+        "pkg/smtcore/theory_diff_logic_real_test.go",
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_internalizer_state.go"
       ],
@@ -113497,7 +113550,13 @@
         "TestSMTIntegerDiffTheoryParallelBoundAxioms",
         "TestSMTIntegerDiffTheoryBuildsModelValues",
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
-        "TestSMTSolverIntegerDifferenceEqualityAdapter"
+        "TestSMTSolverIntegerDifferenceEqualityAdapter",
+        "TestSMTRealDiffTheoryAtomUsesInfinitesimalComplement",
+        "TestSMTRealDiffTheoryStrictCycleConflict",
+        "TestSMTRealDiffTheoryBuildsFiniteModelValues",
+        "TestSMTSolverSetupUsesRealDifferenceLogic",
+        "TestSMTSolverPublishesStrictRealDifferenceModel",
+        "TestSMTSolverRealDifferenceEqualityAdapter"
       ],
       "conditionals": [
         {
@@ -113658,7 +113717,20 @@
           ]
         },
         {
-          "name": "Adaptive and implied-bound propagation, cheap equality propagation, explained core equality/disequality reflection, reset/statistics/display, real infinitesimal model scaling, optimization and simplex integration (remaining src/smt/theory_diff_logic_def.h)",
+          "name": "Real zero initialization, <=/>= atom decomposition and polarity, bound axioms, equality adaptation, infinitesimal strict complement, assignment queue, scopes, negative-cycle conflicts, numeral and offset terms, and delta-scaled finite model values",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_diff_logic_real.go",
+          "tests": [
+            "TestSMTRealDiffTheoryAtomUsesInfinitesimalComplement",
+            "TestSMTRealDiffTheoryStrictCycleConflict",
+            "TestSMTRealDiffTheoryBuildsFiniteModelValues",
+            "TestSMTSolverSetupUsesRealDifferenceLogic",
+            "TestSMTSolverPublishesStrictRealDifferenceModel",
+            "TestSMTSolverRealDifferenceEqualityAdapter"
+          ]
+        },
+        {
+          "name": "Adaptive and implied-bound propagation, cheap equality propagation, explained core equality/disequality reflection, reset/statistics/display, optimization and simplex integration (remaining src/smt/theory_diff_logic_def.h)",
           "status": "unported"
         }
       ],
@@ -113666,7 +113738,7 @@
         "Negative-cycle conflicts copy their literal antecedents into an SMT theory justification. Scoped graph activation, atoms, assertions, variables and incompleteness state roll back with the SMT context."
       ],
       "deviations": [
-        "The concrete port currently accepts integer difference logic only; real strict bounds requiring infinitesimals remain unported. Source assertion-only invalid domains return checked Go errors."
+        "The concrete port accepts arbitrary-precision integer and real difference logic. Real strict complements use a lexicographic rational/epsilon pair and model generation selects a finite positive delta that preserves every enabled edge. Source assertion-only invalid domains return checked Go errors."
       ]
     },
     {
