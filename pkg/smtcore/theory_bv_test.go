@@ -77,6 +77,75 @@ func TestSMTBitVectorNumeralBit2Bool(t *testing.T) {
 	}
 }
 
+func TestSMTBitVectorExtendedBooleanGates(t *testing.T) {
+	for _, operation := range []int32{59, 60} {
+		for mask := 0; mask < 8; mask++ {
+			m, family, solver := smtBVSolver(t)
+			family, err := m.RegisterBitVectorPlugin()
+			astTestMust(t, err)
+			boolean, err := m.MkBoolSort()
+			astTestMust(t, err)
+			arguments := make([]ast.ASTHandle, 3)
+			argumentRefs := make([]ast.ASTRef, 3)
+			names := []string{"bv-gate-input-a", "bv-gate-input-b", "bv-gate-input-c"}
+			for i := range arguments {
+				arguments[i], err = m.MkConst(astTestSymbol(t, m, names[i]), boolean)
+				astTestMust(t, err)
+				argumentRefs[i], err = m.NewRef(arguments[i])
+				astTestMust(t, err)
+				arguments[i], err = m.RefGet(argumentRefs[i])
+				astTestMust(t, err)
+			}
+			gate, err := m.MkFamilyApp(family, operation, nil, arguments)
+			astTestMust(t, err)
+			gateRef, err := m.NewRef(gate)
+			astTestMust(t, err)
+			gate, err = m.RefGet(gateRef)
+			astTestMust(t, err)
+			for i, argument := range arguments {
+				assertion := argument
+				if mask&(1<<i) == 0 {
+					assertion, err = m.MkNot(argument)
+					astTestMust(t, err)
+				}
+				astTestMust(t, solver.Assert(assertion))
+			}
+			trueCount := 0
+			for i := range arguments {
+				if mask&(1<<i) != 0 {
+					trueCount++
+				}
+			}
+			expected := trueCount >= 2
+			if operation == 60 {
+				expected = trueCount%2 == 1
+			}
+			wrong := gate
+			if expected {
+				wrong, err = m.MkNot(gate)
+				astTestMust(t, err)
+			}
+			wrongRef, err := m.NewRef(wrong)
+			astTestMust(t, err)
+			wrong, err = m.RefGet(wrongRef)
+			astTestMust(t, err)
+			if err = solver.Assert(wrong); err != nil {
+				t.Fatalf("operation %d mask %d assertion: %v", operation, mask, err)
+			}
+			astTestMust(t, m.DelRef(&wrongRef))
+			astTestMust(t, m.DelRef(&gateRef))
+			for i := range argumentRefs {
+				astTestMust(t, m.DelRef(&argumentRefs[i]))
+			}
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatalf("operation %d mask %d accepted wrong result: %v", operation, mask, status)
+			}
+		}
+	}
+}
+
 func TestSMTBitVectorAdditionCircuit(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
 	one, err := m.BitVectorNumeralUint64(1, 4)
