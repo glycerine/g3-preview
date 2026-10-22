@@ -107859,11 +107859,13 @@
       "path": "src/smt/smt_types.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_literal.go",
         "pkg/smtcore/smt_literal_source_test.go",
-        "pkg/smtcore/smt_types.go"
+        "pkg/smtcore/smt_types.go",
+        "pkg/smtcore/smt_literal_approx_set.go",
+        "pkg/smtcore/smt_justification.go"
       ],
       "tests": [
         "TestSMTLiteralSignedSentinelsAndSourceOperations",
@@ -107882,8 +107884,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Actual signed bool_var constants used by SMT literal construction",
@@ -107903,13 +107905,24 @@
           "tests": [
             "TestSMTCoreTypesFailureFinalCheckAndTheoryVarList"
           ]
+        },
+        {
+          "name": "enode pointer and enode-pair collections plus enabled literal approximate-set specialization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_justification.go",
+          "go_targets": ["pkg/smtcore/smt_literal_approx_set.go"],
+          "tests": [
+            "TestSMTJustificationEqualityAntecedentRecords",
+            "TestSMTLiteralApproxSetSource64CollisionAndSentinels",
+            "TestSMTLiteralApproxSetIndependentFiniteResidueAlgebra"
+          ]
         }
       ],
       "ownership": [
-        "Inline four-byte signed literal has no owning payload. Subsumption reads borrowed spans in source order; numeric ostream insertion uses the existing actual stream owner and preserves immediate output/cold graphs at every allocation refusal."
+        "Scalar IDs and literals have no owning payload; native Go slices replace source vector aliases and borrow enode pointers."
       ],
       "deviations": [
-        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. AST-aware/compact/vector display, neg_literals collection storage, literal approximate set, remaining SMT types and full context/kernel are still continuing dependencies. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported."
+        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Forward declarations require no Go implementation in this source unit, and concrete retained types are introduced by their owning ports."
       ]
     },
     {
