@@ -15,6 +15,7 @@ const (
 	unaryClean
 	unaryRepeat
 	unaryTryFor
+	unaryUsingParams
 )
 
 type unaryTactic struct {

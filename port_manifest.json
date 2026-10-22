@@ -125847,6 +125847,8 @@
         "pkg/tactic/tactic_repeat_test.go",
         "pkg/tactic/tactic_try_for.go",
         "pkg/tactic/tactic_try_for_test.go",
+        "pkg/tactic/tactic_using_params.go",
+        "pkg/tactic/tactic_using_params_test.go",
         "pkg/tactic/tactic_unary.go",
         "pkg/tactic/tactic_unary_test.go"
       ],
@@ -125870,6 +125872,7 @@
         "TestRepeatRecursesAcrossProducedSubgoals",
         "TestTryForCancelsChildAndRestoresResourceLimit",
         "TestTryForDisabledIntervalsApplyNormally",
+        "TestUsingParamsAppliesStoredOverridesAtConstructionAndUpdate",
         "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
@@ -126136,6 +126139,14 @@
           ]
         },
         {
+          "name": "using_params stored overrides, construction update, later merged updates and translation (tactical.cpp:1158-1188)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_using_params.go",
+          "tests": [
+            "TestUsingParamsAppliesStoredOverridesAtConstructionAndUpdate"
+          ]
+        },
+        {
           "name": "unary tactical lifecycle, fail_if_branching result refusal and generic cleanup wrapper (tactical.cpp:886-927,1077-1128)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_unary.go",
@@ -126162,6 +126173,7 @@
         "pkg/tactic/tactic_or_else.go",
         "pkg/tactic/tactic_repeat.go",
         "pkg/tactic/tactic_try_for.go",
+        "pkg/tactic/tactic_using_params.go",
         "pkg/tactic/tactic_unary.go"
       ],
       "tests": [
@@ -126184,6 +126196,7 @@
         "TestRepeatRecursesAcrossProducedSubgoals",
         "TestTryForCancelsChildAndRestoresResourceLimit",
         "TestTryForDisabledIntervalsApplyNormally",
+        "TestUsingParamsAppliesStoredOverridesAtConstructionAndUpdate",
         "TestFailIfBranchingAndCleanTacticals"
       ],
       "conditionals": [
@@ -126258,6 +126271,14 @@
           "tests": [
             "TestTryForCancelsChildAndRestoresResourceLimit",
             "TestTryForDisabledIntervalsApplyNormally"
+          ]
+        },
+        {
+          "name": "typed using-params constructor with explicit Go parameter context",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_using_params.go",
+          "tests": [
+            "TestUsingParamsAppliesStoredOverridesAtConstructionAndUpdate"
           ]
         },
         {
