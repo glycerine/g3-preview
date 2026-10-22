@@ -153,6 +153,30 @@ func (j *SMTEqualityConflictJustification) MarkAntecedents(m SMTAntecedentMarker
 }
 func (*SMTEqualityConflictJustification) Name() string { return "eq-conflict" }
 
+// SMTDisequalityConflictJustification explains why a pending equality cannot
+// merge two roots that are already constrained to be distinct.
+type SMTDisequalityConflictJustification struct {
+	SMTJustificationBase
+	First, Second *SMTEnode
+	Equality      SMTEqualityJustification
+}
+
+func NewSMTDisequalityConflictJustification(first, second *SMTEnode, equality SMTEqualityJustification) (*SMTDisequalityConflictJustification, error) {
+	if first == nil || second == nil || first == second {
+		return nil, ast.ErrASTDomain
+	}
+	return &SMTDisequalityConflictJustification{SMTJustificationBase: NewSMTJustificationBase(true), First: first, Second: second, Equality: equality}, nil
+}
+
+func (j *SMTDisequalityConflictJustification) MarkAntecedents(marker SMTAntecedentMarker) error {
+	if marker == nil {
+		return ast.ErrASTHandle
+	}
+	return marker.MarkJustifiedEquality(j.First, j.Second, j.Equality)
+}
+
+func (*SMTDisequalityConflictJustification) Name() string { return "diseq-conflict" }
+
 type SMTEqualityRootJustification struct {
 	SMTJustificationBase
 	Node *SMTEnode

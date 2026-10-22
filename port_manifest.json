@@ -104356,7 +104356,8 @@
         "pkg/smtcore/smt_theory_lifecycle.go",
         "pkg/smtcore/smt_search.go",
         "pkg/smtcore/smt_assumptions.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_equality_propagation.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -104364,7 +104365,9 @@
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
         "TestSMTInternalizerInstallsLearnedClauseInCurrentScope",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
-        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
+        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
+        "TestSMTCoreEqualityTransitivityAndScopeRollback",
+        "TestSMTCoreEqualityCongruencePropagation"
       ],
       "conditionals": [
         {
@@ -105347,13 +105350,23 @@
             "TestSMTSolverPublishesGeneratedModel",
             "TestSMTSolverPublishesIntegerDifferenceModel"
           ]
+        },
+        {
+          "name": "equality and disequality propagation, union-find class merging, transitivity proofs, congruence closure, theory-variable notification, and scoped rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_equality_propagation.go",
+          "tests": [
+            "TestSMTCoreEqualityTransitivityAndScopeRollback",
+            "TestSMTCoreEqualityCongruencePropagation",
+            "TestSMTSolverImpliedEqualitiesPartitionsByProofAndSort"
+          ]
         }
       ],
       "ownership": [
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
       ],
       "deviations": [
-        "Structural subsumption, restarts, resource limits, and binary-clause specialization remain unported."
+        "Structural subsumption, restarts, and resource limits remain unported."
       ]
     },
     {
@@ -105368,14 +105381,17 @@
         "pkg/smtcore/smt_theory_lifecycle.go",
         "pkg/smtcore/smt_search.go",
         "pkg/smtcore/smt_assumptions.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_equality_propagation.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
-        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder"
+        "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
+        "TestSMTCoreEqualityTransitivityAndScopeRollback",
+        "TestSMTCoreEqualityCongruencePropagation"
       ],
       "conditionals": [
         {
@@ -105597,6 +105613,15 @@
           "tests": [
             "TestSMTSolverPublishesGeneratedModel",
             "TestSMTSolverPublishesIntegerDifferenceModel"
+          ]
+        },
+        {
+          "name": "equality-class, disequality, congruence queue, proof forest, and rollback state",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_equality_propagation.go",
+          "tests": [
+            "TestSMTCoreEqualityTransitivityAndScopeRollback",
+            "TestSMTCoreEqualityCongruencePropagation"
           ]
         }
       ],
@@ -106590,7 +106615,8 @@
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_binary_clause_test.go",
         "pkg/smtcore/smt_theory_propagation.go",
-        "pkg/smtcore/smt_theory.go"
+        "pkg/smtcore/smt_theory.go",
+        "pkg/smtcore/smt_equality_propagation.go"
       ],
       "tests": [
         "TestSMTInternalizationOrderBooleanGateContextsAndNotElision",
@@ -106610,7 +106636,9 @@
         "TestSMTBinaryClauseOptimizationPropagationAndInvariant",
         "TestSMTBinaryClauseOptimizationConflictAndEligibility",
         "TestSMTBinaryClauseOptimizationDefersScopedClauses",
-        "TestSMTKernelEnablesBinaryClausesUnlessProofsAreEnabled"
+        "TestSMTKernelEnablesBinaryClausesUnlessProofsAreEnabled",
+        "TestSMTCoreEqualityTransitivityAndScopeRollback",
+        "TestSMTCoreEqualityCongruencePropagation"
       ],
       "conditionals": [
         {
@@ -107024,6 +107052,15 @@
             "TestSMTBinaryClauseOptimizationConflictAndEligibility",
             "TestSMTBinaryClauseOptimizationDefersScopedClauses",
             "TestSMTKernelEnablesBinaryClausesUnlessProofsAreEnabled"
+          ]
+        },
+        {
+          "name": "assigned equality-atom dispatch into core equality and disequality propagation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_equality_propagation.go",
+          "tests": [
+            "TestSMTCoreEqualityTransitivityAndScopeRollback",
+            "TestSMTCoreEqualityCongruencePropagation"
           ]
         },
         {

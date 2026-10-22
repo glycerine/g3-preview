@@ -11,11 +11,9 @@ func TestSMTSolverImpliedEqualitiesPartitionsByProofAndSort(t *testing.T) {
 	m, config := smtModelGeneratorFixture(t)
 	boolean, err := m.MkBoolSort()
 	astTestMust(t, err)
-	family, err := m.RegisterArithmeticPlugin()
+	uninterpreted, err := m.MkSort(astTestSymbol(t, m, "implied-sort"), ast.ASTSortInfo{})
 	astTestMust(t, err)
-	integer, err := m.MkFamilySort(family, 1, nil)
-	astTestMust(t, err)
-	solver, err := NewSMTSolver(m, nil, "QF_IDL", SMTSolverConfig{Params: config.Context})
+	solver, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: config.Context})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, solver.Close()) })
 	makeConstant := func(name string, sort ast.ASTHandle) ast.ASTHandle {
@@ -23,10 +21,10 @@ func TestSMTSolverImpliedEqualitiesPartitionsByProofAndSort(t *testing.T) {
 		astTestMust(t, makeErr)
 		return value
 	}
-	a := makeConstant("implied-a", integer)
-	b := makeConstant("implied-b", integer)
-	c := makeConstant("implied-c", integer)
-	d := makeConstant("implied-d", integer)
+	a := makeConstant("implied-a", uninterpreted)
+	b := makeConstant("implied-b", uninterpreted)
+	c := makeConstant("implied-c", uninterpreted)
+	d := makeConstant("implied-d", uninterpreted)
 	p := makeConstant("implied-p", boolean)
 	ab, err := m.MkEq(a, b)
 	astTestMust(t, err)

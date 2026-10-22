@@ -1,0 +1,85 @@
+package smtcore
+
+import (
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
+)
+
+func smtUFConstants(t *testing.T, manager *ast.ASTManager, prefix string, count int) (ast.ASTHandle, []ast.ASTHandle) {
+	t.Helper()
+	sort, err := manager.MkSort(astTestSymbol(t, manager, prefix+"-sort"), ast.ASTSortInfo{})
+	astTestMust(t, err)
+	values := make([]ast.ASTHandle, count)
+	for index := range values {
+		values[index], err = manager.MkConst(astTestSymbol(t, manager, prefix+string(rune('a'+index))), sort)
+		astTestMust(t, err)
+	}
+	return sort, values
+}
+
+func TestSMTCoreEqualityTransitivityAndScopeRollback(t *testing.T) {
+	manager, solver := smtSolverFixture(t)
+	_, values := smtUFConstants(t, manager, "core-eq-", 3)
+	for _, value := range values {
+		astTestMust(t, manager.IncRef(value))
+	}
+	t.Cleanup(func() {
+		for _, value := range values {
+			astTestMust(t, manager.DecRef(value))
+		}
+	})
+	ab, err := manager.MkEq(values[0], values[1])
+	astTestMust(t, err)
+	bc, err := manager.MkEq(values[1], values[2])
+	astTestMust(t, err)
+	ac, err := manager.MkEq(values[0], values[2])
+	astTestMust(t, err)
+	notAC, err := manager.MkNot(ac)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(ab))
+	astTestMust(t, solver.Push())
+	astTestMust(t, solver.Assert(bc))
+	astTestMust(t, solver.Assert(notAC))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("transitive equality contradiction", status)
+	}
+	astTestMust(t, solver.Pop(1))
+	ac, err = manager.MkEq(values[0], values[2])
+	astTestMust(t, err)
+	notAC, err = manager.MkNot(ac)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(notAC))
+	status, err = solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("popped equality merge was not restored", status)
+	}
+}
+
+func TestSMTCoreEqualityCongruencePropagation(t *testing.T) {
+	manager, solver := smtSolverFixture(t)
+	sort, values := smtUFConstants(t, manager, "core-cg-", 2)
+	function, err := manager.MkFuncDecl(astTestSymbol(t, manager, "core-cg-f"), []ast.ASTHandle{sort}, sort, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	fa, err := manager.MkApp(function, []ast.ASTHandle{values[0]})
+	astTestMust(t, err)
+	fb, err := manager.MkApp(function, []ast.ASTHandle{values[1]})
+	astTestMust(t, err)
+	ab, err := manager.MkEq(values[0], values[1])
+	astTestMust(t, err)
+	fafb, err := manager.MkEq(fa, fb)
+	astTestMust(t, err)
+	notFAFB, err := manager.MkNot(fafb)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(ab))
+	astTestMust(t, solver.Assert(notFAFB))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("congruence contradiction", status)
+	}
+}

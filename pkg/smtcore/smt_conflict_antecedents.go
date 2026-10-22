@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -169,8 +170,14 @@ func (e *SMTAntecedentExpander) expandEqualityJustification(first, second *SMTEn
 }
 
 func smtCommonTransAncestor(first, second *SMTEnode) (*SMTEnode, error) {
-	if first == nil || second == nil || first.root == nil || first.root != second.root || !first.TransReaches(first.root) || !second.TransReaches(second.root) {
+	if first == nil || second == nil || first.root == nil {
 		return nil, ast.ErrASTDomain
+	}
+	if first.root != second.root {
+		return nil, fmt.Errorf("distinct equality roots: %w", ast.ErrASTDomain)
+	}
+	if !first.TransReaches(first.root) || !second.TransReaches(second.root) {
+		return nil, fmt.Errorf("broken equality proof path: %w", ast.ErrASTDomain)
 	}
 	seen := make(map[*SMTEnode]struct{})
 	for current := first; current != nil; current = current.trans.Target {
@@ -202,13 +209,13 @@ func (e *SMTAntecedentExpander) expandBranch(node, ancestor *SMTEnode) error {
 func (e *SMTAntecedentExpander) expandEquality(first, second *SMTEnode) error {
 	common, err := smtCommonTransAncestor(first, second)
 	if err != nil {
-		return err
+		return fmt.Errorf("find equality proof ancestor: %w", err)
 	}
 	if err = e.expandBranch(first, common); err != nil {
-		return err
+		return fmt.Errorf("expand first equality proof branch: %w", err)
 	}
 	if err = e.expandBranch(second, common); err != nil {
-		return err
+		return fmt.Errorf("expand second equality proof branch: %w", err)
 	}
 	e.equalityUses = append(e.equalityUses, SMTEqualityUse{first, second, common})
 	return nil

@@ -2,6 +2,8 @@
 package smtcore
 
 import (
+	"fmt"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -125,6 +127,28 @@ func (s *SMTInternalizerState) PropagateTheoryAssignments() error {
 		if err != nil {
 			return err
 		}
+		if data.IsEquality() {
+			expression := s.boolExpr[variable]
+			leftExpression, leftErr := s.manager.GetArg(expression, 0)
+			rightExpression, rightErr := s.manager.GetArg(expression, 1)
+			if leftErr != nil || rightErr != nil {
+				return ast.ErrASTDomain
+			}
+			left, right := s.context.enodes[leftExpression], s.context.enodes[rightExpression]
+			if left == nil || right == nil {
+				return ast.ErrASTDomain
+			}
+			if literal.Sign() {
+				if err = s.addDisequality(left, right, literal); err != nil {
+					return fmt.Errorf("propagate equality disequality: %w", err)
+				}
+			} else if err = s.addEquality(left, right, NewSMTEqualityEquation(literal)); err != nil {
+				return fmt.Errorf("propagate equality merge: %w", err)
+			}
+			if s.inconsistent {
+				return nil
+			}
+		}
 		if data.IsTheoryAtom() {
 			plugin := s.theories[data.Theory()]
 			if plugin == nil {
@@ -135,6 +159,9 @@ func (s *SMTInternalizerState) PropagateTheoryAssignments() error {
 			}
 		}
 		s.atomPropagationHead++
+	}
+	if err := s.propagateCongruences(); err != nil {
+		return fmt.Errorf("propagate congruences: %w", err)
 	}
 	return nil
 }

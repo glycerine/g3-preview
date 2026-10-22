@@ -10,23 +10,27 @@ import (
 )
 
 type smtInternalizerScope struct {
-	booleanLimit     int
-	enodeLimit       int
-	pendingLimit     int
-	assignmentLimit  int
-	clauseLimit      int
-	theoryLimit      int
-	assignedLimit    int
-	propagationHead  int
-	theoryEqLimit    int
-	theoryEqHead     int
-	theoryDiseqLimit int
-	theoryDiseqHead  int
-	atomHead         int
-	notifyLimit      int
-	inconsistent     bool
-	conflict         SMTBooleanJustification
-	conflictLiteral  SMTLiteral
+	booleanLimit       int
+	enodeLimit         int
+	pendingLimit       int
+	pendingHead        int
+	equalityLimit      int
+	assignmentLimit    int
+	clauseLimit        int
+	theoryLimit        int
+	assignedLimit      int
+	propagationHead    int
+	theoryEqLimit      int
+	theoryEqHead       int
+	theoryDiseqLimit   int
+	theoryDiseqHead    int
+	atomHead           int
+	notifyLimit        int
+	inconsistent       bool
+	conflict           SMTBooleanJustification
+	conflictLiteral    SMTLiteral
+	disequalities      map[smtEnodePairKey]struct{}
+	disequalityReasons map[smtEnodePairKey]SMTLiteral
 }
 
 type smtInternalizerAssignmentTrail struct {
@@ -47,6 +51,22 @@ type smtInternalizerTheoryTrail struct {
 type smtInternalizerNotifyTrail struct {
 	variable int32
 	theory   SMTTheoryID
+}
+
+type smtEqualityNodeSnapshot struct {
+	node            *SMTEnode
+	root, next      *SMTEnode
+	congruence      *SMTEnode
+	classSize       uint32
+	parents         []*SMTEnode
+	theoryVariables SMTTheoryVarList
+	trans           SMTTransJustification
+}
+
+type smtEqualitySnapshot struct {
+	nodes         []smtEqualityNodeSnapshot
+	disequalities map[smtEnodePairKey]struct{}
+	reasons       map[smtEnodePairKey]SMTLiteral
 }
 
 type SMTTheoryPropagation struct {
@@ -88,6 +108,9 @@ type SMTInternalizerState struct {
 	scopes                   []smtInternalizerScope
 	cachedGeneration         map[ast.ASTHandle]uint32
 	pending                  []SMTInternalizerCongruence
+	pendingHead              int
+	equalityTrail            []smtEqualitySnapshot
+	disequalityReasons       map[smtEnodePairKey]SMTLiteral
 	assignmentTrail          []smtInternalizerAssignmentTrail
 	theoryTrail              []smtInternalizerTheoryTrail
 	theoryEqualities         []SMTTheoryPropagation
@@ -125,7 +148,8 @@ func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext
 		boolVar: make(map[ast.ASTHandle]int32), boolExpr: make([]ast.ASTHandle, 1), booleanData: make([]SMTBoolVarData, 1),
 		activity: make([]float64, 1), assignment: []lbool.LBool{lbool.True, lbool.False}, watches: make([]SMTWatchList, 2),
 		cachedGeneration: make(map[ast.ASTHandle]uint32), theories: make(map[ast.FamilyID]SMTTheoryInternalizer),
-		conflictLiteral: SMTNullLiteral,
+		disequalityReasons: make(map[smtEnodePairKey]SMTLiteral),
+		conflictLiteral:    SMTNullLiteral,
 	}
 	state.booleanData[0].Initialize(0)
 	return state, nil
@@ -494,12 +518,22 @@ func (s *SMTInternalizerState) PushScope() error {
 	if err := s.open(); err != nil {
 		return err
 	}
+	disequalities := make(map[smtEnodePairKey]struct{}, len(s.context.disequalities))
+	for key := range s.context.disequalities {
+		disequalities[key] = struct{}{}
+	}
+	reasons := make(map[smtEnodePairKey]SMTLiteral, len(s.disequalityReasons))
+	for key, literal := range s.disequalityReasons {
+		reasons[key] = literal
+	}
 	s.scopes = append(s.scopes, smtInternalizerScope{
-		booleanLimit: len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending),
+		booleanLimit: len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending), pendingHead: s.pendingHead,
+		equalityLimit:   len(s.equalityTrail),
 		assignmentLimit: len(s.assignmentTrail), clauseLimit: len(s.clauses), theoryLimit: len(s.theoryTrail), inconsistent: s.inconsistent,
 		assignedLimit: len(s.assignedLiterals), propagationHead: s.propagationHead, conflict: s.conflict,
 		conflictLiteral: s.conflictLiteral,
-		theoryEqLimit:   len(s.theoryEqualities), theoryEqHead: s.theoryEqualityHead,
+		disequalities:   disequalities, disequalityReasons: reasons,
+		theoryEqLimit: len(s.theoryEqualities), theoryEqHead: s.theoryEqualityHead,
 		theoryDiseqLimit: len(s.theoryDisequalities), theoryDiseqHead: s.theoryDisequalityHead,
 		atomHead: s.atomPropagationHead, notifyLimit: len(s.notifyTrail),
 	})
@@ -556,6 +590,24 @@ func (s *SMTInternalizerState) unregisterEnode(node *SMTEnode) error {
 }
 
 func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
+	if scope.equalityLimit < 0 || scope.equalityLimit > len(s.equalityTrail) {
+		return ast.ErrASTDomain
+	}
+	for len(s.equalityTrail) > scope.equalityLimit {
+		index := len(s.equalityTrail) - 1
+		entry := s.equalityTrail[index]
+		s.equalityTrail = s.equalityTrail[:index]
+		if err := s.restoreEqualitySnapshot(entry); err != nil {
+			return err
+		}
+	}
+	if scope.disequalities == nil {
+		s.context.disequalities = make(map[smtEnodePairKey]struct{})
+		s.disequalityReasons = make(map[smtEnodePairKey]SMTLiteral)
+	} else {
+		s.context.disequalities = scope.disequalities
+		s.disequalityReasons = scope.disequalityReasons
+	}
 	if scope.theoryLimit < 0 || scope.theoryLimit > len(s.theoryTrail) {
 		return ast.ErrASTDomain
 	}
@@ -678,6 +730,10 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		return ast.ErrASTDomain
 	}
 	s.pending = s.pending[:scope.pendingLimit]
+	if scope.pendingHead < 0 || scope.pendingHead > len(s.pending) {
+		return ast.ErrASTDomain
+	}
+	s.pendingHead = scope.pendingHead
 	s.inconsistent = scope.inconsistent
 	s.conflict = scope.conflict
 	s.conflictLiteral = scope.conflictLiteral
