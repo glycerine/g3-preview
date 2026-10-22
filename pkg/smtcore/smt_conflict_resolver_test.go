@@ -69,3 +69,35 @@ func TestSMTInternalizerInstallsLearnedClauseInCurrentScope(t *testing.T) {
 		t.Fatal("learned clause survived its logical scope")
 	}
 }
+
+func TestSMTConflictResolverMinimizesImpliedLemmaLiteral(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	a := smtRelevancyBool(t, m, "minimize-a")
+	b := smtRelevancyBool(t, m, "minimize-b")
+	c := smtRelevancyBool(t, m, "minimize-c")
+	for _, expression := range []ast.ASTHandle{a, b, c} {
+		astTestMust(t, state.Internalize(expression, true))
+	}
+	av, _ := state.BoolVar(a)
+	bv, _ := state.BoolVar(b)
+	cv, _ := state.BoolVar(c)
+	la, lb, lc := NewSMTLiteral(av, false), NewSMTLiteral(bv, false), NewSMTLiteral(cv, false)
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.AssignLiteral(la, NewSMTBooleanAxiom()))
+	reason, err := NewSMTClause(m, []SMTLiteral{lc, la.Negated()}, SMTClauseAux, nil, nil, false, nil)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, reason.Close()) })
+	astTestMust(t, state.AssignLiteral(lc, NewSMTBooleanClause(reason)))
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.AssignLiteral(lb, NewSMTBooleanAxiom()))
+	resolver, err := NewSMTConflictResolver(state)
+	astTestMust(t, err)
+	marks := make([]bool, len(state.booleanData))
+	marks[av], marks[cv] = true, true
+	lemma, err := resolver.minimizeLemma([]SMTLiteral{lb.Negated(), la.Negated(), lc.Negated()}, marks, resolver.levels(), 0)
+	astTestMust(t, err)
+	if len(lemma) != 2 || lemma[0] != lb.Negated() || lemma[1] != la.Negated() || state.Statistics().NumMinimizedLits != 1 {
+		t.Fatal("minimized lemma", lemma, state.Statistics())
+	}
+}

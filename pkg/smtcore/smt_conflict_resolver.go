@@ -18,6 +18,130 @@ type SMTConflictResolver struct {
 	expander *SMTAntecedentExpander
 }
 
+func (r *SMTConflictResolver) minimizeLemma(lemma []SMTLiteral, marks []bool, levels []uint32, baseLevel uint32) ([]SMTLiteral, error) {
+	levelSet := make(map[uint32]struct{}, len(lemma))
+	for _, literal := range lemma {
+		levelSet[levels[literal.Var()]] = struct{}{}
+	}
+	temporary := make([]int32, 0)
+	var implied func(SMTLiteral) (bool, error)
+	implied = func(literal SMTLiteral) (bool, error) {
+		oldTemporary := len(temporary)
+		stack := []int32{literal.Var()}
+		processAntecedent := func(antecedent SMTLiteral) bool {
+			variable := antecedent.Var()
+			level := levels[variable]
+			if marks[variable] || level <= baseLevel {
+				return true
+			}
+			if _, found := levelSet[level]; !found {
+				return false
+			}
+			marks[variable] = true
+			temporary = append(temporary, variable)
+			stack = append(stack, variable)
+			return true
+		}
+		fail := func() (bool, error) {
+			for len(temporary) > oldTemporary {
+				index := len(temporary) - 1
+				marks[temporary[index]] = false
+				temporary = temporary[:index]
+			}
+			return false, nil
+		}
+		for len(stack) != 0 {
+			index := len(stack) - 1
+			variable := stack[index]
+			stack = stack[:index]
+			justification := r.state.booleanData[variable].Justification()
+			switch justification.Kind() {
+			case SMTBooleanJustificationClause:
+				clause, ok := justification.Clause()
+				if !ok || clause == nil {
+					return false, ast.ErrASTDomain
+				}
+				position := -1
+				for i := 0; i < len(clause.literals) && i < 2; i++ {
+					if clause.literals[i].Var() == variable {
+						position = i
+						break
+					}
+				}
+				if position < 0 {
+					return false, ast.ErrASTDomain
+				}
+				for i, item := range clause.literals {
+					if i != position && !processAntecedent(item.Negated()) {
+						return fail()
+					}
+				}
+				if clause.justification != nil {
+					antecedents, err := r.expander.ExpandJustification(clause.justification)
+					if err != nil {
+						return false, err
+					}
+					for _, antecedent := range antecedents {
+						if !processAntecedent(antecedent) {
+							return fail()
+						}
+					}
+				}
+			case SMTBooleanJustificationBinaryClause:
+				antecedent, ok := justification.Literal()
+				if !ok {
+					return false, ast.ErrASTDomain
+				}
+				if !processAntecedent(antecedent) {
+					return fail()
+				}
+			case SMTBooleanJustificationAxiom:
+				if levels[variable] > baseLevel {
+					return fail()
+				}
+			case SMTBooleanJustificationObject:
+				if r.state.booleanData[variable].Assumption {
+					return fail()
+				}
+				object, ok := justification.Justification()
+				if !ok || object == nil {
+					return false, ast.ErrASTDomain
+				}
+				antecedents, err := r.expander.ExpandJustification(object)
+				if err != nil {
+					return false, err
+				}
+				for _, antecedent := range antecedents {
+					if !processAntecedent(antecedent) {
+						return fail()
+					}
+				}
+			default:
+				return false, ast.ErrASTDomain
+			}
+		}
+		return true, nil
+	}
+	kept := lemma[:1]
+	for _, literal := range lemma[1:] {
+		remove, err := implied(literal)
+		if err != nil {
+			return nil, err
+		}
+		if remove {
+			marks[literal.Var()] = true
+			temporary = append(temporary, literal.Var())
+			r.state.statistics.NumMinimizedLits++
+		} else {
+			kept = append(kept, literal)
+		}
+	}
+	for _, variable := range temporary {
+		marks[variable] = false
+	}
+	return kept, nil
+}
+
 func NewSMTConflictResolver(state *SMTInternalizerState) (*SMTConflictResolver, error) {
 	if state == nil || state.open() != nil {
 		return nil, ast.ErrASTHandle
@@ -161,6 +285,10 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 		}
 	}
 	lemma[0] = consequent.Negated()
+	lemma, err = r.minimizeLemma(lemma, marks, levels, baseLevel)
+	if err != nil {
+		return SMTConflictResolution{}, err
+	}
 	result.Resolved, result.Lemma = true, lemma
 	result.InternalScopeLevel = r.state.booleanData[lemma[0].Var()].InternalLevel()
 	result.NewScopeLevel = baseLevel

@@ -103584,7 +103584,8 @@
         "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities",
         "TestSMTConflictJustificationMaximumAssignmentLevels",
         "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification",
-        "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel"
+        "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel",
+        "TestSMTConflictResolverMinimizesImpliedLemmaLiteral"
       ],
       "conditionals": [
         {
@@ -103937,7 +103938,15 @@
           ]
         },
         {
-          "name": "lemma minimization, structural subsumption, and unsat-core extraction",
+          "name": "recursive implication-based learned-lemma minimization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_resolver.go",
+          "tests": [
+            "TestSMTConflictResolverMinimizesImpliedLemmaLiteral"
+          ]
+        },
+        {
+          "name": "structural subsumption and unsat-core extraction",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -103953,7 +103962,7 @@
         "The antecedent expander owns its work queues, duplicate set and emitted event history; justifications and enodes are borrowed and temporary justification marks are always cleared."
       ],
       "deviations": [
-        "Dynamic-ack callbacks are recorded as typed congruence/equality-use events until the concrete manager is connected. Minimization, proof generation, and search-loop learning integration remain open."
+        "Dynamic-ack callbacks are recorded as typed congruence/equality-use events until the concrete manager is connected. Structural subsumption, proof generation, and unsat-core extraction remain open."
       ]
     },
     {
@@ -103972,7 +103981,8 @@
         "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities",
         "TestSMTConflictJustificationMaximumAssignmentLevels",
         "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification",
-        "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel"
+        "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel",
+        "TestSMTConflictResolverMinimizesImpliedLemmaLiteral"
       ],
       "conditionals": [
         {
@@ -104025,7 +104035,15 @@
           ]
         },
         {
-          "name": "proof accessors, minimization, structural subsumption, and unsat-core interface",
+          "name": "recursive implication-based learned-lemma minimization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_resolver.go",
+          "tests": [
+            "TestSMTConflictResolverMinimizesImpliedLemmaLiteral"
+          ]
+        },
+        {
+          "name": "proof accessors, structural subsumption, and unsat-core interface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -105094,7 +105112,7 @@
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
       ],
       "deviations": [
-        "Lemma minimization, conflict proofs, unsat-core extraction, restarts, resource limits, and binary-clause specialization remain unported."
+        "Structural subsumption, conflict proofs, unsat-core extraction, restarts, resource limits, and binary-clause specialization remain unported."
       ]
     },
     {
@@ -105326,7 +105344,7 @@
         "SMTInternalizerState owns the concrete slices and clause objects for this context subset."
       ],
       "deviations": [
-        "The complete context interface, lemma minimization, conflict proofs, model state, and remaining lifecycle operations remain unported."
+        "The complete context interface, structural subsumption, conflict proofs, model state, and remaining lifecycle operations remain unported."
       ]
     },
     {
