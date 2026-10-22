@@ -106326,6 +106326,8 @@
         "TestSMTInternalizerBooleanVariablesLiteralsAssignmentsAndScopes",
         "TestSMTInternalizerEnodeGenerationCongruenceAndRollback",
         "TestSMTInternalizerBooleanGateClausesAndRootAssertions",
+        "TestSMTInternalizerImplicationGateWithoutPreprocessing",
+        "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
         "TestSMTInternalizerTermITEEqualityClausesAndRelevancy",
         "TestSMTInternalizerQuantifierRegistrationAndDefaultAssertion",
         "TestSMTInternalizerConsumesMaterializedQuantifierInstance",
@@ -106705,6 +106707,8 @@
           "go_target": "pkg/smtcore/smt_internalizer.go",
           "tests": [
             "TestSMTInternalizerBooleanGateClausesAndRootAssertions",
+            "TestSMTInternalizerImplicationGateWithoutPreprocessing",
+            "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
             "TestSMTInternalizerTermITEEqualityClausesAndRelevancy",
             "TestSMTInternalizerQuantifierRegistrationAndDefaultAssertion",
             "TestSMTInternalizerConsumesMaterializedQuantifierInstance",
@@ -106756,7 +106760,8 @@
       ],
       "deviations": [
         "Registered theories now supply default-internalizer selection; nondefault theory families remain top-down boundaries in the ordering pass.",
-        "Internalized logical clauses are retained as concrete typed records for the future DPLL watch and justification layer."
+        "Internalized logical clauses are retained as concrete typed records for the future DPLL watch and justification layer.",
+        "The retained Go kernel directly encodes implication gates because the C++ preprocessing pass that normally eliminates OP_IMPLIES has not reached this facade; the clauses preserve the source Boolean semantics and conservative relevancy dependencies."
       ]
     },
     {
@@ -108667,9 +108672,15 @@
       "path": "src/smt/smt_solver.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_solver.go"
+      ],
+      "tests": [
+        "TestSMTSolverKernelFacadeAssertionsScopesAndResults",
+        "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
+        "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
+      ],
       "assertions": [
         {
           "line": 126,
@@ -108688,19 +108699,52 @@
           "text": "SASSERT(m_name2assertion.contains(name));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "kernel-backed construction, assertions, named assertions, scopes, checks under assumptions, unsat cores, assertion and assumption queries, statistics, display, and factory",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverKernelFacadeAssertionsScopesAndResults",
+            "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
+            "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
+          ]
+        },
+        {
+          "name": "parameter storage and update",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
+          ]
+        },
+        {
+          "name": "kernel translation and copy, model and final proof exposure, reason and label extraction, consequence and mutex solving, progress sampling, and unsat-core minimization and pattern extension",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "SMTSolver owns its SMTKernel, named-assertion adapter, current check result, copied parameter reference, and retained tracked-formula references; it borrows the AST manager, parameter context, quantifier registry, and progress callback."
+      ],
+      "deviations": [
+        "Unavailable kernel result facilities return empty ordinary result fields or an explicit domain error; they are not simulated by a universal adapter."
+      ]
     },
     {
       "path": "src/smt/smt_solver.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_solver.go"
+      ],
+      "tests": [
+        "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -108711,11 +108755,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "SMT solver and solver-factory construction interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete Go constructor returns an owning solver value; the factory owns no process services and closes independently."
+      ],
+      "deviations": [
+        "The Go constructor takes SMTSolverConfig so the parameter context and optional quantifier registry are explicit borrowed services."
+      ]
     },
     {
       "path": "src/smt/smt_statistics.cpp",

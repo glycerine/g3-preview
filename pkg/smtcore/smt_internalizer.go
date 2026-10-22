@@ -71,7 +71,7 @@ func (s *SMTInternalizerState) applySortConstraint(expression ast.ASTHandle, nod
 }
 
 func smtInternalizerGateOperation(operation int32) bool {
-	return operation == ast.ASTOpAnd || operation == ast.ASTOpOr || operation == ast.ASTOpIff || operation == ast.ASTOpIte
+	return operation == ast.ASTOpAnd || operation == ast.ASTOpOr || operation == ast.ASTOpIff || operation == ast.ASTOpIte || operation == ast.ASTOpImplies
 }
 
 func (s *SMTInternalizerState) Clauses() []SMTInternalizedClause {
@@ -494,6 +494,33 @@ func (s *SMTInternalizerState) addGateConstraints(expression ast.ASTHandle, oper
 				return err
 			}
 		}
+	case ast.ASTOpImplies:
+		if len(arguments) != 2 {
+			return ast.ErrASTDomain
+		}
+		for _, clause := range [][]SMTLiteral{
+			{literal.Negated(), arguments[0].Negated(), arguments[1]},
+			{literal, arguments[0]},
+			{literal, arguments[1].Negated()},
+		} {
+			if err = s.addClause(clause, false, ast.ASTHandle{}); err != nil {
+				return err
+			}
+		}
+		if s.relevancy != nil {
+			left, getErr := s.manager.GetArg(expression, 0)
+			if getErr != nil {
+				return getErr
+			}
+			right, getErr := s.manager.GetArg(expression, 1)
+			if getErr != nil {
+				return getErr
+			}
+			if err = s.relevancy.AddDependency(expression, left); err != nil {
+				return err
+			}
+			return s.relevancy.AddDependency(expression, right)
+		}
 	case ast.ASTOpIte:
 		if len(arguments) != 3 {
 			return ast.ErrASTDomain
@@ -742,6 +769,20 @@ func (s *SMTInternalizerState) Assert(expression, proof ast.ASTHandle, generatio
 				return err
 			}
 			if err = s.addClause([]SMTLiteral{left.Negated(), right}, true, proof); err != nil {
+				return err
+			}
+		case ast.ASTOpImplies:
+			if len(arguments) != 2 {
+				return ast.ErrASTDomain
+			}
+			if err = s.Internalize(expression, true); err != nil {
+				return err
+			}
+			literal, literalErr := s.Literal(expression)
+			if literalErr != nil {
+				return literalErr
+			}
+			if err = s.addClause([]SMTLiteral{literal}, true, proof); err != nil {
 				return err
 			}
 		case ast.ASTOpIte:
