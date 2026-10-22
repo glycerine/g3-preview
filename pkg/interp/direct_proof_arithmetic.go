@@ -60,7 +60,24 @@ func (p *DirectProofInterpolator) MakeLeqToEq(x, y, xLeqY, yLeqX ast.ASTHandle) 
 	if side == TermB {
 		return p.keep(p.base.manager.Make(OperatorTrue))
 	}
-	return ast.ASTHandle{}, ProofError{}
+	negatedConclusion, err := p.base.manager.MkNot(conclusion)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	literals := []ast.ASTHandle{negatedConclusion, xLeqY, yLeqX}
+	arguments := make([]ast.ASTHandle, len(literals))
+	for i, literal := range literals {
+		arguments[i], err = p.placeholder(literal)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
+	proof, err := p.makeSymbol(p.leqToEq, arguments...)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result, err := p.makeContraNode(proof, literals, 1)
+	return p.keep(result, err)
 }
 
 func (p *DirectProofInterpolator) MakeEqToLeq(x, y, xLeqY ast.ASTHandle) (ast.ASTHandle, error) {
@@ -77,7 +94,29 @@ func (p *DirectProofInterpolator) MakeEqToLeq(x, y, xLeqY ast.ASTHandle) (ast.AS
 	if side == TermB {
 		return p.keep(p.base.manager.Make(OperatorTrue))
 	}
-	return ast.ASTHandle{}, ProofError{}
+	equality, err := p.base.manager.Make(OperatorEqual, x, y)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	negatedInequality, err := p.base.manager.MkNot(xLeqY)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	literals := []ast.ASTHandle{equality, negatedInequality}
+	first, err := p.placeholder(literals[0])
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	second, err := p.placeholder(literals[1])
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	proof, err := p.makeSymbol(p.eqToLeq, first, second)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result, err := p.makeContraNode(proof, literals, 2)
+	return p.keep(result, err)
 }
 
 func (p *DirectProofInterpolator) MakeCutRule(tLeqC, divisor, conclusion, premise ast.ASTHandle) (ast.ASTHandle, error) {

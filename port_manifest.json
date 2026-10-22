@@ -41746,7 +41746,7 @@
           ]
         },
         {
-          "name": "local Farkas combination, leq2eq, eq2leq, and integer cut rules",
+          "name": "local Farkas combination and integer cut rules plus local/mixed leq2eq and eq2leq proof terms",
           "status": "ported",
           "go_target": "pkg/interp/direct_proof_arithmetic.go",
           "tests": [
@@ -41839,7 +41839,7 @@
           ]
         },
         {
-          "name": "local arithmetic proof-rule declarations",
+          "name": "local arithmetic rules plus mixed leq2eq and eq2leq declarations",
           "status": "ported",
           "go_target": "pkg/interp/direct_proof_arithmetic.go",
           "tests": [

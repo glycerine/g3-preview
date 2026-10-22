@@ -26,6 +26,9 @@ type DirectProofInterpolator struct {
 	weak         bool
 	contra       ast.ASTHandle
 	sum          ast.ASTHandle
+	rotateSum    ast.ASTHandle
+	leqToEq      ast.ASTHandle
+	eqToLeq      ast.ASTHandle
 	excludedMid  ast.ASTHandle
 	noProof      ast.ASTHandle
 	placeholders map[ast.ASTHandle]ast.ASTHandle
@@ -62,6 +65,15 @@ func NewDirectProofInterpolator(base *Base, scope ScopeRange, weak bool) (result
 		return nil, err
 	}
 	if p.sum, err = p.newFunction("@sum", []ast.ASTHandle{boolean, integer, boolean}, boolean); err != nil {
+		return nil, err
+	}
+	if p.rotateSum, err = p.newFunction("@rotsum", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
+		return nil, err
+	}
+	if p.leqToEq, err = p.newFunction("@leq2eq", []ast.ASTHandle{boolean, boolean, boolean}, boolean); err != nil {
+		return nil, err
+	}
+	if p.eqToLeq, err = p.newFunction("@eq2leq", []ast.ASTHandle{boolean, boolean}, boolean); err != nil {
 		return nil, err
 	}
 	if p.excludedMid, err = p.newFunction("@exmid", []ast.ASTHandle{boolean, boolean, boolean}, boolean); err != nil {
@@ -189,9 +201,10 @@ func (p *DirectProofInterpolator) makeContraNode(proof ast.ASTHandle, literals [
 	for i, literal := range literals {
 		rotated := p.noProof
 		if proofMask&(1<<i) != 0 {
-			// Rotation is introduced by the arithmetic rule family. Basic rules
-			// call this helper only with an empty mask.
-			return ast.ASTHandle{}, ast.ErrASTDomain
+			rotated, err = p.makeSymbol(p.rotateSum, literal, proof)
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
 		}
 		entry, e := p.makeSymbol(p.contra, rotated, literal)
 		if e != nil {

@@ -249,8 +249,26 @@ func TestDirectProofLocalArithmeticRules(t *testing.T) {
 	}
 	mixed, err := manager.Make(OperatorLE, x, y)
 	interpMust(t, err)
-	if _, err = direct.MakeEqToLeq(x, y, mixed); !errors.As(err, new(ProofError)) {
-		t.Fatal("mixed arithmetic boundary", err)
+	mixedEqToLeq, err := direct.MakeEqToLeq(x, y, mixed)
+	interpMust(t, err)
+	if op, e := manager.Operator(mixedEqToLeq); e != nil || op != OperatorAnd {
+		t.Fatal("mixed eq-to-leq", op, e)
+	}
+	yLeqX, err := manager.Make(OperatorLE, y, x)
+	interpMust(t, err)
+	mixedLeqToEq, err := direct.MakeLeqToEq(x, y, mixed, yLeqX)
+	interpMust(t, err)
+	if op, e := manager.Operator(mixedLeqToEq); e != nil || op != OperatorAnd {
+		t.Fatal("mixed leq-to-eq", op, e)
+	}
+	rotatedContra, err := manager.Arg(mixedLeqToEq, 1)
+	interpMust(t, err)
+	rotatedProof, err := manager.Arg(rotatedContra, 0)
+	interpMust(t, err)
+	declaration, err := manager.Symbol(rotatedProof)
+	interpMust(t, err)
+	if declaration != direct.rotateSum {
+		t.Fatal("mixed leq-to-eq rotation", declaration, direct.rotateSum)
 	}
 }
 
