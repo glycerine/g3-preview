@@ -115970,9 +115970,16 @@
       "path": "src/smt/theory_lra.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_arith_linear.go"
+      ],
+      "tests": [
+        "TestSMTSolverSetupUsesLinearRealArithmetic",
+        "TestSMTSolverPublishesStrictLinearRealModel",
+        "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
+        "TestSMTSolverLinearArithmeticPropagatesPolynomialIntervals"
+      ],
       "conditionals": [
         {
           "line": 1246,
@@ -116121,24 +116128,71 @@
           "text": "SASSERT(!ev.first.is_zero());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "linear term and atom internalization, exact simplex feasibility, bound propagation, equality propagation, scopes, conflicts, statistics and model values",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTSolverSetupUsesLinearRealArithmetic",
+            "TestSMTSolverPublishesStrictLinearRealModel",
+            "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
+            "TestSMTSolverLinearArithmeticPropagatesPolynomialIntervals"
+          ]
+        },
+        {
+          "name": "theory_opt objective registration, infinitesimal value and maximize/blocker callbacks",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "SMTLinearArithmeticTheory owns its exact simplex solver, linear definitions, atoms, assertion and scope trails, equality adapter and statistics; it borrows context enodes and AST handles through SMTTheoryBase."
+      ],
+      "deviations": [
+        "Go uses the shared exact linear-arithmetic implementation for the source theory_lra selection. The source's specialized bound/use-list data structures and propagation heuristics are algorithmic optimizations; theory_opt objective callbacks remain open."
+      ]
     },
     {
       "path": "src/smt/theory_lra.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_arith_linear.go"
+      ],
+      "tests": [
+        "TestSMTSolverSetupUsesLinearRealArithmetic",
+        "TestSMTSolverPublishesStrictLinearRealModel"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "real linear-arithmetic theory lifecycle, propagation and model interface",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTSolverSetupUsesLinearRealArithmetic",
+            "TestSMTSolverPublishesStrictLinearRealModel"
+          ]
+        },
+        {
+          "name": "optimization objective interface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The concrete Go theory owns its solver state and borrows the registered arithmetic family and SMT context."
+      ],
+      "deviations": [
+        "The retained setup selects the shared exact Go linear solver for QF_LRA and QF_UFLRA."
+      ]
     },
     {
       "path": "src/smt/theory_opt.cpp",
