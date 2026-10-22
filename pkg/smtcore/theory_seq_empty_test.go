@@ -603,6 +603,28 @@ func TestSMTSequenceTheoryBranchesLeadingVariableOverlap(t *testing.T) {
 	if status != lbool.False {
 		t.Fatal("leading variable overlap branch", status)
 	}
+	rightName, err := m.Symbols.Intern("seq.right")
+	astTestMust(t, err)
+	remainder, err := m.MkSequenceSkolem(rightName, []ast.ASTHandle{x, empty, y}, sort)
+	astTestMust(t, err)
+	yWord, err := m.MkSequenceConcat(shared, remainder)
+	astTestMust(t, err)
+	yDefinition, err := m.MkEq(y, yWord)
+	astTestMust(t, err)
+	notYDefinition, err := m.MkNot(yDefinition)
+	astTestMust(t, err)
+	secondSolver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, secondSolver.Close()) })
+	astTestMust(t, secondSolver.Assert(wordEquality))
+	astTestMust(t, secondSolver.Assert(lengthOrder))
+	astTestMust(t, secondSolver.Assert(xDefinition))
+	astTestMust(t, secondSolver.Assert(notYDefinition))
+	status, err = secondSolver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("leading variable overlap remainder branch", status)
+	}
 }
 
 func TestSMTSequenceTheoryLengthCoherenceDecomposition(t *testing.T) {
