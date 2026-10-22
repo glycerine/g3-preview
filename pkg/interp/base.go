@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/solver"
 )
 
 type baseRanges struct {
@@ -29,7 +30,20 @@ type Base struct {
 	simplified  map[ast.ASTHandle]ast.ASTHandle
 	frames      map[ast.ASTHandle]int
 	weak        bool
+	solver      solver.Factory
+	evaluator   solver.ConsequenceEvaluatorFactory
 	closed      bool
+}
+
+func (b *Base) ConfigureSolver(factory solver.Factory, evaluator solver.ConsequenceEvaluatorFactory) error {
+	if err := b.open(); err != nil {
+		return err
+	}
+	if factory == nil {
+		return ast.ErrASTHandle
+	}
+	b.solver, b.evaluator = factory, evaluator
+	return nil
 }
 
 func NewBase(manager *Manager, constraints []ast.ASTHandle, parents []int, theory []ast.ASTHandle) (result *Base, resultErr error) {

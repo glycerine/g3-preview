@@ -40394,9 +40394,10 @@
       "path": "src/interp/iz3base.cpp",
       "component": "interp",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/interp/base.go",
+        "pkg/interp/base_solver.go",
         "pkg/interp/base_simplify.go",
         "pkg/interp/base_tree.go"
       ],
@@ -40404,7 +40405,9 @@
         "TestInterpolationBaseRangesScopesFramesAndOptions",
         "TestInterpolationBaseSimplification",
         "TestInterpolationBaseCopyCloseAndGuards",
-        "TestInterpolationBaseTreeToParentsRepresentation"
+        "TestInterpolationBaseTreeToParentsRepresentation",
+        "TestInterpolationBaseSolverUnsatProof",
+        "TestInterpolationBaseSolverModelValuesAndGuards"
       ],
       "conditionals": [
         {
@@ -40450,7 +40453,7 @@
           "text": "SASSERT(l_undef == res);"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -40470,24 +40473,30 @@
         },
         {
           "name": "solver-backed satisfiability/model evaluation helper",
-          "status": "unported",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/interp/base_solver.go",
+          "tests": [
+            "TestInterpolationBaseSolverUnsatProof",
+            "TestInterpolationBaseSolverModelValuesAndGuards"
+          ]
         }
       ],
       "ownership": [
         "Base borrows Manager and owns ASTRef roots for constraints, theory formulas, and memoized simplification results; Close releases them in reverse order."
       ],
       "deviations": [
-        "File-name printing is exposed as an io.Writer operation; callers own file creation and closure. The inactive check_interp body is not ported."
+        "File-name printing is exposed as an io.Writer operation; callers own file creation and closure. The inactive check_interp and simplify-with-literal bodies are not ported.",
+        "The concrete C++ SMT factory dependency is injected through the retained solver.Factory interface; the final smtcore port will supply that implementation."
       ]
     },
     {
       "path": "src/interp/iz3base.h",
       "component": "interp",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/interp/base.go",
+        "pkg/interp/base_solver.go",
         "pkg/interp/base_simplify.go",
         "pkg/interp/base_tree.go"
       ],
@@ -40495,7 +40504,9 @@
         "TestInterpolationBaseRangesScopesFramesAndOptions",
         "TestInterpolationBaseSimplification",
         "TestInterpolationBaseCopyCloseAndGuards",
-        "TestInterpolationBaseTreeToParentsRepresentation"
+        "TestInterpolationBaseTreeToParentsRepresentation",
+        "TestInterpolationBaseSolverUnsatProof",
+        "TestInterpolationBaseSolverModelValuesAndGuards"
       ],
       "conditionals": [
         {
@@ -40507,7 +40518,7 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -40526,9 +40537,13 @@
           ]
         },
         {
-          "name": "solver-backed satisfiability/model evaluation and derived clause interpolation hook",
-          "status": "unported",
-          "tests": []
+          "name": "solver-backed satisfiability/model evaluation declaration",
+          "status": "ported",
+          "go_target": "pkg/interp/base_solver.go",
+          "tests": [
+            "TestInterpolationBaseSolverUnsatProof",
+            "TestInterpolationBaseSolverModelValuesAndGuards"
+          ]
         }
       ],
       "ownership": [
