@@ -176,7 +176,7 @@ func (i *ModelImplicant) collect(formulas []ast.ASTHandle) ([]ast.ASTHandle, err
 // CloseImplicantResults releases a successful result vector.
 func (i *ModelImplicant) MinimizeLiterals(formulas []ast.ASTHandle, md *Model) (result []ast.ASTRef, err error) {
 	if err = i.setupModel(md); err != nil {
-		return nil, err
+		return nil, errors.Join(err, i.reset())
 	}
 	defer func() {
 		err = errors.Join(err, i.reset())
@@ -269,7 +269,7 @@ func (i *ModelImplicant) markCone(root ast.ASTHandle) error {
 // the selected formulas' cone of influence, preserving model order.
 func (i *ModelImplicant) MinimizeModel(formulas []ast.ASTHandle, md *Model) (result []ast.ASTRef, err error) {
 	if err = i.setupModel(md); err != nil {
-		return nil, err
+		return nil, errors.Join(err, i.reset())
 	}
 	defer func() {
 		err = errors.Join(err, i.reset())

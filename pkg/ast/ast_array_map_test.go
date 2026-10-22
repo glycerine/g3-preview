@@ -212,4 +212,9 @@ func TestASTArraySortUtilityAbsentPluginAndDomainBounds(t *testing.T) {
 			t.Fatal("array domain bounds", i, e)
 		}
 	}
+	rangeSort, e := m.ArrayRange(s)
+	astTestMust(t, e)
+	if rangeSort != bs {
+		t.Fatal("array range", rangeSort, bs)
+	}
 }

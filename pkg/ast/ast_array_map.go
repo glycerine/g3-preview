@@ -190,6 +190,20 @@ func (m *ASTManager) ArrayDomain(s ASTHandle, i uint32) (ASTHandle, error) {
 	r, e := m.arraySortParameter(info, i)
 	return m.external(r), e
 }
+
+// ArrayRange returns the final sort parameter, matching get_array_range.
+func (m *ASTManager) ArrayRange(s ASTHandle) (ASTHandle, error) {
+	if e := m.lock(); e != nil {
+		return ASTHandle{}, e
+	}
+	defer m.mu.Unlock()
+	info, e := m.arrayMapSort(s)
+	if e != nil {
+		return ASTHandle{}, e
+	}
+	r, e := m.arraySortParameter(info, info.count-1)
+	return m.external(r), e
+}
 func (m *ASTManager) MkArraySort(domain AppArguments, rangeSort ASTHandle) (result ASTHandle, err error) {
 	if e := m.lock(); e != nil {
 		return result, e

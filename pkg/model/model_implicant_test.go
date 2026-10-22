@@ -129,3 +129,67 @@ func TestModelImplicantEvalExpressionUsesCompletion(t *testing.T) {
 		t.Fatal("model completion should choose false for missing Boolean", got)
 	}
 }
+
+func TestModelImplicantExtensionalArrayEquality(t *testing.T) {
+	m, md, implicant := modelImplicantFixture(t)
+	arrayFamily, err := m.RegisterArrayPlugin()
+	astTestMust(t, err)
+	indexSort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "implicant-index"), nil)
+	astTestMust(t, err)
+	boolSort := mustBoolSort(t, m)
+	arraySort, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{indexSort}), boolSort)
+	astTestMust(t, err)
+	no, err := m.MkFalse()
+	astTestMust(t, err)
+	yes, err := m.MkTrue()
+	astTestMust(t, err)
+	allNo, err := m.MkConstArray(arraySort, no)
+	astTestMust(t, err)
+	allYes, err := m.MkConstArray(arraySort, yes)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "implicant-left-array"), arraySort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "implicant-right-array"), arraySort)
+	astTestMust(t, err)
+	astTestPin(t, m, left)
+	astTestPin(t, m, right)
+	leftDecl, err := m.GetDecl(left)
+	astTestMust(t, err)
+	rightDecl, err := m.GetDecl(right)
+	astTestMust(t, err)
+	astTestMust(t, md.Core().RegisterConstant(leftDecl, allNo))
+	astTestMust(t, md.Core().RegisterConstant(rightDecl, allYes))
+	eq, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	formula, err := m.MkNot(eq)
+	astTestMust(t, err)
+	astTestPin(t, m, formula)
+
+	literals, err := implicant.MinimizeLiterals([]ast.ASTHandle{formula}, md)
+	astTestMust(t, err)
+	defer func() { astTestMust(t, model.CloseImplicantResults(m, &literals)) }()
+	if len(literals) != 1 {
+		t.Fatal(len(literals))
+	}
+	literal, err := m.RefGet(literals[0])
+	astTestMust(t, err)
+	op, err := m.GetDeclKind(literal)
+	astTestMust(t, err)
+	arg, err := m.GetArg(literal, 0)
+	astTestMust(t, err)
+	if op != ast.ASTOpNot || arg != eq {
+		t.Fatal("array disequality literal", arrayFamily, op, arg, eq)
+	}
+	astTestMust(t, model.CloseImplicantResults(m, &literals))
+
+	index, err := m.GetSomeValue(indexSort)
+	astTestMust(t, err)
+	stored, err := m.MkFamilyApp(arrayFamily, ast.ASTArrayOpStore, nil, []ast.ASTHandle{allNo, index, yes})
+	astTestMust(t, err)
+	astTestMust(t, md.Core().RegisterConstant(rightDecl, stored))
+	literals, err = implicant.MinimizeLiterals([]ast.ASTHandle{formula}, md)
+	astTestMust(t, err)
+	if len(literals) != 1 {
+		t.Fatal("store-row disequality", len(literals))
+	}
+}

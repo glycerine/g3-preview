@@ -71697,9 +71697,9 @@
       "path": "src/model/model_implicant.cpp",
       "component": "model",
       "role": "production",
-      "status": "partial",
-      "go_targets": ["pkg/model/model_implicant.go", "pkg/model/model_implicant_minimize.go"],
-      "tests": ["TestModelImplicantBooleanLiteralAndConeSelection", "TestModelImplicantArithmeticDisequalitySplit", "TestModelImplicantEvalExpressionUsesCompletion"],
+      "status": "ported",
+      "go_targets": ["pkg/model/model_implicant.go", "pkg/model/model_implicant_minimize.go", "pkg/model/model_implicant_array.go"],
+      "tests": ["TestModelImplicantBooleanLiteralAndConeSelection", "TestModelImplicantArithmeticDisequalitySplit", "TestModelImplicantEvalExpressionUsesCompletion", "TestModelImplicantExtensionalArrayEquality"],
       "assertions": [
         {
           "line": 113,
@@ -71858,25 +71858,25 @@
           "text": "VERIFY(m_model->eval(e, result, true));"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {"name": "state reset, model setup, value assignment and Boolean/arithmetic source evaluator", "status": "ported", "go_target": "pkg/model/model_implicant.go", "tests": ["TestModelImplicantBooleanLiteralAndConeSelection", "TestModelImplicantArithmeticDisequalitySplit"]},
         {"name": "formula collection, source Boolean witness choice and arithmetic disequality literal splitting", "status": "ported", "go_target": "pkg/model/model_implicant_minimize.go", "tests": ["TestModelImplicantBooleanLiteralAndConeSelection", "TestModelImplicantArithmeticDisequalitySplit"]},
         {"name": "cone-of-influence pruning and model-order constant equalities", "status": "ported", "go_target": "pkg/model/model_implicant_minimize.go", "tests": ["TestModelImplicantBooleanLiteralAndConeSelection"]},
-        {"name": "model-completing expression and zero-arity declaration evaluation", "status": "partial", "go_target": "pkg/model/model_implicant.go", "tests": ["TestModelImplicantEvalExpressionUsesCompletion"]},
-        {"name": "array function-interpretation extraction, extensional equality and normalized array-value reconstruction", "status": "unported", "go_target": "", "tests": []}
+        {"name": "model-completing expression, normalized array reconstruction and zero-arity declaration evaluation", "status": "ported", "go_target": "pkg/model/model_implicant.go", "go_targets": ["pkg/model/model_implicant_array.go"], "tests": ["TestModelImplicantEvalExpressionUsesCompletion", "TestModelImplicantExtensionalArrayEquality"]},
+        {"name": "array function-interpretation extraction and best-effort extensional equality over defaults and selected store rows", "status": "ported", "go_target": "pkg/model/model_implicant_array.go", "tests": ["TestModelImplicantExtensionalArrayEquality"]}
       ],
       "ownership": ["ModelImplicant borrows the manager, model and process services; it owns one temporary ModelEvaluator and explicit AST references for tracked concrete values and constant applications. Returned literal/cone vectors contain caller-owned ASTRef values released by CloseImplicantResults."],
-      "deviations": ["Exact arithmetic state uses math/big.Rat as the idiomatic Go scalar representation. The literal source UMINUS copy behavior is preserved. Array extraction/equality/normalization remains open, so the unit is partial."]
+      "deviations": ["Exact arithmetic state uses math/big.Rat as the idiomatic Go scalar representation. The literal source UMINUS copy behavior is preserved. Array extraction shares the already ported evaluator extraction owner, whose removal of explicit rows equal to the fallback is observationally neutral for equality and reconstruction. ModelEvaluatorConfig supplies services that C++ obtains implicitly; evaluator theory coverage remains tracked by model_evaluator.cpp rather than this unit."]
     },
     {
       "path": "src/model/model_implicant.h",
       "component": "model",
       "role": "production",
-      "status": "partial",
-      "go_targets": ["pkg/model/model_implicant.go", "pkg/model/model_implicant_minimize.go"],
-      "tests": ["TestModelImplicantBooleanLiteralAndConeSelection", "TestModelImplicantArithmeticDisequalitySplit", "TestModelImplicantEvalExpressionUsesCompletion"],
+      "status": "ported",
+      "go_targets": ["pkg/model/model_implicant.go", "pkg/model/model_implicant_minimize.go", "pkg/model/model_implicant_array.go"],
+      "tests": ["TestModelImplicantBooleanLiteralAndConeSelection", "TestModelImplicantArithmeticDisequalitySplit", "TestModelImplicantEvalExpressionUsesCompletion", "TestModelImplicantExtensionalArrayEquality"],
       "conditionals": [
         {
           "line": 20,
@@ -71905,14 +71905,14 @@
           "text": "inline void set_true(expr* x) { SASSERT(is_unknown(x)); m1.mark(x); m2.mark(x); }"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {"name": "typed unknown/X/false/true/concrete state, tracked numerals and concrete values", "status": "ported", "go_target": "pkg/model/model_implicant.go", "tests": ["TestModelImplicantBooleanLiteralAndConeSelection", "TestModelImplicantArithmeticDisequalitySplit"]},
-        {"name": "MinimizeModel, MinimizeLiterals, EvalExpr and EvalDeclaration public operations", "status": "partial", "go_target": "pkg/model/model_implicant_minimize.go", "go_targets": ["pkg/model/model_implicant.go"], "tests": ["TestModelImplicantBooleanLiteralAndConeSelection", "TestModelImplicantArithmeticDisequalitySplit", "TestModelImplicantEvalExpressionUsesCompletion"]}
+        {"name": "MinimizeModel, MinimizeLiterals, EvalExpr and EvalDeclaration public operations", "status": "ported", "go_target": "pkg/model/model_implicant_minimize.go", "go_targets": ["pkg/model/model_implicant.go", "pkg/model/model_implicant_array.go"], "tests": ["TestModelImplicantBooleanLiteralAndConeSelection", "TestModelImplicantArithmeticDisequalitySplit", "TestModelImplicantEvalExpressionUsesCompletion", "TestModelImplicantExtensionalArrayEquality"]}
       ],
       "ownership": ["The concrete Go owner has explicit Close and retryable temporary-reference/evaluator cleanup. Successful minimization transfers independent ASTRef results to the caller."],
-      "deviations": ["ModelEvaluatorConfig supplies the process services that C++ obtains implicitly. Array-specific private operations remain open."]
+      "deviations": ["ModelEvaluatorConfig supplies the process services that C++ obtains implicitly. Successful result ownership is explicit through ASTRef values and CloseImplicantResults."]
     },
     {
       "path": "src/model/model_params.hpp",

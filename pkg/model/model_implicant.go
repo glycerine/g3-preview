@@ -118,11 +118,11 @@ func (i *ModelImplicant) setupModel(md *Model) error {
 		return ast.ErrASTHandle
 	}
 	ev, err := NewModelEvaluator(md.Core(), i.services)
+	i.model = md
+	i.evaluator = ev
 	if err != nil {
 		return err
 	}
-	i.model = md
-	i.evaluator = ev
 	i.states = make(map[ast.ASTHandle]implicantValue)
 	i.numbers = make(map[ast.ASTHandle]*big.Rat)
 	i.values = make(map[ast.ASTHandle]ast.ASTHandle)
@@ -386,6 +386,13 @@ func (i *ModelImplicant) evalBasic(h ast.ASTHandle, op int32, args []ast.ASTHand
 func (i *ModelImplicant) evalEq(h, left, right ast.ASTHandle) error {
 	if left == right {
 		return i.setState(h, implicantTrue)
+	}
+	array, err := i.isArray(left)
+	if err != nil {
+		return err
+	}
+	if array {
+		return i.evalArrayEq(h, left, right)
 	}
 	if i.isX(left) || i.isX(right) {
 		eq, err := i.manager.MkEq(left, right)
@@ -653,7 +660,7 @@ func (i *ModelImplicant) checkModel(formulas []ast.ASTHandle) (bool, error) {
 // Array normalization is completed by the companion array increment.
 func (i *ModelImplicant) EvalExpr(md *Model, expression ast.ASTHandle) (result ast.ASTRef, err error) {
 	if err = i.setupModel(md); err != nil {
-		return result, err
+		return result, errors.Join(err, i.reset())
 	}
 	defer func() { err = errors.Join(err, i.reset()) }()
 	if err = i.evaluator.SetModelCompletion(true); err != nil {
