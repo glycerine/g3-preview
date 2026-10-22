@@ -1,8 +1,10 @@
 package interp
 
 import (
+	"bytes"
 	"errors"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -217,5 +219,100 @@ func TestInterpolationManagerBorrowAndCopyGuards(t *testing.T) {
 	interpMust(t, w.Close())
 	if _, err := w.ASTManager(); !errors.Is(err, ast.ErrASTHandle) {
 		t.Fatal("closed manager", err)
+	}
+}
+
+func TestInterpolationManagerOccursSubstitutionAndFreeVariables(t *testing.T) {
+	m, w := interpManagerFixture(t)
+	intSort, err := w.IntType()
+	interpMust(t, err)
+	x, err := w.MakeVariable("subst-x", intSort)
+	interpMust(t, err)
+	x = interpPin(t, m, x)
+	y, err := w.MakeVariable("subst-y", intSort)
+	interpMust(t, err)
+	y = interpPin(t, m, y)
+	shared, err := w.Make(OperatorPlus, x, x)
+	interpMust(t, err)
+	shared = interpPin(t, m, shared)
+	root, err := w.Make(OperatorEqual, shared, y)
+	interpMust(t, err)
+	root = interpPin(t, m, root)
+	for needle, want := range map[ast.ASTHandle]bool{x: true, y: true} {
+		got, e := w.Occurs(needle, root)
+		interpMust(t, e)
+		if got != want {
+			t.Fatal(needle, got)
+		}
+	}
+	three, err := w.MakeIntText("3")
+	interpMust(t, err)
+	three = interpPin(t, m, three)
+	if found, e := w.Occurs(three, root); e != nil || found {
+		t.Fatal(found, e)
+	}
+	rewritten, err := w.SubstituteOne(x, y, shared)
+	interpMust(t, err)
+	rewritten = interpPin(t, m, rewritten)
+	args, err := w.Args(rewritten)
+	interpMust(t, err)
+	if len(args) != 2 || args[0] != y || args[1] != y {
+		t.Fatal(args)
+	}
+	equality, err := w.Make(OperatorEqual, x, y)
+	interpMust(t, err)
+	equality = interpPin(t, m, equality)
+	folded, err := w.Substitute(map[ast.ASTHandle]ast.ASTHandle{x: y}, equality)
+	interpMust(t, err)
+	if yes, e := w.IsTrue(folded); e != nil || !yes {
+		t.Fatal(yes, e)
+	}
+
+	v0, err := m.MkVar(0, intSort)
+	interpMust(t, err)
+	v0 = interpPin(t, m, v0)
+	v2, err := m.MkVar(2, intSort)
+	interpMust(t, err)
+	v2 = interpPin(t, m, v2)
+	free, err := w.Make(OperatorPlus, v0, v2)
+	interpMust(t, err)
+	free = interpPin(t, m, free)
+	if count, e := w.NumFreeVariables(free); e != nil || count != 2 {
+		t.Fatal(count, e)
+	}
+}
+
+func TestInterpolationManagerDisplayAndPrettyFormatting(t *testing.T) {
+	m, w := interpManagerFixture(t)
+	boolSort, err := w.BoolType()
+	interpMust(t, err)
+	p, err := w.MakeVariable("display-p", boolSort)
+	interpMust(t, err)
+	p = interpPin(t, m, p)
+	negated, err := w.MkNot(p)
+	interpMust(t, err)
+	negated = interpPin(t, m, negated)
+	var out bytes.Buffer
+	interpMust(t, w.PrintClause(&out, []ast.ASTHandle{p, negated}))
+	if out.String() != "(display-p,(not display-p))" {
+		t.Fatal(out.String())
+	}
+	out.Reset()
+	interpMust(t, w.PrintSATProblem(&out, negated))
+	for _, text := range []string{"(set-info :status unknown)", "(declare-fun display-p () Bool)", "(assert", "(check-sat)"} {
+		if !strings.Contains(out.String(), text) {
+			t.Fatalf("missing %q in %q", text, out.String())
+		}
+	}
+	out.Reset()
+	long := strings.Repeat("x", 80)
+	interpMust(t, PrettyPrint(&out, "prefix,"+long))
+	if out.String() != "prefix,\n"+long {
+		t.Fatalf("pretty output %q", out.String())
+	}
+	out.Reset()
+	interpMust(t, PrettyPrint(&out, "f(a,b)"))
+	if out.String() != "f(a,b)" {
+		t.Fatal(out.String())
 	}
 }

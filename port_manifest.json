@@ -40695,6 +40695,8 @@
         "TestInterpolationManagerOperatorConstructionAndAccess",
         "TestInterpolationManagerNumeralsTypesQuantifiersAndClone",
         "TestInterpolationManagerBooleanSimplifiers",
+        "TestInterpolationManagerOccursSubstitutionAndFreeVariables",
+        "TestInterpolationManagerDisplayAndPrettyFormatting",
         "TestInterpolationManagerBorrowAndCopyGuards"
       ],
       "conditionals": [
@@ -40767,17 +40769,19 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "operator construction/classification, application and quantifier construction/cloning, structural and quantifier access, symbol/type/numeral access, variables, types, declarations, coefficients, and Boolean simplifying constructors",
+          "name": "operator construction/classification, application and quantifier construction/cloning, structural and quantifier access, symbol/type/numeral access, variables, types, declarations, coefficients, Boolean simplifying constructors, occurrence/substitution, free-variable counting, and display helpers",
           "status": "ported",
           "go_target": "pkg/interp/manager.go",
           "tests": [
             "TestInterpolationManagerOperatorConstructionAndAccess",
             "TestInterpolationManagerNumeralsTypesQuantifiersAndClone",
-            "TestInterpolationManagerBooleanSimplifiers"
+            "TestInterpolationManagerBooleanSimplifiers",
+            "TestInterpolationManagerOccursSubstitutionAndFreeVariables",
+            "TestInterpolationManagerDisplayAndPrettyFormatting"
           ]
         },
         {
-          "name": "proof metadata, printing, rewriting, theory-lemma coefficient extraction, linear combinations, integer division, substitution, free-variable closure, and quantifier optimization",
+          "name": "proof metadata, rewriting, theory-lemma coefficient extraction, linear combinations, integer division, free-variable universal closure, and controlling-equality quantifier optimization",
           "status": "unported",
           "tests": []
         }
@@ -40801,6 +40805,8 @@
         "TestInterpolationManagerOperatorConstructionAndAccess",
         "TestInterpolationManagerNumeralsTypesQuantifiersAndClone",
         "TestInterpolationManagerBooleanSimplifiers",
+        "TestInterpolationManagerOccursSubstitutionAndFreeVariables",
+        "TestInterpolationManagerDisplayAndPrettyFormatting",
         "TestInterpolationManagerBorrowAndCopyGuards"
       ],
       "conditionals": [
@@ -40817,18 +40823,20 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Operator vocabulary, borrowed manager facade, structural/quantifier/numeral/type accessors, construction and cloning surface, predicates, and Boolean simplifying constructors",
+          "name": "Operator vocabulary, borrowed manager facade, structural/quantifier/numeral/type accessors, construction/cloning, predicates, Boolean simplification, substitution, free-variable counting, and display surface",
           "status": "ported",
           "go_target": "pkg/interp/manager.go",
           "tests": [
             "TestInterpolationManagerOperatorConstructionAndAccess",
             "TestInterpolationManagerNumeralsTypesQuantifiersAndClone",
             "TestInterpolationManagerBooleanSimplifiers",
+            "TestInterpolationManagerOccursSubstitutionAndFreeVariables",
+            "TestInterpolationManagerDisplayAndPrettyFormatting",
             "TestInterpolationManagerBorrowAndCopyGuards"
           ]
         },
         {
-          "name": "remaining proof, arithmetic algorithm, substitution, free-variable, simplifier, and display declarations",
+          "name": "remaining proof, arithmetic algorithm, rewriting, universal closure, and optimized-quantification declarations",
           "status": "unported",
           "tests": []
         }
