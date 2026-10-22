@@ -88,6 +88,7 @@
         "ast_activity_cache.go",
         "ast_app_coercion.go",
         "ast_arith_algebraic.go",
+        "ast_arith_app_util.go",
         "ast_arith_decl.go",
         "ast_arith_names.go",
         "ast_arith_numeral.go",
@@ -117,6 +118,7 @@
         "ast_builtin_plugins.go",
         "ast_builtin_plugins_user.go",
         "ast_builtin_plugins_values.go",
+        "ast_bv_all_ones.go",
         "ast_bv_api_numeral_text.go",
         "ast_bv_app_parameter_util.go",
         "ast_bv_app_util.go",
@@ -230,7 +232,14 @@
         "ast_datalog_relation_indexed.go",
         "ast_datalog_relation_simple.go",
         "ast_datalog_sorts.go",
+        "ast_datatype_cardinality.go",
+        "ast_datatype_decl.go",
+        "ast_datatype_definition.go",
+        "ast_datatype_display.go",
+        "ast_datatype_names.go",
         "ast_datatype_plugin.go",
+        "ast_datatype_utility.go",
+        "ast_datatype_values.go",
         "ast_debug_ref_count.go",
         "ast_decl_collector.go",
         "ast_decl_parameter_access.go",
@@ -288,6 +297,7 @@
         "ast_fpa_scoped_values.go",
         "ast_fpa_smt_equality.go",
         "ast_fpa_some_value.go",
+        "ast_fpa_sort_access.go",
         "ast_fpa_special_decl.go",
         "ast_fpa_to_bv.go",
         "ast_fpa_to_bv_decl.go",
@@ -366,8 +376,18 @@
         "ast_registered_plugin_memory_trace.go",
         "ast_resource_limit.go",
         "ast_rewriter_access.go",
+        "ast_seq_decl.go",
+        "ast_seq_factories.go",
+        "ast_seq_match.go",
+        "ast_seq_names.go",
+        "ast_seq_parameterized.go",
         "ast_seq_plugin.go",
+        "ast_seq_recognizers.go",
+        "ast_seq_regex.go",
         "ast_seq_signature_memory_trace.go",
+        "ast_seq_string.go",
+        "ast_seq_utility.go",
+        "ast_seq_values.go",
         "ast_shared_occs.go",
         "ast_shared_occs_iterator.go",
         "ast_shared_occs_mark.go",
@@ -376,6 +396,7 @@
         "ast_smt2_arith_literal.go",
         "ast_smt2_boolean_tree.go",
         "ast_smt2_bv_literal.go",
+        "ast_smt2_datalog_literal.go",
         "ast_smt2_declare_fun.go",
         "ast_smt2_fdecl.go",
         "ast_smt2_fdecl_classify.go",
@@ -387,6 +408,7 @@
         "ast_smt2_let_trace.go",
         "ast_smt2_quantifier_root.go",
         "ast_smt2_sort.go",
+        "ast_smt2_string_literal.go",
         "ast_smt2_var_labels.go",
         "ast_smt_legacy_benchmark.go",
         "ast_smt_legacy_decl.go",
@@ -411,6 +433,7 @@
         "ast_trace_filename.go",
         "ast_trace_hooks.go",
         "ast_translation.go",
+        "ast_translation_datatype.go",
         "ast_translation_plugins.go",
         "ast_uninterpreted_plugin.go",
         "ast_used_symbols.go",
@@ -436,11 +459,51 @@
     {
       "package": "ast/fpa",
       "imports": [
-        "util/params"
+        "ast",
+        "util/params",
+        "util/symbol"
       ],
       "production_files": [
+        "fpa2bv_add.go",
+        "fpa2bv_conversions.go",
+        "fpa2bv_converter.go",
+        "fpa2bv_div.go",
+        "fpa2bv_extrema.go",
+        "fpa2bv_fma.go",
+        "fpa2bv_format.go",
+        "fpa2bv_from_real.go",
+        "fpa2bv_integer.go",
+        "fpa2bv_integral.go",
+        "fpa2bv_mul.go",
+        "fpa2bv_predicates.go",
+        "fpa2bv_rem.go",
         "fpa2bv_rewriter_params.go",
+        "fpa2bv_round.go",
+        "fpa2bv_sqrt.go",
+        "fpa2bv_symbols.go",
+        "fpa2bv_to_bv.go",
+        "fpa2bv_to_real.go",
+        "fpa2bv_unpack.go",
         "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "ast/macros",
+      "imports": [
+        "arena",
+        "ast",
+        "ast/rewriter",
+        "util/params",
+        "util/symbol"
+      ],
+      "production_files": [
+        "macro_candidates.go",
+        "macro_expander.go",
+        "macro_finder.go",
+        "macro_manager.go",
+        "macro_numeric.go",
+        "macro_util.go",
+        "quasi_macros.go"
       ]
     },
     {
@@ -480,10 +543,12 @@
         "collect.go",
         "collect_memory_trace.go",
         "contains_subpattern.go",
+        "expr_pattern_match.go",
         "infer.go",
         "multi_pattern.go",
         "multi_pattern_memory_trace.go",
         "options.go",
+        "pattern_database_loader.go",
         "pattern_selection.go",
         "pattern_stage_trace.go",
         "preferred_pattern.go",
@@ -491,6 +556,7 @@
         "pull_boolean_trace.go",
         "pull_direct.go",
         "reduce_quantifier.go",
+        "reduce_quantifier_database.go",
         "reduce_quantifier_trace.go",
         "rewriter.go",
         "smaller_pattern.go"
@@ -499,11 +565,19 @@
     {
       "package": "ast/proofs",
       "imports": [
+        "arena",
         "ast",
         "ast/rewriter",
-        "util/diagnostic"
+        "util/diagnostic",
+        "util/params",
+        "util/symbol"
       ],
       "production_files": [
+        "checker.go",
+        "checker_arith.go",
+        "checker_basic.go",
+        "checker_hyper.go",
+        "checker_rules.go",
         "elim_aux_assertions.go",
         "hypotheses.go",
         "hypotheses_memory.go",
@@ -519,7 +593,11 @@
       "package": "ast/rewriter",
       "imports": [
         "ast",
+        "ast/fpa",
+        "math/polynomial",
         "util/diagnostic",
+        "util/lbool",
+        "util/memory",
         "util/messages",
         "util/numeral",
         "util/params",
@@ -529,7 +607,11 @@
         "util/z3exception"
       ],
       "production_files": [
+        "arith_algebraic.go",
+        "arith_polynomial.go",
+        "arith_rewriter.go",
         "arith_rewriter_params.go",
+        "arith_transcendental.go",
         "array_rewriter.go",
         "array_rewriter_eq.go",
         "array_rewriter_map.go",
@@ -548,6 +630,9 @@
         "bool_rewriter_ite_value_trace.go",
         "bool_rewriter_local.go",
         "bool_rewriter_public.go",
+        "bv_bounds.go",
+        "bv_bounds_convert.go",
+        "bv_bounds_trace.go",
         "bv_elim.go",
         "bv_polynomial_add_core.go",
         "bv_polynomial_cancel.go",
@@ -580,6 +665,7 @@
         "bv_rewriter_derived_extend_repeat.go",
         "bv_rewriter_derived_rotate.go",
         "bv_rewriter_derived_sign_extend.go",
+        "bv_rewriter_dispatch.go",
         "bv_rewriter_eq_concat.go",
         "bv_rewriter_equality.go",
         "bv_rewriter_equality_trace.go",
@@ -630,15 +716,18 @@
         "bv_trailing_remove.go",
         "bv_trailing_table.go",
         "bv_trailing_trace.go",
+        "datatype_rewriter.go",
         "der.go",
         "der_rewrite.go",
         "distribute_forall.go",
         "dl_rewriter.go",
         "elim_bounds.go",
+        "enum2bv_rewriter.go",
         "expr_free_vars.go",
         "expr_replacer.go",
         "expr_safe_replace.go",
         "factor_rewriter.go",
+        "fpa2bv_rewriter.go",
         "fpa_bv2rm.go",
         "fpa_bv_wrap.go",
         "fpa_classification.go",
@@ -657,7 +746,11 @@
         "label_rewriter.go",
         "maximize_ac_sharing.go",
         "mk_extract_proc.go",
+        "mk_simplified_app.go",
+        "pb2bv_rewriter.go",
         "pb_rewriter.go",
+        "pb_rewriter_validate.go",
+        "polynomial_shapes.go",
         "push_app_ite.go",
         "quant_hoist.go",
         "rewriter_cache_memory_trace.go",
@@ -665,9 +758,14 @@
         "rewriter_core.go",
         "rewriter_core_cache_trace.go",
         "rewriter_engine.go",
+        "rewriter_engine_proof.go",
         "rewriter_params.go",
         "rewriter_roots.go",
         "rewriter_types.go",
+        "seq_rewriter.go",
+        "seq_rewriter_automaton.go",
+        "seq_rewriter_equality.go",
+        "th_rewriter.go",
         "traversal.go",
         "unused_vars_ufbv.go",
         "used_vars_ufbv.go",
@@ -804,6 +902,16 @@
         "solver_setup.go",
         "solver_setup_memory_trace.go",
         "source_assertion.go"
+      ]
+    },
+    {
+      "package": "math/grobner",
+      "imports": [
+        "ast"
+      ],
+      "production_files": [
+        "basis.go",
+        "grobner.go"
       ]
     },
     {
@@ -1703,6 +1811,7 @@
         "util/memory",
         "util/messages",
         "util/params",
+        "util/smt2",
         "util/symbol",
         "util/text"
       ],
@@ -1722,22 +1831,45 @@
         "model_copy.go",
         "model_copy_memory_trace.go",
         "model_core.go",
+        "model_eval.go",
         "model_evaluator.go",
         "model_evaluator_array_equality.go",
         "model_evaluator_array_expansion.go",
         "model_evaluator_function_memory_trace.go",
         "model_evaluator_memory_trace.go",
+        "model_evaluator_params.go",
         "model_evaluator_trace.go",
         "model_filter_allocation.go",
         "model_functions.go",
+        "model_implicant.go",
+        "model_implicant_array.go",
+        "model_implicant_minimize.go",
         "model_interpretation_owners.go",
         "model_lifecycle.go",
         "model_memory_process_guard.go",
         "model_package_boundary.go",
+        "model_params.go",
+        "model_printers.go",
         "model_sat_allocation.go",
+        "model_translation.go",
         "model_universe_memory_trace.go",
         "model_v2_display.go",
         "model_value.go"
+      ]
+    },
+    {
+      "package": "model/fpa",
+      "imports": [
+        "ast",
+        "ast/fpa",
+        "model"
+      ],
+      "production_files": [
+        "bv2fpa_converter.go",
+        "bv2fpa_display.go",
+        "bv2fpa_functions.go",
+        "bv2fpa_model.go",
+        "bv2fpa_translate.go"
       ]
     },
     {
@@ -2120,7 +2252,9 @@
       "imports": [
         "arena",
         "ast",
+        "ast/fpa",
         "model",
+        "model/fpa",
         "util/diagnostic",
         "util/memory",
         "util/params",
@@ -2130,6 +2264,7 @@
         "util/z3exception"
       ],
       "production_files": [
+        "fpa2bv_model_converter.go",
         "source_debug_off.go",
         "tactic_exception.go",
         "tactic_extension_model.go",
@@ -2228,6 +2363,19 @@
         "max_bv_sharing_goal.go",
         "max_bv_sharing_proof.go",
         "max_bv_sharing_reduce.go"
+      ]
+    },
+    {
+      "package": "tactic/fpa",
+      "imports": [
+        "ast",
+        "ast/fpa",
+        "ast/rewriter",
+        "tactic",
+        "util/params"
+      ],
+      "production_files": [
+        "fpa2bv_tactic.go"
       ]
     },
     {

@@ -42279,8 +42279,8 @@
       "path": "src/math/grobner/CMakeLists.txt",
       "component": "math",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/math/grobner/grobner.go"],
       "tests": [],
       "registrations": [
         {
@@ -42288,19 +42288,29 @@
           "text": "z3_add_component(grobner"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery replaces the Grobner CMake component and preserves the pkg/math/grobner package boundary."]
     },
     {
       "path": "src/math/grobner/grobner.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/math/grobner/grobner.go",
+        "pkg/math/grobner/basis.go",
+        "pkg/math/grobner/grobner_test.go"
+      ],
+      "tests": [
+        "TestBasisReducesNonlinearEquation",
+        "TestBasisSuperposesSharedLeadingFactor",
+        "TestWeightsScopesDependenciesAndDisplay",
+        "TestExpressionAssertionAndInconsistency",
+        "TestLaterScopeRewriteFreezesAndRestoresBaseEquation"
+      ],
       "conditionals": [
         {
           "line": 944,
@@ -42373,19 +42383,67 @@
           "text": "SASSERT(target->m_scope_lvl >= source->m_scope_lvl);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "construction, destruction, reset, variable weights, graded lexicographic order and order updates at cpp:24-120,203-279",
+          "status": "ported",
+          "go_target": "pkg/math/grobner/grobner.go",
+          "tests": ["TestWeightsScopesDependenciesAndDisplay"]
+        },
+        {
+          "name": "monomial construction, expression extraction, equality assertion, merging and coefficient normalization at cpp:281-495",
+          "status": "ported",
+          "go_target": "pkg/math/grobner/grobner.go",
+          "tests": ["TestBasisReducesNonlinearEquation", "TestBasisSuperposesSharedLeadingFactor", "TestExpressionAssertionAndInconsistency"]
+        },
+        {
+          "name": "monomial subset, equation copy, scoped reduction, processed and pending simplification at cpp:497-797",
+          "status": "ported",
+          "go_target": "pkg/math/grobner/basis.go",
+          "tests": ["TestBasisReducesNonlinearEquation", "TestLaterScopeRewriteFreezesAndRestoresBaseEquation"]
+        },
+        {
+          "name": "leading-monomial unification, superposition, incremental and threshold basis computation and equation inspection at cpp:799-988",
+          "status": "ported",
+          "go_target": "pkg/math/grobner/basis.go",
+          "tests": ["TestBasisReducesNonlinearEquation", "TestExpressionAssertionAndInconsistency"]
+        },
+        {
+          "name": "monomial, equation and solver display at cpp:122-200",
+          "status": "ported",
+          "go_target": "pkg/math/grobner/grobner.go",
+          "tests": ["TestWeightsScopesDependenciesAndDisplay"]
+        }
+      ],
+      "ownership": [
+        "A Solver borrows its AST manager, owns one reference to every weighted variable and monomial variable, owns every asserted equation and its dependency reference, and releases equations before weighted variables on reset or close.",
+        "AssertMonomialsZero consumes live caller monomials. Cross-scope reduction copies the earlier equation into the current scope, retains the original in the unfreeze list, and restores it when that scope is popped. Dependency joins are reference-counted through the AST manager."
+      ],
+      "deviations": [
+        "Go uses math/big.Rat for exact coefficients, slices and concrete insertion-ordered equation sets instead of C++ rational, ptr_vector and obj_hashtable containers.",
+        "The source pop_scope assertion is reversed even though the following subtraction requires num_scopes <= scope level; Go validates that required domain and returns ast.ErrASTDomain.",
+        "PROFILE_GB is an inactive compile-time reporting block and has no retained algorithmic effect. Go propagates AST cancellation, ownership and writer errors."
+      ]
     },
     {
       "path": "src/math/grobner/grobner.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/math/grobner/grobner.go",
+        "pkg/math/grobner/basis.go",
+        "pkg/math/grobner/grobner_test.go"
+      ],
+      "tests": [
+        "TestBasisReducesNonlinearEquation",
+        "TestBasisSuperposesSharedLeadingFactor",
+        "TestWeightsScopesDependenciesAndDisplay",
+        "TestExpressionAssertionAndInconsistency",
+        "TestLaterScopeRewriteFreezesAndRestoresBaseEquation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -42396,11 +42454,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "grobner_stats, monomial and equation observations, construction, weights, assertion, basis, inconsistency, reset, equation inspection, scopes and display",
+          "status": "ported",
+          "go_target": "pkg/math/grobner/grobner.go",
+          "go_targets": ["pkg/math/grobner/basis.go"],
+          "tests": ["TestBasisReducesNonlinearEquation", "TestBasisSuperposesSharedLeadingFactor", "TestWeightsScopesDependenciesAndDisplay", "TestExpressionAssertionAndInconsistency", "TestLaterScopeRewriteFreezesAndRestoresBaseEquation"]
+        },
+        {
+          "name": "declared simplify(expr*, expr_ref&) has no definition in grobner.cpp and no retained source consumer",
+          "status": "reference_only",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Go exposes borrowed Equation and Monomial observations while their Solver owner is live. Public monomial construction transfers ownership to assertion or DelMonomial, and Close releases all retained AST and dependency references."
+      ],
+      "deviations": [
+        "Go names the engine Solver and returns errors from fallible AST, cancellation and output operations. The undefined, uncalled expression simplifier is intentionally not invented."
+      ]
     },
     {
       "path": "src/math/hilbert/CMakeLists.txt",
