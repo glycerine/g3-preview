@@ -103280,11 +103280,16 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/smt_conflict_antecedents.go"],
+      "go_targets": [
+        "pkg/smtcore/smt_conflict_antecedents.go",
+        "pkg/smtcore/smt_conflict_levels.go"
+      ],
       "tests": [
         "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
         "TestSMTAntecedentExpanderTransitivityEquationsAndCommonAncestor",
-        "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities"
+        "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities",
+        "TestSMTConflictJustificationMaximumAssignmentLevels",
+        "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification"
       ],
       "conditionals": [
         {
@@ -103620,6 +103625,15 @@
           ]
         },
         {
+          "name": "maximum assignment level for justification, clause, binary, axiom and object dependencies",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_levels.go",
+          "tests": [
+            "TestSMTConflictJustificationMaximumAssignmentLevels",
+            "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification"
+          ]
+        },
+        {
           "name": "assignment-level analysis, FUIP resolution, lemma minimization and unsat-core extraction",
           "status": "unported",
           "go_target": null,
@@ -103644,11 +103658,16 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/smt_conflict_antecedents.go"],
+      "go_targets": [
+        "pkg/smtcore/smt_conflict_antecedents.go",
+        "pkg/smtcore/smt_conflict_levels.go"
+      ],
       "tests": [
         "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
         "TestSMTAntecedentExpanderTransitivityEquationsAndCommonAncestor",
-        "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities"
+        "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities",
+        "TestSMTConflictJustificationMaximumAssignmentLevels",
+        "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification"
       ],
       "conditionals": [
         {
@@ -103681,6 +103700,15 @@
             "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
             "TestSMTAntecedentExpanderTransitivityEquationsAndCommonAncestor",
             "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities"
+          ]
+        },
+        {
+          "name": "justification and Boolean-justification maximum assignment-level queries",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_levels.go",
+          "tests": [
+            "TestSMTConflictJustificationMaximumAssignmentLevels",
+            "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification"
           ]
         },
         {
