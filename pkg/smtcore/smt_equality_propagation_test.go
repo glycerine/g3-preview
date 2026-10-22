@@ -108,3 +108,33 @@ func TestSMTCoreEqualityPropagatesBooleanCongruence(t *testing.T) {
 		t.Fatal("Boolean congruence contradiction", status)
 	}
 }
+
+func TestSMTCoreEqualityPropagatesRelevancyAndRollsBack(t *testing.T) {
+	manager := astTestManager(t)
+	_, values := smtUFConstants(t, manager, "core-relevant-eq-", 2)
+	equality, err := manager.MkEq(values[0], values[1])
+	astTestMust(t, err)
+	context, relevancy, state := smtInternalizerFixture(t, manager, nil)
+	astTestMust(t, state.Internalize(equality, false))
+	left, right := context.enodes[values[0]], context.enodes[values[1]]
+	if left == nil || right == nil {
+		t.Fatal("equality arguments were not internalized")
+	}
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.markRelevant(values[0]))
+	astTestMust(t, relevancy.Propagate())
+	variable, found := state.BoolVar(equality)
+	if !found {
+		t.Fatal("equality Boolean variable missing")
+	}
+	astTestMust(t, state.AssignLiteral(NewSMTLiteral(variable, false), NewSMTBooleanAxiom()))
+	astTestMust(t, state.PropagateTheoryAssignments())
+	astTestMust(t, relevancy.Propagate())
+	if left.root != right.root || !relevancy.IsRelevant(values[1]) {
+		t.Fatal("equality merge did not propagate relevancy")
+	}
+	astTestMust(t, state.PopScopes(1))
+	if left.root == right.root || relevancy.IsRelevant(values[1]) {
+		t.Fatal("scope pop did not restore equality class and relevancy")
+	}
+}

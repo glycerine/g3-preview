@@ -232,6 +232,10 @@ func (s *SMTInternalizerState) PropagateCore() (bool, error) {
 		if err = s.PropagateTheoryEvents(); err != nil {
 			return false, err
 		}
+		dynamicAckProgress, err := s.dynamicAck.propagate()
+		if err != nil {
+			return false, err
+		}
 		theoryProgress := false
 		for _, plugin := range s.theoryOrder {
 			if plugin.CanPropagate() {
@@ -245,7 +249,7 @@ func (s *SMTInternalizerState) PropagateCore() (bool, error) {
 			return false, nil
 		}
 		relevancyDone := s.relevancy == nil || !s.relevancy.CanPropagate()
-		if s.propagationHead == len(s.assignedLiterals) && s.atomPropagationHead == len(s.assignedLiterals) && s.theoryEqualityHead == len(s.theoryEqualities) && s.theoryDisequalityHead == len(s.theoryDisequalities) && relevancyDone && !theoryProgress {
+		if s.propagationHead == len(s.assignedLiterals) && s.atomPropagationHead == len(s.assignedLiterals) && s.theoryEqualityHead == len(s.theoryEqualities) && s.theoryDisequalityHead == len(s.theoryDisequalities) && relevancyDone && !theoryProgress && !dynamicAckProgress {
 			return true, nil
 		}
 	}

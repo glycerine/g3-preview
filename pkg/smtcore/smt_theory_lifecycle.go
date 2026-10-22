@@ -29,7 +29,7 @@ func (s *SMTInternalizerState) InitializeTheorySearch() error {
 			return err
 		}
 	}
-	return nil
+	return s.dynamicAck.schedule.initSearch()
 }
 
 func (s *SMTInternalizerState) RestartTheories() error {

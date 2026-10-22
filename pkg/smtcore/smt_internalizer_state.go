@@ -111,6 +111,7 @@ type SMTInternalizerState struct {
 	pendingHead              int
 	equalityTrail            []smtEqualitySnapshot
 	disequalityReasons       map[smtEnodePairKey]SMTLiteral
+	dynamicAck               *smtDynAckManager
 	assignmentTrail          []smtInternalizerAssignmentTrail
 	theoryTrail              []smtInternalizerTheoryTrail
 	theoryEqualities         []SMTTheoryPropagation
@@ -152,7 +153,34 @@ func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext
 		conflictLiteral:    SMTNullLiteral,
 	}
 	state.booleanData[0].Initialize(0)
+	dynamicAck, err := newSMTDynAckManager(state, defaultSMTDynAckState())
+	if err != nil {
+		_ = table.Close()
+		return nil, err
+	}
+	state.dynamicAck = dynamicAck
 	return state, nil
+}
+
+// ConfigureDynamicAck installs source dynamic-Ackermann parameters before any
+// expressions or scopes are created.
+func (s *SMTInternalizerState) ConfigureDynamicAck(config SMTDynAckState) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if len(s.booleanStack) != 0 || len(s.enodeStack) != 0 || len(s.scopes) != 0 {
+		return ast.ErrASTDomain
+	}
+	replacement, err := newSMTDynAckManager(s, config)
+	if err != nil {
+		return err
+	}
+	if err = s.dynamicAck.close(); err != nil {
+		_ = replacement.close()
+		return err
+	}
+	s.dynamicAck = replacement
+	return nil
 }
 
 func (s *SMTInternalizerState) RegisterTheory(theory SMTTheoryInternalizer) error {
@@ -785,6 +813,7 @@ func (s *SMTInternalizerState) Close() error {
 		result = errors.Join(result, s.PopScopes(uint32(len(s.scopes))))
 	}
 	result = errors.Join(result, s.popTo(smtInternalizerScope{}))
+	result = errors.Join(result, s.dynamicAck.close())
 	result = errors.Join(result, s.congruence.Close())
 	if result == nil {
 		s.closed = true

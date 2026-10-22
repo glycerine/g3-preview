@@ -338,6 +338,9 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 	if err != nil {
 		return SMTConflictResolution{}, err
 	}
+	if err = r.state.dynamicAck.recordConflictUses(r.expander, originalConflict); err != nil {
+		return SMTConflictResolution{}, err
+	}
 	result := SMTConflictResolution{ConflictLevel: conflictLevel}
 	if conflictLevel <= baseLevel {
 		proof, proofErr := r.conflictProof(originalConflict, notLiteral, nil)

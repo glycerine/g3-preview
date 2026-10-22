@@ -259,6 +259,40 @@ func (s *SMTInternalizerState) propagateBooleanClass(root *SMTEnode) error {
 	return nil
 }
 
+func (s *SMTInternalizerState) propagateEqualityClassRelevancy(first, second *SMTEnode) error {
+	relevant := false
+	for _, root := range []*SMTEnode{first, second} {
+		for node := root; ; node = node.next {
+			if s.context.relevant[node.owner] {
+				relevant = true
+				break
+			}
+			if node.next == root {
+				break
+			}
+		}
+		if relevant {
+			break
+		}
+	}
+	if !relevant {
+		return nil
+	}
+	for _, root := range []*SMTEnode{first, second} {
+		for node := root; ; node = node.next {
+			if !s.context.relevant[node.owner] {
+				if err := s.markRelevant(node.owner); err != nil {
+					return err
+				}
+			}
+			if node.next == root {
+				break
+			}
+		}
+	}
+	return nil
+}
+
 func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification SMTEqualityJustification) error {
 	if left == nil || right == nil || left.manager != s.manager || right.manager != s.manager {
 		return ast.ErrASTDomain
@@ -287,6 +321,9 @@ func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification 
 		left, right, r1, r2 = right, left, r2, r1
 	}
 	s.equalityTrail = append(s.equalityTrail, s.equalitySnapshot())
+	if err := s.propagateEqualityClassRelevancy(r1, r2); err != nil {
+		return fmt.Errorf("propagate equality-class relevancy: %w", err)
+	}
 	if err := s.mergeTheoryVariables(r1, r2); err != nil {
 		return fmt.Errorf("merge theory variables: %w", err)
 	}
