@@ -2,6 +2,7 @@ package smtcore
 
 import (
 	"errors"
+	"math/big"
 	"strings"
 	"testing"
 
@@ -382,6 +383,56 @@ func TestSMTSolverPublishesIntegerDifferenceModel(t *testing.T) {
 	}
 }
 
+func TestSMTSolverPublishesStrictLinearRealModel(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	zero, err := m.ArithmeticRealNumeralText("0")
+	astTestMust(t, err)
+	one, err := m.ArithmeticRealNumeralText("1")
+	astTestMust(t, err)
+	realSort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "solver-model-lra-x"), realSort)
+	astTestMust(t, err)
+	s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	astTestMust(t, s.SetProduceModels(true))
+	for _, bound := range []struct {
+		op          int32
+		left, right ast.ASTHandle
+	}{
+		{smtArithOpLT, zero, x},
+		{smtArithOpLT, x, one},
+	} {
+		comparison, comparisonErr := m.MkFamilyApp(family, bound.op, nil, []ast.ASTHandle{bound.left, bound.right})
+		astTestMust(t, comparisonErr)
+		astTestMust(t, s.Assert(comparison))
+	}
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("strict linear model status", status)
+	}
+	generated, err := s.AcquireModel()
+	astTestMust(t, err)
+	if generated == nil {
+		t.Fatal("linear arithmetic solver omitted generated model")
+	}
+	t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
+	declaration, err := m.GetDecl(x)
+	astTestMust(t, err)
+	value, err := generated.ConstantInterpretation(declaration)
+	astTestMust(t, err)
+	text, _, matched, err := m.ArithmeticNumeralText(value)
+	astTestMust(t, err)
+	rational, valid := new(big.Rat).SetString(text)
+	if !matched || !valid || rational.Sign() <= 0 || rational.Cmp(big.NewRat(1, 1)) >= 0 {
+		t.Fatal("strict linear model value", text, matched, valid)
+	}
+}
+
 func TestSMTSolverDerivesBooleanConsequences(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	s, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
@@ -720,7 +771,7 @@ func TestSMTSolverTranslatesBaseKernelAndTrackedAssertions(t *testing.T) {
 	}
 }
 
-func TestSMTSolverSetupRejectsReachedUnsupportedArithmetic(t *testing.T) {
+func TestSMTSolverSetupUsesLinearRealArithmetic(t *testing.T) {
 	m := astTestManager(t)
 	arithmetic, err := m.RegisterArithmeticPlugin()
 	astTestMust(t, err)
@@ -741,20 +792,65 @@ func TestSMTSolverSetupRejectsReachedUnsupportedArithmetic(t *testing.T) {
 	astTestMust(t, err)
 	realSort, err := m.GetSort(two)
 	astTestMust(t, err)
-	x, err := m.MkConst(astTestSymbol(t, m, "unsupported-lra-x"), realSort)
+	x, err := m.MkConst(astTestSymbol(t, m, "linear-lra-x"), realSort)
 	astTestMust(t, err)
-	comparison, err := m.MkFamilyApp(arithmetic, smtArithOpLT, nil, []ast.ASTHandle{x, two})
+	y, err := m.MkConst(astTestSymbol(t, m, "linear-lra-y"), realSort)
+	astTestMust(t, err)
+	sum, err := m.MkFamilyApp(arithmetic, smtArithOpAdd, nil, []ast.ASTHandle{x, y})
+	astTestMust(t, err)
+	comparison, err := m.MkFamilyApp(arithmetic, smtArithOpLT, nil, []ast.ASTHandle{sum, two})
 	astTestMust(t, err)
 	astTestMust(t, s.Assert(comparison))
 	status, err = s.CheckSat(nil)
 	astTestMust(t, err)
-	if status != lbool.Undef {
-		t.Fatal("unsupported arithmetic reported a definite result", status)
+	if status != lbool.True {
+		t.Fatal("strict linear arithmetic", status)
 	}
-	reason, err := s.ReasonUnknown()
+	astTestMust(t, s.Push())
+	one, err := m.ArithmeticRealNumeralText("1")
 	astTestMust(t, err)
-	if reason != "(incomplete (theory arithmetic))" {
-		t.Fatal("unsupported arithmetic reason", reason)
+	for _, expression := range []ast.ASTHandle{x, y} {
+		lower, lowerErr := m.MkFamilyApp(arithmetic, smtArithOpGE, nil, []ast.ASTHandle{expression, one})
+		astTestMust(t, lowerErr)
+		astTestMust(t, s.Assert(lower))
+	}
+	status, err = s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("infeasible linear arithmetic", status)
+	}
+	astTestMust(t, s.Pop(1))
+	status, err = s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("linear arithmetic scope replay", status)
+	}
+}
+
+func TestSMTSolverLinearArithmeticRejectsNonlinearTerms(t *testing.T) {
+	m := astTestManager(t)
+	arithmetic, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
+	one, err := m.ArithmeticRealNumeralText("1")
+	astTestMust(t, err)
+	realSort, err := m.GetSort(one)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "nonlinear-lra-x"), realSort)
+	astTestMust(t, err)
+	product, err := m.MkFamilyApp(arithmetic, smtArithOpMul, nil, []ast.ASTHandle{x, x})
+	astTestMust(t, err)
+	comparison, err := m.MkFamilyApp(arithmetic, smtArithOpLT, nil, []ast.ASTHandle{product, one})
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(comparison))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.Undef {
+		t.Fatal("nonlinear arithmetic reported a definite result", status)
 	}
 }
 

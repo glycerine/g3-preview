@@ -109769,7 +109769,8 @@
         "pkg/smtcore/smt_setup.go"
       ],
       "tests": [
-        "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
+        "TestSMTSolverSetupUsesLinearRealArithmetic",
+        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
         "TestSMTSolverSetupUsesRealDifferenceLogic",
         "TestSMTSolverPublishesStrictRealDifferenceModel"
@@ -109792,11 +109793,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "explicit arithmetic and array logic classification, concrete QF_RDL/QF_IDL/QF_UFIDL theory selection, and conservative incomplete-theory installation for remaining arithmetic and array logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409)",
+          "name": "explicit arithmetic and array logic classification, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA theory selection, and conservative incomplete-theory installation for remaining arithmetic and array logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409)",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
-            "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
+            "TestSMTSolverSetupUsesLinearRealArithmetic",
+            "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
             "TestSMTSolverSetupUsesIntegerDifferenceLogic",
             "TestSMTSolverSetupUsesRealDifferenceLogic",
             "TestSMTSolverPublishesStrictRealDifferenceModel"
@@ -109810,10 +109812,10 @@
         }
       ],
       "ownership": [
-        "The kernel owns its theory registry; setup creates concrete real or integer difference theories for QF_RDL and QF_IDL/QF_UFIDL and dummy-theory values for reached families whose solvers remain unavailable."
+        "The kernel owns its theory registry; setup creates concrete real difference, integer difference, or linear rational theories for QF_RDL, QF_IDL/QF_UFIDL, and QF_LRA and dummy-theory values for reached families whose solvers remain unavailable."
       ],
       "deviations": [
-        "QF_RDL uses the retained real difference theory, while QF_IDL and QF_UFIDL use the retained integer difference theory. Other incomplete arithmetic and array logics install SMTDummyTheory so reached expressions return source-style incompleteness instead of an unsound propositional SAT result."
+        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, and QF_LRA uses the retained rational linear simplex specialization. Nonlinear QF_LRA expressions and other incomplete arithmetic and array logics return source-style incompleteness instead of an unsound propositional SAT result."
       ]
     },
     {
@@ -109825,7 +109827,8 @@
         "pkg/smtcore/smt_setup.go"
       ],
       "tests": [
-        "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
+        "TestSMTSolverSetupUsesLinearRealArithmetic",
+        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
         "TestSMTSolverSetupUsesRealDifferenceLogic"
       ],
@@ -109847,7 +109850,8 @@
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
-            "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
+            "TestSMTSolverSetupUsesLinearRealArithmetic",
+            "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
             "TestSMTSolverSetupUsesIntegerDifferenceLogic",
             "TestSMTSolverSetupUsesRealDifferenceLogic"
           ]
@@ -109883,7 +109887,8 @@
         "TestSMTSolverReasonUnknownUsesKernelFailure",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
-        "TestSMTSolverSetupRejectsReachedUnsupportedArithmetic",
+        "TestSMTSolverSetupUsesLinearRealArithmetic",
+        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
         "TestSMTSolverForwardsFastProgressSamples",
         "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
       ],
@@ -110877,7 +110882,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_arith_tableau.go",
-        "pkg/smtcore/theory_arith_bounds.go"
+        "pkg/smtcore/theory_arith_bounds.go",
+        "pkg/smtcore/theory_arith_linear.go"
       ],
       "tests": [
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
@@ -110887,7 +110893,10 @@
         "TestSMTArithmeticAntecedentAndDerivedCoefficients",
         "TestSMTArithmeticBoundTrailEncoding",
         "TestSMTArithmeticEqualityBoundAndAccumulation",
-        "TestSMTNormalizeArithmeticIntegerBound"
+        "TestSMTNormalizeArithmeticIntegerBound",
+        "TestSMTSolverSetupUsesLinearRealArithmetic",
+        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+        "TestSMTSolverPublishesStrictLinearRealModel"
       ],
       "conditionals": [
         {
@@ -111024,6 +111033,16 @@
             "TestSMTArithmeticBoundTrailEncoding",
             "TestSMTArithmeticEqualityBoundAndAccumulation",
             "TestSMTNormalizeArithmeticIntegerBound"
+          ]
+        },
+        {
+          "name": "retained rational linear internalization, atom assignment, simplex feasibility, scope replay, equality axioms, and model values",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTSolverSetupUsesLinearRealArithmetic",
+            "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+            "TestSMTSolverPublishesStrictLinearRealModel"
           ]
         }
       ],
@@ -111479,10 +111498,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_arith_tableau.go"
+        "pkg/smtcore/theory_arith_tableau.go",
+        "pkg/smtcore/theory_arith_linear.go"
       ],
       "tests": [
-        "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge"
+        "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
+        "TestSMTSolverSetupUsesLinearRealArithmetic",
+        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+        "TestSMTSolverPublishesStrictLinearRealModel"
       ],
       "conditionals": [
         {
