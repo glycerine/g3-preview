@@ -19,6 +19,7 @@ type smtSearchProgress struct {
 type smtRetainedLemmaAtom struct {
 	expression ast.ASTHandle
 	sign       bool
+	relevant   bool
 }
 
 func (s *SMTInternalizerState) retainLemmaAtoms(literals []SMTLiteral) ([]smtRetainedLemmaAtom, error) {
@@ -33,7 +34,11 @@ func (s *SMTInternalizerState) retainLemmaAtoms(literals []SMTLiteral) ([]smtRet
 			_ = s.releaseLemmaAtoms(atoms)
 			return nil, err
 		}
-		atoms = append(atoms, smtRetainedLemmaAtom{expression: expression, sign: literal.Sign()})
+		relevant := false
+		if s.relevancy != nil {
+			relevant = s.relevancy.IsRelevant(expression)
+		}
+		atoms = append(atoms, smtRetainedLemmaAtom{expression: expression, sign: literal.Sign(), relevant: relevant})
 	}
 	return atoms, nil
 }
@@ -57,6 +62,11 @@ func (s *SMTInternalizerState) reinternalizeLemmaAtoms(atoms []smtRetainedLemmaA
 		}
 		if atom.sign {
 			literal = literal.Negated()
+		}
+		if atom.relevant && s.relevancy != nil && !s.relevancy.IsRelevant(atom.expression) {
+			if err = s.relevancy.MarkRelevant(atom.expression); err != nil {
+				return nil, err
+			}
 		}
 		literals[index] = literal
 	}

@@ -153,6 +153,7 @@ func TestSMTSearchReinternalizesLearnedClauseAtomsAfterBackjump(t *testing.T) {
 		t.Fatal("missing scoped learned-clause atom")
 	}
 	literal := NewSMTLiteral(variable, true)
+	astTestMust(t, state.relevancy.MarkRelevant(expression))
 	atoms, err := state.retainLemmaAtoms([]SMTLiteral{literal})
 	astTestMust(t, err)
 	astTestMust(t, state.PopScopes(1))
@@ -169,6 +170,9 @@ func TestSMTSearchReinternalizesLearnedClauseAtomsAfterBackjump(t *testing.T) {
 	astTestMust(t, err)
 	if data.InternalLevel() != 0 {
 		t.Fatal("reinternalized atom scope", data.InternalLevel())
+	}
+	if !state.relevancy.IsRelevant(expression) {
+		t.Fatal("reinternalized learned atom lost conflict relevancy")
 	}
 }
 
