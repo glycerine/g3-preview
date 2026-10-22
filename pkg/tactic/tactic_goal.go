@@ -79,6 +79,66 @@ func NewGoalConfigCopy(src *Goal) (*Goal, error) {
 	g.depth, g.precision = src.depth, src.precision
 	return g, nil
 }
+
+func (g *Goal) Translate(translation *ast.ASTTranslation) (result *Goal, err error) {
+	if err = g.open(); err != nil {
+		return nil, err
+	}
+	if translation == nil || translation.From() != g.manager || translation.To() == nil {
+		return nil, ast.ErrASTHandle
+	}
+	targetProofs, err := translation.To().ProofsEnabled()
+	if err != nil {
+		return nil, err
+	}
+	result, err = NewGoal(translation.To(), targetProofs && g.proofsEnabled, g.modelsEnabled, g.coreEnabled)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if err != nil && result != nil {
+			err = errors.Join(err, result.Close())
+			result = nil
+		}
+	}()
+	for i, form := range g.forms {
+		translatedForm, e := translation.Translate(form)
+		if e != nil {
+			return nil, e
+		}
+		var translatedProof ast.ASTHandle
+		if result.proofsEnabled {
+			translatedProof, e = translation.Translate(g.proofs[i])
+			if e != nil {
+				return nil, e
+			}
+		}
+		var translatedDependency ast.ASTDependency
+		if result.coreEnabled {
+			translatedDependency, e = translation.TranslateDependency(g.dependencies[i])
+			if e != nil {
+				return nil, e
+			}
+		}
+		if e = goalPushExpr(result.manager, &result.forms, translatedForm); e != nil {
+			return nil, e
+		}
+		if result.proofsEnabled {
+			if e = goalPushExpr(result.manager, &result.proofs, translatedProof); e != nil {
+				return nil, e
+			}
+		}
+		if result.coreEnabled {
+			if e = goalPushDependency(result.manager, &result.dependencies, translatedDependency); e != nil {
+				return nil, e
+			}
+		}
+	}
+	result.inconsistent = g.inconsistent
+	result.depth = g.depth
+	result.precision = g.precision
+	return result, nil
+}
 func (g *Goal) open() error {
 	if g == nil || g.self != g {
 		return ast.ErrASTHandle
