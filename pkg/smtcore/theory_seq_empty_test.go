@@ -1240,6 +1240,61 @@ func TestSMTSequenceTheoryNegativePrefixPropagatesToTails(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryNegativeSuffixPropagatesToInitialSegments(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	value, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(value)
+	astTestMust(t, err)
+	elementSort, sequence, err := m.SequenceSortElement(sort)
+	astTestMust(t, err)
+	if !sequence {
+		t.Fatal("string sort is not a sequence")
+	}
+	boundary, err := m.MkConst(astTestSymbol(t, m, "sequence-negative-suffix-boundary"), sort)
+	astTestMust(t, err)
+	container, err := m.MkConst(astTestSymbol(t, m, "sequence-negative-suffix-container"), sort)
+	astTestMust(t, err)
+	suffix, err := m.MkSequenceSuffix(boundary, container)
+	astTestMust(t, err)
+	notSuffix, err := m.MkNot(suffix)
+	astTestMust(t, err)
+	empty, err := m.MkSequenceEmpty(sort)
+	astTestMust(t, err)
+	containerEmpty, err := m.MkEq(container, empty)
+	astTestMust(t, err)
+	containerNonempty, err := m.MkNot(containerEmpty)
+	astTestMust(t, err)
+	lastName, err := m.Symbols.Intern("seq.last")
+	astTestMust(t, err)
+	boundaryLast, err := m.MkSequenceSkolem(lastName, []ast.ASTHandle{boundary}, elementSort)
+	astTestMust(t, err)
+	containerLast, err := m.MkSequenceSkolem(lastName, []ast.ASTHandle{container}, elementSort)
+	astTestMust(t, err)
+	lastEqual, err := m.MkEq(boundaryLast, containerLast)
+	astTestMust(t, err)
+	firstName, err := m.Symbols.Intern("seq.first")
+	astTestMust(t, err)
+	boundaryInitial, err := m.MkSequenceSkolem(firstName, []ast.ASTHandle{boundary}, sort)
+	astTestMust(t, err)
+	containerInitial, err := m.MkSequenceSkolem(firstName, []ast.ASTHandle{container}, sort)
+	astTestMust(t, err)
+	initialSuffix, err := m.MkSequenceSuffix(boundaryInitial, containerInitial)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(notSuffix))
+	astTestMust(t, solver.Assert(containerNonempty))
+	astTestMust(t, solver.Assert(lastEqual))
+	astTestMust(t, solver.Assert(initialSuffix))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("negative suffix did not propagate to initial segments", status)
+	}
+}
+
 func TestSMTSequenceTheoryNegativeBoundaryWitnesses(t *testing.T) {
 	for _, suffix := range []bool{false, true} {
 		name := "prefix"

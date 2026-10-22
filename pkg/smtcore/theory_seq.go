@@ -555,6 +555,9 @@ func (t *SMTSequenceTheory) Assign(variable int32, value bool) error {
 	if op == 3 && !value {
 		return t.addNegativePrefixStep(expression)
 	}
+	if op == 4 && !value {
+		return t.addNegativeSuffixStep(expression)
+	}
 	return nil
 }
 

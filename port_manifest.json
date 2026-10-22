@@ -116816,6 +116816,7 @@
         "TestSMTSequenceTheoryNonContainsPropagatesToTail",
         "TestSMTSequenceTheoryNegativeBoundaryWitnesses",
         "TestSMTSequenceTheoryNegativePrefixPropagatesToTails",
+        "TestSMTSequenceTheoryNegativeSuffixPropagatesToInitialSegments",
         "TestSMTSequenceTheoryAtBoundaryAxioms",
         "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms",
         "TestSMTSequenceTheoryExtractOversizedPrefixIsSource",
@@ -117334,10 +117335,10 @@
           "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms", "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches", "TestSMTSequenceTheoryNonContainsPropagatesToTail"]
         },
         {
-          "name": "negative prefix and suffix shared-segment mismatch witnesses with distinct element or exhausted-container alternatives, plus lazy negative-prefix propagation through equal heads to decomposed tails (src/smt/theory_seq.cpp:4464-4624)",
+          "name": "negative prefix and suffix shared-segment mismatch witnesses with distinct element or exhausted-container alternatives, plus lazy negative-prefix propagation through equal heads to decomposed tails and symmetric negative-suffix propagation through equal last elements to initial segments (src/smt/theory_seq.cpp:4464-4684)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_boundary_negative.go",
-          "tests": ["TestSMTSequenceTheoryNegativeBoundaryWitnesses", "TestSMTSequenceTheoryNegativePrefixPropagatesToTails"]
+          "tests": ["TestSMTSequenceTheoryNegativeBoundaryWitnesses", "TestSMTSequenceTheoryNegativePrefixPropagatesToTails", "TestSMTSequenceTheoryNegativeSuffixPropagatesToInitialSegments"]
         },
         {
           "name": "deduplicated owned axiom queue, propagation head and scoped replay (src/smt/theory_seq.cpp:3068-3108)",
