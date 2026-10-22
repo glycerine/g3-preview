@@ -110882,14 +110882,16 @@
       "path": "src/smt/theory_arith.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "This translation unit only explicitly instantiates the mi_ext, i_ext, and inf_ext C++ templates. Go compiles the concrete rational and integer theory constructors directly and requires no explicit-instantiation source unit."
+      ]
     },
     {
       "path": "src/smt/theory_arith.h",
@@ -112276,7 +112278,7 @@
       "path": "src/smt/theory_arith_def.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -112289,11 +112291,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "This header only aggregates the arithmetic implementation headers. Go package compilation aggregates the corresponding files without an include-only source unit."
+      ]
     },
     {
       "path": "src/smt/theory_arith_eq.h",
