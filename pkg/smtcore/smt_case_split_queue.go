@@ -5,6 +5,7 @@ package smtcore
 import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	z3rand "github.com/glycerine/g3/pkg/util/random"
 )
 
 // SMTActivityCaseSplitQueue is the concrete activity strategy retained by the
@@ -13,6 +14,7 @@ import (
 type SMTActivityCaseSplitQueue struct {
 	state                                 *SMTInternalizerState
 	phaseSelection, cachingOn, cachingOff uint32
+	randomVariableFrequency               float64
 	phaseCounter                          uint32
 	cacheEnabled, phaseDefault            bool
 }
@@ -31,6 +33,7 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	q.phaseSelection = state.PhaseSelection
 	q.cachingOn = state.PhaseCachingOn
 	q.cachingOff = state.PhaseCachingOff
+	q.randomVariableFrequency = state.RandomVarFreq
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
@@ -105,18 +108,33 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 		return SMTNullBoolVar, lbool.Undef, err
 	}
 	next := SMTNullBoolVar
+	threshold := int(q.randomVariableFrequency * float64(z3rand.Max))
+	if int(q.state.random.Next()) < threshold && len(q.state.boolExpr) != 0 {
+		candidate := int32(q.state.random.Next() % uint32(len(q.state.boolExpr)))
+		if candidate >= SMTFirstBoolVar {
+			value, err := q.state.Assignment(NewSMTLiteral(candidate, false))
+			if err != nil {
+				return SMTNullBoolVar, lbool.Undef, err
+			}
+			if value == lbool.Undef {
+				next = candidate
+			}
+		}
+	}
 	best := 0.0
-	for variable := int32(SMTFirstBoolVar); int(variable) < len(q.state.boolExpr); variable++ {
-		value, err := q.state.Assignment(NewSMTLiteral(variable, false))
-		if err != nil {
-			return SMTNullBoolVar, lbool.Undef, err
-		}
-		if value != lbool.Undef {
-			continue
-		}
-		activity := q.state.activity[variable]
-		if next == SMTNullBoolVar || activity > best {
-			next, best = variable, activity
+	if next == SMTNullBoolVar {
+		for variable := int32(SMTFirstBoolVar); int(variable) < len(q.state.boolExpr); variable++ {
+			value, err := q.state.Assignment(NewSMTLiteral(variable, false))
+			if err != nil {
+				return SMTNullBoolVar, lbool.Undef, err
+			}
+			if value != lbool.Undef {
+				continue
+			}
+			activity := q.state.activity[variable]
+			if next == SMTNullBoolVar || activity > best {
+				next, best = variable, activity
+			}
 		}
 	}
 	if next == SMTNullBoolVar {

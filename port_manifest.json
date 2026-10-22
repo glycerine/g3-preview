@@ -103189,17 +103189,18 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "activity-based selection of the greatest-activity unassigned variable, cached assignment phases, conservative conflict-phase invalidation, phase-cache cycling, always-false/true, source-random, and literal-occurrence phase strategies",
+          "name": "activity-based and random-frequency selection of an unassigned variable, cached assignment phases, conservative conflict-phase invalidation, phase-cache cycling, always-false/true, source-random, and literal-occurrence phase strategies",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_case_split_queue.go",
           "tests": [
             "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase",
             "TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases",
-            "TestSMTActivityCaseSplitQueueForgetsConservativeConflictPhases"
+            "TestSMTActivityCaseSplitQueueForgetsConservativeConflictPhases",
+            "TestSMTActivityCaseSplitQueueHonorsRandomVariableFrequency"
           ]
         },
         {
-          "name": "delayed, cached-relevancy, relevancy, relevancy-activity, goal, and theory-aware queue strategies and random selection",
+          "name": "delayed, cached-relevancy, relevancy, relevancy-activity, goal, and theory-aware queue strategies",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -103223,7 +103224,8 @@
       "tests": [
         "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase",
         "TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases",
-        "TestSMTActivityCaseSplitQueueForgetsConservativeConflictPhases"
+        "TestSMTActivityCaseSplitQueueForgetsConservativeConflictPhases",
+        "TestSMTActivityCaseSplitQueueHonorsRandomVariableFrequency"
       ],
       "conditionals": [
         {
@@ -103239,13 +103241,14 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "next case split, configured phase selection, phase-cache lifecycle, and conservative conflict-phase invalidation consumed by the retained activity-based search",
+          "name": "next activity/random-frequency case split, configured phase selection, phase-cache lifecycle, and conservative conflict-phase invalidation consumed by the retained activity-based search",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_case_split_queue.go",
           "tests": [
             "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase",
             "TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases",
-            "TestSMTActivityCaseSplitQueueForgetsConservativeConflictPhases"
+            "TestSMTActivityCaseSplitQueueForgetsConservativeConflictPhases",
+            "TestSMTActivityCaseSplitQueueHonorsRandomVariableFrequency"
           ]
         },
         {

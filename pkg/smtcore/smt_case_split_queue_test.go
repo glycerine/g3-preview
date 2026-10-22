@@ -86,7 +86,7 @@ func TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases(t *testing.T) 
 	astTestMust(t, queue.ConfigurePhases(config))
 	selected, phase, err = queue.NextCaseSplit()
 	astTestMust(t, err)
-	if selected != variable || phase != lbool.True {
+	if selected != variable || phase != lbool.False {
 		t.Fatal("source-random phase", selected, phase)
 	}
 
@@ -141,5 +141,27 @@ func TestSMTActivityCaseSplitQueueForgetsConservativeConflictPhases(t *testing.T
 	astTestMust(t, queue.PrepareConflict())
 	if !state.booleanData[variable].PhaseAvailable {
 		t.Fatal("ordinary caching discarded current-level phase")
+	}
+}
+
+func TestSMTActivityCaseSplitQueueHonorsRandomVariableFrequency(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	variables := make([]int32, 3)
+	for index := range variables {
+		expression := smtRelevancyBool(t, m, "random-variable-"+string(rune('a'+index)))
+		astTestMust(t, state.Internalize(expression, true))
+		variables[index], _ = state.BoolVar(expression)
+	}
+	state.activity[variables[0]] = 100
+	params := SMTParamsState{InvDecay: 1.052, RandomInitialActivity: 0, RandomVarFreq: 1, PhaseSelection: 0}
+	astTestMust(t, state.configureBooleanHeuristics(params))
+	queue, err := NewSMTActivityCaseSplitQueue(state)
+	astTestMust(t, err)
+	astTestMust(t, queue.ConfigurePhases(params))
+	selected, _, err := queue.NextCaseSplit()
+	astTestMust(t, err)
+	if selected != variables[2] {
+		t.Fatal("random split did not override activity", selected, variables)
 	}
 }
