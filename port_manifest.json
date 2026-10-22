@@ -107444,22 +107444,46 @@
       "path": "src/smt/smt_value_sort.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_value_sort.go"
+      ],
+      "tests": [
+        "TestSMTValueSortScalarsRecursiveDatatypesAndExpressions",
+        "TestSMTValueSortRejectsUninterpretedAndContainingDatatype"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_value_sort sort and expression overloads",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_value_sort.go",
+          "tests": [
+            "TestSMTValueSortScalarsRecursiveDatatypesAndExpressions",
+            "TestSMTValueSortRejectsUninterpretedAndContainingDatatype"
+          ]
+        }
+      ],
+      "ownership": [
+        "Traversal stores borrowed AST handles in Go slices and a visited map; the AST manager retains all nodes."
+      ],
+      "deviations": [
+        "Checked AST queries return errors for invalid handles in place of unchecked C++ sort pointers."
+      ]
     },
     {
       "path": "src/smt/smt_value_sort.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/smt_value_sort.go"
+      ],
+      "tests": [
+        "TestSMTValueSortScalarsRecursiveDatatypesAndExpressions",
+        "TestSMTValueSortRejectsUninterpretedAndContainingDatatype"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -107470,10 +107494,21 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "value-sort query interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_value_sort.go",
+          "tests": [
+            "TestSMTValueSortScalarsRecursiveDatatypesAndExpressions"
+          ]
+        }
+      ],
+      "ownership": [
+        "Both public queries borrow their manager and input handles."
+      ],
       "deviations": []
     },
     {
