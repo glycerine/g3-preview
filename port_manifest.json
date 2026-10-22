@@ -116798,6 +116798,7 @@
         "TestSMTSequenceTheoryFixedLengthOneDecomposition",
         "TestSMTSequenceTheoryFixedLengthDecomposition",
         "TestSMTSequenceTheoryLengthLowerBoundDecomposition",
+        "TestSMTSequenceTheoryLengthBoundsConstrainRemainder",
         "TestSMTSequenceTheoryNativeWordVariableClassification",
         "TestSMTSequenceTheoryBranchesBinaryUnitEquation",
         "TestSMTSequenceTheoryRejectsIncompatibleCyclicUnits",
@@ -117373,10 +117374,10 @@
           "tests": ["TestSMTSequenceTheoryFixedLengthDecomposition"]
         },
         {
-          "name": "positive integer lower-bound coherence exposing the required stable seq.nth prefix units and indexed seq.tail remainder through linear-arithmetic interval evidence, capped below the native 2048-element threshold (src/smt/theory_seq.cpp:851-897)",
+          "name": "positive integer lower-bound coherence exposing the required stable seq.nth prefix units and indexed seq.tail remainder through linear-arithmetic interval evidence, plus an exact residual upper bound when the original sequence is bounded above, capped below the native 2048-element threshold (src/smt/theory_seq.cpp:851-897)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_fixed_length.go",
-          "tests": ["TestSMTSequenceTheoryLengthLowerBoundDecomposition"]
+          "tests": ["TestSMTSequenceTheoryLengthLowerBoundDecomposition", "TestSMTSequenceTheoryLengthBoundsConstrainRemainder"]
         },
         {
           "name": "relevant symbolic sequence root extensionality through an equality case split, excluding pairs already equal or disequal (src/smt/theory_seq.cpp check_extensionality)",

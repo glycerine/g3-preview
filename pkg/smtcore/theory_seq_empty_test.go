@@ -697,6 +697,47 @@ func TestSMTSequenceTheoryLengthLowerBoundDecomposition(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryLengthBoundsConstrainRemainder(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	value, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(value)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-bounded-remainder-x"), sort)
+	astTestMust(t, err)
+	length, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	two, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	three, err := m.ArithmeticIntegerNumeralText("3")
+	astTestMust(t, err)
+	lowerBound, err := m.MkArithmeticGE(length, two)
+	astTestMust(t, err)
+	upperBound, err := m.MkArithmeticLE(length, three)
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	tailName, err := m.Symbols.Intern("seq.tail")
+	astTestMust(t, err)
+	remainder, err := m.MkSequenceSkolem(tailName, []ast.ASTHandle{x, one}, sort)
+	astTestMust(t, err)
+	remainderLength, err := m.MkSequenceLength(remainder)
+	astTestMust(t, err)
+	remainderTooLong, err := m.MkArithmeticGE(remainderLength, two)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(lowerBound))
+	astTestMust(t, solver.Assert(upperBound))
+	astTestMust(t, solver.Assert(remainderTooLong))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("sequence upper bound did not constrain the exposed remainder", status)
+	}
+}
+
 func TestSMTSequenceTheoryNativeWordVariableClassification(t *testing.T) {
 	m := astTestManager(t)
 	literal, err := m.MkString("a")

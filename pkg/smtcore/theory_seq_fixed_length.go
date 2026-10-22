@@ -22,6 +22,19 @@ func smtSequenceIntegerLowerBound(value *big.Rat, epsilonSign int) (uint64, bool
 	return quotient.Uint64(), quotient.IsUint64()
 }
 
+func smtSequenceIntegerUpperBound(value *big.Rat, open bool) (uint64, bool) {
+	if value == nil || value.Sign() < 0 {
+		return 0, false
+	}
+	quotient := new(big.Int)
+	remainder := new(big.Int)
+	quotient.QuoRem(value.Num(), value.Denom(), remainder)
+	if open && remainder.Sign() == 0 {
+		quotient.Sub(quotient, big.NewInt(1))
+	}
+	return quotient.Uint64(), quotient.Sign() >= 0 && quotient.IsUint64()
+}
+
 func (t *SMTSequenceTheory) addLengthLowerBoundDecomposition() (bool, error) {
 	state, err := t.State()
 	if err != nil {
@@ -135,12 +148,58 @@ func (t *SMTSequenceTheory) addLengthLowerBoundDecomposition() (bool, error) {
 		if makeErr != nil {
 			return false, makeErr
 		}
-		if _, found := t.axioms.set[constraint]; found {
-			continue
+		progress := false
+		if _, found := t.axioms.set[constraint]; !found {
+			internal = append(internal, remainder, word)
+			t.trackInternalTerms(internal...)
+			if makeErr = t.axioms.Push(constraint); makeErr != nil {
+				return false, makeErr
+			}
+			progress = true
 		}
-		internal = append(internal, remainder, word)
-		t.trackInternalTerms(internal...)
-		return true, t.axioms.Push(constraint)
+		if !interval.plusInfinity() {
+			upper, upperErr := interval.upperValue()
+			if upperErr != nil {
+				return false, upperErr
+			}
+			upperCount, upperIntegral := smtSequenceIntegerUpperBound(upper, interval.upperOpen)
+			if upperIntegral && upperCount >= count {
+				upperValue, boundErr := t.integer(upperCount)
+				if boundErr != nil {
+					return false, boundErr
+				}
+				upperBound, boundErr := state.manager.MkArithmeticLE(length, upperValue)
+				if boundErr != nil {
+					return false, boundErr
+				}
+				remainderLength, boundErr := state.manager.MkSequenceLength(remainder)
+				if boundErr != nil {
+					return false, boundErr
+				}
+				remainderMaximum, boundErr := t.integer(upperCount - count)
+				if boundErr != nil {
+					return false, boundErr
+				}
+				remainderBound, boundErr := state.manager.MkArithmeticLE(remainderLength, remainderMaximum)
+				if boundErr != nil {
+					return false, boundErr
+				}
+				upperConstraint, boundErr := state.manager.MkImplies(upperBound, remainderBound)
+				if boundErr != nil {
+					return false, boundErr
+				}
+				if _, found := t.axioms.set[upperConstraint]; !found {
+					t.trackInternalTerms(remainder)
+					if boundErr = t.axioms.Push(upperConstraint); boundErr != nil {
+						return false, boundErr
+					}
+					progress = true
+				}
+			}
+		}
+		if progress {
+			return true, nil
+		}
 	}
 	return false, nil
 }
