@@ -99381,9 +99381,14 @@
       "path": "src/smt/fingerprints.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/fingerprints.go"
+      ],
+      "tests": [
+        "TestSMTFingerprintExactThenRootIdentityAndScopes",
+        "TestSMTFingerprintResetAndGuards"
+      ],
       "conditionals": [
         {
           "line": 124,
@@ -99404,19 +99409,38 @@
           "text": "SASSERT(m_set.size() == m_fingerprints.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "fingerprint construction/equality and fingerprint_set insert, contains, reset, scopes, display, and slow_contains",
+          "status": "ported",
+          "go_target": "pkg/smtcore/fingerprints.go",
+          "tests": [
+            "TestSMTFingerprintExactThenRootIdentityAndScopes",
+            "TestSMTFingerprintResetAndGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTFingerprintSet owns fingerprint records and copied node-pointer slices; quantifier handles and enodes are borrowed from the enclosing context."
+      ],
+      "deviations": [
+        "The only retained void-pointer payload is a quantifier AST handle. Native Go maps and slices replace the source pointer hash table and region; no C++ hashing is ported. Debug display uses stable AST ids instead of process pointer addresses."
+      ]
     },
     {
       "path": "src/smt/fingerprints.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/smtcore/fingerprints.go"
+      ],
+      "tests": [
+        "TestSMTFingerprintExactThenRootIdentityAndScopes",
+        "TestSMTFingerprintResetAndGuards"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -99441,11 +99465,24 @@
           "text": "enode * get_arg(unsigned idx) const { SASSERT(idx < m_num_args); return m_args[idx]; }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "fingerprint and fingerprint_set interfaces",
+          "status": "ported",
+          "go_target": "pkg/smtcore/fingerprints.go",
+          "tests": [
+            "TestSMTFingerprintExactThenRootIdentityAndScopes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Returned fingerprints are borrowed from the set and remain valid until their insertion scope is popped or the enclosing context is discarded."
+      ],
+      "deviations": [
+        "Concrete typed quantifier handles replace the unused universal void-pointer interface."
+      ]
     },
     {
       "path": "src/smt/mam.cpp",
