@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	coremodel "github.com/glycerine/g3/pkg/model"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -210,6 +211,100 @@ func (c *SMTModelChecker) addAuxiliaryBlockingClause(auxiliary *SMTSolver, skole
 	return auxiliary.Assert(clause)
 }
 
+func (c *SMTModelChecker) addInstantiationSetRestrictions(auxiliary *SMTSolver, quantifier ast.ASTHandle, skolems []ast.ASTHandle, finite []bool) (asserted bool, result error) {
+	if c.modelFinder == nil {
+		return false, nil
+	}
+	for i, skolem := range skolems {
+		if finite[i] || skolem.IsNull() {
+			continue
+		}
+		values, err := c.modelFinder.InstantiationValues(quantifier, uint32(i))
+		if err != nil {
+			return false, err
+		}
+		if len(values) == 0 {
+			continue
+		}
+		equalities := make([]ast.ASTHandle, 0, len(values))
+		refs := make([]ast.ASTRef, 0, len(values))
+		for _, value := range values {
+			equal, e := c.manager.MkEq(skolem, value)
+			if e != nil {
+				for j := range refs {
+					result = errors.Join(result, c.manager.DelRef(&refs[j]))
+				}
+				return false, errors.Join(e, result)
+			}
+			ref, e := c.manager.NewRef(equal)
+			if e != nil {
+				for j := range refs {
+					result = errors.Join(result, c.manager.DelRef(&refs[j]))
+				}
+				return false, errors.Join(e, result)
+			}
+			refs = append(refs, ref)
+			equalities = append(equalities, equal)
+		}
+		clause, err := c.manager.MkOrArgs(equalities)
+		if err == nil {
+			err = auxiliary.Assert(clause)
+		}
+		for j := range refs {
+			err = errors.Join(err, c.manager.DelRef(&refs[j]))
+		}
+		if err != nil {
+			return false, err
+		}
+		asserted = true
+	}
+	return asserted, nil
+}
+
+func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier ast.ASTHandle, values []ast.ASTHandle, finite []bool, skolemDecls []ast.ASTHandle, requireInverse bool) (raw, bindings []ast.ASTHandle, inverseOK bool, err error) {
+	raw = append([]ast.ASTHandle(nil), values...)
+	for i, declaration := range skolemDecls {
+		if declaration.IsNull() {
+			continue
+		}
+		value, e := cex.ConstantInterpretation(declaration)
+		if e != nil {
+			return nil, nil, false, e
+		}
+		if value.IsNull() {
+			sort, e := c.manager.GetDeclarationSort(quantifier, uint32(i))
+			if e != nil {
+				return nil, nil, false, e
+			}
+			value, e = cex.GetSomeValue(sort)
+			if e != nil {
+				return nil, nil, false, e
+			}
+		}
+		raw[i] = value
+	}
+	bindings = append([]ast.ASTHandle(nil), raw...)
+	inverseOK = true
+	if c.modelFinder == nil {
+		return raw, bindings, !requireInverse, nil
+	}
+	for i := range bindings {
+		if finite[i] {
+			continue
+		}
+		term, _, found, e := c.modelFinder.Inverse(quantifier, uint32(i), bindings[i])
+		if e != nil {
+			return nil, nil, false, e
+		}
+		if found {
+			bindings[i] = term
+		} else if requireInverse {
+			inverseOK = false
+		}
+	}
+	return raw, bindings, inverseOK, nil
+}
+
 func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel, quantifier ast.ASTHandle, values []ast.ASTHandle, finite []bool, remaining *uint32) (found bool, result error) {
 	if c.auxiliary == nil {
 		return false, nil
@@ -289,76 +384,105 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 	if err = auxiliary.Assert(negated); err != nil {
 		return false, err
 	}
+	status, err := auxiliary.CheckSat(nil)
+	if err != nil {
+		return false, err
+	}
+	if status == lbool.False {
+		return false, nil
+	}
+	if status != lbool.True {
+		c.exhausted = true
+		return false, nil
+	}
+	complete, err := auxiliary.AcquireModel()
+	if err != nil {
+		return false, err
+	}
+	if complete == nil {
+		return false, ast.ErrASTPending
+	}
+	defer func() { result = errors.Join(result, complete.DecRef()) }()
+	restricted, err := c.addInstantiationSetRestrictions(auxiliary, quantifier, skolems, finite)
+	if err != nil {
+		return false, err
+	}
+	first := complete
 	for *remaining != 0 {
-		status, err := auxiliary.CheckSat(nil)
+		cex := first
+		first = nil
+		if restricted || cex == nil {
+			status, err = auxiliary.CheckSat(nil)
+			if err != nil {
+				return false, err
+			}
+			if status == lbool.False {
+				break
+			}
+			if status != lbool.True {
+				c.exhausted = true
+				return found, nil
+			}
+			cex, err = auxiliary.AcquireModel()
+			if err != nil {
+				return false, err
+			}
+			if cex == nil {
+				return false, ast.ErrASTPending
+			}
+		}
+		raw, bindings, inverseOK, err := c.auxiliaryBindings(cex, quantifier, values, finite, skolemDecls, restricted)
 		if err != nil {
+			if cex != complete {
+				err = errors.Join(err, cex.DecRef())
+			}
 			return false, err
 		}
-		if status == lbool.False {
-			return found, nil
-		}
-		if status != lbool.True {
-			c.exhausted = true
-			return found, nil
-		}
-		cex, err := auxiliary.AcquireModel()
-		if err != nil {
-			return false, err
-		}
-		if cex == nil {
-			return false, ast.ErrASTPending
-		}
-		bindings := append([]ast.ASTHandle(nil), values...)
-		for i, declaration := range skolemDecls {
-			if declaration.IsNull() {
-				continue
-			}
-			value, e := cex.ConstantInterpretation(declaration)
-			if e != nil {
-				return false, errors.Join(e, cex.DecRef())
-			}
-			if value.IsNull() {
-				sort, e := c.manager.GetDeclarationSort(quantifier, uint32(i))
-				if e != nil {
-					return false, errors.Join(e, cex.DecRef())
-				}
-				value, e = cex.GetSomeValue(sort)
-				if e != nil {
-					return false, errors.Join(e, cex.DecRef())
+		if restricted && !inverseOK {
+			if cex != complete {
+				if err = cex.DecRef(); err != nil {
+					return false, err
 				}
 			}
-			bindings[i] = value
-		}
-		if c.modelFinder != nil {
-			for i := range bindings {
-				if finite[i] {
-					continue
-				}
-				term, _, inverse, e := c.modelFinder.Inverse(quantifier, uint32(i), bindings[i])
-				if e != nil {
-					return false, errors.Join(e, cex.DecRef())
-				}
-				if inverse {
-					bindings[i] = term
-				}
-			}
+			break
 		}
 		inserted, err := c.addCounterexample(quantifier, bindings)
 		if err != nil {
-			return false, errors.Join(err, cex.DecRef())
+			if cex != complete {
+				err = errors.Join(err, cex.DecRef())
+			}
+			return false, err
 		}
 		if inserted {
 			found = true
 			*remaining--
 		}
-		if *remaining == 0 {
-			return found, cex.DecRef()
+		if *remaining != 0 {
+			if err = c.addAuxiliaryBlockingClause(auxiliary, skolems, raw, finite); err != nil {
+				if cex != complete {
+					err = errors.Join(err, cex.DecRef())
+				}
+				return false, err
+			}
 		}
-		if err = c.addAuxiliaryBlockingClause(auxiliary, skolems, bindings, finite); err != nil {
-			return false, errors.Join(err, cex.DecRef())
+		if cex != complete {
+			if err = cex.DecRef(); err != nil {
+				return false, err
+			}
 		}
-		if err = cex.DecRef(); err != nil {
+	}
+	if restricted && !found && *remaining != 0 {
+		_, bindings, _, err := c.auxiliaryBindings(complete, quantifier, values, finite, skolemDecls, false)
+		if err != nil {
 			return false, err
+		}
+		inserted, err := c.addCounterexample(quantifier, bindings)
+		if err != nil {
+			return false, err
+		}
+		if inserted {
+			found = true
+			*remaining--
 		}
 	}
 	return found, nil

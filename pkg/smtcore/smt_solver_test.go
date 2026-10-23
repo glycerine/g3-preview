@@ -155,6 +155,106 @@ func TestSMTSolverMBQIBlocksAndCollectsMultipleIntegerCounterexamples(t *testing
 	}
 }
 
+func TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	five, err := m.ArithmeticIntegerNumeralText("5")
+	astTestMust(t, err)
+	integer, err := m.GetSort(zero)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	predicate := smtQuickPredicate(t, m, "solver-mbqi-inst-set-p", integer, boolean)
+	variable, err := m.MkVar(0, integer)
+	astTestMust(t, err)
+	trigger, err := m.MkApp(predicate, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{trigger})
+	astTestMust(t, err)
+	body, err := m.MkEq(variable, zero)
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []usymbol.Symbol{astTestSymbol(t, m, "solver-mbqi-inst-set-x")},
+		Body: body, Patterns: []ast.ASTHandle{pattern},
+	})
+	astTestMust(t, err)
+	ground, err := m.MkApp(predicate, []ast.ASTHandle{five})
+	astTestMust(t, err)
+	local, err := modelConfig.Context.NewValue()
+	astTestMust(t, err)
+	ematching := "ematching"
+	astTestMust(t, modelConfig.Context.SetBoolName(&local, &ematching, false))
+	s, err := NewSMTSolver(m, &local, "AUFLIA", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, s.Close())
+		astTestMust(t, modelConfig.Context.Del(&local))
+	})
+	astTestMust(t, s.Assert(ground))
+	astTestMust(t, s.Assert(quantifier))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("restricted integer counterexample did not refute quantifier", status)
+	}
+	fingerprints := s.kernel.internalizer.quantifiers.fingerprints.fingerprints
+	if len(fingerprints) != 1 || len(fingerprints[0].args) != 1 || fingerprints[0].args[0].owner != five {
+		t.Fatal("MBQI did not use the pattern instantiation-set inverse", len(fingerprints))
+	}
+}
+
+func TestSMTSolverMBQIFallsBackWhenInstantiationSetHasNoCounterexample(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	integer, err := m.GetSort(zero)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	predicate := smtQuickPredicate(t, m, "solver-mbqi-fallback-p", integer, boolean)
+	variable, err := m.MkVar(0, integer)
+	astTestMust(t, err)
+	trigger, err := m.MkApp(predicate, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{trigger})
+	astTestMust(t, err)
+	body, err := m.MkEq(variable, zero)
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []usymbol.Symbol{astTestSymbol(t, m, "solver-mbqi-fallback-x")},
+		Body: body, Patterns: []ast.ASTHandle{pattern},
+	})
+	astTestMust(t, err)
+	ground, err := m.MkApp(predicate, []ast.ASTHandle{zero})
+	astTestMust(t, err)
+	local, err := modelConfig.Context.NewValue()
+	astTestMust(t, err)
+	ematching := "ematching"
+	astTestMust(t, modelConfig.Context.SetBoolName(&local, &ematching, false))
+	s, err := NewSMTSolver(m, &local, "AUFLIA", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, s.Close())
+		astTestMust(t, modelConfig.Context.Del(&local))
+	})
+	astTestMust(t, s.Assert(ground))
+	astTestMust(t, s.Assert(quantifier))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("complete auxiliary counterexample was not used", status)
+	}
+	fingerprints := s.kernel.internalizer.quantifiers.fingerprints.fingerprints
+	if len(fingerprints) != 1 || len(fingerprints[0].args) != 1 || fingerprints[0].args[0].owner == zero {
+		t.Fatal("MBQI did not fall back from the exhausted instantiation set", len(fingerprints))
+	}
+}
+
 func TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "solver-mbqi-sort"), nil)

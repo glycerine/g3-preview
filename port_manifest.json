@@ -108480,6 +108480,8 @@
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
         "TestSMTSolverMBQIBlocksAndCollectsMultipleIntegerCounterexamples",
+        "TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet",
+        "TestSMTSolverMBQIFallsBackWhenInstantiationSetHasNoCounterexample",
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
       "assertions": [
@@ -108554,17 +108556,27 @@
           ]
         },
         {
-          "name": "model-finder instantiation-set restriction and recursive-function checking",
+          "name": "model-finder instantiation-set restriction, inverse recovery and complete-counterexample fallback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "tests": [
+            "TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet",
+            "TestSMTSolverMBQIFallsBackWhenInstantiationSetHasNoCounterexample"
+          ]
+        },
+        {
+          "name": "recursive-function checking",
           "status": "unported",
           "go_target": null,
           "tests": []
         },
         {
           "name": "inverse-term recovery from populated model-finder instantiation sets",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_model_checker.go",
           "tests": [
             "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals",
+            "TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet",
             "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters"
           ]
         },
@@ -108590,7 +108602,7 @@
         "SMTModelChecker borrows the internalizer, registry and candidate proto-model. Temporary instantiated, evaluated and Skolem expressions are held by checked AST references and released after the auxiliary solver closes; acquired counterexample models are explicitly released."
       ],
       "deviations": [
-        "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in a fresh solver using the parent logic and parameter services. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. Blocking clauses enumerate distinct auxiliary models up to m_max_cexs. Populated model-finder inverse maps replace matching auxiliary values with retained context terms. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; newly deduplicated instances enter the retained queue immediately instead of waiting for a separate restart callback. Instantiation-set restriction before auxiliary search and recursive-function checking remain open."
+        "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in a fresh solver using the parent logic and parameter services. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. Blocking clauses enumerate distinct auxiliary models up to m_max_cexs. Populated model-finder inverse maps restrict Skolem values and replace matching auxiliary values with retained context terms; an unrestricted complete model is retained as the source fallback when restrictions yield no instance. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; newly deduplicated instances enter the retained queue immediately instead of waiting for a separate restart callback. Recursive-function checking remains open, pending a retained recursive-function producer."
       ]
     },
     {
@@ -108608,6 +108620,8 @@
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
         "TestSMTSolverMBQIBlocksAndCollectsMultipleIntegerCounterexamples",
+        "TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet",
+        "TestSMTSolverMBQIFallsBackWhenInstantiationSetHasNoCounterexample",
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
       "conditionals": [

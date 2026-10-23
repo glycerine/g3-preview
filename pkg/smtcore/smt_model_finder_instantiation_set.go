@@ -176,6 +176,17 @@ func (s *smtModelFinderInstantiationSet) Inverse(value ast.ASTHandle) (term ast.
 	return term, generation, found, nil
 }
 
+func (s *smtModelFinderInstantiationSet) Values() ([]ast.ASTHandle, error) {
+	if err := s.open(); err != nil {
+		return nil, err
+	}
+	result := make([]ast.ASTHandle, 0, len(s.inverse))
+	for value := range s.inverse {
+		result = append(result, value)
+	}
+	return result, nil
+}
+
 func (s *smtModelFinderInstantiationSet) Close() (result error) {
 	if s == nil {
 		return ast.ErrASTHandle

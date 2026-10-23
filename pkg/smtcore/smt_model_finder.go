@@ -98,6 +98,14 @@ func (f *SMTModelFinder) Inverse(quantifier ast.ASTHandle, variable uint32, valu
 	return set.Inverse(value)
 }
 
+func (f *SMTModelFinder) InstantiationValues(quantifier ast.ASTHandle, variable uint32) ([]ast.ASTHandle, error) {
+	set, err := f.instantiationSet(quantifier, variable, false)
+	if err != nil || set == nil {
+		return nil, err
+	}
+	return set.Values()
+}
+
 func (f *SMTModelFinder) releaseQuantifier(quantifier ast.ASTHandle) (result error) {
 	for _, set := range f.sets[quantifier] {
 		if set != nil {
