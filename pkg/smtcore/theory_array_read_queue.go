@@ -31,14 +31,9 @@ func (t *SMTArrayTheory) queueStoreReadAxiom(read, store ast.ASTHandle, upward b
 	if allEqual {
 		return false, nil
 	}
-	for _, entry := range t.readFingerprints[store] {
-		if smtFingerprintArgsEqual(entry.indices, indices) {
-			return false, nil
-		}
+	if !t.insertArrayReadFingerprint(store, indices) {
+		return false, nil
 	}
-	entry := &smtArrayReadFingerprint{store: store, indices: indices}
-	t.readFingerprints[store] = append(t.readFingerprints[store], entry)
-	t.readFingerprintTrail = append(t.readFingerprintTrail, entry)
 	t.readTodo = append(t.readTodo, smtArrayAxiomPair{observer: read, array: store})
 	if upward {
 		t.statistics.expandedAxiom2++
@@ -46,6 +41,20 @@ func (t *SMTArrayTheory) queueStoreReadAxiom(read, store ast.ASTHandle, upward b
 		t.statistics.axiom2++
 	}
 	return true, nil
+}
+
+// Source uses the same constructor/indices fingerprint shape for stores and
+// maps. The concrete AST identity distinguishes those retained operations.
+func (t *SMTArrayTheory) insertArrayReadFingerprint(constructor ast.ASTHandle, indices []*SMTEnode) bool {
+	for _, entry := range t.readFingerprints[constructor] {
+		if smtFingerprintArgsEqual(entry.indices, indices) {
+			return false
+		}
+	}
+	entry := &smtArrayReadFingerprint{store: constructor, indices: indices}
+	t.readFingerprints[constructor] = append(t.readFingerprints[constructor], entry)
+	t.readFingerprintTrail = append(t.readFingerprintTrail, entry)
+	return true
 }
 
 func (t *SMTArrayTheory) assertStoreReadAxiomCore(read, store ast.ASTHandle) error {

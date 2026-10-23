@@ -9,6 +9,7 @@ import (
 
 type smtArrayVarData struct {
 	stores, parentStores, parentSelects []*SMTEnode
+	maps, parentMaps, consts, asArrays  []*SMTEnode
 	propUpward                          bool
 }
 
@@ -61,6 +62,11 @@ func (t *SMTArrayTheory) CreateVariable(node *SMTEnode) (SMTTheoryVar, error) {
 			return variable, err
 		}
 	}
+	if !t.simple && array {
+		if err := t.initializeFullArrayVariable(node, data, op); err != nil {
+			return variable, err
+		}
+	}
 	return variable, nil
 }
 
@@ -73,34 +79,24 @@ func (t *SMTArrayTheory) addParentSelect(variable SMTTheoryVar, read *SMTEnode) 
 	if err := t.arrayTrail.PushUndo(func() { data.parentSelects = data.parentSelects[:len(data.parentSelects)-1] }); err != nil {
 		return err
 	}
-	if !t.activeParentSelects[read.owner] {
-		t.activeParentSelects[read.owner] = true
-		if err := t.arrayTrail.PushUndo(func() { delete(t.activeParentSelects, read.owner) }); err != nil {
-			return err
-		}
-	}
 	for _, store := range data.stores {
 		if err := t.enqueueStoreReadAxiom(read.owner, store.owner); err != nil {
 			return err
 		}
 	}
-	// Full constructor lists are still represented by the existing typed
-	// observer machinery. Store parents above use the private array classes.
 	if !t.simple {
-		array := read.arguments[0]
-		for i := 0; i < len(t.variables); i++ {
-			candidate := t.variables[i]
-			if candidate == nil || candidate.root != array.root {
-				continue
-			}
-			op, belongs, err := t.arrayOperation(candidate.owner)
-			if err != nil {
+		for _, node := range data.consts {
+			if err := t.assertSelectAxiom(read.owner, node.owner); err != nil {
 				return err
 			}
-			if !belongs || op == ast.ASTArrayOpStore {
-				continue
+		}
+		for _, node := range data.maps {
+			if _, err := t.instantiateMapRead(read, node); err != nil {
+				return err
 			}
-			if err := t.assertSelectAxiom(read.owner, candidate.owner); err != nil {
+		}
+		for _, node := range data.asArrays {
+			if err := t.assertSelectAxiom(read.owner, node.owner); err != nil {
 				return err
 			}
 		}
@@ -140,6 +136,13 @@ func (t *SMTArrayTheory) setArrayUpward(variable uint32) error {
 	for _, store := range data.stores {
 		if err := t.setStoreBaseUpward(store); err != nil {
 			return err
+		}
+	}
+	if !t.simple {
+		for _, mapped := range data.maps {
+			if err := t.setMapInputsUpward(mapped); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -186,6 +189,9 @@ func (t *SMTArrayTheory) mergeArrayClasses(root, child uint32) error {
 			return err
 		}
 	}
+	if !t.simple {
+		return t.mergeFullArrayClasses(root, second)
+	}
 	return nil
 }
 
@@ -216,6 +222,17 @@ func (t *SMTArrayTheory) Relevant(expression ast.ASTHandle) error {
 	if !t.simple && op == ast.ASTArrayOpSelect {
 		return t.addParentSelect(node.arguments[0].TheoryVar(t.FamilyID()), node)
 	}
+	if !t.simple && op == ast.ASTArrayOpMap {
+		for _, input := range node.arguments {
+			variable := input.TheoryVar(t.FamilyID())
+			if err := t.addParentMap(variable, node); err != nil {
+				return err
+			}
+			if err := t.setArrayUpward(uint32(variable)); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
@@ -235,6 +252,17 @@ func (t *SMTArrayTheory) assertDelayedStoreAxioms() (bool, error) {
 					return false, err
 				}
 				progress = progress || added
+			}
+		}
+		if !t.simple {
+			for _, mapped := range data.parentMaps {
+				for _, read := range data.parentSelects {
+					added, err := t.instantiateMapRead(read, mapped)
+					if err != nil {
+						return false, err
+					}
+					progress = progress || added
+				}
 			}
 		}
 	}

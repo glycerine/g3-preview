@@ -10,6 +10,9 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"array_constructor_default_models.smt2":        "sat\n(((= a ((as const (Array Bool Bool)) true)) true) ((= b (store a false false)) true) ((select a true) true) ((select b false) false) ((select b true) true))\nunsat\nsat\n(((= a ((as const (Array Bool Bool)) true)) true) ((= b (store a false false)) true) ((select a true) true) ((select b false) false) ((select b true) true))\n",
+	"array_store_chain_model_propagation.smt2":     "sat\n(((= b (store a true false)) true) ((= c (store b false true)) true) ((select b false) true) ((select c false) true) ((select c true) false))\nunsat\nsat\n(((= b (store a true false)) true) ((= c (store b false true)) true) ((select b false) true) ((select c false) true) ((select c true) false))\n",
+	"array_cyclic_store_model_scopes.smt2":         "sat\n(((select a true) true) ((= a (store a true true)) true))\nunsat\nsat\n(((select a true) true) ((= a (store a true true)) true))\n",
 	"array_weak_live_parent_scopes.smt2":           "sat\n(((= a b) true))\nunsat\nunsat\nsat\n(((= a b) true))\n",
 	"array_late_default_alias_scopes.smt2":         "sat\nunsat\nsat\n",
 	"array_multidimensional_read_queue.smt2":       "sat\nunsat\nsat\nunsat\nsat\n",

@@ -350,7 +350,7 @@ func (k *SMTKernel) buildCandidateModelGenerator() (*SMTModelGenerator, error) {
 		return fail(err)
 	}
 	if err = generator.BuildStateValues(k.internalizer); err != nil {
-		return fail(err)
+		return fail(fmt.Errorf("build state model values: %w", err))
 	}
 	if err = generator.registerAssertedMacros(k.assertedMacros); err != nil {
 		return fail(err)
@@ -359,6 +359,11 @@ func (k *SMTKernel) buildCandidateModelGenerator() (*SMTModelGenerator, error) {
 		if err = manager.modelFinder.FixModel(generator.model); err != nil {
 			return fail(err)
 		}
+	}
+	// Source context::mk_proto_model completes partial interpretations after
+	// quantifier model adjustment, including arrays with unspecified defaults.
+	if err = generator.model.CompletePartialFunctions(); err != nil {
+		return fail(err)
 	}
 	return generator, nil
 }

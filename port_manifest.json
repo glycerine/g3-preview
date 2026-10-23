@@ -106361,6 +106361,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_model.go",
+        "pkg/smtcore/theory_array_model_test.go",
+        "pkg/smtcore/theory_array_full_parents.go",
+        "pkg/cmd/g3/test_vectors/array_cyclic_store_model_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_store_chain_model_propagation.smt2",
+        "pkg/cmd/g3/test_vectors/array_constructor_default_models.smt2",
         "pkg/smtcore/theory_array_parents.go",
         "pkg/smtcore/theory_array_parents_test.go",
         "pkg/cmd/g3/test_vectors/array_weak_live_parent_scopes.smt2",
@@ -106404,6 +106410,8 @@
         "pkg/smtcore/theory_arith_assume_eq_test.go"
       ],
       "tests": [
+        "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+        "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
         "TestSMTArrayTranslationInitializationUpdatesCorrectParameterOwner",
         "TestSMTArrayTranslationBackendsOwnersModelsAndScopes",
@@ -107370,6 +107378,21 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "mk_proto_model completes partial function interpretations after quantifier model adjustment, including array tables with unspecified defaults; cleanup/compression integration remains separate",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+            "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "common store/select scheduling: source private backtrackable array union-find, scoped parent lists and upward flags, relevance-gated versus eager registration, store-class merge effects, delayed axiom2b/final-check alternation, live weak guard and native unsigned statistics; init disables laziness on the correct ordinary/copied parameter owner",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_parents.go",
@@ -107636,6 +107659,7 @@
         "Search reads the quantifier manager-owned acceptedModel at the ground completion boundary. A checked candidate transfers through the existing generated-model path; an unchecked candidate cannot publish a SAT result."
       ],
       "deviations": [
+        "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
         "Copied array registration now applies the source initialization side effect to the chosen parameter owner: simple arrays update destination fparams, while full arrays may set the shared source owner laziness to zero when destination relevance is disabled. Ordinary and copied owners refresh before push/check so the original full backend observes shared initialization changes. Focused tests check owner identity and live weak settings; arrays and the overall context remain partial.",
         "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
         "Boolean assignment propagation now reaches existing equivalence-class members even with merge_tf disabled, matching the second half of source propagate_bool_var_enode. Focused tests exercise root/non-root assignment, both truth values and scope restoration; strict simple/full Boolean-index array scripts require UNSAT after both index reads agree.",
@@ -118381,6 +118405,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_model.go",
+        "pkg/smtcore/theory_array_model_test.go",
+        "pkg/smtcore/theory_array_full_parents.go",
+        "pkg/cmd/g3/test_vectors/array_cyclic_store_model_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_store_chain_model_propagation.smt2",
+        "pkg/cmd/g3/test_vectors/array_constructor_default_models.smt2",
         "pkg/smtcore/theory_array_parents.go",
         "pkg/smtcore/theory_array_parents_test.go",
         "pkg/cmd/g3/test_vectors/array_weak_live_parent_scopes.smt2",
@@ -118412,6 +118442,8 @@
         "pkg/smtcore/smt_setup.go"
       ],
       "tests": [
+        "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+        "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
         "TestSMTArrayTranslationInitializationUpdatesCorrectParameterOwner",
         "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
@@ -118525,6 +118557,22 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "native array model preparation: independent default-sharing partition with mg_find/mg_merge, explicit/finite/extra-fresh/unspecified fallback selection, relevant congruence-root select collection, upward store-edge worklist excluding overwritten or already-present indices, table value procedures without constructor dependency cycles and model finalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_model.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+            "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "common store/select scheduling: source private backtrackable array union-find, scoped parent lists and upward flags, relevance-gated versus eager registration, store-class merge effects, delayed axiom2b/final-check alternation, live weak guard and native unsigned statistics; init disables laziness on the correct ordinary/copied parameter owner",
           "status": "ported",
@@ -118672,6 +118720,7 @@
         "SMTArrayTheory owns concrete Go maps and scoped trails for observed terms, instantiated constructor pairs and epsilon constants while borrowing manager-owned AST handles and context-owned enodes."
       ],
       "deviations": [
+        "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
         "Retained store/select scheduling now uses the private source union-find and trail, scoped parent store/select lists, weak-aware upward flags, delayed expansion, and unsigned source counters. Constructor placeholders defer ordinary initialization until logic setup; copied plugins initialize with the destination relevance setting and the constructor-selected source/destination parameter owner. Hidden branches have no retained writers: laziness is only default 1 or init-written 0; DelayExpAxiom stays true, CG stays false and AlwaysPropUpward stays true; their legacy registration is inside #if 0. Array reset_eh is only referenced by the unused array reset override chain, not by context dispatch or array destructors. Those branches are not ported. Full constructor scheduling, native model preparation and diagnostic integration remain partial. Strict runner agreement is 132.",
         "Store/read axioms now enter concrete propagation worklists. Store axiom1 directly merges read/value without proofs and marks/retains a unit equality with proofs. Conditional read fingerprints use store identity and index roots, suppress equal-index/duplicate work, recheck roots when emitted and activate consequence relevance on a false index equality. Scope pop clears pending work and child fingerprints. A multidimensional C++ regression exposed late alias reads missing pre-existing merged stores; registration now visits those constructors. The focused proof regression validates a false proof fact and scope recovery. Strict runner agreement is 130; relevance-triggered parent scheduling and delayed upward propagation remain incomplete.",
         "Shared-array interface splitting now follows the retained nested-array and foreign-parent consumers. Relevant array roots used as arrays plus indices/values, or in another theory/UF/quantifier, produce relevant same-sort equality decisions without arithmetic true-first bias. Existing relevant or known-disequal pairs are skipped; scope pop removes child equalities while split counters remain cumulative. LazyIEq/Delay are consumed from the actual backend owner after logic setup, including the AUFLIRA four-call schedule and bounded progress. A strict nested-array scope vector raises Go/C++ agreement to 128. Store/read delayed worklists and other controls remain partial.",
@@ -118689,6 +118738,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_model.go",
+        "pkg/smtcore/theory_array_model_test.go",
+        "pkg/smtcore/theory_array_full_parents.go",
+        "pkg/cmd/g3/test_vectors/array_cyclic_store_model_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_store_chain_model_propagation.smt2",
+        "pkg/cmd/g3/test_vectors/array_constructor_default_models.smt2",
         "pkg/smtcore/theory_array_parents.go",
         "pkg/smtcore/theory_array_parents_test.go",
         "pkg/cmd/g3/test_vectors/array_weak_live_parent_scopes.smt2",
@@ -118719,6 +118774,8 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+        "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
         "TestSMTArrayTranslationInitializationUpdatesCorrectParameterOwner",
         "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
@@ -118752,6 +118809,22 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "native array model preparation: independent default-sharing partition with mg_find/mg_merge, explicit/finite/extra-fresh/unspecified fallback selection, relevant congruence-root select collection, upward store-edge worklist excluding overwritten or already-present indices, table value procedures without constructor dependency cycles and model finalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_model.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+            "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "common store/select scheduling: source private backtrackable array union-find, scoped parent lists and upward flags, relevance-gated versus eager registration, store-class merge effects, delayed axiom2b/final-check alternation, live weak guard and native unsigned statistics; init disables laziness on the correct ordinary/copied parameter owner",
           "status": "ported",
@@ -118893,6 +118966,7 @@
         "The Go theory owns typed maps and slices in place of source var_data allocation, trail stacks and union-find storage."
       ],
       "deviations": [
+        "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
         "Retained store/select scheduling now uses the private source union-find and trail, scoped parent store/select lists, weak-aware upward flags, delayed expansion, and unsigned source counters. Constructor placeholders defer ordinary initialization until logic setup; copied plugins initialize with the destination relevance setting and the constructor-selected source/destination parameter owner. Hidden branches have no retained writers: laziness is only default 1 or init-written 0; DelayExpAxiom stays true, CG stays false and AlwaysPropUpward stays true; their legacy registration is inside #if 0. Array reset_eh is only referenced by the unused array reset override chain, not by context dispatch or array destructors. Those branches are not ported. Full constructor scheduling, native model preparation and diagnostic integration remain partial. Strict runner agreement is 132.",
         "Store/read axioms now enter concrete propagation worklists. Store axiom1 directly merges read/value without proofs and marks/retains a unit equality with proofs. Conditional read fingerprints use store identity and index roots, suppress equal-index/duplicate work, recheck roots when emitted and activate consequence relevance on a false index equality. Scope pop clears pending work and child fingerprints. A multidimensional C++ regression exposed late alias reads missing pre-existing merged stores; registration now visits those constructors. The focused proof regression validates a false proof fact and scope recovery. Strict runner agreement is 130; relevance-triggered parent scheduling and delayed upward propagation remain incomplete.",
         "Shared-array interface splitting now follows the retained nested-array and foreign-parent consumers. Relevant array roots used as arrays plus indices/values, or in another theory/UF/quantifier, produce relevant same-sort equality decisions without arithmetic true-first bias. Existing relevant or known-disequal pairs are skipped; scope pop removes child equalities while split counters remain cumulative. LazyIEq/Delay are consumed from the actual backend owner after logic setup, including the AUFLIRA four-call schedule and bounded progress. A strict nested-array scope vector raises Go/C++ agreement to 128. Store/read delayed worklists and other controls remain partial.",
@@ -118910,6 +118984,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_model.go",
+        "pkg/smtcore/theory_array_model_test.go",
+        "pkg/smtcore/theory_array_full_parents.go",
+        "pkg/cmd/g3/test_vectors/array_cyclic_store_model_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_store_chain_model_propagation.smt2",
+        "pkg/cmd/g3/test_vectors/array_constructor_default_models.smt2",
         "pkg/smtcore/theory_array_parents.go",
         "pkg/smtcore/theory_array_parents_test.go",
         "pkg/smtcore/smt_array_lifecycle.go",
@@ -118932,6 +119012,8 @@
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+        "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
         "TestSMTArrayTranslationInitializationUpdatesCorrectParameterOwner",
         "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
@@ -119108,6 +119190,22 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "native array model preparation: independent default-sharing partition with mg_find/mg_merge, explicit/finite/extra-fresh/unspecified fallback selection, relevant congruence-root select collection, upward store-edge worklist excluding overwritten or already-present indices, table value procedures without constructor dependency cycles and model finalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_model.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+            "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "common store/select scheduling: source private backtrackable array union-find, scoped parent lists and upward flags, relevance-gated versus eager registration, store-class merge effects, delayed axiom2b/final-check alternation, live weak guard and native unsigned statistics; init disables laziness on the correct ordinary/copied parameter owner",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_parents.go",
@@ -119177,7 +119275,7 @@
           ]
         },
         {
-          "name": "remaining native model default-sharing partition, upward observed-select propagation and model/diagnostic fidelity",
+          "name": "remaining base array diagnostic/trace integration and model completion audit",
           "status": "unported",
           "tests": []
         },
@@ -119226,6 +119324,7 @@
         "Array value procedures retain their existing enode-value dependencies and generated interpretation owner. Reading disabled relevance does not change marks; observed defaults and selects enter the same dependency-before-value model traversal and scoped array trails as filtered terms."
       ],
       "deviations": [
+        "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
         "Common store/select scheduling now owns the source private backtrackable partition, parent lists and trailed upward flags. Lazy parents register on relevance; relevance-disabled initialization sets laziness to zero on the correct scalar owner. Delayed upward axioms have their native separate unsigned counter and alternate with interface equalities; weak mode blocks new upward flags. Eight simple/full, relevance and weak combinations verify merge effects and exact scope restoration. A strict live-weak/nested-array model script raises C++ agreement to 132. Base units remain partial: source collect_defaults/mg_merge and propagate_selects_to_store_parents are not yet faithfully represented by the existing per-root model tables.",
         "Store/read axioms now enter concrete propagation worklists. Store axiom1 directly merges read/value without proofs and marks/retains a unit equality with proofs. Conditional read fingerprints use store identity and index roots, suppress equal-index/duplicate work, recheck roots when emitted and activate consequence relevance on a false index equality. Scope pop clears pending work and child fingerprints. A multidimensional C++ regression exposed late alias reads missing pre-existing merged stores; registration now visits those constructors. The focused proof regression validates a false proof fact and scope recovery. Strict runner agreement is 130; relevance-triggered parent scheduling and delayed upward propagation remain incomplete.",
         "Shared-array interface splitting now follows the retained nested-array and foreign-parent consumers. Relevant array roots used as arrays plus indices/values, or in another theory/UF/quantifier, produce relevant same-sort equality decisions without arithmetic true-first bias. Existing relevant or known-disequal pairs are skipped; scope pop removes child equalities while split counters remain cumulative. LazyIEq/Delay are consumed from the actual backend owner after logic setup, including the AUFLIRA four-call schedule and bounded progress. A strict nested-array scope vector raises Go/C++ agreement to 128. Store/read delayed worklists and other controls remain partial.",
@@ -119241,6 +119340,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_model.go",
+        "pkg/smtcore/theory_array_model_test.go",
+        "pkg/smtcore/theory_array_full_parents.go",
+        "pkg/cmd/g3/test_vectors/array_cyclic_store_model_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_store_chain_model_propagation.smt2",
+        "pkg/cmd/g3/test_vectors/array_constructor_default_models.smt2",
         "pkg/smtcore/theory_array_parents.go",
         "pkg/smtcore/theory_array_parents_test.go",
         "pkg/smtcore/smt_array_lifecycle.go",
@@ -119261,6 +119366,8 @@
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+        "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
         "TestSMTArrayTranslationInitializationUpdatesCorrectParameterOwner",
         "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
@@ -119291,6 +119398,22 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "native array model preparation: independent default-sharing partition with mg_find/mg_merge, explicit/finite/extra-fresh/unspecified fallback selection, relevant congruence-root select collection, upward store-edge worklist excluding overwritten or already-present indices, table value procedures without constructor dependency cycles and model finalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_model.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+            "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "common store/select scheduling: source private backtrackable array union-find, scoped parent lists and upward flags, relevance-gated versus eager registration, store-class merge effects, delayed axiom2b/final-check alternation, live weak guard and native unsigned statistics; init disables laziness on the correct ordinary/copied parameter owner",
           "status": "ported",
@@ -119361,7 +119484,7 @@
           ]
         },
         {
-          "name": "remaining native model default-sharing partition, upward observed-select propagation and model/diagnostic fidelity",
+          "name": "remaining base array diagnostic/trace integration and model completion audit",
           "status": "unported",
           "tests": []
         },
@@ -119391,6 +119514,7 @@
         "Array value procedures retain their existing enode-value dependencies and generated interpretation owner. Reading disabled relevance does not change marks; observed defaults and selects enter the same dependency-before-value model traversal and scoped array trails as filtered terms."
       ],
       "deviations": [
+        "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
         "Common store/select scheduling now owns the source private backtrackable partition, parent lists and trailed upward flags. Lazy parents register on relevance; relevance-disabled initialization sets laziness to zero on the correct scalar owner. Delayed upward axioms have their native separate unsigned counter and alternate with interface equalities; weak mode blocks new upward flags. Eight simple/full, relevance and weak combinations verify merge effects and exact scope restoration. A strict live-weak/nested-array model script raises C++ agreement to 132. Base units remain partial: source collect_defaults/mg_merge and propagate_selects_to_store_parents are not yet faithfully represented by the existing per-root model tables.",
         "Store/read axioms now enter concrete propagation worklists. Store axiom1 directly merges read/value without proofs and marks/retains a unit equality with proofs. Conditional read fingerprints use store identity and index roots, suppress equal-index/duplicate work, recheck roots when emitted and activate consequence relevance on a false index equality. Scope pop clears pending work and child fingerprints. A multidimensional C++ regression exposed late alias reads missing pre-existing merged stores; registration now visits those constructors. The focused proof regression validates a false proof fact and scope recovery. Strict runner agreement is 130; relevance-triggered parent scheduling and delayed upward propagation remain incomplete.",
         "Shared-array interface splitting now follows the retained nested-array and foreign-parent consumers. Relevant array roots used as arrays plus indices/values, or in another theory/UF/quantifier, produce relevant same-sort equality decisions without arithmetic true-first bias. Existing relevant or known-disequal pairs are skipped; scope pop removes child equalities while split counters remain cumulative. LazyIEq/Delay are consumed from the actual backend owner after logic setup, including the AUFLIRA four-call schedule and bounded progress. A strict nested-array scope vector raises Go/C++ agreement to 128. Store/read delayed worklists and other controls remain partial.",
@@ -119405,6 +119529,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_model.go",
+        "pkg/smtcore/theory_array_model_test.go",
+        "pkg/smtcore/theory_array_full_parents.go",
+        "pkg/cmd/g3/test_vectors/array_cyclic_store_model_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_store_chain_model_propagation.smt2",
+        "pkg/cmd/g3/test_vectors/array_constructor_default_models.smt2",
         "pkg/smtcore/theory_array_parents.go",
         "pkg/smtcore/theory_array_parents_test.go",
         "pkg/cmd/g3/test_vectors/array_weak_live_parent_scopes.smt2",
@@ -119425,6 +119555,8 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+        "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
         "TestSMTArrayTranslationInitializationUpdatesCorrectParameterOwner",
         "TestSMTArrayDefaultThroughEquality",
@@ -119591,6 +119723,22 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "full constructor variable initialization emits default const/map/as-array axioms; scoped maps, parent maps, consts and as-arrays merge through private array classes; relevant maps mark inputs upward and delayed select-map expansion uses constructor/index-root fingerprints and relevant equality axioms",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_full_parents.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+            "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "common store/select scheduling: source private backtrackable array union-find, scoped parent lists and upward flags, relevance-gated versus eager registration, store-class merge effects, delayed axiom2b/final-check alternation, live weak guard and native unsigned statistics; init disables laziness on the correct ordinary/copied parameter owner",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_parents.go",
@@ -119676,7 +119824,7 @@
           ]
         },
         {
-          "name": "Remaining full constructor parent lists, delayed map propagation and constructor/default initialization timing",
+          "name": "Remaining full equality-cache scope fidelity, canonical constructor/default axiom review and diagnostic integration",
           "status": "unported",
           "tests": []
         },
@@ -119703,6 +119851,7 @@
         "Scoped Go maps own epsilon and constructor-observer fingerprints. Array table procedures own dependency slices until auxiliary function interpretations transfer to ProtoModel."
       ],
       "deviations": [
+        "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
         "Retained store/select scheduling now uses the private source union-find and trail, scoped parent store/select lists, weak-aware upward flags, delayed expansion, and unsigned source counters. Constructor placeholders defer ordinary initialization until logic setup; copied plugins initialize with the destination relevance setting and the constructor-selected source/destination parameter owner. Hidden branches have no retained writers: laziness is only default 1 or init-written 0; DelayExpAxiom stays true, CG stays false and AlwaysPropUpward stays true; their legacy registration is inside #if 0. Array reset_eh is only referenced by the unused array reset override chain, not by context dispatch or array destructors. Those branches are not ported. Full constructor scheduling, native model preparation and diagnostic integration remain partial. Strict runner agreement is 132.",
         "A late default of an alias previously missed constructors merged before the default was internalized. Source add_parent_default visits those existing constructors; Go now does likewise. A strict ALL-logic script first checks an alias of the constant-true array, then asserts not(default(alias)) in a child scope: native and Go agree on SAT/UNSAT/SAT. This regression failed SAT before the fix and raises strict C++ runner agreement to 131. Full relevance-triggered parent scheduling, upward propagation and remaining full-array constructor timing remain partial.",
         "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
@@ -119718,6 +119867,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_model.go",
+        "pkg/smtcore/theory_array_model_test.go",
+        "pkg/smtcore/theory_array_full_parents.go",
+        "pkg/cmd/g3/test_vectors/array_cyclic_store_model_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_store_chain_model_propagation.smt2",
+        "pkg/cmd/g3/test_vectors/array_constructor_default_models.smt2",
         "pkg/smtcore/theory_array_parents.go",
         "pkg/smtcore/theory_array_parents_test.go",
         "pkg/cmd/g3/test_vectors/array_weak_live_parent_scopes.smt2",
@@ -119738,6 +119893,8 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+        "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
         "TestSMTArrayTranslationInitializationUpdatesCorrectParameterOwner",
         "TestSMTArrayDefaultThroughEquality",
@@ -119763,6 +119920,22 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "full constructor variable initialization emits default const/map/as-array axioms; scoped maps, parent maps, consts and as-arrays merge through private array classes; relevant maps mark inputs upward and delayed select-map expansion uses constructor/index-root fingerprints and relevant equality axioms",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_full_parents.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+            "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "common store/select scheduling: source private backtrackable array union-find, scoped parent lists and upward flags, relevance-gated versus eager registration, store-class merge effects, delayed axiom2b/final-check alternation, live weak guard and native unsigned statistics; init disables laziness on the correct ordinary/copied parameter owner",
           "status": "ported",
@@ -119849,7 +120022,7 @@
           ]
         },
         {
-          "name": "Remaining full constructor parent lists, delayed map propagation and constructor/default initialization timing",
+          "name": "Remaining full equality-cache scope fidelity, canonical constructor/default axiom review and diagnostic integration",
           "status": "unported",
           "tests": []
         },
@@ -119864,6 +120037,7 @@
         "SMTArrayTheory owns concrete typed metadata rather than separately allocated var_data_full records."
       ],
       "deviations": [
+        "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
         "Retained store/select scheduling now uses the private source union-find and trail, scoped parent store/select lists, weak-aware upward flags, delayed expansion, and unsigned source counters. Constructor placeholders defer ordinary initialization until logic setup; copied plugins initialize with the destination relevance setting and the constructor-selected source/destination parameter owner. Hidden branches have no retained writers: laziness is only default 1 or init-written 0; DelayExpAxiom stays true, CG stays false and AlwaysPropUpward stays true; their legacy registration is inside #if 0. Array reset_eh is only referenced by the unused array reset override chain, not by context dispatch or array destructors. Those branches are not ported. Full constructor scheduling, native model preparation and diagnostic integration remain partial. Strict runner agreement is 132.",
         "A late default of an alias previously missed constructors merged before the default was internalized. Source add_parent_default visits those existing constructors; Go now does likewise. A strict ALL-logic script first checks an alias of the constant-true array, then asserts not(default(alias)) in a child scope: native and Go agree on SAT/UNSAT/SAT. This regression failed SAT before the fix and raises strict C++ runner agreement to 131. Full relevance-triggered parent scheduling, upward propagation and remaining full-array constructor timing remain partial.",
         "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",

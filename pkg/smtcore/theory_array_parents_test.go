@@ -50,7 +50,8 @@ func TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback(t *testing.T) {
 					read, err := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{a, indices[1]})
 					astTestMust(t, err)
 					astTestMust(t, s.Internalize(read, true))
-					if relevant && theory.activeParentSelects[read] {
+					parentData := theory.arrayData[theory.arrayUnion.Find(uint32(s.context.enodes[a].TheoryVar(family)))]
+					if relevant && len(parentData.parentSelects) != 0 {
 						t.Fatal("irrelevant read entered parent list")
 					}
 					astTestMust(t, s.markRelevant(read))
