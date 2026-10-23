@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/simplex"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/numeral"
 	z3rand "github.com/glycerine/g3/pkg/util/random"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
@@ -78,6 +79,7 @@ type smtLinearArithmeticAtom struct {
 }
 
 type smtLinearArithmeticScope struct {
+	expressionBounds                     int
 	finalCheckIndex                      uint32
 	assumeEqualities, assumeEqualityHead int
 	derivedBounds                        int
@@ -93,6 +95,7 @@ type smtLinearArithmeticScope struct {
 }
 
 type smtLinearArithmeticStatistics struct {
+	euclideanCalls, euclideanBounds                      uint64
 	integerEqualityBranches                              uint64
 	gomoryCuts                                           uint64
 	gcdTests, gcdConflicts                               uint64
@@ -110,6 +113,9 @@ type smtLinearArithmeticStatistics struct {
 // bounds. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	euclideanNumerals                    *numeral.RationalManager
+	expressionBounds                     []smtArithmeticExpressionBound
+	euclideanEnabled                     bool
 	integerEqualityBranching             bool
 	branchCutCounter, branchCutRatio     uint32
 	gcdEnabled, ignoreIntegers           bool
@@ -216,6 +222,7 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 	t.ignoreIntegers = config.IgnoreInt
 	t.branchCutRatio = config.BranchCutRatio
 	t.integerEqualityBranching = config.IntEqBranching
+	t.euclideanEnabled = config.EuclideanSolver
 	t.nonlinearEnabled = config.NLArith
 	t.nonlinearGB = config.NLArithGB
 	t.nonlinearGBLimit = config.NLArithGBThreshold
@@ -1163,6 +1170,15 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 			}
 		}
 	}
+	for _, bound := range t.expressionBounds {
+		base, found := coefficientBases[bound.key]
+		if !found {
+			return nil, lbool.Undef, ast.ErrASTDomain
+		}
+		if _, err := smtTightenSimplexBound(solver, base, bound.lower, bound.value); err != nil {
+			return solver, lbool.False, nil
+		}
+	}
 	for _, bound := range t.derivedBounds {
 		if _, err := smtTightenSimplexBound(solver, bound.column, bound.lower, bound.value); err != nil {
 			return solver, lbool.False, nil
@@ -1272,6 +1288,7 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 	t.scopes[len(t.scopes)-1].assumeEqualities = len(t.assumeEqualityCandidates)
 	t.scopes[len(t.scopes)-1].assumeEqualityHead = t.assumeEqualityHead
 	t.scopes[len(t.scopes)-1].finalCheckIndex = t.finalCheckIndex
+	t.scopes[len(t.scopes)-1].expressionBounds = len(t.expressionBounds)
 	return nil
 }
 
@@ -1281,6 +1298,8 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
+	clear(t.expressionBounds[scope.expressionBounds:])
+	t.expressionBounds = t.expressionBounds[:scope.expressionBounds]
 	t.finalCheckIndex = scope.finalCheckIndex
 	clear(t.assumeEqualityCandidates[scope.assumeEqualities:])
 	t.assumeEqualityCandidates = t.assumeEqualityCandidates[:scope.assumeEqualities]
@@ -1812,6 +1831,8 @@ func (t *SMTLinearArithmeticTheory) CollectStatistics(target *statistics.Statist
 	target.UpdateUint64("arith gcd conflicts", t.statistics.gcdConflicts)
 	target.UpdateUint64("arith gomory cuts", t.statistics.gomoryCuts)
 	target.UpdateUint64("arith eq branches", t.statistics.integerEqualityBranches)
+	target.UpdateUint64("arith euclidean calls", t.statistics.euclideanCalls)
+	target.UpdateUint64("arith euclidean bounds", t.statistics.euclideanBounds)
 	return nil
 }
 

@@ -30,6 +30,24 @@ func (t *SMTLinearArithmeticTheory) finalCheckIntegerFeasibility() (SMTFinalChec
 			} else if conflict {
 				return SMTFinalCheckContinue, t.arithmeticGCDConflict()
 			}
+			if t.euclideanEnabled {
+				progress, err := t.applyEuclideanSolver(bounds)
+				if err != nil {
+					return SMTFinalCheckGiveUp, err
+				}
+				if t.state.inconsistent {
+					return SMTFinalCheckContinue, nil
+				}
+				if progress {
+					status, err = bounds.MakeFeasible()
+					if err != nil || status == lbool.Undef {
+						return SMTFinalCheckGiveUp, err
+					}
+					if status == lbool.False {
+						return SMTFinalCheckContinue, t.derivedBoundConflict()
+					}
+				}
+			}
 			if err = bounds.RemoveArithmeticFixedBases(); err != nil {
 				return SMTFinalCheckGiveUp, err
 			}

@@ -13,6 +13,17 @@ import (
 )
 
 func (t *SMTLinearArithmeticTheory) integerColumnExpression(refs *smtArithmeticDivisionCall, solver *simplex.Solver, column uint32) (ast.ASTHandle, error) {
+	if _, original := t.theoryVariable(column); !original {
+		if value, fixed := smtFixedSimplexColumn(solver, column); fixed {
+			return refs.hold(t.state.manager.ArithmeticNumeralRat(value, value.IsInt()))
+		}
+	}
+	return t.integerColumnDefinition(refs, solver, column)
+}
+
+// Euclidean equation extraction needs the defining polynomial even when a
+// replay comparison column is fixed; cut emission may substitute its value.
+func (t *SMTLinearArithmeticTheory) integerColumnDefinition(refs *smtArithmeticDivisionCall, solver *simplex.Solver, column uint32) (ast.ASTHandle, error) {
 	m := t.state.manager
 	if variable, found := t.theoryVariable(column); found {
 		node, err := t.Enode(variable)
@@ -21,10 +32,10 @@ func (t *SMTLinearArithmeticTheory) integerColumnExpression(refs *smtArithmeticD
 		}
 		return node.owner, nil
 	}
-	if value, fixed := smtFixedSimplexColumn(solver, column); fixed {
-		return refs.hold(m.ArithmeticNumeralRat(value, value.IsInt()))
-	}
 	if column < t.nextSimplex || int(column-t.nextSimplex) >= len(t.atoms) {
+		if value, fixed := smtFixedSimplexColumn(solver, column); fixed {
+			return refs.hold(m.ArithmeticNumeralRat(value, value.IsInt()))
+		}
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
 	form := &t.atoms[column-t.nextSimplex].form
@@ -35,7 +46,7 @@ func (t *SMTLinearArithmeticTheory) integerColumnExpression(refs *smtArithmeticD
 	sort.Slice(columns, func(i, j int) bool { return columns[i] < columns[j] })
 	var terms []ast.ASTHandle
 	for _, column := range columns {
-		term, err := t.integerColumnExpression(refs, solver, column)
+		term, err := t.integerColumnDefinition(refs, solver, column)
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}

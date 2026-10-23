@@ -43486,7 +43486,9 @@
         "pkg/math/euclid/solved_queue.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/math/euclid/solver_heap_debug_test.go",
-        "pkg/util/numeral/scoped_numeral.go"
+        "pkg/util/numeral/scoped_numeral.go",
+        "pkg/smtcore/theory_arith_euclidean.go",
+        "pkg/smtcore/theory_arith_euclidean_test.go"
       ],
       "tests": [
         "TestEuclideanEquationConstructionSortAndOwnedRelease",
@@ -43543,7 +43545,8 @@
         "TestEuclideanPositionSourceBinarySearch",
         "TestEuclideanSetupVariableJustificationAndEquationOwnership",
         "TestEuclideanSetupHeaderRefusalBeforeBuffers",
-        "TestEuclideanSetupSolvedVariableQueue"
+        "TestEuclideanSetupSolvedVariableQueue",
+        "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
       ],
       "assertions": [
         {
@@ -43783,7 +43786,8 @@
         "normalizeQuery substitutes directly into the caller-owned c_prime, matching source constant publication before the rational justification merge. A real numeral allocation refusal in that later merge leaves c_prime at the substituted value while the solver retains the stopped normalization workspace for owning Close; the borrowed input constant is unchanged.",
         "normalizeQuery retains its started equation-shaped m_norm_* workspace in the concrete solver owner after a stopped numeral copy. The original failure becomes a sticky solver stop; a later query cannot overwrite the partial owner. Successful queries release it at source function end, while solver Close drains it after the queue and before older buffer members. The equation-shaped owner is the concrete Go replacement for the three parallel source member vectors.",
         "Source normalize_eq checks divisibility of the constant but divides only variable coefficients and justification coefficients by their gcd. The Go path retains that exact result. After source normalize_eq destroys an empty zero equality, assert_eq still calls add_occs on its null slot; Go skips that invalid dereference.",
-        "Unit and non-unit elimination, internal solve, normalize query and public solver methods have concrete Go paths. Source svector::erase(value) ignores an absent occurrence, which happens for a decomposition parameter in the compacted original equation; Go matches this no-op. Explanation IDs are returned as a copy of the source const vector, and io.Writer reports host write errors."
+        "Unit and non-unit elimination, internal solve, normalize query and public solver methods have concrete Go paths. Source svector::erase(value) ignores an absent occurrence, which happens for a decomposition parameter in the compacted original equation; Go matches this no-op. Explanation IDs are returned as a copy of the source const vector, and io.Writer reports host write errors.",
+        "The retained SMT arithmetic consumer now uses the already ported public solver with a borrowed theory-owned numeral manager, MkVar/MkJustification, AssertEq, Solve/Inconsistent and Normalize. The concrete bridge owns coefficient/constant temporaries and closes each solver before the persistent manager is checked at theory destruction. Integration checks use signed 100-bit integer coefficients, zero-GCD normalization, solver explanations, repeated SMT scopes and fresh-column replay."
       ]
     },
     {
@@ -114032,7 +114036,9 @@
         "pkg/smtcore/theory_arith_gcd_test.go",
         "pkg/smtcore/theory_arith_gcd_mixed_test.go",
         "pkg/smtcore/theory_arith_integer_branch_cut.go",
-        "pkg/smtcore/theory_arith_gomory_test.go"
+        "pkg/smtcore/theory_arith_gomory_test.go",
+        "pkg/smtcore/theory_arith_euclidean.go",
+        "pkg/smtcore/theory_arith_euclidean_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -114059,7 +114065,8 @@
         "TestSMTAssumeEqualityScopedPhaseAndRelevancy",
         "TestSMTIntegerGCDAndExtendedGCDScopedProofs",
         "TestSMTMixedGCDWithFixedFractionalReal",
-        "TestSMTIntegerBranchAndGomoryScopesProofsAndModels"
+        "TestSMTIntegerBranchAndGomoryScopesProofsAndModels",
+        "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
       ],
       "conditionals": [
         {
@@ -114950,7 +114957,8 @@
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
         "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
         "Replay comparison rows now reuse the first column with identical concrete linear coefficients; sorted column IDs and exact rational coefficient strings identify the expression independently of the RHS constant. Applying every assertion through bound tightening preserves earlier stronger bounds. This restores source expression sharing, so equality adapters fix one expression column and the live deferred integer GCD checks see its rational constant. Tests cover repeated weaker lower/upper assertions, unbounded parity contradictions, bounded extended-GCD contradictions, mixed fixed-real premises and scope restoration.",
-        "Integer feasibility no longer runs a hidden recursive bounded search. Its remaining fractional model is repaired through source Boolean branching and mixed-integer Gomory propagation, sharing SMT scope restoration, conflict learning, proofs and models with the other theories. Candidate-model point bounds remain confined to separate replays. The branch/cut counter persists as in the source and its configured ratio controls alternation. Current focused tests force both paths and repeated scopes."
+        "Integer feasibility no longer runs a hidden recursive bounded search. Its remaining fractional model is repaired through source Boolean branching and mixed-integer Gomory propagation, sharing SMT scope restoration, conflict learning, proofs and models with the other theories. Candidate-model point bounds remain confined to separate replays. The branch/cut counter persists as in the source and its configured ratio controls alternation. Current focused tests force both paths and repeated scopes.",
+        "Euclidean arithmetic bounds are now scoped alongside existing numeric replay facts. Comparison-column facts are stored by the exact logical polynomial coefficient key rather than a shifting auxiliary column ID, and replay tightens the current shared expression column. The arithmetic theory owns the source-equivalent Euclidean numeral-manager lifetime and exposes checked cleanup through the existing optional theory Close hook. Temporary model-completion point bounds are never premises for Euclidean facts."
       ]
     },
     {
@@ -115163,7 +115171,9 @@
         "pkg/smtcore/theory_arith_gomory_test.go",
         "pkg/smtcore/smt_justification_theory.go",
         "pkg/smtcore/theory_arith_integer_equality_branch.go",
-        "pkg/smtcore/theory_arith_integer_equality_branch_test.go"
+        "pkg/smtcore/theory_arith_integer_equality_branch_test.go",
+        "pkg/smtcore/theory_arith_euclidean.go",
+        "pkg/smtcore/theory_arith_euclidean_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
@@ -115186,7 +115196,8 @@
         "TestArithmeticGomorySingleTermDirectionsAndMixedReals",
         "TestArithmeticIntegerBasePrefersSmallestBoundedRange",
         "TestSMTIntegerBranchAndGomoryScopesProofsAndModels",
-        "TestSMTIntegerEqualityBranchWitnessScopesProofsAndModels"
+        "TestSMTIntegerEqualityBranchWitnessScopesProofsAndModels",
+        "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
       ],
       "conditionals": [
         {
@@ -115482,8 +115493,12 @@
           ]
         },
         {
-          "name": "source Euclidean-solver bridge remains unported",
-          "status": "unported"
+          "name": "Euclidean bridge proof dependency and optional coefficient refinement remains incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_euclidean.go",
+          "tests": [
+            "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
+          ]
         },
         {
           "name": "branch_infeasible_int_equality tight-row extraction: select bases within one infinitesimal unit of a bound, normalize basic coefficients, substitute fixed rational nonbases, skip nonfixed Real terms, clear denominators and align integer matrix columns",
@@ -115505,6 +115520,27 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "euclidean_solver_bridge fixed-equation extraction, concrete theory-variable mapping and Normalize queries: skip numerals/noninteger monomials, combine missing-variable coefficient GCDs, tighten shifted congruence endpoints and derive zero-GCD fixed values",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_euclidean.go",
+          "tests": [
+            "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
+          ]
+        },
+        {
+          "name": "apply_euclidean_solver option wiring, theory-owned numeral manager, scoped numeric bound propagation and comparison-expression replay",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_euclidean.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -115512,9 +115548,10 @@
       ],
       "deviations": [
         "The source deferred GCD and extended GCD checks now run before integer branch-and-bound and inside each branch replay. Canonical rows clear denominators after normalizing the basic coefficient, eliminate fixed columns using their bounds rather than possibly stale assignment values, and skip nonfixed real columns. Extended checks round the bounded least-coefficient interval against the remaining coefficient GCD, including negative intervals. Global conflicts come only from unconditional replay and preserve the gcd-test proof parameter; speculative branch failures remain local. Proof regressions inspect the actual proof DAG for that parameter. Explanations conservatively include all active arithmetic assertion literals instead of source minimal fixed/bound dependencies. The concrete Go API skips fixed epsilon-valued columns, guarding the source invariant that fixed values are rational. IgnoreInt now yields give-up for unresolved integer feasibility. Eager/adaptive paths are excluded under the retained-consumer rule: src scans find only false constructor initializers, field declarations, display/read sites, and no setter assignments. Full source integer patching, Gomory cuts and remaining feasibility algorithms are still incomplete.",
-        "The live integer-feasibility path now removes fixed variables from the basis, patches integer-infeasible values using source freedom intervals and denominator LCMs, floors remaining integer nonbases, and runs MakeFeasible. Patching starts from an unconditional replay, so any conflict has logical assertion premises; no speculative branch bounds become global facts. Integral patched models are published and pass through the existing staged conservative validation. Mixed real intervals without integer points remain unchanged. Focused scoped model tests verify an initially fractional 2*x=y tableau with 1<=y<=3 is solved without branch-and-bound, with proofs enabled or disabled and with unrestricted fractional Real columns. Models that patching cannot repair now enter source integer Boolean case splitting and Gomory cuts. The equality cut-from-proof path is recorded below; the retained Euclidean bridge remains incomplete. The unused max_min_infeasible_int_vars path is excluded because its sole caller is compile-time disabled.",
+        "The live integer-feasibility path now removes fixed variables from the basis, patches integer-infeasible values using source freedom intervals and denominator LCMs, floors remaining integer nonbases, and runs MakeFeasible. Patching starts from an unconditional replay, so any conflict has logical assertion premises; no speculative branch bounds become global facts. Integral patched models are published and pass through the existing staged conservative validation. Mixed real intervals without integer points remain unchanged. Focused scoped model tests verify an initially fractional 2*x=y tableau with 1<=y<=3 is solved without branch-and-bound, with proofs enabled or disabled and with unrestricted fractional Real columns. Models that patching cannot repair now enter source integer Boolean case splitting and Gomory cuts. The equality cut-from-proof path is recorded below; the retained Euclidean bridge is recorded below. The unused max_min_infeasible_int_vars path is excluded because its sole caller is compile-time disabled.",
         "The retained default integer path now uses the source bounded-range/random basic-variable selector, relevant Boolean GE-ceiling case splits and branch/cut counter ratio. Gomory rounds move nonbases to bounds, expose free-variable zero case splits, require rational bound assignments, compute the source mixed/integer cut coefficients, and propagate the resulting bound with a gomory-cut justification that returns to its arithmetic owner. The old private recursive branch-and-bound implementation and its 1024-node limit were removed, together with speculative branch replay parameters. Replay-only comparison columns are materialized as their concrete linear expressions; fixed anonymous replay columns are substituted under their active bound premises. Cut and branch expressions are fully built before internalization can allocate new columns and shift auxiliary indices. Stage advancement increments numeric progress when a cut is postponed so the source next branch/cut round is reached. The concrete tableau has no quasi-base rows. Cut explanations currently cite all active arithmetic assertions and carry the source rule tag, while minimal source bound/equality dependencies and optional proof coefficient arrays remain incomplete. Tests force branch-only and cut-only modes, verify exact candidate exclusion and integer-solution preservation, positive/negative real and integer coefficients with unequal fractional parts, scoped SAT models and UNSAT proofs containing gomory-cut. The optional equality cut-from-proof path is recorded below and the retained Euclidean bridge remains incomplete; branch_cut_ratio=0 gives up instead of evaluating the source undefined zero modulus.",
-        "The retained arith.int_eq_branch option now attempts source cut-from-proof equality branching on branch rounds. Tight canonical rows are visited in row-vector order, basic coefficients are normalized for the Go tableau, fixed nonbases use their bound values, nonfixed real rows are skipped, and exact rational denominators are cleared into the existing concrete integer equation solver. An infeasible nontrivial witness becomes the two GE alternatives excluding its impossible integer equality, with both expressions materialized before internalization can shift replay-column indices. Feasible/trivial witnesses fall back to ordinary variable branching; source variable selection is repeated after the optional equality attempt. No-variable systems are skipped because their source witness cannot yield a polynomial split. The source rational-fixed-value invariant is guarded for Go infinitesimal callers. Scoped tests exercise enabled/disabled modes, proofs, lower/upper tight bounds with denominator three, UNSAT 3*x+2*y=1 and SAT 3*x+2*y=5 nonnegative models. The source Euclidean bridge and precise Gomory proof dependency/optional coefficient arrays remain incomplete."
+        "The retained arith.int_eq_branch option now attempts source cut-from-proof equality branching on branch rounds. Tight canonical rows are visited in row-vector order, basic coefficients are normalized for the Go tableau, fixed nonbases use their bound values, nonfixed real rows are skipped, and exact rational denominators are cleared into the existing concrete integer equation solver. An infeasible nontrivial witness becomes the two GE alternatives excluding its impossible integer equality, with both expressions materialized before internalization can shift replay-column indices. Feasible/trivial witnesses fall back to ordinary variable branching; source variable selection is repeated after the optional equality attempt. No-variable systems are skipped because their source witness cannot yield a polynomial split. The source rational-fixed-value invariant is guarded for Go infinitesimal callers. Scoped tests exercise enabled/disabled modes, proofs, lower/upper tight bounds with denominator three, UNSAT 3*x+2*y=1 and SAT 3*x+2*y=5 nonnegative models. The source Euclidean bridge is recorded below; precise Gomory proof dependency/optional coefficient arrays remain incomplete.",
+        "The retained arith.euclidean_solver option now runs after deferred integer GCD checking. Fixed integer definitions, including replay-only comparison polynomials, are sent to the existing concrete math/euclid solver; normalized queries combine solved parameters with coefficient GCDs for variables absent from the solution set, then round lower/upper bounds in the shifted congruence class or fix zero-GCD expressions. As in the retained source bridge, an inconsistent equation solver returns without manufacturing the conflict left TODO in C++. The numeral manager belongs to the arithmetic theory and is borrowed by each temporary Euclidean solver. Every input and query-output numeral is released before solver close, and theory close checks the persistent manager; positive/negative 100-bit coefficient tests exercise native cell ownership across repeated calls. Derived facts use only a replay of logical assertions. Stable theory columns retain ordinary scoped bounds; comparison-only facts retain exact coefficient keys and are rebound after new theory columns shift auxiliary IDs. AST definition expressions remain pinned for the bridge, and cut emission still substitutes fixed values separately. Tests cover option guards, signed congruences, zero-GCD fixed comparison expressions, proofs, exact integer models, insertion of fresh variables and repeated pop restoration without branching. Explanations conservatively retain all current arithmetic assertion premises; minimal source bound/equality dependencies and precise optional proof coefficients remain incomplete."
       ]
     },
     {
