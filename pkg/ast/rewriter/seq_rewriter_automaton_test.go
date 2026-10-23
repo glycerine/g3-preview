@@ -158,6 +158,13 @@ func TestSequenceRewriterShortestRegexByteString(t *testing.T) {
 	if exhaustive || len(words) != 0 {
 		t.Fatal("symbolic regex candidates", words, exhaustive)
 	}
+	complement, err := m.MkRegexComplement(aRegex)
+	astTestMust(t, err)
+	words, exhaustive, err = rw.RegexByteStringCandidates(complement, 2)
+	astTestMust(t, err)
+	if exhaustive || len(words) != 2 || words[0] != "" || words[1] == "a" {
+		t.Fatal("complement regex candidates", words, exhaustive)
+	}
 }
 
 func TestSequenceRewriterAutomatonIntersectionSolver(t *testing.T) {

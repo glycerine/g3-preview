@@ -659,9 +659,6 @@ func (b *sequenceAutomatonBuilder) regex(expression ast.ASTHandle) (*sequenceAut
 	if left, right, intersection, err := b.rewriter.manager.SequenceBinaryOperationArguments(expression, 19); err != nil {
 		return nil, err
 	} else if intersection {
-		if b.rewriter.solver == nil {
-			return nil, nil
-		}
 		leftAutomaton, err := b.regex(left)
 		if err != nil || leftAutomaton == nil {
 			return nil, err
@@ -675,9 +672,6 @@ func (b *sequenceAutomatonBuilder) regex(expression ast.ASTHandle) (*sequenceAut
 	if body, complement, err := b.rewriter.manager.SequenceUnaryOperationArgument(expression, 21); err != nil {
 		return nil, err
 	} else if complement {
-		if b.rewriter.solver == nil {
-			return nil, nil
-		}
 		automaton, err := b.regex(body)
 		if err != nil || automaton == nil {
 			return nil, err

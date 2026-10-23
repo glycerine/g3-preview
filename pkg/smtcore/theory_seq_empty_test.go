@@ -3081,6 +3081,64 @@ func TestSMTSequenceTheoryAdvancesConcreteRegexWitness(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryCompletesNegativeUnboundedRegexModel(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	sequenceSort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-negative-unbounded-x"), sequenceSort)
+	astTestMust(t, err)
+	aRegex, err := m.MkSequenceToRegex(a)
+	astTestMust(t, err)
+	star, err := m.MkRegexStar(aRegex)
+	astTestMust(t, err)
+	membership, err := m.MkSequenceInRegex(x, star)
+	astTestMust(t, err)
+	notMembership, err := m.MkNot(membership)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(notMembership))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		reason, reasonErr := solver.ReasonUnknown()
+		astTestMust(t, reasonErr)
+		t.Fatal("negative unbounded regex model remained incomplete", status, reason)
+	}
+}
+
+func TestSMTSequenceTheoryClosesEmptyNegativeRegexComplement(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	sequenceSort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-negative-full-x"), sequenceSort)
+	astTestMust(t, err)
+	aRegex, err := m.MkSequenceToRegex(a)
+	astTestMust(t, err)
+	regexSort, err := m.GetSort(aRegex)
+	astTestMust(t, err)
+	full, err := m.MkRegexFull(regexSort)
+	astTestMust(t, err)
+	membership, err := m.MkSequenceInRegex(x, full)
+	astTestMust(t, err)
+	notMembership, err := m.MkNot(membership)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(notMembership))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("empty negative regex complement remained open", status)
+	}
+}
+
 func TestSMTSequenceTheoryClosesExhaustedFiniteRegexLanguage(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	a, err := m.MkString("a")

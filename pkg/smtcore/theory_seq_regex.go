@@ -272,8 +272,20 @@ func (t *SMTSequenceTheory) branchConcreteRegexWitness(expression, sequence, reg
 		return false, false, err
 	}
 	assignment, err := state.Assignment(literal)
-	if err != nil || assignment != lbool.True {
+	if err != nil || assignment == lbool.Undef {
 		return false, false, err
+	}
+	candidateRegex := regex
+	activation := expression
+	if assignment == lbool.False {
+		candidateRegex, err = state.manager.MkRegexComplement(regex)
+		if err != nil {
+			return false, false, err
+		}
+		activation, err = state.manager.MkNot(expression)
+		if err != nil {
+			return false, false, err
+		}
 	}
 	rw, err := rewriter.NewSequenceRewriter(state.manager)
 	if err != nil {
@@ -290,7 +302,7 @@ func (t *SMTSequenceTheory) branchConcreteRegexWitness(expression, sequence, reg
 	if hasLower {
 		limit += int(lower)
 	}
-	witnesses, exhaustive, err := rw.RegexByteStringCandidates(regex, limit)
+	witnesses, exhaustive, err := rw.RegexByteStringCandidates(candidateRegex, limit)
 	if err != nil {
 		return false, false, err
 	}
@@ -341,7 +353,7 @@ func (t *SMTSequenceTheory) branchConcreteRegexWitness(expression, sequence, reg
 			return false, false, err
 		}
 	}
-	constraint, err := state.manager.MkImplies(expression, choices)
+	constraint, err := state.manager.MkImplies(activation, choices)
 	if err != nil {
 		return false, false, err
 	}
