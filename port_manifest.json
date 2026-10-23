@@ -116790,6 +116790,7 @@
         "TestSMTSequenceTheoryReducedWordDisequationConflict",
         "TestSMTSequenceTheoryPropagatesResidualWordDisequality",
         "TestSMTSequenceTheoryConcreteNonContainsConflict",
+        "TestSMTSequenceTheorySymbolicNonContainsModel",
         "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution",
         "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries",
         "TestSMTSequenceTheoryReducesEqualLengthBoundaries",
@@ -117296,10 +117297,10 @@
           "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes"]
         },
         {
-          "name": "sequence term and atom internalization, structural recognition of generated seq.nth Skolem unit/concat words, symbolic length support, theory-variable attachment, literal-value equality conflicts, scoped equality and disequality state, final-check boundary, and model-value factory hooks (src/smt/theory_seq.cpp:2225-2255,2616-2785,4053-4130)",
+          "name": "sequence term and atom internalization, structural recognition of generated Skolem words including mixed user/generated concatenations, implemented relation and sequence operations, theory-variable attachment, literal-value equality conflicts, scoped equality and disequality state, final-check boundary, and model-value factory hooks (src/smt/theory_seq.cpp:2225-2255,2616-2785,4053-4130)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
-          "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel"]
+          "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel", "TestSMTSequenceTheorySymbolicNonContainsModel"]
         },
         {
           "name": "solution-map expansion of queued concat leaves and concrete string-word conflict detection with dependency explanations (src/smt/theory_seq.cpp:1341-1533,2856-3066)",
@@ -117317,7 +117318,7 @@
           "name": "fixed-length sequence disequality reduction to guarded indexed element disequalities using stable seq.nth witnesses, with non-sequence theory callbacks excluded before length construction (src/smt/theory_seq.cpp:1841-2013)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_disequality_fixed.go",
-          "tests": ["TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheoryUnresolvedNonContainsGivesUpCleanly"]
+          "tests": ["TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheorySymbolicNonContainsModel"]
         },
         {
           "name": "false contains re-expansion and concrete substring conflict with assignment and equality dependencies (src/smt/theory_seq.cpp solve_nc/assign_eh retained concrete case)",
@@ -117359,7 +117360,7 @@
           "name": "positive prefix, suffix and contains Skolem witnesses plus false-relation nonempty implications, non-containment prefix/suffix exclusions, and lazy non-containment propagation through the decomposed source tail (src/smt/theory_seq.cpp:3927-4010,4464-4546,4707-4739)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
-          "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms", "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches", "TestSMTSequenceTheoryNonContainsPropagatesToTail"]
+          "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms", "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches", "TestSMTSequenceTheoryNonContainsPropagatesToTail", "TestSMTSequenceTheorySymbolicNonContainsModel"]
         },
         {
           "name": "negative prefix and suffix shared-segment mismatch witnesses with distinct element or exhausted-container alternatives, plus lazy negative-prefix propagation through equal heads to decomposed tails and symmetric negative-suffix propagation through equal last elements to initial segments (src/smt/theory_seq.cpp:4464-4684)",

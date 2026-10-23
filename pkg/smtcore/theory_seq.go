@@ -190,10 +190,11 @@ func (t *SMTSequenceTheory) generatedSequenceTerm(expression ast.ASTHandle, visi
 			return false, argumentErr
 		}
 		leftGenerated, argumentErr := t.generatedSequenceTerm(left, visiting)
-		if argumentErr != nil || !leftGenerated {
+		if argumentErr != nil {
 			return false, argumentErr
 		}
-		return t.generatedSequenceTerm(right, visiting)
+		rightGenerated, argumentErr := t.generatedSequenceTerm(right, visiting)
+		return leftGenerated || rightGenerated, argumentErr
 	}
 	return false, nil
 }
@@ -332,7 +333,8 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 	if err != nil {
 		return false, err
 	}
-	if !value && !internal && !generated && op != 9 && op != 12 {
+	implemented := 3 <= op && op <= 10 || op == 27 || op == 28
+	if !value && !internal && !generated && !implemented && op != 12 {
 		if err = t.markUnsupported(); err != nil {
 			return false, err
 		}

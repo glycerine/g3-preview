@@ -363,7 +363,7 @@ func TestSMTSequenceTheoryConcreteNonContainsConflict(t *testing.T) {
 	}
 }
 
-func TestSMTSequenceTheoryUnresolvedNonContainsGivesUpCleanly(t *testing.T) {
+func TestSMTSequenceTheorySymbolicNonContainsModel(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	literal, err := m.MkString("z")
 	astTestMust(t, err)
@@ -381,8 +381,8 @@ func TestSMTSequenceTheoryUnresolvedNonContainsGivesUpCleanly(t *testing.T) {
 	astTestMust(t, solver.Assert(notContains))
 	status, err := solver.CheckSat(nil)
 	astTestMust(t, err)
-	if status != lbool.Undef || solver.kernel.lastFailure != SMTFailureTheory {
-		t.Fatal("unresolved non-containment boundary", status, solver.kernel.lastFailure)
+	if status != lbool.True {
+		t.Fatal("symbolic negative containment model", status, solver.kernel.lastFailure)
 	}
 }
 
