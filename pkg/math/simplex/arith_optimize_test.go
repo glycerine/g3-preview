@@ -122,8 +122,8 @@ func TestArithmeticMaxMinIntegerGainsAndSharedMovement(t *testing.T) {
 	if err != nil || result.Status != ArithmeticOptimized || !result.HasShared || result.Value.Main.Cmp(big.NewRat(4, 1)) != 0 {
 		t.Fatal("shared movement guard", result, err)
 	}
-	if len(result.Bounds) != 0 {
-		t.Fatal("shared optimum produced a logical bound explanation")
+	if len(result.Bounds) != 1 || result.Bounds[0].Column != 1 || result.Bounds[0].Lower || result.Bounds[0].Coefficient.Cmp(big.NewRat(2, 1)) != 0 {
+		t.Fatal("shared optimum lost its objective explanation", result.Bounds)
 	}
 	free := NewSolver(nil)
 	free.EnsureVariable(0)

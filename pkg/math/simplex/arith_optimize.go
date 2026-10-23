@@ -313,8 +313,8 @@ func (o *arithmeticOptimizer) optimize(maximize bool) (ArithmeticOptStatus, erro
 }
 
 // ArithmeticMaxMin preserves the source's integer-gain and sharing guards.
-// Its temporary objective is removed before returning; source bounds are
-// derived by the arithmetic theory only from an exact unshared optimum.
+// Its temporary objective is removed before returning. Every exact optimum
+// retains its row explanation; sharing affects the caller's propagation timing.
 func (s *Solver) ArithmeticMaxMin(variable uint32, maximize bool, config ArithmeticOptConfig) (result ArithmeticOptResult, err error) {
 	if variable >= s.NumVariables() {
 		return result, fmt.Errorf("simplex: arithmetic variable out of range")
@@ -336,7 +336,7 @@ func (s *Solver) ArithmeticMaxMin(variable uint32, maximize bool, config Arithme
 	o := arithmeticOptimizer{solver: s, config: config, objective: objective}
 	result.Status, err = o.optimize(maximize)
 	result.HasShared, result.Changed = o.shared, o.changed
-	if err == nil && result.Status == ArithmeticOptimized && !result.HasShared {
+	if err == nil && result.Status == ArithmeticOptimized {
 		row, basic := s.BasicRow(objective)
 		if !basic {
 			return result, fmt.Errorf("simplex: optimized objective is not basic")

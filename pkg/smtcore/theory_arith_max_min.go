@@ -73,7 +73,7 @@ func (t *SMTLinearArithmeticTheory) maxMinNonlinearVariables() (bool, error) {
 			mark(factor)
 		}
 	}
-	var pending []smtArithmeticReplayBound
+	propagateNow := false
 	for _, column := range columns {
 		for _, maximize := range []bool{true, false} {
 			value := solver.Value(column)
@@ -89,14 +89,19 @@ func (t *SMTLinearArithmeticTheory) maxMinNonlinearVariables() (bool, error) {
 			if err != nil {
 				return false, err
 			}
-			if result.Status == simplex.ArithmeticOptimized && !result.HasShared {
+			if result.Status == simplex.ArithmeticOptimized {
 				value := t.normalizeOptimizedBound(column, !maximize, result.Value.Clone())
 				explanation := smtArithmeticWeightedBoundExplanation(solver, result.Bounds)
-				pending = append(pending, smtArithmeticReplayBound{column: column, lower: !maximize, value: value, explanation: explanation})
+				t.queueOptimizationBound(solver, smtArithmeticReplayBound{column: column, lower: !maximize, value: value, explanation: explanation})
+				propagateNow = propagateNow || !result.HasShared
 			}
 		}
 	}
 	progress := false
+	var pending []smtArithmeticReplayBound
+	if propagateNow {
+		pending = t.drainOptimizationBounds()
+	}
 	for _, bound := range pending {
 		changed, err := smtTightenReplaySimplexBound(solver, bound.column, bound.lower, bound.value, bound.explanation)
 		if err != nil {
@@ -104,7 +109,6 @@ func (t *SMTLinearArithmeticTheory) maxMinNonlinearVariables() (bool, error) {
 			return true, t.derivedBoundConflict(solver)
 		}
 		if changed {
-			t.derivedBounds = append(t.derivedBounds, bound)
 			progress = true
 		}
 	}

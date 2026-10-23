@@ -113508,7 +113508,10 @@
         "pkg/ast/ast_parameter_rat.go",
         "pkg/ast/ast_parameter_rat_test.go",
         "pkg/smtcore/theory_arith_nonlinear.go",
-        "pkg/smtcore/theory_arith_nonlinear_strategy.go"
+        "pkg/smtcore/theory_arith_nonlinear_strategy.go",
+        "pkg/smtcore/theory_arith_pending_bounds.go",
+        "pkg/smtcore/theory_arith_pending_bounds_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
@@ -113538,7 +113541,10 @@
         "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays",
         "TestSMTArithmeticRowBoundExplanationsChooseEndpointsAndMergeWeights",
         "TestSMTArithmeticAffineDefinitionBoundExplanations",
-        "TestArithmeticMaxMinExplanationPreservesStrictEndpoint"
+        "TestArithmeticMaxMinExplanationPreservesStrictEndpoint",
+        "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -114046,24 +114052,29 @@
           ]
         },
         {
-          "name": "max_min exact unshared optimum explanations: capture the normalized objective row before removing it, select signed lower/upper endpoint contributions, preserve strict infinitesimals, omit best-effort/shared explanations, and persist weighted derived bounds",
+          "name": "max_min exact optimum explanations: capture the normalized objective row before removing it, select signed lower/upper endpoint contributions, preserve strict infinitesimals, omit best-effort/shared explanations, and persist weighted derived bounds",
           "status": "ported",
           "go_target": "pkg/math/simplex/arith_optimize.go",
           "go_targets": [
             "pkg/math/simplex/arith_optimize_test.go",
             "pkg/smtcore/theory_arith_max_min.go",
             "pkg/smtcore/theory_arith_max_min_test.go",
-            "pkg/smtcore/theory_arith_bound_dependency.go"
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_pending_bounds.go",
+            "pkg/smtcore/theory_arith_pending_bounds_test.go"
           ],
           "tests": [
             "TestArithmeticMaxMinDerivedExtremaAndBestEffort",
             "TestArithmeticMaxMinIntegerGainsAndSharedMovement",
             "TestArithmeticMaxMinExplanationPreservesStrictEndpoint",
-            "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
+            "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
+            "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes"
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop."
+      ],
       "deviations": [
         "The retained nonlinear max/min path uses a temporary canonical objective row, removed on return, with raw matrix pivot coefficients normalized for source gain formulas. Integer-column gain and sharing guards are retained. The maintain_integrality=true optimization-engine path remains unported; this is not a claim to complete optimization support.",
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
@@ -114116,7 +114127,9 @@
         "pkg/smtcore/theory_arith_nonlinear_dependency_test.go",
         "pkg/math/simplex/arith_row_conflict.go",
         "pkg/math/simplex/arith_row_conflict_test.go",
-        "pkg/smtcore/theory_arith_row_conflict_test.go"
+        "pkg/smtcore/theory_arith_row_conflict_test.go",
+        "pkg/smtcore/theory_arith_pending_bounds.go",
+        "pkg/smtcore/theory_arith_pending_bounds_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -114158,7 +114171,8 @@
         "TestSMTRejectedNonlinearCandidateKeepsLogicalContextConsistent",
         "TestArithmeticRowConflictSignedBasesAndRelaxationBudget",
         "TestArithmeticRowConflictStrictGapAndUnknownPremises",
-        "TestSMTArithmeticInfeasibleRowsUseScopedRelaxedProofPremises"
+        "TestSMTArithmeticInfeasibleRowsUseScopedRelaxedProofPremises",
+        "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes"
       ],
       "conditionals": [
         {
@@ -115128,7 +115142,8 @@
       ],
       "ownership": [
         "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification.",
-        "Division application markers follow theory scopes. Concrete division calls pin generated arithmetic and Boolean terms through recursive axiom internalization. The disabled constant-modulus enumeration option has no active retained setter and is not translated."
+        "Division application markers follow theory scopes. Concrete division calls pin generated arithmetic and Boolean terms through recursive axiom internalization. The disabled constant-modulus enumeration option has no active retained setter and is not translated.",
+        "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop."
       ],
       "deviations": [
         "Affine definition-bound propagation evaluates retained replay rows before and after nonlinear interval propagation, including sign reversal for negated-square aliases. General row scheduling, propagation to every row variable, and minimal row-bound explanations remain incomplete.",
@@ -115978,7 +115993,9 @@
         "pkg/math/simplex/bound_dependency.go",
         "pkg/math/simplex/bound_dependency_test.go",
         "pkg/smtcore/theory_arith_grobner_dependency.go",
-        "pkg/smtcore/theory_arith_grobner_dependency_test.go"
+        "pkg/smtcore/theory_arith_grobner_dependency_test.go",
+        "pkg/smtcore/theory_arith_pending_bounds.go",
+        "pkg/smtcore/theory_arith_pending_bounds_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -116009,7 +116026,8 @@
         "TestSMTLinearMonomialAffineRowRetainsFixedFactorPremises",
         "TestBoundConflictDependenciesOwnAndInvalidateSnapshots",
         "TestSMTRejectedNonlinearCandidateKeepsLogicalContextConsistent",
-        "TestSMTGrobnerDependenciesOwnLiteralPolarityAndConsumerLifetime"
+        "TestSMTGrobnerDependenciesOwnLiteralPolarityAndConsumerLifetime",
+        "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes"
       ],
       "conditionals": [
         {
@@ -116460,7 +116478,7 @@
           ]
         },
         {
-          "name": "remaining shared optimization bound buffering and interval resource/dependency refinements",
+          "name": "remaining interval resource/dependency refinements",
           "status": "unported",
           "go_target": null,
           "tests": [
@@ -116468,11 +116486,19 @@
           ]
         },
         {
-          "name": "max_min_nl_vars: deduplicate monomial and factor columns, maximize then minimize, retain exact unshared optimized bounds, validate moved candidates including shared columns, and use the conservative final-check pass for interface equalities; shared bound buffering remains incomplete",
-          "status": "partial",
+          "name": "max_min_nl_vars: deduplicate monomial and factor columns, maximize then minimize, queue every exact optimum with owning explanations, immediately propagate when any exact optimum avoids shared columns, otherwise let ordinary theory propagation drain the scoped queue, and validate moved candidates with conservative interface-equality rechecks",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_max_min.go",
           "tests": [
-            "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
+            "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
+            "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/smtcore/theory_arith_pending_bounds.go",
+            "pkg/smtcore/theory_arith_pending_bounds_test.go",
+            "pkg/cmd/g3/main_test.go"
           ]
         },
         {
@@ -116565,7 +116591,8 @@
         }
       ],
       "ownership": [
-        "The retained legacy arithmetic theory constructs rational-plus-epsilon model values and marks irrational algebraic numerals unsupported at theory_arith_core.h:765-769; mk_value at theory_arith_core.h:3257-3270 produces rational numerals."
+        "The retained legacy arithmetic theory constructs rational-plus-epsilon model values and marks irrational algebraic numerals unsupported at theory_arith_core.h:765-769; mk_value at theory_arith_core.h:3257-3270 produces rational numerals.",
+        "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop."
       ],
       "deviations": [
         "Nonlinear monomials now have independent tableau columns with scoped factor-column lists. Relevant assignments are checked using the same exact rational epsilon as model construction. The Go tableau additionally completes a candidate by evaluating products and affine definitions, then fixes every arithmetic column and rechecks every original row; a failed completion preserves the relaxation. This concrete-model completion is a Go representation adaptation, not a claim to port the remaining source nonlinear search strategies.",

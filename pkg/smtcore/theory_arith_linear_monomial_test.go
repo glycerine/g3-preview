@@ -96,9 +96,35 @@ func TestSMTLinearizedMonomialScopesProofsAndModels(t *testing.T) {
 						astTestMust(t, s.Pop(1))
 						status, err = s.CheckSat(nil)
 						astTestMust(t, err)
-						if status != lbool.Undef {
-							t.Fatal("conditional linear product row survived pop", status)
+						if status == lbool.False {
+							t.Fatal("feasible parent rejected after pop", status)
 						}
+						// A satisfying child point may survive as a model, but
+						// neither its fixed x bound nor its conditional row may
+						// survive as a logical constraint.
+						column, err := theory.ensureVariable(x)
+						astTestMust(t, err)
+						replay, feasible, err := theory.buildSimplex()
+						astTestMust(t, err)
+						if feasible != lbool.True {
+							t.Fatal("parent replay", feasible)
+						}
+						if _, exists := replay.Lower(column); exists {
+							t.Fatal("child lower bound survived pop")
+						}
+						if _, exists := replay.Upper(column); exists {
+							t.Fatal("child upper bound survived pop")
+						}
+						astTestMust(t, s.Push())
+						impossible, err := m.MkEq(x, one)
+						astTestMust(t, err)
+						astTestMust(t, s.Assert(impossible))
+						status, err = s.CheckSat(nil)
+						astTestMust(t, err)
+						if status != lbool.False {
+							t.Fatal("retained assignment hid y=y+1 contradiction", status)
+						}
+						astTestMust(t, s.Pop(1))
 					}
 				}
 				astTestMust(t, s.Pop(1))

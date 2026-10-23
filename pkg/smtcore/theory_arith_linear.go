@@ -79,6 +79,7 @@ type smtLinearArithmeticAtom struct {
 }
 
 type smtLinearArithmeticScope struct {
+	pendingBounds, pendingBoundHead      int
 	expressionBounds                     int
 	finalCheckIndex                      uint32
 	assumeEqualities, assumeEqualityHead int
@@ -113,6 +114,8 @@ type smtLinearArithmeticStatistics struct {
 // bounds. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	pendingBounds                        []smtArithmeticReplayBound
+	pendingBoundHead                     int
 	strongerLemmas                       bool
 	euclideanNumerals                    *numeral.RationalManager
 	expressionBounds                     []smtArithmeticExpressionBound
@@ -741,7 +744,7 @@ func (t *SMTLinearArithmeticTheory) Assign(variable int32, truth bool) error {
 }
 
 func (t *SMTLinearArithmeticTheory) CanPropagate() bool {
-	return t != nil && t.assertionHead < len(t.assertions)
+	return t != nil && (t.assertionHead < len(t.assertions) || t.pendingBoundHead < len(t.pendingBounds))
 }
 
 func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth, integer bool) (lower bool, value simplex.Infinitesimal) {
@@ -1053,7 +1056,18 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 }
 
 func (t *SMTLinearArithmeticTheory) rebuild() (bool, error) {
-	solver, status, err := t.buildSimplex()
+	// Replaying logical rows must not discard the current assignment. In
+	// particular, popping constraints leaves a feasible child assignment valid
+	// in the parent. Values are seeds, never additional bounds or premises.
+	seeds := make(map[uint32]simplex.Infinitesimal, len(t.simplexVariables))
+	if t.solver != nil {
+		for _, column := range t.simplexVariables {
+			if column < t.solver.NumVariables() {
+				seeds[column] = t.solver.Value(column)
+			}
+		}
+	}
+	solver, status, err := t.buildSimplexReplay(nil, seeds)
 	if err == nil && status == lbool.True {
 		t.solver = solver
 	}
@@ -1068,6 +1082,10 @@ func (t *SMTLinearArithmeticTheory) buildSimplex() (*simplex.Solver, lbool.LBool
 }
 
 func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*big.Rat) (*simplex.Solver, lbool.LBool, error) {
+	return t.buildSimplexReplay(values, nil)
+}
+
+func (t *SMTLinearArithmeticTheory) buildSimplexReplay(values map[uint32]*big.Rat, seeds map[uint32]simplex.Infinitesimal) (*simplex.Solver, lbool.LBool, error) {
 	solver := simplex.NewSolver(nil)
 	for variable := uint32(0); variable < t.nextSimplex; variable++ {
 		solver.EnsureVariable(variable)
@@ -1231,6 +1249,25 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 			return solver, lbool.False, nil
 		}
 	}
+	// Set only nonbasic values: SetValue then updates every dependent basic
+	// row. Clamp to logical bounds before feasibility repair, which repairs
+	// basic variables rather than arbitrary nonbasic assignments.
+	for column := uint32(1); column < t.nextSimplex; column++ {
+		value, exists := seeds[column]
+		if !exists {
+			continue
+		}
+		if _, basic := solver.BasicRow(column); basic {
+			continue
+		}
+		if lower, exists := solver.Lower(column); exists && value.Cmp(&lower) < 0 {
+			value = lower
+		}
+		if upper, exists := solver.Upper(column); exists && value.Cmp(&upper) > 0 {
+			value = upper
+		}
+		solver.SetValue(column, value)
+	}
 	status, err := solver.MakeFeasible()
 	if err != nil {
 		return nil, lbool.Undef, err
@@ -1257,6 +1294,7 @@ func (t *SMTLinearArithmeticTheory) Propagate() error {
 	if err != nil {
 		return err
 	}
+	t.drainOptimizationBounds()
 	t.assertionHead = len(t.assertions)
 	for _, assertion := range t.assertions {
 		atom := &t.atoms[assertion.atom]
@@ -1295,6 +1333,8 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 	t.scopes[len(t.scopes)-1].assumeEqualityHead = t.assumeEqualityHead
 	t.scopes[len(t.scopes)-1].finalCheckIndex = t.finalCheckIndex
 	t.scopes[len(t.scopes)-1].expressionBounds = len(t.expressionBounds)
+	t.scopes[len(t.scopes)-1].pendingBounds = len(t.pendingBounds)
+	t.scopes[len(t.scopes)-1].pendingBoundHead = t.pendingBoundHead
 	return nil
 }
 
@@ -1304,6 +1344,9 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
+	clear(t.pendingBounds[scope.pendingBounds:])
+	t.pendingBounds = t.pendingBounds[:scope.pendingBounds]
+	t.pendingBoundHead = scope.pendingBoundHead
 	clear(t.expressionBounds[scope.expressionBounds:])
 	t.expressionBounds = t.expressionBounds[:scope.expressionBounds]
 	t.finalCheckIndex = scope.finalCheckIndex
