@@ -139,3 +139,18 @@ func (m *ASTManager) MkUninterpretedSort(name usymbol.Symbol, ps []ASTParameter)
 	r, e := m.userSort(k, ps)
 	return m.external(r), e
 }
+
+// IsUninterpretedSort follows ast_manager::is_uninterp(sort*): both a
+// declaration without a family and a user-sort declaration are uninterpreted.
+func (m *ASTManager) IsUninterpretedSort(sort ASTHandle) (bool, error) {
+	if err := m.lock(); err != nil {
+		return false, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireKind(sort, ASTSort)
+	if err != nil {
+		return false, err
+	}
+	family, _, err := m.declIdentity(r)
+	return family == NullFamilyID || family == 4, err
+}

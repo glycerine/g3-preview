@@ -614,6 +614,9 @@ func (f *SMTModelFinder) FixModel(model *protomodel.ProtoModel) error {
 	if err != nil {
 		return err
 	}
+	if err = f.populateAUFInstantiationSets(relevant); err != nil {
+		return err
+	}
 	for _, quantifier := range relevant {
 		if err = f.collectPatternInstantiationTerms(quantifier); err != nil {
 			return err

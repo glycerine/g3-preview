@@ -4,6 +4,31 @@ import (
 	"testing"
 )
 
+func TestASTUninterpretedSortClassification(t *testing.T) {
+	m := astTestManager(t)
+	plain, err := m.MkSort(astTestSymbol(t, m, "uninterpreted-plain"), ASTSortInfo{})
+	astTestMust(t, err)
+	user, err := m.MkUninterpretedSort(astTestSymbol(t, m, "uninterpreted-user"), nil)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	for _, test := range []struct {
+		sort ASTHandle
+		want bool
+	}{{plain, true}, {user, true}, {boolean, false}} {
+		got, err := m.IsUninterpretedSort(test.sort)
+		astTestMust(t, err)
+		if got != test.want {
+			t.Fatal("uninterpreted sort classification", got, test.want)
+		}
+	}
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	if _, err = m.IsUninterpretedSort(truth); err == nil {
+		t.Fatal("sort predicate accepted an expression")
+	}
+}
+
 func TestASTAllEagerPluginBranches(t *testing.T) {
 	m := astTestManager(t)
 	b, e := m.MkBoolSort()
