@@ -11072,7 +11072,7 @@
           "name": "ast_manager::mk_fresh_var_name shared fresh-id scalar for pulled duplicate binders (ast.cpp:2246-2251; ast.h:1827)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_fresh_factories.go",
-          "go_targets": ["pkg/ast/normal_forms/pull_boolean.go"],
+          "go_targets": ["pkg/ast/normal_forms/pull_boolean.go", "pkg/ast/pattern/pull_boolean_test.go"],
           "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"]
         },
         {
@@ -12174,7 +12174,7 @@
           "name": "ast_manager::mk_fresh_var_name shared fresh-id scalar for pulled duplicate binders (ast.cpp:2246-2251; ast.h:1827)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_fresh_factories.go",
-          "go_targets": ["pkg/ast/normal_forms/pull_boolean.go"],
+          "go_targets": ["pkg/ast/normal_forms/pull_boolean.go", "pkg/ast/pattern/pull_boolean_test.go"],
           "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"]
         },
         {
@@ -21229,14 +21229,7 @@
       "component": "ast",
       "role": "production",
       "status": "ported",
-      "go_targets": [
-        "pkg/ast/normal_forms/pull_direct.go",
-        "pkg/ast/normal_forms/pull_boolean.go",
-        "pkg/ast/pattern/reduce_quantifier.go",
-        "pkg/ast/normal_forms/pull_quant.go",
-        "pkg/ast/normal_forms/pull_nested_quant.go",
-        "pkg/ast/normal_forms/pull_quant_test.go"
-      ],
+      "go_targets": ["pkg/ast/normal_forms/pull_direct.go", "pkg/ast/normal_forms/pull_boolean.go", "pkg/ast/pattern/reduce_quantifier.go", "pkg/ast/normal_forms/pull_quant.go", "pkg/ast/normal_forms/pull_nested_quant.go", "pkg/ast/normal_forms/pull_quant_test.go", "pkg/smtcore/smt_asserted_pull_quant_test.go"],
       "tests": [
         "TestPatternInferencePullDirectNestedForallFindsPattern",
         "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames",
@@ -21291,6 +21284,7 @@
           "name": "pull_quant1_core direct nested forall/forall binder concatenation and minimum weight for retained pattern inference (pull_quant.cpp:173-189)",
           "status": "ported",
           "go_target": "pkg/ast/normal_forms/pull_direct.go",
+          "go_targets": ["pkg/ast/pattern/pull_boolean_test.go"],
           "tests": [
             "TestPatternInferencePullDirectNestedForallFindsPattern"
           ]
@@ -21312,9 +21306,7 @@
           "name": "pull_quant TRACE declaration-count and both shifted-expression SMT2 records at pull_quant.cpp:102,109,131 for retained Boolean pull",
           "status": "ported",
           "go_target": "pkg/ast/normal_forms/pull_boolean.go",
-          "go_targets": [
-            "pkg/ast/normal_forms/pull_boolean_trace.go"
-          ],
+          "go_targets": ["pkg/ast/normal_forms/pull_boolean_trace.go", "pkg/ast/pattern/pull_boolean_test.go"],
           "tests": [
             "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"
           ]
@@ -21331,6 +21323,7 @@
           "name": "pull_nested_quant quantifier substitution traversal, reset, cached proof ownership and close",
           "status": "ported",
           "go_target": "pkg/ast/normal_forms/pull_nested_quant.go",
+          "go_targets": ["pkg/smtcore/smt_asserted_pull_quant_test.go"],
           "tests": [
             "TestPullNestedQuantifiersRewritesBelowApplications",
             "TestSMTAssertedPullQuantifierScopedConflict"
@@ -21359,14 +21352,7 @@
       "component": "ast",
       "role": "production",
       "status": "ported",
-      "go_targets": [
-        "pkg/ast/normal_forms/pull_direct.go",
-        "pkg/ast/normal_forms/pull_boolean.go",
-        "pkg/ast/pattern/reduce_quantifier.go",
-        "pkg/ast/normal_forms/pull_quant.go",
-        "pkg/ast/normal_forms/pull_nested_quant.go",
-        "pkg/ast/normal_forms/pull_quant_test.go"
-      ],
+      "go_targets": ["pkg/ast/normal_forms/pull_direct.go", "pkg/ast/normal_forms/pull_boolean.go", "pkg/ast/pattern/reduce_quantifier.go", "pkg/ast/normal_forms/pull_quant.go", "pkg/ast/normal_forms/pull_nested_quant.go", "pkg/ast/normal_forms/pull_quant_test.go", "pkg/smtcore/smt_asserted_pull_quant_test.go"],
       "tests": [
         "TestPatternInferencePullDirectNestedForallFindsPattern",
         "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames",
@@ -21393,6 +21379,7 @@
           "name": "pull_quant retained direct nested universal quantifier branch",
           "status": "ported",
           "go_target": "pkg/ast/normal_forms/pull_direct.go",
+          "go_targets": ["pkg/ast/pattern/pull_boolean_test.go"],
           "tests": [
             "TestPatternInferencePullDirectNestedForallFindsPattern"
           ]
@@ -21401,6 +21388,7 @@
           "name": "retained no-proof recursive Boolean application pull",
           "status": "ported",
           "go_target": "pkg/ast/normal_forms/pull_boolean.go",
+          "go_targets": ["pkg/ast/pattern/pull_boolean_test.go"],
           "tests": [
             "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames",
             "TestPatternInferencePullsBooleanApplicationThenFindsPattern"
@@ -21418,6 +21406,7 @@
           "name": "pull_nested_quant quantifier substitution traversal, reset, cached proof ownership and close",
           "status": "ported",
           "go_target": "pkg/ast/normal_forms/pull_nested_quant.go",
+          "go_targets": ["pkg/smtcore/smt_asserted_pull_quant_test.go"],
           "tests": [
             "TestPullNestedQuantifiersRewritesBelowApplications",
             "TestSMTAssertedPullQuantifierScopedConflict"
@@ -86377,9 +86366,18 @@
       "path": "src/parsers/smt2/smt2scanner.cpp",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/parsers/smt2/scanner.go",
+        "pkg/parsers/smt2/scanner_test.go"
+      ],
+      "tests": [
+        "TestSMT2ScannerCommandTokensAndExactNumerals",
+        "TestSMT2ScannerComplianceQuotedEscapesAndLocations",
+        "TestSMT2ScannerInputCachingAndRecovery",
+        "TestSMT2ScannerMalformedAndEOFGuards",
+        "TestSMT2ScannerSourceTraceAndLargeTokens"
+      ],
       "assertions": [
         {
           "line": 27,
@@ -86414,19 +86412,64 @@
           "text": "SASSERT(curr() == '#');"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "scan, read_comment, read_symbol/core, read_quoted_symbol, read_number/signed_number, read_string, read_bv_literal and typed scanner exceptions",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/scanner.go",
+          "tests": [
+            "TestSMT2ScannerCommandTokensAndExactNumerals",
+            "TestSMT2ScannerComplianceQuotedEscapesAndLocations",
+            "TestSMT2ScannerInputCachingAndRecovery",
+            "TestSMT2ScannerMalformedAndEOFGuards"
+          ]
+        },
+        {
+          "name": "token values, source locations, raw input caching, trimmed cached_str ranges and source symbol/numeral TRACE records",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/scanner.go",
+          "tests": [
+            "TestSMT2ScannerComplianceQuotedEscapesAndLocations",
+            "TestSMT2ScannerInputCachingAndRecovery",
+            "TestSMT2ScannerMalformedAndEOFGuards",
+            "TestSMT2ScannerSourceTraceAndLargeTokens"
+          ]
+        },
+        {
+          "name": "construction from cmd_context parameters and top-level SMT-LIB parser consumption",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The scanner borrows its io.Reader; bufio, Go strings, byte slices and math/big own lexical buffers, spellings, cached source text and exact numeral storage. Number returns an independent rational copy; token spelling remains valid across subsequent scans.",
+        "No AST handles are owned by the lexer. The future command parser interns identifiers and constructs AST numerals when consuming tokens."
+      ],
+      "deviations": [
+        "Go buffered byte input replaces the source 1024-byte and interactive stream paths. The lexical constructor currently receives the compliant-mode snapshot directly until cmd_context integration is ported.",
+        "EOF guards terminate final bit-vector literals and quoted strings without reading the stale source current-byte value after stream exhaustion. Cached-string bounds are validated before whitespace trimming.",
+        "Identifier spellings use Go strings rather than porting symbol/string allocation internals; scanner diagnostics use typed Go errors with source line and column fields."
+      ]
     },
     {
       "path": "src/parsers/smt2/smt2scanner.h",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/parsers/smt2/scanner.go",
+        "pkg/parsers/smt2/scanner_test.go"
+      ],
+      "tests": [
+        "TestSMT2ScannerCommandTokensAndExactNumerals",
+        "TestSMT2ScannerComplianceQuotedEscapesAndLocations",
+        "TestSMT2ScannerInputCachingAndRecovery",
+        "TestSMT2ScannerMalformedAndEOFGuards",
+        "TestSMT2ScannerSourceTraceAndLargeTokens"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -86437,11 +86480,47 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "scan, read_comment, read_symbol/core, read_quoted_symbol, read_number/signed_number, read_string, read_bv_literal and typed scanner exceptions",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/scanner.go",
+          "tests": [
+            "TestSMT2ScannerCommandTokensAndExactNumerals",
+            "TestSMT2ScannerComplianceQuotedEscapesAndLocations",
+            "TestSMT2ScannerInputCachingAndRecovery",
+            "TestSMT2ScannerMalformedAndEOFGuards"
+          ]
+        },
+        {
+          "name": "token values, source locations, raw input caching, trimmed cached_str ranges and source symbol/numeral TRACE records",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/scanner.go",
+          "tests": [
+            "TestSMT2ScannerComplianceQuotedEscapesAndLocations",
+            "TestSMT2ScannerInputCachingAndRecovery",
+            "TestSMT2ScannerMalformedAndEOFGuards",
+            "TestSMT2ScannerSourceTraceAndLargeTokens"
+          ]
+        },
+        {
+          "name": "construction from cmd_context parameters and top-level SMT-LIB parser consumption",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The scanner borrows its io.Reader; bufio, Go strings, byte slices and math/big own lexical buffers, spellings, cached source text and exact numeral storage. Number returns an independent rational copy; token spelling remains valid across subsequent scans.",
+        "No AST handles are owned by the lexer. The future command parser interns identifiers and constructs AST numerals when consuming tokens."
+      ],
+      "deviations": [
+        "Go buffered byte input replaces the source 1024-byte and interactive stream paths. The lexical constructor currently receives the compliant-mode snapshot directly until cmd_context integration is ported.",
+        "EOF guards terminate final bit-vector literals and quoted strings without reading the stale source current-byte value after stream exhaustion. Cached-string bounds are validated before whitespace trimming.",
+        "Identifier spellings use Go strings rather than porting symbol/string allocation internals; scanner diagnostics use typed Go errors with source line and column fields."
+      ]
     },
     {
       "path": "src/parsers/util/CMakeLists.txt",
@@ -109683,6 +109762,7 @@
           "name": "direct x_eq_y, x_neq_y, x_eq_t, x_neq_t qinfo constraints and ground-term population",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_auf_literals.go",
+          "go_targets": ["pkg/ast/ast_builtin_plugins_test.go"],
           "tests": [
             "TestSMTModelFinderAUFGraphEqualityAndDisequalityConstraints",
             "TestASTUninterpretedSortClassification"
@@ -206685,6 +206765,7 @@
           "name": "Retained pull_quant1_core declaration-count and shifted-expression TRACE at pull_quant.cpp:102,109,131",
           "status": "ported",
           "go_target": "pkg/ast/normal_forms/pull_boolean_trace.go",
+          "go_targets": ["pkg/ast/pattern/pull_boolean_test.go"],
           "tests": [
             "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"
           ]
@@ -209185,6 +209266,7 @@
           "name": "Retained pull_quant1_core declaration-count and shifted-expression TRACE at pull_quant.cpp:102,109,131",
           "status": "ported",
           "go_target": "pkg/ast/normal_forms/pull_boolean_trace.go",
+          "go_targets": ["pkg/ast/pattern/pull_boolean_test.go"],
           "tests": [
             "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"
           ]
