@@ -245,19 +245,19 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		if err != nil {
 			return false, err
 		}
+		state, argumentErr := t.State()
+		if argumentErr != nil {
+			return false, argumentErr
+		}
+		regexExpression, argumentErr := state.manager.GetArg(expression, 1)
+		if argumentErr != nil {
+			return false, argumentErr
+		}
 		if regexReduced {
-			state, argumentErr := t.State()
-			if argumentErr != nil {
-				return false, argumentErr
-			}
-			regexExpression, argumentErr := state.manager.GetArg(expression, 1)
-			if argumentErr != nil {
-				return false, argumentErr
-			}
 			t.trackInternalTerms(expression)
-			if argumentErr = t.trackRegexTree(regexExpression); argumentErr != nil {
-				return false, argumentErr
-			}
+		}
+		if argumentErr = t.trackRegexTree(regexExpression); argumentErr != nil {
+			return false, argumentErr
 		}
 	}
 	if err = t.ensureVariable(expression); err != nil {
@@ -290,7 +290,7 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		return false, err
 	}
 	_, internal := t.internalTerms[expression]
-	if !value && !internal {
+	if !value && !internal && op != 12 {
 		if err = t.markUnsupported(); err != nil {
 			return false, err
 		}
@@ -860,6 +860,13 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if progress {
 		return SMTFinalCheckContinue, nil
 	}
+	regexProgress, regexUnresolved, err := t.reduceExpandedRegexMemberships()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if regexProgress {
+		return SMTFinalCheckContinue, nil
+	}
 	progress, err = t.addLengthLowerBoundDecomposition()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
@@ -923,7 +930,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if progress {
 		return SMTFinalCheckContinue, nil
 	}
-	if t.unsupported != 0 {
+	if t.unsupported != 0 || regexUnresolved {
 		return SMTFinalCheckGiveUp, nil
 	}
 	return SMTFinalCheckDone, nil

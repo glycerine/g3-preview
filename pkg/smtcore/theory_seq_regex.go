@@ -22,6 +22,14 @@ func (t *SMTSequenceTheory) addRegexMembershipAxiom(expression ast.ASTHandle) (r
 	if err != nil {
 		return false, err
 	}
+	return t.addRegexMembershipAxiomForSequence(expression, sequence, regex)
+}
+
+func (t *SMTSequenceTheory) addRegexMembershipAxiomForSequence(expression, sequence, regex ast.ASTHandle) (reducedExactly bool, result error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
 	rw, err := rewriter.NewSequenceRewriter(state.manager)
 	if err != nil {
 		return false, err
@@ -50,6 +58,64 @@ func (t *SMTSequenceTheory) addRegexMembershipAxiom(expression ast.ASTHandle) (r
 		return false, err
 	}
 	return true, t.axioms.Push(equivalence)
+}
+
+func (t *SMTSequenceTheory) reduceExpandedRegexMemberships() (progress, unresolved bool, result error) {
+	state, err := t.State()
+	if err != nil {
+		return false, false, err
+	}
+	seen := make(map[ast.ASTHandle]struct{})
+	for expression := range state.context.enodes {
+		if _, found := seen[expression]; found {
+			continue
+		}
+		seen[expression] = struct{}{}
+		operation, own, operationErr := t.operation(expression)
+		if operationErr != nil {
+			return false, false, operationErr
+		}
+		if !own || operation != 12 {
+			continue
+		}
+		sequence, argumentErr := state.manager.GetArg(expression, 0)
+		if argumentErr != nil {
+			return false, false, argumentErr
+		}
+		regex, argumentErr := state.manager.GetArg(expression, 1)
+		if argumentErr != nil {
+			return false, false, argumentErr
+		}
+		parts, _, expandErr := t.expandWord([]ast.ASTHandle{sequence}, nil)
+		if expandErr != nil {
+			return false, false, expandErr
+		}
+		sort, sortErr := state.manager.GetSort(sequence)
+		if sortErr != nil {
+			return false, false, sortErr
+		}
+		expanded, makeErr := t.makeWord(parts, sort)
+		if makeErr != nil {
+			return false, false, makeErr
+		}
+		before := len(t.axioms.set)
+		reduced, reduceErr := t.addRegexMembershipAxiomForSequence(expression, expanded, regex)
+		if reduceErr != nil {
+			return false, false, reduceErr
+		}
+		if !reduced {
+			unresolved = true
+			continue
+		}
+		t.trackInternalTerms(expression)
+		if treeErr := t.trackRegexTree(regex); treeErr != nil {
+			return false, false, treeErr
+		}
+		if len(t.axioms.set) != before {
+			progress = true
+		}
+	}
+	return progress, unresolved, nil
 }
 
 func (t *SMTSequenceTheory) trackRegexTree(expression ast.ASTHandle) error {
