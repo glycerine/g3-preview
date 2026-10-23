@@ -3017,7 +3017,148 @@ func TestSMTSequenceTheoryCompletesMinimumLengthRegexModel(t *testing.T) {
 	status, err := solver.CheckSat(nil)
 	astTestMust(t, err)
 	if status != lbool.True {
-		t.Fatal("minimum-length regex model remained incomplete", status)
+		reason, reasonErr := solver.ReasonUnknown()
+		astTestMust(t, reasonErr)
+		t.Fatal("minimum-length regex model remained incomplete", status, reason)
+	}
+}
+
+func TestSMTSequenceTheoryCompletesUnboundedRegexModel(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-unbounded-model-x"), sort)
+	astTestMust(t, err)
+	aRegex, err := m.MkSequenceToRegex(a)
+	astTestMust(t, err)
+	star, err := m.MkRegexStar(aRegex)
+	astTestMust(t, err)
+	membership, err := m.MkSequenceInRegex(x, star)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(membership))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		reason, reasonErr := solver.ReasonUnknown()
+		astTestMust(t, reasonErr)
+		t.Fatal("unbounded regex model remained incomplete", status, reason)
+	}
+}
+
+func TestSMTSequenceTheoryAdvancesConcreteRegexWitness(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-next-witness-x"), sort)
+	astTestMust(t, err)
+	aRegex, err := m.MkSequenceToRegex(a)
+	astTestMust(t, err)
+	plus, err := m.MkRegexPlus(aRegex)
+	astTestMust(t, err)
+	membership, err := m.MkSequenceInRegex(x, plus)
+	astTestMust(t, err)
+	xIsA, err := m.MkEq(x, a)
+	astTestMust(t, err)
+	xIsNotA, err := m.MkNot(xIsA)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	for _, assertion := range []ast.ASTHandle{membership, xIsNotA} {
+		astTestMust(t, solver.Assert(assertion))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("unbounded regex did not advance past its shortest witness", status)
+	}
+}
+
+func TestSMTSequenceTheoryClosesExhaustedFiniteRegexLanguage(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-finite-witness-x"), sort)
+	astTestMust(t, err)
+	aRegex, err := m.MkSequenceToRegex(a)
+	astTestMust(t, err)
+	bRegex, err := m.MkSequenceToRegex(b)
+	astTestMust(t, err)
+	union, err := m.MkRegexUnion(aRegex, bRegex)
+	astTestMust(t, err)
+	membership, err := m.MkSequenceInRegex(x, union)
+	astTestMust(t, err)
+	assertions := []ast.ASTHandle{membership}
+	for _, value := range []ast.ASTHandle{a, b} {
+		equality, makeErr := m.MkEq(x, value)
+		astTestMust(t, makeErr)
+		disequality, makeErr := m.MkNot(equality)
+		astTestMust(t, makeErr)
+		assertions = append(assertions, disequality)
+	}
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	for _, assertion := range assertions {
+		astTestMust(t, solver.Assert(assertion))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("exhausted finite regex language remained open", status)
+	}
+}
+
+func TestSMTSequenceTheoryBranchesConcreteRegexWitness(t *testing.T) {
+	m, _ := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-witness-x"), sort)
+	astTestMust(t, err)
+	aRegex, err := m.MkSequenceToRegex(a)
+	astTestMust(t, err)
+	star, err := m.MkRegexStar(aRegex)
+	astTestMust(t, err)
+	membership, err := m.MkSequenceInRegex(x, star)
+	astTestMust(t, err)
+	family, err := m.SequenceFamilyID()
+	astTestMust(t, err)
+	theory, err := NewSMTSequenceTheory(family)
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.RegisterTheory(theory))
+	astTestMust(t, state.Internalize(membership, true))
+	literal, err := state.Literal(membership)
+	astTestMust(t, err)
+	astTestMust(t, state.assignDecisionLiteral(literal))
+	branched, reduced, err := theory.branchConcreteRegexWitness(membership, x, star)
+	astTestMust(t, err)
+	if !branched || reduced {
+		t.Fatal("regex witness branch", branched, reduced)
+	}
+	empty, err := m.MkString("")
+	astTestMust(t, err)
+	equality, err := m.MkEq(x, empty)
+	astTestMust(t, err)
+	equalityLiteral, err := state.Literal(equality)
+	astTestMust(t, err)
+	data, err := state.BooleanData(equalityLiteral.Var())
+	astTestMust(t, err)
+	if !data.TryTrueFirst() {
+		t.Fatal("shortest regex witness lacks native true-first preference")
 	}
 }
 

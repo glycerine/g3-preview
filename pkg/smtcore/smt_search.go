@@ -342,6 +342,13 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 				continue
 			}
 			if k.internalizer.searchProgress() == before {
+				variable, _, splitErr := queue.NextCaseSplit()
+				if splitErr != nil {
+					return lbool.Undef, fmt.Errorf("smt search final case split: %w", splitErr)
+				}
+				if variable != SMTNullBoolVar {
+					continue
+				}
 				k.lastFailure = SMTFailureUnknown
 				k.unknown = "theory made no progress"
 				return lbool.Undef, nil

@@ -944,9 +944,10 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
-	if regexProgress, err = propagateAxioms(regexProgress); err != nil {
+	reportedRegexProgress := regexProgress
+	if regexProgress, err = propagateAxioms(reportedRegexProgress); err != nil {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence regex propagation: %w", err)
-	} else if regexProgress {
+	} else if regexProgress || reportedRegexProgress {
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.addLengthLowerBoundDecomposition()

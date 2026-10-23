@@ -103,6 +103,63 @@ func TestSequenceRewriterAutomatonMembership(t *testing.T) {
 	}
 }
 
+func TestSequenceRewriterShortestRegexByteString(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	rw, err := NewSequenceRewriter(m)
+	astTestMust(t, err)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	aRegex, err := m.MkSequenceToRegex(a)
+	astTestMust(t, err)
+	for _, test := range []struct {
+		name, want string
+		make       func() (ast.ASTHandle, error)
+	}{
+		{name: "star", make: func() (ast.ASTHandle, error) { return m.MkRegexStar(aRegex) }},
+		{name: "plus", want: "a", make: func() (ast.ASTHandle, error) { return m.MkRegexPlus(aRegex) }},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			regex, makeErr := test.make()
+			astTestMust(t, makeErr)
+			actual, found, witnessErr := rw.ShortestRegexByteString(regex)
+			astTestMust(t, witnessErr)
+			if !found || actual != test.want {
+				t.Fatal("shortest regex witness", actual, found, "want", test.want)
+			}
+		})
+	}
+	b, err := m.MkString("b")
+	astTestMust(t, err)
+	bRegex, err := m.MkSequenceToRegex(b)
+	astTestMust(t, err)
+	finite, err := m.MkRegexUnion(aRegex, bRegex)
+	astTestMust(t, err)
+	words, exhaustive, err := rw.RegexByteStringCandidates(finite, 3)
+	astTestMust(t, err)
+	if !exhaustive || len(words) != 2 || !((words[0] == "a" && words[1] == "b") || (words[0] == "b" && words[1] == "a")) {
+		t.Fatal("finite regex candidates", words, exhaustive)
+	}
+	zero, err := m.BitVectorNumeralUnsigned(0, 8)
+	astTestMust(t, err)
+	byteSort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	symbolicByte, err := m.MkConst(astTestSymbol(t, m, "candidate-byte"), byteSort)
+	astTestMust(t, err)
+	symbolicUnit, err := m.MkSequenceUnit(symbolicByte)
+	astTestMust(t, err)
+	symbolicRegex, err := m.MkSequenceToRegex(symbolicUnit)
+	astTestMust(t, err)
+	words, exhaustive, err = rw.RegexByteStringCandidates(symbolicRegex, 1)
+	astTestMust(t, err)
+	if exhaustive || len(words) != 0 {
+		t.Fatal("symbolic regex candidates", words, exhaustive)
+	}
+}
+
 func TestSequenceRewriterAutomatonIntersectionSolver(t *testing.T) {
 	m := astTestManager(t)
 	_, err := m.RegisterArithmeticPlugin()

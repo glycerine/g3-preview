@@ -34731,6 +34731,7 @@
         "TestSequenceRewriterRegexLoopAndMembershipGuards",
         "TestSequenceRewriterAutomatonMembership",
         "TestSequenceRewriterAutomatonIntersectionSolver",
+        "TestSequenceRewriterShortestRegexByteString",
         "TestSequenceRewriterEqualityBoundaryReductions",
         "TestSequenceRewriterEqualityArithmeticLengthAndSubsequence",
         "TestSequenceRewriterDeclarationDispatch"
@@ -35063,13 +35064,14 @@
           ]
         },
         {
-          "name": "seq_rewriter::mk_str_in_regexp retained NFA construction, singleton-language extraction, concrete/symbolic membership and solver-backed intersection/complement determinization (seq_rewriter.cpp:26-342,1147-1328)",
+          "name": "seq_rewriter::mk_str_in_regexp retained NFA construction, singleton-language extraction, concrete/symbolic membership, breadth-first concrete byte-witness enumeration, and solver-backed intersection/complement determinization (seq_rewriter.cpp:26-342,1147-1328)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/seq_rewriter_automaton.go",
           "tests": [
             "TestSequenceRewriterRegexLoopAndMembershipGuards",
             "TestSequenceRewriterAutomatonMembership",
-            "TestSequenceRewriterAutomatonIntersectionSolver"
+            "TestSequenceRewriterAutomatonIntersectionSolver",
+            "TestSequenceRewriterShortestRegexByteString"
           ]
         },
         {
@@ -104844,7 +104846,8 @@
         "TestSMTCoreEqualityCongruencePropagation",
         "TestSMTCoreEqualityPropagatesBooleanCongruence",
         "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
-        "TestSMTKernelCapturesRelevantLabeledLiterals"
+        "TestSMTKernelCapturesRelevantLabeledLiterals",
+        "TestSMTSequenceTheoryCompletesUnboundedRegexModel"
       ],
       "conditionals": [
         {
@@ -105794,7 +105797,7 @@
           ]
         },
         {
-          "name": "Boolean decisions, first-UIP conflict learning, random initial variable activity and activity increment/decay/rescaling, non-chronological backjumping, propagation, fast and timed slow progress sampling, timeout/cancellation/resource/memory and conflict-limit checks, and final-check search control",
+          "name": "Boolean decisions, first-UIP conflict learning, random initial variable activity and activity increment/decay/rescaling, non-chronological backjumping, propagation, fast and timed slow progress sampling, timeout/cancellation/resource/memory and conflict-limit checks, final-check search control, and retry of a case split newly exposed by a theory final check",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_search.go",
           "tests": [
@@ -105807,7 +105810,8 @@
             "TestSMTSolverStopsAtConfiguredConflictLimit",
             "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals",
             "TestSMTBooleanActivityIncrementDecayAndRescale",
-            "TestSMTBooleanRandomInitialActivityModes"
+            "TestSMTBooleanRandomInitialActivityModes",
+            "TestSMTSequenceTheoryCompletesUnboundedRegexModel"
           ]
         },
         {
@@ -116852,7 +116856,11 @@
         "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition",
         "TestSMTSequenceTheoryCompletesFixedLengthRegexModel",
         "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel",
-        "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel"
+        "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel",
+        "TestSMTSequenceTheoryCompletesUnboundedRegexModel",
+        "TestSMTSequenceTheoryAdvancesConcreteRegexWitness",
+        "TestSMTSequenceTheoryClosesExhaustedFiniteRegexLanguage",
+        "TestSMTSequenceTheoryBranchesConcreteRegexWitness"
       ],
       "conditionals": [
         {
@@ -117400,10 +117408,10 @@
           "tests": ["TestSMTSequenceTheoryLengthAxioms"]
         },
         {
-          "name": "final-check axiom draining with observable SAT and equality progress detection across scoped replay (src/smt/theory_seq.cpp:252-302,3068-3108)",
+          "name": "final-check axiom draining with observable SAT and equality progress detection across scoped replay, preserving a theory continue result when regex branching exposes a relevant equality without immediate propagation (src/smt/theory_seq.cpp:252-302,3068-3108)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
-          "tests": ["TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition"]
+          "tests": ["TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel", "TestSMTSequenceTheoryCompletesUnboundedRegexModel"]
         },
         {
           "name": "exact length axioms for concat, unit, empty, string, arbitrary sequence non-negativity, zero-length iff empty, and int.to.str nonnegative lower bound, exact one-digit threshold, and fixed integer or length driven arbitrary decimal-width refinement (src/smt/theory_seq.cpp:627-633,3313-3390)",
@@ -117472,10 +117480,10 @@
           "tests": ["TestSMTSequenceTheoryReplaceAxioms", "TestSMTSequenceTheoryReplaceTightestPrefixAxioms"]
         },
         {
-          "name": "regular-language membership reduction through the retained Go regex automaton builder, including concrete automata, symbolic singleton languages, final-check retry after word-solution, guarded fixed-length seq.nth expansion, exhaustive guarded decomposition and reduction across small finite arithmetic length intervals, completion after the native minimum-length remainder branch for lower-bounded models, scoped exact-regex term tracking, explicit give-up for still-unresolved memberships, and definitive satisfiability for exact reductions (src/smt/theory_seq.cpp:3391-3445,4166-4191)",
+          "name": "regular-language membership reduction through the retained Go regex automaton builder, including concrete automata, symbolic singleton languages, final-check retry after word-solution, guarded fixed-length seq.nth expansion, exhaustive guarded decomposition and reduction across small finite arithmetic length intervals, completion after the native minimum-length remainder branch for lower-bounded models, breadth-first concrete witness branching for positive unbounded membership while skipping words below a proved arithmetic length lower bound, advancement past refuted witnesses, exact finite-language exhaustion implications, scoped exact-regex term tracking, explicit give-up for still-unresolved memberships, and definitive satisfiability for exact reductions (src/smt/theory_seq.cpp:3391-3445,4166-4191)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_regex.go",
-          "tests": ["TestSMTSequenceTheoryRegexMembershipReduction", "TestSMTSequenceTheoryRetriesRegexAfterWordSolution", "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel", "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel", "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel"]
+          "tests": ["TestSMTSequenceTheoryRegexMembershipReduction", "TestSMTSequenceTheoryRetriesRegexAfterWordSolution", "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel", "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel", "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel", "TestSMTSequenceTheoryCompletesUnboundedRegexModel", "TestSMTSequenceTheoryAdvancesConcreteRegexWitness", "TestSMTSequenceTheoryClosesExhaustedFiniteRegexLanguage", "TestSMTSequenceTheoryBranchesConcreteRegexWitness"]
         },
         {
           "name": "int.to.str empty iff negative, nonnegative round trip through str.to.int, numeric-language membership for nonnegative conversions, str.to.int lower bound plus exact nonnegative iff [0-9]+ membership, and complete arbitrary-precision ground conversion values including leading-zero parsing (src/smt/theory_seq.cpp:2284-2462)",

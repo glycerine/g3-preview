@@ -704,6 +704,113 @@ func (b *sequenceAutomatonBuilder) regex(expression ast.ASTHandle) (*sequenceAut
 	return nil, nil
 }
 
+// RegexByteStringCandidates enumerates concrete byte strings in breadth-first
+// automaton order. Exhaustive is true when the concrete language was finite
+// and completely traversed before limit was reached. Symbolic labels are left
+// to the lazy automaton path.
+func (r *SequenceRewriter) RegexByteStringCandidates(regex ast.ASTHandle, limit int) (words []string, exhaustive bool, result error) {
+	if err := r.open(); err != nil {
+		return nil, false, err
+	}
+	if limit <= 0 {
+		return nil, false, ast.ErrASTDomain
+	}
+	builder := &sequenceAutomatonBuilder{rewriter: r}
+	defer builder.close()
+	automaton, err := builder.regex(regex)
+	if err != nil || automaton == nil {
+		return nil, false, err
+	}
+	canReachFinal := make([]bool, len(automaton.moves))
+	reverse := make([][]int, len(automaton.moves))
+	work := make([]int, 0, len(automaton.finals))
+	for source, moves := range automaton.moves {
+		for _, move := range moves {
+			reverse[move.destination] = append(reverse[move.destination], source)
+		}
+	}
+	for state := range automaton.finals {
+		canReachFinal[state] = true
+		work = append(work, state)
+	}
+	for len(work) != 0 {
+		state := work[len(work)-1]
+		work = work[:len(work)-1]
+		for _, predecessor := range reverse[state] {
+			if canReachFinal[predecessor] {
+				continue
+			}
+			canReachFinal[predecessor] = true
+			work = append(work, predecessor)
+		}
+	}
+	type candidate struct {
+		state int
+		word  string
+	}
+	queue := []candidate{{state: automaton.initial}}
+	seenConfigurations := map[string]struct{}{strconv.Itoa(automaton.initial) + ":": {}}
+	seenWords := make(map[string]struct{})
+	symbolicPath := false
+	for len(queue) != 0 {
+		current := queue[0]
+		queue = queue[1:]
+		closure := automaton.epsilonClosure(current.state)
+		for _, state := range closure {
+			if automaton.finals[state] {
+				if _, found := seenWords[current.word]; !found {
+					seenWords[current.word] = struct{}{}
+					words = append(words, current.word)
+					if len(words) == limit {
+						return words, false, nil
+					}
+				}
+				break
+			}
+		}
+		for _, source := range closure {
+			for _, move := range automaton.moves[source] {
+				if move.label == nil || !canReachFinal[move.destination] {
+					continue
+				}
+				values, concrete, valueErr := builder.concreteLabelBytes(move.label)
+				if valueErr != nil {
+					return nil, false, valueErr
+				}
+				if !concrete {
+					symbolicPath = true
+					continue
+				}
+				for value, accepted := range values {
+					if !accepted {
+						continue
+					}
+					nextWord := current.word + string([]byte{byte(value)})
+					key := strconv.Itoa(move.destination) + ":" + nextWord
+					if _, found := seenConfigurations[key]; found {
+						continue
+					}
+					seenConfigurations[key] = struct{}{}
+					queue = append(queue, candidate{
+						state: move.destination,
+						word:  nextWord,
+					})
+				}
+			}
+		}
+	}
+	return words, !symbolicPath, nil
+}
+
+// ShortestRegexByteString returns the first concrete witness accepted by regex.
+func (r *SequenceRewriter) ShortestRegexByteString(regex ast.ASTHandle) (string, bool, error) {
+	words, _, err := r.RegexByteStringCandidates(regex, 1)
+	if err != nil || len(words) == 0 {
+		return "", false, err
+	}
+	return words[0], true, nil
+}
+
 func (b *sequenceAutomatonBuilder) automatonSequence(a *sequenceAutomaton) ([]ast.ASTHandle, bool) {
 	state := a.initial
 	visited := make(map[int]bool)

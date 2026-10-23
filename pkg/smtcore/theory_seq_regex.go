@@ -7,9 +7,47 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 const smtSequenceMaximumBoundedRegexLengths = 32
+
+func (t *SMTSequenceTheory) sequenceLengthLowerBound(sequence ast.ASTHandle) (uint64, bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return 0, false, err
+	}
+	arithmeticFamily, err := state.manager.ArithmeticFamilyID()
+	if err != nil {
+		return 0, false, err
+	}
+	arithmetic, ok := state.Theory(arithmeticFamily).(*SMTLinearArithmeticTheory)
+	if !ok {
+		return 0, false, nil
+	}
+	intervals, err := arithmetic.linearVariableIntervals()
+	if err != nil {
+		return 0, false, err
+	}
+	length, err := state.manager.MkSequenceLength(sequence)
+	if err != nil {
+		return 0, false, err
+	}
+	interval, evaluated, err := arithmetic.polynomialInterval(length, intervals)
+	if err != nil || !evaluated || interval.minusInfinity() {
+		return 0, false, err
+	}
+	lowerValue, err := interval.lowerValue()
+	if err != nil || lowerValue.Sign() < 0 {
+		return 0, false, err
+	}
+	epsilonSign := 0
+	if interval.lowerOpen {
+		epsilonSign = 1
+	}
+	lower, integral := smtSequenceIntegerLowerBound(lowerValue, epsilonSign)
+	return lower, integral, nil
+}
 
 func (t *SMTSequenceTheory) addRegexMembershipAxiom(expression ast.ASTHandle) (reducedExactly bool, result error) {
 	state, err := t.State()
@@ -224,6 +262,95 @@ func (t *SMTSequenceTheory) addBoundedRegexMembershipAxioms(expression, sequence
 	return allReduced, nil
 }
 
+func (t *SMTSequenceTheory) branchConcreteRegexWitness(expression, sequence, regex ast.ASTHandle) (branched, reduced bool, result error) {
+	state, err := t.State()
+	if err != nil {
+		return false, false, err
+	}
+	literal, err := state.Literal(expression)
+	if err != nil {
+		return false, false, err
+	}
+	assignment, err := state.Assignment(literal)
+	if err != nil || assignment != lbool.True {
+		return false, false, err
+	}
+	rw, err := rewriter.NewSequenceRewriter(state.manager)
+	if err != nil {
+		return false, false, err
+	}
+	lower, hasLower, err := t.sequenceLengthLowerBound(sequence)
+	if err != nil {
+		return false, false, err
+	}
+	if hasLower && lower > smtSequenceMaximumFixedDecomposition {
+		return false, false, nil
+	}
+	limit := len(state.boolExpr) + 1
+	if hasLower {
+		limit += int(lower)
+	}
+	witnesses, exhaustive, err := rw.RegexByteStringCandidates(regex, limit)
+	if err != nil {
+		return false, false, err
+	}
+	sequenceSort, err := state.manager.GetSort(sequence)
+	if err != nil {
+		return false, false, err
+	}
+	equalities := make([]ast.ASTHandle, 0, len(witnesses))
+	for _, witnessText := range witnesses {
+		witness, witnessErr := state.manager.MkString(witnessText)
+		if witnessErr != nil {
+			return false, false, witnessErr
+		}
+		witnessSort, witnessErr := state.manager.GetSort(witness)
+		if witnessErr != nil || witnessSort != sequenceSort {
+			return false, false, witnessErr
+		}
+		equality, witnessErr := state.manager.MkEq(sequence, witness)
+		if witnessErr != nil {
+			return false, false, witnessErr
+		}
+		equalities = append(equalities, equality)
+		if hasLower && uint64(len(witnessText)) < lower {
+			continue
+		}
+		equalityAssignment, witnessErr := t.assumeSequenceEquality(sequence, witness)
+		if witnessErr != nil {
+			return false, false, witnessErr
+		}
+		if equalityAssignment == lbool.Undef {
+			return true, false, nil
+		}
+		if equalityAssignment == lbool.True {
+			reduced, witnessErr = t.addGuardedRegexMembershipAxiom(expression, witness, regex, equality)
+			return false, reduced, witnessErr
+		}
+	}
+	if !exhaustive {
+		return false, false, nil
+	}
+	choices, err := state.manager.MkFalse()
+	if err != nil {
+		return false, false, err
+	}
+	if len(equalities) != 0 {
+		choices, err = state.manager.MkOrArray(equalities)
+		if err != nil {
+			return false, false, err
+		}
+	}
+	constraint, err := state.manager.MkImplies(expression, choices)
+	if err != nil {
+		return false, false, err
+	}
+	if _, found := t.axioms.set[constraint]; found {
+		return false, false, nil
+	}
+	return true, true, t.axioms.Push(constraint)
+}
+
 func (t *SMTSequenceTheory) reduceExpandedRegexMemberships() (progress, unresolved bool, result error) {
 	state, err := t.State()
 	if err != nil {
@@ -296,6 +423,16 @@ func (t *SMTSequenceTheory) reduceExpandedRegexMemberships() (progress, unresolv
 					}
 				}
 			}
+		}
+		if !reduced {
+			branched, witnessReduced, witnessErr := t.branchConcreteRegexWitness(expression, sequence, regex)
+			if witnessErr != nil {
+				return false, false, witnessErr
+			}
+			if branched {
+				progress = true
+			}
+			reduced = witnessReduced
 		}
 		if !reduced {
 			unresolved = true
