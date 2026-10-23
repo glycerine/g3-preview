@@ -589,7 +589,7 @@ func (f *SMTModelFinder) relevantQuantifiers() ([]ast.ASTHandle, error) {
 	}
 	result := make([]ast.ASTHandle, 0, len(f.quantifiers))
 	for _, quantifier := range f.quantifiers {
-		if f.state.context.relevant[quantifier] && f.state.context.assignments[quantifier] == lbool.True {
+		if f.state.isRelevant(quantifier) && f.state.context.assignments[quantifier] == lbool.True {
 			result = append(result, quantifier)
 		}
 	}

@@ -219,7 +219,7 @@ func (g *smtModelFinderAUFGraph) populateLiterals(quantifier ast.ASTHandle) erro
 			// For x=t on an uninterpreted sort, the source includes every
 			// relevant context term of that sort (paper section 4.1).
 			for _, enode := range g.finder.state.context.enodes {
-				if !g.finder.state.context.relevant[enode.owner] {
+				if !g.finder.state.isRelevant(enode.owner) {
 					continue
 				}
 				sort, err := g.finder.manager.GetSort(enode.owner)

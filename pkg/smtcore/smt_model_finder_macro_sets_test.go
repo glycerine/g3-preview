@@ -61,6 +61,21 @@ func TestSMTModelFinderMacroSetsPreserveOriginalRelevantArguments(t *testing.T) 
 	if !found || term != seven || generation != 4 {
 		t.Fatal("macro-based inverse was not built", term, generation, found)
 	}
+	// With filtering disabled, unmarked quantifiers and applications are
+	// relevant too. Both original arguments must enter the macro set.
+	state.relevancy.enabled = false
+	astTestMust(t, state.context.SetRelevant(q, false))
+	unfiltered, err := protomodel.NewProtoModel(m, config)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, unfiltered.Close()) })
+	astTestMust(t, finder.FixModel(unfiltered))
+	all, err := finder.instantiationSet(q, 0, false)
+	astTestMust(t, err)
+	if all == nil || len(all.elements) != 2 || all.elements[seven] != 4 || all.elements[three] != 1 {
+		t.Fatal("disabled filtering omitted a quantifier or macro argument", all)
+	}
+	state.relevancy.enabled = true
+	astTestMust(t, state.context.SetRelevant(q, true))
 	astTestMust(t, state.context.SetRelevant(sevenApplication, false))
 	astTestMust(t, state.context.SetRelevant(threeApplication, true))
 	next, err := protomodel.NewProtoModel(m, config)
@@ -69,7 +84,7 @@ func TestSMTModelFinderMacroSetsPreserveOriginalRelevantArguments(t *testing.T) 
 	astTestMust(t, finder.FixModel(next))
 	updated, err := finder.instantiationSet(q, 0, false)
 	astTestMust(t, err)
-	if !set.closed || updated == set || updated == nil || len(updated.elements) != 1 || updated.elements[three] != 1 {
+	if !set.closed || !all.closed || updated == set || updated == all || updated == nil || len(updated.elements) != 1 || updated.elements[three] != 1 {
 		t.Fatal("new model retained prior terms or ownership", set.closed, updated)
 	}
 	_, _, found, err = finder.Inverse(q, 0, seven)

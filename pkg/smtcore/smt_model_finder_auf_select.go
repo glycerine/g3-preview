@@ -51,7 +51,7 @@ func (g *smtModelFinderAUFGraph) matchingArrays(array ast.ASTHandle) ([]*SMTEnod
 		return nil, err
 	}
 	if ground {
-		if node := context.enodes[array]; node != nil && context.relevant[array] {
+		if node := context.enodes[array]; node != nil && g.finder.state.isRelevant(array) {
 			return []*SMTEnode{node}, nil
 		}
 		return nil, nil
@@ -71,7 +71,7 @@ func (g *smtModelFinderAUFGraph) matchingArrays(array ast.ASTHandle) ([]*SMTEnod
 	var matches []*SMTEnode
 	for _, node := range arrays {
 		for _, parent := range node.parents {
-			if context.relevant[parent.owner] && parent.declaration == declaration {
+			if g.finder.state.isRelevant(parent.owner) && parent.declaration == declaration {
 				matches = append(matches, parent)
 			}
 		}
@@ -151,7 +151,7 @@ func (g *smtModelFinderAUFGraph) processSelectVars() error {
 }
 
 func (g *smtModelFinderAUFGraph) populateSelectVars(quantifier ast.ASTHandle) error {
-	context, m := g.finder.state.context, g.finder.manager
+	m := g.finder.manager
 	for _, info := range g.selects {
 		if info.quantifier != quantifier {
 			continue
@@ -181,7 +181,7 @@ func (g *smtModelFinderAUFGraph) populateSelectVars(quantifier ast.ASTHandle) er
 				return ast.ErrASTDomain
 			}
 			for _, parent := range node.parents {
-				if !context.relevant[parent.owner] || parent.declaration != declaration {
+				if !g.finder.state.isRelevant(parent.owner) || parent.declaration != declaration {
 					continue
 				}
 				if info.position >= uint32(len(parent.arguments)) {

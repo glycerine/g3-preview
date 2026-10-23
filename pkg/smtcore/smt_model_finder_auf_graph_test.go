@@ -68,10 +68,23 @@ func TestSMTModelFinderAUFGraphSharesPatternlessArgumentSets(t *testing.T) {
 			t.Fatal("irrelevant ground application contributed an argument")
 		}
 	}
+	state.relevancy.enabled = false
+	unfiltered := newSMTModelFinderAUFGraph(finder)
+	t.Cleanup(func() { astTestMust(t, unfiltered.close()) })
+	astTestMust(t, unfiltered.build([]ast.ASTHandle{first, second}))
+	for _, q := range []ast.ASTHandle{first, second} {
+		set := unfiltered.uvars[smtModelFinderAUFKey{q, 0}].root().set
+		if len(set.elements) != 3 || set.elements[a] != 3 || set.elements[b] != 7 || set.elements[ignored] != 1 {
+			t.Fatal("disabled filtering omitted a shared function argument", set.elements)
+		}
+	}
 }
 
 func TestSMTModelFinderAUFGraphEqualityAndDisequalityConstraints(t *testing.T) {
 	m, state, _, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})
+	relevancy, err := NewSMTRelevancyPropagator(state.context, true)
+	astTestMust(t, err)
+	astTestMust(t, state.SetRelevancy(relevancy))
 	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "auf-literal-sort"), nil)
 	astTestMust(t, err)
 	x, err := m.MkVar(0, sort)
@@ -82,6 +95,8 @@ func TestSMTModelFinderAUFGraphEqualityAndDisequalityConstraints(t *testing.T) {
 	b, bNode := smtEnodeConstant(t, m, 9401, sort, 8)
 	astTestMust(t, state.context.RegisterEnode(aNode, true))
 	astTestMust(t, state.context.RegisterEnode(bNode, true))
+	unmarked, unmarkedNode := smtEnodeConstant(t, m, 9402, sort, 9)
+	astTestMust(t, state.context.RegisterEnode(unmarkedNode, false))
 	equalVariables, err := m.MkEq(x, y)
 	astTestMust(t, err)
 	equalGround, err := m.MkEq(x, a)
@@ -119,6 +134,17 @@ func TestSMTModelFinderAUFGraphEqualityAndDisequalityConstraints(t *testing.T) {
 			}
 			if len(first.set.elements) != test.terms {
 				t.Fatal("literal instantiation terms", first.set.elements)
+			}
+			if test.name == "equal-ground" {
+				state.relevancy.enabled = false
+				unfiltered := newSMTModelFinderAUFGraph(manager.modelFinder)
+				t.Cleanup(func() { astTestMust(t, unfiltered.close()) })
+				astTestMust(t, unfiltered.build([]ast.ASTHandle{q}))
+				set := unfiltered.uvars[smtModelFinderAUFKey{q, 0}].root().set
+				if len(set.elements) != 3 || set.elements[unmarked] != 9 {
+					t.Fatal("disabled filtering omitted an uninterpreted equality term", set.elements)
+				}
+				state.relevancy.enabled = true
 			}
 			if test.exception && (first.exceptions[0] != a || first.set.elements[b] != 8) {
 				t.Fatal("uninterpreted equality omitted context term or exception", first)

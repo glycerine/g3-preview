@@ -99,6 +99,29 @@ func TestSMTModelFinderAUFSelectIndexesUseModelFunctionAndRelevantParents(t *tes
 	if len(graph.selects) != 2 {
 		t.Fatal("array index qinfo collection", graph.selects)
 	}
+	state.relevancy.enabled = false
+	astTestMust(t, state.context.SetRelevant(array, false))
+	unfiltered := newSMTModelFinderAUFGraph(finder)
+	unfiltered.model = proto
+	t.Cleanup(func() { astTestMust(t, unfiltered.close()) })
+	astTestMust(t, unfiltered.build([]ast.ASTHandle{q}))
+	for _, test := range []struct {
+		variable      uint32
+		first, second ast.ASTHandle
+	}{{0, falsehood, truth}, {1, four, nine}} {
+		node := unfiltered.uvars[smtModelFinderAUFKey{q, 1 - test.variable}].root()
+		if len(node.set.elements) != 2 {
+			t.Fatal("disabled filtering omitted an array or select parent", test.variable, node.set.elements)
+		}
+		if _, found := node.set.elements[test.first]; !found {
+			t.Fatal("missing first select index", test.variable)
+		}
+		if _, found := node.set.elements[test.second]; !found {
+			t.Fatal("missing unmarked select index", test.variable)
+		}
+	}
+	state.relevancy.enabled = true
+	astTestMust(t, state.context.SetRelevant(array, true))
 	astTestMust(t, finder.FixModel(proto))
 	for _, test := range []struct {
 		variable   uint32
@@ -194,5 +217,18 @@ func TestSMTModelFinderAUFSelectNestedArrayParents(t *testing.T) {
 		if len(node.set.elements) != 1 || node.set.elements[test.term] != test.generation {
 			t.Fatal("nested select did not follow relevant array parents", test.variable, node.set.elements)
 		}
+	}
+	astTestMust(t, state.context.SetRelevant(array, false))
+	astTestMust(t, state.context.SetRelevant(groundInner, false))
+	matches, err := graph.matchingArrays(nestedPattern)
+	astTestMust(t, err)
+	if len(matches) != 0 {
+		t.Fatal("enabled filtering accepted an unmarked nested array")
+	}
+	state.relevancy.enabled = false
+	matches, err = graph.matchingArrays(nestedPattern)
+	astTestMust(t, err)
+	if len(matches) != 1 || matches[0].owner != groundInner {
+		t.Fatal("disabled filtering skipped nested array parents", matches)
 	}
 }

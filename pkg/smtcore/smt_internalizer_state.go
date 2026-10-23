@@ -251,6 +251,16 @@ func (s *SMTInternalizerState) RegisterTheory(theory SMTTheoryInternalizer) erro
 	return nil
 }
 
+// Source context::is_relevant includes all internalized expressions when
+// filtering is disabled. A standalone read-side context without a relevancy
+// service retains its explicitly marked view.
+func (s *SMTInternalizerState) isRelevant(expression ast.ASTHandle) bool {
+	if s.relevancy != nil {
+		return s.relevancy.IsRelevant(expression)
+	}
+	return s.context.relevant[expression]
+}
+
 func (s *SMTInternalizerState) Theory(family ast.FamilyID) SMTTheoryInternalizer {
 	if s == nil {
 		return nil

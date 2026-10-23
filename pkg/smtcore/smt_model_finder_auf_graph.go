@@ -170,7 +170,7 @@ func (g *smtModelFinderAUFGraph) populateFunctionArguments(quantifier ast.ASTHan
 			}
 		}
 		for _, application := range context.byDeclaration[info.function] {
-			if application == nil || !context.relevant[application.owner] {
+			if application == nil || !g.finder.state.isRelevant(application.owner) {
 				continue
 			}
 			if info.position >= uint32(len(application.arguments)) {

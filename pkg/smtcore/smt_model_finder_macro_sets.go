@@ -35,7 +35,7 @@ func (f *SMTModelFinder) populateMacroInstantiationSets(quantifier ast.ASTHandle
 			continue
 		}
 		for _, application := range f.state.context.byDeclaration[chosen] {
-			if application == nil || !f.state.context.relevant[application.owner] {
+			if application == nil || !f.state.isRelevant(application.owner) {
 				continue
 			}
 			if info.position >= uint32(len(application.arguments)) {

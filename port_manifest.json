@@ -110194,7 +110194,8 @@
         "pkg/smtcore/smt_model_finder_hint_indexes_test.go",
         "pkg/smtcore/smt_model_finder_hint_greedy.go",
         "pkg/smtcore/smt_model_finder_hint_greedy_test.go",
-        "pkg/smtcore/smt_model_finder_hint_trace.go"
+        "pkg/smtcore/smt_model_finder_hint_trace.go",
+        "pkg/smtcore/smt_internalizer_state.go"
       ],
       "tests": [
         "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle",
@@ -110694,7 +110695,9 @@
           "name": "direct x_eq_y, x_neq_y, x_eq_t, x_neq_t qinfo constraints and ground-term population",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_auf_literals.go",
-          "go_targets": ["pkg/ast/ast_builtin_plugins_test.go"],
+          "go_targets": [
+            "pkg/ast/ast_builtin_plugins_test.go"
+          ],
           "tests": [
             "TestSMTModelFinderAUFGraphEqualityAndDisequalityConstraints",
             "TestASTUninterpretedSortClassification"
@@ -110879,17 +110882,44 @@
           "name": "Retained hint_solver residue-candidate TRACE at smt_model_finder.cpp:2925 after candidate collection and before recursive selection",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
-          "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
+          "tests": [
+            "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"
+          ]
         },
         {
           "name": "Retained hint_solver greedy-entry and acyclic-found TRACE at smt_model_finder.cpp:2841,2917 with source search-state snapshots",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
-          "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
+          "tests": [
+            "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"
+          ]
+        },
+        {
+          "name": "mode-aware context::is_relevant in relevant-quantifier collection, macro and AUF function-argument sets, uninterpreted equality terms, ground arrays and nested select-parent matching; disabled filtering includes unmarked terms while enabled filtering preserves original argument generations and model-owned set replacement",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer_state.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_finder.go",
+            "pkg/smtcore/smt_model_finder_macro_sets.go",
+            "pkg/smtcore/smt_model_finder_macro_sets_test.go",
+            "pkg/smtcore/smt_model_finder_auf_graph.go",
+            "pkg/smtcore/smt_model_finder_auf_graph_test.go",
+            "pkg/smtcore/smt_model_finder_auf_literals.go",
+            "pkg/smtcore/smt_model_finder_auf_select.go",
+            "pkg/smtcore/smt_model_finder_auf_select_test.go"
+          ],
+          "tests": [
+            "TestSMTModelFinderMacroSetsPreserveOriginalRelevantArguments",
+            "TestSMTModelFinderAUFGraphSharesPatternlessArgumentSets",
+            "TestSMTModelFinderAUFGraphEqualityAndDisequalityConstraints",
+            "TestSMTModelFinderAUFSelectIndexesUseModelFunctionAndRelevantParents",
+            "TestSMTModelFinderAUFSelectNestedArrayParents"
+          ]
         }
       ],
       "ownership": [
-        "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit."
+        "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit.",
+        "Model finding and model generation share the internalizer's concrete mode-aware relevancy query. Disabled filtering includes internalized unmarked quantifiers, function applications, same-sort equality terms, ground arrays and nested select parents. The active quantifier assignment still must be true. Enabled filtering and standalone read-side fixtures preserve their marked view. Tests switch modes, retain original argument generations despite equivalence roots, verify array index positions, and check that replacing a model closes prior instantiation sets."
       ],
       "deviations": [
         "Go arithmetic-witness refinement: when the chosen witness evaluates to a public numeral provably distinct from all exceptions and avoided fallbacks, the instantiation set retains the numeral rather than the reassignable auxiliary constant. This preserves its value when an instance enters the context and avoids regenerating symbolic counterexamples on every candidate. Colliding and nonnumeric witnesses retain the source symbolic-witness/deferred-constraint path. Covered by TestSMTModelFinderAUFArithmeticWitnessUsesStableNumeral and the integer MBQI solver regressions.",
@@ -110961,7 +110991,8 @@
         "pkg/smtcore/smt_asserted_quasi_macros_test.go",
         "pkg/smtcore/smt_model_reservation_regression_test.go",
         "pkg/smtcore/theory_arith_assume_eq_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_internalizer_state.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -111176,7 +111207,8 @@
       ],
       "ownership": [
         "The generator owns its proto-model, pinned constructed AST values, fresh placeholder objects, root-value map and source-ordering state while borrowing the AST manager, context, enode roots and theory-created model-value procedures.",
-        "Model-generation relevance queries borrow the active internalizer relevancy service so disabled filtering includes every internalized expression even when the marked map is empty. Context-only fixtures without a service retain their explicitly marked view. The regression checks arithmetic argument separation, optional unused Boolean publication and evaluation of the generated UF interpretation in relevancy modes 0 and 2. The integer_uf_model_relevancy.smt2 C++ comparison evaluates model disequalities before and after a scope pop, catching omitted interpretations that SAT-only comparisons miss."
+        "Model-generation relevance queries borrow the active internalizer relevancy service so disabled filtering includes every internalized expression even when the marked map is empty. Context-only fixtures without a service retain their explicitly marked view. The regression checks arithmetic argument separation, optional unused Boolean publication and evaluation of the generated UF interpretation in relevancy modes 0 and 2. The integer_uf_model_relevancy.smt2 C++ comparison evaluates model disequalities before and after a scope pop, catching omitted interpretations that SAT-only comparisons miss.",
+        "The mode-aware relevancy helper now lives on SMTInternalizerState and is shared with model finding; model-value and function publication retain their previously verified behavior."
       ],
       "deviations": [
         "The source iterative color traversal is expressed as a concrete recursive Go DFS with identical dependency-before-source order. A dependency cycle returns ast.ErrASTDomain instead of relying on a debug assertion."
