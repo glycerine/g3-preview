@@ -11,11 +11,21 @@ import (
 // internalized, assigned, and merged.
 type SMTCheckerContext struct {
 	manager       *ast.ASTManager
+	relevancy     *SMTRelevancyPropagator
 	relevant      map[ast.ASTHandle]bool
 	assignments   map[ast.ASTHandle]lbool.LBool
 	enodes        map[ast.ASTHandle]*SMTEnode
 	byDeclaration map[ast.ASTHandle][]*SMTEnode
 	disequalities map[smtEnodePairKey]struct{}
+}
+
+// Source context::is_relevant includes all expressions when filtering is
+// disabled. Standalone read-side contexts retain their explicitly marked view.
+func (c *SMTCheckerContext) isRelevant(expression ast.ASTHandle) bool {
+	if c.relevancy != nil {
+		return c.relevancy.IsRelevant(expression)
+	}
+	return c.relevant[expression]
 }
 
 func NewSMTCheckerContext(manager *ast.ASTManager) (*SMTCheckerContext, error) {
@@ -212,7 +222,7 @@ func (c *SMTChecker) congruentEnode(expression ast.ASTHandle, arguments []*SMTEn
 		if !matches && candidate.commutative && len(arguments) == 2 {
 			matches = candidate.arguments[0].root == arguments[1].root && candidate.arguments[1].root == arguments[0].root
 		}
-		if matches && c.context.relevant[candidate.owner] {
+		if matches && c.context.isRelevant(candidate.owner) {
 			return candidate, nil
 		}
 	}
@@ -234,7 +244,7 @@ func (c *SMTChecker) enodeEqualTo(expression ast.ASTHandle) (*SMTEnode, error) {
 		}
 		return c.bindings[len(c.bindings)-int(index)-1], nil
 	}
-	if node := c.context.enodes[expression]; node != nil && c.context.relevant[expression] {
+	if node := c.context.enodes[expression]; node != nil && c.context.isRelevant(expression) {
 		return node, nil
 	}
 	if kind != ast.ASTApp {
@@ -275,7 +285,7 @@ func (c *SMTChecker) checkCore(expression ast.ASTHandle, value bool) (bool, erro
 	if sort != boolean {
 		return false, ast.ErrASTDomain
 	}
-	if assignment, found := c.context.assignments[expression]; found && c.context.relevant[expression] {
+	if assignment, found := c.context.assignments[expression]; found && c.context.isRelevant(expression) {
 		return assignment != lbool.Undef && value == (assignment == lbool.True), nil
 	}
 	kind, err := manager.GetKind(expression)
@@ -335,7 +345,7 @@ func (c *SMTChecker) checkCore(expression ast.ASTHandle, value bool) (bool, erro
 			if len(arguments) != 3 {
 				return false, ast.ErrASTDomain
 			}
-			if assignment, found := c.context.assignments[arguments[0]]; found && c.context.relevant[arguments[0]] {
+			if assignment, found := c.context.assignments[arguments[0]]; found && c.context.isRelevant(arguments[0]) {
 				switch assignment {
 				case lbool.False:
 					return c.check(arguments[2], value)
@@ -359,7 +369,7 @@ func (c *SMTChecker) checkCore(expression ast.ASTHandle, value bool) (bool, erro
 				return false, err
 			}
 			right, err := c.enodeEqualTo(arguments[1])
-			if err != nil || left == nil || right == nil || !c.context.relevant[left.owner] || !c.context.relevant[right.owner] {
+			if err != nil || left == nil || right == nil || !c.context.isRelevant(left.owner) || !c.context.isRelevant(right.owner) {
 				return false, err
 			}
 			if value {
@@ -369,7 +379,7 @@ func (c *SMTChecker) checkCore(expression ast.ASTHandle, value bool) (bool, erro
 		}
 	}
 	node, err := c.enodeEqualTo(expression)
-	if err != nil || node == nil || !node.boolean || !c.context.relevant[node.owner] {
+	if err != nil || node == nil || !node.boolean || !c.context.isRelevant(node.owner) {
 		return false, err
 	}
 	assignment, found := c.context.assignments[node.owner]

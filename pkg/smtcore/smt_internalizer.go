@@ -20,6 +20,7 @@ func (s *SMTInternalizerState) SetRelevancy(propagator *SMTRelevancyPropagator) 
 		return ast.ErrASTDomain
 	}
 	s.relevancy = propagator
+	s.context.relevancy = propagator
 	return nil
 }
 

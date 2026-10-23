@@ -59,7 +59,7 @@ func (q *SMTQuickChecker) collectorCheckArg(node *SMTEnode, parent ast.ASTHandle
 		return true
 	}
 	for _, current := range q.context.byDeclaration[parent] {
-		if !q.context.relevant[current.owner] || !current.IsCongruenceRoot() || position >= uint32(len(current.arguments)) {
+		if !q.context.isRelevant(current.owner) || !current.IsCongruenceRoot() || position >= uint32(len(current.arguments)) {
 			continue
 		}
 		if current.arguments[position].root == node.root {
@@ -101,7 +101,7 @@ func (q *SMTQuickChecker) collectCore(expression, parent ast.ASTHandle, parentPo
 				}
 				clear(temporary[index])
 				for _, current := range q.context.byDeclaration[decl] {
-					if q.context.relevant[current.owner] && current.IsCongruenceRoot() && q.collectorCheckArg(current, parent, parentPosition, true) && position < uint32(len(current.arguments)) {
+					if q.context.isRelevant(current.owner) && current.IsCongruenceRoot() && q.collectorCheckArg(current, parent, parentPosition, true) && position < uint32(len(current.arguments)) {
 						root := current.arguments[position].root
 						if _, present := sets[index][root]; present {
 							temporary[index][root] = struct{}{}
@@ -113,7 +113,7 @@ func (q *SMTQuickChecker) collectCore(expression, parent ast.ASTHandle, parentPo
 			}
 			found[index] = true
 			for _, current := range q.context.byDeclaration[decl] {
-				if q.context.relevant[current.owner] && current.IsCongruenceRoot() && q.collectorCheckArg(current, parent, parentPosition, conservative) && position < uint32(len(current.arguments)) {
+				if q.context.isRelevant(current.owner) && current.IsCongruenceRoot() && q.collectorCheckArg(current, parent, parentPosition, conservative) && position < uint32(len(current.arguments)) {
 					sets[index][current.arguments[position].root] = struct{}{}
 				}
 			}
@@ -349,7 +349,7 @@ func (q *SMTQuickChecker) checkCore(expression ast.ASTHandle, value bool) (bool,
 	if sort != boolean {
 		return false, ast.ErrASTDomain
 	}
-	if _, internalized := q.context.assignments[expression]; internalized && q.context.relevant[expression] {
+	if _, internalized := q.context.assignments[expression]; internalized && q.context.isRelevant(expression) {
 		assignment := q.context.assignments[expression]
 		return assignment != lbool.Undef && value == (assignment == lbool.True), nil
 	}
@@ -470,7 +470,7 @@ func (q *SMTQuickChecker) checkCore(expression ast.ASTHandle, value bool) (bool,
 				return left == right, nil
 			}
 			leftNode, rightNode := q.context.enodes[left], q.context.enodes[right]
-			if leftNode != nil && rightNode != nil && q.context.relevant[left] && q.context.relevant[right] && leftNode.root != rightNode.root {
+			if leftNode != nil && rightNode != nil && q.context.isRelevant(left) && q.context.isRelevant(right) && leftNode.root != rightNode.root {
 				return true, nil
 			}
 			return q.context.manager.AreDistinct(left, right)
@@ -480,7 +480,7 @@ func (q *SMTQuickChecker) checkCore(expression ast.ASTHandle, value bool) (bool,
 	if err != nil {
 		return false, err
 	}
-	if assignment, internalized := q.context.assignments[canonical]; internalized && q.context.relevant[canonical] && assignment != lbool.Undef {
+	if assignment, internalized := q.context.assignments[canonical]; internalized && q.context.isRelevant(canonical) && assignment != lbool.Undef {
 		return value == (assignment == lbool.True), nil
 	}
 	op, err := q.context.manager.GetDeclKind(canonical)

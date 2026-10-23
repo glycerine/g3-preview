@@ -236,7 +236,7 @@ func (m *SMTMAM) candidates(term ast.ASTHandle) ([]*SMTEnode, error) {
 	}
 	var result []*SMTEnode
 	for _, node := range m.state.context.byDeclaration[declaration] {
-		if m.state.context.relevant[node.owner] {
+		if m.state.isRelevant(node.owner) {
 			result = append(result, node)
 		}
 	}

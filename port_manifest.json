@@ -101312,7 +101312,8 @@
         "TestSMTMAMMatchesUnaryAndRepeatedVariablesModuloEquality",
         "TestSMTMAMJoinsMultiPatternsAndRollsBackPatterns",
         "TestSMTMAMTracksNestedGroundPatternTermsAsShared",
-        "TestSMTQuantifierManagerEMatchingFeedsInstanceQueue"
+        "TestSMTQuantifierManagerEMatchingFeedsInstanceQueue",
+        "TestSMTQuantifierMatchersHonorDisabledRelevancy"
       ],
       "conditionals": [
         {
@@ -102026,10 +102027,19 @@
           "status": "reference_only",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "context::is_relevant policy shared by E-matching candidate enumeration, quick-check collector intersections and unions, assigned-atom checks and congruence lookups; live mode changes do not alter scoped relevance marks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_mam.go",
+          "tests": [
+            "TestSMTQuantifierMatchersHonorDisabledRelevancy"
+          ]
         }
       ],
       "ownership": [
-        "SMTMAM borrows the SMT context, registry, pattern AST handles and enodes; native Go slices and maps own pattern order, deduplication, shared-ground membership and scope limits."
+        "SMTMAM borrows the SMT context, registry, pattern AST handles and enodes; native Go slices and maps own pattern order, deduplication, shared-ground membership and scope limits.",
+        "The read-side checker context borrows the concrete relevancy service installed by SetRelevancy. Queries follow its current enabled flag without creating marks, callbacks, owning AST roots, or synthetic relevance trails; standalone contexts without a service retain their explicit marks."
       ],
       "deviations": [
         "The Go implementation exhaustively matches registered triggers over relevant congruence classes instead of compiling native instruction trees and approximate-label filters. This preserves bindings, repeated-variable equality, multi-pattern joins, generation bounds, fingerprint deduplication and scoped behavior while replacing source indexing optimizations."
@@ -105247,7 +105257,8 @@
       ],
       "tests": [
         "TestSMTCheckerBooleanAssignmentsAndStructure",
-        "TestSMTCheckerEqualityDisequalityBindingsAndCongruence"
+        "TestSMTCheckerEqualityDisequalityBindingsAndCongruence",
+        "TestSMTQuantifierMatchersHonorDisabledRelevancy"
       ],
       "assertions": [
         {
@@ -105282,10 +105293,19 @@
             "TestSMTCheckerBooleanAssignmentsAndStructure",
             "TestSMTCheckerEqualityDisequalityBindingsAndCongruence"
           ]
+        },
+        {
+          "name": "context::is_relevant policy shared by E-matching candidate enumeration, quick-check collector intersections and unions, assigned-atom checks and congruence lookups; live mode changes do not alter scoped relevance marks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_checker.go",
+          "tests": [
+            "TestSMTQuantifierMatchersHonorDisabledRelevancy"
+          ]
         }
       ],
       "ownership": [
-        "SMTChecker borrows its concrete checker context, AST handles, enodes, and per-call binding slice; native maps own only query caches and context indexes."
+        "SMTChecker borrows its concrete checker context, AST handles, enodes, and per-call binding slice; native maps own only query caches and context indexes.",
+        "The read-side checker context borrows the concrete relevancy service installed by SetRelevancy. Queries follow its current enabled flag without creating marks, callbacks, owning AST roots, or synthetic relevance trails; standalone contexts without a service retain their explicit marks."
       ],
       "deviations": [
         "The context queries used by the source checker are one concrete Go context component. Congruence lookup scans declaration-indexed enodes and compares equality-class roots, preserving the retained behavior without a universal solver adapter."
@@ -107340,7 +107360,8 @@
         "pkg/smtcore/theory_arith_mixed_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_theory_relevance_test.go",
-        "pkg/smtcore/theory_arith_division_test.go"
+        "pkg/smtcore/theory_arith_division_test.go",
+        "pkg/smtcore/smt_checker.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -107359,7 +107380,8 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
-        "TestSMTArithmeticSymbolicZeroDivisorGuard"
+        "TestSMTArithmeticSymbolicZeroDivisorGuard",
+        "TestSMTQuantifierMatchersHonorDisabledRelevancy"
       ],
       "conditionals": [
         {
@@ -107630,11 +107652,20 @@
             "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
             "TestSMTArithmeticSymbolicZeroDivisorGuard"
           ]
+        },
+        {
+          "name": "context::is_relevant policy shared by E-matching candidate enumeration, quick-check collector intersections and unions, assigned-atom checks and congruence lookups; live mode changes do not alter scoped relevance marks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_checker.go",
+          "tests": [
+            "TestSMTQuantifierMatchersHonorDisabledRelevancy"
+          ]
         }
       ],
       "ownership": [
         "SMTInternalizerState owns the concrete slices and clause objects for this context subset.",
-        "The theory notification trail stores Boolean variable IDs without AST ownership. Scope rollback restores eligibility for subsequent assignments and relevance events."
+        "The theory notification trail stores Boolean variable IDs without AST ownership. Scope rollback restores eligibility for subsequent assignments and relevance events.",
+        "The read-side checker context borrows the concrete relevancy service installed by SetRelevancy. Queries follow its current enabled flag without creating marks, callbacks, owning AST roots, or synthetic relevance trails; standalone contexts without a service retain their explicit marks."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported."
@@ -111747,7 +111778,8 @@
       ],
       "tests": [
         "TestSMTQuickCheckerCollectorConservativeIntersectionAndUnion",
-        "TestSMTQuickCheckerUnsatInstantiationCanonicalizationAndDuplicates"
+        "TestSMTQuickCheckerUnsatInstantiationCanonicalizationAndDuplicates",
+        "TestSMTQuantifierMatchersHonorDisabledRelevancy"
       ],
       "assertions": [
         {
@@ -111785,10 +111817,19 @@
           "tests": [
             "TestSMTQuickCheckerUnsatInstantiationCanonicalizationAndDuplicates"
           ]
+        },
+        {
+          "name": "context::is_relevant policy shared by E-matching candidate enumeration, quick-check collector intersections and unions, assigned-atom checks and congruence lookups; live mode changes do not alter scoped relevance marks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quick_checker.go",
+          "tests": [
+            "TestSMTQuantifierMatchersHonorDisabledRelevancy"
+          ]
         }
       ],
       "ownership": [
-        "SMTQuickChecker borrows its checker context, theory rewriter, quantifier registry, enodes, and model-value handles; native maps and slices own per-query caches and candidate views, while ASTRef values retain rewritten temporary applications until query cleanup."
+        "SMTQuickChecker borrows its checker context, theory rewriter, quantifier registry, enodes, and model-value handles; native maps and slices own per-query caches and candidate views, while ASTRef values retain rewritten temporary applications until query cleanup.",
+        "The read-side checker context borrows the concrete relevancy service installed by SetRelevancy. Queries follow its current enabled flag without creating marks, callbacks, owning AST roots, or synthetic relevance trails; standalone contexts without a service retain their explicit marks."
       ],
       "deviations": [
         "The source context calls are supplied by concrete SMTCheckerContext and SMTQuantifierRegistry components. Explicit ground candidates are recursively internalized into concrete Go enodes without a universal context adapter."

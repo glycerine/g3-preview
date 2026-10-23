@@ -255,10 +255,7 @@ func (s *SMTInternalizerState) RegisterTheory(theory SMTTheoryInternalizer) erro
 // filtering is disabled. A standalone read-side context without a relevancy
 // service retains its explicitly marked view.
 func (s *SMTInternalizerState) isRelevant(expression ast.ASTHandle) bool {
-	if s.relevancy != nil {
-		return s.relevancy.IsRelevant(expression)
-	}
-	return s.context.relevant[expression]
+	return s.context.isRelevant(expression)
 }
 
 func (s *SMTInternalizerState) Theory(family ast.FamilyID) SMTTheoryInternalizer {

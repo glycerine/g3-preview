@@ -4,8 +4,95 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestSMTQuantifierMatchersHonorDisabledRelevancy(t *testing.T) {
+	m, state, registry, mam := smtMAMFixture(t)
+	relevancy, err := NewSMTRelevancyPropagator(state.context, true)
+	astTestMust(t, err)
+	astTestMust(t, state.SetRelevancy(relevancy))
+	sort, err := m.MkSort(astTestSymbol(t, m, "matcher-relevancy-sort"), ast.ASTSortInfo{})
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	p := smtQuickPredicate(t, m, "matcher-relevancy-p", sort, boolean)
+	q := smtQuickPredicate(t, m, "matcher-relevancy-q", sort, boolean)
+	variable, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	pv, err := m.MkApp(p, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	qv, err := m.MkApp(q, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	body, err := m.MkAnd(pv, qv)
+	astTestMust(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{pv, qv})
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{astTestSymbol(t, m, "matcher-x")},
+		Body: body, Patterns: []ast.ASTHandle{pattern},
+	})
+	astTestMust(t, err)
+	astTestMust(t, registry.Add(quantifier, 0))
+	constants := make([]*SMTEnode, 3)
+	for index := range constants {
+		_, constants[index] = smtEnodeConstant(t, m, 2630+uint32(index), sort, uint32(index+2))
+		astTestMust(t, state.context.RegisterEnode(constants[index], false))
+	}
+	pa, _ := smtQuickApplicationNode(t, m, state.context, p, constants[0], false)
+	smtQuickApplicationNode(t, m, state.context, p, constants[1], false)
+	smtQuickApplicationNode(t, m, state.context, q, constants[1], false)
+	smtQuickApplicationNode(t, m, state.context, q, constants[2], false)
+	astTestMust(t, state.context.SetAssignment(pa, lbool.False))
+	quick, err := NewSMTQuickChecker(state.context, smtQuickTheoryRewriter(t, m), registry)
+	astTestMust(t, err)
+	checker, err := NewSMTChecker(state.context)
+	astTestMust(t, err)
+	astTestMust(t, mam.AddPattern(quantifier, pattern))
+	for _, enabled := range []bool{true, false, true} {
+		relevancy.enabled = enabled
+		candidates, err := quick.CollectCandidates(quantifier, true)
+		astTestMust(t, err)
+		if enabled {
+			if len(candidates[0]) != 0 {
+				t.Fatal("filtering admitted unmarked quick-check candidates", candidates)
+			}
+		} else {
+			if len(candidates[0]) != 1 || candidates[0][0] != constants[1] {
+				t.Fatal("disabled filtering lost the multi-predicate intersection", candidates)
+			}
+			union, err := quick.CollectCandidates(quantifier, false)
+			astTestMust(t, err)
+			if len(union[0]) != 3 {
+				t.Fatal("disabled filtering lost nonconservative candidates", union)
+			}
+		}
+		unsat, err := checker.IsUnsatisfiable(pa, nil)
+		astTestMust(t, err)
+		if unsat == enabled {
+			t.Fatal("checker ignored the current relevancy policy", enabled, unsat)
+		}
+		quick.checkCache = make(map[smtQuickCheckKey]bool)
+		unsat, err = quick.check(pa, false)
+		astTestMust(t, err)
+		if unsat == enabled {
+			t.Fatal("quick checker ignored the current relevancy policy", enabled, unsat)
+		}
+		mam.dirty = true
+		astTestMust(t, mam.Match())
+		if enabled && len(registry.schedule.newEntries) != 0 || !enabled && len(registry.schedule.newEntries) != 1 {
+			t.Fatal("E-matching did not obey the current relevancy policy", enabled, registry.schedule.newEntries)
+		}
+		if !enabled && registry.schedule.newEntries[0].Fingerprint.args[0] != constants[1] {
+			t.Fatal("E-matching joined different bindings")
+		}
+		registry.schedule.newEntries = nil
+	}
+	if len(relevancy.RelevantExpressions()) != 0 {
+		t.Fatal("reading relevancy policy changed the scoped relevance marks")
+	}
+}
 
 func smtMAMFixture(t *testing.T) (*ast.ASTManager, *SMTInternalizerState, *SMTQuantifierRegistry, *SMTMAM) {
 	t.Helper()
