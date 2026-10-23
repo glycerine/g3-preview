@@ -29,6 +29,46 @@ func contextFixture(t *testing.T) *Context {
 	return c
 }
 
+func TestCommandContextUnsignedOptionsValidateTypesAndUpdateLiveSolver(t *testing.T) {
+	c := contextFixture(t)
+	contextMust(t, c.SetUIntOption("smt.relevancy", 0))
+	contextMust(t, c.SetUIntOption("rlimit", ^uint32(0)))
+	contextMust(t, c.SetUIntOption("timeout", ^uint32(0)))
+	for _, test := range []struct {
+		name string
+		want uint32
+	}{{"rlimit", ^uint32(0)}, {"timeout", ^uint32(0)}} {
+		value, err := c.config.Params.GetUIntName(&c.params, &test.name, 17)
+		contextMust(t, err)
+		if value != test.want {
+			t.Fatal("unsigned option value", test.name, value, test.want)
+		}
+	}
+	global, err := c.config.Globals.SourceGetValueName("smt.relevancy")
+	contextMust(t, err)
+	if global != "0" {
+		t.Fatal("module unsigned value", global)
+	}
+	status, err := c.CheckSat(nil)
+	contextMust(t, err)
+	if status != lbool.True {
+		t.Fatal(status)
+	}
+	contextMust(t, c.SetUIntOption("smt.relevancy", 2))
+	global, err = c.config.Globals.SourceGetValueName("smt.relevancy")
+	contextMust(t, err)
+	if global != "2" {
+		t.Fatal("live unsigned update", global)
+	}
+	contextMust(t, c.SetUIntOption("smt.restart_factor", 2))
+	if err := c.SetUIntOption("smt.ematching", 1); err == nil {
+		t.Fatal("unsigned value accepted for a Boolean option")
+	}
+	if err := c.SetUIntOption("smt.unported_uint_option", 1); err == nil {
+		t.Fatal("unknown unsigned option accepted")
+	}
+}
+
 func TestCommandContextDefinitionOwnershipAndScopes(t *testing.T) {
 	c := contextFixture(t)
 	m, err := c.Manager()

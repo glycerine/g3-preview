@@ -200,6 +200,34 @@ func (c *Context) SetBoolOption(name string, value bool) error {
 	return nil
 }
 
+// SetUIntOption follows the retained unsigned front-end and module option
+// paths. The source parameter catalog validates module names and types.
+func (c *Context) SetUIntOption(name string, value uint32) error {
+	if err := c.valid(); err != nil {
+		return err
+	}
+	name = strings.ReplaceAll(name, "-", "_")
+	text := strconv.FormatUint(uint64(value), 10)
+	if name == "timeout" || name == "rlimit" {
+		if err := c.parameters.Set(&name, &text); err != nil {
+			return err
+		}
+		if err := c.config.Params.SetUIntName(&c.params, &name, value); err != nil {
+			return err
+		}
+	} else {
+		if err := c.config.Globals.SourceSetName(name, text); err != nil {
+			return err
+		}
+		// Preserve the catalog's type. An integer token can also supply a
+		// Double parameter; a local UInt shadow would hide that typed value.
+	}
+	if c.solver != nil {
+		return c.solver.UpdateParams(&c.params)
+	}
+	return nil
+}
+
 func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 	if err := c.valid(); err != nil {
 		return nil, err

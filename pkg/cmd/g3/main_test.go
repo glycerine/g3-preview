@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"quantified_model_relevancy.smt2":           "sat\n(((f 7) 7) ((f 11) 11))\nunsat\nsat\n(((f 11) 11))\n",
 	"integer_uf_model_relevancy.smt2":           "sat\n(((distinct x y) true) ((distinct (f x) (f y)) true))\nunsat\nsat\n(((distinct x y) true) ((distinct (f x) (f y)) true))\n",
 	"arithmetic_eq_options.smt2":                "unsat\nsat\nunsat\nsat\nunsat\nsat\n",
 	"rational_square_interval_scopes.smt2":      "unsat\nsat\nsat\n((d (/ 121.0 225.0)) (|squared difference| (/ 121.0 225.0)) ((let ((q d)) (+ q 0)) (/ 121.0 225.0)))\nunsat\nsat\nsat\n",
@@ -262,5 +263,39 @@ func TestSMTLibRunnerCommandLine(t *testing.T) {
 	}
 	if !strings.HasPrefix(out.String(), "unsat\n") || !strings.Contains(out.String(), "asserted") {
 		t.Fatal(out.String())
+	}
+}
+
+// The retained C++ executable can return models violating p and (or a b)
+// after changing relevancy from 0 to 2. Keep this case outside the strict
+// comparison table: require valid Go models and expose the reference defect.
+func TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect(t *testing.T) {
+	script, err := os.ReadFile(filepath.Join("test_vectors", "relevancy_update_scopes.smt2"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	valid := "sat\n((p true) ((or a b) true))\nsat\n((p true) ((or a b) true))\nsat\n((p true) ((or a b) true))\nunsat\nsat\n((p true) ((or a b) true))\n"
+	var out bytes.Buffer
+	if err = run(bytes.NewReader(script), &out); err != nil {
+		t.Fatal(err, out.String())
+	}
+	if canonicalOutput(out.String()) != canonicalOutput(valid) {
+		t.Fatal("Go model violates an active assertion after option update or pop", out.String())
+	}
+	if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
+		cmd := exec.Command(reference, "-in")
+		cmd.Stdin = bytes.NewReader(script)
+		value, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatal("C++ reference", err, string(value))
+		}
+		if canonicalOutput(string(value)) == canonicalOutput(valid) {
+			return // A reference with the model defect fixed agrees with Go.
+		}
+		knownDefect := "sat\n((p true) ((or a b) true))\nsat\n((p false) ((or a b) false))\nsat\n((p false) ((or a b) false))\nunsat\nsat\n((p false) ((or a b) false))\n"
+		if canonicalOutput(string(value)) != canonicalOutput(knownDefect) {
+			t.Fatal("unexpected C++ option-update behavior", string(value))
+		}
+		t.Log("C++ reference returned models violating asserted formulas after the relevancy update; Go models remain valid")
 	}
 }

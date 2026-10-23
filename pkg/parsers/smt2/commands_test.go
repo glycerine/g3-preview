@@ -112,6 +112,86 @@ func TestSMT2GetValueRejectsEmptyAndQuantifiedTermsBeforeOutput(t *testing.T) {
 	}
 }
 
+func TestSMT2UnsignedOptionsAndLiveRelevancyUpdates(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	input := `(set-option :smt.relevancy 0)
+(set-option :rlimit 4294967295)
+(set-option :produce-models true)
+(declare-const p Bool)
+(assert p)
+(check-sat)
+(get-value (p))
+(set-option :smt.relevancy 2)
+(check-sat)
+(get-value (p))`
+	var out bytes.Buffer
+	if err := ParseCommands(context, strings.NewReader(input), &out); err != nil {
+		t.Fatal(err, out.String())
+	}
+	if want := "sat\n((p true))\nsat\n((p true))\n"; out.String() != want {
+		t.Fatal("unsigned options or relevancy update", out.String(), want)
+	}
+}
+
+func TestSMT2UnsignedOptionsRejectRangeAndTrailingArguments(t *testing.T) {
+	for _, value := range []string{"4294967296", "0 extra", "0.5", "-1"} {
+		t.Run(value, func(t *testing.T) {
+			context, err := cmd_context.NewStandaloneContext()
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() {
+				if err := context.Close(); err != nil {
+					t.Fatal(err)
+				}
+			})
+			var out bytes.Buffer
+			if err := ParseCommands(context, strings.NewReader("(set-option :smt.relevancy "+value+")"), &out); err == nil || out.Len() != 0 {
+				t.Fatal("invalid unsigned option accepted or printed output", err, out.String())
+			}
+		})
+	}
+}
+
+func TestSMT2RelevancyUpdatesRestoreCachedBooleanAndTermITEWatches(t *testing.T) {
+	for _, formula := range []string{"(or a b)", "(not (and a b))", "(ite c a b)", "(= (ite c 1 2) x)"} {
+		t.Run(formula, func(t *testing.T) {
+			context, err := cmd_context.NewStandaloneContext()
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() {
+				if err := context.Close(); err != nil {
+					t.Fatal(err)
+				}
+			})
+			query := "(check-sat)(get-value (" + formula + "))"
+			input := "(set-option :smt.relevancy 0)(set-option :produce-models true)" +
+				"(declare-const a Bool)(declare-const b Bool)(declare-const c Bool)(declare-const x Int)" +
+				"(assert " + formula + ")" + query +
+				"(push 1)(set-option :smt.relevancy 2)" + query +
+				"(push 1)(assert (not c))" + query +
+				"(pop 1)" + query + "(pop 1)" + query
+			var out bytes.Buffer
+			if err := ParseCommands(context, strings.NewReader(input), &out); err != nil {
+				t.Fatal(err, out.String())
+			}
+			want := strings.Repeat("sat\n(("+formula+" true))\n", 5)
+			if out.String() != want {
+				t.Fatal("cached relevance watches lost an asserted gate or term ITE", out.String(), want)
+			}
+		})
+	}
+}
+
 func TestSMT2FunctionDefinitionFailuresAndRecovery(t *testing.T) {
 	for _, script := range []string{
 		"(define-fun f ((x Int)) Real x)",

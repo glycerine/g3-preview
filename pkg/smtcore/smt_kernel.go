@@ -30,6 +30,7 @@ type SMTKernel struct {
 	manager          *ast.ASTManager
 	checker          *SMTCheckerContext
 	relevancy        *SMTRelevancyPropagator
+	repairRelevancy  bool
 	internalizer     *SMTInternalizerState
 	assertions       []SMTKernelAssertion
 	assertedHead     int
@@ -396,6 +397,9 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err = k.internalizer.configureBooleanHeuristics(paramsState); err != nil {
 		return err
 	}
+	if !k.relevancy.enabled && paramsState.RelevancyLvl > 0 {
+		k.repairRelevancy = true
+	}
 	k.relevancy.enabled = paramsState.RelevancyLvl > 0
 	k.internalizer.relevancyLevel = paramsState.RelevancyLvl
 	k.smtState = paramsState
@@ -758,6 +762,19 @@ func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 	}
 	if err := k.internalizePending(); err != nil {
 		return nil, fmt.Errorf("smt kernel internalize assertions: %w", err)
+	}
+	// Cached assertions may have been internalized while relevancy filtering
+	// was disabled. Reestablish their root relevance before each check so a
+	// live option update or scope pop cannot omit them from the next model.
+	if k.repairRelevancy && k.relevancy.enabled {
+		for _, assertion := range k.assertions[:k.assertedHead] {
+			if err := k.internalizer.markRelevant(assertion.Formula); err != nil {
+				return nil, fmt.Errorf("smt kernel mark asserted formulas relevant: %w", err)
+			}
+			if err := k.relevancy.restoreExpressionWatches(assertion.Formula); err != nil {
+				return nil, fmt.Errorf("smt kernel restore asserted relevance watches: %w", err)
+			}
+		}
 	}
 	if err := k.internalizer.InitializeTheorySearch(); err != nil {
 		return nil, fmt.Errorf("smt kernel initialize theory search: %w", err)

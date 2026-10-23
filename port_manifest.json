@@ -37594,7 +37594,10 @@
         "TestSMTLibRunnerProofScript",
         "TestCommandContextNamedCoreAndProof",
         "TestSMT2GetValuePreservesParsedTermTextAcrossQueries",
-        "TestSMT2GetValueRejectsEmptyAndQuantifiedTermsBeforeOutput"
+        "TestSMT2GetValueRejectsEmptyAndQuantifiedTermsBeforeOutput",
+        "TestCommandContextUnsignedOptionsValidateTypesAndUpdateLiveSolver",
+        "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
+        "TestSMT2UnsignedOptionsRejectRangeAndTrailingArguments"
       ],
       "conditionals": [
         {
@@ -37669,10 +37672,29 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "unsigned set-option numeral path: validate uint32 input and command tail before effects, store front-end timeout/rlimit values, preserve typed global module values including integer input to Double parameters, and update an existing solver",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "go_targets": [
+            "pkg/cmd_context/context_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextUnsignedOptionsValidateTypesAndUpdateLiveSolver",
+            "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
+            "TestSMT2UnsignedOptionsRejectRangeAndTrailingArguments",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Default-model get-value keeps expanded AST expressions pinned in command-local references and independently caches original input term strings. The scanner cache end is saved before each token advance; copied term strings survive cache reset and are passed alongside concrete AST handles to result output. Definitions, quoted identifiers, let terms and internal whitespace are echoed without AST expansion. Empty lists and quantified terms are rejected before result output. The rational_square_interval_scopes.smt2 C++ comparison checks exact 121/225 values after scoped rational square constraints. Indexed optimization-model queries remain outside this increment."
+        "Default-model get-value keeps expanded AST expressions pinned in command-local references and independently caches original input term strings. The scanner cache end is saved before each token advance; copied term strings survive cache reset and are passed alongside concrete AST handles to result output. Definitions, quoted identifiers, let terms and internal whitespace are echoed without AST expansion. Empty lists and quantified terms are rejected before result output. The rational_square_interval_scopes.smt2 C++ comparison checks exact 121/225 values after scoped rational square constraints. Indexed optimization-model queries remain outside this increment.",
+        "Unsigned input rejects overflow, negative values for this path and trailing arguments before effects. Front-end timeout/rlimit values use the local unsigned parameter frame. Module values are parsed and owned by the source catalog, retaining its declared type even for integer input to Double options such as smt.restart_factor; no local UInt shadows that value. The catalog rejects unknown names and incompatible Boolean types. Floating-point, bit-vector and other remaining option-value branches are not claimed."
       ],
       "deviations": []
     },
@@ -86190,7 +86212,9 @@
         "pkg/parsers/smt2/expressions.go",
         "pkg/parsers/smt2/commands_test.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/cmd_context/results.go"
+        "pkg/cmd_context/results.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/context_test.go"
       ],
       "tests": [
         "TestSMT2ParserPushLocalShiftsFreeVariables",
@@ -86207,7 +86231,10 @@
         "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
         "TestSMT2FunctionDefinitionFailuresAndRecovery",
         "TestSMT2GetValuePreservesParsedTermTextAcrossQueries",
-        "TestSMT2GetValueRejectsEmptyAndQuantifiedTermsBeforeOutput"
+        "TestSMT2GetValueRejectsEmptyAndQuantifiedTermsBeforeOutput",
+        "TestCommandContextUnsignedOptionsValidateTypesAndUpdateLiveSolver",
+        "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
+        "TestSMT2UnsignedOptionsRejectRangeAndTrailingArguments"
       ],
       "assertions": [
         {
@@ -86851,11 +86878,30 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "unsigned set-option numeral path: validate uint32 input and command tail before effects, store front-end timeout/rlimit values, preserve typed global module values including integer input to Double parameters, and update an existing solver",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "go_targets": [
+            "pkg/cmd_context/context_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextUnsignedOptionsValidateTypesAndUpdateLiveSolver",
+            "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
+            "TestSMT2UnsignedOptionsRejectRangeAndTrailingArguments",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Each parsed command holds ASTRefs for all constructed terms/sorts until the command context acquires its declaration/assertion references. Existing concrete local binding and var-shifting helpers own quantifier/let frames and are unwound on success and error.",
-        "Default-model get-value keeps expanded AST expressions pinned in command-local references and independently caches original input term strings. The scanner cache end is saved before each token advance; copied term strings survive cache reset and are passed alongside concrete AST handles to result output. Definitions, quoted identifiers, let terms and internal whitespace are echoed without AST expansion. Empty lists and quantified terms are rejected before result output. The rational_square_interval_scopes.smt2 C++ comparison checks exact 121/225 values after scoped rational square constraints. Indexed optimization-model queries remain outside this increment."
+        "Default-model get-value keeps expanded AST expressions pinned in command-local references and independently caches original input term strings. The scanner cache end is saved before each token advance; copied term strings survive cache reset and are passed alongside concrete AST handles to result output. Definitions, quoted identifiers, let terms and internal whitespace are echoed without AST expansion. Empty lists and quantified terms are rejected before result output. The rational_square_interval_scopes.smt2 C++ comparison checks exact 121/225 values after scoped rational square constraints. Indexed optimization-model queries remain outside this increment.",
+        "Unsigned input rejects overflow, negative values for this path and trailing arguments before effects. Front-end timeout/rlimit values use the local unsigned parameter frame. Module values are parsed and owned by the source catalog, retaining its declared type even for integer input to Double options such as smt.restart_factor; no local UInt shadows that value. The catalog rejects unknown names and incompatible Boolean types. Floating-point, bit-vector and other remaining option-value branches are not claimed."
       ],
       "deviations": [
         "The selected local lookup returns an owning ASTRef for the future parser expression stack and reuses the concrete AST var_shifter; scanner, command-context fallback, other parser branches and complete expression-stack integration remain unported.",
@@ -109440,7 +109486,10 @@
         "pkg/smtcore/smt_assumptions.go",
         "pkg/smtcore/smt_search.go",
         "pkg/smtcore/smt_kernel_results.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_relevancy.go",
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -109460,7 +109509,10 @@
         "TestSMTSolverDerivesBooleanConsequences",
         "TestSMTSolverFindsBinaryClauseMutexes",
         "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
-        "TestSMTSolverPreferredSATReturnsConflictingPreferenceCores"
+        "TestSMTSolverPreferredSATReturnsConflictingPreferenceCores",
+        "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
+        "TestSMT2RelevancyUpdatesRestoreCachedBooleanAndTermITEWatches",
+        "TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -109601,14 +109653,31 @@
           "status": "dead_deleted",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "Go cached-assertion adaptation for live disabled-to-enabled relevance updates: restore active root relevance and missing source AND/OR/Boolean-ITE/term-ITE watches before checks, deduplicate existing handlers, skip quantifier bodies, and repeat after scope pops",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "go_targets": [
+            "pkg/smtcore/smt_relevancy.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
+            "TestSMT2RelevancyUpdatesRestoreCachedBooleanAndTermITEWatches",
+            "TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect"
+          ]
         }
       ],
       "ownership": [
-        "SMTKernel owns formula and proof references for asserted entries, the latest terminal unsat proof reference, and its checker, relevancy propagator, and internalizer lifecycle."
+        "SMTKernel owns formula and proof references for asserted entries, the latest terminal unsat proof reference, and its checker, relevancy propagator, and internalizer lifecycle.",
+        "After filtering is enabled following a disabled period, prepareCheck restores root relevance and source-shaped AND/OR/ITE watches from the owned active assertion DAG. Existing watches and handlers are not duplicated; scoped ones are recreated after pop. Quantifier bodies use instances, and term-ITE repair requires an existing enode. Checks that never reenable filtering retain their existing path."
       ],
       "deviations": [
         "Check uses first-UIP learning and backjumping and returns undef when a theory gives up or requests continuation without observable progress.",
-        "Cross-manager Translate reconstructs a kernel and replays owned base assertions instead of invoking context::copy; the solver interface has no reset operation, so the source placement-new reset is not exposed."
+        "Cross-manager Translate reconstructs a kernel and replays owned base assertions instead of invoking context::copy; the solver interface has no reset operation, so the source placement-new reset is not exposed.",
+        "The C++ executable returns invalid Boolean models for relevancy_update_scopes.smt2 after changing smt.relevancy from 0 to 2. Go requires models satisfying p and (or a b), including after pop. TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect retains the complete case separately from exact-output comparisons, requires valid Go output, and accepts only the observed invalid reference snapshot or a corrected reference agreeing with Go. This is an explicit reference defect, not a weakened Go expectation; 90 other scripts retain exact C++ comparisons."
       ]
     },
     {
@@ -111343,7 +111412,10 @@
       "go_targets": [
         "pkg/smtcore/smt_quantifier_registry.go",
         "pkg/smtcore/smt_quantifier_manager.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_quantifier_manager_test.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
@@ -111354,7 +111426,10 @@
         "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverInstallsQuantifierManagerAndEMatches",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
-        "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
+        "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample",
+        "TestSMTQuantifierActivationHonorsDisabledRelevancyAndAssignment",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "assertions": [
         {
@@ -111447,10 +111522,26 @@
             "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
             "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
           ]
+        },
+        {
+          "name": "is_active uses mode-aware context relevance and a true quantifier assignment in E-matching activation, quick checking and MBQI candidate validation; disabled filtering cannot omit a universal constraint",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "go_targets": [
+            "pkg/smtcore/smt_quantifier_manager_test.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTQuantifierActivationHonorsDisabledRelevancyAndAssignment",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "SMTQuantifierRegistry borrows quantifier AST handles, enode bindings, its queue schedule and cost model; it owns native statistic maps, insertion-ordered quantifier slices, and the scoped fingerprint set. SMTQuantifierManager owns its cached substitution and composes the registry, checker, rewriter, queue and internalizer through concrete typed references. SMTKernel owns the default cost model and closes it after the manager; an explicitly supplied registry retains caller ownership of its cost model."
+        "SMTQuantifierRegistry borrows quantifier AST handles, enode bindings, its queue schedule and cost model; it owns native statistic maps, insertion-ordered quantifier slices, and the scoped fingerprint set. SMTQuantifierManager owns its cached substitution and composes the registry, checker, rewriter, queue and internalizer through concrete typed references. SMTKernel owns the default cost model and closes it after the manager; an explicitly supplied registry retains caller ownership of its cost model.",
+        "Quantifier activity borrows the shared relevance query and retains the true-assignment guard. quantified_model_relevancy.smt2 disables E-matching and filtering, checks identity-function model values, and rejects a scoped conflicting ground fact. Reverting the activity predicate makes Go incorrectly return SAT for that conflict."
       ],
       "deviations": [
         "The source public add_instance forwarding bug that passes max_generation as max_top_generation is preserved. Finite MBQI uses a concrete Go model checker, honors mbqi.id prefixes, and resets and grows the source counterexample and iteration limits on each search. Auxiliary-solver checking and full model-finder adjustment remain open."
@@ -111751,13 +111842,19 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/smt_relevancy.go"
+        "pkg/smtcore/smt_relevancy.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTRelevancyBooleanConnectivePropagation",
         "TestSMTRelevancySharedAssignmentWatches",
         "TestSMTRelevancyDependenciesWatchesScopesAndEqualityClasses",
-        "TestSMTRelevancyDisabledAndTermITEHandler"
+        "TestSMTRelevancyDisabledAndTermITEHandler",
+        "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
+        "TestSMT2RelevancyUpdatesRestoreCachedBooleanAndTermITEWatches",
+        "TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect"
       ],
       "conditionals": [
         {
@@ -111925,13 +112022,30 @@
             "TestSMTRelevancySharedAssignmentWatches",
             "TestSMTRelevancyDisabledAndTermITEHandler"
           ]
+        },
+        {
+          "name": "Go cached-assertion adaptation for live disabled-to-enabled relevance updates: restore active root relevance and missing source AND/OR/Boolean-ITE/term-ITE watches before checks, deduplicate existing handlers, skip quantifier bodies, and repeat after scope pops",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "go_targets": [
+            "pkg/smtcore/smt_relevancy.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
+            "TestSMT2RelevancyUpdatesRestoreCachedBooleanAndTermITEWatches",
+            "TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect"
+          ]
         }
       ],
       "ownership": [
-        "SMTRelevancyPropagator borrows its concrete checker context and AST manager; native maps and slices own handler records, watch lists, scopes, and ordered relevance events."
+        "SMTRelevancyPropagator borrows its concrete checker context and AST manager; native maps and slices own handler records, watch lists, scopes, and ordered relevance events.",
+        "After filtering is enabled following a disabled period, prepareCheck restores root relevance and source-shaped AND/OR/ITE watches from the owned active assertion DAG. Existing watches and handlers are not duplicated; scoped ones are recreated after pop. Quantifier bodies use instances, and term-ITE repair requires an existing enode. Checks that never reenable filtering retain their existing path."
       ],
       "deviations": [
-        "The source region-allocated virtual handlers are closed typed Go records for the retained handler kinds. Context relevant_eh notification is exposed as ordered DrainNewlyRelevant events for the eventual context owner."
+        "The source region-allocated virtual handlers are closed typed Go records for the retained handler kinds. Context relevant_eh notification is exposed as ordered DrainNewlyRelevant events for the eventual context owner.",
+        "The C++ executable returns invalid Boolean models for relevancy_update_scopes.smt2 after changing smt.relevancy from 0 to 2. Go requires models satisfying p and (or a b), including after pop. TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect retains the complete case separately from exact-output comparisons, requires valid Go output, and accepts only the observed invalid reference snapshot or a corrected reference agreeing with Go. This is an explicit reference defect, not a weakened Go expectation; 90 other scripts retain exact C++ comparisons."
       ]
     },
     {

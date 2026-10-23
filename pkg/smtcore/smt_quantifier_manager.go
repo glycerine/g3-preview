@@ -349,7 +349,7 @@ func (q *SMTQuantifierManager) Propagate() error {
 }
 
 func (q *SMTQuantifierManager) active(quantifier ast.ASTHandle) bool {
-	return q.state.context.relevant[quantifier] && q.state.context.assignments[quantifier] == lbool.True
+	return q.state.isRelevant(quantifier) && q.state.context.assignments[quantifier] == lbool.True
 }
 
 func (q *SMTQuantifierManager) quickCheck() (bool, error) {

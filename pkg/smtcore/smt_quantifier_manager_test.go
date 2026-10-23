@@ -44,6 +44,30 @@ func smtManagedQuantifier(t *testing.T, m *ast.ASTManager, name string) (ast.AST
 	return quantifier, predicate, sort
 }
 
+func TestSMTQuantifierActivationHonorsDisabledRelevancyAndAssignment(t *testing.T) {
+	m, state, _, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})
+	relevancy, err := NewSMTRelevancyPropagator(state.context, true)
+	astTestMust(t, err)
+	astTestMust(t, state.SetRelevancy(relevancy))
+	quantifier, _, _ := smtManagedQuantifier(t, m, "activation-relevancy")
+	astTestMust(t, state.Internalize(quantifier, true))
+	astTestMust(t, state.context.SetRelevant(quantifier, false))
+	astTestMust(t, state.context.SetAssignment(quantifier, lbool.True))
+	if manager.active(quantifier) {
+		t.Fatal("enabled filtering activated an unmarked quantifier")
+	}
+	relevancy.enabled = false
+	if !manager.active(quantifier) {
+		t.Fatal("disabled filtering skipped an assigned quantifier")
+	}
+	for _, assignment := range []lbool.LBool{lbool.False, lbool.Undef} {
+		astTestMust(t, state.context.SetAssignment(quantifier, assignment))
+		if manager.active(quantifier) {
+			t.Fatal("disabled filtering ignored the quantifier assignment", assignment)
+		}
+	}
+}
+
 func TestSMTQuantifierManagerPropagatesAndScopesQueuedInstances(t *testing.T) {
 	m, state, registry, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})
 	quantifier, _, sort := smtManagedQuantifier(t, m, "managed-queue")

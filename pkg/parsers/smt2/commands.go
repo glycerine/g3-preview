@@ -168,6 +168,19 @@ func (p *commandParser) command() (bool, error) {
 		if err := p.advance(); err != nil {
 			return false, err
 		}
+		if p.token == IntegerToken {
+			value, err := p.unsigned()
+			if err != nil {
+				return false, err
+			}
+			if err = p.requireEnd(); err != nil {
+				return false, err
+			}
+			if err = p.context.SetUIntOption(key, value); err != nil {
+				return false, err
+			}
+			break
+		}
 		value, err := p.symbol()
 		if err != nil {
 			return false, err
