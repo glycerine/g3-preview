@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"inferred_trigger.smt2":       "unsat\n",
 	"function_overloads.smt2":     "sat\n",
 	"function_definitions.smt2":   "unsat\n",
 	"definition_scopes.smt2":      "sat\nsat\n",

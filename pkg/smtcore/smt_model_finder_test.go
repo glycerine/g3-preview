@@ -169,8 +169,19 @@ func TestSMTModelFinderPublishesSharedHintMacro(t *testing.T) {
 		t.Fatal("shared hint macro quantifiers", status, reason)
 	}
 	finder := solver.kernel.internalizer.quantifierManager.modelFinder
-	if finder.chosen[first] != function || finder.chosen[second] != function {
-		t.Fatal("hint search did not select the shared definition", finder.chosen)
+	// Pattern inference rebuilds the quantified assertions before the model
+	// finder sees them. Verify both retained QIDs and their selected definition.
+	seen := make(map[symbol.Symbol]bool)
+	for q, selected := range finder.chosen {
+		qid, _, err := m.GetQuantifierIDs(q)
+		astTestMust(t, err)
+		seen[qid] = true
+		if selected != function {
+			t.Fatal("hint search selected the wrong shared definition", finder.chosen)
+		}
+	}
+	if len(seen) != 2 || !seen[astTestSymbol(t, m, "model-finder-hint-q1")] || !seen[astTestSymbol(t, m, "model-finder-hint-q2")] {
+		t.Fatal("hint search omitted a shared definition quantifier", seen)
 	}
 	generated, err := solver.AcquireModel()
 	astTestMust(t, err)

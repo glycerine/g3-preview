@@ -99310,7 +99310,10 @@
         "pkg/smtcore/smt_asserted_ite.go",
         "pkg/smtcore/smt_asserted_ite_test.go",
         "pkg/smtcore/smt_asserted_reduce.go",
-        "pkg/smtcore/smt_asserted_reduce_test.go"
+        "pkg/smtcore/smt_asserted_reduce_test.go",
+        "pkg/smtcore/smt_asserted_patterns.go",
+        "pkg/smtcore/smt_asserted_patterns_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -99342,7 +99345,10 @@
         "TestSMTAssertedDistributionScopedConflict",
         "TestSMTAssertedRewriterSwitchesConjunctionPhases",
         "TestSMTAssertedRewriterPreservesParametersAcrossPhaseUpdates",
-        "TestSMTAssertedInputSurvivesPhaseCacheFlush"
+        "TestSMTAssertedInputSurvivesPhaseCacheFlush",
+        "TestSMTAssertedPatternInferenceGuardsAndProofs",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -99537,6 +99543,20 @@
           ]
         },
         {
+          "name": "pattern_inference_fn: source-order E-matching and quantifier guards, lifetime-owned inference rewriter, constructor-only policy snapshots, live parameter updates and proof-preserving pending suffix replacement without post-operation reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_patterns.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTAssertedPatternInferenceGuardsAndProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "remaining pending-formula reduction passes and quantifier transforms",
           "status": "unported",
           "go_target": null,
@@ -99547,7 +99567,8 @@
         "The kernel owns references to each flattened formula and its derived proof until pop or close.",
         "The concrete formula batch pins transformed rows and generated ITE definition proofs before temporary rewriter owners close. Pulling and injectivity passes swap/flatten rows without post-operation reduction; ITE passes reduce the resulting pending suffix as required by their source post_op.",
         "The kernel owns its accumulated assertion-rewriter parameter reference until close, and pins incoming formula/proof handles before phase changes flush cached ASTs. Tests that reuse original formulas after preprocessing retain independent AST references.",
-        "Negated-disjunction assertion flattening uses the source mk_not helper, eliminating double negations and simplifying Boolean constants consistently with not-or elimination proofs."
+        "Negated-disjunction assertion flattening uses the source mk_not helper, eliminating double negations and simplifying Boolean constants consistently with not-or elimination proofs.",
+        "The kernel owns the pattern inference rewriter until close. The transformed formula batch pins inferred quantifiers and composed proofs; model-finder identities refer to those transformed quantifiers, preserving their source QIDs."
       ],
       "deviations": [
         "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager.",
@@ -99576,7 +99597,10 @@
         "pkg/smtcore/smt_asserted_ite.go",
         "pkg/smtcore/smt_asserted_ite_test.go",
         "pkg/smtcore/smt_asserted_reduce.go",
-        "pkg/smtcore/smt_asserted_reduce_test.go"
+        "pkg/smtcore/smt_asserted_reduce_test.go",
+        "pkg/smtcore/smt_asserted_patterns.go",
+        "pkg/smtcore/smt_asserted_patterns_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -99608,7 +99632,10 @@
         "TestSMTAssertedDistributionScopedConflict",
         "TestSMTAssertedRewriterSwitchesConjunctionPhases",
         "TestSMTAssertedRewriterPreservesParametersAcrossPhaseUpdates",
-        "TestSMTAssertedInputSurvivesPhaseCacheFlush"
+        "TestSMTAssertedInputSurvivesPhaseCacheFlush",
+        "TestSMTAssertedPatternInferenceGuardsAndProofs",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -99751,6 +99778,20 @@
           ]
         },
         {
+          "name": "pattern_inference_fn: source-order E-matching and quantifier guards, lifetime-owned inference rewriter, constructor-only policy snapshots, live parameter updates and proof-preserving pending suffix replacement without post-operation reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_patterns.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTAssertedPatternInferenceGuardsAndProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "setup, reset, and remaining pending-formula reductions",
           "status": "unported",
           "go_target": null,
@@ -99761,7 +99802,8 @@
         "Flattened formula and proof handles are explicit owned kernel references; returned assertion handles are borrowed views.",
         "The concrete formula batch pins transformed rows and generated ITE definition proofs before temporary rewriter owners close. Pulling and injectivity passes swap/flatten rows without post-operation reduction; ITE passes reduce the resulting pending suffix as required by their source post_op.",
         "The kernel owns its accumulated assertion-rewriter parameter reference until close, and pins incoming formula/proof handles before phase changes flush cached ASTs. Tests that reuse original formulas after preprocessing retain independent AST references.",
-        "Negated-disjunction assertion flattening uses the source mk_not helper, eliminating double negations and simplifying Boolean constants consistently with not-or elimination proofs."
+        "Negated-disjunction assertion flattening uses the source mk_not helper, eliminating double negations and simplifying Boolean constants consistently with not-or elimination proofs.",
+        "The kernel owns the pattern inference rewriter until close. The transformed formula batch pins inferred quantifiers and composed proofs; model-finder identities refer to those transformed quantifiers, preserving their source QIDs."
       ],
       "deviations": [
         "The concrete retained subset is integrated with SMTKernel rather than exposed as a preprocessing class."

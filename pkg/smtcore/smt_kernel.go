@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/macros"
 	"github.com/glycerine/g3/pkg/ast/normal_forms"
+	"github.com/glycerine/g3/pkg/ast/pattern"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/solver"
@@ -47,6 +48,7 @@ type SMTKernel struct {
 	modelConfig      model.ModelEvaluatorConfig
 	generated        *model.Model
 	preprocessor     *rewriter.TheoryRewriter
+	patternInference *pattern.InferenceRewriter
 	assertedMacros   *macros.Manager
 	definedNames     *normal_forms.DefinedNames
 	quantifierCosts  *SMTQICostModel
@@ -160,6 +162,12 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 		}
 		return err
 	}
+	// Source constructs the inference functor with the initial params before
+	// smt_solver applies its full update. Preserve constructor-only policies.
+	patternOptions, err := full.preprocess.pattern.InferenceOptions(nil)
+	if err != nil {
+		return errors.Join(err, full.Close())
+	}
 	// smt_solver constructs smt_params and its context first, then invokes the
 	// full updt_params overload. That second step updates embedded bases such as
 	// dyn_ack_params, whose constructors intentionally saw an empty params_ref.
@@ -212,6 +220,13 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	}
 	k.relevancy.enabled = fullState.RelevancyLvl > 0
 	k.smtParams = full
+	k.patternInference, err = pattern.NewInferenceRewriterWithOptions(k.manager, patternOptions)
+	if err != nil {
+		return err
+	}
+	if err = full.preprocess.pattern.UpdateInferenceRewriter(k.patternInference, nil); err != nil {
+		return err
+	}
 	k.smtState = fullState
 	k.arithState = arithmetic
 	k.bvState = bitVector
@@ -372,6 +387,11 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	}
 	k.relevancy.enabled = paramsState.RelevancyLvl > 0
 	k.smtState = paramsState
+	if k.patternInference != nil {
+		if err = k.smtParams.preprocess.pattern.UpdateInferenceRewriter(k.patternInference, nil); err != nil {
+			return err
+		}
+	}
 	k.arithState = arithmetic
 	k.bvState = bitVector
 	if k.internalizer.quantifierManager != nil {
@@ -598,6 +618,9 @@ func (k *SMTKernel) internalizePending() error {
 	}
 	if err := k.applyPendingQuasiMacros(); err != nil {
 		return fmt.Errorf("apply asserted quasi-macros: %w", err)
+	}
+	if err := k.inferPendingPatterns(); err != nil {
+		return fmt.Errorf("infer asserted quantifier patterns: %w", err)
 	}
 	if err := k.reducePendingAssertions(); err != nil {
 		return fmt.Errorf("reduce final assertions: %w", err)
@@ -965,6 +988,13 @@ func (k *SMTKernel) Close() error {
 	result = errors.Join(result, k.clearGeneratedModel())
 	result = errors.Join(result, k.clearUnsatCore())
 	result = errors.Join(result, k.manager.DelRef(&k.unsatProof))
+	if k.patternInference != nil {
+		if err := k.patternInference.Close(); err != nil {
+			result = errors.Join(result, err)
+		} else {
+			k.patternInference = nil
+		}
+	}
 	if k.preprocessor != nil {
 		if err := k.preprocessor.Close(); err != nil {
 			result = errors.Join(result, err)
