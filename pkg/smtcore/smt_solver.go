@@ -788,6 +788,9 @@ func (s *SMTSolver) Translate(manager *ast.ASTManager, params *uparams.ParamsRef
 	if err = next.kernel.copyArithmeticPlugin(s.kernel); err != nil {
 		return nil, errors.Join(err, next.Close())
 	}
+	if err = next.kernel.copyBitVectorPlugin(s.kernel); err != nil {
+		return nil, errors.Join(err, next.Close())
+	}
 	if err = next.SetProduceModels(s.produceModels); err != nil {
 		_ = next.Close()
 		return nil, err

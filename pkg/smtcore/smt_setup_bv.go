@@ -22,13 +22,8 @@ func (k *SMTKernel) setupBitVectorLogicPolicy() error {
 		k.smtParams.array.state.Mode = 1 // AR_SIMPLE
 		k.smtParams.preprocess.state.PropagateBooleans = true
 	}
-	for _, theory := range k.internalizer.theoryOrder {
-		if bv, ok := theory.(*SMTBitVectorTheory); ok {
-			if err := bv.ConfigureBitVector(k.bvState); err != nil {
-				return err
-			}
-			bv.bitBlasterParams = k.smtParams.preprocess.bit
-		}
+	if err := k.configureBitVectorTheories(k.bvState, k.smtParams.preprocess.bit); err != nil {
+		return err
 	}
 	return k.applySimpleSetupPolicy()
 }

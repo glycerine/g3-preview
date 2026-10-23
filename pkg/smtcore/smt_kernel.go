@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast/normal_forms"
 	"github.com/glycerine/g3/pkg/ast/pattern"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/ast/rewriter/bit_blaster"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/util/cooperate"
@@ -76,6 +77,8 @@ type SMTKernel struct {
 	copiedArithmeticPlugin bool
 	copiedArithmeticOwner  *SMTArithParams
 	copiedArithmeticConfig SMTArithState
+	copiedBVOwner          *SMTBVParams
+	copiedBitBlasterOwner  *bit_blaster.SMTBitBlasterParams
 }
 
 func (k *SMTKernel) readPreprocessorState(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) (state SMTPreprocessorState, result error) {
@@ -430,12 +433,8 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err = k.configureArithmeticTheories(arithmetic); err != nil {
 		return err
 	}
-	for _, theory := range k.internalizer.theories {
-		if configurable, ok := theory.(interface{ ConfigureBitVector(SMTBVState) error }); ok {
-			if err = configurable.ConfigureBitVector(bitVector); err != nil {
-				return err
-			}
-		}
+	if err = k.configureBitVectorTheories(bitVector, k.smtParams.preprocess.bit); err != nil {
+		return err
 	}
 	name := "preprocess"
 	enabled, err := k.paramContext.GetBoolName(params, &name, true)
@@ -490,9 +489,16 @@ func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 	}
 	if bv, ok := theory.(*SMTBitVectorTheory); ok && k.smtParams != nil {
 		bv.bitBlasterParams = k.smtParams.preprocess.bit
+		if k.copiedBitBlasterOwner != nil {
+			bv.bitBlasterParams = *k.copiedBitBlasterOwner
+		}
 	}
 	if configurable, ok := theory.(interface{ ConfigureBitVector(SMTBVState) error }); ok {
-		if err := configurable.ConfigureBitVector(k.bvState); err != nil {
+		config := k.bvState
+		if k.copiedBVOwner != nil {
+			config = k.copiedBVOwner.state
+		}
+		if err := configurable.ConfigureBitVector(config); err != nil {
 			return err
 		}
 	}
@@ -677,6 +683,11 @@ func (k *SMTKernel) Push() error {
 	if err := k.open(); err != nil {
 		return err
 	}
+	if k.copiedBVOwner != nil {
+		if err := k.configureBitVectorTheories(k.bvState, k.smtParams.preprocess.bit); err != nil {
+			return err
+		}
+	}
 	if k.copiedArithmeticOwner != nil {
 		if err := k.configureArithmeticTheories(k.arithState); err != nil {
 			return err
@@ -763,6 +774,11 @@ func (k *SMTKernel) ScopeLevel() uint32 {
 func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 	if err := k.open(); err != nil {
 		return nil, err
+	}
+	if k.copiedBVOwner != nil {
+		if err := k.configureBitVectorTheories(k.bvState, k.smtParams.preprocess.bit); err != nil {
+			return nil, err
+		}
 	}
 	if k.copiedArithmeticOwner != nil {
 		if err := k.configureArithmeticTheories(k.arithState); err != nil {
