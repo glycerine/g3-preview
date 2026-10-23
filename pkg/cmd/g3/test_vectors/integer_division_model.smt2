@@ -1,0 +1,6 @@
+(set-logic QF_LIA)
+(declare-const x Int)
+(assert (= (div x 3) (- 3)))
+(assert (= (mod x 3) 2))
+(check-sat)
+(get-value (x (div x 3) (mod x 3) (rem x 3)))

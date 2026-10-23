@@ -30,6 +30,7 @@ type smtInternalizerScope struct {
 	atomHead           int
 	notifyLimit        int
 	enodeFlagLimit     int
+	atomNotifiedLimit  int
 	simplifyHead       int
 	inconsistent       bool
 	conflict           SMTBooleanJustification
@@ -135,6 +136,9 @@ type SMTInternalizerState struct {
 	atomPropagationHead      int
 	notifyTrail              []smtInternalizerNotifyTrail
 	enodeFlagTrail           []int32
+	atomNotified             map[int32]bool
+	atomNotifiedTrail        []int32
+	relevancyLevel           uint32
 	clauses                  []SMTInternalizedClause
 	ownedJustifications      []SMTJustification
 	assignedLiterals         []SMTLiteral
@@ -618,7 +622,8 @@ func (s *SMTInternalizerState) PushScope() error {
 		theoryEqLimit: len(s.theoryEqualities), theoryEqHead: s.theoryEqualityHead,
 		theoryDiseqLimit: len(s.theoryDisequalities), theoryDiseqHead: s.theoryDisequalityHead,
 		atomHead: s.atomPropagationHead, notifyLimit: len(s.notifyTrail), simplifyHead: s.simplifyHead,
-		enodeFlagLimit: len(s.enodeFlagTrail),
+		enodeFlagLimit:    len(s.enodeFlagTrail),
+		atomNotifiedLimit: len(s.atomNotifiedTrail),
 	})
 	if s.quantifiers != nil {
 		if err := s.quantifiers.PushScope(); err != nil {
@@ -774,6 +779,14 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		return ast.ErrASTDomain
 	}
 	s.atomPropagationHead = scope.atomHead
+	if scope.atomNotifiedLimit < 0 || scope.atomNotifiedLimit > len(s.atomNotifiedTrail) {
+		return ast.ErrASTDomain
+	}
+	for len(s.atomNotifiedTrail) > scope.atomNotifiedLimit {
+		i := len(s.atomNotifiedTrail) - 1
+		delete(s.atomNotified, s.atomNotifiedTrail[i])
+		s.atomNotifiedTrail = s.atomNotifiedTrail[:i]
+	}
 	if scope.enodeFlagLimit < 0 || scope.enodeFlagLimit > len(s.enodeFlagTrail) {
 		return ast.ErrASTDomain
 	}

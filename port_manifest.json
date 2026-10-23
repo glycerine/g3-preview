@@ -105996,7 +105996,9 @@
         "pkg/smtcore/smt_kernel_results.go",
         "pkg/smtcore/smt_boolean_term_value_test.go",
         "pkg/smtcore/theory_arith_mixed_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_theory_relevance_test.go",
+        "pkg/smtcore/theory_arith_division_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -106029,7 +106031,9 @@
         "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
         "TestSMTMixedArithmeticScopeModel",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
+        "TestSMTArithmeticSymbolicZeroDivisorGuard"
       ],
       "conditionals": [
         {
@@ -107068,10 +107072,23 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "relevance-aware theory-atom notifications: level-two callbacks wait for relevance, assigned atoms are delivered on later relevant_eh, duplicate callbacks are suppressed and notification state restores with scope rollback; existing Boolean-enode/equality propagation remains eager",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_propagation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_internalizer_state.go"
+          ],
+          "tests": [
+            "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
+            "TestSMTArithmeticSymbolicZeroDivisorGuard"
+          ]
         }
       ],
       "ownership": [
-        "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
+        "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records.",
+        "The theory notification trail stores Boolean variable IDs without AST ownership. Scope rollback restores eligibility for subsequent assignments and relevance events."
       ],
       "deviations": [
         "Structural subsumption remains unported.",
@@ -107095,7 +107112,9 @@
         "pkg/smtcore/smt_kernel_results.go",
         "pkg/smtcore/smt_boolean_term_value_test.go",
         "pkg/smtcore/theory_arith_mixed_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_theory_relevance_test.go",
+        "pkg/smtcore/theory_arith_division_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -107112,7 +107131,9 @@
         "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
         "TestSMTMixedArithmeticScopeModel",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
+        "TestSMTArithmeticSymbolicZeroDivisorGuard"
       ],
       "conditionals": [
         {
@@ -107371,10 +107392,23 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "relevance-aware theory-atom notifications: level-two callbacks wait for relevance, assigned atoms are delivered on later relevant_eh, duplicate callbacks are suppressed and notification state restores with scope rollback; existing Boolean-enode/equality propagation remains eager",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_propagation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_internalizer_state.go"
+          ],
+          "tests": [
+            "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
+            "TestSMTArithmeticSymbolicZeroDivisorGuard"
+          ]
         }
       ],
       "ownership": [
-        "SMTInternalizerState owns the concrete slices and clause objects for this context subset."
+        "SMTInternalizerState owns the concrete slices and clause objects for this context subset.",
+        "The theory notification trail stores Boolean variable IDs without AST ownership. Scope rollback restores eligibility for subsequent assignments and relevance events."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported."
@@ -113764,7 +113798,9 @@
         "pkg/smtcore/theory_arith_mixed.go",
         "pkg/smtcore/theory_arith_casts.go",
         "pkg/smtcore/theory_arith_mixed_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/theory_arith_division.go",
+        "pkg/smtcore/theory_arith_division_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -113776,7 +113812,9 @@
         "TestSMTMixedArithmeticScopeModel",
         "TestSMTMixedArithmeticCastsScopedProofs",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTArithmeticDivisionScopedProofs",
+        "TestSMTArithmeticSymbolicZeroDivisorGuard"
       ],
       "conditionals": [
         {
@@ -114540,10 +114578,26 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "retained default division axioms: publish division variables before recursive sibling internalization; div/mod reconstruction and absolute-divisor bounds, source rem sign rule, guarded real division and zero-divisor freedom, scoped axiom ownership and relevance watches; nonlinear solving remains partial",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_division.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticDivisionScopedProofs",
+            "TestSMTArithmeticSymbolicZeroDivisorGuard",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification."
+        "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification.",
+        "Division application markers follow theory scopes. Concrete division calls pin generated arithmetic and Boolean terms through recursive axiom internalization. The disabled constant-modulus enumeration option has no active retained setter and is not translated."
       ],
       "deviations": []
     },

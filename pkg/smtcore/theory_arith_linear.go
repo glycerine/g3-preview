@@ -80,6 +80,7 @@ type smtLinearArithmeticScope struct {
 	head                      int
 	unsupported               bool
 	castTerms, castPredicates int
+	divisionTerms             int
 }
 
 type smtLinearIntegerBranch struct {
@@ -117,6 +118,8 @@ type SMTLinearArithmeticTheory struct {
 	castTermTrail      []ast.ASTHandle
 	castPredicates     map[int32]bool
 	castPredicateTrail []int32
+	divisionTerms      map[ast.ASTHandle]bool
+	divisionTermTrail  []ast.ASTHandle
 	delta              big.Rat
 	equalityAdapter    *smtArithmeticEqualityAdapter
 	statistics         smtLinearArithmeticStatistics
@@ -155,6 +158,7 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		integerColumns: make(map[uint32]bool),
 		castTerms:      make(map[ast.ASTHandle]bool),
 		castPredicates: make(map[int32]bool),
+		divisionTerms:  make(map[ast.ASTHandle]bool),
 	}
 	t.equalityAdapter, err = newSMTArithmeticEqualityAdapter(base)
 	if err != nil {
@@ -375,8 +379,17 @@ func (t *SMTLinearArithmeticTheory) linearize(expression ast.ASTHandle) (smtLine
 				return smtLinearForm{}, false, argErr
 			}
 			denominator, numeral, numeralErr := t.numeral(right)
-			if numeralErr != nil || !numeral || denominator.Sign() == 0 {
+			if numeralErr != nil {
 				return smtLinearForm{}, false, numeralErr
+			}
+			if !numeral || denominator.Sign() == 0 {
+				variable, err := t.ensureVariable(expression)
+				if err != nil {
+					return smtLinearForm{}, false, err
+				}
+				result := newSMTLinearForm()
+				result.addTerm(variable, big.NewRat(1, 1))
+				return result, true, nil
 			}
 			result, linear, partErr := t.linearize(left)
 			if partErr == nil && linear {
@@ -388,6 +401,8 @@ func (t *SMTLinearArithmeticTheory) linearize(expression ast.ASTHandle) (smtLine
 				return smtLinearForm{}, false, nil
 			}
 			// Its variable is constrained by the source floor axioms below.
+		case smtArithOpIDiv, smtArithOpRem, smtArithOpMod:
+			// These variables are constrained by guarded division axioms.
 		default:
 			return smtLinearForm{}, false, nil
 		}
@@ -412,7 +427,7 @@ func (t *SMTLinearArithmeticTheory) InternalizeTerm(expression ast.ASTHandle) (b
 	}
 	if own {
 		switch op {
-		case smtArithOpNum, smtArithOpAdd, smtArithOpSub, smtArithOpUMinus, smtArithOpMul, smtArithOpDiv, smtArithOpToReal, smtArithOpToInt:
+		case smtArithOpNum, smtArithOpAdd, smtArithOpSub, smtArithOpUMinus, smtArithOpMul, smtArithOpDiv, smtArithOpToReal, smtArithOpToInt, smtArithOpIDiv, smtArithOpRem, smtArithOpMod:
 		default:
 			t.unsupported = true
 		}
@@ -430,7 +445,19 @@ func (t *SMTLinearArithmeticTheory) InternalizeTerm(expression ast.ASTHandle) (b
 			return false, argumentErr
 		}
 	}
-	if own && op == smtArithOpToInt && t.mixed {
+	division := own && (op == smtArithOpIDiv || op == smtArithOpRem || op == smtArithOpMod)
+	if own && op == smtArithOpDiv {
+		denominator, err := state.manager.GetArg(expression, 1)
+		if err != nil {
+			return false, err
+		}
+		value, numeral, err := t.numeral(denominator)
+		if err != nil {
+			return false, err
+		}
+		division = !numeral || value.Sign() == 0
+	}
+	if division || own && op == smtArithOpToInt && t.mixed {
 		// Source internalize_to_int publishes its variable before creating
 		// the to_real/to_int axioms, whose terms visit this cast again.
 		node := state.context.enodes[expression]
@@ -443,7 +470,12 @@ func (t *SMTLinearArithmeticTheory) InternalizeTerm(expression ast.ASTHandle) (b
 		if _, err = t.createVariable(node); err != nil {
 			return false, err
 		}
-		if err = t.installToIntAxioms(expression); err != nil {
+		if division {
+			err = t.installDivisionAxioms(expression, op)
+		} else {
+			err = t.installToIntAxioms(expression)
+		}
+		if err != nil {
 			return false, err
 		}
 		return true, nil
@@ -1150,7 +1182,7 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
-	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail)})
+	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail)})
 	return nil
 }
 
@@ -1175,6 +1207,10 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 		delete(t.castPredicates, variable)
 	}
 	t.castPredicateTrail = t.castPredicateTrail[:scope.castPredicates]
+	for _, term := range t.divisionTermTrail[scope.divisionTerms:] {
+		delete(t.divisionTerms, term)
+	}
+	t.divisionTermTrail = t.divisionTermTrail[:scope.divisionTerms]
 	t.scopes = t.scopes[:level]
 	if err := t.equalityAdapter.PopScopes(count); err != nil {
 		return err

@@ -1,0 +1,7 @@
+(set-logic ALL)
+(declare-const x Int)
+(assert (= x 1))
+(assert (= (div x 0) 5))
+(assert (= (mod x 0) 6))
+(check-sat)
+(get-value ((div x 0) (mod x 0) (rem x 0)))

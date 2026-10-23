@@ -8,7 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-func (t *SMTLinearArithmeticTheory) assertCastAxiom(formula ast.ASTHandle) (result error) {
+func (t *SMTLinearArithmeticTheory) assertArithmeticAxiom(formula ast.ASTHandle) (result error) {
 	s := t.state
 	ref, err := s.manager.NewRef(formula)
 	if err != nil {
@@ -22,7 +22,17 @@ func (t *SMTLinearArithmeticTheory) assertCastAxiom(formula ast.ASTHandle) (resu
 	if err != nil {
 		return err
 	}
-	return s.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal})
+	if err = s.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); err != nil {
+		return err
+	}
+	if literal.Var() == SMTTrueBoolVar {
+		return nil
+	}
+	atom, err := s.BoolExpression(literal.Var())
+	if err != nil {
+		return err
+	}
+	return s.markRelevant(atom)
 }
 
 func (t *SMTLinearArithmeticTheory) installToIntAxioms(term ast.ASTHandle) (result error) {
@@ -50,7 +60,7 @@ func (t *SMTLinearArithmeticTheory) installToIntAxioms(term ast.ASTHandle) (resu
 		if err != nil {
 			return err
 		}
-		return t.assertCastAxiom(eq)
+		return t.assertArithmeticAxiom(eq)
 	}
 	realTerm, err := m.MkFamilyApp(t.FamilyID(), smtArithOpToReal, nil, []ast.ASTHandle{term})
 	if err != nil {
@@ -99,10 +109,10 @@ func (t *SMTLinearArithmeticTheory) installToIntAxioms(term ast.ASTHandle) (resu
 		return err
 	}
 	defer func() { result = errors.Join(result, m.DelRef(&upperRef)) }()
-	if err = t.assertCastAxiom(lower); err != nil {
+	if err = t.assertArithmeticAxiom(lower); err != nil {
 		return err
 	}
-	return t.assertCastAxiom(upper)
+	return t.assertArithmeticAxiom(upper)
 }
 
 func (t *SMTLinearArithmeticTheory) internalizeIsInt(expression ast.ASTHandle) (handled bool, result error) {

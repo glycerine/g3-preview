@@ -10,6 +10,10 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"integer_zero_divisor.smt2":                 "sat\n(((div x 0) (div 1 0)) ((mod x 0) (mod 1 0)) ((rem x 0) (rem 1 0)))\n",
+	"integer_division_model.smt2":               "sat\n((x (- 7)) ((div x 3) (- 3)) ((mod x 3) 2) ((rem x 3) 2))\n",
+	"integer_negative_divisor.smt2":             "sat\n((x (- 7)) ((div x (- 3)) 3) ((mod x (- 3)) 2) ((rem x (- 3)) (- 2)))\n",
+	"integer_division_scopes.smt2":              "unsat\nsat\n((x 5))\n",
 	"mixed_floor_scopes.smt2":                   "sat\n((i (- 2)))\nunsat\nsat\n",
 	"mixed_is_int.smt2":                         "unsat\n",
 	"mixed_not_is_int.smt2":                     "unsat\n",

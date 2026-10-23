@@ -116,55 +116,75 @@ func (s *SMTInternalizerState) PropagateTheoryEvents() error {
 	return nil
 }
 
+func (s *SMTInternalizerState) propagateAssignedAtom(literal SMTLiteral) error {
+	variable := literal.Var()
+	data, err := s.BooleanData(variable)
+	if err != nil {
+		return fmt.Errorf("assigned literal %d Boolean metadata: %w", variable, err)
+	}
+	if !data.IsAtom() || s.atomNotified[variable] {
+		return nil
+	}
+	if node := s.context.enodes[s.boolExpr[variable]]; node != nil {
+		if err = s.propagateBooleanEnode(variable, node); err != nil {
+			return err
+		}
+		if s.inconsistent {
+			return nil
+		}
+	}
+	if data.IsEquality() {
+		expression := s.boolExpr[variable]
+		leftExpression, leftErr := s.manager.GetArg(expression, 0)
+		rightExpression, rightErr := s.manager.GetArg(expression, 1)
+		if leftErr != nil || rightErr != nil {
+			return fmt.Errorf("assigned equality %d arguments: %w", variable, ast.ErrASTDomain)
+		}
+		left, right := s.context.enodes[leftExpression], s.context.enodes[rightExpression]
+		if left == nil || right == nil {
+			return fmt.Errorf("assigned equality %d enodes: %w", variable, ast.ErrASTDomain)
+		}
+		if literal.Sign() {
+			if err = s.addDisequality(left, right, literal); err != nil {
+				return fmt.Errorf("propagate equality disequality: %w", err)
+			}
+		} else if err = s.addEquality(left, right, NewSMTEqualityEquation(literal)); err != nil {
+			return fmt.Errorf("propagate equality merge: %w", err)
+		}
+		if s.inconsistent {
+			return nil
+		}
+	}
+	if data.IsTheoryAtom() {
+		if s.relevancyLevel >= 2 && s.relevancy != nil && !s.relevancy.IsRelevant(s.boolExpr[variable]) {
+			return nil
+		}
+		plugin := s.theories[data.Theory()]
+		if plugin == nil {
+			return fmt.Errorf("assigned theory atom %d missing theory %d: %w", variable, data.Theory(), ast.ErrASTDomain)
+		}
+		if err = plugin.Assign(variable, !literal.Sign()); err != nil {
+			return fmt.Errorf("assigned theory atom %d theory %d: %w", variable, data.Theory(), err)
+		}
+	}
+	if s.atomNotified == nil {
+		s.atomNotified = make(map[int32]bool)
+	}
+	s.atomNotified[variable] = true
+	s.atomNotifiedTrail = append(s.atomNotifiedTrail, variable)
+	return nil
+}
+
 func (s *SMTInternalizerState) PropagateTheoryAssignments() error {
 	if err := s.open(); err != nil {
 		return err
 	}
 	for s.atomPropagationHead < len(s.assignedLiterals) {
-		literal := s.assignedLiterals[s.atomPropagationHead]
-		variable := literal.Var()
-		data, err := s.BooleanData(variable)
-		if err != nil {
-			return fmt.Errorf("assigned literal %d Boolean metadata: %w", variable, err)
+		if err := s.propagateAssignedAtom(s.assignedLiterals[s.atomPropagationHead]); err != nil {
+			return err
 		}
-		if node := s.context.enodes[s.boolExpr[variable]]; node != nil {
-			if err = s.propagateBooleanEnode(variable, node); err != nil {
-				return err
-			}
-			if s.inconsistent {
-				return nil
-			}
-		}
-		if data.IsEquality() {
-			expression := s.boolExpr[variable]
-			leftExpression, leftErr := s.manager.GetArg(expression, 0)
-			rightExpression, rightErr := s.manager.GetArg(expression, 1)
-			if leftErr != nil || rightErr != nil {
-				return fmt.Errorf("assigned equality %d arguments: %w", variable, ast.ErrASTDomain)
-			}
-			left, right := s.context.enodes[leftExpression], s.context.enodes[rightExpression]
-			if left == nil || right == nil {
-				return fmt.Errorf("assigned equality %d enodes: %w", variable, ast.ErrASTDomain)
-			}
-			if literal.Sign() {
-				if err = s.addDisequality(left, right, literal); err != nil {
-					return fmt.Errorf("propagate equality disequality: %w", err)
-				}
-			} else if err = s.addEquality(left, right, NewSMTEqualityEquation(literal)); err != nil {
-				return fmt.Errorf("propagate equality merge: %w", err)
-			}
-			if s.inconsistent {
-				return nil
-			}
-		}
-		if data.IsTheoryAtom() {
-			plugin := s.theories[data.Theory()]
-			if plugin == nil {
-				return fmt.Errorf("assigned theory atom %d missing theory %d: %w", variable, data.Theory(), ast.ErrASTDomain)
-			}
-			if err = plugin.Assign(variable, !literal.Sign()); err != nil {
-				return fmt.Errorf("assigned theory atom %d theory %d: %w", variable, data.Theory(), err)
-			}
+		if s.inconsistent {
+			return nil
 		}
 		s.atomPropagationHead++
 	}
@@ -218,6 +238,26 @@ func (s *SMTInternalizerState) propagateTheoryRelevancy() error {
 					return fmt.Errorf("attached theory %d relevant expression %d: %w", item.theory, expression.Slot(), err)
 				}
 				notified[item.theory] = struct{}{}
+			}
+		}
+		// Source relevant_eh queues an already assigned atom when it first
+		// becomes relevant. Notify once per assignment and restore on pop.
+		if variable, found := s.BoolVar(expression); found {
+			literal := NewSMTLiteral(variable, false)
+			value, err := s.Assignment(literal)
+			if err != nil {
+				return err
+			}
+			if value != lbool.Undef {
+				if value == lbool.False {
+					literal = literal.Negated()
+				}
+				if err = s.propagateAssignedAtom(literal); err != nil {
+					return err
+				}
+				if s.inconsistent {
+					return nil
+				}
 			}
 		}
 	}

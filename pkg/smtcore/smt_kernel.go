@@ -229,6 +229,7 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 		return errors.Join(err, full.Close())
 	}
 	k.relevancy.enabled = fullState.RelevancyLvl > 0
+	k.internalizer.relevancyLevel = fullState.RelevancyLvl
 	k.smtParams = full
 	k.patternInference, err = pattern.NewInferenceRewriterWithOptions(k.manager, patternOptions)
 	if err != nil {
@@ -396,6 +397,7 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 		return err
 	}
 	k.relevancy.enabled = paramsState.RelevancyLvl > 0
+	k.internalizer.relevancyLevel = paramsState.RelevancyLvl
 	k.smtState = paramsState
 	if k.patternInference != nil {
 		if err = k.smtParams.preprocess.pattern.UpdateInferenceRewriter(k.patternInference, nil); err != nil {
