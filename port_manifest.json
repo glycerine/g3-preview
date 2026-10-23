@@ -98537,7 +98537,9 @@
         "pkg/smtcore/smt_asserted_formulas.go",
         "pkg/smtcore/smt_asserted_propagate.go",
         "pkg/smtcore/smt_kernel.go",
-        "pkg/smtcore/smt_solver.go"
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_asserted_macros.go",
+        "pkg/smtcore/smt_asserted_macros_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98547,7 +98549,11 @@
         "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices",
         "TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions",
         "TestSMTSolverValuePropagationComposesProofs",
-        "TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof"
+        "TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof",
+        "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
+        "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
+        "TestSMTAssertedMacroExpansionPreservesUnsatProof",
+        "TestSMTAssertedMacroPublishesPermutedArguments"
       ],
       "conditionals": [
         {
@@ -98648,7 +98654,13 @@
           ]
         },
         {
-          "name": "remaining pending-formula reduction passes, macros, NNF/CNF, and quantifier transforms",
+          "name": "macro-finder fixed-point discovery and expansion of pending assertions, owned formula/proof replacement, commit-time forbidden declarations and scope rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_macros.go",
+          "tests": ["TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels", "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback", "TestSMTAssertedMacroExpansionPreservesUnsatProof"]
+        },
+        {
+          "name": "remaining pending-formula reduction passes, quasi-macros, NNF/CNF, and quantifier transforms",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -98670,7 +98682,9 @@
         "pkg/smtcore/smt_asserted_formulas.go",
         "pkg/smtcore/smt_asserted_propagate.go",
         "pkg/smtcore/smt_kernel.go",
-        "pkg/smtcore/smt_solver.go"
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_asserted_macros.go",
+        "pkg/smtcore/smt_asserted_macros_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98680,7 +98694,11 @@
         "TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices",
         "TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions",
         "TestSMTSolverValuePropagationComposesProofs",
-        "TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof"
+        "TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof",
+        "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
+        "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
+        "TestSMTAssertedMacroExpansionPreservesUnsatProof",
+        "TestSMTAssertedMacroPublishesPermutedArguments"
       ],
       "conditionals": [
         {
@@ -98732,7 +98750,13 @@
           ]
         },
         {
-          "name": "setup, reset, remaining pending-formula reductions, and macros",
+          "name": "scoped asserted macro ownership, forbidden declarations, discovery, expansion and model interpretation access",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_macros.go",
+          "tests": ["TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels", "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback", "TestSMTAssertedMacroExpansionPreservesUnsatProof"]
+        },
+        {
+          "name": "setup, reset, remaining pending-formula reductions, and quasi-macros",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -109506,7 +109530,9 @@
       "go_targets": [
         "pkg/smtcore/smt_model_generator.go",
         "pkg/smtcore/smt_model_generator_test.go",
-        "pkg/smtcore/smt_model_publication_test.go"
+        "pkg/smtcore/smt_model_publication_test.go",
+        "pkg/smtcore/smt_asserted_macros.go",
+        "pkg/smtcore/smt_asserted_macros_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -109517,7 +109543,11 @@
         "TestSMTModelGeneratorFinalizesTheories",
         "TestSMTModelGeneratorRegistersExistingModelValues",
         "TestSMTIntegerDiffTheoryBuildsModelValues",
-        "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding"
+        "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
+        "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
+        "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
+        "TestSMTAssertedMacroExpansionPreservesUnsatProof",
+        "TestSMTAssertedMacroPublishesPermutedArguments"
       ],
       "assertions": [
         {
@@ -109672,7 +109702,13 @@
           ]
         },
         {
-          "name": "Asserted-formula macro interpretations and remaining model-assembly orchestration (remaining src/smt/smt_model_generator.cpp)",
+          "name": "register_macros: normalized asserted-formula macro interpretations after theory finalization and before model-finder adjustment (src/smt/smt_model_generator.cpp:510-532)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_macros.go",
+          "tests": ["TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels", "TestSMTAssertedMacroPublishesPermutedArguments"]
+        },
+        {
+          "name": "remaining model-assembly completeness audit (src/smt/smt_model_generator.cpp)",
           "status": "unported"
         }
       ],
@@ -109692,7 +109728,9 @@
         "pkg/smtcore/smt_model_generator.go",
         "pkg/smtcore/smt_model_generator_test.go",
         "pkg/smtcore/smt_model_value.go",
-        "pkg/smtcore/smt_model_value_test.go"
+        "pkg/smtcore/smt_model_value_test.go",
+        "pkg/smtcore/smt_asserted_macros.go",
+        "pkg/smtcore/smt_asserted_macros_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -109704,7 +109742,11 @@
         "TestSMTModelGeneratorRegistersExistingModelValues",
         "TestSMTIntegerDiffTheoryBuildsModelValues",
         "TestSMTModelValueDependenciesAndProcedures",
-        "TestSMTModelValueEnodeDependencyCanonicalizesRoot"
+        "TestSMTModelValueEnodeDependencyCanonicalizesRoot",
+        "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
+        "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
+        "TestSMTAssertedMacroExpansionPreservesUnsatProof",
+        "TestSMTAssertedMacroPublishesPermutedArguments"
       ],
       "conditionals": [
         {
@@ -109766,7 +109808,13 @@
           ]
         },
         {
-          "name": "Hidden declarations, asserted-formula macros and remaining model construction (remaining src/smt/smt_model_generator.h:177-232)",
+          "name": "asserted-formula macro interpretations and ordered model-assembly registration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_macros.go",
+          "tests": ["TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels", "TestSMTAssertedMacroPublishesPermutedArguments"]
+        },
+        {
+          "name": "Hidden declarations and remaining model construction audit (remaining src/smt/smt_model_generator.h:177-232)",
           "status": "unported"
         }
       ],

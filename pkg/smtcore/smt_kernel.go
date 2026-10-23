@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/macros"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/solver"
@@ -45,6 +46,7 @@ type SMTKernel struct {
 	modelConfig      model.ModelEvaluatorConfig
 	generated        *model.Model
 	preprocessor     *rewriter.TheoryRewriter
+	assertedMacros   *macros.Manager
 	quantifierCosts  *SMTQICostModel
 	modelCooperation *cooperate.Cooperation
 	paramContext     *uparams.ParamsContext
@@ -102,8 +104,12 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 	if err != nil {
 		return nil, errors.Join(err, internalizer.Close())
 	}
+	macroManager, err := macros.NewManager(manager)
+	if err != nil {
+		return nil, errors.Join(err, manager.DelRef(&proof), internalizer.Close())
+	}
 	return &SMTKernel{
-		manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof,
+		manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof, assertedMacros: macroManager,
 		smtState: SMTParamsState{
 			MaxConflicts: ^uint32(0), InvDecay: 1.052, RandomInitialActivity: 1, RandomVarFreq: 0.01, CaseSplitStrategy: 1, RestartStrategy: 1, RestartInitial: 100, RestartFactor: 1.1,
 			RestartAdaptive: true, AgilityFactor: 0.9999, RestartAgilityThreshold: 0.18, SimplifyClauses: true,
@@ -285,6 +291,9 @@ func (k *SMTKernel) buildCandidateModelGenerator() (*SMTModelGenerator, error) {
 		return fail(err)
 	}
 	if err = generator.BuildStateValues(k.internalizer); err != nil {
+		return fail(err)
+	}
+	if err = generator.registerAssertedMacros(k.assertedMacros); err != nil {
 		return fail(err)
 	}
 	if manager := k.internalizer.quantifierManager; manager != nil && manager.modelFinder != nil {
@@ -489,12 +498,23 @@ func (k *SMTKernel) Assertions() []SMTKernelAssertion {
 }
 
 func (k *SMTKernel) internalizePending() error {
+	if k.assertedMacros.HasMacros() {
+		if err := k.findPendingMacros(); err != nil {
+			return err
+		}
+	}
 	if err := k.propagatePendingAssertions(); err != nil {
+		return err
+	}
+	if err := k.findPendingMacros(); err != nil {
 		return err
 	}
 	for k.assertedHead < len(k.assertions) {
 		assertion := k.assertions[k.assertedHead]
 		if err := k.internalizer.Assert(assertion.Formula, assertion.Proof, 0); err != nil {
+			return err
+		}
+		if err := k.assertedMacros.MarkForbidden([]ast.ASTHandle{assertion.Formula}); err != nil {
 			return err
 		}
 		k.assertedHead++
@@ -509,8 +529,11 @@ func (k *SMTKernel) Push() error {
 	if err := k.internalizePending(); err != nil {
 		return err
 	}
-	if err := k.internalizer.PushScope(); err != nil {
+	if err := k.assertedMacros.PushScope(); err != nil {
 		return err
+	}
+	if err := k.internalizer.PushScope(); err != nil {
+		return errors.Join(err, k.assertedMacros.PopScope(1))
 	}
 	k.scopes = append(k.scopes, len(k.assertions))
 	return nil
@@ -526,6 +549,9 @@ func (k *SMTKernel) Pop(count uint32) error {
 	level := len(k.scopes) - int(count)
 	limit := k.scopes[level]
 	if err := k.internalizer.PopScopes(count); err != nil {
+		return err
+	}
+	if err := k.assertedMacros.PopScope(count); err != nil {
 		return err
 	}
 	for index := len(k.assertions); index > limit; index-- {
@@ -848,6 +874,7 @@ func (k *SMTKernel) Close() error {
 		}
 	}
 	result = errors.Join(result, k.internalizer.Close())
+	result = errors.Join(result, k.assertedMacros.Close())
 	if k.quantifierCosts != nil {
 		result = errors.Join(result, k.quantifierCosts.Close())
 	}
