@@ -110044,6 +110044,7 @@
         "TestSMTQFUFBVSetupUsesNativeArrayAndBitVectorRoute",
         "TestSMTQFAUFLIASetupUsesIntegerArithmeticAndArrays",
         "TestSMTLinearRealLogicSetupUsesConcreteArithmetic",
+        "TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset",
         "TestSMTDatatypeQFDTSetup",
         "TestSMTPseudoBooleanQFFDExactCardinality",
         "TestSMTQFFPSetupInstallsFloatingPointAndBitVectorTheories",
@@ -110068,7 +110069,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "explicit arithmetic and array logic classification, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA/QF_UFLRA/QF_UFLIA/QF_AUFLIA/LRA/UFLRA theory selection, native shared QF_UFBV array/bit-vector and UFLRA array routing, and conservative incomplete-theory installation for remaining arithmetic and array logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409)",
+          "name": "explicit arithmetic and array logic classification, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA/QF_UFLRA/QF_UFLIA/QF_AUFLIA/LRA/UFLRA and retained AUFLIA/AUFLIA+/AUFLIA-/UFNIA linear-subset theory selection, native shared QF_UFBV array/bit-vector and quantified array routing, and conservative incomplete-theory installation for remaining nonlinear or mixed arithmetic logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409)",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
@@ -110082,7 +110083,8 @@
             "TestSMTSolverPublishesStrictRealDifferenceModel",
             "TestSMTQFUFBVSetupUsesNativeArrayAndBitVectorRoute",
             "TestSMTQFAUFLIASetupUsesIntegerArithmeticAndArrays",
-            "TestSMTLinearRealLogicSetupUsesConcreteArithmetic"
+            "TestSMTLinearRealLogicSetupUsesConcreteArithmetic",
+            "TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset"
           ]
         },
         {

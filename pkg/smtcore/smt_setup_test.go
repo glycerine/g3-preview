@@ -115,3 +115,45 @@ func TestSMTLinearRealLogicSetupUsesConcreteArithmetic(t *testing.T) {
 		})
 	}
 }
+
+func TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset(t *testing.T) {
+	for _, logic := range []string{"AUFLIA", "AUFLIA+", "AUFLIA-", "UFNIA"} {
+		t.Run(logic, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			arithmeticFamily, err := m.RegisterArithmeticPlugin()
+			astTestMust(t, err)
+			arrayFamily, err := m.RegisterArrayPlugin()
+			astTestMust(t, err)
+			integerSort, err := m.MkFamilySort(arithmeticFamily, 1, nil)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "quantified-integer-setup-x"), integerSort)
+			astTestMust(t, err)
+			y, err := m.MkConst(astTestSymbol(t, m, "quantified-integer-setup-y"), integerSort)
+			astTestMust(t, err)
+			less, err := m.MkFamilyApp(arithmeticFamily, smtArithOpLT, nil, []ast.ASTHandle{x, y})
+			astTestMust(t, err)
+			greaterEqual, err := m.MkFamilyApp(arithmeticFamily, smtArithOpGE, nil, []ast.ASTHandle{x, y})
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, logic, SMTSolverConfig{
+				Params:         modelConfig.Context,
+				ModelEvaluator: modelConfig,
+			})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			arithmetic, ok := solver.kernel.internalizer.theories[arithmeticFamily].(*SMTLinearArithmeticTheory)
+			if !ok || !arithmetic.integer {
+				t.Fatal(logic, "did not install the concrete integer linear subset")
+			}
+			if _, ok = solver.kernel.internalizer.theories[arrayFamily].(*SMTArrayTheory); !ok {
+				t.Fatal(logic, "did not install the native shared array theory")
+			}
+			astTestMust(t, solver.Assert(less))
+			astTestMust(t, solver.Assert(greaterEqual))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal(logic, "linear contradiction", status)
+			}
+		})
+	}
+}
