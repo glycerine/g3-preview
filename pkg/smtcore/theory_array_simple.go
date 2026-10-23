@@ -5,7 +5,7 @@ import "github.com/glycerine/g3/pkg/ast"
 
 // SMTSimpleArrayTheory shares store/select and model infrastructure with the
 // full theory. Its immutable operation boundary excludes full-array axioms.
-// The source delayed parent/axiom worklists remain a separate partial port.
+// Full constructor scheduling remains a separate partial port.
 type SMTSimpleArrayTheory struct{ *SMTArrayTheory }
 
 func NewSMTSimpleArrayTheory(family ast.FamilyID) (*SMTSimpleArrayTheory, error) {
@@ -68,6 +68,10 @@ func (k *SMTKernel) setupArrayBackend() error {
 }
 
 func (k *SMTKernel) replaceUnusedArrayTheory(theory SMTTheoryInternalizer) error {
+	core := smtArrayCore(theory)
+	if core.parameterOwner == nil {
+		core.parameterOwner = &k.smtParams.array
+	}
 	s := k.internalizer
 	if len(s.scopes) != 0 || s.theoriesSetup {
 		return ast.ErrASTDomain
@@ -76,8 +80,8 @@ func (k *SMTKernel) replaceUnusedArrayTheory(theory SMTTheoryInternalizer) error
 	if old == nil {
 		return s.RegisterTheory(theory)
 	}
-	core := smtArrayCore(old)
-	if core == nil || core.NumVariables() != 0 || len(core.storeTrail) != 0 || len(core.selectTrail) != 0 || len(core.scopes) != 0 {
+	previous := smtArrayCore(old)
+	if previous == nil || previous.NumVariables() != 0 || len(previous.storeTrail) != 0 || len(previous.selectTrail) != 0 || len(previous.scopes) != 0 {
 		return ast.ErrASTDomain
 	}
 	position := -1

@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
+	"github.com/glycerine/g3/pkg/util/backtrack"
 	"github.com/glycerine/g3/pkg/util/statistics"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -28,9 +29,9 @@ type smtArrayAxiomPair struct {
 }
 
 type smtArrayStatistics struct {
-	axiom1, axiom2, extensionality                        uint64
-	mapAxiom, defaultMap, selectConst, defaultStore       uint64
-	defaultConst, defaultAsArray, selectAsArray, eqSplits uint64
+	axiom1, axiom2, expandedAxiom2, extensionality        uint32
+	mapAxiom, defaultMap, selectConst, defaultStore       uint32
+	defaultConst, defaultAsArray, selectAsArray, eqSplits uint32
 }
 
 // SMTArrayTheory internalizes read-over-write, constant-array, map, default,
@@ -57,6 +58,13 @@ type SMTArrayTheory struct {
 	readTodo                              []smtArrayAxiomPair
 	readFingerprints                      map[ast.ASTHandle][]*smtArrayReadFingerprint
 	readFingerprintTrail                  []*smtArrayReadFingerprint
+	arrayUnion                            *backtrack.UnionFind
+	arrayTrail                            *backtrack.TrailStack
+	arrayData                             []*smtArrayVarData
+	arrayMergeError                       error
+	activeParentSelects                   map[ast.ASTHandle]bool
+	parameterOwner                        *SMTArrayParams
+	schedulingReady                       bool
 }
 
 func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
@@ -64,7 +72,7 @@ func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &SMTArrayTheory{
+	theory := &SMTArrayTheory{
 		SMTTheoryBase:              base,
 		extensional:                true,
 		stores:                     make(map[ast.ASTHandle]bool),
@@ -76,7 +84,11 @@ func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
 		extensionalityFingerprints: make(map[smtArrayEnodePair]bool),
 		arrayConfig:                SMTArrayState{Mode: 3, Simplify: true, Extensional: true, Laziness: 1, DelayExpAxiom: true, AlwaysPropUpward: true, LazyIEqDelay: 10},
 		readFingerprints:           make(map[ast.ASTHandle][]*smtArrayReadFingerprint),
-	}, nil
+		arrayTrail:                 backtrack.NewTrailStack(),
+		activeParentSelects:        make(map[ast.ASTHandle]bool),
+	}
+	theory.arrayUnion, err = backtrack.NewUnionFind(&smtArrayUnionContext{theory})
+	return theory, err
 }
 
 func (t *SMTArrayTheory) arrayOperation(expression ast.ASTHandle) (int32, bool, error) {
@@ -190,6 +202,12 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 		if err = t.assertStoreAxiom(expression); err != nil {
 			return false, fmt.Errorf("array store axiom: %w", err)
 		}
+		if t.arrayConfig.Laziness == 0 {
+			base := state.context.enodes[expression].arguments[0]
+			if err = t.addParentStore(base.TheoryVar(t.FamilyID()), state.context.enodes[expression]); err != nil {
+				return false, err
+			}
+		}
 	case ast.ASTArrayOpSelect:
 		if err = t.assertSelectStoreAxioms(expression); err != nil {
 			return false, fmt.Errorf("array select-store axiom: %w", err)
@@ -276,30 +294,8 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 	if err != nil {
 		return err
 	}
-	return t.assertEquivalentSelectAxioms(selectExpression, array)
-}
-
-// Source add_parent_select visits the stores/constructors already in the
-// array class, including a read registered after an earlier equality merge.
-func (t *SMTArrayTheory) assertEquivalentSelectAxioms(observer, array ast.ASTHandle) error {
-	state, err := t.State()
-	if err != nil {
-		return err
-	}
-	if err := t.assertSelectAxiom(observer, array); err != nil {
-		return err
-	}
-	node := state.context.enodes[array]
-	if node == nil {
-		return nil
-	}
-	for index := 0; index < len(t.variables); index++ {
-		candidate := t.variables[index]
-		if candidate != nil && candidate.owner != array && candidate.root == node.root {
-			if err := t.assertSelectAxiom(observer, candidate.owner); err != nil {
-				return err
-			}
-		}
+	if t.arrayConfig.Laziness == 0 {
+		return t.addParentSelect(state.context.enodes[array].TheoryVar(t.FamilyID()), state.context.enodes[selectExpression])
 	}
 	return nil
 }
@@ -767,7 +763,14 @@ func (t *SMTArrayTheory) NewEquality(left, right SMTTheoryVar) error {
 	if _, err := t.Enode(right); err != nil {
 		return err
 	}
-	return t.instantiateEquivalentArrayAxioms()
+	t.arrayUnion.Merge(uint32(left), uint32(right))
+	if t.arrayMergeError != nil {
+		return t.arrayMergeError
+	}
+	if !t.simple {
+		return t.instantiateEquivalentArrayAxioms()
+	}
+	return nil
 }
 func (*SMTArrayTheory) Assign(int32, bool) error { return nil }
 
@@ -777,6 +780,9 @@ func (t *SMTArrayTheory) instantiateEquivalentArrayAxioms() error {
 		return err
 	}
 	for _, observer := range t.selectTrail {
+		if !t.activeParentSelects[observer] {
+			continue
+		}
 		array, argErr := state.manager.GetArg(observer, 0)
 		if argErr != nil {
 			return argErr
@@ -787,6 +793,13 @@ func (t *SMTArrayTheory) instantiateEquivalentArrayAxioms() error {
 		}
 		for _, candidate := range t.variables {
 			if candidate != nil && candidate.root == arrayNode.root {
+				op, array, err := t.arrayOperation(candidate.owner)
+				if err != nil {
+					return err
+				}
+				if array && op == ast.ASTArrayOpStore {
+					continue
+				}
 				if err = t.assertSelectAxiom(observer, candidate.owner); err != nil {
 					return err
 				}
@@ -830,6 +843,7 @@ func (t *SMTArrayTheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {
 		return err
 	}
+	t.arrayTrail.PushScope()
 	t.scopes = append(t.scopes, smtArrayScope{
 		stores:           len(t.storeTrail),
 		selects:          len(t.selectTrail),
@@ -850,6 +864,14 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
+	oldVars, err := t.OldNumVariables(count)
+	if err != nil {
+		return err
+	}
+	if err := t.arrayTrail.PopScope(count); err != nil {
+		return err
+	}
+	t.arrayData = t.arrayData[:oldVars]
 	// Source theory_array_base::pop_scope_eh clears pending work before
 	// dropping the enodes and fingerprints owned by the popped scopes.
 	t.extensionalityTodo = nil
@@ -900,17 +922,32 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 
 func (t *SMTArrayTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	t.finalCheckIndex++
+	var delayed, interfaces bool
+	var err error
 	if t.arrayConfig.LazyIEq && t.finalCheckIndex%t.arrayConfig.LazyIEqDelay != 0 {
+		if _, err = t.assertDelayedStoreAxioms(); err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
 		// The native final-check loop revisits delayed theories. Record this
 		// bounded scheduling step so Go's no-progress guard does so as well.
 		t.state.theoryProgress++
 		return SMTFinalCheckContinue, nil
 	}
-	progress, err := t.makeInterfaceEqualities()
+	if !t.arrayConfig.LazyIEq && t.finalCheckIndex%2 == 1 {
+		delayed, err = t.assertDelayedStoreAxioms()
+		if err == nil && !delayed {
+			interfaces, err = t.makeInterfaceEqualities()
+		}
+	} else {
+		interfaces, err = t.makeInterfaceEqualities()
+		if err == nil && !interfaces {
+			delayed, err = t.assertDelayedStoreAxioms()
+		}
+	}
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
-	if progress {
+	if delayed || interfaces {
 		return SMTFinalCheckContinue, nil
 	}
 	if t.unsupported {
@@ -925,17 +962,17 @@ func (t *SMTArrayTheory) CollectStatistics(target *statistics.Statistics) error 
 	if t == nil || target == nil {
 		return ast.ErrASTHandle
 	}
-	target.UpdateUint64("array ax1", t.statistics.axiom1)
-	target.UpdateUint64("array ax2", t.statistics.axiom2)
-	target.UpdateUint64("array exp ax2", 0)
-	target.UpdateUint64("array ext ax", t.statistics.extensionality)
-	target.UpdateUint64("array splits", t.statistics.eqSplits)
-	target.UpdateUint64("array map ax", t.statistics.mapAxiom)
-	target.UpdateUint64("array def const", t.statistics.defaultConst)
-	target.UpdateUint64("array sel const", t.statistics.selectConst)
-	target.UpdateUint64("array def store", t.statistics.defaultStore)
-	target.UpdateUint64("array def as-array", t.statistics.defaultAsArray)
-	target.UpdateUint64("array sel as-array", t.statistics.selectAsArray)
+	target.UpdateUint64("array ax1", uint64(t.statistics.axiom1))
+	target.UpdateUint64("array ax2", uint64(t.statistics.axiom2))
+	target.UpdateUint64("array exp ax2", uint64(t.statistics.expandedAxiom2))
+	target.UpdateUint64("array ext ax", uint64(t.statistics.extensionality))
+	target.UpdateUint64("array splits", uint64(t.statistics.eqSplits))
+	target.UpdateUint64("array map ax", uint64(t.statistics.mapAxiom))
+	target.UpdateUint64("array def const", uint64(t.statistics.defaultConst))
+	target.UpdateUint64("array sel const", uint64(t.statistics.selectConst))
+	target.UpdateUint64("array def store", uint64(t.statistics.defaultStore))
+	target.UpdateUint64("array def as-array", uint64(t.statistics.defaultAsArray))
+	target.UpdateUint64("array sel as-array", uint64(t.statistics.selectAsArray))
 	return nil
 }
 

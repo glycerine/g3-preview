@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"array_weak_live_parent_scopes.smt2":           "sat\n(((= a b) true))\nunsat\nunsat\nsat\n(((= a b) true))\n",
 	"array_late_default_alias_scopes.smt2":         "sat\nunsat\nsat\n",
 	"array_multidimensional_read_queue.smt2":       "sat\nunsat\nsat\nunsat\nsat\n",
 	"array_multidimensional_read_queue_proof.smt2": "sat\nunsat\nsat\nunsat\nsat\n",

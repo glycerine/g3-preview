@@ -196,3 +196,62 @@ func TestSMTArrayTranslationBackendsOwnersModelsAndScopes(t *testing.T) {
 		}
 	}
 }
+
+func TestSMTArrayTranslationInitializationUpdatesCorrectParameterOwner(t *testing.T) {
+	for _, simple := range []bool{false, true} {
+		m, cfg := smtModelGeneratorFixture(t)
+		params, err := cfg.Context.NewValue()
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, cfg.Context.Del(&params)) })
+		name := "auto_config"
+		astTestMust(t, cfg.Context.SetBoolName(&params, &name, simple))
+		source, err := NewSMTSolver(m, &params, "QF_AX", SMTSolverConfig{Params: cfg.Context})
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, source.Close()) })
+		// The first-push profile retains relevance, unlike the unit-only
+		// static first-check profile, so source init leaves laziness at 1.
+		astTestMust(t, source.Push())
+		astTestMust(t, source.Pop(1))
+		if source.kernel.smtParams.array.state.Laziness != 1 {
+			t.Fatal("source fixture did not retain lazy parents")
+		}
+		targetParams, err := cfg.Context.NewValue()
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, cfg.Context.Del(&targetParams)) })
+		name = "auto_config"
+		astTestMust(t, cfg.Context.SetBoolName(&targetParams, &name, false))
+		name = "relevancy"
+		astTestMust(t, cfg.Context.SetUIntName(&targetParams, &name, 0))
+		translated, err := source.Translate(m, &targetParams)
+		astTestMust(t, err)
+		dest := translated.(*SMTSolver)
+		t.Cleanup(func() { astTestMust(t, dest.Close()) })
+		family, err := m.ArrayFamilyID()
+		astTestMust(t, err)
+		core := smtArrayCore(dest.kernel.internalizer.theories[family])
+		if core.simple != simple || core.arrayConfig.Laziness != 0 {
+			t.Fatal("copied init did not disable lazy registration")
+		}
+		wantSourceLazy := uint32(0)
+		if simple {
+			wantSourceLazy = 1
+		}
+		if source.kernel.smtParams.array.state.Laziness != wantSourceLazy {
+			t.Fatal("copied init mutated incorrect owner", simple)
+		}
+		name = "array.weak"
+		astTestMust(t, cfg.Context.SetBoolName(&params, &name, true))
+		astTestMust(t, source.UpdateParams(&params))
+		status, err := dest.CheckSat(nil)
+		astTestMust(t, err)
+		if status != lbool.True || core.arrayConfig.Weak == simple {
+			t.Fatal("copied weak control did not follow its source/destination owner")
+		}
+		status, err = source.CheckSat(nil)
+		astTestMust(t, err)
+		original := smtArrayCore(source.kernel.internalizer.theories[family])
+		if status != lbool.True || original.arrayConfig.Laziness != wantSourceLazy {
+			t.Fatal("original backend missed shared parameter mutation")
+		}
+	}
+}

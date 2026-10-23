@@ -17,6 +17,14 @@ func (t *SMTArrayTheory) NewDisequality(left, right SMTTheoryVar) error {
 	if err != nil {
 		return err
 	}
+	first, err = t.Enode(SMTTheoryVar(t.arrayUnion.Find(uint32(left))))
+	if err != nil {
+		return err
+	}
+	second, err = t.Enode(SMTTheoryVar(t.arrayUnion.Find(uint32(right))))
+	if err != nil {
+		return err
+	}
 	s, err := t.State()
 	if err != nil {
 		return err
@@ -29,7 +37,6 @@ func (t *SMTArrayTheory) NewDisequality(left, right SMTTheoryVar) error {
 	if err != nil || family != t.FamilyID() || !t.extensional {
 		return err
 	}
-	first, second = first.root, second.root
 	leftID, err := first.OwnerID()
 	if err != nil {
 		return err
@@ -43,7 +50,7 @@ func (t *SMTArrayTheory) NewDisequality(left, right SMTTheoryVar) error {
 	}
 	// Source fingerprints retain the roots at insertion, rather than a
 	// mutable universal data pointer. This concrete set is local to arrays.
-	pair := smtArrayEnodePair{first, second}
+	pair := smtArrayEnodePair{first.root, second.root}
 	if t.extensionalityFingerprints[pair] {
 		return nil
 	}
@@ -53,7 +60,7 @@ func (t *SMTArrayTheory) NewDisequality(left, right SMTTheoryVar) error {
 	if err != nil || already {
 		return err
 	}
-	t.extensionalityTodo = append(t.extensionalityTodo, pair)
+	t.extensionalityTodo = append(t.extensionalityTodo, smtArrayEnodePair{first, second})
 	t.statistics.extensionality++
 	return nil
 }
@@ -63,6 +70,7 @@ func (t *SMTArrayTheory) alreadyDisequalReads(first, second *SMTEnode) (bool, er
 	if err != nil {
 		return false, err
 	}
+	first, second = first.root, second.root
 	if first.classSize > second.classSize {
 		first, second = second, first
 	}

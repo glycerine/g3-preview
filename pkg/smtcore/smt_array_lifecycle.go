@@ -39,7 +39,14 @@ func (k *SMTKernel) copyArrayPlugin(source *SMTKernel) error {
 	if err = smtArrayCore(theory).ConfigureArray(config); err != nil {
 		return err
 	}
+	smtArrayCore(theory).parameterOwner = owner
+	if owner == nil {
+		smtArrayCore(theory).parameterOwner = &k.smtParams.array
+	}
 	if err = k.replaceUnusedArrayTheory(theory); err != nil {
+		return err
+	}
+	if err = smtArrayCore(theory).Setup(); err != nil {
 		return err
 	}
 	k.copiedArrayPlugin, k.copiedArrayOwner = true, owner

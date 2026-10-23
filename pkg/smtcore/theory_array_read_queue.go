@@ -9,13 +9,18 @@ type smtArrayReadFingerprint struct {
 }
 
 func (t *SMTArrayTheory) enqueueStoreReadAxiom(read, store ast.ASTHandle) error {
+	_, err := t.queueStoreReadAxiom(read, store, false)
+	return err
+}
+
+func (t *SMTArrayTheory) queueStoreReadAxiom(read, store ast.ASTHandle, upward bool) (bool, error) {
 	s, err := t.State()
 	if err != nil {
-		return err
+		return false, err
 	}
 	readNode, storeNode := s.context.enodes[read], s.context.enodes[store]
 	if readNode == nil || storeNode == nil || len(readNode.arguments) < 2 || len(storeNode.arguments) != len(readNode.arguments)+1 {
-		return ast.ErrASTDomain
+		return false, ast.ErrASTDomain
 	}
 	allEqual := true
 	indices := make([]*SMTEnode, len(readNode.arguments)-1)
@@ -24,19 +29,23 @@ func (t *SMTArrayTheory) enqueueStoreReadAxiom(read, store ast.ASTHandle) error 
 		allEqual = allEqual && indices[i] == storeNode.arguments[i+1].root
 	}
 	if allEqual {
-		return nil
+		return false, nil
 	}
 	for _, entry := range t.readFingerprints[store] {
 		if smtFingerprintArgsEqual(entry.indices, indices) {
-			return nil
+			return false, nil
 		}
 	}
 	entry := &smtArrayReadFingerprint{store: store, indices: indices}
 	t.readFingerprints[store] = append(t.readFingerprints[store], entry)
 	t.readFingerprintTrail = append(t.readFingerprintTrail, entry)
 	t.readTodo = append(t.readTodo, smtArrayAxiomPair{observer: read, array: store})
-	t.statistics.axiom2++
-	return nil
+	if upward {
+		t.statistics.expandedAxiom2++
+	} else {
+		t.statistics.axiom2++
+	}
+	return true, nil
 }
 
 func (t *SMTArrayTheory) assertStoreReadAxiomCore(read, store ast.ASTHandle) error {

@@ -494,8 +494,10 @@ func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 	}
 	if array := smtArrayCore(theory); array != nil && k.smtParams != nil {
 		config := k.smtParams.array.state
+		array.parameterOwner = &k.smtParams.array
 		if k.copiedArrayOwner != nil {
 			config = k.copiedArrayOwner.state
+			array.parameterOwner = k.copiedArrayOwner
 		}
 		if err := array.ConfigureArray(config); err != nil {
 			return err
@@ -697,7 +699,7 @@ func (k *SMTKernel) Push() error {
 	if err := k.open(); err != nil {
 		return err
 	}
-	if k.copiedArrayOwner != nil {
+	if k.smtParams != nil {
 		if err := k.configureArrayTheories(k.smtParams.array.state); err != nil {
 			return err
 		}
@@ -794,7 +796,7 @@ func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 	if err := k.open(); err != nil {
 		return nil, err
 	}
-	if k.copiedArrayOwner != nil {
+	if k.smtParams != nil {
 		if err := k.configureArrayTheories(k.smtParams.array.state); err != nil {
 			return nil, err
 		}

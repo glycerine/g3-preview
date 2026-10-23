@@ -47,7 +47,7 @@ func TestSMTArraySharedRolesAndScopedInterfaceEqualities(t *testing.T) {
 		}
 		astTestMust(t, state.markRelevant(array))
 	}
-	for attempt := uint64(1); attempt <= 2; attempt++ {
+	for attempt := uint32(1); attempt <= 2; attempt++ {
 		astTestMust(t, state.PushScope())
 		status, err := theory.FinalCheck()
 		astTestMust(t, err)

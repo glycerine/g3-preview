@@ -51,6 +51,11 @@ func TestSMTArrayStoreReadQueuesProofBranchesAndRelevance(t *testing.T) {
 			read, err := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{store, indices[1]})
 			astTestMust(t, err)
 			astTestMust(t, state.Internalize(read, true))
+			if len(theory.readTodo) != 0 {
+				t.Fatal("irrelevant read registered its parent eagerly")
+			}
+			astTestMust(t, state.markRelevant(read))
+			astTestMust(t, state.propagateTheoryRelevancy())
 			if len(theory.readTodo) != 1 || theory.statistics.axiom2 != 1 {
 				t.Fatal("conditional read axiom was not deferred")
 			}
@@ -59,6 +64,8 @@ func TestSMTArrayStoreReadQueuesProofBranchesAndRelevance(t *testing.T) {
 			aliasRead, err := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{store, indices[2]})
 			astTestMust(t, err)
 			astTestMust(t, state.Internalize(aliasRead, true))
+			astTestMust(t, state.markRelevant(aliasRead))
+			astTestMust(t, state.propagateTheoryRelevancy())
 			if len(theory.readTodo) != 1 {
 				t.Fatal("equal index roots did not suppress duplicate work")
 			}
@@ -127,6 +134,8 @@ func TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork(t *testing.T) {
 		read, err := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{store, indices[1]})
 		astTestMust(t, err)
 		astTestMust(t, state.Internalize(read, true))
+		astTestMust(t, state.markRelevant(read))
+		astTestMust(t, state.propagateTheoryRelevancy())
 		if len(theory.readTodo) != 1 || len(theory.readFingerprintTrail) != 1 {
 			t.Fatal("child read was not queued")
 		}
