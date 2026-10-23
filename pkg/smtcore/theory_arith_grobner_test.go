@@ -15,11 +15,13 @@ func TestSMTNonlinearGrobnerCoupledEquationsScopedProofs(t *testing.T) {
 			limit         uint32
 			secondProduct string
 			want          lbool.LBool
+			perturbate    bool
 		}{
-			{false, 512, "2", lbool.Undef},
-			{true, 0, "2", lbool.Undef},
-			{true, 512, "2", lbool.False},
-			{true, 512, "-1", lbool.Undef},
+			{false, 512, "2", lbool.Undef, true},
+			{true, 0, "2", lbool.Undef, true},
+			{true, 512, "2", lbool.False, true},
+			{true, 512, "-1", lbool.Undef, true},
+			{true, 512, "-1", lbool.Undef, false},
 		} {
 			t.Run(fmt.Sprint(proofs, "/", tc), func(t *testing.T) {
 				m, cfg := smtModelGeneratorFixture(t)
@@ -66,10 +68,12 @@ func TestSMTNonlinearGrobnerCoupledEquationsScopedProofs(t *testing.T) {
 					astTestMust(t, err)
 					config.NLArithGB = tc.enabled
 					config.NLArithGBThreshold = tc.limit
+					config.NLArithGBPerturbate = tc.perturbate
 					astTestMust(t, theory.ConfigureArithmetic(config))
 					for _, formula := range formulas {
 						astTestMust(t, s.Assert(formula))
 					}
+					before := theory.statistics.grobner
 					status, err := s.CheckSat(nil)
 					astTestMust(t, err)
 					if status != tc.want {
@@ -77,6 +81,24 @@ func TestSMTNonlinearGrobnerCoupledEquationsScopedProofs(t *testing.T) {
 					}
 					if tc.enabled && theory.statistics.grobner == 0 {
 						t.Fatal("Grobner engine was not exercised")
+					}
+					if tc.enabled && tc.limit == 0 && !theory.nonlinearGBExhausted {
+						t.Fatal("Grobner equation limit did not mark the search exhausted")
+					}
+					if tc.enabled && tc.secondProduct == "-1" {
+						rounds := theory.statistics.grobner - before
+						if tc.perturbate && rounds < 2 || !tc.perturbate && rounds != 1 {
+							t.Fatal("Grobner perturbation rounds", tc.perturbate, rounds)
+						}
+					}
+					if tc.enabled && tc.limit == 0 {
+						config.NLArithGBThreshold = 512
+						astTestMust(t, theory.ConfigureArithmetic(config))
+						retried, err := s.CheckSat(nil)
+						astTestMust(t, err)
+						if retried != lbool.False || theory.nonlinearGBExhausted {
+							t.Fatal("new search did not reset Grobner exhaustion", retried, theory.nonlinearGBExhausted)
+						}
 					}
 					if status == lbool.False && proofs {
 						proof, err := s.Proof()
@@ -88,6 +110,9 @@ func TestSMTNonlinearGrobnerCoupledEquationsScopedProofs(t *testing.T) {
 						}
 					}
 					astTestMust(t, s.Pop(1))
+					if theory.nonlinearGBExhausted {
+						t.Fatal("Grobner exhaustion survived pop")
+					}
 					status, err = s.CheckSat(nil)
 					astTestMust(t, err)
 					if status != lbool.True {

@@ -78,6 +78,7 @@ type smtLinearArithmeticAtom struct {
 }
 
 type smtLinearArithmeticScope struct {
+	nonlinearGBExhausted      bool
 	atoms, assertions         int
 	head                      int
 	unsupported               bool
@@ -107,6 +108,8 @@ type smtLinearArithmeticStatistics struct {
 // bound. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	nonlinearGBPerturbate bool
+	nonlinearGBExhausted  bool
 	*SMTTheoryBase
 	solver              *simplex.Solver
 	simplexVariables    []uint32
@@ -165,22 +168,23 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		return nil, err
 	}
 	t := &SMTLinearArithmeticTheory{
-		SMTTheoryBase:       base,
-		solver:              simplex.NewSolver(nil),
-		atomByBool:          make(map[int32]int),
-		definitions:         make(map[SMTTheoryVar]smtLinearForm),
-		nextSimplex:         1,
-		integer:             integer,
-		integerColumns:      make(map[uint32]bool),
-		castTerms:           make(map[ast.ASTHandle]bool),
-		castPredicates:      make(map[int32]bool),
-		divisionTerms:       make(map[ast.ASTHandle]bool),
-		nonlinearFactors:    make(map[uint32][]uint32),
-		nonlinearEnabled:    true,
-		nonlinearGB:         true,
-		nonlinearGBLimit:    512,
-		nonlinearBranching:  true,
-		nonlinearRoundLimit: 1024,
+		SMTTheoryBase:         base,
+		solver:                simplex.NewSolver(nil),
+		atomByBool:            make(map[int32]int),
+		definitions:           make(map[SMTTheoryVar]smtLinearForm),
+		nextSimplex:           1,
+		integer:               integer,
+		integerColumns:        make(map[uint32]bool),
+		castTerms:             make(map[ast.ASTHandle]bool),
+		castPredicates:        make(map[int32]bool),
+		divisionTerms:         make(map[ast.ASTHandle]bool),
+		nonlinearFactors:      make(map[uint32][]uint32),
+		nonlinearEnabled:      true,
+		nonlinearGB:           true,
+		nonlinearGBPerturbate: true,
+		nonlinearGBLimit:      512,
+		nonlinearBranching:    true,
+		nonlinearRoundLimit:   1024,
 	}
 	t.equalityAdapter, err = newSMTArithmeticEqualityAdapter(base)
 	if err != nil {
@@ -197,6 +201,7 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 	t.nonlinearEnabled = config.NLArith
 	t.nonlinearGB = config.NLArithGB
 	t.nonlinearGBLimit = config.NLArithGBThreshold
+	t.nonlinearGBPerturbate = config.NLArithGBPerturbate
 	t.nonlinearBranching = config.NLArithBranching
 	t.nonlinearRoundLimit = config.NLArithRounds
 	t.nonlinearRandom.SetSeed(config.RandomSeed)
@@ -1288,7 +1293,7 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
-	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail), nonlinearTerms: len(t.nonlinearColumns), nonlinearRounds: t.nonlinearRounds})
+	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail), nonlinearTerms: len(t.nonlinearColumns), nonlinearRounds: t.nonlinearRounds, nonlinearGBExhausted: t.nonlinearGBExhausted})
 	return nil
 }
 
@@ -1322,6 +1327,7 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 	}
 	t.nonlinearColumns = t.nonlinearColumns[:scope.nonlinearTerms]
 	t.nonlinearRounds = scope.nonlinearRounds
+	t.nonlinearGBExhausted = scope.nonlinearGBExhausted
 	t.scopes = t.scopes[:level]
 	if err := t.equalityAdapter.PopScopes(count); err != nil {
 		return err
@@ -1807,6 +1813,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions(validated bool) (bo
 }
 
 func (t *SMTLinearArithmeticTheory) InitializeSearch() error {
+	t.nonlinearGBExhausted = false
 	return t.equalityAdapter.InitializeSearch()
 }
 func (t *SMTLinearArithmeticTheory) Restart() error { return t.equalityAdapter.Restart() }

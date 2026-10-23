@@ -102,6 +102,9 @@ func (t *SMTLinearArithmeticTheory) assertGrobnerForm(gb *grobner.Solver, solver
 }
 
 func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err error) {
+	if t.nonlinearGBExhausted {
+		return false, nil
+	}
 	// The last integer-feasible candidate may contain speculative branch
 	// bounds. Reconstruct the unconditional tableau before substituting
 	// fixed variables or using their intervals to justify a global conflict.
@@ -179,35 +182,56 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 			}
 		}
 	}
-	t.statistics.grobner++
-	if _, err = gb.ComputeBasis(t.nonlinearGBLimit); err != nil {
-		return false, err
-	}
-	conflict = gb.Inconsistent()
-	var manager smtArithmeticBoundDependencyManager
-	for _, equation := range gb.Equations() {
-		if conflict {
+	nextWeight := 8
+	for {
+		t.statistics.grobner++
+		done, basisErr := gb.ComputeBasis(t.nonlinearGBLimit)
+		if basisErr != nil {
+			return false, basisErr
+		}
+		canceled, cancelErr := t.state.manager.Canceled()
+		if cancelErr != nil || canceled {
+			return false, cancelErr
+		}
+		if !done {
+			t.nonlinearGBExhausted = true
+		}
+		conflict = gb.Inconsistent()
+		var manager smtArithmeticBoundDependencyManager
+		for _, equation := range gb.Equations() {
+			if conflict {
+				break
+			}
+			sum, err := newSMTOldIntervalPoint(&manager, new(big.Rat), nil, nil)
+			if err != nil {
+				return false, err
+			}
+			for _, monomial := range equation.Monomials() {
+				interval, err := t.grobnerMonomialInterval(solver, columns, &manager, monomial)
+				if err != nil {
+					return false, err
+				}
+				if err = sum.add(interval); err != nil {
+					return false, err
+				}
+			}
+			conflict = !sum.containsZero()
+			if !conflict {
+				conflict, err = t.grobnerSquareInconsistent(solver, columns, &manager, equation.Monomials())
+				if err != nil {
+					return false, err
+				}
+			}
+		}
+		if conflict || !t.nonlinearGBPerturbate || t.nonlinearGBExhausted {
 			break
 		}
-		sum, err := newSMTOldIntervalPoint(&manager, new(big.Rat), nil, nil)
-		if err != nil {
-			return false, err
+		modified, orderErr := smtPerturbGrobnerOrder(gb, &nextWeight)
+		if orderErr != nil {
+			return false, orderErr
 		}
-		for _, monomial := range equation.Monomials() {
-			interval, err := t.grobnerMonomialInterval(solver, columns, &manager, monomial)
-			if err != nil {
-				return false, err
-			}
-			if err = sum.add(interval); err != nil {
-				return false, err
-			}
-		}
-		conflict = !sum.containsZero()
-		if !conflict {
-			conflict, err = t.grobnerSquareInconsistent(solver, columns, &manager, equation.Monomials())
-			if err != nil {
-				return false, err
-			}
+		if !modified {
+			break
 		}
 	}
 	if conflict {
