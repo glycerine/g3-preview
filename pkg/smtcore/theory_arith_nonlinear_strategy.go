@@ -93,7 +93,7 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearStrategyBounds() (bool, er
 			if valid[column][index] && (lower && value.Cmp(&old.value) <= 0 || !lower && value.Cmp(&old.value) >= 0) {
 				continue
 			}
-			t.derivedBounds = append(t.derivedBounds, smtArithmeticReplayBound{column: column, lower: lower, value: value.Clone()})
+			t.derivedBounds = append(t.derivedBounds, smtArithmeticReplayBound{column: column, lower: lower, value: value.Clone(), explanation: smtArithmeticCopyBoundExplanation(solver, column, lower)})
 			progress = true
 		}
 	}

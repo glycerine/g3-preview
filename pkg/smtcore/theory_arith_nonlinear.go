@@ -193,6 +193,10 @@ func (t *SMTLinearArithmeticTheory) nonlinearColumnInterval(solver *simplex.Solv
 }
 
 func (t *SMTLinearArithmeticTheory) updateNonlinearBounds(solver *simplex.Solver, column uint32, interval *smtOldInterval) (bool, bool) {
+	return t.updateArithmeticBoundsWithExplanations(solver, column, interval, [2]*smtArithmeticBoundExplanation{})
+}
+
+func (t *SMTLinearArithmeticTheory) updateArithmeticBoundsWithExplanations(solver *simplex.Solver, column uint32, interval *smtOldInterval, explanations [2]*smtArithmeticBoundExplanation) (bool, bool) {
 	changed := false
 	for _, lower := range []bool{true, false} {
 		endpoint, open := &interval.upper, interval.upperOpen
@@ -225,12 +229,11 @@ func (t *SMTLinearArithmeticTheory) updateNonlinearBounds(solver *simplex.Solver
 		if exists && (lower && bound.Cmp(&old) <= 0 || !lower && bound.Cmp(&old) >= 0) {
 			continue
 		}
-		var err error
+		index := 1
 		if lower {
-			err = solver.SetLower(column, bound)
-		} else {
-			err = solver.SetUpper(column, bound)
+			index = 0
 		}
+		_, err := smtTightenReplaySimplexBound(solver, column, lower, bound, explanations[index])
 		if err != nil {
 			return changed, true
 		}
@@ -257,7 +260,13 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticDefinitionBounds(solver *
 		if err != nil {
 			return false, false, err
 		}
-		for term, coefficient := range definition.terms {
+		ordered := make([]uint32, 0, len(definition.terms))
+		for term := range definition.terms {
+			ordered = append(ordered, term)
+		}
+		sort.Slice(ordered, func(i, j int) bool { return ordered[i] < ordered[j] })
+		for _, term := range ordered {
+			coefficient := definition.terms[term]
 			bound, err := t.nonlinearColumnInterval(solver, term, &manager)
 			if err != nil {
 				return false, false, err
@@ -273,7 +282,16 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticDefinitionBounds(solver *
 				return false, false, err
 			}
 		}
-		progress, conflict := t.updateNonlinearBounds(solver, t.simplexVariables[variable], interval)
+		var explanations [2]*smtArithmeticBoundExplanation
+		for i, lower := range []bool{true, false} {
+			var uses []simplex.ArithmeticBoundUse
+			for _, term := range ordered {
+				coefficient := definition.terms[term]
+				uses = append(uses, simplex.ArithmeticBoundUse{Column: term, Lower: lower == (coefficient.Sign() > 0), Coefficient: *new(big.Rat).Set(coefficient)})
+			}
+			explanations[i] = smtArithmeticWeightedBoundExplanation(solver, uses)
+		}
+		progress, conflict := t.updateArithmeticBoundsWithExplanations(solver, t.simplexVariables[variable], interval, explanations)
 		if conflict {
 			return changed, true, nil
 		}

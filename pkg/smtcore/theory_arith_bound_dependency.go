@@ -13,6 +13,41 @@ type smtArithmeticBoundExplanation struct {
 	dependencies []simplex.BoundDependency
 }
 
+// mk_bound_from_row uses justified_derived_bound: combine contributions to
+// repeated literals while preserving their first occurrence in the row.
+func smtArithmeticWeightedBoundExplanation(solver *simplex.Solver, uses []simplex.ArithmeticBoundUse) *smtArithmeticBoundExplanation {
+	result := &smtArithmeticBoundExplanation{}
+	positions := make(map[int32]int)
+	for _, use := range uses {
+		if use.Coefficient.Sign() == 0 {
+			continue
+		}
+		dependencies, known := solver.BoundDependencies(use.Column, use.Lower)
+		if !known {
+			return nil
+		}
+		for _, dependency := range dependencies {
+			coefficient := new(big.Rat).Mul(&use.Coefficient, &dependency.Coefficient)
+			if position, found := positions[dependency.Literal]; found {
+				old := &result.dependencies[position].Coefficient
+				old.Add(old, coefficient)
+			} else {
+				positions[dependency.Literal] = len(result.dependencies)
+				result.dependencies = append(result.dependencies, simplex.BoundDependency{Literal: dependency.Literal, Coefficient: *coefficient})
+			}
+		}
+	}
+	return result
+}
+
+func smtArithmeticCopyBoundExplanation(solver *simplex.Solver, column uint32, lower bool) *smtArithmeticBoundExplanation {
+	dependencies, known := solver.BoundDependencies(column, lower)
+	if !known {
+		return nil
+	}
+	return &smtArithmeticBoundExplanation{dependencies: dependencies}
+}
+
 // Euclidean mk_bound creates a plain derived_bound. Its accumulator deduplicates
 // premises and discards their old multipliers; a later push_justification uses
 // the caller's coefficient once for each retained premise.

@@ -113506,7 +113506,9 @@
         "pkg/smtcore/theory_arith_bound_dependency.go",
         "pkg/smtcore/theory_arith_bound_dependency_test.go",
         "pkg/ast/ast_parameter_rat.go",
-        "pkg/ast/ast_parameter_rat_test.go"
+        "pkg/ast/ast_parameter_rat_test.go",
+        "pkg/smtcore/theory_arith_nonlinear.go",
+        "pkg/smtcore/theory_arith_nonlinear_strategy.go"
       ],
       "tests": [
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
@@ -113533,7 +113535,9 @@
         "TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions",
         "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
         "TestASTParameterRatExactOwningCopy",
-        "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays"
+        "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays",
+        "TestSMTArithmeticRowBoundExplanationsChooseEndpointsAndMergeWeights",
+        "TestSMTArithmeticAffineDefinitionBoundExplanations"
       ],
       "conditionals": [
         {
@@ -114023,6 +114027,22 @@
             "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
             "TestASTParameterRatExactOwningCopy"
           ]
+        },
+        {
+          "name": "justified_derived_bound and mk_bound_from_row concrete rational explanations: choose lower or upper endpoints by coefficient sign, compose exact signed coefficients, combine repeated-literal contributions in first-use order, and distinguish unknown from unconditional dependencies",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_bound_dependency.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_bound_dependency_test.go",
+            "pkg/smtcore/theory_arith_fixed_bounds.go",
+            "pkg/smtcore/theory_arith_nonlinear.go",
+            "pkg/smtcore/theory_arith_nonlinear_strategy.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticRowBoundExplanationsChooseEndpointsAndMergeWeights",
+            "TestSMTArithmeticAffineDefinitionBoundExplanations"
+          ]
         }
       ],
       "ownership": [],
@@ -114073,7 +114093,8 @@
         "pkg/smtcore/theory_arith_bound_dependency.go",
         "pkg/smtcore/theory_arith_bound_dependency_test.go",
         "pkg/ast/ast_parameter_rat.go",
-        "pkg/ast/ast_parameter_rat_test.go"
+        "pkg/ast/ast_parameter_rat_test.go",
+        "pkg/smtcore/theory_arith_nonlinear_strategy.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -114108,7 +114129,9 @@
         "TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions",
         "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
         "TestASTParameterRatExactOwningCopy",
-        "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays"
+        "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays",
+        "TestSMTArithmeticRowBoundExplanationsChooseEndpointsAndMergeWeights",
+        "TestSMTArithmeticAffineDefinitionBoundExplanations"
       ],
       "conditionals": [
         {
@@ -115008,6 +115031,24 @@
             "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
             "TestASTParameterRatExactOwningCopy",
             "TestSMTIntegerGCDAndExtendedGCDScopedProofs"
+          ]
+        },
+        {
+          "name": "row and affine-definition bound propagation retain weighted premises through scoped numeric replay and fixed shared-value storage; nonlinear interval and optimization explanation chains remain incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_bound_dependency_test.go",
+            "pkg/smtcore/theory_arith_fixed_bounds.go",
+            "pkg/smtcore/theory_arith_nonlinear.go",
+            "pkg/smtcore/theory_arith_nonlinear_strategy.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticRowBoundExplanationsChooseEndpointsAndMergeWeights",
+            "TestSMTArithmeticAffineDefinitionBoundExplanations",
+            "TestSMTSharedArithmeticFixedRowsScopedProofs",
+            "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
           ]
         }
       ],

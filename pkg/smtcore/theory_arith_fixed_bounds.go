@@ -60,7 +60,9 @@ func (t *SMTLinearArithmeticTheory) propagateFixedSharedValues() (bool, error) {
 			continue
 		}
 		bound := simplex.RationalInfinitesimal(value)
-		t.derivedBounds = append(t.derivedBounds, smtArithmeticReplayBound{column: column, lower: true, value: bound.Clone()}, smtArithmeticReplayBound{column: column, lower: false, value: bound.Clone()})
+		t.derivedBounds = append(t.derivedBounds,
+			smtArithmeticReplayBound{column: column, lower: true, value: bound.Clone(), explanation: smtArithmeticCopyBoundExplanation(solver, column, true)},
+			smtArithmeticReplayBound{column: column, lower: false, value: bound.Clone(), explanation: smtArithmeticCopyBoundExplanation(solver, column, false)})
 		progress = true
 	}
 	if progress {
@@ -138,7 +140,19 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticRowBounds(solver *simplex
 			if err = interval.mul(scalar); err != nil {
 				return false, err
 			}
-			_, conflict := t.updateNonlinearBounds(solver, target.Variable, interval)
+			var explanations [2]*smtArithmeticBoundExplanation
+			for i, lower := range []bool{true, false} {
+				var uses []simplex.ArithmeticBoundUse
+				for _, other := range entries {
+					if other.Variable == target.Variable {
+						continue
+					}
+					coefficient := new(big.Rat).Neg(new(big.Rat).Quo(other.Coefficient, target.Coefficient))
+					uses = append(uses, simplex.ArithmeticBoundUse{Column: other.Variable, Lower: lower == (coefficient.Sign() > 0), Coefficient: *coefficient})
+				}
+				explanations[i] = smtArithmeticWeightedBoundExplanation(solver, uses)
+			}
+			_, conflict := t.updateArithmeticBoundsWithExplanations(solver, target.Variable, interval, explanations)
 			if conflict {
 				return true, nil
 			}
