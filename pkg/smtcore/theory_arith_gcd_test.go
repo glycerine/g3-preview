@@ -29,6 +29,8 @@ func TestSMTIntegerGCDAndExtendedGCDScopedProofs(t *testing.T) {
 				astTestMust(t, err)
 				y, err := m.MkConst(astTestSymbol(t, m, "gcd-y"), sort)
 				astTestMust(t, err)
+				z, err := m.MkConst(astTestSymbol(t, m, "gcd-unrelated"), sort)
+				astTestMust(t, err)
 				num := func(v int64) ast.ASTHandle {
 					h, err := m.ArithmeticNumeralRat(big.NewRat(v, 1), true)
 					astTestMust(t, err)
@@ -45,7 +47,7 @@ func TestSMTIntegerGCDAndExtendedGCDScopedProofs(t *testing.T) {
 				}
 				eq, err := m.MkEq(app(smtArithOpAdd, app(smtArithOpMul, num(2), x), app(smtArithOpMul, num(coefficient), y)), num(rhs))
 				astTestMust(t, err)
-				formulas := []ast.ASTHandle{eq}
+				formulas := []ast.ASTHandle{eq, app(smtArithOpGE, z, num(1234567))}
 				if extended {
 					formulas = append(formulas, app(smtArithOpGE, x, num(1)), app(smtArithOpLE, x, num(2)))
 				}
@@ -84,6 +86,25 @@ func TestSMTIntegerGCDAndExtendedGCDScopedProofs(t *testing.T) {
 						if !smtProofHasTheoryRule(t, m, proof, "gcd-test") {
 							t.Fatal("GCD conflict proof lost gcd-test rule")
 						}
+						lemma := smtProofTheoryRuleNode(t, m, proof, "gcd-test")
+						decl, err := m.GetDecl(lemma)
+						astTestMust(t, err)
+						parameters, err := m.GetDeclParametersCopy(decl)
+						astTestMust(t, err)
+						if len(parameters) < 3 {
+							t.Fatal("GCD lemma omitted bound weights")
+						}
+						for i := range parameters {
+							kind, err := m.ParameterKind(parameters[i])
+							astTestMust(t, err)
+							if i > 1 && kind != ast.ASTParameterRational {
+								t.Fatal("non-rational GCD weight", kind)
+							}
+							astTestMust(t, m.DelParameter(&parameters[i]))
+						}
+						if smtTestArithmeticExpressionContains(t, m, lemma, z) {
+							t.Fatal("GCD proof cites unrelated assertion")
+						}
 					}
 					astTestMust(t, s.Pop(1))
 					status, err = s.CheckSat(nil)
@@ -111,6 +132,10 @@ func TestSMTIntegerGCDAndExtendedGCDScopedProofs(t *testing.T) {
 }
 
 func smtProofHasTheoryRule(t *testing.T, m *ast.ASTManager, proof ast.ASTHandle, rule string) bool {
+	return !smtProofTheoryRuleNode(t, m, proof, rule).IsNull()
+}
+
+func smtProofTheoryRuleNode(t *testing.T, m *ast.ASTManager, proof ast.ASTHandle, rule string) ast.ASTHandle {
 	t.Helper()
 	stack := []ast.ASTHandle{proof}
 	seen := make(map[ast.ASTHandle]bool)
@@ -144,7 +169,7 @@ func smtProofHasTheoryRule(t *testing.T, m *ast.ASTManager, proof ast.ASTHandle,
 			astTestMust(t, m.DelParameter(&parameters[i]))
 		}
 		if matched {
-			return true
+			return node
 		}
 		count, err := m.GetNumArgs(node)
 		astTestMust(t, err)
@@ -152,6 +177,36 @@ func smtProofHasTheoryRule(t *testing.T, m *ast.ASTManager, proof ast.ASTHandle,
 			arg, err := m.GetArg(node, i)
 			astTestMust(t, err)
 			stack = append(stack, arg)
+		}
+	}
+	return ast.ASTHandle{}
+}
+
+func smtTestArithmeticExpressionContains(t *testing.T, m *ast.ASTManager, expression, target ast.ASTHandle) bool {
+	t.Helper()
+	stack := []ast.ASTHandle{expression}
+	seen := make(map[ast.ASTHandle]bool)
+	for len(stack) != 0 {
+		node := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if node == target {
+			return true
+		}
+		if seen[node] {
+			continue
+		}
+		seen[node] = true
+		kind, err := m.GetKind(node)
+		astTestMust(t, err)
+		if kind != ast.ASTApp {
+			continue
+		}
+		count, err := m.GetNumArgs(node)
+		astTestMust(t, err)
+		for i := uint32(0); i < count; i++ {
+			argument, err := m.GetArg(node, i)
+			astTestMust(t, err)
+			stack = append(stack, argument)
 		}
 	}
 	return false

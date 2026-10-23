@@ -10,6 +10,8 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"integer_bound_provenance_scopes.smt2":      "unsat\nunsat\nsat\n",
+	"mixed_cut_bound_provenance_scopes.smt2":    "unsat\nsat\n",
 	"integer_euclidean_scopes.smt2":             "unsat\nsat\n((x 1) (y 1))\n",
 	"mixed_euclidean_large_integer.smt2":        "sat\n((x 1) (y 1))\n",
 	"integer_equality_branch_scopes.smt2":       "unsat\nsat\n((x 1) (y 1))\n",

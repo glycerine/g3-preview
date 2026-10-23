@@ -1067,10 +1067,10 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 		solver.EnsureVariable(variable)
 	}
 	one := simplex.RationalInfinitesimal(big.NewRat(1, 1))
-	if err := solver.SetLower(0, one); err != nil {
+	if err := solver.SetLowerWithDependencies(0, one, nil); err != nil {
 		return nil, lbool.Undef, err
 	}
-	if err := solver.SetUpper(0, one); err != nil {
+	if err := solver.SetUpperWithDependencies(0, one, nil); err != nil {
 		return nil, lbool.Undef, err
 	}
 	definitionVariables := make([]int, 0, len(t.definitions))
@@ -1144,7 +1144,8 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 		}
 		lower, bound := smtLinearAtomBound(atom, assertion.truth, t.integralAtom(atom))
 		base := atomBases[assertion.atom]
-		_, err := smtTightenSimplexBound(solver, base, lower, bound)
+		dependency := simplex.BoundDependency{Literal: smtLinearAssertionLiteral(atom, assertion).Index(), Coefficient: *big.NewRat(1, 1)}
+		_, err := smtTightenExplainedSimplexBound(solver, base, lower, bound, []simplex.BoundDependency{dependency})
 		if err != nil {
 			return solver, lbool.False, nil
 		}
@@ -1155,15 +1156,8 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 				direct := bound.Clone()
 				direct.Quo(coefficient)
 				directLower := lower == (coefficient.Sign() > 0)
-				if directLower {
-					if old, exists := solver.Lower(variable); !exists || direct.Cmp(&old) > 0 {
-						err = solver.SetLower(variable, direct)
-					}
-				} else {
-					if old, exists := solver.Upper(variable); !exists || direct.Cmp(&old) < 0 {
-						err = solver.SetUpper(variable, direct)
-					}
-				}
+				directDependency := simplex.BoundDependency{Literal: dependency.Literal, Coefficient: *new(big.Rat).Inv(coefficient)}
+				_, err = smtTightenExplainedSimplexBound(solver, variable, directLower, direct, []simplex.BoundDependency{directDependency})
 				if err != nil {
 					return solver, lbool.False, nil
 				}

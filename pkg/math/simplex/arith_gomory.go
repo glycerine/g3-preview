@@ -14,7 +14,10 @@ type ArithmeticCutTerm struct {
 }
 
 type ArithmeticGomoryCut struct {
-	Terms    []ArithmeticCutTerm
+	Terms []ArithmeticCutTerm
+	// Bounds retain the endpoint coefficients before polynomial denominator
+	// clearing or single-term normalization, as in the source justification.
+	Bounds   []ArithmeticBoundUse
 	Bound    big.Rat
 	Lower    bool
 	Conflict bool
@@ -142,6 +145,7 @@ func (s *Solver) ArithmeticGomory(row Row, integers map[uint32]bool) (cut Arithm
 			bound = &s.vars[column].lower.Main
 		}
 		cut.Bound.Add(&cut.Bound, new(big.Rat).Mul(coefficient, bound))
+		cut.Bounds = append(cut.Bounds, ArithmeticBoundUse{column, lower, *new(big.Rat).Set(coefficient)})
 		cut.Terms = append(cut.Terms, ArithmeticCutTerm{column, *coefficient})
 	}
 	if len(cut.Terms) == 0 {

@@ -64,10 +64,12 @@ func (a *Infinitesimal) String() string {
 }
 
 type variableInfo struct {
-	row                          uint32
-	base, lowerValid, upperValid bool
-	value, lower, upper          Infinitesimal
-	baseCoeff                    big.Rat
+	row                                  uint32
+	base, lowerValid, upperValid         bool
+	value, lower, upper                  Infinitesimal
+	baseCoeff                            big.Rat
+	lowerDependencies, upperDependencies []BoundDependency
+	lowerExplained, upperExplained       bool
 }
 
 type Stats struct{ NumPivots, NumInfeasible, NumChecks uint64 }
@@ -233,6 +235,7 @@ func (s *Solver) SetLower(v uint32, bound Infinitesimal) error {
 	}
 	x.lower.Set(&bound)
 	x.lowerValid = true
+	x.lowerDependencies, x.lowerExplained = nil, false
 	if !x.base && x.value.Cmp(&bound) < 0 {
 		d := bound.Clone()
 		d.Sub(&x.value)
@@ -250,6 +253,7 @@ func (s *Solver) SetUpper(v uint32, bound Infinitesimal) error {
 	}
 	x.upper.Set(&bound)
 	x.upperValid = true
+	x.upperDependencies, x.upperExplained = nil, false
 	if !x.base && x.value.Cmp(&bound) > 0 {
 		d := bound.Clone()
 		d.Sub(&x.value)
@@ -262,11 +266,13 @@ func (s *Solver) SetUpper(v uint32, bound Infinitesimal) error {
 func (s *Solver) UnsetLower(v uint32) {
 	if int(v) < len(s.vars) {
 		s.vars[v].lowerValid = false
+		s.vars[v].lowerDependencies, s.vars[v].lowerExplained = nil, false
 	}
 }
 func (s *Solver) UnsetUpper(v uint32) {
 	if int(v) < len(s.vars) {
 		s.vars[v].upperValid = false
+		s.vars[v].upperDependencies, s.vars[v].upperExplained = nil, false
 	}
 }
 func (s *Solver) Lower(v uint32) (Infinitesimal, bool) {

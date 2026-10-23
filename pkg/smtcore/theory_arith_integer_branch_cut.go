@@ -13,16 +13,14 @@ import (
 )
 
 func (t *SMTLinearArithmeticTheory) integerColumnExpression(refs *smtArithmeticDivisionCall, solver *simplex.Solver, column uint32) (ast.ASTHandle, error) {
-	if _, original := t.theoryVariable(column); !original {
-		if value, fixed := smtFixedSimplexColumn(solver, column); fixed {
-			return refs.hold(t.state.manager.ArithmeticNumeralRat(value, value.IsInt()))
-		}
-	}
+	// Keep a comparison column's defining polynomial even when it is fixed.
+	// Replacing it with its current endpoint would require the other endpoint
+	// as an additional equality premise, absent from the source cut reason.
 	return t.integerColumnDefinition(refs, solver, column)
 }
 
-// Euclidean equation extraction needs the defining polynomial even when a
-// replay comparison column is fixed; cut emission may substitute its value.
+// Replay comparison columns represent coefficient-only polynomials. The
+// distinguished constant column has no defining atom and remains a numeral.
 func (t *SMTLinearArithmeticTheory) integerColumnDefinition(refs *smtArithmeticDivisionCall, solver *simplex.Solver, column uint32) (ast.ASTHandle, error) {
 	m := t.state.manager
 	if variable, found := t.theoryVariable(column); found {
@@ -168,23 +166,28 @@ func (t *SMTLinearArithmeticTheory) gomoryIntegerColumn(column uint32) (result e
 		return err
 	}
 	t.statistics.gomoryCuts++
-	literals := make([]SMTLiteral, 0, len(t.assertions))
-	for _, assertion := range t.assertions {
-		literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
-	}
 	m := t.state.manager
-	symbol, err := m.Symbols.Intern("gomory-cut")
+	proofs, err := m.ProofsEnabled()
 	if err != nil {
 		return err
 	}
-	parameter, err := m.NewParameterSymbol(symbol)
+	antecedents, explained, err := smtArithmeticExplainBounds(t.solver, cut.Bounds, proofs)
 	if err != nil {
 		return err
 	}
-	defer func() { result = errors.Join(result, m.DelParameter(&parameter)) }()
+	if !explained {
+		for _, assertion := range t.assertions {
+			antecedents.literals = append(antecedents.literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
+		}
+	}
+	parameters, err := antecedents.parameters(m, "gomory-cut")
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(m, parameters)) }()
 	if cut.Conflict {
 		t.statistics.conflicts++
-		return t.state.SetTheoryConflict(t.FamilyID(), literals, parameter)
+		return t.state.SetTheoryConflict(t.FamilyID(), antecedents.literals, parameters...)
 	}
 	var bound ast.ASTHandle
 	if len(cut.Terms) == 1 {
@@ -205,7 +208,7 @@ func (t *SMTLinearArithmeticTheory) gomoryIntegerColumn(column uint32) (result e
 	if assignment, e := t.state.Assignment(literal); e != nil || assignment == lbool.True {
 		return e
 	}
-	owner, err := NewSMTExtTheoryPropagationJustification(m, t.FamilyID(), literals, nil, literal, []ast.ASTParameter{parameter})
+	owner, err := NewSMTExtTheoryPropagationJustification(m, t.FamilyID(), antecedents.literals, nil, literal, parameters)
 	if err != nil {
 		return err
 	}

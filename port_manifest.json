@@ -10006,7 +10006,9 @@
         "pkg/ast/ast_core_distinct_trace.go",
         "pkg/ast/ast_translation_plugins.go",
         "pkg/ast/ast_basic_mixed_join_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/ast/ast_parameter_rat.go",
+        "pkg/ast/ast_parameter_rat_test.go"
       ],
       "tests": [
         "TestASTFuncDeclInfoSourceText",
@@ -10166,7 +10168,8 @@
         "TestASTCopyFamiliesPluginsCopiesFormatPlugin",
         "TestASTBasicEqualityAndITEJoinMixedArithmeticAsReal",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestASTParameterRatExactOwningCopy"
       ],
       "conditionals": [
         {
@@ -113497,7 +113500,13 @@
         "pkg/smtcore/theory_arith_assume_eq_test.go",
         "pkg/math/simplex/arith_freedom.go",
         "pkg/math/simplex/arith_freedom_test.go",
-        "pkg/smtcore/theory_arith_mutation.go"
+        "pkg/smtcore/theory_arith_mutation.go",
+        "pkg/math/simplex/bound_dependency.go",
+        "pkg/math/simplex/bound_dependency_test.go",
+        "pkg/smtcore/theory_arith_bound_dependency.go",
+        "pkg/smtcore/theory_arith_bound_dependency_test.go",
+        "pkg/ast/ast_parameter_rat.go",
+        "pkg/ast/ast_parameter_rat_test.go"
       ],
       "tests": [
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
@@ -113517,7 +113526,13 @@
         "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
         "TestArithmeticFreedomIntegerMultiplesAndFixedBasePivot",
         "TestArithmeticFreedomRealOpenIntervalsAndOneSidedUpdates",
-        "TestArithmeticFreedomNegativeOpenIntegerLCM"
+        "TestArithmeticFreedomNegativeOpenIntegerLCM",
+        "TestBoundDependenciesOwnCoefficientsAndInvalidateModelBounds",
+        "TestArithmeticGCDExplanationNormalizedEndpoints",
+        "TestSMTArithmeticReplayBoundDependenciesAndScaling",
+        "TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions",
+        "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
+        "TestASTParameterRatExactOwningCopy"
       ],
       "conditionals": [
         {
@@ -113994,6 +114009,19 @@
           "tests": [
             "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
           ]
+        },
+        {
+          "name": "antecedents_t::init and params: owning rule symbol and exact rational literal coefficients followed by equality coefficients; expand independently weighted endpoint dependencies without deduplicating proof premises",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_bound_dependency.go",
+          "go_targets": [
+            "pkg/ast/ast_parameter_rat.go",
+            "pkg/ast/ast_parameter_rat_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
+            "TestASTParameterRatExactOwningCopy"
+          ]
         }
       ],
       "ownership": [],
@@ -114038,7 +114066,13 @@
         "pkg/smtcore/theory_arith_integer_branch_cut.go",
         "pkg/smtcore/theory_arith_gomory_test.go",
         "pkg/smtcore/theory_arith_euclidean.go",
-        "pkg/smtcore/theory_arith_euclidean_test.go"
+        "pkg/smtcore/theory_arith_euclidean_test.go",
+        "pkg/math/simplex/bound_dependency.go",
+        "pkg/math/simplex/bound_dependency_test.go",
+        "pkg/smtcore/theory_arith_bound_dependency.go",
+        "pkg/smtcore/theory_arith_bound_dependency_test.go",
+        "pkg/ast/ast_parameter_rat.go",
+        "pkg/ast/ast_parameter_rat_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -114066,7 +114100,13 @@
         "TestSMTIntegerGCDAndExtendedGCDScopedProofs",
         "TestSMTMixedGCDWithFixedFractionalReal",
         "TestSMTIntegerBranchAndGomoryScopesProofsAndModels",
-        "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
+        "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels",
+        "TestBoundDependenciesOwnCoefficientsAndInvalidateModelBounds",
+        "TestArithmeticGCDExplanationNormalizedEndpoints",
+        "TestSMTArithmeticReplayBoundDependenciesAndScaling",
+        "TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions",
+        "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
+        "TestASTParameterRatExactOwningCopy"
       ],
       "conditionals": [
         {
@@ -114943,6 +114983,30 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "collect_fixed_var_justifications and extended GCD endpoint provenance: preserve normalized signed row coefficients and lower/upper endpoint order, omit unrelated assertions, retain conservative premises for derived bounds without explanation chains",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_gcd.go",
+          "go_targets": [
+            "pkg/math/simplex/bound_dependency.go",
+            "pkg/math/simplex/bound_dependency_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_bound_dependency_test.go",
+            "pkg/ast/ast_parameter_rat.go",
+            "pkg/ast/ast_parameter_rat_test.go",
+            "pkg/math/simplex/arith_gcd.go",
+            "pkg/smtcore/theory_arith_gcd_test.go"
+          ],
+          "tests": [
+            "TestBoundDependenciesOwnCoefficientsAndInvalidateModelBounds",
+            "TestArithmeticGCDExplanationNormalizedEndpoints",
+            "TestSMTArithmeticReplayBoundDependenciesAndScaling",
+            "TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions",
+            "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
+            "TestASTParameterRatExactOwningCopy",
+            "TestSMTIntegerGCDAndExtendedGCDScopedProofs"
+          ]
         }
       ],
       "ownership": [
@@ -115173,7 +115237,13 @@
         "pkg/smtcore/theory_arith_integer_equality_branch.go",
         "pkg/smtcore/theory_arith_integer_equality_branch_test.go",
         "pkg/smtcore/theory_arith_euclidean.go",
-        "pkg/smtcore/theory_arith_euclidean_test.go"
+        "pkg/smtcore/theory_arith_euclidean_test.go",
+        "pkg/math/simplex/bound_dependency.go",
+        "pkg/math/simplex/bound_dependency_test.go",
+        "pkg/smtcore/theory_arith_bound_dependency.go",
+        "pkg/smtcore/theory_arith_bound_dependency_test.go",
+        "pkg/ast/ast_parameter_rat.go",
+        "pkg/ast/ast_parameter_rat_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
@@ -115197,7 +115267,13 @@
         "TestArithmeticIntegerBasePrefersSmallestBoundedRange",
         "TestSMTIntegerBranchAndGomoryScopesProofsAndModels",
         "TestSMTIntegerEqualityBranchWitnessScopesProofsAndModels",
-        "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
+        "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels",
+        "TestBoundDependenciesOwnCoefficientsAndInvalidateModelBounds",
+        "TestArithmeticGCDExplanationNormalizedEndpoints",
+        "TestSMTArithmeticReplayBoundDependenciesAndScaling",
+        "TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions",
+        "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
+        "TestASTParameterRatExactOwningCopy"
       ],
       "conditionals": [
         {
@@ -115403,17 +115479,31 @@
           ]
         },
         {
-          "name": "retained deferred gcd_test over fractional integer basic rows, scoped logical conflicts and source gcd-test proof parameter",
-          "status": "ported",
+          "name": "retained deferred gcd_test over fractional integer basic rows: precise assertion-bound dependencies and source coefficient parameters; derived-bound explanation chains remain incomplete",
+          "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_gcd.go",
           "go_targets": [
-            "pkg/cmd/g3/main_test.go"
+            "pkg/cmd/g3/main_test.go",
+            "pkg/math/simplex/bound_dependency.go",
+            "pkg/math/simplex/bound_dependency_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_bound_dependency_test.go",
+            "pkg/ast/ast_parameter_rat.go",
+            "pkg/ast/ast_parameter_rat_test.go",
+            "pkg/math/simplex/arith_gcd.go",
+            "pkg/smtcore/theory_arith_gcd_test.go"
           ],
           "tests": [
             "TestSMTIntegerGCDAndExtendedGCDScopedProofs",
             "TestSMTMixedGCDWithFixedFractionalReal",
             "TestSMTLibRunnerScripts",
-            "TestSMTLibRunnerCPPReference"
+            "TestSMTLibRunnerCPPReference",
+            "TestBoundDependenciesOwnCoefficientsAndInvalidateModelBounds",
+            "TestArithmeticGCDExplanationNormalizedEndpoints",
+            "TestSMTArithmeticReplayBoundDependenciesAndScaling",
+            "TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions",
+            "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
+            "TestASTParameterRatExactOwningCopy"
           ]
         },
         {
@@ -115480,16 +115570,26 @@
           ]
         },
         {
-          "name": "mk_polynomial_ge and Gomory propagation integration: materialize concrete theory/auxiliary expressions, propagate conditional cuts back to arithmetic with gomory-cut proof rule, and restore through SMT scopes",
+          "name": "mk_polynomial_ge and Gomory propagation integration: retain defining polynomials for fixed comparison columns, propagate conditional cuts with endpoint coefficients before cut normalization, and restore scopes; derived-bound explanation chains remain incomplete",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_integer_branch_cut.go",
           "go_targets": [
-            "pkg/cmd/g3/main_test.go"
+            "pkg/cmd/g3/main_test.go",
+            "pkg/math/simplex/bound_dependency.go",
+            "pkg/math/simplex/bound_dependency_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_bound_dependency_test.go",
+            "pkg/ast/ast_parameter_rat.go",
+            "pkg/ast/ast_parameter_rat_test.go",
+            "pkg/math/simplex/arith_gomory.go",
+            "pkg/math/simplex/arith_gomory_test.go"
           ],
           "tests": [
             "TestSMTIntegerBranchAndGomoryScopesProofsAndModels",
             "TestSMTLibRunnerScripts",
-            "TestSMTLibRunnerCPPReference"
+            "TestSMTLibRunnerCPPReference",
+            "TestArithmeticGomoryIntegerCutExcludesCandidateAndPreservesSolutions",
+            "TestArithmeticGomorySingleTermDirectionsAndMixedReals"
           ]
         },
         {

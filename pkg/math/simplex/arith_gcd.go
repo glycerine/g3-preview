@@ -15,6 +15,10 @@ const (
 // to eliminate fixed columns from an integer row. Nonfixed real columns
 // disable the test, as in the source mixed-arithmetic implementation.
 func (s *Solver) ArithmeticGCDRow(row Row, integers map[uint32]bool) (ArithmeticGCDResult, error) {
+	return s.arithmeticGCDRow(row, integers, nil)
+}
+
+func (s *Solver) arithmeticGCDRow(row Row, integers map[uint32]bool, explanation *[]ArithmeticBoundUse) (ArithmeticGCDResult, error) {
 	entries, err := s.RowEntries(row)
 	if err != nil {
 		return ArithmeticGCDPass, err
@@ -32,6 +36,7 @@ func (s *Solver) ArithmeticGCDRow(row Row, integers map[uint32]bool) (Arithmetic
 		lcm.Mul(new(big.Int).Quo(lcm, gcd), denominator)
 	}
 	var constant big.Rat
+	var fixedBounds, intervalBounds []ArithmeticBoundUse
 	var gcd, least big.Int
 	leastBounded := false
 	for i, entry := range entries {
@@ -45,6 +50,11 @@ func (s *Solver) ArithmeticGCDRow(row Row, integers map[uint32]bool) (Arithmetic
 				return ArithmeticGCDPass, nil
 			}
 			constant.Add(&constant, new(big.Rat).Mul(coefficient, &lower.Main))
+			if explanation != nil {
+				fixedBounds = append(fixedBounds,
+					ArithmeticBoundUse{column, true, *new(big.Rat).Set(&coefficients[i])},
+					ArithmeticBoundUse{column, false, *new(big.Rat).Set(&coefficients[i])})
+			}
 			continue
 		}
 		if !integers[column] {
@@ -71,6 +81,9 @@ func (s *Solver) ArithmeticGCDRow(row Row, integers map[uint32]bool) (Arithmetic
 		return ArithmeticGCDPass, nil
 	}
 	if !new(big.Rat).Quo(&constant, new(big.Rat).SetInt(&gcd)).IsInt() {
+		if explanation != nil {
+			*explanation = fixedBounds
+		}
 		return ArithmeticGCDConflict, nil
 	}
 	if !leastBounded {
@@ -97,6 +110,11 @@ func (s *Solver) ArithmeticGCDRow(row Row, integers map[uint32]bool) (Arithmetic
 		}
 		lower.Add(lower, new(big.Rat).Mul(coefficient, lo))
 		upper.Add(upper, new(big.Rat).Mul(coefficient, hi))
+		if explanation != nil {
+			intervalBounds = append(intervalBounds,
+				ArithmeticBoundUse{column, true, *new(big.Rat).Set(&coefficients[i])},
+				ArithmeticBoundUse{column, false, *new(big.Rat).Set(&coefficients[i])})
+		}
 	}
 	if gcd.Sign() == 0 {
 		return ArithmeticGCDPass, nil
@@ -105,6 +123,9 @@ func (s *Solver) ArithmeticGCDRow(row Row, integers map[uint32]bool) (Arithmetic
 	upper.Quo(upper, new(big.Rat).SetInt(&gcd))
 	lo, hi := RationalInfinitesimal(lower), RationalInfinitesimal(upper)
 	if arithmeticFloor(&hi).Cmp(arithmeticCeil(&lo)) < 0 {
+		if explanation != nil {
+			*explanation = append(intervalBounds, fixedBounds...)
+		}
 		return ArithmeticExtendedGCDConflict, nil
 	}
 	return ArithmeticGCDPass, nil
@@ -112,6 +133,13 @@ func (s *Solver) ArithmeticGCDRow(row Row, integers map[uint32]bool) (Arithmetic
 
 // ArithmeticGCD scans fractional integer basic rows for the deferred source check.
 func (s *Solver) ArithmeticGCD(integers map[uint32]bool) (result ArithmeticGCDResult, checks uint64, err error) {
+	result, checks, _, err = s.ArithmeticGCDWithExplanation(integers)
+	return
+}
+
+// ArithmeticGCDWithExplanation returns the endpoint uses in source order:
+// least-coefficient intervals first (extended test), then fixed columns.
+func (s *Solver) ArithmeticGCDWithExplanation(integers map[uint32]bool) (result ArithmeticGCDResult, checks uint64, bounds []ArithmeticBoundUse, err error) {
 	for _, base := range s.rowBase {
 		if base == NullVariable || !integers[base] {
 			continue
@@ -120,7 +148,7 @@ func (s *Solver) ArithmeticGCD(integers map[uint32]bool) (result ArithmeticGCDRe
 			continue
 		}
 		checks++
-		result, err = s.ArithmeticGCDRow(Row{s.vars[base].row}, integers)
+		result, err = s.arithmeticGCDRow(Row{s.vars[base].row}, integers, &bounds)
 		if err != nil || result != ArithmeticGCDPass {
 			return
 		}

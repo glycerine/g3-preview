@@ -28,7 +28,7 @@ func (t *SMTLinearArithmeticTheory) finalCheckIntegerFeasibility() (SMTFinalChec
 			if conflict, err := t.checkArithmeticGCD(bounds); err != nil {
 				return SMTFinalCheckGiveUp, err
 			} else if conflict {
-				return SMTFinalCheckContinue, t.arithmeticGCDConflict()
+				return SMTFinalCheckContinue, nil
 			}
 			if t.euclideanEnabled {
 				progress, err := t.applyEuclideanSolver(bounds)

@@ -48,30 +48,37 @@ func (t *SMTLinearArithmeticTheory) checkArithmeticGCD(solver *simplex.Solver) (
 	if !t.gcdEnabled {
 		return false, nil
 	}
-	result, checks, err := solver.ArithmeticGCD(t.arithmeticIntegerMask())
+	result, checks, bounds, err := solver.ArithmeticGCDWithExplanation(t.arithmeticIntegerMask())
 	t.statistics.gcdTests += checks
 	if err != nil || result == simplex.ArithmeticGCDPass {
 		return false, err
 	}
 	t.statistics.gcdConflicts++
-	return true, nil
+	return true, t.arithmeticGCDConflict(solver, bounds)
 }
 
-func (t *SMTLinearArithmeticTheory) arithmeticGCDConflict() (result error) {
+func (t *SMTLinearArithmeticTheory) arithmeticGCDConflict(solver *simplex.Solver, bounds []simplex.ArithmeticBoundUse) (result error) {
 	m := t.state.manager
-	symbol, err := m.Symbols.Intern("gcd-test")
+	proofs, err := m.ProofsEnabled()
 	if err != nil {
 		return err
 	}
-	parameter, err := m.NewParameterSymbol(symbol)
+	antecedents, explained, err := smtArithmeticExplainBounds(solver, bounds, proofs)
 	if err != nil {
 		return err
 	}
-	defer func() { result = errors.Join(result, m.DelParameter(&parameter)) }()
-	literals := make([]SMTLiteral, 0, len(t.assertions))
-	for _, assertion := range t.assertions {
-		literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
+	// Derived bounds without dependency chains still require the conservative
+	// assertion set. Do not attach invented numerical weights to that fallback.
+	if !explained {
+		for _, assertion := range t.assertions {
+			antecedents.literals = append(antecedents.literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
+		}
 	}
+	parameters, err := antecedents.parameters(m, "gcd-test")
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(m, parameters)) }()
 	t.statistics.conflicts++
-	return t.state.SetTheoryConflict(t.FamilyID(), literals, parameter)
+	return t.state.SetTheoryConflict(t.FamilyID(), antecedents.literals, parameters...)
 }

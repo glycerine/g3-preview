@@ -29,6 +29,15 @@ func TestArithmeticGomoryIntegerCutExcludesCandidateAndPreservesSolutions(t *tes
 	if err != nil || !ready || cut.Conflict || len(cut.Terms) != 3 {
 		t.Fatal(cut, ready, err)
 	}
+	if len(cut.Bounds) != 3 {
+		t.Fatal("missing cut endpoint explanations", cut.Bounds)
+	}
+	for i, want := range []*big.Rat{big.NewRat(1, 1), big.NewRat(1, 2), big.NewRat(1, 1)} {
+		use := &cut.Bounds[i]
+		if use.Column != uint32(i+1) || !use.Lower || use.Coefficient.Cmp(want) != 0 {
+			t.Fatal("proof weight changed during denominator clearing", i, use)
+		}
+	}
 	value := new(big.Rat)
 	for _, term := range cut.Terms {
 		v := s.Value(term.Column)
@@ -87,6 +96,13 @@ func TestArithmeticGomorySingleTermDirectionsAndMixedReals(t *testing.T) {
 					}
 					if err != nil || !ready || len(cut.Terms) != 1 || cut.Terms[0].Column != 1 || cut.Lower != lower || cut.Bound.Cmp(big.NewRat(want, 1)) != 0 {
 						t.Fatal(integer, lower, cut, ready, err)
+					}
+					weight := big.NewRat(-1, 1)
+					if lower {
+						weight.SetFrac64(1, divisor-1)
+					}
+					if len(cut.Bounds) != 1 || cut.Bounds[0].Column != 1 || cut.Bounds[0].Lower != lower || cut.Bounds[0].Coefficient.Cmp(weight) != 0 {
+						t.Fatal("proof weight changed during single-term normalization", divisor, sign, integer, lower, cut.Bounds)
 					}
 				}
 			}

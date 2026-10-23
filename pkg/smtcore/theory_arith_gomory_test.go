@@ -35,6 +35,8 @@ func TestSMTIntegerBranchAndGomoryScopesProofsAndModels(t *testing.T) {
 					astTestMust(t, err)
 					y, err := m.MkConst(astTestSymbol(t, m, "gomory-y"), sort)
 					astTestMust(t, err)
+					z, err := m.MkConst(astTestSymbol(t, m, "gomory-unrelated"), sort)
+					astTestMust(t, err)
 					num := func(v int64) ast.ASTHandle {
 						h, err := m.ArithmeticNumeralRat(big.NewRat(v, 1), true)
 						astTestMust(t, err)
@@ -47,7 +49,7 @@ func TestSMTIntegerBranchAndGomoryScopesProofsAndModels(t *testing.T) {
 					}
 					eq, err := m.MkEq(app(smtArithOpAdd, app(smtArithOpMul, num(2), x), y), num(1))
 					astTestMust(t, err)
-					formulas := []ast.ASTHandle{eq, app(smtArithOpGE, y, num(0)), app(smtArithOpLE, y, num(1))}
+					formulas := []ast.ASTHandle{eq, app(smtArithOpGE, y, num(0)), app(smtArithOpLE, y, num(1)), app(smtArithOpGE, z, num(9876543))}
 					if unsat {
 						real, err := m.MkFamilySort(family, 0, nil)
 						astTestMust(t, err)
@@ -99,6 +101,27 @@ func TestSMTIntegerBranchAndGomoryScopesProofsAndModels(t *testing.T) {
 							astTestMust(t, err)
 							if !m.IsFalse(fact) || cuts && !smtProofHasTheoryRule(t, m, proof, "gomory-cut") {
 								t.Fatal("Gomory proof fact or rule metadata")
+							}
+							if cuts {
+								lemma := smtProofTheoryRuleNode(t, m, proof, "gomory-cut")
+								decl, err := m.GetDecl(lemma)
+								astTestMust(t, err)
+								parameters, err := m.GetDeclParametersCopy(decl)
+								astTestMust(t, err)
+								if len(parameters) < 3 {
+									t.Fatal("Gomory lemma omitted bound weights")
+								}
+								for i := range parameters {
+									kind, err := m.ParameterKind(parameters[i])
+									astTestMust(t, err)
+									if i > 1 && kind != ast.ASTParameterRational {
+										t.Fatal("non-rational Gomory weight", kind)
+									}
+									astTestMust(t, m.DelParameter(&parameters[i]))
+								}
+								if smtTestArithmeticExpressionContains(t, m, lemma, z) {
+									t.Fatal("Gomory proof cites unrelated assertion")
+								}
 							}
 						}
 						if !unsat {
