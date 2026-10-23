@@ -151,7 +151,7 @@ func TestSMTNonlinearIntegerBranchesScopedProofsAndModels(t *testing.T) {
 						if theory.nonlinearRounds != 0 {
 							t.Fatal("nonlinear round budget survived scope pop", theory.nonlinearRounds)
 						}
-						if len(theory.nonlinearBounds) != 0 || theory.nonlinearStrategy != 0 {
+						if len(theory.derivedBounds) != 0 || theory.nonlinearStrategy != 0 {
 							t.Fatal("nonlinear strategy facts survived scope pop")
 						}
 						status, err = s.CheckSat(nil)

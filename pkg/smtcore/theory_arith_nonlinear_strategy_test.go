@@ -72,8 +72,8 @@ func TestSMTNonlinearNumericProgressAndScopedStrategies(t *testing.T) {
 					t.Fatal("iterated nonlinear interval conflict", status)
 				}
 				after := s.kernel.internalizer.searchProgress()
-				if after.theory <= before.theory || after.variables != before.variables || len(theory.nonlinearBounds) == 0 {
-					t.Fatal("numeric-only progress was not retained", before, after, len(theory.nonlinearBounds))
+				if after.theory <= before.theory || after.variables != before.variables || len(theory.derivedBounds) == 0 {
+					t.Fatal("numeric-only progress was not retained", before, after, len(theory.derivedBounds))
 				}
 				if theory.statistics.grobner != 0 || theory.statistics.nonlinearBranches != 0 {
 					t.Fatal("interval conflict used a disabled strategy")
@@ -88,7 +88,7 @@ func TestSMTNonlinearNumericProgressAndScopedStrategies(t *testing.T) {
 					}
 				}
 				astTestMust(t, s.Pop(1))
-				if len(theory.nonlinearBounds) != 0 || theory.nonlinearStrategy != 0 {
+				if len(theory.derivedBounds) != 0 || theory.nonlinearStrategy != 0 {
 					t.Fatal("derived numeric facts survived pop")
 				}
 				astTestMust(t, s.Pop(1))

@@ -10,6 +10,8 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"shared_arithmetic_fixed_rows.smt2":         "unsat\nsat\n",
+	"shared_arithmetic_fixed_integer.smt2":      "unsat\n",
 	"nonlinear_numeric_progress.smt2":           "unsat\nsat\n((x 3) (y 4))\n",
 	"nonlinear_cluster_inequalities.smt2":       "unsat\nsat\n((x 1.0) (y 1.0) (z (- 1.0)))\n",
 	"nonlinear_cluster_strict.smt2":             "unsat\n",

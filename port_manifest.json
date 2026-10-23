@@ -106036,7 +106036,10 @@
         "pkg/smtcore/smt_theory_relevance_test.go",
         "pkg/smtcore/theory_arith_division_test.go",
         "pkg/smtcore/theory_arith_nonlinear_strategy.go",
-        "pkg/smtcore/theory_arith_nonlinear_strategy_test.go"
+        "pkg/smtcore/theory_arith_nonlinear_strategy_test.go",
+        "pkg/smtcore/theory_arith_fixed_bounds.go",
+        "pkg/smtcore/theory_arith_fixed_bounds_test.go",
+        "pkg/smtcore/theory_arith_shared.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -106072,7 +106075,8 @@
         "TestSMTLibRunnerCPPReference",
         "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
         "TestSMTArithmeticSymbolicZeroDivisorGuard",
-        "TestSMTNonlinearNumericProgressAndScopedStrategies"
+        "TestSMTNonlinearNumericProgressAndScopedStrategies",
+        "TestSMTSharedArithmeticFixedRowsScopedProofs"
       ],
       "conditionals": [
         {
@@ -107130,6 +107134,14 @@
           "go_target": "pkg/smtcore/smt_search.go",
           "tests": [
             "TestSMTNonlinearNumericProgressAndScopedStrategies"
+          ]
+        },
+        {
+          "name": "arithmetic context-sharing query for root theory-variable counts, ite roots, active MAM sharing, foreign-family parents and underspecified arithmetic parents",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_shared.go",
+          "tests": [
+            "TestSMTSharedArithmeticFixedRowsScopedProofs"
           ]
         }
       ],
@@ -113399,7 +113411,10 @@
       "go_targets": [
         "pkg/smtcore/theory_arith_tableau.go",
         "pkg/smtcore/smt_farkas_util.go",
-        "pkg/smtcore/theory_arith_bounds.go"
+        "pkg/smtcore/theory_arith_bounds.go",
+        "pkg/smtcore/theory_arith_fixed_bounds.go",
+        "pkg/smtcore/theory_arith_fixed_bounds_test.go",
+        "pkg/smtcore/theory_arith_shared.go"
       ],
       "tests": [
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
@@ -113411,7 +113426,8 @@
         "TestSMTArithmeticAntecedentAndDerivedCoefficients",
         "TestSMTArithmeticBoundTrailEncoding",
         "TestSMTArithmeticEqualityBoundAndAccumulation",
-        "TestSMTNormalizeArithmeticIntegerBound"
+        "TestSMTNormalizeArithmeticIntegerBound",
+        "TestSMTSharedArithmeticFixedRowsScopedProofs"
       ],
       "conditionals": [
         {
@@ -113829,6 +113845,14 @@
             "TestSMTArithmeticEqualityBoundAndAccumulation",
             "TestSMTNormalizeArithmeticIntegerBound"
           ]
+        },
+        {
+          "name": "arithmetic is_shared override for underspecified division-family parents and fixed arithmetic equality integration with foreign-family parents",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_shared.go",
+          "tests": [
+            "TestSMTSharedArithmeticFixedRowsScopedProofs"
+          ]
         }
       ],
       "ownership": [],
@@ -113851,7 +113875,10 @@
         "pkg/smtcore/theory_arith_nonlinear.go",
         "pkg/smtcore/theory_arith_nonlinear_test.go",
         "pkg/smtcore/theory_arith_grobner_square_test.go",
-        "pkg/smtcore/theory_arith_linear_monomial_test.go"
+        "pkg/smtcore/theory_arith_linear_monomial_test.go",
+        "pkg/smtcore/theory_arith_fixed_bounds.go",
+        "pkg/smtcore/theory_arith_fixed_bounds_test.go",
+        "pkg/smtcore/theory_arith_shared.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -113870,7 +113897,8 @@
         "TestSMTNonlinearUpwardDownwardAndIntegerIntervals",
         "TestSMTNonlinearCandidateRejectsRelaxedProduct",
         "TestSMTNonlinearGrobnerExpandedSquareScopedProofs",
-        "TestSMTLinearizedMonomialScopesProofsAndModels"
+        "TestSMTLinearizedMonomialScopesProofsAndModels",
+        "TestSMTSharedArithmeticFixedRowsScopedProofs"
       ],
       "conditionals": [
         {
@@ -114679,6 +114707,19 @@
           "tests": [
             "TestSMTLinearizedMonomialScopesProofsAndModels"
           ]
+        },
+        {
+          "name": "small-row interval bounds and fixed shared-variable equality propagation: unconditional replay fixes arithmetic inputs of UF applications and propagates congruence with scoped premises",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTSharedArithmeticFixedRowsScopedProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -114686,7 +114727,8 @@
         "Division application markers follow theory scopes. Concrete division calls pin generated arithmetic and Boolean terms through recursive axiom internalization. The disabled constant-modulus enumeration option has no active retained setter and is not translated."
       ],
       "deviations": [
-        "Affine definition-bound propagation evaluates retained replay rows before and after nonlinear interval propagation, including sign reversal for negated-square aliases. General row scheduling, propagation to every row variable, and minimal row-bound explanations remain incomplete."
+        "Affine definition-bound propagation evaluates retained replay rows before and after nonlinear interval propagation, including sign reversal for negated-square aliases. General row scheduling, propagation to every row variable, and minimal row-bound explanations remain incomplete.",
+        "Shared arithmetic variables can become fixed through a combination of row bounds even when no explicit opposite unary bounds occur. A branch-free row interval pass derives these points, retains only newly fixed original columns as scoped replay bounds, and propagates equal-valued shared roots with all active arithmetic literals as premises. This closes the false-SAT case x>=0, y>=0, x+y<=0, f(x)!=f(y). General bound-atom propagation and optimal fixed-point discovery remain separate work."
       ]
     },
     {

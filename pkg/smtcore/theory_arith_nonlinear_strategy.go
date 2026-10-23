@@ -8,7 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-type smtNonlinearDerivedBound struct {
+type smtArithmeticReplayBound struct {
 	column uint32
 	lower  bool
 	value  simplex.Infinitesimal
@@ -27,7 +27,7 @@ func smtTightenSimplexBound(solver *simplex.Solver, column uint32, lower bool, v
 	return true, solver.SetUpper(column, value)
 }
 
-func (t *SMTLinearArithmeticTheory) nonlinearStrategyConflict() error {
+func (t *SMTLinearArithmeticTheory) derivedBoundConflict() error {
 	literals := make([]SMTLiteral, 0, len(t.assertions))
 	for _, assertion := range t.assertions {
 		literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
@@ -42,14 +42,14 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearStrategyBounds() (bool, er
 		return false, err
 	}
 	if status == lbool.False {
-		return true, t.nonlinearStrategyConflict()
+		return true, t.derivedBoundConflict()
 	}
-	before := make(map[uint32][2]smtNonlinearDerivedBound, len(t.simplexVariables))
+	before := make(map[uint32][2]smtArithmeticReplayBound, len(t.simplexVariables))
 	valid := make(map[uint32][2]bool, len(t.simplexVariables))
 	for _, column := range t.simplexVariables {
 		lower, hasLower := solver.Lower(column)
 		upper, hasUpper := solver.Upper(column)
-		before[column] = [2]smtNonlinearDerivedBound{{column, true, lower}, {column, false, upper}}
+		before[column] = [2]smtArithmeticReplayBound{{column, true, lower}, {column, false, upper}}
 		valid[column] = [2]bool{hasLower, hasUpper}
 	}
 	_, conflict, err := t.propagateNonlinearBounds(solver)
@@ -63,14 +63,14 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearStrategyBounds() (bool, er
 		}
 	}
 	if conflict {
-		return true, t.nonlinearStrategyConflict()
+		return true, t.derivedBoundConflict()
 	}
 	status, err = solver.MakeFeasible()
 	if err != nil || status == lbool.Undef {
 		return false, err
 	}
 	if status == lbool.False {
-		return true, t.nonlinearStrategyConflict()
+		return true, t.derivedBoundConflict()
 	}
 	progress := false
 	for _, column := range t.simplexVariables {
@@ -86,7 +86,7 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearStrategyBounds() (bool, er
 			if valid[column][index] && (lower && value.Cmp(&old.value) <= 0 || !lower && value.Cmp(&old.value) >= 0) {
 				continue
 			}
-			t.nonlinearBounds = append(t.nonlinearBounds, smtNonlinearDerivedBound{column, lower, value.Clone()})
+			t.derivedBounds = append(t.derivedBounds, smtArithmeticReplayBound{column, lower, value.Clone()})
 			progress = true
 		}
 	}
