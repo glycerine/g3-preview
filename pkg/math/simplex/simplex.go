@@ -77,14 +77,16 @@ type Stats struct{ NumPivots, NumInfeasible, NumChecks uint64 }
 // Solver is the concrete exact tableau used by both retained mpz and mpq
 // consumers. Integer rows are accepted through AddIntegerRow.
 type Solver struct {
-	limit         *control.Reslimit
-	matrix        Matrix
-	vars          []variableInfo
-	rowBase       []uint32
-	patch         map[uint32]bool
-	maxIterations uint32
-	infeasible    uint32
-	Stats         Stats
+	boundConflict      []BoundDependency
+	boundConflictKnown bool
+	limit              *control.Reslimit
+	matrix             Matrix
+	vars               []variableInfo
+	rowBase            []uint32
+	patch              map[uint32]bool
+	maxIterations      uint32
+	infeasible         uint32
+	Stats              Stats
 }
 
 func NewSolver(limit *control.Reslimit) *Solver {
@@ -228,6 +230,7 @@ func (s *Solver) updateValue(v uint32, delta *Infinitesimal) {
 }
 
 func (s *Solver) SetLower(v uint32, bound Infinitesimal) error {
+	s.boundConflict, s.boundConflictKnown = nil, false
 	s.EnsureVariable(v)
 	x := &s.vars[v]
 	if x.upperValid && bound.Cmp(&x.upper) > 0 {
@@ -246,6 +249,7 @@ func (s *Solver) SetLower(v uint32, bound Infinitesimal) error {
 	return nil
 }
 func (s *Solver) SetUpper(v uint32, bound Infinitesimal) error {
+	s.boundConflict, s.boundConflictKnown = nil, false
 	s.EnsureVariable(v)
 	x := &s.vars[v]
 	if x.lowerValid && x.lower.Cmp(&bound) > 0 {
@@ -264,12 +268,14 @@ func (s *Solver) SetUpper(v uint32, bound Infinitesimal) error {
 	return nil
 }
 func (s *Solver) UnsetLower(v uint32) {
+	s.boundConflict, s.boundConflictKnown = nil, false
 	if int(v) < len(s.vars) {
 		s.vars[v].lowerValid = false
 		s.vars[v].lowerDependencies, s.vars[v].lowerExplained = nil, false
 	}
 }
 func (s *Solver) UnsetUpper(v uint32) {
+	s.boundConflict, s.boundConflictKnown = nil, false
 	if int(v) < len(s.vars) {
 		s.vars[v].upperValid = false
 		s.vars[v].upperDependencies, s.vars[v].upperExplained = nil, false
@@ -677,6 +683,7 @@ func (s *Solver) Minimize(objective uint32) (lbool.LBool, error) {
 }
 
 func (s *Solver) Reset() {
+	s.boundConflict, s.boundConflictKnown = nil, false
 	s.matrix.Reset()
 	s.vars = nil
 	s.rowBase = nil

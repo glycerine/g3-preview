@@ -124,7 +124,7 @@ func (n *smtNestedArithmetic) checkClusterRows() (bool, error) {
 			// Every canonical row is an equality to zero. Its interval must
 			// contain zero, including open endpoint information.
 			if interval.positiveOne() || interval.negativeOne() {
-				return true, n.theory.derivedBoundConflict()
+				return true, n.theory.derivedBoundConflict(n.solver)
 			}
 		}
 	}

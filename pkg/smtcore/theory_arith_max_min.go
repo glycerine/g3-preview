@@ -30,7 +30,7 @@ func (t *SMTLinearArithmeticTheory) maxMinNonlinearVariables() (bool, error) {
 		return false, err
 	}
 	if status == lbool.False {
-		return true, t.derivedBoundConflict()
+		return true, t.derivedBoundConflict(solver)
 	}
 	integers := make(map[uint32]bool, len(t.integerColumns)+len(t.atoms)+1)
 	shared := make(map[uint32]bool)
@@ -57,7 +57,7 @@ func (t *SMTLinearArithmeticTheory) maxMinNonlinearVariables() (bool, error) {
 		return false, err
 	}
 	if status == lbool.False {
-		return true, t.derivedBoundConflict()
+		return true, t.derivedBoundConflict(solver)
 	}
 	var columns []uint32
 	found := make(map[uint32]bool)
@@ -100,7 +100,8 @@ func (t *SMTLinearArithmeticTheory) maxMinNonlinearVariables() (bool, error) {
 	for _, bound := range pending {
 		changed, err := smtTightenReplaySimplexBound(solver, bound.column, bound.lower, bound.value, bound.explanation)
 		if err != nil {
-			return true, t.derivedBoundConflict()
+			t.recordArithmeticBoundConflict(solver, bound.column, bound.lower, bound.explanation)
+			return true, t.derivedBoundConflict(solver)
 		}
 		if changed {
 			t.derivedBounds = append(t.derivedBounds, bound)
@@ -112,7 +113,7 @@ func (t *SMTLinearArithmeticTheory) maxMinNonlinearVariables() (bool, error) {
 		return false, err
 	}
 	if status == lbool.False {
-		return true, t.derivedBoundConflict()
+		return true, t.derivedBoundConflict(solver)
 	}
 	if progress {
 		t.solver = solver

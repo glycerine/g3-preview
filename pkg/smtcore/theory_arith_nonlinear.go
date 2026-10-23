@@ -241,6 +241,7 @@ func (t *SMTLinearArithmeticTheory) updateArithmeticBoundsWithExplanations(solve
 		}
 		_, err := smtTightenReplaySimplexBound(solver, column, lower, bound, explanations[index])
 		if err != nil {
+			t.recordArithmeticBoundConflict(solver, column, lower, explanations[index])
 			return changed, true
 		}
 		changed = true

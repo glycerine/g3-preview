@@ -4,6 +4,8 @@
 package smtcore
 
 import (
+	"errors"
+
 	"github.com/glycerine/g3/pkg/math/simplex"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -28,7 +30,31 @@ func smtTightenSimplexBound(solver *simplex.Solver, column uint32, lower bool, v
 	return true, solver.SetUpper(column, value)
 }
 
-func (t *SMTLinearArithmeticTheory) derivedBoundConflict() error {
+func (t *SMTLinearArithmeticTheory) derivedBoundConflict(solver *simplex.Solver) (result error) {
+	if t.state.inconsistent {
+		return nil
+	}
+	if solver != nil {
+		if dependencies, known := solver.BoundConflictDependencies(); known && len(dependencies) != 0 {
+			proofs, err := t.state.manager.ProofsEnabled()
+			if err != nil {
+				return err
+			}
+			var antecedents smtArithmeticAntecedents
+			for _, dependency := range dependencies {
+				if err = antecedents.pushLiteral(SMTLiteralFromIndex(dependency.Literal), &dependency.Coefficient, proofs); err != nil {
+					return err
+				}
+			}
+			parameters, err := antecedents.parameters(t.state.manager, "farkas")
+			if err != nil {
+				return err
+			}
+			defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(t.state.manager, parameters)) }()
+			t.statistics.conflicts++
+			return t.state.SetTheoryConflict(t.FamilyID(), antecedents.literals, parameters...)
+		}
+	}
 	literals := make([]SMTLiteral, 0, len(t.assertions))
 	for _, assertion := range t.assertions {
 		literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
@@ -43,7 +69,7 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearStrategyBounds() (bool, er
 		return false, err
 	}
 	if status == lbool.False {
-		return true, t.derivedBoundConflict()
+		return true, t.derivedBoundConflict(solver)
 	}
 	before := make(map[uint32][2]smtArithmeticReplayBound, len(t.simplexVariables))
 	valid := make(map[uint32][2]bool, len(t.simplexVariables))
@@ -70,14 +96,14 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearStrategyBounds() (bool, er
 		}
 	}
 	if conflict {
-		return true, t.derivedBoundConflict()
+		return true, t.derivedBoundConflict(solver)
 	}
 	status, err = solver.MakeFeasible()
 	if err != nil || status == lbool.Undef {
 		return false, err
 	}
 	if status == lbool.False {
-		return true, t.derivedBoundConflict()
+		return true, t.derivedBoundConflict(solver)
 	}
 	progress := false
 	for _, column := range t.simplexVariables {

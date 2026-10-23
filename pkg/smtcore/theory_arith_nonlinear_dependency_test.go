@@ -1,16 +1,93 @@
 package smtcore
 
 import (
+	"fmt"
 	"math/big"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/simplex"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func smtTestIntervalBound(t *testing.T, solver *simplex.Solver, column uint32, lower bool, value int64, literal int32) {
 	t.Helper()
 	_, err := smtTightenExplainedSimplexBound(solver, column, lower, simplex.RationalInfinitesimal(big.NewRat(value, 1)), []simplex.BoundDependency{{Literal: literal, Coefficient: *big.NewRat(-7, 3)}})
 	astTestMust(t, err)
+}
+
+func TestSMTRejectedNonlinearCandidateKeepsLogicalContextConsistent(t *testing.T) {
+	for _, proofs := range []bool{false, true} {
+		t.Run(fmt.Sprint(proofs), func(t *testing.T) {
+			m, cfg := smtModelGeneratorFixture(t)
+			if proofs {
+				astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+			}
+			s, err := NewSMTSolver(m, nil, "QF_NRA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, s.Close()) })
+			s.kernel.preprocess = false
+			family, err := m.ArithmeticFamilyID()
+			astTestMust(t, err)
+			sort, err := m.MkFamilySort(family, 0, nil)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "candidate-dependency-x"), sort)
+			astTestMust(t, err)
+			y, err := m.MkConst(astTestSymbol(t, m, "candidate-dependency-y"), sort)
+			astTestMust(t, err)
+			product, err := m.MkArithmeticMul(x, y)
+			astTestMust(t, err)
+			var formulas []ast.ASTHandle
+			for _, entry := range []struct {
+				term  ast.ASTHandle
+				op    int32
+				value int64
+			}{{x, smtArithOpGE, 1}, {x, smtArithOpLE, 3}, {y, smtArithOpGE, 1}, {y, smtArithOpLE, 3}, {product, smtArithOpLE, 5}} {
+				value, err := m.ArithmeticNumeralRat(big.NewRat(entry.value, 1), false)
+				astTestMust(t, err)
+				formula, err := m.MkFamilyApp(family, entry.op, nil, []ast.ASTHandle{entry.term, value})
+				astTestMust(t, err)
+				ref, err := m.NewRef(formula)
+				astTestMust(t, err)
+				t.Cleanup(func() { astTestMust(t, m.DelRef(&ref)) })
+				formulas = append(formulas, formula)
+			}
+			for repeat := 0; repeat < 2; repeat++ {
+				astTestMust(t, s.Push())
+				for _, formula := range formulas {
+					astTestMust(t, s.Assert(formula))
+				}
+				status, err := s.CheckSat(nil)
+				astTestMust(t, err)
+				if status != lbool.True {
+					t.Fatal("consistent logical bounds", status)
+				}
+				theory := s.kernel.internalizer.theories[family].(*SMTLinearArithmeticTheory)
+				xColumn, err := theory.ensureVariable(x)
+				astTestMust(t, err)
+				yColumn, err := theory.ensureVariable(y)
+				astTestMust(t, err)
+				before := theory.statistics.conflicts
+				rejected, status, err := theory.buildSimplexWithValues(map[uint32]*big.Rat{xColumn: big.NewRat(3, 1), yColumn: big.NewRat(3, 1)})
+				astTestMust(t, err)
+				if status != lbool.False || rejected == nil {
+					t.Fatal("invalid candidate not rejected", status)
+				}
+				if theory.state.inconsistent || theory.statistics.conflicts != before {
+					t.Fatal("rejected candidate became a logical conflict")
+				}
+				if _, known := rejected.BoundConflictDependencies(); known {
+					t.Fatal("candidate values acquired a logical explanation")
+				}
+				status, err = s.CheckSat(nil)
+				astTestMust(t, err)
+				if status != lbool.True {
+					t.Fatal("candidate rejection poisoned later check", status)
+				}
+				astTestMust(t, s.Pop(1))
+			}
+		})
+	}
 }
 
 func smtTestPlainIntervalPremises(t *testing.T, solver *simplex.Solver, column uint32, lower bool, literals ...int32) {

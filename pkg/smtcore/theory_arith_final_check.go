@@ -20,7 +20,7 @@ func (t *SMTLinearArithmeticTheory) finalCheckIntegerFeasibility() (SMTFinalChec
 				return SMTFinalCheckGiveUp, err
 			}
 			if status == lbool.False {
-				return SMTFinalCheckContinue, t.derivedBoundConflict()
+				return SMTFinalCheckContinue, t.derivedBoundConflict(bounds)
 			}
 			if status == lbool.Undef {
 				return SMTFinalCheckGiveUp, nil
@@ -44,7 +44,7 @@ func (t *SMTLinearArithmeticTheory) finalCheckIntegerFeasibility() (SMTFinalChec
 						return SMTFinalCheckGiveUp, err
 					}
 					if status == lbool.False {
-						return SMTFinalCheckContinue, t.derivedBoundConflict()
+						return SMTFinalCheckContinue, t.derivedBoundConflict(bounds)
 					}
 				}
 			}
@@ -61,7 +61,7 @@ func (t *SMTLinearArithmeticTheory) finalCheckIntegerFeasibility() (SMTFinalChec
 				return SMTFinalCheckGiveUp, err
 			}
 			if status == lbool.False {
-				return SMTFinalCheckContinue, t.derivedBoundConflict()
+				return SMTFinalCheckContinue, t.derivedBoundConflict(bounds)
 			}
 			t.solver = bounds
 			if _, _, fractional := t.fractionalVariable(bounds); !fractional {

@@ -406,7 +406,8 @@ func (t *SMTLinearArithmeticTheory) applyEuclideanSolver(tableau *simplex.Solver
 	for _, bound := range pending {
 		changed, err := smtTightenReplaySimplexBound(tableau, bound.column, bound.lower, bound.value, bound.explanation)
 		if err != nil {
-			return true, t.derivedBoundConflict()
+			t.recordArithmeticBoundConflict(tableau, bound.column, bound.lower, bound.explanation)
+			return true, t.derivedBoundConflict(tableau)
 		}
 		if !changed {
 			continue

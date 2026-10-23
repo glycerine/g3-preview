@@ -68,6 +68,21 @@ func smtArithmeticCopyBoundExplanation(solver *simplex.Solver, column uint32, lo
 	return &smtArithmeticBoundExplanation{dependencies: dependencies}
 }
 
+// Source theory_arith_core.h sign_bound_conflict pushes the attempted bound
+// first, then the opposite endpoint, each with coefficient one.
+func (t *SMTLinearArithmeticTheory) recordArithmeticBoundConflict(solver *simplex.Solver, column uint32, lower bool, explanation *smtArithmeticBoundExplanation) {
+	opposite := smtArithmeticCopyBoundExplanation(solver, column, !lower)
+	if explanation == nil || opposite == nil {
+		solver.RecordBoundConflictDependencies(nil, false)
+		return
+	}
+	var dependencies []simplex.BoundDependency
+	for _, reason := range []*smtArithmeticBoundExplanation{explanation, opposite} {
+		dependencies = append(dependencies, reason.dependencies...)
+	}
+	solver.RecordBoundConflictDependencies(dependencies, true)
+}
+
 // Euclidean mk_bound creates a plain derived_bound. Its accumulator deduplicates
 // premises and discards their old multipliers; a later push_justification uses
 // the caller's coefficient once for each retained premise.

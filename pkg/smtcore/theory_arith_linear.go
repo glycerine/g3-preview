@@ -1054,6 +1054,9 @@ func (t *SMTLinearArithmeticTheory) rebuild() (bool, error) {
 	if err == nil && status == lbool.True {
 		t.solver = solver
 	}
+	if err == nil && status == lbool.False && t.state != nil {
+		err = t.derivedBoundConflict(solver)
+	}
 	return status == lbool.True, err
 }
 
@@ -1147,6 +1150,7 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 		dependency := simplex.BoundDependency{Literal: smtLinearAssertionLiteral(atom, assertion).Index(), Coefficient: *big.NewRat(1, 1)}
 		_, err := smtTightenExplainedSimplexBound(solver, base, lower, bound, []simplex.BoundDependency{dependency})
 		if err != nil {
+			t.recordArithmeticBoundConflict(solver, base, lower, &smtArithmeticBoundExplanation{dependencies: []simplex.BoundDependency{dependency}})
 			return solver, lbool.False, nil
 		}
 		// Source single-variable atoms constrain the variable directly. Keep
@@ -1159,6 +1163,7 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 				directDependency := simplex.BoundDependency{Literal: dependency.Literal, Coefficient: *new(big.Rat).Inv(coefficient)}
 				_, err = smtTightenExplainedSimplexBound(solver, variable, directLower, direct, []simplex.BoundDependency{directDependency})
 				if err != nil {
+					t.recordArithmeticBoundConflict(solver, variable, directLower, &smtArithmeticBoundExplanation{dependencies: []simplex.BoundDependency{directDependency}})
 					return solver, lbool.False, nil
 				}
 			}
@@ -1170,11 +1175,13 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 			return nil, lbool.Undef, ast.ErrASTDomain
 		}
 		if _, err := smtTightenReplaySimplexBound(solver, base, bound.lower, bound.value, bound.explanation); err != nil {
+			t.recordArithmeticBoundConflict(solver, base, bound.lower, bound.explanation)
 			return solver, lbool.False, nil
 		}
 	}
 	for _, bound := range t.derivedBounds {
 		if _, err := smtTightenReplaySimplexBound(solver, bound.column, bound.lower, bound.value, bound.explanation); err != nil {
+			t.recordArithmeticBoundConflict(solver, bound.column, bound.lower, bound.explanation)
 			return solver, lbool.False, nil
 		}
 	}

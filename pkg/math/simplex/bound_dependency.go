@@ -2,6 +2,20 @@ package simplex
 
 import "math/big"
 
+// RecordBoundConflictDependencies retains a failed endpoint update's logical
+// premises. The owner decides whether this tableau represents logical replay
+// or a temporary candidate; recording never changes the SMT context.
+func (s *Solver) RecordBoundConflictDependencies(dependencies []BoundDependency, known bool) {
+	s.boundConflict, s.boundConflictKnown = nil, known
+	if known {
+		s.boundConflict = cloneBoundDependencies(dependencies)
+	}
+}
+
+func (s *Solver) BoundConflictDependencies() ([]BoundDependency, bool) {
+	return cloneBoundDependencies(s.boundConflict), s.boundConflictKnown
+}
+
 // BoundDependency is a weighted Boolean literal index supplied by the SMT
 // arithmetic consumer. Tableau pivots preserve bounds and their dependencies.
 type BoundDependency struct {

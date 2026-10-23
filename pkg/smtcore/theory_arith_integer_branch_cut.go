@@ -251,7 +251,7 @@ func (t *SMTLinearArithmeticTheory) branchOrCutIntegerColumn(column uint32) (SMT
 		return SMTFinalCheckGiveUp, err
 	}
 	if status == lbool.False {
-		return SMTFinalCheckContinue, t.derivedBoundConflict()
+		return SMTFinalCheckContinue, t.derivedBoundConflict(t.solver)
 	}
 	column, found := t.solver.ArithmeticIntegerBase(integers, &t.nonlinearRandom)
 	if !found {

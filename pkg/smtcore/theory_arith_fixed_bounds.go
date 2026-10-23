@@ -35,7 +35,7 @@ func (t *SMTLinearArithmeticTheory) propagateFixedSharedValues() (bool, error) {
 		return false, err
 	}
 	if status == lbool.False {
-		return true, t.derivedBoundConflict()
+		return true, t.derivedBoundConflict(solver)
 	}
 	alreadyFixed := make(map[uint32]bool)
 	for _, column := range t.simplexVariables {
@@ -44,14 +44,14 @@ func (t *SMTLinearArithmeticTheory) propagateFixedSharedValues() (bool, error) {
 	if conflict, err := t.propagateArithmeticRowBounds(solver); err != nil {
 		return false, err
 	} else if conflict {
-		return true, t.derivedBoundConflict()
+		return true, t.derivedBoundConflict(solver)
 	}
 	status, err = solver.MakeFeasible()
 	if err != nil || status == lbool.Undef {
 		return false, err
 	}
 	if status == lbool.False {
-		return true, t.derivedBoundConflict()
+		return true, t.derivedBoundConflict(solver)
 	}
 	progress := false
 	for _, column := range t.simplexVariables {

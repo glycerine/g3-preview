@@ -30,15 +30,17 @@ func TestSMTNonlinearRelaxationScopesProofsAndModel(t *testing.T) {
 			astTestMust(t, err)
 			y, err := m.MkConst(astTestSymbol(t, m, "nl-y"), sort)
 			astTestMust(t, err)
+			unrelated, err := m.MkConst(astTestSymbol(t, m, "nl-unrelated"), sort)
+			astTestMust(t, err)
 			product, err := m.MkArithmeticMul(x, y)
 			astTestMust(t, err)
-			refs := []ast.ASTHandle{x, y, product}
+			refs := []ast.ASTHandle{x, y, product, unrelated}
 			var base []ast.ASTHandle
 			for _, spec := range []struct {
 				term  ast.ASTHandle
 				op    int32
 				value string
-			}{{x, smtArithOpGT, "2"}, {x, smtArithOpLE, "3"}, {y, smtArithOpGE, "4"}, {y, smtArithOpLE, "5"}} {
+			}{{x, smtArithOpGT, "2"}, {x, smtArithOpLE, "3"}, {y, smtArithOpGE, "4"}, {y, smtArithOpLE, "5"}, {unrelated, smtArithOpGE, "999"}} {
 				value, err := m.ArithmeticRealNumeralText(spec.value)
 				astTestMust(t, err)
 				bound, err := m.MkFamilyApp(family, spec.op, nil, []ast.ASTHandle{spec.term, value})
@@ -111,6 +113,28 @@ func TestSMTNonlinearRelaxationScopesProofsAndModel(t *testing.T) {
 						astTestMust(t, err)
 						if !m.IsFalse(fact) {
 							t.Fatal("nonlinear contradiction proof")
+						}
+						lemma := smtProofTheoryRuleNode(t, m, proof, "farkas")
+						if lemma.IsNull() {
+							t.Fatal("interval bound contradiction lost source farkas rule")
+						}
+						if smtTestArithmeticExpressionContains(t, m, lemma, unrelated) {
+							t.Fatal("interval conflict cites unrelated assertion")
+						}
+						decl, err := m.GetDecl(lemma)
+						astTestMust(t, err)
+						parameters, err := m.GetDeclParametersCopy(decl)
+						astTestMust(t, err)
+						if len(parameters) < 3 {
+							t.Fatal("interval conflict lost bound coefficients")
+						}
+						for i := range parameters {
+							kind, err := m.ParameterKind(parameters[i])
+							astTestMust(t, err)
+							if i > 1 && kind != ast.ASTParameterRational {
+								t.Fatal("non-rational interval conflict weight", kind)
+							}
+							astTestMust(t, m.DelParameter(&parameters[i]))
 						}
 					}
 					astTestMust(t, s.Pop(1))

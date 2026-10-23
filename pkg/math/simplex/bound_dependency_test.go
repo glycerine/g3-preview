@@ -5,6 +5,42 @@ import (
 	"testing"
 )
 
+func TestBoundConflictDependenciesOwnAndInvalidateSnapshots(t *testing.T) {
+	s := NewSolver(nil)
+	dependencies := []BoundDependency{{Literal: 12, Coefficient: *big.NewRat(-5, 7)}}
+	s.RecordBoundConflictDependencies(dependencies, true)
+	dependencies[0].Coefficient.SetInt64(99)
+	copy, known := s.BoundConflictDependencies()
+	if !known || len(copy) != 1 || copy[0].Coefficient.Cmp(big.NewRat(-5, 7)) != 0 {
+		t.Fatal(copy, known)
+	}
+	copy[0].Coefficient.SetInt64(42)
+	copy, _ = s.BoundConflictDependencies()
+	if copy[0].Coefficient.Cmp(big.NewRat(-5, 7)) != 0 {
+		t.Fatal("borrowed conflict coefficient")
+	}
+	if err := s.SetLower(1, RationalInfinitesimal(big.NewRat(0, 1))); err != nil {
+		t.Fatal(err)
+	}
+	if _, known = s.BoundConflictDependencies(); known {
+		t.Fatal("bound update retained stale conflict")
+	}
+	s.RecordBoundConflictDependencies(dependencies, true)
+	s.UnsetLower(1)
+	if _, known = s.BoundConflictDependencies(); known {
+		t.Fatal("unset retained stale conflict")
+	}
+	s.RecordBoundConflictDependencies(dependencies, true)
+	s.Reset()
+	if _, known = s.BoundConflictDependencies(); known {
+		t.Fatal("reset retained conflict")
+	}
+	s.RecordBoundConflictDependencies(dependencies, false)
+	if copy, known = s.BoundConflictDependencies(); known || len(copy) != 0 {
+		t.Fatal("unknown conflict acquired premises", copy, known)
+	}
+}
+
 func TestBoundDependenciesOwnCoefficientsAndInvalidateModelBounds(t *testing.T) {
 	s := NewSolver(nil)
 	dependencies := []BoundDependency{{Literal: 12, Coefficient: *big.NewRat(-7, 3)}}

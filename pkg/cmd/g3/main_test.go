@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"nonlinear_bound_provenance_scopes.smt2":    "sat\nunsat\nsat\nunsat\nsat\n",
 	"integer_bound_provenance_scopes.smt2":      "unsat\nunsat\nsat\n",
 	"mixed_cut_bound_provenance_scopes.smt2":    "unsat\nsat\n",
 	"integer_euclidean_scopes.smt2":             "unsat\nsat\n((x 1) (y 1))\n",
