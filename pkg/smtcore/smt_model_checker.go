@@ -8,12 +8,15 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-// SMTModelChecker checks universal quantifiers over the finite universes
-// exposed by a candidate proto-model. Counterexamples are inserted into the
-// ordinary quantifier queue, so proof construction and internalization remain
-// centralized in SMTQIInstanceBuilder.
+type smtAuxiliarySolverFactory func() (*SMTSolver, error)
+
+// SMTModelChecker checks universal quantifiers over finite proto-model
+// universes and uses a fresh SMT solver for infinite domains. Counterexamples
+// enter the ordinary quantifier queue so proof construction and
+// internalization remain centralized in SMTQIInstanceBuilder.
 type SMTModelChecker struct {
 	manager        *ast.ASTManager
 	state          *SMTInternalizerState
@@ -24,7 +27,16 @@ type SMTModelChecker struct {
 	iteration      uint32
 	exhausted      bool
 	valueTerms     map[ast.ASTHandle]ast.ASTHandle
+	auxiliary      smtAuxiliarySolverFactory
 	closed         bool
+}
+
+func (c *SMTModelChecker) SetAuxiliarySolverFactory(factory smtAuxiliarySolverFactory) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	c.auxiliary = factory
+	return nil
 }
 
 func (c *SMTModelChecker) SetCandidateTerms(rootValues map[*SMTEnode]ast.ASTHandle) error {
@@ -149,20 +161,158 @@ func (c *SMTModelChecker) addCounterexample(quantifier ast.ASTHandle, values []a
 	return c.registry.AddInstance(quantifier, ast.ASTHandle{}, nodes, maxGeneration, 0, 0)
 }
 
+func (c *SMTModelChecker) auxiliaryCounterexample(model *protomodel.ProtoModel, quantifier ast.ASTHandle, values []ast.ASTHandle, finite []bool) (added bool, result error) {
+	if c.auxiliary == nil {
+		return false, nil
+	}
+	body, err := c.manager.GetQuantifierBody(quantifier)
+	if err != nil {
+		return false, err
+	}
+	evaluated, err := c.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return false, err
+	}
+	defer func() { result = errors.Join(result, c.manager.DelRef(&evaluated)) }()
+	if _, err = model.Eval(body, evaluated, true); err != nil {
+		return false, err
+	}
+	evaluatedBody, err := c.manager.RefGet(evaluated)
+	if err != nil {
+		return false, err
+	}
+	bindings := append([]ast.ASTHandle(nil), values...)
+	skolemDecls := make([]ast.ASTHandle, len(bindings))
+	skolemRefs := make([]ast.ASTRef, 0, len(bindings))
+	defer func() {
+		for i := len(skolemRefs) - 1; i >= 0; i-- {
+			result = errors.Join(result, c.manager.DelRef(&skolemRefs[i]))
+		}
+	}()
+	for i := range bindings {
+		if finite[i] {
+			continue
+		}
+		sort, e := c.manager.GetDeclarationSort(quantifier, uint32(i))
+		if e != nil {
+			return false, e
+		}
+		bindings[i], e = c.manager.MkFreshConst("mbqi", sort)
+		if e != nil {
+			return false, e
+		}
+		ref, e := c.manager.NewRef(bindings[i])
+		if e != nil {
+			return false, e
+		}
+		skolemRefs = append(skolemRefs, ref)
+		skolemDecls[i], e = c.manager.GetDecl(bindings[i])
+		if e != nil {
+			return false, e
+		}
+	}
+	substitution, err := rewriter.NewVarSubstitution(c.manager, true)
+	if err != nil {
+		return false, err
+	}
+	defer func() { result = errors.Join(result, substitution.Close()) }()
+	ground, err := c.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return false, err
+	}
+	defer func() { result = errors.Join(result, c.manager.DelRef(&ground)) }()
+	if err = substitution.Substitute(evaluatedBody, bindings, ground); err != nil {
+		return false, err
+	}
+	groundBody, err := c.manager.RefGet(ground)
+	if err != nil {
+		return false, err
+	}
+	negated, err := c.manager.MkNot(groundBody)
+	if err != nil {
+		return false, err
+	}
+	auxiliary, err := c.auxiliary()
+	if err != nil {
+		return false, err
+	}
+	defer func() { result = errors.Join(result, auxiliary.Close()) }()
+	if err = auxiliary.Assert(negated); err != nil {
+		return false, err
+	}
+	status, err := auxiliary.CheckSat(nil)
+	if err != nil {
+		return false, err
+	}
+	if status == lbool.False {
+		return false, nil
+	}
+	if status != lbool.True {
+		c.exhausted = true
+		return false, nil
+	}
+	cex, err := auxiliary.AcquireModel()
+	if err != nil {
+		return false, err
+	}
+	if cex == nil {
+		return false, ast.ErrASTPending
+	}
+	defer func() { result = errors.Join(result, cex.DecRef()) }()
+	for i, declaration := range skolemDecls {
+		if declaration.IsNull() {
+			continue
+		}
+		value, e := cex.ConstantInterpretation(declaration)
+		if e != nil {
+			return false, e
+		}
+		if value.IsNull() {
+			sort, e := c.manager.GetDeclarationSort(quantifier, uint32(i))
+			if e != nil {
+				return false, e
+			}
+			value, e = cex.GetSomeValue(sort)
+			if e != nil {
+				return false, e
+			}
+		}
+		bindings[i] = value
+	}
+	return c.addCounterexample(quantifier, bindings)
+}
+
 func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifier ast.ASTHandle, remaining *uint32) (bool, error) {
 	count, err := c.manager.GetNumDeclarations(quantifier)
 	if err != nil {
 		return false, err
 	}
 	universes := make([][]ast.ASTHandle, count)
+	finite := make([]bool, count)
+	boolean, err := c.manager.MkBoolSort()
+	if err != nil {
+		return false, err
+	}
+	hasInfinite := false
 	for i := uint32(0); i < count; i++ {
 		sort, err := c.manager.GetDeclarationSort(quantifier, i)
 		if err != nil {
 			return false, err
 		}
-		universes[i], err = c.universe(model, sort)
-		if err != nil {
-			return false, err
+		finite[i] = sort == boolean
+		if !finite[i] {
+			finite[i], err = model.IsFinite(sort)
+			if err != nil {
+				return false, err
+			}
+		}
+		if finite[i] || c.auxiliary == nil {
+			universes[i], err = c.universe(model, sort)
+			if err != nil {
+				return false, err
+			}
+		} else {
+			hasInfinite = true
 		}
 	}
 	values := make([]ast.ASTHandle, count)
@@ -173,11 +323,25 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 			return nil
 		}
 		if index < count {
+			if !finite[index] && c.auxiliary != nil {
+				return visit(index + 1)
+			}
 			for _, value := range universes[index] {
 				values[index] = value
 				if err := visit(index + 1); err != nil || *remaining == 0 {
 					return err
 				}
+			}
+			return nil
+		}
+		if hasInfinite {
+			inserted, err := c.auxiliaryCounterexample(model, quantifier, values, finite)
+			if err != nil {
+				return err
+			}
+			if inserted {
+				found = true
+				*remaining--
 			}
 			return nil
 		}
@@ -268,6 +432,7 @@ func (c *SMTModelChecker) Close() error {
 	c.state = nil
 	c.registry = nil
 	c.valueTerms = nil
+	c.auxiliary = nil
 	c.manager = nil
 	return nil
 }

@@ -26,6 +26,7 @@ type SMTQuantifierManager struct {
 	builder          *SMTQIInstanceBuilder
 	mam              *SMTMAM
 	modelChecker     *SMTModelChecker
+	auxiliarySolver  smtAuxiliarySolverFactory
 	candidateModel   func() (*SMTModelGenerator, error)
 	activated        map[ast.ASTHandle]bool
 	activationTrail  []ast.ASTHandle
@@ -112,6 +113,9 @@ func (q *SMTQuantifierManager) UpdateMBQI(enabled bool, identifier string, maxCe
 		if err = checker.ConfigureLifecycle(maxCexs, maxIterations); err != nil {
 			return errors.Join(err, checker.Close())
 		}
+		if err = checker.SetAuxiliarySolverFactory(q.auxiliarySolver); err != nil {
+			return errors.Join(err, checker.Close())
+		}
 		q.modelChecker = checker
 	} else if enabled {
 		if err := q.modelChecker.ConfigureLifecycle(maxCexs, maxIterations); err != nil {
@@ -126,6 +130,17 @@ func (q *SMTQuantifierManager) UpdateMBQI(enabled bool, identifier string, maxCe
 	q.mbqi = enabled
 	q.mbqiID = identifier
 	return nil
+}
+
+func (q *SMTQuantifierManager) SetAuxiliarySolverFactory(factory smtAuxiliarySolverFactory) error {
+	if err := q.open(); err != nil {
+		return err
+	}
+	q.auxiliarySolver = factory
+	if q.modelChecker == nil {
+		return nil
+	}
+	return q.modelChecker.SetAuxiliarySolverFactory(factory)
 }
 
 func (q *SMTQuantifierManager) open() error {

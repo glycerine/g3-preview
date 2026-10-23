@@ -142,7 +142,38 @@ func NewSMTSolver(m *ast.ASTManager, p *uparams.ParamsRef, logic string, config 
 	if err != nil {
 		return nil, cleanupServices(errors.Join(err, kernel.Close(), config.Params.Del(&value)))
 	}
+	if manager := kernel.internalizer.quantifierManager; manager != nil {
+		if err = manager.SetAuxiliarySolverFactory(s.newAuxiliarySolver); err != nil {
+			return nil, cleanupServices(errors.Join(err, s.named.Close(), kernel.Close(), config.Params.Del(&value)))
+		}
+	}
 	return s, nil
+}
+
+func (s *SMTSolver) newAuxiliarySolver() (*SMTSolver, error) {
+	if err := s.open(); err != nil {
+		return nil, err
+	}
+	config := s.config
+	config.Quantifiers = nil
+	config.Globals = s.kernel.paramGlobals
+	config.ModelEvaluator = s.kernel.modelConfig
+	logic := ""
+	var err error
+	if s.logic != (usymbol.Symbol{}) {
+		logic, err = s.manager.Symbols.String(s.logic)
+		if err != nil {
+			return nil, err
+		}
+	}
+	auxiliary, err := NewSMTSolver(s.manager, &s.params, logic, config)
+	if err != nil {
+		return nil, err
+	}
+	if err = auxiliary.SetProduceModels(true); err != nil {
+		return nil, errors.Join(err, auxiliary.Close())
+	}
+	return auxiliary, nil
 }
 
 func (s *SMTSolver) open() error {

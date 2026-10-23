@@ -108478,6 +108478,7 @@
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
         "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
+        "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
       "assertions": [
@@ -108543,10 +108544,12 @@
           ]
         },
         {
-          "name": "auxiliary SMT context, skolem restrictions, blocking clauses, inverse-term extraction and recursive-function checking",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "auxiliary SMT context, skolem substitution, finite-domain restrictions, blocking clauses, inverse-term extraction and recursive-function checking",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "tests": [
+            "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample"
+          ]
         },
         {
           "name": "candidate-model final-check dispatch and direct retained queue publication",
@@ -108567,10 +108570,10 @@
         }
       ],
       "ownership": [
-        "SMTModelChecker borrows the internalizer, registry and candidate proto-model. Temporary instantiated and evaluated expressions are held by checked AST references and released before returning."
+        "SMTModelChecker borrows the internalizer, registry and candidate proto-model. Temporary instantiated, evaluated and Skolem expressions are held by checked AST references and released after the auxiliary solver closes; acquired counterexample models are explicitly released."
       ],
       "deviations": [
-        "The current concrete checker enumerates Boolean and proto-model universes directly and is dispatched from the production final-check loop. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; newly deduplicated instances enter the retained queue immediately instead of waiting for a separate restart callback. The source auxiliary solver path for infinite or incomplete instantiation sets remains open."
+        "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in a fresh solver using the parent logic and parameter services. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; newly deduplicated instances enter the retained queue immediately instead of waiting for a separate restart callback. Blocking-clause enumeration, model-finder inverse terms and recursive-function checking remain open."
       ]
     },
     {
@@ -108586,6 +108589,7 @@
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
         "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
+        "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
       "conditionals": [
@@ -108621,9 +108625,10 @@
         {
           "name": "auxiliary-context and model-finder integration surface",
           "status": "partial",
-          "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
           "tests": [
-            "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
+            "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
+            "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample"
           ]
         }
       ],

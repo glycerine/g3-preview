@@ -84,6 +84,36 @@ func TestSMTSolverMBQIFindsPatternlessBooleanCounterexample(t *testing.T) {
 	}
 }
 
+func TestSMTSolverMBQIFindsInfiniteIntegerCounterexample(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	integer, err := m.GetSort(zero)
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, integer)
+	astTestMust(t, err)
+	body, err := m.MkEq(variable, zero)
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []usymbol.Symbol{astTestSymbol(t, m, "solver-mbqi-int")}, Body: body,
+	})
+	astTestMust(t, err)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	s, err := NewSMTSolver(m, nil, "AUFLIA", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
+	astTestMust(t, s.Assert(quantifier))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		reason, _ := s.ReasonUnknown()
+		t.Fatal("infinite integer counterexample was not instantiated", status, reason)
+	}
+}
+
 func TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "solver-mbqi-sort"), nil)
@@ -284,7 +314,7 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 	}
 	setBool("mbqi", true)
 	astTestMust(t, solver.UpdateParams(&local))
-	if !quantifiers.mbqi || quantifiers.modelChecker == nil || quantifiers.modelChecker.initialMaxCexs != 5 || quantifiers.modelChecker.maxIterations != 7 {
+	if !quantifiers.mbqi || quantifiers.modelChecker == nil || quantifiers.modelChecker.initialMaxCexs != 5 || quantifiers.modelChecker.maxIterations != 7 || quantifiers.modelChecker.auxiliary == nil {
 		t.Fatal("parameter update failed to recreate MBQI checker")
 	}
 }
