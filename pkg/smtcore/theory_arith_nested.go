@@ -28,6 +28,8 @@ type smtNestedArithmetic struct {
 	solver       *simplex.Solver
 	refs         smtArithmeticDivisionCall
 	dependencies smtArithmeticBoundDependencyManager
+	aliases      map[uint32]ast.ASTHandle
+	columns      map[ast.ASTHandle]uint32
 }
 
 func (n *smtNestedArithmetic) integer(expression ast.ASTHandle) (bool, error) {
@@ -66,6 +68,9 @@ func (n *smtNestedArithmetic) power(variable ast.ASTHandle, degree uint32) (ast.
 }
 
 func (n *smtNestedArithmetic) column(expression ast.ASTHandle) (uint32, bool) {
+	if column, found := n.columns[expression]; found {
+		return column, true
+	}
 	node := n.theory.state.context.enodes[expression]
 	if node == nil || !n.theory.IsAttachedToVariable(node) {
 		return 0, false
@@ -419,7 +424,7 @@ func (n *smtNestedArithmetic) terms(form *smtLinearForm) ([]smtNestedTerm, bool,
 	columns := make([]uint32, 0, len(form.terms))
 	haveInteger, haveReal := false, false
 	for column := range form.terms {
-		integer := n.theory.integer || n.theory.integerColumns[column]
+		integer := n.columnInteger(column)
 		if integer {
 			haveInteger = true
 		} else {
@@ -449,15 +454,18 @@ func (n *smtNestedArithmetic) terms(form *smtLinearForm) ([]smtNestedTerm, bool,
 	}
 	var result []smtNestedTerm
 	for _, column := range columns {
-		variable, found := n.theory.theoryVariable(column)
-		if !found {
+		expression := n.aliases[column]
+		if variable, found := n.theory.theoryVariable(column); found {
+			node, err := n.theory.Enode(variable)
+			if err != nil {
+				return nil, false, err
+			}
+			expression = node.owner
+		}
+		if expression == (ast.ASTHandle{}) {
 			return nil, false, ast.ErrASTDomain
 		}
-		node, err := n.theory.Enode(variable)
-		if err != nil {
-			return nil, false, err
-		}
-		term := smtNestedTerm{expression: node.owner}
+		term := smtNestedTerm{expression: expression}
 		term.coefficient.Mul(form.terms[column], new(big.Rat).SetInt(scale))
 		if factors := n.theory.nonlinearFactors[column]; len(factors) != 0 {
 			for _, factor := range factors {
@@ -485,7 +493,7 @@ func (n *smtNestedArithmetic) terms(form *smtLinearForm) ([]smtNestedTerm, bool,
 			if err != nil {
 				return nil, false, err
 			}
-		} else if value, numeral, err := n.theory.numeral(node.owner); err != nil {
+		} else if value, numeral, err := n.theory.numeral(expression); err != nil {
 			return nil, false, err
 		} else if numeral {
 			term.coefficient.Mul(&term.coefficient, value)
@@ -494,7 +502,7 @@ func (n *smtNestedArithmetic) terms(form *smtLinearForm) ([]smtNestedTerm, bool,
 				return nil, false, err
 			}
 		} else {
-			term.factors = []ast.ASTHandle{node.owner}
+			term.factors = []ast.ASTHandle{expression}
 		}
 		if term.coefficient.Sign() != 0 {
 			result = append(result, term)
@@ -518,6 +526,9 @@ func (t *SMTLinearArithmeticTheory) checkCrossNestedConsistency() (conflict bool
 	}
 	n := smtNestedArithmetic{theory: t, solver: solver, refs: smtArithmeticDivisionCall{theory: t}}
 	defer func() { result = errors.Join(result, n.refs.close()) }()
+	if conflict, err := n.checkClusterRows(); err != nil || conflict {
+		return conflict, err
+	}
 	for _, assertion := range t.assertions {
 		atom := &t.atoms[assertion.atom]
 		if !atom.supported || !atom.nonlinear {
@@ -534,11 +545,7 @@ func (t *SMTLinearArithmeticTheory) checkCrossNestedConsistency() (conflict bool
 		sort.SliceStable(variables, func(i, j int) bool { return variables[i].count > variables[j].count })
 		for _, variable := range variables {
 			t.statistics.crossNested++
-			expression, err := n.crossNested(polynomial, variable.expression)
-			if err != nil {
-				return false, err
-			}
-			interval, err := n.evaluate(expression)
+			interval, err := n.nestedInterval(polynomial, variable.expression)
 			if err != nil {
 				return false, err
 			}
