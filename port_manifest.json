@@ -119173,29 +119173,51 @@
       "path": "src/smt/theory_dense_diff_logic.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
-      "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"],
-      "tests": ["TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict", "TestSMTRealDiffTheoryStrictCycleConflict"],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_dense_diff_matrix.go",
+        "pkg/smtcore/smt_dense_diff_matrix_test.go"
+      ],
+      "tests": [
+        "TestSMTDenseDifferenceClosureExplanationsAndRollback"
+      ],
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
-          "name": "integer and real dense-difference explicit instantiations",
-          "status": "platform_replacement",
-          "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"],
-          "tests": ["TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict", "TestSMTRealDiffTheoryStrictCycleConflict"]
+          "name": "concrete infinitesimal-rational dense matrix: self-edge sentinel and variable growth, add_edge reverse-cycle check, update_cells forward-target set and incremental all-pairs closure, source-edge antecedents, deep-owned cell trails, scope rollback and provisional init_model assignments",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_dense_diff_matrix.go",
+          "tests": [
+            "TestSMTDenseDifferenceClosureExplanationsAndRollback"
+          ]
+        },
+        {
+          "name": "dense theory construction/selection, arithmetic atom and term internalization, cell occurrence propagation, context conflicts, equality combination, epsilon and zero adjustment, model-factory callbacks and optimization objectives",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
         }
       ],
-      "ownership": ["Go uses concrete integer and real graph solvers rather than C++ template instantiations."],
-      "deviations": ["The retained arbitrary-precision graph solvers cover both source small-integer and multiprecision instantiations without duplicating representation-specific classes."]
+      "ownership": [
+        "The concrete dense matrix owns its rows, edges, cell trails and scope limits. Every stored or returned infinitesimal rational copies both big.Rat components; rollback restores owned snapshots before truncating child variables and edges. The provisional model is a fresh owned value slice. No generic or callback adapter is introduced."
+      ],
+      "deviations": [
+        "Correction of earlier coverage classification: the sparse Go difference graph is not a port of the source dense all-pairs algorithm. Dense matrix closure is now ported directly, with independent Bellman-Ford checks after each insertion across seven edge orders, rational/infinitesimal distances, explanation weight checks, rejected negative cycles, model inequality checks and nested variable rollback. The dense theory is not yet connected to setup or the SMT context; atom/occurrence propagation, model publication and optimization remain unported. Fixed-size numeric representation specializations are not duplicated; retained arbitrary-precision concrete numerals are used."
+      ]
     },
     {
       "path": "src/smt/theory_dense_diff_logic.h",
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"],
-      "tests": ["TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation", "TestSMTRealDiffTheoryAtomUsesInfinitesimalComplement"],
+      "go_targets": [
+        "pkg/smtcore/smt_dense_diff_matrix.go",
+        "pkg/smtcore/smt_dense_diff_matrix_test.go"
+      ],
+      "tests": [
+        "TestSMTDenseDifferenceClosureExplanationsAndRollback"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -119223,19 +119245,40 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {"name": "dense difference atom, edge, matrix-closure, propagation, scope, conflict and model declarations", "status": "platform_replacement", "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"], "tests": ["TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation", "TestSMTRealDiffTheoryAtomUsesInfinitesimalComplement"]},
-        {"name": "theory_opt objective declarations", "status": "unported", "go_target": null, "tests": []}
+        {
+          "name": "concrete infinitesimal-rational dense matrix: self-edge sentinel and variable growth, add_edge reverse-cycle check, update_cells forward-target set and incremental all-pairs closure, source-edge antecedents, deep-owned cell trails, scope rollback and provisional init_model assignments",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_dense_diff_matrix.go",
+          "tests": [
+            "TestSMTDenseDifferenceClosureExplanationsAndRollback"
+          ]
+        },
+        {
+          "name": "dense theory construction/selection, arithmetic atom and term internalization, cell occurrence propagation, context conflicts, equality combination, epsilon and zero adjustment, model-factory callbacks and optimization objectives",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
       ],
-      "ownership": ["The concrete Go difference theories own graph edges, assertions, scopes and model state while borrowing context enodes."],
-      "deviations": ["Sparse incremental graph closure replaces the dense all-pairs matrix; it preserves satisfiability, propagation explanations and model values. Objective callbacks remain open."]
+      "ownership": [
+        "The concrete dense matrix owns its rows, edges, cell trails and scope limits. Every stored or returned infinitesimal rational copies both big.Rat components; rollback restores owned snapshots before truncating child variables and edges. The provisional model is a fresh owned value slice. No generic or callback adapter is introduced."
+      ],
+      "deviations": [
+        "Correction of earlier coverage classification: the sparse Go difference graph is not a port of the source dense all-pairs algorithm. Dense matrix closure is now ported directly, with independent Bellman-Ford checks after each insertion across seven edge orders, rational/infinitesimal distances, explanation weight checks, rejected negative cycles, model inequality checks and nested variable rollback. The dense theory is not yet connected to setup or the SMT context; atom/occurrence propagation, model publication and optimization remain unported. Fixed-size numeric representation specializations are not duplicated; retained arbitrary-precision concrete numerals are used."
+      ]
     },
     {
       "path": "src/smt/theory_dense_diff_logic_def.h",
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"],
-      "tests": ["TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict", "TestSMTRealDiffTheoryStrictCycleConflict", "TestSMTRealDiffTheoryBuildsFiniteModelValues"],
+      "go_targets": [
+        "pkg/smtcore/smt_dense_diff_matrix.go",
+        "pkg/smtcore/smt_dense_diff_matrix_test.go"
+      ],
+      "tests": [
+        "TestSMTDenseDifferenceClosureExplanationsAndRollback"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -119383,11 +119426,27 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {"name": "difference-term internalization, complementary bounds, incremental negative-cycle detection, equality adapter, scope rollback, propagation antecedents and model construction", "status": "platform_replacement", "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"], "tests": ["TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict", "TestSMTRealDiffTheoryStrictCycleConflict", "TestSMTRealDiffTheoryBuildsFiniteModelValues"]},
-        {"name": "linear objective internalization, infinitesimal maximize and blocker construction", "status": "unported", "go_target": null, "tests": []}
+        {
+          "name": "concrete infinitesimal-rational dense matrix: self-edge sentinel and variable growth, add_edge reverse-cycle check, update_cells forward-target set and incremental all-pairs closure, source-edge antecedents, deep-owned cell trails, scope rollback and provisional init_model assignments",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_dense_diff_matrix.go",
+          "tests": [
+            "TestSMTDenseDifferenceClosureExplanationsAndRollback"
+          ]
+        },
+        {
+          "name": "dense theory construction/selection, arithmetic atom and term internalization, cell occurrence propagation, context conflicts, equality combination, epsilon and zero adjustment, model-factory callbacks and optimization objectives",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
       ],
-      "ownership": ["Go slices and maps own the concrete graph, bound literals, predecessor explanations and scoped assertion trail."],
-      "deviations": ["The source Floyd-Warshall matrix and fixnum specializations are replaced by the retained exact graph algorithms. Optimization objectives remain open."]
+      "ownership": [
+        "The concrete dense matrix owns its rows, edges, cell trails and scope limits. Every stored or returned infinitesimal rational copies both big.Rat components; rollback restores owned snapshots before truncating child variables and edges. The provisional model is a fresh owned value slice. No generic or callback adapter is introduced."
+      ],
+      "deviations": [
+        "Correction of earlier coverage classification: the sparse Go difference graph is not a port of the source dense all-pairs algorithm. Dense matrix closure is now ported directly, with independent Bellman-Ford checks after each insertion across seven edge orders, rational/infinitesimal distances, explanation weight checks, rejected negative cycles, model inequality checks and nested variable rollback. The dense theory is not yet connected to setup or the SMT context; atom/occurrence propagation, model publication and optimization remain unported. Fixed-size numeric representation specializations are not duplicated; retained arbitrary-precision concrete numerals are used."
+      ]
     },
     {
       "path": "src/smt/theory_diff_logic.cpp",
