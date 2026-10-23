@@ -549,7 +549,15 @@ func (s *SMTInternalizerState) internalizeQuantifier(expression ast.ASTHandle, g
 	if cached, found := s.cachedGeneration[expression]; found {
 		generation = cached
 	}
-	return s.quantifiers.Add(expression, generation)
+	if err = s.quantifiers.Add(expression, generation); err != nil {
+		return err
+	}
+	if s.quantifierManager != nil && s.quantifierManager.modelFinder != nil {
+		if err = s.quantifierManager.modelFinder.RegisterQuantifier(expression); err != nil {
+			return errors.Join(err, s.quantifiers.Delete(expression))
+		}
+	}
+	return nil
 }
 
 func (s *SMTInternalizerState) internalizeDistinct(expression ast.ASTHandle, gateContext bool) error {

@@ -25,6 +25,7 @@ type SMTQuantifierManager struct {
 	substitute       *SMTCachedVarSubstitution
 	builder          *SMTQIInstanceBuilder
 	mam              *SMTMAM
+	modelFinder      *SMTModelFinder
 	modelChecker     *SMTModelChecker
 	auxiliarySolver  smtAuxiliarySolverFactory
 	candidateModel   func() (*SMTModelGenerator, error)
@@ -81,9 +82,13 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 	if err != nil {
 		return nil, errors.Join(err, substitute.Close())
 	}
+	modelFinder, err := NewSMTModelFinder(state)
+	if err != nil {
+		return nil, errors.Join(err, substitute.Close())
+	}
 	result := &SMTQuantifierManager{
 		state: state, registry: state.quantifiers, rewriter: rw, checker: checker, quick: quick,
-		substitute: substitute, builder: builder, mam: mam, activated: make(map[ast.ASTHandle]bool),
+		substitute: substitute, builder: builder, mam: mam, modelFinder: modelFinder, activated: make(map[ast.ASTHandle]bool),
 		promoteUnsat: config.PromoteUnsat, ematching: config.Ematching,
 		quickUnsat: config.QuickUnsat, quickNotSat: config.QuickNotSat, lazyQuick: config.LazyQuick,
 		mbqi: config.MBQI, mbqiID: config.MBQIID, candidateModel: config.CandidateModel,
@@ -91,10 +96,10 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 	if config.MBQI {
 		result.modelChecker, err = NewSMTModelChecker(state, config.MaxCexs)
 		if err != nil {
-			return nil, errors.Join(err, substitute.Close())
+			return nil, errors.Join(err, modelFinder.Close(), substitute.Close())
 		}
 		if err = result.modelChecker.ConfigureLifecycle(config.MaxCexs, config.MaxIterations); err != nil {
-			return nil, errors.Join(err, result.modelChecker.Close(), substitute.Close())
+			return nil, errors.Join(err, result.modelChecker.Close(), modelFinder.Close(), substitute.Close())
 		}
 	}
 	state.quantifierManager = result
@@ -157,6 +162,9 @@ func (q *SMTQuantifierManager) InitSearch() error {
 	if err := q.substitute.Reset(); err != nil {
 		return err
 	}
+	if err := q.modelFinder.InitSearch(); err != nil {
+		return err
+	}
 	if q.modelChecker != nil {
 		if err := q.modelChecker.InitSearch(); err != nil {
 			return err
@@ -216,6 +224,10 @@ func (q *SMTQuantifierManager) PushScope() error {
 	if err := q.mam.PushScope(); err != nil {
 		return err
 	}
+	if err := q.modelFinder.PushScope(); err != nil {
+		_ = q.mam.PopScopes(1)
+		return err
+	}
 	q.activationScopes = append(q.activationScopes, len(q.activationTrail))
 	return nil
 }
@@ -230,6 +242,9 @@ func (q *SMTQuantifierManager) PopScopes(count uint32) error {
 	level := len(q.activationScopes) - int(count)
 	limit := q.activationScopes[level]
 	if err := q.mam.PopScopes(count); err != nil {
+		return err
+	}
+	if err := q.modelFinder.PopScopes(count); err != nil {
 		return err
 	}
 	for _, quantifier := range q.activationTrail[limit:] {
@@ -481,6 +496,7 @@ func (q *SMTQuantifierManager) Close() error {
 		return nil
 	}
 	err := q.substitute.Close()
+	err = errors.Join(err, q.modelFinder.Close())
 	if q.modelChecker != nil {
 		err = errors.Join(err, q.modelChecker.Close())
 	}
@@ -491,6 +507,7 @@ func (q *SMTQuantifierManager) Close() error {
 		q.closed = true
 		q.builder = nil
 		q.mam = nil
+		q.modelFinder = nil
 		q.modelChecker = nil
 		q.candidateModel = nil
 		q.quick = nil

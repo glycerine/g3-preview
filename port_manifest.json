@@ -108653,6 +108653,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_model_finder.go",
+        "pkg/smtcore/smt_model_finder_test.go",
         "pkg/smtcore/smt_model_finder_quantifier_set.go",
         "pkg/smtcore/smt_model_finder_quantifier_set_test.go",
         "pkg/smtcore/smt_model_finder_hint_search.go",
@@ -108666,6 +108668,7 @@
         "pkg/smtcore/smt_model_finder_hint_trace.go"
       ],
       "tests": [
+        "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle",
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
         "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
         "TestModelFinderHintSatisfiedResidueSourceScopeTransitions",
@@ -109075,6 +109078,22 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "model_finder construction, quantifier registration, relevant-quantifier collection, scope rollback, reset-equivalent close and search initialization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder.go",
+          "tests": [
+            "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle"
+          ]
+        },
+        {
+          "name": "candidate-model fix_model dispatch before MBQI",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample"
+          ]
+        },
+        {
           "name": "hint_solver m_residue and m_satisfied scoped quantifier-set storage",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_model_finder_quantifier_set.go",
@@ -109133,16 +109152,21 @@
         "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit."
       ],
       "deviations": [
-        "The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering, Q_f/Q_f_def indexes and bounded greedy search are ported with borrowed AST handles. Full quantifier_info and cond_macro ownership, interpretation publication and broader model-finder algorithms remain open."
+        "The production model-finder lifecycle is wired to quantifier internalization, context scopes, search initialization and candidate-model construction. The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering, Q_f/Q_f_def indexes and bounded greedy search are ported with borrowed AST handles. Full quantifier_info and cond_macro analysis, interpretation publication and AUF model-extension algorithms remain open."
       ]
     },
     {
       "path": "src/smt/smt_model_finder.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_model_finder.go",
+        "pkg/smtcore/smt_quantifier_manager.go"
+      ],
+      "tests": [
+        "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle"
+      ],
       "conditionals": [
         {
           "line": 46,
@@ -109153,11 +109177,30 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "model_finder public registration, scope, search and fix-model lifecycle surface",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_model_finder.go",
+          "tests": [
+            "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle"
+          ]
+        },
+        {
+          "name": "flat quantifier, inverse lookup and instantiation-set restriction surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "SMTModelFinder borrows the AST manager, internalizer state and registered quantifier handles; the quantifier registry retains the corresponding AST nodes. Scope rollback removes borrowed identities without separate AST ownership."
+      ],
+      "deviations": [
+        "The live lifecycle is present, but FixModel currently only selects relevant quantifiers. Macro publication, AUF instantiation sets and inverse lookup remain open."
+      ]
     },
     {
       "path": "src/smt/smt_model_generator.cpp",

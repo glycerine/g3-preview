@@ -286,6 +286,11 @@ func (k *SMTKernel) buildCandidateModelGenerator() (*SMTModelGenerator, error) {
 	if err = generator.BuildStateValues(k.internalizer); err != nil {
 		return fail(err)
 	}
+	if manager := k.internalizer.quantifierManager; manager != nil && manager.modelFinder != nil {
+		if err = manager.modelFinder.FixModel(generator.model); err != nil {
+			return fail(err)
+		}
+	}
 	return generator, nil
 }
 
