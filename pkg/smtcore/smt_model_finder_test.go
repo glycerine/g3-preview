@@ -71,3 +71,54 @@ func TestSMTModelFinderCollectsDirectPatternGroundArguments(t *testing.T) {
 		t.Fatal("direct trigger argument was not collected", set)
 	}
 }
+
+func TestSMTModelFinderPublishesIsolatedSimpleMacro(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	integer, err := m.GetSort(zero)
+	astTestMust(t, err)
+	function, err := m.MkFuncDecl(astTestSymbol(t, m, "model-finder-simple-f"), []ast.ASTHandle{integer}, integer, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, integer)
+	astTestMust(t, err)
+	application, err := m.MkApp(function, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	body, err := m.MkEq(application, variable)
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []symbol.Symbol{astTestSymbol(t, m, "model-finder-simple-x")}, Body: body,
+	})
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "AUFLIA", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.SetProduceModels(true))
+	astTestMust(t, solver.Assert(quantifier))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		reason, _ := solver.ReasonUnknown()
+		t.Fatal("simple macro quantifier", status, reason)
+	}
+	generated, err := solver.AcquireModel()
+	astTestMust(t, err)
+	if generated == nil {
+		t.Fatal("simple macro omitted generated model")
+	}
+	t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
+	interpretation, err := generated.FunctionInterpretation(function)
+	astTestMust(t, err)
+	if interpretation == nil {
+		t.Fatal("simple macro function interpretation was not published")
+	}
+	fallback, err := interpretation.Else()
+	astTestMust(t, err)
+	index, err := m.GetVarIndex(fallback)
+	astTestMust(t, err)
+	if index != 0 {
+		t.Fatal("simple macro fallback", fallback, index)
+	}
+}

@@ -6,6 +6,8 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/macros"
+	"github.com/glycerine/g3/pkg/model"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -19,6 +21,10 @@ type SMTModelFinder struct {
 	quantifiers []ast.ASTHandle
 	registered  map[ast.ASTHandle]struct{}
 	sets        map[ast.ASTHandle][]*smtModelFinderInstantiationSet
+	macroUtil   *macros.Util
+	candidates  map[ast.ASTHandle]*macros.Candidates
+	nonGround   map[ast.ASTHandle]map[ast.ASTHandle]struct{}
+	chosen      map[ast.ASTHandle]ast.ASTHandle
 	scopes      []int
 	closed      bool
 }
@@ -27,14 +33,20 @@ func NewSMTModelFinder(state *SMTInternalizerState) (*SMTModelFinder, error) {
 	if state == nil || state.manager == nil || state.context == nil {
 		return nil, ast.ErrASTHandle
 	}
+	util, err := macros.NewUtil(state.manager)
+	if err != nil {
+		return nil, err
+	}
 	return &SMTModelFinder{
 		manager: state.manager, state: state, registered: make(map[ast.ASTHandle]struct{}),
-		sets: make(map[ast.ASTHandle][]*smtModelFinderInstantiationSet),
+		sets: make(map[ast.ASTHandle][]*smtModelFinderInstantiationSet), macroUtil: util,
+		candidates: make(map[ast.ASTHandle]*macros.Candidates), nonGround: make(map[ast.ASTHandle]map[ast.ASTHandle]struct{}),
+		chosen: make(map[ast.ASTHandle]ast.ASTHandle),
 	}, nil
 }
 
 func (f *SMTModelFinder) open() error {
-	if f == nil || f.manager == nil || f.state == nil || f.registered == nil || f.sets == nil || f.closed {
+	if f == nil || f.manager == nil || f.state == nil || f.registered == nil || f.sets == nil || f.macroUtil == nil || f.candidates == nil || f.closed {
 		return ast.ErrASTHandle
 	}
 	return nil
@@ -61,6 +73,75 @@ func (f *SMTModelFinder) RegisterQuantifier(quantifier ast.ASTHandle) error {
 		return err
 	}
 	f.sets[quantifier] = make([]*smtModelFinderInstantiationSet, count)
+	candidates, err := macros.NewCandidates(f.manager)
+	if err != nil {
+		return err
+	}
+	f.candidates[quantifier] = candidates
+	f.nonGround[quantifier] = make(map[ast.ASTHandle]struct{})
+	body, err := f.manager.GetQuantifierBody(quantifier)
+	if err != nil {
+		return err
+	}
+	bodyKind, err := f.manager.GetKind(body)
+	if err != nil {
+		return err
+	}
+	if bodyKind == ast.ASTApp {
+		if err = f.macroUtil.CollectQuantifierCandidates(quantifier, candidates); err != nil {
+			return errors.Join(err, candidates.Close())
+		}
+	}
+	if err = f.collectNonGroundDeclarations(body, f.nonGround[quantifier]); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (f *SMTModelFinder) collectNonGroundDeclarations(root ast.ASTHandle, result map[ast.ASTHandle]struct{}) error {
+	stack := []ast.ASTHandle{root}
+	seen := make(map[ast.ASTHandle]struct{})
+	for len(stack) != 0 {
+		n := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if _, found := seen[n]; found {
+			continue
+		}
+		seen[n] = struct{}{}
+		kind, err := f.manager.GetKind(n)
+		if err != nil {
+			return err
+		}
+		if kind != ast.ASTApp {
+			continue
+		}
+		ground, err := f.manager.IsGround(n)
+		if err != nil {
+			return err
+		}
+		declaration, err := f.manager.GetDecl(n)
+		if err != nil {
+			return err
+		}
+		family, err := f.manager.GetFamilyID(declaration)
+		if err != nil {
+			return err
+		}
+		if !ground && family != f.manager.BasicFamilyID() {
+			result[declaration] = struct{}{}
+		}
+		count, err := f.manager.GetNumArgs(n)
+		if err != nil {
+			return err
+		}
+		for i := uint32(0); i < count; i++ {
+			child, err := f.manager.GetArg(n, i)
+			if err != nil {
+				return err
+			}
+			stack = append(stack, child)
+		}
+	}
 	return nil
 }
 
@@ -112,11 +193,84 @@ func (f *SMTModelFinder) releaseQuantifier(quantifier ast.ASTHandle) (result err
 			result = errors.Join(result, set.Close())
 		}
 	}
+	if candidates := f.candidates[quantifier]; candidates != nil {
+		result = errors.Join(result, candidates.Close())
+	}
 	if result == nil {
 		delete(f.sets, quantifier)
+		delete(f.candidates, quantifier)
+		delete(f.nonGround, quantifier)
+		delete(f.chosen, quantifier)
 		delete(f.registered, quantifier)
 	}
 	return result
+}
+
+func (f *SMTModelFinder) macroOccursElsewhere(declaration, except ast.ASTHandle, quantifiers []ast.ASTHandle) bool {
+	for _, quantifier := range quantifiers {
+		if quantifier == except {
+			continue
+		}
+		if _, found := f.nonGround[quantifier][declaration]; found {
+			return true
+		}
+	}
+	return false
+}
+
+func (f *SMTModelFinder) publishSimpleMacro(candidate macros.Candidate, proto *protomodel.ProtoModel) error {
+	interpretation, err := proto.Core().FunctionInterpretation(candidate.Declaration)
+	if err != nil {
+		return err
+	}
+	if interpretation == nil {
+		arity, err := f.manager.GetArity(candidate.Declaration)
+		if err != nil {
+			return err
+		}
+		interpretation, err = model.NewFunctionInterpretation(f.manager, arity)
+		if err != nil {
+			return err
+		}
+		if err = proto.Core().RegisterFunction(candidate.Declaration, interpretation); err != nil {
+			return errors.Join(err, interpretation.Close())
+		}
+	}
+	return interpretation.SetElse(candidate.Definition)
+}
+
+func (f *SMTModelFinder) processSimpleMacros(proto *protomodel.ProtoModel, quantifiers []ast.ASTHandle) ([]ast.ASTHandle, error) {
+	current := append([]ast.ASTHandle(nil), quantifiers...)
+	for {
+		removed := false
+		next := make([]ast.ASTHandle, 0, len(current))
+		for _, quantifier := range current {
+			selected := false
+			candidates := f.candidates[quantifier]
+			for i := 0; candidates != nil && i < candidates.Len(); i++ {
+				candidate, err := candidates.At(i)
+				if err != nil {
+					return nil, err
+				}
+				if !candidate.SatisfyAtom || f.macroOccursElsewhere(candidate.Declaration, quantifier, current) {
+					continue
+				}
+				if err = f.publishSimpleMacro(candidate, proto); err != nil {
+					return nil, err
+				}
+				f.chosen[quantifier] = candidate.Declaration
+				selected, removed = true, true
+				break
+			}
+			if !selected {
+				next = append(next, quantifier)
+			}
+		}
+		if !removed {
+			return next, nil
+		}
+		current = next
+	}
 }
 
 func (f *SMTModelFinder) PushScope() error {
@@ -247,6 +401,13 @@ func (f *SMTModelFinder) FixModel(model *protomodel.ProtoModel) error {
 		return err
 	}
 	for _, quantifier := range relevant {
+		delete(f.chosen, quantifier)
+	}
+	relevant, err = f.processSimpleMacros(model, relevant)
+	if err != nil {
+		return err
+	}
+	for _, quantifier := range relevant {
 		if err = f.collectPatternInstantiationTerms(quantifier); err != nil {
 			return err
 		}
@@ -283,6 +444,10 @@ func (f *SMTModelFinder) Close() error {
 	f.scopes = nil
 	f.registered = nil
 	f.sets = nil
+	f.macroUtil = nil
+	f.candidates = nil
+	f.nonGround = nil
+	f.chosen = nil
 	f.state = nil
 	f.manager = nil
 	return result
