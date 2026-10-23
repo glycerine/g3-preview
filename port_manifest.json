@@ -112280,7 +112280,9 @@
         "pkg/smtcore/smt_setup_bv.go",
         "pkg/smtcore/smt_setup_bv_test.go",
         "pkg/smtcore/theory_bv.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_setup_difference.go",
+        "pkg/smtcore/smt_setup_difference_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -112321,7 +112323,10 @@
         "TestSMTAUFLIAFeatureSetupRejectsRealSorts",
         "TestSMTLRASetupPreservesNNFAndArithmeticControls",
         "TestSMTBitVectorLogicSetupProfiles",
-        "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates"
+        "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates",
+        "TestSMTIDLSetupFirstBoundaryAndSimplex",
+        "TestSMTIDLStaticSetupRejectsWrongFeatures",
+        "TestSMTIDLDenseFeaturePolicyAndProofRouting"
       ],
       "assertions": [
         {
@@ -112546,6 +112551,25 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "QF_IDL default/static scalar policy, difference/real/UF rejection, unit random activity, dense feature tuning, >5000-constant relevance guard and first-boundary lifetime; select integer simplex for the normal route and per-column mixed integrality for static proof mode; dense backend implementation remains incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup_difference.go",
+          "go_targets": [
+            "pkg/smtcore/smt_setup.go",
+            "pkg/smtcore/smt_setup_real.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTIDLSetupFirstBoundaryAndSimplex",
+            "TestSMTIDLStaticSetupRejectsWrongFeatures",
+            "TestSMTIDLDenseFeaturePolicyAndProofRouting",
+            "TestSMTSolverSetupUsesIntegerDifferenceLogic",
+            "TestSMTSolverIntegerDifferenceEqualityAdapter",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -112557,7 +112581,8 @@
         "Array setup reuses the concrete temporary static-feature collector and releases it on success and rejection. Selected array mode, SMT search policy and preprocessing flags remain in their existing owners. Sharing the simple policy application step does not replace theory owners, scoped array observations or datatype state.",
         "Quantified setup closes its temporary feature collector on all exits, updates existing parameter owners and the live quantifier manager, and retains constructor-owned cost expressions and cached eager threshold. Pattern inference updates its existing rewriter; MBQI uses the existing concrete checker factory.",
         "LRA synchronizes scalar fields in existing SMT, arithmetic and preprocessing owners with the registered concrete arithmetic theory at the first setup boundary. LRA/UFLRA use per-variable mixed arithmetic without replacing an initialized theory; backend mode selection beyond the existing mixed/default and disabled modes remains partial.",
-        "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs."
+        "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs.",
+        "IDL feature validation uses the existing temporary collector over borrowed assertions and closes it on rejection and success. The normal registered arithmetic backend is the concrete integer simplex; static proof mode selects the shared implementation\u2019s per-column mixed integrality before assertion internalization. Selected policy remains in the existing owners and live consumers. Arithmetic setup now forwards Boolean heuristic settings before variable creation, as required by IDL unit randomization."
       ],
       "deviations": [
         "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. Unrecognized logics follow source setup_unknown and install every retained theory; unsupported arithmetic uses the dummy checkpoint so nonlinear terms return incompleteness. QF_FP, QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory together with its bit-vector backend. QF_BVRE, QF_S and ALL install the concrete sequence theory. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics likewise return incompleteness instead of an unsound result.",
@@ -112567,7 +112592,8 @@
         "The retained QF_AX and QF_AUFLIA setup policies now distinguish the logic-only first-push path from feature-dependent first checking. QF_AUFLIA unit-only input preserves the existing restart strategy/factor, while clausal input selects geometric restart factor 1.5 and zero initial activity. QF_DT applies the shared UF setup without the QF_UF arithmetic-validation overload, alongside its existing concrete datatype registration. Explicit relevance-mode tests disable automatic setup to retain their chosen controls. A QF_AX unit-profile array-model scope regression raises the strict C++ runner set to 96; other backend-selection and logic-profile work remains partial.",
         "Quantified logic scalar policies now cover AUFLIA, AUFLIRA, UFNIA, AUFNIRA, their retained aliases, UFLRA and quantified unknown-logic classification. Static features deliberately skip bound variables as in the source. The mixed quantified automatic-profile runner restores SAT/model/UNSAT scope behavior with initially disabled MBQI and E-matching, bringing strict C++ script comparisons to 97. Backend selection, remaining logic profiles and string-theory routing remain incomplete.",
         "LRA now preserves NNF/CNF and Eq2Ineq settings while applying its own source profile. First-push, first-check, disabled automatic setup, scoped contradiction and pop recovery are covered. LRA and UFLRA now instantiate mixed rather than real-only arithmetic as their source setup requires. A term-ITE SAT/model/UNSAT/pop script brings strict C++ comparisons to 98. Other arithmetic backend modes and automatic feature selection remain incomplete.",
-        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial."
+        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
+        "Normal automatic QF_IDL setup now uses integer simplex instead of the separately tested difference-graph theory. Default first-push and feature-based first-check policies, invalid difference/real/UF inputs, dense feature settings and proof-mode integrality have focused coverage. Dense backend algorithms themselves remain incomplete: the Go route still uses integer simplex for the source dense branch. The valid first-push IDL SAT/model/UNSAT/pop script brings strict C++ comparisons to 100. Other arithmetic-mode and automatic backend-selection branches remain partial."
       ]
     },
     {
@@ -112596,7 +112622,9 @@
         "pkg/smtcore/smt_setup_bv.go",
         "pkg/smtcore/smt_setup_bv_test.go",
         "pkg/smtcore/theory_bv.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_setup_difference.go",
+        "pkg/smtcore/smt_setup_difference_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -112626,7 +112654,10 @@
         "TestSMTAUFLIAFeatureSetupRejectsRealSorts",
         "TestSMTLRASetupPreservesNNFAndArithmeticControls",
         "TestSMTBitVectorLogicSetupProfiles",
-        "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates"
+        "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates",
+        "TestSMTIDLSetupFirstBoundaryAndSimplex",
+        "TestSMTIDLStaticSetupRejectsWrongFeatures",
+        "TestSMTIDLDenseFeaturePolicyAndProofRouting"
       ],
       "conditionals": [
         {
@@ -112795,6 +112826,25 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "QF_IDL default/static scalar policy, difference/real/UF rejection, unit random activity, dense feature tuning, >5000-constant relevance guard and first-boundary lifetime; select integer simplex for the normal route and per-column mixed integrality for static proof mode; dense backend implementation remains incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup_difference.go",
+          "go_targets": [
+            "pkg/smtcore/smt_setup.go",
+            "pkg/smtcore/smt_setup_real.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTIDLSetupFirstBoundaryAndSimplex",
+            "TestSMTIDLStaticSetupRejectsWrongFeatures",
+            "TestSMTIDLDenseFeaturePolicyAndProofRouting",
+            "TestSMTSolverSetupUsesIntegerDifferenceLogic",
+            "TestSMTSolverIntegerDifferenceEqualityAdapter",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -112805,7 +112855,8 @@
         "Array setup reuses the concrete temporary static-feature collector and releases it on success and rejection. Selected array mode, SMT search policy and preprocessing flags remain in their existing owners. Sharing the simple policy application step does not replace theory owners, scoped array observations or datatype state.",
         "Quantified setup closes its temporary feature collector on all exits, updates existing parameter owners and the live quantifier manager, and retains constructor-owned cost expressions and cached eager threshold. Pattern inference updates its existing rewriter; MBQI uses the existing concrete checker factory.",
         "LRA synchronizes scalar fields in existing SMT, arithmetic and preprocessing owners with the registered concrete arithmetic theory at the first setup boundary. LRA/UFLRA use per-variable mixed arithmetic without replacing an initialized theory; backend mode selection beyond the existing mixed/default and disabled modes remains partial.",
-        "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs."
+        "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs.",
+        "IDL feature validation uses the existing temporary collector over borrowed assertions and closes it on rejection and success. The normal registered arithmetic backend is the concrete integer simplex; static proof mode selects the shared implementation\u2019s per-column mixed integrality before assertion internalization. Selected policy remains in the existing owners and live consumers. Arithmetic setup now forwards Boolean heuristic settings before variable creation, as required by IDL unit randomization."
       ],
       "deviations": [
         "The Go surface is a direct setup function rather than a persistent setup object because only construction-time explicit-logic routing is currently consumed. Sequence logics install SMTEmptySequenceTheory as a safe give-up checkpoint until the concrete sequence solver replaces it.",
@@ -112815,7 +112866,8 @@
         "The retained QF_AX and QF_AUFLIA setup policies now distinguish the logic-only first-push path from feature-dependent first checking. QF_AUFLIA unit-only input preserves the existing restart strategy/factor, while clausal input selects geometric restart factor 1.5 and zero initial activity. QF_DT applies the shared UF setup without the QF_UF arithmetic-validation overload, alongside its existing concrete datatype registration. Explicit relevance-mode tests disable automatic setup to retain their chosen controls. A QF_AX unit-profile array-model scope regression raises the strict C++ runner set to 96; other backend-selection and logic-profile work remains partial.",
         "Quantified logic scalar policies now cover AUFLIA, AUFLIRA, UFNIA, AUFNIRA, their retained aliases, UFLRA and quantified unknown-logic classification. Static features deliberately skip bound variables as in the source. The mixed quantified automatic-profile runner restores SAT/model/UNSAT scope behavior with initially disabled MBQI and E-matching, bringing strict C++ script comparisons to 97. Backend selection, remaining logic profiles and string-theory routing remain incomplete.",
         "LRA now preserves NNF/CNF and Eq2Ineq settings while applying its own source profile. First-push, first-check, disabled automatic setup, scoped contradiction and pop recovery are covered. LRA and UFLRA now instantiate mixed rather than real-only arithmetic as their source setup requires. A term-ITE SAT/model/UNSAT/pop script brings strict C++ comparisons to 98. Other arithmetic backend modes and automatic feature selection remain incomplete.",
-        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial."
+        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
+        "Normal automatic QF_IDL setup now uses integer simplex instead of the separately tested difference-graph theory. Default first-push and feature-based first-check policies, invalid difference/real/UF inputs, dense feature settings and proof-mode integrality have focused coverage. Dense backend algorithms themselves remain incomplete: the Go route still uses integer simplex for the source dense branch. The valid first-push IDL SAT/model/UNSAT/pop script brings strict C++ comparisons to 100. Other arithmetic-mode and automatic backend-selection branches remain partial."
       ]
     },
     {

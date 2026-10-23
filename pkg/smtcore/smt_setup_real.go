@@ -43,6 +43,9 @@ func (k *SMTKernel) applyArithmeticSetup(smt SMTParamsState, arithmetic SMTArith
 	k.smtParams.preprocess.state, k.preprocessState = preprocess, preprocess
 	k.relevancy.enabled = smt.RelevancyLvl > 0
 	k.internalizer.relevancyLevel = smt.RelevancyLvl
+	if err := k.internalizer.configureBooleanHeuristics(smt); err != nil {
+		return err
+	}
 	for _, theory := range k.internalizer.theoryOrder {
 		if configurable, ok := theory.(interface{ ConfigureArithmetic(SMTArithState) error }); ok {
 			if err := configurable.ConfigureArithmetic(arithmetic); err != nil {
