@@ -111768,7 +111768,7 @@
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
-        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+        "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
         "TestSMTSolverLinearArithmeticEqualityAdapter",
         "TestSMTSolverUFLinearArithmeticCongruence",
@@ -111814,7 +111814,7 @@
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
             "TestSMTSolverSetupUsesLinearRealArithmetic",
-            "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+            "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
             "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
             "TestSMTSolverLinearArithmeticEqualityAdapter",
             "TestSMTSolverUFLinearArithmeticCongruence",
@@ -111914,7 +111914,7 @@
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
-        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+        "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
         "TestSMTSolverLinearArithmeticEqualityAdapter",
         "TestSMTSolverUFLinearArithmeticCongruence",
@@ -111946,7 +111946,7 @@
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
             "TestSMTSolverSetupUsesLinearRealArithmetic",
-            "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+            "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
             "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
             "TestSMTSolverLinearArithmeticEqualityAdapter",
             "TestSMTSolverUFLinearArithmeticCongruence",
@@ -112017,7 +112017,7 @@
         "TestSMTSolverExtendsUnsatCoreThroughQuantifierPatterns",
         "TestSMTSolverExtendsUnsatCoreWithNonlocalPatterns",
         "TestSMTSolverSetupUsesLinearRealArithmetic",
-        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+        "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
         "TestSMTSolverForwardsFastProgressSamples",
         "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals",
         "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
@@ -113182,7 +113182,7 @@
         "TestSMTArithmeticEqualityBoundAndAccumulation",
         "TestSMTNormalizeArithmeticIntegerBound",
         "TestSMTSolverSetupUsesLinearRealArithmetic",
-        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+        "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
         "TestSMTSolverPublishesStrictLinearRealModel",
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
         "TestSMTSolverLinearArithmeticEqualityAdapter",
@@ -113333,7 +113333,7 @@
           "go_target": "pkg/smtcore/theory_arith_linear.go",
           "tests": [
             "TestSMTSolverSetupUsesLinearRealArithmetic",
-            "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+            "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
             "TestSMTSolverPublishesStrictLinearRealModel",
             "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
             "TestSMTSolverLinearArithmeticEqualityAdapter",
@@ -113800,21 +113800,26 @@
         "pkg/smtcore/theory_arith_mixed_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/theory_arith_division.go",
-        "pkg/smtcore/theory_arith_division_test.go"
+        "pkg/smtcore/theory_arith_division_test.go",
+        "pkg/smtcore/theory_arith_nonlinear.go",
+        "pkg/smtcore/theory_arith_nonlinear_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
         "TestSMTLinearArithmeticStandaloneTermDefinition",
         "TestSMTLinearArithmeticEqualDefinitionRows",
         "TestSMTSolverSetupUsesLinearRealArithmetic",
-        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
+        "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
         "TestSMTSolverPublishesStrictLinearRealModel",
         "TestSMTMixedArithmeticScopeModel",
         "TestSMTMixedArithmeticCastsScopedProofs",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTArithmeticDivisionScopedProofs",
-        "TestSMTArithmeticSymbolicZeroDivisorGuard"
+        "TestSMTArithmeticSymbolicZeroDivisorGuard",
+        "TestSMTNonlinearRelaxationScopesProofsAndModel",
+        "TestSMTNonlinearUpwardDownwardAndIntegerIntervals",
+        "TestSMTNonlinearCandidateRejectsRelaxedProduct"
       ],
       "conditionals": [
         {
@@ -114593,6 +114598,15 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "internalize_mul_core monomial relaxation variables with concrete factor columns and scoped ownership",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
+          "tests": [
+            "TestSMTNonlinearRelaxationScopesProofsAndModel",
+            "TestSMTNonlinearCandidateRejectsRelaxedProduct"
+          ]
         }
       ],
       "ownership": [
@@ -115148,13 +115162,21 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_arith_linear.go"
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/smtcore/theory_arith_nonlinear.go",
+        "pkg/smtcore/theory_arith_nonlinear_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
         "TestSMTSolverLinearArithmeticEvaluatesFixedPolynomial",
         "TestSMTSolverLinearArithmeticPropagatesPolynomialIntervals",
-        "TestSMTSolverLinearArithmeticRejectsNonlinearTerms"
+        "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
+        "TestSMTNonlinearRelaxationScopesProofsAndModel",
+        "TestSMTNonlinearUpwardDownwardAndIntegerIntervals",
+        "TestSMTNonlinearCandidateRejectsRelaxedProduct",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -115456,17 +115478,36 @@
           ]
         },
         {
-          "name": "nonlinear clustering, downward interval propagation, unfixed assignment repair, Horner and Grobner reasoning",
+          "name": "get_value and check_monomial_assignments validate relevant product columns against exact common-epsilon factor values before SAT",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
+          "tests": [
+            "TestSMTNonlinearRelaxationScopesProofsAndModel",
+            "TestSMTNonlinearCandidateRejectsRelaxedProduct"
+          ]
+        },
+        {
+          "name": "propagate_nl_upward, propagate_nl_downward for degree-one targets, and update_bounds_using_interval with open and integer endpoints",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
+          "tests": [
+            "TestSMTNonlinearRelaxationScopesProofsAndModel",
+            "TestSMTNonlinearUpwardDownwardAndIntegerIntervals"
+          ]
+        },
+        {
+          "name": "nonlinear clustering, max/min bound discovery, strategy rotation, branching, Horner and Grobner reasoning, and irrational models",
           "status": "unported",
           "go_target": null,
           "tests": [
-            "TestSMTSolverLinearArithmeticRejectsNonlinearTerms"
+            "TestSMTNonlinearCandidateRejectsRelaxedProduct"
           ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The retained nonlinear rules recognize even-power products, evaluate fixed polynomials exactly, and evaluate polynomial intervals upward from active unary bounds. Interval conflicts conservatively cite all active linear assertions. Downward propagation, assignment repair, and Grobner reasoning remain unsupported and make CheckSat return unknown when required."
+        "Nonlinear monomials now have independent tableau columns with scoped factor-column lists. Relevant assignments are checked using the same exact rational epsilon as model construction. The Go tableau additionally completes a candidate by evaluating products and affine definitions, then fixes every arithmetic column and rechecks every original row; a failed completion preserves the relaxation. This concrete-model completion is a Go representation adaptation, not a claim to port the remaining source nonlinear search strategies.",
+        "One upward/downward interval propagation pass runs during each tableau replay, including each speculative integer branch. Repeated factors use interval powers, downward propagation skips powers greater than one and zero-containing divisors, and integer endpoints are rounded. Derived bounds are reconstructed after pops; failed bounds reject only the current replay or integer branch. Source monomial scheduling, iterative strategies, minimal bound-dependency explanations, max/min discovery, nonlinear branching, Horner, Grobner reasoning, and irrational models remain incomplete. Existing interval conflicts conservatively cite active assertion premises."
       ]
     },
     {

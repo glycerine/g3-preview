@@ -10,6 +10,10 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"nonlinear_zero_candidate.smt2":             "sat\n((x 0.0) ((* x x) 0.0))\n",
+	"nonlinear_interval_candidate.smt2":         "sat\n",
+	"nonlinear_product_scopes.smt2":             "unsat\nsat\n((x 2.0) (y 3.0) ((* x y) 6.0))\n",
+	"nonlinear_positive_product.smt2":           "unsat\n",
 	"integer_zero_divisor.smt2":                 "sat\n(((div x 0) (div 1 0)) ((mod x 0) (mod 1 0)) ((rem x 0) (rem 1 0)))\n",
 	"integer_division_model.smt2":               "sat\n((x (- 7)) ((div x 3) (- 3)) ((mod x 3) 2) ((rem x 3) 2))\n",
 	"integer_negative_divisor.smt2":             "sat\n((x (- 7)) ((div x (- 3)) 3) ((mod x (- 3)) 2) ((rem x (- 3)) (- 2)))\n",

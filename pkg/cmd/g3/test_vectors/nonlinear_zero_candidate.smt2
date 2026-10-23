@@ -1,0 +1,6 @@
+(set-logic QF_NRA)
+(set-option :produce-models true)
+(declare-const x Real)
+(assert (< (* x x) 1))
+(check-sat)
+(get-value (x (* x x)))

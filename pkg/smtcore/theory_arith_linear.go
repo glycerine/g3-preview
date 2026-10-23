@@ -70,6 +70,7 @@ type smtLinearArithmeticAtom struct {
 	form      smtLinearForm
 	op        int32
 	supported bool
+	nonlinear bool
 	decided   bool
 	required  bool
 	truth     bool
@@ -81,6 +82,7 @@ type smtLinearArithmeticScope struct {
 	unsupported               bool
 	castTerms, castPredicates int
 	divisionTerms             int
+	nonlinearTerms            int
 }
 
 type smtLinearIntegerBranch struct {
@@ -120,6 +122,9 @@ type SMTLinearArithmeticTheory struct {
 	castPredicateTrail []int32
 	divisionTerms      map[ast.ASTHandle]bool
 	divisionTermTrail  []ast.ASTHandle
+	nonlinearColumns   []uint32
+	nonlinearFactors   map[uint32][]uint32
+	nonlinearEnabled   bool
 	delta              big.Rat
 	equalityAdapter    *smtArithmeticEqualityAdapter
 	statistics         smtLinearArithmeticStatistics
@@ -149,16 +154,18 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		return nil, err
 	}
 	t := &SMTLinearArithmeticTheory{
-		SMTTheoryBase:  base,
-		solver:         simplex.NewSolver(nil),
-		atomByBool:     make(map[int32]int),
-		definitions:    make(map[SMTTheoryVar]smtLinearForm),
-		nextSimplex:    1,
-		integer:        integer,
-		integerColumns: make(map[uint32]bool),
-		castTerms:      make(map[ast.ASTHandle]bool),
-		castPredicates: make(map[int32]bool),
-		divisionTerms:  make(map[ast.ASTHandle]bool),
+		SMTTheoryBase:    base,
+		solver:           simplex.NewSolver(nil),
+		atomByBool:       make(map[int32]int),
+		definitions:      make(map[SMTTheoryVar]smtLinearForm),
+		nextSimplex:      1,
+		integer:          integer,
+		integerColumns:   make(map[uint32]bool),
+		castTerms:        make(map[ast.ASTHandle]bool),
+		castPredicates:   make(map[int32]bool),
+		divisionTerms:    make(map[ast.ASTHandle]bool),
+		nonlinearFactors: make(map[uint32][]uint32),
+		nonlinearEnabled: true,
 	}
 	t.equalityAdapter, err = newSMTArithmeticEqualityAdapter(base)
 	if err != nil {
@@ -172,6 +179,7 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 		return ast.ErrASTHandle
 	}
 	t.equalityAdapter.lazy = config.LazyAdapter
+	t.nonlinearEnabled = config.NLArith
 	return nil
 }
 
@@ -350,7 +358,13 @@ func (t *SMTLinearArithmeticTheory) linearize(expression ast.ASTHandle) (smtLine
 				}
 				if len(part.terms) != 0 {
 					if hasTerms {
-						return smtLinearForm{}, false, nil
+						column, err := t.ensureVariable(expression)
+						if err != nil {
+							return smtLinearForm{}, false, err
+						}
+						form := newSMTLinearForm()
+						form.addTerm(column, big.NewRat(1, 1))
+						return form, true, nil
 					}
 					hasTerms = true
 					part.scale(&result.constant)
@@ -443,6 +457,12 @@ func (t *SMTLinearArithmeticTheory) InternalizeTerm(expression ast.ASTHandle) (b
 		}
 		if argumentErr = state.Internalize(argument, false); argumentErr != nil {
 			return false, argumentErr
+		}
+	}
+	if own && op == smtArithOpMul {
+		nonlinear, err := t.internalizeNonlinearMonomial(expression)
+		if err != nil || nonlinear {
+			return nonlinear, err
 		}
 	}
 	division := own && (op == smtArithOpIDiv || op == smtArithOpRem || op == smtArithOpMod)
@@ -566,7 +586,7 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 		return false, err
 	}
 	t.atomByBool[variable] = len(t.atoms)
-	t.atoms = append(t.atoms, smtLinearArithmeticAtom{variable: variable, left: left, right: right, form: form, op: op, supported: linear, decided: decided, required: required})
+	t.atoms = append(t.atoms, smtLinearArithmeticAtom{variable: variable, left: left, right: right, form: form, op: op, supported: linear, nonlinear: t.nonlinearForm(&form), decided: decided, required: required})
 	if linear {
 		t.statistics.addRows++
 	}
@@ -988,6 +1008,10 @@ func (t *SMTLinearArithmeticTheory) rebuild() (bool, error) {
 }
 
 func (t *SMTLinearArithmeticTheory) buildSimplex(branches []smtLinearIntegerBranch) (*simplex.Solver, lbool.LBool, error) {
+	return t.buildSimplexWithValues(branches, nil)
+}
+
+func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(branches []smtLinearIntegerBranch, values map[uint32]*big.Rat) (*simplex.Solver, lbool.LBool, error) {
 	solver := simplex.NewSolver(nil)
 	for variable := uint32(0); variable < t.nextSimplex; variable++ {
 		solver.EnsureVariable(variable)
@@ -1070,6 +1094,27 @@ func (t *SMTLinearArithmeticTheory) buildSimplex(branches []smtLinearIntegerBran
 		if err != nil {
 			return solver, lbool.False, nil
 		}
+		// Source single-variable atoms constrain the variable directly. Keep
+		// these bounds as well as the comparison row for nonlinear intervals.
+		if len(atom.form.terms) == 1 {
+			for variable, coefficient := range atom.form.terms {
+				direct := bound.Clone()
+				direct.Quo(coefficient)
+				directLower := lower == (coefficient.Sign() > 0)
+				if directLower {
+					if old, exists := solver.Lower(variable); !exists || direct.Cmp(&old) > 0 {
+						err = solver.SetLower(variable, direct)
+					}
+				} else {
+					if old, exists := solver.Upper(variable); !exists || direct.Cmp(&old) < 0 {
+						err = solver.SetUpper(variable, direct)
+					}
+				}
+				if err != nil {
+					return solver, lbool.False, nil
+				}
+			}
+		}
 	}
 	for index := range branches {
 		branch := &branches[index]
@@ -1081,6 +1126,24 @@ func (t *SMTLinearArithmeticTheory) buildSimplex(branches []smtLinearIntegerBran
 			err = solver.SetUpper(branch.variable, bound)
 		}
 		if err != nil {
+			return solver, lbool.False, nil
+		}
+	}
+	for column, value := range values {
+		bound := simplex.RationalInfinitesimal(value)
+		if err := solver.SetLower(column, bound); err != nil {
+			return solver, lbool.False, nil
+		}
+		if err := solver.SetUpper(column, bound); err != nil {
+			return solver, lbool.False, nil
+		}
+	}
+	if t.nonlinearEnabled && len(t.nonlinearColumns) != 0 {
+		_, conflict, err := t.propagateNonlinearBounds(solver)
+		if err != nil {
+			return solver, lbool.Undef, err
+		}
+		if conflict {
 			return solver, lbool.False, nil
 		}
 	}
@@ -1182,7 +1245,7 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
-	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail)})
+	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail), nonlinearTerms: len(t.nonlinearColumns)})
 	return nil
 }
 
@@ -1211,6 +1274,10 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 		delete(t.divisionTerms, term)
 	}
 	t.divisionTermTrail = t.divisionTermTrail[:scope.divisionTerms]
+	for _, column := range t.nonlinearColumns[scope.nonlinearTerms:] {
+		delete(t.nonlinearFactors, column)
+	}
+	t.nonlinearColumns = t.nonlinearColumns[:scope.nonlinearTerms]
 	t.scopes = t.scopes[:level]
 	if err := t.equalityAdapter.PopScopes(count); err != nil {
 		return err
@@ -1238,16 +1305,6 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckContinue, nil
 	}
 	if t.unsupported {
-		return SMTFinalCheckGiveUp, nil
-	}
-	complete, conflict, err := t.checkNonlinearAssertions()
-	if err != nil {
-		return SMTFinalCheckGiveUp, err
-	}
-	if conflict {
-		return SMTFinalCheckContinue, nil
-	}
-	if !complete {
 		return SMTFinalCheckGiveUp, nil
 	}
 	propagated, err := t.propagateImpliedEqualities()
@@ -1290,6 +1347,38 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 				return SMTFinalCheckContinue, nil
 			}
 		}
+	}
+	satisfied, err := t.checkNonlinearMonomialAssignments()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	complete, conflict, err := t.checkNonlinearAssertions(satisfied)
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if conflict {
+		return SMTFinalCheckContinue, nil
+	}
+	if !satisfied && t.nonlinearEnabled {
+		// A branch-and-bound tableau contains speculative bounds. Replay
+		// interval propagation inside buildSimplex, where a contradiction
+		// rejects only that branch rather than the whole SMT context.
+		satisfied, err = t.completeNonlinearCandidate()
+		if err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
+		if satisfied {
+			complete, conflict, err = t.checkNonlinearAssertions(true)
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			if conflict {
+				return SMTFinalCheckContinue, nil
+			}
+		}
+	}
+	if !satisfied || !complete {
+		return SMTFinalCheckGiveUp, nil
 	}
 	return SMTFinalCheckDone, nil
 }
@@ -1559,7 +1648,7 @@ func (t *SMTLinearArithmeticTheory) polynomialInterval(expression ast.ASTHandle,
 	return result, err == nil, err
 }
 
-func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions() (bool, bool, error) {
+func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions(validated bool) (bool, bool, error) {
 	state, err := t.State()
 	if err != nil {
 		return false, false, err
@@ -1571,7 +1660,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions() (bool, bool, erro
 	}
 	for _, assertion := range t.assertions {
 		atom := &t.atoms[assertion.atom]
-		if atom.supported || atom.decided {
+		if atom.supported && (!atom.nonlinear || validated) || atom.decided {
 			continue
 		}
 		left, leftLiterals, leftFixed, valueErr := t.fixedPolynomialValue(atom.left, fixed)
@@ -1734,6 +1823,43 @@ func (t *SMTLinearArithmeticTheory) InitializeModel(generator *SMTModelGenerator
 		}
 		return ast.ErrASTDomain
 	}
+	t.computeModelDelta()
+	factory, err := protomodel.NewArithmeticFactory(state.manager)
+	if err != nil {
+		return err
+	}
+	return generator.RegisterFactory(factory)
+}
+
+func (t *SMTLinearArithmeticTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
+	if node == nil || generator == nil || !t.IsAttachedToVariable(node) {
+		return nil, ast.ErrASTDomain
+	}
+	state, err := t.State()
+	if err != nil || generator.manager != state.manager {
+		if err != nil {
+			return nil, err
+		}
+		return nil, ast.ErrASTDomain
+	}
+	theoryVariable := node.TheoryVar(t.FamilyID())
+	rational := t.arithmeticColumnValue(t.simplexVariables[theoryVariable])
+	sort, err := state.manager.GetSort(node.owner)
+	if err != nil {
+		return nil, err
+	}
+	kind, err := state.manager.GetDeclKind(sort)
+	if err != nil {
+		return nil, err
+	}
+	numeral, err := state.manager.ArithmeticNumeralRat(rational, kind == 1)
+	if err != nil {
+		return nil, err
+	}
+	return NewSMTExpressionValueProcedure(numeral)
+}
+
+func (t *SMTLinearArithmeticTheory) computeModelDelta() {
 	t.delta.SetInt64(1)
 	for variable := uint32(0); variable < t.solver.NumVariables(); variable++ {
 		value := t.solver.Value(variable)
@@ -1782,40 +1908,4 @@ func (t *SMTLinearArithmeticTheory) InitializeModel(generator *SMTModelGenerator
 			}
 		}
 	}
-	factory, err := protomodel.NewArithmeticFactory(state.manager)
-	if err != nil {
-		return err
-	}
-	return generator.RegisterFactory(factory)
-}
-
-func (t *SMTLinearArithmeticTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
-	if node == nil || generator == nil || !t.IsAttachedToVariable(node) {
-		return nil, ast.ErrASTDomain
-	}
-	state, err := t.State()
-	if err != nil || generator.manager != state.manager {
-		if err != nil {
-			return nil, err
-		}
-		return nil, ast.ErrASTDomain
-	}
-	theoryVariable := node.TheoryVar(t.FamilyID())
-	value := t.solver.Value(t.simplexVariables[theoryVariable])
-	var epsilon, rational big.Rat
-	epsilon.Mul(&t.delta, &value.Epsilon)
-	rational.Add(&value.Main, &epsilon)
-	sort, err := state.manager.GetSort(node.owner)
-	if err != nil {
-		return nil, err
-	}
-	kind, err := state.manager.GetDeclKind(sort)
-	if err != nil {
-		return nil, err
-	}
-	numeral, err := state.manager.ArithmeticNumeralRat(&rational, kind == 1)
-	if err != nil {
-		return nil, err
-	}
-	return NewSMTExpressionValueProcedure(numeral)
 }

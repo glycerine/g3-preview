@@ -1568,13 +1568,13 @@ func TestSMTSolverLinearArithmeticPropagatesOffsetEquality(t *testing.T) {
 	}
 }
 
-func TestSMTSolverLinearArithmeticRejectsNonlinearTerms(t *testing.T) {
+func TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate(t *testing.T) {
 	m := astTestManager(t)
 	arithmetic, err := m.RegisterArithmeticPlugin()
 	astTestMust(t, err)
 	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
 	astTestMust(t, err)
-	s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: params})
+	s, err := NewSMTSolver(m, nil, "QF_NRA", SMTSolverConfig{Params: params})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
 	one, err := m.ArithmeticRealNumeralText("1")
@@ -1590,8 +1590,8 @@ func TestSMTSolverLinearArithmeticRejectsNonlinearTerms(t *testing.T) {
 	astTestMust(t, s.Assert(comparison))
 	status, err := s.CheckSat(nil)
 	astTestMust(t, err)
-	if status != lbool.Undef {
-		t.Fatal("nonlinear arithmetic reported a definite result", status)
+	if status != lbool.True {
+		t.Fatal("nonlinear zero candidate", status)
 	}
 }
 
@@ -1725,7 +1725,7 @@ func TestSMTSolverLinearArithmeticPropagatesPolynomialIntervals(t *testing.T) {
 	}{
 		{name: "proved", op: smtArithOpGT, threshold: "8", want: lbool.True},
 		{name: "refuted", op: smtArithOpLT, threshold: "8", want: lbool.False},
-		{name: "overlap", op: smtArithOpLT, threshold: "9", want: lbool.Undef},
+		{name: "overlap", op: smtArithOpLT, threshold: "9", want: lbool.True},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			m := astTestManager(t)
