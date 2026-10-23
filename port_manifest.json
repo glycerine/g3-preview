@@ -37729,13 +37729,15 @@
         "pkg/cmd_context/applications.go",
         "pkg/cmd_context/results.go",
         "pkg/cmd_context/context_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd_context/macros.go"
       ],
       "tests": [
         "TestCommandContextScopesDeclarationsAndModel",
         "TestCommandContextNamedCoreAndProof",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestCommandContextDefinitionOwnershipAndScopes"
       ],
       "conditionals": [
         {
@@ -37938,11 +37940,12 @@
           ]
         },
         {
-          "name": "builtin plugin name registration and exact-sort concrete UF overload resolution for retained parsed applications; coercion and full logic validation remain open",
+          "name": "builtin plugin registration, sole-declaration arithmetic coercions and exact-domain UF overload resolution; full logic validation remains open",
           "status": "partial",
           "go_target": "pkg/cmd_context/applications.go",
           "tests": [
-            "TestSMTLibRunnerScripts"
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ],
           "go_targets": [
             "pkg/cmd/g3/main_test.go"
@@ -37964,7 +37967,23 @@
           ]
         },
         {
-          "name": "remaining command context: logic validation, coercions, macros/definitions, parametric sorts/datatypes, reset, limits, optimization and tactic/extension commands",
+          "name": "nonrecursive macro definitions, exact-domain duplicate and declaration collisions, compatible-sort lookup, capture-safe standard-order substitution and scoped/global cleanup",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/macros.go",
+          "go_targets": [
+            "pkg/cmd_context/context_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/commands_test.go"
+          ],
+          "tests": [
+            "TestCommandContextDefinitionOwnershipAndScopes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMT2FunctionDefinitionFailuresAndRecovery"
+          ]
+        },
+        {
+          "name": "remaining command context: logic validation, parametric sorts/datatypes, recursive definitions, reset, limits, optimization and tactic/extension commands",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -37972,7 +37991,8 @@
       ],
       "ownership": [
         "The command context owns its lazily created AST manager and SMTSolver, original assertion and optional core-tag ASTRefs, function/sort declaration trails and local params. Standalone sessions own and close the borrowed solver-service graph after context resources are released.",
-        "Scoped declarations are restored in trail order; global declarations survive pop and close with the session. Temporary returned model references and evaluators are closed after printing."
+        "Scoped declarations are restored in trail order; global declarations survive pop and close with the session. Temporary returned model references and evaluators are closed after printing.",
+        "Macro declarations own body and parameter-sort ASTRefs; caller-owned application result references survive temporary substitution cleanup and scoped definition removal."
       ],
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete."
@@ -37989,13 +38009,15 @@
         "pkg/cmd_context/applications.go",
         "pkg/cmd_context/results.go",
         "pkg/cmd_context/context_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd_context/macros.go"
       ],
       "tests": [
         "TestCommandContextScopesDeclarationsAndModel",
         "TestCommandContextNamedCoreAndProof",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestCommandContextDefinitionOwnershipAndScopes"
       ],
       "conditionals": [
         {
@@ -38046,11 +38068,12 @@
           ]
         },
         {
-          "name": "builtin plugin name registration and exact-sort concrete UF overload resolution for retained parsed applications; coercion and full logic validation remain open",
+          "name": "builtin plugin registration, sole-declaration arithmetic coercions and exact-domain UF overload resolution; full logic validation remains open",
           "status": "partial",
           "go_target": "pkg/cmd_context/applications.go",
           "tests": [
-            "TestSMTLibRunnerScripts"
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ],
           "go_targets": [
             "pkg/cmd/g3/main_test.go"
@@ -38072,7 +38095,23 @@
           ]
         },
         {
-          "name": "remaining command context: logic validation, coercions, macros/definitions, parametric sorts/datatypes, reset, limits, optimization and tactic/extension commands",
+          "name": "nonrecursive macro definitions, exact-domain duplicate and declaration collisions, compatible-sort lookup, capture-safe standard-order substitution and scoped/global cleanup",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/macros.go",
+          "go_targets": [
+            "pkg/cmd_context/context_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/commands_test.go"
+          ],
+          "tests": [
+            "TestCommandContextDefinitionOwnershipAndScopes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMT2FunctionDefinitionFailuresAndRecovery"
+          ]
+        },
+        {
+          "name": "remaining command context: logic validation, parametric sorts/datatypes, recursive definitions, reset, limits, optimization and tactic/extension commands",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -38080,7 +38119,8 @@
       ],
       "ownership": [
         "The command context owns its lazily created AST manager and SMTSolver, original assertion and optional core-tag ASTRefs, function/sort declaration trails and local params. Standalone sessions own and close the borrowed solver-service graph after context resources are released.",
-        "Scoped declarations are restored in trail order; global declarations survive pop and close with the session. Temporary returned model references and evaluators are closed after printing."
+        "Scoped declarations are restored in trail order; global declarations survive pop and close with the session. Temporary returned model references and evaluators are closed after printing.",
+        "Macro declarations own body and parameter-sort ASTRefs; caller-owned application result references survive temporary substitution cleanup and scoped definition removal."
       ],
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete."
@@ -86050,7 +86090,8 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMT2CommandsRejectMalformedInputBeforeEffects",
-        "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess"
+        "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
+        "TestSMT2FunctionDefinitionFailuresAndRecovery"
       ],
       "assertions": [
         {
@@ -86660,7 +86701,21 @@
           ]
         },
         {
-          "name": "remaining parser grammar and command recovery: definitions/recursive functions, parametric/datatype declarations, pattern/other attributes, complete qualified local resolution, options and extensions",
+          "name": "parse_define_fun and parse_define_const with reversed parameter binders, exact body/result-sort check and command publication after syntax validation",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/expressions.go",
+          "go_targets": [
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMT2FunctionDefinitionFailuresAndRecovery",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "remaining parser grammar and command recovery: recursive functions, parametric/datatype declarations, pattern/other attributes, complete qualified local resolution, options and extensions",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -86689,7 +86744,8 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMT2CommandsRejectMalformedInputBeforeEffects",
-        "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess"
+        "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
+        "TestSMT2FunctionDefinitionFailuresAndRecovery"
       ],
       "conditionals": [
         {
@@ -86742,7 +86798,21 @@
           ]
         },
         {
-          "name": "remaining parser grammar and command recovery: definitions/recursive functions, parametric/datatype declarations, pattern/other attributes, complete qualified local resolution, options and extensions",
+          "name": "parse_define_fun and parse_define_const with reversed parameter binders, exact body/result-sort check and command publication after syntax validation",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/expressions.go",
+          "go_targets": [
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMT2FunctionDefinitionFailuresAndRecovery",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "remaining parser grammar and command recovery: recursive functions, parametric/datatype declarations, pattern/other attributes, complete qualified local resolution, options and extensions",
           "status": "unported",
           "go_target": null,
           "tests": []

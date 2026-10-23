@@ -26,7 +26,7 @@ type assertion struct {
 	expression, tag ast.ASTHandle
 	ref, tagRef     ast.ASTRef
 }
-type scope struct{ functions, sorts, assertions int }
+type scope struct{ functions, sorts, assertions, macros int }
 type builtin struct {
 	family ast.FamilyID
 	kind   int32
@@ -48,6 +48,8 @@ type Context struct {
 	sorts                            map[string]ast.ASTHandle
 	builtins                         map[string][]builtin
 	functionTrail, sortTrail         []declaration
+	macros                           map[string][]macroDeclaration
+	macroTrail                       []string
 	assertions                       []assertion
 	scopes                           []scope
 	PrintSuccess, GlobalDeclarations bool
@@ -62,7 +64,7 @@ func NewContext(config smtcore.SMTSolverConfig) (*Context, error) {
 	if config.Params == nil || config.Globals == nil {
 		return nil, uparams.ErrParamsOwner
 	}
-	c := &Context{config: config, functions: make(map[string][]ast.ASTHandle), sorts: make(map[string]ast.ASTHandle), builtins: make(map[string][]builtin), status: lbool.Undef}
+	c := &Context{config: config, functions: make(map[string][]ast.ASTHandle), sorts: make(map[string]ast.ASTHandle), builtins: make(map[string][]builtin), macros: make(map[string][]macroDeclaration), status: lbool.Undef}
 	var err error
 	c.params, err = config.Params.NewValue()
 	if err != nil {
@@ -301,6 +303,9 @@ func (c *Context) DeclareFunction(name string, domain []ast.ASTHandle, rangeSort
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
+	if c.containsMacro(name, domain) {
+		return ast.ASTHandle{}, fmt.Errorf("invalid declaration, named expression already defined with this name %s", name)
+	}
 	if _, found := c.builtins[name]; found {
 		return ast.ASTHandle{}, fmt.Errorf("invalid declaration, builtin symbol %s", name)
 	}
@@ -380,7 +385,7 @@ func (c *Context) Push(count uint32) error {
 		if err := c.solver.Push(); err != nil {
 			return err
 		}
-		c.scopes = append(c.scopes, scope{len(c.functionTrail), len(c.sortTrail), len(c.assertions)})
+		c.scopes = append(c.scopes, scope{len(c.functionTrail), len(c.sortTrail), len(c.assertions), len(c.macroTrail)})
 	}
 	c.checked = false
 	return nil
@@ -403,6 +408,9 @@ func (c *Context) Pop(count uint32) error {
 	level := len(c.scopes) - int(count)
 	s := c.scopes[level]
 	if !c.GlobalDeclarations {
+		if err := c.restoreMacros(s.macros); err != nil {
+			return err
+		}
 		if err := c.restoreDeclarations(s.functions, s.sorts); err != nil {
 			return err
 		}
@@ -511,6 +519,9 @@ func (c *Context) Close() error {
 		c.solver = nil
 	}
 	if c.manager != nil {
+		if err := c.restoreMacros(0); err != nil {
+			return err
+		}
 		if err := c.restoreAssertions(0); err != nil {
 			return err
 		}

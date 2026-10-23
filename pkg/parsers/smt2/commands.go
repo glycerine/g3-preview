@@ -236,6 +236,10 @@ func (p *commandParser) command() (bool, error) {
 		if _, err = p.context.DeclareFunction(function, domain, rangeSort); err != nil {
 			return false, err
 		}
+	case "define-fun", "define-const":
+		if err := p.defineFunction(name == "define-fun"); err != nil {
+			return false, err
+		}
 	case "assert":
 		expression, named, err := p.expression()
 		if err != nil {
@@ -474,7 +478,15 @@ func (p *commandParser) indexedApplication(name string, indices []uint32, args [
 			return ast.ASTHandle{}, err
 		}
 	}
-	return p.pin(p.context.MakeApp(name, args, parameters, rangeSort))
+	ref, err := p.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	p.refs = append(p.refs, ref)
+	if err = p.context.MakeAppInto(name, args, parameters, rangeSort, ref); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.manager.RefGet(ref)
 }
 
 func parseBitVectorName(name string) (string, bool) {

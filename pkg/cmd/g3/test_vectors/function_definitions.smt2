@@ -1,0 +1,6 @@
+(set-logic ALL)
+(define-const base Int 7)
+(define-fun subtract_args ((x Int) (y Int)) Int (- x y))
+(define-fun shifted ((x Int)) Int (subtract_args x base))
+(assert (not (= (shifted 10) 3)))
+(check-sat)

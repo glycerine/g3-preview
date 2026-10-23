@@ -122,6 +122,14 @@ func (c *Context) MakeApp(name string, args []ast.ASTHandle, indices []ast.ASTPa
 	if len(indices) != 0 {
 		return ast.ASTHandle{}, fmt.Errorf("invalid use of indexed identifier, unknown builtin function %s", name)
 	}
+	// Source func_decls::find returns the sole declaration directly. MkApp
+	// then validates arity and performs the manager's arithmetic coercions.
+	if declarations := c.functions[name]; len(declarations) == 1 {
+		return m.MkApp(declarations[0], args)
+	}
+	if len(args) == 0 && rangeSort.IsNull() && len(c.functions[name]) > 1 {
+		return ast.ASTHandle{}, fmt.Errorf("ambiguous constant reference %s; use (as <symbol> <sort>)", name)
+	}
 	var match ast.ASTHandle
 	for _, decl := range c.functions[name] {
 		arity, err := m.GetArity(decl)

@@ -1,0 +1,8 @@
+(set-option :global-declarations true)
+(set-logic QF_UF)
+(push 1)
+(define-const truth Bool true)
+(define-fun negate ((x Bool)) Bool (not x))
+(pop 1)
+(assert (negate truth))
+(check-sat)

@@ -10,6 +10,13 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"function_overloads.smt2":     "sat\n",
+	"function_definitions.smt2":   "unsat\n",
+	"definition_scopes.smt2":      "sat\nsat\n",
+	"definition_capture.smt2":     "unsat\n",
+	"definition_coercions.smt2":   "unsat\n",
+	"function_coercions.smt2":     "unsat\n",
+	"global_definitions.smt2":     "unsat\n",
 	"boolean_model.smt2":          "sat\n(model\n  (define-fun p () Bool true)\n)\n",
 	"constant_array.smt2":         "unsat\n",
 	"string_value.smt2":           "sat\n((x \"a\"\"b\"))\n",

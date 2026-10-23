@@ -63,3 +63,39 @@ func TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess(t *testing.T) {
 		t.Fatal(out.String())
 	}
 }
+
+func TestSMT2FunctionDefinitionFailuresAndRecovery(t *testing.T) {
+	for _, script := range []string{
+		"(define-fun f ((x Int)) Real x)",
+		"(define-const f Real 1)",
+		"(define-fun f ((x Bool)) Bool x extra)",
+		"(define-fun f ((x Bool)) Bool x)(define-fun f ((y Bool)) Bool (not y))",
+		"(declare-fun f (Bool) Bool)(define-fun f ((x Bool)) Bool x)",
+		"(define-fun f ((x Bool)) Bool x)(declare-fun f (Bool) Bool)",
+		"(define-fun and ((x Bool)) Bool x)",
+	} {
+		t.Run(script, func(t *testing.T) {
+			c, err := cmd_context.NewStandaloneContext()
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() {
+				if err := c.Close(); err != nil {
+					t.Fatal(err)
+				}
+			}()
+			var out bytes.Buffer
+			if err := ParseCommands(c, strings.NewReader(script), &out); err == nil {
+				t.Fatal("invalid definition accepted")
+			}
+			// A failed definition must leave the command context usable, including
+			// releasing parser locals and restoring bound-variable scope.
+			if err := ParseCommands(c, strings.NewReader("(define-fun g ((x Bool)) Bool x)(assert (g true))(check-sat)"), &out); err != nil {
+				t.Fatal(err)
+			}
+			if out.String() != "sat\n" {
+				t.Fatal(out.String())
+			}
+		})
+	}
+}

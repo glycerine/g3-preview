@@ -51,7 +51,7 @@ func (p *commandParser) expression() (ast.ASTHandle, string, error) {
 			result, err = m.RefGet(ref)
 			return result, "", err
 		}
-		result, err = p.context.MakeApp(name, nil, nil, ast.ASTHandle{})
+		result, err = p.indexedApplication(name, nil, nil, ast.ASTHandle{})
 	case LeftParenToken:
 		if err := p.advance(); err != nil {
 			return ast.ASTHandle{}, "", err
@@ -187,6 +187,54 @@ func (p *commandParser) sortedVariables() ([]usymbol.Symbol, []ast.ASTHandle, er
 		sorts = append(sorts, sort)
 	}
 	return names, sorts, p.advance()
+}
+
+// Source parse_define_fun / parse_define_const: unlike argument coercions,
+// the declared return sort must equal the body sort exactly.
+func (p *commandParser) defineFunction(withArguments bool) (result error) {
+	if _, err := p.astManager(); err != nil {
+		return err
+	}
+	name, err := p.symbol()
+	if err != nil {
+		return err
+	}
+	var names []usymbol.Symbol
+	var sorts []ast.ASTHandle
+	if withArguments {
+		names, sorts, err = p.sortedVariables()
+		if err != nil {
+			return err
+		}
+	}
+	oldBindings, oldExprs := p.bindings, len(p.locals.refs)
+	p.bindings, err = p.env.bindSortedVariables(p.manager, names, sorts, p.bindings, &p.locals)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		p.bindings = oldBindings
+		result = errors.Join(result, p.env.endScopeWithOwningCleanup(), p.locals.shrink(p.manager, oldExprs))
+	}()
+	rangeSort, err := p.sort()
+	if err != nil {
+		return err
+	}
+	body, _, err := p.expression()
+	if err != nil {
+		return err
+	}
+	actual, err := p.manager.GetSort(body)
+	if err != nil {
+		return err
+	}
+	if actual != rangeSort {
+		return fmt.Errorf("invalid function/constant definition, sort mismatch")
+	}
+	if err = p.requireEnd(); err != nil {
+		return err
+	}
+	return p.context.DefineFunction(name, sorts, body)
 }
 
 func (p *commandParser) quantifier(forall bool) (value ast.ASTHandle, named string, result error) {

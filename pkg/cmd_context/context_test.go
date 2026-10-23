@@ -29,6 +29,44 @@ func contextFixture(t *testing.T) *Context {
 	return c
 }
 
+func TestCommandContextDefinitionOwnershipAndScopes(t *testing.T) {
+	c := contextFixture(t)
+	m, err := c.Manager()
+	contextMust(t, err)
+	b, err := c.LookupSort("Bool")
+	contextMust(t, err)
+	truth, err := m.MkTrue()
+	contextMust(t, err)
+	contextMust(t, c.DefineFunction("choose", []ast.ASTHandle{b}, truth))
+	out, err := m.NewRef(ast.ASTHandle{})
+	contextMust(t, err)
+	defer func() { contextMust(t, m.DelRef(&out)) }()
+	contextMust(t, c.MakeAppInto("choose", []ast.ASTHandle{truth}, nil, ast.ASTHandle{}, out))
+	contextMust(t, c.Push(1))
+	u, err := c.DeclareSort("UnusedParameter")
+	contextMust(t, err)
+	// The body does not mention its parameter's sort.
+	contextMust(t, c.DefineFunction("choose", []ast.ASTHandle{u}, truth))
+	if err := c.DefineFunction("choose", []ast.ASTHandle{u}, truth); err == nil {
+		t.Fatal("duplicate macro accepted")
+	}
+	if _, err := c.DeclareFunction("choose", []ast.ASTHandle{u}, b); err == nil {
+		t.Fatal("function/macro domain collision accepted")
+	}
+	contextMust(t, c.DefineFunction("temporary", nil, truth))
+	contextMust(t, c.MakeAppInto("temporary", nil, nil, ast.ASTHandle{}, out))
+	contextMust(t, c.Pop(1))
+	value, err := m.RefGet(out)
+	contextMust(t, err)
+	if value != truth {
+		t.Fatal("substitution output lost after scope cleanup")
+	}
+	if err := c.MakeAppInto("temporary", nil, nil, ast.ASTHandle{}, out); err == nil {
+		t.Fatal("scoped macro survived pop")
+	}
+	contextMust(t, c.MakeAppInto("choose", []ast.ASTHandle{truth}, nil, ast.ASTHandle{}, out))
+}
+
 func TestCommandContextScopesDeclarationsAndModel(t *testing.T) {
 	c := contextFixture(t)
 	contextMust(t, c.SetLogic("QF_UF"))
