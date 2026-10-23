@@ -1,0 +1,8 @@
+(set-logic QF_NRA)
+(declare-const x Real)
+(declare-const y Real)
+(push 1)
+(assert (= (+ (* x x) (* y y) (* (- 2) x y)) (- 1)))
+(check-sat)
+(pop 1)
+(check-sat)

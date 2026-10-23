@@ -113802,7 +113802,8 @@
         "pkg/smtcore/theory_arith_division.go",
         "pkg/smtcore/theory_arith_division_test.go",
         "pkg/smtcore/theory_arith_nonlinear.go",
-        "pkg/smtcore/theory_arith_nonlinear_test.go"
+        "pkg/smtcore/theory_arith_nonlinear_test.go",
+        "pkg/smtcore/theory_arith_grobner_square_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -113819,7 +113820,8 @@
         "TestSMTArithmeticSymbolicZeroDivisorGuard",
         "TestSMTNonlinearRelaxationScopesProofsAndModel",
         "TestSMTNonlinearUpwardDownwardAndIntegerIntervals",
-        "TestSMTNonlinearCandidateRejectsRelaxedProduct"
+        "TestSMTNonlinearCandidateRejectsRelaxedProduct",
+        "TestSMTNonlinearGrobnerExpandedSquareScopedProofs"
       ],
       "conditionals": [
         {
@@ -114607,13 +114609,28 @@
             "TestSMTNonlinearRelaxationScopesProofsAndModel",
             "TestSMTNonlinearCandidateRejectsRelaxedProduct"
           ]
+        },
+        {
+          "name": "propagate_bounds retained affine definition rows carry nonlinear interval bounds through preprocessor aliases before and after monomial propagation",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTNonlinearGrobnerExpandedSquareScopedProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification.",
         "Division application markers follow theory scopes. Concrete division calls pin generated arithmetic and Boolean terms through recursive axiom internalization. The disabled constant-modulus enumeration option has no active retained setter and is not translated."
       ],
-      "deviations": []
+      "deviations": [
+        "Affine definition-bound propagation evaluates retained replay rows before and after nonlinear interval propagation, including sign reversal for negated-square aliases. General row scheduling, propagation to every row variable, and minimal row-bound explanations remain incomplete."
+      ]
     },
     {
       "path": "src/smt/theory_arith_def.h",
@@ -115167,7 +115184,9 @@
         "pkg/smtcore/theory_arith_nonlinear_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/theory_arith_grobner.go",
-        "pkg/smtcore/theory_arith_grobner_test.go"
+        "pkg/smtcore/theory_arith_grobner_test.go",
+        "pkg/smtcore/theory_arith_grobner_square.go",
+        "pkg/smtcore/theory_arith_grobner_square_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -115179,7 +115198,9 @@
         "TestSMTNonlinearCandidateRejectsRelaxedProduct",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestSMTNonlinearGrobnerCoupledEquationsScopedProofs"
+        "TestSMTNonlinearGrobnerCoupledEquationsScopedProofs",
+        "TestSMTGrobnerPerfectSquareMonomialsAndCrossTerms",
+        "TestSMTNonlinearGrobnerExpandedSquareScopedProofs"
       ],
       "conditionals": [
         {
@@ -115512,7 +115533,21 @@
           ]
         },
         {
-          "name": "nonlinear clustering, max/min bound discovery, strategy rotation, nonlinear branching, Horner reasoning, Grobner perfect-square consistency, variable-order perturbation and derived-equation insertion, and irrational models",
+          "name": "is_perfect_square overloads and is_inconsistent2: exact rational coefficient roots, paired variable powers, -2ab cross-term matching, and interval strengthening for expanded monomial-difference squares",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_grobner_square.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTGrobnerPerfectSquareMonomialsAndCrossTerms",
+            "TestSMTNonlinearGrobnerExpandedSquareScopedProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "nonlinear clustering, max/min bound discovery, strategy rotation, nonlinear branching, Horner reasoning, variable-order perturbation and derived-equation insertion, and irrational models",
           "status": "unported",
           "go_target": null,
           "tests": [
@@ -115524,7 +115559,7 @@
       "deviations": [
         "Nonlinear monomials now have independent tableau columns with scoped factor-column lists. Relevant assignments are checked using the same exact rational epsilon as model construction. The Go tableau additionally completes a candidate by evaluating products and affine definitions, then fixes every arithmetic column and rechecks every original row; a failed completion preserves the relaxation. This concrete-model completion is a Go representation adaptation, not a claim to port the remaining source nonlinear search strategies.",
         "One upward/downward interval propagation pass runs during each tableau replay, including each speculative integer branch. Repeated factors use interval powers, downward propagation skips powers greater than one and zero-containing divisors, and integer endpoints are rounded. Derived bounds are reconstructed after pops; failed bounds reject only the current replay or integer branch.",
-        "The Grobner consumer sends concrete typed monomials from definition equations, opposite active bounds, and fixed product columns to math/grobner; it substitutes only unconditional fixed bounds from a branch-free replay, applies the source variable weights and generated-equation threshold, and checks basis equations against exact rational intervals. Conflicts conservatively cite all active assertion literals rather than a minimal source dependency graph. Source connected-cluster extraction, complete tableau-row enumeration, iterative nonlinear strategies, max/min discovery, nonlinear branching, Horner reasoning, Grobner perfect-square consistency, variable-order perturbation, optional derived-equation insertion, and irrational models remain incomplete."
+        "The Grobner consumer sends concrete typed monomials from definition equations, opposite active bounds, and fixed product columns to math/grobner; it substitutes only unconditional fixed bounds from a branch-free replay, applies the source variable weights and generated-equation threshold, and checks basis equations against exact rational intervals and source expanded perfect-square strengthening. Conflicts conservatively cite all active assertion literals rather than a minimal source dependency graph. Source connected-cluster extraction, complete tableau-row enumeration, iterative nonlinear strategies, max/min discovery, nonlinear branching, Horner reasoning, variable-order perturbation, optional derived-equation insertion, and irrational models remain incomplete."
       ]
     },
     {

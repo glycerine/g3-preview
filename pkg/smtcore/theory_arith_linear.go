@@ -1146,7 +1146,21 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(branches []smtLinearI
 		}
 	}
 	if t.nonlinearEnabled && len(t.nonlinearColumns) != 0 {
-		_, conflict, err := t.propagateNonlinearBounds(solver)
+		_, conflict, err := t.propagateArithmeticDefinitionBounds(solver)
+		if err != nil {
+			return solver, lbool.Undef, err
+		}
+		if conflict {
+			return solver, lbool.False, nil
+		}
+		_, conflict, err = t.propagateNonlinearBounds(solver)
+		if err != nil {
+			return solver, lbool.Undef, err
+		}
+		if conflict {
+			return solver, lbool.False, nil
+		}
+		_, conflict, err = t.propagateArithmeticDefinitionBounds(solver)
 		if err != nil {
 			return solver, lbool.Undef, err
 		}

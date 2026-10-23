@@ -194,35 +194,21 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 			return false, err
 		}
 		for _, monomial := range equation.Monomials() {
-			interval, err := newSMTOldIntervalPoint(&manager, monomial.Coefficient(), nil, nil)
+			interval, err := t.grobnerMonomialInterval(solver, columns, &manager, monomial)
 			if err != nil {
 				return false, err
-			}
-			for i := uint32(0); i < monomial.Degree(); {
-				h := monomial.Variable(i)
-				j := i + 1
-				for j < monomial.Degree() && monomial.Variable(j) == h {
-					j++
-				}
-				column, found := columns[h]
-				if !found {
-					return false, ast.ErrASTDomain
-				}
-				bound, err := t.nonlinearColumnInterval(solver, column, &manager)
-				if err != nil {
-					return false, err
-				}
-				bound.power(j - i)
-				if err = interval.mul(bound); err != nil {
-					return false, err
-				}
-				i = j
 			}
 			if err = sum.add(interval); err != nil {
 				return false, err
 			}
 		}
 		conflict = !sum.containsZero()
+		if !conflict {
+			conflict, err = t.grobnerSquareInconsistent(solver, columns, &manager, equation.Monomials())
+			if err != nil {
+				return false, err
+			}
+		}
 	}
 	if conflict {
 		literals := make([]SMTLiteral, 0, len(t.assertions))

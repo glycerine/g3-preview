@@ -10,6 +10,8 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"nonlinear_grobner_expanded_square.smt2":    "unsat\nsat\n",
+	"nonlinear_grobner_rational_square.smt2":    "unsat\n",
 	"nonlinear_grobner_coupled.smt2":            "unsat\nsat\n",
 	"nonlinear_zero_candidate.smt2":             "sat\n((x 0.0) ((* x x) 0.0))\n",
 	"nonlinear_interval_candidate.smt2":         "sat\n",

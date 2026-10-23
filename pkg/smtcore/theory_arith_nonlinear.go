@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"math/big"
+	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/simplex"
@@ -232,6 +233,49 @@ func (t *SMTLinearArithmeticTheory) updateNonlinearBounds(solver *simplex.Solver
 		changed = true
 	}
 	return changed, false
+}
+
+// Source arithmetic row bound propagation carries the bounds of nonlinear
+// columns through affine aliases, for example x*x >= 0 implies -(x*x) <= 0.
+// These are the definition rows retained by the replay tableau.
+func (t *SMTLinearArithmeticTheory) propagateArithmeticDefinitionBounds(solver *simplex.Solver) (bool, bool, error) {
+	var manager smtArithmeticBoundDependencyManager
+	variables := make([]int, 0, len(t.definitions))
+	for variable := range t.definitions {
+		variables = append(variables, int(variable))
+	}
+	sort.Ints(variables)
+	changed := false
+	for _, raw := range variables {
+		variable := SMTTheoryVar(raw)
+		definition := t.definitions[variable]
+		interval, err := newSMTOldIntervalPoint(&manager, &definition.constant, nil, nil)
+		if err != nil {
+			return false, false, err
+		}
+		for term, coefficient := range definition.terms {
+			bound, err := t.nonlinearColumnInterval(solver, term, &manager)
+			if err != nil {
+				return false, false, err
+			}
+			scalar, err := newSMTOldIntervalPoint(&manager, coefficient, nil, nil)
+			if err != nil {
+				return false, false, err
+			}
+			if err = bound.mul(scalar); err != nil {
+				return false, false, err
+			}
+			if err = interval.add(bound); err != nil {
+				return false, false, err
+			}
+		}
+		progress, conflict := t.updateNonlinearBounds(solver, t.simplexVariables[variable], interval)
+		if conflict {
+			return changed, true, nil
+		}
+		changed = changed || progress
+	}
+	return changed, false, nil
 }
 
 func (t *SMTLinearArithmeticTheory) propagateNonlinearBounds(solver *simplex.Solver) (bool, bool, error) {
