@@ -108288,10 +108288,14 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/smtcore/theory_array_display.go",
+        "pkg/smtcore/theory_array_display_test.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_types.go"
       ],
       "tests": [
+        "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
+        "TestSMTFullArrayDisplayConstructorLists",
         "TestSMTSolverReasonUnknownUsesKernelFailure",
         "TestSMTCoreTypesFailureFinalCheckAndTheoryVarList"
       ],
@@ -108342,6 +108346,18 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "array display/display_var/display_ids and context display_theories dispatch: source field widths, private union-find representatives, per-variable parent/store lists, full map/parent-map/const rows, empty theories, scope rollback and writer errors",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_display.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_display_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
+            "TestSMTFullArrayDisplayConstructorLists"
+          ]
+        },
         {
           "name": "last-failure display names and API reason strings",
           "status": "ported",
@@ -118554,6 +118570,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_display.go",
+        "pkg/smtcore/theory_array_display_test.go",
         "pkg/smtcore/theory_array_model.go",
         "pkg/smtcore/theory_array_model_test.go",
         "pkg/smtcore/theory_array_full_parents.go",
@@ -118591,6 +118609,8 @@
         "pkg/smtcore/smt_setup.go"
       ],
       "tests": [
+        "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
+        "TestSMTFullArrayDisplayConstructorLists",
         "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
         "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
@@ -118848,9 +118868,16 @@
           ]
         },
         {
-          "name": "Retained array diagnostic display and trace integration",
-          "status": "unported",
-          "tests": []
+          "name": "array display/display_var/display_ids and context display_theories dispatch: source field widths, private union-find representatives, per-variable parent/store lists, full map/parent-map/const rows, empty theories, scope rollback and writer errors",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_display.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_display_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
+            "TestSMTFullArrayDisplayConstructorLists"
+          ]
         },
         {
           "name": "store/select internalization, read-over-write axioms, equality-class propagation and extensionality",
@@ -118887,6 +118914,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_display.go",
+        "pkg/smtcore/theory_array_display_test.go",
         "pkg/smtcore/theory_array_model.go",
         "pkg/smtcore/theory_array_model_test.go",
         "pkg/smtcore/theory_array_full_parents.go",
@@ -118923,6 +118952,8 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
+        "TestSMTFullArrayDisplayConstructorLists",
         "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
         "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
@@ -119100,9 +119131,16 @@
           ]
         },
         {
-          "name": "Retained array diagnostic display and trace integration",
-          "status": "unported",
-          "tests": []
+          "name": "array display/display_var/display_ids and context display_theories dispatch: source field widths, private union-find representatives, per-variable parent/store lists, full map/parent-map/const rows, empty theories, scope rollback and writer errors",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_display.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_display_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
+            "TestSMTFullArrayDisplayConstructorLists"
+          ]
         },
         {
           "name": "complete retained array theory lifecycle, axiom propagation, scoping, final-check and statistics interface",
@@ -119691,6 +119729,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_display.go",
+        "pkg/smtcore/theory_array_display_test.go",
         "pkg/smtcore/theory_array_full_defaults.go",
         "pkg/smtcore/theory_array_default_values.go",
         "pkg/smtcore/theory_array_full_defaults_test.go",
@@ -119729,6 +119769,8 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
+        "TestSMTFullArrayDisplayConstructorLists",
         "TestSMTFullArrayCanonicalConstructorDefaultAxioms",
         "TestSMTFullArrayDefaultFingerprintsAndEpsilonsAreScoped",
         "TestSMTFullArrayEqualityCacheOrderedPairsAndScopeReset",
@@ -119902,6 +119944,18 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "array display/display_var/display_ids and context display_theories dispatch: source field widths, private union-find representatives, per-variable parent/store lists, full map/parent-map/const rows, empty theories, scope rollback and writer errors",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_display.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_display_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
+            "TestSMTFullArrayDisplayConstructorLists"
+          ]
+        },
+        {
           "name": "canonical default const/map/store/as-array axioms with shared single-constructor fingerprints checked before current roots, ordered equality cache, map-value rewriting, finite-store epsilon ITE and large-domain base default, scoped epsilon/fingerprint cleanup, and private-class store visitation at default internalization/relevance without global merge-time rescans",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_full_defaults.go",
@@ -120055,7 +120109,7 @@
           ]
         },
         {
-          "name": "Remaining array diagnostic integration and final retained-consumer/source audit",
+          "name": "Remaining array sort registration, extensionality fingerprint fidelity and final retained-consumer/source audit",
           "status": "unported",
           "tests": []
         },
@@ -120099,6 +120153,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_display.go",
+        "pkg/smtcore/theory_array_display_test.go",
         "pkg/smtcore/theory_array_full_defaults.go",
         "pkg/smtcore/theory_array_default_values.go",
         "pkg/smtcore/theory_array_full_defaults_test.go",
@@ -120135,6 +120191,8 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
+        "TestSMTFullArrayDisplayConstructorLists",
         "TestSMTFullArrayCanonicalConstructorDefaultAxioms",
         "TestSMTFullArrayDefaultFingerprintsAndEpsilonsAreScoped",
         "TestSMTFullArrayEqualityCacheOrderedPairsAndScopeReset",
@@ -120166,6 +120224,18 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "array display/display_var/display_ids and context display_theories dispatch: source field widths, private union-find representatives, per-variable parent/store lists, full map/parent-map/const rows, empty theories, scope rollback and writer errors",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_display.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_display_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
+            "TestSMTFullArrayDisplayConstructorLists"
+          ]
+        },
         {
           "name": "canonical default const/map/store/as-array axioms with shared single-constructor fingerprints checked before current roots, ordered equality cache, map-value rewriting, finite-store epsilon ITE and large-domain base default, scoped epsilon/fingerprint cleanup, and private-class store visitation at default internalization/relevance without global merge-time rescans",
           "status": "ported",
@@ -120308,7 +120378,7 @@
           ]
         },
         {
-          "name": "Remaining array diagnostic integration and final retained-consumer/source audit",
+          "name": "Remaining array sort registration, extensionality fingerprint fidelity and final retained-consumer/source audit",
           "status": "unported",
           "tests": []
         },
