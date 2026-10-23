@@ -217,6 +217,13 @@ func (s *SMTInternalizerState) propagateBooleanClass(root *SMTEnode) error {
 	var source *SMTEnode
 	value := lbool.Undef
 	for node := root; ; node = node.next {
+		if s.manager.IsTrue(node.owner) || s.manager.IsFalse(node.owner) {
+			source, value = node, lbool.False
+			if s.manager.IsTrue(node.owner) {
+				value = lbool.True
+			}
+			break
+		}
 		if variable, found := s.boolVar[node.owner]; found {
 			assigned, err := s.Assignment(NewSMTLiteral(variable, false))
 			if err != nil {
@@ -237,7 +244,13 @@ func (s *SMTInternalizerState) propagateBooleanClass(root *SMTEnode) error {
 	for node := root; ; node = node.next {
 		if variable, found := s.boolVar[node.owner]; found && node != source {
 			literal := NewSMTLiteral(variable, value == lbool.False)
-			justification, err := NewSMTModusPonensIffJustification(source, node)
+			var justification SMTJustification
+			var err error
+			if s.manager.IsTrue(source.owner) || s.manager.IsFalse(source.owner) {
+				justification, err = NewSMTEqualityRootJustification(node)
+			} else {
+				justification, err = NewSMTModusPonensIffJustification(source, node)
+			}
 			if err != nil {
 				return err
 			}
@@ -257,6 +270,46 @@ func (s *SMTInternalizerState) propagateBooleanClass(root *SMTEnode) error {
 		}
 	}
 	return nil
+}
+
+// The source context creates true/false enodes at initialization. The concrete
+// Go context creates them when a Boolean value first participates as a term.
+func (s *SMTInternalizerState) booleanValueEnode(value bool) (*SMTEnode, error) {
+	var expression ast.ASTHandle
+	var err error
+	if value {
+		expression, err = s.manager.MkTrue()
+	} else {
+		expression, err = s.manager.MkFalse()
+	}
+	if err != nil {
+		return nil, err
+	}
+	if node := s.context.enodes[expression]; node != nil {
+		return node, nil
+	}
+	return s.MkEnode(expression, true, true, false)
+}
+
+// Source: context::propagate_bool_var_enode. This is also needed when a term
+// enode is attached after its Boolean variable has already been assigned.
+func (s *SMTInternalizerState) propagateBooleanEnode(variable int32, node *SMTEnode) error {
+	if !node.mergeTruthValue {
+		return nil
+	}
+	literal := NewSMTLiteral(variable, false)
+	value, err := s.Assignment(literal)
+	if err != nil || value == lbool.Undef {
+		return err
+	}
+	constant, err := s.booleanValueEnode(value == lbool.True)
+	if err != nil {
+		return err
+	}
+	if value == lbool.False {
+		literal = literal.Negated()
+	}
+	return s.addEquality(node, constant, NewSMTEqualityEquation(literal))
 }
 
 func (s *SMTInternalizerState) propagateEqualityClassRelevancy(first, second *SMTEnode) error {

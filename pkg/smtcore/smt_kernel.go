@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/macros"
+	"github.com/glycerine/g3/pkg/ast/normal_forms"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/solver"
@@ -47,6 +48,7 @@ type SMTKernel struct {
 	generated        *model.Model
 	preprocessor     *rewriter.TheoryRewriter
 	assertedMacros   *macros.Manager
+	definedNames     *normal_forms.DefinedNames
 	quantifierCosts  *SMTQICostModel
 	modelCooperation *cooperate.Cooperation
 	paramContext     *uparams.ParamsContext
@@ -108,8 +110,12 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 	if err != nil {
 		return nil, errors.Join(err, manager.DelRef(&proof), internalizer.Close())
 	}
+	names, err := normal_forms.NewDefinedNames(manager)
+	if err != nil {
+		return nil, errors.Join(err, macroManager.Close(), manager.DelRef(&proof), internalizer.Close())
+	}
 	return &SMTKernel{
-		manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof, assertedMacros: macroManager,
+		manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof, assertedMacros: macroManager, definedNames: names,
 		smtState: SMTParamsState{
 			MaxConflicts: ^uint32(0), InvDecay: 1.052, RandomInitialActivity: 1, RandomVarFreq: 0.01, CaseSplitStrategy: 1, RestartStrategy: 1, RestartInitial: 100, RestartFactor: 1.1,
 			RestartAdaptive: true, AgilityFactor: 0.9999, RestartAgilityThreshold: 0.18, SimplifyClauses: true,
@@ -512,6 +518,12 @@ func (k *SMTKernel) internalizePending() error {
 	if err := k.findPendingMacros(); err != nil {
 		return fmt.Errorf("find asserted macros: %w", err)
 	}
+	if err := k.normalizePendingAssertions(); err != nil {
+		return fmt.Errorf("normalize asserted formulas: %w", err)
+	}
+	if err := k.findPendingMacros(); err != nil {
+		return fmt.Errorf("find normalized macros: %w", err)
+	}
 	if err := k.applyPendingQuasiMacros(); err != nil {
 		return fmt.Errorf("apply asserted quasi-macros: %w", err)
 	}
@@ -538,8 +550,11 @@ func (k *SMTKernel) Push() error {
 	if err := k.assertedMacros.PushScope(); err != nil {
 		return err
 	}
-	if err := k.internalizer.PushScope(); err != nil {
+	if err := k.definedNames.Push(); err != nil {
 		return errors.Join(err, k.assertedMacros.PopScope(1))
+	}
+	if err := k.internalizer.PushScope(); err != nil {
+		return errors.Join(err, k.definedNames.Pop(1), k.assertedMacros.PopScope(1))
 	}
 	k.scopes = append(k.scopes, len(k.assertions))
 	return nil
@@ -558,6 +573,9 @@ func (k *SMTKernel) Pop(count uint32) error {
 		return err
 	}
 	if err := k.assertedMacros.PopScope(count); err != nil {
+		return err
+	}
+	if err := k.definedNames.Pop(count); err != nil {
 		return err
 	}
 	for index := len(k.assertions); index > limit; index-- {
@@ -881,6 +899,7 @@ func (k *SMTKernel) Close() error {
 	}
 	result = errors.Join(result, k.internalizer.Close())
 	result = errors.Join(result, k.assertedMacros.Close())
+	result = errors.Join(result, k.definedNames.Close())
 	if k.quantifierCosts != nil {
 		result = errors.Join(result, k.quantifierCosts.Close())
 	}

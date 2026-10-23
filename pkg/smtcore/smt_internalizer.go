@@ -414,7 +414,7 @@ func (s *SMTInternalizerState) ensureBooleanEnode(expression ast.ASTHandle, vari
 		return err
 	}
 	data.SetENode()
-	return nil
+	return s.propagateBooleanEnode(variable, node)
 }
 
 func (s *SMTInternalizerState) Internalize(expression ast.ASTHandle, gateContext bool) error {
@@ -443,6 +443,10 @@ func (s *SMTInternalizerState) Internalize(expression ast.ASTHandle, gateContext
 
 func (s *SMTInternalizerState) internalizeFormula(expression ast.ASTHandle, gateContext bool) error {
 	if s.manager.IsTrue(expression) || s.manager.IsFalse(expression) {
+		if !gateContext {
+			_, err := s.booleanValueEnode(s.manager.IsTrue(expression))
+			return err
+		}
 		return nil
 	}
 	op, basic, err := s.basicOperation(expression)

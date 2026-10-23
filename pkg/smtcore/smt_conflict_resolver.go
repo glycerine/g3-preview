@@ -35,7 +35,11 @@ func (r *SMTConflictResolver) syncENodeLiterals() error {
 		if node == nil {
 			return ast.ErrASTDomain
 		}
-		if err := r.expander.SetENodeLiteral(node, NewSMTLiteral(variable, false)); err != nil {
+		literal := NewSMTLiteral(variable, false)
+		if r.state.assignment[literal.Index()] == lbool.False {
+			literal = literal.Negated()
+		}
+		if err := r.expander.SetENodeLiteral(node, literal); err != nil {
 			return err
 		}
 	}

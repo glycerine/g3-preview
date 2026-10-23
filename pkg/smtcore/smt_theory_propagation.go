@@ -127,6 +127,14 @@ func (s *SMTInternalizerState) PropagateTheoryAssignments() error {
 		if err != nil {
 			return fmt.Errorf("assigned literal %d Boolean metadata: %w", variable, err)
 		}
+		if node := s.context.enodes[s.boolExpr[variable]]; node != nil {
+			if err = s.propagateBooleanEnode(variable, node); err != nil {
+				return err
+			}
+			if s.inconsistent {
+				return nil
+			}
+		}
 		if data.IsEquality() {
 			expression := s.boolExpr[variable]
 			leftExpression, leftErr := s.manager.GetArg(expression, 0)

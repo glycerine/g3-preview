@@ -98542,7 +98542,9 @@
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_asserted_macros.go",
         "pkg/smtcore/smt_asserted_macros_test.go",
-        "pkg/smtcore/smt_asserted_quasi_macros_test.go"
+        "pkg/smtcore/smt_asserted_quasi_macros_test.go",
+        "pkg/smtcore/smt_asserted_nnf.go",
+        "pkg/smtcore/smt_asserted_nnf_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98557,7 +98559,12 @@
         "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
         "TestSMTAssertedMacroExpansionPreservesUnsatProof",
         "TestSMTAssertedMacroPublishesPermutedArguments",
-        "TestSMTAssertedQuasiMacrosPublishConditionalModel"
+        "TestSMTAssertedQuasiMacrosPublishConditionalModel",
+        "TestSMTAssertedNNFSkolemizesExistentialAndNegativeUniversal",
+        "TestSMTAssertedNNFExistentialConflictPreservesProof",
+        "TestSMTAssertedNNFDependentSkolemFunction",
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
+        "TestSMTAssertedNNFUsesGlobalModuleOptions"
       ],
       "conditionals": [
         {
@@ -98670,7 +98677,13 @@
           "tests": ["TestSMTAssertedQuasiMacrosPublishConditionalModel"]
         },
         {
-          "name": "remaining pending-formula reduction passes, NNF/CNF, and quantifier transforms",
+          "name": "nnf_cnf: scoped defined names, existential/negative-universal and dependent Skolem normalization, introduced definitions before the main formula, global NNF options, and composed transformation/rewrite proofs",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_nnf.go",
+          "tests": ["TestSMTAssertedNNFSkolemizesExistentialAndNegativeUniversal", "TestSMTAssertedNNFExistentialConflictPreservesProof", "TestSMTAssertedNNFDependentSkolemFunction", "TestSMTAssertedNNFDefinitionNamesFollowUserScopes", "TestSMTAssertedNNFUsesGlobalModuleOptions"]
+        },
+        {
+          "name": "remaining pending-formula reduction passes and quantifier transforms",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -98696,7 +98709,9 @@
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_asserted_macros.go",
         "pkg/smtcore/smt_asserted_macros_test.go",
-        "pkg/smtcore/smt_asserted_quasi_macros_test.go"
+        "pkg/smtcore/smt_asserted_quasi_macros_test.go",
+        "pkg/smtcore/smt_asserted_nnf.go",
+        "pkg/smtcore/smt_asserted_nnf_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98711,7 +98726,12 @@
         "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
         "TestSMTAssertedMacroExpansionPreservesUnsatProof",
         "TestSMTAssertedMacroPublishesPermutedArguments",
-        "TestSMTAssertedQuasiMacrosPublishConditionalModel"
+        "TestSMTAssertedQuasiMacrosPublishConditionalModel",
+        "TestSMTAssertedNNFSkolemizesExistentialAndNegativeUniversal",
+        "TestSMTAssertedNNFExistentialConflictPreservesProof",
+        "TestSMTAssertedNNFDependentSkolemFunction",
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
+        "TestSMTAssertedNNFUsesGlobalModuleOptions"
       ],
       "conditionals": [
         {
@@ -98773,6 +98793,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_macros.go",
           "tests": ["TestSMTAssertedQuasiMacrosPublishConditionalModel"]
+        },
+        {
+          "name": "NNF/CNF reduction entry, scoped defined-name ownership and proof-preserving Skolem normalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_nnf.go",
+          "tests": ["TestSMTAssertedNNFDefinitionNamesFollowUserScopes", "TestSMTAssertedNNFExistentialConflictPreservesProof"]
         },
         {
           "name": "setup, reset, and remaining pending-formula reductions",
@@ -104229,7 +104255,8 @@
         "TestSMTConflictProofBuildsCongruenceEquality",
         "TestSMTConflictResolverMinimizesImpliedLemmaLiteral",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
-        "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
+        "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes"
       ],
       "conditionals": [
         {
@@ -104869,7 +104896,8 @@
         "pkg/smtcore/smt_assumptions.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_equality_propagation.go",
-        "pkg/smtcore/smt_kernel_results.go"
+        "pkg/smtcore/smt_kernel_results.go",
+        "pkg/smtcore/smt_boolean_term_value_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -104897,7 +104925,9 @@
         "TestSMTCoreEqualityPropagatesBooleanCongruence",
         "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
         "TestSMTKernelCapturesRelevantLabeledLiterals",
-        "TestSMTSequenceTheoryCompletesUnboundedRegexModel"
+        "TestSMTSequenceTheoryCompletesUnboundedRegexModel",
+        "TestSMTBooleanTermTruthValueCongruenceAndProof",
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes"
       ],
       "conditionals": [
         {
@@ -105929,7 +105959,8 @@
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records."
       ],
       "deviations": [
-        "Structural subsumption remains unported."
+        "Structural subsumption remains unported.",
+        "Go creates interpreted true/false enodes on first term use rather than during context initialization. Assigned Boolean terms merge with those truth-value classes, including when their enodes are created after assignment; conflict antecedent lookup retains the actual assigned polarity."
       ]
     },
     {
@@ -105946,7 +105977,8 @@
         "pkg/smtcore/smt_assumptions.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_equality_propagation.go",
-        "pkg/smtcore/smt_kernel_results.go"
+        "pkg/smtcore/smt_kernel_results.go",
+        "pkg/smtcore/smt_boolean_term_value_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -105958,7 +105990,9 @@
         "TestSMTCoreEqualityCongruencePropagation",
         "TestSMTCoreEqualityPropagatesBooleanCongruence",
         "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
-        "TestSMTKernelCapturesRelevantLabeledLiterals"
+        "TestSMTKernelCapturesRelevantLabeledLiterals",
+        "TestSMTBooleanTermTruthValueCongruenceAndProof",
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes"
       ],
       "conditionals": [
         {
@@ -107271,7 +107305,8 @@
         "pkg/smtcore/smt_binary_clause_test.go",
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_theory.go",
-        "pkg/smtcore/smt_equality_propagation.go"
+        "pkg/smtcore/smt_equality_propagation.go",
+        "pkg/smtcore/smt_boolean_term_value_test.go"
       ],
       "tests": [
         "TestSMTInternalizationOrderBooleanGateContextsAndNotElision",
@@ -107303,7 +107338,9 @@
         "TestSMTCoreEqualityTransitivityAndScopeRollback",
         "TestSMTCoreEqualityCongruencePropagation",
         "TestSMTCoreEqualityPropagatesBooleanCongruence",
-        "TestSMTInternalizerDefaultAssertionMarksLiteralRelevant"
+        "TestSMTInternalizerDefaultAssertionMarksLiteralRelevant",
+        "TestSMTBooleanTermTruthValueCongruenceAndProof",
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes"
       ],
       "conditionals": [
         {
@@ -107801,7 +107838,8 @@
       "go_targets": [
         "pkg/smtcore/smt_justification.go",
         "pkg/smtcore/smt_justification_theory.go",
-        "pkg/smtcore/smt_conflict_proof.go"
+        "pkg/smtcore/smt_conflict_proof.go",
+        "pkg/smtcore/smt_conflict_resolver.go"
       ],
       "tests": [
         "TestSMTJustificationBaseUnitAndSimpleAntecedents",
@@ -107810,7 +107848,8 @@
         "TestSMTConflictResolverOwnsFirstUIPProof",
         "TestSMTConflictProofReconstructsEnodeEqualityBranch",
         "TestSMTConflictProofBuildsEqualityRootAndConflictJustifications",
-        "TestSMTConflictProofBuildsCongruenceEquality"
+        "TestSMTConflictProofBuildsCongruenceEquality",
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes"
       ],
       "conditionals": [
         {
