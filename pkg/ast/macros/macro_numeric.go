@@ -250,6 +250,10 @@ func (u *Util) IsVarPlusGround(term ast.ASTHandle, ground ast.ASTRef) (inverse b
 }
 
 func (u *Util) IsPseudoHead(term ast.ASTHandle, declarations uint32) (head, ground ast.ASTHandle, matched bool, err error) {
+	kind, err := u.manager.GetKind(term)
+	if err != nil || kind != ast.ASTApp {
+		return head, ground, false, err
+	}
 	family, err := u.manager.GetFamilyID(term)
 	if err != nil {
 		return head, ground, false, err
@@ -400,6 +404,10 @@ func (u *Util) IsPseudoPredicateMacro(term ast.ASTHandle) (head, ground, definit
 	}
 	body, err := u.manager.GetQuantifierBody(term)
 	if err != nil {
+		return head, ground, definition, false, err
+	}
+	kind, err = u.manager.GetKind(body)
+	if err != nil || kind != ast.ASTApp {
 		return head, ground, definition, false, err
 	}
 	family, err := u.manager.GetFamilyID(body)

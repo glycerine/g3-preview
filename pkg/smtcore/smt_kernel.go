@@ -499,6 +499,9 @@ func (k *SMTKernel) Assertions() []SMTKernelAssertion {
 
 func (k *SMTKernel) internalizePending() error {
 	if k.assertedMacros.HasMacros() {
+		if err := k.expandPendingMacros(); err != nil {
+			return fmt.Errorf("expand asserted macros: %w", err)
+		}
 		if err := k.findPendingMacros(); err != nil {
 			return err
 		}
@@ -507,7 +510,10 @@ func (k *SMTKernel) internalizePending() error {
 		return err
 	}
 	if err := k.findPendingMacros(); err != nil {
-		return err
+		return fmt.Errorf("find asserted macros: %w", err)
+	}
+	if err := k.applyPendingQuasiMacros(); err != nil {
+		return fmt.Errorf("apply asserted quasi-macros: %w", err)
 	}
 	for k.assertedHead < len(k.assertions) {
 		assertion := k.assertions[k.assertedHead]

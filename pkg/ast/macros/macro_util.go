@@ -202,6 +202,10 @@ func (u *Util) IsMacroHead(term ast.ASTHandle, declarations uint32) (bool, error
 }
 
 func (u *Util) simpleMacro(term ast.ASTHandle, declarations uint32, right bool) (head, definition ast.ASTHandle, matched bool, result error) {
+	kind, err := u.manager.GetKind(term)
+	if err != nil || kind != ast.ASTApp {
+		return head, definition, false, err
+	}
 	fid, err := u.manager.GetFamilyID(term)
 	if err != nil {
 		return head, definition, false, err

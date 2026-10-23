@@ -9,7 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func smtAssertedMacroFixture(t *testing.T, proofs bool) (*ast.ASTManager, *SMTSolver, model.ModelEvaluatorConfig) {
+func smtAssertedMacroFixture(t *testing.T, proofs, quasi bool) (*ast.ASTManager, *SMTSolver, model.ModelEvaluatorConfig) {
 	t.Helper()
 	m, config := smtModelGeneratorFixture(t)
 	if proofs {
@@ -20,6 +20,8 @@ func smtAssertedMacroFixture(t *testing.T, proofs bool) (*ast.ASTManager, *SMTSo
 	macroFinder, propagate := "macro_finder", "propagate_values"
 	astTestMust(t, config.Context.SetBoolName(&local, &macroFinder, true))
 	astTestMust(t, config.Context.SetBoolName(&local, &propagate, false))
+	quasiMacros := "quasi_macros"
+	astTestMust(t, config.Context.SetBoolName(&local, &quasiMacros, quasi))
 	solver, err := NewSMTSolver(m, &local, "AUFLIA", SMTSolverConfig{Params: config.Context, ModelEvaluator: config})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, solver.Close()); astTestMust(t, config.Context.Del(&local)) })
@@ -28,7 +30,7 @@ func smtAssertedMacroFixture(t *testing.T, proofs bool) (*ast.ASTManager, *SMTSo
 }
 
 func TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels(t *testing.T) {
-	m, solver, config := smtAssertedMacroFixture(t, false)
+	m, solver, config := smtAssertedMacroFixture(t, false, false)
 	one, err := m.ArithmeticIntegerNumeralText("1")
 	astTestMust(t, err)
 	integer, err := m.GetSort(one)
@@ -114,6 +116,15 @@ func TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels(t *testing.T) {
 	}
 	three, err := m.ArithmeticIntegerNumeralText("3")
 	astTestMust(t, err)
+	// Previously extracted definitions remain active when discovery and
+	// ordinary preprocessing are disabled for subsequent assertions.
+	params, err := config.Context.NewValue()
+	astTestMust(t, err)
+	for _, name := range []string{"macro_finder", "preprocess"} {
+		astTestMust(t, config.Context.SetBoolName(&params, &name, false))
+	}
+	astTestMust(t, solver.UpdateParams(&params))
+	astTestMust(t, config.Context.Del(&params))
 	four, err := m.ArithmeticIntegerNumeralText("4")
 	astTestMust(t, err)
 	application, err := m.MkApp(f, []ast.ASTHandle{three})
@@ -131,7 +142,7 @@ func TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels(t *testing.T) {
 }
 
 func TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback(t *testing.T) {
-	m, solver, _ := smtAssertedMacroFixture(t, false)
+	m, solver, _ := smtAssertedMacroFixture(t, false, false)
 	zero, err := m.ArithmeticIntegerNumeralText("0")
 	astTestMust(t, err)
 	integer, err := m.GetSort(zero)
@@ -179,7 +190,7 @@ func TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback(t *testing.T) {
 }
 
 func TestSMTAssertedMacroExpansionPreservesUnsatProof(t *testing.T) {
-	m, solver, _ := smtAssertedMacroFixture(t, true)
+	m, solver, _ := smtAssertedMacroFixture(t, true, false)
 	boolean, err := m.MkBoolSort()
 	astTestMust(t, err)
 	x, err := m.MkVar(0, boolean)
@@ -215,7 +226,7 @@ func TestSMTAssertedMacroExpansionPreservesUnsatProof(t *testing.T) {
 }
 
 func TestSMTAssertedMacroPublishesPermutedArguments(t *testing.T) {
-	m, solver, config := smtAssertedMacroFixture(t, false)
+	m, solver, config := smtAssertedMacroFixture(t, false, false)
 	three, err := m.ArithmeticIntegerNumeralText("3")
 	astTestMust(t, err)
 	seven, err := m.ArithmeticIntegerNumeralText("7")

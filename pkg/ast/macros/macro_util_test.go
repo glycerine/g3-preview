@@ -760,3 +760,24 @@ func TestQuasiMacrosUniqueConversionAndRepeatedRejection(t *testing.T) {
 		})
 	}
 }
+
+func TestMacroRecognizersTreatBooleanVariablesAsNonMatches(t *testing.T) {
+	m := fixture(t)
+	u, err := macros.NewUtil(m)
+	must(t, err)
+	b, err := m.MkBoolSort()
+	must(t, err)
+	x, err := m.MkVar(0, b)
+	must(t, err)
+	if _, _, matched, err := u.IsSimpleMacro(x, 1); err != nil || matched {
+		t.Fatal("Boolean variable was not rejected as a simple macro", matched, err)
+	}
+	if _, _, matched, err := u.IsPseudoHead(x, 1); err != nil || matched {
+		t.Fatal("Boolean variable was not rejected as a pseudo head", matched, err)
+	}
+	q, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{mustSymbol(t, m, "macro-variable-x")}, Body: x})
+	must(t, err)
+	if _, _, _, matched, err := u.IsPseudoPredicateMacro(q); err != nil || matched {
+		t.Fatal("variable quantifier body was not rejected as a pseudo predicate", matched, err)
+	}
+}

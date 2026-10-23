@@ -20439,7 +20439,8 @@
         "TestMacroUtilHeadsSimpleMacrosAndForbiddenDeclarations",
         "TestMacroUtilQuasiHeadNormalizationAndCandidates",
         "TestMacroUtilQuasiConversionClauseConditionsAndHints",
-        "TestMacroUtilArithmeticCandidatesAndPseudoPredicates"
+        "TestMacroUtilArithmeticCandidatesAndPseudoPredicates",
+        "TestMacroRecognizersTreatBooleanVariablesAsNonMatches"
       ],
       "assertions": [
         {
@@ -20534,7 +20535,8 @@
         "TestMacroUtilHeadsSimpleMacrosAndForbiddenDeclarations",
         "TestMacroUtilQuasiHeadNormalizationAndCandidates",
         "TestMacroUtilQuasiConversionClauseConditionsAndHints",
-        "TestMacroUtilArithmeticCandidatesAndPseudoPredicates"
+        "TestMacroUtilArithmeticCandidatesAndPseudoPredicates",
+        "TestMacroRecognizersTreatBooleanVariablesAsNonMatches"
       ],
       "conditionals": [
         {
@@ -98539,7 +98541,8 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_asserted_macros.go",
-        "pkg/smtcore/smt_asserted_macros_test.go"
+        "pkg/smtcore/smt_asserted_macros_test.go",
+        "pkg/smtcore/smt_asserted_quasi_macros_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98553,7 +98556,8 @@
         "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
         "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
         "TestSMTAssertedMacroExpansionPreservesUnsatProof",
-        "TestSMTAssertedMacroPublishesPermutedArguments"
+        "TestSMTAssertedMacroPublishesPermutedArguments",
+        "TestSMTAssertedQuasiMacrosPublishConditionalModel"
       ],
       "conditionals": [
         {
@@ -98660,7 +98664,13 @@
           "tests": ["TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels", "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback", "TestSMTAssertedMacroExpansionPreservesUnsatProof"]
         },
         {
-          "name": "remaining pending-formula reduction passes, quasi-macros, NNF/CNF, and quantifier transforms",
+          "name": "apply_quasi_macros repeated pending-formula conversion, shared macro ownership, proof-preserving formula replacement and conditional model interpretation publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_macros.go",
+          "tests": ["TestSMTAssertedQuasiMacrosPublishConditionalModel"]
+        },
+        {
+          "name": "remaining pending-formula reduction passes, NNF/CNF, and quantifier transforms",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -98670,7 +98680,8 @@
         "The kernel owns references to each flattened formula and its derived proof until pop or close."
       ],
       "deviations": [
-        "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager."
+        "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager.",
+        "Go expands stored definitions before committing later assertions independently of new-discovery and ordinary-preprocessing flags. Definitions removed from the assertion list therefore remain effective after parameter changes and when quasi_macros is enabled without macro_finder."
       ]
     },
     {
@@ -98684,7 +98695,8 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_asserted_macros.go",
-        "pkg/smtcore/smt_asserted_macros_test.go"
+        "pkg/smtcore/smt_asserted_macros_test.go",
+        "pkg/smtcore/smt_asserted_quasi_macros_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98698,7 +98710,8 @@
         "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
         "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
         "TestSMTAssertedMacroExpansionPreservesUnsatProof",
-        "TestSMTAssertedMacroPublishesPermutedArguments"
+        "TestSMTAssertedMacroPublishesPermutedArguments",
+        "TestSMTAssertedQuasiMacrosPublishConditionalModel"
       ],
       "conditionals": [
         {
@@ -98756,7 +98769,13 @@
           "tests": ["TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels", "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback", "TestSMTAssertedMacroExpansionPreservesUnsatProof"]
         },
         {
-          "name": "setup, reset, remaining pending-formula reductions, and quasi-macros",
+          "name": "parameter-controlled quasi-macro reduction and model construction through the shared scoped macro manager",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_macros.go",
+          "tests": ["TestSMTAssertedQuasiMacrosPublishConditionalModel"]
+        },
+        {
+          "name": "setup, reset, and remaining pending-formula reductions",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -109532,7 +109551,8 @@
         "pkg/smtcore/smt_model_generator_test.go",
         "pkg/smtcore/smt_model_publication_test.go",
         "pkg/smtcore/smt_asserted_macros.go",
-        "pkg/smtcore/smt_asserted_macros_test.go"
+        "pkg/smtcore/smt_asserted_macros_test.go",
+        "pkg/smtcore/smt_asserted_quasi_macros_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -109547,7 +109567,8 @@
         "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
         "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
         "TestSMTAssertedMacroExpansionPreservesUnsatProof",
-        "TestSMTAssertedMacroPublishesPermutedArguments"
+        "TestSMTAssertedMacroPublishesPermutedArguments",
+        "TestSMTAssertedQuasiMacrosPublishConditionalModel"
       ],
       "assertions": [
         {
@@ -109730,7 +109751,8 @@
         "pkg/smtcore/smt_model_value.go",
         "pkg/smtcore/smt_model_value_test.go",
         "pkg/smtcore/smt_asserted_macros.go",
-        "pkg/smtcore/smt_asserted_macros_test.go"
+        "pkg/smtcore/smt_asserted_macros_test.go",
+        "pkg/smtcore/smt_asserted_quasi_macros_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -109746,7 +109768,8 @@
         "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
         "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
         "TestSMTAssertedMacroExpansionPreservesUnsatProof",
-        "TestSMTAssertedMacroPublishesPermutedArguments"
+        "TestSMTAssertedMacroPublishesPermutedArguments",
+        "TestSMTAssertedQuasiMacrosPublishConditionalModel"
       ],
       "conditionals": [
         {

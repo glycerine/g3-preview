@@ -36,6 +36,10 @@ func (k *SMTKernel) findPendingMacros() (result error) {
 		return err
 	}
 	defer func() { result = errors.Join(result, batch.Close()) }()
+	return k.replacePendingMacroBatch(batch)
+}
+
+func (k *SMTKernel) replacePendingMacroBatch(batch *macros.FormulaBatch) (result error) {
 	original := k.assertions
 	// Keep the old references alive until all replacement assertions have
 	// acquired theirs. On failure, retain the original pending formula list.
@@ -57,6 +61,12 @@ func (k *SMTKernel) findPendingMacros() (result error) {
 		if err != nil {
 			return err
 		}
+		if !k.preprocess {
+			if err = k.pushAssertion(row.Expression, row.Proof); err != nil {
+				return err
+			}
+			continue
+		}
 		formula, proof, err := k.preprocessAssertion(row.Expression, row.Proof)
 		if err != nil {
 			return err
@@ -68,6 +78,102 @@ func (k *SMTKernel) findPendingMacros() (result error) {
 		}
 	}
 	return k.propagatePendingAssertions()
+}
+
+// Discovery flags do not change definitions already removed from the formula
+// list. Expand those definitions before committing any later assertions.
+func (k *SMTKernel) expandPendingMacros() (result error) {
+	if !k.assertedMacros.HasMacros() || k.assertedHead == len(k.assertions) {
+		return nil
+	}
+	batch, err := macros.NewFormulaBatch(k.manager)
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, batch.Close()) }()
+	out, err := k.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, k.manager.DelRef(&out)) }()
+	proof, err := k.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, k.manager.DelRef(&proof)) }()
+	for _, assertion := range k.assertions[k.assertedHead:] {
+		dependency, err := k.assertedMacros.ExpandMacros(assertion.Formula, assertion.Proof, ast.ASTDependency{}, out, proof)
+		if err != nil {
+			return err
+		}
+		row := macros.Formula{Dependency: dependency}
+		row.Expression, err = k.manager.RefGet(out)
+		if err == nil {
+			row.Proof, err = k.manager.RefGet(proof)
+		}
+		if err == nil {
+			err = batch.Insert(row)
+		}
+		if err = errors.Join(err, k.manager.DependencyDec(dependency)); err != nil {
+			return err
+		}
+	}
+	return k.replacePendingMacroBatch(batch)
+}
+
+// applyPendingQuasiMacros follows the source repeated quasi-macro pass. Each
+// batch owns the formulas until the next pass has acquired its references.
+func (k *SMTKernel) applyPendingQuasiMacros() (result error) {
+	if !k.preprocess || !k.preprocessState.QuasiMacros || k.assertedHead == len(k.assertions) {
+		return nil
+	}
+	var inputs []macros.Formula
+	hasQuantifiers := false
+	for _, assertion := range k.assertions[k.assertedHead:] {
+		nested, err := k.manager.HasQuantifiers(assertion.Formula)
+		if err != nil {
+			return err
+		}
+		hasQuantifiers = hasQuantifiers || nested
+		inputs = append(inputs, macros.Formula{Expression: assertion.Formula, Proof: assertion.Proof})
+	}
+	if !hasQuantifiers {
+		return nil
+	}
+	proc, err := macros.NewQuasiMacros(k.manager, k.assertedMacros)
+	if err != nil {
+		return err
+	}
+	var batch *macros.FormulaBatch
+	defer func() {
+		if batch != nil {
+			result = errors.Join(result, batch.Close())
+		}
+	}()
+	for {
+		next, changed, err := proc.Apply(inputs)
+		if err != nil {
+			return err
+		}
+		if batch != nil {
+			if err = batch.Close(); err != nil {
+				return errors.Join(err, next.Close())
+			}
+		}
+		batch = next
+		if !changed {
+			break
+		}
+		inputs = nil
+		for i := 0; i < batch.Len(); i++ {
+			row, err := batch.At(i)
+			if err != nil {
+				return err
+			}
+			inputs = append(inputs, row)
+		}
+	}
+	return k.replacePendingMacroBatch(batch)
 }
 
 func (g *SMTModelGenerator) registerAssertedMacros(manager *macros.Manager) (result error) {
