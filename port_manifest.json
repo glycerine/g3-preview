@@ -117365,10 +117365,10 @@
           "tests": ["TestSMTSequenceTheoryLengthAxioms"]
         },
         {
-          "name": "exact length axioms for concat, unit, empty, string, arbitrary sequence non-negativity, zero-length iff empty, and int.to.str lower bound (src/smt/theory_seq.cpp:627-633,3313-3360)",
+          "name": "exact length axioms for concat, unit, empty, string, arbitrary sequence non-negativity, zero-length iff empty, and int.to.str nonnegative lower bound, exact one-digit threshold, and fixed integer or length driven arbitrary decimal-width refinement (src/smt/theory_seq.cpp:627-633,3313-3390)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_length.go",
-          "tests": ["TestSMTSequenceTheoryLengthAxioms"]
+          "tests": ["TestSMTSequenceTheoryLengthAxioms", "TestSMTSequenceTheoryIntegerStringLengthThreshold", "TestSMTSequenceTheoryIntegerStringModelLengthRefinement"]
         },
         {
           "name": "symbolic sequence empty-or-head/tail coherence decomposition with stable seq.nth and seq.tail witnesses (src/smt/theory_seq.cpp check_length_coherence, mk_decompose and propagate_length_coherence)",

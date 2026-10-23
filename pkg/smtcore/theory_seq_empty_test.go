@@ -2700,6 +2700,118 @@ func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryIntegerStringLengthThreshold(t *testing.T) {
+	for _, test := range []struct {
+		name     string
+		oneDigit bool
+	}{
+		{name: "one-digit", oneDigit: true},
+		{name: "multiple-digits"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			zero, err := m.ArithmeticIntegerNumeralText("0")
+			astTestMust(t, err)
+			one, err := m.ArithmeticIntegerNumeralText("1")
+			astTestMust(t, err)
+			ten, err := m.ArithmeticIntegerNumeralText("10")
+			astTestMust(t, err)
+			integerSort, err := m.GetSort(zero)
+			astTestMust(t, err)
+			n, err := m.MkConst(astTestSymbol(t, m, "sequence-itos-length-"+test.name), integerSort)
+			astTestMust(t, err)
+			converted, err := m.MkIntToString(n)
+			astTestMust(t, err)
+			length, err := m.MkSequenceLength(converted)
+			astTestMust(t, err)
+			nAtLeastTen, err := m.MkArithmeticGE(n, ten)
+			astTestMust(t, err)
+			lengthAtMostOne, err := m.MkArithmeticLE(length, one)
+			astTestMust(t, err)
+			assertions := []ast.ASTHandle{nAtLeastTen, lengthAtMostOne}
+			if test.oneDigit {
+				nNonnegative, makeErr := m.MkArithmeticGE(n, zero)
+				astTestMust(t, makeErr)
+				nBelowTen, makeErr := m.MkNot(nAtLeastTen)
+				astTestMust(t, makeErr)
+				lengthOne, makeErr := m.MkEq(length, one)
+				astTestMust(t, makeErr)
+				notLengthOne, makeErr := m.MkNot(lengthOne)
+				astTestMust(t, makeErr)
+				assertions = []ast.ASTHandle{nNonnegative, nBelowTen, notLengthOne}
+			}
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			for _, assertion := range assertions {
+				astTestMust(t, solver.Assert(assertion))
+			}
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("integer string length threshold", status)
+			}
+		})
+	}
+}
+
+func TestSMTSequenceTheoryIntegerStringModelLengthRefinement(t *testing.T) {
+	for _, test := range []struct {
+		name         string
+		fixedInteger bool
+	}{
+		{name: "fixed-integer", fixedInteger: true},
+		{name: "fixed-length"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			zero, err := m.ArithmeticIntegerNumeralText("0")
+			astTestMust(t, err)
+			integerSort, err := m.GetSort(zero)
+			astTestMust(t, err)
+			n, err := m.MkConst(astTestSymbol(t, m, "sequence-itos-model-length-"+test.name), integerSort)
+			astTestMust(t, err)
+			converted, err := m.MkIntToString(n)
+			astTestMust(t, err)
+			length, err := m.MkSequenceLength(converted)
+			astTestMust(t, err)
+			three, err := m.ArithmeticIntegerNumeralText("3")
+			astTestMust(t, err)
+			assertions := make([]ast.ASTHandle, 0, 2)
+			if test.fixedInteger {
+				oneHundredTwentyThree, makeErr := m.ArithmeticIntegerNumeralText("123")
+				astTestMust(t, makeErr)
+				binding, makeErr := m.MkEq(n, oneHundredTwentyThree)
+				astTestMust(t, makeErr)
+				two, makeErr := m.ArithmeticIntegerNumeralText("2")
+				astTestMust(t, makeErr)
+				tooShort, makeErr := m.MkArithmeticLE(length, two)
+				astTestMust(t, makeErr)
+				assertions = append(assertions, binding, tooShort)
+			} else {
+				fixedLength, makeErr := m.MkEq(length, three)
+				astTestMust(t, makeErr)
+				oneThousand, makeErr := m.ArithmeticIntegerNumeralText("1000")
+				astTestMust(t, makeErr)
+				tooLarge, makeErr := m.MkArithmeticGE(n, oneThousand)
+				astTestMust(t, makeErr)
+				assertions = append(assertions, fixedLength, tooLarge)
+			}
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			for _, assertion := range assertions {
+				astTestMust(t, solver.Assert(assertion))
+			}
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("integer string model length refinement", status)
+			}
+		})
+	}
+}
+
 func TestSMTSequenceTheoryIntegerStringAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name  string

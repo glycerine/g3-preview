@@ -3,10 +3,123 @@
 package smtcore
 
 import (
+	"math/big"
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
+
+func (t *SMTSequenceTheory) addIntegerStringLengthRefinement() (bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	arithmeticFamily, err := state.manager.ArithmeticFamilyID()
+	if err != nil {
+		return false, err
+	}
+	arithmetic, ok := state.Theory(arithmeticFamily).(*SMTLinearArithmeticTheory)
+	if !ok {
+		return false, nil
+	}
+	fixed := arithmetic.fixedLinearAssignments()
+	seen := make(map[ast.ASTHandle]struct{})
+	for _, node := range t.variables {
+		if node == nil {
+			continue
+		}
+		conversion := node.Owner()
+		if _, found := seen[conversion]; found {
+			continue
+		}
+		seen[conversion] = struct{}{}
+		integer, matched, matchErr := state.manager.SequenceIntToStringArgument(conversion)
+		if matchErr != nil {
+			return false, matchErr
+		}
+		if !matched {
+			continue
+		}
+		length, makeErr := state.manager.MkSequenceLength(conversion)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		width := uint64(1)
+		integerValue, _, integerFixed, valueErr := arithmetic.fixedPolynomialValue(integer, fixed)
+		if valueErr != nil {
+			return false, valueErr
+		}
+		if integerFixed && integerValue.IsInt() && integerValue.Sign() >= 0 {
+			width = uint64(len(integerValue.Num().String()))
+		}
+		lengthValue, _, lengthFixed, valueErr := arithmetic.fixedPolynomialValue(length, fixed)
+		if valueErr != nil {
+			return false, valueErr
+		}
+		if lengthFixed && lengthValue.IsInt() && lengthValue.Sign() > 0 && lengthValue.Num().IsUint64() && lengthValue.Num().Uint64() > width {
+			width = lengthValue.Num().Uint64()
+		}
+		if width <= 1 || width >= smtSequenceMaximumFixedDecomposition {
+			continue
+		}
+		lowerPower := new(big.Int).Exp(big.NewInt(10), new(big.Int).SetUint64(width-1), nil)
+		upperPower := new(big.Int).Mul(new(big.Int).Set(lowerPower), big.NewInt(10))
+		lower, makeErr := state.manager.ArithmeticIntegerNumeralText(lowerPower.String())
+		if makeErr != nil {
+			return false, makeErr
+		}
+		upper, makeErr := state.manager.ArithmeticIntegerNumeralText(upperPower.String())
+		if makeErr != nil {
+			return false, makeErr
+		}
+		widthValue, makeErr := t.integer(width)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		integerAtLeastLower, makeErr := state.manager.MkArithmeticGE(integer, lower)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		lengthAtLeastWidth, makeErr := state.manager.MkArithmeticGE(length, widthValue)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		lowerConstraint, makeErr := state.manager.MkImplies(integerAtLeastLower, lengthAtLeastWidth)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		integerAtLeastUpper, makeErr := state.manager.MkArithmeticGE(integer, upper)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		lengthAtMostWidth, makeErr := state.manager.MkArithmeticLE(length, widthValue)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		lengthAboveWidth, makeErr := state.manager.MkNot(lengthAtMostWidth)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		upperConstraint, makeErr := state.manager.MkImplies(integerAtLeastUpper, lengthAboveWidth)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		progress := false
+		for _, constraint := range []ast.ASTHandle{lowerConstraint, upperConstraint} {
+			if _, found := t.axioms.set[constraint]; found {
+				continue
+			}
+			if makeErr = t.axioms.Push(constraint); makeErr != nil {
+				return false, makeErr
+			}
+			progress = true
+		}
+		if progress {
+			return true, nil
+		}
+	}
+	return false, nil
+}
 
 func (t *SMTSequenceTheory) assertConstraint(expression ast.ASTHandle) error {
 	state, err := t.State()
@@ -181,5 +294,31 @@ func (t *SMTSequenceTheory) addLengthAxiom(length ast.ASTHandle) error {
 	if err != nil {
 		return err
 	}
-	return t.axioms.Push(implication)
+	if err = t.axioms.Push(implication); err != nil {
+		return err
+	}
+	ten, err := t.integer(10)
+	if err != nil {
+		return err
+	}
+	integerAtLeastTen, err := state.manager.MkArithmeticGE(integer, ten)
+	if err != nil {
+		return err
+	}
+	integerBelowTen, err := state.manager.MkNot(integerAtLeastTen)
+	if err != nil {
+		return err
+	}
+	lengthAtMostOne, err := state.manager.MkArithmeticLE(length, one)
+	if err != nil {
+		return err
+	}
+	if err = t.pushSequenceImplication([]ast.ASTHandle{integerNonnegative, integerBelowTen}, lengthAtMostOne); err != nil {
+		return err
+	}
+	lengthAboveOne, err := state.manager.MkNot(lengthAtMostOne)
+	if err != nil {
+		return err
+	}
+	return t.pushSequenceImplication([]ast.ASTHandle{integerAtLeastTen}, lengthAboveOne)
 }
