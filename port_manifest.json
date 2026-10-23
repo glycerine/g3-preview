@@ -108472,6 +108472,7 @@
       "go_targets": [
         "pkg/smtcore/smt_model_checker.go",
         "pkg/smtcore/smt_model_checker_inverse_test.go",
+        "pkg/smtcore/smt_model_checker_budget_test.go",
         "pkg/smtcore/smt_quantifier_manager.go",
         "pkg/smtcore/smt_kernel.go"
       ],
@@ -108480,6 +108481,7 @@
         "TestSMTModelCheckerInversePreservesGenerationBeforeFingerprintCanonicalization",
         "TestSMTModelCheckerRejectsUnrecoverablePrivateBindings",
         "TestSMTModelCheckerFiniteUniverseRecoversModelFinderTerm",
+        "TestSMTModelCheckerCounterexampleCapAppliesToEveryQuantifier",
         "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
@@ -109467,10 +109469,10 @@
         }
       ],
       "ownership": [
-        "SMTModelFinder borrows the AST manager, internalizer state and registered quantifier handles; the quantifier registry retains the corresponding AST nodes. Scope rollback removes borrowed identities without separate AST ownership."
+        "SMTModelFinder borrows the AST manager and internalizer state. It owns flattened-quantifier references, macro candidate references, instantiation-term/inverse references, dependency references and deferred witness-constraint references. Scope rollback closes each quantifier's owned analysis; restart transfers witness constraints into internalizer ownership."
       ],
       "deviations": [
-        "The live lifecycle is present, but FixModel currently only selects relevant quantifiers. Macro publication, AUF instantiation sets and inverse lookup remain open."
+        "The live lifecycle includes flattened analysis, macro publication, AUF graph fixing and projections, inverse recovery and deferred witness constraints. The enclosing source-surface and ownership completeness audit remains open."
       ]
     },
     {

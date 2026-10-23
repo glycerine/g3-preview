@@ -524,6 +524,8 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 		}
 		if inserted {
 			found = true
+		}
+		if !c.exhausted {
 			*remaining--
 		}
 		if *remaining != 0 {
@@ -538,6 +540,9 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 			if err = cex.DecRef(); err != nil {
 				return false, err
 			}
+		}
+		if c.exhausted {
+			break
 		}
 	}
 	if restricted && !found && *remaining != 0 {
@@ -554,7 +559,9 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 			*remaining--
 		}
 	}
-	return found, nil
+	// The complete auxiliary check already proved that the candidate
+	// violates this quantifier, even if its binding was queued previously.
+	return true, nil
 }
 
 func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifier ast.ASTHandle, remaining *uint32) (bool, error) {
@@ -648,12 +655,12 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 		if !c.manager.IsFalse(value) {
 			return nil
 		}
-		inserted, err := c.addFiniteCounterexample(quantifier, values)
+		found = true
+		_, err = c.addFiniteCounterexample(quantifier, values)
 		if err != nil {
 			return err
 		}
-		if inserted {
-			found = true
+		if !c.exhausted {
 			*remaining--
 		}
 		return nil
@@ -662,7 +669,7 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 }
 
 // Check returns true when every supplied quantifier holds in the candidate
-// finite model. A false result means an instance was queued or checking could
+// finite model. A false result means a counterexample was found or checking could
 // not safely finish; Exhausted distinguishes the latter case.
 func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.ASTHandle) (bool, error) {
 	if err := c.open(); err != nil {
@@ -676,23 +683,20 @@ func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.
 		return false, nil
 	}
 	c.exhausted = false
-	remaining := c.maxCexs
-	if remaining == 0 {
-		remaining = 1
-	}
 	found := false
 	if len(quantifiers) != 0 {
 		c.iteration++
 	}
 	for _, quantifier := range quantifiers {
+		remaining := c.maxCexs
+		if remaining == 0 {
+			remaining = 1
+		}
 		added, err := c.checkQuantifier(model, quantifier, &remaining)
 		if err != nil {
 			return false, err
 		}
 		found = found || added
-		if remaining == 0 {
-			break
-		}
 	}
 	c.maxCexs += c.initialMaxCexs
 	return !found && !c.exhausted, nil

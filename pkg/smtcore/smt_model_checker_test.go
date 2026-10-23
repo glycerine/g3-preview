@@ -66,8 +66,8 @@ func TestSMTModelCheckerFindsFiniteBooleanCounterexample(t *testing.T) {
 	}
 	satisfied, err = checker.Check(proto, []ast.ASTHandle{quantifier})
 	astTestMust(t, err)
-	if !satisfied {
-		t.Fatal("duplicate counterexample was reported as new")
+	if satisfied || registry.schedule.Stats().Instances != 1 {
+		t.Fatal("duplicate counterexample changed instance count or incorrectly validated the model", satisfied, registry.schedule.Stats())
 	}
 	if checker.iteration != 2 || checker.maxCexs != 3 {
 		t.Fatal("second model-check lifecycle", checker.iteration, checker.maxCexs)
