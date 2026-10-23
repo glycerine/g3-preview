@@ -5,10 +5,12 @@ package smtcore
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // SMTQuantifierManager composes the concrete quantifier components owned by
@@ -34,6 +36,7 @@ type SMTQuantifierManager struct {
 	quickNotSat      bool
 	lazyQuick        bool
 	mbqi             bool
+	mbqiID           string
 	closed           bool
 }
 
@@ -45,6 +48,8 @@ type SMTQuantifierManagerConfig struct {
 	LazyQuick      bool
 	MBQI           bool
 	MaxCexs        uint32
+	MaxIterations  uint32
+	MBQIID         string
 	CandidateModel func() (*SMTModelGenerator, error)
 }
 
@@ -80,12 +85,15 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 		substitute: substitute, builder: builder, mam: mam, activated: make(map[ast.ASTHandle]bool),
 		promoteUnsat: config.PromoteUnsat, ematching: config.Ematching,
 		quickUnsat: config.QuickUnsat, quickNotSat: config.QuickNotSat, lazyQuick: config.LazyQuick,
-		mbqi: config.MBQI, candidateModel: config.CandidateModel,
+		mbqi: config.MBQI, mbqiID: config.MBQIID, candidateModel: config.CandidateModel,
 	}
 	if config.MBQI {
 		result.modelChecker, err = NewSMTModelChecker(state, config.MaxCexs)
 		if err != nil {
 			return nil, errors.Join(err, substitute.Close())
+		}
+		if err = result.modelChecker.ConfigureLifecycle(config.MaxIterations); err != nil {
+			return nil, errors.Join(err, result.modelChecker.Close(), substitute.Close())
 		}
 	}
 	state.quantifierManager = result
@@ -105,6 +113,11 @@ func (q *SMTQuantifierManager) InitSearch() error {
 	}
 	if err := q.substitute.Reset(); err != nil {
 		return err
+	}
+	if q.modelChecker != nil {
+		if err := q.modelChecker.InitSearch(); err != nil {
+			return err
+		}
 	}
 	return q.registry.InitSearch()
 }
@@ -357,9 +370,16 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 		if err = q.modelChecker.SetCandidateTerms(generator.rootValues); err != nil {
 			return SMTFinalCheckGiveUp, errors.Join(err, generator.Close())
 		}
-		modelSatisfied, checkErr := q.modelChecker.Check(generator.model, q.activeQuantifiers())
+		active, activeErr := q.activeQuantifiers()
+		if activeErr != nil {
+			return SMTFinalCheckGiveUp, errors.Join(activeErr, generator.Close())
+		}
+		modelSatisfied, checkErr := q.modelChecker.Check(generator.model, active)
 		if checkErr != nil {
 			return SMTFinalCheckGiveUp, errors.Join(checkErr, generator.Close())
+		}
+		if q.modelChecker.Exhausted() {
+			return SMTFinalCheckGiveUp, generator.Close()
 		}
 		if !modelSatisfied {
 			entries, scheduleErr := q.registry.schedule.ScheduleNew(map[*SMTFingerprint]bool{})
@@ -381,14 +401,33 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 	return SMTFinalCheckDone, nil
 }
 
-func (q *SMTQuantifierManager) activeQuantifiers() []ast.ASTHandle {
+func (q *SMTQuantifierManager) mbqiEnabled(quantifier ast.ASTHandle) (bool, error) {
+	if q.mbqiID == "" {
+		return true, nil
+	}
+	identifier, _, err := q.state.manager.GetQuantifierIDs(quantifier)
+	if err != nil {
+		return false, err
+	}
+	if identifier == (usymbol.Symbol{}) || identifier.IsNumerical() {
+		return false, nil
+	}
+	text, present, err := q.state.manager.Symbols.BareString(identifier)
+	return present && strings.HasPrefix(text, q.mbqiID), err
+}
+
+func (q *SMTQuantifierManager) activeQuantifiers() ([]ast.ASTHandle, error) {
 	result := make([]ast.ASTHandle, 0, len(q.registry.quantifiers))
 	for _, quantifier := range q.registry.quantifiers {
-		if q.active(quantifier) {
+		enabled, err := q.mbqiEnabled(quantifier)
+		if err != nil {
+			return nil, err
+		}
+		if q.active(quantifier) && enabled {
 			result = append(result, quantifier)
 		}
 	}
-	return result
+	return result, nil
 }
 
 func (q *SMTQuantifierManager) Close() error {

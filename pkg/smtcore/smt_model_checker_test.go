@@ -57,6 +57,9 @@ func TestSMTModelCheckerFindsFiniteBooleanCounterexample(t *testing.T) {
 	if satisfied || !registry.schedule.HasWork() {
 		t.Fatal("false Boolean binding did not queue a counterexample", satisfied)
 	}
+	if checker.iteration != 1 || checker.maxCexs != 2 {
+		t.Fatal("first model-check lifecycle", checker.iteration, checker.maxCexs)
+	}
 	astTestMust(t, manager.Propagate())
 	if registry.schedule.Stats().Instances != 1 {
 		t.Fatal("counterexample was not materialized", registry.schedule.Stats())
@@ -65,5 +68,15 @@ func TestSMTModelCheckerFindsFiniteBooleanCounterexample(t *testing.T) {
 	astTestMust(t, err)
 	if !satisfied {
 		t.Fatal("duplicate counterexample was reported as new")
+	}
+	if checker.iteration != 2 || checker.maxCexs != 3 {
+		t.Fatal("second model-check lifecycle", checker.iteration, checker.maxCexs)
+	}
+	astTestMust(t, checker.ConfigureLifecycle(0))
+	astTestMust(t, checker.InitSearch())
+	satisfied, err = checker.Check(proto, []ast.ASTHandle{quantifier})
+	astTestMust(t, err)
+	if satisfied || !checker.Exhausted() || checker.iteration != 0 || checker.maxCexs != 1 {
+		t.Fatal("exhausted model-check lifecycle", satisfied, checker.Exhausted(), checker.iteration, checker.maxCexs)
 	}
 }

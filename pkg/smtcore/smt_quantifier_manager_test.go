@@ -89,6 +89,44 @@ func TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker(t *testing.T) {
 	}
 }
 
+func TestSMTQuantifierManagerFiltersMBQIByQuantifierIDPrefix(t *testing.T) {
+	m, _, _, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{
+		MBQI: true, MaxCexs: 1, MaxIterations: 10, MBQIID: "selected.",
+	})
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, boolean)
+	astTestMust(t, err)
+	makeQuantifier := func(name string, id symbol.Symbol) ast.ASTHandle {
+		predicate := smtQuickPredicate(t, m, "mbqi-prefix-"+name, boolean, boolean)
+		body, makeErr := m.MkApp(predicate, []ast.ASTHandle{variable})
+		astTestMust(t, makeErr)
+		value, makeErr := m.MkQuantifier(ast.ASTQuantifierSpec{
+			Forall: true, Sorts: []ast.ASTHandle{boolean}, Names: []symbol.Symbol{astTestSymbol(t, m, "mbqi-prefix-x")},
+			Body: body, QID: id,
+		})
+		astTestMust(t, makeErr)
+		return value
+	}
+	selected := makeQuantifier("selected", astTestSymbol(t, m, "selected.quantifier"))
+	rejected := makeQuantifier("rejected", astTestSymbol(t, m, "other.quantifier"))
+	numerical := makeQuantifier("numerical", symbol.Numerical(7))
+	unnamed := makeQuantifier("unnamed", symbol.Symbol{})
+	for _, test := range []struct {
+		name       string
+		quantifier ast.ASTHandle
+		want       bool
+	}{
+		{"selected", selected, true}, {"rejected", rejected, false}, {"numerical", numerical, false}, {"unnamed", unnamed, false},
+	} {
+		got, err := manager.mbqiEnabled(test.quantifier)
+		astTestMust(t, err)
+		if got != test.want {
+			t.Fatal(test.name, "MBQI id-prefix classification", got, "want", test.want)
+		}
+	}
+}
+
 func TestSMTQuantifierManagerEMatchingFeedsInstanceQueue(t *testing.T) {
 	m, state, registry, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{Ematching: true})
 	sort, err := m.MkSort(astTestSymbol(t, m, "managed-ematch-sort"), ast.ASTSortInfo{})

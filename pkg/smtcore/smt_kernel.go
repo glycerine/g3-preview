@@ -247,7 +247,11 @@ func (k *SMTKernel) configureQuantifiers(full *SMTParams, state SMTParamsState, 
 		k.internalizer.quantifiers = registry
 		k.quantifierCosts = costs
 	}
-	_, err := NewSMTQuantifierManager(k.internalizer, k.preprocessor, SMTQuantifierManagerConfig{
+	mbqiID, err := qi.MBQIId.String()
+	if err != nil {
+		return err
+	}
+	_, err = NewSMTQuantifierManager(k.internalizer, k.preprocessor, SMTQuantifierManagerConfig{
 		Ematching:      state.Ematching,
 		PromoteUnsat:   qi.PromoteUnsat,
 		QuickUnsat:     qi.QuickChecker >= 1,
@@ -255,6 +259,8 @@ func (k *SMTKernel) configureQuantifiers(full *SMTParams, state SMTParamsState, 
 		LazyQuick:      qi.LazyQuickChecker,
 		MBQI:           qi.MBQI,
 		MaxCexs:        qi.MaxCexs,
+		MaxIterations:  qi.MaxIterations,
+		MBQIID:         mbqiID,
 		CandidateModel: k.buildCandidateModelGenerator,
 	})
 	return err

@@ -15,12 +15,16 @@ import (
 // ordinary quantifier queue, so proof construction and internalization remain
 // centralized in SMTQIInstanceBuilder.
 type SMTModelChecker struct {
-	manager    *ast.ASTManager
-	state      *SMTInternalizerState
-	registry   *SMTQuantifierRegistry
-	maxCexs    uint32
-	valueTerms map[ast.ASTHandle]ast.ASTHandle
-	closed     bool
+	manager        *ast.ASTManager
+	state          *SMTInternalizerState
+	registry       *SMTQuantifierRegistry
+	initialMaxCexs uint32
+	maxCexs        uint32
+	maxIterations  uint32
+	iteration      uint32
+	exhausted      bool
+	valueTerms     map[ast.ASTHandle]ast.ASTHandle
+	closed         bool
 }
 
 func (c *SMTModelChecker) SetCandidateTerms(rootValues map[*SMTEnode]ast.ASTHandle) error {
@@ -40,7 +44,32 @@ func NewSMTModelChecker(state *SMTInternalizerState, maxCexs uint32) (*SMTModelC
 	if state == nil || state.manager == nil || state.quantifiers == nil {
 		return nil, ast.ErrASTHandle
 	}
-	return &SMTModelChecker{manager: state.manager, state: state, registry: state.quantifiers, maxCexs: maxCexs}, nil
+	return &SMTModelChecker{
+		manager: state.manager, state: state, registry: state.quantifiers,
+		initialMaxCexs: maxCexs, maxCexs: maxCexs, maxIterations: ^uint32(0),
+	}, nil
+}
+
+func (c *SMTModelChecker) ConfigureLifecycle(maxIterations uint32) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	c.maxIterations = maxIterations
+	return nil
+}
+
+func (c *SMTModelChecker) InitSearch() error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	c.maxCexs = c.initialMaxCexs
+	c.iteration = 0
+	c.exhausted = false
+	return nil
+}
+
+func (c *SMTModelChecker) Exhausted() bool {
+	return c != nil && !c.closed && c.exhausted
 }
 
 func (c *SMTModelChecker) open() error {
@@ -200,11 +229,19 @@ func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.
 	if model == nil || model.Core() == nil {
 		return false, ast.ErrASTHandle
 	}
+	if len(quantifiers) != 0 && c.iteration >= c.maxIterations {
+		c.exhausted = true
+		return false, nil
+	}
+	c.exhausted = false
 	remaining := c.maxCexs
 	if remaining == 0 {
 		remaining = 1
 	}
 	found := false
+	if len(quantifiers) != 0 {
+		c.iteration++
+	}
 	for _, quantifier := range quantifiers {
 		added, err := c.checkQuantifier(model, quantifier, &remaining)
 		if err != nil {
@@ -215,6 +252,7 @@ func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.
 			break
 		}
 	}
+	c.maxCexs += c.initialMaxCexs
 	return !found, nil
 }
 
