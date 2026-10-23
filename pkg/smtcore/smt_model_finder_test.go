@@ -237,6 +237,7 @@ func TestSMTModelFinderForcedFullMacrosRejectDependencyCycle(t *testing.T) {
 	} {
 		astTestMust(t, finder.candidates[quantifier].Reset())
 		astTestMust(t, finder.candidates[quantifier].Insert(candidate))
+		finder.auf[quantifier] = true
 	}
 	finder.hint.infos[first].macros = []hintConditionalMacro{{function: f, definition: gApp, satisfyAtom: true}}
 	finder.hint.infos[second].macros = []hintConditionalMacro{{function: g, definition: fApp, satisfyAtom: true}}
@@ -276,5 +277,124 @@ func TestSMTModelFinderForcedFullMacrosRejectDependencyCycle(t *testing.T) {
 	astTestMust(t, err)
 	if interpretation != nil {
 		t.Fatal("cyclic full macro was published")
+	}
+}
+
+func TestSMTModelFinderAUFClassification(t *testing.T) {
+	m, _, _, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	integer, err := m.GetSort(zero)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, integer)
+	astTestMust(t, err)
+	predicate, err := m.MkFuncDecl(astTestSymbol(t, m, "model-finder-auf-p"), []ast.ASTHandle{integer}, boolean, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	predicateApp, err := m.MkApp(predicate, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	bound, err := m.MkArithmeticLE(variable, zero)
+	astTestMust(t, err)
+	product, err := m.MkArithmeticMul(variable, variable)
+	astTestMust(t, err)
+	nonlinear, err := m.MkArithmeticLE(product, zero)
+	astTestMust(t, err)
+	makeQuantifier := func(name string, body ast.ASTHandle) ast.ASTHandle {
+		quantifier, e := m.MkQuantifier(ast.ASTQuantifierSpec{
+			Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []symbol.Symbol{astTestSymbol(t, m, name+"-x")}, Body: body,
+		})
+		astTestMust(t, e)
+		return quantifier
+	}
+	for _, test := range []struct {
+		name string
+		body ast.ASTHandle
+		want bool
+	}{{"uninterpreted-variable-argument", predicateApp, true}, {"variable-ground-bound", bound, true}, {"interpreted-nonlinear-term", nonlinear, false}} {
+		quantifier := makeQuantifier("model-finder-auf-"+test.name, test.body)
+		got, err := manager.modelFinder.classifyAUF(quantifier)
+		astTestMust(t, err)
+		if got != test.want {
+			t.Fatalf("%s classification %v want %v", test.name, got, test.want)
+		}
+	}
+}
+
+func TestSMTModelFinderCombinesConditionalNonAUFMacros(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	integer, err := m.GetSort(zero)
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, integer)
+	astTestMust(t, err)
+	function, err := m.MkFuncDecl(astTestSymbol(t, m, "model-finder-conditional-f"), []ast.ASTHandle{integer}, integer, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	application, err := m.MkApp(function, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	equality, err := m.MkEq(application, zero)
+	astTestMust(t, err)
+	product, err := m.MkArithmeticMul(variable, variable)
+	astTestMust(t, err)
+	nonlinear, err := m.MkArithmeticLE(product, zero)
+	astTestMust(t, err)
+	body, err := m.MkAndArray([]ast.ASTHandle{equality, nonlinear})
+	astTestMust(t, err)
+	condition1, err := m.MkArithmeticLE(variable, zero)
+	astTestMust(t, err)
+	condition2, err := m.MkArithmeticGE(variable, zero)
+	astTestMust(t, err)
+	makeQuantifier := func(name string) ast.ASTHandle {
+		quantifier, e := m.MkQuantifier(ast.ASTQuantifierSpec{
+			Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []symbol.Symbol{astTestSymbol(t, m, name+"-x")},
+			Body: body, QID: astTestSymbol(t, m, name),
+		})
+		astTestMust(t, e)
+		return quantifier
+	}
+	first, second := makeQuantifier("model-finder-conditional-q1"), makeQuantifier("model-finder-conditional-q2")
+	solver, err := NewSMTSolver(m, nil, "AUFLIA", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	state := solver.kernel.internalizer
+	astTestMust(t, state.Internalize(first, true))
+	astTestMust(t, state.Internalize(second, true))
+	finder := state.quantifierManager.modelFinder
+	for quantifier, candidate := range map[ast.ASTHandle]macros.Candidate{
+		first:  {Declaration: function, Definition: zero, Condition: condition1, SatisfyAtom: true},
+		second: {Declaration: function, Definition: one, Condition: condition2, SatisfyAtom: true},
+	} {
+		astTestMust(t, finder.candidates[quantifier].Reset())
+		astTestMust(t, finder.candidates[quantifier].Insert(candidate))
+		finder.auf[quantifier] = false
+		finder.hint.infos[quantifier].macros = []hintConditionalMacro{{function: function, definition: candidate.Definition, satisfyAtom: true}}
+		astTestMust(t, state.context.SetRelevant(quantifier, true))
+		astTestMust(t, state.context.SetAssignment(quantifier, lbool.True))
+	}
+	proto, err := protomodel.NewProtoModel(m, modelConfig)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, proto.Close()) })
+	astTestMust(t, finder.FixModel(proto))
+	if finder.chosen[first] != function || finder.chosen[second] != function {
+		t.Fatal("conditional non-AUF macros were not selected", finder.chosen)
+	}
+	interpretation, err := proto.Core().FunctionInterpretation(function)
+	astTestMust(t, err)
+	if interpretation == nil {
+		t.Fatal("conditional non-AUF definition was not published")
+	}
+	definition, err := interpretation.Else()
+	astTestMust(t, err)
+	want, err := m.MkIte(condition2, one, zero)
+	astTestMust(t, err)
+	if definition != want {
+		t.Fatal("conditional non-AUF definition", definition, want)
 	}
 }

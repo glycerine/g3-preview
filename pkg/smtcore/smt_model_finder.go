@@ -24,6 +24,7 @@ type SMTModelFinder struct {
 	macroUtil     *macros.Util
 	candidates    map[ast.ASTHandle]*macros.Candidates
 	nonGround     map[ast.ASTHandle]map[ast.ASTHandle]struct{}
+	auf           map[ast.ASTHandle]bool
 	chosen        map[ast.ASTHandle]ast.ASTHandle
 	hint          *hintSearchState
 	dependencies  *ast.FuncDeclDependencies
@@ -48,12 +49,12 @@ func NewSMTModelFinder(state *SMTInternalizerState) (*SMTModelFinder, error) {
 		manager: state.manager, state: state, registered: make(map[ast.ASTHandle]struct{}),
 		sets: make(map[ast.ASTHandle][]*smtModelFinderInstantiationSet), macroUtil: util,
 		candidates: make(map[ast.ASTHandle]*macros.Candidates), nonGround: make(map[ast.ASTHandle]map[ast.ASTHandle]struct{}),
-		chosen: make(map[ast.ASTHandle]ast.ASTHandle), hint: newHintSearchState(), dependencies: dependencies,
+		auf: make(map[ast.ASTHandle]bool), chosen: make(map[ast.ASTHandle]ast.ASTHandle), hint: newHintSearchState(), dependencies: dependencies,
 	}, nil
 }
 
 func (f *SMTModelFinder) open() error {
-	if f == nil || f.manager == nil || f.state == nil || f.registered == nil || f.sets == nil || f.macroUtil == nil || f.candidates == nil || f.hint == nil || f.dependencies == nil || f.closed {
+	if f == nil || f.manager == nil || f.state == nil || f.registered == nil || f.sets == nil || f.macroUtil == nil || f.candidates == nil || f.auf == nil || f.hint == nil || f.dependencies == nil || f.closed {
 		return ast.ErrASTHandle
 	}
 	return nil
@@ -106,6 +107,10 @@ func (f *SMTModelFinder) RegisterQuantifier(quantifier ast.ASTHandle) error {
 		}
 	}
 	if err = f.collectNonGroundDeclarations(body, f.nonGround[quantifier]); err != nil {
+		return err
+	}
+	f.auf[quantifier], err = f.classifyAUF(quantifier)
+	if err != nil {
 		return err
 	}
 	info := &hintQuantifierInfo{nonGround: make([]ast.ASTHandle, 0, len(f.nonGround[quantifier]))}
@@ -227,6 +232,7 @@ func (f *SMTModelFinder) releaseQuantifier(quantifier ast.ASTHandle) (result err
 		delete(f.sets, quantifier)
 		delete(f.candidates, quantifier)
 		delete(f.nonGround, quantifier)
+		delete(f.auf, quantifier)
 		delete(f.chosen, quantifier)
 		delete(f.hint.infos, quantifier)
 		delete(f.registered, quantifier)
@@ -339,39 +345,49 @@ func (f *SMTModelFinder) addNonAUFMacro(proto *protomodel.ProtoModel, candidate 
 	return true, nil
 }
 
-// processForcedFullMacros is the full-macro arm of non_auf_macro_solver.
-// The source applies it to every unconditional non-hint candidate whose
-// quantifier weight reaches mbqi.force_template, including AUF formulas.
-func (f *SMTModelFinder) processForcedFullMacros(proto *protomodel.ProtoModel, quantifiers []ast.ASTHandle) ([]ast.ASTHandle, error) {
+// processNonAUFMacros ports non_auf_macro_solver. Full macros are available to
+// non-AUF quantifiers and to every quantifier forced by mbqi.force_template;
+// remaining conditional definitions are combined into an ordered ITE else.
+func (f *SMTModelFinder) processNonAUFMacros(proto *protomodel.ProtoModel, quantifiers []ast.ASTHandle) ([]ast.ASTHandle, error) {
 	current := append([]ast.ASTHandle(nil), quantifiers...)
 	for {
 		byDeclaration := make(map[ast.ASTHandle]smtModelFinderFullMacro)
-		order := make([]ast.ASTHandle, 0)
+		fullOrder := make([]ast.ASTHandle, 0)
+		conditional := make(map[ast.ASTHandle]struct{})
+		conditionalOrder := make([]ast.ASTHandle, 0)
 		for _, quantifier := range current {
 			weight, err := f.manager.GetQuantifierWeight(quantifier)
 			if err != nil {
 				return nil, err
 			}
-			if weight < 0 || uint32(weight) < f.forceTemplate {
-				continue
-			}
+			forced := weight >= 0 && uint32(weight) >= f.forceTemplate
 			candidates := f.candidates[quantifier]
 			for i := 0; candidates != nil && i < candidates.Len(); i++ {
 				candidate, err := candidates.At(i)
 				if err != nil {
 					return nil, err
 				}
-				if candidate.Hint || !f.manager.IsTrue(candidate.Condition) {
+				if candidate.Hint {
 					continue
 				}
-				if _, found := byDeclaration[candidate.Declaration]; !found {
-					order = append(order, candidate.Declaration)
+				if f.manager.IsTrue(candidate.Condition) && (!f.auf[quantifier] || forced) {
+					if _, found := byDeclaration[candidate.Declaration]; !found {
+						fullOrder = append(fullOrder, candidate.Declaration)
+					}
+					byDeclaration[candidate.Declaration] = smtModelFinderFullMacro{quantifier: quantifier, candidate: candidate}
+					delete(conditional, candidate.Declaration)
+					continue
 				}
-				byDeclaration[candidate.Declaration] = smtModelFinderFullMacro{quantifier: quantifier, candidate: candidate}
+				if _, full := byDeclaration[candidate.Declaration]; !full && !f.auf[quantifier] {
+					if _, found := conditional[candidate.Declaration]; !found {
+						conditionalOrder = append(conditionalOrder, candidate.Declaration)
+					}
+					conditional[candidate.Declaration] = struct{}{}
+				}
 			}
 		}
 		removed := make(map[ast.ASTHandle]struct{})
-		for _, declaration := range order {
+		for _, declaration := range fullOrder {
 			macro := byDeclaration[declaration]
 			added, err := f.addNonAUFMacro(proto, macro.candidate)
 			if err != nil {
@@ -380,6 +396,61 @@ func (f *SMTModelFinder) processForcedFullMacros(proto *protomodel.ProtoModel, q
 			if added {
 				f.chosen[macro.quantifier] = declaration
 				removed[macro.quantifier] = struct{}{}
+			}
+		}
+		for _, declaration := range conditionalOrder {
+			if _, stillConditional := conditional[declaration]; !stillConditional {
+				continue
+			}
+			var definition ast.ASTHandle
+			selected := make([]ast.ASTHandle, 0)
+			ignore := false
+			for _, quantifier := range current {
+				if _, alreadyRemoved := removed[quantifier]; alreadyRemoved {
+					continue
+				}
+				candidates := f.candidates[quantifier]
+				var candidate macros.Candidate
+				found := false
+				for i := 0; candidates != nil && i < candidates.Len(); i++ {
+					row, err := candidates.At(i)
+					if err != nil {
+						return nil, err
+					}
+					if row.Declaration == declaration && !row.Hint {
+						candidate, found = row, true
+					}
+				}
+				if !found {
+					continue
+				}
+				if f.manager.IsTrue(candidate.Condition) {
+					ignore = true
+					break
+				}
+				selected = append(selected, quantifier)
+				if definition.IsNull() {
+					definition = candidate.Definition
+				} else {
+					next, err := f.manager.MkIte(candidate.Condition, candidate.Definition, definition)
+					if err != nil {
+						return nil, err
+					}
+					definition = next
+				}
+			}
+			if ignore || definition.IsNull() {
+				continue
+			}
+			added, err := f.addNonAUFMacro(proto, macros.Candidate{Declaration: declaration, Definition: definition})
+			if err != nil {
+				return nil, err
+			}
+			if added {
+				for _, quantifier := range selected {
+					f.chosen[quantifier] = declaration
+					removed[quantifier] = struct{}{}
+				}
 			}
 		}
 		if len(removed) == 0 {
@@ -539,7 +610,7 @@ func (f *SMTModelFinder) FixModel(model *protomodel.ProtoModel) error {
 	if err != nil {
 		return err
 	}
-	relevant, err = f.processForcedFullMacros(model, relevant)
+	relevant, err = f.processNonAUFMacros(model, relevant)
 	if err != nil {
 		return err
 	}
@@ -586,6 +657,7 @@ func (f *SMTModelFinder) Close() error {
 	f.macroUtil = nil
 	f.candidates = nil
 	f.nonGround = nil
+	f.auf = nil
 	f.chosen = nil
 	f.hint = nil
 	f.dependencies = nil

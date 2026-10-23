@@ -108678,6 +108678,7 @@
       "go_targets": [
         "pkg/smtcore/smt_model_finder.go",
         "pkg/smtcore/smt_model_finder_test.go",
+        "pkg/smtcore/smt_model_finder_auf_classify.go",
         "pkg/smtcore/smt_model_finder_instantiation_set.go",
         "pkg/smtcore/smt_model_finder_instantiation_set_test.go",
         "pkg/smtcore/smt_model_finder_quantifier_set.go",
@@ -108699,6 +108700,8 @@
         "TestSMTModelFinderPublishesIsolatedSimpleMacro",
         "TestSMTModelFinderPublishesSharedHintMacro",
         "TestSMTModelFinderForcedFullMacrosRejectDependencyCycle",
+        "TestSMTModelFinderAUFClassification",
+        "TestSMTModelFinderCombinesConditionalNonAUFMacros",
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
         "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
         "TestModelFinderHintSatisfiedResidueSourceScopeTransitions",
@@ -109124,11 +109127,20 @@
           ]
         },
         {
-          "name": "non_auf_macro_solver forced unconditional full macros, function-dependency cycle rejection and mbqi.force_template propagation",
-          "status": "partial",
+          "name": "non_auf_macro_solver full and conditional macro selection, ordered ITE definitions, function-dependency cycle rejection and mbqi.force_template propagation",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder.go",
           "tests": [
-            "TestSMTModelFinderForcedFullMacrosRejectDependencyCycle"
+            "TestSMTModelFinderForcedFullMacrosRejectDependencyCycle",
+            "TestSMTModelFinderCombinesConditionalNonAUFMacros"
+          ]
+        },
+        {
+          "name": "quantifier_analyzer formula and term traversal for AUF classification",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_auf_classify.go",
+          "tests": [
+            "TestSMTModelFinderAUFClassification"
           ]
         },
         {
@@ -109222,7 +109234,7 @@
         "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit."
       ],
       "deviations": [
-        "The production model-finder lifecycle is wired to quantifier internalization, context scopes, search initialization, MBQI candidate construction and final published-model construction. Existing AST macro analysis supplies owned conditional-macro candidates; the simple macro solver repeatedly publishes an eligible isolated satisfying definition as the function fallback and records the chosen declaration. Shared conditional macros flow through the hint solver's indexes and bounded search, and selected definitions are published into the generated model. The non-AUF solver's forced-template branch publishes unconditional definitions while rejecting cyclic function dependencies; conditional non-AUF selection still awaits the AUF classifier. Concrete instantiation sets retain accepted terms, reject private model values, build model-value inverses and preserve source generation preference. Direct-variable positions in retained trigger patterns collect matching ground-context arguments; the broader AUF constraint graph remains open. The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering, Q_f/Q_f_def indexes and bounded greedy search are ported with borrowed AST handles. Remaining AUF analysis and model extension remain open."
+        "The production model-finder lifecycle is wired to quantifier internalization, context scopes, search initialization, MBQI candidate construction and final published-model construction. Existing AST macro analysis supplies owned conditional-macro candidates; the simple macro solver repeatedly publishes an eligible isolated satisfying definition as the function fallback and records the chosen declaration. Shared conditional macros flow through the hint solver's indexes and bounded search, and selected definitions are published into the generated model. The quantifier analyzer classifies AUF formula and term structure, and the non-AUF solver publishes unconditional or ordered conditional definitions while rejecting cyclic function dependencies. Concrete instantiation sets retain accepted terms, reject private model values, build model-value inverses and preserve source generation preference. Direct-variable positions in retained trigger patterns collect matching ground-context arguments; the broader AUF constraint graph and qinfo population remain open. The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering, Q_f/Q_f_def indexes and bounded greedy search are ported with borrowed AST handles. Remaining AUF analysis and model extension remain open."
       ]
     },
     {
