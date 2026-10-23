@@ -205,3 +205,73 @@ func TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair(t *testing.T) {
 		}
 	}
 }
+
+func TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse(t *testing.T) {
+	g := newSMTUTVPIGraph()
+	zero, err := g.addVariable(true)
+	astTestMust(t, err)
+	integer, err := g.addVariable(true)
+	astTestMust(t, err)
+	real, err := g.addVariable(false)
+	astTestMust(t, err)
+	bound := func(variable int32, negative bool, weight *smtInfRational) {
+		id, err := g.addInequality([]smtUTVPIGraphTerm{{variable, negative}}, weight, NewSMTLiteral(int32(len(g.graph.edges)+2), false))
+		astTestMust(t, err)
+		ok, err := g.enablePair(id)
+		astTestMust(t, err)
+		if !ok {
+			t.Fatal("consistent model constraint rejected")
+		}
+	}
+	bound(integer, false, diffInf(-3, 0))
+	bound(integer, true, diffInf(3, 0))
+	// 0<r<1/3. Infinitesimal substitution must respect the rational slack;
+	// substituting a fixed epsilon such as 1 would violate this interval.
+	bound(real, true, diffInf(0, 1))
+	upper := newSMTInfRational(big.NewRat(-1, 3), big.NewRat(1, 1))
+	bound(real, false, &upper)
+	check := func(values []big.Rat, count int) {
+		if len(values) != count || values[zero].Sign() != 0 || values[integer].Cmp(big.NewRat(3, 1)) != 0 || values[real].Sign() <= 0 || values[real].Cmp(big.NewRat(1, 3)) >= 0 {
+			t.Fatal("typed mixed model violated a source constraint", values)
+		}
+	}
+	values, err := g.modelValues(zero)
+	astTestMust(t, err)
+	check(values, 3)
+	astTestMust(t, g.push())
+	child, err := g.addVariable(true)
+	astTestMust(t, err)
+	bound(child, false, diffInf(-7, 0))
+	bound(child, true, diffInf(7, 0))
+	childValues, err := g.modelValues(zero)
+	astTestMust(t, err)
+	check(childValues, 4)
+	if childValues[child].Cmp(big.NewRat(7, 1)) != 0 {
+		t.Fatal("child integer value", &childValues[child])
+	}
+	astTestMust(t, g.pop(1))
+	values, err = g.modelValues(zero)
+	astTestMust(t, err)
+	check(values, 3)
+	astTestMust(t, g.push())
+	reused, err := g.addVariable(true)
+	astTestMust(t, err)
+	if reused != child {
+		t.Fatal("source variable numbering was not restored by pop")
+	}
+	bound(reused, false, diffInf(4, 0))
+	bound(reused, true, diffInf(-4, 0))
+	values, err = g.modelValues(zero)
+	astTestMust(t, err)
+	check(values, 4)
+	if values[reused].Cmp(big.NewRat(-4, 1)) != 0 {
+		t.Fatal("reused variable retained popped model state", &values[reused])
+	}
+	astTestMust(t, g.pop(1))
+	if err := g.pop(1); err == nil {
+		t.Fatal("invalid scope pop accepted")
+	}
+	if _, err := g.modelValues(-1); err == nil {
+		t.Fatal("invalid zero variable accepted")
+	}
+}

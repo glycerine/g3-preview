@@ -123403,7 +123403,8 @@
         "TestSMTUTVPILinearizationNormalizationAndRefusals",
         "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
         "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
-        "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair"
+        "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair",
+        "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse"
       ],
       "conditionals": [
         {
@@ -123424,6 +123425,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Graph portions of init_model, compute_delta and mk_value; paired-variable scope metadata and ID reuse",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_utvpi_graph.go",
+          "tests": [
+            "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse"
+          ]
+        },
         {
           "name": "Concrete UTVPI linearizer and doubled-variable graph representation",
           "status": "ported",
@@ -123459,7 +123468,8 @@
       "tests": [
         "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
         "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
-        "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair"
+        "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair",
+        "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse"
       ],
       "conditionals": [
         {
@@ -123588,6 +123598,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Graph portions of init_model, compute_delta and mk_value; paired-variable scope metadata and ID reuse",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_utvpi_graph.go",
+          "tests": [
+            "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse"
+          ]
+        },
         {
           "name": "add_ineq, enable_edge, check_z_consistency, is_parity_ok and enforce_parity: concrete rdl_ext graph algorithms",
           "status": "ported",

@@ -2,6 +2,8 @@
 // check_z_consistency, is_parity_ok and enforce_parity (rdl_ext).
 package smtcore
 
+import "math/big"
+
 // A source UTVPI variable has two graph vertices: positive 2*v and negative
 // 2*v+1. Its value is half their potential difference. Edge coefficients are
 // kept separately from literals so unary constraints retain their factor two
@@ -10,6 +12,7 @@ type smtUTVPIGraph struct {
 	graph        *SMTInfRationalDiffGraph
 	integer      []bool
 	coefficients []uint32
+	scopes       []int
 }
 
 type smtUTVPIGraphTerm struct {
@@ -71,7 +74,13 @@ func (g *smtUTVPIGraph) addInequality(terms []smtUTVPIGraphTerm, weight *smtInfR
 		coefficient = 1
 	}
 	// Popped graph edges can reuse their IDs; discard matching stale weights.
-	g.coefficients = g.coefficients[:len(g.graph.edges)]
+	if len(g.coefficients) > len(g.graph.edges) {
+		g.coefficients = g.coefficients[:len(g.graph.edges)]
+	}
+	for len(g.coefficients) < len(g.graph.edges) {
+		// Model normalization can add unconditional, zero-weight edges.
+		g.coefficients = append(g.coefficients, 0)
+	}
 	id, err := g.graph.AddEdge(source, target, &edgeWeight, literal)
 	if err != nil {
 		return -1, err
@@ -199,4 +208,82 @@ func (g *smtUTVPIGraph) enforceParity() error {
 		return errSMTDiffGraphDomain
 	}
 	return nil
+}
+
+func (g *smtUTVPIGraph) push() error {
+	if err := g.graph.Push(); err != nil {
+		return err
+	}
+	g.scopes = append(g.scopes, len(g.integer))
+	return nil
+}
+
+func (g *smtUTVPIGraph) pop(count uint32) error {
+	if count == 0 || int(count) > len(g.scopes) {
+		return errSMTDiffGraphDomain
+	}
+	level := len(g.scopes) - int(count)
+	if err := g.graph.Pop(count); err != nil {
+		return err
+	}
+	g.integer = g.integer[:g.scopes[level]]
+	g.scopes = g.scopes[:level]
+	if len(g.coefficients) > len(g.graph.edges) {
+		g.coefficients = g.coefficients[:len(g.graph.edges)]
+	}
+	return nil
+}
+
+// modelValues implements the graph part of init_model, compute_delta and
+// mk_value. The distinguished zero variable is created by the theory owner.
+// Values own their rationals; integer values are checked before publication.
+func (g *smtUTVPIGraph) modelValues(zeroVariable int32) ([]big.Rat, error) {
+	if zeroVariable < 0 || int(zeroVariable) >= len(g.integer) {
+		return nil, errSMTDiffGraphDomain
+	}
+	conflict, err := g.parityConflict()
+	if err != nil {
+		return nil, err
+	}
+	if len(conflict) != 0 {
+		return nil, errSMTDiffGraphDomain
+	}
+	if err := g.enforceParity(); err != nil {
+		return nil, err
+	}
+	if err := g.graph.SetPairToZero(2*zeroVariable, 2*zeroVariable+1); err != nil {
+		return nil, err
+	}
+	delta := big.NewRat(1, 1)
+	for i := range g.graph.edges {
+		edge := &g.graph.edges[i]
+		if !edge.enabled {
+			continue
+		}
+		var bound smtInfRational
+		bound.Sub(&g.graph.assignment[edge.target], &g.graph.assignment[edge.source])
+		bound.Sub(&bound, &edge.weight)
+		if bound.Sign() > 0 {
+			return nil, errSMTDiffGraphDomain
+		}
+		if bound.infinitesimal.Sign() > 0 {
+			limit := new(big.Rat).Neg(&bound.rational)
+			limit.Quo(limit, &bound.infinitesimal)
+			if limit.Cmp(delta) < 0 {
+				delta.Set(limit)
+			}
+		}
+	}
+	values := make([]big.Rat, len(g.integer))
+	for variable, integer := range g.integer {
+		var difference smtInfRational
+		difference.Sub(&g.graph.assignment[2*variable], &g.graph.assignment[2*variable+1])
+		values[variable].Mul(delta, &difference.infinitesimal)
+		values[variable].Add(&values[variable], &difference.rational)
+		values[variable].Quo(&values[variable], big.NewRat(2, 1))
+		if integer && !values[variable].IsInt() {
+			return nil, errSMTDiffGraphDomain
+		}
+	}
+	return values, nil
 }
