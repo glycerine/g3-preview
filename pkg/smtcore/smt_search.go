@@ -322,6 +322,13 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 		}
 		switch status {
 		case SMTFinalCheckDone:
+			// Source context::restart validates quantified candidate models
+			// after ground search. E-matching saturation alone cannot certify
+			// SAT; the default plugin returns UNKNOWN when MBQI is disabled.
+			if manager := k.internalizer.quantifierManager; manager != nil && !manager.registry.Empty() && manager.acceptedModel == nil {
+				k.lastFailure = SMTFailureQuantifiers
+				return lbool.Undef, nil
+			}
 			if err = k.captureRelevantLabels(); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search capture labels: %w", err)
 			}

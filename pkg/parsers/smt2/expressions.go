@@ -11,6 +11,12 @@ import (
 )
 
 func (p *commandParser) expression() (ast.ASTHandle, string, error) {
+	return p.expressionWithQuantifier(nil)
+}
+
+// Only the immediate annotated body of a quantifier can update its metadata.
+// Recursive argument, let-body and attribute-body expressions use expression.
+func (p *commandParser) expressionWithQuantifier(quantifier *ast.ASTQuantifierSpec) (ast.ASTHandle, string, error) {
 	m, err := p.astManager()
 	if err != nil {
 		return ast.ASTHandle{}, "", err
@@ -94,27 +100,7 @@ func (p *commandParser) expression() (ast.ASTHandle, string, error) {
 			case "let":
 				return p.letExpression()
 			case "!":
-				body, named, err := p.expression()
-				if err != nil {
-					return ast.ASTHandle{}, "", err
-				}
-				for p.token == KeywordToken {
-					key := p.scanner.ID()
-					if err = p.advance(); err != nil {
-						return ast.ASTHandle{}, "", err
-					}
-					if key != ":named" {
-						return ast.ASTHandle{}, "", fmt.Errorf("unsupported expression attribute %s", key)
-					}
-					named, err = p.symbol()
-					if err != nil {
-						return ast.ASTHandle{}, "", err
-					}
-				}
-				if err = p.expect(RightParenToken); err != nil {
-					return ast.ASTHandle{}, "", err
-				}
-				return body, named, nil
+				return p.annotatedExpression(quantifier)
 			case "_":
 				name, indices, err := p.indexed()
 				if err != nil {
@@ -251,14 +237,22 @@ func (p *commandParser) quantifier(forall bool) (value ast.ASTHandle, named stri
 		p.bindings = oldBindings
 		result = errors.Join(result, p.env.endScopeWithOwningCleanup(), p.locals.shrink(p.manager, oldExprs))
 	}()
-	body, _, err := p.expression()
+	spec := ast.ASTQuantifierSpec{Forall: forall, Sorts: sorts, Names: names, Weight: 1}
+	body, _, err := p.expressionWithQuantifier(&spec)
 	if err != nil {
 		return ast.ASTHandle{}, "", err
+	}
+	spec.Body = body
+	if err = p.validateQuantifierPatterns(&spec); err != nil {
+		return ast.ASTHandle{}, "", err
+	}
+	if spec.QID.IsNull() {
+		spec.QID = usymbol.Numerical(uint32(p.scanner.Line()))
 	}
 	if err = p.expect(RightParenToken); err != nil {
 		return ast.ASTHandle{}, "", err
 	}
-	value, err = p.pin(p.manager.MkQuantifier(ast.ASTQuantifierSpec{Forall: forall, Sorts: sorts, Names: names, Body: body, Weight: 1}))
+	value, err = p.pin(p.manager.MkQuantifier(spec))
 	return value, "", err
 }
 

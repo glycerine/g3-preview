@@ -10,6 +10,8 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"quantified_ematching_saturation.smt2":      "unknown\nunsat\nunknown\n",
+	"quantified_ematching_relevancy.smt2":       "unsat\nunsat\n",
 	"quantified_model_relevancy.smt2":           "sat\n(((f 7) 7) ((f 11) 11))\nunsat\nsat\n(((f 11) 11))\n",
 	"integer_uf_model_relevancy.smt2":           "sat\n(((distinct x y) true) ((distinct (f x) (f y)) true))\nunsat\nsat\n(((distinct x y) true) ((distinct (f x) (f y)) true))\n",
 	"arithmetic_eq_options.smt2":                "unsat\nsat\nunsat\nsat\nunsat\nsat\n",

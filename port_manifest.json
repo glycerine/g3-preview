@@ -86214,7 +86214,9 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd_context/results.go",
         "pkg/cmd_context/context.go",
-        "pkg/cmd_context/context_test.go"
+        "pkg/cmd_context/context_test.go",
+        "pkg/parsers/smt2/annotations.go",
+        "pkg/parsers/smt2/annotations_test.go"
       ],
       "tests": [
         "TestSMT2ParserPushLocalShiftsFreeVariables",
@@ -86234,7 +86236,11 @@
         "TestSMT2GetValueRejectsEmptyAndQuantifiedTermsBeforeOutput",
         "TestCommandContextUnsignedOptionsValidateTypesAndUpdateLiveSolver",
         "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
-        "TestSMT2UnsignedOptionsRejectRangeAndTrailingArguments"
+        "TestSMT2UnsignedOptionsRejectRangeAndTrailingArguments",
+        "TestSMT2QuantifierAttributesPreserveMultiPatternsAndMetadata",
+        "TestSMT2QuantifierPatternValidationAndParserOptions",
+        "TestSMT2NestedQuantifierMetadataAndNoPatternsStayLocal",
+        "TestSMT2QuantifierAttributesRejectWrongScopesAndBadPatterns"
       ],
       "assertions": [
         {
@@ -86896,16 +86902,34 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "consume_attributes, push_pattern_frame, process_last_symbol and pop_quant_frame: direct quantifier-body patterns and multi-patterns, no-pattern terms, weight, qid, skolemid, line-number fallback IDs, nested binder isolation, pattern validation and parser.ignore_user_patterns/parser.ignore_bad_patterns updates",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/annotations.go",
+          "tests": [
+            "TestSMT2QuantifierAttributesPreserveMultiPatternsAndMetadata",
+            "TestSMT2QuantifierPatternValidationAndParserOptions",
+            "TestSMT2NestedQuantifierMetadataAndNoPatternsStayLocal",
+            "TestSMT2QuantifierAttributesRejectWrongScopesAndBadPatterns",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
         }
       ],
       "ownership": [
         "Each parsed command holds ASTRefs for all constructed terms/sorts until the command context acquires its declaration/assertion references. Existing concrete local binding and var-shifting helpers own quantifier/let frames and are unwound on success and error.",
         "Default-model get-value keeps expanded AST expressions pinned in command-local references and independently caches original input term strings. The scanner cache end is saved before each token advance; copied term strings survive cache reset and are passed alongside concrete AST handles to result output. Definitions, quoted identifiers, let terms and internal whitespace are echoed without AST expansion. Empty lists and quantified terms are rejected before result output. The rational_square_interval_scopes.smt2 C++ comparison checks exact 121/225 values after scoped rational square constraints. Indexed optimization-model queries remain outside this increment.",
-        "Unsigned input rejects overflow, negative values for this path and trailing arguments before effects. Front-end timeout/rlimit values use the local unsigned parameter frame. Module values are parsed and owned by the source catalog, retaining its declared type even for integer input to Double options such as smt.restart_factor; no local UInt shadows that value. The catalog rejects unknown names and incompatible Boolean types. Floating-point, bit-vector and other remaining option-value branches are not claimed."
+        "Unsigned input rejects overflow, negative values for this path and trailing arguments before effects. Front-end timeout/rlimit values use the local unsigned parameter frame. Module values are parsed and owned by the source catalog, retaining its declared type even for integer input to Double options such as smt.restart_factor; no local UInt shadows that value. The catalog rejects unknown names and incompatible Boolean types. Floating-point, bit-vector and other remaining option-value branches are not claimed.",
+        "Quantifier metadata belongs to a concrete ASTQuantifierSpec local to its recursive grammar frame. Command-local ASTRefs retain parsed pattern terms and pattern applications until the resulting quantifier is owned by the command context. Parser option snapshots release their temporary ParamsRef owner immediately; rejected metadata unwinds the existing local-binding and command-root cleanup."
       ],
       "deviations": [
         "The selected local lookup returns an owning ASTRef for the future parser expression stack and reuses the concrete AST var_shifter; scanner, command-context fallback, other parser branches and complete expression-stack integration remain unported.",
-        "Go recursive grammar functions replace source explicit parser frame dispatch for retained branches. The current runner stops on the first command error; full C++ recovery and unsupported grammar branches remain open and fail explicitly."
+        "Go recursive grammar functions replace source explicit parser frame dispatch for retained branches. The current runner stops on the first command error; full C++ recovery and unsupported grammar branches remain open and fail explicitly.",
+        "Explicit quantified patterns now reach E-matching through the SMT-LIB runner. Validation warnings use the process diagnostic warning service, invalid patterns follow ignore_bad_patterns, and ignored user patterns are consumed as S-expressions. Full legacy qualified unary-pattern and constant-pattern discard variants, expression labels, unknown-attribute warning/recovery and other parser grammar branches remain partial. The runner now has 92 strict C++ comparisons plus the separately documented C++ live-relevancy model defect regression."
       ]
     },
     {
@@ -106252,7 +106276,8 @@
         "TestSMTNonlinearNumericProgressAndScopedStrategies",
         "TestSMTSharedArithmeticFixedRowsScopedProofs",
         "TestSMTAssumeEqualityScopedPhaseAndRelevancy",
-        "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
+        "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
+        "TestSMTQuantifiedSearchRequiresModelValidation"
       ],
       "conditionals": [
         {
@@ -107328,17 +107353,32 @@
             "TestSMTAssumeEqualityScopedPhaseAndRelevancy",
             "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
           ]
+        },
+        {
+          "name": "context::restart quantified candidate-model acceptance: a nonempty quantifier registry without an accepted checked model returns UNKNOWN with QUANTIFIERS failure instead of treating E-matching saturation as SAT",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_search.go",
+          "tests": [
+            "TestSMTQuantifiedSearchRequiresModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
         }
       ],
       "ownership": [
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records.",
-        "The theory notification trail stores Boolean variable IDs without AST ownership. Scope rollback restores eligibility for subsequent assignments and relevance events."
+        "The theory notification trail stores Boolean variable IDs without AST ownership. Scope rollback restores eligibility for subsequent assignments and relevance events.",
+        "Search reads the quantifier manager-owned acceptedModel at the ground completion boundary. A checked candidate transfers through the existing generated-model path; an unchecked candidate cannot publish a SAT result."
       ],
       "deviations": [
         "Structural subsumption remains unported.",
         "Go creates interpreted true/false enodes on first term use rather than during context initialization. Assigned Boolean terms merge with those truth-value classes, including when their enodes are created after assignment; conflict antecedent lookup retains the actual assigned polarity.",
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
-        "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial."
+        "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
+        "With auto_config=false and MBQI disabled, the transitive-relation runner regression now agrees with C++ on UNKNOWN, UNSAT after grounded contradictory facts, then UNKNOWN after pop. The no-preprocessing solver regression additionally verifies incomplete-quantifier failure reporting and repeated scoped E-matching refutations."
       ]
     },
     {
@@ -109543,7 +109583,8 @@
         "TestSMTSolverPreferredSATReturnsConflictingPreferenceCores",
         "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
         "TestSMT2RelevancyUpdatesRestoreCachedBooleanAndTermITEWatches",
-        "TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect"
+        "TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect",
+        "TestSMTQuantifiedSearchRequiresModelValidation"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -109699,16 +109740,26 @@
             "TestSMT2RelevancyUpdatesRestoreCachedBooleanAndTermITEWatches",
             "TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect"
           ]
+        },
+        {
+          "name": "update_params preserves the theory rewriter borrowed by quantified instance materialization when assertion preprocessing is disabled, and continues updating that same live owner",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTQuantifiedSearchRequiresModelValidation"
+          ]
         }
       ],
       "ownership": [
         "SMTKernel owns formula and proof references for asserted entries, the latest terminal unsat proof reference, and its checker, relevancy propagator, and internalizer lifecycle.",
-        "After filtering is enabled following a disabled period, prepareCheck restores root relevance and source-shaped AND/OR/ITE watches from the owned active assertion DAG. Existing watches and handlers are not duplicated; scoped ones are recreated after pop. Quantifier bodies use instances, and term-ITE repair requires an existing enode. Checks that never reenable filtering retain their existing path."
+        "After filtering is enabled following a disabled period, prepareCheck restores root relevance and source-shaped AND/OR/ITE watches from the owned active assertion DAG. Existing watches and handlers are not duplicated; scoped ones are recreated after pop. Quantifier bodies use instances, and term-ITE repair requires an existing enode. Checks that never reenable filtering retain their existing path.",
+        "The kernel retains its shared theory rewriter until kernel teardown. Toggling assertion preprocessing changes whether assertion passes run and cannot close the rewriter while the quantifier manager and quick checker still borrow it."
       ],
       "deviations": [
         "Check uses first-UIP learning and backjumping and returns undef when a theory gives up or requests continuation without observable progress.",
         "Cross-manager Translate reconstructs a kernel and replays owned base assertions instead of invoking context::copy; the solver interface has no reset operation, so the source placement-new reset is not exposed.",
-        "The C++ executable returns invalid Boolean models for relevancy_update_scopes.smt2 after changing smt.relevancy from 0 to 2. Go requires models satisfying p and (or a b), including after pop. TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect retains the complete case separately from exact-output comparisons, requires valid Go output, and accepts only the observed invalid reference snapshot or a corrected reference agreeing with Go. This is an explicit reference defect, not a weakened Go expectation; 90 other scripts retain exact C++ comparisons."
+        "The C++ executable returns invalid Boolean models for relevancy_update_scopes.smt2 after changing smt.relevancy from 0 to 2. Go requires models satisfying p and (or a b), including after pop. TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect retains the complete case separately from exact-output comparisons, requires valid Go output, and accepts only the observed invalid reference snapshot or a corrected reference agreeing with Go. This is an explicit reference defect, not a weakened Go expectation; 90 other scripts retain exact C++ comparisons.",
+        "The Go shared rewriter owner is retained independently of the hidden assertion-preprocessing switch, preventing a closed-rewriter domain error during subsequent quantifier instantiation."
       ]
     },
     {
@@ -111460,7 +111511,9 @@
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample",
         "TestSMTQuantifierActivationHonorsDisabledRelevancyAndAssignment",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTQuantifierManagerNewEnodesAndCursorRollback",
+        "TestSMTQuantifiedSearchRequiresModelValidation"
       ],
       "assertions": [
         {
@@ -111568,14 +111621,30 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "default_qm_plugin::propagate new-enode scan while relevancy is disabled, scoped new-enode cursor restoration, and E-matching reactivation for ground terms internalized after the initial pattern scan",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "tests": [
+            "TestSMTQuantifierManagerNewEnodesAndCursorRollback",
+            "TestSMTQuantifiedSearchRequiresModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
         }
       ],
       "ownership": [
         "SMTQuantifierRegistry borrows quantifier AST handles, enode bindings, its queue schedule and cost model; it owns native statistic maps, insertion-ordered quantifier slices, and the scoped fingerprint set. SMTQuantifierManager owns its cached substitution and composes the registry, checker, rewriter, queue and internalizer through concrete typed references. SMTKernel owns the default cost model and closes it after the manager; an explicitly supplied registry retains caller ownership of its cost model.",
-        "Quantifier activity borrows the shared relevance query and retains the true-assignment guard. quantified_model_relevancy.smt2 disables E-matching and filtering, checks identity-function model values, and rejects a scoped conflicting ground fact. Reverting the activity predicate makes Go incorrectly return SAT for that conflict."
+        "Quantifier activity borrows the shared relevance query and retains the true-assignment guard. quantified_model_relevancy.smt2 disables E-matching and filtering, checks identity-function model values, and rejects a scoped conflicting ground fact. Reverting the activity predicate makes Go incorrectly return SAT for that conflict.",
+        "The quantifier manager stores an integer cursor into the internalizer-owned enode stack and saves it alongside activation scopes. Pop restores the cursor before removed enodes can be reused; the manager borrows nodes during notification and creates no extra AST or enode owner."
       ],
       "deviations": [
-        "The source public add_instance forwarding bug that passes max_generation as max_top_generation is preserved. Finite MBQI uses a concrete Go model checker, honors mbqi.id prefixes, and resets and grows the source counterexample and iteration limits on each search. Auxiliary-solver checking and full model-finder adjustment remain open."
+        "The source public add_instance forwarding bug that passes max_generation as max_top_generation is preserved. Finite MBQI uses a concrete Go model checker, honors mbqi.id prefixes, and resets and grows the source counterexample and iteration limits on each search. Auxiliary-solver checking and full model-finder adjustment remain open.",
+        "The concrete matcher observes newly internalized unmarked terms when relevancy is disabled, including equal-length replacement scopes. Source instruction-tree optimizations remain represented by the existing direct typed matcher. Quantified E-matching saturation does not itself authorize SAT; the search boundary requires a model accepted by the quantifier checker."
       ]
     },
     {

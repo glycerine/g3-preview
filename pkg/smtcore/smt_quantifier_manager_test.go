@@ -68,6 +68,107 @@ func TestSMTQuantifierActivationHonorsDisabledRelevancyAndAssignment(t *testing.
 	}
 }
 
+func TestSMTQuantifierManagerNewEnodesAndCursorRollback(t *testing.T) {
+	m, state, registry, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{Ematching: true})
+	relevancy, err := NewSMTRelevancyPropagator(state.context, false)
+	astTestMust(t, err)
+	astTestMust(t, state.SetRelevancy(relevancy))
+	_, predicate, sort := smtManagedQuantifier(t, m, "new-enode")
+	variable, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	body, err := m.MkApp(predicate, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{body})
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{symbol.Numerical(0)}, Body: body, Patterns: []ast.ASTHandle{pattern},
+	})
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(quantifier, true))
+	astTestMust(t, state.context.SetAssignment(quantifier, lbool.True))
+	astTestMust(t, manager.Propagate())
+	if manager.CanPropagate() {
+		t.Fatal("matching did not consume its initial work")
+	}
+	baseHead := manager.newEnodeHead
+	for cycle := uint32(0); cycle < 2; cycle++ {
+		astTestMust(t, state.PushScope())
+		constant, err := m.MkConst(astTestSymbol(t, m, "new-enode-binding"), sort)
+		astTestMust(t, err)
+		application, err := m.MkApp(predicate, []ast.ASTHandle{constant})
+		astTestMust(t, err)
+		astTestMust(t, state.Internalize(application, true))
+		astTestMust(t, state.context.SetAssignment(application, lbool.False))
+		if !manager.CanPropagate() {
+			t.Fatal("new unmarked enode did not expose E-matching work", cycle)
+		}
+		astTestMust(t, manager.Propagate())
+		if registry.schedule.Stats().Instances != cycle+1 || manager.newEnodeHead != len(state.enodeStack) {
+			t.Fatal("new enode was not matched", cycle, registry.schedule.Stats(), manager.newEnodeHead, len(state.enodeStack))
+		}
+		astTestMust(t, state.PopScopes(1))
+		if manager.newEnodeHead != baseHead {
+			t.Fatal("scoped enode cursor was not restored", cycle, manager.newEnodeHead, baseHead)
+		}
+	}
+}
+
+func TestSMTQuantifiedSearchRequiresModelValidation(t *testing.T) {
+	m, solver := smtAssertedNNFFixture(t, false)
+	local, err := solver.kernel.paramContext.NewValue()
+	astTestMust(t, err)
+	for _, name := range []string{"mbqi", "preprocess"} {
+		astTestMust(t, solver.kernel.paramContext.SetBoolName(&local, &name, false))
+	}
+	name := "relevancy"
+	astTestMust(t, solver.kernel.paramContext.SetUIntName(&local, &name, 0))
+	astTestMust(t, solver.UpdateParams(&local))
+	astTestMust(t, solver.kernel.paramContext.Del(&local))
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "validation-sort"), nil)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	predicate := smtQuickPredicate(t, m, "validation-p", sort, boolean)
+	variable, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	body, err := m.MkApp(predicate, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{body})
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{symbol.Numerical(0)}, Body: body, Patterns: []ast.ASTHandle{pattern},
+	})
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(quantifier))
+	for cycle := 0; cycle < 2; cycle++ {
+		status, err := solver.CheckSat(nil)
+		astTestMust(t, err)
+		failure, err := solver.kernel.LastFailure()
+		astTestMust(t, err)
+		reason, err := solver.ReasonUnknown()
+		astTestMust(t, err)
+		if status != lbool.Undef || failure != SMTFailureQuantifiers || reason != "(incomplete quantifiers)" {
+			t.Fatal("unchecked quantified model was accepted", status, failure, reason)
+		}
+		astTestMust(t, solver.Push())
+		constant, err := m.MkConst(astTestSymbol(t, m, "validation-binding"), sort)
+		astTestMust(t, err)
+		application, err := m.MkApp(predicate, []ast.ASTHandle{constant})
+		astTestMust(t, err)
+		negative, err := m.MkNot(application)
+		astTestMust(t, err)
+		astTestMust(t, solver.Assert(negative))
+		status, err = solver.CheckSat(nil)
+		if err != nil {
+			t.Fatal("scoped check", cycle, err)
+		}
+		if status != lbool.False {
+			t.Fatal("E-matching failed to refute a grounded contradiction", cycle, status)
+		}
+		astTestMust(t, solver.Pop(1))
+	}
+}
+
 func TestSMTQuantifierManagerPropagatesAndScopesQueuedInstances(t *testing.T) {
 	m, state, registry, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})
 	quantifier, _, sort := smtManagedQuantifier(t, m, "managed-queue")

@@ -33,6 +33,8 @@ type SMTQuantifierManager struct {
 	activated        map[ast.ASTHandle]bool
 	activationTrail  []ast.ASTHandle
 	activationScopes []int
+	newEnodeHead     int
+	newEnodeScopes   []int
 	promoteUnsat     bool
 	ematching        bool
 	quickUnsat       bool
@@ -196,6 +198,9 @@ func (q *SMTQuantifierManager) CanPropagate() bool {
 	if q.registry.schedule.HasWork() || q.ematching && q.mam.HasWork() {
 		return true
 	}
+	if q.hasNewEnodes() {
+		return true
+	}
 	if q.ematching {
 		for _, quantifier := range q.registry.quantifiers {
 			if q.active(quantifier) && !q.activated[quantifier] {
@@ -204,6 +209,22 @@ func (q *SMTQuantifierManager) CanPropagate() bool {
 		}
 	}
 	return false
+}
+
+// Source default_qm_plugin::propagate scans newly internalized enodes when
+// relevancy is disabled, since no relevant_eh notifications will arrive.
+func (q *SMTQuantifierManager) hasNewEnodes() bool {
+	return q.ematching && !q.registry.Empty() && q.state.relevancy != nil && !q.state.relevancy.enabled && q.newEnodeHead < len(q.state.enodeStack)
+}
+
+func (q *SMTQuantifierManager) notifyNewEnodes() {
+	if !q.hasNewEnodes() {
+		return
+	}
+	for _, node := range q.state.enodeStack[q.newEnodeHead:] {
+		q.mam.Relevant(node)
+	}
+	q.newEnodeHead = len(q.state.enodeStack)
 }
 
 func (q *SMTQuantifierManager) activatePatterns() error {
@@ -245,6 +266,7 @@ func (q *SMTQuantifierManager) PushScope() error {
 		return err
 	}
 	q.activationScopes = append(q.activationScopes, len(q.activationTrail))
+	q.newEnodeScopes = append(q.newEnodeScopes, q.newEnodeHead)
 	return nil
 }
 
@@ -268,6 +290,8 @@ func (q *SMTQuantifierManager) PopScopes(count uint32) error {
 	}
 	q.activationTrail = q.activationTrail[:limit]
 	q.activationScopes = q.activationScopes[:level]
+	q.newEnodeHead = q.newEnodeScopes[level]
+	q.newEnodeScopes = q.newEnodeScopes[:level]
 	return nil
 }
 
@@ -332,6 +356,7 @@ func (q *SMTQuantifierManager) Propagate() error {
 	if err := q.activatePatterns(); err != nil {
 		return err
 	}
+	q.notifyNewEnodes()
 	if q.ematching && q.mam.HasWork() {
 		if err := q.mam.Match(); err != nil {
 			return err
@@ -406,6 +431,7 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 	if err := q.activatePatterns(); err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
+	q.notifyNewEnodes()
 	if q.ematching && q.mam.HasWork() {
 		if err := q.mam.Match(); err != nil {
 			return SMTFinalCheckGiveUp, err

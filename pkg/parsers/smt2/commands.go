@@ -16,17 +16,19 @@ import (
 )
 
 type commandParser struct {
-	context  *cmd_context.Context
-	scanner  *Scanner
-	token    Token
-	cacheEnd int
-	out      io.Writer
-	manager  *ast.ASTManager
-	refs     []ast.ASTRef
-	env      smt2LocalEnv
-	locals   localExprStack
-	bindings uint32
-	shifter  *rewriter.VarShifter
+	context            *cmd_context.Context
+	scanner            *Scanner
+	token              Token
+	cacheEnd           int
+	out                io.Writer
+	manager            *ast.ASTManager
+	refs               []ast.ASTRef
+	env                smt2LocalEnv
+	locals             localExprStack
+	bindings           uint32
+	shifter            *rewriter.VarShifter
+	ignoreUserPatterns bool
+	ignoreBadPatterns  bool
 }
 
 // ParseCommands executes the retained SMT-LIB command grammar against Context.
@@ -48,6 +50,9 @@ func ParseCommands(context *cmd_context.Context, input io.Reader, out io.Writer)
 			result = errors.Join(result, p.shifter.Close())
 		}
 	}()
+	if err = p.configurePatternOptions(); err != nil {
+		return err
+	}
 	if err = p.advance(); err != nil {
 		return err
 	}
@@ -192,6 +197,9 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		if err = p.context.SetBoolOption(key, value == "true"); err != nil {
+			return false, err
+		}
+		if err = p.configurePatternOptions(); err != nil {
 			return false, err
 		}
 	case "set-info":

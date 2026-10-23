@@ -443,25 +443,16 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 			return err
 		}
 	}
-	if !enabled {
-		if k.preprocessor != nil {
-			if err = k.preprocessor.Close(); err != nil {
-				return err
-			}
-			k.preprocessor = nil
-		}
-		k.preprocess = false
-		k.preprocessState = state
-		k.assertedPhaseReady = false
-		return nil
-	}
+	// Quantifier instantiation borrows this rewriter independently of the
+	// assertion-preprocessing switch. Preserve its lifetime when that switch
+	// is disabled, including across later parameter updates.
 	if k.preprocessor == nil {
 		k.preprocessor, err = rewriter.NewTheoryRewriter(k.manager, k.paramContext, k.paramGlobals, params)
 	} else {
 		err = k.preprocessor.UpdateParams(params)
 	}
 	if err == nil {
-		k.preprocess = true
+		k.preprocess = enabled
 		k.preprocessState = state
 		k.assertedPhaseReady = false
 		err = k.setAssertedEliminateAnd(false)

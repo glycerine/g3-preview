@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
@@ -228,11 +229,14 @@ func (b *SMTQIInstanceBuilder) MaterializeAndInternalize(prepared *SMTQIPrepared
 		return nil, ast.ErrASTDomain
 	}
 	result, err := b.Materialize(prepared, rw, stat, scope)
-	if err != nil || result == nil {
-		return result, err
+	if err != nil {
+		return result, fmt.Errorf("rewrite and finish instance: %w", err)
+	}
+	if result == nil {
+		return nil, nil
 	}
 	if err = internalizer.InternalizeInstance(result); err != nil {
-		return nil, errors.Join(err, result.Close())
+		return nil, errors.Join(fmt.Errorf("internalize instance lemma: %w", err), result.Close())
 	}
 	return result, nil
 }
