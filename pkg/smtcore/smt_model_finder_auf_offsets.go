@@ -64,9 +64,9 @@ func (g *smtModelFinderAUFGraph) insertShifted(to *smtModelFinderAUFNode, term, 
 	return err
 }
 
-func (g *smtModelFinderAUFGraph) populateOffsets() error {
+func (g *smtModelFinderAUFGraph) populateOffsets(quantifier ast.ASTHandle) error {
 	for _, info := range g.fvars {
-		if info.offset.IsNull() {
+		if info.quantifier != quantifier || info.offset.IsNull() {
 			continue
 		}
 		argument := g.arguments[smtModelFinderAUFKey{info.function, info.position}].root()
@@ -75,9 +75,6 @@ func (g *smtModelFinderAUFGraph) populateOffsets() error {
 			// Source uses only ground-context arguments for this case: no
 			// finite fixed point exists for a nonzero offset within a class.
 			continue
-		}
-		if argument.mono || variable.mono {
-			argument.mono, variable.mono = true, true
 		}
 		// The second population pass enforces A_f_i-k subset S_j followed
 		// by S_j+k subset A_f_i, preserving each source generation.

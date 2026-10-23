@@ -106,3 +106,66 @@ func TestSMTModelFinderAUFBitVectorOffsetWraps(t *testing.T) {
 		t.Fatal("4-bit offset did not wrap 1-2 to 15 and 15+2 to 1", variable.set.elements, argument.set.elements)
 	}
 }
+
+func TestSMTModelFinderAUFOffsetPassesFollowQuantifierOrder(t *testing.T) {
+	for _, producerFirst := range []bool{false, true} {
+		name := "offset-before-producer"
+		if producerFirst {
+			name = "producer-before-offset"
+		}
+		t.Run(name, func(t *testing.T) {
+			m, _, _, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})
+			one, err := m.ArithmeticIntegerNumeralText("1")
+			astTestMust(t, err)
+			nine, err := m.ArithmeticIntegerNumeralText("9")
+			astTestMust(t, err)
+			ten, err := m.ArithmeticIntegerNumeralText("10")
+			astTestMust(t, err)
+			integer, err := m.GetSort(one)
+			astTestMust(t, err)
+			boolean, err := m.MkBoolSort()
+			astTestMust(t, err)
+			p := smtQuickPredicate(t, m, "offset-pass-p", integer, boolean)
+			x, err := m.MkVar(0, integer)
+			astTestMust(t, err)
+			shifted, err := m.MkArithmeticAdd(x, one)
+			astTestMust(t, err)
+			offsetBody, err := m.MkApp(p, []ast.ASTHandle{shifted})
+			astTestMust(t, err)
+			direct, err := m.MkApp(p, []ast.ASTHandle{x})
+			astTestMust(t, err)
+			equal, err := m.MkEq(x, ten)
+			astTestMust(t, err)
+			notEqual, err := m.MkNot(equal)
+			astTestMust(t, err)
+			producerBody, err := m.MkAnd(direct, notEqual)
+			astTestMust(t, err)
+			makeQuantifier := func(name string, body ast.ASTHandle) ast.ASTHandle {
+				q, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []symbol.Symbol{astTestSymbol(t, m, name)}, Body: body})
+				astTestMust(t, err)
+				return q
+			}
+			offset := makeQuantifier("offset-pass-x", offsetBody)
+			producer := makeQuantifier("offset-pass-y", producerBody)
+			quantifiers := []ast.ASTHandle{offset, producer}
+			if producerFirst {
+				quantifiers = []ast.ASTHandle{producer, offset}
+			}
+			graph := newSMTModelFinderAUFGraph(manager.modelFinder)
+			t.Cleanup(func() { astTestMust(t, graph.close()) })
+			astTestMust(t, graph.build(quantifiers))
+			offsetSet := graph.uvars[smtModelFinderAUFKey{offset, 0}].root().set.elements
+			producerSet := graph.uvars[smtModelFinderAUFKey{producer, 0}].root().set.elements
+			if _, found := producerSet[ten]; !found {
+				t.Fatal("producer did not populate shared argument class")
+			}
+			if producerFirst {
+				if _, found := offsetSet[nine]; !found || len(offsetSet) != 1 {
+					t.Fatal("offset did not consume earlier quantifier's term", offsetSet)
+				}
+			} else if len(offsetSet) != 0 {
+				t.Fatal("offset consumed a later quantifier's first-pass term", offsetSet)
+			}
+		})
+	}
+}

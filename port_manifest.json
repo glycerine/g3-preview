@@ -108733,6 +108733,7 @@
         "TestSMTModelFinderAUFGraphSharesPatternlessArgumentSets",
         "TestSMTModelFinderAUFGraphEqualityAndDisequalityConstraints",
         "TestSMTModelFinderAUFOffsetPopulationAndSameClassCutoff",
+        "TestSMTModelFinderAUFOffsetPassesFollowQuantifierOrder",
         "TestSMTModelFinderAUFBitVectorOffsetWraps",
         "TestSMTModelFinderAUFComparisonGroundBoundaries",
         "TestSMTModelFinderAUFVariableComparisonPolarityAndSignedProjection",
@@ -109223,6 +109224,7 @@
           "go_target": "pkg/smtcore/smt_model_finder_auf_offsets.go",
           "tests": [
             "TestSMTModelFinderAUFOffsetPopulationAndSameClassCutoff",
+            "TestSMTModelFinderAUFOffsetPassesFollowQuantifierOrder",
             "TestSMTModelFinderAUFBitVectorOffsetWraps"
           ]
         },

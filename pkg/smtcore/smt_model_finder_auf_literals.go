@@ -197,8 +197,11 @@ func (g *smtModelFinderAUFGraph) processLiterals() error {
 	return nil
 }
 
-func (g *smtModelFinderAUFGraph) populateLiterals() error {
+func (g *smtModelFinderAUFGraph) populateLiterals(quantifier ast.ASTHandle) error {
 	for _, info := range g.literals {
+		if info.quantifier != quantifier {
+			continue
+		}
 		node := g.uvars[smtModelFinderAUFKey{info.quantifier, info.first}]
 		switch info.kind {
 		case aufDisequalGround, aufOrderedGround:

@@ -138,9 +138,37 @@ func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 			}
 		}
 	}
+	for _, quantifier := range quantifiers {
+		if err := g.populateFunctionArguments(quantifier); err != nil {
+			return err
+		}
+		if err := g.populateLiterals(quantifier); err != nil {
+			return err
+		}
+		if err := g.populateSelectVars(quantifier); err != nil {
+			return err
+		}
+		if err := g.populateOffsets(quantifier); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (g *smtModelFinderAUFGraph) populateFunctionArguments(quantifier ast.ASTHandle) error {
 	context := g.finder.state.context
 	for _, info := range g.fvars {
+		if info.quantifier != quantifier {
+			continue
+		}
 		node := g.arguments[smtModelFinderAUFKey{info.function, info.position}]
+		if !info.offset.IsNull() {
+			variable := g.uvars[smtModelFinderAUFKey{info.quantifier, info.variable}].root()
+			argument := node.root()
+			if argument != variable && (argument.mono || variable.mono) {
+				argument.mono, variable.mono = true, true
+			}
+		}
 		for _, application := range context.byDeclaration[info.function] {
 			if application == nil || !context.relevant[application.owner] {
 				continue
@@ -162,13 +190,7 @@ func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 			}
 		}
 	}
-	if err := g.populateLiterals(); err != nil {
-		return err
-	}
-	if err := g.populateSelectVars(); err != nil {
-		return err
-	}
-	return g.populateOffsets()
+	return nil
 }
 
 func (g *smtModelFinderAUFGraph) publishInstantiationSets() error {

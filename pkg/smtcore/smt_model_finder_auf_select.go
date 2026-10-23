@@ -150,9 +150,12 @@ func (g *smtModelFinderAUFGraph) processSelectVars() error {
 	return nil
 }
 
-func (g *smtModelFinderAUFGraph) populateSelectVars() error {
+func (g *smtModelFinderAUFGraph) populateSelectVars(quantifier ast.ASTHandle) error {
 	context, m := g.finder.state.context, g.finder.manager
 	for _, info := range g.selects {
+		if info.quantifier != quantifier {
+			continue
+		}
 		array, err := m.GetArg(info.selectTerm, 0)
 		if err != nil {
 			return err
