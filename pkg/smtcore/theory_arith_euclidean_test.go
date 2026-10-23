@@ -23,6 +23,7 @@ func TestSMTEuclideanBridgeCongruenceScopesProofsAndModels(t *testing.T) {
 							s, err := NewSMTSolver(m, nil, "QF_LIA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
 							astTestMust(t, err)
 							t.Cleanup(func() { astTestMust(t, s.Close()) })
+							smtDisableAutoConfig(t, s)
 							s.kernel.preprocess = false
 							astTestMust(t, s.SetProduceModels(true))
 							family, err := m.ArithmeticFamilyID()

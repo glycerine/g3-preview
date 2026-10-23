@@ -8,6 +8,19 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
+// Algorithm-focused tests set theory controls directly; disable automatic
+// setup so the driver's first push cannot replace those chosen controls.
+func smtDisableAutoConfig(t *testing.T, solver *SMTSolver) {
+	t.Helper()
+	context := solver.kernel.paramContext
+	params, err := context.NewValue()
+	astTestMust(t, err)
+	defer func() { astTestMust(t, context.Del(&params)) }()
+	name := "auto_config"
+	astTestMust(t, context.SetBoolName(&params, &name, false))
+	astTestMust(t, solver.UpdateParams(&params))
+}
+
 func TestSMTQFUFLIASetupOwnsInternalArithmeticThresholdAcrossUpdates(t *testing.T) {
 	for _, tc := range []struct {
 		name, logic string

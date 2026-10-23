@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"integer_auto_deep_ite.smt2":                "sat\n((holds true))\nunsat\nsat\n((holds true))\n",
 	"quantified_ematching_saturation.smt2":      "unknown\nunsat\nunknown\n",
 	"quantified_ematching_relevancy.smt2":       "unsat\nunsat\n",
 	"quantified_model_relevancy.smt2":           "sat\n(((f 7) 7) ((f 11) 11))\nunsat\nsat\n(((f 11) 11))\n",

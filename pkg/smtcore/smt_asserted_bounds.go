@@ -17,9 +17,12 @@ func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 	if k.preprocessingSetupDone || k.smtParams == nil {
 		return nil
 	}
-	k.preprocessingSetupDone = true
 	if !k.smtState.AutoConfig {
+		k.preprocessingSetupDone = true
 		return nil
+	}
+	if err := k.setupIntegerLogicPolicy(useStaticFeatures); err != nil {
+		return err
 	}
 	enabled := false
 	switch k.setupLogic {
@@ -45,6 +48,7 @@ func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 		k.preprocessState.EliminateBounds = true
 		k.smtParams.preprocess.state.EliminateBounds = true
 	}
+	k.preprocessingSetupDone = true
 	return nil
 }
 
