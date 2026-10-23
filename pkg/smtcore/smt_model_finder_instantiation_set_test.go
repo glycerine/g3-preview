@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
+	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals(t *testing.T) {
@@ -56,4 +57,48 @@ func TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals(t *testing.T)
 		t.Fatal("term removed after inverse construction", err)
 	}
 	astTestMust(t, set.MakeInverse(proto))
+}
+
+func TestSMTModelFinderInstantiationSetRejectsQuantifiedPrivateValues(t *testing.T) {
+	m := astTestManager(t)
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "instantiation-private-sort"), nil)
+	astTestMust(t, err)
+	private, err := m.MkModelValue(0, sort)
+	astTestMust(t, err)
+	x, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	predicate, err := m.MkFuncDecl(astTestSymbol(t, m, "instantiation-private-p"), []ast.ASTHandle{sort, sort}, boolean, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	application, err := m.MkApp(predicate, []ast.ASTHandle{x, private})
+	astTestMust(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{application})
+	astTestMust(t, err)
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	set, err := newSMTModelFinderInstantiationSet(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, set.Close()) })
+	for _, location := range []string{"body", "pattern", "no-pattern"} {
+		spec := ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{astTestSymbol(t, m, "instantiation-private-x")}, Body: truth}
+		switch location {
+		case "body":
+			spec.Body = application
+		case "pattern":
+			spec.Patterns = []ast.ASTHandle{pattern}
+		case "no-pattern":
+			spec.NoPatterns = []ast.ASTHandle{application}
+		}
+		quantifier, err := m.MkQuantifier(spec)
+		astTestMust(t, err)
+		inserted, err := set.Insert(quantifier, 0)
+		astTestMust(t, err)
+		if inserted {
+			t.Fatal("private model value escaped through quantified " + location)
+		}
+	}
+	if len(set.elements) != 0 || len(set.references) != 0 {
+		t.Fatal("rejected private terms retained ownership")
+	}
 }

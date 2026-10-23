@@ -108722,6 +108722,7 @@
       "tests": [
         "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle",
         "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals",
+        "TestSMTModelFinderInstantiationSetRejectsQuantifiedPrivateValues",
         "TestSMTModelFinderCollectsDirectPatternGroundArguments",
         "TestSMTModelFinderPublishesIsolatedSimpleMacro",
         "TestSMTModelFinderPublishesSharedHintMacro",
@@ -109319,7 +109320,8 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_instantiation_set.go",
           "tests": [
-            "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals"
+            "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals",
+            "TestSMTModelFinderInstantiationSetRejectsQuantifiedPrivateValues"
           ]
         },
         {

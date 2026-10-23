@@ -55,6 +55,36 @@ func (s *smtModelFinderInstantiationSet) containsModelValue(root ast.ASTHandle) 
 		if err != nil {
 			return false, err
 		}
+		if kind == ast.ASTQuantifier {
+			body, err := s.manager.GetQuantifierBody(n)
+			if err != nil {
+				return false, err
+			}
+			stack = append(stack, body)
+			patterns, err := s.manager.GetNumPatterns(n)
+			if err != nil {
+				return false, err
+			}
+			for i := uint32(0); i < patterns; i++ {
+				pattern, err := s.manager.GetPattern(n, i)
+				if err != nil {
+					return false, err
+				}
+				stack = append(stack, pattern)
+			}
+			noPatterns, err := s.manager.GetNumNoPatterns(n)
+			if err != nil {
+				return false, err
+			}
+			for i := uint32(0); i < noPatterns; i++ {
+				pattern, err := s.manager.GetNoPattern(n, i)
+				if err != nil {
+					return false, err
+				}
+				stack = append(stack, pattern)
+			}
+			continue
+		}
 		if kind != ast.ASTApp {
 			continue
 		}
