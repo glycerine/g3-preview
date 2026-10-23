@@ -108480,7 +108480,7 @@
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
         "TestSMTSolverMBQIBlocksAndCollectsMultipleIntegerCounterexamples",
-        "TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet",
+        "TestSMTSolverMBQIRestrictsSkolemToBodyInstantiationSet",
         "TestSMTSolverMBQIFallsBackWhenInstantiationSetHasNoCounterexample",
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
@@ -108560,7 +108560,7 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_checker.go",
           "tests": [
-            "TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet",
+            "TestSMTSolverMBQIRestrictsSkolemToBodyInstantiationSet",
             "TestSMTSolverMBQIFallsBackWhenInstantiationSetHasNoCounterexample"
           ]
         },
@@ -108576,7 +108576,7 @@
           "go_target": "pkg/smtcore/smt_model_checker.go",
           "tests": [
             "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals",
-            "TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet",
+            "TestSMTSolverMBQIRestrictsSkolemToBodyInstantiationSet",
             "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters"
           ]
         },
@@ -108620,7 +108620,7 @@
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
         "TestSMTSolverMBQIBlocksAndCollectsMultipleIntegerCounterexamples",
-        "TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet",
+        "TestSMTSolverMBQIRestrictsSkolemToBodyInstantiationSet",
         "TestSMTSolverMBQIFallsBackWhenInstantiationSetHasNoCounterexample",
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
@@ -108723,7 +108723,7 @@
         "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle",
         "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals",
         "TestSMTModelFinderInstantiationSetRejectsQuantifiedPrivateValues",
-        "TestSMTModelFinderCollectsDirectPatternGroundArguments",
+        "TestSMTModelFinderIgnoresTriggerOnlyDeclarations",
         "TestSMTModelFinderPublishesIsolatedSimpleMacro",
         "TestSMTModelFinderPublishesSharedHintMacro",
         "TestSMTModelFinderForcedFullMacrosRejectDependencyCycle",
@@ -109327,11 +109327,11 @@
           ]
         },
         {
-          "name": "direct-variable trigger analysis and ground-context argument population",
-          "status": "partial",
-          "go_target": "pkg/smtcore/smt_model_finder.go",
+          "name": "body-derived qinfo ignores trigger-only declarations when constructing AUF instantiation sets",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_auf_analyzer.go",
           "tests": [
-            "TestSMTModelFinderCollectsDirectPatternGroundArguments"
+            "TestSMTModelFinderIgnoresTriggerOnlyDeclarations"
           ]
         },
         {

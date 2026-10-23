@@ -590,78 +590,6 @@ func (f *SMTModelFinder) relevantQuantifiers() ([]ast.ASTHandle, error) {
 	return result, nil
 }
 
-func (f *SMTModelFinder) collectPatternTerm(quantifier, term ast.ASTHandle, declarations uint32) error {
-	kind, err := f.manager.GetKind(term)
-	if err != nil {
-		return err
-	}
-	if kind != ast.ASTApp {
-		return nil
-	}
-	declaration, err := f.manager.GetDecl(term)
-	if err != nil {
-		return err
-	}
-	count, err := f.manager.GetNumArgs(term)
-	if err != nil {
-		return err
-	}
-	ground := f.state.context.byDeclaration[declaration]
-	for position := uint32(0); position < count; position++ {
-		argument, err := f.manager.GetArg(term, position)
-		if err != nil {
-			return err
-		}
-		argumentKind, err := f.manager.GetKind(argument)
-		if err != nil {
-			return err
-		}
-		if argumentKind == ast.ASTVar {
-			index, err := f.manager.GetVarIndex(argument)
-			if err != nil {
-				return err
-			}
-			if index < declarations {
-				variable := declarations - index - 1
-				for _, application := range ground {
-					if application == nil || !f.state.context.relevant[application.owner] || position >= uint32(len(application.arguments)) {
-						continue
-					}
-					binding := application.arguments[position]
-					if _, err = f.InsertInstantiationTerm(quantifier, variable, binding.owner, binding.Generation()); err != nil {
-						return err
-					}
-				}
-			}
-		}
-		if err = f.collectPatternTerm(quantifier, argument, declarations); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (f *SMTModelFinder) collectPatternInstantiationTerms(quantifier ast.ASTHandle) error {
-	declarations, err := f.manager.GetNumDeclarations(quantifier)
-	if err != nil {
-		return err
-	}
-	patterns, err := f.manager.GetNumPatterns(quantifier)
-	if err != nil {
-		return err
-	}
-	for i := uint32(0); i < patterns; i++ {
-		pattern, err := f.manager.GetPattern(quantifier, i)
-		if err != nil {
-			return err
-		}
-		if err = f.collectPatternTerm(quantifier, pattern, declarations); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // FixModel is the production entry used during candidate-model construction.
 // Quantifier-specific macro and AUF passes progressively extend this method.
 func (f *SMTModelFinder) FixModel(model *protomodel.ProtoModel) error {
@@ -714,11 +642,6 @@ func (f *SMTModelFinder) FixModel(model *protomodel.ProtoModel) error {
 	}
 	if err = f.populateAUFInstantiationSets(relevant, model); err != nil {
 		return err
-	}
-	for _, quantifier := range relevant {
-		if err = f.collectPatternInstantiationTerms(quantifier); err != nil {
-			return err
-		}
 	}
 	for _, quantifier := range allRelevant {
 		if err = f.populateMacroInstantiationSets(quantifier); err != nil {

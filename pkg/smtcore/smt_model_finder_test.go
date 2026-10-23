@@ -44,7 +44,7 @@ func TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle(t *testing.T) {
 	astTestMust(t, manager.InitSearch())
 }
 
-func TestSMTModelFinderCollectsDirectPatternGroundArguments(t *testing.T) {
+func TestSMTModelFinderIgnoresTriggerOnlyDeclarations(t *testing.T) {
 	m, state, _, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})
 	sort, err := m.MkSort(astTestSymbol(t, m, "model-finder-pattern-sort"), ast.ASTSortInfo{})
 	astTestMust(t, err)
@@ -57,20 +57,23 @@ func TestSMTModelFinderCollectsDirectPatternGroundArguments(t *testing.T) {
 	astTestMust(t, err)
 	pattern, err := m.MkPattern([]ast.ASTHandle{body})
 	astTestMust(t, err)
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
 	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
 		Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{astTestSymbol(t, m, "model-finder-pattern-x")},
-		Body: body, Patterns: []ast.ASTHandle{pattern},
+		Body: truth, Patterns: []ast.ASTHandle{pattern},
 	})
 	astTestMust(t, err)
 	astTestMust(t, state.Internalize(quantifier, true))
 	owner, binding := smtEnodeConstant(t, m, 9100, sort, 7)
 	astTestMust(t, state.context.RegisterEnode(binding, true))
 	_, _ = smtQuickApplicationNode(t, m, state.context, predicate, binding, true)
-	astTestMust(t, manager.modelFinder.collectPatternInstantiationTerms(quantifier))
-	set, err := manager.modelFinder.instantiationSet(quantifier, 0, false)
-	astTestMust(t, err)
-	if set == nil || set.elements[owner] != 7 || len(set.elements) != 1 {
-		t.Fatal("direct trigger argument was not collected", set)
+	graph := newSMTModelFinderAUFGraph(manager.modelFinder)
+	t.Cleanup(func() { astTestMust(t, graph.close()) })
+	astTestMust(t, graph.build([]ast.ASTHandle{quantifier}))
+	set := graph.uvars[smtModelFinderAUFKey{quantifier, 0}].root().set
+	if len(graph.fvars) != 0 || len(set.elements) != 0 {
+		t.Fatal("trigger-only occurrence added a body constraint", owner, set.elements)
 	}
 }
 

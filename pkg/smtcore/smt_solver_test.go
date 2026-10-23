@@ -159,7 +159,7 @@ func TestSMTSolverMBQIBlocksAndCollectsMultipleIntegerCounterexamples(t *testing
 	}
 }
 
-func TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet(t *testing.T) {
+func TestSMTSolverMBQIRestrictsSkolemToBodyInstantiationSet(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	_, err := m.RegisterArithmeticPlugin()
 	astTestMust(t, err)
@@ -179,6 +179,8 @@ func TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet(t *testing.T) {
 	pattern, err := m.MkPattern([]ast.ASTHandle{trigger})
 	astTestMust(t, err)
 	body, err := m.MkEq(variable, zero)
+	astTestMust(t, err)
+	body, err = m.MkAnd(trigger, body)
 	astTestMust(t, err)
 	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
 		Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []usymbol.Symbol{astTestSymbol(t, m, "solver-mbqi-inst-set-x")},
@@ -206,7 +208,7 @@ func TestSMTSolverMBQIRestrictsSkolemToPatternInstantiationSet(t *testing.T) {
 	}
 	fingerprints := s.kernel.internalizer.quantifiers.fingerprints.fingerprints
 	if len(fingerprints) != 1 || len(fingerprints[0].args) != 1 || fingerprints[0].args[0].owner != five {
-		t.Fatal("MBQI did not use the pattern instantiation-set inverse", len(fingerprints))
+		t.Fatal("MBQI did not use the body instantiation-set inverse", len(fingerprints))
 	}
 }
 
