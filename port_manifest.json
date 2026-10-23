@@ -99313,7 +99313,9 @@
         "pkg/smtcore/smt_asserted_reduce_test.go",
         "pkg/smtcore/smt_asserted_patterns.go",
         "pkg/smtcore/smt_asserted_patterns_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_asserted_bv.go",
+        "pkg/smtcore/smt_asserted_bv_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -99348,7 +99350,9 @@
         "TestSMTAssertedInputSurvivesPhaseCacheFlush",
         "TestSMTAssertedPatternInferenceGuardsAndProofs",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTAssertedBit2IntGuardsAndProofs",
+        "TestSMTAssertedBVSharingScopesAndProofs"
       ],
       "conditionals": [
         {
@@ -99557,6 +99561,28 @@
           ]
         },
         {
+          "name": "apply_bit2int: guarded pending-suffix bit-vector-to-integer propagation, transformation proof composition and post-operation reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_bv.go",
+          "tests": [
+            "TestSMTAssertedBit2IntGuardsAndProofs"
+          ]
+        },
+        {
+          "name": "max_bv_sharing_fn: lifetime-owned sharing reducer, source first-scope initialization, user-scope cache rollback, proof composition and ordinary post-operation reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_bv.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTAssertedBVSharingScopesAndProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "remaining pending-formula reduction passes and quantifier transforms",
           "status": "unported",
           "go_target": null,
@@ -99568,7 +99594,8 @@
         "The concrete formula batch pins transformed rows and generated ITE definition proofs before temporary rewriter owners close. Pulling and injectivity passes swap/flatten rows without post-operation reduction; ITE passes reduce the resulting pending suffix as required by their source post_op.",
         "The kernel owns its accumulated assertion-rewriter parameter reference until close, and pins incoming formula/proof handles before phase changes flush cached ASTs. Tests that reuse original formulas after preprocessing retain independent AST references.",
         "Negated-disjunction assertion flattening uses the source mk_not helper, eliminating double negations and simplifying Boolean constants consistently with not-or elimination proofs.",
-        "The kernel owns the pattern inference rewriter until close. The transformed formula batch pins inferred quantifiers and composed proofs; model-finder identities refer to those transformed quantifiers, preserving their source QIDs."
+        "The kernel owns the pattern inference rewriter until close. The transformed formula batch pins inferred quantifiers and composed proofs; model-finder identities refer to those transformed quantifiers, preserving their source QIDs.",
+        "The kernel owns the maximize_bv_sharing rewriter and pushes/pops its operand cache with assertion scopes. Bit2int owns its per-pass cache until transformed formula/proof rows have acquired references."
       ],
       "deviations": [
         "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager.",
@@ -99600,7 +99627,9 @@
         "pkg/smtcore/smt_asserted_reduce_test.go",
         "pkg/smtcore/smt_asserted_patterns.go",
         "pkg/smtcore/smt_asserted_patterns_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_asserted_bv.go",
+        "pkg/smtcore/smt_asserted_bv_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -99635,7 +99664,9 @@
         "TestSMTAssertedInputSurvivesPhaseCacheFlush",
         "TestSMTAssertedPatternInferenceGuardsAndProofs",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTAssertedBit2IntGuardsAndProofs",
+        "TestSMTAssertedBVSharingScopesAndProofs"
       ],
       "conditionals": [
         {
@@ -99792,6 +99823,28 @@
           ]
         },
         {
+          "name": "apply_bit2int: guarded pending-suffix bit-vector-to-integer propagation, transformation proof composition and post-operation reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_bv.go",
+          "tests": [
+            "TestSMTAssertedBit2IntGuardsAndProofs"
+          ]
+        },
+        {
+          "name": "max_bv_sharing_fn: lifetime-owned sharing reducer, source first-scope initialization, user-scope cache rollback, proof composition and ordinary post-operation reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_bv.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTAssertedBVSharingScopesAndProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "setup, reset, and remaining pending-formula reductions",
           "status": "unported",
           "go_target": null,
@@ -99803,7 +99856,8 @@
         "The concrete formula batch pins transformed rows and generated ITE definition proofs before temporary rewriter owners close. Pulling and injectivity passes swap/flatten rows without post-operation reduction; ITE passes reduce the resulting pending suffix as required by their source post_op.",
         "The kernel owns its accumulated assertion-rewriter parameter reference until close, and pins incoming formula/proof handles before phase changes flush cached ASTs. Tests that reuse original formulas after preprocessing retain independent AST references.",
         "Negated-disjunction assertion flattening uses the source mk_not helper, eliminating double negations and simplifying Boolean constants consistently with not-or elimination proofs.",
-        "The kernel owns the pattern inference rewriter until close. The transformed formula batch pins inferred quantifiers and composed proofs; model-finder identities refer to those transformed quantifiers, preserving their source QIDs."
+        "The kernel owns the pattern inference rewriter until close. The transformed formula batch pins inferred quantifiers and composed proofs; model-finder identities refer to those transformed quantifiers, preserving their source QIDs.",
+        "The kernel owns the maximize_bv_sharing rewriter and pushes/pops its operand cache with assertion scopes. Bit2int owns its per-pass cache until transformed formula/proof rows have acquired references."
       ],
       "deviations": [
         "The concrete retained subset is integrated with SMTKernel rather than exposed as a preprocessing class."
@@ -115809,7 +115863,9 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/theory_bv.go"
+        "pkg/smtcore/theory_bv.go",
+        "pkg/smtcore/theory_bv_fixed_terms_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTBitVectorNumeralEquality",
@@ -115838,7 +115894,10 @@
         "TestSMTBitVectorToIntAxiom",
         "TestSMTIntToBitVectorAxiom",
         "TestSMTBitVectorRelevantTermMarksBits",
-        "TestSMTBitVectorBlastLimitGivesUnknown"
+        "TestSMTBitVectorBlastLimitGivesUnknown",
+        "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -116240,10 +116299,24 @@
         {
           "name": "trace display and debug-only invariant printers/checkers without retained consumers",
           "status": "dead_deleted"
+        },
+        {
+          "name": "add_bit, init_bits/find_wpos and fixed_var_eh: interpreted gate notification, polarity-normalized occurrences, immediate fixed-term discovery and compound-value equalities used by UF congruence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "The theory borrows the SMT internalizer, manager and enodes. It owns scoped AST references for published bit vectors and delayed lazy bridge definitions, releases temporary circuit roots after internalization, and releases all remaining roots on scope pop or close."
+        "The theory borrows the SMT internalizer, manager and enodes. It owns scoped AST references for published bit vectors and delayed lazy bridge definitions, releases temporary circuit roots after internalization, and releases all remaining roots on scope pop or close.",
+        "Bit occurrence keys strip Boolean negations to mirror source literal-variable indexing; scoped bit owners retain the indexed atoms until occurrence removal. Compound interpreted terms participate in fixed-value equality discovery."
       ],
       "deviations": [
         "Go SAT equivalence clauses replace the source imperative bit-assignment and union-find propagation queues while preserving equality, congruence, conflict and backtracking semantics. Go slices, maps and math/big values replace source vectors, tables and numerals. Diagnostic display and Z3DEBUG invariant routines have no retained consumer."
@@ -116255,7 +116328,9 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/theory_bv.go"
+        "pkg/smtcore/theory_bv.go",
+        "pkg/smtcore/theory_bv_fixed_terms_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTBitVectorNumeralEquality",
@@ -116284,7 +116359,10 @@
         "TestSMTBitVectorToIntAxiom",
         "TestSMTIntToBitVectorAxiom",
         "TestSMTBitVectorRelevantTermMarksBits",
-        "TestSMTBitVectorBlastLimitGivesUnknown"
+        "TestSMTBitVectorBlastLimitGivesUnknown",
+        "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -116342,10 +116420,24 @@
         {
           "name": "debug-only display and invariant helpers without retained consumers",
           "status": "dead_deleted"
+        },
+        {
+          "name": "add_bit, init_bits/find_wpos and fixed_var_eh: interpreted gate notification, polarity-normalized occurrences, immediate fixed-term discovery and compound-value equalities used by UF congruence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Concrete Go maps and slices own bit metadata and scope trails; ASTRef values own every expression that must outlive its immediate constructor call. SMTTheoryBase remains the borrowed theory-variable and enode adapter."
+        "Concrete Go maps and slices own bit metadata and scope trails; ASTRef values own every expression that must outlive its immediate constructor call. SMTTheoryBase remains the borrowed theory-variable and enode adapter.",
+        "Bit occurrence keys strip Boolean negations to mirror source literal-variable indexing; scoped bit owners retain the indexed atoms until occurrence removal. Compound interpreted terms participate in fixed-value equality discovery."
       ],
       "deviations": [
         "The source bit-atom occurrence lists, region allocation, union-find merge auxiliaries and custom justifications are represented by guarded SAT clauses and the shared Go congruence/equality machinery. This removes pointer-region storage while retaining reached solver behavior."

@@ -49,6 +49,7 @@ type SMTKernel struct {
 	generated        *model.Model
 	preprocessor     *rewriter.TheoryRewriter
 	patternInference *pattern.InferenceRewriter
+	bvSharing        *rewriter.MaximizeBVSharing
 	assertedMacros   *macros.Manager
 	definedNames     *normal_forms.DefinedNames
 	quantifierCosts  *SMTQICostModel
@@ -121,8 +122,15 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 	if err != nil {
 		return nil, errors.Join(err, macroManager.Close(), manager.DelRef(&proof), internalizer.Close())
 	}
+	sharing, err := rewriter.NewMaximizeBVSharing(manager)
+	if err != nil {
+		if sharing != nil {
+			err = errors.Join(err, sharing.Close())
+		}
+		return nil, errors.Join(err, names.Close(), macroManager.Close(), manager.DelRef(&proof), internalizer.Close())
+	}
 	return &SMTKernel{
-		manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof, assertedMacros: macroManager, definedNames: names,
+		manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof, assertedMacros: macroManager, definedNames: names, bvSharing: sharing,
 		smtState: SMTParamsState{
 			MaxConflicts: ^uint32(0), InvDecay: 1.052, RandomInitialActivity: 1, RandomVarFreq: 0.01, CaseSplitStrategy: 1, RestartStrategy: 1, RestartInitial: 100, RestartFactor: 1.1,
 			RestartAdaptive: true, AgilityFactor: 0.9999, RestartAgilityThreshold: 0.18, SimplifyClauses: true,
@@ -619,8 +627,14 @@ func (k *SMTKernel) internalizePending() error {
 	if err := k.applyPendingQuasiMacros(); err != nil {
 		return fmt.Errorf("apply asserted quasi-macros: %w", err)
 	}
+	if err := k.applyPendingBit2Int(); err != nil {
+		return fmt.Errorf("propagate asserted bit-vectors over integers: %w", err)
+	}
 	if err := k.inferPendingPatterns(); err != nil {
 		return fmt.Errorf("infer asserted quantifier patterns: %w", err)
+	}
+	if err := k.maximizePendingBVSharing(); err != nil {
+		return fmt.Errorf("maximize asserted bit-vector sharing: %w", err)
 	}
 	if err := k.reducePendingAssertions(); err != nil {
 		return fmt.Errorf("reduce final assertions: %w", err)
@@ -651,8 +665,11 @@ func (k *SMTKernel) Push() error {
 	if err := k.definedNames.Push(); err != nil {
 		return errors.Join(err, k.assertedMacros.PopScope(1))
 	}
-	if err := k.internalizer.PushScope(); err != nil {
+	if err := k.bvSharing.PushScope(); err != nil {
 		return errors.Join(err, k.definedNames.Pop(1), k.assertedMacros.PopScope(1))
+	}
+	if err := k.internalizer.PushScope(); err != nil {
+		return errors.Join(err, k.bvSharing.PopScope(1), k.definedNames.Pop(1), k.assertedMacros.PopScope(1))
 	}
 	k.scopes = append(k.scopes, len(k.assertions))
 	return nil
@@ -668,6 +685,9 @@ func (k *SMTKernel) Pop(count uint32) error {
 	level := len(k.scopes) - int(count)
 	limit := k.scopes[level]
 	if err := k.internalizer.PopScopes(count); err != nil {
+		return err
+	}
+	if err := k.bvSharing.PopScope(count); err != nil {
 		return err
 	}
 	if err := k.assertedMacros.PopScope(count); err != nil {
@@ -987,6 +1007,13 @@ func (k *SMTKernel) Close() error {
 	result = errors.Join(result, k.clearLiteralResults())
 	result = errors.Join(result, k.clearGeneratedModel())
 	result = errors.Join(result, k.clearUnsatCore())
+	if k.bvSharing != nil {
+		if err := k.bvSharing.Close(); err != nil {
+			result = errors.Join(result, err)
+		} else {
+			k.bvSharing = nil
+		}
+	}
 	result = errors.Join(result, k.manager.DelRef(&k.unsatProof))
 	if k.patternInference != nil {
 		if err := k.patternInference.Close(); err != nil {

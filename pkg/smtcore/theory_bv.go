@@ -1282,6 +1282,10 @@ func (t *SMTBitVectorTheory) bitsFor(expression ast.ASTHandle) ([]ast.ASTHandle,
 	// back through this method.
 	t.bits[expression] = bits
 	for _, bit := range bits {
+		bit, err = t.bitAtom(bit)
+		if err != nil {
+			return nil, err
+		}
 		if !state.manager.IsTrue(bit) && !state.manager.IsFalse(bit) {
 			t.bitExpressions[bit] = append(t.bitExpressions[bit], expression)
 		}
@@ -1621,6 +1625,23 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 		if err = state.Internalize(bit, true); err != nil {
 			return false, fmt.Errorf("bit-vector bit %d: %w", index, err)
 		}
+		literal, literalErr := state.Literal(bit)
+		if literalErr != nil {
+			return false, literalErr
+		}
+		if literal.Var() != SMTTrueBoolVar {
+			data, dataErr := state.BooleanData(literal.Var())
+			if dataErr != nil {
+				return false, dataErr
+			}
+			// Source add_bit subscribes gate literals as well as bit2bool
+			// atoms, so completion of an interpreted term triggers equality.
+			if !data.IsTheoryAtom() {
+				if err = state.SetVariableTheory(literal.Var(), t.FamilyID()); err != nil {
+					return false, err
+				}
+			}
+		}
 	}
 	if err = t.publishStaticDisequalities(expression); err != nil {
 		return false, err
@@ -1672,6 +1693,11 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 		if argErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); argErr != nil {
 			return false, argErr
 		}
+	}
+	// Source init_bits calls find_wpos immediately. All bits may already be
+	// fixed when a new compound term reuses an existing circuit.
+	if err = t.discoverFixedEqualities(); err != nil {
+		return false, err
 	}
 	return true, nil
 }
@@ -1848,6 +1874,18 @@ func (t *SMTBitVectorTheory) NewDisequality(left, right SMTTheoryVar) error {
 	return state.addTheoryAxiom(t.FamilyID(), clause)
 }
 
+// Source bit occurrences are indexed by Boolean variable, independently of
+// literal polarity. Keep the expression index on the same underlying atom.
+func (t *SMTBitVectorTheory) bitAtom(bit ast.ASTHandle) (ast.ASTHandle, error) {
+	for {
+		not, child, err := t.state.manager.IsNot(bit)
+		if err != nil || !not {
+			return bit, err
+		}
+		bit = child
+	}
+}
+
 func (t *SMTBitVectorTheory) fixedAssignment(bits []ast.ASTHandle) (*big.Int, []SMTLiteral, bool, error) {
 	state, err := t.State()
 	if err != nil {
@@ -1856,8 +1894,12 @@ func (t *SMTBitVectorTheory) fixedAssignment(bits []ast.ASTHandle) (*big.Int, []
 	value := new(big.Int)
 	antecedents := make([]SMTLiteral, 0, len(bits))
 	for i, bit := range bits {
-		if !state.manager.IsTrue(bit) && !state.manager.IsFalse(bit) {
-			if _, internalized := state.BoolVar(bit); !internalized {
+		atom, atomErr := t.bitAtom(bit)
+		if atomErr != nil {
+			return nil, nil, false, atomErr
+		}
+		if !state.manager.IsTrue(atom) && !state.manager.IsFalse(atom) {
+			if _, internalized := state.BoolVar(atom); !internalized {
 				return nil, nil, false, nil
 			}
 		}
@@ -1882,20 +1924,10 @@ func (t *SMTBitVectorTheory) fixedAssignment(bits []ast.ASTHandle) (*big.Int, []
 	return value, antecedents, true, nil
 }
 
-func (t *SMTBitVectorTheory) fixedEqualityCandidate(expression ast.ASTHandle) (bool, error) {
-	op, own, err := t.operation(expression)
-	if err != nil {
-		return false, err
-	}
-	return !own || op >= 12 && op <= 16, nil
-}
-
 func (t *SMTBitVectorTheory) Assign(variable int32, _ bool) (result error) {
 	if t.discoveringFixed {
 		return nil
 	}
-	t.discoveringFixed = true
-	defer func() { t.discoveringFixed = false }()
 	state, err := t.State()
 	if err != nil {
 		return err
@@ -1906,13 +1938,6 @@ func (t *SMTBitVectorTheory) Assign(variable int32, _ bool) (result error) {
 	}
 	completed := false
 	for _, expression := range t.bitExpressions[bit] {
-		candidate, candidateErr := t.fixedEqualityCandidate(expression)
-		if candidateErr != nil {
-			return candidateErr
-		}
-		if !candidate {
-			continue
-		}
 		_, _, fixed, fixedErr := t.fixedAssignment(t.bits[expression])
 		if fixedErr != nil {
 			return fmt.Errorf("bit-vector completion check for %d: %w", expression.Slot(), fixedErr)
@@ -1925,19 +1950,25 @@ func (t *SMTBitVectorTheory) Assign(variable int32, _ bool) (result error) {
 	if !completed {
 		return nil
 	}
+	return t.discoverFixedEqualities()
+}
+
+func (t *SMTBitVectorTheory) discoverFixedEqualities() error {
+	if t.discoveringFixed {
+		return nil
+	}
+	t.discoveringFixed = true
+	defer func() { t.discoveringFixed = false }()
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
 	type fixedTerm struct {
 		expression  ast.ASTHandle
 		antecedents []SMTLiteral
 	}
 	fixed := make(map[string]fixedTerm)
 	for expression, bits := range t.bits {
-		candidate, candidateErr := t.fixedEqualityCandidate(expression)
-		if candidateErr != nil {
-			return candidateErr
-		}
-		if !candidate {
-			continue
-		}
 		node := state.context.enodes[expression]
 		if node == nil || !t.IsAttachedToVariable(node) {
 			continue
@@ -2011,6 +2042,10 @@ func (t *SMTBitVectorTheory) PopScopes(count uint32) error {
 	scope := t.scopes[level]
 	for _, expression := range t.bitTrail[scope.bits:] {
 		for _, bit := range t.bits[expression] {
+			bit, err = t.bitAtom(bit)
+			if err != nil {
+				return err
+			}
 			owners := t.bitExpressions[bit]
 			for i := len(owners) - 1; i >= 0; i-- {
 				if owners[i] == expression {
