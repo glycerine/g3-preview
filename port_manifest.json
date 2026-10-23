@@ -108705,6 +108705,7 @@
         "pkg/smtcore/smt_model_finder_cancel_test.go",
         "pkg/smtcore/smt_model_finder_auf_analyzer.go",
         "pkg/smtcore/smt_model_finder_auf_analyzer_test.go",
+        "pkg/smtcore/smt_model_publication_test.go",
         "pkg/smtcore/smt_model_finder_instantiation_set.go",
         "pkg/smtcore/smt_model_finder_instantiation_set_test.go",
         "pkg/smtcore/smt_model_finder_quantifier_set.go",
@@ -108752,6 +108753,7 @@
         "TestSMTModelFinderCancellationAndResourceCheckpoint",
         "TestSMTModelFinderAUFAnalyzerVisitsBooleanFormulasInsideTerms",
         "TestSMTModelFinderAUFAnalyzerDeduplicatesSharedQInfo",
+        "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
         "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
         "TestModelFinderHintSatisfiedResidueSourceScopeTransitions",
@@ -109343,11 +109345,12 @@
           ]
         },
         {
-          "name": "candidate-model fix_model dispatch before MBQI",
-          "status": "partial",
+          "name": "candidate-model fix_model dispatch before MBQI and ownership transfer of the accepted candidate for final model publication",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
-            "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample"
+            "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
+            "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding"
           ]
         },
         {
@@ -109470,7 +109473,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_model_generator.go",
-        "pkg/smtcore/smt_model_generator_test.go"
+        "pkg/smtcore/smt_model_generator_test.go",
+        "pkg/smtcore/smt_model_publication_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -109480,7 +109484,8 @@
         "TestSMTModelGeneratorPublishesFunctionInterpretation",
         "TestSMTModelGeneratorFinalizesTheories",
         "TestSMTModelGeneratorRegistersExistingModelValues",
-        "TestSMTIntegerDiffTheoryBuildsModelValues"
+        "TestSMTIntegerDiffTheoryBuildsModelValues",
+        "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding"
       ],
       "assertions": [
         {

@@ -613,28 +613,25 @@ func (k *SMTKernel) ConfigureModelGeneration(enabled bool, config model.ModelEva
 }
 
 func (k *SMTKernel) buildGeneratedModel() error {
+	var generator *SMTModelGenerator
+	if manager := k.internalizer.quantifierManager; manager != nil {
+		generator = manager.acceptedModel
+		manager.acceptedModel = nil
+	}
 	if !k.produceModel {
+		if generator != nil {
+			return generator.Close()
+		}
 		return nil
 	}
-	generator, err := NewSMTModelGenerator(k.manager)
-	if err != nil {
-		return err
-	}
-	fail := func(cause error) error { return errors.Join(cause, generator.Close()) }
-	if err = generator.SetContext(k.checker); err != nil {
-		return fail(err)
-	}
-	if err = generator.InitializeModel(k.modelConfig); err != nil {
-		return fail(err)
-	}
-	if err = generator.BuildStateValues(k.internalizer); err != nil {
-		return fail(err)
-	}
-	if manager := k.internalizer.quantifierManager; manager != nil && manager.modelFinder != nil {
-		if err = manager.modelFinder.FixModel(generator.model); err != nil {
-			return fail(err)
+	var err error
+	if generator == nil {
+		generator, err = k.buildCandidateModelGenerator()
+		if err != nil {
+			return err
 		}
 	}
+	fail := func(cause error) error { return errors.Join(cause, generator.Close()) }
 	generated, err := generator.FinalModel()
 	if err != nil {
 		return fail(err)

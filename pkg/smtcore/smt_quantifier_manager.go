@@ -29,6 +29,7 @@ type SMTQuantifierManager struct {
 	modelChecker     *SMTModelChecker
 	auxiliarySolver  smtAuxiliarySolverFactory
 	candidateModel   func() (*SMTModelGenerator, error)
+	acceptedModel    *SMTModelGenerator
 	activated        map[ast.ASTHandle]bool
 	activationTrail  []ast.ASTHandle
 	activationScopes []int
@@ -167,6 +168,12 @@ func (q *SMTQuantifierManager) open() error {
 func (q *SMTQuantifierManager) InitSearch() error {
 	if err := q.open(); err != nil {
 		return err
+	}
+	if q.acceptedModel != nil {
+		if err := q.acceptedModel.Close(); err != nil {
+			return err
+		}
+		q.acceptedModel = nil
 	}
 	if err := q.substitute.Reset(); err != nil {
 		return err
@@ -464,9 +471,12 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 			}
 			return SMTFinalCheckContinue, nil
 		}
-		if err = generator.Close(); err != nil {
-			return SMTFinalCheckGiveUp, err
+		if q.acceptedModel != nil {
+			if err = q.acceptedModel.Close(); err != nil {
+				return SMTFinalCheckGiveUp, errors.Join(err, generator.Close())
+			}
 		}
+		q.acceptedModel = generator
 	}
 	return SMTFinalCheckDone, nil
 }
@@ -506,6 +516,12 @@ func (q *SMTQuantifierManager) Close() error {
 	}
 	if q.closed {
 		return nil
+	}
+	if q.acceptedModel != nil {
+		if err := q.acceptedModel.Close(); err != nil {
+			return err
+		}
+		q.acceptedModel = nil
 	}
 	err := q.substitute.Close()
 	err = errors.Join(err, q.modelFinder.Close())
