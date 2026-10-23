@@ -260,29 +260,55 @@ func (t *SMTSequenceTheory) rejectFixedLengthMismatch(left, right []ast.ASTHandl
 
 func (t *SMTSequenceTheory) branchLeadingVariableOverlap(left, right []ast.ASTHandle) (bool, error) {
 	for pass := 0; pass < 2; pass++ {
-		if len(left) > 1 && len(right) > 1 && left[0] != right[0] {
+		if len(left) > 1 && len(right) > 1 {
 			leftVariable, err := t.sequenceVariable(left[0])
 			if err != nil {
 				return false, err
 			}
-			rightVariable, err := t.sequenceVariable(right[0])
-			if err != nil {
-				return false, err
+			if !leftVariable {
+				left, right = right, left
+				continue
 			}
-			if leftVariable && rightVariable {
+			for rightIndex, candidate := range right {
+				rightVariable, variableErr := t.sequenceVariable(candidate)
+				if variableErr != nil {
+					return false, variableErr
+				}
+				if !rightVariable || left[0] == candidate {
+					continue
+				}
 				state, stateErr := t.State()
 				if stateErr != nil {
 					return false, stateErr
+				}
+				if rightIndex != 0 {
+					fixedPrefix := true
+					for _, part := range right[:rightIndex] {
+						if _, fixedString, textErr := state.manager.SequenceStringValue(part); textErr != nil {
+							return false, textErr
+						} else if fixedString {
+							continue
+						}
+						if _, unit, unitErr := state.manager.SequenceUnitArgument(part); unitErr != nil {
+							return false, unitErr
+						} else if !unit {
+							fixedPrefix = false
+							break
+						}
+					}
+					if fixedPrefix {
+						continue
+					}
 				}
 				sort, makeErr := state.manager.GetSort(left[0])
 				if makeErr != nil {
 					return false, makeErr
 				}
-				emptyPrefix, makeErr := state.manager.MkSequenceEmpty(sort)
+				prefix, makeErr := t.makeWord(right[:rightIndex], sort)
 				if makeErr != nil {
 					return false, makeErr
 				}
-				arguments := []ast.ASTHandle{left[0], emptyPrefix, right[0]}
+				arguments := []ast.ASTHandle{left[0], prefix, candidate}
 				shared, makeErr := t.relationSkolem("seq.left", arguments, sort)
 				if makeErr != nil {
 					return false, makeErr
@@ -291,7 +317,14 @@ func (t *SMTSequenceTheory) branchLeadingVariableOverlap(left, right []ast.ASTHa
 				if makeErr != nil {
 					return false, makeErr
 				}
-				leftDefinition, makeErr := state.manager.MkEq(left[0], shared)
+				leftValue := shared
+				if rightIndex != 0 {
+					leftValue, makeErr = state.manager.MkSequenceConcat(prefix, shared)
+					if makeErr != nil {
+						return false, makeErr
+					}
+				}
+				leftDefinition, makeErr := state.manager.MkEq(left[0], leftValue)
 				if makeErr != nil {
 					return false, makeErr
 				}
@@ -299,7 +332,7 @@ func (t *SMTSequenceTheory) branchLeadingVariableOverlap(left, right []ast.ASTHa
 				if makeErr != nil {
 					return false, makeErr
 				}
-				rightDefinition, makeErr := state.manager.MkEq(right[0], rightWord)
+				rightDefinition, makeErr := state.manager.MkEq(candidate, rightWord)
 				if makeErr != nil {
 					return false, makeErr
 				}
@@ -311,13 +344,37 @@ func (t *SMTSequenceTheory) branchLeadingVariableOverlap(left, right []ast.ASTHa
 				if makeErr != nil {
 					return false, makeErr
 				}
-				rightLength, makeErr := state.manager.MkSequenceLength(right[0])
+				rightLength, makeErr := state.manager.MkSequenceLength(candidate)
 				if makeErr != nil {
 					return false, makeErr
 				}
-				lengthOrder, makeErr := state.manager.MkArithmeticLE(leftLength, rightLength)
-				if makeErr != nil {
-					return false, makeErr
+				var abovePrefix, withinCandidate ast.ASTHandle
+				if rightIndex == 0 {
+					withinCandidate, makeErr = state.manager.MkArithmeticLE(leftLength, rightLength)
+					if makeErr != nil {
+						return false, makeErr
+					}
+				} else {
+					prefixLength, lengthErr := state.manager.MkSequenceLength(prefix)
+					if lengthErr != nil {
+						return false, lengthErr
+					}
+					atMostPrefix, lengthErr := state.manager.MkArithmeticLE(leftLength, prefixLength)
+					if lengthErr != nil {
+						return false, lengthErr
+					}
+					abovePrefix, lengthErr = state.manager.MkNot(atMostPrefix)
+					if lengthErr != nil {
+						return false, lengthErr
+					}
+					prefixAndRightLength, lengthErr := state.manager.MkArithmeticAdd(prefixLength, rightLength)
+					if lengthErr != nil {
+						return false, lengthErr
+					}
+					withinCandidate, lengthErr = state.manager.MkArithmeticLE(leftLength, prefixAndRightLength)
+					if lengthErr != nil {
+						return false, lengthErr
+					}
 				}
 				leftWord, makeErr := t.makeWord(left, sort)
 				if makeErr != nil {
@@ -331,7 +388,12 @@ func (t *SMTSequenceTheory) branchLeadingVariableOverlap(left, right []ast.ASTHa
 				if makeErr != nil {
 					return false, makeErr
 				}
-				antecedent, makeErr := state.manager.MkAnd(wordEquality, lengthOrder)
+				var antecedent ast.ASTHandle
+				if rightIndex == 0 {
+					antecedent, makeErr = state.manager.MkAnd(wordEquality, withinCandidate)
+				} else {
+					antecedent, makeErr = state.manager.MkAndArray([]ast.ASTHandle{wordEquality, abovePrefix, withinCandidate})
+				}
 				if makeErr != nil {
 					return false, makeErr
 				}
@@ -340,9 +402,12 @@ func (t *SMTSequenceTheory) branchLeadingVariableOverlap(left, right []ast.ASTHa
 					return false, makeErr
 				}
 				if _, found := t.axioms.set[constraint]; found {
-					return false, nil
+					if rightIndex == 0 {
+						return false, nil
+					}
+					continue
 				}
-				t.trackInternalTerms(shared, remainder, rightWord)
+				t.trackInternalTerms(shared, remainder, leftValue, rightWord)
 				return true, t.axioms.Push(constraint)
 			}
 		}

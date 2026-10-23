@@ -117323,10 +117323,10 @@
           "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict", "TestSMTSequenceTheoryNativeWordVariableClassification"]
         },
         {
-          "name": "zero-length leading-variable elimination, exact total-length mismatch conflicts, leading-variable overlap decomposition with stable seq.left and seq.right witnesses under the model length order, and multi-part prefix and suffix splitting at arithmetic-proven equal total lengths with guarded prefix and residual equalities (src/smt/theory_seq.cpp:482-630,1574-1691)",
+          "name": "zero-length leading-variable elimination, exact total-length mismatch conflicts, leading-variable overlap decomposition with stable seq.left and seq.right witnesses for empty and non-fixed prefixes under the exact |b| < |X| <= |b| + |Y| model length guards (fixed string and unit prefixes remain covered by the complete binary word routines), and multi-part prefix and suffix splitting at arithmetic-proven equal total lengths with guarded prefix and residual equalities (src/smt/theory_seq.cpp:482-630,1574-1691)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_length_split.go",
-          "tests": ["TestSMTSequenceTheorySplitsFixedLengthPrefixes", "TestSMTSequenceTheoryRejectsFixedLengthWordMismatch", "TestSMTSequenceTheoryBranchesLeadingVariableOverlap"]
+          "tests": ["TestSMTSequenceTheorySplitsFixedLengthPrefixes", "TestSMTSequenceTheoryRejectsFixedLengthWordMismatch", "TestSMTSequenceTheoryBranchesLeadingVariableOverlap", "TestSMTSequenceTheoryBranchesPrefixedVariableOverlap"]
         },
         {
           "name": "complete fixed-string binary word-equation branching with finite prefix-overlap alternatives, exhaustive variable-prefix splits against fixed string and generic seq.unit words, an unbounded shared-tail Skolem family, exact rejection of self-referential fixed tails with unequal lengths or no cyclic rotation, and cyclic unit-element compatibility constraints (src/smt/theory_seq.cpp:335-790,1554-1763)",
