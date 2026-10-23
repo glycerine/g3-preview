@@ -1,0 +1,97 @@
+// Source: src/smt/asserted_formulas.h cheap_quant_fourier_motzkin;
+// src/smt/asserted_formulas.cpp simplify_fmls, reduce.
+package smtcore
+
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/macros"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
+)
+
+// Source setup_AUFLIA / setup_AUFLIRA enable this hidden preprocessor field.
+// A first push selects CFG_LOGIC; a first check uses static quantifier features
+// for setup_unknown. Other setup tuning remains in the ongoing setup port.
+func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
+	if k.preprocessingSetupDone || k.smtParams == nil {
+		return nil
+	}
+	k.preprocessingSetupDone = true
+	if !k.smtState.AutoConfig {
+		return nil
+	}
+	enabled := false
+	switch k.setupLogic {
+	case "AUFLIA", "AUFLIRA", "AUFNIRA", "AUFLIA+", "AUFLIA-", "AUFLIRA+", "AUFLIRA-", "AUFNIRA+", "AUFNIRA-", "UFNIA":
+		enabled = true
+	case "UFLRA":
+		// setup_auto_config routes this logic through setup_unknown(st).
+		enabled = !useStaticFeatures
+	}
+	if !enabled && useStaticFeatures && (smtLogicUsesUnknownSetup(k.setupLogic) || k.setupLogic == "UFLRA") {
+		for _, row := range k.assertions {
+			has, err := k.manager.HasQuantifiers(row.Formula)
+			if err != nil {
+				return err
+			}
+			if has {
+				enabled = true
+				break
+			}
+		}
+	}
+	if enabled {
+		k.preprocessState.EliminateBounds = true
+		k.smtParams.preprocess.state.EliminateBounds = true
+	}
+	return nil
+}
+
+func (k *SMTKernel) eliminatePendingBounds() (result error) {
+	if !k.preprocess || !k.preprocessState.EliminateBounds || k.assertedHead == len(k.assertions) {
+		return nil
+	}
+	quantified := false
+	for _, row := range k.assertions[k.assertedHead:] {
+		has, err := k.manager.HasQuantifiers(row.Formula)
+		if err != nil {
+			return err
+		}
+		quantified = quantified || has
+	}
+	if !quantified {
+		return nil
+	}
+	proc, err := rewriter.NewElimBounds(k.manager)
+	if proc != nil {
+		defer func() { result = errors.Join(result, proc.Close()) }()
+	}
+	if err != nil {
+		return err
+	}
+	out, err := k.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, k.manager.DelRef(&out)) }()
+	proof, err := k.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, k.manager.DelRef(&proof)) }()
+	batch, err := macros.NewFormulaBatch(k.manager)
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, batch.Close()) }()
+	for _, row := range k.assertions[k.assertedHead:] {
+		if err = proc.RewriteWithProof(row.Formula, out, proof); err != nil {
+			return err
+		}
+		if err = k.appendSimplifiedAssertion(batch, row, out, proof); err != nil {
+			return err
+		}
+	}
+	return k.replacePendingFormulaBatch(batch, true)
+}

@@ -1,0 +1,8 @@
+(set-logic AUFLIA)
+(declare-fun p (Int) Bool)
+(push 1)
+(assert (forall ((x Int) (y Int)) (or (<= x 5) (p y))))
+(assert (not (p 0)))
+(check-sat)
+(pop 1)
+(check-sat)

@@ -99315,7 +99315,9 @@
         "pkg/smtcore/smt_asserted_patterns_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_asserted_bv.go",
-        "pkg/smtcore/smt_asserted_bv_test.go"
+        "pkg/smtcore/smt_asserted_bv_test.go",
+        "pkg/smtcore/smt_asserted_bounds.go",
+        "pkg/smtcore/smt_asserted_bounds_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -99352,7 +99354,9 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTAssertedBit2IntGuardsAndProofs",
-        "TestSMTAssertedBVSharingScopesAndProofs"
+        "TestSMTAssertedBVSharingScopesAndProofs",
+        "TestSMTAssertedBoundEliminationGuardsProofsAndScopes",
+        "TestSMTAssertedBoundsSourceSetupAndUpdates"
       ],
       "conditionals": [
         {
@@ -99583,6 +99587,20 @@
           ]
         },
         {
+          "name": "cheap_quant_fourier_motzkin: preprocessing/quantifier/hidden-policy guards, one-sided unused arithmetic bound elimination, proof composition and post-operation reduction before pattern inference",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_bounds.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTAssertedBoundEliminationGuardsProofsAndScopes",
+            "TestSMTAssertedBoundsSourceSetupAndUpdates",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "remaining pending-formula reduction passes and quantifier transforms",
           "status": "unported",
           "go_target": null,
@@ -99629,7 +99647,9 @@
         "pkg/smtcore/smt_asserted_patterns_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_asserted_bv.go",
-        "pkg/smtcore/smt_asserted_bv_test.go"
+        "pkg/smtcore/smt_asserted_bv_test.go",
+        "pkg/smtcore/smt_asserted_bounds.go",
+        "pkg/smtcore/smt_asserted_bounds_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -99666,7 +99686,9 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTAssertedBit2IntGuardsAndProofs",
-        "TestSMTAssertedBVSharingScopesAndProofs"
+        "TestSMTAssertedBVSharingScopesAndProofs",
+        "TestSMTAssertedBoundEliminationGuardsProofsAndScopes",
+        "TestSMTAssertedBoundsSourceSetupAndUpdates"
       ],
       "conditionals": [
         {
@@ -99840,6 +99862,20 @@
           ],
           "tests": [
             "TestSMTAssertedBVSharingScopesAndProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "cheap_quant_fourier_motzkin: preprocessing/quantifier/hidden-policy guards, one-sided unused arithmetic bound elimination, proof composition and post-operation reduction before pattern inference",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_bounds.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTAssertedBoundEliminationGuardsProofsAndScopes",
+            "TestSMTAssertedBoundsSourceSetupAndUpdates",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -111638,7 +111674,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_setup.go"
+        "pkg/smtcore/smt_setup.go",
+        "pkg/smtcore/smt_asserted_bounds.go",
+        "pkg/smtcore/smt_asserted_bounds_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -111659,7 +111697,8 @@
         "TestSMTPseudoBooleanQFFDExactCardinality",
         "TestSMTQFFPSetupInstallsFloatingPointAndBitVectorTheories",
         "TestSMTFloatingPointIEEEAndStructuralEqualities",
-        "TestSMTSequenceLogicsInstallSafeCheckpointTheory"
+        "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
+        "TestSMTAssertedBoundsSourceSetupAndUpdates"
       ],
       "assertions": [
         {
@@ -111734,6 +111773,17 @@
           "tests": [
             "TestSMTPseudoBooleanQFFDExactCardinality"
           ]
+        },
+        {
+          "name": "bound-elimination setup policy only: first-push logic mode versus first-check quantifier features, auto_config guard, explicit quantified arithmetic logic routing and hidden policy retention across parameter updates; remaining setup policies and mixed arithmetic backend selection remain incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_asserted_bounds.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go"
+          ],
+          "tests": [
+            "TestSMTAssertedBoundsSourceSetupAndUpdates"
+          ]
         }
       ],
       "ownership": [
@@ -111749,7 +111799,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_setup.go"
+        "pkg/smtcore/smt_setup.go",
+        "pkg/smtcore/smt_asserted_bounds.go",
+        "pkg/smtcore/smt_asserted_bounds_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -111759,7 +111811,8 @@
         "TestSMTSolverUFLinearArithmeticCongruence",
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
         "TestSMTSolverSetupUsesRealDifferenceLogic",
-        "TestSMTSequenceLogicsInstallSafeCheckpointTheory"
+        "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
+        "TestSMTAssertedBoundsSourceSetupAndUpdates"
       ],
       "conditionals": [
         {
@@ -111794,6 +111847,17 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "bound-elimination setup policy only: first-push logic mode versus first-check quantifier features, auto_config guard, explicit quantified arithmetic logic routing and hidden policy retention across parameter updates; remaining setup policies and mixed arithmetic backend selection remain incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_asserted_bounds.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go"
+          ],
+          "tests": [
+            "TestSMTAssertedBoundsSourceSetupAndUpdates"
+          ]
         }
       ],
       "ownership": [

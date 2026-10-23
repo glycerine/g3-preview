@@ -91,6 +91,7 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 	if kernel == nil || manager == nil {
 		return ast.ErrASTHandle
 	}
+	kernel.setupLogic = logic
 	install := func(family ast.FamilyID, name string) error {
 		dummy, err := NewSMTDummyTheory(family, name)
 		if err != nil {

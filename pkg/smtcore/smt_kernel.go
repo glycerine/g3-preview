@@ -66,10 +66,12 @@ type SMTKernel struct {
 	timerClock       func() (uint64, error)
 	closed           bool
 
-	assertedParams      uparams.ParamsRef
-	assertedParamsReady bool
-	assertedElimAnd     bool
-	assertedPhaseReady  bool
+	assertedParams         uparams.ParamsRef
+	assertedParamsReady    bool
+	assertedElimAnd        bool
+	assertedPhaseReady     bool
+	preprocessingSetupDone bool
+	setupLogic             string
 }
 
 func (k *SMTKernel) readPreprocessorState(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) (state SMTPreprocessorState, result error) {
@@ -424,7 +426,9 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err != nil {
 		return err
 	}
-	state, err := k.readPreprocessorState(k.paramContext, k.paramGlobals, params)
+	// Source updates the existing embedded parameter object. Its hidden
+	// fields include policy selected by setup and have no public getters.
+	state, err := k.smtParams.preprocess.State()
 	if err != nil {
 		return err
 	}
@@ -630,6 +634,9 @@ func (k *SMTKernel) internalizePending() error {
 	if err := k.applyPendingBit2Int(); err != nil {
 		return fmt.Errorf("propagate asserted bit-vectors over integers: %w", err)
 	}
+	if err := k.eliminatePendingBounds(); err != nil {
+		return fmt.Errorf("eliminate asserted quantifier bounds: %w", err)
+	}
 	if err := k.inferPendingPatterns(); err != nil {
 		return fmt.Errorf("infer asserted quantifier patterns: %w", err)
 	}
@@ -654,6 +661,9 @@ func (k *SMTKernel) internalizePending() error {
 
 func (k *SMTKernel) Push() error {
 	if err := k.open(); err != nil {
+		return err
+	}
+	if err := k.setupAssertedBounds(false); err != nil {
 		return err
 	}
 	if err := k.internalizePending(); err != nil {
@@ -725,6 +735,9 @@ func (k *SMTKernel) ScopeLevel() uint32 {
 func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 	if err := k.open(); err != nil {
 		return nil, err
+	}
+	if err := k.setupAssertedBounds(true); err != nil {
+		return nil, fmt.Errorf("smt kernel configure asserted bounds: %w", err)
 	}
 	if err := k.internalizer.configureBooleanHeuristics(k.smtState); err != nil {
 		return nil, fmt.Errorf("smt kernel configure Boolean heuristics: %w", err)

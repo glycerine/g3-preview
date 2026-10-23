@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"quantified_bounds.smt2":         "unsat\nsat\n",
 	"bit_vector_sharing_scopes.smt2": "unsat\nsat\nunsat\nsat\n",
 	"inferred_trigger.smt2":          "unsat\n",
 	"function_overloads.smt2":        "sat\n",
