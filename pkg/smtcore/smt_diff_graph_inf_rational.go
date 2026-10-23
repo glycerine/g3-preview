@@ -88,6 +88,7 @@ type SMTInfRationalDiffGraph struct {
 	heap            smtInfRationalDiffHeap
 	lastEnabledEdge int32
 	enabledEdges    []int32
+	propagationCost uint32
 }
 
 func NewSMTInfRationalDiffGraph() *SMTInfRationalDiffGraph {
@@ -194,6 +195,7 @@ func (g *SMTInfRationalDiffGraph) makeFeasible(id int32) bool {
 
 	source := target
 	for {
+		g.propagationCost++
 		if g.mark[root] != smtDiffUnmarked {
 			g.heap.reset()
 			g.resetMarks()

@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 func TestSMTUTVPIContextConflictsProofsAndScopes(t *testing.T) {
@@ -88,6 +89,22 @@ func TestSMTUTVPIContextConflictsProofsAndScopes(t *testing.T) {
 					if !ok || len(extended.Equalities) != 0 {
 						t.Fatal("source extended theory conflict was not retained")
 					}
+					stats := statistics.New()
+					astTestMust(t, theory.CollectStatistics(stats))
+					counts := map[statistics.Key]uint32{}
+					for i := 0; i < stats.Size(); i++ {
+						if !stats.IsUint(i) {
+							t.Fatal("small UTVPI count was not an unsigned statistic")
+						}
+						counts[stats.Key(i)] = stats.UintValue(i)
+					}
+					assertions := uint32(2)
+					if parity {
+						assertions = 4
+					}
+					if counts["utvpi conflicts"] != 1 || counts["utvpi asserts"] != assertions || counts["dl prop steps"] == 0 {
+						t.Fatal("source conflict/assertion/graph counters", counts)
+					}
 					parameters := extended.Parameters()
 					if !proofs && len(parameters) != 0 {
 						t.Fatal("proof-disabled conflict allocated numerical parameters")
@@ -135,6 +152,15 @@ func TestSMTUTVPIContextConflictsProofsAndScopes(t *testing.T) {
 					astTestMust(t, err)
 					if status != SMTFinalCheckDone {
 						t.Fatal("empty parent failed after pop", status)
+					}
+					parentStats := statistics.New()
+					astTestMust(t, theory.CollectStatistics(parentStats))
+					parentCounts := map[statistics.Key]uint32{}
+					for i := 0; i < parentStats.Size(); i++ {
+						parentCounts[parentStats.Key(i)] = parentStats.UintValue(i)
+					}
+					if !reflect.DeepEqual(counts, parentCounts) {
+						t.Fatal("cumulative UTVPI statistics were incorrectly trailed", counts, parentCounts)
 					}
 				})
 			}
@@ -327,6 +353,15 @@ func TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal(t *testing.T) {
 			astTestMust(t, theory.NewDisequality(left, right))
 			if theory.adapter.NumAxioms() != 1 {
 				t.Fatal("duplicate equality pair was not suppressed")
+			}
+			stats := statistics.New()
+			astTestMust(t, theory.CollectStatistics(stats))
+			counts := map[statistics.Key]uint32{}
+			for i := 0; i < stats.Size(); i++ {
+				counts[stats.Key(i)] = stats.UintValue(i)
+			}
+			if counts["core->utvpi eqs"] != 1 || counts["core->utvpi diseqs"] != 0 || counts["arith eq adapter"] != 1 {
+				t.Fatal("active source equality/disequality callback counters", counts)
 			}
 			astTestMust(t, state.PopScopes(1))
 			if len(theory.atoms) != 0 || len(theory.graph.graph.edges) != 0 {

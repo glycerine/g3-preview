@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 func TestSMTBasicArithmeticModesBeforeFirstBoundary(t *testing.T) {
@@ -85,6 +86,17 @@ func TestSMTBasicArithmeticModesBeforeFirstBoundary(t *testing.T) {
 					case 4:
 						if _, ok := k.internalizer.theories[family].(*SMTUTVPITheory); !ok {
 							t.Fatal("UTVPI mode not selected")
+						}
+						stats := statistics.New()
+						astTestMust(t, solver.CollectStatistics(stats))
+						found := false
+						for i := 0; i < stats.Size(); i++ {
+							if stats.Key(i) == "utvpi asserts" {
+								found = stats.IsUint(i) && stats.UintValue(i) != 0
+							}
+						}
+						if !found {
+							t.Fatal("solver statistics omitted the selected UTVPI backend")
 						}
 					}
 					if k.arithState.Eq2Ineq != (mode == 1 || mode == 3 || mode == 4) || k.smtParams.arith.state != k.arithState || !k.preprocessState.NNFCNF {

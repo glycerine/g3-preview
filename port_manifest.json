@@ -100346,6 +100346,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/smtcore/smt_utvpi_cycle.go",
         "pkg/smtcore/smt_utvpi_cycle_test.go",
         "pkg/smtcore/smt_diff_graph_rational.go",
@@ -100745,6 +100746,20 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "UTVPI cumulative conflicts/assertions/core equality counters, arithmetic equality-adapter counts and infinitesimal-graph propagation costs through solver statistics collection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_utvpi.go",
+          "go_targets": [
+            "pkg/smtcore/theory_utvpi_test.go",
+            "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPIContextConflictsProofsAndScopes",
+            "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary"
+          ]
+        },
+        {
           "name": "Concrete UTVPI traverse_neg_cycle2: enabled weaker shortcuts, strict negative-cycle validation and retained weighted conflict/proof antecedents",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_utvpi_cycle.go",
@@ -100801,6 +100816,7 @@
         "Graph slices own copied big.Rat or concrete infinitesimal-rational assignments, weights and search values. Edge explanations borrow immutable SMTLiteral values. Scope rollback retires enabled edges before truncating adjacency and edge storage."
       ],
       "deviations": [
+        "UTVPI statistics now expose the source cumulative conflict/assertion/core equality counters, equality-adapter counts and graph propagation cost via SMTSolver. Counts survive scope pop. The active two-argument disequality callback does not increment the source disequality counter; its only increment is in an unused overload. Other UTVPI graph statistics remain zero because this owner never calls implied-literal discovery or find_relaxed_edge.",
         "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. General difference-logic learned-edge generation remains separately incomplete.",
         "The retained concrete instantiations use math/big.Rat values directly or a pair of owned big.Rat values ordered lexicographically. No template or STL container is ported. The infinitesimal graph exposes only operations reached by real difference logic. Invalid source assertion domains return errSMTDiffGraphDomain."
       ]
@@ -112822,6 +112838,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/smtcore/theory_utvpi.go",
         "pkg/smtcore/theory_utvpi_test.go",
         "pkg/cmd/g3/test_vectors/utvpi_integer_parity_scopes.smt2",
@@ -123539,6 +123556,25 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "UTVPI cumulative conflicts/assertions/core equality counters, arithmetic equality-adapter counts and infinitesimal-graph propagation costs through solver statistics collection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_utvpi.go",
+          "go_targets": [
+            "pkg/smtcore/theory_utvpi_test.go",
+            "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPIContextConflictsProofsAndScopes",
+            "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary"
+          ]
+        },
+        {
+          "name": "Adaptive conflict activity and lemma dumping are disabled by constructor-owned private m_params defaults; the equality adapter only reads those parameters and no retained writer enables these branches",
+          "status": "dead_deleted",
+          "tests": []
+        },
+        {
           "name": "Concrete UTVPI traverse_neg_cycle2: enabled weaker shortcuts, strict negative-cycle validation and retained weighted conflict/proof antecedents",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_utvpi_cycle.go",
@@ -123609,7 +123645,7 @@
           "tests": []
         },
         {
-          "name": "Adaptive conflict activity, lemma dumps, source statistics/display/reset/fresh-context and remaining term-alias/control fidelity",
+          "name": "Source display/reset/fresh-context and remaining term-alias/control fidelity",
           "status": "unported",
           "tests": []
         }
@@ -123618,6 +123654,7 @@
         "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
       ],
       "deviations": [
+        "UTVPI statistics now expose the source cumulative conflict/assertion/core equality counters, equality-adapter counts and graph propagation cost via SMTSolver. Counts survive scope pop. The active two-argument disequality callback does not increment the source disequality counter; its only increment is in an unused overload. Other UTVPI graph statistics remain zero because this owner never calls implied-literal discovery or find_relaxed_edge.",
         "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. General difference-logic learned-edge generation remains separately incomplete.",
         "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
         "The source arithmetic factory can reject a fractional Int candidate after rational-part parity succeeds. Go checks graph model values before SAT acceptance and returns UNKNOWN before publishing an invalid numeral.",
@@ -123630,6 +123667,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/smtcore/smt_utvpi_cycle.go",
         "pkg/smtcore/smt_utvpi_cycle_test.go",
         "pkg/smtcore/theory_utvpi.go",
@@ -123787,6 +123825,25 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "UTVPI cumulative conflicts/assertions/core equality counters, arithmetic equality-adapter counts and infinitesimal-graph propagation costs through solver statistics collection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_utvpi.go",
+          "go_targets": [
+            "pkg/smtcore/theory_utvpi_test.go",
+            "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPIContextConflictsProofsAndScopes",
+            "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary"
+          ]
+        },
+        {
+          "name": "Adaptive conflict activity and lemma dumping are disabled by constructor-owned private m_params defaults; the equality adapter only reads those parameters and no retained writer enables these branches",
+          "status": "dead_deleted",
+          "tests": []
+        },
+        {
           "name": "Concrete UTVPI traverse_neg_cycle2: enabled weaker shortcuts, strict negative-cycle validation and retained weighted conflict/proof antecedents",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_utvpi_cycle.go",
@@ -123857,7 +123914,7 @@
           "tests": []
         },
         {
-          "name": "Adaptive conflict activity, lemma dumps, source statistics/display/reset/fresh-context and remaining term-alias/control fidelity",
+          "name": "Source display/reset/fresh-context and remaining term-alias/control fidelity",
           "status": "unported",
           "tests": []
         }
@@ -123866,6 +123923,7 @@
         "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
       ],
       "deviations": [
+        "UTVPI statistics now expose the source cumulative conflict/assertion/core equality counters, equality-adapter counts and graph propagation cost via SMTSolver. Counts survive scope pop. The active two-argument disequality callback does not increment the source disequality counter; its only increment is in an unused overload. Other UTVPI graph statistics remain zero because this owner never calls implied-literal discovery or find_relaxed_edge.",
         "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. General difference-logic learned-edge generation remains separately incomplete.",
         "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
         "The source arithmetic factory can reject a fractional Int candidate after rational-part parity succeeds. Go checks graph model values before SAT acceptance and returns UNKNOWN before publishing an invalid numeral.",

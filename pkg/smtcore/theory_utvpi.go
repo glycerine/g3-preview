@@ -7,11 +7,16 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 type smtUTVPIScope struct {
 	atoms, assertions, head int
 	unsupported             bool
+}
+
+type smtUTVPIStatistics struct {
+	conflicts, assertions, coreEqualities uint32
 }
 
 // SMTUTVPITheory owns the source doubled-variable graph. Its arithmetic
@@ -31,6 +36,7 @@ type SMTUTVPITheory struct {
 	scopes      []smtUTVPIScope
 	unsupported bool
 	values      []big.Rat
+	statistics  smtUTVPIStatistics
 }
 
 func NewSMTUTVPITheory(family ast.FamilyID) (*SMTUTVPITheory, error) {
@@ -271,6 +277,7 @@ func (t *SMTUTVPITheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 
 func (t *SMTUTVPITheory) Assign(variable int32, truth bool) error {
 	if i, found := t.byBool[variable]; found {
+		t.statistics.assertions++
 		t.assertions = append(t.assertions, smtIntegerDiffAssertion{atom: i, truth: truth})
 	}
 	return nil
@@ -279,6 +286,7 @@ func (t *SMTUTVPITheory) Assign(variable int32, truth bool) error {
 func (t *SMTUTVPITheory) CanPropagate() bool { return t.head < len(t.assertions) }
 
 func (t *SMTUTVPITheory) setConflict(edges []int32) (result error) {
+	t.statistics.conflicts++
 	var antecedents smtArithmeticAntecedents
 	for _, id := range edges {
 		edge := &t.graph.graph.edges[id]
@@ -383,6 +391,7 @@ func (t *SMTUTVPITheory) InternalizeEquality(expression ast.ASTHandle, variable 
 }
 
 func (t *SMTUTVPITheory) NewEquality(left, right SMTTheoryVar) error {
+	t.statistics.coreEqualities++
 	return t.adapter.MkAxioms(left, right)
 }
 func (t *SMTUTVPITheory) NewDisequality(left, right SMTTheoryVar) error {
@@ -455,4 +464,20 @@ func (t *SMTUTVPITheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator
 		return nil, err
 	}
 	return NewSMTExpressionValueProcedure(expression)
+}
+
+func (t *SMTUTVPITheory) CollectStatistics(target *statistics.Statistics) error {
+	if t == nil || target == nil {
+		return ast.ErrASTHandle
+	}
+	target.UpdateUint("utvpi conflicts", t.statistics.conflicts)
+	target.UpdateUint("utvpi asserts", t.statistics.assertions)
+	target.UpdateUint("core->utvpi eqs", t.statistics.coreEqualities)
+	// The source core->utvpi diseqs counter is only incremented by the unused
+	// three-argument overload. Zero contributions are omitted by statistics.
+	target.UpdateUint64("arith eq adapter", t.adapter.NumAxioms())
+	target.UpdateUint("dl prop steps", t.graph.graph.propagationCost)
+	// UTVPI never calls the graph's implied-literal or relaxed-edge routines;
+	// their four additional graph counters remain zero in this instantiation.
+	return nil
 }
