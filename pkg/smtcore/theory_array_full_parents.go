@@ -66,7 +66,7 @@ func (t *SMTArrayTheory) instantiateMapRead(observer, mapped *SMTEnode) (bool, e
 	}
 	indices := make([]*SMTEnode, len(observer.arguments)-1)
 	for i := range indices {
-		indices[i] = observer.arguments[i+1].root
+		indices[i] = observer.arguments[i+1]
 	}
 	if !t.insertArrayReadFingerprint(mapped.owner, indices) {
 		return false, nil

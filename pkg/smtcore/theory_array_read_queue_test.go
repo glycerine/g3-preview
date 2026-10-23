@@ -154,6 +154,50 @@ func TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork(t *testing.T) {
 	}
 }
 
+func TestSMTArrayReadFingerprintOriginalTupleAfterRootChange(t *testing.T) {
+	m := astTestManager(t)
+	family, err := m.RegisterArrayPlugin()
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	theory, err := NewSMTArrayTheory(family)
+	astTestMust(t, err)
+	astTestMust(t, state.RegisterTheory(theory))
+	_, indices := smtArrayQueueIndices(t, m, "fingerprint-root-", 4)
+	for _, index := range indices {
+		astTestMust(t, state.Internalize(index, false))
+	}
+	first, second, other := state.context.enodes[indices[0]], state.context.enodes[indices[1]], state.context.enodes[indices[2]]
+	// Constructor identity is opaque to the fingerprint table.
+	constructor := indices[3]
+	tuple := []*SMTEnode{first, other}
+	if !theory.insertArrayReadFingerprint(constructor, tuple) {
+		t.Fatal("initial tuple was rejected")
+	}
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.addEquality(first, second, NewSMTEqualityAxiom()))
+	if first.root != second || first.root == first {
+		t.Fatal("test did not move the original fingerprint's root")
+	}
+	if theory.insertArrayReadFingerprint(constructor, tuple) || len(theory.readFingerprintTrail) != 1 {
+		t.Fatal("original tuple was forgotten when its root changed")
+	}
+	// Native fingerprints are snapshots, not continually rehashed classes:
+	// the new representative tuple can be inserted once in the child scope.
+	if !theory.insertArrayReadFingerprint(constructor, []*SMTEnode{second, other}) {
+		t.Fatal("new root tuple was rejected")
+	}
+	if theory.insertArrayReadFingerprint(constructor, tuple) || theory.insertArrayReadFingerprint(constructor, []*SMTEnode{second, other}) {
+		t.Fatal("duplicate original or canonical tuple was accepted")
+	}
+	astTestMust(t, state.PopScopes(1))
+	if first.root != first || second.root != second || len(theory.readFingerprintTrail) != 1 {
+		t.Fatal("scope pop lost the original fingerprint or retained the child root tuple")
+	}
+	if theory.insertArrayReadFingerprint(constructor, tuple) || !theory.insertArrayReadFingerprint(constructor, []*SMTEnode{second, other}) {
+		t.Fatal("fingerprint lookup did not recover after scope pop")
+	}
+}
+
 func TestSMTArrayQueuedMultidimensionalReadConflictProof(t *testing.T) {
 	m, solver := smtAssertedNNFFixture(t, true)
 	solver.kernel.preprocess = false

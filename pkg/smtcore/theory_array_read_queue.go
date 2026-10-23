@@ -25,8 +25,8 @@ func (t *SMTArrayTheory) queueStoreReadAxiom(read, store ast.ASTHandle, upward b
 	allEqual := true
 	indices := make([]*SMTEnode, len(readNode.arguments)-1)
 	for i := range indices {
-		indices[i] = readNode.arguments[i+1].root
-		allEqual = allEqual && indices[i] == storeNode.arguments[i+1].root
+		indices[i] = readNode.arguments[i+1]
+		allEqual = allEqual && indices[i].root == storeNode.arguments[i+1].root
 	}
 	if allEqual {
 		return false, nil
@@ -46,12 +46,23 @@ func (t *SMTArrayTheory) queueStoreReadAxiom(read, store ast.ASTHandle, upward b
 // Source uses the same constructor/indices fingerprint shape for stores and
 // maps. The concrete AST identity distinguishes those retained operations.
 func (t *SMTArrayTheory) insertArrayReadFingerprint(constructor ast.ASTHandle, indices []*SMTEnode) bool {
+	// fingerprint_set::insert checks the original tuple before replacing it
+	// with current roots. An older fingerprint can still name a former root.
 	for _, entry := range t.readFingerprints[constructor] {
 		if smtFingerprintArgsEqual(entry.indices, indices) {
 			return false
 		}
 	}
-	entry := &smtArrayReadFingerprint{store: constructor, indices: indices}
+	roots := make([]*SMTEnode, len(indices))
+	for i, node := range indices {
+		roots[i] = node.root
+	}
+	for _, entry := range t.readFingerprints[constructor] {
+		if smtFingerprintArgsEqual(entry.indices, roots) {
+			return false
+		}
+	}
+	entry := &smtArrayReadFingerprint{store: constructor, indices: roots}
 	t.readFingerprints[constructor] = append(t.readFingerprints[constructor], entry)
 	t.readFingerprintTrail = append(t.readFingerprintTrail, entry)
 	return true

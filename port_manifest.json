@@ -101335,9 +101335,13 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/smtcore/theory_array_read_queue.go",
+        "pkg/smtcore/theory_array_read_queue_test.go",
+        "pkg/smtcore/theory_array_full_parents.go",
         "pkg/smtcore/fingerprints.go"
       ],
       "tests": [
+        "TestSMTArrayReadFingerprintOriginalTupleAfterRootChange",
         "TestSMTFingerprintExactThenRootIdentityAndScopes",
         "TestSMTFingerprintResetAndGuards"
       ],
@@ -101364,6 +101368,18 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "array read fingerprint lookup checks original index tuple before current roots, stores root snapshots, and removes only child fingerprints on scope pop",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_read_queue.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_read_queue_test.go",
+            "pkg/smtcore/theory_array_full_parents.go"
+          ],
+          "tests": [
+            "TestSMTArrayReadFingerprintOriginalTupleAfterRootChange"
+          ]
+        },
         {
           "name": "fingerprint construction/equality and fingerprint_set insert, contains, reset, scopes, display, and slow_contains",
           "status": "ported",
@@ -119063,6 +119079,7 @@
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTArrayReadFingerprintOriginalTupleAfterRootChange",
         "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
         "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
@@ -119240,6 +119257,18 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "array read fingerprint lookup checks original index tuple before current roots, stores root snapshots, and removes only child fingerprints on scope pop",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_read_queue.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_read_queue_test.go",
+            "pkg/smtcore/theory_array_full_parents.go"
+          ],
+          "tests": [
+            "TestSMTArrayReadFingerprintOriginalTupleAfterRootChange"
+          ]
+        },
         {
           "name": "native array model preparation: independent default-sharing partition with mg_find/mg_merge, explicit/finite/extra-fresh/unspecified fallback selection, relevant congruence-root select collection, upward store-edge worklist excluding overwritten or already-present indices, table value procedures without constructor dependency cycles and model finalization",
           "status": "ported",
@@ -119580,6 +119609,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_read_queue.go",
+        "pkg/smtcore/theory_array_read_queue_test.go",
         "pkg/smtcore/theory_array_model.go",
         "pkg/smtcore/theory_array_model_test.go",
         "pkg/smtcore/theory_array_full_parents.go",
@@ -119606,6 +119637,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayReadFingerprintOriginalTupleAfterRootChange",
         "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
         "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
@@ -119773,6 +119805,18 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "array read fingerprint lookup checks original index tuple before current roots, stores root snapshots, and removes only child fingerprints on scope pop",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_read_queue.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_read_queue_test.go",
+            "pkg/smtcore/theory_array_full_parents.go"
+          ],
+          "tests": [
+            "TestSMTArrayReadFingerprintOriginalTupleAfterRootChange"
+          ]
+        },
         {
           "name": "full constructor variable initialization emits default const/map/as-array axioms; scoped maps, parent maps, consts and as-arrays merge through private array classes; relevant maps mark inputs upward and delayed select-map expansion uses constructor/index-root fingerprints and relevant equality axioms",
           "status": "ported",
