@@ -100346,6 +100346,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_utvpi_cycle.go",
+        "pkg/smtcore/smt_utvpi_cycle_test.go",
         "pkg/smtcore/smt_diff_graph_rational.go",
         "pkg/smtcore/smt_diff_graph_rational_test.go",
         "pkg/smtcore/smt_diff_graph_inf_rational.go",
@@ -100354,6 +100356,8 @@
         "pkg/smtcore/smt_diff_graph_inf_zero_test.go"
       ],
       "tests": [
+        "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
+        "TestSMTUTVPIContextShortcutConflictProof",
         "TestSMTRationalDiffGraphFeasibleActivationAndAssignment",
         "TestSMTRationalDiffGraphNegativeCycleExplanationAndRollback",
         "TestSMTRationalDiffGraphScopesAndDomainGuards",
@@ -100741,6 +100745,19 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete UTVPI traverse_neg_cycle2: enabled weaker shortcuts, strict negative-cycle validation and retained weighted conflict/proof antecedents",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_utvpi_cycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_utvpi_cycle_test.go",
+            "pkg/smtcore/theory_utvpi_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
+            "TestSMTUTVPIContextShortcutConflictProof"
+          ]
+        },
+        {
           "name": "Retained infinitesimal-rational UTVPI graph support: normalized-zero Gabow SCCs, successors, reverse-order shortest edge paths, assignment updates, paired zero normalization and negative-cycle edge identities",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_diff_graph_inf_zero.go",
@@ -100784,6 +100801,7 @@
         "Graph slices own copied big.Rat or concrete infinitesimal-rational assignments, weights and search values. Edge explanations borrow immutable SMTLiteral values. Scope rollback retires enabled edges before truncating adjacency and edge storage."
       ],
       "deviations": [
+        "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. General difference-logic learned-edge generation remains separately incomplete.",
         "The retained concrete instantiations use math/big.Rat values directly or a pair of owned big.Rat values ordered lexicographically. No template or STL container is ported. The infinitesimal graph exposes only operations reached by real difference logic. Invalid source assertion domains return errSMTDiffGraphDomain."
       ]
     },
@@ -112317,6 +112335,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_utvpi_cycle.go",
+        "pkg/smtcore/smt_utvpi_cycle_test.go",
         "pkg/smtcore/theory_utvpi.go",
         "pkg/smtcore/theory_utvpi_test.go",
         "pkg/cmd/g3/test_vectors/utvpi_integer_parity_scopes.smt2",
@@ -123484,6 +123504,8 @@
         "pkg/smtcore/smt_utvpi_graph_test.go"
       ],
       "tests": [
+        "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
+        "TestSMTUTVPIContextShortcutConflictProof",
         "TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerRefusal",
         "TestSMTUTVPIContextConflictsProofsAndScopes",
         "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
@@ -123516,6 +123538,19 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete UTVPI traverse_neg_cycle2: enabled weaker shortcuts, strict negative-cycle validation and retained weighted conflict/proof antecedents",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_utvpi_cycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_utvpi_cycle_test.go",
+            "pkg/smtcore/theory_utvpi_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
+            "TestSMTUTVPIContextShortcutConflictProof"
+          ]
+        },
         {
           "name": "Graph portions of init_model, compute_delta and mk_value; paired-variable scope metadata and ID reuse",
           "status": "ported",
@@ -123574,7 +123609,7 @@
           "tests": []
         },
         {
-          "name": "Stronger negative-cycle shortcut/pruning, adaptive conflict activity, lemma dumps, source statistics/display/reset/fresh-context and remaining term-alias/control fidelity",
+          "name": "Adaptive conflict activity, lemma dumps, source statistics/display/reset/fresh-context and remaining term-alias/control fidelity",
           "status": "unported",
           "tests": []
         }
@@ -123583,6 +123618,7 @@
         "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
       ],
       "deviations": [
+        "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. General difference-logic learned-edge generation remains separately incomplete.",
         "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
         "The source arithmetic factory can reject a fractional Int candidate after rational-part parity succeeds. Go checks graph model values before SAT acceptance and returns UNKNOWN before publishing an invalid numeral.",
         "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact source alias/control behavior remains partial; simplex is not used as a replacement."
@@ -123594,6 +123630,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_utvpi_cycle.go",
+        "pkg/smtcore/smt_utvpi_cycle_test.go",
         "pkg/smtcore/theory_utvpi.go",
         "pkg/smtcore/theory_utvpi_test.go",
         "pkg/cmd/g3/main_test.go",
@@ -123607,6 +123645,8 @@
         "pkg/smtcore/smt_utvpi_graph_test.go"
       ],
       "tests": [
+        "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
+        "TestSMTUTVPIContextShortcutConflictProof",
         "TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerRefusal",
         "TestSMTUTVPIContextConflictsProofsAndScopes",
         "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
@@ -123747,6 +123787,19 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Concrete UTVPI traverse_neg_cycle2: enabled weaker shortcuts, strict negative-cycle validation and retained weighted conflict/proof antecedents",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_utvpi_cycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_utvpi_cycle_test.go",
+            "pkg/smtcore/theory_utvpi_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
+            "TestSMTUTVPIContextShortcutConflictProof"
+          ]
+        },
+        {
           "name": "Graph portions of init_model, compute_delta and mk_value; paired-variable scope metadata and ID reuse",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_utvpi_graph.go",
@@ -123804,7 +123857,7 @@
           "tests": []
         },
         {
-          "name": "Stronger negative-cycle shortcut/pruning, adaptive conflict activity, lemma dumps, source statistics/display/reset/fresh-context and remaining term-alias/control fidelity",
+          "name": "Adaptive conflict activity, lemma dumps, source statistics/display/reset/fresh-context and remaining term-alias/control fidelity",
           "status": "unported",
           "tests": []
         }
@@ -123813,6 +123866,7 @@
         "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
       ],
       "deviations": [
+        "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. General difference-logic learned-edge generation remains separately incomplete.",
         "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
         "The source arithmetic factory can reject a fractional Int candidate after rational-part parity succeeds. Go checks graph model values before SAT acceptance and returns UNKNOWN before publishing an invalid numeral.",
         "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact source alias/control behavior remains partial; simplex is not used as a replacement."

@@ -329,7 +329,7 @@ func (t *SMTUTVPITheory) Propagate() error {
 			return err
 		}
 		if !ok {
-			cycle, err := t.graph.graph.NegativeCycleEdges()
+			cycle, err := t.graph.negativeCycleEdges()
 			if err != nil {
 				return err
 			}

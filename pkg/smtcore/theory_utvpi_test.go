@@ -3,6 +3,7 @@ package smtcore
 import (
 	"fmt"
 	"math/big"
+	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -138,6 +139,85 @@ func TestSMTUTVPIContextConflictsProofsAndScopes(t *testing.T) {
 				})
 			}
 		}
+	}
+}
+
+func TestSMTUTVPIContextShortcutConflictProof(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	theory, err := NewSMTUTVPITheory(family)
+	astTestMust(t, err)
+	astTestMust(t, state.RegisterTheory(theory))
+	sort, err := m.MkFamilySort(family, 1, nil)
+	astTestMust(t, err)
+	variables := []ast.ASTHandle{}
+	for i := 0; i < 5; i++ {
+		x, err := m.MkConst(astTestSymbol(t, m, fmt.Sprint("utvpi-shortcut-", i)), sort)
+		astTestMust(t, err)
+		astTestMust(t, state.Internalize(x, false))
+		variables = append(variables, x)
+	}
+	assert := func(source, target int, weight int64) SMTLiteral {
+		difference, err := m.MkFamilyApp(family, smtArithOpSub, nil, []ast.ASTHandle{variables[target], variables[source]})
+		astTestMust(t, err)
+		n, err := m.ArithmeticNumeralRat(big.NewRat(weight, 1), true)
+		astTestMust(t, err)
+		formula, err := m.MkFamilyApp(family, smtArithOpLE, nil, []ast.ASTHandle{difference, n})
+		astTestMust(t, err)
+		astTestMust(t, state.Internalize(formula, true))
+		literal, err := state.Literal(formula)
+		astTestMust(t, err)
+		astTestMust(t, state.AssignLiteral(literal, NewSMTBooleanAxiom()))
+		astTestMust(t, state.PropagateTheoryAssignments())
+		astTestMust(t, theory.Propagate())
+		return literal
+	}
+	for i := 0; i < 3; i++ {
+		assert(i, i+1, 0)
+	}
+	lastChain := assert(3, 4, 0)
+	assert(1, 3, 1)
+	full := assert(0, 3, 2)
+	closing := assert(4, 0, -3)
+	original, err := theory.graph.graph.NegativeCycleEdges()
+	astTestMust(t, err)
+	if len(original) != 5 {
+		t.Fatal("missing original five-edge parent cycle", original)
+	}
+	conflict, found := state.Conflict()
+	if !found {
+		t.Fatal("missing shortcut arithmetic conflict")
+	}
+	owner, _ := conflict.Justification()
+	extended, ok := owner.(*SMTExtTheoryConflictJustification)
+	if !ok {
+		t.Fatal("missing extended UTVPI conflict")
+	}
+	if !reflect.DeepEqual(extended.Literals, []SMTLiteral{closing, lastChain, full}) {
+		t.Fatal("conflict did not use the shorter source antecedents", extended.Literals)
+	}
+	parameters := extended.Parameters()
+	if len(parameters) != 4 {
+		t.Fatal("shortened proof retained obsolete parent-edge coefficients", len(parameters))
+	}
+	for _, parameter := range parameters[1:] {
+		want, err := m.NewParameterRat(big.NewRat(1, 1))
+		astTestMust(t, err)
+		equal, err := m.ParameterEqual(parameter, want)
+		astTestMust(t, err)
+		astTestMust(t, m.DelParameter(&want))
+		if !equal {
+			t.Fatal("binary shortcut lost coefficient one")
+		}
+	}
+	resolver := &SMTConflictResolver{state: state}
+	proof, err := resolver.conflictProof(conflict, SMTNullLiteral, nil)
+	astTestMust(t, err)
+	if proof.IsNull() {
+		t.Fatal("shortened conflict did not build a proof")
 	}
 }
 
