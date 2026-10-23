@@ -27,6 +27,9 @@ func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 	if err := k.setupRealLogicPolicy(useStaticFeatures); err != nil {
 		return err
 	}
+	if err := k.setupSimpleLogicPolicy(useStaticFeatures); err != nil {
+		return err
+	}
 	enabled := false
 	switch k.setupLogic {
 	case "AUFLIA", "AUFLIRA", "AUFNIRA", "AUFLIA+", "AUFLIA-", "AUFLIRA+", "AUFLIRA-", "AUFNIRA+", "AUFNIRA-", "UFNIA":

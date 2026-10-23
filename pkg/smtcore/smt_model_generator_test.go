@@ -22,6 +22,8 @@ func TestSMTModelGeneratorHonorsDisabledRelevancyForValuesAndFunctions(t *testin
 			t.Cleanup(func() { astTestMust(t, cfg.Context.Del(&params)) })
 			key := "relevancy"
 			astTestMust(t, cfg.Context.SetUIntName(&params, &key, level))
+			key = "auto_config"
+			astTestMust(t, cfg.Context.SetBoolName(&params, &key, false))
 			s, err := NewSMTSolver(m, &params, "QF_UFLRA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, s.Close()) })

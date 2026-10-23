@@ -195,6 +195,7 @@ func TestSMTAssertedNNFUsesGlobalModuleOptions(t *testing.T) {
 	solver, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: config.Context, ModelEvaluator: config})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	smtDisableAutoConfig(t, solver)
 	b, err := m.MkBoolSort()
 	astTestMust(t, err)
 	a := smtRelevancyBool(t, m, "nnf-global-a")
