@@ -22,7 +22,11 @@ func (p *ProtoModel) uninterpretedConstant(h ast.ASTHandle) (ast.ASTHandle, bool
 	return d, fid == ast.NullFamilyID, err
 }
 
-func (p *ProtoModel) cleanExpression(root ast.ASTHandle, found map[ast.ASTHandle]struct{}) (result ast.ASTHandle, err error) {
+func (p *ProtoModel) cleanFunctionElse(fi *model.FunctionInterpretation, found map[ast.ASTHandle]struct{}) (err error) {
+	root, err := fi.Else()
+	if err != nil {
+		return err
+	}
 	memo := make(map[ast.ASTHandle]ast.ASTHandle)
 	var owned []ast.ASTRef
 	defer func() {
@@ -102,7 +106,13 @@ func (p *ProtoModel) cleanExpression(root ast.ASTHandle, found map[ast.ASTHandle
 		memo[h] = v
 		return v, nil
 	}
-	return visit(root)
+	cleaned, err := visit(root)
+	if err != nil {
+		return err
+	}
+	// Like the source trail, owned must keep every rewritten expression alive
+	// until the function interpretation has acquired its fallback reference.
+	return fi.SetElse(cleaned)
 }
 
 func (p *ProtoModel) Cleanup() error {
@@ -127,15 +137,7 @@ func (p *ProtoModel) Cleanup() error {
 			}
 			continue
 		}
-		fallback, err := fi.Else()
-		if err != nil {
-			return err
-		}
-		cleaned, err := p.cleanExpression(fallback, found)
-		if err != nil {
-			return err
-		}
-		if err = fi.SetElse(cleaned); err != nil {
+		if err = p.cleanFunctionElse(fi, found); err != nil {
 			return err
 		}
 	}

@@ -102725,8 +102725,8 @@
       "component": "smt",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/proto_model.go", "pkg/smtcore/proto_model/cleanup.go", "pkg/model/model_package_boundary.go", "pkg/smtcore/proto_model/proto_model_test.go"],
-      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues", "TestProtoModelCompletionCleanupEvaluationAndFinalModel"],
+      "go_targets": ["pkg/smtcore/proto_model/proto_model.go", "pkg/smtcore/proto_model/cleanup.go", "pkg/model/model_package_boundary.go", "pkg/smtcore/proto_model/proto_model_test.go", "pkg/smtcore/proto_model/cleanup_test.go"],
+      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues", "TestProtoModelCompletionCleanupEvaluationAndFinalModel", "TestProtoModelCleanupOwnsRewrittenFallbackUntilInstalled"],
       "assertions": [
         {
           "line": 72,
@@ -102756,7 +102756,7 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [{"name": "construction, factory dispatch, evaluation, auxiliary registration/reregistration, cleanup, universes, compression, partial completion, and final-model conversion", "status": "ported", "go_target": "pkg/smtcore/proto_model/proto_model.go", "tests": ["TestProtoModelCompletionCleanupEvaluationAndFinalModel"]}],
-      "ownership": ["ProtoModel owns its construction model, evaluator, theory rewriter, registered factories and auxiliary-declaration set; FinalModel produces independent interpretation copies before closing the construction owner."],
+      "ownership": ["ProtoModel owns its construction model, evaluator, theory rewriter, registered factories and auxiliary-declaration set; FinalModel produces independent interpretation copies before closing the construction owner. Cleanup retains rewritten expressions through fallback installation, matching the source trail lifetime."],
       "deviations": ["Reregistration and final conversion copy function interpretations before retiring their source owners; this preserves independent Go ownership instead of transferring raw C++ pointers."]
     },
     {
