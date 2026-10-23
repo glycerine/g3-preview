@@ -76,6 +76,19 @@ func (f *SMTModelFinder) open() error {
 	return nil
 }
 
+// checkpoint corresponds to model_finder::checkpoint: model-finder work must
+// honor the owning manager's cancellation and resource limit.
+func (f *SMTModelFinder) checkpoint() error {
+	canceled, err := f.manager.Canceled()
+	if err != nil {
+		return err
+	}
+	if canceled {
+		return errors.New(f.manager.ResourceLimit().CancelMessage())
+	}
+	return nil
+}
+
 func (f *SMTModelFinder) SetForceTemplate(value uint32) {
 	if f != nil && !f.closed {
 		f.forceTemplate = value
@@ -84,6 +97,9 @@ func (f *SMTModelFinder) SetForceTemplate(value uint32) {
 
 func (f *SMTModelFinder) RegisterQuantifier(quantifier ast.ASTHandle) (result error) {
 	if err := f.open(); err != nil {
+		return err
+	}
+	if err := f.checkpoint(); err != nil {
 		return err
 	}
 	kind, err := f.manager.GetKind(quantifier)
@@ -185,6 +201,9 @@ func (f *SMTModelFinder) collectNonGroundDeclarations(root ast.ASTHandle, result
 	stack := []ast.ASTHandle{root}
 	seen := make(map[ast.ASTHandle]struct{})
 	for len(stack) != 0 {
+		if err := f.checkpoint(); err != nil {
+			return err
+		}
 		n := stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
 		if _, found := seen[n]; found {
@@ -651,6 +670,9 @@ func (f *SMTModelFinder) FixModel(model *protomodel.ProtoModel) error {
 	}
 	if model == nil || model.Core() == nil {
 		return ast.ErrASTHandle
+	}
+	if err := f.checkpoint(); err != nil {
+		return err
 	}
 	relevant, err := f.relevantQuantifiers()
 	if err != nil {

@@ -144,6 +144,9 @@ func (g *smtModelFinderAUFGraph) collectFVars(quantifier ast.ASTHandle) error {
 
 func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 	for _, quantifier := range quantifiers {
+		if err := g.finder.checkpoint(); err != nil {
+			return err
+		}
 		count, err := g.finder.manager.GetNumDeclarations(g.finder.flatQuantifier(quantifier))
 		if err != nil {
 			return err
@@ -166,6 +169,9 @@ func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 	}
 	// All equalities must be processed before allocating root sets.
 	for _, info := range g.fvars {
+		if err := g.finder.checkpoint(); err != nil {
+			return err
+		}
 		argument, err := g.argument(info.function, info.position)
 		if err != nil {
 			return err

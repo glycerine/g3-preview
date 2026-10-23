@@ -143,6 +143,9 @@ func (g *smtModelFinderAUFGraph) extendModel() error {
 		return err
 	}
 	for _, node := range g.nodes {
+		if err := g.finder.checkpoint(); err != nil {
+			return err
+		}
 		if node.parent != nil {
 			continue
 		}
