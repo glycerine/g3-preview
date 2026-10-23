@@ -26,6 +26,22 @@ type SMTConflictResolver struct {
 	closed     bool
 }
 
+func (r *SMTConflictResolver) syncENodeLiterals() error {
+	for variable := int32(SMTFirstBoolVar); int(variable) < len(r.state.booleanData); variable++ {
+		if !r.state.booleanData[variable].IsENode() {
+			continue
+		}
+		node := r.state.context.enodes[r.state.boolExpr[variable]]
+		if node == nil {
+			return ast.ErrASTDomain
+		}
+		if err := r.expander.SetENodeLiteral(node, NewSMTLiteral(variable, false)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (r *SMTConflictResolver) minimizeLemma(lemma []SMTLiteral, marks []bool, levels []uint32, baseLevel uint32) ([]SMTLiteral, error) {
 	levelSet := make(map[uint32]struct{}, len(lemma))
 	for _, literal := range lemma {
@@ -158,22 +174,12 @@ func NewSMTConflictResolver(state *SMTInternalizerState) (*SMTConflictResolver, 
 	if err != nil {
 		return nil, err
 	}
-	expander := NewSMTAntecedentExpander()
-	for variable := int32(SMTFirstBoolVar); int(variable) < len(state.booleanData); variable++ {
-		if !state.booleanData[variable].IsENode() {
-			continue
-		}
-		node := state.context.enodes[state.boolExpr[variable]]
-		if node == nil {
-			_ = state.manager.DelRef(&proof)
-			return nil, ast.ErrASTDomain
-		}
-		if err = expander.SetENodeLiteral(node, NewSMTLiteral(variable, false)); err != nil {
-			_ = state.manager.DelRef(&proof)
-			return nil, err
-		}
+	resolver := &SMTConflictResolver{state: state, expander: NewSMTAntecedentExpander(), lemmaProof: proof}
+	if err = resolver.syncENodeLiterals(); err != nil {
+		_ = state.manager.DelRef(&proof)
+		return nil, err
 	}
-	return &SMTConflictResolver{state: state, expander: expander, lemmaProof: proof}, nil
+	return resolver, nil
 }
 
 // LemmaProof returns the resolver-owned proof produced by the most recent
@@ -332,6 +338,9 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 		return SMTConflictResolution{}, ast.ErrASTHandle
 	}
 	if err := r.state.manager.ResetRef(r.lemmaProof); err != nil {
+		return SMTConflictResolution{}, err
+	}
+	if err := r.syncENodeLiterals(); err != nil {
 		return SMTConflictResolution{}, err
 	}
 	originalConflict := conflict

@@ -76,6 +76,35 @@ func TestSMTConflictResolverIgnoresTrueAntecedent(t *testing.T) {
 	}
 }
 
+func TestSMTConflictResolverSynchronizesLateBooleanEnodes(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	first := smtRelevancyBool(t, m, "resolve-initial-enode")
+	astTestMust(t, state.Internalize(first, true))
+	resolver, err := NewSMTConflictResolver(state)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, resolver.Close()) })
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "resolve-late-sort"), nil)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "resolve-late-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "resolve-late-right"), sort)
+	astTestMust(t, err)
+	late, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(late, true))
+	variable, found := state.BoolVar(late)
+	if !found {
+		t.Fatal("missing late Boolean variable")
+	}
+	astTestMust(t, resolver.syncENodeLiterals())
+	literal, err := resolver.expander.LiteralForENode(state.context.enodes[late])
+	astTestMust(t, err)
+	if literal != NewSMTLiteral(variable, false) {
+		t.Fatal("late Boolean enode literal", literal, variable)
+	}
+}
+
 func TestSMTInternalizerInstallsLearnedClauseInCurrentScope(t *testing.T) {
 	m := astTestManager(t)
 	_, _, state := smtInternalizerFixture(t, m, nil)

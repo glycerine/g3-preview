@@ -3110,6 +3110,63 @@ func TestSMTSequenceTheoryCompletesNegativeUnboundedRegexModel(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryCompletesSymbolicUnboundedRegexModel(t *testing.T) {
+	for _, rejectSingleton := range []bool{false, true} {
+		name := "singleton"
+		if rejectSingleton {
+			name = "advance"
+		}
+		t.Run(name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			_, err := m.RegisterArithmeticPlugin()
+			astTestMust(t, err)
+			_, err = m.RegisterBitVectorPlugin()
+			astTestMust(t, err)
+			zero, err := m.BitVectorNumeralUnsigned(0, 8)
+			astTestMust(t, err)
+			byteSort, err := m.GetSort(zero)
+			astTestMust(t, err)
+			character, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-symbolic-byte-"+name), byteSort)
+			astTestMust(t, err)
+			unit, err := m.MkSequenceUnit(character)
+			astTestMust(t, err)
+			sequenceSort, err := m.GetSort(unit)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-symbolic-x-"+name), sequenceSort)
+			astTestMust(t, err)
+			unitRegex, err := m.MkSequenceToRegex(unit)
+			astTestMust(t, err)
+			plus, err := m.MkRegexPlus(unitRegex)
+			astTestMust(t, err)
+			membership, err := m.MkSequenceInRegex(x, plus)
+			astTestMust(t, err)
+			assertions := []ast.ASTHandle{membership}
+			if rejectSingleton {
+				length, makeErr := m.MkSequenceLength(x)
+				astTestMust(t, makeErr)
+				two, makeErr := m.ArithmeticIntegerNumeralText("2")
+				astTestMust(t, makeErr)
+				lowerBound, makeErr := m.MkArithmeticGE(length, two)
+				astTestMust(t, makeErr)
+				assertions = append(assertions, lowerBound)
+			}
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			for _, assertion := range assertions {
+				astTestMust(t, solver.Assert(assertion))
+			}
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.True {
+				reason, reasonErr := solver.ReasonUnknown()
+				astTestMust(t, reasonErr)
+				t.Fatal("symbolic unbounded regex model remained incomplete", status, reason)
+			}
+		})
+	}
+}
+
 func TestSMTSequenceTheoryClosesEmptyNegativeRegexComplement(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	a, err := m.MkString("a")
@@ -3136,6 +3193,55 @@ func TestSMTSequenceTheoryClosesEmptyNegativeRegexComplement(t *testing.T) {
 	astTestMust(t, err)
 	if status != lbool.False {
 		t.Fatal("empty negative regex complement remained open", status)
+	}
+}
+
+func TestSMTSequenceTheoryClosesExhaustedSymbolicRegexLengths(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	zero, err := m.BitVectorNumeralUnsigned(0, 8)
+	astTestMust(t, err)
+	byteSort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	characters := make([]ast.ASTHandle, 2)
+	regexes := make([]ast.ASTHandle, 2)
+	var sequenceSort ast.ASTHandle
+	for index, name := range []string{"left", "right"} {
+		characters[index], err = m.MkConst(astTestSymbol(t, m, "sequence-regex-symbolic-finite-"+name), byteSort)
+		astTestMust(t, err)
+		unit, makeErr := m.MkSequenceUnit(characters[index])
+		astTestMust(t, makeErr)
+		sequenceSort, makeErr = m.GetSort(unit)
+		astTestMust(t, makeErr)
+		regexes[index], makeErr = m.MkSequenceToRegex(unit)
+		astTestMust(t, makeErr)
+	}
+	union, err := m.MkRegexUnion(regexes[0], regexes[1])
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-symbolic-finite-x"), sequenceSort)
+	astTestMust(t, err)
+	membership, err := m.MkSequenceInRegex(x, union)
+	astTestMust(t, err)
+	length, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	lengthOne, err := m.MkEq(length, one)
+	astTestMust(t, err)
+	notLengthOne, err := m.MkNot(lengthOne)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(membership))
+	astTestMust(t, solver.Assert(notLengthOne))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("exhausted symbolic regex lengths remained open", status)
 	}
 }
 

@@ -188,6 +188,33 @@ func (a *sequenceAutomaton) movesFrom(state int, closeDestination bool) []sequen
 	return result
 }
 
+func (a *sequenceAutomaton) statesReachingFinal() []bool {
+	result := make([]bool, len(a.moves))
+	reverse := make([][]int, len(a.moves))
+	work := make([]int, 0, len(a.finals))
+	for source, moves := range a.moves {
+		for _, move := range moves {
+			reverse[move.destination] = append(reverse[move.destination], source)
+		}
+	}
+	for state := range a.finals {
+		result[state] = true
+		work = append(work, state)
+	}
+	for len(work) != 0 {
+		state := work[len(work)-1]
+		work = work[:len(work)-1]
+		for _, predecessor := range reverse[state] {
+			if result[predecessor] {
+				continue
+			}
+			result[predecessor] = true
+			work = append(work, predecessor)
+		}
+	}
+	return result
+}
+
 type sequenceAutomatonBuilder struct {
 	rewriter *SequenceRewriter
 	refs     []ast.ASTRef
@@ -710,34 +737,12 @@ func (r *SequenceRewriter) RegexByteStringCandidates(regex ast.ASTHandle, limit 
 		return nil, false, ast.ErrASTDomain
 	}
 	builder := &sequenceAutomatonBuilder{rewriter: r}
-	defer builder.close()
+	defer func() { result = errors.Join(result, builder.close()) }()
 	automaton, err := builder.regex(regex)
 	if err != nil || automaton == nil {
 		return nil, false, err
 	}
-	canReachFinal := make([]bool, len(automaton.moves))
-	reverse := make([][]int, len(automaton.moves))
-	work := make([]int, 0, len(automaton.finals))
-	for source, moves := range automaton.moves {
-		for _, move := range moves {
-			reverse[move.destination] = append(reverse[move.destination], source)
-		}
-	}
-	for state := range automaton.finals {
-		canReachFinal[state] = true
-		work = append(work, state)
-	}
-	for len(work) != 0 {
-		state := work[len(work)-1]
-		work = work[:len(work)-1]
-		for _, predecessor := range reverse[state] {
-			if canReachFinal[predecessor] {
-				continue
-			}
-			canReachFinal[predecessor] = true
-			work = append(work, predecessor)
-		}
-	}
+	canReachFinal := automaton.statesReachingFinal()
 	type candidate struct {
 		state int
 		word  string
@@ -794,6 +799,77 @@ func (r *SequenceRewriter) RegexByteStringCandidates(regex ast.ASTHandle, limit 
 		}
 	}
 	return words, !symbolicPath, nil
+}
+
+// RegexAcceptedLengths enumerates word lengths that have a structurally
+// accepting automaton path. Symbolic labels are treated as potentially
+// satisfiable; the exact fixed-word reducer supplies their constraints.
+func (r *SequenceRewriter) RegexAcceptedLengths(regex ast.ASTHandle, limit int) (lengths []uint64, exhaustive bool, result error) {
+	if err := r.open(); err != nil {
+		return nil, false, err
+	}
+	if limit <= 0 {
+		return nil, false, ast.ErrASTDomain
+	}
+	builder := &sequenceAutomatonBuilder{rewriter: r}
+	defer func() { result = errors.Join(result, builder.close()) }()
+	automaton, err := builder.regex(regex)
+	if err != nil || automaton == nil {
+		return nil, false, err
+	}
+	type position struct {
+		state  int
+		length uint64
+	}
+	canReachFinal := automaton.statesReachingFinal()
+	queue := []position{{state: automaton.initial}}
+	seen := map[position]struct{}{{state: automaton.initial}: {}}
+	seenLengths := make(map[uint64]struct{})
+	for len(queue) != 0 {
+		current := queue[0]
+		queue = queue[1:]
+		closure := automaton.epsilonClosure(current.state)
+		for _, state := range closure {
+			if !automaton.finals[state] {
+				continue
+			}
+			if _, found := seenLengths[current.length]; !found {
+				seenLengths[current.length] = struct{}{}
+				lengths = append(lengths, current.length)
+				if len(lengths) == limit {
+					return lengths, false, nil
+				}
+			}
+			break
+		}
+		for _, source := range closure {
+			for _, move := range automaton.moves[source] {
+				if move.label == nil || !canReachFinal[move.destination] {
+					continue
+				}
+				values, concrete, valueErr := builder.concreteLabelBytes(move.label)
+				if valueErr != nil {
+					return nil, false, valueErr
+				}
+				if concrete {
+					satisfiable := false
+					for _, accepted := range values {
+						satisfiable = satisfiable || accepted
+					}
+					if !satisfiable {
+						continue
+					}
+				}
+				next := position{state: move.destination, length: current.length + 1}
+				if _, found := seen[next]; found {
+					continue
+				}
+				seen[next] = struct{}{}
+				queue = append(queue, next)
+			}
+		}
+	}
+	return lengths, true, nil
 }
 
 // ShortestRegexByteString returns the first concrete witness accepted by regex.

@@ -363,6 +363,140 @@ func (t *SMTSequenceTheory) branchConcreteRegexWitness(expression, sequence, reg
 	return true, true, t.axioms.Push(constraint)
 }
 
+func (t *SMTSequenceTheory) assumeRegexLength(guard ast.ASTHandle) (lbool.LBool, error) {
+	state, err := t.State()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if err = state.Internalize(guard, false); err != nil {
+		return lbool.Undef, err
+	}
+	literal, err := state.Literal(guard)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	assignment, err := state.Assignment(literal)
+	if err != nil || assignment != lbool.Undef {
+		return assignment, err
+	}
+	if err = state.markRelevant(guard); err != nil {
+		return lbool.Undef, err
+	}
+	data, err := state.BooleanData(literal.Var())
+	if err != nil {
+		return lbool.Undef, err
+	}
+	data.SetTrueFirst()
+	return lbool.Undef, nil
+}
+
+func (t *SMTSequenceTheory) branchSymbolicRegexLength(expression, sequence, regex ast.ASTHandle) (branched, reduced bool, result error) {
+	state, err := t.State()
+	if err != nil {
+		return false, false, err
+	}
+	literal, err := state.Literal(expression)
+	if err != nil {
+		return false, false, err
+	}
+	assignment, err := state.Assignment(literal)
+	if err != nil || assignment == lbool.Undef {
+		return false, false, err
+	}
+	candidateRegex := regex
+	activation := expression
+	if assignment == lbool.False {
+		candidateRegex, err = state.manager.MkRegexComplement(regex)
+		if err != nil {
+			return false, false, err
+		}
+		activation, err = state.manager.MkNot(expression)
+		if err != nil {
+			return false, false, err
+		}
+	}
+	lower, hasLower, err := t.sequenceLengthLowerBound(sequence)
+	if err != nil {
+		return false, false, err
+	}
+	if hasLower && lower > smtSequenceMaximumFixedDecomposition {
+		return false, false, nil
+	}
+	limit := len(state.boolExpr) + 1
+	if hasLower {
+		limit += int(lower)
+	}
+	rw, err := rewriter.NewSequenceRewriter(state.manager)
+	if err != nil {
+		return false, false, err
+	}
+	lengths, exhaustive, err := rw.RegexAcceptedLengths(candidateRegex, limit)
+	if err != nil {
+		return false, false, err
+	}
+	guards := make([]ast.ASTHandle, 0, len(lengths))
+	for _, count := range lengths {
+		if count > smtSequenceMaximumFixedDecomposition {
+			return false, false, nil
+		}
+		word, guard, internal, wordErr := t.fixedLengthRegexWord(sequence, count)
+		if wordErr != nil {
+			return false, false, wordErr
+		}
+		guards = append(guards, guard)
+		if hasLower && count < lower {
+			continue
+		}
+		assignment, wordErr := t.assumeRegexLength(guard)
+		if wordErr != nil {
+			return false, false, wordErr
+		}
+		if assignment == lbool.False {
+			continue
+		}
+		definition, wordErr := state.manager.MkEq(sequence, word)
+		if wordErr != nil {
+			return false, false, wordErr
+		}
+		guardedDefinition, wordErr := state.manager.MkImplies(guard, definition)
+		if wordErr != nil {
+			return false, false, wordErr
+		}
+		if _, found := t.axioms.set[guardedDefinition]; !found {
+			if wordErr = t.axioms.Push(guardedDefinition); wordErr != nil {
+				return false, false, wordErr
+			}
+		}
+		t.trackInternalTerms(internal...)
+		if assignment == lbool.Undef {
+			return true, false, nil
+		}
+		reduced, wordErr = t.addGuardedRegexMembershipAxiom(expression, word, regex, guard)
+		return false, reduced, wordErr
+	}
+	if !exhaustive {
+		return false, false, nil
+	}
+	choices, err := state.manager.MkFalse()
+	if err != nil {
+		return false, false, err
+	}
+	if len(guards) != 0 {
+		choices, err = state.manager.MkOrArray(guards)
+		if err != nil {
+			return false, false, err
+		}
+	}
+	constraint, err := state.manager.MkImplies(activation, choices)
+	if err != nil {
+		return false, false, err
+	}
+	if _, found := t.axioms.set[constraint]; found {
+		return false, false, nil
+	}
+	return true, true, t.axioms.Push(constraint)
+}
+
 func (t *SMTSequenceTheory) reduceExpandedRegexMemberships() (progress, unresolved bool, result error) {
 	state, err := t.State()
 	if err != nil {
@@ -443,8 +577,20 @@ func (t *SMTSequenceTheory) reduceExpandedRegexMemberships() (progress, unresolv
 			}
 			if branched {
 				progress = true
+				continue
 			}
 			reduced = witnessReduced
+		}
+		if !reduced {
+			branched, lengthReduced, lengthErr := t.branchSymbolicRegexLength(expression, sequence, regex)
+			if lengthErr != nil {
+				return false, false, lengthErr
+			}
+			if branched {
+				progress = true
+				continue
+			}
+			reduced = lengthReduced
 		}
 		if !reduced {
 			unresolved = true
