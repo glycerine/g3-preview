@@ -850,35 +850,63 @@ func (t *SMTSequenceTheory) checkConcreteRelations() (bool, error) {
 }
 
 func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
-	if _, err := t.State(); err != nil {
+	state, err := t.State()
+	if err != nil {
 		return SMTFinalCheckGiveUp, err
+	}
+	propagateAxioms := func(reported bool) (bool, error) {
+		if !reported {
+			return false, nil
+		}
+		before := state.searchProgress()
+		if propagateErr := t.Propagate(); propagateErr != nil {
+			return false, propagateErr
+		}
+		return state.Inconsistent() || state.searchProgress() != before, nil
 	}
 	progress, err := t.addIntegerStringLengthRefinement()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
-	if progress {
+	if progress, err = propagateAxioms(progress); err != nil {
+		return SMTFinalCheckGiveUp, err
+	} else if progress {
 		return SMTFinalCheckContinue, nil
 	}
 	regexProgress, regexUnresolved, err := t.reduceExpandedRegexMemberships()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
-	if regexProgress {
+	if regexProgress, err = propagateAxioms(regexProgress); err != nil {
+		return SMTFinalCheckGiveUp, err
+	} else if regexProgress {
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.addLengthLowerBoundDecomposition()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
-	if progress {
+	if progress, err = propagateAxioms(progress); err != nil {
+		return SMTFinalCheckGiveUp, err
+	} else if progress {
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.addFixedLengthDecomposition()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
-	if progress {
+	if progress, err = propagateAxioms(progress); err != nil {
+		return SMTFinalCheckGiveUp, err
+	} else if progress {
+		return SMTFinalCheckContinue, nil
+	}
+	progress, err = t.addFixedLengthDisequalityReduction()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if progress, err = propagateAxioms(progress); err != nil {
+		return SMTFinalCheckGiveUp, err
+	} else if progress {
 		return SMTFinalCheckContinue, nil
 	}
 	conflict, err := t.checkConcreteEquations()

@@ -26,6 +26,10 @@ func (t *SMTSequenceTheory) addRegexMembershipAxiom(expression ast.ASTHandle) (r
 }
 
 func (t *SMTSequenceTheory) addRegexMembershipAxiomForSequence(expression, sequence, regex ast.ASTHandle) (reducedExactly bool, result error) {
+	return t.addGuardedRegexMembershipAxiom(expression, sequence, regex, ast.ASTHandle{})
+}
+
+func (t *SMTSequenceTheory) addGuardedRegexMembershipAxiom(expression, sequence, regex, guard ast.ASTHandle) (reducedExactly bool, result error) {
 	state, err := t.State()
 	if err != nil {
 		return false, err
@@ -57,7 +61,67 @@ func (t *SMTSequenceTheory) addRegexMembershipAxiomForSequence(expression, seque
 	if err != nil {
 		return false, err
 	}
+	if !guard.IsNull() {
+		equivalence, err = state.manager.MkImplies(guard, equivalence)
+		if err != nil {
+			return false, err
+		}
+	}
 	return true, t.axioms.Push(equivalence)
+}
+
+func (t *SMTSequenceTheory) fixedLengthRegexWord(sequence ast.ASTHandle, count uint64) (word, guard ast.ASTHandle, internal []ast.ASTHandle, result error) {
+	state, err := t.State()
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, nil, err
+	}
+	sort, err := state.manager.GetSort(sequence)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, nil, err
+	}
+	elementSort, isSequence, err := state.manager.SequenceSortElement(sort)
+	if err != nil || !isSequence {
+		if err == nil {
+			err = ast.ErrASTDomain
+		}
+		return ast.ASTHandle{}, ast.ASTHandle{}, nil, err
+	}
+	parts := make([]ast.ASTHandle, 0, int(count))
+	internal = make([]ast.ASTHandle, 0, int(count)*2+1)
+	for index := uint64(0); index < count; index++ {
+		position, makeErr := t.integer(index)
+		if makeErr != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, nil, makeErr
+		}
+		element, makeErr := t.relationSkolem("seq.nth", []ast.ASTHandle{sequence, position}, elementSort)
+		if makeErr != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, nil, makeErr
+		}
+		unit, makeErr := state.manager.MkSequenceUnit(element)
+		if makeErr != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, nil, makeErr
+		}
+		parts = append(parts, unit)
+		internal = append(internal, element, unit)
+	}
+	word, err = t.makeWord(parts, sort)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, nil, err
+	}
+	length, err := state.manager.MkSequenceLength(sequence)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, nil, err
+	}
+	lengthValue, err := t.integer(count)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, nil, err
+	}
+	guard, err = state.manager.MkEq(length, lengthValue)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, nil, err
+	}
+	internal = append(internal, word)
+	return word, guard, internal, nil
 }
 
 func (t *SMTSequenceTheory) reduceExpandedRegexMemberships() (progress, unresolved bool, result error) {
@@ -104,10 +168,30 @@ func (t *SMTSequenceTheory) reduceExpandedRegexMemberships() (progress, unresolv
 			return false, false, reduceErr
 		}
 		if !reduced {
+			count, exact, lengthErr := t.exactSequenceLength(sequence)
+			if lengthErr != nil {
+				return false, false, lengthErr
+			}
+			if exact && count <= smtSequenceMaximumFixedDecomposition {
+				fixedWord, guard, internal, wordErr := t.fixedLengthRegexWord(sequence, count)
+				if wordErr != nil {
+					return false, false, wordErr
+				}
+				reduced, reduceErr = t.addGuardedRegexMembershipAxiom(expression, fixedWord, regex, guard)
+				if reduceErr != nil {
+					return false, false, reduceErr
+				}
+				if reduced {
+					t.trackInternalTerms(internal...)
+				}
+			}
+		}
+		if !reduced {
 			unresolved = true
 			continue
 		}
-		t.trackInternalTerms(expression)
+		t.trackInternalTerms(expression, expanded)
+		t.trackInternalTerms(parts...)
 		if treeErr := t.trackRegexTree(regex); treeErr != nil {
 			return false, false, treeErr
 		}

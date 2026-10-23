@@ -2635,6 +2635,45 @@ func TestSMTSequenceTheoryRetriesRegexAfterWordSolution(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	aa, err := m.MkString("aa")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-fixed-length-x"), sort)
+	astTestMust(t, err)
+	aRegex, err := m.MkSequenceToRegex(a)
+	astTestMust(t, err)
+	star, err := m.MkRegexStar(aRegex)
+	astTestMust(t, err)
+	membership, err := m.MkSequenceInRegex(x, star)
+	astTestMust(t, err)
+	length, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	two, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	fixedLength, err := m.MkEq(length, two)
+	astTestMust(t, err)
+	xIsAA, err := m.MkEq(x, aa)
+	astTestMust(t, err)
+	xIsNotAA, err := m.MkNot(xIsAA)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	for _, assertion := range []ast.ASTHandle{membership, fixedLength, xIsNotAA} {
+		astTestMust(t, solver.Assert(assertion))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("fixed-length decomposed regex membership", status)
+	}
+}
+
 func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name  string

@@ -116776,7 +116776,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_disequality_solve.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_fixed_length.go", "pkg/smtcore/theory_seq_length_split.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_extensionality.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_extract_special.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_ground.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_disequality_solve.go", "pkg/smtcore/theory_seq_disequality_fixed.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_fixed_length.go", "pkg/smtcore/theory_seq_length_split.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_extensionality.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_extract_special.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_ground.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -116829,7 +116829,9 @@
         "TestSMTSequenceTheorySpecialTailAndDropLastDecompositions",
         "TestSMTSequenceTheoryIndexAxioms",
         "TestSMTSequenceTheoryReplaceAxioms",
-        "TestSMTSequenceTheoryRegexMembershipReduction"
+        "TestSMTSequenceTheoryRegexMembershipReduction",
+        "TestSMTSequenceTheoryRetriesRegexAfterWordSolution",
+        "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition"
       ],
       "conditionals": [
         {
@@ -117311,6 +117313,12 @@
           "tests": ["TestSMTSequenceTheoryConcreteWordDisequationConflict", "TestSMTSequenceTheoryReducedWordDisequationConflict", "TestSMTSequenceTheoryPropagatesResidualWordDisequality"]
         },
         {
+          "name": "fixed-length sequence disequality reduction to guarded indexed element disequalities using stable seq.nth witnesses (src/smt/theory_seq.cpp:1841-2013)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_disequality_fixed.go",
+          "tests": ["TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition"]
+        },
+        {
           "name": "false contains re-expansion and concrete substring conflict with assignment and equality dependencies (src/smt/theory_seq.cpp solve_nc/assign_eh retained concrete case)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
@@ -117363,6 +117371,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_axioms.go",
           "tests": ["TestSMTSequenceTheoryLengthAxioms"]
+        },
+        {
+          "name": "final-check axiom draining with observable SAT and equality progress detection across scoped replay (src/smt/theory_seq.cpp:252-302,3068-3108)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq.go",
+          "tests": ["TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition"]
         },
         {
           "name": "exact length axioms for concat, unit, empty, string, arbitrary sequence non-negativity, zero-length iff empty, and int.to.str nonnegative lower bound, exact one-digit threshold, and fixed integer or length driven arbitrary decimal-width refinement (src/smt/theory_seq.cpp:627-633,3313-3390)",
@@ -117431,10 +117445,10 @@
           "tests": ["TestSMTSequenceTheoryReplaceAxioms", "TestSMTSequenceTheoryReplaceTightestPrefixAxioms"]
         },
         {
-          "name": "regular-language membership reduction through the retained Go regex automaton builder, including concrete automata, symbolic singleton languages, final-check retry after word-solution expansion, scoped exact-regex term tracking, explicit give-up for still-unresolved memberships, and definitive satisfiability for exact reductions (src/smt/theory_seq.cpp:3391-3445,4166-4191)",
+          "name": "regular-language membership reduction through the retained Go regex automaton builder, including concrete automata, symbolic singleton languages, final-check retry after word-solution and guarded fixed-length seq.nth expansion, scoped exact-regex term tracking, explicit give-up for still-unresolved memberships, and definitive satisfiability for exact reductions (src/smt/theory_seq.cpp:3391-3445,4166-4191)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_regex.go",
-          "tests": ["TestSMTSequenceTheoryRegexMembershipReduction", "TestSMTSequenceTheoryRetriesRegexAfterWordSolution"]
+          "tests": ["TestSMTSequenceTheoryRegexMembershipReduction", "TestSMTSequenceTheoryRetriesRegexAfterWordSolution", "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition"]
         },
         {
           "name": "int.to.str empty iff negative, nonnegative round trip through str.to.int, numeric-language membership for nonnegative conversions, str.to.int lower bound plus exact nonnegative iff [0-9]+ membership, and complete arbitrary-precision ground conversion values including leading-zero parsing (src/smt/theory_seq.cpp:2284-2462)",
