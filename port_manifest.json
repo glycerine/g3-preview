@@ -108471,11 +108471,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_model_checker_inverse_test.go",
         "pkg/smtcore/smt_quantifier_manager.go",
         "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
+        "TestSMTModelCheckerInversePreservesGenerationBeforeFingerprintCanonicalization",
         "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",

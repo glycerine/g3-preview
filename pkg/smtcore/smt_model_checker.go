@@ -135,12 +135,12 @@ func (c *SMTModelChecker) universe(model *protomodel.ProtoModel, sort ast.ASTHan
 	return []ast.ASTHandle{value}, nil
 }
 
-func (c *SMTModelChecker) bindingNode(value ast.ASTHandle) (*SMTEnode, error) {
-	if term := c.valueTerms[value]; !term.IsNull() {
+func (c *SMTModelChecker) bindingNode(value ast.ASTHandle, fromInverse bool) (*SMTEnode, error) {
+	if term := c.valueTerms[value]; !fromInverse && !term.IsNull() {
 		value = term
 	}
 	if node := c.state.context.enodes[value]; node != nil {
-		return node.root, nil
+		return node, nil
 	}
 	kind, err := c.manager.GetKind(value)
 	if err != nil || kind != ast.ASTApp {
@@ -153,12 +153,16 @@ func (c *SMTModelChecker) bindingNode(value ast.ASTHandle) (*SMTEnode, error) {
 		return nil, err
 	}
 	if node := c.state.context.enodes[value]; node != nil {
-		return node.root, nil
+		return node, nil
 	}
 	return c.state.MkEnode(value, false, false, true)
 }
 
 func (c *SMTModelChecker) addCounterexample(quantifier ast.ASTHandle, values []ast.ASTHandle) (bool, error) {
+	return c.enqueueCounterexample(quantifier, values, false)
+}
+
+func (c *SMTModelChecker) enqueueCounterexample(quantifier ast.ASTHandle, values []ast.ASTHandle, fromInverse bool) (bool, error) {
 	count, err := c.manager.GetNumDeclarations(quantifier)
 	if err != nil {
 		return false, err
@@ -170,7 +174,7 @@ func (c *SMTModelChecker) addCounterexample(quantifier ast.ASTHandle, values []a
 	nodes := make([]*SMTEnode, len(values))
 	var maxGeneration uint32
 	for i, value := range values {
-		node, err := c.bindingNode(value)
+		node, err := c.bindingNode(value, fromInverse)
 		if err != nil {
 			return false, err
 		}
@@ -310,6 +314,9 @@ func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier
 	inverseOK = true
 	if c.modelFinder == nil {
 		return raw, bindings, !requireInverse, nil
+	}
+	if !requireInverse {
+		return raw, bindings, true, nil
 	}
 	for i := range bindings {
 		if finite[i] || uint32(i) >= count {
@@ -473,7 +480,7 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 			}
 			break
 		}
-		inserted, err := c.addCounterexample(quantifier, bindings)
+		inserted, err := c.enqueueCounterexample(quantifier, bindings, restricted)
 		if err != nil {
 			if cex != complete {
 				err = errors.Join(err, cex.DecRef())
