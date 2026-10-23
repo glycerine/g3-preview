@@ -159,6 +159,14 @@ func (c *SMTModelChecker) bindingNode(value ast.ASTHandle) (*SMTEnode, error) {
 }
 
 func (c *SMTModelChecker) addCounterexample(quantifier ast.ASTHandle, values []ast.ASTHandle) (bool, error) {
+	count, err := c.manager.GetNumDeclarations(quantifier)
+	if err != nil {
+		return false, err
+	}
+	if uint32(len(values)) < count {
+		return false, ast.ErrASTDomain
+	}
+	values = values[:count]
 	nodes := make([]*SMTEnode, len(values))
 	var maxGeneration uint32
 	for i, value := range values {
@@ -215,7 +223,14 @@ func (c *SMTModelChecker) addInstantiationSetRestrictions(auxiliary *SMTSolver, 
 	if c.modelFinder == nil {
 		return false, nil
 	}
-	for i, skolem := range skolems {
+	count, err := c.manager.GetNumDeclarations(quantifier)
+	if err != nil {
+		return false, err
+	}
+	if uint32(len(skolems)) < count {
+		return false, ast.ErrASTDomain
+	}
+	for i, skolem := range skolems[:count] {
 		if finite[i] || skolem.IsNull() {
 			continue
 		}
@@ -262,6 +277,14 @@ func (c *SMTModelChecker) addInstantiationSetRestrictions(auxiliary *SMTSolver, 
 }
 
 func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier ast.ASTHandle, values []ast.ASTHandle, finite []bool, skolemDecls []ast.ASTHandle, requireInverse bool) (raw, bindings []ast.ASTHandle, inverseOK bool, err error) {
+	flat := quantifier
+	if c.modelFinder != nil {
+		flat = c.modelFinder.flatQuantifier(quantifier)
+	}
+	count, err := c.manager.GetNumDeclarations(quantifier)
+	if err != nil {
+		return nil, nil, false, err
+	}
 	raw = append([]ast.ASTHandle(nil), values...)
 	for i, declaration := range skolemDecls {
 		if declaration.IsNull() {
@@ -272,7 +295,7 @@ func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier
 			return nil, nil, false, e
 		}
 		if value.IsNull() {
-			sort, e := c.manager.GetDeclarationSort(quantifier, uint32(i))
+			sort, e := c.manager.GetDeclarationSort(flat, uint32(i))
 			if e != nil {
 				return nil, nil, false, e
 			}
@@ -289,7 +312,7 @@ func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier
 		return raw, bindings, !requireInverse, nil
 	}
 	for i := range bindings {
-		if finite[i] {
+		if finite[i] || uint32(i) >= count {
 			continue
 		}
 		term, _, found, e := c.modelFinder.Inverse(quantifier, uint32(i), bindings[i])
@@ -309,7 +332,11 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 	if c.auxiliary == nil {
 		return false, nil
 	}
-	body, err := c.manager.GetQuantifierBody(quantifier)
+	flat := quantifier
+	if c.modelFinder != nil {
+		flat = c.modelFinder.flatQuantifier(quantifier)
+	}
+	body, err := c.manager.GetQuantifierBody(flat)
 	if err != nil {
 		return false, err
 	}
@@ -337,7 +364,7 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 		if finite[i] {
 			continue
 		}
-		sort, e := c.manager.GetDeclarationSort(quantifier, uint32(i))
+		sort, e := c.manager.GetDeclarationSort(flat, uint32(i))
 		if e != nil {
 			return false, e
 		}
@@ -489,7 +516,11 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 }
 
 func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifier ast.ASTHandle, remaining *uint32) (bool, error) {
-	count, err := c.manager.GetNumDeclarations(quantifier)
+	flat := quantifier
+	if c.modelFinder != nil {
+		flat = c.modelFinder.flatQuantifier(quantifier)
+	}
+	count, err := c.manager.GetNumDeclarations(flat)
 	if err != nil {
 		return false, err
 	}
@@ -501,7 +532,7 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 	}
 	hasInfinite := false
 	for i := uint32(0); i < count; i++ {
-		sort, err := c.manager.GetDeclarationSort(quantifier, i)
+		sort, err := c.manager.GetDeclarationSort(flat, i)
 		if err != nil {
 			return false, err
 		}
@@ -553,7 +584,7 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 			return err
 		}
 		defer func() { result = errors.Join(result, c.manager.DelRef(&instance)) }()
-		if err = rewriter.InstantiateQuantifier(c.manager, quantifier, values, instance); err != nil {
+		if err = rewriter.InstantiateQuantifier(c.manager, flat, values, instance); err != nil {
 			return err
 		}
 		term, err := c.manager.RefGet(instance)

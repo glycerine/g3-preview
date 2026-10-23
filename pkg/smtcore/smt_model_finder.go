@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/macros"
+	"github.com/glycerine/g3/pkg/ast/pattern"
 	"github.com/glycerine/g3/pkg/model"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -21,6 +22,7 @@ type SMTModelFinder struct {
 	quantifiers        []ast.ASTHandle
 	registered         map[ast.ASTHandle]struct{}
 	sets               map[ast.ASTHandle][]*smtModelFinderInstantiationSet
+	flat               map[ast.ASTHandle]smtModelFinderFlatQuantifier
 	macroUtil          *macros.Util
 	candidates         map[ast.ASTHandle]*macros.Candidates
 	nonGround          map[ast.ASTHandle]map[ast.ASTHandle]struct{}
@@ -32,6 +34,18 @@ type SMTModelFinder struct {
 	pendingConstraints []ast.ASTRef
 	scopes             []int
 	closed             bool
+}
+
+type smtModelFinderFlatQuantifier struct {
+	quantifier ast.ASTHandle
+	reference  ast.ASTRef
+}
+
+func (f *SMTModelFinder) flatQuantifier(quantifier ast.ASTHandle) ast.ASTHandle {
+	if flat, found := f.flat[quantifier]; found {
+		return flat.quantifier
+	}
+	return quantifier
 }
 
 func NewSMTModelFinder(state *SMTInternalizerState) (*SMTModelFinder, error) {
@@ -49,6 +63,7 @@ func NewSMTModelFinder(state *SMTInternalizerState) (*SMTModelFinder, error) {
 	return &SMTModelFinder{
 		manager: state.manager, state: state, registered: make(map[ast.ASTHandle]struct{}),
 		sets: make(map[ast.ASTHandle][]*smtModelFinderInstantiationSet), macroUtil: util,
+		flat:       make(map[ast.ASTHandle]smtModelFinderFlatQuantifier),
 		candidates: make(map[ast.ASTHandle]*macros.Candidates), nonGround: make(map[ast.ASTHandle]map[ast.ASTHandle]struct{}),
 		auf: make(map[ast.ASTHandle]bool), chosen: make(map[ast.ASTHandle]ast.ASTHandle), hint: newHintSearchState(), dependencies: dependencies,
 	}, nil
@@ -67,7 +82,7 @@ func (f *SMTModelFinder) SetForceTemplate(value uint32) {
 	}
 }
 
-func (f *SMTModelFinder) RegisterQuantifier(quantifier ast.ASTHandle) error {
+func (f *SMTModelFinder) RegisterQuantifier(quantifier ast.ASTHandle) (result error) {
 	if err := f.open(); err != nil {
 		return err
 	}
@@ -83,6 +98,12 @@ func (f *SMTModelFinder) RegisterQuantifier(quantifier ast.ASTHandle) error {
 	}
 	f.registered[quantifier] = struct{}{}
 	f.quantifiers = append(f.quantifiers, quantifier)
+	defer func() {
+		if result != nil {
+			result = errors.Join(result, f.releaseQuantifier(quantifier))
+			f.quantifiers = f.quantifiers[:len(f.quantifiers)-1]
+		}
+	}()
 	count, err := f.manager.GetNumDeclarations(quantifier)
 	if err != nil {
 		return err
@@ -98,13 +119,42 @@ func (f *SMTModelFinder) RegisterQuantifier(quantifier ast.ASTHandle) error {
 	if err != nil {
 		return err
 	}
+	nested, err := f.manager.HasQuantifiers(body)
+	if err != nil {
+		return err
+	}
+	var flatRef ast.ASTRef
+	if nested {
+		flatRef, err = pattern.PullQuantifierNoProof(f.manager, quantifier)
+	} else {
+		flatRef, err = f.manager.NewRef(quantifier)
+	}
+	if err != nil {
+		return err
+	}
+	flat, err := f.manager.RefGet(flatRef)
+	if err != nil {
+		return errors.Join(err, f.manager.DelRef(&flatRef))
+	}
+	f.flat[quantifier] = smtModelFinderFlatQuantifier{quantifier: flat, reference: flatRef}
+	body, err = f.manager.GetQuantifierBody(flat)
+	if err != nil {
+		return err
+	}
+	nested, err = f.manager.HasQuantifiers(body)
+	if err != nil {
+		return err
+	}
+	if nested {
+		return ast.ErrASTPending
+	}
 	bodyKind, err := f.manager.GetKind(body)
 	if err != nil {
 		return err
 	}
 	if bodyKind == ast.ASTApp {
-		if err = f.macroUtil.CollectQuantifierCandidates(quantifier, candidates); err != nil {
-			return errors.Join(err, candidates.Close())
+		if err = f.macroUtil.CollectQuantifierCandidates(flat, candidates); err != nil {
+			return err
 		}
 	}
 	if err = f.collectNonGroundDeclarations(body, f.nonGround[quantifier]); err != nil {
@@ -228,6 +278,13 @@ func (f *SMTModelFinder) releaseQuantifier(quantifier ast.ASTHandle) (result err
 	}
 	if candidates := f.candidates[quantifier]; candidates != nil {
 		result = errors.Join(result, candidates.Close())
+	}
+	if flat, found := f.flat[quantifier]; found {
+		if err := f.manager.DelRef(&flat.reference); err != nil {
+			result = errors.Join(result, err)
+		} else {
+			delete(f.flat, quantifier)
+		}
 	}
 	if result == nil {
 		delete(f.sets, quantifier)
@@ -357,7 +414,7 @@ func (f *SMTModelFinder) processNonAUFMacros(proto *protomodel.ProtoModel, quant
 		conditional := make(map[ast.ASTHandle]struct{})
 		conditionalOrder := make([]ast.ASTHandle, 0)
 		for _, quantifier := range current {
-			weight, err := f.manager.GetQuantifierWeight(quantifier)
+			weight, err := f.manager.GetQuantifierWeight(f.flatQuantifier(quantifier))
 			if err != nil {
 				return nil, err
 			}
@@ -664,6 +721,7 @@ func (f *SMTModelFinder) Close() error {
 	f.scopes = nil
 	f.registered = nil
 	f.sets = nil
+	f.flat = nil
 	f.macroUtil = nil
 	f.candidates = nil
 	f.nonGround = nil

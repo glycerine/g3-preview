@@ -58,11 +58,12 @@ func (g *smtModelFinderAUFGraph) node(index map[smtModelFinderAUFKey]*smtModelFi
 // Variable indexes are de Bruijn indexes; the manager stores binder sorts in
 // declaration order, as does the public model-finder instantiation-set API.
 func (g *smtModelFinderAUFGraph) uvar(quantifier ast.ASTHandle, variable uint32) (*smtModelFinderAUFNode, error) {
-	count, err := g.finder.manager.GetNumDeclarations(quantifier)
+	flat := g.finder.flatQuantifier(quantifier)
+	count, err := g.finder.manager.GetNumDeclarations(flat)
 	if err != nil || variable >= count {
 		return nil, errors.Join(err, ast.ErrASTDomain)
 	}
-	sort, err := g.finder.manager.GetDeclarationSort(quantifier, count-variable-1)
+	sort, err := g.finder.manager.GetDeclarationSort(flat, count-variable-1)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +79,7 @@ func (g *smtModelFinderAUFGraph) argument(function ast.ASTHandle, position uint3
 }
 
 func (g *smtModelFinderAUFGraph) collectFVars(quantifier ast.ASTHandle) error {
-	body, err := g.finder.manager.GetQuantifierBody(quantifier)
+	body, err := g.finder.manager.GetQuantifierBody(g.finder.flatQuantifier(quantifier))
 	if err != nil {
 		return err
 	}
@@ -143,7 +144,7 @@ func (g *smtModelFinderAUFGraph) collectFVars(quantifier ast.ASTHandle) error {
 
 func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 	for _, quantifier := range quantifiers {
-		count, err := g.finder.manager.GetNumDeclarations(quantifier)
+		count, err := g.finder.manager.GetNumDeclarations(g.finder.flatQuantifier(quantifier))
 		if err != nil {
 			return err
 		}
@@ -155,7 +156,7 @@ func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 		if err := g.collectFVars(quantifier); err != nil {
 			return err
 		}
-		body, err := g.finder.manager.GetQuantifierBody(quantifier)
+		body, err := g.finder.manager.GetQuantifierBody(g.finder.flatQuantifier(quantifier))
 		if err != nil {
 			return err
 		}
@@ -227,9 +228,16 @@ func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 
 func (g *smtModelFinderAUFGraph) publishInstantiationSets() error {
 	for key, node := range g.uvars {
-		count, err := g.finder.manager.GetNumDeclarations(key.owner)
+		count, err := g.finder.manager.GetNumDeclarations(g.finder.flatQuantifier(key.owner))
 		if err != nil {
 			return err
+		}
+		originalCount, err := g.finder.manager.GetNumDeclarations(key.owner)
+		if err != nil {
+			return err
+		}
+		if count-key.index-1 >= originalCount {
+			continue
 		}
 		for term, generation := range node.root().set.elements {
 			if _, err := g.finder.InsertInstantiationTerm(key.owner, count-key.index-1, term, generation); err != nil {

@@ -420,7 +420,7 @@ func (c *smtModelFinderAUFClassifier) formulaWithPolarity(formula ast.ASTHandle,
 }
 
 func (f *SMTModelFinder) classifyAUF(quantifier ast.ASTHandle) (bool, error) {
-	body, err := f.manager.GetQuantifierBody(quantifier)
+	body, err := f.manager.GetQuantifierBody(f.flatQuantifier(quantifier))
 	if err != nil {
 		return false, err
 	}
