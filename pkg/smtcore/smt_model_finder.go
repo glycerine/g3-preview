@@ -430,8 +430,11 @@ func (f *SMTModelFinder) addNonAUFMacro(proto *protomodel.ProtoModel, candidate 
 // processNonAUFMacros ports non_auf_macro_solver. Full macros are available to
 // non-AUF quantifiers and to every quantifier forced by mbqi.force_template;
 // remaining conditional definitions are combined into an ordered ITE else.
+// The returned AUF input includes survivors from every pass, matching the
+// source's final new_qs plus residue sequence, including repeated quantifiers.
 func (f *SMTModelFinder) processNonAUFMacros(proto *protomodel.ProtoModel, quantifiers []ast.ASTHandle) ([]ast.ASTHandle, error) {
 	current := append([]ast.ASTHandle(nil), quantifiers...)
+	var residue []ast.ASTHandle
 	for {
 		byDeclaration := make(map[ast.ASTHandle]smtModelFinderFullMacro)
 		fullOrder := make([]ast.ASTHandle, 0)
@@ -535,14 +538,17 @@ func (f *SMTModelFinder) processNonAUFMacros(proto *protomodel.ProtoModel, quant
 				}
 			}
 		}
-		if len(removed) == 0 {
-			return current, nil
-		}
 		next := make([]ast.ASTHandle, 0, len(current)-len(removed))
 		for _, quantifier := range current {
 			if _, found := removed[quantifier]; !found {
 				next = append(next, quantifier)
+				// Source non_auf_macro_solver preserves this pass's
+				// survivors for AUF, even if a later macro removes them.
+				residue = append(residue, quantifier)
 			}
+		}
+		if len(removed) == 0 {
+			return append(next, residue...), nil
 		}
 		current = next
 	}

@@ -108729,6 +108729,7 @@
         "pkg/ast/pattern/pull_quantifier.go",
         "pkg/smtcore/smt_model_finder_macro_sets.go",
         "pkg/smtcore/smt_model_finder_macro_sets_test.go",
+        "pkg/smtcore/smt_model_finder_macro_residue_test.go",
         "pkg/smtcore/smt_model_finder_cancel_test.go",
         "pkg/smtcore/smt_model_finder_auf_analyzer.go",
         "pkg/smtcore/smt_model_finder_auf_analyzer_test.go",
@@ -108757,6 +108758,7 @@
         "TestSMTModelFinderForcedFullMacrosRejectDependencyCycle",
         "TestSMTModelFinderAUFClassification",
         "TestSMTModelFinderCombinesConditionalNonAUFMacros",
+        "TestSMTModelFinderNonAUFMacrosRetainEarlierPassResidue",
         "TestSMTModelFinderAUFNodeMergeConstraintsAndInstantiationSet",
         "TestSMTModelFinderAUFGraphSharesPatternlessArgumentSets",
         "TestSMTModelFinderAUFGraphEqualityAndDisequalityConstraints",
@@ -109212,7 +109214,8 @@
           "go_target": "pkg/smtcore/smt_model_finder.go",
           "tests": [
             "TestSMTModelFinderForcedFullMacrosRejectDependencyCycle",
-            "TestSMTModelFinderCombinesConditionalNonAUFMacros"
+            "TestSMTModelFinderCombinesConditionalNonAUFMacros",
+            "TestSMTModelFinderNonAUFMacrosRetainEarlierPassResidue"
           ]
         },
         {
