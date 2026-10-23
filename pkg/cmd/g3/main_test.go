@@ -10,6 +10,8 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"linearized_product_real_scopes.smt2":       "sat\n((y 1.0))\nsat\n((y (/ 1.0 2.0)))\nsat\n((y (- 1.0)))\n",
+	"linearized_product_integer_scopes.smt2":    "unsat\nsat\n((y 1))\n",
 	"nonlinear_integer_factor_scopes.smt2":      "unsat\nsat\n",
 	"nonlinear_integer_zero_split.smt2":         "sat\n",
 	"nonlinear_integer_upper_split.smt2":        "sat\n",

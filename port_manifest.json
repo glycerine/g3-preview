@@ -113803,7 +113803,8 @@
         "pkg/smtcore/theory_arith_division_test.go",
         "pkg/smtcore/theory_arith_nonlinear.go",
         "pkg/smtcore/theory_arith_nonlinear_test.go",
-        "pkg/smtcore/theory_arith_grobner_square_test.go"
+        "pkg/smtcore/theory_arith_grobner_square_test.go",
+        "pkg/smtcore/theory_arith_linear_monomial_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -113821,7 +113822,8 @@
         "TestSMTNonlinearRelaxationScopesProofsAndModel",
         "TestSMTNonlinearUpwardDownwardAndIntegerIntervals",
         "TestSMTNonlinearCandidateRejectsRelaxedProduct",
-        "TestSMTNonlinearGrobnerExpandedSquareScopedProofs"
+        "TestSMTNonlinearGrobnerExpandedSquareScopedProofs",
+        "TestSMTLinearizedMonomialScopesProofsAndModels"
       ],
       "conditionals": [
         {
@@ -114622,6 +114624,14 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "propagate_core retains linearized monomial equations and checks feasibility after installing their zero bounds even when nonlinear search is disabled",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTLinearizedMonomialScopesProofsAndModels"
+          ]
         }
       ],
       "ownership": [
@@ -115188,7 +115198,8 @@
         "pkg/smtcore/theory_arith_grobner_square.go",
         "pkg/smtcore/theory_arith_grobner_square_test.go",
         "pkg/smtcore/theory_arith_nonlinear_branch.go",
-        "pkg/smtcore/theory_arith_nonlinear_branch_test.go"
+        "pkg/smtcore/theory_arith_nonlinear_branch_test.go",
+        "pkg/smtcore/theory_arith_linear_monomial_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -115203,7 +115214,8 @@
         "TestSMTNonlinearGrobnerCoupledEquationsScopedProofs",
         "TestSMTGrobnerPerfectSquareMonomialsAndCrossTerms",
         "TestSMTNonlinearGrobnerExpandedSquareScopedProofs",
-        "TestSMTNonlinearIntegerBranchesScopedProofsAndModels"
+        "TestSMTNonlinearIntegerBranchesScopedProofsAndModels",
+        "TestSMTLinearizedMonomialScopesProofsAndModels"
       ],
       "conditionals": [
         {
@@ -115563,6 +115575,19 @@
           ]
         },
         {
+          "name": "is_monomial_linear, get_monomial_fixed_var_product, and propagate_linear_monomial(s): all-fixed or zero-factor bounds and an m-k*x=0 row for exactly one unfixed factor, independently of general nonlinear search",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLinearizedMonomialScopesProofsAndModels",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "nonlinear clustering, max/min bound discovery, strategy rotation, Horner reasoning, variable-order perturbation and derived-equation insertion, and irrational models",
           "status": "unported",
           "go_target": null,
@@ -115576,7 +115601,8 @@
         "Nonlinear monomials now have independent tableau columns with scoped factor-column lists. Relevant assignments are checked using the same exact rational epsilon as model construction. The Go tableau additionally completes a candidate by evaluating products and affine definitions, then fixes every arithmetic column and rechecks every original row; a failed completion preserves the relaxation. This concrete-model completion is a Go representation adaptation, not a claim to port the remaining source nonlinear search strategies.",
         "One upward/downward interval propagation pass runs during each tableau replay, including each speculative integer branch. Repeated factors use interval powers, downward propagation skips powers greater than one and zero-containing divisors, and integer endpoints are rounded. Derived bounds are reconstructed after pops; failed bounds reject only the current replay or integer branch.",
         "The Grobner consumer sends concrete typed monomials from definition equations, opposite active bounds, and fixed product columns to math/grobner; it substitutes only unconditional fixed bounds from a branch-free replay, applies the source variable weights and generated-equation threshold, and checks basis equations against exact rational intervals and source expanded perfect-square strengthening. Conflicts conservatively cite all active assertion literals rather than a minimal source dependency graph. Source connected-cluster extraction, complete tableau-row enumeration, iterative nonlinear strategies, max/min discovery, Horner reasoning, variable-order perturbation, optional derived-equation insertion, and irrational models remain incomplete.",
-        "Nonlinear integer branching uses unconditional replay bounds to select a factor of a mismatched integer monomial, preferring the smallest bounded interval and applying the source random reservoir otherwise. New endpoint or zero-equality atoms are marked relevant and true-first without asserting either branch. The nonlinear round count is scoped and obeys arith.nl.rounds. The existing replay representation keeps speculative integer-feasibility bounds separate from the logical bounds used to choose a split."
+        "Nonlinear integer branching uses unconditional replay bounds to select a factor of a mismatched integer monomial, preferring the smallest bounded interval and applying the source random reservoir otherwise. New endpoint or zero-equality atoms are marked relevant and true-first without asserting either branch. The nonlinear round count is scoped and obeys arith.nl.rounds. The existing replay representation keeps speculative integer-feasibility bounds separate from the logical bounds used to choose a split.",
+        "Products with all factors fixed, any fixed zero factor, or exactly one unfixed factor are propagated during tableau replay before MakeFeasible, including when arith.nl is false. The one-unfixed-factor path creates the source affine relation m-k*x and fixes a fresh auxiliary column at zero, preserving the tableau basis and retaining the conditional fixed-bound premises in the current replay. Rebuilding after a pop or integer branch removes conditional rows without a persistent source m_nl_propagated trail."
       ]
     },
     {

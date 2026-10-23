@@ -364,15 +364,61 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearBounds(solver *simplex.Sol
 			break
 		}
 	}
-	if changed && !conflict {
-		status, err := solver.MakeFeasible()
-		if err != nil {
-			return false, false, err
-		}
-		if status == lbool.Undef {
-			return false, false, nil
-		}
-		conflict = status == lbool.False
-	}
 	return changed, conflict, nil
+}
+
+// Source: theory_arith_nl.h is_monomial_linear,
+// get_monomial_fixed_var_product, and propagate_linear_monomial(s).
+// Replaying the resulting equation within this tableau keeps its fixed-bound
+// premises local to the current SMT scope or integer-feasibility branch.
+func (t *SMTLinearArithmeticTheory) propagateLinearMonomials(solver *simplex.Solver) (bool, error) {
+	var manager smtArithmeticBoundDependencyManager
+	for _, column := range t.nonlinearColumns {
+		coefficient := big.NewRat(1, 1)
+		var remaining uint32
+		unfixed := 0
+		for _, factor := range t.nonlinearFactors[column] {
+			value, fixed := smtFixedSimplexColumn(solver, factor)
+			if fixed {
+				coefficient.Mul(coefficient, value)
+				if coefficient.Sign() == 0 {
+					break // One zero factor suffices, irrespective of others.
+				}
+			} else {
+				remaining = factor
+				unfixed++ // Repeated unfixed factors are distinct occurrences.
+			}
+		}
+		if coefficient.Sign() != 0 && unfixed > 1 {
+			continue
+		}
+		if coefficient.Sign() == 0 || unfixed == 0 {
+			interval, err := newSMTOldIntervalPoint(&manager, coefficient, nil, nil)
+			if err != nil {
+				return false, err
+			}
+			_, conflict := t.updateNonlinearBounds(solver, column, interval)
+			if conflict {
+				return true, nil
+			}
+			continue
+		}
+		// Source introduces the affine term m-k*x and fixes it at zero.
+		// Its fresh base column also preserves the replay tableau's basis
+		// when the existing product occurs in earlier comparison rows.
+		base := solver.NumVariables()
+		variables := []uint32{base, column, remaining}
+		coefficients := []big.Rat{*big.NewRat(1, 1), *big.NewRat(-1, 1), *coefficient}
+		if _, err := solver.AddRationalRow(base, variables, coefficients); err != nil {
+			return false, err
+		}
+		zero := simplex.RationalInfinitesimal(new(big.Rat))
+		if err := solver.SetLower(base, zero); err != nil {
+			return true, nil
+		}
+		if err := solver.SetUpper(base, zero); err != nil {
+			return true, nil
+		}
+	}
+	return false, nil
 }
