@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"bit_vector_auto_carry.smt2":                "sat\n(((bvadd x y) #xa) ((bvsub x y) #x4))\nunsat\nsat\n(((bvadd x y) #xa) ((bvsub x y) #x4))\n",
 	"lra_auto_ite_profile.smt2":                 "sat\n((x (/ 3.0 2.0)))\nunsat\nsat\n((x (/ 3.0 2.0)))\n",
 	"quantified_mixed_auto_profile.smt2":        "sat\n(((= (f 3.0) 4.0) true))\nunsat\nsat\n(((= (f 7.0) 8.0) true))\n",
 	"array_auto_unit_profile.smt2":              "sat\n(((select a true) true))\nsat\n(((select a true) true) ((select a false) false))\nsat\n(((select a true) true))\nunsat\nsat\n(((select a true) true))\n",

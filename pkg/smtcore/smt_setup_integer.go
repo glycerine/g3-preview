@@ -6,8 +6,12 @@ import (
 )
 
 func (k *SMTKernel) setupIntegerLogicPolicy(useStaticFeatures bool) (result error) {
-	if k.setupLogic != "QF_LIA" {
+	if k.setupLogic != "QF_LIA" && k.setupLogic != "QF_BVRE" {
 		return nil
+	}
+	if k.setupLogic == "QF_BVRE" {
+		// setup_QF_BVRE calls the logic-only QF_LIA overload.
+		useStaticFeatures = false
 	}
 	features, err := k.arithmeticSetupFeatures(useStaticFeatures)
 	if err != nil {

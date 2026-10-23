@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/ast/rewriter/bit_blaster"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -49,6 +50,7 @@ type SMTBitVectorTheory struct {
 	unsupported      bool
 	statistics       smtBVStatistics
 	config           SMTBVState
+	bitBlasterParams bit_blaster.SMTBitBlasterParams
 	discoveringFixed bool
 }
 
@@ -370,96 +372,62 @@ func (t *SMTBitVectorTheory) unsignedLE(left, right []ast.ASTHandle) (ast.ASTHan
 	return result, t.retainTemporary([]ast.ASTHandle{result})
 }
 
-func (t *SMTBitVectorTheory) addBits(left, right []ast.ASTHandle) ([]ast.ASTHandle, error) {
-	if len(left) == 0 || len(left) != len(right) {
-		return nil, ast.ErrASTDomain
-	}
-	state, _ := t.State()
-	carry, err := state.manager.MkFalse()
+// The concrete source bit-blaster owns each returned output reference until
+// it is transferred into the theory's temporary roots.
+func (t *SMTBitVectorTheory) arithmeticBitBlaster() (*bit_blaster.Engine, error) {
+	state, err := t.State()
 	if err != nil {
 		return nil, err
 	}
-	result := make([]ast.ASTHandle, len(left))
-	for i := range left {
-		partial, gateErr := t.boolXor(left[i], right[i])
-		if gateErr != nil {
-			return nil, gateErr
-		}
-		result[i], gateErr = t.boolXor(partial, carry)
-		if gateErr != nil {
-			return nil, gateErr
-		}
-		if i+1 == len(left) {
-			continue
-		}
-		first, gateErr := t.boolAnd(left[i], right[i])
-		if gateErr != nil {
-			return nil, gateErr
-		}
-		second, gateErr := t.boolAnd(left[i], carry)
-		if gateErr != nil {
-			return nil, gateErr
-		}
-		third, gateErr := t.boolAnd(right[i], carry)
-		if gateErr != nil {
-			return nil, gateErr
-		}
-		carry, gateErr = t.boolOr(first, second)
-		if gateErr == nil {
-			carry, gateErr = t.boolOr(carry, third)
-		}
-		if gateErr != nil {
-			return nil, gateErr
+	config, err := bit_blaster.NewConfig(state.manager, t.FamilyID(), t.bitBlasterParams)
+	if err != nil {
+		return nil, err
+	}
+	return bit_blaster.NewEngine(config)
+}
+
+func (t *SMTBitVectorTheory) adoptBitBlasterRefs(refs []ast.ASTRef) ([]ast.ASTHandle, error) {
+	t.temporary = append(t.temporary, refs...)
+	state, err := t.State()
+	if err != nil {
+		return nil, err
+	}
+	bits := make([]ast.ASTHandle, len(refs))
+	for i, ref := range refs {
+		bits[i], err = state.manager.RefGet(ref)
+		if err != nil {
+			return nil, err
 		}
 	}
-	return result, t.retainTemporary(result)
+	return bits, nil
+}
+
+func (t *SMTBitVectorTheory) addBits(left, right []ast.ASTHandle) ([]ast.ASTHandle, error) {
+	engine, err := t.arithmeticBitBlaster()
+	if err != nil {
+		return nil, err
+	}
+	refs, err := engine.MkAdder(left, right)
+	if err != nil {
+		return nil, err
+	}
+	return t.adoptBitBlasterRefs(refs)
 }
 
 func (t *SMTBitVectorTheory) subtractBits(left, right []ast.ASTHandle) ([]ast.ASTHandle, ast.ASTHandle, error) {
-	if len(left) == 0 || len(left) != len(right) {
-		return nil, ast.ASTHandle{}, ast.ErrASTDomain
-	}
-	state, _ := t.State()
-	carry, err := state.manager.MkTrue()
+	engine, err := t.arithmeticBitBlaster()
 	if err != nil {
 		return nil, ast.ASTHandle{}, err
 	}
-	result := make([]ast.ASTHandle, len(left))
-	for i := range left {
-		notRight, gateErr := t.boolNot(right[i])
-		if gateErr != nil {
-			return nil, ast.ASTHandle{}, gateErr
-		}
-		partial, gateErr := t.boolXor(left[i], notRight)
-		if gateErr != nil {
-			return nil, ast.ASTHandle{}, gateErr
-		}
-		result[i], gateErr = t.boolXor(partial, carry)
-		if gateErr != nil {
-			return nil, ast.ASTHandle{}, gateErr
-		}
-		first, gateErr := t.boolAnd(left[i], notRight)
-		if gateErr != nil {
-			return nil, ast.ASTHandle{}, gateErr
-		}
-		second, gateErr := t.boolAnd(left[i], carry)
-		if gateErr != nil {
-			return nil, ast.ASTHandle{}, gateErr
-		}
-		third, gateErr := t.boolAnd(notRight, carry)
-		if gateErr != nil {
-			return nil, ast.ASTHandle{}, gateErr
-		}
-		carry, gateErr = t.boolOr(first, second)
-		if gateErr == nil {
-			carry, gateErr = t.boolOr(carry, third)
-		}
-		if gateErr != nil {
-			return nil, ast.ASTHandle{}, gateErr
-		}
+	refs, carry, err := engine.MkSubtracter(left, right)
+	if err != nil {
+		return nil, ast.ASTHandle{}, err
 	}
-	retained := append(append([]ast.ASTHandle(nil), result...), carry)
-	return result, carry, t.retainTemporary(retained)
+	bits, err := t.adoptBitBlasterRefs(append(refs, carry))
+	if err != nil {
+		return nil, ast.ASTHandle{}, err
+	}
+	return bits[:len(bits)-1], bits[len(bits)-1], nil
 }
 
 func (t *SMTBitVectorTheory) unsignedDivRem(left, right []ast.ASTHandle) ([]ast.ASTHandle, []ast.ASTHandle, error) {

@@ -487,6 +487,9 @@ func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 	if err := k.open(); err != nil {
 		return err
 	}
+	if bv, ok := theory.(*SMTBitVectorTheory); ok && k.smtParams != nil {
+		bv.bitBlasterParams = k.smtParams.preprocess.bit
+	}
 	if configurable, ok := theory.(interface{ ConfigureBitVector(SMTBVState) error }); ok {
 		if err := configurable.ConfigureBitVector(k.bvState); err != nil {
 			return err

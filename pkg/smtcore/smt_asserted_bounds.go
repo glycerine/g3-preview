@@ -21,6 +21,9 @@ func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 		k.preprocessingSetupDone = true
 		return nil
 	}
+	if err := k.setupBitVectorLogicPolicy(); err != nil {
+		return err
+	}
 	if err := k.setupIntegerLogicPolicy(useStaticFeatures); err != nil {
 		return err
 	}

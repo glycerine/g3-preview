@@ -521,6 +521,7 @@ func TestSMTBitVectorRelevantTermMarksBits(t *testing.T) {
 
 func TestSMTBitVectorBlastLimitGivesUnknown(t *testing.T) {
 	m, _, solver := smtBVSolver(t)
+	smtDisableAutoConfig(t, solver)
 	family, err := m.RegisterBitVectorPlugin()
 	astTestMust(t, err)
 	theory, ok := solver.kernel.internalizer.theories[family].(*SMTBitVectorTheory)
