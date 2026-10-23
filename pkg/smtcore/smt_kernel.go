@@ -260,6 +260,7 @@ func (k *SMTKernel) configureQuantifiers(full *SMTParams, state SMTParamsState, 
 		MBQI:           qi.MBQI,
 		MaxCexs:        qi.MaxCexs,
 		MaxIterations:  qi.MaxIterations,
+		ForceTemplate:  qi.ForceTemplate,
 		MBQIID:         mbqiID,
 		CandidateModel: k.buildCandidateModelGenerator,
 	})
@@ -341,7 +342,7 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	k.arithState = arithmetic
 	k.bvState = bitVector
 	if k.internalizer.quantifierManager != nil {
-		if err = k.internalizer.quantifierManager.UpdateMBQI(quantifiers.MBQI, mbqiID, quantifiers.MaxCexs, quantifiers.MaxIterations); err != nil {
+		if err = k.internalizer.quantifierManager.UpdateMBQI(quantifiers.MBQI, mbqiID, quantifiers.MaxCexs, quantifiers.MaxIterations, quantifiers.ForceTemplate); err != nil {
 			return err
 		}
 	}

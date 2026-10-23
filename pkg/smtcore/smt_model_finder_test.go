@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/macros"
+	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -182,5 +184,97 @@ func TestSMTModelFinderPublishesSharedHintMacro(t *testing.T) {
 	astTestMust(t, err)
 	if index, e := m.GetVarIndex(fallback); e != nil || index != 0 {
 		t.Fatal("shared hint macro fallback", fallback, index, e)
+	}
+}
+
+func TestSMTModelFinderForcedFullMacrosRejectDependencyCycle(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	integer, err := m.GetSort(zero)
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, integer)
+	astTestMust(t, err)
+	makeFunction := func(name string) ast.ASTHandle {
+		declaration, e := m.MkFuncDecl(astTestSymbol(t, m, name), []ast.ASTHandle{integer}, integer, ast.ASTFuncDeclInfo{})
+		astTestMust(t, e)
+		return declaration
+	}
+	f, g := makeFunction("model-finder-full-f"), makeFunction("model-finder-full-g")
+	fApp, err := m.MkApp(f, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	gApp, err := m.MkApp(g, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	body, err := m.MkEq(fApp, gApp)
+	astTestMust(t, err)
+	makeQuantifier := func(name string) ast.ASTHandle {
+		quantifier, e := m.MkQuantifier(ast.ASTQuantifierSpec{
+			Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []symbol.Symbol{astTestSymbol(t, m, name+"-x")},
+			Body: body, Weight: 10, QID: astTestSymbol(t, m, name),
+		})
+		astTestMust(t, e)
+		return quantifier
+	}
+	first, second := makeQuantifier("model-finder-full-q1"), makeQuantifier("model-finder-full-q2")
+	solver, err := NewSMTSolver(m, nil, "AUFLIA", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	state := solver.kernel.internalizer
+	astTestMust(t, state.Internalize(first, true))
+	astTestMust(t, state.Internalize(second, true))
+	finder := state.quantifierManager.modelFinder
+	if len(finder.quantifiers) != 2 {
+		t.Fatal("forced full macro quantifiers were not registered", finder.quantifiers)
+	}
+	first, second = finder.quantifiers[0], finder.quantifiers[1]
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	for quantifier, candidate := range map[ast.ASTHandle]macros.Candidate{
+		first:  {Declaration: f, Definition: gApp, Condition: truth, SatisfyAtom: true},
+		second: {Declaration: g, Definition: fApp, Condition: truth, SatisfyAtom: true},
+	} {
+		astTestMust(t, finder.candidates[quantifier].Reset())
+		astTestMust(t, finder.candidates[quantifier].Insert(candidate))
+	}
+	finder.hint.infos[first].macros = []hintConditionalMacro{{function: f, definition: gApp, satisfyAtom: true}}
+	finder.hint.infos[second].macros = []hintConditionalMacro{{function: g, definition: fApp, satisfyAtom: true}}
+	astTestMust(t, state.context.SetRelevant(first, true))
+	astTestMust(t, state.context.SetAssignment(first, lbool.True))
+	astTestMust(t, state.context.SetRelevant(second, true))
+	astTestMust(t, state.context.SetAssignment(second, lbool.True))
+	proto, err := protomodel.NewProtoModel(m, modelConfig)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, proto.Close()) })
+	if finder.forceTemplate != 10 {
+		t.Fatal("mbqi.force_template was not propagated", finder.forceTemplate)
+	}
+	astTestMust(t, finder.FixModel(proto))
+	if finder.chosen[first] != f || !finder.chosen[second].IsNull() {
+		t.Fatal("forced full macro cycle selection", finder.chosen)
+	}
+	if dependencies := finder.dependencies.GetDependencies(f); len(dependencies) != 1 {
+		t.Fatal("full macro dependencies", dependencies)
+	} else if _, found := dependencies[g]; !found {
+		t.Fatal("full macro omitted dependency", dependencies)
+	}
+	if finder.dependencies.Contains(g) {
+		t.Fatal("cyclic full macro dependency was retained")
+	}
+	interpretation, err := proto.Core().FunctionInterpretation(f)
+	astTestMust(t, err)
+	if interpretation == nil {
+		t.Fatal("accepted full macro was not published")
+	}
+	definition, err := interpretation.Else()
+	astTestMust(t, err)
+	if definition != gApp {
+		t.Fatal("full macro definition", definition, gApp)
+	}
+	interpretation, err = proto.Core().FunctionInterpretation(g)
+	astTestMust(t, err)
+	if interpretation != nil {
+		t.Fatal("cyclic full macro was published")
 	}
 }

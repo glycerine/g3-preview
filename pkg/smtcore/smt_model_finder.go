@@ -16,18 +16,20 @@ import (
 // candidate model before MBQI checks it. The macro and AUF algorithms attach
 // their per-quantifier state to this lifecycle.
 type SMTModelFinder struct {
-	manager     *ast.ASTManager
-	state       *SMTInternalizerState
-	quantifiers []ast.ASTHandle
-	registered  map[ast.ASTHandle]struct{}
-	sets        map[ast.ASTHandle][]*smtModelFinderInstantiationSet
-	macroUtil   *macros.Util
-	candidates  map[ast.ASTHandle]*macros.Candidates
-	nonGround   map[ast.ASTHandle]map[ast.ASTHandle]struct{}
-	chosen      map[ast.ASTHandle]ast.ASTHandle
-	hint        *hintSearchState
-	scopes      []int
-	closed      bool
+	manager       *ast.ASTManager
+	state         *SMTInternalizerState
+	quantifiers   []ast.ASTHandle
+	registered    map[ast.ASTHandle]struct{}
+	sets          map[ast.ASTHandle][]*smtModelFinderInstantiationSet
+	macroUtil     *macros.Util
+	candidates    map[ast.ASTHandle]*macros.Candidates
+	nonGround     map[ast.ASTHandle]map[ast.ASTHandle]struct{}
+	chosen        map[ast.ASTHandle]ast.ASTHandle
+	hint          *hintSearchState
+	dependencies  *ast.FuncDeclDependencies
+	forceTemplate uint32
+	scopes        []int
+	closed        bool
 }
 
 func NewSMTModelFinder(state *SMTInternalizerState) (*SMTModelFinder, error) {
@@ -38,19 +40,29 @@ func NewSMTModelFinder(state *SMTInternalizerState) (*SMTModelFinder, error) {
 	if err != nil {
 		return nil, err
 	}
+	dependencies, err := ast.NewFuncDeclDependencies(state.manager)
+	if err != nil {
+		return nil, err
+	}
 	return &SMTModelFinder{
 		manager: state.manager, state: state, registered: make(map[ast.ASTHandle]struct{}),
 		sets: make(map[ast.ASTHandle][]*smtModelFinderInstantiationSet), macroUtil: util,
 		candidates: make(map[ast.ASTHandle]*macros.Candidates), nonGround: make(map[ast.ASTHandle]map[ast.ASTHandle]struct{}),
-		chosen: make(map[ast.ASTHandle]ast.ASTHandle), hint: newHintSearchState(),
+		chosen: make(map[ast.ASTHandle]ast.ASTHandle), hint: newHintSearchState(), dependencies: dependencies,
 	}, nil
 }
 
 func (f *SMTModelFinder) open() error {
-	if f == nil || f.manager == nil || f.state == nil || f.registered == nil || f.sets == nil || f.macroUtil == nil || f.candidates == nil || f.hint == nil || f.closed {
+	if f == nil || f.manager == nil || f.state == nil || f.registered == nil || f.sets == nil || f.macroUtil == nil || f.candidates == nil || f.hint == nil || f.dependencies == nil || f.closed {
 		return ast.ErrASTHandle
 	}
 	return nil
+}
+
+func (f *SMTModelFinder) SetForceTemplate(value uint32) {
+	if f != nil && !f.closed {
+		f.forceTemplate = value
+	}
 }
 
 func (f *SMTModelFinder) RegisterQuantifier(quantifier ast.ASTHandle) error {
@@ -307,6 +319,82 @@ func (f *SMTModelFinder) processHintMacros(proto *protomodel.ProtoModel, quantif
 	return plan.remaining, nil
 }
 
+type smtModelFinderFullMacro struct {
+	quantifier ast.ASTHandle
+	candidate  macros.Candidate
+}
+
+func (f *SMTModelFinder) addNonAUFMacro(proto *protomodel.ProtoModel, candidate macros.Candidate) (bool, error) {
+	dependencies := make(ast.FuncDeclSet)
+	if err := f.dependencies.CollectNonGround(candidate.Definition, dependencies); err != nil {
+		return false, err
+	}
+	inserted, err := f.dependencies.Insert(candidate.Declaration, dependencies)
+	if err != nil || !inserted {
+		return false, err
+	}
+	if err = f.publishFunctionDefinition(candidate.Declaration, candidate.Definition, proto); err != nil {
+		return false, errors.Join(err, f.dependencies.Erase(candidate.Declaration))
+	}
+	return true, nil
+}
+
+// processForcedFullMacros is the full-macro arm of non_auf_macro_solver.
+// The source applies it to every unconditional non-hint candidate whose
+// quantifier weight reaches mbqi.force_template, including AUF formulas.
+func (f *SMTModelFinder) processForcedFullMacros(proto *protomodel.ProtoModel, quantifiers []ast.ASTHandle) ([]ast.ASTHandle, error) {
+	current := append([]ast.ASTHandle(nil), quantifiers...)
+	for {
+		byDeclaration := make(map[ast.ASTHandle]smtModelFinderFullMacro)
+		order := make([]ast.ASTHandle, 0)
+		for _, quantifier := range current {
+			weight, err := f.manager.GetQuantifierWeight(quantifier)
+			if err != nil {
+				return nil, err
+			}
+			if weight < 0 || uint32(weight) < f.forceTemplate {
+				continue
+			}
+			candidates := f.candidates[quantifier]
+			for i := 0; candidates != nil && i < candidates.Len(); i++ {
+				candidate, err := candidates.At(i)
+				if err != nil {
+					return nil, err
+				}
+				if candidate.Hint || !f.manager.IsTrue(candidate.Condition) {
+					continue
+				}
+				if _, found := byDeclaration[candidate.Declaration]; !found {
+					order = append(order, candidate.Declaration)
+				}
+				byDeclaration[candidate.Declaration] = smtModelFinderFullMacro{quantifier: quantifier, candidate: candidate}
+			}
+		}
+		removed := make(map[ast.ASTHandle]struct{})
+		for _, declaration := range order {
+			macro := byDeclaration[declaration]
+			added, err := f.addNonAUFMacro(proto, macro.candidate)
+			if err != nil {
+				return nil, err
+			}
+			if added {
+				f.chosen[macro.quantifier] = declaration
+				removed[macro.quantifier] = struct{}{}
+			}
+		}
+		if len(removed) == 0 {
+			return current, nil
+		}
+		next := make([]ast.ASTHandle, 0, len(current)-len(removed))
+		for _, quantifier := range current {
+			if _, found := removed[quantifier]; !found {
+				next = append(next, quantifier)
+			}
+		}
+		current = next
+	}
+}
+
 func (f *SMTModelFinder) PushScope() error {
 	if err := f.open(); err != nil {
 		return err
@@ -440,11 +528,18 @@ func (f *SMTModelFinder) FixModel(model *protomodel.ProtoModel) error {
 			info.theOne = ast.ASTHandle{}
 		}
 	}
+	if err = f.dependencies.Reset(); err != nil {
+		return err
+	}
 	relevant, err = f.processSimpleMacros(model, relevant)
 	if err != nil {
 		return err
 	}
 	relevant, err = f.processHintMacros(model, relevant)
+	if err != nil {
+		return err
+	}
+	relevant, err = f.processForcedFullMacros(model, relevant)
 	if err != nil {
 		return err
 	}
@@ -480,6 +575,9 @@ func (f *SMTModelFinder) Close() error {
 	if result != nil {
 		return result
 	}
+	if err := f.dependencies.Close(); err != nil {
+		return err
+	}
 	f.closed = true
 	f.quantifiers = nil
 	f.scopes = nil
@@ -490,6 +588,7 @@ func (f *SMTModelFinder) Close() error {
 	f.nonGround = nil
 	f.chosen = nil
 	f.hint = nil
+	f.dependencies = nil
 	f.state = nil
 	f.manager = nil
 	return result

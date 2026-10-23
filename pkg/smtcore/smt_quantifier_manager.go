@@ -51,6 +51,7 @@ type SMTQuantifierManagerConfig struct {
 	MBQI           bool
 	MaxCexs        uint32
 	MaxIterations  uint32
+	ForceTemplate  uint32
 	MBQIID         string
 	CandidateModel func() (*SMTModelGenerator, error)
 }
@@ -86,6 +87,7 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 	if err != nil {
 		return nil, errors.Join(err, substitute.Close())
 	}
+	modelFinder.SetForceTemplate(config.ForceTemplate)
 	result := &SMTQuantifierManager{
 		state: state, registry: state.quantifiers, rewriter: rw, checker: checker, quick: quick,
 		substitute: substitute, builder: builder, mam: mam, modelFinder: modelFinder, activated: make(map[ast.ASTHandle]bool),
@@ -109,7 +111,7 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 	return result, nil
 }
 
-func (q *SMTQuantifierManager) UpdateMBQI(enabled bool, identifier string, maxCexs, maxIterations uint32) error {
+func (q *SMTQuantifierManager) UpdateMBQI(enabled bool, identifier string, maxCexs, maxIterations, forceTemplate uint32) error {
 	if err := q.open(); err != nil {
 		return err
 	}
@@ -140,6 +142,7 @@ func (q *SMTQuantifierManager) UpdateMBQI(enabled bool, identifier string, maxCe
 	}
 	q.mbqi = enabled
 	q.mbqiID = identifier
+	q.modelFinder.SetForceTemplate(forceTemplate)
 	return nil
 }
 
