@@ -1,6 +1,6 @@
 // Source: src/ast/normal_forms/pull_quant.cpp:163-197;
 // src/ast/pattern/pattern_inference.cpp:679-698.
-package pattern
+package normal_forms
 
 import (
 	"github.com/glycerine/g3/pkg/ast"
@@ -10,8 +10,8 @@ import (
 // In the direct forall(forall(body)) case, the inner body's de Bruijn indices
 // already address inner binders first and outer binders afterward. Source
 // pull_quant1_core therefore concatenates declarations without shifting body.
-func (c *patternCandidates) pullDirectForall(outer, inner ast.ASTHandle) (ast.ASTHandle, error) {
-	m := c.manager
+func (p *pullQuantCore) pullDirectForall(outer, inner ast.ASTHandle) (ast.ASTHandle, error) {
+	m := p.manager
 	outerCount, err := m.GetNumDeclarations(outer)
 	if err != nil {
 		return ast.ASTHandle{}, err

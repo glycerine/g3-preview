@@ -11072,7 +11072,7 @@
           "name": "ast_manager::mk_fresh_var_name shared fresh-id scalar for pulled duplicate binders (ast.cpp:2246-2251; ast.h:1827)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_fresh_factories.go",
-          "go_targets": ["pkg/ast/pattern/pull_boolean.go"],
+          "go_targets": ["pkg/ast/normal_forms/pull_boolean.go"],
           "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"]
         },
         {
@@ -12174,7 +12174,7 @@
           "name": "ast_manager::mk_fresh_var_name shared fresh-id scalar for pulled duplicate binders (ast.cpp:2246-2251; ast.h:1827)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_fresh_factories.go",
-          "go_targets": ["pkg/ast/pattern/pull_boolean.go"],
+          "go_targets": ["pkg/ast/normal_forms/pull_boolean.go"],
           "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"]
         },
         {
@@ -21229,8 +21229,23 @@
       "component": "ast",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/ast/pattern/pull_direct.go", "pkg/ast/pattern/pull_boolean.go", "pkg/ast/pattern/reduce_quantifier.go"],
-      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern", "TestPatternPullNoProofIdentityAndSourcePreconditionGuards"],
+      "go_targets": [
+        "pkg/ast/normal_forms/pull_direct.go",
+        "pkg/ast/normal_forms/pull_boolean.go",
+        "pkg/ast/pattern/reduce_quantifier.go",
+        "pkg/ast/normal_forms/pull_quant.go",
+        "pkg/ast/normal_forms/pull_nested_quant.go",
+        "pkg/ast/normal_forms/pull_quant_test.go"
+      ],
+      "tests": [
+        "TestPatternInferencePullDirectNestedForallFindsPattern",
+        "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames",
+        "TestPatternInferencePullsBooleanApplicationThenFindsPattern",
+        "TestPatternPullNoProofIdentityAndSourcePreconditionGuards",
+        "TestPullQuantProofTraversalPreservesBindersAndMetadata",
+        "TestPullNestedQuantifiersRewritesBelowApplications",
+        "TestSMTAssertedPullQuantifierScopedConflict"
+      ],
       "assertions": [
         {
           "line": 47,
@@ -21275,25 +21290,54 @@
         {
           "name": "pull_quant1_core direct nested forall/forall binder concatenation and minimum weight for retained pattern inference (pull_quant.cpp:173-189)",
           "status": "ported",
-          "go_target": "pkg/ast/pattern/pull_direct.go",
-          "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
+          "go_target": "pkg/ast/normal_forms/pull_direct.go",
+          "tests": [
+            "TestPatternInferencePullDirectNestedForallFindsPattern"
+          ]
         },
         {
           "name": "no-proof recursive NOT/AND/OR pull, bound/free variable shifts, duplicate binder names and retained pattern-inference caller",
           "status": "ported",
-          "go_target": "pkg/ast/pattern/pull_boolean.go",
-          "go_targets": ["pkg/ast/ast_core_fresh_factories.go", "pkg/ast/pattern/reduce_quantifier.go"],
-          "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"]
+          "go_target": "pkg/ast/normal_forms/pull_boolean.go",
+          "go_targets": [
+            "pkg/ast/ast_core_fresh_factories.go",
+            "pkg/ast/pattern/reduce_quantifier.go"
+          ],
+          "tests": [
+            "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames",
+            "TestPatternInferencePullsBooleanApplicationThenFindsPattern"
+          ]
         },
         {
           "name": "pull_quant TRACE declaration-count and both shifted-expression SMT2 records at pull_quant.cpp:102,109,131 for retained Boolean pull",
           "status": "ported",
-          "go_target": "pkg/ast/pattern/pull_boolean.go",
-          "go_targets": ["pkg/ast/pattern/pull_boolean_trace.go"],
-          "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"]
+          "go_target": "pkg/ast/normal_forms/pull_boolean.go",
+          "go_targets": [
+            "pkg/ast/normal_forms/pull_boolean_trace.go"
+          ],
+          "tests": [
+            "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"
+          ]
         },
         {
-          "name": "proof generation, pull_quant2 and pull_nested_quant other consumers",
+          "name": "pull_quant proof-generating Boolean and quantifier reductions using the retained AST traversal, pull-quant, quantifier-introduction, congruence and transitivity proofs",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/pull_quant.go",
+          "tests": [
+            "TestPullQuantProofTraversalPreservesBindersAndMetadata"
+          ]
+        },
+        {
+          "name": "pull_nested_quant quantifier substitution traversal, reset, cached proof ownership and close",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/pull_nested_quant.go",
+          "tests": [
+            "TestPullNestedQuantifiersRewritesBelowApplications",
+            "TestSMTAssertedPullQuantifierScopedConflict"
+          ]
+        },
+        {
+          "name": "pull_quant2 specialized two-level interface: no call sites in retained C++ src consumers",
           "status": "reference_only",
           "tests": []
         }
@@ -21301,12 +21345,13 @@
       "ownership": [
         "The retained no-proof transformer borrows its input AST handle and manager. Every recursive result is held by an ASTRef until its parent publishes or rejects it, and the returned ASTRef independently owns the final result pin.",
         "Each pull invocation owns and closes its VarShifter. Temporary shifted-child references are released on success and error; native Go slices own the temporary declaration, name, child and reference buffers.",
-        "Declaration sorts and symbols are borrowed from the AST and symbol managers. Duplicate binder spellings are freshly interned in the manager-owned symbol table."
+        "Declaration sorts and symbols are borrowed from the AST and symbol managers. Duplicate binder spellings are freshly interned in the manager-owned symbol table.",
+        "The proof-aware PullQuant owns a VarShifter and AST traversal. PullNestedQuantifiers owns its inner puller, outer traversal and output/proof references. Traversal caches and caller output references independently pin their formulas and proofs until reset or close."
       ],
       "deviations": [
-        "The retained pattern-inference caller rejects proof-enabled operation before invoking this transform, so pull_quant2 and proof construction remain reference-only.",
-        "pull_nested_quant is used by unretained C++ SMT consumers; no unused universal Go adapter is added.",
-        "Violated SNF polarity and nested-universal preconditions return ast.ErrASTPending instead of continuing after source debug assertions."
+        "The no-proof recursive consumer is shared with pattern inference and MBQI through a concrete normal_forms interface; proof-aware solver consumers use the retained AST rewriter configuration.",
+        "Source assertion preconditions are represented by typed Go errors.",
+        "pull_quant2 has no call sites outside its own declaration, implementation and forwarding method in src; the unused interface remains reference-only."
       ]
     },
     {
@@ -21314,8 +21359,23 @@
       "component": "ast",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/ast/pattern/pull_direct.go", "pkg/ast/pattern/pull_boolean.go", "pkg/ast/pattern/reduce_quantifier.go"],
-      "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern", "TestPatternPullNoProofIdentityAndSourcePreconditionGuards"],
+      "go_targets": [
+        "pkg/ast/normal_forms/pull_direct.go",
+        "pkg/ast/normal_forms/pull_boolean.go",
+        "pkg/ast/pattern/reduce_quantifier.go",
+        "pkg/ast/normal_forms/pull_quant.go",
+        "pkg/ast/normal_forms/pull_nested_quant.go",
+        "pkg/ast/normal_forms/pull_quant_test.go"
+      ],
+      "tests": [
+        "TestPatternInferencePullDirectNestedForallFindsPattern",
+        "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames",
+        "TestPatternInferencePullsBooleanApplicationThenFindsPattern",
+        "TestPatternPullNoProofIdentityAndSourcePreconditionGuards",
+        "TestPullQuantProofTraversalPreservesBindersAndMetadata",
+        "TestPullNestedQuantifiersRewritesBelowApplications",
+        "TestSMTAssertedPullQuantifierScopedConflict"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -21332,28 +21392,52 @@
         {
           "name": "pull_quant retained direct nested universal quantifier branch",
           "status": "ported",
-          "go_target": "pkg/ast/pattern/pull_direct.go",
-          "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
+          "go_target": "pkg/ast/normal_forms/pull_direct.go",
+          "tests": [
+            "TestPatternInferencePullDirectNestedForallFindsPattern"
+          ]
         },
         {
           "name": "retained no-proof recursive Boolean application pull",
           "status": "ported",
-          "go_target": "pkg/ast/pattern/pull_boolean.go",
-          "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"]
+          "go_target": "pkg/ast/normal_forms/pull_boolean.go",
+          "tests": [
+            "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames",
+            "TestPatternInferencePullsBooleanApplicationThenFindsPattern"
+          ]
         },
         {
-          "name": "proof and other pull_nested_quant interfaces",
+          "name": "pull_quant proof-generating Boolean and quantifier reductions using the retained AST traversal, pull-quant, quantifier-introduction, congruence and transitivity proofs",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/pull_quant.go",
+          "tests": [
+            "TestPullQuantProofTraversalPreservesBindersAndMetadata"
+          ]
+        },
+        {
+          "name": "pull_nested_quant quantifier substitution traversal, reset, cached proof ownership and close",
+          "status": "ported",
+          "go_target": "pkg/ast/normal_forms/pull_nested_quant.go",
+          "tests": [
+            "TestPullNestedQuantifiersRewritesBelowApplications",
+            "TestSMTAssertedPullQuantifierScopedConflict"
+          ]
+        },
+        {
+          "name": "pull_quant2 specialized two-level interface: no call sites in retained C++ src consumers",
           "status": "reference_only",
           "tests": []
         }
       ],
       "ownership": [
         "The concrete retained interface borrows its manager and input handles and returns an independently owned ASTRef; internal ASTRefs keep recursive results alive until assembly and are closed on every exit.",
-        "The VarShifter and all native Go temporary slices are invocation-owned. Symbols and declaration sorts remain manager-owned borrowed values."
+        "The VarShifter and all native Go temporary slices are invocation-owned. Symbols and declaration sorts remain manager-owned borrowed values.",
+        "The proof-aware PullQuant owns a VarShifter and AST traversal. PullNestedQuantifiers owns its inner puller, outer traversal and output/proof references. Traversal caches and caller output references independently pin their formulas and proofs until reset or close."
       ],
       "deviations": [
-        "Only the no-proof pattern-inference interface is retained. Proof APIs and pull_nested_quant declarations have no retained Go consumer and remain reference-only.",
-        "Source assertion preconditions are represented by typed Go errors."
+        "The no-proof recursive consumer is shared with pattern inference and MBQI through a concrete normal_forms interface; proof-aware solver consumers use the retained AST rewriter configuration.",
+        "Source assertion preconditions are represented by typed Go errors.",
+        "pull_quant2 has no call sites outside its own declaration, implementation and forwarding method in src; the unused interface remains reference-only."
       ]
     },
     {
@@ -21671,8 +21755,8 @@
         "pkg/ast/pattern/reduce_quantifier_database.go",
         "pkg/ast/pattern/expr_pattern_match.go",
         "pkg/ast/pattern/pattern_database_loader.go",
-        "pkg/ast/pattern/pull_direct.go",
-        "pkg/ast/pattern/pull_boolean.go",
+        "pkg/ast/normal_forms/pull_direct.go",
+        "pkg/ast/normal_forms/pull_boolean.go",
         "pkg/ast/pattern/rewriter.go",
         "pkg/ast/pattern/options.go",
         "pkg/smtcore/pattern_inference_rewriter.go"
@@ -21958,14 +22042,14 @@
           "name": "pull_quantifiers direct nested universal body merges binder declarations and retries pattern inference with pulled warning (pattern_inference.cpp:679-698)",
           "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
-          "go_targets": ["pkg/ast/pattern/pull_direct.go"],
+          "go_targets": ["pkg/ast/normal_forms/pull_direct.go"],
           "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern"]
         },
         {
           "name": "pull_quantifiers no-proof recursive Boolean application retry and warning (pattern_inference.cpp:679-698)",
           "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
-          "go_targets": ["pkg/ast/pattern/pull_boolean.go"],
+          "go_targets": ["pkg/ast/normal_forms/pull_boolean.go"],
           "tests": ["TestPatternInferencePullsBooleanApplicationThenFindsPattern"]
         },
         {
@@ -34290,7 +34374,8 @@
         "pkg/ast/rewriter/rewriter_configuration.go",
         "pkg/ast/rewriter/traversal.go",
         "pkg/ast/rewriter/rewriter_roots.go",
-        "pkg/ast/rewriter/rewriter_roots_test.go"
+        "pkg/ast/rewriter/rewriter_roots_test.go",
+        "pkg/ast/normal_forms/pull_quant_test.go"
       ],
       "tests": [
         "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
@@ -34310,7 +34395,9 @@
         "TestRewriterNativeRootOnlyReferenceAliasReplacement",
         "TestRewriterNativeFrameAndScopeGrowth",
         "TestVarSubstitutionNativeColdBindingGrowth",
-        "TestTraversalProofCongruenceRewriteAndReflexivity"
+        "TestTraversalProofCongruenceRewriteAndReflexivity",
+        "TestPullQuantProofTraversalPreservesBindersAndMetadata",
+        "TestPullNestedQuantifiersRewritesBelowApplications"
       ],
       "conditionals": [
         {
@@ -34534,7 +34621,8 @@
         }
       ],
       "ownership": [
-        "Concrete iterative frames/scopes and borrowed scalar binding/shift arrays use native slices and retain algorithm state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
+        "Concrete iterative frames/scopes and borrowed scalar binding/shift arrays use native slices and retain algorithm state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred.",
+        "processAppProof pins the composed proof before clearing the callback proof reference: transitivity with a null first proof can return that exact callback proof, matching the source proof_ref assignment lifetime."
       ],
       "deviations": [
         "Original base rewriting infrastructure, forward/inverse shifting and both traversal specializations are translated. Unsupported REWRITE_RULE and proof-mode non-ground macro expansion preserve the source's own unimplemented states. Cancellation resets; step-limit interruption preserves frames for Resume. Trace formatting remains with the separate rewriter.cpp trace-profile audit.",
@@ -98546,7 +98634,9 @@
         "pkg/smtcore/smt_asserted_nnf.go",
         "pkg/smtcore/smt_asserted_nnf_test.go",
         "pkg/smtcore/smt_asserted_injectivity.go",
-        "pkg/smtcore/smt_asserted_injectivity_test.go"
+        "pkg/smtcore/smt_asserted_injectivity_test.go",
+        "pkg/smtcore/smt_asserted_pull_quant.go",
+        "pkg/smtcore/smt_asserted_pull_quant_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98568,7 +98658,9 @@
         "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
         "TestSMTAssertedNNFUsesGlobalModuleOptions",
         "TestSMTAssertedInjectivityRefinementAndGuards",
-        "TestSMTAssertedInjectivityConflict"
+        "TestSMTAssertedInjectivityConflict",
+        "TestSMTAssertedPullQuantifierGuardsAndProofs",
+        "TestSMTAssertedPullQuantifierScopedConflict"
       ],
       "conditionals": [
         {
@@ -98708,6 +98800,15 @@
           ]
         },
         {
+          "name": "pull_nested_quantifiers pending assertion transform after NNF, parameter and preprocessing guards, proof composition and scoped assertion ownership",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_pull_quant.go",
+          "tests": [
+            "TestSMTAssertedPullQuantifierGuardsAndProofs",
+            "TestSMTAssertedPullQuantifierScopedConflict"
+          ]
+        },
+        {
           "name": "remaining pending-formula reduction passes and quantifier transforms",
           "status": "unported",
           "go_target": null,
@@ -98738,7 +98839,9 @@
         "pkg/smtcore/smt_asserted_nnf.go",
         "pkg/smtcore/smt_asserted_nnf_test.go",
         "pkg/smtcore/smt_asserted_injectivity.go",
-        "pkg/smtcore/smt_asserted_injectivity_test.go"
+        "pkg/smtcore/smt_asserted_injectivity_test.go",
+        "pkg/smtcore/smt_asserted_pull_quant.go",
+        "pkg/smtcore/smt_asserted_pull_quant_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98760,7 +98863,9 @@
         "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
         "TestSMTAssertedNNFUsesGlobalModuleOptions",
         "TestSMTAssertedInjectivityRefinementAndGuards",
-        "TestSMTAssertedInjectivityConflict"
+        "TestSMTAssertedInjectivityConflict",
+        "TestSMTAssertedPullQuantifierGuardsAndProofs",
+        "TestSMTAssertedPullQuantifierScopedConflict"
       ],
       "conditionals": [
         {
@@ -98845,6 +98950,15 @@
           "tests": [
             "TestSMTAssertedInjectivityRefinementAndGuards",
             "TestSMTAssertedInjectivityConflict"
+          ]
+        },
+        {
+          "name": "pull_nested_quantifiers pending assertion transform after NNF, parameter and preprocessing guards, proof composition and scoped assertion ownership",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_pull_quant.go",
+          "tests": [
+            "TestSMTAssertedPullQuantifierGuardsAndProofs",
+            "TestSMTAssertedPullQuantifierScopedConflict"
           ]
         },
         {
@@ -206358,7 +206472,7 @@
         {
           "name": "Retained pull_quant1_core declaration-count and shifted-expression TRACE at pull_quant.cpp:102,109,131",
           "status": "ported",
-          "go_target": "pkg/ast/pattern/pull_boolean_trace.go",
+          "go_target": "pkg/ast/normal_forms/pull_boolean_trace.go",
           "tests": [
             "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"
           ]
@@ -208858,7 +208972,7 @@
         {
           "name": "Retained pull_quant1_core declaration-count and shifted-expression TRACE at pull_quant.cpp:102,109,131",
           "status": "ported",
-          "go_target": "pkg/ast/pattern/pull_boolean_trace.go",
+          "go_target": "pkg/ast/normal_forms/pull_boolean_trace.go",
           "tests": [
             "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"
           ]

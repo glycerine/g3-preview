@@ -159,10 +159,12 @@ func (r *rewriterEngine) processAppProof() error {
 			if e != nil {
 				return e
 			}
-			if e = m.ResetRef(r.pr2); e != nil {
+			// Transitivity may return the step itself when the first proof is
+			// null. Pin it before releasing the callback's proof reference.
+			if e = m.SetRef(r.pr, proof); e != nil {
 				return e
 			}
-			if e = m.SetRef(r.pr, proof); e != nil {
+			if e = m.ResetRef(r.pr2); e != nil {
 				return e
 			}
 			if e = shrinkRewriterRoots(m, &c.results, fr.spos); e != nil {
