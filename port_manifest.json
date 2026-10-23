@@ -113537,7 +113537,8 @@
         "TestASTParameterRatExactOwningCopy",
         "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays",
         "TestSMTArithmeticRowBoundExplanationsChooseEndpointsAndMergeWeights",
-        "TestSMTArithmeticAffineDefinitionBoundExplanations"
+        "TestSMTArithmeticAffineDefinitionBoundExplanations",
+        "TestArithmeticMaxMinExplanationPreservesStrictEndpoint"
       ],
       "conditionals": [
         {
@@ -114042,6 +114043,23 @@
           "tests": [
             "TestSMTArithmeticRowBoundExplanationsChooseEndpointsAndMergeWeights",
             "TestSMTArithmeticAffineDefinitionBoundExplanations"
+          ]
+        },
+        {
+          "name": "max_min exact unshared optimum explanations: capture the normalized objective row before removing it, select signed lower/upper endpoint contributions, preserve strict infinitesimals, omit best-effort/shared explanations, and persist weighted derived bounds",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/arith_optimize.go",
+          "go_targets": [
+            "pkg/math/simplex/arith_optimize_test.go",
+            "pkg/smtcore/theory_arith_max_min.go",
+            "pkg/smtcore/theory_arith_max_min_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go"
+          ],
+          "tests": [
+            "TestArithmeticMaxMinDerivedExtremaAndBestEffort",
+            "TestArithmeticMaxMinIntegerGainsAndSharedMovement",
+            "TestArithmeticMaxMinExplanationPreservesStrictEndpoint",
+            "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
           ]
         }
       ],
@@ -115034,7 +115052,7 @@
           ]
         },
         {
-          "name": "row and affine-definition bound propagation retain weighted premises through scoped numeric replay and fixed shared-value storage; nonlinear interval and optimization explanation chains remain incomplete",
+          "name": "row and affine-definition bound propagation retain weighted premises through scoped numeric replay and fixed shared-value storage; nonlinear interval explanation chains remain incomplete",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
           "go_targets": [

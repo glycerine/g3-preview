@@ -31,6 +31,7 @@ type ArithmeticOptResult struct {
 	Status             ArithmeticOptStatus
 	HasShared, Changed bool
 	Value              Infinitesimal
+	Bounds             []ArithmeticBoundUse
 }
 
 type arithmeticOptimizer struct {
@@ -335,6 +336,23 @@ func (s *Solver) ArithmeticMaxMin(variable uint32, maximize bool, config Arithme
 	o := arithmeticOptimizer{solver: s, config: config, objective: objective}
 	result.Status, err = o.optimize(maximize)
 	result.HasShared, result.Changed = o.shared, o.changed
+	if err == nil && result.Status == ArithmeticOptimized && !result.HasShared {
+		row, basic := s.BasicRow(objective)
+		if !basic {
+			return result, fmt.Errorf("simplex: optimized objective is not basic")
+		}
+		entries, e := s.RowEntries(row)
+		if e != nil {
+			return result, e
+		}
+		for _, entry := range entries {
+			if entry.Variable == objective {
+				continue
+			}
+			coefficient := new(big.Rat).Neg(new(big.Rat).Quo(entry.Coefficient, &s.vars[objective].baseCoeff))
+			result.Bounds = append(result.Bounds, ArithmeticBoundUse{Column: entry.Variable, Lower: !maximize == (coefficient.Sign() > 0), Coefficient: *coefficient})
+		}
+	}
 	return result, err
 }
 

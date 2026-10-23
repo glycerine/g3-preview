@@ -91,13 +91,14 @@ func (t *SMTLinearArithmeticTheory) maxMinNonlinearVariables() (bool, error) {
 			}
 			if result.Status == simplex.ArithmeticOptimized && !result.HasShared {
 				value := t.normalizeOptimizedBound(column, !maximize, result.Value.Clone())
-				pending = append(pending, smtArithmeticReplayBound{column: column, lower: !maximize, value: value})
+				explanation := smtArithmeticWeightedBoundExplanation(solver, result.Bounds)
+				pending = append(pending, smtArithmeticReplayBound{column: column, lower: !maximize, value: value, explanation: explanation})
 			}
 		}
 	}
 	progress := false
 	for _, bound := range pending {
-		changed, err := smtTightenSimplexBound(solver, bound.column, bound.lower, bound.value)
+		changed, err := smtTightenReplaySimplexBound(solver, bound.column, bound.lower, bound.value, bound.explanation)
 		if err != nil {
 			return true, t.derivedBoundConflict()
 		}

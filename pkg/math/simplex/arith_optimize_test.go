@@ -35,9 +35,26 @@ func TestArithmeticMaxMinDerivedExtremaAndBestEffort(t *testing.T) {
 	if err != nil || first.Status != ArithmeticBestEffort || !first.Changed || first.Value.Main.Cmp(big.NewRat(2, 1)) != 0 {
 		t.Fatal("source pivot best effort", first, err)
 	}
+	if len(first.Bounds) != 0 {
+		t.Fatal("best effort produced an optimum explanation", first.Bounds)
+	}
 	second, err := s.ArithmeticMaxMin(0, true, ArithmeticOptConfig{MaxEfforts: 20})
 	if err != nil || second.Status != ArithmeticOptimized || second.HasShared || second.Value.Main.Cmp(big.NewRat(2, 1)) != 0 {
 		t.Fatal("exact upper optimum", second, err)
+	}
+	if len(second.Bounds) != 2 {
+		t.Fatal("missing optimized row explanation", second.Bounds)
+	}
+	for _, use := range second.Bounds {
+		coefficient, lower := big.NewRat(1, 1), false
+		if use.Column == 1 {
+			coefficient, lower = big.NewRat(-1, 1), true
+		} else if use.Column != 2 {
+			t.Fatal("temporary objective in explanation", use)
+		}
+		if use.Lower != lower || use.Coefficient.Cmp(coefficient) != 0 {
+			t.Fatal("optimized row endpoint or sign", use)
+		}
 	}
 	minimum, err := s.ArithmeticMaxMin(0, false, ArithmeticOptConfig{MaxEfforts: 20})
 	if err != nil || minimum.Value.Main.Sign() != 0 {
@@ -82,6 +99,13 @@ func TestArithmeticMaxMinIntegerGainsAndSharedMovement(t *testing.T) {
 		} else if result.Status != ArithmeticOptimized || result.Value.Main.Cmp(big.NewRat(3, 2)) != 0 {
 			t.Fatal("rational optimum", result)
 		}
+		if integer {
+			if len(result.Bounds) != 0 {
+				t.Fatal("integer best effort produced a bound explanation")
+			}
+		} else if len(result.Bounds) != 1 || result.Bounds[0].Column != 1 || result.Bounds[0].Lower || result.Bounds[0].Coefficient.Cmp(big.NewRat(1, 2)) != 0 {
+			t.Fatal("normalized rational optimum explanation", result.Bounds)
+		}
 	}
 	s := NewSolver(nil)
 	_, err := s.AddRationalRow(0, []uint32{0, 1}, integerRow(1, -2))
@@ -98,10 +122,44 @@ func TestArithmeticMaxMinIntegerGainsAndSharedMovement(t *testing.T) {
 	if err != nil || result.Status != ArithmeticOptimized || !result.HasShared || result.Value.Main.Cmp(big.NewRat(4, 1)) != 0 {
 		t.Fatal("shared movement guard", result, err)
 	}
+	if len(result.Bounds) != 0 {
+		t.Fatal("shared optimum produced a logical bound explanation")
+	}
 	free := NewSolver(nil)
 	free.EnsureVariable(0)
 	result, err = free.ArithmeticMaxMin(0, true, ArithmeticOptConfig{MaxEfforts: 20})
 	if err != nil || result.Status != ArithmeticUnbounded {
 		t.Fatal("unbounded objective", result, err)
+	}
+}
+
+func TestArithmeticMaxMinExplanationPreservesStrictEndpoint(t *testing.T) {
+	s := NewSolver(nil)
+	_, err := s.AddRationalRow(0, []uint32{0, 1}, integerRow(2, -1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	bound := RationalInfinitesimal(big.NewRat(3, 1))
+	bound.Epsilon.SetInt64(-1)
+	if err = s.SetUpper(1, bound); err != nil {
+		t.Fatal(err)
+	}
+	result, err := s.ArithmeticMaxMin(0, true, ArithmeticOptConfig{MaxEfforts: 20})
+	if err == nil && result.Status == ArithmeticBestEffort {
+		if len(result.Bounds) != 0 {
+			t.Fatal("strict best effort produced an optimum explanation")
+		}
+		result, err = s.ArithmeticMaxMin(0, true, ArithmeticOptConfig{MaxEfforts: 20})
+	}
+	if err != nil || result.Status != ArithmeticOptimized || len(result.Bounds) != 1 {
+		t.Fatal(result, err)
+	}
+	use := result.Bounds[0]
+	if use.Column != 1 || use.Lower || use.Coefficient.Cmp(big.NewRat(1, 2)) != 0 {
+		t.Fatal(use)
+	}
+	bound.Mul(&use.Coefficient)
+	if result.Value.Cmp(&bound) != 0 || result.Value.Epsilon.Cmp(big.NewRat(-1, 2)) != 0 {
+		t.Fatal("strict optimum lost infinitesimal coefficient", result.Value, bound)
 	}
 }
