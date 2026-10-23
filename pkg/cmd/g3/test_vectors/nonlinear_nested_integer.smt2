@@ -1,0 +1,6 @@
+(set-logic QF_NIA)
+(set-option :smt.arith.nl.gb false)
+(set-option :smt.arith.nl.branching false)
+(declare-const x Int)
+(assert (<= (+ (* x x) (* (- 2) x) 2) 0))
+(check-sat)

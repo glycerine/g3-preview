@@ -94,6 +94,7 @@ type smtLinearIntegerBranch struct {
 }
 
 type smtLinearArithmeticStatistics struct {
+	crossNested                                          uint64
 	conflicts, addRows, pivots, assertLower, assertUpper uint64
 	fixedEqualities, offsetEqualities, branches          uint64
 	grobner                                              uint64
@@ -1425,6 +1426,15 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		}
 	}
 	if !satisfied || !complete {
+		if t.nonlinearEnabled && len(t.nonlinearColumns) != 0 {
+			conflict, err := t.checkCrossNestedConsistency()
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			if conflict {
+				return SMTFinalCheckContinue, nil
+			}
+		}
 		if t.nonlinearEnabled && t.nonlinearGB && len(t.nonlinearColumns) != 0 {
 			conflict, err := t.checkNonlinearGrobner()
 			if err != nil {
@@ -1871,6 +1881,7 @@ func (t *SMTLinearArithmeticTheory) CollectStatistics(target *statistics.Statist
 	target.UpdateUint64("arith ineq splits", t.statistics.branches)
 	target.UpdateUint64("arith eq adapter", t.equalityAdapter.NumAxioms())
 	target.UpdateUint64("arith grobner", t.statistics.grobner)
+	target.UpdateUint64("arith nonlinear horner", t.statistics.crossNested)
 	return nil
 }
 

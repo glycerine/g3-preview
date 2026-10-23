@@ -1,0 +1,6 @@
+(set-logic QF_NRA)
+(set-option :smt.arith.nl.gb false)
+(declare-const x Real)
+(assert (> x 1))
+(assert (<= (- (* x x) x) 0))
+(check-sat)

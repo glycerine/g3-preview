@@ -10,6 +10,10 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"nonlinear_horner_bound.smt2":               "unsat\n",
+	"nonlinear_completed_square.smt2":           "unsat\n",
+	"nonlinear_nested_multivariate.smt2":        "unsat\nsat\n",
+	"nonlinear_nested_integer.smt2":             "unsat\n",
 	"linearized_product_real_scopes.smt2":       "sat\n((y 1.0))\nsat\n((y (/ 1.0 2.0)))\nsat\n((y (- 1.0)))\n",
 	"linearized_product_integer_scopes.smt2":    "unsat\nsat\n((y 1))\n",
 	"nonlinear_integer_factor_scopes.smt2":      "unsat\nsat\n",

@@ -115199,7 +115199,10 @@
         "pkg/smtcore/theory_arith_grobner_square_test.go",
         "pkg/smtcore/theory_arith_nonlinear_branch.go",
         "pkg/smtcore/theory_arith_nonlinear_branch_test.go",
-        "pkg/smtcore/theory_arith_linear_monomial_test.go"
+        "pkg/smtcore/theory_arith_linear_monomial_test.go",
+        "pkg/smtcore/theory_arith_nested.go",
+        "pkg/smtcore/theory_arith_nested_test.go",
+        "pkg/smtcore/theory_arith_nested_mixed_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -115215,7 +115218,10 @@
         "TestSMTGrobnerPerfectSquareMonomialsAndCrossTerms",
         "TestSMTNonlinearGrobnerExpandedSquareScopedProofs",
         "TestSMTNonlinearIntegerBranchesScopedProofsAndModels",
-        "TestSMTLinearizedMonomialScopesProofsAndModels"
+        "TestSMTLinearizedMonomialScopesProofsAndModels",
+        "TestSMTCrossNestedArithmeticScopedProofs",
+        "TestSMTNestedPolynomialIdentityAtRationalPoints",
+        "TestSMTNestedMixedCoefficientSortGuards"
       ],
       "conditionals": [
         {
@@ -115588,7 +115594,22 @@
           ]
         },
         {
-          "name": "nonlinear clustering, max/min bound discovery, strategy rotation, Horner reasoning, variable-order perturbation and derived-equation insertion, and irrational models",
+          "name": "get_polynomial_info, p2expr, degree/factor, horner, cross_nested and interval consistency for active nonlinear comparison polynomials: most-frequent variable nesting, two-term completing-square rule, integer coefficient normalization and sort guards",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_nested.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTCrossNestedArithmeticScopedProofs",
+            "TestSMTNestedPolynomialIdentityAtRationalPoints",
+            "TestSMTNestedMixedCoefficientSortGuards",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "nonlinear clustering, max/min bound discovery, fair strategy rotation, complete row-level nested polynomial checks, variable-order perturbation and derived-equation insertion, and irrational models",
           "status": "unported",
           "go_target": null,
           "tests": [
@@ -115602,7 +115623,8 @@
         "One upward/downward interval propagation pass runs during each tableau replay, including each speculative integer branch. Repeated factors use interval powers, downward propagation skips powers greater than one and zero-containing divisors, and integer endpoints are rounded. Derived bounds are reconstructed after pops; failed bounds reject only the current replay or integer branch.",
         "The Grobner consumer sends concrete typed monomials from definition equations, opposite active bounds, and fixed product columns to math/grobner; it substitutes only unconditional fixed bounds from a branch-free replay, applies the source variable weights and generated-equation threshold, and checks basis equations against exact rational intervals and source expanded perfect-square strengthening. Conflicts conservatively cite all active assertion literals rather than a minimal source dependency graph. Source connected-cluster extraction, complete tableau-row enumeration, iterative nonlinear strategies, max/min discovery, Horner reasoning, variable-order perturbation, optional derived-equation insertion, and irrational models remain incomplete.",
         "Nonlinear integer branching uses unconditional replay bounds to select a factor of a mismatched integer monomial, preferring the smallest bounded interval and applying the source random reservoir otherwise. New endpoint or zero-equality atoms are marked relevant and true-first without asserting either branch. The nonlinear round count is scoped and obeys arith.nl.rounds. The existing replay representation keeps speculative integer-feasibility bounds separate from the logical bounds used to choose a split.",
-        "Products with all factors fixed, any fixed zero factor, or exactly one unfixed factor are propagated during tableau replay before MakeFeasible, including when arith.nl is false. The one-unfixed-factor path creates the source affine relation m-k*x and fixes a fresh auxiliary column at zero, preserving the tableau basis and retaining the conditional fixed-bound premises in the current replay. Rebuilding after a pop or integer branch removes conditional rows without a persistent source m_nl_propagated trail."
+        "Products with all factors fixed, any fixed zero factor, or exactly one unfixed factor are propagated during tableau replay before MakeFeasible, including when arith.nl is false. The one-unfixed-factor path creates the source affine relation m-k*x and fixes a fresh auxiliary column at zero, preserving the tableau basis and retaining the conditional fixed-bound premises in the current replay. Rebuilding after a pop or integer branch removes conditional rows without a persistent source m_nl_propagated trail.",
+        "Cross-nested polynomial construction now factors repeated variables recursively using source Horner and completing-square transformations, then evaluates exact intervals while respecting existing internalized-column bounds. The replay integration checks active comparison polynomials directly and uses all active assertion literals for conflicts; full row/cluster traversal and source bound-weighted resource accounting remain incomplete. Integer rows clear coefficient denominators; mixed rows are skipped when coercions are disabled. Optional square completion falls back to Horner when its offset or leading coefficient would require a fractional Int numeral. Temporary polynomial ASTs are pinned for the check and released on every return."
       ]
     },
     {
@@ -115613,10 +115635,12 @@
       "go_targets": [
         "pkg/smtcore/theory_arith_linear.go",
         "pkg/smtcore/smt_solver.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/theory_arith_nested.go"
       ],
       "tests": [
-        "TestSMTSolverCollectsAndResetsLinearArithmeticStatistics"
+        "TestSMTSolverCollectsAndResetsLinearArithmeticStatistics",
+        "TestSMTCrossNestedArithmeticScopedProofs"
       ],
       "conditionals": [
         {
@@ -115656,6 +115680,15 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "collect_statistics arithmetic nonlinear Horner counter",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTCrossNestedArithmeticScopedProofs",
+            "TestSMTSolverCollectsAndResetsLinearArithmeticStatistics"
+          ]
         }
       ],
       "ownership": [],
