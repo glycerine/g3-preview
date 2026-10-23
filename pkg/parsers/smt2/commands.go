@@ -19,6 +19,7 @@ type commandParser struct {
 	context  *cmd_context.Context
 	scanner  *Scanner
 	token    Token
+	cacheEnd int
 	out      io.Writer
 	manager  *ast.ASTManager
 	refs     []ast.ASTRef
@@ -65,7 +66,12 @@ func ParseCommands(context *cmd_context.Context, input io.Reader, out io.Writer)
 	return nil
 }
 
-func (p *commandParser) advance() error { var err error; p.token, err = p.scanner.Scan(); return err }
+func (p *commandParser) advance() error {
+	p.cacheEnd = p.scanner.CacheSize()
+	var err error
+	p.token, err = p.scanner.Scan()
+	return err
+}
 func (p *commandParser) expect(token Token) error {
 	if p.token != token {
 		return fmt.Errorf("unexpected input, expected token %d", token)
@@ -302,14 +308,14 @@ func (p *commandParser) command() (bool, error) {
 		}
 		success = false
 	case "get-value":
-		values, err := p.expressions()
+		values, text, err := p.valueExpressions()
 		if err != nil {
 			return false, err
 		}
 		if err = p.requireEnd(); err != nil {
 			return false, err
 		}
-		if err = p.context.WriteValues(p.out, values); err != nil {
+		if err = p.context.WriteValuesWithText(p.out, values, text); err != nil {
 			return false, err
 		}
 		success = false
@@ -397,6 +403,47 @@ func (p *commandParser) expressions() ([]ast.ASTHandle, error) {
 		values = append(values, value)
 	}
 	return values, p.advance()
+}
+
+// Source parse_get_value caches each original term before expanding
+// definitions, lets, and coercions. Evaluate the AST, but echo that text.
+func (p *commandParser) valueExpressions() ([]ast.ASTHandle, []string, error) {
+	p.scanner.StartCaching()
+	defer func() { p.scanner.StopCaching(); p.scanner.ResetCache() }()
+	if err := p.expect(LeftParenToken); err != nil {
+		return nil, nil, err
+	}
+	var values []ast.ASTHandle
+	var text []string
+	begin := 0
+	for p.token != RightParenToken {
+		value, _, err := p.expression()
+		if err != nil {
+			return nil, nil, err
+		}
+		ground, err := p.manager.IsGround(value)
+		if err != nil {
+			return nil, nil, err
+		}
+		quantifiers, err := p.manager.HasQuantifiers(value)
+		if err != nil {
+			return nil, nil, err
+		}
+		if !ground || quantifiers {
+			return nil, nil, fmt.Errorf("invalid get-value term, term must be ground and must not contain quantifiers")
+		}
+		term, err := p.scanner.CachedString(begin, p.cacheEnd)
+		if err != nil {
+			return nil, nil, err
+		}
+		begin = p.cacheEnd
+		values = append(values, value)
+		text = append(text, term)
+	}
+	if len(values) == 0 {
+		return nil, nil, fmt.Errorf("invalid get-value command, empty list of terms")
+	}
+	return values, text, p.advance()
 }
 
 // parseIndexed consumes (_ name index...), used for sorts and applications.

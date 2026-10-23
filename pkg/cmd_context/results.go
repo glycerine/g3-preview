@@ -1,5 +1,6 @@
 // Source: src/cmd_context/basic_cmds.cpp get-value, get-proof and
 // get-unsat-core; cmd_context.cpp result availability checks.
+// Original get-value term text follows smt2parser.cpp parse_get_value.
 package cmd_context
 
 import (
@@ -36,6 +37,15 @@ func (c *Context) WriteExpression(out io.Writer, expression ast.ASTHandle) (resu
 }
 
 func (c *Context) WriteValues(out io.Writer, expressions []ast.ASTHandle) (result error) {
+	return c.WriteValuesWithText(out, expressions, nil)
+}
+
+// WriteValuesWithText evaluates parsed expressions while echoing their original
+// SMT-LIB terms. A nil text slice uses the ordinary AST expression printer.
+func (c *Context) WriteValuesWithText(out io.Writer, expressions []ast.ASTHandle, text []string) (result error) {
+	if text != nil && len(text) != len(expressions) {
+		return fmt.Errorf("get-value term text count does not match expression count")
+	}
 	md, err := c.Model()
 	if err != nil {
 		return err
@@ -64,7 +74,11 @@ func (c *Context) WriteValues(out io.Writer, expressions []ast.ASTHandle) (resul
 		if err != nil {
 			return err
 		}
-		err = c.writeValuePair(out, expression, value)
+		term := ""
+		if text != nil {
+			term = text[i]
+		}
+		err = c.writeValuePair(out, expression, value, term)
 		err = errors.Join(err, c.manager.DelRef(&value))
 		if err != nil {
 			return err
@@ -74,7 +88,7 @@ func (c *Context) WriteValues(out io.Writer, expressions []ast.ASTHandle) (resul
 	return err
 }
 
-func (c *Context) writeValuePair(out io.Writer, expression ast.ASTHandle, value ast.ASTRef) error {
+func (c *Context) writeValuePair(out io.Writer, expression ast.ASTHandle, value ast.ASTRef, text string) error {
 	h, err := c.manager.RefGet(value)
 	if err != nil {
 		return err
@@ -82,7 +96,12 @@ func (c *Context) writeValuePair(out io.Writer, expression ast.ASTHandle, value 
 	if _, err = io.WriteString(out, "("); err != nil {
 		return err
 	}
-	if err = c.WriteExpression(out, expression); err != nil {
+	if text == "" {
+		err = c.WriteExpression(out, expression)
+	} else {
+		_, err = io.WriteString(out, text)
+	}
+	if err != nil {
 		return err
 	}
 	if _, err = io.WriteString(out, " "); err != nil {

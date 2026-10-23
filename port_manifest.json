@@ -37592,7 +37592,9 @@
         "TestSMT2CommandsRejectMalformedInputBeforeEffects",
         "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
         "TestSMTLibRunnerProofScript",
-        "TestCommandContextNamedCoreAndProof"
+        "TestCommandContextNamedCoreAndProof",
+        "TestSMT2GetValuePreservesParsedTermTextAcrossQueries",
+        "TestSMT2GetValueRejectsEmptyAndQuantifiedTermsBeforeOutput"
       ],
       "conditionals": [
         {
@@ -37651,9 +37653,27 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "default-model parse_get_value: preserve original cached query text while evaluating expanded ground AST expressions, reject empty lists and quantified terms, reset the cache between queries, and echo definitions, quoted symbols and lets with exact values",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "go_targets": [
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd_context/results.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMT2GetValuePreservesParsedTermTextAcrossQueries",
+            "TestSMT2GetValueRejectsEmptyAndQuantifiedTermsBeforeOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Default-model get-value keeps expanded AST expressions pinned in command-local references and independently caches original input term strings. The scanner cache end is saved before each token advance; copied term strings survive cache reset and are passed alongside concrete AST handles to result output. Definitions, quoted identifiers, let terms and internal whitespace are echoed without AST expansion. Empty lists and quantified terms are rejected before result output. The rational_square_interval_scopes.smt2 C++ comparison checks exact 121/225 values after scoped rational square constraints. Indexed optimization-model queries remain outside this increment."
+      ],
       "deviations": []
     },
     {
@@ -86169,7 +86189,8 @@
         "pkg/parsers/smt2/commands.go",
         "pkg/parsers/smt2/expressions.go",
         "pkg/parsers/smt2/commands_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd_context/results.go"
       ],
       "tests": [
         "TestSMT2ParserPushLocalShiftsFreeVariables",
@@ -86184,7 +86205,9 @@
         "TestSMTLibRunnerCPPReference",
         "TestSMT2CommandsRejectMalformedInputBeforeEffects",
         "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
-        "TestSMT2FunctionDefinitionFailuresAndRecovery"
+        "TestSMT2FunctionDefinitionFailuresAndRecovery",
+        "TestSMT2GetValuePreservesParsedTermTextAcrossQueries",
+        "TestSMT2GetValueRejectsEmptyAndQuantifiedTermsBeforeOutput"
       ],
       "assertions": [
         {
@@ -86812,10 +86835,27 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "default-model parse_get_value: preserve original cached query text while evaluating expanded ground AST expressions, reject empty lists and quantified terms, reset the cache between queries, and echo definitions, quoted symbols and lets with exact values",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "go_targets": [
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd_context/results.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMT2GetValuePreservesParsedTermTextAcrossQueries",
+            "TestSMT2GetValueRejectsEmptyAndQuantifiedTermsBeforeOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Each parsed command holds ASTRefs for all constructed terms/sorts until the command context acquires its declaration/assertion references. Existing concrete local binding and var-shifting helpers own quantifier/let frames and are unwound on success and error."
+        "Each parsed command holds ASTRefs for all constructed terms/sorts until the command context acquires its declaration/assertion references. Existing concrete local binding and var-shifting helpers own quantifier/let frames and are unwound on success and error.",
+        "Default-model get-value keeps expanded AST expressions pinned in command-local references and independently caches original input term strings. The scanner cache end is saved before each token advance; copied term strings survive cache reset and are passed alongside concrete AST handles to result output. Definitions, quoted identifiers, let terms and internal whitespace are echoed without AST expansion. Empty lists and quantified terms are rejected before result output. The rational_square_interval_scopes.smt2 C++ comparison checks exact 121/225 values after scoped rational square constraints. Indexed optimization-model queries remain outside this increment."
       ],
       "deviations": [
         "The selected local lookup returns an owning ASTRef for the future parser expression stack and reuses the concrete AST var_shifter; scanner, command-context fallback, other parser branches and complete expression-stack integration remain unported.",
