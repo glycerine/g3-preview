@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"array_explicit_extensionality_scopes.smt2":    "sat\nunsat\nsat\nunsat\nsat\n",
 	"array_default_store_visitation_scopes.smt2":   "sat\nsat\nunsat\nsat\n",
 	"array_function_reference_signatures.smt2":     "unsat\nunsat\nunsat\nsat\n",
 	"array_canonical_constructor_reads.smt2":       "sat\n(((select a i) true) ((select b j) false))\nunsat\nsat\nunsat\nunsat\nsat\n(((select a i) true) ((select b j) false))\n",

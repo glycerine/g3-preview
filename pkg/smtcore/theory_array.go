@@ -21,6 +21,7 @@ type smtArrayScope struct {
 	unsupported                         bool
 	extensionality                      int
 	readFingerprints                    int
+	sorts                               int
 }
 
 type smtArrayAxiomPair struct {
@@ -66,6 +67,8 @@ type SMTArrayTheory struct {
 	parameterOwner                        *SMTArrayParams
 	schedulingReady                       bool
 	modelData                             *smtArrayModelData
+	sortDeclarations                      map[ast.ASTHandle][]ast.ASTHandle
+	sortTrail                             []ast.ASTHandle
 }
 
 func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
@@ -81,6 +84,7 @@ func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
 		defaults:                   make(map[ast.ASTHandle]bool),
 		equalityAxioms:             make(map[smtArrayExpressionPair]bool),
 		defaultFingerprints:        make(map[*SMTEnode]bool),
+		sortDeclarations:           make(map[ast.ASTHandle][]ast.ASTHandle),
 		epsilons:                   make(map[ast.ASTHandle]ast.ASTHandle),
 		extensionalityFingerprints: make(map[smtArrayEnodePair]bool),
 		arrayConfig:                SMTArrayState{Mode: 3, Simplify: true, Extensional: true, Laziness: 1, DelayExpAxiom: true, AlwaysPropUpward: true, LazyIEqDelay: 10},
@@ -112,14 +116,14 @@ func (t *SMTArrayTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool
 	if op, array, err := t.arrayOperation(expression); err != nil {
 		return false, err
 	} else if array {
-		if op == ast.ASTArrayOpExt {
+		if op == ast.ASTArrayOpExt && t.simple {
 			return false, nil
 		}
 		if t.simple && op != ast.ASTArrayOpSelect && op != ast.ASTArrayOpStore {
 			t.unsupported = true
 			return false, nil
 		}
-		if op == ast.ASTArrayOpSelect || op == ast.ASTArrayOpDefault {
+		if op == ast.ASTArrayOpSelect || op == ast.ASTArrayOpDefault || op == ast.ASTArrayOpExt {
 			_, termErr := t.InternalizeTerm(expression)
 			if termErr != nil {
 				return false, fmt.Errorf("array select atom: %w", termErr)
@@ -162,7 +166,7 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 	if err != nil || !array {
 		return false, err
 	}
-	if op == ast.ASTArrayOpExt {
+	if op == ast.ASTArrayOpExt && t.simple {
 		return false, nil
 	}
 	if t.simple && op != ast.ASTArrayOpStore && op != ast.ASTArrayOpSelect {
@@ -215,7 +219,15 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 		if err = t.assertSelectStoreAxioms(expression); err != nil {
 			return false, fmt.Errorf("array select-store axiom: %w", err)
 		}
-	case ast.ASTArrayOpConst, ast.ASTArrayOpExt:
+	case ast.ASTArrayOpConst:
+	case ast.ASTArrayOpExt:
+		node := state.context.enodes[expression]
+		if len(node.arguments) != 2 {
+			return false, ast.ErrASTDomain
+		}
+		if err = t.instantiateArrayExtensionality(node.arguments[0], node.arguments[1]); err != nil {
+			return false, err
+		}
 	case ast.ASTArrayOpMap:
 		for _, input := range state.context.enodes[expression].arguments {
 			if err = t.addParentMap(input.TheoryVar(t.FamilyID()), state.context.enodes[expression]); err != nil {
@@ -423,14 +435,11 @@ func (t *SMTArrayTheory) assertExtensionalityCore(left, right ast.ASTHandle) err
 	}
 	leftArguments := []ast.ASTHandle{left}
 	rightArguments := []ast.ASTHandle{right}
-	for index := uint32(0); ; index++ {
-		declaration, declErr := state.manager.MkArrayExtDecl(sort, index)
-		if errors.Is(declErr, ast.ErrASTDomain) {
-			break
-		}
-		if declErr != nil {
-			return declErr
-		}
+	declarations := t.sortDeclarations[sort]
+	if len(declarations) == 0 {
+		return ast.ErrASTDomain
+	}
+	for _, declaration := range declarations {
 		witness, appErr := state.manager.MkApp(declaration, []ast.ASTHandle{left, right})
 		if appErr != nil {
 			return appErr
@@ -449,11 +458,11 @@ func (t *SMTArrayTheory) assertExtensionalityCore(left, right ast.ASTHandle) err
 	if err != nil {
 		return err
 	}
-	selectEquality, err := t.MkEqualityLiteral(leftSelect, rightSelect, true)
+	arrayEquality, err := t.MkEqualityLiteral(left, right, true)
 	if err != nil {
 		return err
 	}
-	arrayEquality, err := t.MkEqualityLiteral(left, right, true)
+	selectEquality, err := t.MkEqualityLiteral(leftSelect, rightSelect, true)
 	if err != nil {
 		return err
 	}
@@ -513,6 +522,7 @@ func (t *SMTArrayTheory) PushScope() error {
 		unsupported:         t.unsupported,
 		extensionality:      len(t.extensionalityTrail),
 		readFingerprints:    len(t.readFingerprintTrail),
+		sorts:               len(t.sortTrail),
 	})
 	return nil
 }
@@ -535,6 +545,9 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	// dropping the enodes and fingerprints owned by the popped scopes.
 	t.extensionalityTodo = nil
 	t.storeTodo, t.readTodo = nil, nil
+	if err := t.restoreArraySorts(scope.sorts); err != nil {
+		return err
+	}
 	// theory_array_full::pop_scope_eh resets the entire ordered-pair cache,
 	// including pairs inserted before the popped scopes.
 	clear(t.equalityAxioms)

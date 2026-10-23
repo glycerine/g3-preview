@@ -37,6 +37,13 @@ func (t *SMTArrayTheory) NewDisequality(left, right SMTTheoryVar) error {
 	if err != nil || family != t.FamilyID() || !t.extensional {
 		return err
 	}
+	return t.instantiateArrayExtensionality(first, second)
+}
+
+func (t *SMTArrayTheory) instantiateArrayExtensionality(first, second *SMTEnode) error {
+	if !t.extensional {
+		return nil
+	}
 	leftID, err := first.OwnerID()
 	if err != nil {
 		return err
@@ -48,8 +55,11 @@ func (t *SMTArrayTheory) NewDisequality(left, right SMTTheoryVar) error {
 	if leftID > rightID {
 		first, second = second, first
 	}
-	// Source fingerprints retain the roots at insertion, rather than a
-	// mutable universal data pointer. This concrete set is local to arrays.
+	// fingerprint_set::insert checks the original ordered node pair before
+	// checking current roots; stored pairs remain snapshots across merges.
+	if t.extensionalityFingerprints[smtArrayEnodePair{first, second}] {
+		return nil
+	}
 	pair := smtArrayEnodePair{first.root, second.root}
 	if t.extensionalityFingerprints[pair] {
 		return nil

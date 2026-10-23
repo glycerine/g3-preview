@@ -52,6 +52,19 @@ func (t *SMTArrayTheory) CreateVariable(node *SMTEnode) (SMTTheoryVar, error) {
 	}
 	data := &smtArrayVarData{}
 	t.arrayData = append(t.arrayData, data)
+	sort, err := t.state.manager.GetSort(node.owner)
+	if err != nil {
+		return variable, err
+	}
+	family, err := t.state.manager.GetFamilyID(sort)
+	if err != nil {
+		return variable, err
+	}
+	if family == t.FamilyID() {
+		if err = t.registerArraySort(sort); err != nil {
+			return variable, err
+		}
+	}
 	op, array, err := t.arrayOperation(node.owner)
 	if err != nil {
 		return variable, err
