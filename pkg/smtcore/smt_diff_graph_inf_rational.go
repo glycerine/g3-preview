@@ -255,22 +255,34 @@ func (g *SMTInfRationalDiffGraph) EnableEdge(id int32) (bool, error) {
 	return feasible, nil
 }
 
-func (g *SMTInfRationalDiffGraph) NegativeCycleExplanations() ([]SMTLiteral, error) {
+func (g *SMTInfRationalDiffGraph) NegativeCycleEdges() ([]int32, error) {
 	if !g.validEdge(g.lastEnabledEdge) || g.edgeFeasible(&g.edges[g.lastEnabledEdge]) {
 		return nil, errSMTDiffGraphDomain
 	}
 	last := g.lastEnabledEdge
-	result := make([]SMTLiteral, 0, 4)
+	result := make([]int32, 0, 4)
 	id := last
 	for steps := 0; ; steps++ {
 		if steps > len(g.edges) || !g.validEdge(id) {
 			return nil, errSMTDiffGraphDomain
 		}
-		result = append(result, g.edges[id].explanation)
+		result = append(result, id)
 		id = g.parent[g.edges[id].source]
 		if id == last {
 			break
 		}
+	}
+	return result, nil
+}
+
+func (g *SMTInfRationalDiffGraph) NegativeCycleExplanations() ([]SMTLiteral, error) {
+	edges, err := g.NegativeCycleEdges()
+	if err != nil {
+		return nil, err
+	}
+	result := make([]SMTLiteral, len(edges))
+	for i, id := range edges {
+		result[i] = g.edges[id].explanation
 	}
 	return result, nil
 }

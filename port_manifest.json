@@ -100349,7 +100349,9 @@
         "pkg/smtcore/smt_diff_graph_rational.go",
         "pkg/smtcore/smt_diff_graph_rational_test.go",
         "pkg/smtcore/smt_diff_graph_inf_rational.go",
-        "pkg/smtcore/smt_diff_graph_inf_rational_test.go"
+        "pkg/smtcore/smt_diff_graph_inf_rational_test.go",
+        "pkg/smtcore/smt_diff_graph_inf_zero.go",
+        "pkg/smtcore/smt_diff_graph_inf_zero_test.go"
       ],
       "tests": [
         "TestSMTRationalDiffGraphFeasibleActivationAndAssignment",
@@ -100363,7 +100365,9 @@
         "TestSMTRationalDiffGraphShortestZeroPathStrictTimestamp",
         "TestSMTInfRationalLexicographicOrder",
         "TestSMTInfRationalDiffGraphStrictNegativeCycle",
-        "TestSMTInfRationalDiffGraphAssignmentScopeAndNormalization"
+        "TestSMTInfRationalDiffGraphAssignmentScopeAndNormalization",
+        "TestSMTInfRationalTightEdgeComponentsPathsAndUpdates",
+        "TestSMTInfRationalPairedZeroAndCycleEdgeIdentity"
       ],
       "conditionals": [
         {
@@ -100736,6 +100740,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained infinitesimal-rational UTVPI graph support: normalized-zero Gabow SCCs, successors, reverse-order shortest edge paths, assignment updates, paired zero normalization and negative-cycle edge identities",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_diff_graph_inf_zero.go",
+          "tests": [
+            "TestSMTInfRationalTightEdgeComponentsPathsAndUpdates",
+            "TestSMTInfRationalPairedZeroAndCycleEdgeIdentity"
+          ]
+        },
         {
           "name": "Concrete rational dl_edge and sparse dl_graph construction, indexed-heap assignment repair, activation, negative cycles, scopes, zero normalization, edge lookup, undirected traversal, reset, zero-edge SCC/successors and shortest paths, direct/two-hop subsumption and timestamp-bounded lazy explanations (src/smt/diff_logic.h:39-559,751-845,905-1224,1278-1355,1640-1834)",
           "status": "ported",
@@ -123333,9 +123346,14 @@
       "path": "src/smt/theory_utvpi.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
-      "go_targets": ["pkg/smtcore/theory_arith_linear.go"],
-      "tests": ["TestSMTSolverSetupUsesLinearRealArithmetic", "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic"],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_utvpi_linearizer.go",
+        "pkg/smtcore/smt_utvpi_linearizer_test.go"
+      ],
+      "tests": [
+        "TestSMTUTVPILinearizationNormalizationAndRefusals"
+      ],
       "assertions": [
         {
           "line": 73,
@@ -123345,18 +123363,48 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {"name": "UTVPI fragment linearization and integer/real explicit theory instantiations", "status": "platform_replacement", "go_target": "pkg/smtcore/theory_arith_linear.go", "tests": ["TestSMTSolverSetupUsesLinearRealArithmetic", "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic"]}
+        {
+          "name": "utvpi_tester::linearize single-term, difference and worklist overloads",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_utvpi_linearizer.go",
+          "tests": [
+            "TestSMTUTVPILinearizationNormalizationAndRefusals"
+          ]
+        },
+        {
+          "name": "utvpi_tester formula acceptance operators: no retained source consumer",
+          "status": "dead_deleted",
+          "tests": []
+        },
+        {
+          "name": "Explicit UTVPI theory instantiations: retained rdl_ext backend integration",
+          "status": "unported",
+          "tests": []
+        }
       ],
-      "ownership": ["The shared exact linear solver owns normalized rows directly and therefore needs no separate fragment-tester scratch maps or template instantiations."],
-      "deviations": ["The general exact linearizer accepts the UTVPI fragment as a subset; it does not need a separate acceptance-only tester or doubled-variable Bellman-Ford specialization."]
+      "ownership": [
+        "The concrete linearizer owns rational coefficients, its worklist and normalized terms; AST handles borrow the manager."
+      ],
+      "deviations": [
+        "Corrected the earlier completion claim: general simplex coverage does not port the retained UTVPI backend. Constructor-only int_only/fixnum flags have no retained writers; only rdl_ext is selected by basic setup, with dynamic integer-variable parity handling."
+      ]
     },
     {
       "path": "src/smt/theory_utvpi.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
-      "go_targets": ["pkg/smtcore/theory_arith_linear.go"],
-      "tests": ["TestSMTSolverLinearArithmeticEqualityAdapter", "TestSMTSolverPublishesStrictLinearRealModel"],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_utvpi_linearizer.go",
+        "pkg/smtcore/smt_utvpi_graph.go",
+        "pkg/smtcore/smt_utvpi_graph_test.go"
+      ],
+      "tests": [
+        "TestSMTUTVPILinearizationNormalizationAndRefusals",
+        "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
+        "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
+        "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -123376,18 +123424,43 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {"name": "UTVPI atom, graph, trail, equality-adapter, lifecycle, propagation, statistics and model interface", "status": "platform_replacement", "go_target": "pkg/smtcore/theory_arith_linear.go", "tests": ["TestSMTSolverLinearArithmeticEqualityAdapter", "TestSMTSolverPublishesStrictLinearRealModel"]}
+        {
+          "name": "Concrete UTVPI linearizer and doubled-variable graph representation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_utvpi_graph.go",
+          "tests": [
+            "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
+            "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
+            "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair"
+          ]
+        },
+        {
+          "name": "UTVPI theory context interface, atoms, scopes, equality adapter, statistics and model publication",
+          "status": "unported",
+          "tests": []
+        }
       ],
-      "ownership": ["SMTLinearArithmeticTheory owns exact simplex rows, atoms, assertions, scopes, equality state and model-value procedures."],
-      "deviations": ["The specialized graph representation is an algorithm choice. The generic setup's arith.solver selector remains tracked in src/smt/smt_setup.cpp rather than duplicating theory semantics here."]
+      "ownership": [
+        "The Go UTVPI graph owns paired infinitesimal-rational vertices, variable sort flags and per-edge explanation coefficients. It is not yet registered as a context theory."
+      ],
+      "deviations": [
+        "Removed the unsupported claim that the general simplex implementation replaces the specialized UTVPI theory. Context integration remains required."
+      ]
     },
     {
       "path": "src/smt/theory_utvpi_def.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
-      "go_targets": ["pkg/smtcore/theory_arith_linear.go"],
-      "tests": ["TestSMTSolverLinearArithmeticPropagatesImpliedEquality", "TestSMTSolverLinearArithmeticPropagatesFixedEquality", "TestSMTSolverLinearArithmeticPropagatesOffsetEquality", "TestSMTSolverPublishesStrictLinearRealModel"],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/smt_utvpi_graph.go",
+        "pkg/smtcore/smt_utvpi_graph_test.go"
+      ],
+      "tests": [
+        "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
+        "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
+        "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair"
+      ],
       "conditionals": [
         {
           "line": 50,
@@ -123515,10 +123588,28 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {"name": "term and atom internalization, complementary inequalities, exact feasibility, integer branching, equality propagation, scope rollback, conflicts and model values", "status": "platform_replacement", "go_target": "pkg/smtcore/theory_arith_linear.go", "tests": ["TestSMTSolverLinearArithmeticPropagatesImpliedEquality", "TestSMTSolverLinearArithmeticPropagatesFixedEquality", "TestSMTSolverLinearArithmeticPropagatesOffsetEquality", "TestSMTSolverPublishesStrictLinearRealModel"]}
+        {
+          "name": "add_ineq, enable_edge, check_z_consistency, is_parity_ok and enforce_parity: concrete rdl_ext graph algorithms",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_utvpi_graph.go",
+          "tests": [
+            "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
+            "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
+            "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair"
+          ]
+        },
+        {
+          "name": "Term and atom internalization, complementary inequalities, context conflicts, equality events, scope lifecycle, statistics, model construction and setup selection",
+          "status": "unported",
+          "tests": []
+        }
       ],
-      "ownership": ["Go maps and slices replace the native doubled-variable graph, atom index, asserted queue and scope vectors while the exact simplex solver owns arithmetic rows."],
-      "deviations": ["Exact simplex feasibility and integer branch search replace parity edges and Bellman-Ford traversal while preserving the retained UTVPI theory result and model contract."]
+      "ownership": [
+        "Paired graph edges own infinitesimal-rational weights and literals. Parallel edge coefficients retain source unary factor two and binary factor one; integer sort flags select parity checks. No context-owned atoms or model values are published yet."
+      ],
+      "deviations": [
+        "The direct graph and parity algorithms replace the earlier inaccurate simplex-as-UTVPI completion claim. Stronger negative-cycle pruning and context/model integration remain incomplete."
+      ]
     },
     {
       "path": "src/smt/theory_wmaxsat.cpp",
