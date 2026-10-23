@@ -116840,7 +116840,8 @@
         "TestSMTSequenceTheoryRetriesRegexAfterWordSolution",
         "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition",
         "TestSMTSequenceTheoryCompletesFixedLengthRegexModel",
-        "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel"
+        "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel",
+        "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel"
       ],
       "conditionals": [
         {
@@ -117460,10 +117461,10 @@
           "tests": ["TestSMTSequenceTheoryReplaceAxioms", "TestSMTSequenceTheoryReplaceTightestPrefixAxioms"]
         },
         {
-          "name": "regular-language membership reduction through the retained Go regex automaton builder, including concrete automata, symbolic singleton languages, final-check retry after word-solution, guarded fixed-length seq.nth expansion, exhaustive guarded decomposition and reduction across small finite arithmetic length intervals, scoped exact-regex term tracking, explicit give-up for still-unresolved memberships, and definitive satisfiability for exact reductions (src/smt/theory_seq.cpp:3391-3445,4166-4191)",
+          "name": "regular-language membership reduction through the retained Go regex automaton builder, including concrete automata, symbolic singleton languages, final-check retry after word-solution, guarded fixed-length seq.nth expansion, exhaustive guarded decomposition and reduction across small finite arithmetic length intervals, completion after the native minimum-length remainder branch for lower-bounded models, scoped exact-regex term tracking, explicit give-up for still-unresolved memberships, and definitive satisfiability for exact reductions (src/smt/theory_seq.cpp:3391-3445,4166-4191)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_regex.go",
-          "tests": ["TestSMTSequenceTheoryRegexMembershipReduction", "TestSMTSequenceTheoryRetriesRegexAfterWordSolution", "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel", "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel"]
+          "tests": ["TestSMTSequenceTheoryRegexMembershipReduction", "TestSMTSequenceTheoryRetriesRegexAfterWordSolution", "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel", "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel", "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel"]
         },
         {
           "name": "int.to.str empty iff negative, nonnegative round trip through str.to.int, numeric-language membership for nonnegative conversions, str.to.int lower bound plus exact nonnegative iff [0-9]+ membership, and complete arbitrary-precision ground conversion values including leading-zero parsing (src/smt/theory_seq.cpp:2284-2462)",
@@ -117670,7 +117671,7 @@
           "name": "regular-language membership and automaton reduction declarations",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_regex.go",
-          "tests": ["TestSMTSequenceTheoryRegexMembershipReduction", "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel"]
+          "tests": ["TestSMTSequenceTheoryRegexMembershipReduction", "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel", "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel"]
         },
         {
           "name": "retained integer/string conversion arithmetic, empty-value and round-trip constraints",

@@ -2948,6 +2948,39 @@ func TestSMTSequenceTheoryCompletesBoundedLengthRegexModel(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryCompletesMinimumLengthRegexModel(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-minimum-length-model-x"), sort)
+	astTestMust(t, err)
+	aRegex, err := m.MkSequenceToRegex(a)
+	astTestMust(t, err)
+	plus, err := m.MkRegexPlus(aRegex)
+	astTestMust(t, err)
+	membership, err := m.MkSequenceInRegex(x, plus)
+	astTestMust(t, err)
+	length, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	two, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	lowerBound, err := m.MkArithmeticGE(length, two)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	for _, assertion := range []ast.ASTHandle{membership, lowerBound} {
+		astTestMust(t, solver.Assert(assertion))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("minimum-length regex model remained incomplete", status)
+	}
+}
+
 func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name  string
