@@ -652,7 +652,11 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 		if err != nil {
 			return err
 		}
+		if c.manager.IsTrue(value) {
+			return nil
+		}
 		if !c.manager.IsFalse(value) {
+			c.exhausted = true
 			return nil
 		}
 		found = true
@@ -678,9 +682,15 @@ func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.
 	if model == nil || model.Core() == nil {
 		return false, ast.ErrASTHandle
 	}
-	if len(quantifiers) != 0 && c.iteration >= c.maxIterations {
+	if len(quantifiers) == 0 {
+		return true, nil
+	}
+	if c.iteration >= c.maxIterations {
 		c.exhausted = true
 		return false, nil
+	}
+	if err := model.Compress(); err != nil {
+		return false, err
 	}
 	c.exhausted = false
 	found := false
@@ -699,7 +709,13 @@ func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.
 		found = found || added
 	}
 	c.maxCexs += c.initialMaxCexs
-	return !found && !c.exhausted, nil
+	if found || c.exhausted {
+		return false, nil
+	}
+	if err := model.Cleanup(); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (c *SMTModelChecker) Close() error {

@@ -108473,6 +108473,7 @@
         "pkg/smtcore/smt_model_checker.go",
         "pkg/smtcore/smt_model_checker_inverse_test.go",
         "pkg/smtcore/smt_model_checker_budget_test.go",
+        "pkg/smtcore/smt_model_checker_lifecycle_test.go",
         "pkg/smtcore/smt_quantifier_manager.go",
         "pkg/smtcore/smt_kernel.go"
       ],
@@ -108482,6 +108483,8 @@
         "TestSMTModelCheckerRejectsUnrecoverablePrivateBindings",
         "TestSMTModelCheckerFiniteUniverseRecoversModelFinderTerm",
         "TestSMTModelCheckerCounterexampleCapAppliesToEveryQuantifier",
+        "TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup",
+        "TestSMTModelCheckerResidualQuantifierDoesNotValidateCandidate",
         "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
@@ -108575,6 +108578,15 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "candidate compression before checking, cleanup only after success, and rejection of unresolved finite evaluations",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "tests": [
+            "TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup",
+            "TestSMTModelCheckerResidualQuantifierDoesNotValidateCandidate"
+          ]
         },
         {
           "name": "inverse-term recovery from populated model-finder instantiation sets",
