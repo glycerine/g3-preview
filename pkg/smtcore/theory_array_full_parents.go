@@ -5,6 +5,12 @@ package smtcore
 import "github.com/glycerine/g3/pkg/ast"
 
 func (t *SMTArrayTheory) initializeFullArrayVariable(node *SMTEnode, data *smtArrayVarData, op int32) error {
+	if op != ast.ASTArrayOpConst && op != ast.ASTArrayOpMap && op != ast.ASTArrayOpAsArray {
+		return nil
+	}
+	if _, err := t.instantiateConstructorDefault(node.owner); err != nil {
+		return err
+	}
 	switch op {
 	case ast.ASTArrayOpConst:
 		data.consts = append(data.consts, node)
@@ -15,15 +21,7 @@ func (t *SMTArrayTheory) initializeFullArrayVariable(node *SMTEnode, data *smtAr
 	default:
 		return nil
 	}
-	s, err := t.State()
-	if err != nil {
-		return err
-	}
-	defaultTerm, err := s.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpDefault, nil, []ast.ASTHandle{node.owner})
-	if err != nil {
-		return err
-	}
-	return s.Internalize(defaultTerm, false)
+	return nil
 }
 
 func (t *SMTArrayTheory) markArrayEqualityRelevant(literal SMTLiteral) error {

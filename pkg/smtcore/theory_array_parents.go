@@ -233,6 +233,15 @@ func (t *SMTArrayTheory) Relevant(expression ast.ASTHandle) error {
 			}
 		}
 	}
+	if !t.simple {
+		if op == ast.ASTArrayOpDefault {
+			return t.assertDefaultAxiom(expression)
+		}
+		if op == ast.ASTArrayOpConst || op == ast.ASTArrayOpMap || op == ast.ASTArrayOpAsArray {
+			_, err := t.instantiateConstructorDefault(expression)
+			return err
+		}
+	}
 	return nil
 }
 

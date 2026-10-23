@@ -1,0 +1,22 @@
+(set-logic ALL)
+(set-option :auto_config false)
+(declare-sort U 0)
+(declare-const i U)
+(declare-const a (Array U Bool))
+(declare-const b (Array U Bool))
+(push 1)
+(assert (default a))
+(assert (not (default b)))
+(check-sat)
+; Native add_parent_default visits stores at internalization/relevance time;
+; merging this later store does not globally revisit earlier default terms.
+(push 1)
+(assert (= a (store b i true)))
+(check-sat)
+(pop 1)
+; An explicit store default does visit the store and generates its axiom.
+(push 1)
+(assert (default (store b i true)))
+(check-sat)
+(pop 1)
+(check-sat)
