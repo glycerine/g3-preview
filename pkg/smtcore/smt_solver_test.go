@@ -620,6 +620,145 @@ func TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback(t *testing.T) {
 	astTestMust(t, s.AssertTracked(a, tag))
 }
 
+func TestSMTSolverExtendsUnsatCoreThroughQuantifierPatterns(t *testing.T) {
+	m, s := smtSolverFixture(t)
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "core-pattern-sort"), nil)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	function, err := m.MkFuncDecl(astTestSymbol(t, m, "core-pattern-f"), []ast.ASTHandle{sort}, sort, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	predicate, err := m.MkFuncDecl(astTestSymbol(t, m, "core-pattern-p"), []ast.ASTHandle{sort}, boolean, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	functionVar, err := m.MkApp(function, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	body, err := m.MkApp(predicate, []ast.ASTHandle{functionVar})
+	astTestMust(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{functionVar})
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []usymbol.Symbol{astTestSymbol(t, m, "core-pattern-x")},
+		Body: body, Patterns: []ast.ASTHandle{pattern},
+	})
+	astTestMust(t, err)
+	constant, err := m.MkConst(astTestSymbol(t, m, "core-pattern-a"), sort)
+	astTestMust(t, err)
+	functionConstant, err := m.MkApp(function, []ast.ASTHandle{constant})
+	astTestMust(t, err)
+	conflict := smtRelevancyBool(t, m, "core-pattern-conflict")
+	combined, err := m.MkAnd(conflict, quantifier)
+	astTestMust(t, err)
+	notConflict, err := m.MkNot(conflict)
+	astTestMust(t, err)
+	extra, err := m.MkEq(functionConstant, constant)
+	astTestMust(t, err)
+	quantifierTag := smtRelevancyBool(t, m, "core-pattern-quantifier-tag")
+	negativeTag := smtRelevancyBool(t, m, "core-pattern-negative-tag")
+	extraTag := smtRelevancyBool(t, m, "core-pattern-extra-tag")
+	astTestMust(t, s.AssertTracked(combined, quantifierTag))
+	astTestMust(t, s.AssertTracked(notConflict, negativeTag))
+	astTestMust(t, s.AssertTracked(extra, extraTag))
+
+	params := s.config.Params.EmptyValue()
+	t.Cleanup(func() { astTestMust(t, s.config.Params.Del(&params)) })
+	name := "core.extend_patterns"
+	astTestMust(t, s.config.Params.SetBoolName(&params, &name, true))
+	name = "core.extend_patterns.max_distance"
+	astTestMust(t, s.config.Params.SetUIntName(&params, &name, 0))
+	astTestMust(t, s.UpdateParams(&params))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("pattern core status", status)
+	}
+	core, err := s.UnsatCore()
+	astTestMust(t, err)
+	if len(core) != 2 {
+		t.Fatal("zero-distance pattern core", core)
+	}
+	astTestMust(t, s.config.Params.SetUIntName(&params, &name, 1))
+	astTestMust(t, s.UpdateParams(&params))
+	status, err = s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("pattern core status after distance update", status)
+	}
+	core, err = s.UnsatCore()
+	astTestMust(t, err)
+	seen := make(map[ast.ASTHandle]bool, len(core))
+	for _, member := range core {
+		seen[member] = true
+	}
+	if len(core) != 3 || !seen[quantifierTag] || !seen[negativeTag] || !seen[extraTag] {
+		t.Fatal("pattern-extended core", core)
+	}
+}
+
+func TestSMTSolverExtendsUnsatCoreWithNonlocalPatterns(t *testing.T) {
+	m, s := smtSolverFixture(t)
+	conflict := smtRelevancyBool(t, m, "nonlocal-core-conflict")
+	notConflict, err := m.MkNot(conflict)
+	astTestMust(t, err)
+	positiveTag := smtRelevancyBool(t, m, "nonlocal-core-positive-tag")
+	negativeTag := smtRelevancyBool(t, m, "nonlocal-core-negative-tag")
+	quantifierTag := smtRelevancyBool(t, m, "nonlocal-core-quantifier-tag")
+	astTestMust(t, s.AssertTracked(conflict, positiveTag))
+	astTestMust(t, s.AssertTracked(notConflict, negativeTag))
+
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "nonlocal-core-sort"), nil)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	function, err := m.MkFuncDecl(astTestSymbol(t, m, "nonlocal-core-f"), []ast.ASTHandle{sort}, sort, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	predicate, err := m.MkFuncDecl(astTestSymbol(t, m, "nonlocal-core-p"), []ast.ASTHandle{sort}, boolean, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	body, err := m.MkApp(predicate, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	functionVar, err := m.MkApp(function, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{functionVar})
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []usymbol.Symbol{astTestSymbol(t, m, "nonlocal-core-x")},
+		Body: body, Patterns: []ast.ASTHandle{pattern},
+	})
+	astTestMust(t, err)
+	constant, err := m.MkConst(astTestSymbol(t, m, "nonlocal-core-a"), sort)
+	astTestMust(t, err)
+	functionConstant, err := m.MkApp(function, []ast.ASTHandle{constant})
+	astTestMust(t, err)
+	outsideBody, err := m.MkEq(functionConstant, constant)
+	astTestMust(t, err)
+	combined, err := m.MkAnd(quantifier, outsideBody)
+	astTestMust(t, err)
+	astTestMust(t, s.AssertTracked(combined, quantifierTag))
+
+	params := s.config.Params.EmptyValue()
+	t.Cleanup(func() { astTestMust(t, s.config.Params.Del(&params)) })
+	name := "core.extend_nonlocal_patterns"
+	astTestMust(t, s.config.Params.SetBoolName(&params, &name, true))
+	astTestMust(t, s.UpdateParams(&params))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("nonlocal pattern core status", status)
+	}
+	core, err := s.UnsatCore()
+	astTestMust(t, err)
+	seen := make(map[ast.ASTHandle]bool, len(core))
+	for _, member := range core {
+		seen[member] = true
+	}
+	if len(core) != 3 || !seen[positiveTag] || !seen[negativeTag] || !seen[quantifierTag] {
+		t.Fatal("nonlocal pattern-extended core", core)
+	}
+}
+
 func TestSMTInternalizerImplicationGateWithoutPreprocessing(t *testing.T) {
 	m := astTestManager(t)
 	a := smtRelevancyBool(t, m, "smt-implies-a")

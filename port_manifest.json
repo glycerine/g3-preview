@@ -110207,9 +110207,10 @@
       "path": "src/smt/smt_solver.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_solver_core.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_dyn_ack_manager.go"
       ],
@@ -110221,6 +110222,8 @@
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
         "TestSMTSolverTranslatesWithinManager",
+        "TestSMTSolverExtendsUnsatCoreThroughQuantifierPatterns",
+        "TestSMTSolverExtendsUnsatCoreWithNonlocalPatterns",
         "TestSMTSolverSetupUsesLinearRealArithmetic",
         "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
         "TestSMTSolverForwardsFastProgressSamples",
@@ -110324,14 +110327,23 @@
         ]
       },
       {
-        "name": "registered theory-plugin copying",
-        "status": "unported",
-        "go_target": null,
+        "name": "registered theory-plugin copying for arbitrary externally injected kernel plugins",
+        "status": "reference_only",
+        "go_target": "pkg/smtcore/smt_solver.go",
         "tests": []
       },
       {
-        "name": "unsat-core minimization and pattern extension",
-        "status": "unported",
+        "name": "distance-bounded and nonlocal quantifier-pattern unsat-core extension",
+        "status": "ported",
+        "go_target": "pkg/smtcore/smt_solver_core.go",
+        "tests": [
+          "TestSMTSolverExtendsUnsatCoreThroughQuantifierPatterns",
+          "TestSMTSolverExtendsUnsatCoreWithNonlocalPatterns"
+        ]
+      },
+      {
+        "name": "unsat-core MUS minimization guarded by m_minimizing_core",
+        "status": "reference_only",
         "go_target": null,
         "tests": []
       }
@@ -110341,7 +110353,7 @@
       ],
       "deviations": [
         "Unavailable kernel result facilities return empty ordinary result fields or an explicit domain error; they are not simulated by a universal adapter.",
-        "Cross-manager translation obtains manager-bound parameter and quantifier services through TargetConfig and preserves the source's duplicate named-implication assertion after copying kernel formulas."
+        "Cross-manager translation obtains manager-bound parameter and quantifier services through TargetConfig and preserves the source's duplicate named-implication assertion after copying kernel formulas. Retained callers cannot inject arbitrary kernel theory plugins, so translation reconstructs the configured concrete theory set instead of exposing the source internal plugin-copy mechanism. The source MUS branch is unreachable because m_minimizing_core is initialized false and is set true only inside that branch; the live pattern-extension policies are ported."
       ]
     },
     {

@@ -492,7 +492,11 @@ func (s *SMTSolver) CheckSatCore(assumptions []ast.ASTHandle) (lbool.LBool, erro
 		return lbool.Undef, err
 	}
 	if status == lbool.False {
-		if err = result.SetUnsatCore(s.kernel.UnsatCore()); err != nil {
+		core, coreErr := s.extendUnsatCore(s.kernel.UnsatCore())
+		if coreErr != nil {
+			return lbool.Undef, coreErr
+		}
+		if err = result.SetUnsatCore(core); err != nil {
 			return lbool.Undef, err
 		}
 		proof, proofErr := s.kernel.Proof()
