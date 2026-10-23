@@ -521,6 +521,9 @@ func (k *SMTKernel) internalizePending() error {
 	if err := k.normalizePendingAssertions(); err != nil {
 		return fmt.Errorf("normalize asserted formulas: %w", err)
 	}
+	if err := k.refinePendingInjectivityAxioms(); err != nil {
+		return fmt.Errorf("refine asserted injectivity axioms: %w", err)
+	}
 	if err := k.findPendingMacros(); err != nil {
 		return fmt.Errorf("find normalized macros: %w", err)
 	}

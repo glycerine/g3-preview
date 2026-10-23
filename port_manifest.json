@@ -98544,7 +98544,9 @@
         "pkg/smtcore/smt_asserted_macros_test.go",
         "pkg/smtcore/smt_asserted_quasi_macros_test.go",
         "pkg/smtcore/smt_asserted_nnf.go",
-        "pkg/smtcore/smt_asserted_nnf_test.go"
+        "pkg/smtcore/smt_asserted_nnf_test.go",
+        "pkg/smtcore/smt_asserted_injectivity.go",
+        "pkg/smtcore/smt_asserted_injectivity_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98564,7 +98566,9 @@
         "TestSMTAssertedNNFExistentialConflictPreservesProof",
         "TestSMTAssertedNNFDependentSkolemFunction",
         "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
-        "TestSMTAssertedNNFUsesGlobalModuleOptions"
+        "TestSMTAssertedNNFUsesGlobalModuleOptions",
+        "TestSMTAssertedInjectivityRefinementAndGuards",
+        "TestSMTAssertedInjectivityConflict"
       ],
       "conditionals": [
         {
@@ -98668,19 +98672,40 @@
           "name": "macro-finder fixed-point discovery and expansion of pending assertions, owned formula/proof replacement, commit-time forbidden declarations and scope rollback",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_macros.go",
-          "tests": ["TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels", "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback", "TestSMTAssertedMacroExpansionPreservesUnsatProof"]
+          "tests": [
+            "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
+            "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
+            "TestSMTAssertedMacroExpansionPreservesUnsatProof"
+          ]
         },
         {
           "name": "apply_quasi_macros repeated pending-formula conversion, shared macro ownership, proof-preserving formula replacement and conditional model interpretation publication",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_macros.go",
-          "tests": ["TestSMTAssertedQuasiMacrosPublishConditionalModel"]
+          "tests": [
+            "TestSMTAssertedQuasiMacrosPublishConditionalModel"
+          ]
         },
         {
           "name": "nnf_cnf: scoped defined names, existential/negative-universal and dependent Skolem normalization, introduced definitions before the main formula, global NNF options, and composed transformation/rewrite proofs",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_nnf.go",
-          "tests": ["TestSMTAssertedNNFSkolemizesExistentialAndNegativeUniversal", "TestSMTAssertedNNFExistentialConflictPreservesProof", "TestSMTAssertedNNFDependentSkolemFunction", "TestSMTAssertedNNFDefinitionNamesFollowUserScopes", "TestSMTAssertedNNFUsesGlobalModuleOptions"]
+          "tests": [
+            "TestSMTAssertedNNFSkolemizesExistentialAndNegativeUniversal",
+            "TestSMTAssertedNNFExistentialConflictPreservesProof",
+            "TestSMTAssertedNNFDependentSkolemFunction",
+            "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
+            "TestSMTAssertedNNFUsesGlobalModuleOptions"
+          ]
+        },
+        {
+          "name": "refine_inj_axiom: default-enabled pending universal injectivity refinement, inverse trigger construction, parameter and preprocessing guards, and composed rewrite proofs",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_injectivity.go",
+          "tests": [
+            "TestSMTAssertedInjectivityRefinementAndGuards",
+            "TestSMTAssertedInjectivityConflict"
+          ]
         },
         {
           "name": "remaining pending-formula reduction passes and quantifier transforms",
@@ -98711,7 +98736,9 @@
         "pkg/smtcore/smt_asserted_macros_test.go",
         "pkg/smtcore/smt_asserted_quasi_macros_test.go",
         "pkg/smtcore/smt_asserted_nnf.go",
-        "pkg/smtcore/smt_asserted_nnf_test.go"
+        "pkg/smtcore/smt_asserted_nnf_test.go",
+        "pkg/smtcore/smt_asserted_injectivity.go",
+        "pkg/smtcore/smt_asserted_injectivity_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98731,7 +98758,9 @@
         "TestSMTAssertedNNFExistentialConflictPreservesProof",
         "TestSMTAssertedNNFDependentSkolemFunction",
         "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
-        "TestSMTAssertedNNFUsesGlobalModuleOptions"
+        "TestSMTAssertedNNFUsesGlobalModuleOptions",
+        "TestSMTAssertedInjectivityRefinementAndGuards",
+        "TestSMTAssertedInjectivityConflict"
       ],
       "conditionals": [
         {
@@ -98786,19 +98815,37 @@
           "name": "scoped asserted macro ownership, forbidden declarations, discovery, expansion and model interpretation access",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_macros.go",
-          "tests": ["TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels", "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback", "TestSMTAssertedMacroExpansionPreservesUnsatProof"]
+          "tests": [
+            "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
+            "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
+            "TestSMTAssertedMacroExpansionPreservesUnsatProof"
+          ]
         },
         {
           "name": "parameter-controlled quasi-macro reduction and model construction through the shared scoped macro manager",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_macros.go",
-          "tests": ["TestSMTAssertedQuasiMacrosPublishConditionalModel"]
+          "tests": [
+            "TestSMTAssertedQuasiMacrosPublishConditionalModel"
+          ]
         },
         {
           "name": "NNF/CNF reduction entry, scoped defined-name ownership and proof-preserving Skolem normalization",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_nnf.go",
-          "tests": ["TestSMTAssertedNNFDefinitionNamesFollowUserScopes", "TestSMTAssertedNNFExistentialConflictPreservesProof"]
+          "tests": [
+            "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
+            "TestSMTAssertedNNFExistentialConflictPreservesProof"
+          ]
+        },
+        {
+          "name": "refine_inj_axiom: default-enabled pending universal injectivity refinement, inverse trigger construction, parameter and preprocessing guards, and composed rewrite proofs",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_injectivity.go",
+          "tests": [
+            "TestSMTAssertedInjectivityRefinementAndGuards",
+            "TestSMTAssertedInjectivityConflict"
+          ]
         },
         {
           "name": "setup, reset, and remaining pending-formula reductions",
@@ -104238,7 +104285,8 @@
         "pkg/smtcore/smt_conflict_antecedents.go",
         "pkg/smtcore/smt_conflict_levels.go",
         "pkg/smtcore/smt_conflict_resolver.go",
-        "pkg/smtcore/smt_conflict_proof.go"
+        "pkg/smtcore/smt_conflict_proof.go",
+        "pkg/smtcore/smt_asserted_injectivity_test.go"
       ],
       "tests": [
         "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
@@ -104256,7 +104304,9 @@
         "TestSMTConflictResolverMinimizesImpliedLemmaLiteral",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
         "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
-        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes"
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
+        "TestSMTAssertedInjectivityConflict",
+        "TestSMTDisequalityConflictProofAcrossEqualityBranches"
       ],
       "conditionals": [
         {
@@ -104649,7 +104699,8 @@
         "The resolver owns its most recent lemma proof through an ASTRef and releases or replaces it across Close and Resolve."
       ],
       "deviations": [
-        "Dynamic-Ack callbacks feed the concrete pair/triple manager during conflict expansion. Recursive Go calls replace the source explicit proof todo stack. The constructor's watch-list reference has no source read after initialization and requires no Go storage."
+        "Dynamic-Ack callbacks feed the concrete pair/triple manager during conflict expansion. Recursive Go calls replace the source explicit proof todo stack. The constructor's watch-list reference has no source read after initialization and requires no Go storage.",
+        "The Go equality engine detects explicit disequalities before merging their roots. Its concrete disequality-conflict justification reconstructs the equality of the original disequality operands from both equality branches and the pending merge, then uses the existing Boolean conflict proof to resolve against the disequality literal."
       ]
     },
     {
@@ -107839,7 +107890,8 @@
         "pkg/smtcore/smt_justification.go",
         "pkg/smtcore/smt_justification_theory.go",
         "pkg/smtcore/smt_conflict_proof.go",
-        "pkg/smtcore/smt_conflict_resolver.go"
+        "pkg/smtcore/smt_conflict_resolver.go",
+        "pkg/smtcore/smt_asserted_injectivity_test.go"
       ],
       "tests": [
         "TestSMTJustificationBaseUnitAndSimpleAntecedents",
@@ -107849,7 +107901,9 @@
         "TestSMTConflictProofReconstructsEnodeEqualityBranch",
         "TestSMTConflictProofBuildsEqualityRootAndConflictJustifications",
         "TestSMTConflictProofBuildsCongruenceEquality",
-        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes"
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
+        "TestSMTAssertedInjectivityConflict",
+        "TestSMTDisequalityConflictProofAcrossEqualityBranches"
       ],
       "conditionals": [
         {
@@ -107974,7 +108028,8 @@
         "Proof wrappers retain their proof AST, theory records own copied AST parameters, and theory lemmas retain expression ASTs independently of Boolean-variable lifetime."
       ],
       "deviations": [
-        "A typed SMTAntecedentMarker carries dependency marking. A resolver-local typed dispatcher replaces the source virtual mk_proof calls and covers proof wrappers, unit resolution, equality, simple/extended theory and stored theory lemmas."
+        "A typed SMTAntecedentMarker carries dependency marking. A resolver-local typed dispatcher replaces the source virtual mk_proof calls and covers proof wrappers, unit resolution, equality, simple/extended theory and stored theory lemmas.",
+        "The Go equality engine detects explicit disequalities before merging their roots. Its concrete disequality-conflict justification reconstructs the equality of the original disequality operands from both equality branches and the pending merge, then uses the existing Boolean conflict proof to resolve against the disequality literal."
       ]
     },
     {
