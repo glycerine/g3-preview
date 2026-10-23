@@ -115996,7 +115996,8 @@
         "pkg/smtcore/theory_arith_grobner_dependency_test.go",
         "pkg/smtcore/theory_arith_pending_bounds.go",
         "pkg/smtcore/theory_arith_pending_bounds_test.go",
-        "pkg/smtcore/theory_arith_interval_resource_test.go"
+        "pkg/smtcore/theory_arith_interval_resource_test.go",
+        "pkg/smtcore/theory_arith_nonlinear_selection_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -116030,7 +116031,9 @@
         "TestSMTGrobnerDependenciesOwnLiteralPolarityAndConsumerLifetime",
         "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes",
         "TestSMTNonlinearIntervalMultiplicationChargesResultEndpoints",
-        "TestSMTGrobnerMonomialIntervalChargesPoweredAccumulator"
+        "TestSMTGrobnerMonomialIntervalChargesPoweredAccumulator",
+        "TestSMTNonlinearPropagationSelectsSourceDirections",
+        "TestSMTNonlinearPropagationBatchesMonomialsBeforeApplyingBounds"
       ],
       "conditionals": [
         {
@@ -116341,8 +116344,8 @@
           ]
         },
         {
-          "name": "propagate_nl_upward, propagate_nl_downward for degree-one targets, and update_bounds_using_interval with open/integer endpoints and plain derived-bound dependencies; opposite-bound conflicts retain exact premises; equation and nested-polynomial conflicts retain source premises; source analyze_monomial selection and propagation scheduling remain incomplete",
-          "status": "partial",
+          "name": "propagate_nl_upward, propagate_nl_downward for degree-one targets, and update_bounds_using_interval with open/integer endpoints and plain derived-bound dependencies; opposite-bound conflicts retain exact premises; equation and nested-polynomial conflicts retain source premises; interval work uses source endpoint resource charges and bounds are applied after the complete monomial pass",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
           "tests": [
             "TestSMTNonlinearRelaxationScopesProofsAndModel",
@@ -116354,7 +116357,9 @@
             "TestBoundConflictDependenciesOwnAndInvalidateSnapshots",
             "TestSMTRejectedNonlinearCandidateKeepsLogicalContextConsistent",
             "TestSMTLibRunnerScripts",
-            "TestSMTLibRunnerCPPReference"
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTNonlinearPropagationSelectsSourceDirections",
+            "TestSMTNonlinearPropagationBatchesMonomialsBeforeApplyingBounds"
           ],
           "go_targets": [
             "pkg/smtcore/theory_arith_bound_dependency.go",
@@ -116363,7 +116368,9 @@
             "pkg/math/simplex/bound_dependency.go",
             "pkg/math/simplex/bound_dependency_test.go",
             "pkg/smtcore/theory_arith_nonlinear_test.go",
-            "pkg/cmd/g3/main_test.go"
+            "pkg/cmd/g3/main_test.go",
+            "pkg/smtcore/theory_arith_nonlinear_selection_test.go",
+            "pkg/smtcore/theory_arith_interval_resource_test.go"
           ]
         },
         {
@@ -116481,7 +116488,7 @@
           ]
         },
         {
-          "name": "remaining interval dependency refinements and source analyze_monomial selection/propagation scheduling",
+          "name": "remaining interval dependency refinements",
           "status": "unported",
           "go_target": null,
           "tests": [
@@ -116604,16 +116611,29 @@
             "TestSMTNonlinearIntervalMultiplicationChargesResultEndpoints",
             "TestSMTGrobnerMonomialIntervalChargesPoweredAccumulator"
           ]
+        },
+        {
+          "name": "analyze_monomial and propagate_nl_bounds selection: count free odd-power factors, treat even powers as bounded, skip two free odd factors or a free product with one free odd factor, select upward-only or the single eligible downward target, and derive the complete pass from entry bounds before applying pending results",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_nonlinear_selection_test.go"
+          ],
+          "tests": [
+            "TestSMTNonlinearPropagationSelectsSourceDirections",
+            "TestSMTNonlinearPropagationBatchesMonomialsBeforeApplyingBounds"
+          ]
         }
       ],
       "ownership": [
         "The retained legacy arithmetic theory constructs rational-plus-epsilon model values and marks irrational algebraic numerals unsupported at theory_arith_core.h:765-769; mk_value at theory_arith_core.h:3257-3270 produces rational numerals.",
         "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop.",
-        "mul_bound_of resource costs use the resulting accumulator after each grouped factor power. Source rational zero has size one; integers omit denominator bits. Each endpoint increments the AST manager resource counter separately, even if the first increment exhausts its budget; the operation itself does not add a cancellation branch. Other interval evaluation and affine-row products do not inherit these source-specific charges."
+        "mul_bound_of resource costs use the resulting accumulator after each grouped factor power. Source rational zero has size one; integers omit denominator bits. Each endpoint increments the AST manager resource counter separately, even if the first increment exhausts its budget; the operation itself does not add a cancellation branch. Other interval evaluation and affine-row products do not inherit these source-specific charges.",
+        "The nonlinear bound pass keeps interval results and their dependency leaves alive until every relevant monomial has been evaluated against the entry tableau. Bounds are then applied together; interval values never become temporary model assumptions. A real-enode two-product regression verifies that a derived y>0 endpoint affects the second product only in the next pass. Direction tests inspect rational bounds, owning explanations and exact interval resource deltas; overlaying the preceding implementation makes both scheduling and direction tests fail."
       ],
       "deviations": [
         "Nonlinear monomials now have independent tableau columns with scoped factor-column lists. Relevant assignments are checked using the same exact rational epsilon as model construction. The Go tableau additionally completes a candidate by evaluating products and affine definitions, then fixes every arithmetic column and rechecks every original row; a failed completion preserves the relaxation. This concrete-model completion is a Go representation adaptation, not a claim to port the remaining source nonlinear search strategies.",
-        "One upward/downward interval propagation pass runs during each tableau replay, including each speculative integer branch. Repeated factors use interval powers, downward propagation skips powers greater than one and zero-containing divisors, and integer endpoints are rounded. Derived bounds are reconstructed after pops; failed bounds reject only the current replay or integer branch.",
+        "One nonlinear bound propagation pass runs during each tableau replay, including speculative integer branches. Within a pass, source analyze_monomial selects directions using entry bounds: free odd factors count as missing bounds, even powers do not, and unsupported roots and zero-containing divisors are skipped. All interval results are collected before applying any endpoint, with source mul_bound_of resource charges and owning dependencies. Replays remain a Go representation adaptation; failed candidate bounds reject only that candidate, while logical replay conflicts preserve their own premises.",
         "The Grobner consumer sends concrete typed monomials from definition equations, opposite active bounds, and fixed product columns to math/grobner; it substitutes only unconditional fixed bounds from a branch-free replay, applies the source variable weights and generated-equation threshold, and checks basis equations against exact rational intervals and source expanded perfect-square strengthening. Conflicts conservatively cite all active assertion literals rather than a minimal source dependency graph. Source iterative nonlinear strategies, max/min discovery, Horner reasoning, irrational models remain incomplete.",
         "Nonlinear integer branching uses unconditional replay bounds to select a factor of a mismatched integer monomial, preferring the smallest bounded interval and applying the source random reservoir otherwise. New endpoint or zero-equality atoms are marked relevant and true-first without asserting either branch. The nonlinear round count is scoped and obeys arith.nl.rounds. The existing replay representation keeps speculative integer-feasibility bounds separate from the logical bounds used to choose a split.",
         "Products with all factors fixed, any fixed zero factor, or exactly one unfixed factor are propagated during tableau replay before MakeFeasible, including when arith.nl is false. The one-unfixed-factor path creates the source affine relation m-k*x and fixes a fresh auxiliary column at zero, preserving the tableau basis and retaining the conditional fixed-bound premises in the current replay. Rebuilding after a pop or integer branch removes conditional rows without a persistent source m_nl_propagated trail.",
@@ -116621,7 +116641,7 @@
         "The source default variable-order perturbation path is now retained: each eligible lower linear variable is promoted once above weights 0..7, UpdateOrder requeues equations with changed leading terms, and basis computation repeats. Equation-threshold exhaustion stops further rounds in the same search, is scoped, and resets in InitializeSearch. The optional derived-equation insertion path is excluded under the retained-consumer rule: a complete src scan finds m_nl_arith_gb_eqs only in its false constructor initializer, field declaration, diagnostic display and guarded call; updt_params does not expose a setter, and internalize_gb_eq/monomial2expr have no other callers.",
         "Nonlinear clusters now follow actual column/row incidence after simplex pivots, stopping expansion at fixed variables and pruning rows whose different base variable is free. Clustered canonical rows are sent to Grobner reasoning with their current bounds. Replay-only comparison columns use pinned local Real AST variables indexed by column; these polynomial-elimination aliases are released at the end of the call and never enter the SMT context or public model. Existing definition/opposite-bound seeds remain valid redundant equations. The replay tableau has no quasi-base row representation.",
         "The source four-way nonlinear strategy index is now scoped and resets at search initialization. Interval improvements derived from a branch-free tableau are retained as scoped theory-column bounds and strengthened on replay, including integer-feasibility replay; speculative branch bounds never justify global conflicts. The source nonlinear round limit covers repeated attempts. Numeric-only progress increments an internal search generation so the Go no-progress guard retries final checking without inventing Boolean atoms. Remaining driver work includes max/min bound discovery and assignment movement, source interval resource/dependency refinements and source resource/dependency refinements.",
-        "Nonlinear final checking now moves nonbase variables to bounds and runs the retained source max/min optimizer before the rotating strategies. Only exact unshared optimized results become scoped replay bounds; best-effort results are never promoted to logical facts. Changed unshared candidates must satisfy all products, active assertions and integrality. Shared assignment interface-equality adjustment, source interval resource/dependency refinements, irrational models and remaining source resource/dependency refinements are still incomplete.",
+        "Nonlinear final checking moves nonbase variables to bounds and runs the source max/min optimizer before the rotating strategies. Every exact optimum, including shared-column optima, retains an owning explanation in the scoped pending-bound queue; best-effort results never become logical facts. Any exact unshared optimum drains the complete queue immediately, otherwise ordinary theory propagation drains it later. Moved candidates must satisfy all products, active assertions and integrality, and conservative final checking revalidates shared equalities. Remaining interval dependency and broader source-driver audits are recorded separately.",
         "Model epsilon refinement now preserves distinctions between shared real symbolic assignments before concrete rational model construction. The same deterministic refinement runs before nonlinear product validation and candidate completion, so model construction cannot silently change the epsilon on which a validated product depended. Integer branching uses the same computation and propagates errors. The focused regression reproduces the source 19/2 versus 10-epsilon collision, checks equality preservation, and inspects a returned UF/arithmetic model. The shared-equality queue, assignment mutation and final-check scheduling are recorded in the arithmetic auxiliary and core units.",
         "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
         "Nested consistency now visits each basic variable in the nonlinear cluster and checks its canonical equality row, gated by the source repeated-nonfixed-variable test. Replay-only comparison columns use pinned local AST variables of their concrete integer/real sort, retain their exact current intervals, and never enter the SMT context or public model. The distinguished constant column becomes the row constant; integer rows clear coefficient denominators and mixed rows retain the source coercion guard. Zero exclusion respects open endpoints and conflicts conservatively cite active arithmetic assertions. Per-variable transformation ASTs are released immediately after interval evaluation while polynomial inputs and private aliases remain pinned until the enclosing check closes. The original direct comparison checks remain valid redundant consumers in the replay representation. Source bound-weighted resource accounting and minimal dependency explanations remain incomplete."

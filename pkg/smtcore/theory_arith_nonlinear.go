@@ -343,7 +343,13 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticDefinitionBounds(solver *
 
 func (t *SMTLinearArithmeticTheory) propagateNonlinearBounds(solver *simplex.Solver) (bool, bool, error) {
 	var manager smtArithmeticBoundDependencyManager
-	changed, conflict := false, false
+	// Source mk_derived_nl_bound queues facts for propagate_core. Every
+	// monomial in this pass must therefore read the bounds present on entry.
+	type intervalUpdate struct {
+		column   uint32
+		interval *smtOldInterval
+	}
+	var updates []intervalUpdate
 	for _, column := range t.nonlinearColumns {
 		variable, found := t.theoryVariable(column)
 		if !found {
@@ -365,23 +371,43 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearBounds(solver *simplex.Sol
 			}
 			powers[factor]++
 		}
-		// Repeated factors are powers: interval multiplication alone loses
-		// the nonnegativity of squares whose factor interval contains zero.
-		product, err := newSMTOldIntervalPoint(&manager, big.NewRat(1, 1), nil, nil)
-		if err != nil {
-			return false, false, err
-		}
-		for _, factor := range ordered {
-			if err = t.multiplyNonlinearColumnBound(solver, factor, powers[factor], product); err != nil {
-				return false, false, err
+		// Source analyze_monomial counts only free odd-power factors.
+		// Even powers already have a nonnegative interval without bounds.
+		badCount, freeIndex := 0, -1
+		for index, factor := range ordered {
+			if powers[factor]%2 != 0 && smtArithmeticColumnFree(solver, factor) {
+				badCount++
+				freeIndex = index
+				if badCount >= 2 {
+					break
+				}
 			}
 		}
-		progress, inconsistent := t.updateNonlinearBounds(solver, column, product)
-		changed, conflict = changed || progress, conflict || inconsistent
-		if conflict {
-			break
+		freeMonomial := smtArithmeticColumnFree(solver, column)
+		if badCount >= 2 || badCount == 1 && freeMonomial {
+			continue
 		}
-		for _, target := range ordered {
+		if badCount == 0 {
+			product, err := newSMTOldIntervalPoint(&manager, big.NewRat(1, 1), nil, nil)
+			if err != nil {
+				return false, false, err
+			}
+			for _, factor := range ordered {
+				if err = t.multiplyNonlinearColumnBound(solver, factor, powers[factor], product); err != nil {
+					return false, false, err
+				}
+			}
+			updates = append(updates, intervalUpdate{column, product})
+		}
+		// Selection uses the bounds present on entry, before upward
+		// propagation. A free monomial receives only the upward pass.
+		if freeMonomial {
+			continue
+		}
+		for index, target := range ordered {
+			if badCount == 1 && index != freeIndex {
+				continue
+			}
 			if powers[target] != 1 {
 				continue // Source interval arithmetic has no root operation.
 			}
@@ -407,17 +433,24 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearBounds(solver *simplex.Sol
 			if err = interval.div(others); err != nil {
 				return false, false, err
 			}
-			progress, inconsistent = t.updateNonlinearBounds(solver, target, interval)
-			changed, conflict = changed || progress, conflict || inconsistent
-			if conflict {
-				break
-			}
-		}
-		if conflict {
-			break
+			updates = append(updates, intervalUpdate{target, interval})
 		}
 	}
-	return changed, conflict, nil
+	changed := false
+	for _, update := range updates {
+		progress, conflict := t.updateNonlinearBounds(solver, update.column, update.interval)
+		changed = changed || progress
+		if conflict {
+			return changed, true, nil
+		}
+	}
+	return changed, false, nil
+}
+
+func smtArithmeticColumnFree(solver *simplex.Solver, column uint32) bool {
+	_, lower := solver.Lower(column)
+	_, upper := solver.Upper(column)
+	return !lower && !upper
 }
 
 // Source: theory_arith_nl.h is_monomial_linear,
