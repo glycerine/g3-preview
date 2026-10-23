@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"idl_dense_model_scopes.smt2":               "sat\n((x 6) (y 2))\nunsat\nsat\n((x 6) (y 2))\n",
 	"idl_first_push_simplex.smt2":               "sat\n((x 3) (y 1))\nunsat\nsat\n((x 3) (y 1))\n",
 	"bit_vector_auto_carry.smt2":                "sat\n(((bvadd x y) #xa) ((bvsub x y) #x4))\nunsat\nsat\n(((bvadd x y) #xa) ((bvsub x y) #x4))\n",
 	"lra_auto_ite_profile.smt2":                 "sat\n((x (/ 3.0 2.0)))\nunsat\nsat\n((x (/ 3.0 2.0)))\n",

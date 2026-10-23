@@ -174,7 +174,9 @@ func TestSMTIDLDenseFeaturePolicyAndProofRouting(t *testing.T) {
 						t.Fatal("dense feature policy did not match proof/simplex/first-push routing", k.smtState)
 					}
 					theory, ok := k.internalizer.theories[family].(*SMTLinearArithmeticTheory)
-					if !ok || theory.mixed != (proofs && !push) || theory.integer == (proofs && !push) {
+					_, dense := k.internalizer.theories[family].(*SMTDenseDiffTheory)
+					wantDense := !push && !proofs && !simplex
+					if dense != wantDense || !wantDense && (!ok || theory.mixed != (proofs && !push) || theory.integer == (proofs && !push)) {
 						t.Fatal("proof checking and first push selected the wrong integrality mode")
 					}
 					astTestMust(t, solver.Push())

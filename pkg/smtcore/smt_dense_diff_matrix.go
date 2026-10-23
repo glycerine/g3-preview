@@ -23,6 +23,7 @@ type smtDenseDiffTrail struct {
 type smtDenseDiffScope struct{ variables, edges, trail int }
 
 type smtDenseDiffMatrix struct {
+	owner  *SMTDenseDiffTheory
 	rows   [][]smtDenseDiffCell
 	edges  []smtDenseDiffEdge
 	trail  []smtDenseDiffTrail
@@ -116,12 +117,14 @@ func (g *smtDenseDiffMatrix) addEdge(source, target int, offset *smtInfRational,
 		e := smtDenseDiffEdge{source: source, target: target, literal: literal}
 		e.offset.Set(offset)
 		g.edges = append(g.edges, e)
-		g.updateCells()
+		if err := g.updateCells(); err != nil {
+			return false, nil, err
+		}
 	}
 	return true, nil, nil
 }
 
-func (g *smtDenseDiffMatrix) updateCells() {
+func (g *smtDenseDiffMatrix) updateCells() error {
 	id := len(g.edges) - 1
 	e := &g.edges[id]
 	s, t := e.source, e.target
@@ -163,9 +166,15 @@ func (g *smtDenseDiffMatrix) updateCells() {
 				g.trail = append(g.trail, smtDenseDiffTrail{y, x, old})
 				cell.edge = id
 				cell.distance.Set(&value)
+				if g.owner != nil {
+					if err := g.owner.propagateCell(y, x); err != nil {
+						return err
+					}
+				}
 			}
 		}
 	}
+	return nil
 }
 
 func (g *smtDenseDiffMatrix) push() {

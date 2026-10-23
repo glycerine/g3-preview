@@ -75,9 +75,51 @@ func (k *SMTKernel) setupIntegerDifferencePolicy(useStaticFeatures bool) (result
 		}
 		if !proofs && !arithmetic.AutoConfigSimplex && dense {
 			smt.PhaseSelection = 3 // PS_CACHING_CONSERVATIVE
-			// The dense theory backend remains a separate incomplete port;
-			// the registered integer simplex still handles these formulas.
+			if err := k.installDenseIntegerSetup(arithmetic); err != nil {
+				return err
+			}
 		}
 	}
 	return k.applyArithmeticSetup(smt, arithmetic, preprocess)
+}
+
+// The source creates this plugin at the first setup boundary. Replace only
+// the unused constructor-time integer specialization, before any theory term
+// or logical scope can refer to it, preserving the registry order.
+func (k *SMTKernel) installDenseIntegerSetup(config SMTArithState) error {
+	family, err := k.manager.ArithmeticFamilyID()
+	if err != nil {
+		return err
+	}
+	s := k.internalizer
+	old, ok := s.theories[family].(*SMTLinearArithmeticTheory)
+	if !ok || len(old.variables) != 0 || len(s.scopes) != 0 || s.theoriesSetup {
+		return ast.ErrASTDomain
+	}
+	position := -1
+	for i, theory := range s.theoryOrder {
+		if theory == old {
+			position = i
+			break
+		}
+	}
+	if position < 0 {
+		return ast.ErrASTDomain
+	}
+	theory, err := NewSMTDenseDiffTheory(family)
+	if err != nil {
+		return err
+	}
+	if err := theory.ConfigureArithmetic(config); err != nil {
+		return err
+	}
+	if err := theory.Initialize(s); err != nil {
+		return err
+	}
+	if err := old.Close(); err != nil {
+		return err
+	}
+	s.theories[family] = theory
+	s.theoryOrder[position] = theory
+	return nil
 }
