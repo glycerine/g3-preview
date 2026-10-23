@@ -70,6 +70,41 @@ func (t *SMTSequenceTheory) wordHasUncoveredPart(parts []ast.ASTHandle) (bool, e
 	return false, nil
 }
 
+func (t *SMTSequenceTheory) sequenceWordsCanBeEqual(left, right []ast.ASTHandle) (bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	index := 0
+	for index < len(left) && index < len(right) {
+		distinct, exact, distinctErr := t.concreteDistinct(left[index], right[index])
+		if distinctErr != nil {
+			return false, distinctErr
+		}
+		if exact && distinct {
+			return false, nil
+		}
+		equal, _ := t.equalWordParts(left[index], right[index], nil)
+		if !equal {
+			break
+		}
+		index++
+	}
+	if index == len(right) {
+		left, right = right, left
+	}
+	if index == len(left) && index < len(right) {
+		for _, part := range right[index:] {
+			if _, unit, unitErr := state.manager.SequenceUnitArgument(part); unitErr != nil {
+				return false, unitErr
+			} else if unit {
+				return false, nil
+			}
+		}
+	}
+	return true, nil
+}
+
 func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHandle) (bool, error) {
 	if len(left) == 0 || len(right) == 0 {
 		return false, nil
@@ -96,22 +131,35 @@ func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHa
 			if makeErr != nil {
 				return false, makeErr
 			}
-			assignment, assumeErr := t.assumeSequenceEquality(left[0], empty)
-			if assumeErr != nil {
-				return false, assumeErr
+			possible, possibleErr := t.sequenceWordsCanBeEqual(left[1:], right)
+			if possibleErr != nil {
+				return false, possibleErr
 			}
-			if assignment == lbool.Undef {
-				return true, nil
+			if possible {
+				assignment, assumeErr := t.assumeSequenceEquality(left[0], empty)
+				if assumeErr != nil {
+					return false, assumeErr
+				}
+				if assignment == lbool.Undef {
+					return true, nil
+				}
 			}
 			for index, part := range right {
 				if part == left[0] {
 					break
 				}
+				possible, possibleErr = t.sequenceWordsCanBeEqual(left[1:], right[index+1:])
+				if possibleErr != nil {
+					return false, possibleErr
+				}
+				if !possible {
+					continue
+				}
 				prefix, prefixErr := t.makeWord(right[:index+1], sort)
 				if prefixErr != nil {
 					return false, prefixErr
 				}
-				assignment, assumeErr = t.assumeSequenceEquality(left[0], prefix)
+				assignment, assumeErr := t.assumeSequenceEquality(left[0], prefix)
 				if assumeErr != nil {
 					return false, assumeErr
 				}

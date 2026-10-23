@@ -776,6 +776,56 @@ func TestSMTSequenceTheoryBranchesVariablePrefixEqualities(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheorySkipsInfeasibleVariablePrefixes(t *testing.T) {
+	m, _ := smtModelGeneratorFixture(t)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	integerSort, err := m.GetSort(one)
+	astTestMust(t, err)
+	n, err := m.MkConst(astTestSymbol(t, m, "sequence-feasible-prefix-integer"), integerSort)
+	astTestMust(t, err)
+	prefix, err := m.MkIntToString(n)
+	astTestMust(t, err)
+	sort, err := m.GetSort(prefix)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-feasible-prefix-x"), sort)
+	astTestMust(t, err)
+	element, err := m.BitVectorNumeralUnsigned('a', 8)
+	astTestMust(t, err)
+	unit, err := m.MkSequenceUnit(element)
+	astTestMust(t, err)
+	family, err := m.SequenceFamilyID()
+	astTestMust(t, err)
+	theory, err := NewSMTSequenceTheory(family)
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.RegisterTheory(theory))
+	branched, err := theory.branchVariablePrefixEquality(
+		[]ast.ASTHandle{x}, []ast.ASTHandle{prefix, unit})
+	astTestMust(t, err)
+	if !branched {
+		t.Fatal("variable did not reach feasible complete prefix")
+	}
+	empty, err := m.MkSequenceEmpty(sort)
+	astTestMust(t, err)
+	emptyEquality, err := m.MkEq(x, empty)
+	astTestMust(t, err)
+	if _, internalized := state.BoolVar(emptyEquality); internalized {
+		t.Fatal("infeasible empty prefix was internalized")
+	}
+	word, err := m.MkSequenceConcat(prefix, unit)
+	astTestMust(t, err)
+	prefixEquality, err := m.MkEq(x, word)
+	astTestMust(t, err)
+	literal, err := state.Literal(prefixEquality)
+	astTestMust(t, err)
+	data, err := state.BooleanData(literal.Var())
+	astTestMust(t, err)
+	if !data.TryTrueFirst() || !state.relevancy.IsRelevant(prefixEquality) {
+		t.Fatal("feasible complete prefix lacks branch preference")
+	}
+}
+
 func TestSMTSequenceTheoryLengthCoherenceDecomposition(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	value, err := m.MkString("a")
