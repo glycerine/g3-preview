@@ -3,6 +3,73 @@ package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 
+func (t *SMTSequenceTheory) addTightestPrefixAxioms(prefix, needle ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	sort, err := state.manager.GetSort(prefix)
+	if err != nil {
+		return err
+	}
+	elementSort, sequence, err := state.manager.SequenceSortElement(sort)
+	if err != nil {
+		return err
+	}
+	if !sequence {
+		return ast.ErrASTDomain
+	}
+	empty, err := state.manager.MkSequenceEmpty(sort)
+	if err != nil {
+		return err
+	}
+	prefixEmpty, err := state.manager.MkEq(prefix, empty)
+	if err != nil {
+		return err
+	}
+	prefixNonempty, err := state.manager.MkNot(prefixEmpty)
+	if err != nil {
+		return err
+	}
+	initial, err := t.relationSkolem("seq.first", []ast.ASTHandle{prefix}, sort)
+	if err != nil {
+		return err
+	}
+	last, err := t.relationSkolem("seq.last", []ast.ASTHandle{prefix}, elementSort)
+	if err != nil {
+		return err
+	}
+	unit, err := state.manager.MkSequenceUnit(last)
+	if err != nil {
+		return err
+	}
+	decomposition, err := state.manager.MkSequenceConcat(initial, unit)
+	if err != nil {
+		return err
+	}
+	prefixDefinition, err := state.manager.MkEq(prefix, decomposition)
+	if err != nil {
+		return err
+	}
+	if err = t.pushSequenceImplication([]ast.ASTHandle{prefixNonempty}, prefixDefinition); err != nil {
+		return err
+	}
+	needleAndInitial, err := state.manager.MkSequenceConcat(needle, initial)
+	if err != nil {
+		return err
+	}
+	prematureMatch, err := state.manager.MkSequenceContains(needleAndInitial, prefix)
+	if err != nil {
+		return err
+	}
+	notPrematureMatch, err := state.manager.MkNot(prematureMatch)
+	if err != nil {
+		return err
+	}
+	t.trackInternalTerms(initial, last, unit, decomposition, needleAndInitial, prematureMatch)
+	return t.pushSequenceImplication([]ast.ASTHandle{prefixNonempty}, notPrematureMatch)
+}
+
 func (t *SMTSequenceTheory) addIndexAxioms(expression ast.ASTHandle) error {
 	state, err := t.State()
 	if err != nil {
@@ -119,7 +186,10 @@ func (t *SMTSequenceTheory) addIndexAxioms(expression ast.ASTHandle) error {
 		if makeErr != nil {
 			return makeErr
 		}
-		return t.pushSequenceImplication([]ast.ASTHandle{contains}, nonnegative)
+		if makeErr = t.pushSequenceImplication([]ast.ASTHandle{contains}, nonnegative); makeErr != nil {
+			return makeErr
+		}
+		return t.addTightestPrefixAxioms(prefix, needle)
 	}
 
 	sourceLength, err := state.manager.MkSequenceLength(source)

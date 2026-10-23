@@ -2162,6 +2162,90 @@ func TestSMTSequenceTheoryIndexAxioms(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryIndexTightestPrefixAxioms(t *testing.T) {
+	for _, test := range []struct {
+		name          string
+		excludePrefix bool
+	}{
+		{name: "decomposition", excludePrefix: true},
+		{name: "minimality"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			empty, err := m.MkString("")
+			astTestMust(t, err)
+			sort, err := m.GetSort(empty)
+			astTestMust(t, err)
+			elementSort, sequence, err := m.SequenceSortElement(sort)
+			astTestMust(t, err)
+			if !sequence {
+				t.Fatal("string sort is not a sequence")
+			}
+			source, err := m.MkConst(astTestSymbol(t, m, "sequence-tightest-source-"+test.name), sort)
+			astTestMust(t, err)
+			needle, err := m.MkConst(astTestSymbol(t, m, "sequence-tightest-needle-"+test.name), sort)
+			astTestMust(t, err)
+			zero, err := m.ArithmeticIntegerNumeralText("0")
+			astTestMust(t, err)
+			index, err := m.MkSequenceIndex(source, needle, zero)
+			astTestMust(t, err)
+			contains, err := m.MkSequenceContains(source, needle)
+			astTestMust(t, err)
+			needleEmpty, err := m.MkEq(needle, empty)
+			astTestMust(t, err)
+			needleNonempty, err := m.MkNot(needleEmpty)
+			astTestMust(t, err)
+			prefixName, err := m.Symbols.Intern("seq.indexof_left")
+			astTestMust(t, err)
+			prefix, err := m.MkSequenceSkolem(prefixName, []ast.ASTHandle{source, needle}, sort)
+			astTestMust(t, err)
+			prefixEmpty, err := m.MkEq(prefix, empty)
+			astTestMust(t, err)
+			prefixNonempty, err := m.MkNot(prefixEmpty)
+			astTestMust(t, err)
+			prefixLength, err := m.MkSequenceLength(prefix)
+			astTestMust(t, err)
+			indexLength, err := m.MkEq(index, prefixLength)
+			astTestMust(t, err)
+			firstName, err := m.Symbols.Intern("seq.first")
+			astTestMust(t, err)
+			initial, err := m.MkSequenceSkolem(firstName, []ast.ASTHandle{prefix}, sort)
+			astTestMust(t, err)
+			lastName, err := m.Symbols.Intern("seq.last")
+			astTestMust(t, err)
+			last, err := m.MkSequenceSkolem(lastName, []ast.ASTHandle{prefix}, elementSort)
+			astTestMust(t, err)
+			unit, err := m.MkSequenceUnit(last)
+			astTestMust(t, err)
+			decomposition, err := m.MkSequenceConcat(initial, unit)
+			astTestMust(t, err)
+			prefixDefinition, err := m.MkEq(prefix, decomposition)
+			astTestMust(t, err)
+			violation := prefixDefinition
+			if test.excludePrefix {
+				violation, err = m.MkNot(prefixDefinition)
+				astTestMust(t, err)
+			} else {
+				needleAndInitial, makeErr := m.MkSequenceConcat(needle, initial)
+				astTestMust(t, makeErr)
+				violation, makeErr = m.MkSequenceContains(needleAndInitial, prefix)
+				astTestMust(t, makeErr)
+			}
+			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			for _, assertion := range []ast.ASTHandle{contains, needleNonempty, prefixNonempty, indexLength, violation} {
+				astTestMust(t, solver.Assert(assertion))
+			}
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.False {
+				t.Fatal("index tightest-prefix axiom", status)
+			}
+		})
+	}
+}
+
 func TestSMTSequenceTheoryReplaceAxioms(t *testing.T) {
 	t.Run("empty-needle", func(t *testing.T) {
 		m, modelConfig := smtModelGeneratorFixture(t)

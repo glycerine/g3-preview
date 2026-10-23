@@ -117413,10 +117413,10 @@
           "tests": ["TestSMTSequenceTheorySpecialTailAndDropLastDecompositions"]
         },
         {
-          "name": "str.indexof containment, empty-source, empty-needle, offset boundary, zero-offset witness and suffix-search axioms (src/smt/theory_seq.cpp:3150-3252)",
+          "name": "str.indexof containment, empty-source, empty-needle, offset boundary, zero-offset witness, tightest-prefix decomposition and premature-match exclusion, and suffix-search axioms (src/smt/theory_seq.cpp:3137-3252)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_index.go",
-          "tests": ["TestSMTSequenceTheoryIndexAxioms"]
+          "tests": ["TestSMTSequenceTheoryIndexAxioms", "TestSMTSequenceTheoryIndexTightestPrefixAxioms"]
         },
         {
           "name": "str.replace empty-source, empty-needle, absent-needle and first-occurrence witness axioms (src/smt/theory_seq.cpp:3255-3285)",
