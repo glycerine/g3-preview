@@ -25,6 +25,7 @@ type SMTModelFinder struct {
 	candidates  map[ast.ASTHandle]*macros.Candidates
 	nonGround   map[ast.ASTHandle]map[ast.ASTHandle]struct{}
 	chosen      map[ast.ASTHandle]ast.ASTHandle
+	hint        *hintSearchState
 	scopes      []int
 	closed      bool
 }
@@ -41,12 +42,12 @@ func NewSMTModelFinder(state *SMTInternalizerState) (*SMTModelFinder, error) {
 		manager: state.manager, state: state, registered: make(map[ast.ASTHandle]struct{}),
 		sets: make(map[ast.ASTHandle][]*smtModelFinderInstantiationSet), macroUtil: util,
 		candidates: make(map[ast.ASTHandle]*macros.Candidates), nonGround: make(map[ast.ASTHandle]map[ast.ASTHandle]struct{}),
-		chosen: make(map[ast.ASTHandle]ast.ASTHandle),
+		chosen: make(map[ast.ASTHandle]ast.ASTHandle), hint: newHintSearchState(),
 	}, nil
 }
 
 func (f *SMTModelFinder) open() error {
-	if f == nil || f.manager == nil || f.state == nil || f.registered == nil || f.sets == nil || f.macroUtil == nil || f.candidates == nil || f.closed {
+	if f == nil || f.manager == nil || f.state == nil || f.registered == nil || f.sets == nil || f.macroUtil == nil || f.candidates == nil || f.hint == nil || f.closed {
 		return ast.ErrASTHandle
 	}
 	return nil
@@ -95,6 +96,20 @@ func (f *SMTModelFinder) RegisterQuantifier(quantifier ast.ASTHandle) error {
 	if err = f.collectNonGroundDeclarations(body, f.nonGround[quantifier]); err != nil {
 		return err
 	}
+	info := &hintQuantifierInfo{nonGround: make([]ast.ASTHandle, 0, len(f.nonGround[quantifier]))}
+	for declaration := range f.nonGround[quantifier] {
+		info.nonGround = append(info.nonGround, declaration)
+	}
+	for i := 0; i < candidates.Len(); i++ {
+		candidate, err := candidates.At(i)
+		if err != nil {
+			return err
+		}
+		info.macros = append(info.macros, hintConditionalMacro{
+			function: candidate.Declaration, definition: candidate.Definition, satisfyAtom: candidate.SatisfyAtom,
+		})
+	}
+	f.hint.infos[quantifier] = info
 	return nil
 }
 
@@ -201,6 +216,7 @@ func (f *SMTModelFinder) releaseQuantifier(quantifier ast.ASTHandle) (result err
 		delete(f.candidates, quantifier)
 		delete(f.nonGround, quantifier)
 		delete(f.chosen, quantifier)
+		delete(f.hint.infos, quantifier)
 		delete(f.registered, quantifier)
 	}
 	return result
@@ -218,13 +234,13 @@ func (f *SMTModelFinder) macroOccursElsewhere(declaration, except ast.ASTHandle,
 	return false
 }
 
-func (f *SMTModelFinder) publishSimpleMacro(candidate macros.Candidate, proto *protomodel.ProtoModel) error {
-	interpretation, err := proto.Core().FunctionInterpretation(candidate.Declaration)
+func (f *SMTModelFinder) publishFunctionDefinition(declaration, definition ast.ASTHandle, proto *protomodel.ProtoModel) error {
+	interpretation, err := proto.Core().FunctionInterpretation(declaration)
 	if err != nil {
 		return err
 	}
 	if interpretation == nil {
-		arity, err := f.manager.GetArity(candidate.Declaration)
+		arity, err := f.manager.GetArity(declaration)
 		if err != nil {
 			return err
 		}
@@ -232,11 +248,11 @@ func (f *SMTModelFinder) publishSimpleMacro(candidate macros.Candidate, proto *p
 		if err != nil {
 			return err
 		}
-		if err = proto.Core().RegisterFunction(candidate.Declaration, interpretation); err != nil {
+		if err = proto.Core().RegisterFunction(declaration, interpretation); err != nil {
 			return errors.Join(err, interpretation.Close())
 		}
 	}
-	return interpretation.SetElse(candidate.Definition)
+	return interpretation.SetElse(definition)
 }
 
 func (f *SMTModelFinder) processSimpleMacros(proto *protomodel.ProtoModel, quantifiers []ast.ASTHandle) ([]ast.ASTHandle, error) {
@@ -255,7 +271,7 @@ func (f *SMTModelFinder) processSimpleMacros(proto *protomodel.ProtoModel, quant
 				if !candidate.SatisfyAtom || f.macroOccursElsewhere(candidate.Declaration, quantifier, current) {
 					continue
 				}
-				if err = f.publishSimpleMacro(candidate, proto); err != nil {
+				if err = f.publishFunctionDefinition(candidate.Declaration, candidate.Definition, proto); err != nil {
 					return nil, err
 				}
 				f.chosen[quantifier] = candidate.Declaration
@@ -271,6 +287,24 @@ func (f *SMTModelFinder) processSimpleMacros(proto *protomodel.ProtoModel, quant
 		}
 		current = next
 	}
+}
+
+func (f *SMTModelFinder) processHintMacros(proto *protomodel.ProtoModel, quantifiers []ast.ASTHandle) ([]ast.ASTHandle, error) {
+	plan, found, err := f.hint.planSubset(f.manager, quantifiers)
+	if err != nil || !found {
+		return quantifiers, err
+	}
+	for declaration, definition := range plan.definitions {
+		if err = f.publishFunctionDefinition(declaration, definition, proto); err != nil {
+			return nil, err
+		}
+	}
+	for _, quantifier := range quantifiers {
+		if info := f.hint.infos[quantifier]; info != nil && !info.theOne.IsNull() {
+			f.chosen[quantifier] = info.theOne
+		}
+	}
+	return plan.remaining, nil
 }
 
 func (f *SMTModelFinder) PushScope() error {
@@ -402,8 +436,15 @@ func (f *SMTModelFinder) FixModel(model *protomodel.ProtoModel) error {
 	}
 	for _, quantifier := range relevant {
 		delete(f.chosen, quantifier)
+		if info := f.hint.infos[quantifier]; info != nil {
+			info.theOne = ast.ASTHandle{}
+		}
 	}
 	relevant, err = f.processSimpleMacros(model, relevant)
+	if err != nil {
+		return err
+	}
+	relevant, err = f.processHintMacros(model, relevant)
 	if err != nil {
 		return err
 	}
@@ -448,6 +489,7 @@ func (f *SMTModelFinder) Close() error {
 	f.candidates = nil
 	f.nonGround = nil
 	f.chosen = nil
+	f.hint = nil
 	f.state = nil
 	f.manager = nil
 	return result

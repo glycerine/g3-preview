@@ -122,3 +122,65 @@ func TestSMTModelFinderPublishesIsolatedSimpleMacro(t *testing.T) {
 		t.Fatal("simple macro fallback", fallback, index)
 	}
 }
+
+func TestSMTModelFinderPublishesSharedHintMacro(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	integer, err := m.GetSort(zero)
+	astTestMust(t, err)
+	function, err := m.MkFuncDecl(astTestSymbol(t, m, "model-finder-hint-f"), []ast.ASTHandle{integer}, integer, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, integer)
+	astTestMust(t, err)
+	application, err := m.MkApp(function, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	body, err := m.MkEq(application, variable)
+	astTestMust(t, err)
+	makeQuantifier := func(name string) ast.ASTHandle {
+		q, e := m.MkQuantifier(ast.ASTQuantifierSpec{
+			Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []symbol.Symbol{astTestSymbol(t, m, name+"-x")},
+			Body: body, QID: astTestSymbol(t, m, name),
+		})
+		astTestMust(t, e)
+		return q
+	}
+	first, second := makeQuantifier("model-finder-hint-q1"), makeQuantifier("model-finder-hint-q2")
+	if first == second {
+		t.Fatal("shared-macro quantifiers were hash-consed")
+	}
+	solver, err := NewSMTSolver(m, nil, "AUFLIA", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.SetProduceModels(true))
+	astTestMust(t, solver.Assert(first))
+	astTestMust(t, solver.Assert(second))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		reason, _ := solver.ReasonUnknown()
+		t.Fatal("shared hint macro quantifiers", status, reason)
+	}
+	finder := solver.kernel.internalizer.quantifierManager.modelFinder
+	if finder.chosen[first] != function || finder.chosen[second] != function {
+		t.Fatal("hint search did not select the shared definition", finder.chosen)
+	}
+	generated, err := solver.AcquireModel()
+	astTestMust(t, err)
+	if generated == nil {
+		t.Fatal("shared hint macro omitted generated model")
+	}
+	t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
+	interpretation, err := generated.FunctionInterpretation(function)
+	astTestMust(t, err)
+	if interpretation == nil {
+		t.Fatal("shared hint macro function interpretation was not published")
+	}
+	fallback, err := interpretation.Else()
+	astTestMust(t, err)
+	if index, e := m.GetVarIndex(fallback); e != nil || index != 0 {
+		t.Fatal("shared hint macro fallback", fallback, index, e)
+	}
+}
