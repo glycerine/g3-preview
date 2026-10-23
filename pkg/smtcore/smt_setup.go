@@ -130,7 +130,15 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 			}
 			err = kernel.RegisterTheory(theory)
 		} else {
-			err = install(family, "arithmetic")
+			if kernel.arithState.Mode == 0 {
+				err = install(family, "no arithmetic")
+			} else {
+				theory, theoryErr := NewSMTMixedLinearArithmeticTheory(family)
+				if theoryErr != nil {
+					return theoryErr
+				}
+				err = kernel.RegisterTheory(theory)
+			}
 		}
 		if err != nil {
 			return err

@@ -21,6 +21,46 @@ func smtInternalizerFixture(t *testing.T, m *ast.ASTManager, registry *SMTQuanti
 	return context, relevancy, state
 }
 
+func TestSMTInternalizerScopedEnodeFlagOnExistingGate(t *testing.T) {
+	m := astTestManager(t)
+	a := smtRelevancyBool(t, m, "scoped-enode-a")
+	b := smtRelevancyBool(t, m, "scoped-enode-b")
+	gate, err := m.MkAnd(a, b)
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.Internalize(gate, true))
+	variable, found := state.BoolVar(gate)
+	if !found {
+		t.Fatal("gate was not internalized")
+	}
+	data, err := state.BooleanData(variable)
+	astTestMust(t, err)
+	if data.IsENode() {
+		t.Fatal("gate already had an enode")
+	}
+	for i := 0; i < 2; i++ {
+		astTestMust(t, state.PushScope())
+		astTestMust(t, state.Internalize(gate, false))
+		data, err = state.BooleanData(variable)
+		astTestMust(t, err)
+		if !data.IsENode() || state.context.enodes[gate] == nil {
+			t.Fatal("scoped enode was not attached")
+		}
+		astTestMust(t, state.PopScopes(1))
+		data, err = state.BooleanData(variable)
+		astTestMust(t, err)
+		if data.IsENode() || state.context.enodes[gate] != nil {
+			t.Fatal("scoped enode flag survived rollback")
+		}
+		if v, ok := state.BoolVar(gate); !ok || v != variable {
+			t.Fatal("base Boolean variable was lost")
+		}
+		resolver, err := NewSMTConflictResolver(state)
+		astTestMust(t, err)
+		astTestMust(t, resolver.Close())
+	}
+}
+
 func TestSMTInternalizerBooleanGateClausesAndRootAssertions(t *testing.T) {
 	m := astTestManager(t)
 	a := smtRelevancyBool(t, m, "internalize-gate-a")

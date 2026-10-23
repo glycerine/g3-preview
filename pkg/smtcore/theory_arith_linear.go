@@ -76,9 +76,10 @@ type smtLinearArithmeticAtom struct {
 }
 
 type smtLinearArithmeticScope struct {
-	atoms, assertions int
-	head              int
-	unsupported       bool
+	atoms, assertions         int
+	head                      int
+	unsupported               bool
+	castTerms, castPredicates int
 }
 
 type smtLinearIntegerBranch struct {
@@ -99,20 +100,26 @@ type smtLinearArithmeticStatistics struct {
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
 	*SMTTheoryBase
-	solver           *simplex.Solver
-	simplexVariables []uint32
-	nextSimplex      uint32
-	definitions      map[SMTTheoryVar]smtLinearForm
-	atoms            []smtLinearArithmeticAtom
-	atomByBool       map[int32]int
-	assertions       []smtIntegerDiffAssertion
-	assertionHead    int
-	scopes           []smtLinearArithmeticScope
-	unsupported      bool
-	integer          bool
-	delta            big.Rat
-	equalityAdapter  *smtArithmeticEqualityAdapter
-	statistics       smtLinearArithmeticStatistics
+	solver             *simplex.Solver
+	simplexVariables   []uint32
+	nextSimplex        uint32
+	definitions        map[SMTTheoryVar]smtLinearForm
+	atoms              []smtLinearArithmeticAtom
+	atomByBool         map[int32]int
+	assertions         []smtIntegerDiffAssertion
+	assertionHead      int
+	scopes             []smtLinearArithmeticScope
+	unsupported        bool
+	integer            bool
+	mixed              bool
+	integerColumns     map[uint32]bool
+	castTerms          map[ast.ASTHandle]bool
+	castTermTrail      []ast.ASTHandle
+	castPredicates     map[int32]bool
+	castPredicateTrail []int32
+	delta              big.Rat
+	equalityAdapter    *smtArithmeticEqualityAdapter
+	statistics         smtLinearArithmeticStatistics
 }
 
 func NewSMTLinearArithmeticTheory(family ast.FamilyID) (*SMTLinearArithmeticTheory, error) {
@@ -123,18 +130,31 @@ func NewSMTLinearIntegerArithmeticTheory(family ast.FamilyID) (*SMTLinearArithme
 	return newSMTLinearArithmeticTheory(family, true)
 }
 
+// NewSMTMixedLinearArithmeticTheory tracks source is_int_expr per variable,
+// retaining rational columns alongside the integer branch-and-bound columns.
+func NewSMTMixedLinearArithmeticTheory(family ast.FamilyID) (*SMTLinearArithmeticTheory, error) {
+	t, err := newSMTLinearArithmeticTheory(family, false)
+	if err == nil {
+		t.mixed = true
+	}
+	return t, err
+}
+
 func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinearArithmeticTheory, error) {
 	base, err := NewSMTTheoryBase(family)
 	if err != nil {
 		return nil, err
 	}
 	t := &SMTLinearArithmeticTheory{
-		SMTTheoryBase: base,
-		solver:        simplex.NewSolver(nil),
-		atomByBool:    make(map[int32]int),
-		definitions:   make(map[SMTTheoryVar]smtLinearForm),
-		nextSimplex:   1,
-		integer:       integer,
+		SMTTheoryBase:  base,
+		solver:         simplex.NewSolver(nil),
+		atomByBool:     make(map[int32]int),
+		definitions:    make(map[SMTTheoryVar]smtLinearForm),
+		nextSimplex:    1,
+		integer:        integer,
+		integerColumns: make(map[uint32]bool),
+		castTerms:      make(map[ast.ASTHandle]bool),
+		castPredicates: make(map[int32]bool),
 	}
 	t.equalityAdapter, err = newSMTArithmeticEqualityAdapter(base)
 	if err != nil {
@@ -160,6 +180,13 @@ func (t *SMTLinearArithmeticTheory) createVariable(node *SMTEnode) (SMTTheoryVar
 		return SMTNullTheoryVar, err
 	}
 	for len(t.simplexVariables) <= int(v) {
+		integral, err := t.isIntegerExpression(node.owner)
+		if err != nil {
+			return SMTNullTheoryVar, err
+		}
+		if integral {
+			t.integerColumns[t.nextSimplex] = true
+		}
 		t.simplexVariables = append(t.simplexVariables, t.nextSimplex)
 		t.nextSimplex++
 	}
@@ -183,7 +210,7 @@ func (t *SMTLinearArithmeticTheory) ApplySortConstraint(node *SMTEnode, sort ast
 	if t.integer {
 		expected = 1
 	}
-	if kind != expected {
+	if !t.mixed && kind != expected || kind != 0 && kind != 1 {
 		t.unsupported = true
 		return nil
 	}
@@ -356,6 +383,13 @@ func (t *SMTLinearArithmeticTheory) linearize(expression ast.ASTHandle) (smtLine
 				result.scale(new(big.Rat).Inv(denominator))
 			}
 			return result, linear, partErr
+		case smtArithOpToInt:
+			if !t.mixed {
+				return smtLinearForm{}, false, nil
+			}
+			// Its variable is constrained by the source floor axioms below.
+		default:
+			return smtLinearForm{}, false, nil
 		}
 	}
 	variable, err := t.ensureVariable(expression)
@@ -372,6 +406,17 @@ func (t *SMTLinearArithmeticTheory) InternalizeTerm(expression ast.ASTHandle) (b
 	if err != nil {
 		return false, err
 	}
+	op, own, err := t.operation(expression)
+	if err != nil {
+		return false, err
+	}
+	if own {
+		switch op {
+		case smtArithOpNum, smtArithOpAdd, smtArithOpSub, smtArithOpUMinus, smtArithOpMul, smtArithOpDiv, smtArithOpToReal, smtArithOpToInt:
+		default:
+			t.unsupported = true
+		}
+	}
 	count, err := state.manager.GetNumArgs(expression)
 	if err != nil {
 		return false, err
@@ -384,6 +429,24 @@ func (t *SMTLinearArithmeticTheory) InternalizeTerm(expression ast.ASTHandle) (b
 		if argumentErr = state.Internalize(argument, false); argumentErr != nil {
 			return false, argumentErr
 		}
+	}
+	if own && op == smtArithOpToInt && t.mixed {
+		// Source internalize_to_int publishes its variable before creating
+		// the to_real/to_int axioms, whose terms visit this cast again.
+		node := state.context.enodes[expression]
+		if node == nil {
+			node, err = state.MkEnode(expression, false, false, true)
+			if err != nil {
+				return false, err
+			}
+		}
+		if _, err = t.createVariable(node); err != nil {
+			return false, err
+		}
+		if err = t.installToIntAxioms(expression); err != nil {
+			return false, err
+		}
+		return true, nil
 	}
 	form, linear, err := t.linearize(expression)
 	if err == nil && !linear {
@@ -425,6 +488,9 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 	op, arithmetic, err := t.operation(expression)
 	if err != nil {
 		return false, err
+	}
+	if arithmetic && op == 16 && t.mixed {
+		return t.internalizeIsInt(expression)
 	}
 	if !arithmetic || op < smtArithOpLE || op > smtArithOpGT {
 		t.unsupported = true
@@ -551,12 +617,15 @@ func (t *SMTLinearArithmeticTheory) evenMonomialComparison(left, right ast.ASTHa
 }
 
 func (t *SMTLinearArithmeticTheory) Assign(variable int32, truth bool) error {
+	if t.castPredicates[variable] {
+		return nil
+	}
 	index, found := t.atomByBool[variable]
 	if !found {
 		return ast.ErrASTDomain
 	}
 	t.atoms[index].truth = truth
-	lower, _ := smtLinearAtomBound(&t.atoms[index], truth, t.integer)
+	lower, _ := smtLinearAtomBound(&t.atoms[index], truth, t.integralAtom(&t.atoms[index]))
 	if lower {
 		t.statistics.assertLower++
 	} else {
@@ -574,10 +643,22 @@ func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth, integer bool) (low
 	value.Main.Neg(&atom.form.constant)
 	op := smtLinearEffectiveOp(atom.op, truth)
 	lower = op == smtArithOpGE || op == smtArithOpGT
-	if integer && op == smtArithOpGT {
-		value.Main.Add(&value.Main, big.NewRat(1, 1))
-	} else if integer && op == smtArithOpLT {
-		value.Main.Sub(&value.Main, big.NewRat(1, 1))
+	if integer {
+		floor := floorSMTRational(&value.Main)
+		ceil := new(big.Int).Set(floor)
+		if !value.Main.IsInt() {
+			ceil.Add(ceil, big.NewInt(1))
+		}
+		switch op {
+		case smtArithOpGT:
+			value.Main.SetInt(floor.Add(floor, big.NewInt(1)))
+		case smtArithOpLT:
+			value.Main.SetInt(ceil.Sub(ceil, big.NewInt(1)))
+		case smtArithOpGE:
+			value.Main.SetInt(ceil)
+		case smtArithOpLE:
+			value.Main.SetInt(floor)
+		}
 	} else if op == smtArithOpGT {
 		value.Epsilon.SetInt64(1)
 	} else if op == smtArithOpLT {
@@ -664,6 +745,18 @@ func (t *SMTLinearArithmeticTheory) propagateEquality(state *SMTInternalizerStat
 		return false, ast.ErrASTDomain
 	}
 	if left.Root() == right.Root() {
+		return false, nil
+	}
+	leftSort, err := state.manager.GetSort(left.owner)
+	if err != nil {
+		return false, err
+	}
+	rightSort, err := state.manager.GetSort(right.owner)
+	if err != nil {
+		return false, err
+	}
+	// Source propagate_eq_to_core never merges Int and Real enodes.
+	if leftSort != rightSort {
 		return false, nil
 	}
 	justification, err := NewSMTExtTheoryEqualityPropagationJustification(
@@ -934,7 +1027,7 @@ func (t *SMTLinearArithmeticTheory) buildSimplex(branches []smtLinearIntegerBran
 		if !atom.supported {
 			continue
 		}
-		lower, bound := smtLinearAtomBound(atom, assertion.truth, t.integer)
+		lower, bound := smtLinearAtomBound(atom, assertion.truth, t.integralAtom(atom))
 		base := t.nextSimplex + uint32(assertion.atom)
 		var err error
 		if lower {
@@ -967,14 +1060,17 @@ func (t *SMTLinearArithmeticTheory) buildSimplex(branches []smtLinearIntegerBran
 	return solver, status, nil
 }
 
-func (t *SMTLinearArithmeticTheory) fractionalVariable(solver *simplex.Solver) (uint32, *big.Rat, bool) {
+func (t *SMTLinearArithmeticTheory) fractionalVariable(solver *simplex.Solver) (uint32, simplex.Infinitesimal, bool) {
 	for _, variable := range t.simplexVariables {
+		if t.mixed && !t.integerColumns[variable] {
+			continue
+		}
 		value := solver.Value(variable)
 		if value.Epsilon.Sign() != 0 || !value.Main.IsInt() {
-			return variable, new(big.Rat).Set(&value.Main), true
+			return variable, value, true
 		}
 	}
-	return 0, nil, false
+	return 0, simplex.Infinitesimal{}, false
 }
 
 func (t *SMTLinearArithmeticTheory) integerFeasible(branches []smtLinearIntegerBranch, nodes *uint32) (lbool.LBool, error) {
@@ -993,18 +1089,17 @@ func (t *SMTLinearArithmeticTheory) integerFeasible(branches []smtLinearIntegerB
 		return lbool.True, nil
 	}
 	t.statistics.branches++
-	var floor big.Int
-	floor.Quo(value.Num(), value.Denom())
-	if value.Sign() < 0 && new(big.Int).Rem(value.Num(), value.Denom()).Sign() != 0 {
-		floor.Sub(&floor, big.NewInt(1))
+	floor := floorSMTRational(&value.Main)
+	if value.Main.IsInt() && value.Epsilon.Sign() < 0 {
+		floor.Sub(floor, big.NewInt(1))
 	}
-	upper := smtLinearIntegerBranch{variable: variable, value: *new(big.Rat).SetInt(&floor)}
+	upper := smtLinearIntegerBranch{variable: variable, value: *new(big.Rat).SetInt(floor)}
 	left := append(append([]smtLinearIntegerBranch(nil), branches...), upper)
 	leftStatus, err := t.integerFeasible(left, nodes)
 	if err != nil || leftStatus == lbool.True {
 		return leftStatus, err
 	}
-	ceil := new(big.Int).Add(&floor, big.NewInt(1))
+	ceil := new(big.Int).Add(floor, big.NewInt(1))
 	lower := smtLinearIntegerBranch{variable: variable, lower: true, value: *new(big.Rat).SetInt(ceil)}
 	right := append(append([]smtLinearIntegerBranch(nil), branches...), lower)
 	rightStatus, err := t.integerFeasible(right, nodes)
@@ -1055,7 +1150,7 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
-	t.scopes = append(t.scopes, smtLinearArithmeticScope{len(t.atoms), len(t.assertions), t.assertionHead, t.unsupported})
+	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail)})
 	return nil
 }
 
@@ -1072,12 +1167,23 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 	t.assertions = t.assertions[:scope.assertions]
 	t.assertionHead = scope.head
 	t.unsupported = scope.unsupported
+	for _, term := range t.castTermTrail[scope.castTerms:] {
+		delete(t.castTerms, term)
+	}
+	t.castTermTrail = t.castTermTrail[:scope.castTerms]
+	for _, variable := range t.castPredicateTrail[scope.castPredicates:] {
+		delete(t.castPredicates, variable)
+	}
+	t.castPredicateTrail = t.castPredicateTrail[:scope.castPredicates]
 	t.scopes = t.scopes[:level]
 	if err := t.equalityAdapter.PopScopes(count); err != nil {
 		return err
 	}
 	if err := t.SMTTheoryBase.PopScopes(count); err != nil {
 		return err
+	}
+	for _, column := range t.simplexVariables[t.NumVariables():] {
+		delete(t.integerColumns, column)
 	}
 	t.simplexVariables = t.simplexVariables[:t.NumVariables()]
 	for variable := range t.definitions {
@@ -1115,7 +1221,7 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if propagated {
 		return SMTFinalCheckContinue, nil
 	}
-	if t.integer {
+	if t.integer || t.mixed {
 		if _, _, fractional := t.fractionalVariable(t.solver); fractional {
 			var nodes uint32
 			status, err := t.integerFeasible(nil, &nodes)
@@ -1663,7 +1769,15 @@ func (t *SMTLinearArithmeticTheory) ModelValue(node *SMTEnode, generator *SMTMod
 	var epsilon, rational big.Rat
 	epsilon.Mul(&t.delta, &value.Epsilon)
 	rational.Add(&value.Main, &epsilon)
-	numeral, err := state.manager.ArithmeticNumeralRat(&rational, t.integer)
+	sort, err := state.manager.GetSort(node.owner)
+	if err != nil {
+		return nil, err
+	}
+	kind, err := state.manager.GetDeclKind(sort)
+	if err != nil {
+		return nil, err
+	}
+	numeral, err := state.manager.ArithmeticNumeralRat(&rational, kind == 1)
 	if err != nil {
 		return nil, err
 	}

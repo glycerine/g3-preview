@@ -666,7 +666,16 @@ func (k *SMTKernel) Push() error {
 	if err := k.setupAssertedBounds(false); err != nil {
 		return err
 	}
+	if err := k.internalizer.SetupTheories(); err != nil {
+		return err
+	}
 	if err := k.internalizePending(); err != nil {
+		return err
+	}
+	// Source context::push propagates the base assertions before saving a
+	// scope. Otherwise relevance discovered during the next check is scoped
+	// away, and surviving arithmetic terms can disappear from later models.
+	if _, err := k.internalizer.PropagateCore(); err != nil {
 		return err
 	}
 	if err := k.assertedMacros.PushScope(); err != nil {

@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-const i Int)
+(declare-const r Real)
+(assert (= r (+ (to_real i) (/ 1.0 2.0))))
+(assert (> i 0))
+(assert (< r 2.0))
+(check-sat)
+(get-value (i r))

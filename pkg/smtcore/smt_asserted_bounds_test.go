@@ -100,16 +100,9 @@ func TestSMTAssertedBoundsSourceSetupAndUpdates(t *testing.T) {
 				key := "auto_config"
 				astTestMust(t, cfg.Context.SetBoolName(&params, &key, false))
 			}
-			backendLogic := tc.logic
-			if tc.logic == "ALL" {
-				// General mixed arithmetic setup is still partial. Hold the
-				// concrete integer backend constant while checking setup modes.
-				backendLogic = "AUFLIA"
-			}
-			solver, err := NewSMTSolver(m, &params, backendLogic, SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
+			solver, err := NewSMTSolver(m, &params, tc.logic, SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, solver.Close()) })
-			solver.kernel.setupLogic = tc.logic
 			if tc.pushFirst {
 				astTestMust(t, solver.Push())
 			}

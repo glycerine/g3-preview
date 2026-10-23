@@ -2015,6 +2015,9 @@ func (t *SMTBitVectorTheory) discoverFixedEqualities() error {
 		t.fixedEqualities[pair] = true
 		t.fixedTrail = append(t.fixedTrail, pair)
 		t.statistics.theoryToCoreEq++
+		if state.inconsistent {
+			return nil
+		}
 	}
 	return nil
 }

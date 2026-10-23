@@ -159,7 +159,7 @@ func TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset(t *testing.T) {
 	}
 }
 
-func TestSMTUnknownLogicSetupInstallsConservativeTheoryFallback(t *testing.T) {
+func TestSMTUnknownLogicSetupInstallsMixedArithmetic(t *testing.T) {
 	for _, test := range []struct {
 		logic   string
 		integer bool
@@ -194,8 +194,9 @@ func TestSMTUnknownLogicSetupInstallsConservativeTheoryFallback(t *testing.T) {
 			})
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, solver.Close()) })
-			if _, ok := solver.kernel.internalizer.theories[arithmeticFamily].(*SMTDummyTheory); !ok {
-				t.Fatal(test.logic, "did not install conservative arithmetic fallback")
+			arithmetic, ok := solver.kernel.internalizer.theories[arithmeticFamily].(*SMTLinearArithmeticTheory)
+			if !ok || !arithmetic.mixed {
+				t.Fatal(test.logic, "did not install mixed arithmetic")
 			}
 			if _, ok := solver.kernel.internalizer.theories[arrayFamily].(*SMTArrayTheory); !ok {
 				t.Fatal(test.logic, "did not install setup_unknown array theory")

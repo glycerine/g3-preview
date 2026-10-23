@@ -1,0 +1,6 @@
+(set-logic ALL)
+(push 1)
+(assert (forall ((x Int)) (<= x 5)))
+(check-sat)
+(pop 1)
+(check-sat)

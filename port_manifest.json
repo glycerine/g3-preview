@@ -105994,7 +105994,9 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_equality_propagation.go",
         "pkg/smtcore/smt_kernel_results.go",
-        "pkg/smtcore/smt_boolean_term_value_test.go"
+        "pkg/smtcore/smt_boolean_term_value_test.go",
+        "pkg/smtcore/theory_arith_mixed_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -106024,7 +106026,10 @@
         "TestSMTKernelCapturesRelevantLabeledLiterals",
         "TestSMTSequenceTheoryCompletesUnboundedRegexModel",
         "TestSMTBooleanTermTruthValueCongruenceAndProof",
-        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes"
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
+        "TestSMTMixedArithmeticScopeModel",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -107050,6 +107055,19 @@
             "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
             "TestSMTKernelCapturesRelevantLabeledLiterals"
           ]
+        },
+        {
+          "name": "context::push base propagation boundary: set up theory callbacks, internalize pending assertions and propagate before capturing the user scope, preserving base relevance and later model values after pop",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTMixedArithmeticScopeModel",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -107075,7 +107093,9 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_equality_propagation.go",
         "pkg/smtcore/smt_kernel_results.go",
-        "pkg/smtcore/smt_boolean_term_value_test.go"
+        "pkg/smtcore/smt_boolean_term_value_test.go",
+        "pkg/smtcore/theory_arith_mixed_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -107089,7 +107109,10 @@
         "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
         "TestSMTKernelCapturesRelevantLabeledLiterals",
         "TestSMTBooleanTermTruthValueCongruenceAndProof",
-        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes"
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
+        "TestSMTMixedArithmeticScopeModel",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -107334,6 +107357,19 @@
           "tests": [
             "TestSMTKernelCapturesAssignmentsRelevantAndGuessedLiterals",
             "TestSMTKernelCapturesRelevantLabeledLiterals"
+          ]
+        },
+        {
+          "name": "context::push base propagation boundary: set up theory callbacks, internalize pending assertions and propagate before capturing the user scope, preserving base relevance and later model values after pop",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTMixedArithmeticScopeModel",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -108403,7 +108439,8 @@
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_theory.go",
         "pkg/smtcore/smt_equality_propagation.go",
-        "pkg/smtcore/smt_boolean_term_value_test.go"
+        "pkg/smtcore/smt_boolean_term_value_test.go",
+        "pkg/smtcore/smt_internalizer_test.go"
       ],
       "tests": [
         "TestSMTInternalizationOrderBooleanGateContextsAndNotElision",
@@ -108437,7 +108474,9 @@
         "TestSMTCoreEqualityPropagatesBooleanCongruence",
         "TestSMTInternalizerDefaultAssertionMarksLiteralRelevant",
         "TestSMTBooleanTermTruthValueCongruenceAndProof",
-        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes"
+        "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
+        "TestSMTInternalizerScopedEnodeFlagOnExistingGate",
+        "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits"
       ],
       "conditionals": [
         {
@@ -108912,6 +108951,18 @@
           "go_target": "pkg/smtcore/smt_internalizer.go",
           "tests": [
             "TestSMTInternalizerDeepAssertionUsesTopologicalPrepass"
+          ]
+        },
+        {
+          "name": "set_enode_flag trail: an existing Boolean variable may acquire a scoped enode; rollback resets the flag while preserving the base Boolean variable, including repeated scope reuse and conflict-resolver synchronization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer.go",
+          "go_targets": [
+            "pkg/smtcore/smt_internalizer_state.go"
+          ],
+          "tests": [
+            "TestSMTInternalizerScopedEnodeFlagOnExistingGate",
+            "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits"
           ]
         }
       ],
@@ -111676,7 +111727,10 @@
       "go_targets": [
         "pkg/smtcore/smt_setup.go",
         "pkg/smtcore/smt_asserted_bounds.go",
-        "pkg/smtcore/smt_asserted_bounds_test.go"
+        "pkg/smtcore/smt_asserted_bounds_test.go",
+        "pkg/smtcore/theory_arith_mixed.go",
+        "pkg/smtcore/theory_arith_mixed_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -111691,14 +111745,17 @@
         "TestSMTQFAUFLIASetupUsesIntegerArithmeticAndArrays",
         "TestSMTLinearRealLogicSetupUsesConcreteArithmetic",
         "TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset",
-        "TestSMTUnknownLogicSetupInstallsConservativeTheoryFallback",
+        "TestSMTUnknownLogicSetupInstallsMixedArithmetic",
         "TestSMTAllSetupIncludesArrays",
         "TestSMTDatatypeQFDTSetup",
         "TestSMTPseudoBooleanQFFDExactCardinality",
         "TestSMTQFFPSetupInstallsFloatingPointAndBitVectorTheories",
         "TestSMTFloatingPointIEEEAndStructuralEqualities",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
-        "TestSMTAssertedBoundsSourceSetupAndUpdates"
+        "TestSMTAssertedBoundsSourceSetupAndUpdates",
+        "TestSMTMixedArithmeticScopeModel",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "assertions": [
         {
@@ -111718,7 +111775,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "explicit arithmetic and array logic classification, setup_unknown all-theory fallback, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA/QF_UFLRA/QF_UFLIA/QF_AUFLIA/LRA/UFLRA and retained AUFLIA/AUFLIA+/AUFLIA-/UFNIA linear-subset theory selection, native shared QF_UFBV array/bit-vector and quantified array routing, and conservative incomplete-theory installation for remaining nonlinear or mixed arithmetic logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409,891-905)",
+          "name": "explicit arithmetic and array logic classification, setup_unknown all-theory fallback, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA/QF_UFLRA/QF_UFLIA/QF_AUFLIA/LRA/UFLRA and retained AUFLIA/AUFLIA+/AUFLIA-/UFNIA linear-subset theory selection, native shared QF_UFBV array/bit-vector and quantified array routing, and concrete mixed linear arithmetic for the general fallback and quantified mixed routes; remaining nonlinear arithmetic algorithms stay partial (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409,891-905)",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
@@ -111734,7 +111791,7 @@
             "TestSMTQFAUFLIASetupUsesIntegerArithmeticAndArrays",
             "TestSMTLinearRealLogicSetupUsesConcreteArithmetic",
             "TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset",
-            "TestSMTUnknownLogicSetupInstallsConservativeTheoryFallback",
+            "TestSMTUnknownLogicSetupInstallsMixedArithmetic",
             "TestSMTAllSetupIncludesArrays"
           ]
         },
@@ -111784,6 +111841,21 @@
           "tests": [
             "TestSMTAssertedBoundsSourceSetupAndUpdates"
           ]
+        },
+        {
+          "name": "setup_mi_arith and setup_unknown retained default: install concrete per-variable mixed linear arithmetic for AUFLIRA/AUFNIRA and general arithmetic logic routes, preserving explicit no-arithmetic mode; other arithmetic solver modes and feature tuning remain incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTUnknownLogicSetupInstallsMixedArithmetic",
+            "TestSMTMixedArithmeticScopeModel",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTAssertedBoundsSourceSetupAndUpdates"
+          ]
         }
       ],
       "ownership": [
@@ -111801,7 +111873,10 @@
       "go_targets": [
         "pkg/smtcore/smt_setup.go",
         "pkg/smtcore/smt_asserted_bounds.go",
-        "pkg/smtcore/smt_asserted_bounds_test.go"
+        "pkg/smtcore/smt_asserted_bounds_test.go",
+        "pkg/smtcore/theory_arith_mixed.go",
+        "pkg/smtcore/theory_arith_mixed_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -111812,7 +111887,11 @@
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
         "TestSMTSolverSetupUsesRealDifferenceLogic",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
-        "TestSMTAssertedBoundsSourceSetupAndUpdates"
+        "TestSMTAssertedBoundsSourceSetupAndUpdates",
+        "TestSMTUnknownLogicSetupInstallsMixedArithmetic",
+        "TestSMTMixedArithmeticScopeModel",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -111856,6 +111935,21 @@
             "pkg/smtcore/smt_kernel.go"
           ],
           "tests": [
+            "TestSMTAssertedBoundsSourceSetupAndUpdates"
+          ]
+        },
+        {
+          "name": "setup_mi_arith and setup_unknown retained default: install concrete per-variable mixed linear arithmetic for AUFLIRA/AUFNIRA and general arithmetic logic routes, preserving explicit no-arithmetic mode; other arithmetic solver modes and feature tuning remain incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTUnknownLogicSetupInstallsMixedArithmetic",
+            "TestSMTMixedArithmeticScopeModel",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
             "TestSMTAssertedBoundsSourceSetupAndUpdates"
           ]
         }
@@ -113666,7 +113760,11 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_arith_tableau.go",
-        "pkg/smtcore/theory_arith_linear.go"
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/smtcore/theory_arith_mixed.go",
+        "pkg/smtcore/theory_arith_casts.go",
+        "pkg/smtcore/theory_arith_mixed_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -113674,7 +113772,11 @@
         "TestSMTLinearArithmeticEqualDefinitionRows",
         "TestSMTSolverSetupUsesLinearRealArithmetic",
         "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
-        "TestSMTSolverPublishesStrictLinearRealModel"
+        "TestSMTSolverPublishesStrictLinearRealModel",
+        "TestSMTMixedArithmeticScopeModel",
+        "TestSMTMixedArithmeticCastsScopedProofs",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -114423,9 +114525,26 @@
             "TestSMTLinearArithmeticStandaloneTermDefinition",
             "TestSMTLinearArithmeticEqualDefinitionRows"
           ]
+        },
+        {
+          "name": "retained mixed linear arithmetic: source bounded is_int_expr classification, to_real shared rational rows, sort-correct model numerals, eager floor constraints for to_int and equivalence axioms for is_int; unsupported arithmetic operations retain incompleteness",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_casts.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTMixedArithmeticScopeModel",
+            "TestSMTMixedArithmeticCastsScopedProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification."
+      ],
       "deviations": []
     },
     {
@@ -114459,13 +114578,21 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_arith_linear.go"
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/smtcore/theory_arith_mixed.go",
+        "pkg/smtcore/theory_arith_casts.go",
+        "pkg/smtcore/theory_arith_mixed_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
         "TestSMTSolverLinearArithmeticPropagatesFixedEquality",
         "TestSMTSolverLinearArithmeticPropagatesOffsetEquality",
-        "TestSMTLinearArithmeticEqualDefinitionRows"
+        "TestSMTLinearArithmeticEqualDefinitionRows",
+        "TestSMTMixedArithmeticScopeModel",
+        "TestSMTMixedArithmeticCastsScopedProofs",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -114576,9 +114703,26 @@
             "TestSMTSolverLinearArithmeticPropagatesOffsetEquality",
             "TestSMTLinearArithmeticEqualDefinitionRows"
           ]
+        },
+        {
+          "name": "propagate_eq_to_core declared-sort guard: equal numeric values never merge Int and Real enodes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTMixedArithmeticScopeModel",
+            "TestSMTMixedArithmeticCastsScopedProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification."
+      ],
       "deviations": [
         "The linear specialization recognizes active opposite bound pairs, substitutes fixed monomials, and compares affine definition rows directly instead of maintaining the source row-id offset index."
       ]
@@ -114590,11 +114734,19 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_arith_linear.go",
-        "pkg/smtcore/theory_arith_bounds.go"
+        "pkg/smtcore/theory_arith_bounds.go",
+        "pkg/smtcore/theory_arith_mixed.go",
+        "pkg/smtcore/theory_arith_casts.go",
+        "pkg/smtcore/theory_arith_mixed_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
-        "TestSMTNormalizeArithmeticIntegerBound"
+        "TestSMTNormalizeArithmeticIntegerBound",
+        "TestSMTMixedArithmeticScopeModel",
+        "TestSMTMixedArithmeticCastsScopedProofs",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -114762,9 +114914,26 @@
           "tests": [
             "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic"
           ]
+        },
+        {
+          "name": "mixed-column integer feasibility: integral polynomial rational-bound rounding, integer-only branch selection, negative infinitesimal floor handling and scoped integrality metadata alongside unrestricted real columns",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_mixed.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTMixedArithmeticScopeModel",
+            "TestSMTMixedArithmeticCastsScopedProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification."
+      ],
       "deviations": []
     },
     {

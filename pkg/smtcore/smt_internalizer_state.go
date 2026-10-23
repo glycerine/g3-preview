@@ -29,6 +29,7 @@ type smtInternalizerScope struct {
 	theoryDiseqHead    int
 	atomHead           int
 	notifyLimit        int
+	enodeFlagLimit     int
 	simplifyHead       int
 	inconsistent       bool
 	conflict           SMTBooleanJustification
@@ -133,6 +134,7 @@ type SMTInternalizerState struct {
 	theoryDisequalityHead    int
 	atomPropagationHead      int
 	notifyTrail              []smtInternalizerNotifyTrail
+	enodeFlagTrail           []int32
 	clauses                  []SMTInternalizedClause
 	ownedJustifications      []SMTJustification
 	assignedLiterals         []SMTLiteral
@@ -616,6 +618,7 @@ func (s *SMTInternalizerState) PushScope() error {
 		theoryEqLimit: len(s.theoryEqualities), theoryEqHead: s.theoryEqualityHead,
 		theoryDiseqLimit: len(s.theoryDisequalities), theoryDiseqHead: s.theoryDisequalityHead,
 		atomHead: s.atomPropagationHead, notifyLimit: len(s.notifyTrail), simplifyHead: s.simplifyHead,
+		enodeFlagLimit: len(s.enodeFlagTrail),
 	})
 	if s.quantifiers != nil {
 		if err := s.quantifiers.PushScope(); err != nil {
@@ -771,6 +774,14 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		return ast.ErrASTDomain
 	}
 	s.atomPropagationHead = scope.atomHead
+	if scope.enodeFlagLimit < 0 || scope.enodeFlagLimit > len(s.enodeFlagTrail) {
+		return ast.ErrASTDomain
+	}
+	for len(s.enodeFlagTrail) > scope.enodeFlagLimit {
+		i := len(s.enodeFlagTrail) - 1
+		s.booleanData[s.enodeFlagTrail[i]].ResetENode()
+		s.enodeFlagTrail = s.enodeFlagTrail[:i]
+	}
 	for len(s.notifyTrail) > scope.notifyLimit {
 		index := len(s.notifyTrail) - 1
 		entry := s.notifyTrail[index]

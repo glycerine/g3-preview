@@ -1,0 +1,6 @@
+(set-logic QF_LIRA)
+(declare-const r Real)
+(assert (is_int r))
+(assert (> r 0.0))
+(assert (< r 1.0))
+(check-sat)
