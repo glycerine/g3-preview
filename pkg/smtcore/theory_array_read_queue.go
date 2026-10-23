@@ -90,7 +90,7 @@ func (t *SMTArrayTheory) assertStoreReadAxiomCore(read, store ast.ASTHandle) err
 			if selected == fallback {
 				break
 			}
-			consequenceExpr, err = s.manager.MkEq(selected, fallback)
+			consequenceExpr, err = s.mkEqualityAtom(selected, fallback)
 			if err != nil {
 				return err
 			}

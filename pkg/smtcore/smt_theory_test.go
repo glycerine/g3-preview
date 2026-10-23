@@ -298,4 +298,9 @@ func TestSMTTheoryBaseConstructsEqualityLiteral(t *testing.T) {
 	if !found || variable != literal.Var() || state.context.enodes[values[0]] == nil || state.context.enodes[values[1]] == nil {
 		t.Fatal("equality internalization", variable, found, literal)
 	}
+	reversed, err := base.MkEqualityLiteral(values[1], values[0], true)
+	astTestMust(t, err)
+	if reversed != literal {
+		t.Fatal("reversed search equality created a second Boolean atom", literal, reversed)
+	}
 }

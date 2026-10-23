@@ -138,7 +138,7 @@ func (t *SMTTheoryBase) MkEqualityLiteral(left, right ast.ASTHandle, gateContext
 	if err != nil {
 		return SMTNullLiteral, err
 	}
-	equality, err := state.manager.MkEq(left, right)
+	equality, err := state.mkEqualityAtom(left, right)
 	if err != nil {
 		return SMTNullLiteral, err
 	}

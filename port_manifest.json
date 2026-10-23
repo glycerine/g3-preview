@@ -106361,6 +106361,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_equality_atom.go",
+        "pkg/smtcore/smt_equality_atom_test.go",
+        "pkg/smtcore/smt_theory_test.go",
         "pkg/smtcore/theory_array_model.go",
         "pkg/smtcore/theory_array_model_test.go",
         "pkg/smtcore/theory_array_full_parents.go",
@@ -106410,6 +106413,7 @@
         "pkg/smtcore/theory_arith_assume_eq_test.go"
       ],
       "tests": [
+        "TestSMTSearchEqualityArithmeticConventions",
         "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
         "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
@@ -107377,6 +107381,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "search equality atom canonicalization by operand sort family, AST ID ordering, arithmetic numeral placement and constant folding, with default behavior for dummy arithmetic",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_equality_atom.go",
+          "go_targets": [
+            "pkg/smtcore/smt_equality_atom_test.go",
+            "pkg/smtcore/smt_theory_test.go"
+          ],
+          "tests": [
+            "TestSMTSearchEqualityArithmeticConventions",
+            "TestSMTTheoryBaseConstructsEqualityLiteral"
+          ]
+        },
         {
           "name": "mk_proto_model completes partial function interpretations after quantifier model adjustment, including array tables with unspecified defaults; cleanup/compression integration remains separate",
           "status": "ported",
@@ -113856,12 +113873,16 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/smtcore/smt_equality_atom.go",
+        "pkg/smtcore/smt_equality_atom_test.go",
+        "pkg/smtcore/smt_theory_test.go",
         "pkg/smtcore/smt_theory.go",
         "pkg/smtcore/smt_theory_lifecycle.go",
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_model_value.go"
       ],
       "tests": [
+        "TestSMTSearchEqualityArithmeticConventions",
         "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTTheoryBaseConstructsEqualityLiteral"
@@ -113887,6 +113908,19 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "search equality atom canonicalization by operand sort family, AST ID ordering, arithmetic numeral placement and constant folding, with default behavior for dummy arithmetic",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_equality_atom.go",
+          "go_targets": [
+            "pkg/smtcore/smt_equality_atom_test.go",
+            "pkg/smtcore/smt_theory_test.go"
+          ],
+          "tests": [
+            "TestSMTSearchEqualityArithmeticConventions",
+            "TestSMTTheoryBaseConstructsEqualityLiteral"
+          ]
+        },
         {
           "name": "context initialization, theory-variable creation and lookup, and scope push/pop",
           "status": "ported",
@@ -113931,12 +113965,16 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/smtcore/smt_equality_atom.go",
+        "pkg/smtcore/smt_equality_atom_test.go",
+        "pkg/smtcore/smt_theory_test.go",
         "pkg/smtcore/smt_theory.go",
         "pkg/smtcore/smt_theory_lifecycle.go",
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_model_value.go"
       ],
       "tests": [
+        "TestSMTSearchEqualityArithmeticConventions",
         "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTTheoryBaseConstructsEqualityLiteral"
@@ -113980,6 +114018,19 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "search equality atom canonicalization by operand sort family, AST ID ordering, arithmetic numeral placement and constant folding, with default behavior for dummy arithmetic",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_equality_atom.go",
+          "go_targets": [
+            "pkg/smtcore/smt_equality_atom_test.go",
+            "pkg/smtcore/smt_theory_test.go"
+          ],
+          "tests": [
+            "TestSMTSearchEqualityArithmeticConventions",
+            "TestSMTTheoryBaseConstructsEqualityLiteral"
+          ]
+        },
         {
           "name": "typed internalization, theory-variable, scope, assignment, relevancy, equality/disequality event, equality-literal construction, propagation, setup, search initialization, restart, and final-check interface",
           "status": "ported",

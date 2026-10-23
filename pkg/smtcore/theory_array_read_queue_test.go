@@ -75,7 +75,7 @@ func TestSMTArrayStoreReadQueuesProofBranchesAndRelevance(t *testing.T) {
 			}
 			sameIndexRead, err := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{store, indices[0]})
 			astTestMust(t, err)
-			unitEquality, err := m.MkEq(sameIndexRead, value)
+			unitEquality, err := state.mkEqualityAtom(sameIndexRead, value)
 			astTestMust(t, err)
 			_, unitVariable := state.BoolVar(unitEquality)
 			if unitVariable != proofs {
@@ -88,7 +88,7 @@ func TestSMTArrayStoreReadQueuesProofBranchesAndRelevance(t *testing.T) {
 			}
 			fallback, err := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{array, indices[1]})
 			astTestMust(t, err)
-			consequence, err := m.MkEq(read, fallback)
+			consequence, err := state.mkEqualityAtom(read, fallback)
 			astTestMust(t, err)
 			if state.relevancy.IsRelevant(consequence) {
 				t.Fatal("read consequence was relevant before its index premise")
