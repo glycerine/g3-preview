@@ -4,7 +4,26 @@ package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 
+// smtLogicUsesUnknownSetup mirrors setup::setup_default's fallthrough to
+// setup_unknown. QF_FD is a retained Go specialization whose concrete finite
+// domain theories are selected below.
+func smtLogicUsesUnknownSetup(logic string) bool {
+	switch logic {
+	case "QF_UF", "QF_RDL", "QF_IDL", "QF_UFIDL", "QF_LRA", "QF_LIA", "QF_UFLIA", "QF_UFLRA",
+		"QF_AX", "QF_AUFLIA", "QF_BV", "QF_AUFBV", "QF_ABV", "QF_UFBV", "QF_BVRE",
+		"AUFLIA", "AUFLIRA", "AUFNIRA", "AUFLIA+", "AUFLIA-", "AUFLIRA+", "AUFLIRA-",
+		"AUFNIRA+", "AUFNIRA-", "UFNIA", "UFLRA", "LRA", "QF_FP", "QF_FPBV", "QF_BVFP",
+		"QF_S", "QF_DT", "QF_FD":
+		return false
+	default:
+		return true
+	}
+}
+
 func smtLogicUsesArithmetic(logic string) bool {
+	if smtLogicUsesUnknownSetup(logic) {
+		return true
+	}
 	switch logic {
 	case "QF_RDL", "QF_IDL", "QF_UFIDL", "QF_LRA", "QF_LIA", "QF_UFLIA", "QF_UFLRA",
 		"QF_AUFLIA", "AUFLIA", "AUFLIRA", "AUFNIRA", "AUFLIA+", "AUFLIA-", "AUFLIRA+",
@@ -16,6 +35,9 @@ func smtLogicUsesArithmetic(logic string) bool {
 }
 
 func smtLogicUsesArrays(logic string) bool {
+	if smtLogicUsesUnknownSetup(logic) {
+		return true
+	}
 	switch logic {
 	case "QF_AX", "QF_AUFBV", "QF_ABV", "QF_UFBV", "QF_AUFLIA", "AUFLIA", "AUFLIRA", "AUFNIRA", "UFLRA", "UFNIA",
 		"AUFLIA+", "AUFLIA-", "AUFLIRA+", "AUFLIRA-", "AUFNIRA+", "AUFNIRA-":
@@ -26,6 +48,9 @@ func smtLogicUsesArrays(logic string) bool {
 }
 
 func smtLogicUsesBitVectors(logic string) bool {
+	if smtLogicUsesUnknownSetup(logic) {
+		return true
+	}
 	switch logic {
 	case "QF_BV", "QF_UFBV", "QF_AUFBV", "QF_ABV", "QF_BVRE", "QF_FP", "QF_FPBV", "QF_BVFP", "QF_FD", "ALL":
 		return true
@@ -35,6 +60,9 @@ func smtLogicUsesBitVectors(logic string) bool {
 }
 
 func smtLogicUsesDatatypes(logic string) bool {
+	if smtLogicUsesUnknownSetup(logic) {
+		return true
+	}
 	switch logic {
 	case "QF_DT", "QF_FD", "ALL":
 		return true
@@ -43,16 +71,20 @@ func smtLogicUsesDatatypes(logic string) bool {
 	}
 }
 
-func smtLogicUsesPseudoBooleans(logic string) bool { return logic == "QF_FD" || logic == "ALL" }
+func smtLogicUsesPseudoBooleans(logic string) bool {
+	return logic == "QF_FD" || smtLogicUsesUnknownSetup(logic)
+}
 
-func smtLogicUsesDatalog(logic string) bool { return logic == "QF_FD" || logic == "ALL" }
+func smtLogicUsesDatalog(logic string) bool {
+	return logic == "QF_FD" || smtLogicUsesUnknownSetup(logic)
+}
 
 func smtLogicUsesFloatingPoint(logic string) bool {
-	return logic == "QF_FP" || logic == "QF_FPBV" || logic == "QF_BVFP" || logic == "ALL"
+	return logic == "QF_FP" || logic == "QF_FPBV" || logic == "QF_BVFP" || smtLogicUsesUnknownSetup(logic)
 }
 
 func smtLogicUsesSequences(logic string) bool {
-	return logic == "QF_BVRE" || logic == "QF_S" || logic == "ALL"
+	return logic == "QF_BVRE" || logic == "QF_S" || smtLogicUsesUnknownSetup(logic)
 }
 
 func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic string) error {

@@ -1,6 +1,7 @@
 package smtcore
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -155,5 +156,71 @@ func TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset(t *testing.T) {
 				t.Fatal(logic, "linear contradiction", status)
 			}
 		})
+	}
+}
+
+func TestSMTUnknownLogicSetupInstallsConservativeTheoryFallback(t *testing.T) {
+	for _, test := range []struct {
+		logic   string
+		integer bool
+	}{
+		{logic: "QF_NIA", integer: true},
+		{logic: "QF_NRA"},
+		{logic: "QF_UFNRA"},
+	} {
+		t.Run(test.logic, func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			arithmeticFamily, err := m.RegisterArithmeticPlugin()
+			astTestMust(t, err)
+			arrayFamily, err := m.RegisterArrayPlugin()
+			astTestMust(t, err)
+			sortKind := int32(0)
+			if test.integer {
+				sortKind = 1
+			}
+			arithmeticSort, err := m.MkFamilySort(arithmeticFamily, sortKind, nil)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "unknown-setup-x-"+test.logic), arithmeticSort)
+			astTestMust(t, err)
+			zero, err := m.ArithmeticNumeralRat(big.NewRat(0, 1), test.integer)
+			astTestMust(t, err)
+			product, err := m.MkFamilyApp(arithmeticFamily, smtArithOpMul, nil, []ast.ASTHandle{x, x})
+			astTestMust(t, err)
+			positive, err := m.MkFamilyApp(arithmeticFamily, smtArithOpGT, nil, []ast.ASTHandle{product, zero})
+			astTestMust(t, err)
+			solver, err := NewSMTSolver(m, nil, test.logic, SMTSolverConfig{
+				Params:         modelConfig.Context,
+				ModelEvaluator: modelConfig,
+			})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			if _, ok := solver.kernel.internalizer.theories[arithmeticFamily].(*SMTDummyTheory); !ok {
+				t.Fatal(test.logic, "did not install conservative arithmetic fallback")
+			}
+			if _, ok := solver.kernel.internalizer.theories[arrayFamily].(*SMTArrayTheory); !ok {
+				t.Fatal(test.logic, "did not install setup_unknown array theory")
+			}
+			astTestMust(t, solver.Assert(positive))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.Undef {
+				t.Fatal(test.logic, "unsupported nonlinear arithmetic", status)
+			}
+		})
+	}
+}
+
+func TestSMTAllSetupIncludesArrays(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	arrayFamily, err := m.RegisterArrayPlugin()
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "ALL", SMTSolverConfig{
+		Params:         modelConfig.Context,
+		ModelEvaluator: modelConfig,
+	})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	if _, ok := solver.kernel.internalizer.theories[arrayFamily].(*SMTArrayTheory); !ok {
+		t.Fatal("ALL did not install setup_unknown array theory")
 	}
 }

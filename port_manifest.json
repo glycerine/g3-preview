@@ -110053,6 +110053,8 @@
         "TestSMTQFAUFLIASetupUsesIntegerArithmeticAndArrays",
         "TestSMTLinearRealLogicSetupUsesConcreteArithmetic",
         "TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset",
+        "TestSMTUnknownLogicSetupInstallsConservativeTheoryFallback",
+        "TestSMTAllSetupIncludesArrays",
         "TestSMTDatatypeQFDTSetup",
         "TestSMTPseudoBooleanQFFDExactCardinality",
         "TestSMTQFFPSetupInstallsFloatingPointAndBitVectorTheories",
@@ -110077,7 +110079,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "explicit arithmetic and array logic classification, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA/QF_UFLRA/QF_UFLIA/QF_AUFLIA/LRA/UFLRA and retained AUFLIA/AUFLIA+/AUFLIA-/UFNIA linear-subset theory selection, native shared QF_UFBV array/bit-vector and quantified array routing, and conservative incomplete-theory installation for remaining nonlinear or mixed arithmetic logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409)",
+          "name": "explicit arithmetic and array logic classification, setup_unknown all-theory fallback, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA/QF_UFLRA/QF_UFLIA/QF_AUFLIA/LRA/UFLRA and retained AUFLIA/AUFLIA+/AUFLIA-/UFNIA linear-subset theory selection, native shared QF_UFBV array/bit-vector and quantified array routing, and conservative incomplete-theory installation for remaining nonlinear or mixed arithmetic logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409,891-905)",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
@@ -110092,7 +110094,9 @@
             "TestSMTQFUFBVSetupUsesNativeArrayAndBitVectorRoute",
             "TestSMTQFAUFLIASetupUsesIntegerArithmeticAndArrays",
             "TestSMTLinearRealLogicSetupUsesConcreteArithmetic",
-            "TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset"
+            "TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset",
+            "TestSMTUnknownLogicSetupInstallsConservativeTheoryFallback",
+            "TestSMTAllSetupIncludesArrays"
           ]
         },
         {
@@ -110136,7 +110140,7 @@
         "The kernel owns its theory registry; setup creates concrete real difference, integer difference, linear rational, or partial linear integer theories for QF_RDL, QF_IDL/QF_UFIDL, QF_LRA/QF_UFLRA, and QF_LIA/QF_UFLIA and dummy-theory values for reached families whose solvers remain unavailable."
       ],
       "deviations": [
-        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. QF_FP, QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory together with its bit-vector backend. QF_BVRE, QF_S and ALL install the concrete sequence theory. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics likewise return incompleteness instead of an unsound result."
+        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. Unrecognized logics follow source setup_unknown and install every retained theory; unsupported arithmetic uses the dummy checkpoint so nonlinear terms return incompleteness. QF_FP, QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory together with its bit-vector backend. QF_BVRE, QF_S and ALL install the concrete sequence theory. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics likewise return incompleteness instead of an unsound result."
       ]
     },
     {
