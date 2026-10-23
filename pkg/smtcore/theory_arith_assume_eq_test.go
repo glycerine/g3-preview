@@ -60,6 +60,8 @@ func TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels(t *testing.T) {
 				for repeat := 0; repeat < 2; repeat++ {
 					astTestMust(t, s.Push())
 					astTestMust(t, s.Assert(neq))
+					interfaceBefore := s.kernel.internalizer.statistics.NumInterfaceEqs
+					progressBefore := s.kernel.internalizer.theoryProgress
 					status, err := s.CheckSat(nil)
 					astTestMust(t, err)
 					if status != lbool.True {
@@ -84,8 +86,9 @@ func TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels(t *testing.T) {
 					if values[0] == values[1] {
 						t.Fatal("UF disequality has equal arithmetic arguments in returned model", values)
 					}
-					if s.kernel.internalizer.statistics.NumInterfaceEqs == 0 {
-						t.Fatal("shared model-value equality was not split")
+					theory := s.kernel.internalizer.theories[family].(*SMTLinearArithmeticTheory)
+					if s.kernel.internalizer.statistics.NumInterfaceEqs != interfaceBefore || s.kernel.internalizer.theoryProgress <= progressBefore || theory.liberalFinalCheck {
+						t.Fatal("free shared values did not use assignment mutation followed by conservative validation")
 					}
 					astTestMust(t, s.Push())
 					for _, formula := range cycle {
@@ -95,6 +98,12 @@ func TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels(t *testing.T) {
 					astTestMust(t, err)
 					if status != lbool.False {
 						t.Fatal("arithmetic equality cycle and UF disequality", status)
+					}
+					// Unconstrained inputs can now be separated by source assignment
+					// mutation. This equality cycle has no freedom and must still
+					// exercise the Boolean interface split fallback.
+					if s.kernel.internalizer.statistics.NumInterfaceEqs == interfaceBefore {
+						t.Fatal("immovable shared model-value equality was not split")
 					}
 					if proofs {
 						proof, err := s.Proof()
@@ -112,8 +121,7 @@ func TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels(t *testing.T) {
 						t.Fatal("interface equality decision survived pop", status)
 					}
 					astTestMust(t, s.Pop(1))
-					theory := s.kernel.internalizer.theories[family].(*SMTLinearArithmeticTheory)
-					if len(theory.assumeEqualityCandidates) != 0 || theory.assumeEqualityHead != 0 {
+					if len(theory.assumeEqualityCandidates) != 0 || theory.assumeEqualityHead != 0 || theory.finalCheckIndex != 0 {
 						t.Fatal("shared equality candidates survived scope pop")
 					}
 				}

@@ -7,6 +7,11 @@ type smtArithmeticEqualityCandidate struct {
 	left, right SMTTheoryVar
 }
 
+type smtArithmeticSharedValueKey struct {
+	sort          ast.ASTHandle
+	main, epsilon string
+}
+
 func (t *SMTLinearArithmeticTheory) delayedAssumeEqualities() (bool, error) {
 	for t.assumeEqualityHead < len(t.assumeEqualityCandidates) {
 		pair := t.assumeEqualityCandidates[t.assumeEqualityHead]
@@ -35,11 +40,12 @@ func (t *SMTLinearArithmeticTheory) assumeSharedEqualities() (bool, error) {
 	if progress, err := t.delayedAssumeEqualities(); err != nil || progress {
 		return progress, err
 	}
-	type key struct {
-		sort          ast.ASTHandle
-		main, epsilon string
+	if t.liberalFinalCheck {
+		if err := t.mutateArithmeticAssignment(); err != nil {
+			return false, err
+		}
 	}
-	values := make(map[key]SMTTheoryVar)
+	values := make(map[smtArithmeticSharedValueKey]SMTTheoryVar)
 	for variable, column := range t.simplexVariables {
 		node, err := t.Enode(SMTTheoryVar(variable))
 		if err != nil {
@@ -60,7 +66,7 @@ func (t *SMTLinearArithmeticTheory) assumeSharedEqualities() (bool, error) {
 			return false, err
 		}
 		value := t.solver.Value(column)
-		k := key{sort, value.Main.RatString(), value.Epsilon.RatString()}
+		k := smtArithmeticSharedValueKey{sort, value.Main.RatString(), value.Epsilon.RatString()}
 		other, found := values[k]
 		if !found {
 			values[k] = SMTTheoryVar(variable)

@@ -78,6 +78,7 @@ type smtLinearArithmeticAtom struct {
 }
 
 type smtLinearArithmeticScope struct {
+	finalCheckIndex                      uint32
 	assumeEqualities, assumeEqualityHead int
 	derivedBounds                        int
 	nonlinearStrategy                    uint32
@@ -112,12 +113,14 @@ type smtLinearArithmeticStatistics struct {
 // bound. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
-	assumeEqualityCandidates []smtArithmeticEqualityCandidate
-	assumeEqualityHead       int
-	derivedBounds            []smtArithmeticReplayBound
-	nonlinearStrategy        uint32
-	nonlinearGBPerturbate    bool
-	nonlinearGBExhausted     bool
+	finalCheckIndex                      uint32
+	liberalFinalCheck, changedAssignment bool
+	assumeEqualityCandidates             []smtArithmeticEqualityCandidate
+	assumeEqualityHead                   int
+	derivedBounds                        []smtArithmeticReplayBound
+	nonlinearStrategy                    uint32
+	nonlinearGBPerturbate                bool
+	nonlinearGBExhausted                 bool
 	*SMTTheoryBase
 	solver              *simplex.Solver
 	simplexVariables    []uint32
@@ -176,6 +179,7 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		return nil, err
 	}
 	t := &SMTLinearArithmeticTheory{
+		liberalFinalCheck:     true,
 		SMTTheoryBase:         base,
 		solver:                simplex.NewSolver(nil),
 		atomByBool:            make(map[int32]int),
@@ -1305,6 +1309,7 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail), nonlinearTerms: len(t.nonlinearColumns), nonlinearRounds: t.nonlinearRounds, nonlinearGBExhausted: t.nonlinearGBExhausted, derivedBounds: len(t.derivedBounds), nonlinearStrategy: t.nonlinearStrategy})
 	t.scopes[len(t.scopes)-1].assumeEqualities = len(t.assumeEqualityCandidates)
 	t.scopes[len(t.scopes)-1].assumeEqualityHead = t.assumeEqualityHead
+	t.scopes[len(t.scopes)-1].finalCheckIndex = t.finalCheckIndex
 	return nil
 }
 
@@ -1314,6 +1319,7 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
+	t.finalCheckIndex = scope.finalCheckIndex
 	clear(t.assumeEqualityCandidates[scope.assumeEqualities:])
 	t.assumeEqualityCandidates = t.assumeEqualityCandidates[:scope.assumeEqualities]
 	t.assumeEqualityHead = scope.assumeEqualityHead
@@ -1386,121 +1392,18 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if propagated {
 		return SMTFinalCheckContinue, nil
 	}
-	if t.integer || t.mixed {
-		if _, _, fractional := t.fractionalVariable(t.solver); fractional {
-			var nodes uint32
-			status, err := t.integerFeasible(nil, &nodes)
-			if err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-			if status == lbool.Undef {
-				return SMTFinalCheckGiveUp, nil
-			}
-			if status == lbool.False {
-				state, stateErr := t.State()
-				if stateErr != nil {
-					return SMTFinalCheckGiveUp, stateErr
-				}
-				literals := make([]SMTLiteral, 0, len(t.assertions))
-				for _, assertion := range t.assertions {
-					literal := NewSMTLiteral(t.atoms[assertion.atom].variable, false)
-					if !assertion.truth {
-						literal = literal.Negated()
-					}
-					literals = append(literals, literal)
-				}
-				if len(literals) == 0 {
-					return SMTFinalCheckGiveUp, nil
-				}
-				t.statistics.conflicts++
-				if stateErr = state.SetTheoryConflict(t.FamilyID(), literals); stateErr != nil {
-					return SMTFinalCheckGiveUp, stateErr
-				}
-				return SMTFinalCheckContinue, nil
-			}
-		}
-	}
-	if progress, err := t.assumeSharedEqualities(); err != nil {
+	if progress, err := t.delayedAssumeEqualities(); err != nil {
 		return SMTFinalCheckGiveUp, err
 	} else if progress {
 		return SMTFinalCheckContinue, nil
 	}
-	satisfied, err := t.checkNonlinearMonomialAssignments()
-	if err != nil {
-		return SMTFinalCheckGiveUp, err
+	t.liberalFinalCheck, t.changedAssignment = true, false
+	status, err := t.finalCheckArithmeticCore()
+	if err != nil || status != SMTFinalCheckDone || !t.changedAssignment {
+		return status, err
 	}
-	complete, conflict, err := t.checkNonlinearAssertions(satisfied)
-	if err != nil {
-		return SMTFinalCheckGiveUp, err
-	}
-	if conflict {
-		return SMTFinalCheckContinue, nil
-	}
-	if (!satisfied || !complete) && t.nonlinearEnabled && len(t.nonlinearColumns) != 0 {
-		if t.nonlinearRounds > t.nonlinearRoundLimit {
-			return SMTFinalCheckGiveUp, nil
-		}
-		t.nonlinearRounds++
-		if progress, err := t.maxMinNonlinearVariables(); err != nil {
-			return SMTFinalCheckGiveUp, err
-		} else if progress {
-			if t.state.inconsistent {
-				return SMTFinalCheckContinue, nil
-			}
-			if fixed, err := t.propagateFixedSharedValues(); err != nil {
-				return SMTFinalCheckGiveUp, err
-			} else if fixed {
-				return SMTFinalCheckContinue, nil
-			}
-			satisfied, err = t.checkNonlinearMonomialAssignments()
-			if err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-			complete, conflict, err = t.checkNonlinearAssertions(satisfied)
-			if err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-			if conflict || satisfied && complete {
-				return SMTFinalCheckContinue, nil
-			}
-		}
-		// A branch-and-bound tableau contains speculative bounds. Replay
-		// interval propagation inside buildSimplex, where a contradiction
-		// rejects only that branch rather than the whole SMT context.
-		if !satisfied {
-			satisfied, err = t.completeNonlinearCandidate()
-			if err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-		}
-		if satisfied {
-			complete, conflict, err = t.checkNonlinearAssertions(true)
-			if err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-			if conflict {
-				return SMTFinalCheckContinue, nil
-			}
-		}
-	}
-	if !satisfied || !complete {
-		if t.nonlinearEnabled && len(t.nonlinearColumns) != 0 {
-			progress, err := t.runNonlinearStrategies()
-			if err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-			if progress {
-				return SMTFinalCheckContinue, nil
-			}
-		}
-		return SMTFinalCheckGiveUp, nil
-	}
-	if progress, err := t.assumeSharedEqualities(); err != nil {
-		return SMTFinalCheckGiveUp, err
-	} else if progress {
-		return SMTFinalCheckContinue, nil
-	}
-	return SMTFinalCheckDone, nil
+	t.liberalFinalCheck, t.changedAssignment = false, false
+	return t.finalCheckArithmeticCore()
 }
 
 type smtFixedPolynomialValue struct {
@@ -1852,6 +1755,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions(validated bool) (bo
 }
 
 func (t *SMTLinearArithmeticTheory) InitializeSearch() error {
+	t.finalCheckIndex = 0
 	t.nonlinearStrategy = 0
 	t.nonlinearGBExhausted = false
 	return t.equalityAdapter.InitializeSearch()

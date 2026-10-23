@@ -107166,7 +107166,8 @@
       "deviations": [
         "Structural subsumption remains unported.",
         "Go creates interpreted true/false enodes on first term use rather than during context initialization. Assigned Boolean terms merge with those truth-value classes, including when their enodes are created after assignment; conflict antecedent lookup retains the actual assigned polarity.",
-        "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. The source liberal assignment mutation and full three-way final-check scheduler remain incomplete."
+        "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
+        "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial."
       ]
     },
     {
@@ -113435,7 +113436,10 @@
         "pkg/smtcore/theory_arith_max_min.go",
         "pkg/smtcore/theory_arith_max_min_test.go",
         "pkg/smtcore/theory_arith_assume_eq.go",
-        "pkg/smtcore/theory_arith_assume_eq_test.go"
+        "pkg/smtcore/theory_arith_assume_eq_test.go",
+        "pkg/math/simplex/arith_freedom.go",
+        "pkg/math/simplex/arith_freedom_test.go",
+        "pkg/smtcore/theory_arith_mutation.go"
       ],
       "tests": [
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
@@ -113452,7 +113456,10 @@
         "TestArithmeticMaxMinDerivedExtremaAndBestEffort",
         "TestArithmeticMaxMinIntegerGainsAndSharedMovement",
         "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
-        "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
+        "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
+        "TestArithmeticFreedomIntegerMultiplesAndFixedBasePivot",
+        "TestArithmeticFreedomRealOpenIntervalsAndOneSidedUpdates",
+        "TestArithmeticFreedomNegativeOpenIntegerLCM"
       ],
       "conditionals": [
         {
@@ -113897,9 +113904,35 @@
           ]
         },
         {
-          "name": "assume_eqs_core groups relevant shared arithmetic variables by exact symbolic value and sort; candidate queue generation is retained while liberal assignment mutation remains incomplete",
-          "status": "partial",
+          "name": "assume_eqs_core groups relevant shared arithmetic variables by exact symbolic value and sort after optional liberal assignment mutation, then drains the scoped interface equality queue",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_assume_eq.go",
+          "tests": [
+            "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
+          ]
+        },
+        {
+          "name": "get_freedom_interval and random_update: exact row-derived movement intervals, normalized basis coefficients, integer denominator LCM, open endpoint rounding and source random range",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/arith_freedom.go",
+          "tests": [
+            "TestArithmeticFreedomIntegerMultiplesAndFixedBasePivot",
+            "TestArithmeticFreedomRealOpenIntervalsAndOneSidedUpdates",
+            "TestArithmeticFreedomNegativeOpenIntegerLCM"
+          ]
+        },
+        {
+          "name": "remove_fixed_vars_from_base pivots each fixed basic column with the first nonfixed row entry before assignment mutation",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/arith_freedom.go",
+          "tests": [
+            "TestArithmeticFreedomIntegerMultiplesAndFixedBasePivot"
+          ]
+        },
+        {
+          "name": "mutate_assignment: detect equal-valued shared variables of distinct roots, select nonfixed candidates, and move a nonbasic column or the first movable dependency of a basic column",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_mutation.go",
           "tests": [
             "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
           ]
@@ -113908,7 +113941,8 @@
       "ownership": [],
       "deviations": [
         "The retained nonlinear max/min path uses a temporary canonical objective row, removed on return, with raw matrix pivot coefficients normalized for source gain formulas. Integer-column gain and sharing guards are retained. The maintain_integrality=true optimization-engine path remains unported; this is not a claim to complete optimization support.",
-        "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. The source liberal assignment mutation and full three-way final-check scheduler remain incomplete."
+        "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
+        "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial."
       ]
     },
     {
@@ -113937,7 +113971,9 @@
         "pkg/smtcore/theory_arith_epsilon_test.go",
         "pkg/smtcore/theory_arith_assume_eq.go",
         "pkg/smtcore/theory_arith_assume_eq_test.go",
-        "pkg/smtcore/smt_assume_eq_test.go"
+        "pkg/smtcore/smt_assume_eq_test.go",
+        "pkg/smtcore/theory_arith_final_check.go",
+        "pkg/smtcore/theory_arith_mutation.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -114813,6 +114849,17 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "final_check_core and final_check_eh three-stage scheduling: scoped rotating integer/shared-equality/nonlinear stages, accumulated give-up status, liberal assignment mutation followed by conservative revalidation, and numeric assignment progress",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_final_check.go",
+          "tests": [
+            "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
+            "TestSMTNonlinearNumericProgressAndScopedStrategies",
+            "TestSMTNonlinearIntegerBranchesScopedProofsAndModels",
+            "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
+          ]
         }
       ],
       "ownership": [
@@ -114823,8 +114870,9 @@
         "Affine definition-bound propagation evaluates retained replay rows before and after nonlinear interval propagation, including sign reversal for negated-square aliases. General row scheduling, propagation to every row variable, and minimal row-bound explanations remain incomplete.",
         "Shared arithmetic variables can become fixed through a combination of row bounds even when no explicit opposite unary bounds occur. A branch-free row interval pass derives these points, retains only newly fixed original columns as scoped replay bounds, and propagates equal-valued shared roots with all active arithmetic literals as premises. This closes the false-SAT case x>=0, y>=0, x+y<=0, f(x)!=f(y). General bound-atom propagation and optimal fixed-point discovery remain separate work.",
         "The existing small-row interval calculation is shared by fixed-value equality propagation and nonlinear strategy bound replay. Equality aliases such as x=2*y now carry finite factor bounds into monomial intervals. Source minimal dependency explanations and full propagation scheduling remain incomplete.",
-        "Model epsilon refinement now preserves distinctions between shared real symbolic assignments before concrete rational model construction. The same deterministic refinement runs before nonlinear product validation and candidate completion, so model construction cannot silently change the epsilon on which a validated product depended. Integer branching uses the same computation and propagates errors. The focused regression reproduces the source 19/2 versus 10-epsilon collision, checks equality preservation, and inspects a returned UF/arithmetic model. The source liberal assignment mutation remains incomplete; shared equality case splitting is recorded separately below.",
-        "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. The source liberal assignment mutation and full three-way final-check scheduler remain incomplete."
+        "Model epsilon refinement now preserves distinctions between shared real symbolic assignments before concrete rational model construction. The same deterministic refinement runs before nonlinear product validation and candidate completion, so model construction cannot silently change the epsilon on which a validated product depended. Integer branching uses the same computation and propagates errors. The focused regression reproduces the source 19/2 versus 10-epsilon collision, checks equality preservation, and inspects a returned UF/arithmetic model. Shared equality case splitting, assignment mutation and final-check scheduling are recorded separately below.",
+        "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
+        "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial."
       ]
     },
     {
@@ -115891,7 +115939,8 @@
         "Nonlinear clusters now follow actual column/row incidence after simplex pivots, stopping expansion at fixed variables and pruning rows whose different base variable is free. Clustered canonical rows are sent to Grobner reasoning with their current bounds. Replay-only comparison columns use pinned local Real AST variables indexed by column; these polynomial-elimination aliases are released at the end of the call and never enter the SMT context or public model. Existing definition/opposite-bound seeds remain valid redundant equations. The replay tableau has no quasi-base row representation.",
         "The source four-way nonlinear strategy index is now scoped and resets at search initialization. Interval improvements derived from a branch-free tableau are retained as scoped theory-column bounds and strengthened on replay, including integer-feasibility replay; speculative branch bounds never justify global conflicts. The source nonlinear round limit covers repeated attempts. Numeric-only progress increments an internal search generation so the Go no-progress guard retries final checking without inventing Boolean atoms. Remaining driver work includes max/min bound discovery and assignment movement, full row-level nested checks and source resource/dependency refinements.",
         "Nonlinear final checking now moves nonbase variables to bounds and runs the retained source max/min optimizer before the rotating strategies. Only exact unshared optimized results become scoped replay bounds; best-effort results are never promoted to logical facts. Changed unshared candidates must satisfy all products, active assertions and integrality. Shared assignment interface-equality adjustment, full row-level nested checks, irrational models and remaining source resource/dependency refinements are still incomplete.",
-        "Model epsilon refinement now preserves distinctions between shared real symbolic assignments before concrete rational model construction. The same deterministic refinement runs before nonlinear product validation and candidate completion, so model construction cannot silently change the epsilon on which a validated product depended. Integer branching uses the same computation and propagates errors. The focused regression reproduces the source 19/2 versus 10-epsilon collision, checks equality preservation, and inspects a returned UF/arithmetic model. The separate shared-equality assumption queue and assignment mutation paths remain incomplete."
+        "Model epsilon refinement now preserves distinctions between shared real symbolic assignments before concrete rational model construction. The same deterministic refinement runs before nonlinear product validation and candidate completion, so model construction cannot silently change the epsilon on which a validated product depended. Integer branching uses the same computation and propagates errors. The focused regression reproduces the source 19/2 versus 10-epsilon collision, checks equality preservation, and inspects a returned UF/arithmetic model. The shared-equality queue, assignment mutation and final-check scheduling are recorded in the arithmetic auxiliary and core units.",
+        "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial."
       ]
     },
     {
