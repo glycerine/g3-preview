@@ -55,6 +55,9 @@ func (e *SMTAntecedentExpander) LiteralForENode(node *SMTEnode) (SMTLiteral, err
 	}
 	literal, found := e.enodeLiterals[node]
 	if !found {
+		if node != nil {
+			return SMTNullLiteral, fmt.Errorf("missing Boolean enode literal for %v: %w", node.owner, ast.ErrASTDomain)
+		}
 		return SMTNullLiteral, ast.ErrASTDomain
 	}
 	return literal, nil

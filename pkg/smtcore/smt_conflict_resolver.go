@@ -5,6 +5,7 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -345,7 +346,7 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 		return SMTConflictResolution{}, err
 	}
 	if err := r.syncENodeLiterals(); err != nil {
-		return SMTConflictResolution{}, err
+		return SMTConflictResolution{}, fmt.Errorf("sync enode literals: %w", err)
 	}
 	originalConflict := conflict
 	consequent := SMTFalseLiteral
@@ -355,7 +356,7 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 	levels := r.levels()
 	conflictLevel, err := SMTBooleanJustificationMaxLevel(r.expander, consequent, conflict, levels)
 	if err != nil {
-		return SMTConflictResolution{}, err
+		return SMTConflictResolution{}, fmt.Errorf("conflict maximum level (%s, literal %d): %w", conflict.Kind(), notLiteral, err)
 	}
 	if err = r.state.dynamicAck.recordConflictUses(r.expander, originalConflict); err != nil {
 		return SMTConflictResolution{}, err
@@ -458,11 +459,11 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 			}
 			antecedents, err := r.expander.ExpandJustification(object)
 			if err != nil {
-				return err
+				return fmt.Errorf("expand %s: %w", object.Name(), err)
 			}
 			for _, literal := range antecedents {
 				if err = processAntecedent(literal); err != nil {
-					return err
+					return fmt.Errorf("%s antecedent %d: %w", object.Name(), literal, err)
 				}
 			}
 		default:
@@ -478,13 +479,13 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 	index := len(r.state.assignedLiterals) - 1
 	for {
 		if err = process(consequent, conflict); err != nil {
-			return SMTConflictResolution{}, err
+			return SMTConflictResolution{}, fmt.Errorf("resolve consequent %d (%s): %w", consequent, conflict.Kind(), err)
 		}
 		for index >= 0 && !marks[r.state.assignedLiterals[index].Var()] {
 			index--
 		}
 		if index < 0 {
-			return SMTConflictResolution{}, ast.ErrASTDomain
+			return SMTConflictResolution{}, fmt.Errorf("no marked assignment at conflict level %d, remaining %d: %w", conflictLevel, numMarks, ast.ErrASTDomain)
 		}
 		consequent = r.state.assignedLiterals[index]
 		variable := consequent.Var()

@@ -44,6 +44,7 @@ type SMTArrayTheory struct {
 	scopes                                []smtArrayScope
 	unsupported                           bool
 	statistics                            smtArrayStatistics
+	extensional                           bool
 }
 
 func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
@@ -53,6 +54,7 @@ func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
 	}
 	return &SMTArrayTheory{
 		SMTTheoryBase: base,
+		extensional:   true,
 		stores:        make(map[ast.ASTHandle]bool),
 		selects:       make(map[ast.ASTHandle]bool),
 		defaults:      make(map[ast.ASTHandle]bool),
@@ -104,6 +106,11 @@ func (t *SMTArrayTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool
 				if dataErr = state.SetVariableTheory(variable, t.FamilyID()); dataErr != nil {
 					return false, fmt.Errorf("array select Boolean theory: %w", dataErr)
 				}
+			}
+			// Source internalize_term_core explicitly marks Boolean array
+			// terms as having enodes, even when they occur in gate context.
+			if err := state.ensureBooleanEnode(expression, variable, false, false, true); err != nil {
+				return false, err
 			}
 			return true, nil
 		}
@@ -671,6 +678,9 @@ func (t *SMTArrayTheory) InternalizeEquality(expression ast.ASTHandle, variable 
 	state, err := t.State()
 	if err != nil {
 		return err
+	}
+	if !t.extensional {
+		return nil
 	}
 	left, err := state.manager.GetArg(expression, 0)
 	if err != nil {

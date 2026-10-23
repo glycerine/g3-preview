@@ -108963,6 +108963,13 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/smtcore/smt_array_controls.go",
+        "pkg/smtcore/smt_array_controls_test.go",
+        "pkg/cmd/g3/test_vectors/array_extensional_disabled_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_enabled_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_live_updates.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_proof_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_simple_live_updates.smt2",
         "pkg/smtcore/smt_conflict_polarity_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd/g3/test_vectors/bit_vector_symbolic_carry_scopes.smt2",
@@ -108978,6 +108985,7 @@
         "pkg/smtcore/smt_internalizer_test.go"
       ],
       "tests": [
+        "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
         "TestSMTFailedConsequentConflictRetainsTrueOppositeAndFalseLemma",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
@@ -109364,6 +109372,20 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Boolean array select/default terms in gate context: source enode flag, assigned-literal antecedent recovery and scope cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/smtcore/smt_array_controls_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "Failed assignment and binary-propagation conflict polarity: source not_l is the already true opposite of the failed consequent; first-UIP analysis retains false lemma literals and an asserting backjump",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_boolean_propagation.go",
@@ -109523,6 +109545,7 @@
         "SMTInternalizerState owns references for registered Boolean expressions, enode owners, and retained clause proofs; it owns its congruence table, variable arrays, watch lists, scopes, clauses, assignment and theory-variable trails, registered theory order, and pending congruence records, and borrows the checker context, registered theory plugins, and optional relevancy propagator and quantifier registry."
       ],
       "deviations": [
+        "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
         "Corrected reversed not_l polarity in failed AssignLiteral and compact binary BCP conflicts. The resolver expects a true assigned premise opposite to the failed consequent; storing the false consequent created non-false learned literals. A two-level regression checks first-UIP lemma/backjump/assertion behavior, and a symbolic BV add/sub circuit with scoped contradiction/model recovery raises strict C++ runner agreement to 119 scripts.",
         "Registered theories now supply default-internalizer selection; nondefault theory families remain top-down boundaries in the ordering pass.",
         "Internalized logical clauses are retained as concrete typed records for the future DPLL watch and justification layer.",
@@ -118239,10 +118262,21 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_array_controls.go",
+        "pkg/smtcore/smt_array_controls_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/array_extensional_disabled_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_enabled_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_live_updates.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_proof_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_simple_live_updates.smt2",
         "pkg/smtcore/theory_array.go",
         "pkg/smtcore/smt_setup.go"
       ],
       "tests": [
+        "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
         "TestSMTArrayReadOverWrite"
       ],
       "assertions": [
@@ -118339,7 +118373,33 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Retained simple/full array plugin distinction, source array parameter/control consumption (including array.extensional), fresh-plugin parameter ownership and remaining delayed parent/axiom worklists",
+          "name": "array.extensional configuration consumption at theory registration and live parameter updates; disabled option emits no extensionality axiom for newly internalized array equalities",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_array_controls.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Boolean array select/default terms in gate context: source enode flag, assigned-literal antecedent recovery and scope cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/smtcore/smt_array_controls_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained simple/full array plugin distinction, remaining source array parameter/control consumption, fresh-plugin parameter ownership and delayed parent/axiom worklists",
           "status": "unported",
           "tests": []
         },
@@ -118360,7 +118420,8 @@
         "SMTArrayTheory owns concrete Go maps and scoped trails for observed terms, instantiated constructor pairs and epsilon constants while borrowing manager-owned AST handles and context-owned enodes."
       ],
       "deviations": [
-        "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. Source instantiate_extensionality checks m_array_extensional, but Go InternalizeEquality currently emits that axiom unconditionally. Those live controls and remaining source worklists require further porting; these units are partial.",
+        "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
+        "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. The array.extensional option and Boolean array enode flags are now consumed by Go. Simple/full backend selection, clone parameter ownership, other live controls and remaining source worklists still require further porting; these units remain partial.",
         "Guarded eager SAT axioms and shared egraph roots replace native delayed axiom queues, relevancy-triggered parent lists and the private union-find. The source as-array incompleteness guard is preserved. Trace-only display routines are separate from the remaining live source scheduling and parameter controls, which are still incomplete."
       ]
     },
@@ -118370,9 +118431,20 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_array_controls.go",
+        "pkg/smtcore/smt_array_controls_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/array_extensional_disabled_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_enabled_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_live_updates.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_proof_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_simple_live_updates.smt2",
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
         "TestSMTArrayReadOverWrite"
       ],
       "conditionals": [
@@ -118389,7 +118461,33 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Retained simple/full array plugin distinction, source array parameter/control consumption (including array.extensional), fresh-plugin parameter ownership and remaining delayed parent/axiom worklists",
+          "name": "array.extensional configuration consumption at theory registration and live parameter updates; disabled option emits no extensionality axiom for newly internalized array equalities",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_array_controls.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Boolean array select/default terms in gate context: source enode flag, assigned-literal antecedent recovery and scope cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/smtcore/smt_array_controls_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained simple/full array plugin distinction, remaining source array parameter/control consumption, fresh-plugin parameter ownership and delayed parent/axiom worklists",
           "status": "unported",
           "tests": []
         },
@@ -118404,7 +118502,8 @@
         "The Go theory owns typed maps and slices in place of source var_data allocation, trail stacks and union-find storage."
       ],
       "deviations": [
-        "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. Source instantiate_extensionality checks m_array_extensional, but Go InternalizeEquality currently emits that axiom unconditionally. Those live controls and remaining source worklists require further porting; these units are partial.",
+        "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
+        "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. The array.extensional option and Boolean array enode flags are now consumed by Go. Simple/full backend selection, clone parameter ownership, other live controls and remaining source worklists still require further porting; these units remain partial.",
         "The public Go theory interface replaces C++ inheritance and nested manual trail types."
       ]
     },
@@ -118682,9 +118781,20 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_array_controls.go",
+        "pkg/smtcore/smt_array_controls_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/array_extensional_disabled_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_enabled_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_live_updates.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_proof_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_simple_live_updates.smt2",
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
         "TestSMTArrayMapRead",
         "TestSMTArrayDefaultConstAndMap",
         "TestSMTArrayDefaultStoreLargeDomain",
@@ -118841,7 +118951,33 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Retained simple/full array plugin distinction, source array parameter/control consumption (including array.extensional), fresh-plugin parameter ownership and remaining delayed parent/axiom worklists",
+          "name": "array.extensional configuration consumption at theory registration and live parameter updates; disabled option emits no extensionality axiom for newly internalized array equalities",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_array_controls.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Boolean array select/default terms in gate context: source enode flag, assigned-literal antecedent recovery and scope cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/smtcore/smt_array_controls_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained simple/full array plugin distinction, remaining source array parameter/control consumption, fresh-plugin parameter ownership and delayed parent/axiom worklists",
           "status": "unported",
           "tests": []
         },
@@ -118868,7 +119004,8 @@
         "Scoped Go maps own epsilon and constructor-observer fingerprints. Array table procedures own dependency slices until auxiliary function interpretations transfer to ProtoModel."
       ],
       "deviations": [
-        "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. Source instantiate_extensionality checks m_array_extensional, but Go InternalizeEquality currently emits that axiom unconditionally. Those live controls and remaining source worklists require further porting; these units are partial.",
+        "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
+        "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. The array.extensional option and Boolean array enode flags are now consumed by Go. Simple/full backend selection, clone parameter ownership, other live controls and remaining source worklists still require further porting; these units remain partial.",
         "Eager guarded clauses replace source parent-map, parent-default and delayed-equality worklists. Source as-array terms still install sound read/default axioms and deliberately force an incomplete final-check result."
       ]
     },
@@ -118878,9 +119015,20 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_array_controls.go",
+        "pkg/smtcore/smt_array_controls_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/array_extensional_disabled_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_enabled_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_live_updates.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_proof_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/array_extensional_simple_live_updates.smt2",
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
         "TestSMTArrayMapRead"
       ],
       "conditionals": [
@@ -118897,7 +119045,33 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Retained simple/full array plugin distinction, source array parameter/control consumption (including array.extensional), fresh-plugin parameter ownership and remaining delayed parent/axiom worklists",
+          "name": "array.extensional configuration consumption at theory registration and live parameter updates; disabled option emits no extensionality axiom for newly internalized array equalities",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_array_controls.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Boolean array select/default terms in gate context: source enode flag, assigned-literal antecedent recovery and scope cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/smtcore/smt_array_controls_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained simple/full array plugin distinction, remaining source array parameter/control consumption, fresh-plugin parameter ownership and delayed parent/axiom worklists",
           "status": "unported",
           "tests": []
         },
@@ -118912,7 +119086,8 @@
         "SMTArrayTheory owns concrete typed metadata rather than separately allocated var_data_full records."
       ],
       "deviations": [
-        "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. Source instantiate_extensionality checks m_array_extensional, but Go InternalizeEquality currently emits that axiom unconditionally. Those live controls and remaining source worklists require further porting; these units are partial.",
+        "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
+        "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. The array.extensional option and Boolean array enode flags are now consumed by Go. Simple/full backend selection, clone parameter ownership, other live controls and remaining source worklists still require further porting; these units remain partial.",
         "C++ inheritance and manual per-variable allocation collapse into one concrete Go array theory."
       ]
     },

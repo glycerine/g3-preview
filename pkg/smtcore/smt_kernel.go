@@ -436,6 +436,9 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err = k.configureBitVectorTheories(bitVector, k.smtParams.preprocess.bit); err != nil {
 		return err
 	}
+	if err = k.configureArrayTheories(k.smtParams.array.state); err != nil {
+		return err
+	}
 	name := "preprocess"
 	enabled, err := k.paramContext.GetBoolName(params, &name, true)
 	if err != nil {
@@ -486,6 +489,11 @@ func (k *SMTKernel) Internalizer() (*SMTInternalizerState, error) {
 func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 	if err := k.open(); err != nil {
 		return err
+	}
+	if array, ok := theory.(*SMTArrayTheory); ok && k.smtParams != nil {
+		if err := array.ConfigureArray(k.smtParams.array.state); err != nil {
+			return err
+		}
 	}
 	if bv, ok := theory.(*SMTBitVectorTheory); ok && k.smtParams != nil {
 		bv.bitBlasterParams = k.smtParams.preprocess.bit
