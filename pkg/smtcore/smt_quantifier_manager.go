@@ -434,6 +434,9 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 		if err != nil {
 			return SMTFinalCheckGiveUp, err
 		}
+		if len(q.modelFinder.pendingConstraints) != 0 {
+			return SMTFinalCheckContinue, generator.Close()
+		}
 		if err = q.modelChecker.SetCandidateTerms(generator.rootValues); err != nil {
 			return SMTFinalCheckGiveUp, errors.Join(err, generator.Close())
 		}

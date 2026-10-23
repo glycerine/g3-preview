@@ -276,7 +276,13 @@ func TestSMTModelFinderForcedFullMacrosRejectDependencyCycle(t *testing.T) {
 	interpretation, err = proto.Core().FunctionInterpretation(g)
 	astTestMust(t, err)
 	if interpretation != nil {
-		t.Fatal("cyclic full macro was published")
+		// AUF may complete the remaining ground function; it must still
+		// reject the cyclic full-macro definition g(x)=f(x).
+		fallback, err := interpretation.Else()
+		astTestMust(t, err)
+		if fallback == fApp {
+			t.Fatal("cyclic full macro was published")
+		}
 	}
 }
 

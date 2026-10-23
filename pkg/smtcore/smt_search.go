@@ -334,6 +334,18 @@ func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool
 			k.lastFailure = SMTFailureTheory
 			return lbool.Undef, nil
 		case SMTFinalCheckContinue:
+			if manager := k.internalizer.quantifierManager; manager != nil && len(manager.modelFinder.pendingConstraints) != 0 {
+				if count := k.internalizer.scopeLevel - baseLevel; count != 0 {
+					if err = k.internalizer.PopScopes(count); err != nil {
+						return lbool.Undef, err
+					}
+				}
+				k.internalizer.statistics.NumRestarts++
+				if err = k.internalizer.RestartTheories(); err != nil {
+					return lbool.Undef, err
+				}
+				continue
+			}
 			consistent, err = k.internalizer.PropagateCore()
 			if err != nil {
 				return lbool.Undef, fmt.Errorf("smt search final propagation: %w", err)
