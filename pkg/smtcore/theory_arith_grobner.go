@@ -22,7 +22,7 @@ func smtFixedSimplexColumn(solver *simplex.Solver, column uint32) (*big.Rat, boo
 	return new(big.Rat).Set(&lower.Main), true
 }
 
-func (t *SMTLinearArithmeticTheory) grobnerMonomial(gb *grobner.Solver, solver *simplex.Solver, coefficient *big.Rat, column uint32) (*grobner.Monomial, error) {
+func (t *SMTLinearArithmeticTheory) grobnerMonomial(gb *grobner.Solver, solver *simplex.Solver, aliases map[uint32]ast.ASTHandle, coefficient *big.Rat, column uint32) (*grobner.Monomial, error) {
 	coeff := new(big.Rat).Set(coefficient)
 	var variables []ast.ASTHandle
 	var factor func(uint32, bool) error
@@ -47,20 +47,16 @@ func (t *SMTLinearArithmeticTheory) grobnerMonomial(gb *grobner.Solver, solver *
 		if len(t.nonlinearFactors[current]) != 0 {
 			return factor(current, true)
 		}
-		variable, found := t.theoryVariable(current)
+		expression, found := aliases[current]
 		if !found {
 			return ast.ErrASTDomain
 		}
-		node, err := t.Enode(variable)
-		if err != nil {
-			return err
-		}
-		if value, numeral, err := t.numeral(node.owner); err != nil {
+		if value, numeral, err := t.numeral(expression); err != nil {
 			return err
 		} else if numeral {
 			coeff.Mul(coeff, value)
 		} else {
-			variables = append(variables, node.owner)
+			variables = append(variables, expression)
 		}
 		return nil
 	}
@@ -70,7 +66,7 @@ func (t *SMTLinearArithmeticTheory) grobnerMonomial(gb *grobner.Solver, solver *
 	return gb.NewMonomial(coeff, variables)
 }
 
-func (t *SMTLinearArithmeticTheory) assertGrobnerForm(gb *grobner.Solver, solver *simplex.Solver, form *smtLinearForm) (err error) {
+func (t *SMTLinearArithmeticTheory) assertGrobnerForm(gb *grobner.Solver, solver *simplex.Solver, aliases map[uint32]ast.ASTHandle, form *smtLinearForm) (err error) {
 	monomials := make([]*grobner.Monomial, 0, len(form.terms)+1)
 	defer func() {
 		if err != nil {
@@ -85,7 +81,7 @@ func (t *SMTLinearArithmeticTheory) assertGrobnerForm(gb *grobner.Solver, solver
 	}
 	sort.Slice(columns, func(i, j int) bool { return columns[i] < columns[j] })
 	for _, column := range columns {
-		monomial, err := t.grobnerMonomial(gb, solver, form.terms[column], column)
+		monomial, err := t.grobnerMonomial(gb, solver, aliases, form.terms[column], column)
 		if err != nil {
 			return err
 		}
@@ -112,18 +108,26 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 	if err != nil || status != lbool.True {
 		return false, err
 	}
+	cluster, err := t.nonlinearCluster(solver)
+	if err != nil {
+		return false, err
+	}
+	refs := smtArithmeticDivisionCall{theory: t}
+	defer func() { err = errors.Join(err, refs.close()) }()
 	gb, err := grobner.New(t.state.manager)
 	if err != nil {
 		return false, err
 	}
 	defer func() { err = errors.Join(err, gb.Close()) }()
 	columns := make(map[ast.ASTHandle]uint32)
+	aliases := make(map[uint32]ast.ASTHandle)
 	for variable, column := range t.simplexVariables {
 		node, err := t.Enode(SMTTheoryVar(variable))
 		if err != nil {
 			return false, err
 		}
 		columns[node.owner] = column
+		aliases[column] = node.owner
 		_, lower := solver.Lower(column)
 		_, upper := solver.Upper(column)
 		weight := 6 // FREE
@@ -141,6 +145,48 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 			return false, err
 		}
 	}
+	// Replay-only comparison columns have no enode. Local arithmetic
+	// aliases preserve their distinct column identities and bounds during
+	// polynomial elimination; they never enter the public model or context.
+	for _, row := range cluster.rows {
+		entries, rowErr := solver.RowEntries(row)
+		if rowErr != nil {
+			return false, rowErr
+		}
+		form := newSMTLinearForm()
+		for _, entry := range entries {
+			column := entry.Variable
+			if _, fixed := smtFixedSimplexColumn(solver, column); !fixed {
+				if _, exists := aliases[column]; !exists {
+					real, sortErr := t.state.manager.MkFamilySort(t.FamilyID(), 0, nil)
+					if sortErr != nil {
+						return false, sortErr
+					}
+					alias, aliasErr := refs.hold(t.state.manager.MkVar(column, real))
+					if aliasErr != nil {
+						return false, aliasErr
+					}
+					aliases[column] = alias
+					columns[alias] = column
+					_, lower := solver.Lower(column)
+					_, upper := solver.Upper(column)
+					weight := 6
+					if lower && upper {
+						weight = 2
+					} else if lower || upper {
+						weight = 4
+					}
+					if weightErr := gb.SetWeight(alias, weight); weightErr != nil {
+						return false, weightErr
+					}
+				}
+			}
+			form.addTerm(column, entry.Coefficient)
+		}
+		if rowErr = t.assertGrobnerForm(gb, solver, aliases, &form); rowErr != nil {
+			return false, rowErr
+		}
+	}
 	// Definition rows are unconditional equations. Explicit opposite
 	// bounds provide the remaining fixed rows in this replay representation.
 	definitionVariables := make([]int, 0, len(t.definitions))
@@ -153,7 +199,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 		definition := t.definitions[variable]
 		form := definition.clone()
 		form.addTerm(t.simplexVariables[variable], big.NewRat(-1, 1))
-		if err = t.assertGrobnerForm(gb, solver, &form); err != nil {
+		if err = t.assertGrobnerForm(gb, solver, aliases, &form); err != nil {
 			return false, err
 		}
 	}
@@ -165,7 +211,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 		for _, second := range t.assertions[i+1:] {
 			right, ok := smtLinearNormalizedLE(&t.atoms[second.atom], second)
 			if ok && smtLinearFormsOpposite(&left, &right) {
-				if err = t.assertGrobnerForm(gb, solver, &left); err != nil {
+				if err = t.assertGrobnerForm(gb, solver, aliases, &left); err != nil {
 					return false, err
 				}
 				break
@@ -177,7 +223,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 			form := newSMTLinearForm()
 			form.addTerm(column, big.NewRat(1, 1))
 			form.constant.Neg(value)
-			if err = t.assertGrobnerForm(gb, solver, &form); err != nil {
+			if err = t.assertGrobnerForm(gb, solver, aliases, &form); err != nil {
 				return false, err
 			}
 		}

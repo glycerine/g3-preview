@@ -467,6 +467,17 @@ func (s *Solver) BaseCoefficient(r Row) (*big.Rat, error) {
 }
 func (s *Solver) RowEntries(r Row) ([]RowEntry, error) { return s.matrix.Entries(r) }
 
+// ColumnRows and BasicRow expose the concrete tableau incidence information
+// needed by the retained arithmetic theory's nonlinear cluster traversal.
+func (s *Solver) ColumnRows(variable uint32) []Row { return s.matrix.ColumnRows(variable) }
+
+func (s *Solver) BasicRow(variable uint32) (Row, bool) {
+	if !s.isBase(variable) {
+		return Row{}, false
+	}
+	return Row{s.vars[variable].row}, true
+}
+
 // DeleteRow removes the row containing variable. A nonbasic variable is first
 // pivoted into its first row, preserving the source operation order.
 func (s *Solver) DeleteRow(variable uint32) error {

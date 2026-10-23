@@ -10,6 +10,8 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"nonlinear_cluster_inequalities.smt2":       "unsat\nsat\n((x 1.0) (y 1.0) (z (- 1.0)))\n",
+	"nonlinear_cluster_strict.smt2":             "unsat\n",
 	"nonlinear_horner_bound.smt2":               "unsat\n",
 	"nonlinear_completed_square.smt2":           "unsat\n",
 	"nonlinear_nested_multivariate.smt2":        "unsat\nsat\n",
