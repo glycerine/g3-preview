@@ -10,8 +10,28 @@ import (
 func (t *SMTLinearArithmeticTheory) finalCheckIntegerFeasibility() (SMTFinalCheckStatus, error) {
 	if t.integer || t.mixed {
 		if _, _, fractional := t.fractionalVariable(t.solver); fractional {
+			if t.ignoreIntegers {
+				return SMTFinalCheckGiveUp, nil
+			}
+			// The candidate may contain branch bounds. Only this fresh replay
+			// can support a conflict in the global Boolean search context.
+			bounds, status, err := t.buildSimplex(nil)
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			if status == lbool.False {
+				return SMTFinalCheckContinue, t.derivedBoundConflict()
+			}
+			if status == lbool.Undef {
+				return SMTFinalCheckGiveUp, nil
+			}
+			if conflict, err := t.checkArithmeticGCD(bounds); err != nil {
+				return SMTFinalCheckGiveUp, err
+			} else if conflict {
+				return SMTFinalCheckContinue, t.arithmeticGCDConflict()
+			}
 			var nodes uint32
-			status, err := t.integerFeasible(nil, &nodes)
+			status, err = t.integerFeasible(nil, &nodes)
 			if err != nil {
 				return SMTFinalCheckGiveUp, err
 			}

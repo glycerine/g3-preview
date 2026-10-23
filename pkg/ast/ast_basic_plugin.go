@@ -98,8 +98,8 @@ func (m *ASTManager) joinSorts(a, b astNodeRef) (astNodeRef, error) {
 	if e != nil {
 		return astNodeRef{}, e
 	}
-	if af == 5 && bf == 5 {
-		if ak == 1 {
+	if m.arithmeticPlugin != nil && af == m.arithmeticPlugin.family && bf == af {
+		if ak == 0 {
 			return a, nil
 		}
 		return b, nil

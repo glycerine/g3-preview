@@ -10,6 +10,11 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"shared_linear_expression_bounds.smt2":      "unsat\nunsat\nsat\n",
+	"mixed_equality_and_ite_join.smt2":          "sat\nunsat\nunsat\nunsat\nsat\n",
+	"integer_gcd_scopes.smt2":                   "unsat\nsat\n",
+	"integer_extended_gcd.smt2":                 "unsat\nsat\n",
+	"mixed_integer_gcd_scopes.smt2":             "sat\nunsat\nunsat\nsat\n",
 	"nonlinear_nested_row_aliases.smt2":         "unsat\nsat\n",
 	"nonlinear_nested_integer_row_aliases.smt2": "unsat\nsat\n",
 	"shared_arithmetic_equality_cycle.smt2":     "sat\nunsat\nsat\n",

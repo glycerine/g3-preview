@@ -10004,7 +10004,9 @@
         "pkg/ast/ast_info_memory_trace_debug_test.go",
         "pkg/ast/ast_core_quantifier_pattern_trace.go",
         "pkg/ast/ast_core_distinct_trace.go",
-        "pkg/ast/ast_translation_plugins.go"
+        "pkg/ast/ast_translation_plugins.go",
+        "pkg/ast/ast_basic_mixed_join_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestASTFuncDeclInfoSourceText",
@@ -10161,7 +10163,10 @@
         "TestASTExpandedDistinctSourceTraceAfterConjunction",
         "TestASTCopyFamiliesPluginsPreservesOrderAndConcreteKinds",
         "TestASTCopyFamiliesPluginsRejectsDivergentFamilyOrder",
-        "TestASTCopyFamiliesPluginsCopiesFormatPlugin"
+        "TestASTCopyFamiliesPluginsCopiesFormatPlugin",
+        "TestASTBasicEqualityAndITEJoinMixedArithmeticAsReal",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -10750,25 +10755,36 @@
           "name": "source parameter ostream and attached func_decl_info display for the retained defined declaration domain: six parameter kinds, family/kind and nine flags",
           "status": "ported",
           "go_target": "pkg/ast/ast_func_decl_info_text.go",
-          "tests": ["TestASTFuncDeclInfoSourceText", "TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain"]
+          "tests": [
+            "TestASTFuncDeclInfoSourceText",
+            "TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain"
+          ]
         },
         {
           "name": "ast_manager::check_sort/check_sorts_core/check_sorts shallow arity, domain, associative-child and int/real compatibility checks with caught warning (ast.cpp:1958-2030)",
           "status": "ported",
           "go_target": "pkg/ast/ast_check_sorts.go",
-          "tests": ["TestASTCheckSortsShallowWarningsAndAssociativeChild", "TestASTCheckSortsArithmeticCoercionUsesSourceFamily"]
+          "tests": [
+            "TestASTCheckSortsShallowWarningsAndAssociativeChild",
+            "TestASTCheckSortsArithmeticCoercionUsesSourceFamily"
+          ]
         },
         {
           "name": "PARAM_DOUBLE non-finite or out-of-range declaration metadata stops at undefined source unsigned hash conversion; Go registration refuses it",
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_parameter.go",
-          "tests": ["TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain", "TestASTParameterDoubleHashSourceDomain"]
+          "tests": [
+            "TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain",
+            "TestASTParameterDoubleHashSourceDomain"
+          ]
         },
         {
           "name": "mk_quantifier debug-only pattern TRACE before pattern assertion and node allocation (ast.cpp:2356-2361), including complete retained pattern application formatting",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_quantifier_pattern_trace.go",
-          "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration"]
+          "tests": [
+            "TestASTQuantifierPatternSourceTraceBeforeRegistration"
+          ]
         },
         {
           "name": "family_manager constructor next0 and concrete symbol/name members",
@@ -10925,37 +10941,50 @@
           "name": "update_quantifier_weight TRACE after identity check and before replacement construction (ast.cpp:2454)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_update_trace.go",
-          "tests": ["TestASTQuantifierWeightTraceBeforeReplacement"]
+          "tests": [
+            "TestASTQuantifierWeightTraceBeforeReplacement"
+          ]
         },
         {
           "name": "Reached AST delete_node_bug TRACE before deletion worklist with low-level AST printer (ast.cpp:1782)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_delete_trace.go",
-          "tests": ["TestASTDeleteNodeBugTraceBeforeWorklist"]
+          "tests": [
+            "TestASTDeleteNodeBugTraceBeforeWorklist"
+          ]
         },
         {
           "name": "Reached AST ast_delete_node TRACE with depth-three bounded low-level printer before table erase (ast.cpp:1793)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_delete_trace.go",
-          "tests": ["TestASTDeleteNodeBugTraceBeforeWorklist", "TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds"]
+          "tests": [
+            "TestASTDeleteNodeBugTraceBeforeWorklist",
+            "TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds"
+          ]
         },
         {
           "name": "Reached AST unit-resolution proof TRACE at both result publications with low-level printer (ast.cpp:2964,3015)",
           "status": "ported",
           "go_target": "pkg/ast/ast_proof_resolution_trace.go",
-          "tests": ["TestASTUnitResolutionSourceTraceBothOverloads"]
+          "tests": [
+            "TestASTUnitResolutionSourceTraceBothOverloads"
+          ]
         },
         {
           "name": "mk_app chainable branch TRACE before adjacent pair-buffer construction (ast.cpp:2195)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_app_trace.go",
-          "tests": ["TestASTChainableTraceOnlyOnLongNonflatBranch"]
+          "tests": [
+            "TestASTChainableTraceOnlyOnLongNonflatBranch"
+          ]
         },
         {
           "name": "mk_app app_ground TRACE after every successful application path with retained low-level printer (ast.cpp:2207)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_app_trace.go",
-          "tests": ["TestASTAppGroundTraceAfterApplicationConstruction"]
+          "tests": [
+            "TestASTAppGroundTraceAfterApplicationConstruction"
+          ]
         },
         {
           "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection with diagnostic transport",
@@ -11072,8 +11101,13 @@
           "name": "ast_manager::mk_fresh_var_name shared fresh-id scalar for pulled duplicate binders (ast.cpp:2246-2251; ast.h:1827)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_fresh_factories.go",
-          "go_targets": ["pkg/ast/normal_forms/pull_boolean.go", "pkg/ast/pattern/pull_boolean_test.go"],
-          "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"]
+          "go_targets": [
+            "pkg/ast/normal_forms/pull_boolean.go",
+            "pkg/ast/pattern/pull_boolean_test.go"
+          ],
+          "tests": [
+            "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"
+          ]
         },
         {
           "name": "Borrowed Runtime AST argument span through actual application/check_args/payload/register engines (src/ast/ast.cpp:2064-2211)",
@@ -11247,7 +11281,9 @@
           "name": "mk_pattern and is_pattern concrete pattern-plugin construction and recognition (src/ast/ast.cpp:2312-2327)",
           "status": "ported",
           "go_target": "pkg/ast/ast_pattern.go",
-          "go_targets": ["pkg/ast/rewriter/inj_axiom_test.go"],
+          "go_targets": [
+            "pkg/ast/rewriter/inj_axiom_test.go"
+          ],
           "tests": [
             "TestSimplifyInjectivityAxiomBuildsInverseAndPattern"
           ]
@@ -11268,6 +11304,19 @@
             "TestASTCopyFamiliesPluginsPreservesOrderAndConcreteKinds",
             "TestASTCopyFamiliesPluginsRejectsDivergentFamilyOrder",
             "TestASTCopyFamiliesPluginsCopiesFormatPlugin"
+          ]
+        },
+        {
+          "name": "basic_decl_plugin::join selects REAL_SORT for mixed arithmetic equality and ITE operands in either order, using the registered arithmetic family rather than a numeric family constant",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_basic_plugin.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestASTBasicEqualityAndITEJoinMixedArithmeticAsReal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -11294,7 +11343,8 @@
       "deviations": [
         "The complete retained AST manager uses owner/slot/generation handles, typed native slices and maps, and checked cleanup continuations in place of C++ pointers and container internals. Source construction, interning, reference order, translation, dependencies, marks, coercion, proof construction, formatting and trace order are preserved.",
         "Invalid native pointer, assertion, exception and undefined-domain cases return typed Go errors. Native object layout and ABI equivalence are outside the port.",
-        "user_sort_plugin::mk_fresh and scoped_mark are excluded after retained-consumer audits found no reachable production caller."
+        "user_sort_plugin::mk_fresh and scoped_mark are excluded after retained-consumer audits found no reachable production caller.",
+        "Corrected mixed Int/Real basic-sort joins to follow src/ast/ast.cpp:1036-1046: Real wins for equality and ITE branches. The former Int preference could narrow Real equality operands through to_int, turning (= r 0) into a floor constraint. Both operand orders and ITE result/child sorts are checked directly, and scoped SMT-LIB regressions with r=0.5 are compared to C++. Arithmetic-family identity now comes from the registered plugin."
       ]
     },
     {
@@ -113973,7 +114023,10 @@
         "pkg/smtcore/theory_arith_assume_eq_test.go",
         "pkg/smtcore/smt_assume_eq_test.go",
         "pkg/smtcore/theory_arith_final_check.go",
-        "pkg/smtcore/theory_arith_mutation.go"
+        "pkg/smtcore/theory_arith_mutation.go",
+        "pkg/smtcore/theory_arith_gcd.go",
+        "pkg/smtcore/theory_arith_gcd_test.go",
+        "pkg/smtcore/theory_arith_gcd_mixed_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -113997,7 +114050,9 @@
         "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
         "TestSMTArithmeticSharedEpsilonPreservesDistinctValues",
         "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
-        "TestSMTAssumeEqualityScopedPhaseAndRelevancy"
+        "TestSMTAssumeEqualityScopedPhaseAndRelevancy",
+        "TestSMTIntegerGCDAndExtendedGCDScopedProofs",
+        "TestSMTMixedGCDWithFixedFractionalReal"
       ],
       "conditionals": [
         {
@@ -114860,6 +114915,20 @@
             "TestSMTNonlinearIntegerBranchesScopedProofsAndModels",
             "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
           ]
+        },
+        {
+          "name": "source expression-column sharing in replay: comparisons with identical linear coefficients reuse a column while RHS constants become independently tightened bounds, preserving equality fixedness and stronger assertions",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTIntegerGCDAndExtendedGCDScopedProofs",
+            "TestSMTMixedGCDWithFixedFractionalReal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -114872,7 +114941,8 @@
         "The existing small-row interval calculation is shared by fixed-value equality propagation and nonlinear strategy bound replay. Equality aliases such as x=2*y now carry finite factor bounds into monomial intervals. Source minimal dependency explanations and full propagation scheduling remain incomplete.",
         "Model epsilon refinement now preserves distinctions between shared real symbolic assignments before concrete rational model construction. The same deterministic refinement runs before nonlinear product validation and candidate completion, so model construction cannot silently change the epsilon on which a validated product depended. Integer branching uses the same computation and propagates errors. The focused regression reproduces the source 19/2 versus 10-epsilon collision, checks equality preservation, and inspects a returned UF/arithmetic model. Shared equality case splitting, assignment mutation and final-check scheduling are recorded separately below.",
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
-        "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial."
+        "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
+        "Replay comparison rows now reuse the first column with identical concrete linear coefficients; sorted column IDs and exact rational coefficient strings identify the expression independently of the RHS constant. Applying every assertion through bound tightening preserves earlier stronger bounds. This restores source expression sharing, so equality adapters fix one expression column and the live deferred integer GCD checks see its rational constant. Tests cover repeated weaker lower/upper assertions, unbounded parity contradictions, bounded extended-GCD contradictions, mixed fixed-real premises and scope restoration."
       ]
     },
     {
@@ -115069,7 +115139,13 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/math/simplex/arith_optimize.go",
         "pkg/math/simplex/arith_optimize_test.go",
-        "pkg/smtcore/theory_arith_max_min_test.go"
+        "pkg/smtcore/theory_arith_max_min_test.go",
+        "pkg/math/simplex/arith_gcd.go",
+        "pkg/math/simplex/arith_gcd_test.go",
+        "pkg/smtcore/theory_arith_gcd.go",
+        "pkg/smtcore/theory_arith_gcd_test.go",
+        "pkg/smtcore/theory_arith_gcd_mixed_test.go",
+        "pkg/smtcore/theory_arith_final_check.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
@@ -115079,7 +115155,11 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestArithmeticMaxMinIntegerGainsAndSharedMovement",
-        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
+        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
+        "TestArithmeticGCDUsesFixedBoundsAndSkipsNonfixedReals",
+        "TestArithmeticExtendedGCDPositiveAndNegativeIntervals",
+        "TestSMTIntegerGCDAndExtendedGCDScopedProofs",
+        "TestSMTMixedGCDWithFixedFractionalReal"
       ],
       "conditionals": [
         {
@@ -115274,12 +115354,41 @@
             "TestArithmeticMaxMinIntegerGainsAndSharedMovement",
             "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
           ]
+        },
+        {
+          "name": "gcd_test(row) and ext_gcd_test: clear normalized coefficient denominators, substitute fixed lower bounds, skip nonfixed real columns, test coefficient divisibility and least-coefficient bounded intervals",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/arith_gcd.go",
+          "tests": [
+            "TestArithmeticGCDUsesFixedBoundsAndSkipsNonfixedReals",
+            "TestArithmeticExtendedGCDPositiveAndNegativeIntervals"
+          ]
+        },
+        {
+          "name": "retained deferred gcd_test over fractional integer basic rows, unconditional conflict versus speculative branch rejection, and source gcd-test proof parameter",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_gcd.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTIntegerGCDAndExtendedGCDScopedProofs",
+            "TestSMTMixedGCDWithFixedFractionalReal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "eager and adaptive GCD scheduling is unreachable in retained C++: m_arith_eager_gcd and m_arith_adaptive_gcd are constructor-false fields with no retained setters or assignments",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
         "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification."
       ],
-      "deviations": []
+      "deviations": [
+        "The source deferred GCD and extended GCD checks now run before integer branch-and-bound and inside each branch replay. Canonical rows clear denominators after normalizing the basic coefficient, eliminate fixed columns using their bounds rather than possibly stale assignment values, and skip nonfixed real columns. Extended checks round the bounded least-coefficient interval against the remaining coefficient GCD, including negative intervals. Global conflicts come only from unconditional replay and preserve the gcd-test proof parameter; speculative branch failures remain local. Proof regressions inspect the actual proof DAG for that parameter. Explanations conservatively include all active arithmetic assertion literals instead of source minimal fixed/bound dependencies. The concrete Go API skips fixed epsilon-valued columns, guarding the source invariant that fixed values are rational. IgnoreInt now yields give-up for unresolved integer feasibility. Eager/adaptive paths are excluded under the retained-consumer rule: src scans find only false constructor initializers, field declarations, display/read sites, and no setter assignments. Full source integer patching, Gomory cuts and remaining feasibility algorithms are still incomplete."
+      ]
     },
     {
       "path": "src/smt/theory_arith_inv.h",

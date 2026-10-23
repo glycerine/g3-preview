@@ -89,7 +89,8 @@ func (s *SMTInternalizerState) ConflictLiteral() SMTLiteral {
 
 // SetTheoryConflict installs a conflict explained by currently asserted
 // theory literals. The justification is owned by the logical context scope.
-func (s *SMTInternalizerState) SetTheoryConflict(theory SMTTheoryID, literals []SMTLiteral) error {
+// Optional parameters retain source theory-lemma rule metadata.
+func (s *SMTInternalizerState) SetTheoryConflict(theory SMTTheoryID, literals []SMTLiteral, parameters ...ast.ASTParameter) error {
 	if err := s.open(); err != nil {
 		return err
 	}
@@ -99,7 +100,7 @@ func (s *SMTInternalizerState) SetTheoryConflict(theory SMTTheoryID, literals []
 	if s.inconsistent {
 		return nil
 	}
-	justification, err := NewSMTTheoryConflictJustification(s.manager, theory, literals, nil)
+	justification, err := NewSMTTheoryConflictJustification(s.manager, theory, literals, parameters)
 	if err != nil {
 		return err
 	}

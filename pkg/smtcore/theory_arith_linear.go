@@ -99,6 +99,7 @@ type smtLinearIntegerBranch struct {
 }
 
 type smtLinearArithmeticStatistics struct {
+	gcdTests, gcdConflicts                               uint64
 	maxMin                                               uint64
 	crossNested                                          uint64
 	conflicts, addRows, pivots, assertLower, assertUpper uint64
@@ -113,6 +114,7 @@ type smtLinearArithmeticStatistics struct {
 // bound. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	gcdEnabled, ignoreIntegers           bool
 	finalCheckIndex                      uint32
 	liberalFinalCheck, changedAssignment bool
 	assumeEqualityCandidates             []smtArithmeticEqualityCandidate
@@ -179,6 +181,7 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		return nil, err
 	}
 	t := &SMTLinearArithmeticTheory{
+		gcdEnabled:            true,
 		liberalFinalCheck:     true,
 		SMTTheoryBase:         base,
 		solver:                simplex.NewSolver(nil),
@@ -210,6 +213,8 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 		return ast.ErrASTHandle
 	}
 	t.equalityAdapter.lazy = config.LazyAdapter
+	t.gcdEnabled = config.GCDTest
+	t.ignoreIntegers = config.IgnoreInt
 	t.nonlinearEnabled = config.NLArith
 	t.nonlinearGB = config.NLArithGB
 	t.nonlinearGBLimit = config.NLArithGBThreshold
@@ -1091,12 +1096,21 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(branches []smtLinearI
 			return nil, lbool.Undef, err
 		}
 	}
+	atomBases := make([]uint32, len(t.atoms))
+	coefficientBases := make(map[string]uint32)
 	for index := range t.atoms {
 		atom := &t.atoms[index]
 		if !atom.supported {
 			continue
 		}
 		base := t.nextSimplex + uint32(index)
+		key := smtArithmeticCoefficientKey(&atom.form)
+		if prior, found := coefficientBases[key]; found {
+			atomBases[index] = prior
+			continue
+		}
+		atomBases[index] = base
+		coefficientBases[key] = base
 		variables := make([]uint32, 0, len(atom.form.terms)+1)
 		coefficients := make([]big.Rat, 0, len(atom.form.terms)+1)
 		variables = append(variables, base)
@@ -1121,13 +1135,8 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(branches []smtLinearI
 			continue
 		}
 		lower, bound := smtLinearAtomBound(atom, assertion.truth, t.integralAtom(atom))
-		base := t.nextSimplex + uint32(assertion.atom)
-		var err error
-		if lower {
-			err = solver.SetLower(base, bound)
-		} else {
-			err = solver.SetUpper(base, bound)
-		}
+		base := atomBases[assertion.atom]
+		_, err := smtTightenSimplexBound(solver, base, lower, bound)
 		if err != nil {
 			return solver, lbool.False, nil
 		}
@@ -1238,6 +1247,11 @@ func (t *SMTLinearArithmeticTheory) integerFeasible(branches []smtLinearIntegerB
 	solver, status, err := t.buildSimplex(branches)
 	if err != nil || status != lbool.True {
 		return status, err
+	}
+	if conflict, err := t.checkArithmeticGCD(solver); err != nil {
+		return lbool.Undef, err
+	} else if conflict {
+		return lbool.False, nil
 	}
 	variable, value, fractional := t.fractionalVariable(solver)
 	if !fractional {
@@ -1846,6 +1860,8 @@ func (t *SMTLinearArithmeticTheory) CollectStatistics(target *statistics.Statist
 	target.UpdateUint64("arith grobner", t.statistics.grobner)
 	target.UpdateUint64("arith nonlinear horner", t.statistics.crossNested)
 	target.UpdateUint64("arith max-min", t.statistics.maxMin)
+	target.UpdateUint64("arith gcd tests", t.statistics.gcdTests)
+	target.UpdateUint64("arith gcd conflicts", t.statistics.gcdConflicts)
 	return nil
 }
 
