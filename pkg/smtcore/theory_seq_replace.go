@@ -111,5 +111,8 @@ func (t *SMTSequenceTheory) addReplaceAxioms(expression ast.ASTHandle) error {
 	if err = t.pushSequenceImplication(found, sourceDefinition); err != nil {
 		return err
 	}
-	return t.pushSequenceImplication(found, resultDefinition)
+	if err = t.pushSequenceImplication(found, resultDefinition); err != nil {
+		return err
+	}
+	return t.addTightestPrefixAxioms(prefix, needle)
 }

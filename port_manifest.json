@@ -117419,10 +117419,10 @@
           "tests": ["TestSMTSequenceTheoryIndexAxioms", "TestSMTSequenceTheoryIndexTightestPrefixAxioms"]
         },
         {
-          "name": "str.replace empty-source, empty-needle, absent-needle and first-occurrence witness axioms (src/smt/theory_seq.cpp:3255-3285)",
+          "name": "str.replace empty-source, empty-needle, absent-needle, first-occurrence witness, and tightest-prefix minimality axioms (src/smt/theory_seq.cpp:3137-3285)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_replace.go",
-          "tests": ["TestSMTSequenceTheoryReplaceAxioms"]
+          "tests": ["TestSMTSequenceTheoryReplaceAxioms", "TestSMTSequenceTheoryReplaceTightestPrefixAxioms"]
         },
         {
           "name": "regular-language membership reduction through the retained Go regex automaton builder, including concrete automata, symbolic singleton languages, scoped exact-regex term tracking and definitive satisfiability for exact reductions (src/smt/theory_seq.cpp:3391-3445,4166-4191)",
