@@ -28,43 +28,48 @@ func (t *SMTLinearArithmeticTheory) arithmeticIntervalConflict(interval *smtOldI
 	if explanation == nil {
 		return t.derivedBoundConflict(nil)
 	}
-	var literals []SMTLiteral
+	var antecedents smtArithmeticAntecedents
 	seen := make(map[SMTLiteral]bool)
 	for _, dependency := range explanation.dependencies {
-		literal := SMTLiteralFromIndex(dependency.Literal)
-		if !seen[literal] {
+		if dependency.Equality == 0 {
+			literal := SMTLiteralFromIndex(dependency.Literal)
+			if seen[literal] {
+				continue
+			}
 			seen[literal] = true
-			literals = append(literals, literal)
+		}
+		if err := smtArithmeticPushDependency(&antecedents, dependency, big.NewRat(1, 1), false, t.equalityBounds); err != nil {
+			return err
 		}
 	}
 	for _, literal := range premises {
 		if !seen[literal] {
 			seen[literal] = true
-			literals = append(literals, literal)
+			antecedents.literals = append(antecedents.literals, literal)
 		}
 	}
-	if len(literals) == 0 {
+	if len(antecedents.literals) == 0 && len(antecedents.equalities) == 0 {
 		return t.derivedBoundConflict(nil)
 	}
 	t.recordArithmeticConflict()
-	return t.state.SetTheoryConflict(t.FamilyID(), literals)
+	return t.setArithmeticConflict(&antecedents)
 }
 
 // dependency2new_bound creates a plain derived bound. A nil dependency is
 // unconditional, while a leaf without a replay explanation is unknown.
 func smtArithmeticIntervalExplanation(manager *smtArithmeticBoundDependencyManager, root *smtArithmeticBoundDependency) *smtArithmeticBoundExplanation {
 	result := &smtArithmeticBoundExplanation{}
-	seen := make(map[int32]bool)
+	seen := make(map[[2]uint32]bool)
 	for _, bound := range manager.Linearize(root, nil) {
 		if bound.replayExplanation == nil {
 			return nil
 		}
 		for _, dependency := range bound.replayExplanation.dependencies {
-			if seen[dependency.Literal] {
+			if seen[smtArithmeticDependencyKey(dependency)] {
 				continue
 			}
-			seen[dependency.Literal] = true
-			result.dependencies = append(result.dependencies, simplex.BoundDependency{Literal: dependency.Literal, Coefficient: *big.NewRat(1, 1)})
+			seen[smtArithmeticDependencyKey(dependency)] = true
+			result.dependencies = append(result.dependencies, simplex.BoundDependency{Literal: dependency.Literal, Equality: dependency.Equality, Coefficient: *big.NewRat(1, 1)})
 		}
 	}
 	return result
@@ -74,7 +79,7 @@ func smtArithmeticIntervalExplanation(manager *smtArithmeticBoundDependencyManag
 // repeated literals while preserving their first occurrence in the row.
 func smtArithmeticWeightedBoundExplanation(solver *simplex.Solver, uses []simplex.ArithmeticBoundUse) *smtArithmeticBoundExplanation {
 	result := &smtArithmeticBoundExplanation{}
-	positions := make(map[int32]int)
+	positions := make(map[[2]uint32]int)
 	for _, use := range uses {
 		if use.Coefficient.Sign() == 0 {
 			continue
@@ -85,12 +90,12 @@ func smtArithmeticWeightedBoundExplanation(solver *simplex.Solver, uses []simple
 		}
 		for _, dependency := range dependencies {
 			coefficient := new(big.Rat).Mul(&use.Coefficient, &dependency.Coefficient)
-			if position, found := positions[dependency.Literal]; found {
+			if position, found := positions[smtArithmeticDependencyKey(dependency)]; found {
 				old := &result.dependencies[position].Coefficient
 				old.Add(old, coefficient)
 			} else {
-				positions[dependency.Literal] = len(result.dependencies)
-				result.dependencies = append(result.dependencies, simplex.BoundDependency{Literal: dependency.Literal, Coefficient: *coefficient})
+				positions[smtArithmeticDependencyKey(dependency)] = len(result.dependencies)
+				result.dependencies = append(result.dependencies, simplex.BoundDependency{Literal: dependency.Literal, Equality: dependency.Equality, Coefficient: *coefficient})
 			}
 		}
 	}
@@ -125,18 +130,18 @@ func (t *SMTLinearArithmeticTheory) recordArithmeticBoundConflict(solver *simple
 // the caller's coefficient once for each retained premise.
 func smtArithmeticPlainBoundExplanation(solver *simplex.Solver, uses []simplex.ArithmeticBoundUse) *smtArithmeticBoundExplanation {
 	result := &smtArithmeticBoundExplanation{}
-	seen := make(map[int32]bool)
+	seen := make(map[[2]uint32]bool)
 	for _, use := range uses {
 		dependencies, known := solver.BoundDependencies(use.Column, use.Lower)
 		if !known {
 			return nil
 		}
 		for _, dependency := range dependencies {
-			if seen[dependency.Literal] {
+			if seen[smtArithmeticDependencyKey(dependency)] {
 				continue
 			}
-			seen[dependency.Literal] = true
-			result.dependencies = append(result.dependencies, simplex.BoundDependency{Literal: dependency.Literal, Coefficient: *big.NewRat(1, 1)})
+			seen[smtArithmeticDependencyKey(dependency)] = true
+			result.dependencies = append(result.dependencies, simplex.BoundDependency{Literal: dependency.Literal, Equality: dependency.Equality, Coefficient: *big.NewRat(1, 1)})
 		}
 	}
 	return result
@@ -164,7 +169,7 @@ func smtTightenExplainedSimplexBound(solver *simplex.Solver, column uint32, lowe
 
 // Each endpoint expands independently, as bound::push_justification does in
 // the source. Repeated premises retain their separate proof coefficients.
-func smtArithmeticExplainBounds(solver *simplex.Solver, uses []simplex.ArithmeticBoundUse, proofs bool) (smtArithmeticAntecedents, bool, error) {
+func smtArithmeticExplainBounds(solver *simplex.Solver, uses []simplex.ArithmeticBoundUse, proofs bool, equalityBounds []smtArithmeticEqualityEndpoints) (smtArithmeticAntecedents, bool, error) {
 	var result smtArithmeticAntecedents
 	for _, use := range uses {
 		dependencies, known := solver.BoundDependencies(use.Column, use.Lower)
@@ -173,7 +178,7 @@ func smtArithmeticExplainBounds(solver *simplex.Solver, uses []simplex.Arithmeti
 		}
 		for _, dependency := range dependencies {
 			coefficient := new(big.Rat).Mul(&use.Coefficient, &dependency.Coefficient)
-			if err := result.pushLiteral(SMTLiteralFromIndex(dependency.Literal), coefficient, proofs); err != nil {
+			if err := smtArithmeticPushDependency(&result, dependency, coefficient, proofs, equalityBounds); err != nil {
 				return result, false, err
 			}
 		}

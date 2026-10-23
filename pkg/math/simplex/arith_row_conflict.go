@@ -106,7 +106,7 @@ func (s *Solver) ExplainArithmeticInfeasibleRow(integers map[uint32]bool, relax 
 			}
 		}
 		for _, dependency := range dependencies {
-			result = append(result, BoundDependency{Literal: dependency.Literal, Coefficient: *new(big.Rat).Mul(coefficient, &dependency.Coefficient)})
+			result = append(result, BoundDependency{Literal: dependency.Literal, Equality: dependency.Equality, Coefficient: *new(big.Rat).Mul(coefficient, &dependency.Coefficient)})
 		}
 	}
 	dependencies, known := s.BoundDependencies(base, below)

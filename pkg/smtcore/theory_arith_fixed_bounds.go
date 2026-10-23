@@ -105,25 +105,25 @@ func (t *SMTLinearArithmeticTheory) propagateFixedEquality(solver *simplex.Solve
 		{Column: second, Lower: true},
 		{Column: first, Lower: false},
 	}
-	antecedents, known, err := smtArithmeticExplainBounds(solver, uses, proofs)
+	antecedents, known, err := smtArithmeticExplainBounds(solver, uses, proofs, t.equalityBounds)
 	if err != nil {
 		return false, err
 	}
 	if !known {
 		// Logical replay may contain an endpoint whose explanation has not
 		// yet been ported. Preserve the existing conservative justification.
-		var literals []SMTLiteral
-		for _, assertion := range t.assertions {
-			literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
+		antecedents, err := t.allArithmeticAntecedents()
+		if err != nil {
+			return false, err
 		}
-		return t.propagateEquality(t.state, first, second, literals)
+		return t.propagateEqualityWithParameters(t.state, first, second, antecedents.literals, nil, antecedents.equalities)
 	}
 	parameters, err := antecedents.parameters(t.state.manager, "eq-propagate")
 	if err != nil {
 		return false, err
 	}
 	defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(t.state.manager, parameters)) }()
-	return t.propagateEqualityWithParameters(t.state, first, second, antecedents.literals, parameters)
+	return t.propagateEqualityWithParameters(t.state, first, second, antecedents.literals, parameters, antecedents.equalities)
 }
 
 // Derive bounds through canonical equality and comparison rows. The caller

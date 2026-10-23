@@ -171,13 +171,14 @@ func (t *SMTLinearArithmeticTheory) gomoryIntegerColumn(column uint32) (result e
 	if err != nil {
 		return err
 	}
-	antecedents, explained, err := smtArithmeticExplainBounds(t.solver, cut.Bounds, proofs)
+	antecedents, explained, err := smtArithmeticExplainBounds(t.solver, cut.Bounds, proofs, t.equalityBounds)
 	if err != nil {
 		return err
 	}
 	if !explained {
-		for _, assertion := range t.assertions {
-			antecedents.literals = append(antecedents.literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
+		antecedents, err = t.allArithmeticAntecedents()
+		if err != nil {
+			return err
 		}
 	}
 	parameters, err := antecedents.parameters(m, "gomory-cut")
@@ -187,7 +188,7 @@ func (t *SMTLinearArithmeticTheory) gomoryIntegerColumn(column uint32) (result e
 	defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(m, parameters)) }()
 	if cut.Conflict {
 		t.recordArithmeticConflict()
-		return t.state.SetTheoryConflict(t.FamilyID(), antecedents.literals, parameters...)
+		return t.setArithmeticConflict(&antecedents, parameters...)
 	}
 	var bound ast.ASTHandle
 	if len(cut.Terms) == 1 {
@@ -208,7 +209,7 @@ func (t *SMTLinearArithmeticTheory) gomoryIntegerColumn(column uint32) (result e
 	if assignment, e := t.state.Assignment(literal); e != nil || assignment == lbool.True {
 		return e
 	}
-	owner, err := NewSMTExtTheoryPropagationJustification(m, t.FamilyID(), antecedents.literals, nil, literal, parameters)
+	owner, err := NewSMTExtTheoryPropagationJustification(m, t.FamilyID(), antecedents.literals, antecedents.equalities, literal, parameters)
 	if err != nil {
 		return err
 	}

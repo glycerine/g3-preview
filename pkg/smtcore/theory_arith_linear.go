@@ -79,6 +79,7 @@ type smtLinearArithmeticAtom struct {
 }
 
 type smtLinearArithmeticScope struct {
+	equalityBounds                       int
 	pendingBounds, pendingBoundHead      int
 	expressionBounds                     int
 	finalCheckIndex                      uint32
@@ -114,6 +115,8 @@ type smtLinearArithmeticStatistics struct {
 // bounds. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	equalityBoundsEnabled                bool
+	equalityBounds                       []smtArithmeticEqualityEndpoints
 	propagateEqualities                  bool
 	propagationThreshold                 uint32
 	conflictCount                        uint32
@@ -228,6 +231,7 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 		return ast.ErrASTHandle
 	}
 	t.equalityAdapter.lazy = config.LazyAdapter
+	t.equalityBoundsEnabled = config.EqBounds
 	t.propagateEqualities = config.PropagateEqs
 	t.propagationThreshold = config.PropagationThreshold
 	t.strongerLemmas = config.StrongerLemmas
@@ -849,10 +853,10 @@ func smtLinearAssertionLiteral(atom *smtLinearArithmeticAtom, assertion smtInteg
 }
 
 func (t *SMTLinearArithmeticTheory) propagateEquality(state *SMTInternalizerState, first, second uint32, literals []SMTLiteral) (bool, error) {
-	return t.propagateEqualityWithParameters(state, first, second, literals, nil)
+	return t.propagateEqualityWithParameters(state, first, second, literals, nil, nil)
 }
 
-func (t *SMTLinearArithmeticTheory) propagateEqualityWithParameters(state *SMTInternalizerState, first, second uint32, literals []SMTLiteral, parameters []ast.ASTParameter) (bool, error) {
+func (t *SMTLinearArithmeticTheory) propagateEqualityWithParameters(state *SMTInternalizerState, first, second uint32, literals []SMTLiteral, parameters []ast.ASTParameter, equalities []SMTEnodePair) (bool, error) {
 	leftVariable, leftOK := t.theoryVariable(first)
 	rightVariable, rightOK := t.theoryVariable(second)
 	if !leftOK || !rightOK {
@@ -879,7 +883,7 @@ func (t *SMTLinearArithmeticTheory) propagateEqualityWithParameters(state *SMTIn
 		return false, nil
 	}
 	justification, err := NewSMTExtTheoryEqualityPropagationJustification(
-		state.manager, t.FamilyID(), literals, nil, left, right, parameters)
+		state.manager, t.FamilyID(), literals, equalities, left, right, parameters)
 	if err != nil {
 		return false, err
 	}
@@ -1331,7 +1335,7 @@ func (t *SMTLinearArithmeticTheory) Propagate() error {
 		}
 		literals = append(literals, literal)
 	}
-	return state.SetTheoryConflict(t.FamilyID(), literals)
+	return t.setArithmeticFallbackConflict(literals)
 }
 
 func (t *SMTLinearArithmeticTheory) PushScope() error {
@@ -1342,7 +1346,7 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
-	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail), nonlinearTerms: len(t.nonlinearColumns), nonlinearRounds: t.nonlinearRounds, nonlinearGBExhausted: t.nonlinearGBExhausted, derivedBounds: len(t.derivedBounds), nonlinearStrategy: t.nonlinearStrategy})
+	t.scopes = append(t.scopes, smtLinearArithmeticScope{equalityBounds: len(t.equalityBounds), atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail), nonlinearTerms: len(t.nonlinearColumns), nonlinearRounds: t.nonlinearRounds, nonlinearGBExhausted: t.nonlinearGBExhausted, derivedBounds: len(t.derivedBounds), nonlinearStrategy: t.nonlinearStrategy})
 	t.scopes[len(t.scopes)-1].assumeEqualities = len(t.assumeEqualityCandidates)
 	t.scopes[len(t.scopes)-1].assumeEqualityHead = t.assumeEqualityHead
 	t.scopes[len(t.scopes)-1].finalCheckIndex = t.finalCheckIndex
@@ -1358,6 +1362,8 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
+	clear(t.equalityBounds[scope.equalityBounds:])
+	t.equalityBounds = t.equalityBounds[:scope.equalityBounds]
 	clear(t.pendingBounds[scope.pendingBounds:])
 	t.pendingBounds = t.pendingBounds[:scope.pendingBounds]
 	t.pendingBoundHead = scope.pendingBoundHead
@@ -1716,7 +1722,7 @@ func (t *SMTLinearArithmeticTheory) polynomialInterval(expression ast.ASTHandle,
 }
 
 func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions(validated bool) (bool, bool, error) {
-	state, err := t.State()
+	_, err := t.State()
 	if err != nil {
 		return false, false, err
 	}
@@ -1751,7 +1757,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions(validated bool) (bo
 			literals := []SMTLiteral{smtLinearAssertionLiteral(atom, assertion)}
 			literals = append(literals, leftLiterals...)
 			literals = append(literals, rightLiterals...)
-			if err = state.SetTheoryConflict(t.FamilyID(), literals); err != nil {
+			if err = t.setArithmeticFallbackConflict(literals); err != nil {
 				return false, false, err
 			}
 			return true, true, nil
@@ -1790,7 +1796,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions(validated bool) (bo
 				literals = append(literals, smtLinearAssertionLiteral(linearAtom, linearAssertion))
 			}
 		}
-		if err = state.SetTheoryConflict(t.FamilyID(), literals); err != nil {
+		if err = t.setArithmeticFallbackConflict(literals); err != nil {
 			return false, false, err
 		}
 		return true, true, nil
@@ -1879,6 +1885,9 @@ func (t *SMTLinearArithmeticTheory) InternalizeEquality(expression ast.ASTHandle
 }
 
 func (t *SMTLinearArithmeticTheory) NewEquality(left, right SMTTheoryVar) error {
+	if t.equalityBoundsEnabled {
+		return t.queueCongruenceEqualityBounds(left, right)
+	}
 	return t.equalityAdapter.MkAxioms(left, right)
 }
 func (t *SMTLinearArithmeticTheory) NewDisequality(left, right SMTTheoryVar) error {

@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"ufidl_congruence_equality_bounds.smt2":     "sat\n(((>= (f u) 3) true) ((<= (f v) 2) true) ((distinct u v) true))\nunsat\nsat\n(((>= (f u) 3) true) ((<= (f v) 2) true) ((distinct u v) true))\n",
 	"ufidl_dense_model_scopes.smt2":             "sat\n((x 6) (y 2))\nunsat\nsat\n((x 6) (y 2))\n",
 	"ufidl_congruence_models.smt2":              "sat\n(((f x) 5) ((f y) 7) ((distinct x y) true))\nunsat\nsat\n(((f x) 5) ((f y) 7) ((distinct x y) true))\n",
 	"rdl_dense_model_scopes.smt2":               "sat\n((x (/ 3.0 2.0)) (y (/ 1.0 2.0)))\nunsat\nsat\n((x (/ 3.0 2.0)) (y (/ 1.0 2.0)))\n",

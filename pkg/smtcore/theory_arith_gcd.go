@@ -63,15 +63,16 @@ func (t *SMTLinearArithmeticTheory) arithmeticGCDConflict(solver *simplex.Solver
 	if err != nil {
 		return err
 	}
-	antecedents, explained, err := smtArithmeticExplainBounds(solver, bounds, proofs)
+	antecedents, explained, err := smtArithmeticExplainBounds(solver, bounds, proofs, t.equalityBounds)
 	if err != nil {
 		return err
 	}
 	// Derived bounds without dependency chains still require the conservative
 	// assertion set. Do not attach invented numerical weights to that fallback.
 	if !explained {
-		for _, assertion := range t.assertions {
-			antecedents.literals = append(antecedents.literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
+		antecedents, err = t.allArithmeticAntecedents()
+		if err != nil {
+			return err
 		}
 	}
 	parameters, err := antecedents.parameters(m, "gcd-test")
@@ -80,5 +81,5 @@ func (t *SMTLinearArithmeticTheory) arithmeticGCDConflict(solver *simplex.Solver
 	}
 	defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(m, parameters)) }()
 	t.recordArithmeticConflict()
-	return t.state.SetTheoryConflict(t.FamilyID(), antecedents.literals, parameters...)
+	return t.setArithmeticConflict(&antecedents, parameters...)
 }

@@ -51,7 +51,7 @@ func (t *SMTLinearArithmeticTheory) derivedBoundConflict(solver *simplex.Solver)
 			}
 			var antecedents smtArithmeticAntecedents
 			for _, dependency := range dependencies {
-				if err = antecedents.pushLiteral(SMTLiteralFromIndex(dependency.Literal), &dependency.Coefficient, proofs); err != nil {
+				if err = smtArithmeticPushDependency(&antecedents, dependency, &dependency.Coefficient, proofs, t.equalityBounds); err != nil {
 					return err
 				}
 			}
@@ -61,15 +61,15 @@ func (t *SMTLinearArithmeticTheory) derivedBoundConflict(solver *simplex.Solver)
 			}
 			defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(t.state.manager, parameters)) }()
 			t.recordArithmeticConflict()
-			return t.state.SetTheoryConflict(t.FamilyID(), antecedents.literals, parameters...)
+			return t.setArithmeticConflict(&antecedents, parameters...)
 		}
 	}
-	literals := make([]SMTLiteral, 0, len(t.assertions))
-	for _, assertion := range t.assertions {
-		literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
+	antecedents, err := t.allArithmeticAntecedents()
+	if err != nil {
+		return err
 	}
 	t.recordArithmeticConflict()
-	return t.state.SetTheoryConflict(t.FamilyID(), literals)
+	return t.setArithmeticConflict(&antecedents)
 }
 
 func (t *SMTLinearArithmeticTheory) propagateNonlinearStrategyBounds() (bool, error) {

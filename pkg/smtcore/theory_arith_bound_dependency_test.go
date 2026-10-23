@@ -31,7 +31,7 @@ func TestSMTArithmeticReplayBoundDependenciesAndScaling(t *testing.T) {
 		t.Fatal("weaker assertion replaced the strong negative-scaled bound", dependencies, known)
 	}
 	uses := []simplex.ArithmeticBoundUse{{Column: 1, Lower: false, Coefficient: *big.NewRat(9, 7)}}
-	ante, known, err := smtArithmeticExplainBounds(solver, uses, true)
+	ante, known, err := smtArithmeticExplainBounds(solver, uses, true, nil)
 	astTestMust(t, err)
 	if !known || len(ante.literalCoefficients) != 1 || ante.literalCoefficients[0].Cmp(big.NewRat(-6, 7)) != 0 {
 		t.Fatal(ante, known)
@@ -40,7 +40,7 @@ func TestSMTArithmeticReplayBoundDependenciesAndScaling(t *testing.T) {
 	// coincide with a previously justified endpoint.
 	value, _ := solver.Upper(1)
 	astTestMust(t, solver.SetUpper(1, value))
-	if _, known, err = smtArithmeticExplainBounds(solver, uses, true); err != nil || known {
+	if _, known, err = smtArithmeticExplainBounds(solver, uses, true, nil); err != nil || known {
 		t.Fatal("model premise", known, err)
 	}
 }
@@ -68,7 +68,7 @@ func TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions(t *testing.T) {
 		if result != simplex.ArithmeticGCDConflict {
 			t.Fatal(result)
 		}
-		ante, known, err := smtArithmeticExplainBounds(solver, uses, proofs)
+		ante, known, err := smtArithmeticExplainBounds(solver, uses, proofs, nil)
 		astTestMust(t, err)
 		if !known || len(ante.literals) != 2 {
 			t.Fatal(ante, known)
@@ -163,7 +163,7 @@ func TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays(t *testing.T) {
 	if !changed {
 		t.Fatal("derived bound not installed")
 	}
-	ante, known, err := smtArithmeticExplainBounds(solver, []simplex.ArithmeticBoundUse{{Column: 2, Lower: true, Coefficient: *big.NewRat(11, 13)}}, true)
+	ante, known, err := smtArithmeticExplainBounds(solver, []simplex.ArithmeticBoundUse{{Column: 2, Lower: true, Coefficient: *big.NewRat(11, 13)}}, true, nil)
 	astTestMust(t, err)
 	if !known || len(ante.literals) != 1 || ante.literalCoefficients[0].Cmp(big.NewRat(11, 13)) != 0 {
 		t.Fatal("derived-bound caller coefficient", ante, known)

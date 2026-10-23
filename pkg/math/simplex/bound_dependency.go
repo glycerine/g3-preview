@@ -16,10 +16,12 @@ func (s *Solver) BoundConflictDependencies() ([]BoundDependency, bool) {
 	return cloneBoundDependencies(s.boundConflict), s.boundConflictKnown
 }
 
-// BoundDependency is a weighted Boolean literal index supplied by the SMT
-// arithmetic consumer. Tableau pivots preserve bounds and their dependencies.
+// BoundDependency is a weighted literal index or a nonzero equality-premise
+// identifier supplied by the arithmetic owner. The tableau retains identifiers
+// without borrowing context nodes. Equality zero selects the literal variant.
 type BoundDependency struct {
 	Literal     int32
+	Equality    uint32
 	Coefficient big.Rat
 }
 
@@ -35,6 +37,7 @@ func cloneBoundDependencies(dependencies []BoundDependency) []BoundDependency {
 	result := make([]BoundDependency, len(dependencies))
 	for i := range dependencies {
 		result[i].Literal = dependencies[i].Literal
+		result[i].Equality = dependencies[i].Equality
 		result[i].Coefficient.Set(&dependencies[i].Coefficient)
 	}
 	return result

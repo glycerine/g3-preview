@@ -67227,12 +67227,16 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/math/simplex/bound_dependency.go",
+        "pkg/math/simplex/arith_row_conflict.go",
+        "pkg/math/simplex/bound_equality_dependency_test.go",
         "pkg/math/simplex/simplex.go",
         "pkg/math/simplex/simplex_test.go",
         "pkg/smtcore/theory_arith_cluster.go",
         "pkg/smtcore/theory_arith_cluster_test.go"
       ],
       "tests": [
+        "TestArithmeticRowConflictPreservesEqualityPremises",
         "TestSimplexFeasiblePivotAndValues",
         "TestSimplexInfeasibleFixedNonbasicAndWitnessRow",
         "TestSimplexInfinitesimalStrictBounds",
@@ -67256,6 +67260,18 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Typed equality identifiers and owned numerical coefficients in simplex replay and weighted relaxed-row explanations",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/simplex/bound_dependency.go",
+          "go_targets": [
+            "pkg/math/simplex/arith_row_conflict.go",
+            "pkg/math/simplex/bound_equality_dependency_test.go"
+          ],
+          "tests": [
+            "TestArithmeticRowConflictPreservesEqualityPremises"
+          ]
+        },
+        {
           "name": "solver bounds, rows, feasibility, minimization, deletion, reset, values, statistics, and display API",
           "status": "ported",
           "go_target": "pkg/math/simplex/simplex.go",
@@ -67277,16 +67293,29 @@
           ]
         }
       ],
-      "ownership": [],
-      "deviations": ["Solver is the concrete retained exact tableau API. Go errors replace assertion-only invalid-handle behavior, and Stats replaces the source statistics accumulator adapter."]
+      "ownership": [
+        "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters."
+      ],
+      "deviations": [
+        "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
+        "Solver is the concrete retained exact tableau API. Go errors replace assertion-only invalid-handle behavior, and Stats replaces the source statistics accumulator adapter."
+      ]
     },
     {
       "path": "src/math/simplex/simplex_def.h",
       "component": "math",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/math/simplex/simplex.go", "pkg/math/simplex/simplex_test.go"],
-      "tests": ["TestSimplexFeasiblePivotAndValues", "TestSimplexInfeasibleFixedNonbasicAndWitnessRow", "TestSimplexInfinitesimalStrictBounds", "TestSimplexMinimizeBoundedAndUnbounded", "TestSimplexDeleteBaseAndNonbasicRows", "TestSimplexRetainedSourceFeasibilityCases"],
+      "go_targets": [
+        "pkg/math/simplex/bound_dependency.go",
+        "pkg/math/simplex/arith_row_conflict.go",
+        "pkg/math/simplex/bound_equality_dependency_test.go",
+        "pkg/math/simplex/simplex.go", "pkg/math/simplex/simplex_test.go"
+      ],
+      "tests": [
+        "TestArithmeticRowConflictPreservesEqualityPremises",
+        "TestSimplexFeasiblePivotAndValues", "TestSimplexInfeasibleFixedNonbasicAndWitnessRow", "TestSimplexInfinitesimalStrictBounds", "TestSimplexMinimizeBoundedAndUnbounded", "TestSimplexDeleteBaseAndNonbasicRows", "TestSimplexRetainedSourceFeasibilityCases"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -67489,9 +67518,28 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "tableau feasibility pivots, value propagation, primal minimization, Bland default selection, and invariants", "status": "ported", "go_target": "pkg/math/simplex/simplex.go", "tests": ["TestSimplexRetainedSourceFeasibilityCases", "TestSimplexDeleteBaseAndNonbasicRows"]}],
-      "ownership": [],
-      "deviations": ["The source default pivot strategy is the smallest-variable strategy, implemented deterministically with a Go map plus sorted selection. The dormant greatest/least-error strategies and random tie choice are not reached by retained consumers."]
+      "methods": [
+        {
+          "name": "Typed equality identifiers and owned numerical coefficients in simplex replay and weighted relaxed-row explanations",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/simplex/bound_dependency.go",
+          "go_targets": [
+            "pkg/math/simplex/arith_row_conflict.go",
+            "pkg/math/simplex/bound_equality_dependency_test.go"
+          ],
+          "tests": [
+            "TestArithmeticRowConflictPreservesEqualityPremises"
+          ]
+        },
+        {"name": "tableau feasibility pivots, value propagation, primal minimization, Bland default selection, and invariants", "status": "ported", "go_target": "pkg/math/simplex/simplex.go", "tests": ["TestSimplexRetainedSourceFeasibilityCases", "TestSimplexDeleteBaseAndNonbasicRows"]}
+      ],
+      "ownership": [
+        "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters."
+      ],
+      "deviations": [
+        "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
+        "The source default pivot strategy is the smallest-variable strategy, implemented deterministically with a Go map plus sorted selection. The dormant greatest/least-error strategies and random tie choice are not reached by retained consumers."
+      ]
     },
     {
       "path": "src/math/simplex/sparse_matrix.h",
@@ -112256,6 +112304,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_arith_equality_bounds.go",
+        "pkg/smtcore/theory_arith_equality_bounds_test.go",
+        "pkg/smtcore/theory_arith_bound_dependency.go",
+        "pkg/math/simplex/bound_equality_dependency_test.go",
         "pkg/smtcore/smt_setup.go",
         "pkg/smtcore/smt_asserted_bounds.go",
         "pkg/smtcore/smt_asserted_bounds_test.go",
@@ -112289,6 +112341,9 @@
         "pkg/smtcore/smt_setup_ufidl_test.go"
       ],
       "tests": [
+        "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
+        "TestSMTArithmeticMixedPremiseAccumulation",
+        "TestArithmeticRowConflictPreservesEqualityPremises",
         "TestSMTSolverSetupUsesLinearRealArithmetic",
         "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
@@ -112354,6 +112409,24 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "new_eq_eh EqBounds: native numeral endpoints or a zero-valued difference term; scoped queueing without auxiliary Boolean atoms, equality-aware linear/nonlinear explanations, Farkas coefficients and context conflicts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_equality_bounds.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_equality_bounds_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/math/simplex/bound_equality_dependency_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
+            "TestSMTArithmeticMixedPremiseAccumulation",
+            "TestArithmeticRowConflictPreservesEqualityPremises",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "explicit arithmetic and array logic classification, setup_unknown all-theory fallback, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA/QF_UFLRA/QF_UFLIA/QF_AUFLIA/LRA/UFLRA and retained AUFLIA/AUFLIA+/AUFLIA-/UFNIA linear-subset theory selection, native shared QF_UFBV array/bit-vector and quantified array routing, and concrete mixed linear arithmetic for the general fallback and quantified mixed routes; remaining nonlinear arithmetic algorithms stay partial (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409,891-905)",
           "status": "partial",
@@ -112613,7 +112686,7 @@
           ]
         },
         {
-          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption remains incomplete",
+          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption is now connected",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup_difference.go",
           "go_targets": [
@@ -112629,7 +112702,8 @@
         }
       ],
       "ownership": [
-        "The kernel owns its theory registry. QF_RDL uses mixed arithmetic by default and selects dense or real difference arithmetic at its static setup boundary; QF_IDL selects concrete integer/mixed simplex or dense arithmetic. QF_UFIDL selects integer/mixed simplex or the no-UF dense route; its direct equality-bound event consumer remains partial. Other source setup routes retain their separately recorded gaps.",
+        "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
+        "The kernel owns its theory registry. QF_RDL uses mixed arithmetic by default and selects dense or real difference arithmetic at its static setup boundary; QF_IDL selects concrete integer/mixed simplex or dense arithmetic. QF_UFIDL selects integer/mixed simplex or the no-UF dense route; its native equality-bound event consumer is now connected. Other source setup routes retain their separately recorded gaps.",
         "QF_UFLIA logic setup mutates the owning SMT/arithmetic/preprocessing parameter states and their live kernel caches before constructing integer arithmetic. The internal threshold is retained by later updt_params because that source method does not update it; the regression checks owner/cache/theory agreement before and after updates. AutoConfig=false and neighboring real/integer logics do not receive this profile. Static-feature validation, full CFG_BASIC routing and other setup profiles remain separate. Disabling relevancy also requires model generation to use the mode-aware relevancy service rather than its marked-expression map.",
         "The one-time QF_LIA policy borrows pinned asserted formulas while a temporary AST StaticFeatures owns its numeral scratch values and counters. The collector closes on success and failure. Selected scalar policy is stored in the existing owning SMT parameters and their concrete kernel/theory views; later scopes and checks reuse the selected policy.",
         "Integer and real automatic setup share a concrete feature-collection and policy-application path. QF_LRA numerator and denominator are independent owned numeral values released before the feature collector; all failure exits close the collector, and the retained parameter owners contain only the selected scalar policy.",
@@ -112644,6 +112718,7 @@
         "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
       ],
       "deviations": [
+        "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
         "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. Unrecognized logics follow source setup_unknown and install every retained theory; unsupported arithmetic uses the dummy checkpoint so nonlinear terms return incompleteness. QF_FP, QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory together with its bit-vector backend. QF_BVRE, QF_S and ALL install the concrete sequence theory. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics likewise return incompleteness instead of an unsound result.",
         "The QF_LIA setup policy now includes both retained overloads, with static-feature depth >50, unit-only input, clausal restart/phase settings and the CNF unit/binary constant-sum >100000 guard. The first push selects the logic-only overload and prevents later feature reclassification; auto_config=false bypasses this tuning. Manual Euclidean, Gomory and equality-branch tests explicitly disable automatic setup before setting their own theory controls. The 52-level ITE runner regression preserves SAT model values and a scoped UNSAT refutation in 93 exact C++ script comparisons. Other logic profiles, backend-selection policies and full automatic configuration remain partial.",
         "The retained QF_LRA logic and feature policy now follows both source overloads. Tests cover each rational threshold independently, the exact numerator boundary, CNF/non-CNF inputs, first-push logic mode and disabled automatic configuration. The decimal 3906.255859375 exercises reduced numerator 2000003 and denominator 512 in a scoped SAT/model/UNSAT C++ comparison, bringing strict runner comparisons to 94. Remaining automatic backend selection and other logic profiles remain partial.",
@@ -112655,7 +112730,7 @@
         "Normal automatic QF_IDL setup now uses integer simplex instead of the separately tested difference-graph theory. Default first-push and feature-based first-check policies, invalid difference/real/UF inputs, dense feature settings and proof-mode integrality have focused coverage. The initial increment retained integer simplex for the dense branch; the subsequent concrete dense integration is recorded below. The valid first-push IDL SAT/model/UNSAT/pop script brings strict C++ comparisons to 100. Other arithmetic-mode and automatic backend-selection branches remain partial.",
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
-        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go currently records that flag but still uses the equality adapter, so this consumer remains an explicit gap. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
       ]
     },
     {
@@ -112664,6 +112739,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_arith_equality_bounds.go",
+        "pkg/smtcore/theory_arith_equality_bounds_test.go",
+        "pkg/smtcore/theory_arith_bound_dependency.go",
+        "pkg/math/simplex/bound_equality_dependency_test.go",
         "pkg/smtcore/smt_setup.go",
         "pkg/smtcore/smt_asserted_bounds.go",
         "pkg/smtcore/smt_asserted_bounds_test.go",
@@ -112693,6 +112772,9 @@
         "pkg/smtcore/smt_setup_ufidl_test.go"
       ],
       "tests": [
+        "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
+        "TestSMTArithmeticMixedPremiseAccumulation",
+        "TestArithmeticRowConflictPreservesEqualityPremises",
         "TestSMTSolverSetupUsesLinearRealArithmetic",
         "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
@@ -112743,6 +112825,24 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "new_eq_eh EqBounds: native numeral endpoints or a zero-valued difference term; scoped queueing without auxiliary Boolean atoms, equality-aware linear/nonlinear explanations, Farkas coefficients and context conflicts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_equality_bounds.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_equality_bounds_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/math/simplex/bound_equality_dependency_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
+            "TestSMTArithmeticMixedPremiseAccumulation",
+            "TestArithmeticRowConflictPreservesEqualityPremises",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "retained explicit-logic setup entry point",
           "status": "partial",
@@ -112950,7 +113050,7 @@
           ]
         },
         {
-          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption remains incomplete",
+          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption is now connected",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup_difference.go",
           "go_targets": [
@@ -112966,6 +113066,7 @@
         }
       ],
       "ownership": [
+        "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
         "The retained setup helper borrows its kernel and AST manager and publishes created theory implementations into the kernel registry.",
         "The one-time QF_LIA policy borrows pinned asserted formulas while a temporary AST StaticFeatures owns its numeral scratch values and counters. The collector closes on success and failure. Selected scalar policy is stored in the existing owning SMT parameters and their concrete kernel/theory views; later scopes and checks reuse the selected policy.",
         "Integer and real automatic setup share a concrete feature-collection and policy-application path. QF_LRA numerator and denominator are independent owned numeral values released before the feature collector; all failure exits close the collector, and the retained parameter owners contain only the selected scalar policy.",
@@ -112980,6 +113081,7 @@
         "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
       ],
       "deviations": [
+        "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
         "The Go surface is a direct setup function rather than a persistent setup object because only construction-time explicit-logic routing is currently consumed. Sequence logics install SMTEmptySequenceTheory as a safe give-up checkpoint until the concrete sequence solver replaces it.",
         "The QF_LIA setup policy now includes both retained overloads, with static-feature depth >50, unit-only input, clausal restart/phase settings and the CNF unit/binary constant-sum >100000 guard. The first push selects the logic-only overload and prevents later feature reclassification; auto_config=false bypasses this tuning. Manual Euclidean, Gomory and equality-branch tests explicitly disable automatic setup before setting their own theory controls. The 52-level ITE runner regression preserves SAT model values and a scoped UNSAT refutation in 93 exact C++ script comparisons. Other logic profiles, backend-selection policies and full automatic configuration remain partial.",
         "The retained QF_LRA logic and feature policy now follows both source overloads. Tests cover each rational threshold independently, the exact numerator boundary, CNF/non-CNF inputs, first-push logic mode and disabled automatic configuration. The decimal 3906.255859375 exercises reduced numerator 2000003 and denominator 512 in a scoped SAT/model/UNSAT C++ comparison, bringing strict runner comparisons to 94. Remaining automatic backend selection and other logic profiles remain partial.",
@@ -112991,7 +113093,7 @@
         "Normal automatic QF_IDL setup now uses integer simplex instead of the separately tested difference-graph theory. Default first-push and feature-based first-check policies, invalid difference/real/UF inputs, dense feature settings and proof-mode integrality have focused coverage. The initial increment retained integer simplex for the dense branch; the subsequent concrete dense integration is recorded below. The valid first-push IDL SAT/model/UNSAT/pop script brings strict C++ comparisons to 100. Other arithmetic-mode and automatic backend-selection branches remain partial.",
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
-        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go currently records that flag but still uses the equality adapter, so this consumer remains an explicit gap. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
       ]
     },
     {
@@ -114167,6 +114269,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_arith_equality_bounds.go",
+        "pkg/smtcore/theory_arith_equality_bounds_test.go",
+        "pkg/smtcore/theory_arith_bound_dependency.go",
+        "pkg/math/simplex/bound_equality_dependency_test.go",
         "pkg/smtcore/theory_arith_tableau.go",
         "pkg/smtcore/theory_arith_bounds.go",
         "pkg/smtcore/theory_arith_linear.go",
@@ -114175,6 +114281,9 @@
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
+        "TestSMTArithmeticMixedPremiseAccumulation",
+        "TestArithmeticRowConflictPreservesEqualityPremises",
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
         "TestSMTArithmeticRowAndColumnCompressionRepairCrossIndices",
         "TestSMTArithmeticColumnHoleReuseAndSingletonCompression",
@@ -114313,6 +114422,24 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "new_eq_eh EqBounds: native numeral endpoints or a zero-valued difference term; scoped queueing without auxiliary Boolean atoms, equality-aware linear/nonlinear explanations, Farkas coefficients and context conflicts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_equality_bounds.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_equality_bounds_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/math/simplex/bound_equality_dependency_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
+            "TestSMTArithmeticMixedPremiseAccumulation",
+            "TestArithmeticRowConflictPreservesEqualityPremises",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "linear_monomial, row_entry, col_entry, row and column declarations",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_tableau.go",
@@ -114366,9 +114493,12 @@
         }
       ],
       "ownership": [
+        "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
         "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate."
       ],
-      "deviations": []
+      "deviations": [
+        "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial."
+      ]
     },
     {
       "path": "src/smt/theory_arith_aux.h",
@@ -114376,6 +114506,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_arith_equality_bounds.go",
+        "pkg/smtcore/theory_arith_equality_bounds_test.go",
+        "pkg/math/simplex/bound_equality_dependency_test.go",
         "pkg/smtcore/theory_arith_tableau.go",
         "pkg/smtcore/smt_farkas_util.go",
         "pkg/smtcore/theory_arith_bounds.go",
@@ -114404,6 +114537,9 @@
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
+        "TestSMTArithmeticMixedPremiseAccumulation",
+        "TestArithmeticRowConflictPreservesEqualityPremises",
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
         "TestSMTArithmeticRowAndColumnCompressionRepairCrossIndices",
         "TestSMTArithmeticColumnHoleReuseAndSingletonCompression",
@@ -114816,6 +114952,24 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "new_eq_eh EqBounds: native numeral endpoints or a zero-valued difference term; scoped queueing without auxiliary Boolean atoms, equality-aware linear/nonlinear explanations, Farkas coefficients and context conflicts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_equality_bounds.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_equality_bounds_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/math/simplex/bound_equality_dependency_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
+            "TestSMTArithmeticMixedPremiseAccumulation",
+            "TestArithmeticRowConflictPreservesEqualityPremises",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "row and column reset, hole reuse, compression, lookup and denominator LCM",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_tableau.go",
@@ -114963,9 +115117,11 @@
         }
       ],
       "ownership": [
+        "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
         "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop."
       ],
       "deviations": [
+        "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
         "The retained nonlinear max/min path uses a temporary canonical objective row, removed on return, with raw matrix pivot coefficients normalized for source gain formulas. Integer-column gain and sharing guards are retained. The maintain_integrality=true optimization-engine path remains unported; this is not a claim to complete optimization support.",
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
         "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial."
@@ -114977,6 +115133,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_arith_equality_bounds.go",
+        "pkg/smtcore/theory_arith_equality_bounds_test.go",
+        "pkg/math/simplex/bound_equality_dependency_test.go",
         "pkg/smtcore/theory_arith_tableau.go",
         "pkg/smtcore/theory_arith_linear.go",
         "pkg/smtcore/theory_arith_mixed.go",
@@ -115024,6 +115183,9 @@
         "pkg/smtcore/theory_arith_grobner.go"
       ],
       "tests": [
+        "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
+        "TestSMTArithmeticMixedPremiseAccumulation",
+        "TestArithmeticRowConflictPreservesEqualityPremises",
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
         "TestSMTLinearArithmeticStandaloneTermDefinition",
         "TestSMTLinearArithmeticEqualDefinitionRows",
@@ -115801,6 +115963,24 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "new_eq_eh EqBounds: native numeral endpoints or a zero-valued difference term; scoped queueing without auxiliary Boolean atoms, equality-aware linear/nonlinear explanations, Farkas coefficients and context conflicts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_equality_bounds.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_equality_bounds_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/math/simplex/bound_equality_dependency_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
+            "TestSMTArithmeticMixedPremiseAccumulation",
+            "TestArithmeticRowConflictPreservesEqualityPremises",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "row_vars scope and add_row_entry row/column insertion with duplicate coefficient merge",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_tableau.go",
@@ -116066,6 +116246,7 @@
         }
       ],
       "ownership": [
+        "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
         "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification.",
         "Division application markers follow theory scopes. Concrete division calls pin generated arithmetic and Boolean terms through recursive axiom internalization. The disabled constant-modulus enumeration option has no active retained setter and is not translated.",
         "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop.",
@@ -116073,6 +116254,7 @@
         "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate."
       ],
       "deviations": [
+        "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
         "Affine definition-bound propagation evaluates retained replay rows before and after nonlinear interval propagation, including sign reversal for negated-square aliases. General row scheduling, propagation to every row variable, and minimal row-bound explanations remain incomplete.",
         "Shared arithmetic variables can become fixed through a combination of row bounds even when no explicit opposite unary bounds occur. A branch-free row interval pass derives these points, retains only newly fixed original columns as scoped replay bounds, and propagates equal-valued shared roots with all active arithmetic literals as premises. This closes the false-SAT case x>=0, y>=0, x+y<=0, f(x)!=f(y). General bound-atom propagation and optimal fixed-point discovery remain separate work.",
         "The existing small-row interval calculation is shared by fixed-value equality propagation and nonlinear strategy bound replay. Equality aliases such as x=2*y now carry finite factor bounds into monomial intervals. Source minimal dependency explanations and full propagation scheduling remain incomplete.",
@@ -119369,7 +119551,7 @@
           ]
         },
         {
-          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption remains incomplete",
+          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption is now connected",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup_difference.go",
           "go_targets": [
@@ -119393,7 +119575,7 @@
       "deviations": [
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
-        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go currently records that flag but still uses the equality adapter, so this consumer remains an explicit gap. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
       ]
     },
     {
@@ -119496,7 +119678,7 @@
           ]
         },
         {
-          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption remains incomplete",
+          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption is now connected",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup_difference.go",
           "go_targets": [
@@ -119520,7 +119702,7 @@
       "deviations": [
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
-        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go currently records that flag but still uses the equality adapter, so this consumer remains an explicit gap. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
       ]
     },
     {
@@ -119743,7 +119925,7 @@
           ]
         },
         {
-          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption remains incomplete",
+          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption is now connected",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup_difference.go",
           "go_targets": [
@@ -119767,7 +119949,7 @@
       "deviations": [
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
-        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go currently records that flag but still uses the equality adapter, so this consumer remains an explicit gap. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
       ]
     },
     {

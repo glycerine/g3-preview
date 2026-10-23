@@ -251,7 +251,11 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 			form.constant.Neg(value)
 			var premises []SMTLiteral
 			for _, lower := range []bool{true, false} {
-				premises = append(premises, dependencies.boundLiterals(solver, column, lower)...)
+				literals, err := dependencies.boundLiterals(solver, column, lower)
+				if err != nil {
+					return false, err
+				}
+				premises = append(premises, literals...)
 			}
 			if err = t.assertGrobnerForm(gb, solver, aliases, &form, &dependencies, premises...); err != nil {
 				return false, err
@@ -324,7 +328,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 			literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
 		}
 		t.recordArithmeticConflict()
-		err = t.state.SetTheoryConflict(t.FamilyID(), literals)
+		err = t.setArithmeticFallbackConflict(literals)
 	}
 	return conflict, err
 }

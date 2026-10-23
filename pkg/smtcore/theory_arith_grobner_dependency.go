@@ -68,23 +68,38 @@ func (d *smtGrobnerDependencies) add(root ast.ASTDependency, literal SMTLiteral)
 	return d.retain(joined)
 }
 
-func (d *smtGrobnerDependencies) boundLiterals(solver *simplex.Solver, column uint32, lower bool) []SMTLiteral {
+func (d *smtGrobnerDependencies) boundLiterals(solver *simplex.Solver, column uint32, lower bool) ([]SMTLiteral, error) {
 	dependencies, known := solver.BoundDependencies(column, lower)
 	var result []SMTLiteral
 	if !known {
 		for _, assertion := range d.theory.assertions {
 			result = append(result, smtLinearAssertionLiteral(&d.theory.atoms[assertion.atom], assertion))
 		}
-		return result
+		for _, endpoints := range d.theory.equalityBounds {
+			literals, err := NewSMTAntecedentExpander().ExpandEquality(endpoints.lower.left, endpoints.lower.right)
+			if err != nil {
+				return nil, err
+			}
+			result = append(result, literals...)
+		}
+		return result, nil
 	}
 	for _, dependency := range dependencies {
-		result = append(result, SMTLiteralFromIndex(dependency.Literal))
+		literals, err := d.theory.arithmeticDependencyLiterals(dependency)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, literals...)
 	}
-	return result
+	return result, nil
 }
 
 func (d *smtGrobnerDependencies) addBound(root ast.ASTDependency, solver *simplex.Solver, column uint32, lower bool) (ast.ASTDependency, error) {
-	for _, literal := range d.boundLiterals(solver, column, lower) {
+	literals, err := d.boundLiterals(solver, column, lower)
+	if err != nil {
+		return root, err
+	}
+	for _, literal := range literals {
 		var err error
 		root, err = d.add(root, literal)
 		if err != nil {
