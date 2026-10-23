@@ -115052,7 +115052,7 @@
           ]
         },
         {
-          "name": "row and affine-definition bound propagation retain weighted premises through scoped numeric replay and fixed shared-value storage; nonlinear interval explanation chains remain incomplete",
+          "name": "row and affine-definition bound propagation retain weighted premises through scoped numeric replay and fixed shared-value storage; precise interval conflicts and equation provenance remain incomplete",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
           "go_targets": [
@@ -115915,7 +115915,10 @@
         "pkg/smtcore/theory_arith_epsilon.go",
         "pkg/smtcore/theory_arith_epsilon_test.go",
         "pkg/smtcore/theory_arith_nested_rows.go",
-        "pkg/smtcore/theory_arith_nested_rows_test.go"
+        "pkg/smtcore/theory_arith_nested_rows_test.go",
+        "pkg/smtcore/theory_arith_bound_dependency.go",
+        "pkg/smtcore/theory_arith_nonlinear_dependency_test.go",
+        "pkg/smtcore/smt_arith_bound_dependency.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -115939,7 +115942,11 @@
         "TestSMTNonlinearNumericProgressAndScopedStrategies",
         "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
         "TestSMTArithmeticSharedEpsilonPreservesDistinctValues",
-        "TestSMTNestedCanonicalRowsThroughSeparateAliases"
+        "TestSMTNestedCanonicalRowsThroughSeparateAliases",
+        "TestSMTNonlinearProductAndPowerEndpointExplanations",
+        "TestSMTNonlinearUnknownEndpointDoesNotBecomeUnconditional",
+        "TestSMTLinearMonomialZeroFactorExplainsBothBounds",
+        "TestSMTLinearMonomialAffineRowRetainsFixedFactorPremises"
       ],
       "conditionals": [
         {
@@ -116250,12 +116257,21 @@
           ]
         },
         {
-          "name": "propagate_nl_upward, propagate_nl_downward for degree-one targets, and update_bounds_using_interval with open and integer endpoints",
+          "name": "propagate_nl_upward, propagate_nl_downward for degree-one targets, and update_bounds_using_interval with open/integer endpoints and plain derived-bound dependencies; precise interval conflicts remain incomplete",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
           "tests": [
             "TestSMTNonlinearRelaxationScopesProofsAndModel",
-            "TestSMTNonlinearUpwardDownwardAndIntegerIntervals"
+            "TestSMTNonlinearUpwardDownwardAndIntegerIntervals",
+            "TestSMTNonlinearProductAndPowerEndpointExplanations",
+            "TestSMTNonlinearUnknownEndpointDoesNotBecomeUnconditional",
+            "TestSMTLinearMonomialZeroFactorExplainsBothBounds",
+            "TestSMTLinearMonomialAffineRowRetainsFixedFactorPremises"
+          ],
+          "go_targets": [
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_nonlinear_dependency_test.go",
+            "pkg/smtcore/smt_arith_bound_dependency.go"
           ]
         },
         {
@@ -116393,6 +116409,35 @@
             "TestSMTNestedMixedCoefficientSortGuards",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "mk_interval_for and dependency2new_bound: preserve finite endpoint explanation leaves, distinguish unknown from unconditional bounds, flatten and deduplicate nonlinear interval premises into plain derived bounds, and own them independently of temporary dependency graphs",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_nonlinear_dependency_test.go",
+            "pkg/smtcore/smt_arith_bound_dependency.go"
+          ],
+          "tests": [
+            "TestSMTNonlinearProductAndPowerEndpointExplanations",
+            "TestSMTNonlinearUnknownEndpointDoesNotBecomeUnconditional"
+          ]
+        },
+        {
+          "name": "propagate_linear_monomial fixed-factor explanations: retain both endpoints for conditional affine rows and fixed products, reset earlier premises when a zero factor suffices, and propagate the fixed-factor reasons through subsequent row bounds",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_nonlinear_dependency_test.go",
+            "pkg/smtcore/smt_arith_bound_dependency.go"
+          ],
+          "tests": [
+            "TestSMTLinearMonomialZeroFactorExplainsBothBounds",
+            "TestSMTLinearMonomialAffineRowRetainsFixedFactorPremises",
+            "TestSMTLinearizedMonomialScopesProofsAndModels"
           ]
         }
       ],

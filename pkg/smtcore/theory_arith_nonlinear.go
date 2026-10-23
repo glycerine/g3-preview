@@ -184,16 +184,22 @@ func (t *SMTLinearArithmeticTheory) nonlinearColumnInterval(solver *simplex.Solv
 	if lower, ok := solver.Lower(column); ok {
 		result.lower = smtFiniteExtended(&lower.Main)
 		result.lowerOpen = lower.Epsilon.Sign() > 0
+		result.lowerDep = manager.Leaf(&smtArithmeticBound{variable: SMTTheoryVar(column), kind: smtArithmeticLowerBound, value: newSMTArithmeticValue(&lower.Main, &lower.Epsilon), replayExplanation: smtArithmeticCopyBoundExplanation(solver, column, true)})
 	}
 	if upper, ok := solver.Upper(column); ok {
 		result.upper = smtFiniteExtended(&upper.Main)
 		result.upperOpen = upper.Epsilon.Sign() < 0
+		result.upperDep = manager.Leaf(&smtArithmeticBound{variable: SMTTheoryVar(column), kind: smtArithmeticUpperBound, value: newSMTArithmeticValue(&upper.Main, &upper.Epsilon), replayExplanation: smtArithmeticCopyBoundExplanation(solver, column, false)})
 	}
 	return result, nil
 }
 
 func (t *SMTLinearArithmeticTheory) updateNonlinearBounds(solver *simplex.Solver, column uint32, interval *smtOldInterval) (bool, bool) {
-	return t.updateArithmeticBoundsWithExplanations(solver, column, interval, [2]*smtArithmeticBoundExplanation{})
+	explanations := [2]*smtArithmeticBoundExplanation{
+		smtArithmeticIntervalExplanation(interval.manager, interval.lowerDep),
+		smtArithmeticIntervalExplanation(interval.manager, interval.upperDep),
+	}
+	return t.updateArithmeticBoundsWithExplanations(solver, column, interval, explanations)
 }
 
 func (t *SMTLinearArithmeticTheory) updateArithmeticBoundsWithExplanations(solver *simplex.Solver, column uint32, interval *smtOldInterval, explanations [2]*smtArithmeticBoundExplanation) (bool, bool) {
@@ -399,9 +405,14 @@ func (t *SMTLinearArithmeticTheory) propagateLinearMonomials(solver *simplex.Sol
 		coefficient := big.NewRat(1, 1)
 		var remaining uint32
 		unfixed := 0
+		var fixedBounds []simplex.ArithmeticBoundUse
 		for _, factor := range t.nonlinearFactors[column] {
 			value, fixed := smtFixedSimplexColumn(solver, factor)
 			if fixed {
+				if value.Sign() == 0 {
+					fixedBounds = nil
+				}
+				fixedBounds = append(fixedBounds, simplex.ArithmeticBoundUse{Column: factor, Lower: true}, simplex.ArithmeticBoundUse{Column: factor, Lower: false})
 				coefficient.Mul(coefficient, value)
 				if coefficient.Sign() == 0 {
 					break // One zero factor suffices, irrespective of others.
@@ -415,7 +426,9 @@ func (t *SMTLinearArithmeticTheory) propagateLinearMonomials(solver *simplex.Sol
 			continue
 		}
 		if coefficient.Sign() == 0 || unfixed == 0 {
-			interval, err := newSMTOldIntervalPoint(&manager, coefficient, nil, nil)
+			explanation := smtArithmeticPlainBoundExplanation(solver, fixedBounds)
+			dependency := manager.Leaf(&smtArithmeticBound{replayExplanation: explanation})
+			interval, err := newSMTOldIntervalPoint(&manager, coefficient, dependency, dependency)
 			if err != nil {
 				return false, err
 			}
@@ -435,10 +448,11 @@ func (t *SMTLinearArithmeticTheory) propagateLinearMonomials(solver *simplex.Sol
 			return false, err
 		}
 		zero := simplex.RationalInfinitesimal(new(big.Rat))
-		if err := solver.SetLower(base, zero); err != nil {
+		explanation := smtArithmeticPlainBoundExplanation(solver, fixedBounds)
+		if _, err := smtTightenReplaySimplexBound(solver, base, true, zero, explanation); err != nil {
 			return true, nil
 		}
-		if err := solver.SetUpper(base, zero); err != nil {
+		if _, err := smtTightenReplaySimplexBound(solver, base, false, zero, explanation); err != nil {
 			return true, nil
 		}
 	}

@@ -13,6 +13,26 @@ type smtArithmeticBoundExplanation struct {
 	dependencies []simplex.BoundDependency
 }
 
+// dependency2new_bound creates a plain derived bound. A nil dependency is
+// unconditional, while a leaf without a replay explanation is unknown.
+func smtArithmeticIntervalExplanation(manager *smtArithmeticBoundDependencyManager, root *smtArithmeticBoundDependency) *smtArithmeticBoundExplanation {
+	result := &smtArithmeticBoundExplanation{}
+	seen := make(map[int32]bool)
+	for _, bound := range manager.Linearize(root, nil) {
+		if bound.replayExplanation == nil {
+			return nil
+		}
+		for _, dependency := range bound.replayExplanation.dependencies {
+			if seen[dependency.Literal] {
+				continue
+			}
+			seen[dependency.Literal] = true
+			result.dependencies = append(result.dependencies, simplex.BoundDependency{Literal: dependency.Literal, Coefficient: *big.NewRat(1, 1)})
+		}
+	}
+	return result
+}
+
 // mk_bound_from_row uses justified_derived_bound: combine contributions to
 // repeated literals while preserving their first occurrence in the row.
 func smtArithmeticWeightedBoundExplanation(solver *simplex.Solver, uses []simplex.ArithmeticBoundUse) *smtArithmeticBoundExplanation {

@@ -6,10 +6,11 @@ package smtcore
 // smtArithmeticBound is the concrete leaf type used by nonlinear arithmetic
 // explanations. Its bound payload is filled by the arithmetic-theory port.
 type smtArithmeticBound struct {
-	variable SMTTheoryVar
-	value    smtArithmeticValue
-	kind     smtArithmeticBoundKind
-	atom     bool
+	variable          SMTTheoryVar
+	value             smtArithmeticValue
+	kind              smtArithmeticBoundKind
+	atom              bool
+	replayExplanation *smtArithmeticBoundExplanation
 }
 
 type smtArithmeticBoundDependency struct {
