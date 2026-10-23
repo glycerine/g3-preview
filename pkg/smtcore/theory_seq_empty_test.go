@@ -878,7 +878,7 @@ func TestSMTSequenceTheoryBranchesVariablePrefixEqualities(t *testing.T) {
 	_, _, state := smtInternalizerFixture(t, m, nil)
 	astTestMust(t, state.RegisterTheory(theory))
 	branched, err := theory.branchVariablePrefixEquality(
-		[]ast.ASTHandle{x, leftTail}, []ast.ASTHandle{prefix, rightTail})
+		[]ast.ASTHandle{x, leftTail}, []ast.ASTHandle{prefix, rightTail}, nil)
 	astTestMust(t, err)
 	if !branched {
 		t.Fatal("variable did not branch to empty")
@@ -896,7 +896,7 @@ func TestSMTSequenceTheoryBranchesVariablePrefixEqualities(t *testing.T) {
 	}
 	astTestMust(t, state.assignDecisionLiteral(emptyLiteral.Negated()))
 	branched, err = theory.branchVariablePrefixEquality(
-		[]ast.ASTHandle{x, leftTail}, []ast.ASTHandle{prefix, rightTail})
+		[]ast.ASTHandle{x, leftTail}, []ast.ASTHandle{prefix, rightTail}, nil)
 	astTestMust(t, err)
 	if !branched {
 		t.Fatal("variable did not advance to the first word prefix")
@@ -937,7 +937,7 @@ func TestSMTSequenceTheorySkipsInfeasibleVariablePrefixes(t *testing.T) {
 	_, _, state := smtInternalizerFixture(t, m, nil)
 	astTestMust(t, state.RegisterTheory(theory))
 	branched, err := theory.branchVariablePrefixEquality(
-		[]ast.ASTHandle{x}, []ast.ASTHandle{prefix, unit})
+		[]ast.ASTHandle{x}, []ast.ASTHandle{prefix, unit}, nil)
 	astTestMust(t, err)
 	if !branched {
 		t.Fatal("variable did not reach feasible complete prefix")
@@ -959,6 +959,46 @@ func TestSMTSequenceTheorySkipsInfeasibleVariablePrefixes(t *testing.T) {
 	astTestMust(t, err)
 	if !data.TryTrueFirst() || !state.relevancy.IsRelevant(prefixEquality) {
 		t.Fatal("feasible complete prefix lacks branch preference")
+	}
+}
+
+func TestSMTSequenceTheoryClosesExhaustedUnitPrefixBranches(t *testing.T) {
+	m, _ := smtModelGeneratorFixture(t)
+	a, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	b, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	unitA, err := m.MkSequenceUnit(a)
+	astTestMust(t, err)
+	unitB, err := m.MkSequenceUnit(b)
+	astTestMust(t, err)
+	sort, err := m.GetSort(unitA)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-exhausted-prefix-x"), sort)
+	astTestMust(t, err)
+	empty, err := m.MkSequenceEmpty(sort)
+	astTestMust(t, err)
+	word, err := m.MkSequenceConcat(unitA, unitB)
+	astTestMust(t, err)
+	family, err := m.SequenceFamilyID()
+	astTestMust(t, err)
+	theory, err := NewSMTSequenceTheory(family)
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.RegisterTheory(theory))
+	for _, candidate := range []ast.ASTHandle{empty, word} {
+		equality, equalityErr := m.MkEq(x, candidate)
+		astTestMust(t, equalityErr)
+		astTestMust(t, state.Internalize(equality, false))
+		literal, literalErr := state.Literal(equality)
+		astTestMust(t, literalErr)
+		astTestMust(t, state.assignDecisionLiteral(literal.Negated()))
+	}
+	branched, err := theory.branchVariablePrefixEquality(
+		[]ast.ASTHandle{x}, []ast.ASTHandle{unitA, unitB}, nil)
+	astTestMust(t, err)
+	if !branched || !state.Inconsistent() {
+		t.Fatal("exhausted finite unit prefixes did not close the branch", branched, state.Inconsistent())
 	}
 }
 

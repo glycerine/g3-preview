@@ -105,7 +105,7 @@ func (t *SMTSequenceTheory) sequenceWordsCanBeEqual(left, right []ast.ASTHandle)
 	return true, nil
 }
 
-func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHandle) (bool, error) {
+func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
 	if len(left) == 0 || len(right) == 0 {
 		return false, nil
 	}
@@ -118,11 +118,20 @@ func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHa
 		if err != nil {
 			return false, err
 		}
-		if variable && uncovered {
-			state, stateErr := t.State()
-			if stateErr != nil {
-				return false, stateErr
+		state, stateErr := t.State()
+		if stateErr != nil {
+			return false, stateErr
+		}
+		allUnits := true
+		for _, part := range right {
+			if _, unit, unitErr := state.manager.SequenceUnitArgument(part); unitErr != nil {
+				return false, unitErr
+			} else if !unit {
+				allUnits = false
+				break
 			}
+		}
+		if variable && (uncovered || allUnits) {
 			sort, sortErr := state.manager.GetSort(left[0])
 			if sortErr != nil {
 				return false, sortErr
@@ -140,10 +149,11 @@ func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHa
 				if assumeErr != nil {
 					return false, assumeErr
 				}
-				if assignment == lbool.Undef {
+				if assignment != lbool.False {
 					return true, nil
 				}
 			}
+			candidates := []ast.ASTHandle{empty}
 			for index, part := range right {
 				if part == left[0] {
 					break
@@ -163,9 +173,44 @@ func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHa
 				if assumeErr != nil {
 					return false, assumeErr
 				}
-				if assignment == lbool.Undef {
+				if assignment != lbool.False {
 					return true, nil
 				}
+				candidates = append(candidates, prefix)
+			}
+			if allUnits {
+				conflictDependency := dependency
+				for _, candidate := range candidates {
+					equality, equalityErr := state.manager.MkEq(left[0], candidate)
+					if equalityErr != nil {
+						return false, equalityErr
+					}
+					if equalityErr = state.Internalize(equality, false); equalityErr != nil {
+						return false, equalityErr
+					}
+					literal, equalityErr := state.Literal(equality)
+					if equalityErr != nil {
+						return false, equalityErr
+					}
+					assignment, equalityErr := state.Assignment(literal)
+					if equalityErr != nil {
+						return false, equalityErr
+					}
+					if assignment != lbool.False {
+						data, dataErr := state.BooleanData(literal.Var())
+						if dataErr != nil {
+							return false, dataErr
+						}
+						data.SetTrueFirst()
+						return true, nil
+					}
+					conflictDependency = t.dependencies.Join(conflictDependency,
+						t.dependencies.Leaf(smtSequenceAssumption{literal: literal.Negated()}))
+				}
+				if conflictErr := t.setDependencyConflict(conflictDependency); conflictErr != nil {
+					return false, conflictErr
+				}
+				return true, nil
 			}
 		}
 		left, right = right, left

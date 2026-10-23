@@ -632,7 +632,7 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 			index--
 			continue
 		}
-		branched, err = t.branchVariablePrefixEquality(left, right)
+		branched, err = t.branchVariablePrefixEquality(left, right, dependency)
 		if err != nil || branched {
 			return branched, err
 		}
