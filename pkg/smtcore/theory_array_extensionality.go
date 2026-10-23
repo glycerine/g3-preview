@@ -99,40 +99,53 @@ func (t *SMTArrayTheory) alreadyDisequalReads(first, second *SMTEnode) (bool, er
 			if !same {
 				continue
 			}
-			// context::is_diseq looks for a relevant equality atom assigned
-			// false. Boolean equality is an iff, not an egraph disequality.
-			for variable := SMTFirstBoolVar; int(variable) < len(s.boolExpr); variable++ {
-				expression := s.boolExpr[variable]
-				op, basic, err := s.basicOperation(expression)
-				if err != nil {
-					return false, err
-				}
-				if !basic || op != ast.ASTOpEq && op != ast.ASTOpIff || s.relevancy != nil && !s.relevancy.IsRelevant(expression) {
-					continue
-				}
-				value, err := s.Assignment(NewSMTLiteral(variable, false))
-				if err != nil {
-					return false, err
-				}
-				if value != lbool.False {
-					continue
-				}
-				a, err := s.manager.GetArg(expression, 0)
-				if err != nil {
-					return false, err
-				}
-				b, err := s.manager.GetArg(expression, 1)
-				if err != nil {
-					return false, err
-				}
-				left, right := s.context.enodes[a], s.context.enodes[b]
-				if left == nil || right == nil {
-					continue
-				}
-				if left.root == parent.root && right.root == other.root || left.root == other.root && right.root == parent.root {
-					return true, nil
-				}
+			different, err := t.hasRelevantDisequality(parent, other)
+			if err != nil || different {
+				return different, err
 			}
+		}
+	}
+	return false, nil
+}
+
+// Source context::is_diseq: find a relevant equality assigned false modulo
+// egraph roots. Boolean equality uses iff and need not create a disequality
+// in the egraph's non-Boolean disequality table.
+func (t *SMTArrayTheory) hasRelevantDisequality(first, second *SMTEnode) (bool, error) {
+	s, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	for variable := SMTFirstBoolVar; int(variable) < len(s.boolExpr); variable++ {
+		expression := s.boolExpr[variable]
+		op, basic, err := s.basicOperation(expression)
+		if err != nil {
+			return false, err
+		}
+		if !basic || op != ast.ASTOpEq && op != ast.ASTOpIff || s.relevancy != nil && !s.relevancy.IsRelevant(expression) {
+			continue
+		}
+		value, err := s.Assignment(NewSMTLiteral(variable, false))
+		if err != nil {
+			return false, err
+		}
+		if value != lbool.False {
+			continue
+		}
+		a, err := s.manager.GetArg(expression, 0)
+		if err != nil {
+			return false, err
+		}
+		b, err := s.manager.GetArg(expression, 1)
+		if err != nil {
+			return false, err
+		}
+		left, right := s.context.enodes[a], s.context.enodes[b]
+		if left == nil || right == nil {
+			continue
+		}
+		if left.root == first.root && right.root == second.root || left.root == second.root && right.root == first.root {
+			return true, nil
 		}
 	}
 	return false, nil

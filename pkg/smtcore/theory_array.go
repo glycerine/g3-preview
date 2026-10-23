@@ -50,6 +50,8 @@ type SMTArrayTheory struct {
 	extensionalityFingerprints            map[smtArrayEnodePair]bool
 	extensionalityTrail                   []smtArrayEnodePair
 	extensionalityTodo                    []smtArrayEnodePair
+	arrayConfig                           SMTArrayState
+	finalCheckIndex                       uint32
 }
 
 func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
@@ -67,6 +69,7 @@ func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
 		defaultAxioms:              make(map[smtArrayAxiomPair]bool),
 		epsilons:                   make(map[ast.ASTHandle]ast.ASTHandle),
 		extensionalityFingerprints: make(map[smtArrayEnodePair]bool),
+		arrayConfig:                SMTArrayState{Mode: 3, Simplify: true, Extensional: true, Laziness: 1, DelayExpAxiom: true, AlwaysPropUpward: true, LazyIEqDelay: 10},
 	}, nil
 }
 
@@ -884,6 +887,20 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 }
 
 func (t *SMTArrayTheory) FinalCheck() (SMTFinalCheckStatus, error) {
+	t.finalCheckIndex++
+	if t.arrayConfig.LazyIEq && t.finalCheckIndex%t.arrayConfig.LazyIEqDelay != 0 {
+		// The native final-check loop revisits delayed theories. Record this
+		// bounded scheduling step so Go's no-progress guard does so as well.
+		t.state.theoryProgress++
+		return SMTFinalCheckContinue, nil
+	}
+	progress, err := t.makeInterfaceEqualities()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if progress {
+		return SMTFinalCheckContinue, nil
+	}
 	if t.unsupported {
 		return SMTFinalCheckGiveUp, nil
 	}

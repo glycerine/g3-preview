@@ -7,7 +7,11 @@ func (t *SMTArrayTheory) ConfigureArray(config SMTArrayState) error {
 	if t == nil {
 		return ast.ErrASTHandle
 	}
+	if config.LazyIEq && config.LazyIEqDelay == 0 {
+		return ast.ErrASTDomain
+	}
 	t.extensional = config.Extensional
+	t.arrayConfig = config
 	return nil
 }
 

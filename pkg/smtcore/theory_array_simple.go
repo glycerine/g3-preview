@@ -30,7 +30,7 @@ func smtArrayCore(theory SMTTheoryInternalizer) *SMTArrayTheory {
 
 func (k *SMTKernel) setupArrayBackend() error {
 	if k.copiedArrayPlugin {
-		return nil
+		return k.configureArrayTheories(k.smtParams.array.state)
 	}
 	family, err := k.manager.ArrayFamilyID()
 	if err != nil {
@@ -47,7 +47,7 @@ func (k *SMTKernel) setupArrayBackend() error {
 		return ast.ErrASTDomain
 	}
 	if core.simple == simple {
-		return nil
+		return k.configureArrayTheories(k.smtParams.array.state)
 	}
 	if core.NumVariables() != 0 || len(core.storeTrail) != 0 || len(core.selectTrail) != 0 || len(s.scopes) != 0 || s.theoriesSetup {
 		return ast.ErrASTDomain

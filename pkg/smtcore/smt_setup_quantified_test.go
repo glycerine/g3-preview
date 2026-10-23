@@ -96,6 +96,12 @@ func TestSMTQuantifiedLogicSetupProfilesAndConstructorCaches(t *testing.T) {
 				t.Fatal("quantified preprocessing or array policy", preprocess)
 			}
 			patternState := k.smtParams.preprocess.pattern.state
+			arrayFamily, err := m.ArrayFamilyID()
+			astTestMust(t, err)
+			arrayTheory := smtArrayCore(k.internalizer.theories[arrayFamily])
+			if arrayTheory == nil || arrayTheory.arrayConfig.LazyIEq != k.smtParams.array.state.LazyIEq || arrayTheory.arrayConfig.LazyIEqDelay != k.smtParams.array.state.LazyIEqDelay {
+				t.Fatal("array backend did not consume quantified setup's interface schedule")
+			}
 			if tc.mixed {
 				if patternState.MaxMultiPatterns != 10 || !k.smtParams.array.state.LazyIEq || k.smtParams.array.state.LazyIEqDelay != 4 {
 					t.Fatal("mixed quantified profile omitted pattern or array settings")
@@ -107,6 +113,9 @@ func TestSMTQuantifiedLogicSetupProfilesAndConstructorCaches(t *testing.T) {
 			astTestMust(t, err)
 			if status != lbool.True {
 				t.Fatal("quantified setup failed to validate a satisfiable universal", status)
+			}
+			if tc.mixed && arrayTheory.finalCheckIndex < 4 {
+				t.Fatal("mixed quantified setup skipped the delayed array interface checks")
 			}
 			if tc.push {
 				astTestMust(t, solver.Pop(1))

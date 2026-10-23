@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"array_nested_interface_scopes.smt2":         "sat\nunsat\nsat\n",
 	"array_extensional_disequality_timing.smt2":  "sat\nunsat\nsat\nsat\nsat\n",
 	"array_simple_boolean_witness_scopes.smt2":   "sat\n(((distinct a b) true))\nunsat\nsat\n(((distinct a b) true))\n",
 	"array_full_boolean_witness_scopes.smt2":     "sat\n(((distinct a b) true))\nunsat\nsat\n(((distinct a b) true))\n",
