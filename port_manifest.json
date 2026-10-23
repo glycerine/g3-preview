@@ -111122,16 +111122,21 @@
       "path": "src/smt/tactic/smt_tactic.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/solver/solver_tactic.go",
-        "pkg/smtcore/smt_solver.go"
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_tactic.go"
       ],
       "tests": [
         "TestSolverTacticSATProducesModelConverter",
         "TestSolverTacticUNSATRestoresCoreAndProof",
         "TestSolverTacticUnknownBecomesTacticException",
-        "TestSolverTacticCrossManagerTranslation"
+        "TestSolverTacticCrossManagerTranslation",
+        "TestSolverTacticApproximationPolicy",
+        "TestSolverTacticCanAcceptConfiguredApproximationAndCandidate",
+        "TestSMTSolverPreparesIncompleteTheoryCandidateModel",
+        "TestNewSMTTacticUsingCopiesAndFixesAutoConfig"
       ],
       "assertions": [
         {
@@ -111181,31 +111186,38 @@
         },
         {
           "name": "candidate_models and fail_if_inconclusive policy for under/over-approximated goals",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/solver/solver_tactic.go",
+          "go_targets": ["pkg/smtcore/smt_solver.go"],
+          "tests": [
+            "TestSolverTacticApproximationPolicy",
+            "TestSolverTacticCanAcceptConfiguredApproximationAndCandidate",
+            "TestSMTSolverPreparesIncompleteTheoryCandidateModel"
+          ]
         }
       ],
       "ownership": [
         "SolverTactic owns a parameter snapshot and statistics, holds a counted Solver reference, creates a translated solver per Apply, and closes extracted clauses and the translated solver on every exit. SMTSolver owns its kernel and retained assertions."
       ],
       "deviations": [
-        "Go composes the general SolverTactic adapter with SMTSolver instead of embedding an SMT kernel in a dedicated tactic class. The source candidate-model and approximation-preservation switches remain open."
+        "Go composes the general SolverTactic adapter with SMTSolver instead of embedding an SMT kernel in a dedicated tactic class."
       ]
     },
     {
       "path": "src/smt/tactic/smt_tactic.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/solver/solver_tactic.go",
-        "pkg/smtcore/smt_solver.go"
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_tactic.go"
       ],
       "tests": [
         "TestSolverTacticSATProducesModelConverter",
         "TestSolverTacticUNSATRestoresCoreAndProof",
-        "TestSolverTacticUnknownBecomesTacticException"
+        "TestSolverTacticUnknownBecomesTacticException",
+        "TestNewSMTTacticUsingCopiesAndFixesAutoConfig"
       ],
       "conditionals": [
         {
@@ -111231,16 +111243,18 @@
         },
         {
           "name": "mk_smt_tactic_using auto-config convenience factory",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_tactic.go",
+          "tests": [
+            "TestNewSMTTacticUsingCopiesAndFixesAutoConfig"
+          ]
         }
       ],
       "ownership": [
         "The retained Go API constructs the solver and adapter explicitly, so ownership remains visible instead of being hidden behind a raw tactic factory pointer."
       ],
       "deviations": [
-        "No global named-tactic registry wrapper has been added; retained callers compose NewSMTSolver and NewSolverTactic directly."
+        "No global named-tactic registry wrapper has been added because retained callers use the typed NewSMTTacticUsing factory directly."
       ]
     },
     {

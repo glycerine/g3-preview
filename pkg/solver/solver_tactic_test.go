@@ -6,9 +6,27 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 type unsatLastTactic struct{ tactic.Tactic }
+
+type candidateModelSolver struct {
+	Solver
+	available bool
+}
+
+func (s *candidateModelSolver) Translate(m *ast.ASTManager, p *uparams.ParamsRef) (Solver, error) {
+	translated, err := s.Solver.Translate(m, p)
+	if err != nil {
+		return nil, err
+	}
+	return &candidateModelSolver{Solver: translated, available: s.available}, nil
+}
+
+func (s *candidateModelSolver) PrepareCandidateModel() (bool, error) {
+	return s.available, nil
+}
 
 func (u *unsatLastTactic) Apply(goal *tactic.Goal, result *tactic.TacticResult) error {
 	if err := result.Prepare(goal.Manager()); err != nil {
@@ -183,10 +201,97 @@ func TestSolverTacticUnknownBecomesTacticException(t *testing.T) {
 	var result tactic.TacticResult
 	err = converted.Apply(goal, &result)
 	var tacticError tactic.TacticException
-	if !errors.As(err, &tacticError) || err.Error() != "incomplete" {
+	if !errors.As(err, &tacticError) || err.Error() != "smt tactic failed to show goal to be sat/unsat incomplete" {
 		t.Fatalf("unknown error = %v", err)
 	}
 	solverMust(t, result.Close())
+}
+
+func TestSolverTacticApproximationPolicy(t *testing.T) {
+	m := solverTestManager(t)
+	solverMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	params := solverTestParams(t, m)
+	tests := []struct {
+		name      string
+		precision tactic.GoalPrecision
+		child     tactic.Tactic
+		want      string
+	}{
+		{"sat", tactic.GoalOver, tactic.NewSkipTactic(), "over-approximated goal found to be sat"},
+		{"unsat", tactic.GoalUnder, &unsatLastTactic{Tactic: tactic.NewSkipTactic()}, "under-approximated goal found to be unsat"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			proofs := tc.name == "unsat"
+			base, err := NewTacticSolver(m, tc.child, nil, proofs, false, false, "", TacticSolverConfig{Params: params})
+			solverMust(t, err)
+			converted, err := NewSolverTactic(base, SolverTacticConfig{Params: params})
+			solverMust(t, err)
+			defer func() { solverMust(t, converted.Close()) }()
+			goal, err := tactic.NewGoal(m, proofs, false, false)
+			solverMust(t, err)
+			defer func() { solverMust(t, goal.Close()) }()
+			solverMust(t, goal.SetPrecision(tc.precision))
+			if tc.name == "unsat" {
+				solverMust(t, goal.Assert(solverTacticBool(t, m, "approx-unsat")))
+			}
+			var result tactic.TacticResult
+			err = converted.Apply(goal, &result)
+			var tacticError tactic.TacticException
+			if !errors.As(err, &tacticError) || err.Error() != tc.want {
+				t.Fatalf("approximation error = %v", err)
+			}
+			solverMust(t, result.Close())
+		})
+	}
+}
+
+func TestSolverTacticCanAcceptConfiguredApproximationAndCandidate(t *testing.T) {
+	m := solverTestManager(t)
+	params := solverTestParams(t, m)
+	base, err := NewTacticSolver(m, tactic.NewSkipTactic(), nil, false, false, false, "", TacticSolverConfig{Params: params})
+	solverMust(t, err)
+	acceptApproximation, err := NewSolverTactic(base, SolverTacticConfig{Params: params})
+	solverMust(t, err)
+	approximationParams, err := params.NewValue()
+	solverMust(t, err)
+	failName := "fail_if_inconclusive"
+	solverMust(t, params.SetBoolName(&approximationParams, &failName, false))
+	solverMust(t, acceptApproximation.UpdateParams(&approximationParams))
+	solverMust(t, params.Del(&approximationParams))
+	goal, err := tactic.NewGoal(m, false, false, false)
+	solverMust(t, err)
+	solverMust(t, goal.SetPrecision(tactic.GoalOver))
+	var result tactic.TacticResult
+	solverMust(t, acceptApproximation.Apply(goal, &result))
+	if len(result.Goals) != 1 {
+		t.Fatal("configured approximation was rejected")
+	}
+	solverMust(t, result.Close())
+	solverMust(t, goal.Close())
+	solverMust(t, acceptApproximation.Close())
+
+	unknownBase, err := NewTacticSolver(m, tactic.NewSkipTactic(), nil, false, false, false, "", TacticSolverConfig{Params: params})
+	solverMust(t, err)
+	candidate, err := NewSolverTactic(&candidateModelSolver{Solver: unknownBase, available: true}, SolverTacticConfig{Params: params})
+	solverMust(t, err)
+	candidateParams, err := params.NewValue()
+	solverMust(t, err)
+	candidateName := "candidate_models"
+	solverMust(t, params.SetBoolName(&candidateParams, &candidateName, true))
+	solverMust(t, candidate.UpdateParams(&candidateParams))
+	solverMust(t, params.Del(&candidateParams))
+	defer func() { solverMust(t, candidate.Close()) }()
+	unknownGoal, err := tactic.NewGoal(m, false, false, false)
+	solverMust(t, err)
+	defer func() { solverMust(t, unknownGoal.Close()) }()
+	solverMust(t, unknownGoal.Assert(solverTacticBool(t, m, "candidate-unknown")))
+	var candidateResult tactic.TacticResult
+	solverMust(t, candidate.Apply(unknownGoal, &candidateResult))
+	defer func() { solverMust(t, candidateResult.Close()) }()
+	if len(candidateResult.Goals) != 1 || candidateResult.Goals[0] != unknownGoal {
+		t.Fatal("candidate result did not retain the inconclusive goal")
+	}
 }
 
 func TestSolverTacticCrossManagerTranslation(t *testing.T) {

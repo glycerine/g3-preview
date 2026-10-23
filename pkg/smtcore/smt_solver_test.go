@@ -733,6 +733,36 @@ func TestSMTSolverReasonUnknownUsesKernelFailure(t *testing.T) {
 	}
 }
 
+func TestSMTSolverPreparesIncompleteTheoryCandidateModel(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	s, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	astTestMust(t, s.SetProduceModels(true))
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	dummy, err := NewSMTDummyTheory(family, "candidate")
+	astTestMust(t, err)
+	astTestMust(t, dummy.Reset())
+	astTestMust(t, s.kernel.RegisterTheory(dummy))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.Undef {
+		t.Fatal("candidate status", status)
+	}
+	available, err := s.PrepareCandidateModel()
+	astTestMust(t, err)
+	if !available {
+		t.Fatal("incomplete theory did not expose a candidate model")
+	}
+	candidate, err := s.AcquireModel()
+	astTestMust(t, err)
+	if candidate == nil {
+		t.Fatal("candidate model was not published")
+	}
+	astTestMust(t, candidate.DecRef())
+}
+
 func TestSMTSolverPublishesRelevantLabelsInInternalizationOrder(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	first := astTestSymbol(t, m, "smt-result-label-first")
@@ -853,6 +883,21 @@ func TestSMTSolverTranslatesBaseKernelAndTrackedAssertions(t *testing.T) {
 	astTestMust(t, err)
 	if status != lbool.False {
 		t.Fatal("translated tracked assertion", status)
+	}
+}
+
+func TestSMTSolverTranslatesWithinManager(t *testing.T) {
+	m, s := smtSolverFixture(t)
+	params, err := s.Params()
+	astTestMust(t, err)
+	translatedValue, err := s.Translate(m, params)
+	astTestMust(t, err)
+	translated := translatedValue.(*SMTSolver)
+	t.Cleanup(func() { astTestMust(t, translated.Close()) })
+	status, err := translated.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("same-manager translated status", status)
 	}
 }
 

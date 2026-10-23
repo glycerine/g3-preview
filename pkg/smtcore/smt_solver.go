@@ -54,6 +54,7 @@ type SMTSolver struct {
 }
 
 var _ solver.Solver = (*SMTSolver)(nil)
+var _ solver.CandidateModelProvider = (*SMTSolver)(nil)
 
 func smtSolverGlobals(m *ast.ASTManager, config SMTSolverConfig) (*uparams.GlobalParamsService, *uparams.GlobalParamsCatalog, error) {
 	if config.Globals != nil {
@@ -508,6 +509,38 @@ func (s *SMTSolver) CheckSatCore(assumptions []ast.ASTHandle) (lbool.LBool, erro
 	}
 	collectSMTKernelStatistics(stats, s.kernel.Statistics())
 	return status, nil
+}
+
+// PrepareCandidateModel mirrors smt_tactic's candidate-model allowance for
+// conflict-limit, incomplete-theory, and incomplete-quantifier results.
+func (s *SMTSolver) PrepareCandidateModel() (bool, error) {
+	if err := s.open(); err != nil {
+		return false, err
+	}
+	failure, err := s.kernel.LastFailure()
+	if err != nil {
+		return false, err
+	}
+	switch failure {
+	case SMTFailureConflictLimit, SMTFailureTheory, SMTFailureQuantifiers:
+	default:
+		return false, nil
+	}
+	if !s.produceModels {
+		return true, nil
+	}
+	if s.kernel.GeneratedModel() == nil {
+		if err = s.kernel.buildGeneratedModel(); err != nil {
+			return false, err
+		}
+	}
+	if s.result == nil {
+		return false, ast.ErrASTHandle
+	}
+	if err = s.result.SetModel(s.kernel.GeneratedModel()); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (s *SMTSolver) CheckSat(assumptions []ast.ASTHandle) (lbool.LBool, error) {

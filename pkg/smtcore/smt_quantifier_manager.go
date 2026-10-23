@@ -313,6 +313,9 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 	if !full {
 		return SMTFinalCheckDone, nil
 	}
+	if q.registry.Empty() {
+		return SMTFinalCheckDone, nil
+	}
 	if err := q.activatePatterns(); err != nil {
 		return SMTFinalCheckGiveUp, err
 	}

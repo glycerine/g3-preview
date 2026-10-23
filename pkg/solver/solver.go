@@ -40,6 +40,14 @@ type Solver interface {
 	Display(io.Writer, []ast.ASTHandle) error
 }
 
+// CandidateModelProvider is implemented by solvers that can distinguish an
+// inconclusive check whose current assignment is suitable as a candidate
+// model. PrepareCandidateModel publishes that model through AcquireModel when
+// model production is enabled.
+type CandidateModelProvider interface {
+	PrepareCandidateModel() (bool, error)
+}
+
 type Factory interface {
 	New(*ast.ASTManager, *uparams.ParamsRef, bool, bool, bool, string) (Solver, error)
 	Close() error
