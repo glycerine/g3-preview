@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"array_late_default_alias_scopes.smt2":         "sat\nunsat\nsat\n",
 	"array_multidimensional_read_queue.smt2":       "sat\nunsat\nsat\nunsat\nsat\n",
 	"array_multidimensional_read_queue_proof.smt2": "sat\nunsat\nsat\nunsat\nsat\n",
 	"array_nested_interface_scopes.smt2":           "sat\nunsat\nsat\n",

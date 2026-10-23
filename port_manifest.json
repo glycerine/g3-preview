@@ -119276,6 +119276,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/cmd/g3/test_vectors/array_late_default_alias_scopes.smt2",
         "pkg/smtcore/smt_array_lifecycle.go",
         "pkg/smtcore/smt_array_lifecycle_test.go",
         "pkg/smtcore/theory_array_simple.go",
@@ -119292,6 +119293,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayDefaultThroughEquality",
         "TestSMTArrayTranslationBackendsOwnersModelsAndScopes",
         "TestSMTArrayBackendSelection",
         "TestSMTArrayBackendOperationBoundary",
@@ -119455,6 +119457,18 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "add_parent_default constructor visitation for a new default observer whose array class was already merged before registration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "mk_fresh preserves concrete simple/full array plugins with independent AST/enode/axiom state; simple borrows destination fparams and full retains live original source m_params across chained translation",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_array_lifecycle.go",
@@ -119533,6 +119547,7 @@
         "Scoped Go maps own epsilon and constructor-observer fingerprints. Array table procedures own dependency slices until auxiliary function interpretations transfer to ProtoModel."
       ],
       "deviations": [
+        "A late default of an alias previously missed constructors merged before the default was internalized. Source add_parent_default visits those existing constructors; Go now does likewise. A strict ALL-logic script first checks an alias of the constant-true array, then asserts not(default(alias)) in a child scope: native and Go agree on SAT/UNSAT/SAT. This regression failed SAT before the fix and raises strict C++ runner agreement to 131. Full relevance-triggered parent scheduling, upward propagation and remaining full-array constructor timing remain partial.",
         "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
         "Concrete simple/full backend selection and operation boundaries now follow retained setup policies. Simple accepts store/select; full additionally handles const/map/default/as-array (with source as-array incompleteness); ext witnesses defer to default internalization without unsupported marking in both. Modes 0/2 have no retained source writers: legacy integer mode registration is inside #if 0. Full-operation unit tests use ALL because native QF_AX rejects those extensions. Remaining array controls, delayed worklists and fresh-plugin parameter ownership are still incomplete.",
         "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
@@ -119546,6 +119561,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/cmd/g3/test_vectors/array_late_default_alias_scopes.smt2",
         "pkg/smtcore/smt_array_lifecycle.go",
         "pkg/smtcore/smt_array_lifecycle_test.go",
         "pkg/smtcore/theory_array_simple.go",
@@ -119562,6 +119578,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayDefaultThroughEquality",
         "TestSMTArrayTranslationBackendsOwnersModelsAndScopes",
         "TestSMTArrayBackendSelection",
         "TestSMTArrayBackendOperationBoundary",
@@ -119584,6 +119601,18 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "add_parent_default constructor visitation for a new default observer whose array class was already merged before registration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "mk_fresh preserves concrete simple/full array plugins with independent AST/enode/axiom state; simple borrows destination fparams and full retains live original source m_params across chained translation",
           "status": "ported",
@@ -119651,6 +119680,7 @@
         "SMTArrayTheory owns concrete typed metadata rather than separately allocated var_data_full records."
       ],
       "deviations": [
+        "A late default of an alias previously missed constructors merged before the default was internalized. Source add_parent_default visits those existing constructors; Go now does likewise. A strict ALL-logic script first checks an alias of the constant-true array, then asserts not(default(alias)) in a child scope: native and Go agree on SAT/UNSAT/SAT. This regression failed SAT before the fix and raises strict C++ runner agreement to 131. Full relevance-triggered parent scheduling, upward propagation and remaining full-array constructor timing remain partial.",
         "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
         "Concrete simple/full backend selection and operation boundaries now follow retained setup policies. Simple accepts store/select; full additionally handles const/map/default/as-array (with source as-array incompleteness); ext witnesses defer to default internalization without unsupported marking in both. Modes 0/2 have no retained source writers: legacy integer mode registration is inside #if 0. Full-operation unit tests use ALL because native QF_AX rejects those extensions. Remaining array controls, delayed worklists and fresh-plugin parameter ownership are still incomplete.",
         "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",

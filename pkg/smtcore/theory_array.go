@@ -465,7 +465,24 @@ func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) err
 	if err != nil {
 		return err
 	}
-	return t.assertDefaultAxiomForArray(defaultExpression, array)
+	if err := t.assertDefaultAxiomForArray(defaultExpression, array); err != nil {
+		return err
+	}
+	// Source add_parent_default visits constructors already present in the
+	// class when a default is registered after the equality was propagated.
+	node := state.context.enodes[array]
+	if node == nil {
+		return nil
+	}
+	for index := 0; index < len(t.variables); index++ {
+		candidate := t.variables[index]
+		if candidate != nil && candidate.owner != array && candidate.root == node.root {
+			if err := t.assertDefaultAxiomForArray(defaultExpression, candidate.owner); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (t *SMTArrayTheory) assertDefaultAxiomForArray(defaultExpression, array ast.ASTHandle) error {
