@@ -9,6 +9,8 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 )
 
+const smtSequenceMaximumBoundedRegexLengths = 32
+
 func (t *SMTSequenceTheory) addRegexMembershipAxiom(expression ast.ASTHandle) (reducedExactly bool, result error) {
 	state, err := t.State()
 	if err != nil {
@@ -124,6 +126,104 @@ func (t *SMTSequenceTheory) fixedLengthRegexWord(sequence ast.ASTHandle, count u
 	return word, guard, internal, nil
 }
 
+func (t *SMTSequenceTheory) boundedSequenceLengthRange(sequence ast.ASTHandle) (lower, upper uint64, bounded bool, result error) {
+	state, err := t.State()
+	if err != nil {
+		return 0, 0, false, err
+	}
+	arithmeticFamily, err := state.manager.ArithmeticFamilyID()
+	if err != nil {
+		return 0, 0, false, err
+	}
+	arithmetic, ok := state.Theory(arithmeticFamily).(*SMTLinearArithmeticTheory)
+	if !ok {
+		return 0, 0, false, nil
+	}
+	intervals, err := arithmetic.linearVariableIntervals()
+	if err != nil {
+		return 0, 0, false, err
+	}
+	length, err := state.manager.MkSequenceLength(sequence)
+	if err != nil {
+		return 0, 0, false, err
+	}
+	interval, evaluated, err := arithmetic.polynomialInterval(length, intervals)
+	if err != nil || !evaluated || interval.plusInfinity() {
+		return 0, 0, false, err
+	}
+	upperValue, err := interval.upperValue()
+	if err != nil {
+		return 0, 0, false, err
+	}
+	upper, integral := smtSequenceIntegerUpperBound(upperValue, interval.upperOpen)
+	if !integral || upper > smtSequenceMaximumFixedDecomposition {
+		return 0, 0, false, nil
+	}
+	lower = 0
+	if !interval.minusInfinity() {
+		lowerValue, valueErr := interval.lowerValue()
+		if valueErr != nil {
+			return 0, 0, false, valueErr
+		}
+		if lowerValue.Sign() >= 0 {
+			epsilonSign := 0
+			if interval.lowerOpen {
+				epsilonSign = 1
+			}
+			lower, integral = smtSequenceIntegerLowerBound(lowerValue, epsilonSign)
+			if !integral {
+				return 0, 0, false, nil
+			}
+		}
+	}
+	if lower > upper {
+		return 0, 0, false, nil
+	}
+	if upper-lower >= smtSequenceMaximumBoundedRegexLengths {
+		return 0, 0, false, nil
+	}
+	return lower, upper, true, nil
+}
+
+func (t *SMTSequenceTheory) addBoundedRegexMembershipAxioms(expression, sequence, regex ast.ASTHandle, lower, upper uint64) (bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	allReduced := true
+	for count := lower; ; count++ {
+		word, guard, internal, wordErr := t.fixedLengthRegexWord(sequence, count)
+		if wordErr != nil {
+			return false, wordErr
+		}
+		definition, makeErr := state.manager.MkEq(sequence, word)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		guardedDefinition, makeErr := state.manager.MkImplies(guard, definition)
+		if makeErr != nil {
+			return false, makeErr
+		}
+		if _, found := t.axioms.set[guardedDefinition]; !found {
+			if makeErr = t.axioms.Push(guardedDefinition); makeErr != nil {
+				return false, makeErr
+			}
+		}
+		reduced, reduceErr := t.addGuardedRegexMembershipAxiom(expression, word, regex, guard)
+		if reduceErr != nil {
+			return false, reduceErr
+		}
+		if !reduced {
+			allReduced = false
+		}
+		t.trackInternalTerms(internal...)
+		if count == upper {
+			break
+		}
+	}
+	return allReduced, nil
+}
+
 func (t *SMTSequenceTheory) reduceExpandedRegexMemberships() (progress, unresolved bool, result error) {
 	state, err := t.State()
 	if err != nil {
@@ -183,6 +283,17 @@ func (t *SMTSequenceTheory) reduceExpandedRegexMemberships() (progress, unresolv
 				}
 				if reduced {
 					t.trackInternalTerms(internal...)
+				}
+			} else if !exact {
+				lower, upper, bounded, boundsErr := t.boundedSequenceLengthRange(sequence)
+				if boundsErr != nil {
+					return false, false, boundsErr
+				}
+				if bounded {
+					reduced, reduceErr = t.addBoundedRegexMembershipAxioms(expression, sequence, regex, lower, upper)
+					if reduceErr != nil {
+						return false, false, reduceErr
+					}
 				}
 			}
 		}

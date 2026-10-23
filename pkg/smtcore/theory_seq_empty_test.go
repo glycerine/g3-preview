@@ -2849,6 +2849,53 @@ func TestSMTSequenceTheoryCompletesFixedLengthRegexModel(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryCompletesBoundedLengthRegexModel(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	a, err := m.MkString("a")
+	astTestMust(t, err)
+	aa, err := m.MkString("aa")
+	astTestMust(t, err)
+	sort, err := m.GetSort(a)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-bounded-length-model-x"), sort)
+	astTestMust(t, err)
+	aRegex, err := m.MkSequenceToRegex(a)
+	astTestMust(t, err)
+	star, err := m.MkRegexStar(aRegex)
+	astTestMust(t, err)
+	membership, err := m.MkSequenceInRegex(x, star)
+	astTestMust(t, err)
+	length, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	two, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	lowerBound, err := m.MkArithmeticGE(length, one)
+	astTestMust(t, err)
+	upperBound, err := m.MkArithmeticLE(length, two)
+	astTestMust(t, err)
+	xIsA, err := m.MkEq(x, a)
+	astTestMust(t, err)
+	xIsNotA, err := m.MkNot(xIsA)
+	astTestMust(t, err)
+	xIsAA, err := m.MkEq(x, aa)
+	astTestMust(t, err)
+	xIsNotAA, err := m.MkNot(xIsAA)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	for _, assertion := range []ast.ASTHandle{membership, lowerBound, upperBound, xIsNotA, xIsNotAA} {
+		astTestMust(t, solver.Assert(assertion))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("bounded-length regex model remained incomplete", status)
+	}
+}
+
 func TestSMTSequenceTheoryLengthAxioms(t *testing.T) {
 	for _, test := range []struct {
 		name  string
