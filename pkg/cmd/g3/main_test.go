@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"integer_uf_model_relevancy.smt2":           "sat\n(((distinct x y) true) ((distinct (f x) (f y)) true))\nunsat\nsat\n(((distinct x y) true) ((distinct (f x) (f y)) true))\n",
 	"arithmetic_eq_options.smt2":                "unsat\nsat\nunsat\nsat\nunsat\nsat\n",
 	"rational_square_interval_scopes.smt2":      "unsat\nsat\nsat\n((d (/ 121.0 225.0)) (|squared difference| (/ 121.0 225.0)) ((let ((q d)) (+ q 0)) (/ 121.0 225.0)))\nunsat\nsat\nsat\n",
 	"shared_bound_queue.smt2":                   "unknown\nsat\n((x 2.0) ((f x) 0.0) ((f z) 0.0))\nsat\n",

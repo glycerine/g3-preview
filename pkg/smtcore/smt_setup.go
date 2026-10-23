@@ -92,6 +92,21 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 		return ast.ErrASTHandle
 	}
 	kernel.setupLogic = logic
+	if logic == "QF_UFLIA" && kernel.smtParams != nil && kernel.smtState.AutoConfig {
+		// Source setup_QF_UFLIA mutates the owning parameter object before
+		// constructing integer arithmetic. Its threshold is an internal
+		// setup field, so later updt_params calls must retain it.
+		kernel.smtParams.state.RelevancyLvl = 0
+		kernel.smtParams.arith.state.Reflect = false
+		kernel.smtParams.arith.state.PropagationThreshold = 1000
+		kernel.smtParams.preprocess.state.NNFCNF = false
+		kernel.smtState.RelevancyLvl = 0
+		kernel.arithState.Reflect = false
+		kernel.arithState.PropagationThreshold = 1000
+		kernel.preprocessState.NNFCNF = false
+		kernel.relevancy.enabled = false
+		kernel.internalizer.relevancyLevel = 0
+	}
 	install := func(family ast.FamilyID, name string) error {
 		dummy, err := NewSMTDummyTheory(family, name)
 		if err != nil {

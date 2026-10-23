@@ -8,6 +8,59 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
+func TestSMTQFUFLIASetupOwnsInternalArithmeticThresholdAcrossUpdates(t *testing.T) {
+	for _, tc := range []struct {
+		name, logic string
+		auto        bool
+		threshold   uint32
+	}{
+		{"uflia-profile", "QF_UFLIA", true, 1000},
+		{"basic-configuration", "QF_UFLIA", false, ^uint32(0)},
+		{"other-integer-logic", "QF_LIA", true, ^uint32(0)},
+		{"real-logic", "QF_UFLRA", true, ^uint32(0)},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			m, cfg := smtModelGeneratorFixture(t)
+			params, err := cfg.Context.NewValue()
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, cfg.Context.Del(&params)) })
+			name := "auto_config"
+			astTestMust(t, cfg.Context.SetBoolName(&params, &name, tc.auto))
+			s, err := NewSMTSolver(m, &params, tc.logic, SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, s.Close()) })
+			family, err := m.ArithmeticFamilyID()
+			astTestMust(t, err)
+			theory := s.kernel.internalizer.theories[family].(*SMTLinearArithmeticTheory)
+			checkThreshold := func() {
+				owner, err := s.kernel.smtParams.ArithmeticState()
+				astTestMust(t, err)
+				if owner.PropagationThreshold != tc.threshold || s.kernel.arithState.PropagationThreshold != tc.threshold || theory.propagationThreshold != tc.threshold {
+					t.Fatal("setup threshold missing from owner, cache, or arithmetic theory", owner.PropagationThreshold, s.kernel.arithState.PropagationThreshold, theory.propagationThreshold)
+				}
+			}
+			checkThreshold()
+			if tc.threshold == 1000 {
+				if s.kernel.smtParams.state.RelevancyLvl != 0 || s.kernel.smtState.RelevancyLvl != 0 || s.kernel.relevancy.enabled || s.kernel.internalizer.relevancyLevel != 0 {
+					t.Fatal("QF_UFLIA relevancy setup was not applied")
+				}
+				if s.kernel.smtParams.arith.state.Reflect || s.kernel.arithState.Reflect || s.kernel.smtParams.preprocess.state.NNFCNF || s.kernel.preprocessState.NNFCNF {
+					t.Fatal("QF_UFLIA reflection or preprocessing setup was not applied")
+				}
+			}
+			name = "arith.propagate_eqs"
+			for _, enabled := range []bool{false, true} {
+				astTestMust(t, cfg.Context.SetBoolName(&params, &name, enabled))
+				astTestMust(t, s.UpdateParams(&params))
+				checkThreshold()
+				if theory.propagateEqualities != enabled {
+					t.Fatal("parameter update failed to reach the arithmetic theory")
+				}
+			}
+		})
+	}
+}
+
 func TestSMTQFUFBVSetupUsesNativeArrayAndBitVectorRoute(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	_, err := m.RegisterArithmeticPlugin()

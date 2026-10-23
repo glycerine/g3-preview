@@ -110959,7 +110959,9 @@
         "pkg/smtcore/smt_asserted_macros.go",
         "pkg/smtcore/smt_asserted_macros_test.go",
         "pkg/smtcore/smt_asserted_quasi_macros_test.go",
-        "pkg/smtcore/smt_model_reservation_regression_test.go"
+        "pkg/smtcore/smt_model_reservation_regression_test.go",
+        "pkg/smtcore/theory_arith_assume_eq_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -110976,7 +110978,11 @@
         "TestSMTAssertedMacroExpansionPreservesUnsatProof",
         "TestSMTAssertedMacroPublishesPermutedArguments",
         "TestSMTAssertedQuasiMacrosPublishConditionalModel",
-        "TestSMTModelGeneratorReservesExistingValuesBeforeFreshAllocation"
+        "TestSMTModelGeneratorReservesExistingValuesBeforeFreshAllocation",
+        "TestSMTModelGeneratorHonorsDisabledRelevancyForValuesAndFunctions",
+        "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "assertions": [
         {
@@ -111150,10 +111156,27 @@
           "tests": [
             "TestSMTModelGeneratorReservesExistingValuesBeforeFreshAllocation"
           ]
+        },
+        {
+          "name": "context::is_relevant use in model generation: honor disabled filtering while registering existing values, constructing root values and publishing Boolean constants, arithmetic constants and UF interpretations; preserve marked-expression behavior for enabled filtering and standalone read-side contexts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_generator_test.go",
+            "pkg/smtcore/theory_arith_assume_eq_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTModelGeneratorHonorsDisabledRelevancyForValuesAndFunctions",
+            "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "The generator owns its proto-model, pinned constructed AST values, fresh placeholder objects, root-value map and source-ordering state while borrowing the AST manager, context, enode roots and theory-created model-value procedures."
+        "The generator owns its proto-model, pinned constructed AST values, fresh placeholder objects, root-value map and source-ordering state while borrowing the AST manager, context, enode roots and theory-created model-value procedures.",
+        "Model-generation relevance queries borrow the active internalizer relevancy service so disabled filtering includes every internalized expression even when the marked map is empty. Context-only fixtures without a service retain their explicitly marked view. The regression checks arithmetic argument separation, optional unused Boolean publication and evaluation of the generated UF interpretation in relevancy modes 0 and 2. The integer_uf_model_relevancy.smt2 C++ comparison evaluates model disequalities before and after a scope pop, catching omitted interpretations that SAT-only comparisons miss."
       ],
       "deviations": [
         "The source iterative color traversal is expressed as a concrete recursive Go DFS with identical dependency-before-source order. A dependency cycle returns ast.ErrASTDomain instead of relying on a debug assertion."
@@ -111944,7 +111967,11 @@
         "pkg/smtcore/smt_asserted_bounds_test.go",
         "pkg/smtcore/theory_arith_mixed.go",
         "pkg/smtcore/theory_arith_mixed_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_setup_test.go",
+        "pkg/smtcore/theory_arith_assume_eq_test.go",
+        "pkg/smtcore/smt_model_generator.go",
+        "pkg/smtcore/smt_model_generator_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -111969,7 +111996,9 @@
         "TestSMTAssertedBoundsSourceSetupAndUpdates",
         "TestSMTMixedArithmeticScopeModel",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTQFUFLIASetupOwnsInternalArithmeticThresholdAcrossUpdates",
+        "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
       ],
       "assertions": [
         {
@@ -112070,10 +112099,27 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTAssertedBoundsSourceSetupAndUpdates"
           ]
+        },
+        {
+          "name": "setup_QF_UFLIA parameter portion under automatic logic setup: disable relevancy filtering, reflection and NNF/CNF, set the internal arithmetic propagation threshold to 1000 before integer theory registration, update owners and kernel caches, and preserve that threshold through later parameter updates",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "go_targets": [
+            "pkg/smtcore/smt_setup_test.go",
+            "pkg/smtcore/theory_arith_assume_eq_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTQFUFLIASetupOwnsInternalArithmeticThresholdAcrossUpdates",
+            "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "The kernel owns its theory registry; setup creates concrete real difference, integer difference, linear rational, or partial linear integer theories for QF_RDL, QF_IDL/QF_UFIDL, QF_LRA/QF_UFLRA, and QF_LIA/QF_UFLIA and dummy-theory values for reached families whose solvers remain unavailable."
+        "The kernel owns its theory registry; setup creates concrete real difference, integer difference, linear rational, or partial linear integer theories for QF_RDL, QF_IDL/QF_UFIDL, QF_LRA/QF_UFLRA, and QF_LIA/QF_UFLIA and dummy-theory values for reached families whose solvers remain unavailable.",
+        "QF_UFLIA logic setup mutates the owning SMT/arithmetic/preprocessing parameter states and their live kernel caches before constructing integer arithmetic. The internal threshold is retained by later updt_params because that source method does not update it; the regression checks owner/cache/theory agreement before and after updates. AutoConfig=false and neighboring real/integer logics do not receive this profile. Static-feature validation, full CFG_BASIC routing and other setup profiles remain separate. Disabling relevancy also requires model generation to use the mode-aware relevancy service rather than its marked-expression map."
       ],
       "deviations": [
         "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. Unrecognized logics follow source setup_unknown and install every retained theory; unsupported arithmetic uses the dummy checkpoint so nonlinear terms return incompleteness. QF_FP, QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory together with its bit-vector backend. QF_BVRE, QF_S and ALL install the concrete sequence theory. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics likewise return incompleteness instead of an unsound result."

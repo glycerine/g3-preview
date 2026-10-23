@@ -22,6 +22,17 @@ type SMTModelGenerator struct {
 	closed     bool
 }
 
+// Source model generation uses context::is_relevant, which treats every
+// internalized expression as relevant when filtering is disabled. The marked
+// map alone does not encode that mode. Standalone fixtures without a
+// relevancy service retain their explicitly marked read-side context.
+func smtModelExpressionRelevant(state *SMTInternalizerState, expression ast.ASTHandle) bool {
+	if state.relevancy != nil {
+		return state.relevancy.IsRelevant(expression)
+	}
+	return state.context.relevant[expression]
+}
+
 func NewSMTModelGenerator(manager *ast.ASTManager) (*SMTModelGenerator, error) {
 	if manager == nil {
 		return nil, ast.ErrASTHandle
@@ -217,7 +228,7 @@ func (g *SMTModelGenerator) discoverValueProcedures(state *SMTInternalizerState)
 	roots := make([]*SMTEnode, 0, len(state.enodeStack))
 	procedures := make(map[*SMTEnode]SMTModelValueProcedure)
 	for _, node := range state.enodeStack {
-		if node == nil || node.root != node || !g.context.relevant[node.owner] {
+		if node == nil || node.root != node || !smtModelExpressionRelevant(state, node.owner) {
 			continue
 		}
 		roots = append(roots, node)
@@ -313,7 +324,7 @@ func (g *SMTModelGenerator) registerExistingModelValues(state *SMTInternalizerSt
 		return ast.ErrASTDomain
 	}
 	for _, node := range state.enodeStack {
-		if node == nil || node.root != node || !g.context.relevant[node.owner] {
+		if node == nil || node.root != node || !smtModelExpressionRelevant(state, node.owner) {
 			continue
 		}
 		modelValue, err := g.manager.IsModelValue(node.owner)
@@ -352,7 +363,7 @@ func (g *SMTModelGenerator) publishConstantInterpretations(state *SMTInternalize
 	}
 	for variable := int32(SMTFirstBoolVar); int(variable) < len(state.boolExpr); variable++ {
 		expression := state.boolExpr[variable]
-		if expression.IsNull() || !g.context.relevant[expression] {
+		if expression.IsNull() || !smtModelExpressionRelevant(state, expression) {
 			continue
 		}
 		declaration, constant, err := g.uninterpretedConstant(expression)
@@ -378,7 +389,7 @@ func (g *SMTModelGenerator) publishConstantInterpretations(state *SMTInternalize
 		}
 	}
 	for _, node := range state.enodeStack {
-		if node == nil || !g.context.relevant[node.owner] {
+		if node == nil || !smtModelExpressionRelevant(state, node.owner) {
 			continue
 		}
 		value := g.rootValues[node.root]
@@ -433,7 +444,7 @@ func (g *SMTModelGenerator) publishFunctionInterpretations(state *SMTInternalize
 		return ast.ErrASTDomain
 	}
 	for _, node := range state.enodeStack {
-		if node == nil || node.NumArgs() == 0 || !node.IsCongruenceRoot() || !g.context.relevant[node.owner] {
+		if node == nil || node.NumArgs() == 0 || !node.IsCongruenceRoot() || !smtModelExpressionRelevant(state, node.owner) {
 			continue
 		}
 		include, err := g.includeFunctionInterpretation(state, node.declaration)

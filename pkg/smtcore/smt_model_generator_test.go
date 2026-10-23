@@ -2,6 +2,7 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -11,6 +12,92 @@ import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
+
+func TestSMTModelGeneratorHonorsDisabledRelevancyForValuesAndFunctions(t *testing.T) {
+	for _, level := range []uint32{0, 2} {
+		t.Run(fmt.Sprint(level), func(t *testing.T) {
+			m, cfg := smtModelGeneratorFixture(t)
+			params, err := cfg.Context.NewValue()
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, cfg.Context.Del(&params)) })
+			key := "relevancy"
+			astTestMust(t, cfg.Context.SetUIntName(&params, &key, level))
+			s, err := NewSMTSolver(m, &params, "QF_UFLRA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, s.Close()) })
+			s.kernel.preprocess = false
+			astTestMust(t, s.SetProduceModels(true))
+			family, err := m.ArithmeticFamilyID()
+			astTestMust(t, err)
+			sort, err := m.MkFamilySort(family, 0, nil)
+			astTestMust(t, err)
+			x, err := m.MkConst(astTestSymbol(t, m, "relevancy-model-x"), sort)
+			astTestMust(t, err)
+			y, err := m.MkConst(astTestSymbol(t, m, "relevancy-model-y"), sort)
+			astTestMust(t, err)
+			f, err := m.MkFuncDecl(astTestSymbol(t, m, "relevancy-model-f"), []ast.ASTHandle{sort}, sort, ast.ASTFuncDeclInfo{})
+			astTestMust(t, err)
+			fx, err := m.MkApp(f, []ast.ASTHandle{x})
+			astTestMust(t, err)
+			fy, err := m.MkApp(f, []ast.ASTHandle{y})
+			astTestMust(t, err)
+			equal, err := m.MkEq(fx, fy)
+			astTestMust(t, err)
+			different, err := m.MkNot(equal)
+			astTestMust(t, err)
+			boolean, err := m.MkBoolSort()
+			astTestMust(t, err)
+			unused, err := m.MkConst(astTestSymbol(t, m, "relevancy-model-unused"), boolean)
+			astTestMust(t, err)
+			astTestMust(t, s.kernel.internalizer.Internalize(unused, true))
+			astTestMust(t, s.Assert(different))
+			status, err := s.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.True {
+				t.Fatal("distinct UF values", status)
+			}
+			md, err := s.AcquireModel()
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, md.DecRef()) })
+			var values [2]ast.ASTHandle
+			for index, term := range []ast.ASTHandle{x, y} {
+				decl, err := m.GetDecl(term)
+				astTestMust(t, err)
+				values[index], err = md.ConstantInterpretation(decl)
+				astTestMust(t, err)
+				if values[index].IsNull() {
+					t.Fatal("missing arithmetic model constant", index)
+				}
+			}
+			if values[0] == values[1] {
+				t.Fatal("UF disequality received equal arithmetic arguments")
+			}
+			decl, err := m.GetDecl(unused)
+			astTestMust(t, err)
+			value, err := md.ConstantInterpretation(decl)
+			astTestMust(t, err)
+			if value.IsNull() != (level != 0) {
+				t.Fatal("unused Boolean interpretation ignored relevancy mode", level, value)
+			}
+			interpretation, err := md.FunctionInterpretation(f)
+			astTestMust(t, err)
+			if interpretation == nil {
+				t.Fatal("missing UF model interpretation")
+			}
+			evaluator, err := model.NewModelEvaluator(md, cfg)
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, evaluator.Close()) })
+			ref, err := evaluator.EvaluateValue(equal)
+			astTestMust(t, err)
+			fact, err := m.RefGet(ref)
+			astTestMust(t, err)
+			if !m.IsFalse(fact) {
+				t.Fatal("generated function interpretation violates the assertion")
+			}
+			astTestMust(t, m.DelRef(&ref))
+		})
+	}
+}
 
 type smtModelDependencyProcedure struct {
 	dependencies []SMTModelValueDependency
