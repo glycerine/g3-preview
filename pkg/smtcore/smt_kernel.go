@@ -366,6 +366,14 @@ func (k *SMTKernel) buildCandidateModelGenerator() (*SMTModelGenerator, error) {
 	if err = generator.model.CompletePartialFunctions(); err != nil {
 		return fail(err)
 	}
+	if err = generator.model.Cleanup(); err != nil {
+		return fail(err)
+	}
+	if k.smtState.ModelCompact {
+		if err = generator.model.Compress(); err != nil {
+			return fail(err)
+		}
+	}
 	return generator, nil
 }
 

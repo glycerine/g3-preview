@@ -728,7 +728,10 @@ func (p *smtArrayTableValueProcedure) MakeValue(generator *SMTModelGenerator, va
 	if position != len(values) {
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
-	if err = generator.model.RegisterAuxFunction(declaration, interpretation); err != nil {
+	// array_value_proc::mk_value uses register_decl, not register_aux_decl:
+	// the as-array value owns a permanent table in this model. Cleanup only
+	// removes explicitly registered adjustment auxiliaries.
+	if err = generator.model.Core().RegisterFunction(declaration, interpretation); err != nil {
 		return ast.ASTHandle{}, err
 	}
 	owned = false

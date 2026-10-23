@@ -106431,6 +106431,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_model_cleanup_test.go",
+        "pkg/smtcore/theory_array_test.go",
+        "pkg/cmd/g3/test_vectors/model_macro_cleanup_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/model_compact_live_updates.smt2",
         "pkg/cmd/g3/test_vectors/array_function_reference_signatures.smt2",
         "pkg/smtcore/theory_array_full_axioms.go",
         "pkg/smtcore/theory_array_full_axioms_test.go",
@@ -106489,6 +106493,10 @@
         "pkg/smtcore/theory_arith_assume_eq_test.go"
       ],
       "tests": [
+        "TestSMTGeneratedModelCleansMacroFallbackConstants",
+        "TestSMTGeneratedModelCompressionHonorsLiveParameter",
+        "TestSMTArrayModelPreservesObservedSelect",
+        "TestSMTArrayModelPreservesObservedDefault",
         "TestSMTFullArrayEqualityCacheOrderedPairsAndScopeReset",
         "TestSMTFullArrayCanonicalConstructorReadAxioms",
         "TestSMTSearchEqualityArithmeticConventions",
@@ -107493,15 +107501,23 @@
           ]
         },
         {
-          "name": "mk_proto_model completes partial function interpretations after quantifier model adjustment, including array tables with unspecified defaults; cleanup/compression integration remains separate",
+          "name": "mk_proto_model completes partial functions after quantifier adjustment, cleans constant references in fallbacks, and compresses graphs only when the live model.compact parameter is true; array_value_proc registers persistent table interpretations with register_decl rather than removable cleanup auxiliaries",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_kernel.go",
           "go_targets": [
+            "pkg/smtcore/smt_model_cleanup_test.go",
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_test.go",
             "pkg/smtcore/theory_array_model_test.go",
-            "pkg/cmd/g3/main_test.go"
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/model_macro_cleanup_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/model_compact_live_updates.smt2"
           ],
           "tests": [
-            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+            "TestSMTGeneratedModelCleansMacroFallbackConstants",
+            "TestSMTGeneratedModelCompressionHonorsLiveParameter",
+            "TestSMTArrayModelPreservesObservedSelect",
+            "TestSMTArrayModelPreservesObservedDefault",
             "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
@@ -119223,6 +119239,11 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_model_cleanup_test.go",
+        "pkg/smtcore/theory_array_test.go",
+        "pkg/cmd/g3/test_vectors/model_macro_cleanup_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/model_compact_live_updates.smt2",
         "pkg/smtcore/theory_array_sorts.go",
         "pkg/smtcore/theory_array_sorts_test.go",
         "pkg/smtcore/smt_array_controls_test.go",
@@ -119255,6 +119276,8 @@
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTGeneratedModelCleansMacroFallbackConstants",
+        "TestSMTGeneratedModelCompressionHonorsLiveParameter",
         "TestSMTArraySortDeclarationsOwnedAndScoped",
         "TestSMTFullArrayExplicitExtensionalityOriginalFingerprint",
         "TestSMTArrayReadFingerprintOriginalTupleAfterRootChange",
@@ -119435,6 +119458,29 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "mk_proto_model completes partial functions after quantifier adjustment, cleans constant references in fallbacks, and compresses graphs only when the live model.compact parameter is true; array_value_proc registers persistent table interpretations with register_decl rather than removable cleanup auxiliaries",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_cleanup_test.go",
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_test.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/model_macro_cleanup_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/model_compact_live_updates.smt2"
+          ],
+          "tests": [
+            "TestSMTGeneratedModelCleansMacroFallbackConstants",
+            "TestSMTGeneratedModelCompressionHonorsLiveParameter",
+            "TestSMTArrayModelPreservesObservedSelect",
+            "TestSMTArrayModelPreservesObservedDefault",
+            "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "register_sort eagerly retains per-dimension extensionality declarations for attached array sorts, restore_sorts/pop/destruction release scoped ownership, witness axioms reuse registered declarations, full internalize_term/internalize_atom handle explicit array-ext with Boolean enode flags while simple falls back, and fingerprints check original node pairs before current roots",
           "status": "ported",
@@ -119619,6 +119665,11 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_model_cleanup_test.go",
+        "pkg/smtcore/theory_array_test.go",
+        "pkg/cmd/g3/test_vectors/model_macro_cleanup_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/model_compact_live_updates.smt2",
         "pkg/smtcore/theory_array_sorts.go",
         "pkg/smtcore/theory_array_sorts_test.go",
         "pkg/smtcore/smt_array_controls_test.go",
@@ -119649,6 +119700,8 @@
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTGeneratedModelCleansMacroFallbackConstants",
+        "TestSMTGeneratedModelCompressionHonorsLiveParameter",
         "TestSMTArraySortDeclarationsOwnedAndScoped",
         "TestSMTFullArrayExplicitExtensionalityOriginalFingerprint",
         "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
@@ -119683,6 +119736,29 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "mk_proto_model completes partial functions after quantifier adjustment, cleans constant references in fallbacks, and compresses graphs only when the live model.compact parameter is true; array_value_proc registers persistent table interpretations with register_decl rather than removable cleanup auxiliaries",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_cleanup_test.go",
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_test.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/model_macro_cleanup_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/model_compact_live_updates.smt2"
+          ],
+          "tests": [
+            "TestSMTGeneratedModelCleansMacroFallbackConstants",
+            "TestSMTGeneratedModelCompressionHonorsLiveParameter",
+            "TestSMTArrayModelPreservesObservedSelect",
+            "TestSMTArrayModelPreservesObservedDefault",
+            "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "register_sort eagerly retains per-dimension extensionality declarations for attached array sorts, restore_sorts/pop/destruction release scoped ownership, witness axioms reuse registered declarations, full internalize_term/internalize_atom handle explicit array-ext with Boolean enode flags while simple falls back, and fingerprints check original node pairs before current roots",
           "status": "ported",
