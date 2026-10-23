@@ -15,6 +15,7 @@ type smtModelFinderAUFKey struct {
 type smtModelFinderFVar struct {
 	quantifier, function ast.ASTHandle
 	position, variable   uint32
+	offset               ast.ASTHandle
 }
 
 type smtModelFinderAUFGraph struct {
@@ -24,6 +25,7 @@ type smtModelFinderAUFGraph struct {
 	arguments map[smtModelFinderAUFKey]*smtModelFinderAUFNode
 	fvars     []smtModelFinderFVar
 	literals  []smtModelFinderAUFLiteral
+	refs      []ast.ASTRef
 }
 
 func newSMTModelFinderAUFGraph(finder *SMTModelFinder) *smtModelFinderAUFGraph {
@@ -120,7 +122,11 @@ func (g *smtModelFinderAUFGraph) collectFVars(quantifier ast.ASTHandle) error {
 				if err != nil {
 					return err
 				}
-				g.fvars = append(g.fvars, smtModelFinderFVar{quantifier, function, position, variable})
+				g.fvars = append(g.fvars, smtModelFinderFVar{quantifier: quantifier, function: function, position: position, variable: variable})
+			} else if family == ast.NullFamilyID {
+				if err := g.collectOffset(quantifier, function, position, arg); err != nil {
+					return err
+				}
 			}
 			stack = append(stack, arg)
 		}
@@ -160,8 +166,10 @@ func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 		if err != nil {
 			return err
 		}
-		if err = argument.merge(variable); err != nil {
-			return err
+		if info.offset.IsNull() {
+			if err = argument.merge(variable); err != nil {
+				return err
+			}
 		}
 	}
 	if err := g.processLiterals(); err != nil {
@@ -187,12 +195,21 @@ func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 			// Source f_var explicitly requires the original argument enode.
 			// Its class representative can hide necessary MBQI instances.
 			argument := application.arguments[info.position]
+			if !info.offset.IsNull() && node.root() == g.uvars[smtModelFinderAUFKey{info.quantifier, info.variable}].root() {
+				if err := g.insertShifted(node, argument.owner, info.offset, argument.Generation(), false); err != nil {
+					return err
+				}
+				continue
+			}
 			if _, err := node.insert(argument.owner, argument.Generation()); err != nil {
 				return err
 			}
 		}
 	}
-	return g.populateLiterals()
+	if err := g.populateLiterals(); err != nil {
+		return err
+	}
+	return g.populateOffsets()
 }
 
 func (g *smtModelFinderAUFGraph) publishInstantiationSets() error {
@@ -214,6 +231,10 @@ func (g *smtModelFinderAUFGraph) close() (result error) {
 	for _, node := range g.nodes {
 		result = errors.Join(result, node.close())
 	}
+	for i := range g.refs {
+		result = errors.Join(result, g.finder.manager.DelRef(&g.refs[i]))
+	}
+	g.refs = nil
 	return result
 }
 

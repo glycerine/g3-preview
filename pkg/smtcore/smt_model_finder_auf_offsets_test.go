@@ -1,0 +1,108 @@
+package smtcore
+
+import (
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/symbol"
+)
+
+func TestSMTModelFinderAUFOffsetPopulationAndSameClassCutoff(t *testing.T) {
+	for _, sameClass := range []bool{false, true} {
+		name := "separate-classes"
+		if sameClass {
+			name = "same-class"
+		}
+		t.Run(name, func(t *testing.T) {
+			m, state, _, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})
+			two, err := m.ArithmeticIntegerNumeralText("2")
+			astTestMust(t, err)
+			eight, err := m.ArithmeticIntegerNumeralText("8")
+			astTestMust(t, err)
+			ten, err := m.ArithmeticIntegerNumeralText("10")
+			astTestMust(t, err)
+			integer, err := m.GetSort(two)
+			astTestMust(t, err)
+			boolean, err := m.MkBoolSort()
+			astTestMust(t, err)
+			predicate := smtQuickPredicate(t, m, "auf-offset-p", integer, boolean)
+			x, err := m.MkVar(0, integer)
+			astTestMust(t, err)
+			xPlusTwo, err := m.MkArithmeticAdd(x, two)
+			astTestMust(t, err)
+			body, err := m.MkApp(predicate, []ast.ASTHandle{xPlusTwo})
+			astTestMust(t, err)
+			if sameClass {
+				direct, err := m.MkApp(predicate, []ast.ASTHandle{x})
+				astTestMust(t, err)
+				body, err = m.MkAnd(direct, body)
+				astTestMust(t, err)
+			}
+			q, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+				Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []symbol.Symbol{astTestSymbol(t, m, "auf-offset-x")}, Body: body,
+			})
+			astTestMust(t, err)
+			tenNode, err := NewSMTEnode(m, ten, state.context.enodes, SMTEnodeOptions{Generation: 6})
+			astTestMust(t, err)
+			astTestMust(t, state.context.RegisterEnode(tenNode, true))
+			smtQuickApplicationNode(t, m, state.context, predicate, tenNode, true)
+			graph := newSMTModelFinderAUFGraph(manager.modelFinder)
+			t.Cleanup(func() { astTestMust(t, graph.close()) })
+			astTestMust(t, graph.build([]ast.ASTHandle{q}))
+			variable := graph.uvars[smtModelFinderAUFKey{q, 0}].root()
+			argument := graph.arguments[smtModelFinderAUFKey{predicate, 0}].root()
+			if (variable == argument) != sameClass {
+				t.Fatal("offset graph incorrectly merged classes")
+			}
+			if generation, found := variable.set.elements[eight]; !found || generation != 6 {
+				t.Fatal("offset did not recover 10-2 with its generation", variable.set.elements)
+			}
+			wantSize := 1
+			if sameClass {
+				wantSize = 2
+			}
+			if len(variable.set.elements) != wantSize || len(argument.set.elements) != wantSize || argument.set.elements[ten] != 6 {
+				t.Fatal("offset two-pass population or same-class cutoff", variable.set.elements, argument.set.elements)
+			}
+		})
+	}
+}
+
+func TestSMTModelFinderAUFBitVectorOffsetWraps(t *testing.T) {
+	m, state, _, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})
+	_, err := m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	two, err := m.BitVectorNumeralUnsigned(2, 4)
+	astTestMust(t, err)
+	one, err := m.BitVectorNumeralUnsigned(1, 4)
+	astTestMust(t, err)
+	fifteen, err := m.BitVectorNumeralUnsigned(15, 4)
+	astTestMust(t, err)
+	sort, err := m.GetSort(two)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	p := smtQuickPredicate(t, m, "auf-bv-offset-p", sort, boolean)
+	x, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	shifted, err := m.MkBitVectorAdd(x, two)
+	astTestMust(t, err)
+	body, err := m.MkApp(p, []ast.ASTHandle{shifted})
+	astTestMust(t, err)
+	q, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{astTestSymbol(t, m, "auf-bv-offset-x")}, Body: body,
+	})
+	astTestMust(t, err)
+	oneNode, err := NewSMTEnode(m, one, state.context.enodes, SMTEnodeOptions{Generation: 9})
+	astTestMust(t, err)
+	astTestMust(t, state.context.RegisterEnode(oneNode, true))
+	smtQuickApplicationNode(t, m, state.context, p, oneNode, true)
+	graph := newSMTModelFinderAUFGraph(manager.modelFinder)
+	t.Cleanup(func() { astTestMust(t, graph.close()) })
+	astTestMust(t, graph.build([]ast.ASTHandle{q}))
+	variable := graph.uvars[smtModelFinderAUFKey{q, 0}].root()
+	argument := graph.arguments[smtModelFinderAUFKey{p, 0}].root()
+	if len(variable.set.elements) != 1 || variable.set.elements[fifteen] != 9 || len(argument.set.elements) != 1 || argument.set.elements[one] != 9 {
+		t.Fatal("4-bit offset did not wrap 1-2 to 15 and 15+2 to 1", variable.set.elements, argument.set.elements)
+	}
+}
