@@ -108655,6 +108655,8 @@
       "go_targets": [
         "pkg/smtcore/smt_model_finder.go",
         "pkg/smtcore/smt_model_finder_test.go",
+        "pkg/smtcore/smt_model_finder_instantiation_set.go",
+        "pkg/smtcore/smt_model_finder_instantiation_set_test.go",
         "pkg/smtcore/smt_model_finder_quantifier_set.go",
         "pkg/smtcore/smt_model_finder_quantifier_set_test.go",
         "pkg/smtcore/smt_model_finder_hint_search.go",
@@ -108669,6 +108671,7 @@
       ],
       "tests": [
         "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle",
+        "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals",
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
         "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
         "TestModelFinderHintSatisfiedResidueSourceScopeTransitions",
@@ -109078,6 +109081,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "instantiation_set term ownership, model-value rejection, removal guard, model evaluation, inverse selection and generation lookup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_instantiation_set.go",
+          "tests": [
+            "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals"
+          ]
+        },
+        {
           "name": "model_finder construction, quantifier registration, relevant-quantifier collection, scope rollback, reset-equivalent close and search initialization",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder.go",
@@ -109152,7 +109163,7 @@
         "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit."
       ],
       "deviations": [
-        "The production model-finder lifecycle is wired to quantifier internalization, context scopes, search initialization and candidate-model construction. The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering, Q_f/Q_f_def indexes and bounded greedy search are ported with borrowed AST handles. Full quantifier_info and cond_macro analysis, interpretation publication and AUF model-extension algorithms remain open."
+        "The production model-finder lifecycle is wired to quantifier internalization, context scopes, search initialization and candidate-model construction. Concrete instantiation sets retain accepted terms, reject private model values, build model-value inverses and preserve source generation preference. The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering, Q_f/Q_f_def indexes and bounded greedy search are ported with borrowed AST handles. Full quantifier_info and cond_macro analysis, interpretation publication, AUF set population and model extension remain open."
       ]
     },
     {
@@ -109162,10 +109173,12 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_model_finder.go",
+        "pkg/smtcore/smt_model_finder_instantiation_set.go",
         "pkg/smtcore/smt_quantifier_manager.go"
       ],
       "tests": [
         "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle"
+        ,"TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals"
       ],
       "conditionals": [
         {
@@ -109190,9 +109203,11 @@
         },
         {
           "name": "flat quantifier, inverse lookup and instantiation-set restriction surface",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_model_finder_instantiation_set.go",
+          "tests": [
+            "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals"
+          ]
         }
       ],
       "ownership": [
