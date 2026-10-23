@@ -110043,6 +110043,7 @@
         "TestSMTSolverPublishesStrictRealDifferenceModel",
         "TestSMTDatatypeQFDTSetup",
         "TestSMTPseudoBooleanQFFDExactCardinality",
+        "TestSMTQFFPSetupInstallsFloatingPointAndBitVectorTheories",
         "TestSMTFloatingPointIEEEAndStructuralEqualities",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory"
       ],
@@ -110085,6 +110086,7 @@
           "tests": [
             "TestSMTDatatypeQFDTSetup",
             "TestSMTPseudoBooleanQFFDExactCardinality",
+            "TestSMTQFFPSetupInstallsFloatingPointAndBitVectorTheories",
             "TestSMTFloatingPointIEEEAndStructuralEqualities",
             "TestSMTSequenceLogicsInstallSafeCheckpointTheory"
           ]
@@ -110118,7 +110120,7 @@
         "The kernel owns its theory registry; setup creates concrete real difference, integer difference, linear rational, or partial linear integer theories for QF_RDL, QF_IDL/QF_UFIDL, QF_LRA/QF_UFLRA, and QF_LIA/QF_UFLIA and dummy-theory values for reached families whose solvers remain unavailable."
       ],
       "deviations": [
-        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory. QF_BVRE, QF_S and ALL install the scoped empty sequence checkpoint until theory_seq is complete, so reached sequence expressions return source-style incompleteness. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics likewise return incompleteness instead of an unsound result."
+        "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. QF_FP, QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory together with its bit-vector backend. QF_BVRE, QF_S and ALL install the concrete sequence theory. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics likewise return incompleteness instead of an unsound result."
       ]
     },
     {

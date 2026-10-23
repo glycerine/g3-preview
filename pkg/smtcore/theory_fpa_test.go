@@ -30,6 +30,28 @@ func smtFloatingPointSolver(t *testing.T) (*ast.ASTManager, ast.FamilyID, ast.AS
 	return m, family, sort, solver
 }
 
+func TestSMTQFFPSetupInstallsFloatingPointAndBitVectorTheories(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	bvFamily, err := m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	fpFamily, err := m.RegisterFloatingPointPlugin()
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_FP", SMTSolverConfig{
+		Params:         modelConfig.Context,
+		ModelEvaluator: modelConfig,
+	})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	if _, ok := solver.kernel.internalizer.theories[bvFamily].(*SMTBitVectorTheory); !ok {
+		t.Fatal("QF_FP did not install the bit-vector reduction theory")
+	}
+	if _, ok := solver.kernel.internalizer.theories[fpFamily].(*SMTFloatingPointTheory); !ok {
+		t.Fatal("QF_FP did not install the floating-point theory")
+	}
+}
+
 func TestSMTFloatingPointIEEEAndStructuralEqualities(t *testing.T) {
 	t.Run("nan-ieee-self", func(t *testing.T) {
 		m, family, sort, solver := smtFloatingPointSolver(t)

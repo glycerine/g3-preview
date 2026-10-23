@@ -27,7 +27,7 @@ func smtLogicUsesArrays(logic string) bool {
 
 func smtLogicUsesBitVectors(logic string) bool {
 	switch logic {
-	case "QF_BV", "QF_UFBV", "QF_AUFBV", "QF_ABV", "QF_BVRE", "QF_FPBV", "QF_BVFP", "QF_FD", "ALL":
+	case "QF_BV", "QF_UFBV", "QF_AUFBV", "QF_ABV", "QF_BVRE", "QF_FP", "QF_FPBV", "QF_BVFP", "QF_FD", "ALL":
 		return true
 	default:
 		return false
@@ -48,7 +48,7 @@ func smtLogicUsesPseudoBooleans(logic string) bool { return logic == "QF_FD" || 
 func smtLogicUsesDatalog(logic string) bool { return logic == "QF_FD" || logic == "ALL" }
 
 func smtLogicUsesFloatingPoint(logic string) bool {
-	return logic == "QF_FPBV" || logic == "QF_BVFP" || logic == "ALL"
+	return logic == "QF_FP" || logic == "QF_FPBV" || logic == "QF_BVFP" || logic == "ALL"
 }
 
 func smtLogicUsesSequences(logic string) bool {
