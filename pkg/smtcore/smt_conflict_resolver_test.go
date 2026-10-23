@@ -50,6 +50,32 @@ func TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel(t *testing.T) {
 	}
 }
 
+func TestSMTConflictResolverIgnoresTrueAntecedent(t *testing.T) {
+	m := astTestManager(t)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	expression := smtRelevancyBool(t, m, "resolve-true-antecedent")
+	astTestMust(t, state.Internalize(expression, true))
+	variable, found := state.BoolVar(expression)
+	if !found {
+		t.Fatal("missing conflict variable")
+	}
+	literal := NewSMTLiteral(variable, false)
+	astTestMust(t, state.PushScope())
+	astTestMust(t, state.AssignLiteral(literal, NewSMTBooleanAxiom()))
+	justification, err := NewSMTSimpleJustification(true, []SMTLiteral{SMTTrueLiteral, literal})
+	astTestMust(t, err)
+	conflict, err := NewSMTBooleanJustification(justification)
+	astTestMust(t, err)
+	resolver, err := NewSMTConflictResolver(state)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, resolver.Close()) })
+	resolution, err := resolver.Resolve(conflict, SMTNullLiteral, 0)
+	astTestMust(t, err)
+	if !resolution.Resolved || len(resolution.Lemma) != 1 || resolution.Lemma[0] != literal.Negated() {
+		t.Fatal("true antecedent affected conflict resolution", resolution)
+	}
+}
+
 func TestSMTInternalizerInstallsLearnedClauseInCurrentScope(t *testing.T) {
 	m := astTestManager(t)
 	_, _, state := smtInternalizerFixture(t, m, nil)

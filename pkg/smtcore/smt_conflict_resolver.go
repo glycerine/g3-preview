@@ -217,6 +217,12 @@ func (r *SMTConflictResolver) UnsatCore(conflict SMTBooleanJustification, notLit
 	queue := make([]SMTLiteral, 0)
 	core := make([]SMTLiteral, 0)
 	add := func(literal SMTLiteral) error {
+		if literal == SMTTrueLiteral {
+			return nil
+		}
+		if literal == SMTFalseLiteral {
+			return ast.ErrASTDomain
+		}
 		variable := literal.Var()
 		if variable < SMTFirstBoolVar || int(variable) >= len(seen) {
 			return ast.ErrASTDomain
@@ -358,6 +364,12 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 	lemma := []SMTLiteral{SMTNullLiteral}
 	numMarks := 0
 	processAntecedent := func(literal SMTLiteral) error {
+		if literal == SMTTrueLiteral {
+			return nil
+		}
+		if literal == SMTFalseLiteral {
+			return ast.ErrASTDomain
+		}
 		variable := literal.Var()
 		if variable < SMTFirstBoolVar || int(variable) >= len(marks) {
 			return ast.ErrASTDomain
