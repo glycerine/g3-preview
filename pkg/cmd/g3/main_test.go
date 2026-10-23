@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"row_conflict_relaxation.smt2":              "unsat\nsat\nsat\n",
 	"grobner_factor_dependencies.smt2":          "unsat\nsat\nsat\n",
 	"nested_bound_dependency_scopes.smt2":       "unsat\nsat\nunsat\nsat\n",
 	"nonlinear_bound_provenance_scopes.smt2":    "sat\nunsat\nsat\nunsat\nsat\n",

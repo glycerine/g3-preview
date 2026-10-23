@@ -113,6 +113,7 @@ type smtLinearArithmeticStatistics struct {
 // bounds. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	strongerLemmas                       bool
 	euclideanNumerals                    *numeral.RationalManager
 	expressionBounds                     []smtArithmeticExpressionBound
 	euclideanEnabled                     bool
@@ -185,6 +186,7 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		return nil, err
 	}
 	t := &SMTLinearArithmeticTheory{
+		strongerLemmas:        true,
 		branchCutRatio:        2,
 		gcdEnabled:            true,
 		liberalFinalCheck:     true,
@@ -218,6 +220,7 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 		return ast.ErrASTHandle
 	}
 	t.equalityAdapter.lazy = config.LazyAdapter
+	t.strongerLemmas = config.StrongerLemmas
 	t.gcdEnabled = config.GCDTest
 	t.ignoreIntegers = config.IgnoreInt
 	t.branchCutRatio = config.BranchCutRatio
@@ -1148,6 +1151,7 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 		lower, bound := smtLinearAtomBound(atom, assertion.truth, t.integralAtom(atom))
 		base := atomBases[assertion.atom]
 		dependency := simplex.BoundDependency{Literal: smtLinearAssertionLiteral(atom, assertion).Index(), Coefficient: *big.NewRat(1, 1)}
+		solver.AddArithmeticBoundAtom(base, lower, bound, []simplex.BoundDependency{dependency})
 		_, err := smtTightenExplainedSimplexBound(solver, base, lower, bound, []simplex.BoundDependency{dependency})
 		if err != nil {
 			t.recordArithmeticBoundConflict(solver, base, lower, &smtArithmeticBoundExplanation{dependencies: []simplex.BoundDependency{dependency}})
@@ -1161,6 +1165,7 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 				direct.Quo(coefficient)
 				directLower := lower == (coefficient.Sign() > 0)
 				directDependency := simplex.BoundDependency{Literal: dependency.Literal, Coefficient: *new(big.Rat).Inv(coefficient)}
+				solver.AddArithmeticBoundAtom(variable, directLower, direct, []simplex.BoundDependency{directDependency})
 				_, err = smtTightenExplainedSimplexBound(solver, variable, directLower, direct, []simplex.BoundDependency{directDependency})
 				if err != nil {
 					t.recordArithmeticBoundConflict(solver, variable, directLower, &smtArithmeticBoundExplanation{dependencies: []simplex.BoundDependency{directDependency}})

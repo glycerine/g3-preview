@@ -77,16 +77,17 @@ type Stats struct{ NumPivots, NumInfeasible, NumChecks uint64 }
 // Solver is the concrete exact tableau used by both retained mpz and mpq
 // consumers. Integer rows are accepted through AddIntegerRow.
 type Solver struct {
-	boundConflict      []BoundDependency
-	boundConflictKnown bool
-	limit              *control.Reslimit
-	matrix             Matrix
-	vars               []variableInfo
-	rowBase            []uint32
-	patch              map[uint32]bool
-	maxIterations      uint32
-	infeasible         uint32
-	Stats              Stats
+	arithmeticBoundAtoms map[arithmeticBoundKey][]arithmeticBoundAtom
+	boundConflict        []BoundDependency
+	boundConflictKnown   bool
+	limit                *control.Reslimit
+	matrix               Matrix
+	vars                 []variableInfo
+	rowBase              []uint32
+	patch                map[uint32]bool
+	maxIterations        uint32
+	infeasible           uint32
+	Stats                Stats
 }
 
 func NewSolver(limit *control.Reslimit) *Solver {
@@ -268,6 +269,7 @@ func (s *Solver) SetUpper(v uint32, bound Infinitesimal) error {
 	return nil
 }
 func (s *Solver) UnsetLower(v uint32) {
+	delete(s.arithmeticBoundAtoms, arithmeticBoundKey{v, true})
 	s.boundConflict, s.boundConflictKnown = nil, false
 	if int(v) < len(s.vars) {
 		s.vars[v].lowerValid = false
@@ -275,6 +277,7 @@ func (s *Solver) UnsetLower(v uint32) {
 	}
 }
 func (s *Solver) UnsetUpper(v uint32) {
+	delete(s.arithmeticBoundAtoms, arithmeticBoundKey{v, false})
 	s.boundConflict, s.boundConflictKnown = nil, false
 	if int(v) < len(s.vars) {
 		s.vars[v].upperValid = false
@@ -435,6 +438,7 @@ func (s *Solver) makeVariableFeasible(v uint32) (bool, error) {
 }
 
 func (s *Solver) MakeFeasible() (lbool.LBool, error) {
+	s.boundConflict, s.boundConflictKnown = nil, false
 	s.Stats.NumChecks++
 	s.infeasible = NullVariable
 	for iteration := uint32(0); ; iteration++ {
@@ -683,6 +687,7 @@ func (s *Solver) Minimize(objective uint32) (lbool.LBool, error) {
 }
 
 func (s *Solver) Reset() {
+	s.arithmeticBoundAtoms = nil
 	s.boundConflict, s.boundConflictKnown = nil, false
 	s.matrix.Reset()
 	s.vars = nil

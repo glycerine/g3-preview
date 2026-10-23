@@ -35,7 +35,16 @@ func (t *SMTLinearArithmeticTheory) derivedBoundConflict(solver *simplex.Solver)
 		return nil
 	}
 	if solver != nil {
-		if dependencies, known := solver.BoundConflictDependencies(); known && len(dependencies) != 0 {
+		dependencies, known := solver.BoundConflictDependencies()
+		if !known {
+			if _, rowErr := solver.InfeasibleRow(); rowErr == nil {
+				if err := solver.ExplainArithmeticInfeasibleRow(t.arithmeticIntegerMask(), t.strongerLemmas); err != nil {
+					return err
+				}
+				dependencies, known = solver.BoundConflictDependencies()
+			}
+		}
+		if known && len(dependencies) != 0 {
 			proofs, err := t.state.manager.ProofsEnabled()
 			if err != nil {
 				return err

@@ -114113,7 +114113,10 @@
         "pkg/ast/ast_parameter_rat.go",
         "pkg/ast/ast_parameter_rat_test.go",
         "pkg/smtcore/theory_arith_nonlinear_strategy.go",
-        "pkg/smtcore/theory_arith_nonlinear_dependency_test.go"
+        "pkg/smtcore/theory_arith_nonlinear_dependency_test.go",
+        "pkg/math/simplex/arith_row_conflict.go",
+        "pkg/math/simplex/arith_row_conflict_test.go",
+        "pkg/smtcore/theory_arith_row_conflict_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -114152,7 +114155,10 @@
         "TestSMTArithmeticRowBoundExplanationsChooseEndpointsAndMergeWeights",
         "TestSMTArithmeticAffineDefinitionBoundExplanations",
         "TestBoundConflictDependenciesOwnAndInvalidateSnapshots",
-        "TestSMTRejectedNonlinearCandidateKeepsLogicalContextConsistent"
+        "TestSMTRejectedNonlinearCandidateKeepsLogicalContextConsistent",
+        "TestArithmeticRowConflictSignedBasesAndRelaxationBudget",
+        "TestArithmeticRowConflictStrictGapAndUnknownPremises",
+        "TestSMTArithmeticInfeasibleRowsUseScopedRelaxedProofPremises"
       ],
       "conditionals": [
         {
@@ -115055,21 +115061,27 @@
           ]
         },
         {
-          "name": "row and affine-definition bound propagation retain weighted premises through scoped numeric replay and fixed shared-value storage; infeasible-row explanation chains remain incomplete",
-          "status": "partial",
+          "name": "row and affine-definition bound propagation retain weighted premises through scoped numeric replay and fixed shared-value storage with weighted and relaxed infeasible-row explanations",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
           "go_targets": [
             "pkg/smtcore/theory_arith_bound_dependency.go",
             "pkg/smtcore/theory_arith_bound_dependency_test.go",
             "pkg/smtcore/theory_arith_fixed_bounds.go",
             "pkg/smtcore/theory_arith_nonlinear.go",
-            "pkg/smtcore/theory_arith_nonlinear_strategy.go"
+            "pkg/smtcore/theory_arith_nonlinear_strategy.go",
+            "pkg/math/simplex/arith_row_conflict.go",
+            "pkg/math/simplex/arith_row_conflict_test.go",
+            "pkg/smtcore/theory_arith_row_conflict_test.go"
           ],
           "tests": [
             "TestSMTArithmeticRowBoundExplanationsChooseEndpointsAndMergeWeights",
             "TestSMTArithmeticAffineDefinitionBoundExplanations",
             "TestSMTSharedArithmeticFixedRowsScopedProofs",
-            "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
+            "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels",
+            "TestArithmeticRowConflictSignedBasesAndRelaxationBudget",
+            "TestArithmeticRowConflictStrictGapAndUnknownPremises",
+            "TestSMTArithmeticInfeasibleRowsUseScopedRelaxedProofPremises"
           ]
         },
         {
@@ -115088,6 +115100,27 @@
             "TestBoundConflictDependenciesOwnAndInvalidateSnapshots",
             "TestSMTRejectedNonlinearCandidateKeepsLogicalContextConsistent",
             "TestSMTNonlinearRelaxationScopesProofsAndModel",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "sign_row_conflict and explain_bound: normalize signed basic coefficients, select blocking row endpoints, append the violated bound last, retain active weaker bound atoms, respect rational/infinitesimal or integer-one relaxation budgets, support enabled and disabled stronger-lemmas modes, and publish owning farkas coefficients only for logical replay",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/arith_row_conflict.go",
+          "go_targets": [
+            "pkg/math/simplex/arith_row_conflict.go",
+            "pkg/math/simplex/arith_row_conflict_test.go",
+            "pkg/smtcore/theory_arith_row_conflict_test.go",
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_nonlinear_strategy.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestArithmeticRowConflictSignedBasesAndRelaxationBudget",
+            "TestArithmeticRowConflictStrictGapAndUnknownPremises",
+            "TestSMTArithmeticInfeasibleRowsUseScopedRelaxedProofPremises",
+            "TestSMTRejectedNonlinearCandidateKeepsLogicalContextConsistent",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
