@@ -8,7 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-func (k *SMTKernel) arithmeticSetupFeatures(enabled bool) (*ast.StaticFeatures, error) {
+func (k *SMTKernel) setupStaticFeatures(enabled bool) (*ast.StaticFeatures, error) {
 	if !enabled {
 		return nil, nil
 	}
@@ -20,11 +20,19 @@ func (k *SMTKernel) arithmeticSetupFeatures(enabled bool) (*ast.StaticFeatures, 
 	for index, assertion := range k.assertions {
 		formulas[index] = assertion.Formula
 	}
-	if err = features.Collect(formulas...); err == nil && features.NumUninterpretedFunctions != 0 {
-		err = fmt.Errorf("Benchmark contains uninterpreted function symbols, but specified logic does not support them.")
-	}
-	if err != nil {
+	if err = features.Collect(formulas...); err != nil {
 		return nil, errors.Join(err, features.Close())
+	}
+	return features, nil
+}
+
+func (k *SMTKernel) arithmeticSetupFeatures(enabled bool) (*ast.StaticFeatures, error) {
+	features, err := k.setupStaticFeatures(enabled)
+	if err != nil || features == nil {
+		return features, err
+	}
+	if features.NumUninterpretedFunctions != 0 {
+		return nil, errors.Join(fmt.Errorf("Benchmark contains uninterpreted function symbols, but specified logic does not support them."), features.Close())
 	}
 	return features, nil
 }

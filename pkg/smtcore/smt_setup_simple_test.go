@@ -10,7 +10,7 @@ import (
 )
 
 func TestSMTSimpleLogicSetupBeforeFirstPushAndCheck(t *testing.T) {
-	for _, logic := range []string{"QF_UF", "QF_UFLRA"} {
+	for _, logic := range []string{"QF_UF", "QF_DT", "QF_UFLRA"} {
 		for _, firstPush := range []bool{false, true} {
 			for _, automatic := range []bool{false, true} {
 				t.Run(fmt.Sprint(logic, "/", firstPush, "/", automatic), func(t *testing.T) {
@@ -22,7 +22,7 @@ func TestSMTSimpleLogicSetupBeforeFirstPushAndCheck(t *testing.T) {
 						smtDisableAutoConfig(t, solver)
 					}
 					var sort ast.ASTHandle
-					if logic == "QF_UF" {
+					if logic != "QF_UFLRA" {
 						sort, err = m.MkUninterpretedSort(astTestSymbol(t, m, "simple-setup-U"), nil)
 					} else {
 						zero, e := m.ArithmeticRealNumeralText("0")
@@ -55,7 +55,7 @@ func TestSMTSimpleLogicSetupBeforeFirstPushAndCheck(t *testing.T) {
 						if k.smtParams.state.RelevancyLvl != 0 || k.smtState.RelevancyLvl != 0 || k.relevancy.enabled || k.internalizer.relevancyLevel != 0 || k.preprocessState.NNFCNF || k.smtParams.preprocess.state.NNFCNF {
 							t.Fatal("simple profile did not update its owner and consumers")
 						}
-						if logic == "QF_UF" {
+						if logic != "QF_UFLRA" {
 							if k.smtState.RestartStrategy != 2 || k.smtState.PhaseSelection != 4 || k.smtState.RandomInitialActivity != 2 || k.internalizer.randomInitialActivity != 2 {
 								t.Fatal("UF search policy was not selected")
 							}
@@ -66,7 +66,7 @@ func TestSMTSimpleLogicSetupBeforeFirstPushAndCheck(t *testing.T) {
 					if firstPush {
 						astTestMust(t, solver.Push())
 						checkPolicy()
-						if automatic && logic == "QF_UF" {
+						if automatic && logic != "QF_UFLRA" {
 							randomized := false
 							for _, activity := range k.internalizer.activity[1:] {
 								randomized = randomized || activity != 0

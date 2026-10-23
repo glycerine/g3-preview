@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"array_auto_unit_profile.smt2":              "sat\n(((select a true) true))\nsat\n(((select a true) true) ((select a false) false))\nsat\n(((select a true) true))\nunsat\nsat\n(((select a true) true))\n",
 	"array_model_relevancy.smt2":                "sat\n(((select a 3) 7) ((select a 99) 11))\nsat\n(((select a 3) 7) ((select a 4) 19) ((select a 99) 11))\nsat\n(((select a 3) 7) ((select a 99) 11))\nunsat\nsat\n(((select a 3) 7) ((select a 99) 11))\n",
 	"real_auto_rational_profile.smt2":           "sat\n(((= x threshold) true))\nunsat\nsat\n(((= x threshold) true))\n",
 	"integer_auto_deep_ite.smt2":                "sat\n((holds true))\nunsat\nsat\n((holds true))\n",

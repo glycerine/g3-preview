@@ -62,6 +62,10 @@ func TestSMTDatatypeQFDTSetup(t *testing.T) {
 	if status != lbool.False {
 		t.Fatal("QF_DT setup ignored datatype exhaustiveness", status)
 	}
+	policy := solver.kernel.smtState
+	if policy.RelevancyLvl != 0 || policy.RestartStrategy != 2 || policy.PhaseSelection != 4 || policy.RandomInitialActivity != 2 || solver.kernel.preprocessState.NNFCNF {
+		t.Fatal("QF_DT did not apply its shared UF search profile", policy)
+	}
 }
 
 func TestSMTDatatypeRecognizerCases(t *testing.T) {

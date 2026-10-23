@@ -4,26 +4,17 @@ package smtcore
 import (
 	"errors"
 	"fmt"
-
-	"github.com/glycerine/g3/pkg/ast"
 )
 
 func (k *SMTKernel) setupSimpleLogicPolicy(useStaticFeatures bool) (result error) {
 	switch k.setupLogic {
-	case "QF_UF":
-		if useStaticFeatures {
-			features, err := ast.NewStaticFeatures(k.manager)
+	case "QF_UF", "QF_DT":
+		if useStaticFeatures && k.setupLogic == "QF_UF" {
+			features, err := k.setupStaticFeatures(true)
 			if err != nil {
 				return err
 			}
 			defer func() { result = errors.Join(result, features.Close()) }()
-			formulas := make([]ast.ASTHandle, len(k.assertions))
-			for index, row := range k.assertions {
-				formulas[index] = row.Formula
-			}
-			if err = features.Collect(formulas...); err != nil {
-				return err
-			}
 			if features.NumArithInequalities > 0 || features.NumArithTerms > 0 || features.NumArithEqualities > 0 {
 				// Retain the source exception's spelling.
 				return fmt.Errorf("Benchmark constains arithmetic, but specified loging does not support it.")
@@ -39,11 +30,15 @@ func (k *SMTKernel) setupSimpleLogicPolicy(useStaticFeatures bool) (result error
 		return nil
 	}
 	k.smtParams.state.RelevancyLvl = 0
-	k.smtState = k.smtParams.state
 	k.smtParams.preprocess.state.NNFCNF = false
-	k.preprocessState.NNFCNF = false
-	k.relevancy.enabled = false
-	k.internalizer.relevancyLevel = 0
+	return k.applySimpleSetupPolicy()
+}
+
+func (k *SMTKernel) applySimpleSetupPolicy() error {
+	k.smtState = k.smtParams.state
+	k.preprocessState = k.smtParams.preprocess.state
+	k.relevancy.enabled = k.smtState.RelevancyLvl > 0
+	k.internalizer.relevancyLevel = k.smtState.RelevancyLvl
 	// First-push setup precedes Boolean variable creation, so the selected
 	// random initial-activity policy must reach the internalizer immediately.
 	if err := k.internalizer.configureBooleanHeuristics(k.smtState); err != nil {

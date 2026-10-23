@@ -533,6 +533,8 @@ func TestSMTArrayModelPreservesObservedSelect(t *testing.T) {
 			t.Cleanup(func() { astTestMust(t, modelConfig.Context.Del(&params)) })
 			key := "relevancy"
 			astTestMust(t, modelConfig.Context.SetUIntName(&params, &key, level))
+			key = "auto_config"
+			astTestMust(t, modelConfig.Context.SetBoolName(&params, &key, false))
 			solver, err := NewSMTSolver(m, &params, "QF_AX", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, solver.Close()) })
@@ -580,6 +582,8 @@ func TestSMTArrayModelPreservesObservedDefault(t *testing.T) {
 			t.Cleanup(func() { astTestMust(t, modelConfig.Context.Del(&params)) })
 			key := "relevancy"
 			astTestMust(t, modelConfig.Context.SetUIntName(&params, &key, level))
+			key = "auto_config"
+			astTestMust(t, modelConfig.Context.SetBoolName(&params, &key, false))
 			solver, err := NewSMTSolver(m, &params, "QF_AX", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, solver.Close()) })
