@@ -1,4 +1,4 @@
-// Source: src/smt/smt_setup.cpp setup_QF_IDL overloads and is_dense.
+// Source: src/smt/smt_setup.cpp setup_QF_IDL/setup_QF_RDL overloads and is_dense.
 package smtcore
 
 import (
@@ -75,7 +75,7 @@ func (k *SMTKernel) setupIntegerDifferencePolicy(useStaticFeatures bool) (result
 		}
 		if !proofs && !arithmetic.AutoConfigSimplex && dense {
 			smt.PhaseSelection = 3 // PS_CACHING_CONSERVATIVE
-			if err := k.installDenseIntegerSetup(arithmetic); err != nil {
+			if err := k.installDenseSetup(arithmetic); err != nil {
 				return err
 			}
 		}
@@ -84,16 +84,31 @@ func (k *SMTKernel) setupIntegerDifferencePolicy(useStaticFeatures bool) (result
 }
 
 // The source creates this plugin at the first setup boundary. Replace only
-// the unused constructor-time integer specialization, before any theory term
+// the unused constructor-time arithmetic specialization, before any theory term
 // or logical scope can refer to it, preserving the registry order.
-func (k *SMTKernel) installDenseIntegerSetup(config SMTArithState) error {
+func (k *SMTKernel) installDenseSetup(config SMTArithState) error {
+	family, err := k.manager.ArithmeticFamilyID()
+	if err != nil {
+		return err
+	}
+	theory, err := NewSMTDenseDiffTheory(family)
+	if err != nil {
+		return err
+	}
+	if err := theory.ConfigureArithmetic(config); err != nil {
+		return err
+	}
+	return k.replaceUnusedSetupArithmetic(theory)
+}
+
+func (k *SMTKernel) replaceUnusedSetupArithmetic(theory SMTTheoryInternalizer) error {
 	family, err := k.manager.ArithmeticFamilyID()
 	if err != nil {
 		return err
 	}
 	s := k.internalizer
 	old, ok := s.theories[family].(*SMTLinearArithmeticTheory)
-	if !ok || len(old.variables) != 0 || len(s.scopes) != 0 || s.theoriesSetup {
+	if !ok || theory == nil || theory.FamilyID() != family || len(old.variables) != 0 || len(s.scopes) != 0 || s.theoriesSetup {
 		return ast.ErrASTDomain
 	}
 	position := -1
@@ -106,13 +121,6 @@ func (k *SMTKernel) installDenseIntegerSetup(config SMTArithState) error {
 	if position < 0 {
 		return ast.ErrASTDomain
 	}
-	theory, err := NewSMTDenseDiffTheory(family)
-	if err != nil {
-		return err
-	}
-	if err := theory.ConfigureArithmetic(config); err != nil {
-		return err
-	}
 	if err := theory.Initialize(s); err != nil {
 		return err
 	}
@@ -122,4 +130,68 @@ func (k *SMTKernel) installDenseIntegerSetup(config SMTArithState) error {
 	s.theories[family] = theory
 	s.theoryOrder[position] = theory
 	return nil
+}
+
+func (k *SMTKernel) setupRealDifferencePolicy(useStaticFeatures bool) (result error) {
+	if k.setupLogic != "QF_RDL" {
+		return nil
+	}
+	features, err := k.setupStaticFeatures(useStaticFeatures)
+	if err != nil {
+		return err
+	}
+	if features != nil {
+		defer func() { result = errors.Join(result, features.Close()) }()
+		if features.NumArithEqualities != features.NumDiffEqualities || features.NumArithTerms != features.NumDiffTerms || features.NumArithInequalities != features.NumDiffInequalities {
+			return fmt.Errorf("Benchmark is not in QF_RDL (real difference logic).")
+		}
+		if features.HasInt {
+			return fmt.Errorf("Benchmark has integer variables but it is marked as QF_RDL (real difference logic).")
+		}
+		if features.NumUninterpretedFunctions != 0 {
+			return fmt.Errorf("Benchmark contains uninterpreted function symbols, but specified logic does not support them.")
+		}
+	}
+	smt, arithmetic, preprocess := k.smtParams.state, k.smtParams.arith.state, k.smtParams.preprocess.state
+	smt.RelevancyLvl = 0
+	arithmetic.Eq2Ineq = true
+	arithmetic.Reflect = false
+	arithmetic.PropagateEqs = false
+	preprocess.NNFCNF = false
+	if features != nil {
+		dense := smtDenseArithmetic(features)
+		if dense {
+			smt.RestartStrategy = 0 // RS_GEOMETRIC
+			smt.RestartAdaptive = false
+			smt.PhaseSelection = 2 // PS_CACHING
+		}
+		proofs, err := k.manager.ProofsEnabled()
+		if err != nil {
+			return err
+		}
+		if !proofs && !arithmetic.AutoConfigSimplex && dense {
+			if err := k.installDenseSetup(arithmetic); err != nil {
+				return err
+			}
+		} else if !proofs && !arithmetic.AutoConfigSimplex && features.NumUninterpretedConstants <= 4*features.NumBoolConstants && features.NumITETerms == 0 {
+			arithmetic.BoundProp = 0           // BP_NONE
+			arithmetic.PropagationStrategy = 0 // ARITH_PROP_AGILITY
+			arithmetic.AddBinaryBounds = true
+			family, err := k.manager.ArithmeticFamilyID()
+			if err != nil {
+				return err
+			}
+			theory, err := NewSMTRealDiffTheory(family)
+			if err != nil {
+				return err
+			}
+			if err := theory.ConfigureArithmetic(arithmetic); err != nil {
+				return err
+			}
+			if err := k.replaceUnusedSetupArithmetic(theory); err != nil {
+				return err
+			}
+		}
+	}
+	return k.applyArithmeticSetup(smt, arithmetic, preprocess)
 }

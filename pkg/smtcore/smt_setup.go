@@ -119,8 +119,8 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 		if err != nil {
 			return err
 		}
-		if logic == "QF_RDL" {
-			theory, theoryErr := NewSMTRealDiffTheory(family)
+		if logic == "QF_RDL" && kernel.smtState.AutoConfig {
+			theory, theoryErr := NewSMTMixedLinearArithmeticTheory(family)
 			if theoryErr != nil {
 				return theoryErr
 			}
