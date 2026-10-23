@@ -30434,12 +30434,16 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/ast/rewriter/distribute_forall.go"
+        "pkg/ast/rewriter/distribute_forall.go",
+        "pkg/smtcore/smt_asserted_reduce.go",
+        "pkg/smtcore/smt_asserted_reduce_test.go"
       ],
       "tests": [
         "TestDistributeForallSplitsConjunctionAndEliminatesUnusedVariables",
         "TestDistributeForallRebuildsParentsAndAppliesBooleanSimplification",
-        "TestDistributeForallNonTargetDebugAndOwnerGuards"
+        "TestDistributeForallNonTargetDebugAndOwnerGuards",
+        "TestSMTAssertedDistributionGuardsBindersAndProofs",
+        "TestSMTAssertedDistributionScopedConflict"
       ],
       "assertions": [
         {
@@ -30512,12 +30516,16 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/ast/rewriter/distribute_forall.go"
+        "pkg/ast/rewriter/distribute_forall.go",
+        "pkg/smtcore/smt_asserted_reduce.go",
+        "pkg/smtcore/smt_asserted_reduce_test.go"
       ],
       "tests": [
         "TestDistributeForallSplitsConjunctionAndEliminatesUnusedVariables",
         "TestDistributeForallRebuildsParentsAndAppliesBooleanSimplification",
-        "TestDistributeForallNonTargetDebugAndOwnerGuards"
+        "TestDistributeForallNonTargetDebugAndOwnerGuards",
+        "TestSMTAssertedDistributionGuardsBindersAndProofs",
+        "TestSMTAssertedDistributionScopedConflict"
       ],
       "conditionals": [
         {
@@ -98686,7 +98694,9 @@
         "pkg/smtcore/smt_asserted_pull_quant.go",
         "pkg/smtcore/smt_asserted_pull_quant_test.go",
         "pkg/smtcore/smt_asserted_ite.go",
-        "pkg/smtcore/smt_asserted_ite_test.go"
+        "pkg/smtcore/smt_asserted_ite_test.go",
+        "pkg/smtcore/smt_asserted_reduce.go",
+        "pkg/smtcore/smt_asserted_reduce_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98713,7 +98723,12 @@
         "TestSMTAssertedPullQuantifierScopedConflict",
         "TestSMTAssertedITELiftingModesAndProofs",
         "TestSMTAssertedTermITEEliminationDefinitionsAndGuards",
-        "TestSMTAssertedITEPassesScopedConflict"
+        "TestSMTAssertedITEPassesScopedConflict",
+        "TestSMTAssertedDistributionGuardsBindersAndProofs",
+        "TestSMTAssertedDistributionScopedConflict",
+        "TestSMTAssertedRewriterSwitchesConjunctionPhases",
+        "TestSMTAssertedRewriterPreservesParametersAcrossPhaseUpdates",
+        "TestSMTAssertedInputSurvivesPhaseCacheFlush"
       ],
       "conditionals": [
         {
@@ -98880,6 +98895,34 @@
           ]
         },
         {
+          "name": "set_eliminate_and and updt_params: owned accumulated rewriter parameters, source arithmetic/array/BV/Boolean defaults, pre-NNF conjunction preservation, post-NNF conjunction elimination, cache flushing, and subsequent assertion phase restoration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_reduce.go",
+          "tests": [
+            "TestSMTAssertedRewriterSwitchesConjunctionPhases",
+            "TestSMTAssertedRewriterPreservesParametersAcrossPhaseUpdates",
+            "TestSMTAssertedInputSurvivesPhaseCacheFlush"
+          ]
+        },
+        {
+          "name": "reduce_asserted_formulas and reduce_and_solve: proof-preserving pending-suffix rewriting and flattening after NNF and at final reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_reduce.go",
+          "tests": [
+            "TestSMTAssertedRewriterSwitchesConjunctionPhases",
+            "TestSMTAssertedDistributionScopedConflict"
+          ]
+        },
+        {
+          "name": "distribute_forall_fn: source-order guarded universal distribution over reduced conjunctions, unused binder elimination, fallback rewrite proof and post-operation reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_reduce.go",
+          "tests": [
+            "TestSMTAssertedDistributionGuardsBindersAndProofs",
+            "TestSMTAssertedDistributionScopedConflict"
+          ]
+        },
+        {
           "name": "remaining pending-formula reduction passes and quantifier transforms",
           "status": "unported",
           "go_target": null,
@@ -98888,7 +98931,9 @@
       ],
       "ownership": [
         "The kernel owns references to each flattened formula and its derived proof until pop or close.",
-        "The concrete formula batch pins transformed rows and generated ITE definition proofs before temporary rewriter owners close. Pulling and injectivity passes swap/flatten rows without post-operation reduction; ITE passes reduce the resulting pending suffix as required by their source post_op."
+        "The concrete formula batch pins transformed rows and generated ITE definition proofs before temporary rewriter owners close. Pulling and injectivity passes swap/flatten rows without post-operation reduction; ITE passes reduce the resulting pending suffix as required by their source post_op.",
+        "The kernel owns its accumulated assertion-rewriter parameter reference until close, and pins incoming formula/proof handles before phase changes flush cached ASTs. Tests that reuse original formulas after preprocessing retain independent AST references.",
+        "Negated-disjunction assertion flattening uses the source mk_not helper, eliminating double negations and simplifying Boolean constants consistently with not-or elimination proofs."
       ],
       "deviations": [
         "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager.",
@@ -98915,7 +98960,9 @@
         "pkg/smtcore/smt_asserted_pull_quant.go",
         "pkg/smtcore/smt_asserted_pull_quant_test.go",
         "pkg/smtcore/smt_asserted_ite.go",
-        "pkg/smtcore/smt_asserted_ite_test.go"
+        "pkg/smtcore/smt_asserted_ite_test.go",
+        "pkg/smtcore/smt_asserted_reduce.go",
+        "pkg/smtcore/smt_asserted_reduce_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98942,7 +98989,12 @@
         "TestSMTAssertedPullQuantifierScopedConflict",
         "TestSMTAssertedITELiftingModesAndProofs",
         "TestSMTAssertedTermITEEliminationDefinitionsAndGuards",
-        "TestSMTAssertedITEPassesScopedConflict"
+        "TestSMTAssertedITEPassesScopedConflict",
+        "TestSMTAssertedDistributionGuardsBindersAndProofs",
+        "TestSMTAssertedDistributionScopedConflict",
+        "TestSMTAssertedRewriterSwitchesConjunctionPhases",
+        "TestSMTAssertedRewriterPreservesParametersAcrossPhaseUpdates",
+        "TestSMTAssertedInputSurvivesPhaseCacheFlush"
       ],
       "conditionals": [
         {
@@ -99057,6 +99109,34 @@
           ]
         },
         {
+          "name": "set_eliminate_and and updt_params: owned accumulated rewriter parameters, source arithmetic/array/BV/Boolean defaults, pre-NNF conjunction preservation, post-NNF conjunction elimination, cache flushing, and subsequent assertion phase restoration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_reduce.go",
+          "tests": [
+            "TestSMTAssertedRewriterSwitchesConjunctionPhases",
+            "TestSMTAssertedRewriterPreservesParametersAcrossPhaseUpdates",
+            "TestSMTAssertedInputSurvivesPhaseCacheFlush"
+          ]
+        },
+        {
+          "name": "reduce_asserted_formulas and reduce_and_solve: proof-preserving pending-suffix rewriting and flattening after NNF and at final reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_reduce.go",
+          "tests": [
+            "TestSMTAssertedRewriterSwitchesConjunctionPhases",
+            "TestSMTAssertedDistributionScopedConflict"
+          ]
+        },
+        {
+          "name": "distribute_forall_fn: source-order guarded universal distribution over reduced conjunctions, unused binder elimination, fallback rewrite proof and post-operation reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_reduce.go",
+          "tests": [
+            "TestSMTAssertedDistributionGuardsBindersAndProofs",
+            "TestSMTAssertedDistributionScopedConflict"
+          ]
+        },
+        {
           "name": "setup, reset, and remaining pending-formula reductions",
           "status": "unported",
           "go_target": null,
@@ -99065,7 +99145,9 @@
       ],
       "ownership": [
         "Flattened formula and proof handles are explicit owned kernel references; returned assertion handles are borrowed views.",
-        "The concrete formula batch pins transformed rows and generated ITE definition proofs before temporary rewriter owners close. Pulling and injectivity passes swap/flatten rows without post-operation reduction; ITE passes reduce the resulting pending suffix as required by their source post_op."
+        "The concrete formula batch pins transformed rows and generated ITE definition proofs before temporary rewriter owners close. Pulling and injectivity passes swap/flatten rows without post-operation reduction; ITE passes reduce the resulting pending suffix as required by their source post_op.",
+        "The kernel owns its accumulated assertion-rewriter parameter reference until close, and pins incoming formula/proof handles before phase changes flush cached ASTs. Tests that reuse original formulas after preprocessing retain independent AST references.",
+        "Negated-disjunction assertion flattening uses the source mk_not helper, eliminating double negations and simplifying Boolean constants consistently with not-or elimination proofs."
       ],
       "deviations": [
         "The concrete retained subset is integrated with SMTKernel rather than exposed as a preprocessing class."

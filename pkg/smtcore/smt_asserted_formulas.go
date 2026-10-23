@@ -138,7 +138,7 @@ func (k *SMTKernel) pushAssertion(formula, proof ast.ASTHandle) error {
 						return err
 					}
 				}
-				negated, err := k.manager.MkNot(argument)
+				negated, err := k.manager.MkNotSimplified(argument)
 				if err != nil {
 					return err
 				}

@@ -62,6 +62,11 @@ type SMTKernel struct {
 	preprocess       bool
 	timerClock       func() (uint64, error)
 	closed           bool
+
+	assertedParams      uparams.ParamsRef
+	assertedParamsReady bool
+	assertedElimAnd     bool
+	assertedPhaseReady  bool
 }
 
 func (k *SMTKernel) readPreprocessorState(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) (state SMTPreprocessorState, result error) {
@@ -130,7 +135,7 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	if err := k.open(); err != nil {
 		return err
 	}
-	if len(k.assertions) != 0 || k.assertedHead != 0 || len(k.scopes) != 0 || k.preprocessor != nil || k.smtParams != nil {
+	if len(k.assertions) != 0 || k.assertedHead != 0 || len(k.scopes) != 0 || k.preprocessor != nil || k.smtParams != nil || k.assertedParamsReady {
 		return ast.ErrASTDomain
 	}
 	if context == nil || globals == nil || context.SymbolsField != k.manager.Symbols || globals.Context != context {
@@ -138,6 +143,16 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	}
 	k.paramContext = context
 	k.paramGlobals = globals
+	local, err := context.NewValue()
+	if err != nil {
+		return err
+	}
+	k.assertedParams, k.assertedParamsReady = local, true
+	if params != nil {
+		if err = context.Append(&k.assertedParams, params); err != nil {
+			return err
+		}
+	}
 	full, err := NewSMTParams(context, params, globals, k.manager.Budget())
 	if err != nil {
 		if full != nil {
@@ -216,6 +231,9 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	}
 	k.preprocessor = value
 	k.preprocess = enabled
+	if err = k.setAssertedEliminateAnd(false); err != nil {
+		return err
+	}
 	if k.modelConfig.Memory == nil {
 		k.modelCooperation, err = cooperate.NewCooperation(k.manager.Budget())
 		if err != nil {
@@ -382,6 +400,11 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err != nil {
 		return err
 	}
+	if params != nil {
+		if err = k.paramContext.Append(&k.assertedParams, params); err != nil {
+			return err
+		}
+	}
 	if !enabled {
 		if k.preprocessor != nil {
 			if err = k.preprocessor.Close(); err != nil {
@@ -391,6 +414,7 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 		}
 		k.preprocess = false
 		k.preprocessState = state
+		k.assertedPhaseReady = false
 		return nil
 	}
 	if k.preprocessor == nil {
@@ -401,6 +425,8 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err == nil {
 		k.preprocess = true
 		k.preprocessState = state
+		k.assertedPhaseReady = false
+		err = k.setAssertedEliminateAnd(false)
 	}
 	return err
 }
@@ -471,6 +497,22 @@ func (k *SMTKernel) Assert(formula, proof ast.ASTHandle) error {
 			}
 		}
 	}
+	// The source owns expr_ref/proof_ref inputs before changing rewriter
+	// parameters and flushing caches. Keep borrowed inputs alive across that
+	// flush even when the previous rewriter cache supplied their last pin.
+	input, err := k.manager.NewRef(formula)
+	if err != nil {
+		return err
+	}
+	defer k.manager.DelRef(&input)
+	inputProof, err := k.manager.NewRef(proof)
+	if err != nil {
+		return err
+	}
+	defer k.manager.DelRef(&inputProof)
+	if err = k.setAssertedEliminateAnd(false); err != nil {
+		return err
+	}
 	formula, proof, err = k.preprocessAssertion(formula, proof)
 	if err != nil {
 		return err
@@ -504,6 +546,9 @@ func (k *SMTKernel) Assertions() []SMTKernelAssertion {
 }
 
 func (k *SMTKernel) internalizePending() error {
+	if k.assertedHead == len(k.assertions) {
+		return nil
+	}
 	if k.assertedMacros.HasMacros() {
 		if err := k.expandPendingMacros(); err != nil {
 			return fmt.Errorf("expand asserted macros: %w", err)
@@ -511,6 +556,9 @@ func (k *SMTKernel) internalizePending() error {
 		if err := k.findPendingMacros(); err != nil {
 			return err
 		}
+	}
+	if err := k.setAssertedEliminateAnd(false); err != nil {
+		return err
 	}
 	if err := k.propagatePendingAssertions(); err != nil {
 		return err
@@ -520,6 +568,12 @@ func (k *SMTKernel) internalizePending() error {
 	}
 	if err := k.normalizePendingAssertions(); err != nil {
 		return fmt.Errorf("normalize asserted formulas: %w", err)
+	}
+	if err := k.setAssertedEliminateAnd(true); err != nil {
+		return err
+	}
+	if err := k.reducePendingAssertions(); err != nil {
+		return fmt.Errorf("reduce normalized assertions: %w", err)
 	}
 	if err := k.pullPendingNestedQuantifiers(); err != nil {
 		return fmt.Errorf("pull asserted nested quantifiers: %w", err)
@@ -536,11 +590,17 @@ func (k *SMTKernel) internalizePending() error {
 	if err := k.refinePendingInjectivityAxioms(); err != nil {
 		return fmt.Errorf("refine asserted injectivity axioms: %w", err)
 	}
+	if err := k.distributePendingUniversals(); err != nil {
+		return fmt.Errorf("distribute asserted universals: %w", err)
+	}
 	if err := k.findPendingMacros(); err != nil {
 		return fmt.Errorf("find normalized macros: %w", err)
 	}
 	if err := k.applyPendingQuasiMacros(); err != nil {
 		return fmt.Errorf("apply asserted quasi-macros: %w", err)
+	}
+	if err := k.reducePendingAssertions(); err != nil {
+		return fmt.Errorf("reduce final assertions: %w", err)
 	}
 	for k.assertedHead < len(k.assertions) {
 		assertion := k.assertions[k.assertedHead]
@@ -923,6 +983,13 @@ func (k *SMTKernel) Close() error {
 	}
 	if k.smtParams != nil {
 		result = errors.Join(result, k.smtParams.Close())
+	}
+	if k.assertedParamsReady {
+		if err := k.paramContext.Del(&k.assertedParams); err != nil {
+			result = errors.Join(result, err)
+		} else {
+			k.assertedParamsReady = false
+		}
 	}
 	for index := len(k.assertions); index > 0; index-- {
 		assertion := &k.assertions[index-1]

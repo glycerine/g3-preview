@@ -728,6 +728,11 @@ func TestSMTSequenceTheoryBranchesLeadingVariableOverlap(t *testing.T) {
 	astTestMust(t, err)
 	notXDefinition, err := m.MkNot(xDefinition)
 	astTestMust(t, err)
+	// Keep the source formulas used again by the second solver alive even if
+	// the first solver's preprocessing replaces them.
+	for _, formula := range []ast.ASTHandle{wordEquality, lengthOrder, xDefinition} {
+		astTestPin(t, m, formula)
+	}
 	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, solver.Close()) })

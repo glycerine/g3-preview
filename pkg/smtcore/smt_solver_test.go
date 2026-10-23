@@ -349,6 +349,7 @@ func TestSMTSolverPreprocessesAssertionsWithOwnedParameterServices(t *testing.T)
 	astTestMust(t, err)
 	double, err := m.MkNot(notA)
 	astTestMust(t, err)
+	astTestPin(t, m, double) // Reused after the first solver rewrites it away.
 
 	s, err := NewSMTSolver(m, nil, "QF_UF", SMTSolverConfig{Params: context})
 	astTestMust(t, err)
@@ -1817,6 +1818,7 @@ func TestSMTSolverSetupUsesPartialLinearIntegerArithmetic(t *testing.T) {
 			}
 			first, err := m.MkFamilyApp(family, firstOp, nil, []ast.ASTHandle{left, one})
 			astTestMust(t, err)
+			astTestPin(t, m, left) // Also used to build the second assertion.
 			astTestMust(t, s.Assert(first))
 			second, err := m.MkFamilyApp(family, smtArithOpGE, nil, []ast.ASTHandle{left, one})
 			astTestMust(t, err)

@@ -614,6 +614,7 @@ func TestSMTArrayConstructorModelValue(t *testing.T) {
 	astTestMust(t, err)
 	equality, err := m.MkEq(selected, value)
 	astTestMust(t, err)
+	astTestPin(t, m, equality) // Evaluated again after preprocessing reduces it.
 	solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, solver.Close()) })
