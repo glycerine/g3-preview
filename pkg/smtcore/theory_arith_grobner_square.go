@@ -70,12 +70,7 @@ func (t *SMTLinearArithmeticTheory) grobnerMonomialInterval(solver *simplex.Solv
 		if !found {
 			return nil, ast.ErrASTDomain
 		}
-		bound, err := t.nonlinearColumnInterval(solver, column, manager)
-		if err != nil {
-			return nil, err
-		}
-		bound.power(j - i)
-		if err = interval.mul(bound); err != nil {
+		if err = t.multiplyNonlinearColumnBound(solver, column, j-i, interval); err != nil {
 			return nil, err
 		}
 		i = j

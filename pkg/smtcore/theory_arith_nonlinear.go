@@ -194,6 +194,40 @@ func (t *SMTLinearArithmeticTheory) nonlinearColumnInterval(solver *simplex.Solv
 	return result, nil
 }
 
+// Source mul_bound_of charges the resulting accumulator, after raising the
+// factor interval to its power. Open and infinite endpoints each cost one;
+// closed rational endpoints cost numerator bits plus denominator bits for
+// nonintegers. As in source, charging does not itself interrupt this operation.
+func (t *SMTLinearArithmeticTheory) multiplyNonlinearColumnBound(solver *simplex.Solver, column, power uint32, target *smtOldInterval) error {
+	interval, err := t.nonlinearColumnInterval(solver, column, target.manager)
+	if err != nil {
+		return err
+	}
+	interval.power(power)
+	if err = target.mul(interval); err != nil {
+		return err
+	}
+	for index := 0; index < 2; index++ {
+		endpoint, open := &target.lower, target.lowerOpen
+		if index == 1 {
+			endpoint, open = &target.upper, target.upperOpen
+		}
+		cost := uint32(1)
+		if !open && !endpoint.infinite() {
+			bits := endpoint.value.Num().BitLen()
+			if bits == 0 {
+				bits = 1
+			}
+			cost = uint32(bits)
+			if !endpoint.value.IsInt() {
+				cost += uint32(endpoint.value.Denom().BitLen())
+			}
+		}
+		t.state.manager.Limit.IncOffset(cost)
+	}
+	return nil
+}
+
 func (t *SMTLinearArithmeticTheory) updateNonlinearBounds(solver *simplex.Solver, column uint32, interval *smtOldInterval) (bool, bool) {
 	explanations := [2]*smtArithmeticBoundExplanation{
 		smtArithmeticIntervalExplanation(interval.manager, interval.lowerDep),
@@ -338,12 +372,7 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearBounds(solver *simplex.Sol
 			return false, false, err
 		}
 		for _, factor := range ordered {
-			interval, err := t.nonlinearColumnInterval(solver, factor, &manager)
-			if err != nil {
-				return false, false, err
-			}
-			interval.power(powers[factor])
-			if err = product.mul(interval); err != nil {
+			if err = t.multiplyNonlinearColumnBound(solver, factor, powers[factor], product); err != nil {
 				return false, false, err
 			}
 		}
@@ -364,12 +393,7 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearBounds(solver *simplex.Sol
 				if factor == target {
 					continue
 				}
-				interval, err := t.nonlinearColumnInterval(solver, factor, &manager)
-				if err != nil {
-					return false, false, err
-				}
-				interval.power(powers[factor])
-				if err = others.mul(interval); err != nil {
+				if err = t.multiplyNonlinearColumnBound(solver, factor, powers[factor], others); err != nil {
 					return false, false, err
 				}
 			}

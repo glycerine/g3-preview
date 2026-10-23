@@ -115995,7 +115995,8 @@
         "pkg/smtcore/theory_arith_grobner_dependency.go",
         "pkg/smtcore/theory_arith_grobner_dependency_test.go",
         "pkg/smtcore/theory_arith_pending_bounds.go",
-        "pkg/smtcore/theory_arith_pending_bounds_test.go"
+        "pkg/smtcore/theory_arith_pending_bounds_test.go",
+        "pkg/smtcore/theory_arith_interval_resource_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -116027,7 +116028,9 @@
         "TestBoundConflictDependenciesOwnAndInvalidateSnapshots",
         "TestSMTRejectedNonlinearCandidateKeepsLogicalContextConsistent",
         "TestSMTGrobnerDependenciesOwnLiteralPolarityAndConsumerLifetime",
-        "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes"
+        "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes",
+        "TestSMTNonlinearIntervalMultiplicationChargesResultEndpoints",
+        "TestSMTGrobnerMonomialIntervalChargesPoweredAccumulator"
       ],
       "conditionals": [
         {
@@ -116338,7 +116341,7 @@
           ]
         },
         {
-          "name": "propagate_nl_upward, propagate_nl_downward for degree-one targets, and update_bounds_using_interval with open/integer endpoints and plain derived-bound dependencies; opposite-bound conflicts retain exact premises; equation and nested-polynomial conflicts retain source premises; interval resource checks remain incomplete",
+          "name": "propagate_nl_upward, propagate_nl_downward for degree-one targets, and update_bounds_using_interval with open/integer endpoints and plain derived-bound dependencies; opposite-bound conflicts retain exact premises; equation and nested-polynomial conflicts retain source premises; source analyze_monomial selection and propagation scheduling remain incomplete",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
           "tests": [
@@ -116478,7 +116481,7 @@
           ]
         },
         {
-          "name": "remaining interval resource/dependency refinements",
+          "name": "remaining interval dependency refinements and source analyze_monomial selection/propagation scheduling",
           "status": "unported",
           "go_target": null,
           "tests": [
@@ -116588,11 +116591,25 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "mul_bound_of: raise the factor interval to its grouped power, multiply the accumulator, then charge each resulting endpoint separately using one for open or infinite endpoints and source rational bitsize for closed endpoints; nonlinear upward/downward propagation and Grobner monomial evaluation share this operation without introducing an early cancellation branch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_grobner_square.go",
+            "pkg/smtcore/theory_arith_interval_resource_test.go"
+          ],
+          "tests": [
+            "TestSMTNonlinearIntervalMultiplicationChargesResultEndpoints",
+            "TestSMTGrobnerMonomialIntervalChargesPoweredAccumulator"
+          ]
         }
       ],
       "ownership": [
         "The retained legacy arithmetic theory constructs rational-plus-epsilon model values and marks irrational algebraic numerals unsupported at theory_arith_core.h:765-769; mk_value at theory_arith_core.h:3257-3270 produces rational numerals.",
-        "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop."
+        "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop.",
+        "mul_bound_of resource costs use the resulting accumulator after each grouped factor power. Source rational zero has size one; integers omit denominator bits. Each endpoint increments the AST manager resource counter separately, even if the first increment exhausts its budget; the operation itself does not add a cancellation branch. Other interval evaluation and affine-row products do not inherit these source-specific charges."
       ],
       "deviations": [
         "Nonlinear monomials now have independent tableau columns with scoped factor-column lists. Relevant assignments are checked using the same exact rational epsilon as model construction. The Go tableau additionally completes a candidate by evaluating products and affine definitions, then fixes every arithmetic column and rechecks every original row; a failed completion preserves the relaxation. This concrete-model completion is a Go representation adaptation, not a claim to port the remaining source nonlinear search strategies.",
