@@ -842,6 +842,10 @@ func smtLinearAssertionLiteral(atom *smtLinearArithmeticAtom, assertion smtInteg
 }
 
 func (t *SMTLinearArithmeticTheory) propagateEquality(state *SMTInternalizerState, first, second uint32, literals []SMTLiteral) (bool, error) {
+	return t.propagateEqualityWithParameters(state, first, second, literals, nil)
+}
+
+func (t *SMTLinearArithmeticTheory) propagateEqualityWithParameters(state *SMTInternalizerState, first, second uint32, literals []SMTLiteral, parameters []ast.ASTParameter) (bool, error) {
 	leftVariable, leftOK := t.theoryVariable(first)
 	rightVariable, rightOK := t.theoryVariable(second)
 	if !leftOK || !rightOK {
@@ -868,7 +872,7 @@ func (t *SMTLinearArithmeticTheory) propagateEquality(state *SMTInternalizerStat
 		return false, nil
 	}
 	justification, err := NewSMTExtTheoryEqualityPropagationJustification(
-		state.manager, t.FamilyID(), literals, nil, left, right, nil)
+		state.manager, t.FamilyID(), literals, nil, left, right, parameters)
 	if err != nil {
 		return false, err
 	}

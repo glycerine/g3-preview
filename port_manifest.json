@@ -115182,12 +115182,26 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "fixed_var_eh endpoint justifications for logically replayed shared fixed variables: expand lower(first), upper(second), lower(second), upper(first) in source order, preserve zero proof coefficients, publish owning eq-propagate parameters, and omit unrelated arithmetic assertions when endpoint explanations are known",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_fixed_bounds_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go"
+          ],
+          "tests": [
+            "TestSMTSharedArithmeticFixedRowsScopedProofs"
+          ]
         }
       ],
       "ownership": [
         "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification.",
         "Division application markers follow theory scopes. Concrete division calls pin generated arithmetic and Boolean terms through recursive axiom internalization. The disabled constant-modulus enumeration option has no active retained setter and is not translated.",
-        "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop."
+        "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop.",
+        "Shared fixed-value equality propagation now expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the previous conservative fallback; other offset equality propagation and the source fixed-variable table/event integration remain partial."
       ],
       "deviations": [
         "Affine definition-bound propagation evaluates retained replay rows before and after nonlinear interval propagation, including sign reversal for negated-square aliases. General row scheduling, propagation to every row variable, and minimal row-bound explanations remain incomplete.",
@@ -115236,7 +115250,10 @@
         "pkg/smtcore/theory_arith_mixed.go",
         "pkg/smtcore/theory_arith_casts.go",
         "pkg/smtcore/theory_arith_mixed_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/theory_arith_fixed_bounds.go",
+        "pkg/smtcore/theory_arith_fixed_bounds_test.go",
+        "pkg/smtcore/theory_arith_bound_dependency.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
@@ -115246,7 +115263,8 @@
         "TestSMTMixedArithmeticScopeModel",
         "TestSMTMixedArithmeticCastsScopedProofs",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTSharedArithmeticFixedRowsScopedProofs"
       ],
       "conditionals": [
         {
@@ -115372,10 +115390,24 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "fixed_var_eh endpoint justifications for logically replayed shared fixed variables: expand lower(first), upper(second), lower(second), upper(first) in source order, preserve zero proof coefficients, publish owning eq-propagate parameters, and omit unrelated arithmetic assertions when endpoint explanations are known",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_fixed_bounds_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go"
+          ],
+          "tests": [
+            "TestSMTSharedArithmeticFixedRowsScopedProofs"
+          ]
         }
       ],
       "ownership": [
-        "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification."
+        "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification.",
+        "Shared fixed-value equality propagation now expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the previous conservative fallback; other offset equality propagation and the source fixed-variable table/event integration remain partial."
       ],
       "deviations": [
         "The linear specialization recognizes active opposite bound pairs, substitutes fixed monomials, and compares affine definition rows directly instead of maintaining the source row-id offset index."

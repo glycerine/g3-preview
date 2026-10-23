@@ -38,6 +38,8 @@ func TestSMTSharedArithmeticFixedRowsScopedProofs(t *testing.T) {
 					astTestMust(t, err)
 					y, err := m.MkConst(astTestSymbol(t, m, "fixed-shared-y"), sort)
 					astTestMust(t, err)
+					unrelated, err := m.MkConst(astTestSymbol(t, m, "fixed-shared-unrelated"), sort)
+					astTestMust(t, err)
 					f, err := m.MkFuncDecl(astTestSymbol(t, m, "fixed-shared-f"), []ast.ASTHandle{sort}, sort, ast.ASTFuncDeclInfo{})
 					astTestMust(t, err)
 					fx, err := m.MkApp(f, []ast.ASTHandle{x})
@@ -55,7 +57,11 @@ func TestSMTSharedArithmeticFixedRowsScopedProofs(t *testing.T) {
 						astTestMust(t, err)
 						return h
 					}
-					for _, formula := range []ast.ASTHandle{different, app(smtArithOpGE, x, value), app(smtArithOpGE, y, value)} {
+					irrelevantBound := app(smtArithOpGE, unrelated, value)
+					astTestMust(t, s.Assert(irrelevantBound))
+					firstLower := app(smtArithOpGE, x, value)
+					secondLower := app(smtArithOpGE, y, value)
+					for _, formula := range []ast.ASTHandle{different, firstLower, secondLower} {
 						astTestMust(t, s.Assert(formula))
 					}
 					sum := app(smtArithOpAdd, x, y)
@@ -81,6 +87,36 @@ func TestSMTSharedArithmeticFixedRowsScopedProofs(t *testing.T) {
 							if !m.IsFalse(fact) {
 								t.Fatal("fixed-row UF proof")
 							}
+							lemma := smtProofTheoryRuleNode(t, m, proof, "eq-propagate")
+							if lemma.IsNull() {
+								t.Fatal("fixed-row equality lost source eq-propagate rule")
+							}
+							if smtTestArithmeticExpressionContains(t, m, lemma, unrelated) {
+								t.Fatal("fixed-row equality cites unrelated arithmetic assertion")
+							}
+							for _, premise := range []ast.ASTHandle{firstLower, secondLower, fixed} {
+								if !smtTestArithmeticExpressionContains(t, m, lemma, premise) {
+									t.Fatal("fixed-row equality omitted a required endpoint premise")
+								}
+							}
+							decl, err := m.GetDecl(lemma)
+							astTestMust(t, err)
+							parameters, err := m.GetDeclParametersCopy(decl)
+							astTestMust(t, err)
+							if len(parameters) < 6 {
+								t.Fatal("four endpoint explanations lost their proof coefficients", len(parameters))
+							}
+							zero, err := m.NewParameterRat(new(big.Rat))
+							astTestMust(t, err)
+							for i := 2; i < len(parameters); i++ {
+								equal, err := m.ParameterEqual(parameters[i], zero)
+								astTestMust(t, err)
+								if !equal {
+									t.Fatal("fixed equality coefficient must be source zero", i)
+								}
+							}
+							astTestMust(t, m.DelParameter(&zero))
+							astTestMust(t, smtArithmeticReleaseParameters(m, parameters))
 						}
 						astTestMust(t, s.Pop(1))
 						astTestMust(t, s.Push())

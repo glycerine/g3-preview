@@ -3,6 +3,7 @@
 package smtcore
 
 import (
+	"errors"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/math/simplex"
@@ -69,10 +70,6 @@ func (t *SMTLinearArithmeticTheory) propagateFixedSharedValues() (bool, error) {
 		t.solver = solver
 		t.state.theoryProgress++
 	}
-	literals := make([]SMTLiteral, 0, len(t.assertions))
-	for _, assertion := range t.assertions {
-		literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
-	}
 	for i, first := range shared {
 		firstValue, fixed := smtFixedSimplexColumn(solver, first)
 		if !fixed {
@@ -83,13 +80,47 @@ func (t *SMTLinearArithmeticTheory) propagateFixedSharedValues() (bool, error) {
 			if !fixed || firstValue.Cmp(secondValue) != 0 {
 				continue
 			}
-			merged, err := t.propagateEquality(t.state, first, second, literals)
+			merged, err := t.propagateFixedEquality(solver, first, second)
 			if err != nil || merged {
 				return true, err
 			}
 		}
 	}
 	return progress, nil
+}
+
+// Source theory_arith_eq.h fixed_var_eh pushes four endpoint justifications
+// in this order, using zero coefficients for its equality proof rule.
+func (t *SMTLinearArithmeticTheory) propagateFixedEquality(solver *simplex.Solver, first, second uint32) (progress bool, result error) {
+	proofs, err := t.state.manager.ProofsEnabled()
+	if err != nil {
+		return false, err
+	}
+	uses := []simplex.ArithmeticBoundUse{
+		{Column: first, Lower: true},
+		{Column: second, Lower: false},
+		{Column: second, Lower: true},
+		{Column: first, Lower: false},
+	}
+	antecedents, known, err := smtArithmeticExplainBounds(solver, uses, proofs)
+	if err != nil {
+		return false, err
+	}
+	if !known {
+		// Logical replay may contain an endpoint whose explanation has not
+		// yet been ported. Preserve the existing conservative justification.
+		var literals []SMTLiteral
+		for _, assertion := range t.assertions {
+			literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
+		}
+		return t.propagateEquality(t.state, first, second, literals)
+	}
+	parameters, err := antecedents.parameters(t.state.manager, "eq-propagate")
+	if err != nil {
+		return false, err
+	}
+	defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(t.state.manager, parameters)) }()
+	return t.propagateEqualityWithParameters(t.state, first, second, antecedents.literals, parameters)
 }
 
 // Derive bounds through canonical equality and comparison rows. The caller
