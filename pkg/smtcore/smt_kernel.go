@@ -411,9 +411,18 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	k.arithState = arithmetic
 	k.bvState = bitVector
 	if k.internalizer.quantifierManager != nil {
-		if err = k.internalizer.quantifierManager.UpdateMBQI(quantifiers.MBQI, mbqiID, quantifiers.MaxCexs, quantifiers.MaxIterations, quantifiers.ForceTemplate); err != nil {
+		manager := k.internalizer.quantifierManager
+		if err = manager.UpdateMBQI(quantifiers.MBQI, mbqiID, quantifiers.MaxCexs, quantifiers.MaxIterations, quantifiers.ForceTemplate); err != nil {
 			return err
 		}
+		if !manager.ematching && paramsState.Ematching {
+			manager.mam.dirty = true
+		}
+		manager.ematching = paramsState.Ematching
+		manager.registry.maxInstances = quantifiers.MaxInstances
+		manager.registry.schedule.lazyThreshold = float32(quantifiers.LazyThreshold)
+		// Source qi_queue caches its eager threshold and parsed cost/new-gen
+		// functions in the constructor; those remain unchanged on updates.
 	}
 	for _, theory := range k.internalizer.theories {
 		if configurable, ok := theory.(interface{ ConfigureArithmetic(SMTArithState) error }); ok {

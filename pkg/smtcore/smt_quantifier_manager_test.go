@@ -123,7 +123,7 @@ func TestSMTQuantifiedSearchRequiresModelValidation(t *testing.T) {
 	name := "relevancy"
 	astTestMust(t, solver.kernel.paramContext.SetUIntName(&local, &name, 0))
 	astTestMust(t, solver.UpdateParams(&local))
-	astTestMust(t, solver.kernel.paramContext.Del(&local))
+	t.Cleanup(func() { astTestMust(t, solver.kernel.paramContext.Del(&local)) })
 	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "validation-sort"), nil)
 	astTestMust(t, err)
 	boolean, err := m.MkBoolSort()
@@ -158,6 +158,16 @@ func TestSMTQuantifiedSearchRequiresModelValidation(t *testing.T) {
 		negative, err := m.MkNot(application)
 		astTestMust(t, err)
 		astTestMust(t, solver.Assert(negative))
+		name := "ematching"
+		astTestMust(t, solver.kernel.paramContext.SetBoolName(&local, &name, false))
+		astTestMust(t, solver.UpdateParams(&local))
+		status, err = solver.CheckSat(nil)
+		astTestMust(t, err)
+		if status != lbool.Undef {
+			t.Fatal("disabled E-matching processed a fresh scoped term", cycle, status)
+		}
+		astTestMust(t, solver.kernel.paramContext.SetBoolName(&local, &name, true))
+		astTestMust(t, solver.UpdateParams(&local))
 		status, err = solver.CheckSat(nil)
 		if err != nil {
 			t.Fatal("scoped check", cycle, err)
@@ -166,6 +176,74 @@ func TestSMTQuantifiedSearchRequiresModelValidation(t *testing.T) {
 			t.Fatal("E-matching failed to refute a grounded contradiction", cycle, status)
 		}
 		astTestMust(t, solver.Pop(1))
+	}
+}
+
+func TestSMTQuantifierLiveParamsPreservePendingAndConstructorCaches(t *testing.T) {
+	m, solver := smtAssertedNNFFixture(t, false)
+	context := solver.kernel.paramContext
+	local, err := context.NewValue()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, context.Del(&local)) })
+	for _, name := range []string{"qi.eager_threshold", "qi.lazy_threshold"} {
+		astTestMust(t, context.SetDoubleName(&local, &name, 0))
+	}
+	name := "qi.max_instances"
+	astTestMust(t, context.SetUIntName(&local, &name, 0))
+	astTestMust(t, solver.UpdateParams(&local))
+	state := solver.kernel.internalizer
+	manager := state.quantifierManager
+	quantifier, _, sort := smtManagedQuantifier(t, m, "live-qi-params")
+	astTestMust(t, state.Internalize(quantifier, true))
+	bindings := make([]*SMTEnode, 3)
+	for index := range bindings {
+		constant, err := m.MkConst(symbol.Numerical(2740+uint32(index)), sort)
+		astTestMust(t, err)
+		astTestMust(t, state.Internalize(constant, false))
+		bindings[index] = state.context.enodes[constant]
+	}
+	registry := manager.registry
+	first, err := registry.AddInstance(quantifier, ast.ASTHandle{}, bindings[:1], 50, 0, 0)
+	astTestMust(t, err)
+	blocked, err := registry.AddInstance(quantifier, ast.ASTHandle{}, bindings[1:2], 5, 0, 0)
+	astTestMust(t, err)
+	if !first || blocked {
+		t.Fatal("source max_instances boundary was not applied", first, blocked)
+	}
+	queue := registry.schedule
+	ready, err := queue.ScheduleNew(nil)
+	astTestMust(t, err)
+	if len(ready) != 0 || len(queue.delayedEntries) != 1 {
+		t.Fatal("high-cost instance was not retained for delayed checking", ready)
+	}
+	done, ready, err := queue.FinalCheck()
+	astTestMust(t, err)
+	if !done || len(ready) != 0 {
+		t.Fatal("zero lazy threshold processed an ineligible instance", done, ready)
+	}
+	name = "qi.max_instances"
+	astTestMust(t, context.SetUIntName(&local, &name, 1))
+	name = "qi.lazy_threshold"
+	astTestMust(t, context.SetDoubleName(&local, &name, 100))
+	name, replacementCost := "qi.cost", "999"
+	astTestMust(t, context.SetStringName(&local, &name, &replacementCost))
+	astTestMust(t, solver.UpdateParams(&local))
+	second, err := registry.AddInstance(quantifier, ast.ASTHandle{}, bindings[1:2], 5, 0, 0)
+	astTestMust(t, err)
+	blocked, err = registry.AddInstance(quantifier, ast.ASTHandle{}, bindings[2:], 5, 0, 0)
+	astTestMust(t, err)
+	if !second || blocked {
+		t.Fatal("live instance limit reset the count or kept its stale value", second, blocked)
+	}
+	ready, err = queue.ScheduleNew(nil)
+	astTestMust(t, err)
+	if len(ready) != 1 || ready[0].Cost != 5 || ready[0].Fingerprint.args[0] != bindings[1] {
+		t.Fatal("constructor-cached eager threshold or cost function was replaced", ready)
+	}
+	done, ready, err = queue.FinalCheck()
+	astTestMust(t, err)
+	if done || len(ready) != 1 || ready[0].Fingerprint.args[0] != bindings[0] {
+		t.Fatal("updated lazy threshold lost the pending instance", done, ready)
 	}
 }
 
