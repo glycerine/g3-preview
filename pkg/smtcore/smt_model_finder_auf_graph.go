@@ -20,22 +20,24 @@ type smtModelFinderFVar struct {
 }
 
 type smtModelFinderAUFGraph struct {
-	finder    *SMTModelFinder
-	nodes     []*smtModelFinderAUFNode
-	uvars     map[smtModelFinderAUFKey]*smtModelFinderAUFNode
-	arguments map[smtModelFinderAUFKey]*smtModelFinderAUFNode
-	fvars     []smtModelFinderFVar
-	literals  []smtModelFinderAUFLiteral
-	refs      []ast.ASTRef
-	model     *protomodel.ProtoModel
-	selects   []smtModelFinderSelectVar
-	witnesses map[ast.ASTHandle]ast.ASTHandle
+	finder       *SMTModelFinder
+	nodes        []*smtModelFinderAUFNode
+	uvars        map[smtModelFinderAUFKey]*smtModelFinderAUFNode
+	arguments    map[smtModelFinderAUFKey]*smtModelFinderAUFNode
+	fvars        []smtModelFinderFVar
+	literals     []smtModelFinderAUFLiteral
+	refs         []ast.ASTRef
+	model        *protomodel.ProtoModel
+	selects      []smtModelFinderSelectVar
+	witnesses    map[ast.ASTHandle]ast.ASTHandle
+	analysisSeen map[smtModelFinderAnalysisKey]uint8
 }
 
 func newSMTModelFinderAUFGraph(finder *SMTModelFinder) *smtModelFinderAUFGraph {
 	return &smtModelFinderAUFGraph{
 		finder: finder, uvars: make(map[smtModelFinderAUFKey]*smtModelFinderAUFNode),
-		arguments: make(map[smtModelFinderAUFKey]*smtModelFinderAUFNode),
+		arguments:    make(map[smtModelFinderAUFKey]*smtModelFinderAUFNode),
+		analysisSeen: make(map[smtModelFinderAnalysisKey]uint8),
 	}
 }
 
@@ -83,63 +85,7 @@ func (g *smtModelFinderAUFGraph) collectFVars(quantifier ast.ASTHandle) error {
 	if err != nil {
 		return err
 	}
-	stack := []ast.ASTHandle{body}
-	seen := make(map[ast.ASTHandle]bool)
-	for len(stack) != 0 {
-		term := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		if seen[term] {
-			continue
-		}
-		seen[term] = true
-		kind, err := g.finder.manager.GetKind(term)
-		if err != nil {
-			return err
-		}
-		// Nested binders require the quantifier-flattening stage before they
-		// can contribute qinfo for this quantifier's variables.
-		if kind != ast.ASTApp {
-			continue
-		}
-		family, err := g.finder.manager.GetFamilyID(term)
-		if err != nil {
-			return err
-		}
-		function, err := g.finder.manager.GetDecl(term)
-		if err != nil {
-			return err
-		}
-		if err := g.collectSelectVars(quantifier, term); err != nil {
-			return err
-		}
-		count, err := g.finder.manager.GetNumArgs(term)
-		if err != nil {
-			return err
-		}
-		for position := uint32(0); position < count; position++ {
-			arg, err := g.finder.manager.GetArg(term, position)
-			if err != nil {
-				return err
-			}
-			argKind, err := g.finder.manager.GetKind(arg)
-			if err != nil {
-				return err
-			}
-			if family == ast.NullFamilyID && argKind == ast.ASTVar {
-				variable, err := g.finder.manager.GetVarIndex(arg)
-				if err != nil {
-					return err
-				}
-				g.fvars = append(g.fvars, smtModelFinderFVar{quantifier: quantifier, function: function, position: position, variable: variable})
-			} else if family == ast.NullFamilyID {
-				if err := g.collectOffset(quantifier, function, position, arg); err != nil {
-					return err
-				}
-			}
-			stack = append(stack, arg)
-		}
-	}
-	return nil
+	return g.collectLiterals(quantifier, body, false)
 }
 
 func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
@@ -157,13 +103,6 @@ func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 			}
 		}
 		if err := g.collectFVars(quantifier); err != nil {
-			return err
-		}
-		body, err := g.finder.manager.GetQuantifierBody(g.finder.flatQuantifier(quantifier))
-		if err != nil {
-			return err
-		}
-		if err := g.collectLiterals(quantifier, body, false); err != nil {
 			return err
 		}
 	}

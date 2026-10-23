@@ -108703,6 +108703,8 @@
         "pkg/smtcore/smt_model_finder_macro_sets.go",
         "pkg/smtcore/smt_model_finder_macro_sets_test.go",
         "pkg/smtcore/smt_model_finder_cancel_test.go",
+        "pkg/smtcore/smt_model_finder_auf_analyzer.go",
+        "pkg/smtcore/smt_model_finder_auf_analyzer_test.go",
         "pkg/smtcore/smt_model_finder_instantiation_set.go",
         "pkg/smtcore/smt_model_finder_instantiation_set_test.go",
         "pkg/smtcore/smt_model_finder_quantifier_set.go",
@@ -108746,6 +108748,8 @@
         "TestSMTModelFinderMacroSetsPreserveOriginalRelevantArguments",
         "TestSMTModelFinderHintPassRepeatsForDisjointSubsets",
         "TestSMTModelFinderCancellationAndResourceCheckpoint",
+        "TestSMTModelFinderAUFAnalyzerVisitsBooleanFormulasInsideTerms",
+        "TestSMTModelFinderAUFAnalyzerDeduplicatesSharedQInfo",
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
         "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
         "TestModelFinderHintSatisfiedResidueSourceScopeTransitions",
@@ -109299,6 +109303,15 @@
           "go_target": "pkg/smtcore/smt_model_finder.go",
           "tests": [
             "TestSMTModelFinderCancellationAndResourceCheckpoint"
+          ]
+        },
+        {
+          "name": "quantifier_analyzer unified formula/term descent, nested Boolean polarity visits, DAG caches and normalized qinfo deduplication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_auf_analyzer.go",
+          "tests": [
+            "TestSMTModelFinderAUFAnalyzerVisitsBooleanFormulasInsideTerms",
+            "TestSMTModelFinderAUFAnalyzerDeduplicatesSharedQInfo"
           ]
         },
         {

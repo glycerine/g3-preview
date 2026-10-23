@@ -26,7 +26,7 @@ func (g *smtModelFinderAUFGraph) collectOffset(quantifier, function ast.ASTHandl
 		return errors.Join(err, m.DelRef(&ref))
 	}
 	g.refs = append(g.refs, ref)
-	g.fvars = append(g.fvars, smtModelFinderFVar{
+	g.appendFVar(smtModelFinderFVar{
 		quantifier: quantifier, function: function, position: position, variable: index, offset: offset,
 	})
 	return nil

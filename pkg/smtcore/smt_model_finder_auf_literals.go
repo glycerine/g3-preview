@@ -29,6 +29,18 @@ func (g *smtModelFinderAUFGraph) collectLiterals(quantifier, formula ast.ASTHand
 	if err != nil || ground {
 		return err
 	}
+	flag := uint8(1)
+	if negative {
+		flag = 2
+	}
+	key := smtModelFinderAnalysisKey{quantifier, formula}
+	if g.analysisSeen[key]&flag != 0 {
+		return nil
+	}
+	g.analysisSeen[key] |= flag
+	if err := g.finder.checkpoint(); err != nil {
+		return err
+	}
 	kind, err := m.GetKind(formula)
 	if err != nil {
 		return err
@@ -47,7 +59,7 @@ func (g *smtModelFinderAUFGraph) collectLiterals(quantifier, formula ast.ASTHand
 		if err != nil {
 			return err
 		}
-		g.literals = append(g.literals, smtModelFinderAUFLiteral{kind: aufDisequalGround, quantifier: quantifier, first: variable, term: term})
+		g.appendLiteral(smtModelFinderAUFLiteral{kind: aufDisequalGround, quantifier: quantifier, first: variable, term: term})
 		return nil
 	}
 	if kind != ast.ASTApp {
@@ -58,7 +70,14 @@ func (g *smtModelFinderAUFGraph) collectLiterals(quantifier, formula ast.ASTHand
 		return err
 	}
 	if family != m.BasicFamilyID() {
-		return g.collectComparison(quantifier, formula, negative)
+		before := len(g.literals)
+		if err := g.collectComparison(quantifier, formula, negative); err != nil {
+			return err
+		}
+		if len(g.literals) > before {
+			return nil
+		}
+		return g.analyzeApplication(quantifier, formula)
 	}
 	op, err := m.GetDeclKind(formula)
 	if err != nil {
@@ -93,7 +112,7 @@ func (g *smtModelFinderAUFGraph) collectLiterals(quantifier, formula ast.ASTHand
 		return nil
 	case ast.ASTOpEq:
 	default:
-		return nil
+		return g.analyzeApplication(quantifier, formula)
 	}
 	left, err := m.GetArg(formula, 0)
 	if err != nil {
@@ -116,7 +135,10 @@ func (g *smtModelFinderAUFGraph) collectLiterals(quantifier, formula ast.ASTHand
 	} else {
 		first, second, matched, err := g.variableAndVariable(left, right)
 		if err != nil || !matched {
-			return err
+			if err != nil {
+				return err
+			}
+			return g.analyzeApplication(quantifier, formula)
 		}
 		row.first, row.second = first, second
 		row.kind = aufEqualVariables
@@ -124,7 +146,7 @@ func (g *smtModelFinderAUFGraph) collectLiterals(quantifier, formula ast.ASTHand
 			row.kind = aufDisequalVariables
 		}
 	}
-	g.literals = append(g.literals, row)
+	g.appendLiteral(row)
 	return nil
 }
 
