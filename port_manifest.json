@@ -113897,7 +113897,9 @@
         "pkg/smtcore/theory_arith_fixed_bounds.go",
         "pkg/smtcore/theory_arith_fixed_bounds_test.go",
         "pkg/smtcore/theory_arith_shared.go",
-        "pkg/smtcore/theory_arith_max_min_test.go"
+        "pkg/smtcore/theory_arith_max_min_test.go",
+        "pkg/smtcore/theory_arith_epsilon.go",
+        "pkg/smtcore/theory_arith_epsilon_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -113918,7 +113920,8 @@
         "TestSMTNonlinearGrobnerExpandedSquareScopedProofs",
         "TestSMTLinearizedMonomialScopesProofsAndModels",
         "TestSMTSharedArithmeticFixedRowsScopedProofs",
-        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
+        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
+        "TestSMTArithmeticSharedEpsilonPreservesDistinctValues"
       ],
       "conditionals": [
         {
@@ -114748,6 +114751,14 @@
           "tests": [
             "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
           ]
+        },
+        {
+          "name": "refine_epsilon: halve the concrete model epsilon until distinct shared real infinitesimal values remain distinct; preserve exact symbolic equalities",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_epsilon.go",
+          "tests": [
+            "TestSMTArithmeticSharedEpsilonPreservesDistinctValues"
+          ]
         }
       ],
       "ownership": [
@@ -114757,7 +114768,8 @@
       "deviations": [
         "Affine definition-bound propagation evaluates retained replay rows before and after nonlinear interval propagation, including sign reversal for negated-square aliases. General row scheduling, propagation to every row variable, and minimal row-bound explanations remain incomplete.",
         "Shared arithmetic variables can become fixed through a combination of row bounds even when no explicit opposite unary bounds occur. A branch-free row interval pass derives these points, retains only newly fixed original columns as scoped replay bounds, and propagates equal-valued shared roots with all active arithmetic literals as premises. This closes the false-SAT case x>=0, y>=0, x+y<=0, f(x)!=f(y). General bound-atom propagation and optimal fixed-point discovery remain separate work.",
-        "The existing small-row interval calculation is shared by fixed-value equality propagation and nonlinear strategy bound replay. Equality aliases such as x=2*y now carry finite factor bounds into monomial intervals. Source minimal dependency explanations and full propagation scheduling remain incomplete."
+        "The existing small-row interval calculation is shared by fixed-value equality propagation and nonlinear strategy bound replay. Equality aliases such as x=2*y now carry finite factor bounds into monomial intervals. Source minimal dependency explanations and full propagation scheduling remain incomplete.",
+        "Model epsilon refinement now preserves distinctions between shared real symbolic assignments before concrete rational model construction. The same deterministic refinement runs before nonlinear product validation and candidate completion, so model construction cannot silently change the epsilon on which a validated product depended. Integer branching uses the same computation and propagates errors. The focused regression reproduces the source 19/2 versus 10-epsilon collision, checks equality preservation, and inspects a returned UF/arithmetic model. The separate shared-equality assumption queue and assignment mutation paths remain incomplete."
       ]
     },
     {
@@ -115344,7 +115356,9 @@
         "pkg/smtcore/theory_arith_nonlinear_strategy.go",
         "pkg/smtcore/theory_arith_nonlinear_strategy_test.go",
         "pkg/smtcore/theory_arith_max_min.go",
-        "pkg/smtcore/theory_arith_max_min_test.go"
+        "pkg/smtcore/theory_arith_max_min_test.go",
+        "pkg/smtcore/theory_arith_epsilon.go",
+        "pkg/smtcore/theory_arith_epsilon_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -115366,7 +115380,8 @@
         "TestSMTNestedMixedCoefficientSortGuards",
         "TestSMTNonlinearClusterInequalityRowsScopedProofs",
         "TestSMTNonlinearNumericProgressAndScopedStrategies",
-        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
+        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
+        "TestSMTArithmeticSharedEpsilonPreservesDistinctValues"
       ],
       "conditionals": [
         {
@@ -115820,7 +115835,8 @@
         "The source default variable-order perturbation path is now retained: each eligible lower linear variable is promoted once above weights 0..7, UpdateOrder requeues equations with changed leading terms, and basis computation repeats. Equation-threshold exhaustion stops further rounds in the same search, is scoped, and resets in InitializeSearch. The optional derived-equation insertion path is excluded under the retained-consumer rule: a complete src scan finds m_nl_arith_gb_eqs only in its false constructor initializer, field declaration, diagnostic display and guarded call; updt_params does not expose a setter, and internalize_gb_eq/monomial2expr have no other callers.",
         "Nonlinear clusters now follow actual column/row incidence after simplex pivots, stopping expansion at fixed variables and pruning rows whose different base variable is free. Clustered canonical rows are sent to Grobner reasoning with their current bounds. Replay-only comparison columns use pinned local Real AST variables indexed by column; these polynomial-elimination aliases are released at the end of the call and never enter the SMT context or public model. Existing definition/opposite-bound seeds remain valid redundant equations. The replay tableau has no quasi-base row representation.",
         "The source four-way nonlinear strategy index is now scoped and resets at search initialization. Interval improvements derived from a branch-free tableau are retained as scoped theory-column bounds and strengthened on replay, including integer-feasibility replay; speculative branch bounds never justify global conflicts. The source nonlinear round limit covers repeated attempts. Numeric-only progress increments an internal search generation so the Go no-progress guard retries final checking without inventing Boolean atoms. Remaining driver work includes max/min bound discovery and assignment movement, full row-level nested checks and source resource/dependency refinements.",
-        "Nonlinear final checking now moves nonbase variables to bounds and runs the retained source max/min optimizer before the rotating strategies. Only exact unshared optimized results become scoped replay bounds; best-effort results are never promoted to logical facts. Changed unshared candidates must satisfy all products, active assertions and integrality. Shared assignment interface-equality adjustment, full row-level nested checks, irrational models and remaining source resource/dependency refinements are still incomplete."
+        "Nonlinear final checking now moves nonbase variables to bounds and runs the retained source max/min optimizer before the rotating strategies. Only exact unshared optimized results become scoped replay bounds; best-effort results are never promoted to logical facts. Changed unshared candidates must satisfy all products, active assertions and integrality. Shared assignment interface-equality adjustment, full row-level nested checks, irrational models and remaining source resource/dependency refinements are still incomplete.",
+        "Model epsilon refinement now preserves distinctions between shared real symbolic assignments before concrete rational model construction. The same deterministic refinement runs before nonlinear product validation and candidate completion, so model construction cannot silently change the epsilon on which a validated product depended. Integer branching uses the same computation and propagates errors. The focused regression reproduces the source 19/2 versus 10-epsilon collision, checks equality preservation, and inspects a returned UF/arithmetic model. The separate shared-equality assumption queue and assignment mutation paths remain incomplete."
       ]
     },
     {

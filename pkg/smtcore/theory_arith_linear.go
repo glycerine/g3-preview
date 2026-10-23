@@ -1930,7 +1930,9 @@ func (t *SMTLinearArithmeticTheory) InitializeModel(generator *SMTModelGenerator
 		}
 		return ast.ErrASTDomain
 	}
-	t.computeModelDelta()
+	if err = t.computeModelDelta(); err != nil {
+		return err
+	}
 	factory, err := protomodel.NewArithmeticFactory(state.manager)
 	if err != nil {
 		return err
@@ -1966,7 +1968,7 @@ func (t *SMTLinearArithmeticTheory) ModelValue(node *SMTEnode, generator *SMTMod
 	return NewSMTExpressionValueProcedure(numeral)
 }
 
-func (t *SMTLinearArithmeticTheory) computeModelDelta() {
+func (t *SMTLinearArithmeticTheory) computeModelDelta() error {
 	t.delta.SetInt64(1)
 	for variable := uint32(0); variable < t.solver.NumVariables(); variable++ {
 		value := t.solver.Value(variable)
@@ -2015,4 +2017,5 @@ func (t *SMTLinearArithmeticTheory) computeModelDelta() {
 			}
 		}
 	}
+	return t.refineModelDelta()
 }

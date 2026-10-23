@@ -11,8 +11,10 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-func (t *SMTLinearArithmeticTheory) nonlinearBranchTarget(bounds *simplex.Solver) (uint32, bool) {
-	t.computeModelDelta()
+func (t *SMTLinearArithmeticTheory) nonlinearBranchTarget(bounds *simplex.Solver) (uint32, bool, error) {
+	if err := t.computeModelDelta(); err != nil {
+		return 0, false, err
+	}
 	var target uint32
 	found, bounded := false, false
 	var bestRange big.Rat
@@ -51,7 +53,7 @@ func (t *SMTLinearArithmeticTheory) nonlinearBranchTarget(bounds *simplex.Solver
 			}
 		}
 	}
-	return target, found
+	return target, found, nil
 }
 
 func (t *SMTLinearArithmeticTheory) branchNonlinearIntegerVariable() (branched bool, result error) {
@@ -61,7 +63,10 @@ func (t *SMTLinearArithmeticTheory) branchNonlinearIntegerVariable() (branched b
 	if err != nil || status != lbool.True {
 		return false, err
 	}
-	column, found := t.nonlinearBranchTarget(bounds)
+	column, found, err := t.nonlinearBranchTarget(bounds)
+	if err != nil {
+		return false, err
+	}
 	if !found {
 		return false, nil
 	}

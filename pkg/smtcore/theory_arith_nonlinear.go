@@ -84,7 +84,9 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearMonomialAssignments() (bool, e
 	if len(t.nonlinearColumns) == 0 {
 		return true, nil
 	}
-	t.computeModelDelta()
+	if err := t.computeModelDelta(); err != nil {
+		return false, err
+	}
 	for _, column := range t.nonlinearColumns {
 		variable, found := t.theoryVariable(column)
 		if !found {
@@ -114,7 +116,9 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearMonomialAssignments() (bool, e
 // alone cannot justify SAT. Failure leaves the original tableau untouched so
 // the remaining nonlinear strategies can continue from it.
 func (t *SMTLinearArithmeticTheory) completeNonlinearCandidate() (bool, error) {
-	t.computeModelDelta()
+	if err := t.computeModelDelta(); err != nil {
+		return false, err
+	}
 	values := make(map[uint32]*big.Rat)
 	visiting := make(map[uint32]bool)
 	var evaluate func(uint32) (*big.Rat, error)
