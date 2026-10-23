@@ -117314,10 +117314,10 @@
           "tests": ["TestSMTSequenceTheoryConcreteWordDisequationConflict", "TestSMTSequenceTheoryReducedWordDisequationConflict", "TestSMTSequenceTheoryPropagatesResidualWordDisequality"]
         },
         {
-          "name": "fixed-length sequence disequality reduction to guarded indexed element disequalities using stable seq.nth witnesses (src/smt/theory_seq.cpp:1841-2013)",
+          "name": "fixed-length sequence disequality reduction to guarded indexed element disequalities using stable seq.nth witnesses, with non-sequence theory callbacks excluded before length construction (src/smt/theory_seq.cpp:1841-2013)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_disequality_fixed.go",
-          "tests": ["TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition"]
+          "tests": ["TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheoryUnresolvedNonContainsGivesUpCleanly"]
         },
         {
           "name": "false contains re-expansion and concrete substring conflict with assignment and equality dependencies (src/smt/theory_seq.cpp solve_nc/assign_eh retained concrete case)",

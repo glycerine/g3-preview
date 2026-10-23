@@ -23,19 +23,19 @@ func (t *SMTSequenceTheory) fixedDisequalityElements(expression ast.ASTHandle) (
 		truth, makeErr := state.manager.MkTrue()
 		return elements, truth, true, makeErr
 	}
-	count, exact, err := t.exactSequenceLength(expression)
-	if err != nil || !exact || count > smtSequenceMaximumFixedDecomposition {
-		return nil, ast.ASTHandle{}, false, err
-	}
 	sort, err := state.manager.GetSort(expression)
 	if err != nil {
 		return nil, ast.ASTHandle{}, false, err
 	}
 	elementSort, sequence, err := state.manager.SequenceSortElement(sort)
-	if err != nil || !sequence {
-		if err == nil {
-			err = ast.ErrASTDomain
-		}
+	if err != nil {
+		return nil, ast.ASTHandle{}, false, err
+	}
+	if !sequence {
+		return nil, ast.ASTHandle{}, false, nil
+	}
+	count, exact, err := t.exactSequenceLength(expression)
+	if err != nil || !exact || count > smtSequenceMaximumFixedDecomposition {
 		return nil, ast.ASTHandle{}, false, err
 	}
 	elements := make([]ast.ASTHandle, 0, int(count))

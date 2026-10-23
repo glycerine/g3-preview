@@ -894,7 +894,7 @@ func (t *SMTSequenceTheory) checkConcreteRelations() (bool, error) {
 func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	state, err := t.State()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence final state: %w", err)
 	}
 	propagateAxioms := func(reported bool) (bool, error) {
 		if !reported {
@@ -908,7 +908,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	}
 	progress, err := t.addIntegerStringLengthRefinement()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence integer-string length: %w", err)
 	}
 	if progress, err = propagateAxioms(progress); err != nil {
 		return SMTFinalCheckGiveUp, err
@@ -920,13 +920,13 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckGiveUp, err
 	}
 	if regexProgress, err = propagateAxioms(regexProgress); err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence regex propagation: %w", err)
 	} else if regexProgress {
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.addLengthLowerBoundDecomposition()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence length lower bound: %w", err)
 	}
 	if progress, err = propagateAxioms(progress); err != nil {
 		return SMTFinalCheckGiveUp, err
@@ -935,7 +935,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	}
 	progress, err = t.addFixedLengthDecomposition()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence fixed length: %w", err)
 	}
 	if progress, err = propagateAxioms(progress); err != nil {
 		return SMTFinalCheckGiveUp, err
@@ -944,7 +944,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	}
 	progress, err = t.addFixedLengthDisequalityReduction()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence fixed disequality: %w", err)
 	}
 	if progress, err = propagateAxioms(progress); err != nil {
 		return SMTFinalCheckGiveUp, err
@@ -953,49 +953,49 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	}
 	conflict, err := t.checkConcreteEquations()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence concrete equations: %w", err)
 	}
 	if conflict {
 		return SMTFinalCheckContinue, nil
 	}
 	conflict, err = t.checkConcreteRelations()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence concrete relations: %w", err)
 	}
 	if conflict {
 		return SMTFinalCheckContinue, nil
 	}
 	conflict, err = t.checkConcreteNonContains()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence concrete non-contains: %w", err)
 	}
 	if conflict {
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.solveWordEquations()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence word equations: %w", err)
 	}
 	if progress {
 		return SMTFinalCheckContinue, nil
 	}
 	conflict, err = t.checkConcreteDisequations()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence concrete disequations: %w", err)
 	}
 	if conflict {
 		return SMTFinalCheckContinue, nil
 	}
 	conflict, err = t.checkReducedDisequations()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence reduced disequations: %w", err)
 	}
 	if conflict {
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.checkSequenceExtensionality()
 	if err != nil {
-		return SMTFinalCheckGiveUp, err
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence extensionality: %w", err)
 	}
 	if progress {
 		return SMTFinalCheckContinue, nil

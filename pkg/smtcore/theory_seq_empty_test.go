@@ -363,6 +363,29 @@ func TestSMTSequenceTheoryConcreteNonContainsConflict(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryUnresolvedNonContainsGivesUpCleanly(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	literal, err := m.MkString("z")
+	astTestMust(t, err)
+	sort, err := m.GetSort(literal)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-unresolved-noncontains-x"), sort)
+	astTestMust(t, err)
+	contains, err := m.MkSequenceContains(x, literal)
+	astTestMust(t, err)
+	notContains, err := m.MkNot(contains)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(notContains))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.Undef || solver.kernel.lastFailure != SMTFailureTheory {
+		t.Fatal("unresolved non-containment boundary", status, solver.kernel.lastFailure)
+	}
+}
+
 func TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	a, err := m.MkString("a")
