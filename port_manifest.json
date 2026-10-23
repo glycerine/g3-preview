@@ -108476,6 +108476,7 @@
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
+        "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
@@ -108556,11 +108557,12 @@
           ]
         },
         {
-          "name": "search initialization, MBQI iteration limit, and cumulative counterexample bound growth",
+          "name": "search initialization, live parameter refresh, MBQI iteration limit, and cumulative counterexample bound growth",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_checker.go",
           "tests": [
-            "TestSMTModelCheckerFindsFiniteBooleanCounterexample"
+            "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
+            "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters"
           ]
         }
       ],
@@ -108582,6 +108584,7 @@
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
+        "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
       ],
@@ -108607,11 +108610,12 @@
           ]
         },
         {
-          "name": "model-check search initialization, iteration exhaustion, and counterexample-bound lifecycle",
+          "name": "model-check search initialization, live parameter refresh, iteration exhaustion, and counterexample-bound lifecycle",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_checker.go",
           "tests": [
-            "TestSMTModelCheckerFindsFiniteBooleanCounterexample"
+            "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
+            "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters"
           ]
         },
         {
@@ -109433,6 +109437,7 @@
         "TestSMTQuantifierManagerPropagatesAndScopesQueuedInstances",
         "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
         "TestSMTQuantifierManagerFiltersMBQIByQuantifierIDPrefix",
+        "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverInstallsQuantifierManagerAndEMatches",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
@@ -109512,11 +109517,12 @@
           ]
         },
         {
-          "name": "default plugin mbqi.id quantifier identifier-prefix filtering",
+          "name": "default plugin mbqi.id quantifier identifier-prefix filtering and live MBQI parameter refresh",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_quantifier_manager.go",
           "tests": [
-            "TestSMTQuantifierManagerFiltersMBQIByQuantifierIDPrefix"
+            "TestSMTQuantifierManagerFiltersMBQIByQuantifierIDPrefix",
+            "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters"
           ]
         },
         {
@@ -109552,6 +109558,7 @@
         "TestSMTQuantifierManagerPropagatesAndScopesQueuedInstances",
         "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
         "TestSMTQuantifierManagerFiltersMBQIByQuantifierIDPrefix",
+        "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverInstallsQuantifierManagerAndEMatches",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
@@ -109604,11 +109611,12 @@
           ]
         },
         {
-          "name": "concrete default quantifier plugin mbqi.id filtering interface",
+          "name": "concrete default quantifier plugin mbqi.id filtering and live update interface",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_quantifier_manager.go",
           "tests": [
-            "TestSMTQuantifierManagerFiltersMBQIByQuantifierIDPrefix"
+            "TestSMTQuantifierManagerFiltersMBQIByQuantifierIDPrefix",
+            "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters"
           ]
         },
         {

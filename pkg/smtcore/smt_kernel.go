@@ -317,6 +317,14 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err != nil {
 		return err
 	}
+	quantifiers, err := k.smtParams.QuantifierState()
+	if err != nil {
+		return err
+	}
+	mbqiID, err := quantifiers.MBQIId.String()
+	if err != nil {
+		return err
+	}
 	if err = k.internalizer.UpdateDynamicAck(dynamic); err != nil {
 		return err
 	}
@@ -327,6 +335,11 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	k.smtState = paramsState
 	k.arithState = arithmetic
 	k.bvState = bitVector
+	if k.internalizer.quantifierManager != nil {
+		if err = k.internalizer.quantifierManager.UpdateMBQI(quantifiers.MBQI, mbqiID, quantifiers.MaxCexs, quantifiers.MaxIterations); err != nil {
+			return err
+		}
+	}
 	for _, theory := range k.internalizer.theories {
 		if configurable, ok := theory.(interface{ ConfigureArithmetic(SMTArithState) error }); ok {
 			if err = configurable.ConfigureArithmetic(arithmetic); err != nil {

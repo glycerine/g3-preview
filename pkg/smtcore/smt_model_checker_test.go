@@ -72,7 +72,7 @@ func TestSMTModelCheckerFindsFiniteBooleanCounterexample(t *testing.T) {
 	if checker.iteration != 2 || checker.maxCexs != 3 {
 		t.Fatal("second model-check lifecycle", checker.iteration, checker.maxCexs)
 	}
-	astTestMust(t, checker.ConfigureLifecycle(0))
+	astTestMust(t, checker.ConfigureLifecycle(1, 0))
 	astTestMust(t, checker.InitSearch())
 	satisfied, err = checker.Check(proto, []ast.ASTHandle{quantifier})
 	astTestMust(t, err)

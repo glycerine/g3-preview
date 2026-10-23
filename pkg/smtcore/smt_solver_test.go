@@ -226,6 +226,9 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 	setDouble := func(name string, value float64) {
 		astTestMust(t, context.SetDoubleName(&local, &name, value))
 	}
+	setString := func(name, value string) {
+		astTestMust(t, context.SetStringName(&local, &name, &value))
+	}
 	setUInt("dack", 2)
 	setBool("dack.eq", true)
 	setDouble("dack.factor", 0.25)
@@ -233,6 +236,10 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 	setUInt("dack.gc", 23)
 	setDouble("dack.gc_inv_decay", 0.75)
 	setUInt("relevancy", 0)
+	setBool("mbqi", true)
+	setString("mbqi.id", "before.")
+	setUInt("mbqi.max_cexs", 2)
+	setUInt("mbqi.max_iterations", 3)
 
 	solver, err := NewSMTSolver(m, &local, "QF_UF", SMTSolverConfig{Params: context})
 	astTestMust(t, err)
@@ -244,6 +251,11 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 		manager.schedule.factor != 0.25 || manager.pairs.decay != 0.75 {
 		t.Fatal("constructor did not install SMT parameters", internalizer.binaryClauseOptimization, manager.strategy, manager.equalities,
 			manager.pairs.threshold, manager.triples.threshold, manager.schedule.gcEvery, manager.schedule.factor, manager.pairs.decay)
+	}
+	quantifiers := internalizer.quantifierManager
+	if quantifiers == nil || !quantifiers.mbqi || quantifiers.mbqiID != "before." || quantifiers.modelChecker == nil ||
+		quantifiers.modelChecker.initialMaxCexs != 2 || quantifiers.modelChecker.maxIterations != 3 {
+		t.Fatal("constructor did not install MBQI parameters")
 	}
 	maintenance := internalizer.clauseMaintenance
 	if maintenance != defaultSMTClauseMaintenanceConfig() || internalizer.lemmaGCThreshold != maintenance.Initial {
@@ -257,11 +269,23 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 	setUInt("dack.gc", 47)
 	setDouble("dack.gc_inv_decay", 0.5)
 	setUInt("relevancy", 2)
+	setBool("mbqi", false)
+	setString("mbqi.id", "after.")
+	setUInt("mbqi.max_cexs", 5)
+	setUInt("mbqi.max_iterations", 7)
 	astTestMust(t, solver.UpdateParams(&local))
 	if manager != internalizer.dynamicAck || !solver.kernel.relevancy.enabled || manager.strategy != dynAckDisabled || manager.equalities ||
 		manager.pairs.threshold != 11 || manager.triples.threshold != 11 || manager.schedule.gcEvery != 47 ||
 		manager.schedule.factor != 0.5 || manager.pairs.decay != 0.5 {
 		t.Fatal("parameter update replaced or failed to update dynamic-Ack state")
+	}
+	if quantifiers != internalizer.quantifierManager || quantifiers.mbqi || quantifiers.mbqiID != "after." || quantifiers.modelChecker != nil {
+		t.Fatal("parameter update failed to disable or update MBQI state")
+	}
+	setBool("mbqi", true)
+	astTestMust(t, solver.UpdateParams(&local))
+	if !quantifiers.mbqi || quantifiers.modelChecker == nil || quantifiers.modelChecker.initialMaxCexs != 5 || quantifiers.modelChecker.maxIterations != 7 {
+		t.Fatal("parameter update failed to recreate MBQI checker")
 	}
 }
 

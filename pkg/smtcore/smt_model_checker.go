@@ -50,10 +50,11 @@ func NewSMTModelChecker(state *SMTInternalizerState, maxCexs uint32) (*SMTModelC
 	}, nil
 }
 
-func (c *SMTModelChecker) ConfigureLifecycle(maxIterations uint32) error {
+func (c *SMTModelChecker) ConfigureLifecycle(maxCexs, maxIterations uint32) error {
 	if err := c.open(); err != nil {
 		return err
 	}
+	c.initialMaxCexs = maxCexs
 	c.maxIterations = maxIterations
 	return nil
 }

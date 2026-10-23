@@ -92,12 +92,40 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 		if err != nil {
 			return nil, errors.Join(err, substitute.Close())
 		}
-		if err = result.modelChecker.ConfigureLifecycle(config.MaxIterations); err != nil {
+		if err = result.modelChecker.ConfigureLifecycle(config.MaxCexs, config.MaxIterations); err != nil {
 			return nil, errors.Join(err, result.modelChecker.Close(), substitute.Close())
 		}
 	}
 	state.quantifierManager = result
 	return result, nil
+}
+
+func (q *SMTQuantifierManager) UpdateMBQI(enabled bool, identifier string, maxCexs, maxIterations uint32) error {
+	if err := q.open(); err != nil {
+		return err
+	}
+	if enabled && q.modelChecker == nil {
+		checker, err := NewSMTModelChecker(q.state, maxCexs)
+		if err != nil {
+			return err
+		}
+		if err = checker.ConfigureLifecycle(maxCexs, maxIterations); err != nil {
+			return errors.Join(err, checker.Close())
+		}
+		q.modelChecker = checker
+	} else if enabled {
+		if err := q.modelChecker.ConfigureLifecycle(maxCexs, maxIterations); err != nil {
+			return err
+		}
+	} else if q.modelChecker != nil {
+		if err := q.modelChecker.Close(); err != nil {
+			return err
+		}
+		q.modelChecker = nil
+	}
+	q.mbqi = enabled
+	q.mbqiID = identifier
+	return nil
 }
 
 func (q *SMTQuantifierManager) open() error {
