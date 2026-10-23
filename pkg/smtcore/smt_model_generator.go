@@ -205,6 +205,11 @@ func (g *SMTModelGenerator) discoverValueProcedures(state *SMTInternalizerState)
 			}
 		}
 	}
+	// Reserve existing values after theory factories initialize and before
+	// any fallback procedure requests a fresh value (source mk_model order).
+	if err := g.registerExistingModelValues(state); err != nil {
+		return nil, nil, err
+	}
 	booleanSort, err := g.manager.MkBoolSort()
 	if err != nil {
 		return nil, nil, err
@@ -289,9 +294,6 @@ func (g *SMTModelGenerator) discoverValueProcedures(state *SMTInternalizerState)
 func (g *SMTModelGenerator) BuildStateValues(state *SMTInternalizerState) error {
 	roots, procedures, err := g.discoverValueProcedures(state)
 	if err != nil {
-		return err
-	}
-	if err = g.registerExistingModelValues(state); err != nil {
 		return err
 	}
 	if err = g.BuildValues(roots, procedures); err != nil {

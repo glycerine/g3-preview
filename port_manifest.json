@@ -109864,7 +109864,8 @@
         "pkg/smtcore/smt_model_publication_test.go",
         "pkg/smtcore/smt_asserted_macros.go",
         "pkg/smtcore/smt_asserted_macros_test.go",
-        "pkg/smtcore/smt_asserted_quasi_macros_test.go"
+        "pkg/smtcore/smt_asserted_quasi_macros_test.go",
+        "pkg/smtcore/smt_model_reservation_regression_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -109880,7 +109881,8 @@
         "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
         "TestSMTAssertedMacroExpansionPreservesUnsatProof",
         "TestSMTAssertedMacroPublishesPermutedArguments",
-        "TestSMTAssertedQuasiMacrosPublishConditionalModel"
+        "TestSMTAssertedQuasiMacrosPublishConditionalModel",
+        "TestSMTModelGeneratorReservesExistingValuesBeforeFreshAllocation"
       ],
       "assertions": [
         {
@@ -110038,11 +110040,22 @@
           "name": "register_macros: normalized asserted-formula macro interpretations after theory finalization and before model-finder adjustment (src/smt/smt_model_generator.cpp:510-532)",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_macros.go",
-          "tests": ["TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels", "TestSMTAssertedMacroPublishesPermutedArguments"]
+          "tests": [
+            "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
+            "TestSMTAssertedMacroPublishesPermutedArguments"
+          ]
         },
         {
           "name": "remaining model-assembly completeness audit (src/smt/smt_model_generator.cpp)",
           "status": "unported"
+        },
+        {
+          "name": "mk_model ordering: initialize theory factories, register all relevant existing model values, then discover value procedures and allocate fresh fallback values independently of enode insertion order",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "tests": [
+            "TestSMTModelGeneratorReservesExistingValuesBeforeFreshAllocation"
+          ]
         }
       ],
       "ownership": [
@@ -110064,7 +110077,8 @@
         "pkg/smtcore/smt_model_value_test.go",
         "pkg/smtcore/smt_asserted_macros.go",
         "pkg/smtcore/smt_asserted_macros_test.go",
-        "pkg/smtcore/smt_asserted_quasi_macros_test.go"
+        "pkg/smtcore/smt_asserted_quasi_macros_test.go",
+        "pkg/smtcore/smt_model_reservation_regression_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -110081,7 +110095,8 @@
         "TestSMTAssertedMacrosCommittedDeclarationsAndScopeRollback",
         "TestSMTAssertedMacroExpansionPreservesUnsatProof",
         "TestSMTAssertedMacroPublishesPermutedArguments",
-        "TestSMTAssertedQuasiMacrosPublishConditionalModel"
+        "TestSMTAssertedQuasiMacrosPublishConditionalModel",
+        "TestSMTModelGeneratorReservesExistingValuesBeforeFreshAllocation"
       ],
       "conditionals": [
         {
@@ -110146,11 +110161,22 @@
           "name": "asserted-formula macro interpretations and ordered model-assembly registration",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_macros.go",
-          "tests": ["TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels", "TestSMTAssertedMacroPublishesPermutedArguments"]
+          "tests": [
+            "TestSMTAssertedMacrosExpandAcrossScopesAndPublishModels",
+            "TestSMTAssertedMacroPublishesPermutedArguments"
+          ]
         },
         {
           "name": "Hidden declarations and remaining model construction audit (remaining src/smt/smt_model_generator.h:177-232)",
           "status": "unported"
+        },
+        {
+          "name": "mk_model ordering: initialize theory factories, register all relevant existing model values, then discover value procedures and allocate fresh fallback values independently of enode insertion order",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "tests": [
+            "TestSMTModelGeneratorReservesExistingValuesBeforeFreshAllocation"
+          ]
         }
       ],
       "ownership": [
