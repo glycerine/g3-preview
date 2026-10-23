@@ -109,9 +109,9 @@ type smtLinearArithmeticStatistics struct {
 }
 
 // SMTLinearArithmeticTheory is the rational linear specialization of the
-// source arithmetic theory. Each comparison gets a tableau row for its linear
-// polynomial; Boolean assignments select its lower or upper infinitesimal
-// bound. The tableau is replayed after scope pops because math/simplex owns no
+// source arithmetic theory. Comparisons of the same linear polynomial share
+// a tableau row; Boolean assignments tighten its lower or upper infinitesimal
+// bounds. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
 	gcdEnabled, ignoreIntegers           bool

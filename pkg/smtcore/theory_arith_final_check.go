@@ -30,6 +30,25 @@ func (t *SMTLinearArithmeticTheory) finalCheckIntegerFeasibility() (SMTFinalChec
 			} else if conflict {
 				return SMTFinalCheckContinue, t.arithmeticGCDConflict()
 			}
+			if err = bounds.RemoveArithmeticFixedBases(); err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			integers := t.arithmeticIntegerMask()
+			if _, err = bounds.PatchArithmeticIntegerValues(integers); err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			bounds.FixArithmeticIntegerNonBases(integers)
+			status, err = bounds.MakeFeasible()
+			if err != nil || status == lbool.Undef {
+				return SMTFinalCheckGiveUp, err
+			}
+			if status == lbool.False {
+				return SMTFinalCheckContinue, t.derivedBoundConflict()
+			}
+			t.solver = bounds
+			if _, _, fractional := t.fractionalVariable(bounds); !fractional {
+				return SMTFinalCheckDone, nil
+			}
 			var nodes uint32
 			status, err = t.integerFeasible(nil, &nodes)
 			if err != nil {

@@ -115145,7 +115145,10 @@
         "pkg/smtcore/theory_arith_gcd.go",
         "pkg/smtcore/theory_arith_gcd_test.go",
         "pkg/smtcore/theory_arith_gcd_mixed_test.go",
-        "pkg/smtcore/theory_arith_final_check.go"
+        "pkg/smtcore/theory_arith_final_check.go",
+        "pkg/math/simplex/arith_integer_patch.go",
+        "pkg/math/simplex/arith_integer_patch_test.go",
+        "pkg/smtcore/theory_arith_integer_patch_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
@@ -115159,7 +115162,11 @@
         "TestArithmeticGCDUsesFixedBoundsAndSkipsNonfixedReals",
         "TestArithmeticExtendedGCDPositiveAndNegativeIntervals",
         "TestSMTIntegerGCDAndExtendedGCDScopedProofs",
-        "TestSMTMixedGCDWithFixedFractionalReal"
+        "TestSMTMixedGCDWithFixedFractionalReal",
+        "TestArithmeticIntegerPatchRespectsLCMAndOpenBounds",
+        "TestArithmeticIntegerPatchMixedAndNegativeInfinitesimal",
+        "TestArithmeticIntegerPatchChoosesSourceEndpoints",
+        "TestSMTIntegerFreedomPatchingScopedModels"
       ],
       "conditionals": [
         {
@@ -115381,13 +115388,43 @@
         {
           "name": "eager and adaptive GCD scheduling is unreachable in retained C++: m_arith_eager_gcd and m_arith_adaptive_gcd are constructor-false fields with no retained setters or assignments",
           "status": "dead_deleted"
+        },
+        {
+          "name": "patch_int_infeasible_vars: round freedom endpoints and normalized integer coefficient LCM multiples, skip empty integer intervals and already compatible rational components, and choose lower, upper or zero assignments",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/arith_integer_patch.go",
+          "tests": [
+            "TestArithmeticIntegerPatchRespectsLCMAndOpenBounds",
+            "TestArithmeticIntegerPatchMixedAndNegativeInfinitesimal",
+            "TestArithmeticIntegerPatchChoosesSourceEndpoints"
+          ]
+        },
+        {
+          "name": "fix_non_base_vars: floor only nonintegral integer nonbases, preserve real columns, and recheck feasibility before accepting the patched model",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/arith_integer_patch.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_integer_patch_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestArithmeticIntegerPatchMixedAndNegativeInfinitesimal",
+            "TestSMTIntegerFreedomPatchingScopedModels",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "max_min_infeasible_int_vars has no retained caller: its only call is inside the #if 0 block in check_int_feasibility at theory_arith_int.h:1373-1382",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
         "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification."
       ],
       "deviations": [
-        "The source deferred GCD and extended GCD checks now run before integer branch-and-bound and inside each branch replay. Canonical rows clear denominators after normalizing the basic coefficient, eliminate fixed columns using their bounds rather than possibly stale assignment values, and skip nonfixed real columns. Extended checks round the bounded least-coefficient interval against the remaining coefficient GCD, including negative intervals. Global conflicts come only from unconditional replay and preserve the gcd-test proof parameter; speculative branch failures remain local. Proof regressions inspect the actual proof DAG for that parameter. Explanations conservatively include all active arithmetic assertion literals instead of source minimal fixed/bound dependencies. The concrete Go API skips fixed epsilon-valued columns, guarding the source invariant that fixed values are rational. IgnoreInt now yields give-up for unresolved integer feasibility. Eager/adaptive paths are excluded under the retained-consumer rule: src scans find only false constructor initializers, field declarations, display/read sites, and no setter assignments. Full source integer patching, Gomory cuts and remaining feasibility algorithms are still incomplete."
+        "The source deferred GCD and extended GCD checks now run before integer branch-and-bound and inside each branch replay. Canonical rows clear denominators after normalizing the basic coefficient, eliminate fixed columns using their bounds rather than possibly stale assignment values, and skip nonfixed real columns. Extended checks round the bounded least-coefficient interval against the remaining coefficient GCD, including negative intervals. Global conflicts come only from unconditional replay and preserve the gcd-test proof parameter; speculative branch failures remain local. Proof regressions inspect the actual proof DAG for that parameter. Explanations conservatively include all active arithmetic assertion literals instead of source minimal fixed/bound dependencies. The concrete Go API skips fixed epsilon-valued columns, guarding the source invariant that fixed values are rational. IgnoreInt now yields give-up for unresolved integer feasibility. Eager/adaptive paths are excluded under the retained-consumer rule: src scans find only false constructor initializers, field declarations, display/read sites, and no setter assignments. Full source integer patching, Gomory cuts and remaining feasibility algorithms are still incomplete.",
+        "The live integer-feasibility path now removes fixed variables from the basis, patches integer-infeasible values using source freedom intervals and denominator LCMs, floors remaining integer nonbases, and runs MakeFeasible. Patching starts from an unconditional replay, so any conflict has logical assertion premises; no speculative branch bounds become global facts. Integral patched models are published and pass through the existing staged conservative validation. Mixed real intervals without integer points remain unchanged. Focused scoped model tests verify an initially fractional 2*x=y tableau with 1<=y<=3 is solved without branch-and-bound, with proofs enabled or disabled and with unrestricted fractional Real columns. The existing bounded internal branching fallback remains for models that patching cannot repair; source integer case-split selection, Gomory cuts and the retained Euclidean bridge still require further porting. The unused max_min_infeasible_int_vars path is excluded because its sole caller is compile-time disabled."
       ]
     },
     {
