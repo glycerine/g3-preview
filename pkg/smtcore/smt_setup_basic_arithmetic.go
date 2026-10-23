@@ -40,7 +40,7 @@ func (k *SMTKernel) setupBasicArithmetic() (result error) {
 		if existing, ok := k.internalizer.theories[family].(*SMTLinearArithmeticTheory); ok {
 			// Direct internalizer clients may have already created columns.
 			// Their concrete specialization must remain stable thereafter.
-			if existing.NumVariables() == 0 {
+			if existing.NumVariables() == 0 && !k.copiedArithmeticPlugin {
 				existing.integer, existing.mixed = false, true
 			}
 			return nil

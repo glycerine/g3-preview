@@ -106322,7 +106322,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_utvpi_lifecycle.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/theory_utvpi_lifecycle_test.go",
         "pkg/smtcore/smt_setup_difference.go",
         "pkg/smtcore/smt_boolean_activity.go",
@@ -106352,6 +106353,9 @@
         "pkg/smtcore/theory_arith_assume_eq_test.go"
       ],
       "tests": [
+        "TestSMTArithmeticTranslationBeforeSetupUsesDestinationSelection",
+        "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+        "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
         "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState",
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
@@ -107308,9 +107312,21 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_arithmetic_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+            "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner"
+          ]
+        },
+        {
           "name": "Retained UTVPI mk_fresh/copy_plugins path: preserve installed arithmetic type across destination modes, construct independent paired graph and equality adapter, then replay translated assertions and models",
           "status": "partial",
-          "go_target": "pkg/smtcore/theory_utvpi_lifecycle.go",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
           "go_targets": [
             "pkg/smtcore/smt_solver.go",
             "pkg/smtcore/smt_setup_difference.go",
@@ -107500,6 +107516,9 @@
         "Search reads the quantifier manager-owned acceptedModel at the ground completion boundary. A checked candidate transfers through the existing generated-model path; an unchecked candidate cannot publish a SAT result."
       ],
       "deviations": [
+        "Fresh-plugin copying is gated on actual source setup. Go constructor arithmetic placeholders are not native installed plugins before the first push/check; copying before setup leaves destination mode selection active. A dedicated regression verifies an unconfigured UTVPI-mode source translated to a dense-mode destination while preserving independent source UTVPI setup.",
+        "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
+        "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",
         "Structural subsumption remains unported.",
         "Go creates interpreted true/false enodes on first term use rather than during context initialization. Assigned Boolean terms merge with those truth-value classes, including when their enodes are created after assignment; conflict antecedent lookup retains the actual assigned polarity.",
@@ -113270,7 +113289,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_utvpi_lifecycle.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/theory_utvpi_lifecycle_test.go",
         "pkg/smtcore/smt_setup_difference.go",
         "pkg/smtcore/smt_solver.go",
@@ -113279,6 +113299,9 @@
         "pkg/smtcore/smt_dyn_ack_manager.go"
       ],
       "tests": [
+        "TestSMTArithmeticTranslationBeforeSetupUsesDestinationSelection",
+        "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+        "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
         "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState",
         "TestSMTSolverKernelFacadeAssertionsScopesAndResults",
         "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
@@ -113317,9 +113340,21 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_arithmetic_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+            "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner"
+          ]
+        },
+        {
           "name": "Retained UTVPI mk_fresh/copy_plugins path: preserve installed arithmetic type across destination modes, construct independent paired graph and equality adapter, then replay translated assertions and models",
           "status": "partial",
-          "go_target": "pkg/smtcore/theory_utvpi_lifecycle.go",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
           "go_targets": [
             "pkg/smtcore/smt_solver.go",
             "pkg/smtcore/smt_setup_difference.go",
@@ -113405,7 +113440,7 @@
         ]
       },
       {
-        "name": "registered concrete theory-plugin copying during translation: UTVPI is preserved; other retained concrete types remain incomplete",
+        "name": "registered concrete theory-plugin copying during translation: retained arithmetic types are preserved; other theory families remain incomplete",
         "status": "partial",
         "go_target": "pkg/smtcore/smt_solver.go",
         "tests": ["TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState"]
@@ -113430,9 +113465,12 @@
         "SMTSolver owns its SMTKernel, named-assertion adapter, current check result, copied parameter reference, and retained tracked-formula references; it borrows the AST manager, parameter context, quantifier registry, and progress callback."
       ],
       "deviations": [
+        "Fresh-plugin copying is gated on actual source setup. Go constructor arithmetic placeholders are not native installed plugins before the first push/check; copying before setup leaves destination mode selection active. A dedicated regression verifies an unconfigured UTVPI-mode source translated to a dense-mode destination while preserving independent source UTVPI setup.",
+        "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
+        "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",
         "Unavailable kernel result facilities return empty ordinary result fields or an explicit domain error; they are not simulated by a universal adapter.",
-        "Cross-manager translation obtains manager-bound parameter and quantifier services through TargetConfig and preserves the source's duplicate named-implication assertion after copying kernel formulas. The earlier claim that reconstruction from destination settings replaces retained plugin copying was incorrect: an installed concrete source plugin survives destination setup, even when the destination arithmetic mode differs. UTVPI now preserves this behavior; the other retained plugin types remain incomplete, so this unit is partial. The source MUS branch is unreachable because m_minimizing_core is initialized false and is set true only inside that branch; the live pattern-extension policies are ported."
+        "Cross-manager translation obtains manager-bound parameter and quantifier services through TargetConfig and preserves the source's duplicate named-implication assertion after copying kernel formulas. The earlier claim that reconstruction from destination settings replaces retained plugin copying was incorrect: an installed concrete source plugin survives destination setup, even when the destination arithmetic mode differs. Retained arithmetic types now preserve this behavior; other theory families remain incomplete, so this unit is partial. The source MUS branch is unreachable because m_minimizing_core is initialized false and is set true only inside that branch; the live pattern-extension policies are ported."
       ]
     },
     {
@@ -114455,6 +114493,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
         "pkg/smtcore/theory_arith_equality_bounds.go",
         "pkg/smtcore/theory_arith_equality_bounds_test.go",
         "pkg/smtcore/theory_arith_bound_dependency.go",
@@ -114467,6 +114507,8 @@
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+        "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
         "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
         "TestSMTArithmeticMixedPremiseAccumulation",
         "TestArithmeticRowConflictPreservesEqualityPremises",
@@ -114608,6 +114650,18 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_arithmetic_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+            "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner"
+          ]
+        },
+        {
           "name": "new_eq_eh EqBounds: native numeral endpoints or a zero-valued difference term; scoped queueing without auxiliary Boolean atoms, equality-aware linear/nonlinear explanations, Farkas coefficients and context conflicts",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_equality_bounds.go",
@@ -114683,6 +114737,8 @@
         "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate."
       ],
       "deviations": [
+        "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
+        "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial."
       ]
     },
@@ -114692,6 +114748,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
         "pkg/smtcore/theory_arith_equality_bounds.go",
         "pkg/smtcore/theory_arith_equality_bounds_test.go",
         "pkg/math/simplex/bound_equality_dependency_test.go",
@@ -114723,6 +114781,8 @@
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+        "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
         "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
         "TestSMTArithmeticMixedPremiseAccumulation",
         "TestArithmeticRowConflictPreservesEqualityPremises",
@@ -115138,6 +115198,18 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_arithmetic_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+            "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner"
+          ]
+        },
+        {
           "name": "new_eq_eh EqBounds: native numeral endpoints or a zero-valued difference term; scoped queueing without auxiliary Boolean atoms, equality-aware linear/nonlinear explanations, Farkas coefficients and context conflicts",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_equality_bounds.go",
@@ -115307,6 +115379,8 @@
         "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop."
       ],
       "deviations": [
+        "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
+        "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
         "The retained nonlinear max/min path uses a temporary canonical objective row, removed on return, with raw matrix pivot coefficients normalized for source gain formulas. Integer-column gain and sharing guards are retained. The maintain_integrality=true optimization-engine path remains unported; this is not a claim to complete optimization support.",
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
@@ -119667,6 +119741,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
         "pkg/smtcore/smt_dense_diff_matrix.go",
         "pkg/smtcore/smt_dense_diff_matrix_test.go",
         "pkg/smtcore/theory_dense_diff_logic.go",
@@ -119677,6 +119753,8 @@
         "pkg/smtcore/smt_setup_ufidl_test.go"
       ],
       "tests": [
+        "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+        "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
         "TestSMTDenseDifferenceClosureExplanationsAndRollback",
         "TestSMTDenseTheoryPropagationConflictAndScope",
         "TestSMTIDLDenseFeaturePolicyAndProofRouting",
@@ -119690,6 +119768,18 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_arithmetic_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+            "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner"
+          ]
+        },
         {
           "name": "concrete infinitesimal-rational dense matrix: self-edge sentinel and variable growth, add_edge reverse-cycle check, update_cells forward-target set and incremental all-pairs closure, source-edge antecedents, deep-owned cell trails, scope rollback and provisional init_model assignments",
           "status": "ported",
@@ -119759,6 +119849,8 @@
         "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
       ],
       "deviations": [
+        "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
+        "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
         "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
@@ -119770,6 +119862,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
         "pkg/smtcore/smt_dense_diff_matrix.go",
         "pkg/smtcore/smt_dense_diff_matrix_test.go",
         "pkg/smtcore/theory_dense_diff_logic.go",
@@ -119780,6 +119874,8 @@
         "pkg/smtcore/smt_setup_ufidl_test.go"
       ],
       "tests": [
+        "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+        "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
         "TestSMTDenseDifferenceClosureExplanationsAndRollback",
         "TestSMTDenseTheoryPropagationConflictAndScope",
         "TestSMTIDLDenseFeaturePolicyAndProofRouting",
@@ -119818,6 +119914,18 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_arithmetic_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+            "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner"
+          ]
+        },
+        {
           "name": "concrete infinitesimal-rational dense matrix: self-edge sentinel and variable growth, add_edge reverse-cycle check, update_cells forward-target set and incremental all-pairs closure, source-edge antecedents, deep-owned cell trails, scope rollback and provisional init_model assignments",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_dense_diff_matrix.go",
@@ -119886,6 +119994,8 @@
         "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
       ],
       "deviations": [
+        "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
+        "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
         "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
@@ -120144,6 +120254,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
         "pkg/smtcore/smt_setup_basic_arithmetic.go",
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/cmd/g3/main_test.go",
@@ -120151,6 +120263,8 @@
         "pkg/smtcore/theory_diff_logic_real.go"
       ],
       "tests": [
+        "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+        "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
         "TestSMTBasicArithmeticModesBeforeFirstBoundary",
         "TestSMTBasicArithmeticSeesPreSetupParameterUpdate",
         "TestSMTLibRunnerScripts",
@@ -120161,6 +120275,18 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_arithmetic_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+            "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner"
+          ]
+        },
         {
           "name": "Basic setup_arith modes 0/1/2/3 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex or dense matrix; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
           "status": "partial",
@@ -120196,6 +120322,8 @@
         "Go uses separate concrete theory types for retained integer and real instantiations; each owns its graph and scoped assertion state."
       ],
       "deviations": [
+        "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
+        "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "Explicit basic arithmetic modes 0/1/2/3 now select the retained backend at the first boundary. Mixed graph integer complements subtract one, real complements subtract epsilon, and Int model values are checked before publication. C++ rejects the observed mixed candidate with a fractional Int value; Go reports UNKNOWN before constructing that invalid numeral. Six exact mode/model/scope scripts bring strict C++ comparisons to 112. UTVPI, AS_OPTINF, other basic plugin routing and full unknown-logic automatic classification remain incomplete.",
         "The retained consumers select arbitrary-precision integer and real difference logic. Unreached small-integer template variants and unrelated simplex explicit instantiations are not represented by universal adapters."
       ]
@@ -120206,6 +120334,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
         "pkg/smtcore/smt_setup_basic_arithmetic.go",
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/cmd/g3/main_test.go",
@@ -120215,6 +120345,8 @@
         "pkg/smtcore/theory_diff_logic_real_test.go"
       ],
       "tests": [
+        "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+        "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
         "TestSMTBasicArithmeticModesBeforeFirstBoundary",
         "TestSMTBasicArithmeticSeesPreSetupParameterUpdate",
         "TestSMTLibRunnerScripts",
@@ -120247,6 +120379,18 @@
       "methods_audited": false,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_arithmetic_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+            "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner"
+          ]
+        },
         {
           "name": "Basic setup_arith modes 0/1/2/3 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex or dense matrix; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
           "status": "partial",
@@ -120301,6 +120445,8 @@
         "Each theory owns its concrete rational or infinitesimal-rational graph, atom and assertion slices, Boolean-variable index map, and scope snapshots. It borrows the initialized SMTInternalizerState and enodes through SMTTheoryBase; graph explanations borrow immutable SMTLiteral values."
       ],
       "deviations": [
+        "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
+        "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "Explicit basic arithmetic modes 0/1/2/3 now select the retained backend at the first boundary. Mixed graph integer complements subtract one, real complements subtract epsilon, and Int model values are checked before publication. C++ rejects the observed mixed candidate with a fractional Int value; Go reports UNKNOWN before constructing that invalid numeral. Six exact mode/model/scope scripts bring strict C++ comparisons to 112. UTVPI, AS_OPTINF, other basic plugin routing and full unknown-logic automatic classification remain incomplete.",
         "The retained arbitrary-precision integer and real instantiations are present. Go slices and maps replace source vectors and u_map, and unsupported arithmetic is recorded for a give-up final check. Both specializations share only arithmetic syntax decomposition; their graph and search state remain concrete and separate."
       ]
@@ -120640,9 +120786,13 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
         "pkg/smtcore/theory_dummy.go"
       ],
       "tests": [
+        "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+        "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
         "TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh"
       ],
       "methods_audited": true,
@@ -120689,6 +120839,18 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_arithmetic_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+            "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner"
+          ]
+        },
+        {
           "name": "dummy-theory interface, fresh construction, model refusal and empty display",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_dummy.go",
@@ -120701,6 +120863,8 @@
         "Fresh returns an independent uninitialized dummy owner with the same copied name and borrowed family identifier."
       ],
       "deviations": [
+        "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
+        "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "The source empty display has no retained Go output call and is represented by the absence of display state."
       ]
     },
@@ -123467,7 +123631,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_utvpi_lifecycle.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/theory_utvpi_lifecycle_test.go",
         "pkg/smtcore/smt_setup_difference.go",
         "pkg/smtcore/theory_utvpi.go",
@@ -123598,7 +123762,7 @@
         {
           "name": "Retained UTVPI mk_fresh/copy_plugins path: preserve installed arithmetic type across destination modes, construct independent paired graph and equality adapter, then replay translated assertions and models",
           "status": "ported",
-          "go_target": "pkg/smtcore/theory_utvpi_lifecycle.go",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
           "go_targets": [
             "pkg/smtcore/smt_solver.go",
             "pkg/smtcore/smt_setup_difference.go",
@@ -123721,7 +123885,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_utvpi_lifecycle.go",
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/theory_utvpi_lifecycle_test.go",
         "pkg/smtcore/smt_setup_difference.go",
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
@@ -123885,7 +124049,7 @@
         {
           "name": "Retained UTVPI mk_fresh/copy_plugins path: preserve installed arithmetic type across destination modes, construct independent paired graph and equality adapter, then replay translated assertions and models",
           "status": "ported",
-          "go_target": "pkg/smtcore/theory_utvpi_lifecycle.go",
+          "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
           "go_targets": [
             "pkg/smtcore/smt_solver.go",
             "pkg/smtcore/smt_setup_difference.go",

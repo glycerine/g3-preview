@@ -62,7 +62,7 @@ func (k *SMTKernel) setupIntegerDifferencePolicy(useStaticFeatures bool) (result
 		if err != nil {
 			return err
 		}
-		if proofs {
+		if proofs && !k.copiedArithmeticPlugin {
 			family, err := k.manager.ArithmeticFamilyID()
 			if err != nil {
 				return err
@@ -252,7 +252,7 @@ func (k *SMTKernel) setupUFIntegerDifferencePolicy(useStaticFeatures bool) (resu
 		if err != nil {
 			return err
 		}
-		if proofs {
+		if proofs && !k.copiedArithmeticPlugin {
 			family, err := k.manager.ArithmeticFamilyID()
 			if err != nil {
 				return err

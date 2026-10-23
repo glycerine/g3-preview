@@ -74,6 +74,8 @@ type SMTKernel struct {
 	preprocessingSetupDone bool
 	setupLogic             string
 	copiedArithmeticPlugin bool
+	copiedArithmeticOwner  *SMTArithParams
+	copiedArithmeticConfig SMTArithState
 }
 
 func (k *SMTKernel) readPreprocessorState(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) (state SMTPreprocessorState, result error) {
@@ -425,12 +427,10 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 		// Source qi_queue caches its eager threshold and parsed cost/new-gen
 		// functions in the constructor; those remain unchanged on updates.
 	}
+	if err = k.configureArithmeticTheories(arithmetic); err != nil {
+		return err
+	}
 	for _, theory := range k.internalizer.theories {
-		if configurable, ok := theory.(interface{ ConfigureArithmetic(SMTArithState) error }); ok {
-			if err = configurable.ConfigureArithmetic(arithmetic); err != nil {
-				return err
-			}
-		}
 		if configurable, ok := theory.(interface{ ConfigureBitVector(SMTBVState) error }); ok {
 			if err = configurable.ConfigureBitVector(bitVector); err != nil {
 				return err
@@ -497,7 +497,11 @@ func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 		}
 	}
 	if configurable, ok := theory.(interface{ ConfigureArithmetic(SMTArithState) error }); ok {
-		if err := configurable.ConfigureArithmetic(k.arithState); err != nil {
+		config := k.arithState
+		if k.copiedArithmeticOwner != nil {
+			config = k.copiedArithmeticOwner.state
+		}
+		if err := configurable.ConfigureArithmetic(config); err != nil {
 			return err
 		}
 	}
@@ -673,6 +677,11 @@ func (k *SMTKernel) Push() error {
 	if err := k.open(); err != nil {
 		return err
 	}
+	if k.copiedArithmeticOwner != nil {
+		if err := k.configureArithmeticTheories(k.arithState); err != nil {
+			return err
+		}
+	}
 	if err := k.setupAssertedBounds(false); err != nil {
 		return err
 	}
@@ -754,6 +763,11 @@ func (k *SMTKernel) ScopeLevel() uint32 {
 func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 	if err := k.open(); err != nil {
 		return nil, err
+	}
+	if k.copiedArithmeticOwner != nil {
+		if err := k.configureArithmeticTheories(k.arithState); err != nil {
+			return nil, err
+		}
 	}
 	if err := k.setupAssertedBounds(true); err != nil {
 		return nil, fmt.Errorf("smt kernel configure asserted bounds: %w", err)

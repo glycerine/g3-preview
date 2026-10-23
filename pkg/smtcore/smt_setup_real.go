@@ -46,12 +46,8 @@ func (k *SMTKernel) applyArithmeticSetup(smt SMTParamsState, arithmetic SMTArith
 	if err := k.internalizer.configureBooleanHeuristics(smt); err != nil {
 		return err
 	}
-	for _, theory := range k.internalizer.theoryOrder {
-		if configurable, ok := theory.(interface{ ConfigureArithmetic(SMTArithState) error }); ok {
-			if err := configurable.ConfigureArithmetic(arithmetic); err != nil {
-				return err
-			}
-		}
+	if err := k.configureArithmeticTheories(arithmetic); err != nil {
+		return err
 	}
 	k.assertedPhaseReady = false
 	return k.setAssertedEliminateAnd(false)

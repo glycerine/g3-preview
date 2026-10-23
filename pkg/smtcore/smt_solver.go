@@ -783,17 +783,10 @@ func (s *SMTSolver) Translate(manager *ast.ASTManager, params *uparams.ParamsRef
 	if err != nil {
 		return nil, err
 	}
-	// context::copy_plugins creates fresh instances of installed plugins.
-	// The retained UTVPI instance has constructor-owned arithmetic defaults;
-	// destination setup must preserve it even when params selects another mode.
-	for _, theory := range s.kernel.internalizer.theoryOrder {
-		if _, ok := theory.(*SMTUTVPITheory); !ok {
-			continue
-		}
-		if err = next.kernel.copyUTVPIPlugin(); err != nil {
-			return nil, errors.Join(err, next.Close())
-		}
-		break
+	// context::copy_plugins preserves concrete arithmetic types, with fresh
+	// solver data and the parameter owner chosen by each mk_fresh constructor.
+	if err = next.kernel.copyArithmeticPlugin(s.kernel); err != nil {
+		return nil, errors.Join(err, next.Close())
 	}
 	if err = next.SetProduceModels(s.produceModels); err != nil {
 		_ = next.Close()
