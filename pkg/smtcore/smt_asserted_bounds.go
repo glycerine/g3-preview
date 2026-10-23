@@ -30,6 +30,9 @@ func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 	if err := k.setupRealDifferencePolicy(useStaticFeatures); err != nil {
 		return err
 	}
+	if err := k.setupUFIntegerDifferencePolicy(useStaticFeatures); err != nil {
+		return err
+	}
 	if err := k.setupIntegerLogicPolicy(useStaticFeatures); err != nil {
 		return err
 	}

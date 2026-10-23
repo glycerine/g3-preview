@@ -195,3 +195,66 @@ func (k *SMTKernel) setupRealDifferencePolicy(useStaticFeatures bool) (result er
 	}
 	return k.applyArithmeticSetup(smt, arithmetic, preprocess)
 }
+
+// Unlike IDL and RDL, the static UFIDL source overload only rejects real
+// arithmetic; it does not validate the difference-term counters.
+func (k *SMTKernel) setupUFIntegerDifferencePolicy(useStaticFeatures bool) (result error) {
+	if k.setupLogic != "QF_UFIDL" {
+		return nil
+	}
+	features, err := k.setupStaticFeatures(useStaticFeatures)
+	if err != nil {
+		return err
+	}
+	if features != nil {
+		defer func() { result = errors.Join(result, features.Close()) }()
+		if features.HasReal {
+			return fmt.Errorf("Benchmark has real variables but it is marked as QF_UFIDL (uninterpreted functions and difference logic).")
+		}
+	}
+	smt, arithmetic, preprocess := k.smtParams.state, k.smtParams.arith.state, k.smtParams.preprocess.state
+	smt.RelevancyLvl = 0
+	arithmetic.Reflect = false
+	preprocess.NNFCNF = false
+	dense := false
+	if features == nil {
+		arithmetic.Eq2Ineq = true
+	} else {
+		if features.NumUninterpretedFunctions == 0 {
+			arithmetic.Eq2Ineq = true
+			arithmetic.PropagateEqs = false
+			dense = smtDenseArithmetic(features)
+		}
+		proofs, err := k.manager.ProofsEnabled()
+		if err != nil {
+			return err
+		}
+		if proofs {
+			family, err := k.manager.ArithmeticFamilyID()
+			if err != nil {
+				return err
+			}
+			if theory, ok := k.internalizer.theories[family].(*SMTLinearArithmeticTheory); ok {
+				theory.integer, theory.mixed = false, true
+			}
+		}
+		if dense {
+			arithmetic.SmallLemmaSize = 128
+			smt.LemmaGcHalf = true
+			smt.RestartStrategy = 0 // RS_GEOMETRIC
+			if !proofs {
+				if err := k.installDenseSetup(arithmetic); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	if !dense {
+		arithmetic.EqBounds = true
+		smt.PhaseSelection = 0  // PS_ALWAYS_FALSE
+		smt.RestartStrategy = 0 // RS_GEOMETRIC
+		smt.RestartFactor = 1.5
+		smt.RestartAdaptive = false
+	}
+	return k.applyArithmeticSetup(smt, arithmetic, preprocess)
+}

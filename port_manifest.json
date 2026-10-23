@@ -112285,7 +112285,8 @@
         "pkg/smtcore/smt_setup_difference_test.go",
         "pkg/smtcore/theory_dense_diff_logic.go",
         "pkg/smtcore/theory_dense_diff_logic_test.go",
-        "pkg/smtcore/smt_setup_rdl_test.go"
+        "pkg/smtcore/smt_setup_rdl_test.go",
+        "pkg/smtcore/smt_setup_ufidl_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -112332,7 +112333,9 @@
         "TestSMTIDLDenseFeaturePolicyAndProofRouting",
         "TestSMTDenseTheoryPropagationConflictAndScope",
         "TestSMTRDLSetupSelectsConcreteBackend",
-        "TestSMTRDLStaticSetupRejectsWrongFeatures"
+        "TestSMTRDLStaticSetupRejectsWrongFeatures",
+        "TestSMTUFIDLSetupProfilesAndBackends",
+        "TestSMTUFIDLStaticValidationMatchesSource"
       ],
       "assertions": [
         {
@@ -112608,10 +112611,25 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption remains incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup_difference.go",
+          "go_targets": [
+            "pkg/smtcore/smt_setup_ufidl_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTUFIDLSetupProfilesAndBackends",
+            "TestSMTUFIDLStaticValidationMatchesSource",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "The kernel owns its theory registry. QF_RDL uses mixed arithmetic by default and selects dense or real difference arithmetic at its static setup boundary; QF_IDL selects concrete integer/mixed simplex or dense arithmetic. QF_UFIDL and other remaining source setup routes retain their separately recorded partial behavior.",
+        "The kernel owns its theory registry. QF_RDL uses mixed arithmetic by default and selects dense or real difference arithmetic at its static setup boundary; QF_IDL selects concrete integer/mixed simplex or dense arithmetic. QF_UFIDL selects integer/mixed simplex or the no-UF dense route; its direct equality-bound event consumer remains partial. Other source setup routes retain their separately recorded gaps.",
         "QF_UFLIA logic setup mutates the owning SMT/arithmetic/preprocessing parameter states and their live kernel caches before constructing integer arithmetic. The internal threshold is retained by later updt_params because that source method does not update it; the regression checks owner/cache/theory agreement before and after updates. AutoConfig=false and neighboring real/integer logics do not receive this profile. Static-feature validation, full CFG_BASIC routing and other setup profiles remain separate. Disabling relevancy also requires model generation to use the mode-aware relevancy service rather than its marked-expression map.",
         "The one-time QF_LIA policy borrows pinned asserted formulas while a temporary AST StaticFeatures owns its numeral scratch values and counters. The collector closes on success and failure. Selected scalar policy is stored in the existing owning SMT parameters and their concrete kernel/theory views; later scopes and checks reuse the selected policy.",
         "Integer and real automatic setup share a concrete feature-collection and policy-application path. QF_LRA numerator and denominator are independent owned numeral values released before the feature collector; all failure exits close the collector, and the retained parameter owners contain only the selected scalar policy.",
@@ -112622,7 +112640,8 @@
         "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs.",
         "IDL feature validation uses the existing temporary collector over borrowed assertions and closes it on rejection and success. The normal registered arithmetic backend is the concrete integer simplex; static proof mode selects the shared implementation\u2019s per-column mixed integrality before assertion internalization. Selected policy remains in the existing owners and live consumers. Arithmetic setup now forwards Boolean heuristic settings before variable creation, as required by IDL unit randomization.",
         "Dense matrix cells notify their concrete owning theory immediately at each source update, preserving occurrence/antecedent timing without a generic callback layer. The theory borrows its base/context in concrete syntax helpers and owns atom maps, occurrences, integrality flags, scopes and model numerals. Logical-context scopes own propagation and conflict justifications. Dense setup replaces only a theory with no variables or scopes before theory setup; it preserves registry order and closes the unused owner.",
-        "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner."
+        "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner.",
+        "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
       ],
       "deviations": [
         "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. Unrecognized logics follow source setup_unknown and install every retained theory; unsupported arithmetic uses the dummy checkpoint so nonlinear terms return incompleteness. QF_FP, QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory together with its bit-vector backend. QF_BVRE, QF_S and ALL install the concrete sequence theory. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics likewise return incompleteness instead of an unsound result.",
@@ -112635,7 +112654,8 @@
         "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
         "Normal automatic QF_IDL setup now uses integer simplex instead of the separately tested difference-graph theory. Default first-push and feature-based first-check policies, invalid difference/real/UF inputs, dense feature settings and proof-mode integrality have focused coverage. The initial increment retained integer simplex for the dense branch; the subsequent concrete dense integration is recorded below. The valid first-push IDL SAT/model/UNSAT/pop script brings strict C++ comparisons to 100. Other arithmetic-mode and automatic backend-selection branches remain partial.",
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
-        "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete."
+        "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go currently records that flag but still uses the equality adapter, so this consumer remains an explicit gap. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
       ]
     },
     {
@@ -112669,7 +112689,8 @@
         "pkg/smtcore/smt_setup_difference_test.go",
         "pkg/smtcore/theory_dense_diff_logic.go",
         "pkg/smtcore/theory_dense_diff_logic_test.go",
-        "pkg/smtcore/smt_setup_rdl_test.go"
+        "pkg/smtcore/smt_setup_rdl_test.go",
+        "pkg/smtcore/smt_setup_ufidl_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -112705,7 +112726,9 @@
         "TestSMTIDLDenseFeaturePolicyAndProofRouting",
         "TestSMTDenseTheoryPropagationConflictAndScope",
         "TestSMTRDLSetupSelectsConcreteBackend",
-        "TestSMTRDLStaticSetupRejectsWrongFeatures"
+        "TestSMTRDLStaticSetupRejectsWrongFeatures",
+        "TestSMTUFIDLSetupProfilesAndBackends",
+        "TestSMTUFIDLStaticValidationMatchesSource"
       ],
       "conditionals": [
         {
@@ -112925,6 +112948,21 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption remains incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup_difference.go",
+          "go_targets": [
+            "pkg/smtcore/smt_setup_ufidl_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTUFIDLSetupProfilesAndBackends",
+            "TestSMTUFIDLStaticValidationMatchesSource",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -112938,7 +112976,8 @@
         "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs.",
         "IDL feature validation uses the existing temporary collector over borrowed assertions and closes it on rejection and success. The normal registered arithmetic backend is the concrete integer simplex; static proof mode selects the shared implementation\u2019s per-column mixed integrality before assertion internalization. Selected policy remains in the existing owners and live consumers. Arithmetic setup now forwards Boolean heuristic settings before variable creation, as required by IDL unit randomization.",
         "Dense matrix cells notify their concrete owning theory immediately at each source update, preserving occurrence/antecedent timing without a generic callback layer. The theory borrows its base/context in concrete syntax helpers and owns atom maps, occurrences, integrality flags, scopes and model numerals. Logical-context scopes own propagation and conflict justifications. Dense setup replaces only a theory with no variables or scopes before theory setup; it preserves registry order and closes the unused owner.",
-        "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner."
+        "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner.",
+        "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
       ],
       "deviations": [
         "The Go surface is a direct setup function rather than a persistent setup object because only construction-time explicit-logic routing is currently consumed. Sequence logics install SMTEmptySequenceTheory as a safe give-up checkpoint until the concrete sequence solver replaces it.",
@@ -112951,7 +112990,8 @@
         "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
         "Normal automatic QF_IDL setup now uses integer simplex instead of the separately tested difference-graph theory. Default first-push and feature-based first-check policies, invalid difference/real/UF inputs, dense feature settings and proof-mode integrality have focused coverage. The initial increment retained integer simplex for the dense branch; the subsequent concrete dense integration is recorded below. The valid first-push IDL SAT/model/UNSAT/pop script brings strict C++ comparisons to 100. Other arithmetic-mode and automatic backend-selection branches remain partial.",
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
-        "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete."
+        "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go currently records that flag but still uses the equality adapter, so this consumer remains an explicit gap. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
       ]
     },
     {
@@ -119265,7 +119305,8 @@
         "pkg/smtcore/theory_dense_diff_logic_test.go",
         "pkg/smtcore/smt_setup_difference.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/smtcore/smt_setup_rdl_test.go"
+        "pkg/smtcore/smt_setup_rdl_test.go",
+        "pkg/smtcore/smt_setup_ufidl_test.go"
       ],
       "tests": [
         "TestSMTDenseDifferenceClosureExplanationsAndRollback",
@@ -119274,7 +119315,9 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTRDLSetupSelectsConcreteBackend",
-        "TestSMTRDLStaticSetupRejectsWrongFeatures"
+        "TestSMTRDLStaticSetupRejectsWrongFeatures",
+        "TestSMTUFIDLSetupProfilesAndBackends",
+        "TestSMTUFIDLStaticValidationMatchesSource"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -119324,16 +119367,33 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption remains incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup_difference.go",
+          "go_targets": [
+            "pkg/smtcore/smt_setup_ufidl_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTUFIDLSetupProfilesAndBackends",
+            "TestSMTUFIDLStaticValidationMatchesSource",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "The concrete dense matrix owns its rows, edges, cell trails and scope limits. Every stored or returned infinitesimal rational copies both big.Rat components; rollback restores owned snapshots before truncating child variables and edges. The provisional model is a fresh owned value slice. No generic or callback adapter is introduced.",
         "Dense matrix cells notify their concrete owning theory immediately at each source update, preserving occurrence/antecedent timing without a generic callback layer. The theory borrows its base/context in concrete syntax helpers and owns atom maps, occurrences, integrality flags, scopes and model numerals. Logical-context scopes own propagation and conflict justifications. Dense setup replaces only a theory with no variables or scopes before theory setup; it preserves registry order and closes the unused owner.",
-        "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner."
+        "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner.",
+        "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
       ],
       "deviations": [
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
-        "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete."
+        "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go currently records that flag but still uses the equality adapter, so this consumer remains an explicit gap. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
       ]
     },
     {
@@ -119348,7 +119408,8 @@
         "pkg/smtcore/theory_dense_diff_logic_test.go",
         "pkg/smtcore/smt_setup_difference.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/smtcore/smt_setup_rdl_test.go"
+        "pkg/smtcore/smt_setup_rdl_test.go",
+        "pkg/smtcore/smt_setup_ufidl_test.go"
       ],
       "tests": [
         "TestSMTDenseDifferenceClosureExplanationsAndRollback",
@@ -119357,7 +119418,9 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTRDLSetupSelectsConcreteBackend",
-        "TestSMTRDLStaticSetupRejectsWrongFeatures"
+        "TestSMTRDLStaticSetupRejectsWrongFeatures",
+        "TestSMTUFIDLSetupProfilesAndBackends",
+        "TestSMTUFIDLStaticValidationMatchesSource"
       ],
       "conditionals": [
         {
@@ -119431,16 +119494,33 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption remains incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup_difference.go",
+          "go_targets": [
+            "pkg/smtcore/smt_setup_ufidl_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTUFIDLSetupProfilesAndBackends",
+            "TestSMTUFIDLStaticValidationMatchesSource",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "The concrete dense matrix owns its rows, edges, cell trails and scope limits. Every stored or returned infinitesimal rational copies both big.Rat components; rollback restores owned snapshots before truncating child variables and edges. The provisional model is a fresh owned value slice. No generic or callback adapter is introduced.",
         "Dense matrix cells notify their concrete owning theory immediately at each source update, preserving occurrence/antecedent timing without a generic callback layer. The theory borrows its base/context in concrete syntax helpers and owns atom maps, occurrences, integrality flags, scopes and model numerals. Logical-context scopes own propagation and conflict justifications. Dense setup replaces only a theory with no variables or scopes before theory setup; it preserves registry order and closes the unused owner.",
-        "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner."
+        "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner.",
+        "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
       ],
       "deviations": [
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
-        "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete."
+        "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go currently records that flag but still uses the equality adapter, so this consumer remains an explicit gap. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
       ]
     },
     {
@@ -119455,7 +119535,8 @@
         "pkg/smtcore/theory_dense_diff_logic_test.go",
         "pkg/smtcore/smt_setup_difference.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/smtcore/smt_setup_rdl_test.go"
+        "pkg/smtcore/smt_setup_rdl_test.go",
+        "pkg/smtcore/smt_setup_ufidl_test.go"
       ],
       "tests": [
         "TestSMTDenseDifferenceClosureExplanationsAndRollback",
@@ -119464,7 +119545,9 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTRDLSetupSelectsConcreteBackend",
-        "TestSMTRDLStaticSetupRejectsWrongFeatures"
+        "TestSMTRDLStaticSetupRejectsWrongFeatures",
+        "TestSMTUFIDLSetupProfilesAndBackends",
+        "TestSMTUFIDLStaticValidationMatchesSource"
       ],
       "conditionals": [
         {
@@ -119658,16 +119741,33 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption remains incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_setup_difference.go",
+          "go_targets": [
+            "pkg/smtcore/smt_setup_ufidl_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTUFIDLSetupProfilesAndBackends",
+            "TestSMTUFIDLStaticValidationMatchesSource",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "The concrete dense matrix owns its rows, edges, cell trails and scope limits. Every stored or returned infinitesimal rational copies both big.Rat components; rollback restores owned snapshots before truncating child variables and edges. The provisional model is a fresh owned value slice. No generic or callback adapter is introduced.",
         "Dense matrix cells notify their concrete owning theory immediately at each source update, preserving occurrence/antecedent timing without a generic callback layer. The theory borrows its base/context in concrete syntax helpers and owns atom maps, occurrences, integrality flags, scopes and model numerals. Logical-context scopes own propagation and conflict justifications. Dense setup replaces only a theory with no variables or scopes before theory setup; it preserves registry order and closes the unused owner.",
-        "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner."
+        "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner.",
+        "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
       ],
       "deviations": [
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
-        "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete."
+        "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go currently records that flag but still uses the equality adapter, so this consumer remains an explicit gap. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
       ]
     },
     {

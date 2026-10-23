@@ -125,14 +125,8 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 				return theoryErr
 			}
 			err = kernel.RegisterTheory(theory)
-		} else if logic == "QF_IDL" && kernel.smtState.AutoConfig {
+		} else if (logic == "QF_IDL" || logic == "QF_UFIDL") && kernel.smtState.AutoConfig {
 			theory, theoryErr := NewSMTLinearIntegerArithmeticTheory(family)
-			if theoryErr != nil {
-				return theoryErr
-			}
-			err = kernel.RegisterTheory(theory)
-		} else if logic == "QF_UFIDL" {
-			theory, theoryErr := NewSMTIntegerDiffTheory(family)
 			if theoryErr != nil {
 				return theoryErr
 			}

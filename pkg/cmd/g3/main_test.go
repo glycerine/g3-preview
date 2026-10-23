@@ -10,6 +10,8 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"ufidl_dense_model_scopes.smt2":             "sat\n((x 6) (y 2))\nunsat\nsat\n((x 6) (y 2))\n",
+	"ufidl_congruence_models.smt2":              "sat\n(((f x) 5) ((f y) 7) ((distinct x y) true))\nunsat\nsat\n(((f x) 5) ((f y) 7) ((distinct x y) true))\n",
 	"rdl_dense_model_scopes.smt2":               "sat\n((x (/ 3.0 2.0)) (y (/ 1.0 2.0)))\nunsat\nsat\n((x (/ 3.0 2.0)) (y (/ 1.0 2.0)))\n",
 	"rdl_graph_strict_scopes.smt2":              "sat\n(((> x 0.0) true) ((< x (/ 1.0 3.0)) true))\nunsat\nsat\n(((> x 0.0) true) ((< x (/ 1.0 3.0)) true))\n",
 	"idl_dense_model_scopes.smt2":               "sat\n((x 6) (y 2))\nunsat\nsat\n((x 6) (y 2))\n",
