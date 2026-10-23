@@ -165,8 +165,8 @@ func TestSMTLinearRealLogicSetupUsesConcreteArithmetic(t *testing.T) {
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, solver.Close()) })
 			arithmetic, ok := solver.kernel.internalizer.theories[arithmeticFamily].(*SMTLinearArithmeticTheory)
-			if !ok || arithmetic.integer {
-				t.Fatal(test.logic, "did not install concrete rational linear arithmetic")
+			if !ok || arithmetic.integer || !arithmetic.mixed {
+				t.Fatal(test.logic, "did not install concrete mixed linear arithmetic")
 			}
 			_, hasArrays := solver.kernel.internalizer.theories[arrayFamily].(*SMTArrayTheory)
 			if hasArrays != test.wantArrays {

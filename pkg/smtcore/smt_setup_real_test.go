@@ -1,11 +1,91 @@
 package smtcore
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
+
+func TestSMTLRASetupPreservesNNFAndArithmeticControls(t *testing.T) {
+	for _, push := range []bool{false, true} {
+		for _, automatic := range []bool{false, true} {
+			for _, nnf := range []bool{false, true} {
+				t.Run(fmt.Sprint(push, "/", automatic, "/", nnf), func(t *testing.T) {
+					m, cfg := smtModelGeneratorFixture(t)
+					solver, err := NewSMTSolver(m, nil, "LRA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
+					astTestMust(t, err)
+					t.Cleanup(func() { astTestMust(t, solver.Close()) })
+					if !automatic {
+						smtDisableAutoConfig(t, solver)
+					}
+					k := solver.kernel
+					// LRA preserves these controls, unlike QF_LRA's profile.
+					k.smtParams.preprocess.state.NNFCNF = nnf
+					k.preprocessState.NNFCNF = nnf
+					k.smtParams.preprocess.state.EliminateTermITE = false
+					k.preprocessState.EliminateTermITE = false
+					original := k.smtParams.arith.state
+					constant, err := m.ArithmeticRealNumeralText("3/2")
+					astTestMust(t, err)
+					real, err := m.GetSort(constant)
+					astTestMust(t, err)
+					x, err := m.MkConst(astTestSymbol(t, m, "lra-setup-x"), real)
+					astTestMust(t, err)
+					equality, err := m.MkEq(x, constant)
+					astTestMust(t, err)
+					astTestMust(t, solver.Assert(equality))
+					check := func() {
+						t.Helper()
+						want := original
+						if automatic {
+							want.Reflect, want.PropagateEqs = false, false
+						}
+						if k.arithState != want || k.smtParams.arith.state != want || k.preprocessState.NNFCNF != nnf || k.smtParams.preprocess.state.NNFCNF != nnf || k.preprocessState.EliminateTermITE != automatic {
+							t.Fatal("LRA setup changed unrelated controls or omitted its profile")
+						}
+						family, err := m.ArithmeticFamilyID()
+						astTestMust(t, err)
+						theory, ok := k.internalizer.theories[family].(*SMTLinearArithmeticTheory)
+						if !ok || !theory.mixed || theory.propagateEqualities != want.PropagateEqs || k.relevancy.enabled == automatic {
+							t.Fatal("LRA setup did not reach concrete mixed arithmetic and relevance consumers")
+						}
+					}
+					if push {
+						astTestMust(t, solver.Push())
+						check()
+					}
+					status, err := solver.CheckSat(nil)
+					astTestMust(t, err)
+					if status != lbool.True {
+						t.Fatal("LRA setup changed satisfiability", status)
+					}
+					check()
+					astTestMust(t, solver.Push())
+					negated, err := m.MkNot(equality)
+					astTestMust(t, err)
+					astTestMust(t, solver.Assert(negated))
+					status, err = solver.CheckSat(nil)
+					astTestMust(t, err)
+					if status != lbool.False {
+						t.Fatal("LRA child contradiction", status)
+					}
+					astTestMust(t, solver.Pop(1))
+					status, err = solver.CheckSat(nil)
+					astTestMust(t, err)
+					if status != lbool.True {
+						t.Fatal("LRA pop failed to restore satisfiability", status)
+					}
+					check()
+					if push {
+						astTestMust(t, solver.Pop(1))
+					}
+				})
+			}
+		}
+	}
+}
 
 func TestSMTQFLRAAutomaticSetupRationalThresholdsAndCNF(t *testing.T) {
 	for _, tc := range []struct {
