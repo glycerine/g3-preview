@@ -717,6 +717,65 @@ func TestSMTSequenceTheoryBranchesPrefixedVariableOverlap(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryBranchesVariablePrefixEqualities(t *testing.T) {
+	m, _ := smtModelGeneratorFixture(t)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	integerSort, err := m.GetSort(one)
+	astTestMust(t, err)
+	n, err := m.MkConst(astTestSymbol(t, m, "sequence-branch-prefix-integer"), integerSort)
+	astTestMust(t, err)
+	prefix, err := m.MkIntToString(n)
+	astTestMust(t, err)
+	sort, err := m.GetSort(prefix)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-branch-prefix-x"), sort)
+	astTestMust(t, err)
+	leftTail, err := m.MkConst(astTestSymbol(t, m, "sequence-branch-prefix-left-tail"), sort)
+	astTestMust(t, err)
+	rightTail, err := m.MkConst(astTestSymbol(t, m, "sequence-branch-prefix-right-tail"), sort)
+	astTestMust(t, err)
+	family, err := m.SequenceFamilyID()
+	astTestMust(t, err)
+	theory, err := NewSMTSequenceTheory(family)
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.RegisterTheory(theory))
+	branched, err := theory.branchVariablePrefixEquality(
+		[]ast.ASTHandle{x, leftTail}, []ast.ASTHandle{prefix, rightTail})
+	astTestMust(t, err)
+	if !branched {
+		t.Fatal("variable did not branch to empty")
+	}
+	empty, err := m.MkSequenceEmpty(sort)
+	astTestMust(t, err)
+	emptyEquality, err := m.MkEq(x, empty)
+	astTestMust(t, err)
+	emptyLiteral, err := state.Literal(emptyEquality)
+	astTestMust(t, err)
+	emptyData, err := state.BooleanData(emptyLiteral.Var())
+	astTestMust(t, err)
+	if !emptyData.TryTrueFirst() || !state.relevancy.IsRelevant(emptyEquality) {
+		t.Fatal("empty equality lacks native branch preference")
+	}
+	astTestMust(t, state.assignDecisionLiteral(emptyLiteral.Negated()))
+	branched, err = theory.branchVariablePrefixEquality(
+		[]ast.ASTHandle{x, leftTail}, []ast.ASTHandle{prefix, rightTail})
+	astTestMust(t, err)
+	if !branched {
+		t.Fatal("variable did not advance to the first word prefix")
+	}
+	prefixEquality, err := m.MkEq(x, prefix)
+	astTestMust(t, err)
+	prefixLiteral, err := state.Literal(prefixEquality)
+	astTestMust(t, err)
+	prefixData, err := state.BooleanData(prefixLiteral.Var())
+	astTestMust(t, err)
+	if !prefixData.TryTrueFirst() || !state.relevancy.IsRelevant(prefixEquality) {
+		t.Fatal("word-prefix equality lacks native branch preference")
+	}
+}
+
 func TestSMTSequenceTheoryLengthCoherenceDecomposition(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	value, err := m.MkString("a")

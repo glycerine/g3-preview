@@ -502,6 +502,10 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 			}
 			return true, nil
 		}
+		branched, err = t.branchVariablePrefixEquality(left, right)
+		if err != nil || branched {
+			return branched, err
+		}
 	}
 	return false, nil
 }

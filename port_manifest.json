@@ -117335,6 +117335,12 @@
           "tests": ["TestSMTSequenceTheoryBranchesBinaryUnitEquation", "TestSMTSequenceTheoryRejectsIncompatibleCyclicUnits", "TestSMTSequenceTheoryBranchesVariableAcrossFixedUnitWord", "TestSMTSequenceTheoryBranchesFixedStringOverlaps", "TestSMTSequenceTheoryBranchesTwoVariablesAcrossFixedWord", "TestSMTSequenceTheoryBranchesVariablePrefixAcrossFixedWord", "TestSMTSequenceTheoryRejectsImpossibleCyclicBinaryEquations"]
         },
         {
+          "name": "native true-first equality assumptions and empty/whole-prefix candidate advancement for variable word equations containing non-fixed sequence terms (src/smt/theory_seq.cpp:661-850)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_branch_variable.go",
+          "tests": ["TestSMTSequenceTheoryBranchesVariablePrefixEqualities"]
+        },
+        {
           "name": "scoped assigned prefix/suffix/contains atoms and concrete relation checking after solution expansion (src/smt/theory_seq.cpp:3927-4010 and m_atoms scope limits)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_relations.go",
