@@ -1196,6 +1196,58 @@ func TestSMTSequenceTheoryLengthLowerBoundDecomposition(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryBranchesUnboundedLengthAtLowerBound(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	value, err := m.MkString("a")
+	astTestMust(t, err)
+	sort, err := m.GetSort(value)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-unbounded-lower-branch-x"), sort)
+	astTestMust(t, err)
+	length, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	two, err := m.ArithmeticIntegerNumeralText("2")
+	astTestMust(t, err)
+	lowerBound, err := m.MkArithmeticGE(length, two)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(lowerBound))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("unbounded lower-length model", status)
+	}
+	family, err := m.SequenceFamilyID()
+	astTestMust(t, err)
+	theory, ok := solver.kernel.internalizer.theories[family].(*SMTSequenceTheory)
+	if !ok {
+		t.Fatal("sequence theory was not installed")
+	}
+	_, err = theory.addLengthLowerBoundDecomposition()
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	tailName, err := m.Symbols.Intern("seq.tail")
+	astTestMust(t, err)
+	remainder, err := m.MkSequenceSkolem(tailName, []ast.ASTHandle{x, one}, sort)
+	astTestMust(t, err)
+	empty, err := m.MkSequenceEmpty(sort)
+	astTestMust(t, err)
+	minimalLength, err := m.MkEq(remainder, empty)
+	astTestMust(t, err)
+	variable, found := solver.kernel.internalizer.BoolVar(minimalLength)
+	if !found {
+		t.Fatal("unbounded remainder did not expose the native minimum-length branch")
+	}
+	data, err := solver.kernel.internalizer.BooleanData(variable)
+	astTestMust(t, err)
+	if !data.TryTrueFirst() {
+		t.Fatal("minimum-length remainder branch lacks true-first preference")
+	}
+}
+
 func TestSMTSequenceTheoryLengthBoundsConstrainRemainder(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	value, err := m.MkString("a")

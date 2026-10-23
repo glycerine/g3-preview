@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 const smtSequenceMaximumFixedDecomposition = 2048
@@ -195,6 +196,18 @@ func (t *SMTSequenceTheory) addLengthLowerBoundDecomposition() (bool, error) {
 					}
 					progress = true
 				}
+			}
+		} else {
+			empty, branchErr := state.manager.MkSequenceEmpty(sort)
+			if branchErr != nil {
+				return false, branchErr
+			}
+			assignment, branchErr := t.assumeSequenceEquality(remainder, empty)
+			if branchErr != nil {
+				return false, branchErr
+			}
+			if assignment == lbool.Undef {
+				return true, nil
 			}
 		}
 		if progress {
