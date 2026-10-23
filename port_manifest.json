@@ -116474,6 +116474,25 @@
             "TestSMTLinearMonomialAffineRowRetainsFixedFactorPremises",
             "TestSMTLinearizedMonomialScopesProofsAndModels"
           ]
+        },
+        {
+          "name": "is_cross_nested_consistent endpoint conflict explanations: use the lower or upper dependency that excludes zero, retain the active comparison premise for direct assertion checks, omit unrelated assertions, preserve source unweighted conflict parameters, and handle contradictory logical replay bounds",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_nested.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_nested_rows.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_nested_test.go",
+            "pkg/smtcore/theory_arith_nested_rows_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTCrossNestedArithmeticScopedProofs",
+            "TestSMTNestedCanonicalRowsThroughSeparateAliases",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerNestedUnboundedProofModeReferenceUnknown"
+          ]
         }
       ],
       "ownership": [],

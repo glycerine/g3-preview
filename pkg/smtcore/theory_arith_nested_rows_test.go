@@ -29,7 +29,7 @@ func TestSMTNestedCanonicalRowsThroughSeparateAliases(t *testing.T) {
 				astTestMust(t, err)
 				sort, err := m.MkFamilySort(family, kind, nil)
 				astTestMust(t, err)
-				var terms [3]ast.ASTHandle
+				var terms [4]ast.ASTHandle
 				for i := range terms {
 					terms[i], err = m.MkConst(astTestSymbol(t, m, fmt.Sprint("nested-row-", i)), sort)
 					astTestMust(t, err)
@@ -42,6 +42,7 @@ func TestSMTNestedCanonicalRowsThroughSeparateAliases(t *testing.T) {
 				}
 				two, err := m.ArithmeticNumeralRat(big.NewRat(2, 1), integer)
 				astTestMust(t, err)
+				astTestMust(t, s.Assert(app(smtArithOpGE, terms[3], two)))
 				for _, pair := range [][2]ast.ASTHandle{{p, app(smtArithOpMul, x, x)}, {q, app(smtArithOpMul, two, x)}} {
 					eq, err := m.MkEq(pair[0], pair[1])
 					astTestMust(t, err)
@@ -75,6 +76,9 @@ func TestSMTNestedCanonicalRowsThroughSeparateAliases(t *testing.T) {
 						astTestMust(t, err)
 						if !m.IsFalse(fact) {
 							t.Fatal("canonical nested row proof")
+						}
+						if smtTestArithmeticExpressionContains(t, m, proof, terms[3]) {
+							t.Fatal("canonical nested row cites unrelated assertion")
 						}
 					}
 					astTestMust(t, s.Pop(1))

@@ -521,8 +521,11 @@ func (n *smtNestedArithmetic) terms(form *smtLinearForm) ([]smtNestedTerm, bool,
 
 func (t *SMTLinearArithmeticTheory) checkCrossNestedConsistency() (conflict bool, result error) {
 	solver, status, err := t.buildSimplex()
-	if err != nil || status != lbool.True {
+	if err != nil || status == lbool.Undef {
 		return false, err
+	}
+	if status == lbool.False {
+		return true, t.derivedBoundConflict(solver)
 	}
 	n := smtNestedArithmetic{theory: t, solver: solver, refs: smtArithmeticDivisionCall{theory: t}}
 	defer func() { result = errors.Join(result, n.refs.close()) }()
@@ -552,12 +555,8 @@ func (t *SMTLinearArithmeticTheory) checkCrossNestedConsistency() (conflict bool
 			op := smtLinearEffectiveOp(atom.op, assertion.truth)
 			conflict = op == smtArithOpLE && interval.positiveOne() || op == smtArithOpLT && interval.positive() || op == smtArithOpGE && interval.negativeOne() || op == smtArithOpGT && interval.negative()
 			if conflict {
-				literals := make([]SMTLiteral, 0, len(t.assertions))
-				for _, premise := range t.assertions {
-					literals = append(literals, smtLinearAssertionLiteral(&t.atoms[premise.atom], premise))
-				}
-				t.statistics.conflicts++
-				return true, t.state.SetTheoryConflict(t.FamilyID(), literals)
+				lower := op == smtArithOpLE || op == smtArithOpLT
+				return true, t.arithmeticIntervalConflict(interval, lower, smtLinearAssertionLiteral(atom, assertion))
 			}
 		}
 	}

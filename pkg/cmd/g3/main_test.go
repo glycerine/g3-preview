@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"nested_bound_dependency_scopes.smt2":       "unsat\nsat\nunsat\nsat\n",
 	"nonlinear_bound_provenance_scopes.smt2":    "sat\nunsat\nsat\nunsat\nsat\n",
 	"integer_bound_provenance_scopes.smt2":      "unsat\nunsat\nsat\n",
 	"mixed_cut_bound_provenance_scopes.smt2":    "unsat\nsat\n",
@@ -197,6 +198,37 @@ func TestSMTLibRunnerProofScript(t *testing.T) {
 		value, err := cmd.CombinedOutput()
 		if err != nil || !strings.HasPrefix(string(value), "unsat\n") || !strings.Contains(string(value), "(asserted") || !strings.Contains(string(value), "false)") {
 			t.Fatal("C++ proof output", string(value), err)
+		}
+	}
+}
+
+// The retained C++ backend gives up on the unbounded satisfiable scopes in
+// proof mode. Preserve this case separately from strict output comparisons;
+// x=p=q=0 is an independently checked rational witness for those scopes.
+func TestSMTLibRunnerNestedUnboundedProofModeReferenceUnknown(t *testing.T) {
+	script, err := os.ReadFile(filepath.Join("test_vectors", "nested_bound_dependency_scopes.smt2"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	unbounded := strings.Replace(string(script), "(assert (>= x 2.0))\n", "", 1)
+	var out bytes.Buffer
+	if err = run(strings.NewReader(unbounded), &out); err != nil {
+		t.Fatal(err)
+	}
+	if canonicalOutput(out.String()) != canonicalOutput("unsat\nsat\nunsat\nsat\n") {
+		t.Fatal(out.String())
+	}
+	if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
+		for _, entry := range []struct{ script, expected string }{
+			{unbounded, "unsat\nunknown\nunsat\nunknown\n"},
+			{strings.Replace(unbounded, "(push 1)", "(assert (= x 0.0))\n(push 1)", 1), "unsat\nsat\nunsat\nsat\n"},
+		} {
+			cmd := exec.Command(reference, "-in")
+			cmd.Stdin = strings.NewReader(entry.script)
+			value, err := cmd.CombinedOutput()
+			if err != nil || canonicalOutput(string(value)) != canonicalOutput(entry.expected) {
+				t.Fatal("C++ unbounded scope or zero witness", string(value), err)
+			}
 		}
 	}
 }

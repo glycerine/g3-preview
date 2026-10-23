@@ -36,6 +36,8 @@ func TestSMTCrossNestedArithmeticScopedProofs(t *testing.T) {
 						astTestMust(t, err)
 						y, err := m.MkConst(astTestSymbol(t, m, "nested-y"), sort)
 						astTestMust(t, err)
+						unrelated, err := m.MkConst(astTestSymbol(t, m, "nested-unrelated"), sort)
+						astTestMust(t, err)
 						numeral := func(value int64) ast.ASTHandle {
 							h, err := m.ArithmeticNumeralRat(big.NewRat(value, 1), integer)
 							astTestMust(t, err)
@@ -47,7 +49,7 @@ func TestSMTCrossNestedArithmeticScopedProofs(t *testing.T) {
 							return h
 						}
 						var polynomial ast.ASTHandle
-						var formulas []ast.ASTHandle
+						formulas := []ast.ASTHandle{app(smtArithOpGE, unrelated, numeral(77))}
 						switch kind {
 						case "horner-bound":
 							polynomial = app(smtArithOpAdd, app(smtArithOpMul, x, x), app(smtArithOpMul, numeral(-1), x))
@@ -90,6 +92,9 @@ func TestSMTCrossNestedArithmeticScopedProofs(t *testing.T) {
 								astTestMust(t, err)
 								if !m.IsFalse(fact) {
 									t.Fatal("nested polynomial conflict proof")
+								}
+								if smtTestArithmeticExpressionContains(t, m, proof, unrelated) {
+									t.Fatal("nested polynomial proof cites unrelated assertion")
 								}
 							}
 							astTestMust(t, s.Pop(1))

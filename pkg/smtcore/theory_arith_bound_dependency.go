@@ -13,6 +13,43 @@ type smtArithmeticBoundExplanation struct {
 	dependencies []simplex.BoundDependency
 }
 
+// Source set_conflict(v_dependency*) flattens the selected endpoint into a
+// plain derived bound. Its separate coefficient accumulator is empty, so this
+// conflict has no numerical proof parameters.
+func (t *SMTLinearArithmeticTheory) arithmeticIntervalConflict(interval *smtOldInterval, lower bool, premises ...SMTLiteral) error {
+	if t.state.inconsistent {
+		return nil
+	}
+	root := interval.upperDep
+	if lower {
+		root = interval.lowerDep
+	}
+	explanation := smtArithmeticIntervalExplanation(interval.manager, root)
+	if explanation == nil {
+		return t.derivedBoundConflict(nil)
+	}
+	var literals []SMTLiteral
+	seen := make(map[SMTLiteral]bool)
+	for _, dependency := range explanation.dependencies {
+		literal := SMTLiteralFromIndex(dependency.Literal)
+		if !seen[literal] {
+			seen[literal] = true
+			literals = append(literals, literal)
+		}
+	}
+	for _, literal := range premises {
+		if !seen[literal] {
+			seen[literal] = true
+			literals = append(literals, literal)
+		}
+	}
+	if len(literals) == 0 {
+		return t.derivedBoundConflict(nil)
+	}
+	t.statistics.conflicts++
+	return t.state.SetTheoryConflict(t.FamilyID(), literals)
+}
+
 // dependency2new_bound creates a plain derived bound. A nil dependency is
 // unconditional, while a leaf without a replay explanation is unknown.
 func smtArithmeticIntervalExplanation(manager *smtArithmeticBoundDependencyManager, root *smtArithmeticBoundDependency) *smtArithmeticBoundExplanation {
