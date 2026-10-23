@@ -35,6 +35,10 @@ func (s *smtModelFinderInstantiationSet) open() error {
 }
 
 func (s *smtModelFinderInstantiationSet) containsModelValue(root ast.ASTHandle) (bool, error) {
+	return containsPrivateModelTerm(s.manager, root, false)
+}
+
+func containsPrivateModelTerm(manager *ast.ASTManager, root ast.ASTHandle, rejectFunctionArrays bool) (bool, error) {
 	stack := []ast.ASTHandle{root}
 	seen := make(map[ast.ASTHandle]struct{})
 	for len(stack) != 0 {
@@ -44,40 +48,40 @@ func (s *smtModelFinderInstantiationSet) containsModelValue(root ast.ASTHandle) 
 			continue
 		}
 		seen[n] = struct{}{}
-		value, err := s.manager.IsModelValue(n)
+		value, err := manager.IsModelValue(n)
 		if err != nil {
 			return false, err
 		}
 		if value {
 			return true, nil
 		}
-		kind, err := s.manager.GetKind(n)
+		kind, err := manager.GetKind(n)
 		if err != nil {
 			return false, err
 		}
 		if kind == ast.ASTQuantifier {
-			body, err := s.manager.GetQuantifierBody(n)
+			body, err := manager.GetQuantifierBody(n)
 			if err != nil {
 				return false, err
 			}
 			stack = append(stack, body)
-			patterns, err := s.manager.GetNumPatterns(n)
+			patterns, err := manager.GetNumPatterns(n)
 			if err != nil {
 				return false, err
 			}
 			for i := uint32(0); i < patterns; i++ {
-				pattern, err := s.manager.GetPattern(n, i)
+				pattern, err := manager.GetPattern(n, i)
 				if err != nil {
 					return false, err
 				}
 				stack = append(stack, pattern)
 			}
-			noPatterns, err := s.manager.GetNumNoPatterns(n)
+			noPatterns, err := manager.GetNumNoPatterns(n)
 			if err != nil {
 				return false, err
 			}
 			for i := uint32(0); i < noPatterns; i++ {
-				pattern, err := s.manager.GetNoPattern(n, i)
+				pattern, err := manager.GetNoPattern(n, i)
 				if err != nil {
 					return false, err
 				}
@@ -88,12 +92,31 @@ func (s *smtModelFinderInstantiationSet) containsModelValue(root ast.ASTHandle) 
 		if kind != ast.ASTApp {
 			continue
 		}
-		count, err := s.manager.GetNumArgs(n)
+		if rejectFunctionArrays {
+			family, err := manager.GetFamilyID(n)
+			if err != nil {
+				return false, err
+			}
+			arrayFamily, err := manager.ArrayFamilyID()
+			if err != nil {
+				return false, err
+			}
+			if family == arrayFamily {
+				op, err := manager.GetDeclKind(n)
+				if err != nil {
+					return false, err
+				}
+				if op == ast.ASTArrayOpAsArray {
+					return true, nil
+				}
+			}
+		}
+		count, err := manager.GetNumArgs(n)
 		if err != nil {
 			return false, err
 		}
 		for i := uint32(0); i < count; i++ {
-			child, err := s.manager.GetArg(n, i)
+			child, err := manager.GetArg(n, i)
 			if err != nil {
 				return false, err
 			}

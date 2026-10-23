@@ -139,6 +139,10 @@ func (c *SMTModelChecker) bindingNode(value ast.ASTHandle, fromInverse bool) (*S
 	if term := c.valueTerms[value]; !fromInverse && !term.IsNull() {
 		value = term
 	}
+	private, err := containsPrivateModelTerm(c.manager, value, true)
+	if err != nil || private {
+		return nil, err
+	}
 	if node := c.state.context.enodes[value]; node != nil {
 		return node, nil
 	}
@@ -178,12 +182,43 @@ func (c *SMTModelChecker) enqueueCounterexample(quantifier ast.ASTHandle, values
 		if err != nil {
 			return false, err
 		}
+		if node == nil {
+			c.exhausted = true
+			return false, nil
+		}
 		nodes[i] = node
 		if node.Generation() > maxGeneration {
 			maxGeneration = node.Generation()
 		}
 	}
 	return c.registry.AddInstance(quantifier, ast.ASTHandle{}, nodes, maxGeneration, 0, 0)
+}
+
+func (c *SMTModelChecker) addFiniteCounterexample(quantifier ast.ASTHandle, values []ast.ASTHandle) (bool, error) {
+	count, err := c.manager.GetNumDeclarations(quantifier)
+	if err != nil {
+		return false, err
+	}
+	if uint32(len(values)) < count {
+		return false, ast.ErrASTDomain
+	}
+	bindings := append([]ast.ASTHandle(nil), values[:count]...)
+	for i, value := range bindings {
+		if c.modelFinder != nil {
+			term, _, found, err := c.modelFinder.Inverse(quantifier, uint32(i), value)
+			if err != nil {
+				return false, err
+			}
+			if found {
+				bindings[i] = term
+				continue
+			}
+		}
+		if term := c.valueTerms[value]; !term.IsNull() {
+			bindings[i] = term
+		}
+	}
+	return c.enqueueCounterexample(quantifier, bindings, true)
 }
 
 func (c *SMTModelChecker) addAuxiliaryBlockingClause(auxiliary *SMTSolver, skolems, values []ast.ASTHandle, finite []bool) (result error) {
@@ -613,7 +648,7 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 		if !c.manager.IsFalse(value) {
 			return nil
 		}
-		inserted, err := c.addCounterexample(quantifier, values)
+		inserted, err := c.addFiniteCounterexample(quantifier, values)
 		if err != nil {
 			return err
 		}
@@ -627,7 +662,8 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 }
 
 // Check returns true when every supplied quantifier holds in the candidate
-// finite model. A false result means at least one new instance was queued.
+// finite model. A false result means an instance was queued or checking could
+// not safely finish; Exhausted distinguishes the latter case.
 func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.ASTHandle) (bool, error) {
 	if err := c.open(); err != nil {
 		return false, err
@@ -659,7 +695,7 @@ func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.
 		}
 	}
 	c.maxCexs += c.initialMaxCexs
-	return !found, nil
+	return !found && !c.exhausted, nil
 }
 
 func (c *SMTModelChecker) Close() error {

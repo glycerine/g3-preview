@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -59,5 +61,87 @@ func TestSMTModelCheckerInversePreservesGenerationBeforeFingerprintCanonicalizat
 				t.Fatal("fingerprint canonicalization changed")
 			}
 		})
+	}
+}
+
+func TestSMTModelCheckerRejectsUnrecoverablePrivateBindings(t *testing.T) {
+	m, state, registry, _ := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "private-binding-sort"), nil)
+	astTestMust(t, err)
+	private, err := m.MkModelValue(0, sort)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	_, err = m.RegisterArrayPlugin()
+	astTestMust(t, err)
+	function, err := m.MkFuncDecl(astTestSymbol(t, m, "private-binding-function"), []ast.ASTHandle{boolean}, boolean, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	array, err := m.MkAsArray(function)
+	astTestMust(t, err)
+	checker, err := NewSMTModelChecker(state, 1)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, checker.Close()) })
+	for _, value := range []ast.ASTHandle{private, array} {
+		sort, err := m.GetSort(value)
+		astTestMust(t, err)
+		x, err := m.MkVar(0, sort)
+		astTestMust(t, err)
+		p := smtQuickPredicate(t, m, "private-binding-p", sort, boolean)
+		body, err := m.MkApp(p, []ast.ASTHandle{x})
+		astTestMust(t, err)
+		q, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{astTestSymbol(t, m, "private-binding-x")}, Body: body})
+		astTestMust(t, err)
+		astTestMust(t, state.Internalize(q, true))
+		before := len(state.context.enodes)
+		inserted, err := checker.addCounterexample(q, []ast.ASTHandle{value})
+		astTestMust(t, err)
+		if inserted || !checker.Exhausted() || len(state.context.enodes) != before || registry.schedule.HasWork() {
+			t.Fatal("private model binding entered logical context", value)
+		}
+	}
+}
+
+func TestSMTModelCheckerFiniteUniverseRecoversModelFinderTerm(t *testing.T) {
+	m, config := smtModelGeneratorFixture(t)
+	solver, err := NewSMTSolver(m, nil, "AUFLIA", SMTSolverConfig{Params: config.Context, ModelEvaluator: config})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	state := solver.kernel.internalizer
+	manager := state.quantifierManager
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "finite-inverse-sort"), nil)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	p := smtQuickPredicate(t, m, "finite-inverse-p", sort, boolean)
+	x, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	body, err := m.MkApp(p, []ast.ASTHandle{x})
+	astTestMust(t, err)
+	q, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{astTestSymbol(t, m, "finite-inverse-x")}, Body: body})
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(q, true))
+	astTestMust(t, state.context.SetRelevant(q, true))
+	astTestMust(t, state.context.SetAssignment(q, lbool.True))
+	proto, err := protomodel.NewProtoModel(m, config)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, proto.Close()) })
+	astTestMust(t, manager.modelFinder.FixModel(proto))
+	checker := manager.modelChecker
+	// There are no pre-existing ground representatives in the model
+	// generator's map; recovery must use the freshly built AUF inverse.
+	checker.valueTerms = nil
+	satisfied, err := checker.Check(proto, []ast.ASTHandle{q})
+	astTestMust(t, err)
+	if satisfied || checker.Exhausted() || len(state.quantifiers.schedule.newEntries) != 1 {
+		t.Fatal("finite private value was not recovered through its AUF inverse", satisfied, checker.Exhausted())
+	}
+	args := state.quantifiers.schedule.newEntries[0].Fingerprint.args
+	if len(args) != 1 {
+		t.Fatal("finite inverse counterexample arity")
+	}
+	private, err := m.IsModelValue(args[0].owner)
+	astTestMust(t, err)
+	if private {
+		t.Fatal("private universe value escaped instead of the AUF context term")
 	}
 }

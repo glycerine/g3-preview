@@ -108478,6 +108478,8 @@
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
         "TestSMTModelCheckerInversePreservesGenerationBeforeFingerprintCanonicalization",
+        "TestSMTModelCheckerRejectsUnrecoverablePrivateBindings",
+        "TestSMTModelCheckerFiniteUniverseRecoversModelFinderTerm",
         "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
         "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
@@ -108577,6 +108579,9 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_checker.go",
           "tests": [
+            "TestSMTModelCheckerInversePreservesGenerationBeforeFingerprintCanonicalization",
+            "TestSMTModelCheckerRejectsUnrecoverablePrivateBindings",
+            "TestSMTModelCheckerFiniteUniverseRecoversModelFinderTerm",
             "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals",
             "TestSMTSolverMBQIRestrictsSkolemToBodyInstantiationSet",
             "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters"
