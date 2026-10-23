@@ -110,10 +110,11 @@ func (g *smtUTVPIGraph) parityOK(variable int32) (bool, error) {
 	}
 	first := &g.graph.assignment[2*variable].rational
 	second := &g.graph.assignment[2*variable+1].rational
-	if !first.IsInt() || !second.IsInt() {
-		return false, errSMTDiffGraphDomain
-	}
-	return first.Num().Bit(0) == second.Num().Bit(0), nil
+	// rational::is_even is false for non-integral rationals. Real vertices
+	// can be visited while repairing a neighboring integer's parity.
+	firstEven := first.IsInt() && first.Num().Bit(0) == 0
+	secondEven := second.IsInt() && second.Num().Bit(0) == 0
+	return firstEven == secondEven, nil
 }
 
 // parityConflict returns the two shortest tight paths witnessing an odd
@@ -126,6 +127,9 @@ func (g *smtUTVPIGraph) parityConflict() ([]int32, error) {
 	for variable, integer := range g.integer {
 		if !integer {
 			continue
+		}
+		if !g.graph.assignment[2*variable].rational.IsInt() || !g.graph.assignment[2*variable+1].rational.IsInt() {
+			return nil, errSMTDiffGraphDomain
 		}
 		ok, err := g.parityOK(int32(variable))
 		if err != nil {

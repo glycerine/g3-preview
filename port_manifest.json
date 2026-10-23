@@ -112317,6 +112317,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_utvpi.go",
+        "pkg/smtcore/theory_utvpi_test.go",
+        "pkg/cmd/g3/test_vectors/utvpi_integer_parity_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_real_strict_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_models.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_unknown_first_push.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_model_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2",
         "pkg/smtcore/smt_setup_basic_arithmetic.go",
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/smtcore/theory_diff_logic_real.go",
@@ -112427,6 +112435,20 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Basic setup_arith mode 4: Eq2Ineq and concrete rdl_ext UTVPI registration at disabled-auto-config or unknown-logic first-push boundary",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup_basic_arithmetic.go",
+          "tests": [
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
         {
           "name": "Basic setup_arith modes 0/1/2/3 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex or dense matrix; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
           "status": "partial",
@@ -112757,6 +112779,7 @@
         "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
       ],
       "deviations": [
+        "Arithmetic mode 4 now registers the dedicated UTVPI paired-graph theory. Constructor-only int_only remains false; the retained rdl_ext instance checks dynamic Int-variable parity. Mode 5 AS_OPTINF and remaining automatic unknown-logic setup are still incomplete. Six UTVPI scripts bring strict C++ comparisons to 118; a separate explicit nonincremental strategy-gap test is not counted as agreement.",
         "Explicit basic arithmetic modes 0/1/2/3 now select the retained backend at the first boundary. Mixed graph integer complements subtract one, real complements subtract epsilon, and Int model values are checked before publication. C++ rejects the observed mixed candidate with a fractional Int value; Go reports UNKNOWN before constructing that invalid numeral. Six exact mode/model/scope scripts bring strict C++ comparisons to 112. UTVPI, AS_OPTINF, other basic plugin routing and full unknown-logic automatic classification remain incomplete.",
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
         "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. Unrecognized logics follow source setup_unknown and install every retained theory; unsupported arithmetic uses the dummy checkpoint so nonlinear terms return incompleteness. QF_FP, QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory together with its bit-vector backend. QF_BVRE, QF_S and ALL install the concrete sequence theory. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics likewise return incompleteness instead of an unsound result.",
@@ -112779,6 +112802,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_utvpi.go",
+        "pkg/smtcore/theory_utvpi_test.go",
+        "pkg/cmd/g3/test_vectors/utvpi_integer_parity_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_real_strict_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_models.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_unknown_first_push.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_model_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2",
         "pkg/smtcore/smt_setup_basic_arithmetic.go",
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/smtcore/theory_diff_logic_real.go",
@@ -112870,6 +112901,20 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Basic setup_arith mode 4: Eq2Ineq and concrete rdl_ext UTVPI registration at disabled-auto-config or unknown-logic first-push boundary",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup_basic_arithmetic.go",
+          "tests": [
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
         {
           "name": "Basic setup_arith modes 0/1/2/3 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex or dense matrix; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
           "status": "partial",
@@ -113147,6 +113192,7 @@
         "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
       ],
       "deviations": [
+        "Arithmetic mode 4 now registers the dedicated UTVPI paired-graph theory. Constructor-only int_only remains false; the retained rdl_ext instance checks dynamic Int-variable parity. Mode 5 AS_OPTINF and remaining automatic unknown-logic setup are still incomplete. Six UTVPI scripts bring strict C++ comparisons to 118; a separate explicit nonincremental strategy-gap test is not counted as agreement.",
         "Explicit basic arithmetic modes 0/1/2/3 now select the retained backend at the first boundary. Mixed graph integer complements subtract one, real complements subtract epsilon, and Int model values are checked before publication. C++ rejects the observed mixed candidate with a fractional Int value; Go reports UNKNOWN before constructing that invalid numeral. Six exact mode/model/scope scripts bring strict C++ comparisons to 112. UTVPI, AS_OPTINF, other basic plugin routing and full unknown-logic automatic classification remain incomplete.",
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
         "The Go surface is a direct setup function rather than a persistent setup object because only construction-time explicit-logic routing is currently consumed. Sequence logics install SMTEmptySequenceTheory as a safe give-up checkpoint until the concrete sequence solver replaces it.",
@@ -123348,10 +123394,25 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_utvpi.go",
+        "pkg/smtcore/theory_utvpi_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/utvpi_integer_parity_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_real_strict_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_models.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_unknown_first_push.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_model_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2",
         "pkg/smtcore/smt_utvpi_linearizer.go",
         "pkg/smtcore/smt_utvpi_linearizer_test.go"
       ],
       "tests": [
+        "TestSMTUTVPIContextConflictsProofsAndScopes",
+        "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
+        "TestSMTUTVPIMixedBridgeAndSumModelRefusal",
+        "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
         "TestSMTUTVPILinearizationNormalizationAndRefusals"
       ],
       "assertions": [
@@ -123377,16 +123438,30 @@
           "tests": []
         },
         {
-          "name": "Explicit UTVPI theory instantiations: retained rdl_ext backend integration",
-          "status": "unported",
-          "tests": []
+          "name": "Explicit retained rdl_ext instantiation now selected by basic arithmetic mode 4; remaining class-definition controls tracked in theory_utvpi_def.h",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_utvpi.go",
+          "tests": [
+            "TestSMTUTVPIContextConflictsProofsAndScopes",
+            "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
+            "TestSMTUTVPIMixedBridgeAndSumModelRefusal",
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/smtcore/theory_utvpi_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
         }
       ],
       "ownership": [
-        "The concrete linearizer owns rational coefficients, its worklist and normalized terms; AST handles borrow the manager."
+        "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
       ],
       "deviations": [
-        "Corrected the earlier completion claim: general simplex coverage does not port the retained UTVPI backend. Constructor-only int_only/fixnum flags have no retained writers; only rdl_ext is selected by basic setup, with dynamic integer-variable parity handling."
+        "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
+        "The source arithmetic factory can reject a fractional Int candidate after rational-part parity succeeds. Go checks graph model values before SAT acceptance and returns UNKNOWN before publishing an invalid numeral.",
+        "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact source alias/control behavior remains partial; simplex is not used as a replacement."
       ]
     },
     {
@@ -123395,11 +123470,27 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_utvpi.go",
+        "pkg/smtcore/theory_utvpi_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/utvpi_integer_parity_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_real_strict_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_models.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_unknown_first_push.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_model_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2",
         "pkg/smtcore/smt_utvpi_linearizer.go",
         "pkg/smtcore/smt_utvpi_graph.go",
         "pkg/smtcore/smt_utvpi_graph_test.go"
       ],
       "tests": [
+        "TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerRefusal",
+        "TestSMTUTVPIContextConflictsProofsAndScopes",
+        "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
+        "TestSMTUTVPIMixedBridgeAndSumModelRefusal",
+        "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
         "TestSMTUTVPILinearizationNormalizationAndRefusals",
         "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
         "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
@@ -123444,16 +123535,57 @@
           ]
         },
         {
-          "name": "UTVPI theory context interface, atoms, scopes, equality adapter, statistics and model publication",
+          "name": "Context initialization, signed-pair variables, linearized comparisons, strict integer/real complements, queued assignments, paired propagation, weighted extended conflicts, parity final checks, scopes and typed model publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_utvpi.go",
+          "tests": [
+            "TestSMTUTVPIContextConflictsProofsAndScopes",
+            "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
+            "TestSMTUTVPIMixedBridgeAndSumModelRefusal",
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/smtcore/theory_utvpi_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "Active two-argument equality/disequality callbacks through arithmetic equality adapter, initialization and restart integration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_utvpi.go",
+          "tests": [
+            "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal"
+          ]
+        },
+        {
+          "name": "mk_term and mk_num: numerals and concrete unary aliases; Go per-enode variable attachment uses explicit unconditional alias edges",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_utvpi.go",
+          "tests": [
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+            "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal"
+          ]
+        },
+        {
+          "name": "Unused justification-taking equality/disequality overloads, new_eq_or_diseq and expand: retained context calls only the two-argument overloads",
+          "status": "dead_deleted",
+          "tests": []
+        },
+        {
+          "name": "Stronger negative-cycle shortcut/pruning, adaptive conflict activity, lemma dumps, source statistics/display/reset/fresh-context and remaining term-alias/control fidelity",
           "status": "unported",
           "tests": []
         }
       ],
       "ownership": [
-        "The Go UTVPI graph owns paired infinitesimal-rational vertices, variable sort flags and per-edge explanation coefficients. It is not yet registered as a context theory."
+        "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
       ],
       "deviations": [
-        "Removed the unsupported claim that the general simplex implementation replaces the specialized UTVPI theory. Context integration remains required."
+        "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
+        "The source arithmetic factory can reject a fractional Int candidate after rational-part parity succeeds. Go checks graph model values before SAT acceptance and returns UNKNOWN before publishing an invalid numeral.",
+        "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact source alias/control behavior remains partial; simplex is not used as a replacement."
       ]
     },
     {
@@ -123462,10 +123594,26 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_utvpi.go",
+        "pkg/smtcore/theory_utvpi_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/utvpi_integer_parity_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_real_strict_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_models.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_unknown_first_push.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_model_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2",
         "pkg/smtcore/smt_utvpi_graph.go",
         "pkg/smtcore/smt_utvpi_graph_test.go"
       ],
       "tests": [
+        "TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerRefusal",
+        "TestSMTUTVPIContextConflictsProofsAndScopes",
+        "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
+        "TestSMTUTVPIMixedBridgeAndSumModelRefusal",
+        "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
         "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
         "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
         "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair",
@@ -123617,16 +123765,57 @@
           ]
         },
         {
-          "name": "Term and atom internalization, complementary inequalities, context conflicts, equality events, scope lifecycle, statistics, model construction and setup selection",
+          "name": "Context initialization, signed-pair variables, linearized comparisons, strict integer/real complements, queued assignments, paired propagation, weighted extended conflicts, parity final checks, scopes and typed model publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_utvpi.go",
+          "tests": [
+            "TestSMTUTVPIContextConflictsProofsAndScopes",
+            "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
+            "TestSMTUTVPIMixedBridgeAndSumModelRefusal",
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/smtcore/theory_utvpi_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "Active two-argument equality/disequality callbacks through arithmetic equality adapter, initialization and restart integration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_utvpi.go",
+          "tests": [
+            "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal"
+          ]
+        },
+        {
+          "name": "mk_term and mk_num: numerals and concrete unary aliases; Go per-enode variable attachment uses explicit unconditional alias edges",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_utvpi.go",
+          "tests": [
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+            "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal"
+          ]
+        },
+        {
+          "name": "Unused justification-taking equality/disequality overloads, new_eq_or_diseq and expand: retained context calls only the two-argument overloads",
+          "status": "dead_deleted",
+          "tests": []
+        },
+        {
+          "name": "Stronger negative-cycle shortcut/pruning, adaptive conflict activity, lemma dumps, source statistics/display/reset/fresh-context and remaining term-alias/control fidelity",
           "status": "unported",
           "tests": []
         }
       ],
       "ownership": [
-        "Paired graph edges own infinitesimal-rational weights and literals. Parallel edge coefficients retain source unary factor two and binary factor one; integer sort flags select parity checks. No context-owned atoms or model values are published yet."
+        "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
       ],
       "deviations": [
-        "The direct graph and parity algorithms replace the earlier inaccurate simplex-as-UTVPI completion claim. Stronger negative-cycle pruning and context/model integration remain incomplete."
+        "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
+        "The source arithmetic factory can reject a fractional Int candidate after rational-part parity succeeds. Go checks graph model values before SAT acceptance and returns UNKNOWN before publishing an invalid numeral.",
+        "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact source alias/control behavior remains partial; simplex is not used as a replacement."
       ]
     },
     {
@@ -125852,13 +126041,20 @@
       "component": "tactic",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2"
+      ],
+      "tests": [
+        "TestSMTLibRunnerUTVPINonincrementalStrategyGap"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Confirmed integration gap: the native nonincremental strategic pipeline solves the mixed integer/real sum fixture as SAT, while its incremental UTVPI core (after push) refuses a fractional Int candidate as UNKNOWN. Go currently uses the direct core and returns UNKNOWN in both cases. The explicit gap regression verifies those separate results; it is not part of the strict C++ agreement count. The strategic pipeline remains unported."
+      ]
     },
     {
       "path": "src/tactic/arith/add_bounds_tactic.h",
@@ -125888,13 +126084,20 @@
       "component": "tactic",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2"
+      ],
+      "tests": [
+        "TestSMTLibRunnerUTVPINonincrementalStrategyGap"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Confirmed integration gap: the native nonincremental strategic pipeline solves the mixed integer/real sum fixture as SAT, while its incremental UTVPI core (after push) refuses a fractional Int candidate as UNKNOWN. Go currently uses the direct core and returns UNKNOWN in both cases. The explicit gap regression verifies those separate results; it is not part of the strict C++ agreement count. The strategic pipeline remains unported."
+      ]
     },
     {
       "path": "src/tactic/arith/arith_bounds_tactic.h",

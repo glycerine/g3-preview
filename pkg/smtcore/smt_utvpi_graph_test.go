@@ -275,3 +275,38 @@ func TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse(t *testing.T) {
 		t.Fatal("invalid zero variable accepted")
 	}
 }
+
+func TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerRefusal(t *testing.T) {
+	g := newSMTUTVPIGraph()
+	zero, err := g.addVariable(true)
+	astTestMust(t, err)
+	real, err := g.addVariable(false)
+	astTestMust(t, err)
+	first := newSMTInfRational(big.NewRat(1, 2), nil)
+	second := newSMTInfRational(big.NewRat(3, 2), nil)
+	astTestMust(t, g.graph.SetAssignment(2*real, &first))
+	astTestMust(t, g.graph.SetAssignment(2*real+1, &second))
+	ok, err := g.parityOK(real)
+	astTestMust(t, err)
+	if !ok {
+		t.Fatal("source is_even must be false for both nonintegral rational parts")
+	}
+	first.rational.SetInt64(2)
+	astTestMust(t, g.graph.SetAssignment(2*real, &first))
+	ok, err = g.parityOK(real)
+	astTestMust(t, err)
+	if ok {
+		t.Fatal("even integer and nonintegral rational incorrectly have the same parity predicate")
+	}
+	integer, err := g.addVariable(true)
+	astTestMust(t, err)
+	astTestMust(t, g.graph.SetAssignment(2*integer+1, diffInf(0, -1)))
+	ok, err = g.parityOK(integer)
+	astTestMust(t, err)
+	if !ok {
+		t.Fatal("rational-part parity predicate must ignore epsilon")
+	}
+	if _, err := g.modelValues(zero); err == nil {
+		t.Fatal("fractional Int candidate escaped the model publication guard")
+	}
+}

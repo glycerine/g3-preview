@@ -10,6 +10,12 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"utvpi_mixed_model_refusal.smt2":            "unknown\n",
+	"utvpi_mixed_sum_model_refusal.smt2":        "unknown\n",
+	"utvpi_integer_parity_scopes.smt2":          "unsat\nsat\n((x 1) (y 1))\nunsat\nsat\n((x 1) (y 1))\n",
+	"utvpi_mixed_models.smt2":                   "sat\n(((>= i 0) true) ((<= i 1) true) ((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\nunsat\nsat\n(((>= i 0) true) ((<= i 1) true) ((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\n",
+	"utvpi_real_strict_scopes.smt2":             "sat\n(((> (+ x y) 0.0) true) ((< (+ x y) (/ 1.0 3.0)) true) ((= x y) true))\nunsat\nsat\n(((> (+ x y) 0.0) true) ((< (+ x y) (/ 1.0 3.0)) true) ((= x y) true))\n",
+	"utvpi_unknown_first_push.smt2":             "sat\n((x (/ 1.0 2.0)) (y (/ 1.0 2.0)))\nunsat\nsat\n((x (/ 1.0 2.0)) (y (/ 1.0 2.0)))\n",
 	"basic_graph_integer.smt2":                  "sat\n((i 1))\nunsat\nsat\n((i 1))\n",
 	"basic_graph_real.smt2":                     "sat\n(((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\nunsat\nsat\n(((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\n",
 	"basic_dense_mixed.smt2":                    "sat\n(((>= i 0) true) ((<= i 1) true) ((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\nunsat\nsat\n(((>= i 0) true) ((<= i 1) true) ((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\n",
@@ -169,6 +175,36 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 				t.Fatalf("Go/C++ mismatch\nGo:\n%s\nC++:\n%s", goOutput.String(), cppOutput)
 			}
 		})
+	}
+}
+
+// The native combined solver uses its strategic tactic pipeline before the
+// incremental core is selected. This remains an integration gap: the native
+// nonincremental tactic solves this mixed sum, while the direct UTVPI core
+// refuses its fractional Int candidate. The strict comparison set includes
+// the matching incremental variant in utvpi_mixed_sum_model_refusal.smt2.
+func TestSMTLibRunnerUTVPINonincrementalStrategyGap(t *testing.T) {
+	script, err := os.ReadFile(filepath.Join("test_vectors", "utvpi_mixed_sum_model.smt2"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var output bytes.Buffer
+	if err := run(bytes.NewReader(script), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	if canonicalOutput(output.String()) != "unknown" {
+		t.Fatal("update the recorded UTVPI strategy gap after checking the native pipeline", output.String())
+	}
+	if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
+		cmd := exec.Command(reference, "-in")
+		cmd.Stdin = bytes.NewReader(script)
+		native, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatal(err, string(native))
+		}
+		if canonicalOutput(string(native)) != "sat" {
+			t.Fatal("native strategic-solver result changed", string(native))
+		}
 	}
 }
 

@@ -4,8 +4,8 @@ package smtcore
 import "errors"
 
 // Basic setup collects arithmetic features even on the logic-only first-push
-// path. The explicit difference/dense/disabled modes share concrete retained
-// implementations; UTVPI and AS_OPTINF remain separate unfinished backends.
+// path. Difference, dense, UTVPI and disabled modes select their concrete
+// retained implementations; AS_OPTINF remains a separate unfinished backend.
 // Constructor-only int_only/fixnum flags have no retained writers and stay false.
 func (k *SMTKernel) setupBasicArithmetic() (result error) {
 	features, err := k.setupStaticFeatures(true)
@@ -31,8 +31,11 @@ func (k *SMTKernel) setupBasicArithmetic() (result error) {
 	case 3:
 		arithmetic.Eq2Ineq = true
 		theory, err = NewSMTDenseDiffTheory(family)
-	case 4, 5:
-		return nil // Retained UTVPI/AS_OPTINF selection remains incomplete.
+	case 4:
+		arithmetic.Eq2Ineq = true
+		theory, err = NewSMTUTVPITheory(family)
+	case 5:
+		return nil // Retained AS_OPTINF selection remains incomplete.
 	default:
 		if existing, ok := k.internalizer.theories[family].(*SMTLinearArithmeticTheory); ok {
 			// Direct internalizer clients may have already created columns.
@@ -55,7 +58,7 @@ func (k *SMTKernel) setupBasicArithmetic() (result error) {
 	if err := k.replaceUnusedSetupArithmetic(theory); err != nil {
 		return err
 	}
-	if arithmetic.Mode == 1 || arithmetic.Mode == 3 {
+	if arithmetic.Mode == 1 || arithmetic.Mode == 3 || arithmetic.Mode == 4 {
 		return k.applyArithmeticSetup(k.smtParams.state, arithmetic, k.smtParams.preprocess.state)
 	}
 	return nil

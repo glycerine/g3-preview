@@ -10,7 +10,7 @@ import (
 )
 
 func TestSMTBasicArithmeticModesBeforeFirstBoundary(t *testing.T) {
-	for _, mode := range []uint32{0, 1, 2, 3} {
+	for _, mode := range []uint32{0, 1, 2, 3, 4} {
 		for _, real := range []bool{false, true} {
 			for _, push := range []bool{false, true} {
 				t.Run(fmt.Sprint(mode, "/", real, "/", push), func(t *testing.T) {
@@ -82,8 +82,12 @@ func TestSMTBasicArithmeticModesBeforeFirstBoundary(t *testing.T) {
 						if _, ok := k.internalizer.theories[family].(*SMTDenseDiffTheory); !ok {
 							t.Fatal("dense mode not selected")
 						}
+					case 4:
+						if _, ok := k.internalizer.theories[family].(*SMTUTVPITheory); !ok {
+							t.Fatal("UTVPI mode not selected")
+						}
 					}
-					if k.arithState.Eq2Ineq != (mode == 1 || mode == 3) || k.smtParams.arith.state != k.arithState || !k.preprocessState.NNFCNF {
+					if k.arithState.Eq2Ineq != (mode == 1 || mode == 3 || mode == 4) || k.smtParams.arith.state != k.arithState || !k.preprocessState.NNFCNF {
 						t.Fatal("basic selection changed unrelated policy or omitted eq2ineq")
 					}
 					generated, err := solver.AcquireModel()
