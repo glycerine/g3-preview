@@ -1,0 +1,8 @@
+(set-option :global-decls true)
+(push 1)
+(declare-fun p () Bool)
+(assert p)
+(check-sat)
+(pop 1)
+(assert (not p))
+(check-sat)

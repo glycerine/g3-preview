@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun a () (Array Int Int))
+(assert (= a ((as const (Array Int Int)) 3)))
+(assert (not (= (select a 0) 3)))
+(check-sat)

@@ -1,0 +1,7 @@
+(set-option :produce-unsat-cores true)
+(set-logic QF_UF)
+(declare-fun p () Bool)
+(assert (! p :named positive))
+(assert (! (not p) :named negative))
+(check-sat)
+(get-unsat-core)

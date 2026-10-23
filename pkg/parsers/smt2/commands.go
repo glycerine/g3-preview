@@ -1,0 +1,503 @@
+// Source: src/parsers/smt2/smt2parser.cpp command dispatch and retained
+// declaration/assertion/check commands; src/cmd_context/basic_cmds.cpp.
+package smt2
+
+import (
+	"errors"
+	"fmt"
+	"io"
+	"math/big"
+	"strings"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/cmd_context"
+	"github.com/glycerine/g3/pkg/util/lbool"
+)
+
+type commandParser struct {
+	context  *cmd_context.Context
+	scanner  *Scanner
+	token    Token
+	out      io.Writer
+	manager  *ast.ASTManager
+	refs     []ast.ASTRef
+	env      smt2LocalEnv
+	locals   localExprStack
+	bindings uint32
+	shifter  *rewriter.VarShifter
+}
+
+// ParseCommands executes the retained SMT-LIB command grammar against Context.
+// Unsupported commands fail explicitly. Command-local AST references are
+// released after execution; the context owns declarations and assertions.
+func ParseCommands(context *cmd_context.Context, input io.Reader, out io.Writer) (result error) {
+	compliant, err := context.Compliant()
+	if err != nil {
+		return err
+	}
+	scanner, err := NewScanner(input, compliant)
+	if err != nil {
+		return err
+	}
+	p := &commandParser{context: context, scanner: scanner, out: out}
+	defer func() {
+		result = errors.Join(result, p.clearCommand())
+		if p.shifter != nil {
+			result = errors.Join(result, p.shifter.Close())
+		}
+	}()
+	if err = p.advance(); err != nil {
+		return err
+	}
+	for p.token != EOFToken {
+		exit, err := p.command()
+		if err != nil {
+			return &ScannerError{err.Error(), scanner.Line(), scanner.Position()}
+		}
+		if err = p.clearCommand(); err != nil {
+			return err
+		}
+		if exit {
+			return nil
+		}
+	}
+	return nil
+}
+
+func (p *commandParser) advance() error { var err error; p.token, err = p.scanner.Scan(); return err }
+func (p *commandParser) expect(token Token) error {
+	if p.token != token {
+		return fmt.Errorf("unexpected input, expected token %d", token)
+	}
+	return p.advance()
+}
+
+func (p *commandParser) requireEnd() error {
+	if p.token != RightParenToken {
+		return fmt.Errorf("invalid command, ')' expected")
+	}
+	return nil
+}
+func (p *commandParser) symbol() (string, error) {
+	if p.token != SymbolToken {
+		return "", fmt.Errorf("symbol expected")
+	}
+	value := p.scanner.ID()
+	return value, p.advance()
+}
+func (p *commandParser) unsigned() (uint32, error) {
+	if p.token != IntegerToken {
+		return 0, fmt.Errorf("unsigned numeral expected")
+	}
+	n := p.scanner.Number()
+	if !n.IsInt() || n.Sign() < 0 || !n.Num().IsUint64() || n.Num().Uint64() > uint64(^uint32(0)) {
+		return 0, fmt.Errorf("unsigned numeral is out of range")
+	}
+	value := uint32(n.Num().Uint64())
+	return value, p.advance()
+}
+func (p *commandParser) astManager() (*ast.ASTManager, error) {
+	if p.manager != nil {
+		return p.manager, nil
+	}
+	m, err := p.context.Manager()
+	if err != nil {
+		return nil, err
+	}
+	p.manager = m
+	p.shifter, err = rewriter.NewVarShifter(m)
+	return m, err
+}
+func (p *commandParser) pin(value ast.ASTHandle, err error) (ast.ASTHandle, error) {
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	ref, err := p.manager.NewRef(value)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	p.refs = append(p.refs, ref)
+	return value, nil
+}
+func (p *commandParser) clearCommand() (result error) {
+	if p.manager != nil {
+		result = p.locals.reset(p.manager)
+		for i := len(p.refs) - 1; i >= 0; i-- {
+			result = errors.Join(result, p.manager.DelRef(&p.refs[i]))
+		}
+	}
+	p.refs = nil
+	p.env.reset()
+	p.bindings = 0
+	return result
+}
+
+func (p *commandParser) command() (bool, error) {
+	if err := p.expect(LeftParenToken); err != nil {
+		return false, err
+	}
+	name, err := p.symbol()
+	if err != nil {
+		return false, err
+	}
+	success := true
+	switch name {
+	case "set-logic":
+		logic, err := p.symbol()
+		if err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.SetLogic(logic); err != nil {
+			return false, err
+		}
+	case "set-option":
+		if p.token != KeywordToken {
+			return false, fmt.Errorf("option keyword expected")
+		}
+		key := strings.TrimPrefix(p.scanner.ID(), ":")
+		if err := p.advance(); err != nil {
+			return false, err
+		}
+		value, err := p.symbol()
+		if err != nil {
+			return false, err
+		}
+		if value != "true" && value != "false" {
+			return false, fmt.Errorf("Boolean option value expected")
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.SetBoolOption(key, value == "true"); err != nil {
+			return false, err
+		}
+	case "set-info":
+		// Status and source metadata do not affect solving. Consume the
+		// source s-expression value without interpreting it as a formula.
+		if p.token != KeywordToken {
+			return false, fmt.Errorf("information keyword expected")
+		}
+		if err := p.advance(); err != nil {
+			return false, err
+		}
+		if err := p.skipSExpr(); err != nil {
+			return false, err
+		}
+	case "declare-sort":
+		name, err := p.symbol()
+		if err != nil {
+			return false, err
+		}
+		arity, err := p.unsigned()
+		if err != nil {
+			return false, err
+		}
+		if arity != 0 {
+			return false, fmt.Errorf("parameterized user sorts are not ported yet")
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if _, err = p.context.DeclareSort(name); err != nil {
+			return false, err
+		}
+	case "declare-fun", "declare-const":
+		function, err := p.symbol()
+		if err != nil {
+			return false, err
+		}
+		var domain []ast.ASTHandle
+		if name == "declare-fun" {
+			if err = p.expect(LeftParenToken); err != nil {
+				return false, err
+			}
+			for p.token != RightParenToken {
+				sort, err := p.sort()
+				if err != nil {
+					return false, err
+				}
+				domain = append(domain, sort)
+			}
+			if err = p.advance(); err != nil {
+				return false, err
+			}
+		}
+		rangeSort, err := p.sort()
+		if err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if _, err = p.context.DeclareFunction(function, domain, rangeSort); err != nil {
+			return false, err
+		}
+	case "assert":
+		expression, named, err := p.expression()
+		if err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.Assert(expression, named); err != nil {
+			return false, err
+		}
+	case "push", "pop":
+		n, err := p.unsigned()
+		if err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if name == "push" {
+			err = p.context.Push(n)
+		} else {
+			err = p.context.Pop(n)
+		}
+		if err != nil {
+			return false, err
+		}
+	case "check-sat", "check-sat-assuming":
+		var assumptions []ast.ASTHandle
+		if name == "check-sat-assuming" {
+			assumptions, err = p.expressions()
+			if err != nil {
+				return false, err
+			}
+		}
+		if p.token != RightParenToken {
+			return false, fmt.Errorf("unexpected check-sat argument")
+		}
+		status, err := p.context.CheckSat(assumptions)
+		if err != nil {
+			return false, err
+		}
+		text := "unknown"
+		if status == lbool.True {
+			text = "sat"
+		}
+		if status == lbool.False {
+			text = "unsat"
+		}
+		if _, err = fmt.Fprintln(p.out, text); err != nil {
+			return false, err
+		}
+		success = false
+	case "get-model":
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.WriteModel(p.out); err != nil {
+			return false, err
+		}
+		success = false
+	case "get-value":
+		values, err := p.expressions()
+		if err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.WriteValues(p.out, values); err != nil {
+			return false, err
+		}
+		success = false
+	case "get-proof":
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.WriteProof(p.out); err != nil {
+			return false, err
+		}
+		success = false
+	case "get-unsat-core":
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.WriteUnsatCore(p.out); err != nil {
+			return false, err
+		}
+		success = false
+	case "echo":
+		if p.token != StringToken {
+			return false, fmt.Errorf("string expected")
+		}
+		text := p.scanner.String()
+		if err = p.advance(); err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if _, err = fmt.Fprintln(p.out, text); err != nil {
+			return false, err
+		}
+		success = false
+	case "exit":
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if p.context.PrintSuccess {
+			if _, err = fmt.Fprintln(p.out, "success"); err != nil {
+				return false, err
+			}
+		}
+		return true, nil
+	default:
+		return false, fmt.Errorf("unsupported command %s", name)
+	}
+	if err = p.expect(RightParenToken); err != nil {
+		return false, err
+	}
+	if success && p.context.PrintSuccess {
+		_, err = fmt.Fprintln(p.out, "success")
+	}
+	return false, err
+}
+
+func (p *commandParser) skipSExpr() error {
+	if p.token == EOFToken || p.token == RightParenToken {
+		return fmt.Errorf("attribute value expected")
+	}
+	if p.token != LeftParenToken {
+		return p.advance()
+	}
+	if err := p.advance(); err != nil {
+		return err
+	}
+	for p.token != RightParenToken {
+		if err := p.skipSExpr(); err != nil {
+			return err
+		}
+	}
+	return p.advance()
+}
+
+func (p *commandParser) expressions() ([]ast.ASTHandle, error) {
+	if err := p.expect(LeftParenToken); err != nil {
+		return nil, err
+	}
+	var values []ast.ASTHandle
+	for p.token != RightParenToken {
+		value, _, err := p.expression()
+		if err != nil {
+			return nil, err
+		}
+		values = append(values, value)
+	}
+	return values, p.advance()
+}
+
+// parseIndexed consumes (_ name index...), used for sorts and applications.
+func (p *commandParser) indexed() (string, []uint32, error) {
+	name, err := p.symbol()
+	if err != nil {
+		return "", nil, err
+	}
+	var indices []uint32
+	for p.token != RightParenToken {
+		value, err := p.unsigned()
+		if err != nil {
+			return "", nil, err
+		}
+		indices = append(indices, value)
+	}
+	return name, indices, p.advance()
+}
+
+func (p *commandParser) sort() (ast.ASTHandle, error) {
+	m, err := p.astManager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if p.token == SymbolToken {
+		name, err := p.symbol()
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		return p.pin(p.context.LookupSort(name))
+	}
+	if err := p.expect(LeftParenToken); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	name, err := p.symbol()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if name == "_" {
+		name, indices, err := p.indexed()
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		if name != "BitVec" || len(indices) != 1 {
+			return ast.ASTHandle{}, fmt.Errorf("unsupported indexed sort %s", name)
+		}
+		return p.pin(m.BitVectorSort(indices[0]))
+	}
+	if name == "Array" {
+		domain, err := p.sort()
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		rangeSort, err := p.sort()
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		if err = p.expect(RightParenToken); err != nil {
+			return ast.ASTHandle{}, err
+		}
+		return p.pin(m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{domain}), rangeSort))
+	}
+	return ast.ASTHandle{}, fmt.Errorf("unsupported sort constructor %s", name)
+}
+
+func (p *commandParser) indexedApplication(name string, indices []uint32, args []ast.ASTHandle, rangeSort ast.ASTHandle) (ast.ASTHandle, error) {
+	parameters := make([]ast.ASTParameter, len(indices))
+	defer func() {
+		for i := range parameters {
+			if parameters[i] != (ast.ASTParameter{}) {
+				_ = p.manager.DelParameter(&parameters[i])
+			}
+		}
+	}()
+	for i, index := range indices {
+		var err error
+		parameters[i], err = p.manager.NewParameterUint(index)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
+	return p.pin(p.context.MakeApp(name, args, parameters, rangeSort))
+}
+
+func parseBitVectorName(name string) (string, bool) {
+	if !strings.HasPrefix(name, "bv") || len(name) == 2 {
+		return "", false
+	}
+	for _, c := range name[2:] {
+		if c < '0' || c > '9' {
+			return "", false
+		}
+	}
+	return name[2:], true
+}
+
+func (p *commandParser) parseBVNumeral(name string, indices []uint32) (ast.ASTHandle, error) {
+	text, ok := parseBitVectorName(name)
+	if !ok || len(indices) != 1 {
+		return ast.ASTHandle{}, fmt.Errorf("invalid bit-vector numeral")
+	}
+	// A decimal SMT-LIB bv numeral is integral and may exceed machine width.
+	value, ok := new(big.Rat).SetString(text)
+	if !ok {
+		return ast.ASTHandle{}, fmt.Errorf("invalid bit-vector numeral")
+	}
+	return p.pin(p.manager.BitVectorNumeralRat(value, indices[0]))
+}

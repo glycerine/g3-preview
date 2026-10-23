@@ -1,0 +1,5 @@
+(set-logic UF)
+(declare-fun p (Bool) Bool)
+(assert (forall ((x Bool)) (p x)))
+(assert (not (p false)))
+(check-sat)

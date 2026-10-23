@@ -1,0 +1,5 @@
+(set-logic QF_BV)
+(declare-fun x () (_ BitVec 8))
+(assert (= x (_ bv171 8)))
+(assert (not (= ((_ extract 7 4) x) #xa)))
+(check-sat)

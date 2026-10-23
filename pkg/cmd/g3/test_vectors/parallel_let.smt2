@@ -1,0 +1,5 @@
+(set-logic QF_UF)
+(declare-fun p () Bool)
+(assert (let ((x p)) (let ((p false) (y x)) (and y (not p)))))
+(check-sat)
+(get-value (p))

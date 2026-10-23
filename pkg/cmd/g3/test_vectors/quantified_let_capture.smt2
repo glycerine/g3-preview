@@ -1,0 +1,5 @@
+(set-logic UF)
+(declare-fun r (Bool Bool) Bool)
+(assert (forall ((x Bool)) (let ((outer x)) (forall ((y Bool)) (r outer y)))))
+(assert (not (r false true)))
+(check-sat)

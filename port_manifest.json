@@ -37520,9 +37520,27 @@
       "path": "src/cmd_context/basic_cmds.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/runtime.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/results.go",
+        "pkg/cmd_context/context_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/expressions.go",
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMT2CommandsRejectMalformedInputBeforeEffects",
+        "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
+        "TestSMTLibRunnerProofScript",
+        "TestCommandContextNamedCoreAndProof"
+      ],
       "conditionals": [
         {
           "line": 450,
@@ -37549,7 +37567,39 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "retained Boolean set-option, echo and exit dispatch with print-success and initialized-option guards",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": [
+            "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
+            "TestSMTLibRunnerScripts"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "get-model/get-value/get-proof/get-unsat-core output and last-check availability through retained command context",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/results.go",
+          "tests": [
+            "TestCommandContextScopesDeclarationsAndModel",
+            "TestCommandContextNamedCoreAndProof",
+            "TestSMTLibRunnerProofScript"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "remaining basic commands and non-Boolean option values, metadata state queries and validation, model completion policy and remaining output modes",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -37557,9 +37607,27 @@
       "path": "src/cmd_context/basic_cmds.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/runtime.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/results.go",
+        "pkg/cmd_context/context_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/expressions.go",
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMT2CommandsRejectMalformedInputBeforeEffects",
+        "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
+        "TestSMTLibRunnerProofScript",
+        "TestCommandContextNamedCoreAndProof"
+      ],
       "conditionals": [
         {
           "line": 18,
@@ -37572,7 +37640,39 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "retained Boolean set-option, echo and exit dispatch with print-success and initialized-option guards",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": [
+            "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
+            "TestSMTLibRunnerScripts"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "get-model/get-value/get-proof/get-unsat-core output and last-check availability through retained command context",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/results.go",
+          "tests": [
+            "TestCommandContextScopesDeclarationsAndModel",
+            "TestCommandContextNamedCoreAndProof",
+            "TestSMTLibRunnerProofScript"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "remaining basic commands and non-Boolean option values, metadata state queries and validation, model completion policy and remaining output modes",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -37622,9 +37722,21 @@
       "path": "src/cmd_context/cmd_context.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/runtime.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/results.go",
+        "pkg/cmd_context/context_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestCommandContextScopesDeclarationsAndModel",
+        "TestCommandContextNamedCoreAndProof",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 1634,
@@ -37803,17 +37915,88 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "lazy manager/solver construction, logic selection, context_params proof/model/core configuration and owned service teardown",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "tests": [
+            "TestCommandContextScopesDeclarationsAndModel",
+            "TestCommandContextNamedCoreAndProof"
+          ],
+          "go_targets": [
+            "pkg/cmd_context/runtime.go"
+          ]
+        },
+        {
+          "name": "concrete nullary user sorts, function signature declarations, scoped/global declaration trails and original/named assertion ownership",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "tests": [
+            "TestCommandContextScopesDeclarationsAndModel",
+            "TestCommandContextNamedCoreAndProof"
+          ]
+        },
+        {
+          "name": "builtin plugin name registration and exact-sort concrete UF overload resolution for retained parsed applications; coercion and full logic validation remain open",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/applications.go",
+          "tests": [
+            "TestSMTLibRunnerScripts"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "push/pop, check_sat dispatch, last-result invalidation and get-model/get-value/get-proof/get-unsat-core command results through SMTSolver",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "tests": [
+            "TestCommandContextScopesDeclarationsAndModel",
+            "TestCommandContextNamedCoreAndProof",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/cmd_context/results.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "remaining command context: logic validation, coercions, macros/definitions, parametric sorts/datatypes, reset, limits, optimization and tactic/extension commands",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The command context owns its lazily created AST manager and SMTSolver, original assertion and optional core-tag ASTRefs, function/sort declaration trails and local params. Standalone sessions own and close the borrowed solver-service graph after context resources are released.",
+        "Scoped declarations are restored in trail order; global declarations survive pop and close with the session. Temporary returned model references and evaluators are closed after printing."
+      ],
+      "deviations": [
+        "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete."
+      ]
     },
     {
       "path": "src/cmd_context/cmd_context.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/runtime.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/results.go",
+        "pkg/cmd_context/context_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestCommandContextScopesDeclarationsAndModel",
+        "TestCommandContextNamedCoreAndProof",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -37840,9 +38023,68 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "lazy manager/solver construction, logic selection, context_params proof/model/core configuration and owned service teardown",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "tests": [
+            "TestCommandContextScopesDeclarationsAndModel",
+            "TestCommandContextNamedCoreAndProof"
+          ],
+          "go_targets": [
+            "pkg/cmd_context/runtime.go"
+          ]
+        },
+        {
+          "name": "concrete nullary user sorts, function signature declarations, scoped/global declaration trails and original/named assertion ownership",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "tests": [
+            "TestCommandContextScopesDeclarationsAndModel",
+            "TestCommandContextNamedCoreAndProof"
+          ]
+        },
+        {
+          "name": "builtin plugin name registration and exact-sort concrete UF overload resolution for retained parsed applications; coercion and full logic validation remain open",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/applications.go",
+          "tests": [
+            "TestSMTLibRunnerScripts"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "push/pop, check_sat dispatch, last-result invalidation and get-model/get-value/get-proof/get-unsat-core command results through SMTSolver",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "tests": [
+            "TestCommandContextScopesDeclarationsAndModel",
+            "TestCommandContextNamedCoreAndProof",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/cmd_context/results.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "remaining command context: logic validation, coercions, macros/definitions, parametric sorts/datatypes, reset, limits, optimization and tactic/extension commands",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The command context owns its lazily created AST manager and SMTSolver, original assertion and optional core-tag ASTRefs, function/sort declaration trails and local params. Standalone sessions own and close the borrowed solver-service graph after context resources are released.",
+        "Scoped declarations are restored in trail order; global declarations survive pop and close with the session. Temporary returned model references and evaluators are closed after printing."
+      ],
+      "deviations": [
+        "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete."
+      ]
     },
     {
       "path": "src/cmd_context/cmd_context_to_goal.cpp",
@@ -85782,8 +86024,34 @@
       "component": "parsers",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go", "pkg/parsers/smt2/local_sort_stack.go", "pkg/parsers/smt2/local_expr_stack.go", "pkg/parsers/smt2/local_sort_names.go", "pkg/parsers/smt2/datatype_validation.go", "pkg/parsers/smt2/local_match_variable.go", "pkg/parsers/smt2/local_match_variable_test.go"],
-      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2LocalReferenceStacksFrameShrinkAndReset", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup", "TestSMT2SortAndDatatypeNameTablesSourceScopes", "TestSMT2DatatypeNameChecksSourcePriorityAndPartialRewrite", "TestSMT2MatchVariableSourceBindingLevelAndCaseScope"],
+      "go_targets": [
+        "pkg/parsers/smt2/local_environment.go",
+        "pkg/parsers/smt2/local_lookup.go",
+        "pkg/parsers/smt2/local_sort_stack.go",
+        "pkg/parsers/smt2/local_expr_stack.go",
+        "pkg/parsers/smt2/local_sort_names.go",
+        "pkg/parsers/smt2/datatype_validation.go",
+        "pkg/parsers/smt2/local_match_variable.go",
+        "pkg/parsers/smt2/local_match_variable_test.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/expressions.go",
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestSMT2ParserPushLocalShiftsFreeVariables",
+        "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders",
+        "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
+        "TestSMT2LocalReferenceStacksFrameShrinkAndReset",
+        "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup",
+        "TestSMT2SortAndDatatypeNameTablesSourceScopes",
+        "TestSMT2DatatypeNameChecksSourcePriorityAndPartialRewrite",
+        "TestSMT2MatchVariableSourceBindingLevelAndCaseScope",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMT2CommandsRejectMalformedInputBeforeEffects",
+        "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess"
+      ],
       "assertions": [
         {
           "line": 250,
@@ -86301,51 +86569,128 @@
           "name": "parse_match_pattern non-constructor variable inserts a borrowed local at the pre-increment binding level after pushing its owned var (smt2parser.cpp:1499-1510)",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/local_match_variable.go",
-          "tests": ["TestSMT2MatchVariableSourceBindingLevelAndCaseScope"]
+          "tests": [
+            "TestSMT2MatchVariableSourceBindingLevelAndCaseScope"
+          ]
         },
         {
           "name": "push_local and parse_expr_name selected local-binding branch: borrowed ground/same-level term or source var_shifter free-index adjustment, then owning expression-stack reference (smt2parser.cpp:1695-1721)",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/local_lookup.go",
-          "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders"]
+          "tests": [
+            "TestSMT2ParserPushLocalShiftsFreeVariables",
+            "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders"
+          ]
         },
         {
           "name": "parse_qualified_name selected local sort/index checks after push_local, owning sort-stack pop on successful match, and expression-reference cleanup on refusal; parser frame integration remains open (smt2parser.cpp:1723-1729,1735-1754)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/local_lookup.go",
-          "tests": ["TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup"]
+          "tests": [
+            "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
+            "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup"
+          ]
         },
         {
-          "name": "Selected parser sort and expression reference stack ownership, command-frame shrink and reset (smt2parser.cpp:230-240,2818-2832,2992-3003); scanner and command execution integration remain open",
+          "name": "Selected parser sort and expression reference stack ownership, command-frame shrink and reset (smt2parser.cpp:230-240,2818-2832,2992-3003); retained command integration is connected; complete frame recovery remains open",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/local_expr_stack.go",
-          "go_targets": ["pkg/parsers/smt2/local_sort_stack.go"],
-          "tests": ["TestSMT2LocalReferenceStacksFrameShrinkAndReset", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup"]
+          "go_targets": [
+            "pkg/parsers/smt2/local_sort_stack.go"
+          ],
+          "tests": [
+            "TestSMT2LocalReferenceStacksFrameShrinkAndReset",
+            "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup"
+          ]
         },
         {
-          "name": "Selected sort-parameter and datatype declaration name bookkeeping with source reset boundaries; scanner and parameterized-sort construction remain open",
+          "name": "Selected sort-parameter and datatype declaration name bookkeeping with source reset boundaries; parameterized-sort construction and datatype command integration remain open",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/local_sort_names.go",
-          "tests": ["TestSMT2SortAndDatatypeNameTablesSourceScopes"]
+          "tests": [
+            "TestSMT2SortAndDatatypeNameTablesSourceScopes"
+          ]
         },
         {
           "name": "Selected parse_declare_datatype(s) name validation: single missing-first, multi-declaration fix_missing_refs before duplicate checks, exact positioned diagnostics; AST commit and command publication remain open (smt2parser.cpp:885-920,930-954,981-1001)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/datatype_validation.go",
-          "go_targets": ["pkg/smtcore/param_datatype_refs.go"],
-          "tests": ["TestSMT2DatatypeNameChecksSourcePriorityAndPartialRewrite"]
+          "go_targets": [
+            "pkg/smtcore/param_datatype_refs.go"
+          ],
+          "tests": [
+            "TestSMT2DatatypeNameChecksSourcePriorityAndPartialRewrite"
+          ]
+        },
+        {
+          "name": "ParseCommands retained dispatch: set-logic, Boolean set-option, metadata consumption, nullary declare-sort, declare-fun/const, assert, push/pop, check-sat/assuming and result commands",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMT2CommandsRejectMalformedInputBeforeEffects",
+            "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "retained expression grammar: builtin/UF applications, exact numerals/strings/BV literals, indexed identifiers, basic qualified identifiers, Bool/Int/Real/user/BV/Array sorts, universal/existential and parallel let bindings",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/expressions.go",
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "assertion-root named attributes for unsat cores; general annotation and named alias publication remain open",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/expressions.go",
+          "tests": [
+            "TestSMTLibRunnerScripts"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "remaining parser grammar and command recovery: definitions/recursive functions, parametric/datatype declarations, pattern/other attributes, complete qualified local resolution, options and extensions",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
         }
       ],
-      "ownership": [],
-      "deviations": ["The selected local lookup returns an owning ASTRef for the future parser expression stack and reuses the concrete AST var_shifter; scanner, command-context fallback, other parser branches and complete expression-stack integration remain unported."]
+      "ownership": [
+        "Each parsed command holds ASTRefs for all constructed terms/sorts until the command context acquires its declaration/assertion references. Existing concrete local binding and var-shifting helpers own quantifier/let frames and are unwound on success and error."
+      ],
+      "deviations": [
+        "The selected local lookup returns an owning ASTRef for the future parser expression stack and reuses the concrete AST var_shifter; scanner, command-context fallback, other parser branches and complete expression-stack integration remain unported.",
+        "Go recursive grammar functions replace source explicit parser frame dispatch for retained branches. The current runner stops on the first command error; full C++ recovery and unsupported grammar branches remain open and fail explicitly."
+      ]
     },
     {
       "path": "src/parsers/smt2/smt2parser.h",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/expressions.go",
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMT2CommandsRejectMalformedInputBeforeEffects",
+        "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -86358,25 +86703,77 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "ParseCommands retained dispatch: set-logic, Boolean set-option, metadata consumption, nullary declare-sort, declare-fun/const, assert, push/pop, check-sat/assuming and result commands",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMT2CommandsRejectMalformedInputBeforeEffects",
+            "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "retained expression grammar: builtin/UF applications, exact numerals/strings/BV literals, indexed identifiers, basic qualified identifiers, Bool/Int/Real/user/BV/Array sorts, universal/existential and parallel let bindings",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/expressions.go",
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "assertion-root named attributes for unsat cores; general annotation and named alias publication remain open",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/expressions.go",
+          "tests": [
+            "TestSMTLibRunnerScripts"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "remaining parser grammar and command recovery: definitions/recursive functions, parametric/datatype declarations, pattern/other attributes, complete qualified local resolution, options and extensions",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Each parsed command holds ASTRefs for all constructed terms/sorts until the command context acquires its declaration/assertion references. Existing concrete local binding and var-shifting helpers own quantifier/let frames and are unwound on success and error."
+      ],
+      "deviations": [
+        "Go recursive grammar functions replace source explicit parser frame dispatch for retained branches. The current runner stops on the first command error; full C++ recovery and unsupported grammar branches remain open and fail explicitly."
+      ]
     },
     {
       "path": "src/parsers/smt2/smt2scanner.cpp",
       "component": "parsers",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/parsers/smt2/scanner.go",
-        "pkg/parsers/smt2/scanner_test.go"
+        "pkg/parsers/smt2/scanner_test.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMT2ScannerCommandTokensAndExactNumerals",
         "TestSMT2ScannerComplianceQuotedEscapesAndLocations",
         "TestSMT2ScannerInputCachingAndRecovery",
         "TestSMT2ScannerMalformedAndEOFGuards",
-        "TestSMT2ScannerSourceTraceAndLargeTokens"
+        "TestSMT2ScannerSourceTraceAndLargeTokens",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "assertions": [
         {
@@ -86438,10 +86835,16 @@
           ]
         },
         {
-          "name": "construction from cmd_context parameters and top-level SMT-LIB parser consumption",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "construction from cmd_context compliant-mode parameters and top-level SMT-LIB parser consumption",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
         }
       ],
       "ownership": [
@@ -86449,7 +86852,7 @@
         "No AST handles are owned by the lexer. The future command parser interns identifiers and constructs AST numerals when consuming tokens."
       ],
       "deviations": [
-        "Go buffered byte input replaces the source 1024-byte and interactive stream paths. The lexical constructor currently receives the compliant-mode snapshot directly until cmd_context integration is ported.",
+        "Go buffered byte input replaces the source 1024-byte and interactive stream paths. The command parser supplies the compliant-mode snapshot from the retained cmd_context parameters.",
         "EOF guards terminate final bit-vector literals and quoted strings without reading the stale source current-byte value after stream exhaustion. Cached-string bounds are validated before whitespace trimming.",
         "Identifier spellings use Go strings rather than porting symbol/string allocation internals; scanner diagnostics use typed Go errors with source line and column fields."
       ]
@@ -86458,17 +86861,21 @@
       "path": "src/parsers/smt2/smt2scanner.h",
       "component": "parsers",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/parsers/smt2/scanner.go",
-        "pkg/parsers/smt2/scanner_test.go"
+        "pkg/parsers/smt2/scanner_test.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMT2ScannerCommandTokensAndExactNumerals",
         "TestSMT2ScannerComplianceQuotedEscapesAndLocations",
         "TestSMT2ScannerInputCachingAndRecovery",
         "TestSMT2ScannerMalformedAndEOFGuards",
-        "TestSMT2ScannerSourceTraceAndLargeTokens"
+        "TestSMT2ScannerSourceTraceAndLargeTokens",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -86506,10 +86913,16 @@
           ]
         },
         {
-          "name": "construction from cmd_context parameters and top-level SMT-LIB parser consumption",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "construction from cmd_context compliant-mode parameters and top-level SMT-LIB parser consumption",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ]
         }
       ],
       "ownership": [
@@ -86517,7 +86930,7 @@
         "No AST handles are owned by the lexer. The future command parser interns identifiers and constructs AST numerals when consuming tokens."
       ],
       "deviations": [
-        "Go buffered byte input replaces the source 1024-byte and interactive stream paths. The lexical constructor currently receives the compliant-mode snapshot directly until cmd_context integration is ported.",
+        "Go buffered byte input replaces the source 1024-byte and interactive stream paths. The command parser supplies the compliant-mode snapshot from the retained cmd_context parameters.",
         "EOF guards terminate final bit-vector literals and quoted strings without reading the stale source current-byte value after stream exhaustion. Cached-string bounds are validated before whitespace trimming.",
         "Identifier spellings use Go strings rather than porting symbol/string allocation internals; scanner diagnostics use typed Go errors with source line and column fields."
       ]
@@ -98074,7 +98487,9 @@
         "pkg/shell/input_file_option.go",
         "pkg/shell/command_line.go",
         "pkg/shell/command_line_output.go",
-        "pkg/shell/dispatch_memory.go"
+        "pkg/shell/dispatch_memory.go",
+        "pkg/cmd/g3/main.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestShellGlobalTimeoutOptionSourceBranch",
@@ -98087,7 +98502,11 @@
         "TestShellCommandLineReachesGlobalParameterAndTimeoutOwners",
         "TestShellCommandLineDebugAndTraceBuildGates",
         "TestShellResolveSourceInputExtension",
-        "TestShellMemoryDispatchSourceExitText"
+        "TestShellMemoryDispatchSourceExitText",
+        "TestSMTLibRunnerCommandLine",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -98243,13 +98662,31 @@
             "TestShellResolveSourceInputExtension",
             "TestShellMemoryDispatchSourceExitText"
           ]
+        },
+        {
+          "name": "native Go SMT-LIB file/stdin frontend through the retained shell option scanner, context initialization, parser, SMTSolver and model/proof/core output; opt-in C++ executable differential vectors",
+          "status": "ported",
+          "go_target": "pkg/cmd/g3/main.go",
+          "tests": [
+            "TestSMTLibRunnerCommandLine",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
+        },
+        {
+          "name": "remaining frontend and process integration: full options/statistics, resource limits, signal handling, validation, and other input frontends",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
         }
       ],
       "ownership": [
         "The concrete command-line scan borrows actual global-parameter, timeout, verbosity, warning, trace-tag and debug contexts. It owns parser flags and filename state; -file can overwrite or clear selection, and a selected empty filename remains distinct from a null pointer. Parameter-display terminal output uses the actual global-parameter service and a shared stdout buffer for -pp. Help/version output and frontend dispatch remain unported."
       ],
       "deviations": [
-        "The concrete scan reaches -T, -v, -nw, -t, -memory, name=value and build-gated -tr/-dbg through actual utility services and preserves option order, early terminal selection, input-kind flags, duplicate warnings, C-string boundaries and -file direct assignment. Trace and debug options are unknown in builds without their corresponding source gate; compiled builds mutate borrowed tag contexts. -p/-pd/-pm/-pp terminal actions now display through the real global-parameter service, including the -pp diagnostic line and -pm usage suffix. Rendering writes directly to the borrowed stdout writer in source insertion order, preserving a completed prefix on refusal. Help/version output, process exit, Windows slash options and frontend dispatch remain open. Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go -T branch returns an explicit range error."
+        "The concrete scan reaches -T, -v, -nw, -t, -memory, name=value and build-gated -tr/-dbg through actual utility services and preserves option order, early terminal selection, input-kind flags, duplicate warnings, C-string boundaries and -file direct assignment. Trace and debug options are unknown in builds without their corresponding source gate; compiled builds mutate borrowed tag contexts. -p/-pd/-pm/-pp terminal actions now display through the real global-parameter service, including the -pp diagnostic line and -pm usage suffix. Rendering writes directly to the borrowed stdout writer in source insertion order, preserving a completed prefix on refusal. Help/version output, process exit, Windows slash options and frontend dispatch remain open. Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go -T branch returns an explicit range error.",
+        "The early Go executable dispatches the retained SMT-LIB subset directly to SMTSolver. Source tactic-based solver factories, optimization/interpolation/fixedpoint frontend commands and other input formats remain incomplete."
       ]
     },
     {
@@ -98355,14 +98792,42 @@
       "path": "src/shell/smtlib_frontend.cpp",
       "component": "shell",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/cmd/g3/main.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestSMTLibRunnerCommandLine",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTLibRunnerProofScript"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "native Go SMT-LIB file/stdin frontend through the retained shell option scanner, context initialization, parser, SMTSolver and model/proof/core output; opt-in C++ executable differential vectors",
+          "status": "ported",
+          "go_target": "pkg/cmd/g3/main.go",
+          "tests": [
+            "TestSMTLibRunnerCommandLine",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
+        },
+        {
+          "name": "remaining frontend and process integration: full options/statistics, resource limits, signal handling, validation, and other input frontends",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The early Go executable dispatches the retained SMT-LIB subset directly to SMTSolver. Source tactic-based solver factories, optimization/interpolation/fixedpoint frontend commands and other input formats remain incomplete."
+      ]
     },
     {
       "path": "src/shell/smtlib_frontend.h",

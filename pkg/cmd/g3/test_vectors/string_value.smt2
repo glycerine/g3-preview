@@ -1,0 +1,5 @@
+(set-logic QF_S)
+(declare-fun x () String)
+(assert (= x "a""b"))
+(check-sat)
+(get-value (x))
