@@ -96,6 +96,7 @@ type SMTInternalizerCongruence struct {
 }
 
 type SMTInternalizerState struct {
+	theoryProgress           uint64
 	manager                  *ast.ASTManager
 	context                  *SMTCheckerContext
 	congruence               *SMTCongruenceTable

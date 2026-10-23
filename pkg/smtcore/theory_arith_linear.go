@@ -78,6 +78,8 @@ type smtLinearArithmeticAtom struct {
 }
 
 type smtLinearArithmeticScope struct {
+	nonlinearBounds           int
+	nonlinearStrategy         uint32
 	nonlinearGBExhausted      bool
 	atoms, assertions         int
 	head                      int
@@ -108,6 +110,8 @@ type smtLinearArithmeticStatistics struct {
 // bound. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	nonlinearBounds       []smtNonlinearDerivedBound
+	nonlinearStrategy     uint32
 	nonlinearGBPerturbate bool
 	nonlinearGBExhausted  bool
 	*SMTTheoryBase
@@ -1141,25 +1145,26 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(branches []smtLinearI
 			}
 		}
 	}
+	for _, bound := range t.nonlinearBounds {
+		if _, err := smtTightenSimplexBound(solver, bound.column, bound.lower, bound.value); err != nil {
+			return solver, lbool.False, nil
+		}
+	}
 	for index := range branches {
 		branch := &branches[index]
 		bound := simplex.RationalInfinitesimal(&branch.value)
 		var err error
-		if branch.lower {
-			err = solver.SetLower(branch.variable, bound)
-		} else {
-			err = solver.SetUpper(branch.variable, bound)
-		}
+		_, err = smtTightenSimplexBound(solver, branch.variable, branch.lower, bound)
 		if err != nil {
 			return solver, lbool.False, nil
 		}
 	}
 	for column, value := range values {
 		bound := simplex.RationalInfinitesimal(value)
-		if err := solver.SetLower(column, bound); err != nil {
+		if _, err := smtTightenSimplexBound(solver, column, true, bound); err != nil {
 			return solver, lbool.False, nil
 		}
-		if err := solver.SetUpper(column, bound); err != nil {
+		if _, err := smtTightenSimplexBound(solver, column, false, bound); err != nil {
 			return solver, lbool.False, nil
 		}
 	}
@@ -1293,7 +1298,7 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
-	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail), nonlinearTerms: len(t.nonlinearColumns), nonlinearRounds: t.nonlinearRounds, nonlinearGBExhausted: t.nonlinearGBExhausted})
+	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail), nonlinearTerms: len(t.nonlinearColumns), nonlinearRounds: t.nonlinearRounds, nonlinearGBExhausted: t.nonlinearGBExhausted, nonlinearBounds: len(t.nonlinearBounds), nonlinearStrategy: t.nonlinearStrategy})
 	return nil
 }
 
@@ -1328,6 +1333,9 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 	t.nonlinearColumns = t.nonlinearColumns[:scope.nonlinearTerms]
 	t.nonlinearRounds = scope.nonlinearRounds
 	t.nonlinearGBExhausted = scope.nonlinearGBExhausted
+	clear(t.nonlinearBounds[scope.nonlinearBounds:])
+	t.nonlinearBounds = t.nonlinearBounds[:scope.nonlinearBounds]
+	t.nonlinearStrategy = scope.nonlinearStrategy
 	t.scopes = t.scopes[:level]
 	if err := t.equalityAdapter.PopScopes(count); err != nil {
 		return err
@@ -1409,7 +1417,7 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if conflict {
 		return SMTFinalCheckContinue, nil
 	}
-	if !satisfied && t.nonlinearEnabled {
+	if (!satisfied || !complete) && t.nonlinearEnabled && len(t.nonlinearColumns) != 0 {
 		if t.nonlinearRounds > t.nonlinearRoundLimit {
 			return SMTFinalCheckGiveUp, nil
 		}
@@ -1417,9 +1425,11 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		// A branch-and-bound tableau contains speculative bounds. Replay
 		// interval propagation inside buildSimplex, where a contradiction
 		// rejects only that branch rather than the whole SMT context.
-		satisfied, err = t.completeNonlinearCandidate()
-		if err != nil {
-			return SMTFinalCheckGiveUp, err
+		if !satisfied {
+			satisfied, err = t.completeNonlinearCandidate()
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
 		}
 		if satisfied {
 			complete, conflict, err = t.checkNonlinearAssertions(true)
@@ -1433,29 +1443,11 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	}
 	if !satisfied || !complete {
 		if t.nonlinearEnabled && len(t.nonlinearColumns) != 0 {
-			conflict, err := t.checkCrossNestedConsistency()
+			progress, err := t.runNonlinearStrategies()
 			if err != nil {
 				return SMTFinalCheckGiveUp, err
 			}
-			if conflict {
-				return SMTFinalCheckContinue, nil
-			}
-		}
-		if t.nonlinearEnabled && t.nonlinearGB && len(t.nonlinearColumns) != 0 {
-			conflict, err := t.checkNonlinearGrobner()
-			if err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-			if conflict {
-				return SMTFinalCheckContinue, nil
-			}
-		}
-		if t.nonlinearEnabled && t.nonlinearBranching && len(t.nonlinearColumns) != 0 {
-			branched, err := t.branchNonlinearIntegerVariable()
-			if err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-			if branched {
+			if progress {
 				return SMTFinalCheckContinue, nil
 			}
 		}
@@ -1813,6 +1805,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions(validated bool) (bo
 }
 
 func (t *SMTLinearArithmeticTheory) InitializeSearch() error {
+	t.nonlinearStrategy = 0
 	t.nonlinearGBExhausted = false
 	return t.equalityAdapter.InitializeSearch()
 }

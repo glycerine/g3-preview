@@ -87,16 +87,16 @@ func TestSMTNonlinearIntegerBranchesScopedProofsAndModels(t *testing.T) {
 						status, err := s.CheckSat(nil)
 						astTestMust(t, err)
 						want := tc.want
-						if !enabled {
+						if !enabled && tc.want != lbool.False {
 							want = lbool.Undef
 						}
 						if status != want {
 							t.Fatal("nonlinear integer split", status, want)
 						}
-						if enabled && theory.statistics.nonlinearBranches == 0 {
+						if enabled && status == lbool.True && theory.statistics.nonlinearBranches == 0 {
 							t.Fatal("integer nonlinear branching was not exercised")
 						}
-						if !enabled {
+						if !enabled && status == lbool.Undef {
 							state := s.kernel.internalizer
 							previous := len(state.booleanData)
 							branched, err := theory.branchNonlinearIntegerVariable()
@@ -150,6 +150,9 @@ func TestSMTNonlinearIntegerBranchesScopedProofsAndModels(t *testing.T) {
 						astTestMust(t, s.Pop(1))
 						if theory.nonlinearRounds != 0 {
 							t.Fatal("nonlinear round budget survived scope pop", theory.nonlinearRounds)
+						}
+						if len(theory.nonlinearBounds) != 0 || theory.nonlinearStrategy != 0 {
+							t.Fatal("nonlinear strategy facts survived scope pop")
 						}
 						status, err = s.CheckSat(nil)
 						astTestMust(t, err)

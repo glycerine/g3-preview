@@ -106034,7 +106034,9 @@
         "pkg/smtcore/theory_arith_mixed_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_theory_relevance_test.go",
-        "pkg/smtcore/theory_arith_division_test.go"
+        "pkg/smtcore/theory_arith_division_test.go",
+        "pkg/smtcore/theory_arith_nonlinear_strategy.go",
+        "pkg/smtcore/theory_arith_nonlinear_strategy_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -106069,7 +106071,8 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
-        "TestSMTArithmeticSymbolicZeroDivisorGuard"
+        "TestSMTArithmeticSymbolicZeroDivisorGuard",
+        "TestSMTNonlinearNumericProgressAndScopedStrategies"
       ],
       "conditionals": [
         {
@@ -107119,6 +107122,14 @@
           "tests": [
             "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
             "TestSMTArithmeticSymbolicZeroDivisorGuard"
+          ]
+        },
+        {
+          "name": "final_check arithmetic numeric progress reaches the next search iteration without a new Boolean atom or clause; concrete Go generation extends the existing no-progress guard",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_search.go",
+          "tests": [
+            "TestSMTNonlinearNumericProgressAndScopedStrategies"
           ]
         }
       ],
@@ -115241,7 +115252,9 @@
         "pkg/smtcore/theory_arith_nested_mixed_test.go",
         "pkg/smtcore/theory_arith_grobner_order.go",
         "pkg/smtcore/theory_arith_cluster.go",
-        "pkg/smtcore/theory_arith_cluster_test.go"
+        "pkg/smtcore/theory_arith_cluster_test.go",
+        "pkg/smtcore/theory_arith_nonlinear_strategy.go",
+        "pkg/smtcore/theory_arith_nonlinear_strategy_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -115261,7 +115274,8 @@
         "TestSMTCrossNestedArithmeticScopedProofs",
         "TestSMTNestedPolynomialIdentityAtRationalPoints",
         "TestSMTNestedMixedCoefficientSortGuards",
-        "TestSMTNonlinearClusterInequalityRowsScopedProofs"
+        "TestSMTNonlinearClusterInequalityRowsScopedProofs",
+        "TestSMTNonlinearNumericProgressAndScopedStrategies"
       ],
       "conditionals": [
         {
@@ -115674,7 +115688,21 @@
           ]
         },
         {
-          "name": "max/min bound discovery, fair strategy rotation, complete row-level nested polynomial checks, and irrational models",
+          "name": "process_non_linear fair strategy rotation and scoped derived bounds: retry bound propagation, nested-polynomial consistency, Grobner reasoning and integer branching from the next index, preserve unconditional interval improvements across tableau replay and restore on pop",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_nonlinear_strategy.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTNonlinearNumericProgressAndScopedStrategies",
+            "TestSMTNonlinearIntegerBranchesScopedProofsAndModels",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "max/min bound discovery and assignment adjustment, complete row-level nested polynomial checks, and irrational models",
           "status": "unported",
           "go_target": null,
           "tests": [
@@ -115691,7 +115719,8 @@
         "Products with all factors fixed, any fixed zero factor, or exactly one unfixed factor are propagated during tableau replay before MakeFeasible, including when arith.nl is false. The one-unfixed-factor path creates the source affine relation m-k*x and fixes a fresh auxiliary column at zero, preserving the tableau basis and retaining the conditional fixed-bound premises in the current replay. Rebuilding after a pop or integer branch removes conditional rows without a persistent source m_nl_propagated trail.",
         "Cross-nested polynomial construction now factors repeated variables recursively using source Horner and completing-square transformations, then evaluates exact intervals while respecting existing internalized-column bounds. The replay integration checks active comparison polynomials directly and uses all active assertion literals for conflicts; full row/cluster traversal and source bound-weighted resource accounting remain incomplete. Integer rows clear coefficient denominators; mixed rows are skipped when coercions are disabled. Optional square completion falls back to Horner when its offset or leading coefficient would require a fractional Int numeral. Temporary polynomial ASTs are pinned for the check and released on every return.",
         "The source default variable-order perturbation path is now retained: each eligible lower linear variable is promoted once above weights 0..7, UpdateOrder requeues equations with changed leading terms, and basis computation repeats. Equation-threshold exhaustion stops further rounds in the same search, is scoped, and resets in InitializeSearch. The optional derived-equation insertion path is excluded under the retained-consumer rule: a complete src scan finds m_nl_arith_gb_eqs only in its false constructor initializer, field declaration, diagnostic display and guarded call; updt_params does not expose a setter, and internalize_gb_eq/monomial2expr have no other callers.",
-        "Nonlinear clusters now follow actual column/row incidence after simplex pivots, stopping expansion at fixed variables and pruning rows whose different base variable is free. Clustered canonical rows are sent to Grobner reasoning with their current bounds. Replay-only comparison columns use pinned local Real AST variables indexed by column; these polynomial-elimination aliases are released at the end of the call and never enter the SMT context or public model. Existing definition/opposite-bound seeds remain valid redundant equations. The replay tableau has no quasi-base row representation."
+        "Nonlinear clusters now follow actual column/row incidence after simplex pivots, stopping expansion at fixed variables and pruning rows whose different base variable is free. Clustered canonical rows are sent to Grobner reasoning with their current bounds. Replay-only comparison columns use pinned local Real AST variables indexed by column; these polynomial-elimination aliases are released at the end of the call and never enter the SMT context or public model. Existing definition/opposite-bound seeds remain valid redundant equations. The replay tableau has no quasi-base row representation.",
+        "The source four-way nonlinear strategy index is now scoped and resets at search initialization. Interval improvements derived from a branch-free tableau are retained as scoped theory-column bounds and strengthened on replay, including integer-feasibility replay; speculative branch bounds never justify global conflicts. The source nonlinear round limit covers repeated attempts. Numeric-only progress increments an internal search generation so the Go no-progress guard retries final checking without inventing Boolean atoms. Remaining driver work includes max/min bound discovery and assignment movement, full row-level nested checks and source resource/dependency refinements."
       ]
     },
     {
