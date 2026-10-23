@@ -549,7 +549,11 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 			index--
 			continue
 		}
-		reduced, err := t.solveZeroLengthBoundary(left, right, dependency)
+		reduced, err := t.addTailEmptyMaximum(left, right)
+		if err != nil || reduced {
+			return reduced, err
+		}
+		reduced, err = t.solveZeroLengthBoundary(left, right, dependency)
 		if err != nil || reduced {
 			return reduced, err
 		}

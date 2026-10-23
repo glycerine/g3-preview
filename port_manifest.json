@@ -104173,6 +104173,7 @@
         "TestSMTConflictJustificationMaximumAssignmentLevels",
         "TestSMTConflictClauseMaximumLevelWatchConsequentAndAttachedJustification",
         "TestSMTConflictResolverBuildsFirstUIPLemmaAndBackjumpLevel",
+        "TestSMTConflictResolverIgnoresTrueAntecedent",
         "TestSMTConflictResolverOwnsFirstUIPProof",
         "TestSMTConflictProofReconstructsEnodeEqualityBranch",
         "TestSMTConflictProofBuildsEqualityRootAndConflictJustifications",
@@ -116776,7 +116777,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_disequality_solve.go", "pkg/smtcore/theory_seq_disequality_fixed.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_fixed_length.go", "pkg/smtcore/theory_seq_length_split.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_extensionality.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_extract_special.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_ground.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_disequality_solve.go", "pkg/smtcore/theory_seq_disequality_fixed.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_tail_bound.go", "pkg/smtcore/theory_seq_fixed_length.go", "pkg/smtcore/theory_seq_length_split.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_extensionality.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_extract_special.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_ground.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -116786,6 +116787,7 @@
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
         "TestSMTSequenceTheoryLiteralConflictAndConcatModel",
         "TestSMTSequenceTheoryAuditsUnresolvedWordEquation",
+        "TestSMTSequenceTheoryPropagatesTailEmptyMaximumLength",
         "TestSMTSequenceTheoryConcreteWordEquationConflict",
         "TestSMTSequenceTheoryConcreteWordDisequationConflict",
         "TestSMTSequenceTheoryReducedWordDisequationConflict",
@@ -117340,6 +117342,12 @@
           "tests": ["TestSMTSequenceTheorySplitsFixedLengthPrefixes", "TestSMTSequenceTheoryRejectsFixedLengthWordMismatch", "TestSMTSequenceTheoryBranchesLeadingVariableOverlap", "TestSMTSequenceTheoryBranchesPrefixedVariableOverlap"]
         },
         {
+          "name": "seq.tail empty maximum-length propagation with arbitrary-precision indices, finite-upper-bound suppression, solved-tail final-check discovery, and guarded length consequence (src/smt/theory_seq.cpp:1524-1538)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_tail_bound.go",
+          "tests": ["TestSMTSequenceTheoryPropagatesTailEmptyMaximumLength"]
+        },
+        {
           "name": "complete fixed-string binary word-equation branching with finite prefix-overlap alternatives, exhaustive variable-prefix splits against fixed string and generic seq.unit words, an unbounded shared-tail Skolem family, exact rejection of self-referential fixed tails with unequal lengths or no cyclic rotation, and cyclic unit-element compatibility constraints (src/smt/theory_seq.cpp:335-790,1554-1763)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_binary.go",
@@ -117491,7 +117499,7 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_tail_bound.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -117499,7 +117507,9 @@
         "TestSMTSequenceDisequationQueueScopesAndOwnedCases",
         "TestSMTSequenceNonContainsQueueAndAssignmentScopes",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
-        "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary",
+        "TestSMTSequenceTheoryLiteralConflictAndConcatModel",
+        "TestSMTSequenceTheoryAuditsUnresolvedWordEquation",
+        "TestSMTSequenceTheoryPropagatesTailEmptyMaximumLength",
         "TestSMTSequenceTheoryConcreteWordEquationConflict",
         "TestSMTSequenceTheoryConcreteWordDisequationConflict",
         "TestSMTSequenceTheoryConcreteNonContainsConflict",
@@ -117621,6 +117631,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_length.go",
           "tests": ["TestSMTSequenceTheoryLengthAxioms"]
+        },
+        {
+          "name": "seq.tail recognition and empty-tail maximum-length propagation declaration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_tail_bound.go",
+          "tests": ["TestSMTSequenceTheoryPropagatesTailEmptyMaximumLength"]
         },
         {
           "name": "seq.at boundary and in-bounds decomposition declarations",

@@ -490,6 +490,14 @@ func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) error {
 	if err != nil {
 		return err
 	}
+	leftSort, err := state.manager.GetSort(leftNode.Owner())
+	if err != nil {
+		return err
+	}
+	sequence, _, err := t.sequenceSort(leftSort)
+	if err != nil {
+		return err
+	}
 	leftConcat, err := state.manager.IsSequenceConcat(leftNode.Owner())
 	if err != nil {
 		return err
@@ -498,7 +506,7 @@ func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) error {
 	if err != nil {
 		return err
 	}
-	if leftConcat || rightConcat {
+	if sequence && leftNode != rightNode && (leftConcat || rightConcat) {
 		leftParts, flattenErr := state.manager.SequenceFlattenConcat(leftNode.Owner())
 		if flattenErr != nil {
 			return flattenErr
@@ -511,6 +519,7 @@ func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) error {
 			return flattenErr
 		}
 		t.nextEquation++
+		return nil
 	}
 	left, leftDependency, err := t.solutions.Find(leftNode.Owner())
 	if err != nil {
@@ -913,7 +922,16 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		}
 		return state.Inconsistent() || state.searchProgress() != before, nil
 	}
-	progress, err := t.addIntegerStringLengthRefinement()
+	progress, err := t.addSolvedTailEmptyMaximum()
+	if err != nil {
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence tail maximum length: %w", err)
+	}
+	if progress, err = propagateAxioms(progress); err != nil {
+		return SMTFinalCheckGiveUp, err
+	} else if progress {
+		return SMTFinalCheckContinue, nil
+	}
+	progress, err = t.addIntegerStringLengthRefinement()
 	if err != nil {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence integer-string length: %w", err)
 	}
