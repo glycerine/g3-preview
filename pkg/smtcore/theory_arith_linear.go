@@ -78,16 +78,17 @@ type smtLinearArithmeticAtom struct {
 }
 
 type smtLinearArithmeticScope struct {
-	derivedBounds             int
-	nonlinearStrategy         uint32
-	nonlinearGBExhausted      bool
-	atoms, assertions         int
-	head                      int
-	unsupported               bool
-	castTerms, castPredicates int
-	divisionTerms             int
-	nonlinearTerms            int
-	nonlinearRounds           uint32
+	assumeEqualities, assumeEqualityHead int
+	derivedBounds                        int
+	nonlinearStrategy                    uint32
+	nonlinearGBExhausted                 bool
+	atoms, assertions                    int
+	head                                 int
+	unsupported                          bool
+	castTerms, castPredicates            int
+	divisionTerms                        int
+	nonlinearTerms                       int
+	nonlinearRounds                      uint32
 }
 
 type smtLinearIntegerBranch struct {
@@ -111,10 +112,12 @@ type smtLinearArithmeticStatistics struct {
 // bound. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
-	derivedBounds         []smtArithmeticReplayBound
-	nonlinearStrategy     uint32
-	nonlinearGBPerturbate bool
-	nonlinearGBExhausted  bool
+	assumeEqualityCandidates []smtArithmeticEqualityCandidate
+	assumeEqualityHead       int
+	derivedBounds            []smtArithmeticReplayBound
+	nonlinearStrategy        uint32
+	nonlinearGBPerturbate    bool
+	nonlinearGBExhausted     bool
 	*SMTTheoryBase
 	solver              *simplex.Solver
 	simplexVariables    []uint32
@@ -1300,6 +1303,8 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 		return err
 	}
 	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail), nonlinearTerms: len(t.nonlinearColumns), nonlinearRounds: t.nonlinearRounds, nonlinearGBExhausted: t.nonlinearGBExhausted, derivedBounds: len(t.derivedBounds), nonlinearStrategy: t.nonlinearStrategy})
+	t.scopes[len(t.scopes)-1].assumeEqualities = len(t.assumeEqualityCandidates)
+	t.scopes[len(t.scopes)-1].assumeEqualityHead = t.assumeEqualityHead
 	return nil
 }
 
@@ -1309,6 +1314,9 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
+	clear(t.assumeEqualityCandidates[scope.assumeEqualities:])
+	t.assumeEqualityCandidates = t.assumeEqualityCandidates[:scope.assumeEqualities]
+	t.assumeEqualityHead = scope.assumeEqualityHead
 	for index := len(t.atoms); index > scope.atoms; index-- {
 		delete(t.atomByBool, t.atoms[index-1].variable)
 	}
@@ -1412,6 +1420,11 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 			}
 		}
 	}
+	if progress, err := t.assumeSharedEqualities(); err != nil {
+		return SMTFinalCheckGiveUp, err
+	} else if progress {
+		return SMTFinalCheckContinue, nil
+	}
 	satisfied, err := t.checkNonlinearMonomialAssignments()
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
@@ -1481,6 +1494,11 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 			}
 		}
 		return SMTFinalCheckGiveUp, nil
+	}
+	if progress, err := t.assumeSharedEqualities(); err != nil {
+		return SMTFinalCheckGiveUp, err
+	} else if progress {
+		return SMTFinalCheckContinue, nil
 	}
 	return SMTFinalCheckDone, nil
 }
@@ -1874,6 +1892,18 @@ func (t *SMTLinearArithmeticTheory) InternalizeEquality(expression ast.ASTHandle
 	upperLiteral, err := state.Literal(upper)
 	if err != nil {
 		return err
+	}
+	data, err := state.BooleanData(variable)
+	if err != nil {
+		return err
+	}
+	if data.TryTrueFirst() {
+		if _, err = state.setScopedTrueFirst(lowerLiteral.Var()); err != nil {
+			return err
+		}
+		if _, err = state.setScopedTrueFirst(upperLiteral.Var()); err != nil {
+			return err
+		}
 	}
 	equality := NewSMTLiteral(variable, false)
 	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality.Negated(), lowerLiteral}); err != nil {

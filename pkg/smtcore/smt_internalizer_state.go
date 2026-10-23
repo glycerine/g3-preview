@@ -12,6 +12,7 @@ import (
 )
 
 type smtInternalizerScope struct {
+	trueFirstLimit     int
 	booleanLimit       int
 	enodeLimit         int
 	pendingLimit       int
@@ -137,6 +138,7 @@ type SMTInternalizerState struct {
 	atomPropagationHead      int
 	notifyTrail              []smtInternalizerNotifyTrail
 	enodeFlagTrail           []int32
+	trueFirstTrail           []int32
 	atomNotified             map[int32]bool
 	atomNotifiedTrail        []int32
 	relevancyLevel           uint32
@@ -614,7 +616,8 @@ func (s *SMTInternalizerState) PushScope() error {
 		reasons[key] = literal
 	}
 	s.scopes = append(s.scopes, smtInternalizerScope{
-		booleanLimit: len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending), pendingHead: s.pendingHead,
+		trueFirstLimit: len(s.trueFirstTrail),
+		booleanLimit:   len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending), pendingHead: s.pendingHead,
 		equalityLimit:   len(s.equalityTrail),
 		assignmentLimit: len(s.assignmentTrail), clauseLimit: len(s.clauses), justificationLimit: len(s.ownedJustifications), theoryLimit: len(s.theoryTrail), inconsistent: s.inconsistent,
 		assignedLimit: len(s.assignedLiterals), propagationHead: s.propagationHead, conflict: s.conflict,
@@ -704,6 +707,14 @@ func (s *SMTInternalizerState) unregisterEnode(node *SMTEnode) error {
 }
 
 func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
+	if scope.trueFirstLimit < 0 || scope.trueFirstLimit > len(s.trueFirstTrail) {
+		return ast.ErrASTDomain
+	}
+	for len(s.trueFirstTrail) > scope.trueFirstLimit {
+		i := len(s.trueFirstTrail) - 1
+		s.booleanData[s.trueFirstTrail[i]].ResetTrueFirst()
+		s.trueFirstTrail = s.trueFirstTrail[:i]
+	}
 	if scope.equalityLimit < 0 || scope.equalityLimit > len(s.equalityTrail) {
 		return ast.ErrASTDomain
 	}

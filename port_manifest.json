@@ -106039,7 +106039,10 @@
         "pkg/smtcore/theory_arith_nonlinear_strategy_test.go",
         "pkg/smtcore/theory_arith_fixed_bounds.go",
         "pkg/smtcore/theory_arith_fixed_bounds_test.go",
-        "pkg/smtcore/theory_arith_shared.go"
+        "pkg/smtcore/theory_arith_shared.go",
+        "pkg/smtcore/smt_assume_eq.go",
+        "pkg/smtcore/smt_assume_eq_test.go",
+        "pkg/smtcore/theory_arith_assume_eq_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -106076,7 +106079,9 @@
         "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
         "TestSMTArithmeticSymbolicZeroDivisorGuard",
         "TestSMTNonlinearNumericProgressAndScopedStrategies",
-        "TestSMTSharedArithmeticFixedRowsScopedProofs"
+        "TestSMTSharedArithmeticFixedRowsScopedProofs",
+        "TestSMTAssumeEqualityScopedPhaseAndRelevancy",
+        "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
       ],
       "conditionals": [
         {
@@ -107143,6 +107148,15 @@
           "tests": [
             "TestSMTSharedArithmeticFixedRowsScopedProofs"
           ]
+        },
+        {
+          "name": "assume_eq and set_true_first_flag for retained same-sort arithmetic interface equalities: equality case split, scoped preferred phase before auxiliary bound internalization, relevancy and interface statistics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_assume_eq.go",
+          "tests": [
+            "TestSMTAssumeEqualityScopedPhaseAndRelevancy",
+            "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
+          ]
         }
       ],
       "ownership": [
@@ -107151,7 +107165,8 @@
       ],
       "deviations": [
         "Structural subsumption remains unported.",
-        "Go creates interpreted true/false enodes on first term use rather than during context initialization. Assigned Boolean terms merge with those truth-value classes, including when their enodes are created after assignment; conflict antecedent lookup retains the actual assigned polarity."
+        "Go creates interpreted true/false enodes on first term use rather than during context initialization. Assigned Boolean terms merge with those truth-value classes, including when their enodes are created after assignment; conflict antecedent lookup retains the actual assigned polarity.",
+        "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. The source liberal assignment mutation and full three-way final-check scheduler remain incomplete."
       ]
     },
     {
@@ -113418,7 +113433,9 @@
         "pkg/math/simplex/arith_optimize.go",
         "pkg/math/simplex/arith_optimize_test.go",
         "pkg/smtcore/theory_arith_max_min.go",
-        "pkg/smtcore/theory_arith_max_min_test.go"
+        "pkg/smtcore/theory_arith_max_min_test.go",
+        "pkg/smtcore/theory_arith_assume_eq.go",
+        "pkg/smtcore/theory_arith_assume_eq_test.go"
       ],
       "tests": [
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
@@ -113434,7 +113451,8 @@
         "TestSMTSharedArithmeticFixedRowsScopedProofs",
         "TestArithmeticMaxMinDerivedExtremaAndBestEffort",
         "TestArithmeticMaxMinIntegerGainsAndSharedMovement",
-        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
+        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
+        "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
       ],
       "conditionals": [
         {
@@ -113869,11 +113887,28 @@
             "TestArithmeticMaxMinDerivedExtremaAndBestEffort",
             "TestArithmeticMaxMinIntegerGainsAndSharedMovement"
           ]
+        },
+        {
+          "name": "delayed_assume_eqs candidate queue: consume equal-valued distinct-root pairs, create relevant preferred interface equality decisions, and restore queue and head on pop",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_assume_eq.go",
+          "tests": [
+            "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
+          ]
+        },
+        {
+          "name": "assume_eqs_core groups relevant shared arithmetic variables by exact symbolic value and sort; candidate queue generation is retained while liberal assignment mutation remains incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_assume_eq.go",
+          "tests": [
+            "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The retained nonlinear max/min path uses a temporary canonical objective row, removed on return, with raw matrix pivot coefficients normalized for source gain formulas. Integer-column gain and sharing guards are retained. The maintain_integrality=true optimization-engine path remains unported; this is not a claim to complete optimization support."
+        "The retained nonlinear max/min path uses a temporary canonical objective row, removed on return, with raw matrix pivot coefficients normalized for source gain formulas. Integer-column gain and sharing guards are retained. The maintain_integrality=true optimization-engine path remains unported; this is not a claim to complete optimization support.",
+        "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. The source liberal assignment mutation and full three-way final-check scheduler remain incomplete."
       ]
     },
     {
@@ -113899,7 +113934,10 @@
         "pkg/smtcore/theory_arith_shared.go",
         "pkg/smtcore/theory_arith_max_min_test.go",
         "pkg/smtcore/theory_arith_epsilon.go",
-        "pkg/smtcore/theory_arith_epsilon_test.go"
+        "pkg/smtcore/theory_arith_epsilon_test.go",
+        "pkg/smtcore/theory_arith_assume_eq.go",
+        "pkg/smtcore/theory_arith_assume_eq_test.go",
+        "pkg/smtcore/smt_assume_eq_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -113921,7 +113959,9 @@
         "TestSMTLinearizedMonomialScopesProofsAndModels",
         "TestSMTSharedArithmeticFixedRowsScopedProofs",
         "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
-        "TestSMTArithmeticSharedEpsilonPreservesDistinctValues"
+        "TestSMTArithmeticSharedEpsilonPreservesDistinctValues",
+        "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
+        "TestSMTAssumeEqualityScopedPhaseAndRelevancy"
       ],
       "conditionals": [
         {
@@ -114759,6 +114799,20 @@
           "tests": [
             "TestSMTArithmeticSharedEpsilonPreservesDistinctValues"
           ]
+        },
+        {
+          "name": "final_check shared arithmetic model-equality case splitting before SAT, and preferred-phase inheritance by InternalizeEquality auxiliary bound atoms",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_assume_eq.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
+            "TestSMTAssumeEqualityScopedPhaseAndRelevancy",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -114769,7 +114823,8 @@
         "Affine definition-bound propagation evaluates retained replay rows before and after nonlinear interval propagation, including sign reversal for negated-square aliases. General row scheduling, propagation to every row variable, and minimal row-bound explanations remain incomplete.",
         "Shared arithmetic variables can become fixed through a combination of row bounds even when no explicit opposite unary bounds occur. A branch-free row interval pass derives these points, retains only newly fixed original columns as scoped replay bounds, and propagates equal-valued shared roots with all active arithmetic literals as premises. This closes the false-SAT case x>=0, y>=0, x+y<=0, f(x)!=f(y). General bound-atom propagation and optimal fixed-point discovery remain separate work.",
         "The existing small-row interval calculation is shared by fixed-value equality propagation and nonlinear strategy bound replay. Equality aliases such as x=2*y now carry finite factor bounds into monomial intervals. Source minimal dependency explanations and full propagation scheduling remain incomplete.",
-        "Model epsilon refinement now preserves distinctions between shared real symbolic assignments before concrete rational model construction. The same deterministic refinement runs before nonlinear product validation and candidate completion, so model construction cannot silently change the epsilon on which a validated product depended. Integer branching uses the same computation and propagates errors. The focused regression reproduces the source 19/2 versus 10-epsilon collision, checks equality preservation, and inspects a returned UF/arithmetic model. The separate shared-equality assumption queue and assignment mutation paths remain incomplete."
+        "Model epsilon refinement now preserves distinctions between shared real symbolic assignments before concrete rational model construction. The same deterministic refinement runs before nonlinear product validation and candidate completion, so model construction cannot silently change the epsilon on which a validated product depended. Integer branching uses the same computation and propagates errors. The focused regression reproduces the source 19/2 versus 10-epsilon collision, checks equality preservation, and inspects a returned UF/arithmetic model. The source liberal assignment mutation remains incomplete; shared equality case splitting is recorded separately below.",
+        "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. The source liberal assignment mutation and full three-way final-check scheduler remain incomplete."
       ]
     },
     {

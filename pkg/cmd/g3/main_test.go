@@ -10,6 +10,8 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"shared_arithmetic_equality_cycle.smt2":     "sat\nunsat\nsat\n",
+	"shared_arithmetic_integer_cycle.smt2":      "sat\nunsat\nsat\n",
 	"nonlinear_max_min_bounds.smt2":             "unsat\n",
 	"nonlinear_max_min_model.smt2":              "sat\n",
 	"shared_arithmetic_fixed_rows.smt2":         "unsat\nsat\n",
