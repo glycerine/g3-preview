@@ -103,9 +103,18 @@ func TestSMTArrayLazyInterfaceFinalCheckSchedule(t *testing.T) {
 			t.Fatal("bounded lazy scheduling tripped the no-progress guard")
 		}
 	}
+	astTestMust(t, state.InitializeTheorySearch())
+	if theory.finalCheckIndex != 0 {
+		t.Fatal("new search retained the previous lazy interface cadence")
+	}
+	status, err := theory.FinalCheck()
+	astTestMust(t, err)
+	if status != SMTFinalCheckContinue || theory.finalCheckIndex != 1 {
+		t.Fatal("new search did not restart the source delay")
+	}
 	config.LazyIEq = false
 	astTestMust(t, theory.ConfigureArray(config))
-	status, err := theory.FinalCheck()
+	status, err = theory.FinalCheck()
 	astTestMust(t, err)
 	if status != SMTFinalCheckDone {
 		t.Fatal("disabled lazy schedule was retained")

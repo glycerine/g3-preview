@@ -112651,7 +112651,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence including quantified setup synchronization",
+          "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence, init_search_eh reset and quantified setup synchronization",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_shared.go",
           "go_targets": [
@@ -118474,7 +118474,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence including quantified setup synchronization",
+          "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence, init_search_eh reset and quantified setup synchronization",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_shared.go",
           "go_targets": [
@@ -118648,7 +118648,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence including quantified setup synchronization",
+          "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence, init_search_eh reset and quantified setup synchronization",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_shared.go",
           "go_targets": [
@@ -118948,7 +118948,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence including quantified setup synchronization",
+          "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence, init_search_eh reset and quantified setup synchronization",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_shared.go",
           "go_targets": [
@@ -119082,7 +119082,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence including quantified setup synchronization",
+          "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence, init_search_eh reset and quantified setup synchronization",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_shared.go",
           "go_targets": [

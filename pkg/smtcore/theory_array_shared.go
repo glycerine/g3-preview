@@ -4,6 +4,13 @@ package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 
+// Source theory_array::init_search_eh starts the final-check cadence anew
+// for each check-sat, independently of user scopes and cumulative statistics.
+func (t *SMTArrayTheory) InitializeSearch() error {
+	t.finalCheckIndex = 0
+	return nil
+}
+
 func (t *SMTArrayTheory) sharedArrayNode(node *SMTEnode) (bool, error) {
 	s, err := t.State()
 	if err != nil {
