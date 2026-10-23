@@ -2178,7 +2178,7 @@
       "path": "scripts/mk_genfile_common.py",
       "component": "scripts",
       "role": "reference_tool",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/util/params/util_module_params_source.go",
         "pkg/smtcore/util_smt_qi_params_source_test.go"
@@ -104786,6 +104786,7 @@
           "name": "context-native antecedent tracking, tuned fixed-value consequence search and preferred SAT (remaining src/smt/smt_consequences.cpp)",
           "status": "platform_replacement",
           "go_target": "pkg/solver/solver.go",
+          "go_targets": ["pkg/smtcore/smt_solver.go"],
           "tests": [
             "TestSMTSolverDerivesBooleanConsequences"
           ]
@@ -111153,6 +111154,7 @@
           "name": "SMT kernel construction, logic selection, parameter update, progress forwarding, statistics and cross-manager translation",
           "status": "platform_replacement",
           "go_target": "pkg/smtcore/smt_solver.go",
+          "go_targets": ["pkg/solver/solver_tactic.go"],
           "tests": [
             "TestSolverTacticCrossManagerTranslation",
             "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites",
@@ -115053,7 +115055,7 @@
         {
           "name": "integer and real dense-difference explicit instantiations",
           "status": "platform_replacement",
-          "go_target": "pkg/smtcore/theory_diff_logic_integer.go; pkg/smtcore/theory_diff_logic_real.go",
+          "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"],
           "tests": ["TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict", "TestSMTRealDiffTheoryStrictCycleConflict"]
         }
       ],
@@ -115094,7 +115096,7 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {"name": "dense difference atom, edge, matrix-closure, propagation, scope, conflict and model declarations", "status": "platform_replacement", "go_target": "pkg/smtcore/theory_diff_logic_integer.go; pkg/smtcore/theory_diff_logic_real.go", "tests": ["TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation", "TestSMTRealDiffTheoryAtomUsesInfinitesimalComplement"]},
+        {"name": "dense difference atom, edge, matrix-closure, propagation, scope, conflict and model declarations", "status": "platform_replacement", "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"], "tests": ["TestSMTIntegerDiffTheoryAtomEdgesAndIntegerNegation", "TestSMTRealDiffTheoryAtomUsesInfinitesimalComplement"]},
         {"name": "theory_opt objective declarations", "status": "unported", "go_target": null, "tests": []}
       ],
       "ownership": ["The concrete Go difference theories own graph edges, assertions, scopes and model state while borrowing context enodes."],
@@ -115254,7 +115256,7 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {"name": "difference-term internalization, complementary bounds, incremental negative-cycle detection, equality adapter, scope rollback, propagation antecedents and model construction", "status": "platform_replacement", "go_target": "pkg/smtcore/theory_diff_logic_integer.go; pkg/smtcore/theory_diff_logic_real.go", "tests": ["TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict", "TestSMTRealDiffTheoryStrictCycleConflict", "TestSMTRealDiffTheoryBuildsFiniteModelValues"]},
+        {"name": "difference-term internalization, complementary bounds, incremental negative-cycle detection, equality adapter, scope rollback, propagation antecedents and model construction", "status": "platform_replacement", "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"], "tests": ["TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict", "TestSMTRealDiffTheoryStrictCycleConflict", "TestSMTRealDiffTheoryBuildsFiniteModelValues"]},
         {"name": "linear objective internalization, infinitesimal maximize and blocker construction", "status": "unported", "go_target": null, "tests": []}
       ],
       "ownership": ["Go slices and maps own the concrete graph, bound literals, predecessor explanations and scoped assertion trail."],
@@ -115279,7 +115281,7 @@
         {
           "name": "Concrete idl_ext and rdl_ext theory instantiations",
           "status": "ported",
-          "go_target": "pkg/smtcore/theory_diff_logic_integer.go; pkg/smtcore/theory_diff_logic_real.go",
+          "go_targets": ["pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"],
           "tests": [
             "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
             "TestSMTRealDiffTheoryStrictCycleConflict"
@@ -117583,7 +117585,7 @@
           "name": "incremental sequence-theory shell, internalization, equality/disequality callbacks, scope lifecycle, final-check boundary, and model hooks",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
-          "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"]
+          "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndConcatModel"]
         },
         {
           "name": "queued word-equation expansion through scoped solutions and concrete conflict explanations",
