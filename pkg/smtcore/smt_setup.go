@@ -17,7 +17,7 @@ func smtLogicUsesArithmetic(logic string) bool {
 
 func smtLogicUsesArrays(logic string) bool {
 	switch logic {
-	case "QF_AX", "QF_AUFBV", "QF_ABV", "QF_UFBV", "QF_AUFLIA", "AUFLIA", "AUFLIRA", "AUFNIRA",
+	case "QF_AX", "QF_AUFBV", "QF_ABV", "QF_UFBV", "QF_AUFLIA", "AUFLIA", "AUFLIRA", "AUFNIRA", "UFLRA",
 		"AUFLIA+", "AUFLIA-", "AUFLIRA+", "AUFLIRA-", "AUFNIRA+", "AUFNIRA-":
 		return true
 	default:
@@ -83,7 +83,7 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 				return theoryErr
 			}
 			err = kernel.RegisterTheory(theory)
-		} else if logic == "QF_LRA" || logic == "QF_UFLRA" {
+		} else if logic == "QF_LRA" || logic == "QF_UFLRA" || logic == "LRA" || logic == "UFLRA" {
 			theory, theoryErr := NewSMTLinearArithmeticTheory(family)
 			if theoryErr != nil {
 				return theoryErr
