@@ -116831,7 +116831,8 @@
         "TestSMTSequenceTheoryReplaceAxioms",
         "TestSMTSequenceTheoryRegexMembershipReduction",
         "TestSMTSequenceTheoryRetriesRegexAfterWordSolution",
-        "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition"
+        "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition",
+        "TestSMTSequenceTheoryCompletesFixedLengthRegexModel"
       ],
       "conditionals": [
         {
@@ -117295,10 +117296,10 @@
           "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes"]
         },
         {
-          "name": "sequence term and atom internalization, theory-variable attachment, literal-value equality conflicts, scoped equality and disequality state, final-check boundary, and model-value factory hooks (src/smt/theory_seq.cpp:2225-2255,2616-2785,4053-4130)",
+          "name": "sequence term and atom internalization, structural recognition of generated seq.nth Skolem unit/concat words, symbolic length support, theory-variable attachment, literal-value equality conflicts, scoped equality and disequality state, final-check boundary, and model-value factory hooks (src/smt/theory_seq.cpp:2225-2255,2616-2785,4053-4130)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
-          "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary"]
+          "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel"]
         },
         {
           "name": "solution-map expansion of queued concat leaves and concrete string-word conflict detection with dependency explanations (src/smt/theory_seq.cpp:1341-1533,2856-3066)",
@@ -117325,10 +117326,10 @@
           "tests": ["TestSMTSequenceTheoryConcreteNonContainsConflict"]
         },
         {
-          "name": "queued equation expansion, concat flattening, empty removal, adjacent string folding, exact, e-graph-equivalent, equal-length and string-boundary cancellation, native word-variable recognition for uninterpreted, extract, replace and at terms, variable/occurs recognition, unit solutions, dependency-preserving equality propagation, solved removal and residual replacement (src/smt/theory_seq.cpp:1341-1648,2856-3066)",
+          "name": "queued equation expansion, concat flattening, empty removal, adjacent string folding, exact, e-graph-equivalent, equal-length and string-boundary cancellation, native word-variable recognition for uninterpreted, extract, replace and at terms, variable/occurs recognition, unit solutions, dependency-preserving equality propagation, and internal draining of solved removals and residual replacements without spurious SAT progress (src/smt/theory_seq.cpp:1341-1648,2856-3066)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_solve.go",
-          "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict", "TestSMTSequenceTheoryNativeWordVariableClassification"]
+          "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict", "TestSMTSequenceTheoryNativeWordVariableClassification", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel"]
         },
         {
           "name": "zero-length leading-variable elimination, exact total-length mismatch conflicts, leading-variable overlap decomposition with stable seq.left and seq.right witnesses for empty and non-fixed prefixes under the exact |b| < |X| <= |b| + |Y| model length guards (fixed string and unit prefixes remain covered by the complete binary word routines), and multi-part prefix and suffix splitting at arithmetic-proven equal total lengths with guarded prefix and residual equalities (src/smt/theory_seq.cpp:482-630,1574-1691)",
@@ -117448,7 +117449,7 @@
           "name": "regular-language membership reduction through the retained Go regex automaton builder, including concrete automata, symbolic singleton languages, final-check retry after word-solution and guarded fixed-length seq.nth expansion, scoped exact-regex term tracking, explicit give-up for still-unresolved memberships, and definitive satisfiability for exact reductions (src/smt/theory_seq.cpp:3391-3445,4166-4191)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_regex.go",
-          "tests": ["TestSMTSequenceTheoryRegexMembershipReduction", "TestSMTSequenceTheoryRetriesRegexAfterWordSolution", "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition"]
+          "tests": ["TestSMTSequenceTheoryRegexMembershipReduction", "TestSMTSequenceTheoryRetriesRegexAfterWordSolution", "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel"]
         },
         {
           "name": "int.to.str empty iff negative, nonnegative round trip through str.to.int, numeric-language membership for nonnegative conversions, str.to.int lower bound plus exact nonnegative iff [0-9]+ membership, and complete arbitrary-precision ground conversion values including leading-zero parsing (src/smt/theory_seq.cpp:2284-2462)",

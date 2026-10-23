@@ -450,7 +450,11 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 			return true, nil
 		}
 		if len(left) == 0 && len(right) == 0 {
-			return true, t.removeEquation(index)
+			if err = t.removeEquation(index); err != nil {
+				return false, err
+			}
+			index--
+			continue
 		}
 		reduced, err := t.solveZeroLengthBoundary(left, right, dependency)
 		if err != nil || reduced {
@@ -500,7 +504,8 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 			if err = t.equations.Set(index, id, left, right, dependency); err != nil {
 				return false, err
 			}
-			return true, nil
+			index--
+			continue
 		}
 		branched, err = t.branchVariablePrefixEquality(left, right)
 		if err != nil || branched {

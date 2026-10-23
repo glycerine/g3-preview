@@ -160,6 +160,44 @@ func (t *SMTSequenceTheory) supportedValue(expression ast.ASTHandle) (bool, erro
 	return state.manager.IsSequenceEmpty(expression)
 }
 
+func (t *SMTSequenceTheory) generatedSequenceTerm(expression ast.ASTHandle, visiting map[ast.ASTHandle]struct{}) (bool, error) {
+	if _, found := visiting[expression]; found {
+		return false, nil
+	}
+	visiting[expression] = struct{}{}
+	defer delete(visiting, expression)
+	op, own, err := t.operation(expression)
+	if err != nil || !own {
+		return false, err
+	}
+	if op == 42 {
+		return true, nil
+	}
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	if op == ast.ASTSequenceOpUnit {
+		element, unit, argumentErr := state.manager.SequenceUnitArgument(expression)
+		if argumentErr != nil || !unit {
+			return false, argumentErr
+		}
+		return t.generatedSequenceTerm(element, visiting)
+	}
+	if op == ast.ASTSequenceOpConcat {
+		left, right, concat, argumentErr := state.manager.SequenceConcatParts(expression)
+		if argumentErr != nil || !concat {
+			return false, argumentErr
+		}
+		leftGenerated, argumentErr := t.generatedSequenceTerm(left, visiting)
+		if argumentErr != nil || !leftGenerated {
+			return false, argumentErr
+		}
+		return t.generatedSequenceTerm(right, visiting)
+	}
+	return false, nil
+}
+
 func (t *SMTSequenceTheory) markUnsupported() error {
 	if _, err := t.State(); err != nil {
 		return err
@@ -290,7 +328,11 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		return false, err
 	}
 	_, internal := t.internalTerms[expression]
-	if !value && !internal && op != 12 {
+	generated, err := t.generatedSequenceTerm(expression, make(map[ast.ASTHandle]struct{}))
+	if err != nil {
+		return false, err
+	}
+	if !value && !internal && !generated && op != 9 && op != 12 {
 		if err = t.markUnsupported(); err != nil {
 			return false, err
 		}
