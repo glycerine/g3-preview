@@ -73,6 +73,7 @@ type SMTKernel struct {
 	assertedPhaseReady     bool
 	preprocessingSetupDone bool
 	setupLogic             string
+	copiedArithmeticPlugin bool
 }
 
 func (k *SMTKernel) readPreprocessorState(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) (state SMTPreprocessorState, result error) {

@@ -111,6 +111,14 @@ func (k *SMTKernel) replaceUnusedSetupArithmetic(theory SMTTheoryInternalizer) e
 	}
 	s := k.internalizer
 	old := s.theories[family]
+	if k.copiedArithmeticPlugin && old != nil {
+		// Source register_plugin preserves an already copied plugin and
+		// destroys the unused candidate produced by destination setup.
+		if closer, ok := theory.(interface{ Close() error }); ok {
+			return closer.Close()
+		}
+		return nil
+	}
 	if old == nil {
 		return k.RegisterTheory(theory)
 	}

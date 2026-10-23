@@ -106322,6 +106322,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_utvpi_lifecycle.go",
+        "pkg/smtcore/theory_utvpi_lifecycle_test.go",
+        "pkg/smtcore/smt_setup_difference.go",
         "pkg/smtcore/smt_boolean_activity.go",
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_clause_simplification.go",
@@ -106349,6 +106352,7 @@
         "pkg/smtcore/theory_arith_assume_eq_test.go"
       ],
       "tests": [
+        "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState",
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -107304,6 +107308,19 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UTVPI mk_fresh/copy_plugins path: preserve installed arithmetic type across destination modes, construct independent paired graph and equality adapter, then replay translated assertions and models",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_utvpi_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_setup_difference.go",
+            "pkg/smtcore/theory_utvpi_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState"
+          ]
+        },
+        {
           "name": "Boolean assignment queue and two-watched-clause propagation and conflict detection",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_boolean_propagation.go",
@@ -107483,6 +107500,7 @@
         "Search reads the quantifier manager-owned acceptedModel at the ground completion boundary. A checked candidate transfers through the existing generated-model path; an unchecked candidate cannot publish a SAT result."
       ],
       "deviations": [
+        "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",
         "Structural subsumption remains unported.",
         "Go creates interpreted true/false enodes on first term use rather than during context initialization. Assigned Boolean terms merge with those truth-value classes, including when their enodes are created after assignment; conflict antecedent lookup retains the actual assigned polarity.",
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
@@ -113250,14 +113268,18 @@
       "path": "src/smt/smt_solver.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_utvpi_lifecycle.go",
+        "pkg/smtcore/theory_utvpi_lifecycle_test.go",
+        "pkg/smtcore/smt_setup_difference.go",
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_solver_core.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_dyn_ack_manager.go"
       ],
       "tests": [
+        "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState",
         "TestSMTSolverKernelFacadeAssertionsScopesAndResults",
         "TestSMTSolverTrackedAssertionsCoreDuplicatesAndRollback",
         "TestSMTSolverPublishesKernelUnsatProof",
@@ -113294,6 +113316,19 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained UTVPI mk_fresh/copy_plugins path: preserve installed arithmetic type across destination modes, construct independent paired graph and equality adapter, then replay translated assertions and models",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_utvpi_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_setup_difference.go",
+            "pkg/smtcore/theory_utvpi_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState"
+          ]
+        },
         {
           "name": "kernel-backed construction, assertions, named assertions, scopes, checks under assumptions, unsat cores, assertion and assumption queries, statistics, display, and factory",
           "status": "ported",
@@ -113370,10 +113405,10 @@
         ]
       },
       {
-        "name": "registered theory-plugin copying for arbitrary externally injected kernel plugins",
-        "status": "reference_only",
+        "name": "registered concrete theory-plugin copying during translation: UTVPI is preserved; other retained concrete types remain incomplete",
+        "status": "partial",
         "go_target": "pkg/smtcore/smt_solver.go",
-        "tests": []
+        "tests": ["TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState"]
       },
       {
         "name": "distance-bounded and nonlocal quantifier-pattern unsat-core extension",
@@ -113395,8 +113430,9 @@
         "SMTSolver owns its SMTKernel, named-assertion adapter, current check result, copied parameter reference, and retained tracked-formula references; it borrows the AST manager, parameter context, quantifier registry, and progress callback."
       ],
       "deviations": [
+        "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",
         "Unavailable kernel result facilities return empty ordinary result fields or an explicit domain error; they are not simulated by a universal adapter.",
-        "Cross-manager translation obtains manager-bound parameter and quantifier services through TargetConfig and preserves the source's duplicate named-implication assertion after copying kernel formulas. Retained callers cannot inject arbitrary kernel theory plugins, so translation reconstructs the configured concrete theory set instead of exposing the source internal plugin-copy mechanism. The source MUS branch is unreachable because m_minimizing_core is initialized false and is set true only inside that branch; the live pattern-extension policies are ported."
+        "Cross-manager translation obtains manager-bound parameter and quantifier services through TargetConfig and preserves the source's duplicate named-implication assertion after copying kernel formulas. The earlier claim that reconstruction from destination settings replaces retained plugin copying was incorrect: an installed concrete source plugin survives destination setup, even when the destination arithmetic mode differs. UTVPI now preserves this behavior; the other retained plugin types remain incomplete, so this unit is partial. The source MUS branch is unreachable because m_minimizing_core is initialized false and is set true only inside that branch; the live pattern-extension policies are ported."
       ]
     },
     {
@@ -123431,6 +123467,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_utvpi_lifecycle.go",
+        "pkg/smtcore/theory_utvpi_lifecycle_test.go",
+        "pkg/smtcore/smt_setup_difference.go",
         "pkg/smtcore/theory_utvpi.go",
         "pkg/smtcore/theory_utvpi_test.go",
         "pkg/cmd/g3/main_test.go",
@@ -123521,6 +123560,7 @@
         "pkg/smtcore/smt_utvpi_graph_test.go"
       ],
       "tests": [
+        "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState",
         "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
         "TestSMTUTVPIContextShortcutConflictProof",
         "TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerRefusal",
@@ -123555,6 +123595,19 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained UTVPI mk_fresh/copy_plugins path: preserve installed arithmetic type across destination modes, construct independent paired graph and equality adapter, then replay translated assertions and models",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_utvpi_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_setup_difference.go",
+            "pkg/smtcore/theory_utvpi_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState"
+          ]
+        },
         {
           "name": "UTVPI cumulative conflicts/assertions/core equality counters, arithmetic equality-adapter counts and infinitesimal-graph propagation costs through solver statistics collection",
           "status": "ported",
@@ -123645,7 +123698,7 @@
           "tests": []
         },
         {
-          "name": "Source display/reset/fresh-context and remaining term-alias/control fidelity",
+          "name": "Source display/reset and remaining term-alias/control fidelity",
           "status": "unported",
           "tests": []
         }
@@ -123654,6 +123707,7 @@
         "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
       ],
       "deviations": [
+        "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",
         "UTVPI statistics now expose the source cumulative conflict/assertion/core equality counters, equality-adapter counts and graph propagation cost via SMTSolver. Counts survive scope pop. The active two-argument disequality callback does not increment the source disequality counter; its only increment is in an unused overload. Other UTVPI graph statistics remain zero because this owner never calls implied-literal discovery or find_relaxed_edge.",
         "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. General difference-logic learned-edge generation remains separately incomplete.",
         "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
@@ -123667,6 +123721,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_utvpi_lifecycle.go",
+        "pkg/smtcore/theory_utvpi_lifecycle_test.go",
+        "pkg/smtcore/smt_setup_difference.go",
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/smtcore/smt_utvpi_cycle.go",
         "pkg/smtcore/smt_utvpi_cycle_test.go",
@@ -123683,6 +123740,7 @@
         "pkg/smtcore/smt_utvpi_graph_test.go"
       ],
       "tests": [
+        "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState",
         "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
         "TestSMTUTVPIContextShortcutConflictProof",
         "TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerRefusal",
@@ -123825,6 +123883,19 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UTVPI mk_fresh/copy_plugins path: preserve installed arithmetic type across destination modes, construct independent paired graph and equality adapter, then replay translated assertions and models",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_utvpi_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_setup_difference.go",
+            "pkg/smtcore/theory_utvpi_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState"
+          ]
+        },
+        {
           "name": "UTVPI cumulative conflicts/assertions/core equality counters, arithmetic equality-adapter counts and infinitesimal-graph propagation costs through solver statistics collection",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_utvpi.go",
@@ -123914,7 +123985,7 @@
           "tests": []
         },
         {
-          "name": "Source display/reset/fresh-context and remaining term-alias/control fidelity",
+          "name": "Source display/reset and remaining term-alias/control fidelity",
           "status": "unported",
           "tests": []
         }
@@ -123923,6 +123994,7 @@
         "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
       ],
       "deviations": [
+        "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",
         "UTVPI statistics now expose the source cumulative conflict/assertion/core equality counters, equality-adapter counts and graph propagation cost via SMTSolver. Counts survive scope pop. The active two-argument disequality callback does not increment the source disequality counter; its only increment is in an unused overload. Other UTVPI graph statistics remain zero because this owner never calls implied-literal discovery or find_relaxed_edge.",
         "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. General difference-logic learned-edge generation remains separately incomplete.",
         "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
