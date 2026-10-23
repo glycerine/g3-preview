@@ -12,7 +12,7 @@ import (
 )
 
 func TestSMT2CommandsRejectMalformedInputBeforeEffects(t *testing.T) {
-	for _, command := range []string{"(assert false extra)", "(declare-fun p () Bool extra)", "(push 1 extra)", "(assert (forall ((x Bool))"} {
+	for _, command := range []string{"(assert false extra)", "(declare-fun p () Bool extra)", "(declare-const p (Array))", "(declare-const p (Array Bool))", "(push 1 extra)", "(assert (forall ((x Bool))"} {
 		t.Run(command, func(t *testing.T) {
 			context, err := cmd_context.NewStandaloneContext()
 			if err != nil {

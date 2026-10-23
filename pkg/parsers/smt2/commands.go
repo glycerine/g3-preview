@@ -514,18 +514,21 @@ func (p *commandParser) sort() (ast.ASTHandle, error) {
 		return p.pin(m.BitVectorSort(indices[0]))
 	}
 	if name == "Array" {
-		domain, err := p.sort()
-		if err != nil {
-			return ast.ASTHandle{}, err
-		}
-		rangeSort, err := p.sort()
-		if err != nil {
-			return ast.ASTHandle{}, err
+		var sorts []ast.ASTHandle
+		for p.token != RightParenToken {
+			value, err := p.sort()
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			sorts = append(sorts, value)
 		}
 		if err = p.expect(RightParenToken); err != nil {
 			return ast.ASTHandle{}, err
 		}
-		return p.pin(m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{domain}), rangeSort))
+		if len(sorts) < 2 {
+			return ast.ASTHandle{}, fmt.Errorf("array sort expects at least one index sort and a range sort")
+		}
+		return p.pin(m.MkArraySort(ast.SliceArguments(sorts[:len(sorts)-1]), sorts[len(sorts)-1]))
 	}
 	return ast.ASTHandle{}, fmt.Errorf("unsupported sort constructor %s", name)
 }

@@ -86248,6 +86248,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue.smt2",
+        "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue_proof.smt2",
         "pkg/parsers/smt2/local_environment.go",
         "pkg/parsers/smt2/local_lookup.go",
         "pkg/parsers/smt2/local_sort_stack.go",
@@ -86804,6 +86806,20 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "parse_sort retained Array constructor: one or more domain sorts followed by range, including multidimensional and nested domains; reject empty/unary Array before declaration publication",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "go_targets": [
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMT2CommandsRejectMalformedInputBeforeEffects"
+          ]
+        },
+        {
           "name": "parse_match_pattern non-constructor variable inserts a borrowed local at the pre-increment binding level after pushing its owned var (smt2parser.cpp:1499-1510)",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/local_match_variable.go",
@@ -86975,6 +86991,7 @@
         "Quantifier metadata belongs to a concrete ASTQuantifierSpec local to its recursive grammar frame. Command-local ASTRefs retain parsed pattern terms and pattern applications until the resulting quantifier is owned by the command context. Parser option snapshots release their temporary ParamsRef owner immediately; rejected metadata unwinds the existing local-binding and command-root cleanup."
       ],
       "deviations": [
+        "The retained Array constructor now parses all supplied sort arguments, using the final sort as range and preceding sorts as domains, matching native variadic array sorts. Empty/unary constructors are rejected before installing the declaration. Two multidimensional store/read scope scripts, with proofs disabled/enabled, now run through the public parser and compare against C++; strict runner agreement is 130.",
         "The selected local lookup returns an owning ASTRef for the future parser expression stack and reuses the concrete AST var_shifter; scanner, command-context fallback, other parser branches and complete expression-stack integration remain unported.",
         "Go recursive grammar functions replace source explicit parser frame dispatch for retained branches. The current runner stops on the first command error; full C++ recovery and unsupported grammar branches remain open and fail explicitly.",
         "Explicit quantified patterns now reach E-matching through the SMT-LIB runner. Validation warnings use the process diagnostic warning service, invalid patterns follow ignore_bad_patterns, and ignored user patterns are consumed as S-expressions. Full legacy qualified unary-pattern and constant-pattern discard variants, expression labels, unknown-attribute warning/recovery and other parser grammar branches remain partial. The runner now has 92 strict C++ comparisons plus the separately documented C++ live-relevancy model defect regression."
@@ -118341,6 +118358,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue.smt2",
+        "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue_proof.smt2",
+        "pkg/smtcore/theory_array_read_queue.go",
+        "pkg/smtcore/theory_array_read_queue_test.go",
         "pkg/smtcore/theory_array_shared.go",
         "pkg/smtcore/theory_array_shared_test.go",
         "pkg/smtcore/smt_setup_quantified_test.go",
@@ -118365,6 +118386,9 @@
         "pkg/smtcore/smt_setup.go"
       ],
       "tests": [
+        "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
+        "TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork",
+        "TestSMTArrayQueuedMultidimensionalReadConflictProof",
         "TestSMTArraySharedRolesAndScopedInterfaceEqualities",
         "TestSMTArraySharedValueAndUninterpretedParentRoles",
         "TestSMTArrayLazyInterfaceFinalCheckSchedule",
@@ -118474,6 +118498,23 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "store axiom1 and conditional read axiom2 propagation worklists: source proof/unit versus non-proof/direct-equality branches, scoped store-plus-index-root fingerprints, current-root recheck, false-index relevance watches and canonical store reads for alias observers; new reads visit constructors already merged into the array class",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_read_queue.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_read_queue_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
+            "TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork",
+            "TestSMTArrayQueuedMultidimensionalReadConflictProof"
+          ]
+        },
+        {
           "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence, init_search_eh reset and quantified setup synchronization",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_shared.go",
@@ -118581,6 +118622,7 @@
         "SMTArrayTheory owns concrete Go maps and scoped trails for observed terms, instantiated constructor pairs and epsilon constants while borrowing manager-owned AST handles and context-owned enodes."
       ],
       "deviations": [
+        "Store/read axioms now enter concrete propagation worklists. Store axiom1 directly merges read/value without proofs and marks/retains a unit equality with proofs. Conditional read fingerprints use store identity and index roots, suppress equal-index/duplicate work, recheck roots when emitted and activate consequence relevance on a false index equality. Scope pop clears pending work and child fingerprints. A multidimensional C++ regression exposed late alias reads missing pre-existing merged stores; registration now visits those constructors. The focused proof regression validates a false proof fact and scope recovery. Strict runner agreement is 130; relevance-triggered parent scheduling and delayed upward propagation remain incomplete.",
         "Shared-array interface splitting now follows the retained nested-array and foreign-parent consumers. Relevant array roots used as arrays plus indices/values, or in another theory/UF/quantifier, produce relevant same-sort equality decisions without arithmetic true-first bias. Existing relevant or known-disequal pairs are skipped; scope pop removes child equalities while split counters remain cumulative. LazyIEq/Delay are consumed from the actual backend owner after logic setup, including the AUFLIRA four-call schedule and bounded progress. A strict nested-array scope vector raises Go/C++ agreement to 128. Store/read delayed worklists and other controls remain partial.",
         "Array equality internalization no longer emits extensionality eagerly. Source disequality events enqueue a canonical root pair only after scoped duplicate checks and known relevant read-disequality suppression. Propagation drains the concrete queue; scope pop clears pending work and child fingerprints. A strict runner vector switches extensionality on after equality internalization and before disequality, then checks disabled recovery, raising C++ agreement to 127. Shared-array interface equality and other axiom worklists remain incomplete; base units are now explicitly partial.",
         "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
@@ -118596,6 +118638,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue.smt2",
+        "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue_proof.smt2",
+        "pkg/smtcore/theory_array_read_queue.go",
+        "pkg/smtcore/theory_array_read_queue_test.go",
         "pkg/smtcore/theory_array_shared.go",
         "pkg/smtcore/theory_array_shared_test.go",
         "pkg/smtcore/smt_setup_quantified_test.go",
@@ -118619,6 +118665,9 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
+        "TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork",
+        "TestSMTArrayQueuedMultidimensionalReadConflictProof",
         "TestSMTArraySharedRolesAndScopedInterfaceEqualities",
         "TestSMTArraySharedValueAndUninterpretedParentRoles",
         "TestSMTArrayLazyInterfaceFinalCheckSchedule",
@@ -118647,6 +118696,23 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "store axiom1 and conditional read axiom2 propagation worklists: source proof/unit versus non-proof/direct-equality branches, scoped store-plus-index-root fingerprints, current-root recheck, false-index relevance watches and canonical store reads for alias observers; new reads visit constructors already merged into the array class",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_read_queue.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_read_queue_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
+            "TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork",
+            "TestSMTArrayQueuedMultidimensionalReadConflictProof"
+          ]
+        },
         {
           "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence, init_search_eh reset and quantified setup synchronization",
           "status": "ported",
@@ -118749,6 +118815,7 @@
         "The Go theory owns typed maps and slices in place of source var_data allocation, trail stacks and union-find storage."
       ],
       "deviations": [
+        "Store/read axioms now enter concrete propagation worklists. Store axiom1 directly merges read/value without proofs and marks/retains a unit equality with proofs. Conditional read fingerprints use store identity and index roots, suppress equal-index/duplicate work, recheck roots when emitted and activate consequence relevance on a false index equality. Scope pop clears pending work and child fingerprints. A multidimensional C++ regression exposed late alias reads missing pre-existing merged stores; registration now visits those constructors. The focused proof regression validates a false proof fact and scope recovery. Strict runner agreement is 130; relevance-triggered parent scheduling and delayed upward propagation remain incomplete.",
         "Shared-array interface splitting now follows the retained nested-array and foreign-parent consumers. Relevant array roots used as arrays plus indices/values, or in another theory/UF/quantifier, produce relevant same-sort equality decisions without arithmetic true-first bias. Existing relevant or known-disequal pairs are skipped; scope pop removes child equalities while split counters remain cumulative. LazyIEq/Delay are consumed from the actual backend owner after logic setup, including the AUFLIRA four-call schedule and bounded progress. A strict nested-array scope vector raises Go/C++ agreement to 128. Store/read delayed worklists and other controls remain partial.",
         "Array equality internalization no longer emits extensionality eagerly. Source disequality events enqueue a canonical root pair only after scoped duplicate checks and known relevant read-disequality suppression. Propagation drains the concrete queue; scope pop clears pending work and child fingerprints. A strict runner vector switches extensionality on after equality internalization and before disequality, then checks disabled recovery, raising C++ agreement to 127. Shared-array interface equality and other axiom worklists remain incomplete; base units are now explicitly partial.",
         "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
@@ -118764,6 +118831,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue.smt2",
+        "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue_proof.smt2",
+        "pkg/smtcore/theory_array_read_queue.go",
+        "pkg/smtcore/theory_array_read_queue_test.go",
         "pkg/smtcore/theory_array_shared.go",
         "pkg/smtcore/theory_array_shared_test.go",
         "pkg/smtcore/smt_setup_quantified_test.go",
@@ -118777,6 +118848,9 @@
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
+        "TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork",
+        "TestSMTArrayQueuedMultidimensionalReadConflictProof",
         "TestSMTArraySharedRolesAndScopedInterfaceEqualities",
         "TestSMTArraySharedValueAndUninterpretedParentRoles",
         "TestSMTArrayLazyInterfaceFinalCheckSchedule",
@@ -118948,6 +119022,23 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "store axiom1 and conditional read axiom2 propagation worklists: source proof/unit versus non-proof/direct-equality branches, scoped store-plus-index-root fingerprints, current-root recheck, false-index relevance watches and canonical store reads for alias observers; new reads visit constructors already merged into the array class",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_read_queue.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_read_queue_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
+            "TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork",
+            "TestSMTArrayQueuedMultidimensionalReadConflictProof"
+          ]
+        },
+        {
           "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence, init_search_eh reset and quantified setup synchronization",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_shared.go",
@@ -118983,7 +119074,7 @@
           ]
         },
         {
-          "name": "remaining store/read axiom worklists and relevance-triggered parent scheduling",
+          "name": "remaining relevance-triggered array parent scheduling and delayed upward propagation",
           "status": "unported",
           "tests": []
         },
@@ -119032,6 +119123,7 @@
         "Array value procedures retain their existing enode-value dependencies and generated interpretation owner. Reading disabled relevance does not change marks; observed defaults and selects enter the same dependency-before-value model traversal and scoped array trails as filtered terms."
       ],
       "deviations": [
+        "Store/read axioms now enter concrete propagation worklists. Store axiom1 directly merges read/value without proofs and marks/retains a unit equality with proofs. Conditional read fingerprints use store identity and index roots, suppress equal-index/duplicate work, recheck roots when emitted and activate consequence relevance on a false index equality. Scope pop clears pending work and child fingerprints. A multidimensional C++ regression exposed late alias reads missing pre-existing merged stores; registration now visits those constructors. The focused proof regression validates a false proof fact and scope recovery. Strict runner agreement is 130; relevance-triggered parent scheduling and delayed upward propagation remain incomplete.",
         "Shared-array interface splitting now follows the retained nested-array and foreign-parent consumers. Relevant array roots used as arrays plus indices/values, or in another theory/UF/quantifier, produce relevant same-sort equality decisions without arithmetic true-first bias. Existing relevant or known-disequal pairs are skipped; scope pop removes child equalities while split counters remain cumulative. LazyIEq/Delay are consumed from the actual backend owner after logic setup, including the AUFLIRA four-call schedule and bounded progress. A strict nested-array scope vector raises Go/C++ agreement to 128. Store/read delayed worklists and other controls remain partial.",
         "Array equality internalization no longer emits extensionality eagerly. Source disequality events enqueue a canonical root pair only after scoped duplicate checks and known relevant read-disequality suppression. Propagation drains the concrete queue; scope pop clears pending work and child fingerprints. A strict runner vector switches extensionality on after equality internalization and before disequality, then checks disabled recovery, raising C++ agreement to 127. Shared-array interface equality and other axiom worklists remain incomplete; base units are now explicitly partial.",
         "Restored source relevance marking for both extensionality equality atoms. Two strict Boolean-index scripts inspect distinct-array model values, exhaust both Boolean indices to force UNSAT, and restore SAT/models after pop. Together with Boolean class assignment propagation these raise strict runner agreement to 126 scripts.",
@@ -119045,6 +119137,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue.smt2",
+        "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue_proof.smt2",
+        "pkg/smtcore/theory_array_read_queue.go",
+        "pkg/smtcore/theory_array_read_queue_test.go",
         "pkg/smtcore/theory_array_shared.go",
         "pkg/smtcore/theory_array_shared_test.go",
         "pkg/smtcore/smt_setup_quantified_test.go",
@@ -119056,6 +119152,9 @@
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
+        "TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork",
+        "TestSMTArrayQueuedMultidimensionalReadConflictProof",
         "TestSMTArraySharedRolesAndScopedInterfaceEqualities",
         "TestSMTArraySharedValueAndUninterpretedParentRoles",
         "TestSMTArrayLazyInterfaceFinalCheckSchedule",
@@ -119081,6 +119180,23 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "store axiom1 and conditional read axiom2 propagation worklists: source proof/unit versus non-proof/direct-equality branches, scoped store-plus-index-root fingerprints, current-root recheck, false-index relevance watches and canonical store reads for alias observers; new reads visit constructors already merged into the array class",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_read_queue.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_read_queue_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
+            "TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork",
+            "TestSMTArrayQueuedMultidimensionalReadConflictProof"
+          ]
+        },
         {
           "name": "is_shared array/index/value roles and foreign-family/quantifier parents, collect_shared_vars by relevant canonical array root, mk_interface_eqs relevant undecided splits, cumulative split statistics and LazyIEq/LazyIEqDelay final-check cadence, init_search_eh reset and quantified setup synchronization",
           "status": "ported",
@@ -119117,7 +119233,7 @@
           ]
         },
         {
-          "name": "remaining store/read axiom worklists and relevance-triggered parent scheduling",
+          "name": "remaining relevance-triggered array parent scheduling and delayed upward propagation",
           "status": "unported",
           "tests": []
         },
@@ -119147,6 +119263,7 @@
         "Array value procedures retain their existing enode-value dependencies and generated interpretation owner. Reading disabled relevance does not change marks; observed defaults and selects enter the same dependency-before-value model traversal and scoped array trails as filtered terms."
       ],
       "deviations": [
+        "Store/read axioms now enter concrete propagation worklists. Store axiom1 directly merges read/value without proofs and marks/retains a unit equality with proofs. Conditional read fingerprints use store identity and index roots, suppress equal-index/duplicate work, recheck roots when emitted and activate consequence relevance on a false index equality. Scope pop clears pending work and child fingerprints. A multidimensional C++ regression exposed late alias reads missing pre-existing merged stores; registration now visits those constructors. The focused proof regression validates a false proof fact and scope recovery. Strict runner agreement is 130; relevance-triggered parent scheduling and delayed upward propagation remain incomplete.",
         "Shared-array interface splitting now follows the retained nested-array and foreign-parent consumers. Relevant array roots used as arrays plus indices/values, or in another theory/UF/quantifier, produce relevant same-sort equality decisions without arithmetic true-first bias. Existing relevant or known-disequal pairs are skipped; scope pop removes child equalities while split counters remain cumulative. LazyIEq/Delay are consumed from the actual backend owner after logic setup, including the AUFLIRA four-call schedule and bounded progress. A strict nested-array scope vector raises Go/C++ agreement to 128. Store/read delayed worklists and other controls remain partial.",
         "Array equality internalization no longer emits extensionality eagerly. Source disequality events enqueue a canonical root pair only after scoped duplicate checks and known relevant read-disequality suppression. Propagation drains the concrete queue; scope pop clears pending work and child fingerprints. A strict runner vector switches extensionality on after equality internalization and before disequality, then checks disabled recovery, raising C++ agreement to 127. Shared-array interface equality and other axiom worklists remain incomplete; base units are now explicitly partial.",
         "Extensionality now has a disequality-triggered propagation queue. Store/read queues and shared-array interface-equality scheduling remain incomplete; eager clauses alone do not establish their fidelity.",

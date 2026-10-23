@@ -151,15 +151,32 @@ func (t *SMTArrayTheory) hasRelevantDisequality(first, second *SMTEnode) (bool, 
 	return false, nil
 }
 
-func (t *SMTArrayTheory) CanPropagate() bool { return len(t.extensionalityTodo) != 0 }
+func (t *SMTArrayTheory) CanPropagate() bool {
+	return len(t.storeTodo) != 0 || len(t.readTodo) != 0 || len(t.extensionalityTodo) != 0
+}
 
 func (t *SMTArrayTheory) Propagate() error {
-	for index := 0; index < len(t.extensionalityTodo); index++ {
-		pair := t.extensionalityTodo[index]
-		if err := t.assertExtensionalityCore(pair.first.owner, pair.second.owner); err != nil {
-			return err
+	for t.CanPropagate() {
+		for index := 0; index < len(t.storeTodo); index++ {
+			if err := t.assertStoreAxiomCore(t.storeTodo[index]); err != nil {
+				return err
+			}
 		}
+		t.storeTodo = nil
+		for index := 0; index < len(t.readTodo); index++ {
+			pair := t.readTodo[index]
+			if err := t.assertStoreReadAxiomCore(pair.observer, pair.array); err != nil {
+				return err
+			}
+		}
+		t.readTodo = nil
+		for index := 0; index < len(t.extensionalityTodo); index++ {
+			pair := t.extensionalityTodo[index]
+			if err := t.assertExtensionalityCore(pair.first.owner, pair.second.owner); err != nil {
+				return err
+			}
+		}
+		t.extensionalityTodo = nil
 	}
-	t.extensionalityTodo = nil
 	return nil
 }

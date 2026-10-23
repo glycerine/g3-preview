@@ -19,6 +19,7 @@ type smtArrayScope struct {
 	selectAxioms, defaultAxioms         int
 	unsupported                         bool
 	extensionality                      int
+	readFingerprints                    int
 }
 
 type smtArrayAxiomPair struct {
@@ -52,6 +53,10 @@ type SMTArrayTheory struct {
 	extensionalityTodo                    []smtArrayEnodePair
 	arrayConfig                           SMTArrayState
 	finalCheckIndex                       uint32
+	storeTodo                             []ast.ASTHandle
+	readTodo                              []smtArrayAxiomPair
+	readFingerprints                      map[ast.ASTHandle][]*smtArrayReadFingerprint
+	readFingerprintTrail                  []*smtArrayReadFingerprint
 }
 
 func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
@@ -70,6 +75,7 @@ func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
 		epsilons:                   make(map[ast.ASTHandle]ast.ASTHandle),
 		extensionalityFingerprints: make(map[smtArrayEnodePair]bool),
 		arrayConfig:                SMTArrayState{Mode: 3, Simplify: true, Extensional: true, Laziness: 1, DelayExpAxiom: true, AlwaysPropUpward: true, LazyIEqDelay: 10},
+		readFingerprints:           make(map[ast.ASTHandle][]*smtArrayReadFingerprint),
 	}, nil
 }
 
@@ -207,6 +213,12 @@ func (t *SMTArrayTheory) assertStoreAxiom(store ast.ASTHandle) error {
 	}
 	t.stores[store] = true
 	t.storeTrail = append(t.storeTrail, store)
+	t.storeTodo = append(t.storeTodo, store)
+	t.statistics.axiom1++
+	return nil
+}
+
+func (t *SMTArrayTheory) assertStoreAxiomCore(store ast.ASTHandle) error {
 	state, _ := t.State()
 	count, err := state.manager.GetNumArgs(store)
 	if err != nil || count < 3 {
@@ -229,15 +241,29 @@ func (t *SMTArrayTheory) assertStoreAxiom(store ast.ASTHandle) error {
 	if err != nil {
 		return err
 	}
-	literal, err := t.MkEqualityLiteral(selected, value, true)
+	proofs, err := state.manager.ProofsEnabled()
 	if err != nil {
 		return err
 	}
-	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); err != nil {
-		return fmt.Errorf("array store unit axiom: %w", err)
+	if proofs {
+		literal, err := t.MkEqualityLiteral(selected, value, true)
+		if err != nil {
+			return err
+		}
+		if literal.Var() >= SMTFirstBoolVar {
+			if err = state.markRelevant(state.boolExpr[literal.Var()]); err != nil {
+				return err
+			}
+		}
+		return state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal})
 	}
-	t.statistics.axiom1++
-	return nil
+	if err = state.Internalize(selected, false); err != nil {
+		return err
+	}
+	if err = state.addEquality(state.context.enodes[selected], state.context.enodes[value], NewSMTEqualityAxiom()); err != nil {
+		return err
+	}
+	return state.markRelevant(selected)
 }
 
 func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle) error {
@@ -250,7 +276,32 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 	if err != nil {
 		return err
 	}
-	return t.assertSelectAxiom(selectExpression, array)
+	return t.assertEquivalentSelectAxioms(selectExpression, array)
+}
+
+// Source add_parent_select visits the stores/constructors already in the
+// array class, including a read registered after an earlier equality merge.
+func (t *SMTArrayTheory) assertEquivalentSelectAxioms(observer, array ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	if err := t.assertSelectAxiom(observer, array); err != nil {
+		return err
+	}
+	node := state.context.enodes[array]
+	if node == nil {
+		return nil
+	}
+	for index := 0; index < len(t.variables); index++ {
+		candidate := t.variables[index]
+		if candidate != nil && candidate.owner != array && candidate.root == node.root {
+			if err := t.assertSelectAxiom(observer, candidate.owner); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (t *SMTArrayTheory) assertSelectAxiom(selectExpression, array ast.ASTHandle) error {
@@ -268,6 +319,9 @@ func (t *SMTArrayTheory) assertSelectAxiom(selectExpression, array ast.ASTHandle
 	}
 	if t.simple && op != ast.ASTArrayOpStore {
 		return nil
+	}
+	if op == ast.ASTArrayOpStore {
+		return t.enqueueStoreReadAxiom(selectExpression, array)
 	}
 	if op != ast.ASTArrayOpConst && op != ast.ASTArrayOpMap && op != ast.ASTArrayOpAsArray && op != ast.ASTArrayOpStore {
 		return nil
@@ -340,78 +394,6 @@ func (t *SMTArrayTheory) assertSelectAxiom(selectExpression, array ast.ASTHandle
 		}
 		t.statistics.selectAsArray++
 		return nil
-	}
-	if op != ast.ASTArrayOpStore {
-		return nil
-	}
-	storeCount, err := state.manager.GetNumArgs(array)
-	if err != nil || storeCount != selectCount+1 {
-		return err
-	}
-	allEqual := true
-	added := false
-	for index := uint32(1); index < selectCount; index++ {
-		storedIndex, argErr := state.manager.GetArg(array, index)
-		if argErr != nil {
-			return argErr
-		}
-		selectedIndex, argErr := state.manager.GetArg(selectExpression, index)
-		if argErr != nil {
-			return argErr
-		}
-		if storedIndex != selectedIndex {
-			allEqual = false
-			break
-		}
-	}
-	if allEqual {
-		return nil
-	}
-	base, err := state.manager.GetArg(array, 0)
-	if err != nil {
-		return err
-	}
-	fallbackArguments := make([]ast.ASTHandle, 0, selectCount)
-	fallbackArguments = append(fallbackArguments, base)
-	for index := uint32(1); index < selectCount; index++ {
-		argument, argErr := state.manager.GetArg(selectExpression, index)
-		if argErr != nil {
-			return argErr
-		}
-		fallbackArguments = append(fallbackArguments, argument)
-	}
-	fallback, err := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, fallbackArguments)
-	if err != nil {
-		return err
-	}
-	consequence, err := t.MkEqualityLiteral(selectExpression, fallback, true)
-	if err != nil {
-		return err
-	}
-	for index := uint32(1); index < selectCount; index++ {
-		storedIndex, argErr := state.manager.GetArg(array, index)
-		if argErr != nil {
-			return argErr
-		}
-		selectedIndex, argErr := state.manager.GetArg(selectExpression, index)
-		if argErr != nil {
-			return argErr
-		}
-		if storedIndex == selectedIndex {
-			continue
-		}
-		antecedent, equalityErr := t.MkEqualityLiteral(storedIndex, selectedIndex, true)
-		if equalityErr != nil {
-			return equalityErr
-		}
-		clause := append(append(guard[:0:0], guard...), antecedent, consequence)
-		if err = state.addTheoryAxiom(t.FamilyID(), clause); err != nil {
-			return fmt.Errorf("array conditional store axiom: %w", err)
-		}
-		added = true
-	}
-	if added {
-		t.statistics.axiom2++
 	}
 	return nil
 }
@@ -832,14 +814,15 @@ func (t *SMTArrayTheory) PushScope() error {
 		return err
 	}
 	t.scopes = append(t.scopes, smtArrayScope{
-		stores:         len(t.storeTrail),
-		selects:        len(t.selectTrail),
-		defaults:       len(t.defaultTrail),
-		epsilons:       len(t.epsilonTrail),
-		selectAxioms:   len(t.selectAxiomTrail),
-		defaultAxioms:  len(t.defaultAxiomTrail),
-		unsupported:    t.unsupported,
-		extensionality: len(t.extensionalityTrail),
+		stores:           len(t.storeTrail),
+		selects:          len(t.selectTrail),
+		defaults:         len(t.defaultTrail),
+		epsilons:         len(t.epsilonTrail),
+		selectAxioms:     len(t.selectAxiomTrail),
+		defaultAxioms:    len(t.defaultAxiomTrail),
+		unsupported:      t.unsupported,
+		extensionality:   len(t.extensionalityTrail),
+		readFingerprints: len(t.readFingerprintTrail),
 	})
 	return nil
 }
@@ -853,6 +836,18 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	// Source theory_array_base::pop_scope_eh clears pending work before
 	// dropping the enodes and fingerprints owned by the popped scopes.
 	t.extensionalityTodo = nil
+	t.storeTodo, t.readTodo = nil, nil
+	for i := len(t.readFingerprintTrail) - 1; i >= scope.readFingerprints; i-- {
+		entry := t.readFingerprintTrail[i]
+		bucket := t.readFingerprints[entry.store]
+		bucket = bucket[:len(bucket)-1]
+		if len(bucket) == 0 {
+			delete(t.readFingerprints, entry.store)
+		} else {
+			t.readFingerprints[entry.store] = bucket
+		}
+	}
+	t.readFingerprintTrail = t.readFingerprintTrail[:scope.readFingerprints]
 	for _, pair := range t.extensionalityTrail[scope.extensionality:] {
 		delete(t.extensionalityFingerprints, pair)
 	}
