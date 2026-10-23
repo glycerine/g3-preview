@@ -106344,6 +106344,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_array_lifecycle.go",
+        "pkg/smtcore/smt_array_lifecycle_test.go",
         "pkg/smtcore/smt_equality_propagation_test.go",
         "pkg/cmd/g3/test_vectors/array_simple_boolean_witness_scopes.smt2",
         "pkg/cmd/g3/test_vectors/array_full_boolean_witness_scopes.smt2",
@@ -106382,6 +106384,7 @@
         "pkg/smtcore/theory_arith_assume_eq_test.go"
       ],
       "tests": [
+        "TestSMTArrayTranslationBackendsOwnersModelsAndScopes",
         "TestSMTBooleanClassAssignmentAfterMerge",
         "TestSMTArrayBooleanIndexExhaustion",
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -107345,6 +107348,17 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "mk_fresh preserves concrete simple/full array plugins with independent AST/enode/axiom state; simple borrows destination fparams and full retains live original source m_params across chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_array_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_array_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayTranslationBackendsOwnersModelsAndScopes"
+          ]
+        },
+        {
           "name": "propagate_bool_var_enode assignment transfer to an already merged Boolean equivalence class, including merge_tf disabled and root/non-root assignments across scope rollback",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_equality_propagation.go",
@@ -107583,6 +107597,7 @@
         "Search reads the quantifier manager-owned acceptedModel at the ground completion boundary. A checked candidate transfers through the existing generated-model path; an unchecked candidate cannot publish a SAT result."
       ],
       "deviations": [
+        "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
         "Boolean assignment propagation now reaches existing equivalence-class members even with merge_tf disabled, matching the second half of source propagate_bool_var_enode. Focused tests exercise root/non-root assignment, both truth values and scope restoration; strict simple/full Boolean-index array scripts require UNSAT after both index reads agree.",
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
         "Corrected reversed not_l polarity in failed AssignLiteral and compact binary BCP conflicts. The resolver expects a true assigned premise opposite to the failed consequent; storing the false consequent created non-false learned literals. A two-level regression checks first-UIP lemma/backjump/assertion behavior, and a symbolic BV add/sub circuit with scoped contradiction/model recovery raises strict C++ runner agreement to 119 scripts.",
@@ -118299,6 +118314,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_array_lifecycle.go",
+        "pkg/smtcore/smt_array_lifecycle_test.go",
         "pkg/smtcore/theory_array_simple.go",
         "pkg/cmd/g3/test_vectors/array_simple_boolean_witness_scopes.smt2",
         "pkg/cmd/g3/test_vectors/array_full_boolean_witness_scopes.smt2",
@@ -118314,6 +118331,7 @@
         "pkg/smtcore/smt_setup.go"
       ],
       "tests": [
+        "TestSMTArrayTranslationBackendsOwnersModelsAndScopes",
         "TestSMTArrayBackendSelection",
         "TestSMTArrayBackendOperationBoundary",
         "TestSMTArrayBooleanIndexExhaustion",
@@ -118416,6 +118434,17 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "mk_fresh preserves concrete simple/full array plugins with independent AST/enode/axiom state; simple borrows destination fparams and full retains live original source m_params across chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_array_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_array_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayTranslationBackendsOwnersModelsAndScopes"
+          ]
+        },
+        {
           "name": "setup_arrays concrete simple/full selection after logic policies; simple store/select operation boundary, full extended operations and default fallback for extensionality witnesses",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_simple.go",
@@ -118456,7 +118485,7 @@
           ]
         },
         {
-          "name": "Remaining source array parameter/control consumption, fresh-plugin parameter ownership and delayed parent/axiom worklists",
+          "name": "Remaining source array parameter/control consumption and delayed parent/axiom worklists",
           "status": "unported",
           "tests": []
         },
@@ -118477,6 +118506,7 @@
         "SMTArrayTheory owns concrete Go maps and scoped trails for observed terms, instantiated constructor pairs and epsilon constants while borrowing manager-owned AST handles and context-owned enodes."
       ],
       "deviations": [
+        "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
         "Concrete simple/full backend selection and operation boundaries now follow retained setup policies. Simple accepts store/select; full additionally handles const/map/default/as-array (with source as-array incompleteness); ext witnesses defer to default internalization without unsupported marking in both. Modes 0/2 have no retained source writers: legacy integer mode registration is inside #if 0. Full-operation unit tests use ALL because native QF_AX rejects those extensions. Remaining array controls, delayed worklists and fresh-plugin parameter ownership are still incomplete.",
         "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
         "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. The array.extensional option and Boolean array enode flags are now consumed by Go. Simple/full backend selection, clone parameter ownership, other live controls and remaining source worklists still require further porting; these units remain partial.",
@@ -118489,6 +118519,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_array_lifecycle.go",
+        "pkg/smtcore/smt_array_lifecycle_test.go",
         "pkg/smtcore/theory_array_simple.go",
         "pkg/cmd/g3/test_vectors/array_simple_boolean_witness_scopes.smt2",
         "pkg/cmd/g3/test_vectors/array_full_boolean_witness_scopes.smt2",
@@ -118503,6 +118535,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayTranslationBackendsOwnersModelsAndScopes",
         "TestSMTArrayBackendSelection",
         "TestSMTArrayBackendOperationBoundary",
         "TestSMTArrayBooleanIndexExhaustion",
@@ -118525,6 +118558,17 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "mk_fresh preserves concrete simple/full array plugins with independent AST/enode/axiom state; simple borrows destination fparams and full retains live original source m_params across chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_array_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_array_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayTranslationBackendsOwnersModelsAndScopes"
+          ]
+        },
+        {
           "name": "setup_arrays concrete simple/full selection after logic policies; simple store/select operation boundary, full extended operations and default fallback for extensionality witnesses",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_simple.go",
@@ -118565,7 +118609,7 @@
           ]
         },
         {
-          "name": "Remaining source array parameter/control consumption, fresh-plugin parameter ownership and delayed parent/axiom worklists",
+          "name": "Remaining source array parameter/control consumption and delayed parent/axiom worklists",
           "status": "unported",
           "tests": []
         },
@@ -118580,6 +118624,7 @@
         "The Go theory owns typed maps and slices in place of source var_data allocation, trail stacks and union-find storage."
       ],
       "deviations": [
+        "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
         "Concrete simple/full backend selection and operation boundaries now follow retained setup policies. Simple accepts store/select; full additionally handles const/map/default/as-array (with source as-array incompleteness); ext witnesses defer to default internalization without unsupported marking in both. Modes 0/2 have no retained source writers: legacy integer mode registration is inside #if 0. Full-operation unit tests use ALL because native QF_AX rejects those extensions. Remaining array controls, delayed worklists and fresh-plugin parameter ownership are still incomplete.",
         "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
         "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. The array.extensional option and Boolean array enode flags are now consumed by Go. Simple/full backend selection, clone parameter ownership, other live controls and remaining source worklists still require further porting; these units remain partial.",
@@ -118877,6 +118922,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_array_lifecycle.go",
+        "pkg/smtcore/smt_array_lifecycle_test.go",
         "pkg/smtcore/theory_array_simple.go",
         "pkg/cmd/g3/test_vectors/array_simple_boolean_witness_scopes.smt2",
         "pkg/cmd/g3/test_vectors/array_full_boolean_witness_scopes.smt2",
@@ -118891,6 +118938,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayTranslationBackendsOwnersModelsAndScopes",
         "TestSMTArrayBackendSelection",
         "TestSMTArrayBackendOperationBoundary",
         "TestSMTArrayBooleanIndexExhaustion",
@@ -119053,6 +119101,17 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "mk_fresh preserves concrete simple/full array plugins with independent AST/enode/axiom state; simple borrows destination fparams and full retains live original source m_params across chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_array_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_array_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayTranslationBackendsOwnersModelsAndScopes"
+          ]
+        },
+        {
           "name": "setup_arrays concrete simple/full selection after logic policies; simple store/select operation boundary, full extended operations and default fallback for extensionality witnesses",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_simple.go",
@@ -119093,7 +119152,7 @@
           ]
         },
         {
-          "name": "Remaining source array parameter/control consumption, fresh-plugin parameter ownership and delayed parent/axiom worklists",
+          "name": "Remaining source array parameter/control consumption and delayed parent/axiom worklists",
           "status": "unported",
           "tests": []
         },
@@ -119120,6 +119179,7 @@
         "Scoped Go maps own epsilon and constructor-observer fingerprints. Array table procedures own dependency slices until auxiliary function interpretations transfer to ProtoModel."
       ],
       "deviations": [
+        "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
         "Concrete simple/full backend selection and operation boundaries now follow retained setup policies. Simple accepts store/select; full additionally handles const/map/default/as-array (with source as-array incompleteness); ext witnesses defer to default internalization without unsupported marking in both. Modes 0/2 have no retained source writers: legacy integer mode registration is inside #if 0. Full-operation unit tests use ALL because native QF_AX rejects those extensions. Remaining array controls, delayed worklists and fresh-plugin parameter ownership are still incomplete.",
         "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
         "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. The array.extensional option and Boolean array enode flags are now consumed by Go. Simple/full backend selection, clone parameter ownership, other live controls and remaining source worklists still require further porting; these units remain partial.",
@@ -119132,6 +119192,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_array_lifecycle.go",
+        "pkg/smtcore/smt_array_lifecycle_test.go",
         "pkg/smtcore/theory_array_simple.go",
         "pkg/cmd/g3/test_vectors/array_simple_boolean_witness_scopes.smt2",
         "pkg/cmd/g3/test_vectors/array_full_boolean_witness_scopes.smt2",
@@ -119146,6 +119208,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayTranslationBackendsOwnersModelsAndScopes",
         "TestSMTArrayBackendSelection",
         "TestSMTArrayBackendOperationBoundary",
         "TestSMTArrayBooleanIndexExhaustion",
@@ -119167,6 +119230,17 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "mk_fresh preserves concrete simple/full array plugins with independent AST/enode/axiom state; simple borrows destination fparams and full retains live original source m_params across chained translation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_array_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_array_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayTranslationBackendsOwnersModelsAndScopes"
+          ]
+        },
         {
           "name": "setup_arrays concrete simple/full selection after logic policies; simple store/select operation boundary, full extended operations and default fallback for extensionality witnesses",
           "status": "ported",
@@ -119208,7 +119282,7 @@
           ]
         },
         {
-          "name": "Remaining source array parameter/control consumption, fresh-plugin parameter ownership and delayed parent/axiom worklists",
+          "name": "Remaining source array parameter/control consumption and delayed parent/axiom worklists",
           "status": "unported",
           "tests": []
         },
@@ -119223,6 +119297,7 @@
         "SMTArrayTheory owns concrete typed metadata rather than separately allocated var_data_full records."
       ],
       "deviations": [
+        "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
         "Concrete simple/full backend selection and operation boundaries now follow retained setup policies. Simple accepts store/select; full additionally handles const/map/default/as-array (with source as-array incompleteness); ext witnesses defer to default internalization without unsupported marking in both. Modes 0/2 have no retained source writers: legacy integer mode registration is inside #if 0. Full-operation unit tests use ALL because native QF_AX rejects those extensions. Remaining array controls, delayed worklists and fresh-plugin parameter ownership are still incomplete.",
         "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
         "Corrected the earlier completion claim: one eager Go SMTArrayTheory does not establish fidelity to both retained simple and full array plugins. Source theory_array::mk_fresh uses destination fparams, while theory_array_full::mk_fresh borrows source m_params; Go does not yet represent this distinction. The array.extensional option and Boolean array enode flags are now consumed by Go. Simple/full backend selection, clone parameter ownership, other live controls and remaining source worklists still require further porting; these units remain partial.",

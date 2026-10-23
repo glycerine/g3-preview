@@ -79,6 +79,8 @@ type SMTKernel struct {
 	copiedArithmeticConfig SMTArithState
 	copiedBVOwner          *SMTBVParams
 	copiedBitBlasterOwner  *bit_blaster.SMTBitBlasterParams
+	copiedArrayPlugin      bool
+	copiedArrayOwner       *SMTArrayParams
 }
 
 func (k *SMTKernel) readPreprocessorState(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) (state SMTPreprocessorState, result error) {
@@ -491,7 +493,11 @@ func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 		return err
 	}
 	if array := smtArrayCore(theory); array != nil && k.smtParams != nil {
-		if err := array.ConfigureArray(k.smtParams.array.state); err != nil {
+		config := k.smtParams.array.state
+		if k.copiedArrayOwner != nil {
+			config = k.copiedArrayOwner.state
+		}
+		if err := array.ConfigureArray(config); err != nil {
 			return err
 		}
 	}
@@ -691,6 +697,11 @@ func (k *SMTKernel) Push() error {
 	if err := k.open(); err != nil {
 		return err
 	}
+	if k.copiedArrayOwner != nil {
+		if err := k.configureArrayTheories(k.smtParams.array.state); err != nil {
+			return err
+		}
+	}
 	if k.copiedBVOwner != nil {
 		if err := k.configureBitVectorTheories(k.bvState, k.smtParams.preprocess.bit); err != nil {
 			return err
@@ -782,6 +793,11 @@ func (k *SMTKernel) ScopeLevel() uint32 {
 func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 	if err := k.open(); err != nil {
 		return nil, err
+	}
+	if k.copiedArrayOwner != nil {
+		if err := k.configureArrayTheories(k.smtParams.array.state); err != nil {
+			return nil, err
+		}
 	}
 	if k.copiedBVOwner != nil {
 		if err := k.configureBitVectorTheories(k.bvState, k.smtParams.preprocess.bit); err != nil {

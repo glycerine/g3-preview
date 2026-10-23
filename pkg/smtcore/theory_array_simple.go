@@ -29,6 +29,9 @@ func smtArrayCore(theory SMTTheoryInternalizer) *SMTArrayTheory {
 }
 
 func (k *SMTKernel) setupArrayBackend() error {
+	if k.copiedArrayPlugin {
+		return nil
+	}
 	family, err := k.manager.ArrayFamilyID()
 	if err != nil {
 		return err
@@ -61,6 +64,22 @@ func (k *SMTKernel) setupArrayBackend() error {
 	if err = smtArrayCore(theory).ConfigureArray(k.smtParams.array.state); err != nil {
 		return err
 	}
+	return k.replaceUnusedArrayTheory(theory)
+}
+
+func (k *SMTKernel) replaceUnusedArrayTheory(theory SMTTheoryInternalizer) error {
+	s := k.internalizer
+	if len(s.scopes) != 0 || s.theoriesSetup {
+		return ast.ErrASTDomain
+	}
+	old := s.theories[theory.FamilyID()]
+	if old == nil {
+		return s.RegisterTheory(theory)
+	}
+	core := smtArrayCore(old)
+	if core == nil || core.NumVariables() != 0 || len(core.storeTrail) != 0 || len(core.selectTrail) != 0 || len(core.scopes) != 0 {
+		return ast.ErrASTDomain
+	}
 	position := -1
 	for i, registered := range s.theoryOrder {
 		if registered == old {
@@ -71,9 +90,9 @@ func (k *SMTKernel) setupArrayBackend() error {
 	if position < 0 {
 		return ast.ErrASTDomain
 	}
-	if err = theory.Initialize(s); err != nil {
+	if err := theory.Initialize(s); err != nil {
 		return err
 	}
-	s.theories[family], s.theoryOrder[position] = theory, theory
+	s.theories[theory.FamilyID()], s.theoryOrder[position] = theory, theory
 	return nil
 }

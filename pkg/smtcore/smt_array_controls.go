@@ -12,6 +12,9 @@ func (t *SMTArrayTheory) ConfigureArray(config SMTArrayState) error {
 }
 
 func (k *SMTKernel) configureArrayTheories(config SMTArrayState) error {
+	if k.copiedArrayOwner != nil {
+		config = k.copiedArrayOwner.state
+	}
 	for _, theory := range k.internalizer.theoryOrder {
 		if array := smtArrayCore(theory); array != nil {
 			if err := array.ConfigureArray(config); err != nil {
