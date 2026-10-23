@@ -33832,12 +33832,19 @@
       "component": "ast",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/ast/rewriter/push_app_ite.go"],
+      "go_targets": [
+        "pkg/ast/rewriter/push_app_ite.go",
+        "pkg/smtcore/smt_asserted_ite.go",
+        "pkg/smtcore/smt_asserted_ite_test.go"
+      ],
       "tests": [
         "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
         "TestPushAppITERefusesBooleanITEAndITEDeclaration",
         "TestNGPushAppITERequiresNongroundArgument",
-        "TestPushAppITEConfigurationProofAndOwnerGuards"
+        "TestPushAppITEConfigurationProofAndOwnerGuards",
+        "TestPushAppITEPreservesQuantifierAndCongruenceProofs",
+        "TestSMTAssertedITELiftingModesAndProofs",
+        "TestSMTAssertedITEPassesScopedConflict"
       ],
       "assertions": [
         {
@@ -33847,22 +33854,49 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{
-        "name": "has_ite_arg, push_app_ite_cfg::is_target/reduce_app, and ng_push_app_ite_cfg::is_target",
-        "status": "ported",
-        "go_target": "pkg/ast/rewriter/push_app_ite.go",
-        "tests": ["TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode", "TestPushAppITERefusesBooleanITEAndITEDeclaration", "TestNGPushAppITERequiresNongroundArgument", "TestPushAppITEConfigurationProofAndOwnerGuards"]
-      }],
+      "methods": [
+        {
+          "name": "has_ite_arg, push_app_ite_cfg::is_target/reduce_app, and ng_push_app_ite_cfg::is_target",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/push_app_ite.go",
+          "tests": [
+            "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
+            "TestPushAppITERefusesBooleanITEAndITEDeclaration",
+            "TestNGPushAppITERequiresNongroundArgument",
+            "TestPushAppITEConfigurationProofAndOwnerGuards"
+          ]
+        },
+        {
+          "name": "proof-aware rewriter wrapper retains local rewrite, congruence, transitivity and quantifier-introduction proofs through bounded revisits",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/push_app_ite.go",
+          "tests": [
+            "TestPushAppITEPreservesQuantifierAndCongruenceProofs"
+          ]
+        }
+      ],
       "ownership": ["Configuration borrows the AST manager and application arguments. Each reduction uses native Go handle storage and retains no per-call AST nodes. The wrapper owns its charged traversal/configuration representation and releases it idempotently."],
-      "deviations": ["The proof-enabled wrapper publishes one valid root rewrite or reflexivity proof after the exact no-proof traversal instead of preserving the source traversal's internal proof-tree shape."]
+      "deviations": []
     },
     {
       "path": "src/ast/rewriter/push_app_ite.h",
       "component": "ast",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/ast/rewriter/push_app_ite.go"],
-      "tests": ["TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode", "TestPushAppITERefusesBooleanITEAndITEDeclaration", "TestNGPushAppITERequiresNongroundArgument", "TestPushAppITEConfigurationProofAndOwnerGuards"],
+      "go_targets": [
+        "pkg/ast/rewriter/push_app_ite.go",
+        "pkg/smtcore/smt_asserted_ite.go",
+        "pkg/smtcore/smt_asserted_ite_test.go"
+      ],
+      "tests": [
+        "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
+        "TestPushAppITERefusesBooleanITEAndITEDeclaration",
+        "TestNGPushAppITERequiresNongroundArgument",
+        "TestPushAppITEConfigurationProofAndOwnerGuards",
+        "TestPushAppITEPreservesQuantifierAndCongruenceProofs",
+        "TestSMTAssertedITELiftingModesAndProofs",
+        "TestSMTAssertedITEPassesScopedConflict"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -33875,12 +33909,26 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{
-        "name": "push_app_ite_cfg, ng_push_app_ite_cfg, push_app_ite_rw, and ng_push_app_ite_rw declarations and constructors",
-        "status": "ported",
-        "go_target": "pkg/ast/rewriter/push_app_ite.go",
-        "tests": ["TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode", "TestNGPushAppITERequiresNongroundArgument", "TestPushAppITEConfigurationProofAndOwnerGuards"]
-      }],
+      "methods": [
+        {
+          "name": "push_app_ite_cfg, ng_push_app_ite_cfg, push_app_ite_rw, and ng_push_app_ite_rw declarations and constructors",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/push_app_ite.go",
+          "tests": [
+            "TestPushAppITELiftsTermArgumentsAndHonorsConservativeMode",
+            "TestNGPushAppITERequiresNongroundArgument",
+            "TestPushAppITEConfigurationProofAndOwnerGuards"
+          ]
+        },
+        {
+          "name": "proof-aware rewriter wrapper retains local rewrite, congruence, transitivity and quantifier-introduction proofs through bounded revisits",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/push_app_ite.go",
+          "tests": [
+            "TestPushAppITEPreservesQuantifierAndCongruenceProofs"
+          ]
+        }
+      ],
       "ownership": ["Public configuration and wrapper constructors preserve conservative/full and nonground variants. The wrapper owns the traversal, borrows the manager, rejects copied/closed use, and supports reset and idempotent close."],
       "deviations": ["Go exposes explicit constructors and error returns; native inheritance, layout, pointer mutation, assertion, and exception ABI are not claimed."]
     },
@@ -98636,7 +98684,9 @@
         "pkg/smtcore/smt_asserted_injectivity.go",
         "pkg/smtcore/smt_asserted_injectivity_test.go",
         "pkg/smtcore/smt_asserted_pull_quant.go",
-        "pkg/smtcore/smt_asserted_pull_quant_test.go"
+        "pkg/smtcore/smt_asserted_pull_quant_test.go",
+        "pkg/smtcore/smt_asserted_ite.go",
+        "pkg/smtcore/smt_asserted_ite_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98660,7 +98710,10 @@
         "TestSMTAssertedInjectivityRefinementAndGuards",
         "TestSMTAssertedInjectivityConflict",
         "TestSMTAssertedPullQuantifierGuardsAndProofs",
-        "TestSMTAssertedPullQuantifierScopedConflict"
+        "TestSMTAssertedPullQuantifierScopedConflict",
+        "TestSMTAssertedITELiftingModesAndProofs",
+        "TestSMTAssertedTermITEEliminationDefinitionsAndGuards",
+        "TestSMTAssertedITEPassesScopedConflict"
       ],
       "conditionals": [
         {
@@ -98809,6 +98862,24 @@
           ]
         },
         {
+          "name": "lift_ite and ng_lift_ite: conservative/full source modes, ground/nonground guards, setup suppression of redundant nonground passes, composed traversal proofs and post-operation reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_ite.go",
+          "tests": [
+            "TestSMTAssertedITELiftingModesAndProofs",
+            "TestSMTAssertedITEPassesScopedConflict"
+          ]
+        },
+        {
+          "name": "elim_term_ite: pending term naming, definitions appended after transformed original assertions, definition proofs, full-lift suppression, post-operation reduction and scoped name rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_ite.go",
+          "tests": [
+            "TestSMTAssertedTermITEEliminationDefinitionsAndGuards",
+            "TestSMTAssertedITEPassesScopedConflict"
+          ]
+        },
+        {
           "name": "remaining pending-formula reduction passes and quantifier transforms",
           "status": "unported",
           "go_target": null,
@@ -98816,7 +98887,8 @@
         }
       ],
       "ownership": [
-        "The kernel owns references to each flattened formula and its derived proof until pop or close."
+        "The kernel owns references to each flattened formula and its derived proof until pop or close.",
+        "The concrete formula batch pins transformed rows and generated ITE definition proofs before temporary rewriter owners close. Pulling and injectivity passes swap/flatten rows without post-operation reduction; ITE passes reduce the resulting pending suffix as required by their source post_op."
       ],
       "deviations": [
         "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager.",
@@ -98841,7 +98913,9 @@
         "pkg/smtcore/smt_asserted_injectivity.go",
         "pkg/smtcore/smt_asserted_injectivity_test.go",
         "pkg/smtcore/smt_asserted_pull_quant.go",
-        "pkg/smtcore/smt_asserted_pull_quant_test.go"
+        "pkg/smtcore/smt_asserted_pull_quant_test.go",
+        "pkg/smtcore/smt_asserted_ite.go",
+        "pkg/smtcore/smt_asserted_ite_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -98865,7 +98939,10 @@
         "TestSMTAssertedInjectivityRefinementAndGuards",
         "TestSMTAssertedInjectivityConflict",
         "TestSMTAssertedPullQuantifierGuardsAndProofs",
-        "TestSMTAssertedPullQuantifierScopedConflict"
+        "TestSMTAssertedPullQuantifierScopedConflict",
+        "TestSMTAssertedITELiftingModesAndProofs",
+        "TestSMTAssertedTermITEEliminationDefinitionsAndGuards",
+        "TestSMTAssertedITEPassesScopedConflict"
       ],
       "conditionals": [
         {
@@ -98962,6 +99039,24 @@
           ]
         },
         {
+          "name": "lift_ite and ng_lift_ite: conservative/full source modes, ground/nonground guards, setup suppression of redundant nonground passes, composed traversal proofs and post-operation reduction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_ite.go",
+          "tests": [
+            "TestSMTAssertedITELiftingModesAndProofs",
+            "TestSMTAssertedITEPassesScopedConflict"
+          ]
+        },
+        {
+          "name": "elim_term_ite: pending term naming, definitions appended after transformed original assertions, definition proofs, full-lift suppression, post-operation reduction and scoped name rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_ite.go",
+          "tests": [
+            "TestSMTAssertedTermITEEliminationDefinitionsAndGuards",
+            "TestSMTAssertedITEPassesScopedConflict"
+          ]
+        },
+        {
           "name": "setup, reset, and remaining pending-formula reductions",
           "status": "unported",
           "go_target": null,
@@ -98969,7 +99064,8 @@
         }
       ],
       "ownership": [
-        "Flattened formula and proof handles are explicit owned kernel references; returned assertion handles are borrowed views."
+        "Flattened formula and proof handles are explicit owned kernel references; returned assertion handles are borrowed views.",
+        "The concrete formula batch pins transformed rows and generated ITE definition proofs before temporary rewriter owners close. Pulling and injectivity passes swap/flatten rows without post-operation reduction; ITE passes reduce the resulting pending suffix as required by their source post_op."
       ],
       "deviations": [
         "The concrete retained subset is integrated with SMTKernel rather than exposed as a preprocessing class."
@@ -99931,11 +100027,15 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/elim_term_ite.go"
+        "pkg/smtcore/elim_term_ite.go",
+        "pkg/smtcore/smt_asserted_ite.go",
+        "pkg/smtcore/smt_asserted_ite_test.go"
       ],
       "tests": [
         "TestSMTTermITEEliminatorNamesOnlyTermITEAndOwnsDefinitions",
-        "TestSMTTermITEEliminatorLeavesBooleanITE"
+        "TestSMTTermITEEliminatorLeavesBooleanITE",
+        "TestSMTAssertedTermITEEliminationDefinitionsAndGuards",
+        "TestSMTAssertedITEPassesScopedConflict"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -99963,11 +100063,15 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/elim_term_ite.go"
+        "pkg/smtcore/elim_term_ite.go",
+        "pkg/smtcore/smt_asserted_ite.go",
+        "pkg/smtcore/smt_asserted_ite_test.go"
       ],
       "tests": [
         "TestSMTTermITEEliminatorNamesOnlyTermITEAndOwnsDefinitions",
-        "TestSMTTermITEEliminatorLeavesBooleanITE"
+        "TestSMTTermITEEliminatorLeavesBooleanITE",
+        "TestSMTAssertedTermITEEliminationDefinitionsAndGuards",
+        "TestSMTAssertedITEPassesScopedConflict"
       ],
       "conditionals": [
         {

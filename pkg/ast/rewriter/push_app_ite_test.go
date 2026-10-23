@@ -204,3 +204,50 @@ func TestPushAppITEConfigurationProofAndOwnerGuards(t *testing.T) {
 		t.Fatal("closed rewrite guard", e)
 	}
 }
+
+func TestPushAppITEPreservesQuantifierAndCongruenceProofs(t *testing.T) {
+	x := newPushITEFixture(t, true)
+	bound, err := x.m.MkVar(0, x.boolSort)
+	astTestMust(t, err)
+	term := pushITEMustIte(t, x.m, bound, x.x1, x.y1)
+	app := pushITEMustApp(t, x.m, x.f, term, x.x2)
+	body, err := x.m.MkEq(app, x.x1)
+	astTestMust(t, err)
+	q, err := x.m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{x.boolSort}, Names: []usymbol.Symbol{usymbol.Numerical(123)}, Body: body})
+	astTestMust(t, err)
+	astTestPin(t, x.m, q)
+	rw, err := NewPushAppITE(x.m, false)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, rw.Close()) })
+	got, proof := pushITERewrite(t, rw, x.m, q)
+	if got == q {
+		t.Fatal("quantified term ITE was not lifted")
+	}
+	seen := make(map[ast.ASTHandle]bool)
+	stack := []ast.ASTHandle{proof}
+	quantifier, congruence := false, false
+	for len(stack) != 0 {
+		p := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if seen[p] {
+			continue
+		}
+		seen[p] = true
+		yes, err := x.m.IsProofKind(p, ast.ASTPrQuantIntro)
+		astTestMust(t, err)
+		quantifier = quantifier || yes
+		yes, err = x.m.IsProofKind(p, ast.ASTPrMonotonicity)
+		astTestMust(t, err)
+		congruence = congruence || yes
+		n, err := x.m.GetProofNumParents(p)
+		astTestMust(t, err)
+		for i := uint32(0); i < n; i++ {
+			parent, err := x.m.GetProofParent(p, i)
+			astTestMust(t, err)
+			stack = append(stack, parent)
+		}
+	}
+	if !quantifier || !congruence {
+		t.Fatal("lifting discarded the source quantifier or congruence proof", quantifier, congruence)
+	}
+}

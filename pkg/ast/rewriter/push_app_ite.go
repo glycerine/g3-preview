@@ -210,7 +210,15 @@ func newPushAppITE(m *ast.ASTManager, conservative, nongroundOnly bool) (*PushAp
 	}
 	r := &PushAppITE{manager: m, config: c, header: bytes}
 	r.self = r
-	r.traversal, e = NewTraversal(m, c)
+	proofs, e := m.ProofsEnabled()
+	if e != nil {
+		return r, e
+	}
+	if proofs {
+		r.traversal, e = NewProofTraversal(m, c)
+	} else {
+		r.traversal, e = NewTraversal(m, c)
+	}
 	return r, e
 }
 
@@ -234,27 +242,17 @@ func (r *PushAppITE) Rewrite(root ast.ASTHandle, out, proof ast.ASTRef) error {
 	if e := r.open(); e != nil {
 		return e
 	}
-	if e := r.traversal.Rewrite(root, out); e != nil {
-		return e
-	}
 	proofs, e := r.manager.ProofsEnabled()
-	if e != nil || !proofs {
-		return e
-	}
-	result, e := r.manager.RefGet(out)
 	if e != nil {
 		return e
 	}
-	var p ast.ASTHandle
-	if result == root {
-		p, e = r.manager.MkProofReflexivity(root)
-	} else {
-		p, e = r.manager.MkProofRewrite(root, result)
+	if proofs {
+		return r.traversal.RewriteWithProof(root, out, proof)
 	}
-	if e != nil {
+	if e = r.manager.ResetRef(proof); e != nil {
 		return e
 	}
-	return r.manager.SetRef(proof, p)
+	return r.traversal.Rewrite(root, out)
 }
 
 func (r *PushAppITE) Reset() error {

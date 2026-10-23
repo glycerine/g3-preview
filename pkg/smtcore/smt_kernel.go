@@ -524,6 +524,15 @@ func (k *SMTKernel) internalizePending() error {
 	if err := k.pullPendingNestedQuantifiers(); err != nil {
 		return fmt.Errorf("pull asserted nested quantifiers: %w", err)
 	}
+	if err := k.liftPendingITEs(false); err != nil {
+		return fmt.Errorf("lift asserted term ITEs: %w", err)
+	}
+	if err := k.liftPendingITEs(true); err != nil {
+		return fmt.Errorf("lift asserted nonground term ITEs: %w", err)
+	}
+	if err := k.eliminatePendingTermITEs(); err != nil {
+		return fmt.Errorf("eliminate asserted term ITEs: %w", err)
+	}
 	if err := k.refinePendingInjectivityAxioms(); err != nil {
 		return fmt.Errorf("refine asserted injectivity axioms: %w", err)
 	}

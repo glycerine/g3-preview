@@ -76,5 +76,5 @@ func (k *SMTKernel) pullPendingNestedQuantifiers() (result error) {
 	if !changed {
 		return nil
 	}
-	return k.replacePendingMacroBatch(batch)
+	return k.replacePendingFormulaBatch(batch, false)
 }

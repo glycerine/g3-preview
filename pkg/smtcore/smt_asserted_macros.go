@@ -40,6 +40,16 @@ func (k *SMTKernel) findPendingMacros() (result error) {
 }
 
 func (k *SMTKernel) replacePendingMacroBatch(batch *macros.FormulaBatch) (result error) {
+	if err := k.replacePendingFormulaBatch(batch, true); err != nil {
+		return err
+	}
+	return k.propagatePendingAssertions()
+}
+
+// replacePendingFormulaBatch implements the source justified-formula swap.
+// Passes with a reduce_and_solve post-operation rewrite the resulting rows;
+// other passes only flatten their transformed assertions.
+func (k *SMTKernel) replacePendingFormulaBatch(batch *macros.FormulaBatch, reduce bool) (result error) {
 	original := k.assertions
 	// Keep the old references alive until all replacement assertions have
 	// acquired theirs. On failure, retain the original pending formula list.
@@ -61,7 +71,7 @@ func (k *SMTKernel) replacePendingMacroBatch(batch *macros.FormulaBatch) (result
 		if err != nil {
 			return err
 		}
-		if !k.preprocess {
+		if !k.preprocess || !reduce {
 			if err = k.pushAssertion(row.Expression, row.Proof); err != nil {
 				return err
 			}
@@ -77,7 +87,7 @@ func (k *SMTKernel) replacePendingMacroBatch(batch *macros.FormulaBatch) (result
 			return err
 		}
 	}
-	return k.propagatePendingAssertions()
+	return nil
 }
 
 // Discovery flags do not change definitions already removed from the formula

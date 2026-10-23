@@ -65,5 +65,5 @@ func (k *SMTKernel) refinePendingInjectivityAxioms() (result error) {
 	if !changed {
 		return nil
 	}
-	return k.replacePendingMacroBatch(batch)
+	return k.replacePendingFormulaBatch(batch, false)
 }
