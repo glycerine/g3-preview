@@ -37819,6 +37819,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/parsers/smt2/function_references.go",
+        "pkg/parsers/smt2/function_references_test.go",
+        "pkg/parsers/smt2/expressions.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/cmd_context/function_references.go",
+        "pkg/cmd/g3/test_vectors/array_canonical_constructor_reads.smt2",
+        "pkg/cmd/g3/test_vectors/array_function_reference_signatures.smt2",
         "pkg/cmd_context/context.go",
         "pkg/cmd_context/runtime.go",
         "pkg/cmd_context/applications.go",
@@ -37828,6 +37835,7 @@
         "pkg/cmd_context/macros.go"
       ],
       "tests": [
+        "TestSMT2FunctionDeclarationReferenceErrors",
         "TestCommandContextScopesDeclarationsAndModel",
         "TestCommandContextNamedCoreAndProof",
         "TestSMTLibRunnerScripts",
@@ -38013,6 +38021,26 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "function-valued indexed identifiers for map/as-array and function declaration references: bare names, full signatures, indexed builtins, overloaded declaration selection, scoped declarations, and macro/ambiguity/signature errors; numeric sort and bit-vector indices remain typed integers",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/function_references.go",
+          "go_targets": [
+            "pkg/parsers/smt2/function_references.go",
+            "pkg/parsers/smt2/function_references_test.go",
+            "pkg/parsers/smt2/expressions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/cmd_context/function_references.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/array_canonical_constructor_reads.smt2",
+            "pkg/cmd/g3/test_vectors/array_function_reference_signatures.smt2"
+          ],
+          "tests": [
+            "TestSMT2FunctionDeclarationReferenceErrors",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "lazy manager/solver construction, logic selection, context_params proof/model/core configuration and owned service teardown",
           "status": "ported",
@@ -86248,6 +86276,11 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/parsers/smt2/function_references.go",
+        "pkg/parsers/smt2/function_references_test.go",
+        "pkg/cmd_context/function_references.go",
+        "pkg/cmd/g3/test_vectors/array_canonical_constructor_reads.smt2",
+        "pkg/cmd/g3/test_vectors/array_function_reference_signatures.smt2",
         "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue.smt2",
         "pkg/cmd/g3/test_vectors/array_multidimensional_read_queue_proof.smt2",
         "pkg/parsers/smt2/local_environment.go",
@@ -86269,6 +86302,7 @@
         "pkg/parsers/smt2/annotations_test.go"
       ],
       "tests": [
+        "TestSMT2FunctionDeclarationReferenceErrors",
         "TestSMT2ParserPushLocalShiftsFreeVariables",
         "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders",
         "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
@@ -86805,6 +86839,26 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "function-valued indexed identifiers for map/as-array and function declaration references: bare names, full signatures, indexed builtins, overloaded declaration selection, scoped declarations, and macro/ambiguity/signature errors; numeric sort and bit-vector indices remain typed integers",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/function_references.go",
+          "go_targets": [
+            "pkg/parsers/smt2/function_references.go",
+            "pkg/parsers/smt2/function_references_test.go",
+            "pkg/parsers/smt2/expressions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/cmd_context/function_references.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/array_canonical_constructor_reads.smt2",
+            "pkg/cmd/g3/test_vectors/array_function_reference_signatures.smt2"
+          ],
+          "tests": [
+            "TestSMT2FunctionDeclarationReferenceErrors",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "parse_sort retained Array constructor: one or more domain sorts followed by range, including multidimensional and nested domains; reject empty/unary Array before declaration publication",
           "status": "ported",
@@ -106377,6 +106431,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/cmd/g3/test_vectors/array_function_reference_signatures.smt2",
+        "pkg/smtcore/theory_array_full_axioms.go",
+        "pkg/smtcore/theory_array_full_axioms_test.go",
+        "pkg/smtcore/theory_array.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/cmd/g3/test_vectors/array_canonical_constructor_reads.smt2",
         "pkg/smtcore/smt_equality_atom.go",
         "pkg/smtcore/smt_equality_atom_test.go",
         "pkg/smtcore/smt_theory_test.go",
@@ -106429,6 +106489,8 @@
         "pkg/smtcore/theory_arith_assume_eq_test.go"
       ],
       "tests": [
+        "TestSMTFullArrayEqualityCacheOrderedPairsAndScopeReset",
+        "TestSMTFullArrayCanonicalConstructorReadAxioms",
         "TestSMTSearchEqualityArithmeticConventions",
         "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
         "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
@@ -107397,6 +107459,26 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "full-array canonical constructor select axioms for const/map/as-array, shared kernel rewriter for map values independently of assertion preprocessing, and try_assign_eq ordered expression-pair cache reset completely on every scope pop; default-constructor fingerprint/cache conversion remains separate",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_full_axioms.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_full_axioms_test.go",
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_full_parents.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/array_canonical_constructor_reads.smt2"
+          ],
+          "tests": [
+            "TestSMTFullArrayEqualityCacheOrderedPairsAndScopeReset",
+            "TestSMTFullArrayCanonicalConstructorReadAxioms",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "search equality atom canonicalization by operand sort family, AST ID ordering, arithmetic numeral placement and constant folding, with default behavior for dummy arithmetic",
           "status": "ported",
@@ -119609,6 +119691,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/cmd/g3/test_vectors/array_function_reference_signatures.smt2",
+        "pkg/smtcore/theory_array_full_axioms.go",
+        "pkg/smtcore/theory_array_full_axioms_test.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/cmd/g3/test_vectors/array_canonical_constructor_reads.smt2",
         "pkg/smtcore/theory_array_read_queue.go",
         "pkg/smtcore/theory_array_read_queue_test.go",
         "pkg/smtcore/theory_array_model.go",
@@ -119637,6 +119725,8 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTFullArrayEqualityCacheOrderedPairsAndScopeReset",
+        "TestSMTFullArrayCanonicalConstructorReadAxioms",
         "TestSMTArrayReadFingerprintOriginalTupleAfterRootChange",
         "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
         "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
@@ -119806,6 +119896,26 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "full-array canonical constructor select axioms for const/map/as-array, shared kernel rewriter for map values independently of assertion preprocessing, and try_assign_eq ordered expression-pair cache reset completely on every scope pop; default-constructor fingerprint/cache conversion remains separate",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_full_axioms.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_full_axioms_test.go",
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_full_parents.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/array_canonical_constructor_reads.smt2"
+          ],
+          "tests": [
+            "TestSMTFullArrayEqualityCacheOrderedPairsAndScopeReset",
+            "TestSMTFullArrayCanonicalConstructorReadAxioms",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "array read fingerprint lookup checks original index tuple before current roots, stores root snapshots, and removes only child fingerprints on scope pop",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array_read_queue.go",
@@ -119962,6 +120072,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/cmd/g3/test_vectors/array_function_reference_signatures.smt2",
+        "pkg/smtcore/theory_array_full_axioms.go",
+        "pkg/smtcore/theory_array_full_axioms_test.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/cmd/g3/test_vectors/array_canonical_constructor_reads.smt2",
         "pkg/smtcore/theory_array_model.go",
         "pkg/smtcore/theory_array_model_test.go",
         "pkg/smtcore/theory_array_full_parents.go",
@@ -119988,6 +120104,8 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTFullArrayEqualityCacheOrderedPairsAndScopeReset",
+        "TestSMTFullArrayCanonicalConstructorReadAxioms",
         "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
         "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
@@ -120015,6 +120133,26 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "full-array canonical constructor select axioms for const/map/as-array, shared kernel rewriter for map values independently of assertion preprocessing, and try_assign_eq ordered expression-pair cache reset completely on every scope pop; default-constructor fingerprint/cache conversion remains separate",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_full_axioms.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_full_axioms_test.go",
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_full_parents.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/array_canonical_constructor_reads.smt2"
+          ],
+          "tests": [
+            "TestSMTFullArrayEqualityCacheOrderedPairsAndScopeReset",
+            "TestSMTFullArrayCanonicalConstructorReadAxioms",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "full constructor variable initialization emits default const/map/as-array axioms; scoped maps, parent maps, consts and as-arrays merge through private array classes; relevant maps mark inputs upward and delayed select-map expansion uses constructor/index-root fingerprints and relevant equality axioms",
           "status": "ported",

@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	z3rand "github.com/glycerine/g3/pkg/util/random"
 )
@@ -99,6 +100,7 @@ type SMTInternalizerCongruence struct {
 type SMTInternalizerState struct {
 	theoryProgress           uint64
 	manager                  *ast.ASTManager
+	theoryRewriter           *rewriter.TheoryRewriter // borrowed from the kernel
 	context                  *SMTCheckerContext
 	congruence               *SMTCongruenceTable
 	quantifiers              *SMTQuantifierRegistry
@@ -998,6 +1000,7 @@ func (s *SMTInternalizerState) Close() error {
 	result = errors.Join(result, s.congruence.Close())
 	if result == nil {
 		s.closed = true
+		s.theoryRewriter = nil
 		s.context = nil
 		s.manager = nil
 	}

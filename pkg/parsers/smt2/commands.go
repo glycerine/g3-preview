@@ -533,7 +533,7 @@ func (p *commandParser) sort() (ast.ASTHandle, error) {
 	return ast.ASTHandle{}, fmt.Errorf("unsupported sort constructor %s", name)
 }
 
-func (p *commandParser) indexedApplication(name string, indices []uint32, args []ast.ASTHandle, rangeSort ast.ASTHandle) (ast.ASTHandle, error) {
+func (p *commandParser) indexedApplication(name string, indices []identifierIndex, args []ast.ASTHandle, rangeSort ast.ASTHandle) (ast.ASTHandle, error) {
 	parameters := make([]ast.ASTParameter, len(indices))
 	defer func() {
 		for i := range parameters {
@@ -544,7 +544,11 @@ func (p *commandParser) indexedApplication(name string, indices []uint32, args [
 	}()
 	for i, index := range indices {
 		var err error
-		parameters[i], err = p.manager.NewParameterUint(index)
+		if index.function.IsNull() {
+			parameters[i], err = p.manager.NewParameterUint(index.number)
+		} else {
+			parameters[i], err = p.manager.NewParameterAST(index.function)
+		}
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}
@@ -572,9 +576,9 @@ func parseBitVectorName(name string) (string, bool) {
 	return name[2:], true
 }
 
-func (p *commandParser) parseBVNumeral(name string, indices []uint32) (ast.ASTHandle, error) {
+func (p *commandParser) parseBVNumeral(name string, indices []identifierIndex) (ast.ASTHandle, error) {
 	text, ok := parseBitVectorName(name)
-	if !ok || len(indices) != 1 {
+	if !ok || len(indices) != 1 || !indices[0].function.IsNull() {
 		return ast.ASTHandle{}, fmt.Errorf("invalid bit-vector numeral")
 	}
 	// A decimal SMT-LIB bv numeral is integral and may exceed machine width.
@@ -582,5 +586,5 @@ func (p *commandParser) parseBVNumeral(name string, indices []uint32) (ast.ASTHa
 	if !ok {
 		return ast.ASTHandle{}, fmt.Errorf("invalid bit-vector numeral")
 	}
-	return p.pin(p.manager.BitVectorNumeralRat(value, indices[0]))
+	return p.pin(p.manager.BitVectorNumeralRat(value, indices[0].number))
 }

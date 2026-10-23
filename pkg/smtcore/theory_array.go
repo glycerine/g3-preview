@@ -17,7 +17,7 @@ import (
 
 type smtArrayScope struct {
 	stores, selects, defaults, epsilons int
-	selectAxioms, defaultAxioms         int
+	defaultAxioms                       int
 	unsupported                         bool
 	extensionality                      int
 	readFingerprints                    int
@@ -40,8 +40,9 @@ type SMTArrayTheory struct {
 	*SMTTheoryBase
 	stores, selects, defaults             map[ast.ASTHandle]bool
 	storeTrail, selectTrail, defaultTrail []ast.ASTHandle
-	selectAxioms, defaultAxioms           map[smtArrayAxiomPair]bool
-	selectAxiomTrail, defaultAxiomTrail   []smtArrayAxiomPair
+	defaultAxioms                         map[smtArrayAxiomPair]bool
+	defaultAxiomTrail                     []smtArrayAxiomPair
+	equalityAxioms                        map[smtArrayExpressionPair]bool
 	epsilons                              map[ast.ASTHandle]ast.ASTHandle
 	epsilonTrail                          []ast.ASTHandle
 	scopes                                []smtArrayScope
@@ -78,7 +79,7 @@ func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
 		stores:                     make(map[ast.ASTHandle]bool),
 		selects:                    make(map[ast.ASTHandle]bool),
 		defaults:                   make(map[ast.ASTHandle]bool),
-		selectAxioms:               make(map[smtArrayAxiomPair]bool),
+		equalityAxioms:             make(map[smtArrayExpressionPair]bool),
 		defaultAxioms:              make(map[smtArrayAxiomPair]bool),
 		epsilons:                   make(map[ast.ASTHandle]ast.ASTHandle),
 		extensionalityFingerprints: make(map[smtArrayEnodePair]bool),
@@ -309,163 +310,18 @@ func (t *SMTArrayTheory) assertSelectStoreAxioms(selectExpression ast.ASTHandle)
 }
 
 func (t *SMTArrayTheory) assertSelectAxiom(selectExpression, array ast.ASTHandle) error {
-	state, err := t.State()
-	if err != nil {
-		return err
-	}
-	pair := smtArrayAxiomPair{observer: selectExpression, array: array}
-	if t.selectAxioms[pair] {
-		return nil
-	}
 	op, isArray, err := t.arrayOperation(array)
 	if err != nil || !isArray {
 		return err
 	}
-	if t.simple && op != ast.ASTArrayOpStore {
-		return nil
-	}
 	if op == ast.ASTArrayOpStore {
 		return t.enqueueStoreReadAxiom(selectExpression, array)
 	}
-	if op != ast.ASTArrayOpConst && op != ast.ASTArrayOpMap && op != ast.ASTArrayOpAsArray && op != ast.ASTArrayOpStore {
+	if t.simple {
 		return nil
 	}
-	t.selectAxioms[pair] = true
-	t.selectAxiomTrail = append(t.selectAxiomTrail, pair)
-	observedArray, err := state.manager.GetArg(selectExpression, 0)
-	if err != nil {
-		return err
-	}
-	guard := make([]SMTLiteral, 0, 1)
-	if observedArray != array {
-		equal, equalityErr := t.MkEqualityLiteral(observedArray, array, true)
-		if equalityErr != nil {
-			return equalityErr
-		}
-		guard = append(guard, equal.Negated())
-	}
-	selectCount, err := state.manager.GetNumArgs(selectExpression)
-	if err != nil || selectCount < 2 {
-		return err
-	}
-	if op == ast.ASTArrayOpConst {
-		value, argErr := state.manager.GetArg(array, 0)
-		if argErr != nil {
-			return argErr
-		}
-		literal, equalityErr := t.MkEqualityLiteral(selectExpression, value, true)
-		if equalityErr != nil {
-			return equalityErr
-		}
-		if err := t.markArrayEqualityRelevant(literal); err != nil {
-			return err
-		}
-		clause := append(guard, literal)
-		if equalityErr = state.addTheoryAxiom(t.FamilyID(), clause); equalityErr != nil {
-			return fmt.Errorf("constant array select axiom: %w", equalityErr)
-		}
-		t.statistics.selectConst++
-		return nil
-	}
-	if op == ast.ASTArrayOpMap {
-		return t.assertSelectMapAxiom(selectExpression, array, guard)
-	}
-	if op == ast.ASTArrayOpAsArray {
-		function, functionErr := state.manager.AsArrayFunction(array)
-		if functionErr != nil {
-			return functionErr
-		}
-		count, countErr := state.manager.GetNumArgs(selectExpression)
-		if countErr != nil || count < 2 {
-			return countErr
-		}
-		arguments := make([]ast.ASTHandle, 0, count-1)
-		for index := uint32(1); index < count; index++ {
-			argument, argErr := state.manager.GetArg(selectExpression, index)
-			if argErr != nil {
-				return argErr
-			}
-			arguments = append(arguments, argument)
-		}
-		value, appErr := state.manager.MkApp(function, arguments)
-		if appErr != nil {
-			return appErr
-		}
-		literal, equalityErr := t.MkEqualityLiteral(selectExpression, value, true)
-		if equalityErr != nil {
-			return equalityErr
-		}
-		if err := t.markArrayEqualityRelevant(literal); err != nil {
-			return err
-		}
-		clause := append(guard, literal)
-		if equalityErr = state.addTheoryAxiom(t.FamilyID(), clause); equalityErr != nil {
-			return fmt.Errorf("as-array select axiom: %w", equalityErr)
-		}
-		t.statistics.selectAsArray++
-		return nil
-	}
-	return nil
-}
-
-func (t *SMTArrayTheory) assertSelectMapAxiom(selectExpression, arrayMap ast.ASTHandle, guard []SMTLiteral) error {
-	state, _ := t.State()
-	mapDeclaration, err := state.manager.GetDecl(arrayMap)
-	if err != nil {
-		return err
-	}
-	function, err := state.manager.ArrayMapFunction(mapDeclaration)
-	if err != nil {
-		return err
-	}
-	mapCount, err := state.manager.GetNumArgs(arrayMap)
-	if err != nil {
-		return err
-	}
-	selectCount, err := state.manager.GetNumArgs(selectExpression)
-	if err != nil || selectCount < 2 {
-		return err
-	}
-	indices := make([]ast.ASTHandle, 0, selectCount-1)
-	for index := uint32(1); index < selectCount; index++ {
-		argument, argErr := state.manager.GetArg(selectExpression, index)
-		if argErr != nil {
-			return argErr
-		}
-		indices = append(indices, argument)
-	}
-	values := make([]ast.ASTHandle, 0, mapCount)
-	for index := uint32(0); index < mapCount; index++ {
-		input, argErr := state.manager.GetArg(arrayMap, index)
-		if argErr != nil {
-			return argErr
-		}
-		arguments := make([]ast.ASTHandle, 0, selectCount)
-		arguments = append(arguments, input)
-		arguments = append(arguments, indices...)
-		value, selectErr := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, arguments)
-		if selectErr != nil {
-			return selectErr
-		}
-		values = append(values, value)
-	}
-	mapped, err := state.manager.MkApp(function, values)
-	if err != nil {
-		return err
-	}
-	literal, err := t.MkEqualityLiteral(selectExpression, mapped, true)
-	if err != nil {
-		return err
-	}
-	if err := t.markArrayEqualityRelevant(literal); err != nil {
-		return err
-	}
-	clause := append(guard, literal)
-	if err = state.addTheoryAxiom(t.FamilyID(), clause); err != nil {
-		return fmt.Errorf("array map select axiom: %w", err)
-	}
-	t.statistics.mapAxiom++
-	return nil
+	_, err = t.instantiateConstructorRead(selectExpression, array)
+	return err
 }
 
 func (t *SMTArrayTheory) assertDefaultAxiom(defaultExpression ast.ASTHandle) error {
@@ -842,7 +698,6 @@ func (t *SMTArrayTheory) PushScope() error {
 		selects:          len(t.selectTrail),
 		defaults:         len(t.defaultTrail),
 		epsilons:         len(t.epsilonTrail),
-		selectAxioms:     len(t.selectAxiomTrail),
 		defaultAxioms:    len(t.defaultAxiomTrail),
 		unsupported:      t.unsupported,
 		extensionality:   len(t.extensionalityTrail),
@@ -869,6 +724,9 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	// dropping the enodes and fingerprints owned by the popped scopes.
 	t.extensionalityTodo = nil
 	t.storeTodo, t.readTodo = nil, nil
+	// theory_array_full::pop_scope_eh resets the entire ordered-pair cache,
+	// including pairs inserted before the popped scopes.
+	clear(t.equalityAxioms)
 	for i := len(t.readFingerprintTrail) - 1; i >= scope.readFingerprints; i-- {
 		entry := t.readFingerprintTrail[i]
 		bucket := t.readFingerprints[entry.store]
@@ -896,9 +754,6 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	for _, sort := range t.epsilonTrail[scope.epsilons:] {
 		delete(t.epsilons, sort)
 	}
-	for _, pair := range t.selectAxiomTrail[scope.selectAxioms:] {
-		delete(t.selectAxioms, pair)
-	}
 	for _, pair := range t.defaultAxiomTrail[scope.defaultAxioms:] {
 		delete(t.defaultAxioms, pair)
 	}
@@ -906,7 +761,6 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	t.selectTrail = t.selectTrail[:scope.selects]
 	t.defaultTrail = t.defaultTrail[:scope.defaults]
 	t.epsilonTrail = t.epsilonTrail[:scope.epsilons]
-	t.selectAxiomTrail = t.selectAxiomTrail[:scope.selectAxioms]
 	t.defaultAxiomTrail = t.defaultAxiomTrail[:scope.defaultAxioms]
 	t.unsupported = scope.unsupported
 	t.scopes = t.scopes[:level]

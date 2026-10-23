@@ -60,30 +60,7 @@ func (t *SMTArrayTheory) setMapInputsUpward(mapped *SMTEnode) error {
 }
 
 func (t *SMTArrayTheory) instantiateMapRead(observer, mapped *SMTEnode) (bool, error) {
-	s, err := t.State()
-	if err != nil {
-		return false, err
-	}
-	indices := make([]*SMTEnode, len(observer.arguments)-1)
-	for i := range indices {
-		indices[i] = observer.arguments[i+1]
-	}
-	if !t.insertArrayReadFingerprint(mapped.owner, indices) {
-		return false, nil
-	}
-	args := []ast.ASTHandle{mapped.owner}
-	for _, index := range observer.arguments[1:] {
-		args = append(args, index.owner)
-	}
-	read, err := s.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, args)
-	if err != nil {
-		return false, err
-	}
-	before := t.statistics.mapAxiom
-	if err := t.assertSelectAxiom(read, mapped.owner); err != nil {
-		return false, err
-	}
-	return before != t.statistics.mapAxiom, nil
+	return t.instantiateConstructorRead(observer.owner, mapped.owner)
 }
 
 func (t *SMTArrayTheory) mergeFullArrayClasses(root uint32, second *smtArrayVarData) error {

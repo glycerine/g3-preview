@@ -265,6 +265,7 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 		return err
 	}
 	k.preprocessor = value
+	k.internalizer.theoryRewriter = value
 	k.preprocess = enabled
 	if err = k.setAssertedEliminateAnd(false); err != nil {
 		return err
@@ -471,6 +472,7 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 		err = k.preprocessor.UpdateParams(params)
 	}
 	if err == nil {
+		k.internalizer.theoryRewriter = k.preprocessor
 		k.preprocess = enabled
 		k.preprocessState = state
 		k.assertedPhaseReady = false

@@ -63,7 +63,7 @@ func (p *commandParser) expressionWithQuantifier(quantifier *ast.ASTQuantifierSp
 			return ast.ASTHandle{}, "", err
 		}
 		var name string
-		var indices []uint32
+		var indices []identifierIndex
 		var rangeSort ast.ASTHandle
 		if p.token == LeftParenToken {
 			if err := p.advance(); err != nil {
@@ -74,7 +74,7 @@ func (p *commandParser) expressionWithQuantifier(quantifier *ast.ASTQuantifierSp
 				return ast.ASTHandle{}, "", err
 			}
 			if head == "_" {
-				name, indices, err = p.indexed()
+				name, indices, err = p.indexedExpression()
 			} else if head == "as" {
 				name, err = p.symbol()
 				if err == nil {
@@ -102,11 +102,16 @@ func (p *commandParser) expressionWithQuantifier(quantifier *ast.ASTQuantifierSp
 			case "!":
 				return p.annotatedExpression(quantifier)
 			case "_":
-				name, indices, err := p.indexed()
+				name, indices, err := p.indexedExpression()
 				if err != nil {
 					return ast.ASTHandle{}, "", err
 				}
-				value, err := p.parseBVNumeral(name, indices)
+				var value ast.ASTHandle
+				if _, numeral := parseBitVectorName(name); numeral {
+					value, err = p.parseBVNumeral(name, indices)
+				} else {
+					value, err = p.indexedApplication(name, indices, nil, ast.ASTHandle{})
+				}
 				return value, "", err
 			case "as":
 				name, err := p.symbol()
