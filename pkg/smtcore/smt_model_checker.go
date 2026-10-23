@@ -161,7 +161,44 @@ func (c *SMTModelChecker) addCounterexample(quantifier ast.ASTHandle, values []a
 	return c.registry.AddInstance(quantifier, ast.ASTHandle{}, nodes, maxGeneration, 0, 0)
 }
 
-func (c *SMTModelChecker) auxiliaryCounterexample(model *protomodel.ProtoModel, quantifier ast.ASTHandle, values []ast.ASTHandle, finite []bool) (added bool, result error) {
+func (c *SMTModelChecker) addAuxiliaryBlockingClause(auxiliary *SMTSolver, skolems, values []ast.ASTHandle, finite []bool) (result error) {
+	disequalities := make([]ast.ASTHandle, 0, len(skolems))
+	refs := make([]ast.ASTRef, 0, len(skolems))
+	defer func() {
+		for i := len(refs) - 1; i >= 0; i-- {
+			result = errors.Join(result, c.manager.DelRef(&refs[i]))
+		}
+	}()
+	for i, skolem := range skolems {
+		if finite[i] || skolem.IsNull() || values[i].IsNull() {
+			continue
+		}
+		equal, err := c.manager.MkEq(skolem, values[i])
+		if err != nil {
+			return err
+		}
+		disequal, err := c.manager.MkNot(equal)
+		if err != nil {
+			return err
+		}
+		ref, err := c.manager.NewRef(disequal)
+		if err != nil {
+			return err
+		}
+		refs = append(refs, ref)
+		disequalities = append(disequalities, disequal)
+	}
+	if len(disequalities) == 0 {
+		return ast.ErrASTPending
+	}
+	clause, err := c.manager.MkOrArgs(disequalities)
+	if err != nil {
+		return err
+	}
+	return auxiliary.Assert(clause)
+}
+
+func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel, quantifier ast.ASTHandle, values []ast.ASTHandle, finite []bool, remaining *uint32) (found bool, result error) {
 	if c.auxiliary == nil {
 		return false, nil
 	}
@@ -181,15 +218,15 @@ func (c *SMTModelChecker) auxiliaryCounterexample(model *protomodel.ProtoModel, 
 	if err != nil {
 		return false, err
 	}
-	bindings := append([]ast.ASTHandle(nil), values...)
-	skolemDecls := make([]ast.ASTHandle, len(bindings))
-	skolemRefs := make([]ast.ASTRef, 0, len(bindings))
+	skolems := append([]ast.ASTHandle(nil), values...)
+	skolemDecls := make([]ast.ASTHandle, len(skolems))
+	skolemRefs := make([]ast.ASTRef, 0, len(skolems))
 	defer func() {
 		for i := len(skolemRefs) - 1; i >= 0; i-- {
 			result = errors.Join(result, c.manager.DelRef(&skolemRefs[i]))
 		}
 	}()
-	for i := range bindings {
+	for i := range skolems {
 		if finite[i] {
 			continue
 		}
@@ -197,16 +234,16 @@ func (c *SMTModelChecker) auxiliaryCounterexample(model *protomodel.ProtoModel, 
 		if e != nil {
 			return false, e
 		}
-		bindings[i], e = c.manager.MkFreshConst("mbqi", sort)
+		skolems[i], e = c.manager.MkFreshConst("mbqi", sort)
 		if e != nil {
 			return false, e
 		}
-		ref, e := c.manager.NewRef(bindings[i])
+		ref, e := c.manager.NewRef(skolems[i])
 		if e != nil {
 			return false, e
 		}
 		skolemRefs = append(skolemRefs, ref)
-		skolemDecls[i], e = c.manager.GetDecl(bindings[i])
+		skolemDecls[i], e = c.manager.GetDecl(skolems[i])
 		if e != nil {
 			return false, e
 		}
@@ -221,7 +258,7 @@ func (c *SMTModelChecker) auxiliaryCounterexample(model *protomodel.ProtoModel, 
 		return false, err
 	}
 	defer func() { result = errors.Join(result, c.manager.DelRef(&ground)) }()
-	if err = substitution.Substitute(evaluatedBody, bindings, ground); err != nil {
+	if err = substitution.Substitute(evaluatedBody, skolems, ground); err != nil {
 		return false, err
 	}
 	groundBody, err := c.manager.RefGet(ground)
@@ -240,46 +277,65 @@ func (c *SMTModelChecker) auxiliaryCounterexample(model *protomodel.ProtoModel, 
 	if err = auxiliary.Assert(negated); err != nil {
 		return false, err
 	}
-	status, err := auxiliary.CheckSat(nil)
-	if err != nil {
-		return false, err
-	}
-	if status == lbool.False {
-		return false, nil
-	}
-	if status != lbool.True {
-		c.exhausted = true
-		return false, nil
-	}
-	cex, err := auxiliary.AcquireModel()
-	if err != nil {
-		return false, err
-	}
-	if cex == nil {
-		return false, ast.ErrASTPending
-	}
-	defer func() { result = errors.Join(result, cex.DecRef()) }()
-	for i, declaration := range skolemDecls {
-		if declaration.IsNull() {
-			continue
+	for *remaining != 0 {
+		status, err := auxiliary.CheckSat(nil)
+		if err != nil {
+			return false, err
 		}
-		value, e := cex.ConstantInterpretation(declaration)
-		if e != nil {
-			return false, e
+		if status == lbool.False {
+			return found, nil
 		}
-		if value.IsNull() {
-			sort, e := c.manager.GetDeclarationSort(quantifier, uint32(i))
-			if e != nil {
-				return false, e
+		if status != lbool.True {
+			c.exhausted = true
+			return found, nil
+		}
+		cex, err := auxiliary.AcquireModel()
+		if err != nil {
+			return false, err
+		}
+		if cex == nil {
+			return false, ast.ErrASTPending
+		}
+		bindings := append([]ast.ASTHandle(nil), values...)
+		for i, declaration := range skolemDecls {
+			if declaration.IsNull() {
+				continue
 			}
-			value, e = cex.GetSomeValue(sort)
+			value, e := cex.ConstantInterpretation(declaration)
 			if e != nil {
-				return false, e
+				return false, errors.Join(e, cex.DecRef())
 			}
+			if value.IsNull() {
+				sort, e := c.manager.GetDeclarationSort(quantifier, uint32(i))
+				if e != nil {
+					return false, errors.Join(e, cex.DecRef())
+				}
+				value, e = cex.GetSomeValue(sort)
+				if e != nil {
+					return false, errors.Join(e, cex.DecRef())
+				}
+			}
+			bindings[i] = value
 		}
-		bindings[i] = value
+		inserted, err := c.addCounterexample(quantifier, bindings)
+		if err != nil {
+			return false, errors.Join(err, cex.DecRef())
+		}
+		if inserted {
+			found = true
+			*remaining--
+		}
+		if *remaining == 0 {
+			return found, cex.DecRef()
+		}
+		if err = c.addAuxiliaryBlockingClause(auxiliary, skolems, bindings, finite); err != nil {
+			return false, errors.Join(err, cex.DecRef())
+		}
+		if err = cex.DecRef(); err != nil {
+			return false, err
+		}
 	}
-	return c.addCounterexample(quantifier, bindings)
+	return found, nil
 }
 
 func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifier ast.ASTHandle, remaining *uint32) (bool, error) {
@@ -335,14 +391,11 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 			return nil
 		}
 		if hasInfinite {
-			inserted, err := c.auxiliaryCounterexample(model, quantifier, values, finite)
+			inserted, err := c.auxiliaryCounterexamples(model, quantifier, values, finite, remaining)
 			if err != nil {
 				return err
 			}
-			if inserted {
-				found = true
-				*remaining--
-			}
+			found = found || inserted
 			return nil
 		}
 		instance, err := c.manager.NewRef(ast.ASTHandle{})

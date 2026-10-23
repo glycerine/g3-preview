@@ -114,6 +114,47 @@ func TestSMTSolverMBQIFindsInfiniteIntegerCounterexample(t *testing.T) {
 	}
 }
 
+func TestSMTSolverMBQIBlocksAndCollectsMultipleIntegerCounterexamples(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	zero, err := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	integer, err := m.GetSort(zero)
+	astTestMust(t, err)
+	variable, err := m.MkVar(0, integer)
+	astTestMust(t, err)
+	body, err := m.MkEq(variable, zero)
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{integer}, Names: []usymbol.Symbol{astTestSymbol(t, m, "solver-mbqi-many-int")}, Body: body,
+	})
+	astTestMust(t, err)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	local, err := params.NewValue()
+	astTestMust(t, err)
+	name := "mbqi.max_cexs"
+	astTestMust(t, params.SetUIntName(&local, &name, 3))
+	s, err := NewSMTSolver(m, &local, "AUFLIA", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() {
+		astTestMust(t, s.Close())
+		astTestMust(t, params.Del(&local))
+		astTestMust(t, params.Close())
+	})
+	astTestMust(t, s.Assert(quantifier))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("multiple integer counterexamples did not refute quantifier", status)
+	}
+	stats := s.kernel.internalizer.quantifiers.schedule.Stats()
+	if stats.Instances != 3 {
+		t.Fatal("MBQI blocking did not collect the configured counterexample count", stats)
+	}
+}
+
 func TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "solver-mbqi-sort"), nil)
