@@ -9,7 +9,8 @@ type smtModelFinderAUFClassifier struct {
 }
 
 const (
-	aufSeenFormula uint8 = 1 << iota
+	aufSeenFormulaPositive uint8 = 1 << iota
+	aufSeenFormulaNegative
 	aufSeenTerm
 )
 
@@ -136,7 +137,7 @@ func (c *smtModelFinderAUFClassifier) varAndVar(left, right ast.ASTHandle) (bool
 	return rightDifference && leftZero, err
 }
 
-func (c *smtModelFinderAUFClassifier) recognizedLiteral(atom ast.ASTHandle) (bool, error) {
+func (c *smtModelFinderAUFClassifier) recognizedLiteral(atom ast.ASTHandle, negative bool) (bool, error) {
 	family, err := c.finder.manager.GetFamilyID(atom)
 	if err != nil {
 		return false, err
@@ -171,8 +172,10 @@ func (c *smtModelFinderAUFClassifier) recognizedLiteral(atom ast.ASTHandle) (boo
 	if err != nil {
 		return false, err
 	}
-	if matched, err := c.varAndVar(left, right); err != nil || matched {
-		return matched, err
+	if negative {
+		if matched, err := c.varAndVar(left, right); err != nil || matched {
+			return matched, err
+		}
 	}
 	return c.varAndGround(left, right)
 }
@@ -243,7 +246,10 @@ func (c *smtModelFinderAUFClassifier) term(term ast.ASTHandle) (bool, error) {
 		return false, err
 	}
 	if sort == boolean {
-		return c.formula(term)
+		if ok, err := c.formulaWithPolarity(term, false); err != nil || !ok {
+			return ok, err
+		}
+		return c.formulaWithPolarity(term, true)
 	}
 	kind, err := c.finder.manager.GetKind(term)
 	if err != nil {
@@ -313,14 +319,22 @@ func (c *smtModelFinderAUFClassifier) application(term ast.ASTHandle) (bool, err
 }
 
 func (c *smtModelFinderAUFClassifier) formula(formula ast.ASTHandle) (bool, error) {
+	return c.formulaWithPolarity(formula, false)
+}
+
+func (c *smtModelFinderAUFClassifier) formulaWithPolarity(formula ast.ASTHandle, negative bool) (bool, error) {
 	ground, err := c.finder.manager.IsGround(formula)
 	if err != nil || ground {
 		return true, err
 	}
-	if c.seen[formula]&aufSeenFormula != 0 {
+	flag := aufSeenFormulaPositive
+	if negative {
+		flag = aufSeenFormulaNegative
+	}
+	if c.seen[formula]&flag != 0 {
 		return true, nil
 	}
-	c.seen[formula] |= aufSeenFormula
+	c.seen[formula] |= flag
 	kind, err := c.finder.manager.GetKind(formula)
 	if err != nil {
 		return false, err
@@ -351,8 +365,17 @@ func (c *smtModelFinderAUFClassifier) formula(formula ast.ASTHandle) (bool, erro
 				if err != nil {
 					return false, err
 				}
-				if ok, err := c.formula(argument); err != nil || !ok {
+				childNegative := negative
+				if op == ast.ASTOpNot {
+					childNegative = !negative
+				}
+				if ok, err := c.formulaWithPolarity(argument, childNegative); err != nil || !ok {
 					return ok, err
+				}
+				if op == ast.ASTOpIff || op == ast.ASTOpIte && i == 0 {
+					if ok, err := c.formulaWithPolarity(argument, !childNegative); err != nil || !ok {
+						return ok, err
+					}
 				}
 			}
 			return true, nil
@@ -375,7 +398,10 @@ func (c *smtModelFinderAUFClassifier) formula(formula ast.ASTHandle) (bool, erro
 					if err != nil {
 						return false, err
 					}
-					if ok, err := c.formula(argument); err != nil || !ok {
+					if ok, err := c.formulaWithPolarity(argument, false); err != nil || !ok {
+						return ok, err
+					}
+					if ok, err := c.formulaWithPolarity(argument, true); err != nil || !ok {
 						return ok, err
 					}
 				}
@@ -383,7 +409,7 @@ func (c *smtModelFinderAUFClassifier) formula(formula ast.ASTHandle) (bool, erro
 			}
 		}
 	}
-	if recognized, err := c.recognizedLiteral(formula); err != nil || recognized {
+	if recognized, err := c.recognizedLiteral(formula, negative); err != nil || recognized {
 		return recognized, err
 	}
 	return c.application(formula)

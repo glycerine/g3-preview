@@ -108686,6 +108686,8 @@
         "pkg/smtcore/smt_model_finder_auf_literals.go",
         "pkg/smtcore/smt_model_finder_auf_offsets.go",
         "pkg/smtcore/smt_model_finder_auf_offsets_test.go",
+        "pkg/smtcore/smt_model_finder_auf_comparisons.go",
+        "pkg/smtcore/smt_model_finder_auf_comparisons_test.go",
         "pkg/smtcore/smt_model_finder_instantiation_set.go",
         "pkg/smtcore/smt_model_finder_instantiation_set_test.go",
         "pkg/smtcore/smt_model_finder_quantifier_set.go",
@@ -108714,6 +108716,8 @@
         "TestSMTModelFinderAUFGraphEqualityAndDisequalityConstraints",
         "TestSMTModelFinderAUFOffsetPopulationAndSameClassCutoff",
         "TestSMTModelFinderAUFBitVectorOffsetWraps",
+        "TestSMTModelFinderAUFComparisonGroundBoundaries",
+        "TestSMTModelFinderAUFVariableComparisonPolarityAndSignedProjection",
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
         "TestModelFinderScopedQuantifierSetLevelZeroEraseSourceBranch",
         "TestModelFinderHintSatisfiedResidueSourceScopeTransitions",
@@ -109190,6 +109194,15 @@
           ]
         },
         {
+          "name": "numeric variable/ground and variable/difference normalization; x_leq_y, x_sleq_y and x_gle_t constraints with comparison polarity and monotone/signed projection flags",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_auf_comparisons.go",
+          "tests": [
+            "TestSMTModelFinderAUFComparisonGroundBoundaries",
+            "TestSMTModelFinderAUFVariableComparisonPolarityAndSignedProjection"
+          ]
+        },
+        {
           "name": "instantiation_set term ownership, model-value rejection, removal guard, model evaluation, inverse selection and generation lookup",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_instantiation_set.go",
@@ -109280,7 +109293,7 @@
         "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit."
       ],
       "deviations": [
-        "The production model-finder lifecycle is wired to quantifier internalization, context scopes, search initialization, MBQI candidate construction and final published-model construction. Existing AST macro analysis supplies owned conditional-macro candidates; the simple macro solver repeatedly publishes an eligible isolated satisfying definition as the function fallback and records the chosen declaration. Shared conditional macros flow through the hint solver's indexes and bounded search, and selected definitions are published into the generated model. The quantifier analyzer classifies AUF formula and term structure, and the non-AUF solver publishes unconditional or ordered conditional definitions while rejecting cyclic function dependencies. Concrete instantiation sets retain accepted terms, reject private model values, build model-value inverses and preserve source generation preference. The AUF graph now merges quantified-variable and function-argument nodes for direct f_var constraints, populates sets from original relevant argument enodes and publishes shared terms into the MBQI instantiation sets. Direct variable equality/disequality qinfo adds class merges, avoid constraints, exceptions and ground terms. Offset arguments use separate classes, two-pass shifted term transfer and the source same-class cutoff, with arithmetic and bit-vector simplification through the existing theory rewriter. Projection flags and avoidance metadata remain local to graph construction until model extension is ported. Array-select qinfo, arithmetic comparison constraints, nested quantifier flattening, sort finiteness, projection construction and partial-function model extension remain open. The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering, Q_f/Q_f_def indexes and bounded greedy search are ported with borrowed AST handles."
+        "The production model-finder lifecycle is wired to quantifier internalization, context scopes, search initialization, MBQI candidate construction and final published-model construction. Existing AST macro analysis supplies owned conditional-macro candidates; the simple macro solver repeatedly publishes an eligible isolated satisfying definition as the function fallback and records the chosen declaration. Shared conditional macros flow through the hint solver's indexes and bounded search, and selected definitions are published into the generated model. The quantifier analyzer classifies AUF formula and term structure with separate positive/negative formula caches, and the non-AUF solver publishes unconditional or ordered conditional definitions while rejecting cyclic function dependencies. Concrete instantiation sets retain accepted terms, reject private model values, build model-value inverses and preserve source generation preference. The AUF graph merges quantified-variable and function-argument nodes for direct f_var constraints, populates sets from original relevant argument enodes and publishes shared terms into MBQI instantiation sets. Variable equality/disequality qinfo adds class merges, avoid constraints, exceptions and ground terms, including offset and difference forms. Offset arguments use separate classes, two-pass shifted term transfer and the source same-class cutoff, with arithmetic and bit-vector simplification through the existing theory rewriter. Comparison qinfo supplies monotone/signed flags, variable-class merges and polarity-dependent ground boundaries. Projection flags and avoidance metadata remain local to graph construction until model extension is ported. Array-select qinfo, nested quantifier flattening, sort finiteness, projection construction and partial-function model extension remain open. The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering, Q_f/Q_f_def indexes and bounded greedy search are ported with borrowed AST handles."
       ]
     },
     {

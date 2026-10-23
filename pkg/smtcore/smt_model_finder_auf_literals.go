@@ -10,6 +10,9 @@ const (
 	aufDisequalVariables
 	aufEqualGround
 	aufDisequalGround
+	aufOrderedVariables
+	aufSignedOrderedVariables
+	aufOrderedGround
 )
 
 type smtModelFinderAUFLiteral struct {
@@ -51,8 +54,11 @@ func (g *smtModelFinderAUFGraph) collectLiterals(quantifier, formula ast.ASTHand
 		return nil
 	}
 	family, err := m.GetFamilyID(formula)
-	if err != nil || family != m.BasicFamilyID() {
+	if err != nil {
 		return err
+	}
+	if family != m.BasicFamilyID() {
+		return g.collectComparison(quantifier, formula, negative)
 	}
 	op, err := m.GetDeclKind(formula)
 	if err != nil {
@@ -97,43 +103,25 @@ func (g *smtModelFinderAUFGraph) collectLiterals(quantifier, formula ast.ASTHand
 	if err != nil {
 		return err
 	}
-	lk, err := m.GetKind(left)
+	variable, bound, _, matched, err := g.variableAndGround(left, right)
 	if err != nil {
 		return err
 	}
-	rk, err := m.GetKind(right)
-	if err != nil {
-		return err
-	}
-	if lk != ast.ASTVar && rk == ast.ASTVar {
-		left, right, lk, rk = right, left, rk, lk
-	}
-	if lk != ast.ASTVar {
-		return nil
-	}
-	variable, err := m.GetVarIndex(left)
-	if err != nil {
-		return err
-	}
-	row := smtModelFinderAUFLiteral{quantifier: quantifier, first: variable}
-	if rk == ast.ASTVar {
-		row.second, err = m.GetVarIndex(right)
-		if err != nil {
-			return err
-		}
-		row.kind = aufEqualVariables
-		if negative {
-			row.kind = aufDisequalVariables
-		}
-	} else {
-		ground, err := m.IsGround(right)
-		if err != nil || !ground {
-			return err
-		}
-		row.term = right
+	row := smtModelFinderAUFLiteral{quantifier: quantifier, first: variable, term: bound}
+	if matched {
 		row.kind = aufEqualGround
 		if negative {
 			row.kind = aufDisequalGround
+		}
+	} else {
+		first, second, matched, err := g.variableAndVariable(left, right)
+		if err != nil || !matched {
+			return err
+		}
+		row.first, row.second = first, second
+		row.kind = aufEqualVariables
+		if negative {
+			row.kind = aufDisequalVariables
 		}
 	}
 	g.literals = append(g.literals, row)
@@ -147,14 +135,24 @@ func (g *smtModelFinderAUFGraph) processLiterals() error {
 			return err
 		}
 		switch info.kind {
-		case aufEqualVariables, aufDisequalVariables:
+		case aufEqualVariables, aufDisequalVariables, aufOrderedVariables, aufSignedOrderedVariables:
 			second, err := g.uvar(info.quantifier, info.second)
 			if err != nil {
 				return err
 			}
-			if info.kind == aufDisequalVariables {
+			if info.kind != aufEqualVariables {
 				if err = first.merge(second); err != nil {
 					return err
+				}
+				if info.kind == aufOrderedVariables || info.kind == aufSignedOrderedVariables {
+					if err = first.setMono(); err != nil {
+						return err
+					}
+				}
+				if info.kind == aufSignedOrderedVariables {
+					if err = first.setSigned(); err != nil {
+						return err
+					}
 				}
 			} else {
 				if err = first.insertAvoid(second); err != nil {
@@ -168,6 +166,10 @@ func (g *smtModelFinderAUFGraph) processLiterals() error {
 			if err = first.insertException(info.term); err != nil {
 				return err
 			}
+		case aufOrderedGround:
+			if err = first.setMono(); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -177,7 +179,7 @@ func (g *smtModelFinderAUFGraph) populateLiterals() error {
 	for _, info := range g.literals {
 		node := g.uvars[smtModelFinderAUFKey{info.quantifier, info.first}]
 		switch info.kind {
-		case aufDisequalGround:
+		case aufDisequalGround, aufOrderedGround:
 			if _, err := node.insert(info.term, 0); err != nil {
 				return err
 			}
