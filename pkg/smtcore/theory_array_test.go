@@ -1,6 +1,7 @@
 package smtcore
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -510,87 +511,105 @@ func TestSMTArrayPublishesModelValues(t *testing.T) {
 }
 
 func TestSMTArrayModelPreservesObservedSelect(t *testing.T) {
-	m, modelConfig := smtModelGeneratorFixture(t)
-	family, err := m.RegisterArrayPlugin()
-	astTestMust(t, err)
-	boolean, err := m.MkBoolSort()
-	astTestMust(t, err)
-	indexSort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "observed-select-index-sort"), nil)
-	astTestMust(t, err)
-	arraySort, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{indexSort}), boolean)
-	astTestMust(t, err)
-	array, err := m.MkConst(astTestSymbol(t, m, "observed-select-array"), arraySort)
-	astTestMust(t, err)
-	index, err := m.MkConst(astTestSymbol(t, m, "observed-select-index"), indexSort)
-	astTestMust(t, err)
-	selected, err := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{array, index})
-	astTestMust(t, err)
-	solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
-	astTestMust(t, err)
-	t.Cleanup(func() { astTestMust(t, solver.Close()) })
-	astTestMust(t, solver.SetProduceModels(true))
-	astTestMust(t, solver.Assert(selected))
-	status, err := solver.CheckSat(nil)
-	astTestMust(t, err)
-	if status != lbool.True {
-		t.Fatal("observed select model status", status)
-	}
-	generated, err := solver.AcquireModel()
-	astTestMust(t, err)
-	t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
-	out := astTestPin(t, m, ast.ASTHandle{})
-	evaluator, err := model.NewModelEvaluator(generated, modelConfig)
-	astTestMust(t, err)
-	t.Cleanup(func() { astTestMust(t, evaluator.Close()) })
-	astTestMust(t, evaluator.SetModelCompletion(true))
-	astTestMust(t, evaluator.Evaluate(selected, out))
-	result, err := m.RefGet(out)
-	astTestMust(t, err)
-	if !m.IsTrue(result) {
-		t.Fatal("array model lost observed select", result)
+	for _, level := range []uint32{0, 2} {
+		t.Run(fmt.Sprint(level), func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			family, err := m.RegisterArrayPlugin()
+			astTestMust(t, err)
+			boolean, err := m.MkBoolSort()
+			astTestMust(t, err)
+			indexSort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "observed-select-index-sort"), nil)
+			astTestMust(t, err)
+			arraySort, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{indexSort}), boolean)
+			astTestMust(t, err)
+			array, err := m.MkConst(astTestSymbol(t, m, "observed-select-array"), arraySort)
+			astTestMust(t, err)
+			index, err := m.MkConst(astTestSymbol(t, m, "observed-select-index"), indexSort)
+			astTestMust(t, err)
+			selected, err := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{array, index})
+			astTestMust(t, err)
+			params, err := modelConfig.Context.NewValue()
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, modelConfig.Context.Del(&params)) })
+			key := "relevancy"
+			astTestMust(t, modelConfig.Context.SetUIntName(&params, &key, level))
+			solver, err := NewSMTSolver(m, &params, "QF_AX", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.SetProduceModels(true))
+			astTestMust(t, solver.Assert(selected))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.True {
+				t.Fatal("observed select model status", status)
+			}
+			generated, err := solver.AcquireModel()
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
+			out := astTestPin(t, m, ast.ASTHandle{})
+			evaluator, err := model.NewModelEvaluator(generated, modelConfig)
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, evaluator.Close()) })
+			astTestMust(t, evaluator.SetModelCompletion(true))
+			astTestMust(t, evaluator.Evaluate(selected, out))
+			result, err := m.RefGet(out)
+			astTestMust(t, err)
+			if !m.IsTrue(result) {
+				t.Fatal("array model lost observed select", result)
+			}
+		})
 	}
 }
 
 func TestSMTArrayModelPreservesObservedDefault(t *testing.T) {
-	m, modelConfig := smtModelGeneratorFixture(t)
-	family, err := m.RegisterArrayPlugin()
-	astTestMust(t, err)
-	boolean, err := m.MkBoolSort()
-	astTestMust(t, err)
-	arraySort, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), boolean)
-	astTestMust(t, err)
-	array, err := m.MkConst(astTestSymbol(t, m, "observed-default-array"), arraySort)
-	astTestMust(t, err)
-	defaultValue, err := m.MkFamilyApp(family, ast.ASTArrayOpDefault, nil, []ast.ASTHandle{array})
-	astTestMust(t, err)
-	solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
-	astTestMust(t, err)
-	t.Cleanup(func() { astTestMust(t, solver.Close()) })
-	astTestMust(t, solver.SetProduceModels(true))
-	astTestMust(t, solver.Assert(defaultValue))
-	status, err := solver.CheckSat(nil)
-	astTestMust(t, err)
-	if status != lbool.True {
-		t.Fatal("observed default model status", status)
-	}
-	generated, err := solver.AcquireModel()
-	astTestMust(t, err)
-	t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
-	arrayDeclaration, err := m.GetDecl(array)
-	astTestMust(t, err)
-	arrayValue, err := generated.ConstantInterpretation(arrayDeclaration)
-	astTestMust(t, err)
-	function, err := m.AsArrayFunction(arrayValue)
-	astTestMust(t, err)
-	interpretation, err := generated.FunctionInterpretation(function)
-	astTestMust(t, err)
-	if interpretation == nil {
-		t.Fatal("array model omitted observed default interpretation")
-	}
-	fallback, err := interpretation.Else()
-	astTestMust(t, err)
-	if !m.IsTrue(fallback) {
-		t.Fatal("array model lost observed default", fallback)
+	for _, level := range []uint32{0, 2} {
+		t.Run(fmt.Sprint(level), func(t *testing.T) {
+			m, modelConfig := smtModelGeneratorFixture(t)
+			family, err := m.RegisterArrayPlugin()
+			astTestMust(t, err)
+			boolean, err := m.MkBoolSort()
+			astTestMust(t, err)
+			arraySort, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), boolean)
+			astTestMust(t, err)
+			array, err := m.MkConst(astTestSymbol(t, m, "observed-default-array"), arraySort)
+			astTestMust(t, err)
+			defaultValue, err := m.MkFamilyApp(family, ast.ASTArrayOpDefault, nil, []ast.ASTHandle{array})
+			astTestMust(t, err)
+			params, err := modelConfig.Context.NewValue()
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, modelConfig.Context.Del(&params)) })
+			key := "relevancy"
+			astTestMust(t, modelConfig.Context.SetUIntName(&params, &key, level))
+			solver, err := NewSMTSolver(m, &params, "QF_AX", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, solver.Close()) })
+			astTestMust(t, solver.SetProduceModels(true))
+			astTestMust(t, solver.Assert(defaultValue))
+			status, err := solver.CheckSat(nil)
+			astTestMust(t, err)
+			if status != lbool.True {
+				t.Fatal("observed default model status", status)
+			}
+			generated, err := solver.AcquireModel()
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, generated.DecRef()) })
+			arrayDeclaration, err := m.GetDecl(array)
+			astTestMust(t, err)
+			arrayValue, err := generated.ConstantInterpretation(arrayDeclaration)
+			astTestMust(t, err)
+			function, err := m.AsArrayFunction(arrayValue)
+			astTestMust(t, err)
+			interpretation, err := generated.FunctionInterpretation(function)
+			astTestMust(t, err)
+			if interpretation == nil {
+				t.Fatal("array model omitted observed default interpretation")
+			}
+			fallback, err := interpretation.Else()
+			astTestMust(t, err)
+			if !m.IsTrue(fallback) {
+				t.Fatal("array model lost observed default", fallback)
+			}
+		})
 	}
 }
 

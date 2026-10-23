@@ -11,7 +11,7 @@ func (t *SMTSequenceTheory) checkSequenceExtensionality() (bool, error) {
 	}
 	variables := make([]*SMTEnode, 0, len(t.variables))
 	for _, node := range t.variables {
-		if node == nil || node.Root() != node || !state.context.relevant[node.Owner()] {
+		if node == nil || node.Root() != node || !state.isRelevant(node.Owner()) {
 			continue
 		}
 		symbolic, variableErr := t.sequenceVariable(node.Owner())

@@ -1000,7 +1000,7 @@ func (t *SMTArrayTheory) arrayTableModelValue(node *SMTEnode, generator *SMTMode
 	}
 	procedure := &smtArrayTableValueProcedure{sort: sort, rangeSort: rangeSort, domain: domain}
 	for _, defaultExpression := range t.defaultTrail {
-		if !generator.context.relevant[defaultExpression] {
+		if !generator.context.isRelevant(defaultExpression) {
 			continue
 		}
 		array, argErr := generator.manager.GetArg(defaultExpression, 0)
@@ -1026,7 +1026,7 @@ func (t *SMTArrayTheory) arrayTableModelValue(node *SMTEnode, generator *SMTMode
 		}
 	}
 	for _, selectExpression := range t.selectTrail {
-		if !generator.context.relevant[selectExpression] {
+		if !generator.context.isRelevant(selectExpression) {
 			continue
 		}
 		array, argErr := generator.manager.GetArg(selectExpression, 0)

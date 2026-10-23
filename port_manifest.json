@@ -117518,12 +117518,17 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/theory_array.go"
+        "pkg/smtcore/theory_array.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTArrayReadOverWrite",
         "TestSMTArrayConstantRead",
-        "TestSMTArrayExtensionality"
+        "TestSMTArrayExtensionality",
+        "TestSMTArrayModelPreservesObservedSelect",
+        "TestSMTArrayModelPreservesObservedDefault",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -117691,13 +117696,29 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array.go",
           "tests": ["TestSMTArrayPublishesModelValues", "TestSMTArrayModelPreservesObservedSelect", "TestSMTArrayModelPreservesObservedDefault", "TestSMTArrayConstructorModelValue"]
+        },
+        {
+          "name": "context::is_relevant policy for observed array select and default model dependencies under disabled filtering, preserving table entries and fallback values across scopes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayModelPreservesObservedSelect",
+            "TestSMTArrayModelPreservesObservedDefault",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "The theory borrows AST and enode identities, owns observer and axiom-pair trails, and transfers auxiliary function interpretations to ProtoModel during table-value construction."
+        "The theory borrows AST and enode identities, owns observer and axiom-pair trails, and transfers auxiliary function interpretations to ProtoModel during table-value construction.",
+        "Array value procedures retain their existing enode-value dependencies and generated interpretation owner. Reading disabled relevance does not change marks; observed defaults and selects enter the same dependency-before-value model traversal and scoped array trails as filtered terms."
       ],
       "deviations": [
-        "Native fingerprint tables and delayed propagation queues are represented by scoped typed pair maps and eager guarded clauses. Go model procedures depend directly on canonical enode roots and register auxiliary functions through ProtoModel. Native interface-equality scheduling has no retained cross-theory array-sort consumer."
+        "Native fingerprint tables and delayed propagation queues are represented by scoped typed pair maps and eager guarded clauses. Go model procedures depend directly on canonical enode roots and register auxiliary functions through ProtoModel. Native interface-equality scheduling has no retained cross-theory array-sort consumer.",
+        "Observed array model defaults and select entries are no longer lost when relevancy filtering is disabled. Enabled/disabled mode tests inspect actual model interpretation and evaluator results. A new ALL-logic runner vector checks observed and unobserved selects, default fallback 11, scoped additional entries and contradiction recovery against C++, bringing strict comparisons to 95. Direct default(as-array) get-value reduction remains the existing shared C++/Go evaluator behavior and is not changed by this model dependency fix."
       ]
     },
     {
@@ -117706,10 +117727,15 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/theory_array.go"
+        "pkg/smtcore/theory_array.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
-        "TestSMTArrayReadOverWrite"
+        "TestSMTArrayReadOverWrite",
+        "TestSMTArrayModelPreservesObservedSelect",
+        "TestSMTArrayModelPreservesObservedDefault",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -117729,13 +117755,29 @@
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array.go",
           "tests": ["TestSMTArrayReadOverWrite", "TestSMTArrayExtensionality", "TestSMTArrayModelPreservesObservedSelect", "TestSMTArrayModelPreservesObservedDefault"]
+        },
+        {
+          "name": "context::is_relevant policy for observed array select and default model dependencies under disabled filtering, preserving table entries and fallback values across scopes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayModelPreservesObservedSelect",
+            "TestSMTArrayModelPreservesObservedDefault",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Go slices, maps and model-value dependency records replace native vectors, pointer tables and manually allocated value procedures."
+        "Go slices, maps and model-value dependency records replace native vectors, pointer tables and manually allocated value procedures.",
+        "Array value procedures retain their existing enode-value dependencies and generated interpretation owner. Reading disabled relevance does not change marks; observed defaults and selects enter the same dependency-before-value model traversal and scoped array trails as filtered terms."
       ],
       "deviations": [
-        "Queue scheduling and pointer-container helpers are subsumed by eager clauses and the shared SMT/model infrastructure."
+        "Queue scheduling and pointer-container helpers are subsumed by eager clauses and the shared SMT/model infrastructure.",
+        "Observed array model defaults and select entries are no longer lost when relevancy filtering is disabled. Enabled/disabled mode tests inspect actual model interpretation and evaluator results. A new ALL-logic runner vector checks observed and unobserved selects, default fallback 11, scoped additional entries and contradiction recovery against C++, bringing strict comparisons to 95. Direct default(as-array) get-value reduction remains the existing shared C++/Go evaluator behavior and is not changed by this model dependency fix."
       ]
     },
     {
@@ -120591,7 +120633,9 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_disequality_solve.go", "pkg/smtcore/theory_seq_disequality_fixed.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_tail_bound.go", "pkg/smtcore/theory_seq_fixed_length.go", "pkg/smtcore/theory_seq_length_split.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_extensionality.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_extract_special.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_ground.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_disequality_solve.go", "pkg/smtcore/theory_seq_disequality_fixed.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_tail_bound.go", "pkg/smtcore/theory_seq_fixed_length.go", "pkg/smtcore/theory_seq_length_split.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_extensionality.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_extract_special.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_ground.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go",
+        "pkg/smtcore/theory_seq_extensionality_test.go"
+      ],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -120663,7 +120707,8 @@
         "TestSMTSequenceTheoryClosesEmptyNegativeRegexComplement",
         "TestSMTSequenceTheoryClosesExhaustedSymbolicRegexLengths",
         "TestSMTSequenceTheoryClosesExhaustedFiniteRegexLanguage",
-        "TestSMTSequenceTheoryBranchesConcreteRegexWitness"
+        "TestSMTSequenceTheoryBranchesConcreteRegexWitness",
+        "TestSMTSequenceExtensionalityHonorsDisabledRelevancy"
       ],
       "conditionals": [
         {
@@ -121311,14 +121356,27 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "context::is_relevant policy for symbolic sequence interface-root enumeration under disabled filtering, with scoped equality creation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_extensionality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_extensionality_test.go"
+          ],
+          "tests": [
+            "TestSMTSequenceExtensionalityHonorsDisabledRelevancy"
+          ]
         }
       ],
       "ownership": [
         "The solution and exclusion trails own AST references for every stored key and value; maps and dependency nodes borrow those live trail values, and reverse scope rollback releases them after restoring prior mappings.",
-        "SMTSequenceTheory owns its scoped solution and exclusion tables and borrows e-graph nodes and SAT literals; registered SequenceFactory lifetime is owned by ProtoModel."
+        "SMTSequenceTheory owns its scoped solution and exclusion tables and borrows e-graph nodes and SAT literals; registered SequenceFactory lifetime is owned by ProtoModel.",
+        "Relevance checks borrow the existing concrete context policy and create no relevance marks or owners. Sequence interface equalities retain the existing internalizer scope lifetime."
       ],
       "deviations": [
-        "Concrete Go maps replace obj_map and pair hash tables. Dependency joins use an immutable concrete assumption DAG and iterative stable linearization rather than the native scoped_dependency_manager template."
+        "Concrete Go maps replace obj_map and pair hash tables. Dependency joins use an immutable concrete assumption DAG and iterative stable linearization rather than the native scoped_dependency_manager template.",
+        "The sequence interface-root scan now uses the source context relevance policy, including unmarked roots when filtering is disabled; scope rollback removes the generated equality. Remaining source canonicalization and sharing refinements are outside this policy increment."
       ]
     },
     {
