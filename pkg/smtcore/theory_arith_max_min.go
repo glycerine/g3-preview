@@ -120,18 +120,21 @@ func (t *SMTLinearArithmeticTheory) maxMinNonlinearVariables() (bool, error) {
 		t.state.theoryProgress++
 		return true, nil
 	}
-	// Shared assignment movement still needs the source interface-equality
-	// adjustment path. Publish an unshared candidate only after checking
-	// integrality and every product against its actual factor values.
-	changed, sharedChanged := false, false
+	return t.publishOptimizedArithmeticAssignment(solver)
+}
+
+func (t *SMTLinearArithmeticTheory) publishOptimizedArithmeticAssignment(solver *simplex.Solver) (bool, error) {
+	// Source final_check_eh rechecks interface equalities after assignment
+	// movement. Shared columns may move; accepting a candidate still requires
+	// integrality and exact product checks before that second final-check pass.
+	changed := false
 	for _, column := range t.simplexVariables {
 		old, value := t.solver.Value(column), solver.Value(column)
 		if old.Cmp(&value) != 0 {
 			changed = true
-			sharedChanged = sharedChanged || shared[column]
 		}
 	}
-	if !changed || sharedChanged {
+	if !changed {
 		return false, nil
 	}
 	if t.integer || t.mixed {

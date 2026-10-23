@@ -11,13 +11,18 @@ import (
 
 func TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs(t *testing.T) {
 	for _, proofs := range []bool{false, true} {
-		for _, conflict := range []bool{false, true} {
-			t.Run(fmt.Sprint(proofs, "/", conflict), func(t *testing.T) {
+		for _, test := range []struct{ conflict, shared bool }{{false, false}, {true, false}, {false, true}, {true, true}} {
+			conflict, shared := test.conflict, test.shared
+			t.Run(fmt.Sprint(proofs, "/", conflict, "/", shared), func(t *testing.T) {
 				m, cfg := smtModelGeneratorFixture(t)
 				if proofs {
 					astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
 				}
-				s, err := NewSMTSolver(m, nil, "QF_NRA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
+				logic := "QF_NRA"
+				if shared {
+					logic = "QF_UFNRA"
+				}
+				s, err := NewSMTSolver(m, nil, logic, SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
 				astTestMust(t, err)
 				t.Cleanup(func() { astTestMust(t, s.Close()) })
 				s.kernel.preprocess = false
@@ -52,6 +57,15 @@ func TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs(t *testing.T) {
 					equality, err := m.MkEq(product, numeral(-2))
 					astTestMust(t, err)
 					formulas = append(formulas, equality)
+				}
+				if shared {
+					f, err := m.MkFuncDecl(astTestSymbol(t, m, "max-min-shared-f"), []ast.ASTHandle{sort}, sort, ast.ASTFuncDeclInfo{})
+					astTestMust(t, err)
+					fz, err := m.MkApp(f, []ast.ASTHandle{z})
+					astTestMust(t, err)
+					bound, err := m.MkEq(fz, numeral(0))
+					astTestMust(t, err)
+					formulas = append(formulas, bound)
 				}
 				for _, formula := range formulas {
 					ref, err := m.NewRef(formula)
@@ -94,6 +108,54 @@ func TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs(t *testing.T) {
 						}
 					}
 					if !conflict {
+						if shared && theory.liberalFinalCheck {
+							t.Fatal("shared model movement skipped conservative revalidation")
+						}
+						if shared {
+							old := theory.solver
+							zColumn, err := theory.ensureVariable(z)
+							astTestMust(t, err)
+							yColumn, err := theory.ensureVariable(y)
+							astTestMust(t, err)
+							replay, status, err := theory.buildSimplex()
+							astTestMust(t, err)
+							if status != lbool.True {
+								t.Fatal("logical replay", status)
+							}
+							zVariable, found := theory.theoryVariable(zColumn)
+							if !found {
+								t.Fatal("shared theory column disappeared")
+							}
+							zNode, err := theory.Enode(zVariable)
+							astTestMust(t, err)
+							isShared, err := theory.sharedArithmeticNode(zNode)
+							astTestMust(t, err)
+							if !isShared {
+								t.Fatal("regression did not share the moved arithmetic term")
+							}
+							yValue, zValue := big.NewRat(1, 1), big.NewRat(-1, 1)
+							before := replay.Value(zColumn)
+							if before.Main.Cmp(zValue) == 0 && before.Epsilon.Sign() == 0 {
+								yValue, zValue = big.NewRat(2, 1), big.NewRat(-1, 2)
+							}
+							candidate, status, err := theory.buildSimplexWithValues(map[uint32]*big.Rat{yColumn: yValue, zColumn: zValue})
+							astTestMust(t, err)
+							if status != lbool.True {
+								t.Fatal("valid nonlinear point rejected", status)
+							}
+							theory.solver = replay
+							published, err := theory.publishOptimizedArithmeticAssignment(candidate)
+							astTestMust(t, err)
+							if !published || theory.solver != candidate {
+								t.Fatal("valid shared movement was discarded")
+							}
+							valid, err := theory.checkNonlinearMonomialAssignments()
+							astTestMust(t, err)
+							if !valid {
+								t.Fatal("published nonlinear point violates products")
+							}
+							theory.solver = old
+						}
 						model, err := s.AcquireModel()
 						astTestMust(t, err)
 						values := make([]*big.Rat, 3)

@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"shared_nonlinear_model.smt2":               "sat\nunknown\nsat\nsat\n((x 2.0) (y 1.0) (z (- 1.0)) ((f z) 0.0))\n",
 	"row_conflict_relaxation.smt2":              "unsat\nsat\nsat\n",
 	"grobner_factor_dependencies.smt2":          "unsat\nsat\nsat\n",
 	"nested_bound_dependency_scopes.smt2":       "unsat\nsat\nunsat\nsat\n",

@@ -116460,7 +116460,7 @@
           ]
         },
         {
-          "name": "remaining shared assignment adjustment, source interval resource/dependency refinements, and irrational models",
+          "name": "remaining shared optimization bound buffering and interval resource/dependency refinements",
           "status": "unported",
           "go_target": null,
           "tests": [
@@ -116468,7 +116468,7 @@
           ]
         },
         {
-          "name": "max_min_nl_vars: deduplicate monomial and factor columns, maximize then minimize, retain exact unshared optimized bounds and validate moved candidates before publishing",
+          "name": "max_min_nl_vars: deduplicate monomial and factor columns, maximize then minimize, retain exact unshared optimized bounds, validate moved candidates including shared columns, and use the conservative final-check pass for interface equalities; shared bound buffering remains incomplete",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_max_min.go",
           "tests": [
@@ -116547,9 +116547,26 @@
           "tests": [
             "TestSMTGrobnerDependenciesOwnLiteralPolarityAndConsumerLifetime"
           ]
+        },
+        {
+          "name": "shared arithmetic assignment publication after max/min: retain validated rational candidates when shared columns move, preserve integer and product checks, trigger source conservative final-check revalidation, and restore solver scopes; controlled replay rejects the old shared-movement restriction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_max_min.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_max_min_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
+            "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The retained legacy arithmetic theory constructs rational-plus-epsilon model values and marks irrational algebraic numerals unsupported at theory_arith_core.h:765-769; mk_value at theory_arith_core.h:3257-3270 produces rational numerals."
+      ],
       "deviations": [
         "Nonlinear monomials now have independent tableau columns with scoped factor-column lists. Relevant assignments are checked using the same exact rational epsilon as model construction. The Go tableau additionally completes a candidate by evaluating products and affine definitions, then fixes every arithmetic column and rechecks every original row; a failed completion preserves the relaxation. This concrete-model completion is a Go representation adaptation, not a claim to port the remaining source nonlinear search strategies.",
         "One upward/downward interval propagation pass runs during each tableau replay, including each speculative integer branch. Repeated factors use interval powers, downward propagation skips powers greater than one and zero-containing divisors, and integer endpoints are rounded. Derived bounds are reconstructed after pops; failed bounds reject only the current replay or integer branch.",
