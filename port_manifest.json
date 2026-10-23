@@ -110041,6 +110041,7 @@
         "TestSMTSolverSetupUsesIntegerDifferenceLogic",
         "TestSMTSolverSetupUsesRealDifferenceLogic",
         "TestSMTSolverPublishesStrictRealDifferenceModel",
+        "TestSMTQFUFBVSetupUsesNativeArrayAndBitVectorRoute",
         "TestSMTDatatypeQFDTSetup",
         "TestSMTPseudoBooleanQFFDExactCardinality",
         "TestSMTQFFPSetupInstallsFloatingPointAndBitVectorTheories",
@@ -110065,7 +110066,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "explicit arithmetic and array logic classification, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA/QF_UFLRA/QF_UFLIA theory selection, and conservative incomplete-theory installation for remaining arithmetic and array logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409)",
+          "name": "explicit arithmetic and array logic classification, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA/QF_UFLRA/QF_UFLIA theory selection, native shared QF_UFBV array/bit-vector routing, and conservative incomplete-theory installation for remaining arithmetic and array logics (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409)",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
@@ -110076,7 +110077,8 @@
             "TestSMTSolverUFLinearArithmeticCongruence",
             "TestSMTSolverSetupUsesIntegerDifferenceLogic",
             "TestSMTSolverSetupUsesRealDifferenceLogic",
-            "TestSMTSolverPublishesStrictRealDifferenceModel"
+            "TestSMTSolverPublishesStrictRealDifferenceModel",
+            "TestSMTQFUFBVSetupUsesNativeArrayAndBitVectorRoute"
           ]
         },
         {

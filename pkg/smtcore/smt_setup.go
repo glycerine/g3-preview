@@ -17,7 +17,7 @@ func smtLogicUsesArithmetic(logic string) bool {
 
 func smtLogicUsesArrays(logic string) bool {
 	switch logic {
-	case "QF_AX", "QF_AUFBV", "QF_ABV", "QF_AUFLIA", "AUFLIA", "AUFLIRA", "AUFNIRA",
+	case "QF_AX", "QF_AUFBV", "QF_ABV", "QF_UFBV", "QF_AUFLIA", "AUFLIA", "AUFLIRA", "AUFNIRA",
 		"AUFLIA+", "AUFLIA-", "AUFLIRA+", "AUFLIRA-", "AUFNIRA+", "AUFNIRA-":
 		return true
 	default:
