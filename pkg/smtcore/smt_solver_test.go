@@ -355,7 +355,7 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 	}
 	setBool("mbqi", true)
 	astTestMust(t, solver.UpdateParams(&local))
-	if !quantifiers.mbqi || quantifiers.modelChecker == nil || quantifiers.modelChecker.initialMaxCexs != 5 || quantifiers.modelChecker.maxIterations != 7 || quantifiers.modelChecker.auxiliary == nil {
+	if !quantifiers.mbqi || quantifiers.modelChecker == nil || quantifiers.modelChecker.initialMaxCexs != 5 || quantifiers.modelChecker.maxIterations != 7 || quantifiers.modelChecker.auxiliary == nil || quantifiers.modelChecker.modelFinder != quantifiers.modelFinder {
 		t.Fatal("parameter update failed to recreate MBQI checker")
 	}
 }

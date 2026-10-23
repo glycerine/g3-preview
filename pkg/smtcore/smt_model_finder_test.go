@@ -3,7 +3,9 @@ package smtcore
 import (
 	"testing"
 
+	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle(t *testing.T) {
@@ -38,4 +40,34 @@ func TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle(t *testing.T) {
 		t.Fatal("popped quantifier remained registered")
 	}
 	astTestMust(t, manager.InitSearch())
+}
+
+func TestSMTModelFinderCollectsDirectPatternGroundArguments(t *testing.T) {
+	m, state, _, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})
+	sort, err := m.MkSort(astTestSymbol(t, m, "model-finder-pattern-sort"), ast.ASTSortInfo{})
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	predicate := smtQuickPredicate(t, m, "model-finder-pattern-p", sort, boolean)
+	variable, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	body, err := m.MkApp(predicate, []ast.ASTHandle{variable})
+	astTestMust(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{body})
+	astTestMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{astTestSymbol(t, m, "model-finder-pattern-x")},
+		Body: body, Patterns: []ast.ASTHandle{pattern},
+	})
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(quantifier, true))
+	owner, binding := smtEnodeConstant(t, m, 9100, sort, 7)
+	astTestMust(t, state.context.RegisterEnode(binding, true))
+	_, _ = smtQuickApplicationNode(t, m, state.context, predicate, binding, true)
+	astTestMust(t, manager.modelFinder.collectPatternInstantiationTerms(quantifier))
+	set, err := manager.modelFinder.instantiationSet(quantifier, 0, false)
+	astTestMust(t, err)
+	if set == nil || set.elements[owner] != 7 || len(set.elements) != 1 {
+		t.Fatal("direct trigger argument was not collected", set)
+	}
 }

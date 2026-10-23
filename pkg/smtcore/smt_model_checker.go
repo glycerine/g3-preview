@@ -21,6 +21,7 @@ type SMTModelChecker struct {
 	manager        *ast.ASTManager
 	state          *SMTInternalizerState
 	registry       *SMTQuantifierRegistry
+	modelFinder    *SMTModelFinder
 	initialMaxCexs uint32
 	maxCexs        uint32
 	maxIterations  uint32
@@ -29,6 +30,17 @@ type SMTModelChecker struct {
 	valueTerms     map[ast.ASTHandle]ast.ASTHandle
 	auxiliary      smtAuxiliarySolverFactory
 	closed         bool
+}
+
+func (c *SMTModelChecker) SetModelFinder(finder *SMTModelFinder) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if finder == nil || finder.manager != c.manager || finder.state != c.state {
+		return ast.ErrASTDomain
+	}
+	c.modelFinder = finder
+	return nil
 }
 
 func (c *SMTModelChecker) SetAuxiliarySolverFactory(factory smtAuxiliarySolverFactory) error {
@@ -317,6 +329,20 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 			}
 			bindings[i] = value
 		}
+		if c.modelFinder != nil {
+			for i := range bindings {
+				if finite[i] {
+					continue
+				}
+				term, _, inverse, e := c.modelFinder.Inverse(quantifier, uint32(i), bindings[i])
+				if e != nil {
+					return false, errors.Join(e, cex.DecRef())
+				}
+				if inverse {
+					bindings[i] = term
+				}
+			}
+		}
 		inserted, err := c.addCounterexample(quantifier, bindings)
 		if err != nil {
 			return false, errors.Join(err, cex.DecRef())
@@ -484,6 +510,7 @@ func (c *SMTModelChecker) Close() error {
 	c.closed = true
 	c.state = nil
 	c.registry = nil
+	c.modelFinder = nil
 	c.valueTerms = nil
 	c.auxiliary = nil
 	c.manager = nil

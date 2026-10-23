@@ -101,6 +101,9 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 		if err = result.modelChecker.ConfigureLifecycle(config.MaxCexs, config.MaxIterations); err != nil {
 			return nil, errors.Join(err, result.modelChecker.Close(), modelFinder.Close(), substitute.Close())
 		}
+		if err = result.modelChecker.SetModelFinder(modelFinder); err != nil {
+			return nil, errors.Join(err, result.modelChecker.Close(), modelFinder.Close(), substitute.Close())
+		}
 	}
 	state.quantifierManager = result
 	return result, nil
@@ -116,6 +119,9 @@ func (q *SMTQuantifierManager) UpdateMBQI(enabled bool, identifier string, maxCe
 			return err
 		}
 		if err = checker.ConfigureLifecycle(maxCexs, maxIterations); err != nil {
+			return errors.Join(err, checker.Close())
+		}
+		if err = checker.SetModelFinder(q.modelFinder); err != nil {
 			return errors.Join(err, checker.Close())
 		}
 		if err = checker.SetAuxiliarySolverFactory(q.auxiliarySolver); err != nil {
