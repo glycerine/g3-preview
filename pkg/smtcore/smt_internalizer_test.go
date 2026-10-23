@@ -60,6 +60,26 @@ func TestSMTInternalizerBooleanGateClausesAndRootAssertions(t *testing.T) {
 	}
 }
 
+func TestSMTInternalizerDefaultAssertionMarksLiteralRelevant(t *testing.T) {
+	m := astTestManager(t)
+	atom := smtRelevancyBool(t, m, "assert-default-literal")
+	negated, err := m.MkNot(atom)
+	astTestMust(t, err)
+	ref, err := m.NewRef(negated)
+	astTestMust(t, err)
+	_, relevancy, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.Assert(negated, ast.ASTHandle{}, 0))
+	astTestMust(t, m.DelRef(&ref))
+	if !relevancy.IsRelevant(atom) || relevancy.IsRelevant(negated) {
+		t.Fatal("default assertion marked its temporary wrapper instead of its literal")
+	}
+	consistent, err := state.PropagateCore()
+	astTestMust(t, err)
+	if !consistent {
+		t.Fatal("single negative assertion became inconsistent")
+	}
+}
+
 func TestSMTInternalizerBuildsGateAndRootClauseProofs(t *testing.T) {
 	m := astTestManager(t)
 	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))

@@ -59,7 +59,7 @@ func (c *SMTModelChecker) SetCandidateTerms(rootValues map[*SMTEnode]ast.ASTHand
 	c.valueTerms = make(map[ast.ASTHandle]ast.ASTHandle, len(rootValues))
 	for root, value := range rootValues {
 		if root != nil && !value.IsNull() {
-			c.valueTerms[value] = root.owner
+			c.valueTerms[value] = root.EqualityClassMinGeneration().owner
 		}
 	}
 	return nil
@@ -315,7 +315,7 @@ func (c *SMTModelChecker) addInstantiationSetRestrictions(auxiliary *SMTSolver, 
 	return asserted, nil
 }
 
-func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier ast.ASTHandle, values []ast.ASTHandle, finite []bool, skolemDecls []ast.ASTHandle, requireInverse bool) (raw, bindings []ast.ASTHandle, inverseOK bool, err error) {
+func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier ast.ASTHandle, values []ast.ASTHandle, skolemDecls []ast.ASTHandle, requireInverse bool) (raw, bindings []ast.ASTHandle, inverseOK bool, err error) {
 	flat := quantifier
 	if c.modelFinder != nil {
 		flat = c.modelFinder.flatQuantifier(quantifier)
@@ -354,7 +354,7 @@ func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier
 		return raw, bindings, true, nil
 	}
 	for i := range bindings {
-		if finite[i] || uint32(i) >= count {
+		if uint32(i) >= count {
 			continue
 		}
 		term, _, found, e := c.modelFinder.Inverse(quantifier, uint32(i), bindings[i])
@@ -500,7 +500,7 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 				return false, ast.ErrASTPending
 			}
 		}
-		raw, bindings, inverseOK, err := c.auxiliaryBindings(cex, quantifier, values, finite, skolemDecls, restricted)
+		raw, bindings, inverseOK, err := c.auxiliaryBindings(cex, quantifier, values, skolemDecls, restricted)
 		if err != nil {
 			if cex != complete {
 				err = errors.Join(err, cex.DecRef())
@@ -546,7 +546,7 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 		}
 	}
 	if restricted && !found && *remaining != 0 {
-		_, bindings, _, err := c.auxiliaryBindings(complete, quantifier, values, finite, skolemDecls, false)
+		_, bindings, _, err := c.auxiliaryBindings(complete, quantifier, values, skolemDecls, false)
 		if err != nil {
 			return false, err
 		}

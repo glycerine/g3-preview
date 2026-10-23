@@ -13,7 +13,7 @@ func smtMAMFixture(t *testing.T) (*ast.ASTManager, *SMTInternalizerState, *SMTQu
 	costs, err := NewSMTQICostModel(m, "0", "0", nil)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, costs.Close()) })
-	registry, err := NewSMTQuantifierRegistry(m, NewSMTQIQueueSchedule(10, 20, false), costs, 100)
+	registry, err := NewSMTQuantifierRegistry(m, NewSMTQIQueueSchedule(m, 10, 20, false), costs, 100)
 	astTestMust(t, err)
 	context, err := NewSMTCheckerContext(m)
 	astTestMust(t, err)

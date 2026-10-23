@@ -119,7 +119,7 @@ func (f *scalarFactory) makeValue(n *big.Int, s ast.ASTHandle) (ast.ASTHandle, e
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}
-		return f.manager.ArithmeticNumeralRat(new(big.Rat).SetInt(n), kind == 0)
+		return f.manager.ArithmeticNumeralRat(new(big.Rat).SetInt(n), kind == 1)
 	case scalarBitVector:
 		bits, err := f.manager.BitVectorSize(s)
 		if err != nil {

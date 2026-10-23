@@ -20,7 +20,7 @@ func TestSMTQIQueueScheduleEagerPromotionAndLazyThreshold(t *testing.T) {
 	eager := smtQIQueueFingerprint(t, m, "qi-eager")
 	delayed := smtQIQueueFingerprint(t, m, "qi-delayed")
 	promoted := smtQIQueueFingerprint(t, m, "qi-promoted")
-	queue := NewSMTQIQueueSchedule(1, 2.5, false)
+	queue := NewSMTQIQueueSchedule(m, 1, 2.5, false)
 	astTestMust(t, queue.Insert(eager, .5, 1))
 	astTestMust(t, queue.Insert(delayed, 2, 2))
 	astTestMust(t, queue.Insert(promoted, 9, 3))
@@ -53,7 +53,7 @@ func TestSMTQIQueueScheduleConservativeCostBatches(t *testing.T) {
 	first := smtQIQueueFingerprint(t, m, "qi-first")
 	second := smtQIQueueFingerprint(t, m, "qi-second")
 	third := smtQIQueueFingerprint(t, m, "qi-third")
-	queue := NewSMTQIQueueSchedule(0, 5, true)
+	queue := NewSMTQIQueueSchedule(m, 0, 5, true)
 	for _, item := range []struct {
 		fingerprint *SMTFingerprint
 		cost        float32
@@ -85,7 +85,7 @@ func TestSMTQIQueueScheduleScopeRollbackAndDelayedSummaries(t *testing.T) {
 	other := smtQIQueueFingerprint(t, m, "qi-other")
 	first := &SMTFingerprint{data: quantifier.data}
 	second := &SMTFingerprint{data: quantifier.data, dataHash: 1}
-	queue := NewSMTQIQueueSchedule(0, 10, false)
+	queue := NewSMTQIQueueSchedule(m, 0, 10, false)
 	astTestMust(t, queue.Insert(first, 4, 0))
 	astTestMust(t, queue.Insert(second, 2, 0))
 	_, err := queue.ScheduleNew(nil)
@@ -116,5 +116,43 @@ func TestSMTQIQueueScheduleScopeRollbackAndDelayedSummaries(t *testing.T) {
 	}
 	if err := queue.PopScopes(1); err != ast.ErrASTDomain {
 		t.Fatal("scope underflow guard", err)
+	}
+}
+
+func TestSMTQIQueueOwnsRecordedLemmasThroughScopeAndReset(t *testing.T) {
+	m := astTestManager(t)
+	queue := NewSMTQIQueueSchedule(m, 1, 2, false)
+	t.Cleanup(func() { astTestMust(t, queue.Reset()) })
+	atom := smtRelevancyBool(t, m, "owned-lemma-atom")
+	base, err := m.MkNot(atom)
+	astTestMust(t, err)
+	baseRef, err := m.NewRef(base)
+	astTestMust(t, err)
+	astTestMust(t, queue.RecordInstance(base))
+	astTestMust(t, m.DelRef(&baseRef))
+	if _, err = m.GetKind(base); err != nil {
+		t.Fatal("recorded lemma did not outlive its producer", err)
+	}
+	astTestMust(t, queue.PushScope())
+	other := smtRelevancyBool(t, m, "owned-lemma-other")
+	scoped, err := m.MkOr(base, other)
+	astTestMust(t, err)
+	scopedRef, err := m.NewRef(scoped)
+	astTestMust(t, err)
+	astTestMust(t, queue.RecordInstance(scoped))
+	astTestMust(t, m.DelRef(&scopedRef))
+	if _, err = m.GetKind(scoped); err != nil {
+		t.Fatal("scoped lemma did not outlive its producer", err)
+	}
+	astTestMust(t, queue.PopScopes(1))
+	if _, err = m.GetKind(scoped); err == nil {
+		t.Fatal("popped lemma retained its AST ownership")
+	}
+	if _, err = m.GetKind(base); err != nil {
+		t.Fatal("scope rollback released the base lemma", err)
+	}
+	astTestMust(t, queue.Reset())
+	if _, err = m.GetKind(base); err == nil {
+		t.Fatal("reset retained the base lemma")
 	}
 }

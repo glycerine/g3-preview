@@ -33,19 +33,21 @@ type smtQIQueueScope struct {
 }
 
 type SMTQIQueueSchedule struct {
+	manager           *ast.ASTManager
 	eagerThreshold    float32
 	lazyThreshold     float32
 	conservativeFinal bool
 	newEntries        []SMTQIQueueEntry
 	delayedEntries    []SMTQIQueueEntry
 	instances         []ast.ASTHandle
+	instanceRefs      []ast.ASTRef
 	instantiatedTrail []int
 	scopes            []smtQIQueueScope
 	stats             SMTQIQueueStats
 }
 
-func NewSMTQIQueueSchedule(eagerThreshold, lazyThreshold float32, conservativeFinal bool) *SMTQIQueueSchedule {
-	return &SMTQIQueueSchedule{eagerThreshold: eagerThreshold, lazyThreshold: lazyThreshold, conservativeFinal: conservativeFinal}
+func NewSMTQIQueueSchedule(manager *ast.ASTManager, eagerThreshold, lazyThreshold float32, conservativeFinal bool) *SMTQIQueueSchedule {
+	return &SMTQIQueueSchedule{manager: manager, eagerThreshold: eagerThreshold, lazyThreshold: lazyThreshold, conservativeFinal: conservativeFinal}
 }
 
 func (q *SMTQIQueueSchedule) Insert(fingerprint *SMTFingerprint, cost float32, generation uint32) error {
@@ -118,13 +120,18 @@ func (q *SMTQIQueueSchedule) FinalCheck() (bool, []SMTQIQueueEntry, error) {
 }
 
 func (q *SMTQIQueueSchedule) RecordInstance(lemma ast.ASTHandle) error {
-	if q == nil {
+	if q == nil || q.manager == nil {
 		return ast.ErrASTHandle
 	}
 	if lemma.IsNull() {
 		return ast.ErrASTDomain
 	}
+	ref, err := q.manager.NewRef(lemma)
+	if err != nil {
+		return err
+	}
 	q.instances = append(q.instances, lemma)
+	q.instanceRefs = append(q.instanceRefs, ref)
 	q.stats.Instances++
 	return nil
 }
@@ -151,6 +158,9 @@ func (q *SMTQIQueueSchedule) PopScopes(count uint32) error {
 	}
 	newLevel := len(q.scopes) - int(count)
 	scope := q.scopes[newLevel]
+	if err := q.releaseInstances(scope.instanceLimit); err != nil {
+		return err
+	}
 	for _, index := range q.instantiatedTrail[scope.instantiatedLimit:] {
 		if index < 0 || index >= len(q.delayedEntries) {
 			return ast.ErrASTDomain
@@ -159,21 +169,36 @@ func (q *SMTQIQueueSchedule) PopScopes(count uint32) error {
 	}
 	q.instantiatedTrail = q.instantiatedTrail[:scope.instantiatedLimit]
 	q.delayedEntries = q.delayedEntries[:scope.delayedLimit]
-	q.instances = q.instances[:scope.instanceLimit]
 	q.newEntries = nil
 	q.scopes = q.scopes[:newLevel]
 	return nil
 }
 
-func (q *SMTQIQueueSchedule) Reset() {
+func (q *SMTQIQueueSchedule) releaseInstances(limit int) error {
+	for len(q.instanceRefs) > limit {
+		index := len(q.instanceRefs) - 1
+		if err := q.manager.DelRef(&q.instanceRefs[index]); err != nil {
+			return err
+		}
+		q.instanceRefs = q.instanceRefs[:index]
+		q.instances = q.instances[:index]
+	}
+	return nil
+}
+
+func (q *SMTQIQueueSchedule) Reset() error {
 	if q == nil {
-		return
+		return nil
+	}
+	if err := q.releaseInstances(0); err != nil {
+		return err
 	}
 	q.newEntries = nil
 	q.delayedEntries = nil
 	q.instances = nil
 	q.instantiatedTrail = nil
 	q.scopes = nil
+	return nil
 }
 
 func (q *SMTQIQueueSchedule) DelayedSummaries() []SMTQIDelayedSummary {

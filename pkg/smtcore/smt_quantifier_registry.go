@@ -18,7 +18,7 @@ type SMTQuantifierRegistry struct {
 }
 
 func NewSMTQuantifierRegistry(manager *ast.ASTManager, schedule *SMTQIQueueSchedule, costs *SMTQICostModel, maxInstances uint32) (*SMTQuantifierRegistry, error) {
-	if manager == nil || schedule == nil || costs == nil || costs.manager != manager {
+	if manager == nil || schedule == nil || schedule.manager != manager || costs == nil || costs.manager != manager {
 		return nil, ast.ErrASTHandle
 	}
 	generator, err := NewSMTQuantifierStatGenerator(manager)
@@ -173,14 +173,17 @@ func (r *SMTQuantifierRegistry) PopScopes(count uint32) error {
 	return nil
 }
 
-func (r *SMTQuantifierRegistry) Reset() {
+func (r *SMTQuantifierRegistry) Reset() error {
 	if r == nil {
-		return
+		return nil
+	}
+	if err := r.schedule.Reset(); err != nil {
+		return err
 	}
 	r.fingerprints.Reset()
-	r.schedule.Reset()
 	r.statistics = make(map[ast.ASTHandle]*SMTQuantifierStat)
 	r.quantifiers = nil
 	r.numInstances = 0
 	r.scopeLevel = 0
+	return nil
 }

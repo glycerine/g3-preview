@@ -949,6 +949,9 @@ func (s *SMTInternalizerState) Close() error {
 	if s.quantifierManager != nil {
 		result = errors.Join(result, s.quantifierManager.Close())
 	}
+	if s.quantifiers != nil {
+		result = errors.Join(result, s.quantifiers.schedule.Reset())
+	}
 	result = errors.Join(result, s.congruence.Close())
 	if result == nil {
 		s.closed = true

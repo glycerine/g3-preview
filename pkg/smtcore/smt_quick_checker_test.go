@@ -35,7 +35,7 @@ func smtQuickRegistry(t *testing.T, m *ast.ASTManager) (*SMTQuantifierRegistry, 
 	costs, err := NewSMTQICostModel(m, "0", "0", nil)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, costs.Close()) })
-	schedule := NewSMTQIQueueSchedule(1, 1, false)
+	schedule := NewSMTQIQueueSchedule(m, 1, 1, false)
 	registry, err := NewSMTQuantifierRegistry(m, schedule, costs, 100)
 	astTestMust(t, err)
 	return registry, schedule

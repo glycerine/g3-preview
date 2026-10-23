@@ -1167,7 +1167,10 @@ func (s *SMTInternalizerState) Assert(expression, proof ast.ASTHandle, generatio
 	if err = s.assignRootLiteral(literal, proof); err != nil {
 		return err
 	}
-	return s.markRelevant(expression)
+	if literal.Var() < SMTFirstBoolVar {
+		return nil
+	}
+	return s.markRelevant(s.boolExpr[literal.Var()])
 }
 
 func (s *SMTInternalizerState) argumentHandles(expression ast.ASTHandle) ([]ast.ASTHandle, error) {

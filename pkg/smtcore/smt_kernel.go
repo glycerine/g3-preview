@@ -239,7 +239,7 @@ func (k *SMTKernel) configureQuantifiers(full *SMTParams, state SMTParamsState, 
 		if err != nil {
 			return err
 		}
-		schedule := NewSMTQIQueueSchedule(float32(qi.EagerThreshold), float32(qi.LazyThreshold), qi.ConservativeFinalCheck)
+		schedule := NewSMTQIQueueSchedule(k.manager, float32(qi.EagerThreshold), float32(qi.LazyThreshold), qi.ConservativeFinalCheck)
 		registry, err := NewSMTQuantifierRegistry(k.manager, schedule, costs, qi.MaxInstances)
 		if err != nil {
 			return errors.Join(err, costs.Close())

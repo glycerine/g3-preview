@@ -114,7 +114,7 @@ func TestValueFactoriesSomeFreshFreezeAndNumericValues(t *testing.T) {
 	af, err := NewArithmeticFactory(m)
 	protoMust(t, err)
 	protoMust(t, p.RegisterFactory(af))
-	real, err := m.MkFamilySort(af.FamilyID(), 1, nil)
+	real, err := m.MkFamilySort(af.FamilyID(), 0, nil)
 	protoMust(t, err)
 	r0, err := p.SomeValue(real)
 	protoMust(t, err)

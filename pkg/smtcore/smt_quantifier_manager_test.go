@@ -14,7 +14,7 @@ func smtQuantifierManagerFixture(t *testing.T, eager, lazy float32, config SMTQu
 	costs, err := NewSMTQICostModel(m, "0", "0", nil)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, costs.Close()) })
-	registry, err := NewSMTQuantifierRegistry(m, NewSMTQIQueueSchedule(eager, lazy, false), costs, 100)
+	registry, err := NewSMTQuantifierRegistry(m, NewSMTQIQueueSchedule(m, eager, lazy, false), costs, 100)
 	astTestMust(t, err)
 	context, err := NewSMTCheckerContext(m)
 	astTestMust(t, err)

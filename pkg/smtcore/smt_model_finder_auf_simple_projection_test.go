@@ -137,3 +137,48 @@ func TestSMTModelFinderAUFWitnessConstraintsWaitForRestart(t *testing.T) {
 		t.Fatal("restart did not assert witness disequality", assignment)
 	}
 }
+
+func TestSMTModelFinderAUFArithmeticWitnessUsesStableNumeral(t *testing.T) {
+	for _, integer := range []bool{true, false} {
+		m, config := smtModelGeneratorFixture(t)
+		solver, err := NewSMTSolver(m, nil, "AUFLIRA", SMTSolverConfig{Params: config.Context, ModelEvaluator: config})
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, solver.Close()) })
+		proto, err := protomodel.NewProtoModel(m, config)
+		astTestMust(t, err)
+		t.Cleanup(func() { astTestMust(t, proto.Close()) })
+		factory, err := protomodel.NewArithmeticFactory(m)
+		astTestMust(t, err)
+		astTestMust(t, proto.RegisterFactory(factory))
+		zero, err := m.ArithmeticIntegerNumeralText("0")
+		astTestMust(t, err)
+		if !integer {
+			zero, err = m.ArithmeticRealNumeralText("0")
+			astTestMust(t, err)
+		}
+		sort, err := m.GetSort(zero)
+		astTestMust(t, err)
+		_, err = proto.SomeValue(sort)
+		astTestMust(t, err)
+		finder := solver.kernel.internalizer.quantifierManager.modelFinder
+		graph := newSMTModelFinderAUFGraph(finder)
+		graph.model = proto
+		t.Cleanup(func() { astTestMust(t, graph.close()) })
+		node, err := newSMTModelFinderAUFNode(0, sort)
+		astTestMust(t, err)
+		graph.nodes = append(graph.nodes, node)
+		astTestMust(t, node.makeInstantiationSet(m))
+		_, err = node.insert(zero, 0)
+		astTestMust(t, err)
+		astTestMust(t, node.insertException(zero))
+		astTestMust(t, graph.makeSimpleProjection(node))
+		text, isInt, matched, err := m.ArithmeticNumeralText(node.elseValue)
+		astTestMust(t, err)
+		if !matched || isInt != integer || text != "1" || len(finder.pendingConstraints) != 0 {
+			t.Fatal("safe arithmetic witness did not preserve its public numeral", text, isInt, matched, len(finder.pendingConstraints))
+		}
+		if _, found := node.set.elements[node.elseValue]; !found {
+			t.Fatal("stable numeral was not available for inverse recovery")
+		}
+	}
+}
