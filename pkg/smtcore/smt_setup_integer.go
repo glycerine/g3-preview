@@ -3,33 +3,18 @@ package smtcore
 
 import (
 	"errors"
-	"fmt"
-
-	"github.com/glycerine/g3/pkg/ast"
 )
 
 func (k *SMTKernel) setupIntegerLogicPolicy(useStaticFeatures bool) (result error) {
 	if k.setupLogic != "QF_LIA" {
 		return nil
 	}
-	var features *ast.StaticFeatures
-	if useStaticFeatures {
-		var err error
-		features, err = ast.NewStaticFeatures(k.manager)
-		if err != nil {
-			return err
-		}
+	features, err := k.arithmeticSetupFeatures(useStaticFeatures)
+	if err != nil {
+		return err
+	}
+	if features != nil {
 		defer func() { result = errors.Join(result, features.Close()) }()
-		formulas := make([]ast.ASTHandle, len(k.assertions))
-		for index, assertion := range k.assertions {
-			formulas[index] = assertion.Formula
-		}
-		if err = features.Collect(formulas...); err != nil {
-			return err
-		}
-		if features.NumUninterpretedFunctions != 0 {
-			return fmt.Errorf("Benchmark contains uninterpreted function symbols, but specified logic does not support them.")
-		}
 	}
 	smt := k.smtParams.state
 	arithmetic := k.smtParams.arith.state
@@ -71,18 +56,5 @@ func (k *SMTKernel) setupIntegerLogicPolicy(useStaticFeatures bool) (result erro
 			}
 		}
 	}
-	k.smtParams.state, k.smtState = smt, smt
-	k.smtParams.arith.state, k.arithState = arithmetic, arithmetic
-	k.smtParams.preprocess.state, k.preprocessState = preprocess, preprocess
-	k.relevancy.enabled = smt.RelevancyLvl > 0
-	k.internalizer.relevancyLevel = smt.RelevancyLvl
-	for _, theory := range k.internalizer.theoryOrder {
-		if configurable, ok := theory.(interface{ ConfigureArithmetic(SMTArithState) error }); ok {
-			if err := configurable.ConfigureArithmetic(arithmetic); err != nil {
-				return err
-			}
-		}
-	}
-	k.assertedPhaseReady = false
-	return k.setAssertedEliminateAnd(false)
+	return k.applyArithmeticSetup(smt, arithmetic, preprocess)
 }

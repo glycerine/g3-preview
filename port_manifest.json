@@ -112267,7 +112267,9 @@
         "pkg/smtcore/smt_model_generator.go",
         "pkg/smtcore/smt_model_generator_test.go",
         "pkg/smtcore/smt_setup_integer.go",
-        "pkg/smtcore/smt_setup_integer_test.go"
+        "pkg/smtcore/smt_setup_integer_test.go",
+        "pkg/smtcore/smt_setup_real.go",
+        "pkg/smtcore/smt_setup_real_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -112296,7 +112298,8 @@
         "TestSMTQFUFLIASetupOwnsInternalArithmeticThresholdAcrossUpdates",
         "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
         "TestSMTQFLIAAutomaticSetupUsesFeaturesAtFirstBoundary",
-        "TestSMTQFLIAStaticSetupRejectsUninterpretedFunctions"
+        "TestSMTQFLIAStaticSetupRejectsUninterpretedFunctions",
+        "TestSMTQFLRAAutomaticSetupRationalThresholdsAndCNF"
       ],
       "assertions": [
         {
@@ -112427,16 +112430,33 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "setup_QF_LRA default and static-feature policy: exact reduced numerator >2000000 AND denominator >500 guard, CNF conservative-two phase versus non-CNF false-phase/geometric-restart policy, 32-literal small-lemma setting and source preprocessing/reflection/equality controls",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup_real.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTQFLRAAutomaticSetupRationalThresholdsAndCNF",
+            "TestSMTQFLIAAutomaticSetupUsesFeaturesAtFirstBoundary",
+            "TestSMTQFLIAStaticSetupRejectsUninterpretedFunctions",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "The kernel owns its theory registry; setup creates concrete real difference, integer difference, linear rational, or partial linear integer theories for QF_RDL, QF_IDL/QF_UFIDL, QF_LRA/QF_UFLRA, and QF_LIA/QF_UFLIA and dummy-theory values for reached families whose solvers remain unavailable.",
         "QF_UFLIA logic setup mutates the owning SMT/arithmetic/preprocessing parameter states and their live kernel caches before constructing integer arithmetic. The internal threshold is retained by later updt_params because that source method does not update it; the regression checks owner/cache/theory agreement before and after updates. AutoConfig=false and neighboring real/integer logics do not receive this profile. Static-feature validation, full CFG_BASIC routing and other setup profiles remain separate. Disabling relevancy also requires model generation to use the mode-aware relevancy service rather than its marked-expression map.",
-        "The one-time QF_LIA policy borrows pinned asserted formulas while a temporary AST StaticFeatures owns its numeral scratch values and counters. The collector closes on success and failure. Selected scalar policy is stored in the existing owning SMT parameters and their concrete kernel/theory views; later scopes and checks reuse the selected policy."
+        "The one-time QF_LIA policy borrows pinned asserted formulas while a temporary AST StaticFeatures owns its numeral scratch values and counters. The collector closes on success and failure. Selected scalar policy is stored in the existing owning SMT parameters and their concrete kernel/theory views; later scopes and checks reuse the selected policy.",
+        "Integer and real automatic setup share a concrete feature-collection and policy-application path. QF_LRA numerator and denominator are independent owned numeral values released before the feature collector; all failure exits close the collector, and the retained parameter owners contain only the selected scalar policy."
       ],
       "deviations": [
         "QF_RDL uses the retained real difference theory, QF_IDL and QF_UFIDL use the retained integer difference theory, QF_LRA/QF_UFLRA use the retained rational linear simplex specialization, and QF_LIA/QF_UFLIA use integer-bound normalization with bounded exact branch-and-bound. Unrecognized logics follow source setup_unknown and install every retained theory; unsupported arithmetic uses the dummy checkpoint so nonlinear terms return incompleteness. QF_FP, QF_FPBV, QF_BVFP and ALL install the concrete floating-point reduction theory together with its bit-vector backend. QF_BVRE, QF_S and ALL install the concrete sequence theory. Exhausted integer searches, nonlinear expressions, and other incomplete arithmetic and array logics likewise return incompleteness instead of an unsound result.",
-        "The QF_LIA setup policy now includes both retained overloads, with static-feature depth >50, unit-only input, clausal restart/phase settings and the CNF unit/binary constant-sum >100000 guard. The first push selects the logic-only overload and prevents later feature reclassification; auto_config=false bypasses this tuning. Manual Euclidean, Gomory and equality-branch tests explicitly disable automatic setup before setting their own theory controls. The 52-level ITE runner regression preserves SAT model values and a scoped UNSAT refutation in 93 exact C++ script comparisons. Other logic profiles, backend-selection policies and full automatic configuration remain partial."
+        "The QF_LIA setup policy now includes both retained overloads, with static-feature depth >50, unit-only input, clausal restart/phase settings and the CNF unit/binary constant-sum >100000 guard. The first push selects the logic-only overload and prevents later feature reclassification; auto_config=false bypasses this tuning. Manual Euclidean, Gomory and equality-branch tests explicitly disable automatic setup before setting their own theory controls. The 52-level ITE runner regression preserves SAT model values and a scoped UNSAT refutation in 93 exact C++ script comparisons. Other logic profiles, backend-selection policies and full automatic configuration remain partial.",
+        "The retained QF_LRA logic and feature policy now follows both source overloads. Tests cover each rational threshold independently, the exact numerator boundary, CNF/non-CNF inputs, first-push logic mode and disabled automatic configuration. The decimal 3906.255859375 exercises reduced numerator 2000003 and denominator 512 in a scoped SAT/model/UNSAT C++ comparison, bringing strict runner comparisons to 94. Remaining automatic backend selection and other logic profiles remain partial."
       ]
     },
     {
@@ -112452,7 +112472,9 @@
         "pkg/smtcore/theory_arith_mixed_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_setup_integer.go",
-        "pkg/smtcore/smt_setup_integer_test.go"
+        "pkg/smtcore/smt_setup_integer_test.go",
+        "pkg/smtcore/smt_setup_real.go",
+        "pkg/smtcore/smt_setup_real_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -112469,7 +112491,8 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTQFLIAAutomaticSetupUsesFeaturesAtFirstBoundary",
-        "TestSMTQFLIAStaticSetupRejectsUninterpretedFunctions"
+        "TestSMTQFLIAStaticSetupRejectsUninterpretedFunctions",
+        "TestSMTQFLRAAutomaticSetupRationalThresholdsAndCNF"
       ],
       "conditionals": [
         {
@@ -112544,15 +112567,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "setup_QF_LRA default and static-feature policy: exact reduced numerator >2000000 AND denominator >500 guard, CNF conservative-two phase versus non-CNF false-phase/geometric-restart policy, 32-literal small-lemma setting and source preprocessing/reflection/equality controls",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup_real.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTQFLRAAutomaticSetupRationalThresholdsAndCNF",
+            "TestSMTQFLIAAutomaticSetupUsesFeaturesAtFirstBoundary",
+            "TestSMTQFLIAStaticSetupRejectsUninterpretedFunctions",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "The retained setup helper borrows its kernel and AST manager and publishes created theory implementations into the kernel registry.",
-        "The one-time QF_LIA policy borrows pinned asserted formulas while a temporary AST StaticFeatures owns its numeral scratch values and counters. The collector closes on success and failure. Selected scalar policy is stored in the existing owning SMT parameters and their concrete kernel/theory views; later scopes and checks reuse the selected policy."
+        "The one-time QF_LIA policy borrows pinned asserted formulas while a temporary AST StaticFeatures owns its numeral scratch values and counters. The collector closes on success and failure. Selected scalar policy is stored in the existing owning SMT parameters and their concrete kernel/theory views; later scopes and checks reuse the selected policy.",
+        "Integer and real automatic setup share a concrete feature-collection and policy-application path. QF_LRA numerator and denominator are independent owned numeral values released before the feature collector; all failure exits close the collector, and the retained parameter owners contain only the selected scalar policy."
       ],
       "deviations": [
         "The Go surface is a direct setup function rather than a persistent setup object because only construction-time explicit-logic routing is currently consumed. Sequence logics install SMTEmptySequenceTheory as a safe give-up checkpoint until the concrete sequence solver replaces it.",
-        "The QF_LIA setup policy now includes both retained overloads, with static-feature depth >50, unit-only input, clausal restart/phase settings and the CNF unit/binary constant-sum >100000 guard. The first push selects the logic-only overload and prevents later feature reclassification; auto_config=false bypasses this tuning. Manual Euclidean, Gomory and equality-branch tests explicitly disable automatic setup before setting their own theory controls. The 52-level ITE runner regression preserves SAT model values and a scoped UNSAT refutation in 93 exact C++ script comparisons. Other logic profiles, backend-selection policies and full automatic configuration remain partial."
+        "The QF_LIA setup policy now includes both retained overloads, with static-feature depth >50, unit-only input, clausal restart/phase settings and the CNF unit/binary constant-sum >100000 guard. The first push selects the logic-only overload and prevents later feature reclassification; auto_config=false bypasses this tuning. Manual Euclidean, Gomory and equality-branch tests explicitly disable automatic setup before setting their own theory controls. The 52-level ITE runner regression preserves SAT model values and a scoped UNSAT refutation in 93 exact C++ script comparisons. Other logic profiles, backend-selection policies and full automatic configuration remain partial.",
+        "The retained QF_LRA logic and feature policy now follows both source overloads. Tests cover each rational threshold independently, the exact numerator boundary, CNF/non-CNF inputs, first-push logic mode and disabled automatic configuration. The decimal 3906.255859375 exercises reduced numerator 2000003 and denominator 512 in a scoped SAT/model/UNSAT C++ comparison, bringing strict runner comparisons to 94. Remaining automatic backend selection and other logic profiles remain partial."
       ]
     },
     {

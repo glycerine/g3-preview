@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"real_auto_rational_profile.smt2":           "sat\n(((= x threshold) true))\nunsat\nsat\n(((= x threshold) true))\n",
 	"integer_auto_deep_ite.smt2":                "sat\n((holds true))\nunsat\nsat\n((holds true))\n",
 	"quantified_ematching_saturation.smt2":      "unknown\nunsat\nunknown\n",
 	"quantified_ematching_relevancy.smt2":       "unsat\nunsat\n",
