@@ -44,7 +44,8 @@ func (s *SMTInternalizerState) assignLiteralCore(literal SMTLiteral, justificati
 	if value == lbool.False {
 		s.inconsistent = true
 		s.conflict = justification
-		s.conflictLiteral = literal
+		// Source not_l is the already true opposite of the failed consequent.
+		s.conflictLiteral = literal.Negated()
 		s.statistics.NumConflicts++
 		return nil
 	}
@@ -222,7 +223,7 @@ func (s *SMTInternalizerState) Propagate() (bool, error) {
 			case lbool.False:
 				s.inconsistent = true
 				s.conflict = justification
-				s.conflictLiteral = implied
+				s.conflictLiteral = implied.Negated()
 				s.statistics.NumConflicts++
 				return false, nil
 			case lbool.Undef:

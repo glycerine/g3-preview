@@ -105668,6 +105668,10 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/smtcore/smt_boolean_propagation.go",
+        "pkg/smtcore/smt_conflict_polarity_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/bit_vector_symbolic_carry_scopes.smt2",
         "pkg/smtcore/smt_conflict_antecedents.go",
         "pkg/smtcore/smt_conflict_levels.go",
         "pkg/smtcore/smt_conflict_resolver.go",
@@ -105675,6 +105679,9 @@
         "pkg/smtcore/smt_asserted_injectivity_test.go"
       ],
       "tests": [
+        "TestSMTFailedConsequentConflictRetainsTrueOppositeAndFalseLemma",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
         "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
         "TestSMTAntecedentExpanderTransitivityEquationsAndCommonAncestor",
         "TestSMTAntecedentExpanderCongruenceQueuesArgumentEqualities",
@@ -106018,6 +106025,20 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Failed assignment and binary-propagation conflict polarity: source not_l is the already true opposite of the failed consequent; first-UIP analysis retains false lemma literals and an asserting backjump",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_boolean_propagation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_conflict_polarity_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTFailedConsequentConflictRetainsTrueOppositeAndFalseLemma",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "transitivity common ancestor, equality-justification expansion, recursive justification/equality work queues, duplicate suppression and public antecedent extraction",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_conflict_antecedents.go",
@@ -106085,6 +106106,7 @@
         "The resolver owns its most recent lemma proof through an ASTRef and releases or replaces it across Close and Resolve."
       ],
       "deviations": [
+        "Corrected reversed not_l polarity in failed AssignLiteral and compact binary BCP conflicts. The resolver expects a true assigned premise opposite to the failed consequent; storing the false consequent created non-false learned literals. A two-level regression checks first-UIP lemma/backjump/assertion behavior, and a symbolic BV add/sub circuit with scoped contradiction/model recovery raises strict C++ runner agreement to 119 scripts.",
         "Dynamic-Ack callbacks feed the concrete pair/triple manager during conflict expansion. Recursive Go calls replace the source explicit proof todo stack. The constructor's watch-list reference has no source read after initialization and requires no Go storage.",
         "The Go equality engine detects explicit disequalities before merging their roots. Its concrete disequality-conflict justification reconstructs the equality of the original disequality operands from both equality branches and the pending merge, then uses the existing Boolean conflict proof to resolve against the disequality literal."
       ]
@@ -106322,6 +106344,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_conflict_polarity_test.go",
+        "pkg/cmd/g3/test_vectors/bit_vector_symbolic_carry_scopes.smt2",
         "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
         "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/theory_utvpi_lifecycle_test.go",
@@ -106353,6 +106377,7 @@
         "pkg/smtcore/theory_arith_assume_eq_test.go"
       ],
       "tests": [
+        "TestSMTFailedConsequentConflictRetainsTrueOppositeAndFalseLemma",
         "TestSMTArithmeticTranslationBeforeSetupUsesDestinationSelection",
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
         "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
@@ -107312,6 +107337,20 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Failed assignment and binary-propagation conflict polarity: source not_l is the already true opposite of the failed consequent; first-UIP analysis retains false lemma literals and an asserting backjump",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_boolean_propagation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_conflict_polarity_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTFailedConsequentConflictRetainsTrueOppositeAndFalseLemma",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
@@ -107516,6 +107555,7 @@
         "Search reads the quantifier manager-owned acceptedModel at the ground completion boundary. A checked candidate transfers through the existing generated-model path; an unchecked candidate cannot publish a SAT result."
       ],
       "deviations": [
+        "Corrected reversed not_l polarity in failed AssignLiteral and compact binary BCP conflicts. The resolver expects a true assigned premise opposite to the failed consequent; storing the false consequent created non-false learned literals. A two-level regression checks first-UIP lemma/backjump/assertion behavior, and a symbolic BV add/sub circuit with scoped contradiction/model recovery raises strict C++ runner agreement to 119 scripts.",
         "Fresh-plugin copying is gated on actual source setup. Go constructor arithmetic placeholders are not native installed plugins before the first push/check; copying before setup leaves destination mode selection active. A dedicated regression verifies an unconfigured UTVPI-mode source translated to a dense-mode destination while preserving independent source UTVPI setup.",
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
         "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
@@ -108908,6 +108948,9 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/smtcore/smt_conflict_polarity_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/bit_vector_symbolic_carry_scopes.smt2",
         "pkg/smtcore/smt_internalizer_order.go",
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/smtcore/smt_internalizer.go",
@@ -108920,6 +108963,9 @@
         "pkg/smtcore/smt_internalizer_test.go"
       ],
       "tests": [
+        "TestSMTFailedConsequentConflictRetainsTrueOppositeAndFalseLemma",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
         "TestSMTInternalizationOrderBooleanGateContextsAndNotElision",
         "TestSMTInternalizationOrderTermITEContextsAndInternalizedCutoff",
         "TestSMTInternalizerBooleanVariablesLiteralsAssignmentsAndScopes",
@@ -109303,6 +109349,20 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Failed assignment and binary-propagation conflict polarity: source not_l is the already true opposite of the failed consequent; first-UIP analysis retains false lemma literals and an asserting backjump",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_boolean_propagation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_conflict_polarity_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTFailedConsequentConflictRetainsTrueOppositeAndFalseLemma",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "is_gate, dual gate-context coloring, child visitation, and deep-expression topological ordering",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_internalizer_order.go",
@@ -109448,6 +109508,7 @@
         "SMTInternalizerState owns references for registered Boolean expressions, enode owners, and retained clause proofs; it owns its congruence table, variable arrays, watch lists, scopes, clauses, assignment and theory-variable trails, registered theory order, and pending congruence records, and borrows the checker context, registered theory plugins, and optional relevancy propagator and quantifier registry."
       ],
       "deviations": [
+        "Corrected reversed not_l polarity in failed AssignLiteral and compact binary BCP conflicts. The resolver expects a true assigned premise opposite to the failed consequent; storing the false consequent created non-false learned literals. A two-level regression checks first-UIP lemma/backjump/assertion behavior, and a symbolic BV add/sub circuit with scoped contradiction/model recovery raises strict C++ runner agreement to 119 scripts.",
         "Registered theories now supply default-internalizer selection; nondefault theory families remain top-down boundaries in the ordering pass.",
         "Internalized logical clauses are retained as concrete typed records for the future DPLL watch and justification layer.",
         "The retained Go kernel directly encodes implication gates because the C++ preprocessing pass that normally eliminates OP_IMPLIES has not reached this facade; the clauses preserve the source Boolean semantics and conservative relevancy dependencies.",

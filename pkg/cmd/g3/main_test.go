@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"bit_vector_symbolic_carry_scopes.smt2":     "sat\n(((= (bvadd x y) #xa) true) ((= (bvsub x y) #x4) true))\nunsat\nsat\n(((= (bvadd x y) #xa) true) ((= (bvsub x y) #x4) true))\n",
 	"utvpi_mixed_model_refusal.smt2":            "unknown\n",
 	"utvpi_mixed_sum_model_refusal.smt2":        "unknown\n",
 	"utvpi_integer_parity_scopes.smt2":          "unsat\nsat\n((x 1) (y 1))\nunsat\nsat\n((x 1) (y 1))\n",
