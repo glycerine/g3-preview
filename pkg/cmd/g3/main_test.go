@@ -10,6 +10,8 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"nonlinear_max_min_bounds.smt2":             "unsat\n",
+	"nonlinear_max_min_model.smt2":              "sat\n",
 	"shared_arithmetic_fixed_rows.smt2":         "unsat\nsat\n",
 	"shared_arithmetic_fixed_integer.smt2":      "unsat\n",
 	"nonlinear_numeric_progress.smt2":           "unsat\nsat\n((x 3) (y 4))\n",

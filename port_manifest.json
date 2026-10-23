@@ -113414,7 +113414,11 @@
         "pkg/smtcore/theory_arith_bounds.go",
         "pkg/smtcore/theory_arith_fixed_bounds.go",
         "pkg/smtcore/theory_arith_fixed_bounds_test.go",
-        "pkg/smtcore/theory_arith_shared.go"
+        "pkg/smtcore/theory_arith_shared.go",
+        "pkg/math/simplex/arith_optimize.go",
+        "pkg/math/simplex/arith_optimize_test.go",
+        "pkg/smtcore/theory_arith_max_min.go",
+        "pkg/smtcore/theory_arith_max_min_test.go"
       ],
       "tests": [
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
@@ -113427,7 +113431,10 @@
         "TestSMTArithmeticBoundTrailEncoding",
         "TestSMTArithmeticEqualityBoundAndAccumulation",
         "TestSMTNormalizeArithmeticIntegerBound",
-        "TestSMTSharedArithmeticFixedRowsScopedProofs"
+        "TestSMTSharedArithmeticFixedRowsScopedProofs",
+        "TestArithmeticMaxMinDerivedExtremaAndBestEffort",
+        "TestArithmeticMaxMinIntegerGainsAndSharedMovement",
+        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
       ],
       "conditionals": [
         {
@@ -113853,10 +113860,21 @@
           "tests": [
             "TestSMTSharedArithmeticFixedRowsScopedProofs"
           ]
+        },
+        {
+          "name": "init_gains, update_gains, pick_var_to_leave, move_to_bound and max_min: concrete rational tableau optimizer for retained nonlinear caller with maintain_integrality=false, integer LCM gain guards, shared-column tracking and best-effort status",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/arith_optimize.go",
+          "tests": [
+            "TestArithmeticMaxMinDerivedExtremaAndBestEffort",
+            "TestArithmeticMaxMinIntegerGainsAndSharedMovement"
+          ]
         }
       ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The retained nonlinear max/min path uses a temporary canonical objective row, removed on return, with raw matrix pivot coefficients normalized for source gain formulas. Integer-column gain and sharing guards are retained. The maintain_integrality=true optimization-engine path remains unported; this is not a claim to complete optimization support."
+      ]
     },
     {
       "path": "src/smt/theory_arith_core.h",
@@ -113878,7 +113896,8 @@
         "pkg/smtcore/theory_arith_linear_monomial_test.go",
         "pkg/smtcore/theory_arith_fixed_bounds.go",
         "pkg/smtcore/theory_arith_fixed_bounds_test.go",
-        "pkg/smtcore/theory_arith_shared.go"
+        "pkg/smtcore/theory_arith_shared.go",
+        "pkg/smtcore/theory_arith_max_min_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -113898,7 +113917,8 @@
         "TestSMTNonlinearCandidateRejectsRelaxedProduct",
         "TestSMTNonlinearGrobnerExpandedSquareScopedProofs",
         "TestSMTLinearizedMonomialScopesProofsAndModels",
-        "TestSMTSharedArithmeticFixedRowsScopedProofs"
+        "TestSMTSharedArithmeticFixedRowsScopedProofs",
+        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
       ],
       "conditionals": [
         {
@@ -114720,6 +114740,14 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "small canonical-row interval bound propagation into nonlinear strategy replay, including equality aliases and comparison rows with scoped unconditional premises",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
+          "tests": [
+            "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
+          ]
         }
       ],
       "ownership": [
@@ -114728,7 +114756,8 @@
       ],
       "deviations": [
         "Affine definition-bound propagation evaluates retained replay rows before and after nonlinear interval propagation, including sign reversal for negated-square aliases. General row scheduling, propagation to every row variable, and minimal row-bound explanations remain incomplete.",
-        "Shared arithmetic variables can become fixed through a combination of row bounds even when no explicit opposite unary bounds occur. A branch-free row interval pass derives these points, retains only newly fixed original columns as scoped replay bounds, and propagates equal-valued shared roots with all active arithmetic literals as premises. This closes the false-SAT case x>=0, y>=0, x+y<=0, f(x)!=f(y). General bound-atom propagation and optimal fixed-point discovery remain separate work."
+        "Shared arithmetic variables can become fixed through a combination of row bounds even when no explicit opposite unary bounds occur. A branch-free row interval pass derives these points, retains only newly fixed original columns as scoped replay bounds, and propagates equal-valued shared roots with all active arithmetic literals as premises. This closes the false-SAT case x>=0, y>=0, x+y<=0, f(x)!=f(y). General bound-atom propagation and optimal fixed-point discovery remain separate work.",
+        "The existing small-row interval calculation is shared by fixed-value equality propagation and nonlinear strategy bound replay. Equality aliases such as x=2*y now carry finite factor bounds into monomial intervals. Source minimal dependency explanations and full propagation scheduling remain incomplete."
       ]
     },
     {
@@ -114922,7 +114951,10 @@
         "pkg/smtcore/theory_arith_mixed.go",
         "pkg/smtcore/theory_arith_casts.go",
         "pkg/smtcore/theory_arith_mixed_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/math/simplex/arith_optimize.go",
+        "pkg/math/simplex/arith_optimize_test.go",
+        "pkg/smtcore/theory_arith_max_min_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
@@ -114930,7 +114962,9 @@
         "TestSMTMixedArithmeticScopeModel",
         "TestSMTMixedArithmeticCastsScopedProofs",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestArithmeticMaxMinIntegerGainsAndSharedMovement",
+        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
       ],
       "conditionals": [
         {
@@ -115112,6 +115146,18 @@
             "TestSMTMixedArithmeticCastsScopedProofs",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "move_non_base_vars_to_bounds assignment preparation for the nonlinear max/min driver",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/arith_optimize.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_max_min_test.go"
+          ],
+          "tests": [
+            "TestArithmeticMaxMinIntegerGainsAndSharedMovement",
+            "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
           ]
         }
       ],
@@ -115296,7 +115342,9 @@
         "pkg/smtcore/theory_arith_cluster.go",
         "pkg/smtcore/theory_arith_cluster_test.go",
         "pkg/smtcore/theory_arith_nonlinear_strategy.go",
-        "pkg/smtcore/theory_arith_nonlinear_strategy_test.go"
+        "pkg/smtcore/theory_arith_nonlinear_strategy_test.go",
+        "pkg/smtcore/theory_arith_max_min.go",
+        "pkg/smtcore/theory_arith_max_min_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -115317,7 +115365,8 @@
         "TestSMTNestedPolynomialIdentityAtRationalPoints",
         "TestSMTNestedMixedCoefficientSortGuards",
         "TestSMTNonlinearClusterInequalityRowsScopedProofs",
-        "TestSMTNonlinearNumericProgressAndScopedStrategies"
+        "TestSMTNonlinearNumericProgressAndScopedStrategies",
+        "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
       ],
       "conditionals": [
         {
@@ -115744,11 +115793,19 @@
           ]
         },
         {
-          "name": "max/min bound discovery and assignment adjustment, complete row-level nested polynomial checks, and irrational models",
+          "name": "shared assignment interface-equality adjustment, complete row-level nested polynomial checks, and irrational models",
           "status": "unported",
           "go_target": null,
           "tests": [
             "TestSMTNonlinearCandidateRejectsRelaxedProduct"
+          ]
+        },
+        {
+          "name": "max_min_nl_vars: deduplicate monomial and factor columns, maximize then minimize, retain exact unshared optimized bounds and validate moved candidates before publishing",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_max_min.go",
+          "tests": [
+            "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
           ]
         }
       ],
@@ -115762,7 +115819,8 @@
         "Cross-nested polynomial construction now factors repeated variables recursively using source Horner and completing-square transformations, then evaluates exact intervals while respecting existing internalized-column bounds. The replay integration checks active comparison polynomials directly and uses all active assertion literals for conflicts; full row/cluster traversal and source bound-weighted resource accounting remain incomplete. Integer rows clear coefficient denominators; mixed rows are skipped when coercions are disabled. Optional square completion falls back to Horner when its offset or leading coefficient would require a fractional Int numeral. Temporary polynomial ASTs are pinned for the check and released on every return.",
         "The source default variable-order perturbation path is now retained: each eligible lower linear variable is promoted once above weights 0..7, UpdateOrder requeues equations with changed leading terms, and basis computation repeats. Equation-threshold exhaustion stops further rounds in the same search, is scoped, and resets in InitializeSearch. The optional derived-equation insertion path is excluded under the retained-consumer rule: a complete src scan finds m_nl_arith_gb_eqs only in its false constructor initializer, field declaration, diagnostic display and guarded call; updt_params does not expose a setter, and internalize_gb_eq/monomial2expr have no other callers.",
         "Nonlinear clusters now follow actual column/row incidence after simplex pivots, stopping expansion at fixed variables and pruning rows whose different base variable is free. Clustered canonical rows are sent to Grobner reasoning with their current bounds. Replay-only comparison columns use pinned local Real AST variables indexed by column; these polynomial-elimination aliases are released at the end of the call and never enter the SMT context or public model. Existing definition/opposite-bound seeds remain valid redundant equations. The replay tableau has no quasi-base row representation.",
-        "The source four-way nonlinear strategy index is now scoped and resets at search initialization. Interval improvements derived from a branch-free tableau are retained as scoped theory-column bounds and strengthened on replay, including integer-feasibility replay; speculative branch bounds never justify global conflicts. The source nonlinear round limit covers repeated attempts. Numeric-only progress increments an internal search generation so the Go no-progress guard retries final checking without inventing Boolean atoms. Remaining driver work includes max/min bound discovery and assignment movement, full row-level nested checks and source resource/dependency refinements."
+        "The source four-way nonlinear strategy index is now scoped and resets at search initialization. Interval improvements derived from a branch-free tableau are retained as scoped theory-column bounds and strengthened on replay, including integer-feasibility replay; speculative branch bounds never justify global conflicts. The source nonlinear round limit covers repeated attempts. Numeric-only progress increments an internal search generation so the Go no-progress guard retries final checking without inventing Boolean atoms. Remaining driver work includes max/min bound discovery and assignment movement, full row-level nested checks and source resource/dependency refinements.",
+        "Nonlinear final checking now moves nonbase variables to bounds and runs the retained source max/min optimizer before the rotating strategies. Only exact unshared optimized results become scoped replay bounds; best-effort results are never promoted to logical facts. Changed unshared candidates must satisfy all products, active assertions and integrality. Shared assignment interface-equality adjustment, full row-level nested checks, irrational models and remaining source resource/dependency refinements are still incomplete."
       ]
     },
     {

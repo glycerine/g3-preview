@@ -41,6 +41,58 @@ func (t *SMTLinearArithmeticTheory) propagateFixedSharedValues() (bool, error) {
 	for _, column := range t.simplexVariables {
 		_, alreadyFixed[column] = smtFixedSimplexColumn(solver, column)
 	}
+	if conflict, err := t.propagateArithmeticRowBounds(solver); err != nil {
+		return false, err
+	} else if conflict {
+		return true, t.derivedBoundConflict()
+	}
+	status, err = solver.MakeFeasible()
+	if err != nil || status == lbool.Undef {
+		return false, err
+	}
+	if status == lbool.False {
+		return true, t.derivedBoundConflict()
+	}
+	progress := false
+	for _, column := range t.simplexVariables {
+		value, fixed := smtFixedSimplexColumn(solver, column)
+		if !fixed || alreadyFixed[column] {
+			continue
+		}
+		bound := simplex.RationalInfinitesimal(value)
+		t.derivedBounds = append(t.derivedBounds, smtArithmeticReplayBound{column, true, bound.Clone()}, smtArithmeticReplayBound{column, false, bound.Clone()})
+		progress = true
+	}
+	if progress {
+		t.solver = solver
+		t.state.theoryProgress++
+	}
+	literals := make([]SMTLiteral, 0, len(t.assertions))
+	for _, assertion := range t.assertions {
+		literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
+	}
+	for i, first := range shared {
+		firstValue, fixed := smtFixedSimplexColumn(solver, first)
+		if !fixed {
+			continue
+		}
+		for _, second := range shared[i+1:] {
+			secondValue, fixed := smtFixedSimplexColumn(solver, second)
+			if !fixed || firstValue.Cmp(secondValue) != 0 {
+				continue
+			}
+			merged, err := t.propagateEquality(t.state, first, second, literals)
+			if err != nil || merged {
+				return true, err
+			}
+		}
+	}
+	return progress, nil
+}
+
+// Derive bounds through canonical equality and comparison rows. The caller
+// owns replay and records only bounds supported by unconditional assertions.
+func (t *SMTLinearArithmeticTheory) propagateArithmeticRowBounds(solver *simplex.Solver) (bool, error) {
 	var manager smtArithmeticBoundDependencyManager
 	for column := uint32(0); column < solver.NumVariables(); column++ {
 		row, basic := solver.BasicRow(column)
@@ -88,50 +140,9 @@ func (t *SMTLinearArithmeticTheory) propagateFixedSharedValues() (bool, error) {
 			}
 			_, conflict := t.updateNonlinearBounds(solver, target.Variable, interval)
 			if conflict {
-				return true, t.derivedBoundConflict()
+				return true, nil
 			}
 		}
 	}
-	status, err = solver.MakeFeasible()
-	if err != nil || status == lbool.Undef {
-		return false, err
-	}
-	if status == lbool.False {
-		return true, t.derivedBoundConflict()
-	}
-	progress := false
-	for _, column := range t.simplexVariables {
-		value, fixed := smtFixedSimplexColumn(solver, column)
-		if !fixed || alreadyFixed[column] {
-			continue
-		}
-		bound := simplex.RationalInfinitesimal(value)
-		t.derivedBounds = append(t.derivedBounds, smtArithmeticReplayBound{column, true, bound.Clone()}, smtArithmeticReplayBound{column, false, bound.Clone()})
-		progress = true
-	}
-	if progress {
-		t.solver = solver
-		t.state.theoryProgress++
-	}
-	literals := make([]SMTLiteral, 0, len(t.assertions))
-	for _, assertion := range t.assertions {
-		literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
-	}
-	for i, first := range shared {
-		firstValue, fixed := smtFixedSimplexColumn(solver, first)
-		if !fixed {
-			continue
-		}
-		for _, second := range shared[i+1:] {
-			secondValue, fixed := smtFixedSimplexColumn(solver, second)
-			if !fixed || firstValue.Cmp(secondValue) != 0 {
-				continue
-			}
-			merged, err := t.propagateEquality(t.state, first, second, literals)
-			if err != nil || merged {
-				return true, err
-			}
-		}
-	}
-	return progress, nil
+	return false, nil
 }

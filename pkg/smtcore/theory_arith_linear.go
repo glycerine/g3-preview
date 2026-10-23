@@ -97,6 +97,7 @@ type smtLinearIntegerBranch struct {
 }
 
 type smtLinearArithmeticStatistics struct {
+	maxMin                                               uint64
 	crossNested                                          uint64
 	conflicts, addRows, pivots, assertLower, assertUpper uint64
 	fixedEqualities, offsetEqualities, branches          uint64
@@ -1427,6 +1428,29 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 			return SMTFinalCheckGiveUp, nil
 		}
 		t.nonlinearRounds++
+		if progress, err := t.maxMinNonlinearVariables(); err != nil {
+			return SMTFinalCheckGiveUp, err
+		} else if progress {
+			if t.state.inconsistent {
+				return SMTFinalCheckContinue, nil
+			}
+			if fixed, err := t.propagateFixedSharedValues(); err != nil {
+				return SMTFinalCheckGiveUp, err
+			} else if fixed {
+				return SMTFinalCheckContinue, nil
+			}
+			satisfied, err = t.checkNonlinearMonomialAssignments()
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			complete, conflict, err = t.checkNonlinearAssertions(satisfied)
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			if conflict || satisfied && complete {
+				return SMTFinalCheckContinue, nil
+			}
+		}
 		// A branch-and-bound tableau contains speculative bounds. Replay
 		// interval propagation inside buildSimplex, where a contradiction
 		// rejects only that branch rather than the whole SMT context.
@@ -1887,6 +1911,7 @@ func (t *SMTLinearArithmeticTheory) CollectStatistics(target *statistics.Statist
 	target.UpdateUint64("arith eq adapter", t.equalityAdapter.NumAxioms())
 	target.UpdateUint64("arith grobner", t.statistics.grobner)
 	target.UpdateUint64("arith nonlinear horner", t.statistics.crossNested)
+	target.UpdateUint64("arith max-min", t.statistics.maxMin)
 	return nil
 }
 

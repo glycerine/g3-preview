@@ -52,7 +52,13 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearStrategyBounds() (bool, er
 		before[column] = [2]smtArithmeticReplayBound{{column, true, lower}, {column, false, upper}}
 		valid[column] = [2]bool{hasLower, hasUpper}
 	}
-	_, conflict, err := t.propagateNonlinearBounds(solver)
+	conflict, err := t.propagateArithmeticRowBounds(solver)
+	if err != nil {
+		return false, err
+	}
+	if !conflict {
+		_, conflict, err = t.propagateNonlinearBounds(solver)
+	}
 	if err != nil {
 		return false, err
 	}
