@@ -366,21 +366,26 @@ func (f *SMTModelFinder) processSimpleMacros(proto *protomodel.ProtoModel, quant
 }
 
 func (f *SMTModelFinder) processHintMacros(proto *protomodel.ProtoModel, quantifiers []ast.ASTHandle) ([]ast.ASTHandle, error) {
-	plan, found, err := f.hint.planSubset(f.manager, quantifiers)
-	if err != nil || !found {
-		return quantifiers, err
-	}
-	for declaration, definition := range plan.definitions {
-		if err = f.publishFunctionDefinition(declaration, definition, proto); err != nil {
-			return nil, err
+	for {
+		plan, found, err := f.hint.planSubset(f.manager, quantifiers)
+		if err != nil || !found {
+			return quantifiers, err
 		}
-	}
-	for _, quantifier := range quantifiers {
-		if info := f.hint.infos[quantifier]; info != nil && !info.theOne.IsNull() {
-			f.chosen[quantifier] = info.theOne
+		for declaration, definition := range plan.definitions {
+			if err = f.publishFunctionDefinition(declaration, definition, proto); err != nil {
+				return nil, err
+			}
 		}
+		for _, quantifier := range quantifiers {
+			if info := f.hint.infos[quantifier]; info != nil && !info.theOne.IsNull() {
+				f.chosen[quantifier] = info.theOne
+			}
+		}
+		if len(plan.remaining) >= len(quantifiers) {
+			return nil, ast.ErrASTDomain
+		}
+		quantifiers = plan.remaining
 	}
-	return plan.remaining, nil
 }
 
 type smtModelFinderFullMacro struct {
@@ -600,10 +605,10 @@ func (f *SMTModelFinder) collectPatternTerm(quantifier, term ast.ASTHandle, decl
 			if index < declarations {
 				variable := declarations - index - 1
 				for _, application := range ground {
-					if application == nil || position >= uint32(len(application.arguments)) {
+					if application == nil || !f.state.context.relevant[application.owner] || position >= uint32(len(application.arguments)) {
 						continue
 					}
-					binding := application.arguments[position].root
+					binding := application.arguments[position]
 					if _, err = f.InsertInstantiationTerm(quantifier, variable, binding.owner, binding.Generation()); err != nil {
 						return err
 					}
@@ -651,6 +656,7 @@ func (f *SMTModelFinder) FixModel(model *protomodel.ProtoModel) error {
 	if err != nil {
 		return err
 	}
+	allRelevant := append([]ast.ASTHandle(nil), relevant...)
 	for _, quantifier := range relevant {
 		delete(f.chosen, quantifier)
 		if info := f.hint.infos[quantifier]; info != nil {
@@ -677,6 +683,11 @@ func (f *SMTModelFinder) FixModel(model *protomodel.ProtoModel) error {
 	}
 	for _, quantifier := range relevant {
 		if err = f.collectPatternInstantiationTerms(quantifier); err != nil {
+			return err
+		}
+	}
+	for _, quantifier := range allRelevant {
+		if err = f.populateMacroInstantiationSets(quantifier); err != nil {
 			return err
 		}
 		for _, set := range f.sets[quantifier] {
