@@ -102025,7 +102025,8 @@
         "TestSMTOldIntervalInverseAndPower",
         "TestSMTOldIntervalMultiplicationSignTable",
         "TestSMTOldIntervalMultiplyOpenZeroAndDivide",
-        "TestSMTOldIntervalMultiplicationClosedOracle"
+        "TestSMTOldIntervalMultiplicationClosedOracle",
+        "TestSMTOldIntervalCloneOwnsRationalEndpoints"
       ],
       "conditionals": [
         {
@@ -102249,7 +102250,8 @@
         }
       ],
       "ownership": [
-        "Intervals borrow their concrete arithmetic-bound dependency manager and dependency nodes; rational endpoints are independently owned big.Rat values."
+        "Intervals borrow their concrete arithmetic-bound dependency manager and dependency nodes; rational endpoints are independently owned big.Rat values.",
+        "Interval and extended-product copies construct fresh rational endpoints before Set, because Set on a shallow big.Rat copy can reuse shared limb storage. The regression first runs interval addition and subtraction to produce endpoints with ordinary arithmetic capacity, then changes the copy and source in both directions. Endpoint values remain independent while immutable dependency leaves retain their shared manager ownership."
       ],
       "deviations": [
         "Undefined extended-infinity combinations and division by an interval containing zero return a typed Go domain error instead of relying on source assertions."
@@ -102271,7 +102273,8 @@
         "TestSMTOldIntervalInverseAndPower",
         "TestSMTOldIntervalMultiplicationSignTable",
         "TestSMTOldIntervalMultiplyOpenZeroAndDivide",
-        "TestSMTOldIntervalMultiplicationClosedOracle"
+        "TestSMTOldIntervalMultiplicationClosedOracle",
+        "TestSMTOldIntervalCloneOwnsRationalEndpoints"
       ],
       "conditionals": [
         {
@@ -102323,7 +102326,8 @@
         }
       ],
       "ownership": [
-        "The Go interval is a value owner for endpoints and a borrower of search-scoped arithmetic-bound dependency nodes."
+        "The Go interval is a value owner for endpoints and a borrower of search-scoped arithmetic-bound dependency nodes.",
+        "Interval and extended-product copies construct fresh rational endpoints before Set, because Set on a shallow big.Rat copy can reuse shared limb storage. The regression first runs interval addition and subtraction to produce endpoints with ordinary arithmetic capacity, then changes the copy and source in both directions. Endpoint values remain independent while immutable dependency leaves retain their shared manager ownership."
       ],
       "deviations": [
         "The source interval macro alias is represented by the concrete smtOldInterval type within package smtcore."

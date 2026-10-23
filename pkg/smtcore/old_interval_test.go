@@ -5,6 +5,37 @@ import (
 	"testing"
 )
 
+func TestSMTOldIntervalCloneOwnsRationalEndpoints(t *testing.T) {
+	var manager smtArithmeticBoundDependencyManager
+	lower := &smtArithmeticBound{variable: 1}
+	upper := &smtArithmeticBound{variable: 2}
+	original, err := newSMTOldIntervalBounds(&manager, big.NewRat(2, 3), false, manager.Leaf(lower), big.NewRat(7, 5), true, manager.Leaf(upper))
+	astTestMust(t, err)
+	// Exercise intervals produced by arithmetic, whose big.Rat endpoints
+	// can retain spare limb capacity, rather than only fresh numerals.
+	unit, err := newSMTOldIntervalPoint(&manager, big.NewRat(1, 1), nil, nil)
+	astTestMust(t, err)
+	astTestMust(t, original.add(unit))
+	astTestMust(t, original.sub(unit))
+	copy := original.clone()
+	point, err := newSMTOldIntervalPoint(&manager, big.NewRat(11, 13), nil, nil)
+	astTestMust(t, err)
+	astTestMust(t, copy.add(point))
+	if original.String() != "[2/3, 7/5)" || original.lowerDep != copy.lowerDep || original.upperDep != copy.upperDep {
+		t.Fatal("modifying a copied interval changed its source", original, copy)
+	}
+	if copy.String() != "[59/39, 146/65)" {
+		t.Fatal("copied interval sum", copy)
+	}
+	// Mutations must be independent in both directions, while explanation
+	// nodes stay shared immutable leaves owned by the dependency manager.
+	original.lower.value.SetInt64(17)
+	original.upper.value.SetInt64(19)
+	if copy.String() != "[59/39, 146/65)" || !manager.Contains(copy.lowerDep, lower) || !manager.Contains(copy.upperDep, upper) {
+		t.Fatal("source mutation changed copied interval or premises", copy)
+	}
+}
+
 func TestSMTOldIntervalAddSubtractContainsAndDependencies(t *testing.T) {
 	var manager smtArithmeticBoundDependencyManager
 	a, b := &smtArithmeticBound{variable: 1}, &smtArithmeticBound{variable: 2}

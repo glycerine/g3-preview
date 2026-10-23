@@ -51,8 +51,10 @@ func newSMTOldIntervalHalfBound(manager *smtArithmeticBoundDependencyManager, va
 
 func (i *smtOldInterval) clone() *smtOldInterval {
 	result := *i
-	result.lower.set(&i.lower)
-	result.upper.set(&i.upper)
+	// A big.Rat struct copy shares its limb storage. Calling Set on that
+	// shallow copy can reuse the shared storage, so start with fresh values.
+	result.lower = i.lower.clone()
+	result.upper = i.upper.clone()
 	return &result
 }
 func (i *smtOldInterval) valid(other *smtOldInterval) bool {
@@ -152,8 +154,7 @@ func (i *smtOldInterval) negativeZero() bool { return i.upper.zero() && !i.upper
 func (i *smtOldInterval) mixed() bool        { return i.lower.sign() < 0 && i.upper.sign() > 0 }
 
 func smtExtendedProduct(left, right *smtExtendedRational) smtExtendedRational {
-	result := *left
-	result.value.Set(&left.value)
+	result := left.clone()
 	result.mul(right)
 	return result
 }

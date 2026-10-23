@@ -43,6 +43,12 @@ func (n *smtExtendedRational) set(other *smtExtendedRational) *smtExtendedRation
 	return n
 }
 
+func (n *smtExtendedRational) clone() smtExtendedRational {
+	var result smtExtendedRational
+	result.set(n)
+	return result
+}
+
 func (n *smtExtendedRational) infinite() bool { return n.kind != smtExtendedFinite }
 func (n *smtExtendedRational) sign() int {
 	if n.kind == smtExtendedMinusInfinity {
