@@ -113568,7 +113568,7 @@
       "path": "src/smt/smt_solver.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_solver.go"
       ],
@@ -118237,7 +118237,7 @@
       "path": "src/smt/theory_array.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_array.go",
         "pkg/smtcore/smt_setup.go"
@@ -118412,7 +118412,7 @@
       "path": "src/smt/theory_array_base.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_array.go",
         "pkg/cmd/g3/main_test.go"
@@ -118680,7 +118680,7 @@
       "path": "src/smt/theory_array_full.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_array.go"
       ],
