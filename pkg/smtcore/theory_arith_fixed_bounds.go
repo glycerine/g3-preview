@@ -60,7 +60,7 @@ func (t *SMTLinearArithmeticTheory) propagateFixedSharedValues() (bool, error) {
 			continue
 		}
 		bound := simplex.RationalInfinitesimal(value)
-		t.derivedBounds = append(t.derivedBounds, smtArithmeticReplayBound{column, true, bound.Clone()}, smtArithmeticReplayBound{column, false, bound.Clone()})
+		t.derivedBounds = append(t.derivedBounds, smtArithmeticReplayBound{column: column, lower: true, value: bound.Clone()}, smtArithmeticReplayBound{column: column, lower: false, value: bound.Clone()})
 		progress = true
 	}
 	if progress {

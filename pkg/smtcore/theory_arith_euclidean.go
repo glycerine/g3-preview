@@ -39,9 +39,10 @@ func (t *SMTLinearArithmeticTheory) Close() error {
 }
 
 type smtArithmeticExpressionBound struct {
-	key   string
-	lower bool
-	value simplex.Infinitesimal
+	key         string
+	lower       bool
+	value       simplex.Infinitesimal
+	explanation *smtArithmeticBoundExplanation
 }
 
 type smtEuclideanDefinition struct {
@@ -50,15 +51,16 @@ type smtEuclideanDefinition struct {
 }
 
 type smtEuclideanBridge struct {
-	theory         *SMTLinearArithmeticTheory
-	tableau        *simplex.Solver
-	solver         *euclid.Solver
-	integers       *numeral.IntegerManager
-	numbers        []numeral.Int
-	variables      map[uint32]uint32
-	justifications []uint32
-	definitions    []smtEuclideanDefinition
-	refs           smtArithmeticDivisionCall
+	theory              *SMTLinearArithmeticTheory
+	tableau             *simplex.Solver
+	solver              *euclid.Solver
+	integers            *numeral.IntegerManager
+	numbers             []numeral.Int
+	variables           map[uint32]uint32
+	justifications      []uint32
+	normalizationBounds []simplex.ArithmeticBoundUse
+	definitions         []smtEuclideanDefinition
+	refs                smtArithmeticDivisionCall
 }
 
 func (b *smtEuclideanBridge) close() (result error) {
@@ -221,6 +223,7 @@ func (b *smtEuclideanBridge) assertEquations() error {
 }
 
 func (b *smtEuclideanBridge) congruence(expression ast.ASTHandle) (gcd, constant *big.Int, usable bool, result error) {
+	b.normalizationBounds = nil
 	arguments, err := b.monomials(expression)
 	if err != nil {
 		return nil, nil, false, err
@@ -287,6 +290,10 @@ func (b *smtEuclideanBridge) congruence(expression ast.ASTHandle) (gcd, constant
 		if int(j) >= len(b.justifications) || b.justifications[j] == simplex.NullVariable {
 			return nil, nil, false, ast.ErrASTDomain
 		}
+		column := b.justifications[j]
+		b.normalizationBounds = append(b.normalizationBounds,
+			simplex.ArithmeticBoundUse{Column: column, Lower: true},
+			simplex.ArithmeticBoundUse{Column: column, Lower: false})
 	}
 	if g.Cmp(big.NewInt(1)) == 0 {
 		return nil, nil, false, nil
@@ -366,7 +373,10 @@ func (t *SMTLinearArithmeticTheory) applyEuclideanSolver(tableau *simplex.Solver
 		}
 		if g.Sign() == 0 {
 			value := simplex.RationalInfinitesimal(new(big.Rat).SetInt(c))
-			pending = append(pending, smtArithmeticReplayBound{column, true, value.Clone()}, smtArithmeticReplayBound{column, false, value.Clone()})
+			explanation := smtArithmeticPlainBoundExplanation(tableau, b.normalizationBounds)
+			pending = append(pending,
+				smtArithmeticReplayBound{column: column, lower: true, value: value.Clone(), explanation: explanation},
+				smtArithmeticReplayBound{column: column, lower: false, value: value.Clone(), explanation: explanation})
 			continue
 		}
 		for _, isLower := range []bool{true, false} {
@@ -386,12 +396,15 @@ func (t *SMTLinearArithmeticTheory) applyEuclideanSolver(tableau *simplex.Solver
 			value := new(big.Int).Add(new(big.Int).Mul(g, integer), c)
 			bound := simplex.RationalInfinitesimal(new(big.Rat).SetInt(value))
 			if isLower && bound.Main.Cmp(&old.Main) > 0 || !isLower && bound.Main.Cmp(&old.Main) < 0 {
-				pending = append(pending, smtArithmeticReplayBound{column, isLower, bound})
+				uses := []simplex.ArithmeticBoundUse{{Column: column, Lower: isLower}}
+				uses = append(uses, b.normalizationBounds...)
+				explanation := smtArithmeticPlainBoundExplanation(tableau, uses)
+				pending = append(pending, smtArithmeticReplayBound{column: column, lower: isLower, value: bound, explanation: explanation})
 			}
 		}
 	}
 	for _, bound := range pending {
-		changed, err := smtTightenSimplexBound(tableau, bound.column, bound.lower, bound.value)
+		changed, err := smtTightenReplaySimplexBound(tableau, bound.column, bound.lower, bound.value, bound.explanation)
 		if err != nil {
 			return true, t.derivedBoundConflict()
 		}
@@ -405,7 +418,7 @@ func (t *SMTLinearArithmeticTheory) applyEuclideanSolver(tableau *simplex.Solver
 			if int(index) >= len(t.atoms) {
 				return false, ast.ErrASTDomain
 			}
-			t.expressionBounds = append(t.expressionBounds, smtArithmeticExpressionBound{smtArithmeticCoefficientKey(&t.atoms[index].form), bound.lower, bound.value.Clone()})
+			t.expressionBounds = append(t.expressionBounds, smtArithmeticExpressionBound{key: smtArithmeticCoefficientKey(&t.atoms[index].form), lower: bound.lower, value: bound.value.Clone(), explanation: bound.explanation})
 		}
 		t.statistics.euclideanBounds++
 		progress = true

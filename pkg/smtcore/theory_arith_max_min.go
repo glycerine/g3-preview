@@ -91,7 +91,7 @@ func (t *SMTLinearArithmeticTheory) maxMinNonlinearVariables() (bool, error) {
 			}
 			if result.Status == simplex.ArithmeticOptimized && !result.HasShared {
 				value := t.normalizeOptimizedBound(column, !maximize, result.Value.Clone())
-				pending = append(pending, smtArithmeticReplayBound{column, !maximize, value})
+				pending = append(pending, smtArithmeticReplayBound{column: column, lower: !maximize, value: value})
 			}
 		}
 	}

@@ -120,6 +120,7 @@ func TestSMTEuclideanBridgeCongruenceScopesProofsAndModels(t *testing.T) {
 								}
 								if rhs == 5 {
 									if enabled {
+										smtTestEuclideanBoundExplanations(t, theory)
 										key := ""
 										for _, atom := range theory.atoms {
 											if atom.left == doubled {
@@ -128,8 +129,20 @@ func TestSMTEuclideanBridgeCongruenceScopesProofsAndModels(t *testing.T) {
 											}
 										}
 										lower, upper := false, false
+										loosePremises := make(map[int32]bool)
+										for _, atom := range theory.atoms {
+											if atom.left == doubled {
+												loosePremises[NewSMTLiteral(atom.variable, false).Index()] = true
+												loosePremises[NewSMTLiteral(atom.variable, true).Index()] = true
+											}
+										}
 										for _, bound := range theory.expressionBounds {
 											if bound.key == key && bound.value.Main.Cmp(new(big.Rat).SetInt(doubleValue)) == 0 {
+												for _, dependency := range bound.explanation.dependencies {
+													if loosePremises[dependency.Literal] {
+														t.Fatal("zero-GCD bound retained an unnecessary old endpoint premise")
+													}
+												}
 												if bound.lower {
 													lower = true
 												} else {
@@ -167,6 +180,9 @@ func TestSMTEuclideanBridgeCongruenceScopesProofsAndModels(t *testing.T) {
 									if status != lbool.True {
 										t.Fatal("Euclidean replay bounds followed a stale column", status)
 									}
+									if enabled {
+										smtTestEuclideanBoundExplanations(t, theory)
+									}
 									astTestMust(t, s.Pop(1))
 								}
 								astTestMust(t, s.Pop(1))
@@ -190,6 +206,48 @@ func TestSMTEuclideanBridgeCongruenceScopesProofsAndModels(t *testing.T) {
 					}
 				}
 			}
+		}
+	}
+}
+
+func smtTestEuclideanBoundExplanations(t *testing.T, theory *SMTLinearArithmeticTheory) {
+	t.Helper()
+	var explanations []*smtArithmeticBoundExplanation
+	for _, bound := range theory.derivedBounds {
+		explanations = append(explanations, bound.explanation)
+		if _, known := theory.solver.BoundDependencies(bound.column, bound.lower); !known {
+			t.Fatal("original column lost replay premises")
+		}
+	}
+	for _, bound := range theory.expressionBounds {
+		explanations = append(explanations, bound.explanation)
+		found := false
+		for i, atom := range theory.atoms {
+			if atom.supported && smtArithmeticCoefficientKey(&atom.form) == bound.key {
+				if _, known := theory.solver.BoundDependencies(theory.nextSimplex+uint32(i), bound.lower); !known {
+					t.Fatal("comparison column lost replay premises")
+				}
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatal("derived comparison polynomial disappeared")
+		}
+	}
+	if len(explanations) == 0 {
+		t.Fatal("no Euclidean derived bounds")
+	}
+	for _, explanation := range explanations {
+		if explanation == nil || len(explanation.dependencies) == 0 {
+			t.Fatal("Euclidean bound lost its premises")
+		}
+		seen := make(map[int32]bool)
+		for _, dependency := range explanation.dependencies {
+			if seen[dependency.Literal] || dependency.Coefficient.Cmp(big.NewRat(1, 1)) != 0 {
+				t.Fatal("plain derived bound retained duplicate or weighted premise", dependency)
+			}
+			seen[dependency.Literal] = true
 		}
 	}
 }

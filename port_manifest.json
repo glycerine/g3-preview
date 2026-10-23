@@ -113532,7 +113532,8 @@
         "TestSMTArithmeticReplayBoundDependenciesAndScaling",
         "TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions",
         "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
-        "TestASTParameterRatExactOwningCopy"
+        "TestASTParameterRatExactOwningCopy",
+        "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays"
       ],
       "conditionals": [
         {
@@ -114106,7 +114107,8 @@
         "TestSMTArithmeticReplayBoundDependenciesAndScaling",
         "TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions",
         "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
-        "TestASTParameterRatExactOwningCopy"
+        "TestASTParameterRatExactOwningCopy",
+        "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays"
       ],
       "conditionals": [
         {
@@ -115593,11 +115595,16 @@
           ]
         },
         {
-          "name": "Euclidean bridge proof dependency and optional coefficient refinement remains incomplete",
+          "name": "Euclidean plain-derived bound proof dependencies preserve the old endpoint and Normalize fixed-equation premises; explanation chains through other derived-bound producers remain incomplete",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_euclidean.go",
           "tests": [
-            "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
+            "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels",
+            "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays"
+          ],
+          "go_targets": [
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_bound_dependency_test.go"
           ]
         },
         {
@@ -115630,7 +115637,7 @@
           ]
         },
         {
-          "name": "apply_euclidean_solver option wiring, theory-owned numeral manager, scoped numeric bound propagation and comparison-expression replay",
+          "name": "apply_euclidean_solver option wiring, theory-owned numeral manager, scoped numeric bounds and premise propagation through comparison-expression replay",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_euclidean.go",
           "go_targets": [
@@ -115640,6 +115647,19 @@
             "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Euclidean mk_bound plain derived-bound semantics: collect Normalize equation lower and upper premises, include the old endpoint only for nonzero GCD, deduplicate literals, discard stored multipliers, and preserve explanations across replay column shifts and scope pops",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_euclidean.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_bound_dependency_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays",
+            "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
           ]
         }
       ],

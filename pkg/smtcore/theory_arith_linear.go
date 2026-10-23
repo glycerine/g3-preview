@@ -1169,12 +1169,12 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 		if !found {
 			return nil, lbool.Undef, ast.ErrASTDomain
 		}
-		if _, err := smtTightenSimplexBound(solver, base, bound.lower, bound.value); err != nil {
+		if _, err := smtTightenReplaySimplexBound(solver, base, bound.lower, bound.value, bound.explanation); err != nil {
 			return solver, lbool.False, nil
 		}
 	}
 	for _, bound := range t.derivedBounds {
-		if _, err := smtTightenSimplexBound(solver, bound.column, bound.lower, bound.value); err != nil {
+		if _, err := smtTightenReplaySimplexBound(solver, bound.column, bound.lower, bound.value, bound.explanation); err != nil {
 			return solver, lbool.False, nil
 		}
 	}

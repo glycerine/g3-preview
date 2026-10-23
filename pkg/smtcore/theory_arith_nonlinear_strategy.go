@@ -9,9 +9,10 @@ import (
 )
 
 type smtArithmeticReplayBound struct {
-	column uint32
-	lower  bool
-	value  simplex.Infinitesimal
+	column      uint32
+	lower       bool
+	value       simplex.Infinitesimal
+	explanation *smtArithmeticBoundExplanation
 }
 
 func smtTightenSimplexBound(solver *simplex.Solver, column uint32, lower bool, value simplex.Infinitesimal) (bool, error) {
@@ -49,7 +50,7 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearStrategyBounds() (bool, er
 	for _, column := range t.simplexVariables {
 		lower, hasLower := solver.Lower(column)
 		upper, hasUpper := solver.Upper(column)
-		before[column] = [2]smtArithmeticReplayBound{{column, true, lower}, {column, false, upper}}
+		before[column] = [2]smtArithmeticReplayBound{{column: column, lower: true, value: lower}, {column: column, lower: false, value: upper}}
 		valid[column] = [2]bool{hasLower, hasUpper}
 	}
 	conflict, err := t.propagateArithmeticRowBounds(solver)
@@ -92,7 +93,7 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearStrategyBounds() (bool, er
 			if valid[column][index] && (lower && value.Cmp(&old.value) <= 0 || !lower && value.Cmp(&old.value) >= 0) {
 				continue
 			}
-			t.derivedBounds = append(t.derivedBounds, smtArithmeticReplayBound{column, lower, value.Clone()})
+			t.derivedBounds = append(t.derivedBounds, smtArithmeticReplayBound{column: column, lower: lower, value: value.Clone()})
 			progress = true
 		}
 	}

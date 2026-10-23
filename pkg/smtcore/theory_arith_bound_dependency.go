@@ -9,6 +9,39 @@ import (
 	"github.com/glycerine/g3/pkg/math/simplex"
 )
 
+type smtArithmeticBoundExplanation struct {
+	dependencies []simplex.BoundDependency
+}
+
+// Euclidean mk_bound creates a plain derived_bound. Its accumulator deduplicates
+// premises and discards their old multipliers; a later push_justification uses
+// the caller's coefficient once for each retained premise.
+func smtArithmeticPlainBoundExplanation(solver *simplex.Solver, uses []simplex.ArithmeticBoundUse) *smtArithmeticBoundExplanation {
+	result := &smtArithmeticBoundExplanation{}
+	seen := make(map[int32]bool)
+	for _, use := range uses {
+		dependencies, known := solver.BoundDependencies(use.Column, use.Lower)
+		if !known {
+			return nil
+		}
+		for _, dependency := range dependencies {
+			if seen[dependency.Literal] {
+				continue
+			}
+			seen[dependency.Literal] = true
+			result.dependencies = append(result.dependencies, simplex.BoundDependency{Literal: dependency.Literal, Coefficient: *big.NewRat(1, 1)})
+		}
+	}
+	return result
+}
+
+func smtTightenReplaySimplexBound(solver *simplex.Solver, column uint32, lower bool, value simplex.Infinitesimal, explanation *smtArithmeticBoundExplanation) (bool, error) {
+	if explanation == nil {
+		return smtTightenSimplexBound(solver, column, lower, value)
+	}
+	return smtTightenExplainedSimplexBound(solver, column, lower, value, explanation.dependencies)
+}
+
 func smtTightenExplainedSimplexBound(solver *simplex.Solver, column uint32, lower bool, value simplex.Infinitesimal, dependencies []simplex.BoundDependency) (bool, error) {
 	if lower {
 		if old, found := solver.Lower(column); found && value.Cmp(&old) <= 0 {

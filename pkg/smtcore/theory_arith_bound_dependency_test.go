@@ -140,3 +140,35 @@ func TestSMTArithmeticAntecedentParameterOrderAndOwnership(t *testing.T) {
 		t.Fatal("released parameter remained live", err)
 	}
 }
+
+func TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays(t *testing.T) {
+	solver := simplex.NewSolver(nil)
+	low := simplex.RationalInfinitesimal(big.NewRat(1, 1))
+	high := simplex.RationalInfinitesimal(big.NewRat(3, 1))
+	literal := NewSMTLiteral(7, false).Index()
+	dependencies := []simplex.BoundDependency{{Literal: literal, Coefficient: *big.NewRat(-5, 3)}}
+	astTestMust(t, solver.SetLowerWithDependencies(1, low, dependencies))
+	astTestMust(t, solver.SetUpperWithDependencies(1, high, dependencies))
+	uses := []simplex.ArithmeticBoundUse{{Column: 1, Lower: true}, {Column: 1, Lower: false}}
+	explanation := smtArithmeticPlainBoundExplanation(solver, uses)
+	if explanation == nil || len(explanation.dependencies) != 1 || explanation.dependencies[0].Literal != literal || explanation.dependencies[0].Coefficient.Cmp(big.NewRat(1, 1)) != 0 {
+		t.Fatal("plain derived reason", explanation)
+	}
+	// The derived bound owns flattened premises independently of its old
+	// endpoints, and applies a later caller coefficient exactly once.
+	solver.UnsetLower(1)
+	solver.UnsetUpper(1)
+	changed, err := smtTightenReplaySimplexBound(solver, 2, true, high, explanation)
+	astTestMust(t, err)
+	if !changed {
+		t.Fatal("derived bound not installed")
+	}
+	ante, known, err := smtArithmeticExplainBounds(solver, []simplex.ArithmeticBoundUse{{Column: 2, Lower: true, Coefficient: *big.NewRat(11, 13)}}, true)
+	astTestMust(t, err)
+	if !known || len(ante.literals) != 1 || ante.literalCoefficients[0].Cmp(big.NewRat(11, 13)) != 0 {
+		t.Fatal("derived-bound caller coefficient", ante, known)
+	}
+	if reason := smtArithmeticPlainBoundExplanation(solver, uses); reason != nil {
+		t.Fatal("unexplained endpoint became a logical premise")
+	}
+}
