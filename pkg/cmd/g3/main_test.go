@@ -10,6 +10,12 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"basic_graph_integer.smt2":                  "sat\n((i 1))\nunsat\nsat\n((i 1))\n",
+	"basic_graph_real.smt2":                     "sat\n(((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\nunsat\nsat\n(((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\n",
+	"basic_dense_mixed.smt2":                    "sat\n(((>= i 0) true) ((<= i 1) true) ((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\nunsat\nsat\n(((>= i 0) true) ((<= i 1) true) ((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\n",
+	"basic_disabled_arithmetic_scopes.smt2":     "sat\n((p true))\nunknown\nsat\n((p true))\n",
+	"basic_graph_mixed_model_refusal.smt2":      "unknown\n",
+	"basic_unknown_first_push_dense.smt2":       "sat\n((r (/ 1.0 3.0)))\nunsat\nsat\n((r (/ 1.0 3.0)))\n",
 	"ufidl_congruence_equality_bounds.smt2":     "sat\n(((>= (f u) 3) true) ((<= (f v) 2) true) ((distinct u v) true))\nunsat\nsat\n(((>= (f u) 3) true) ((<= (f v) 2) true) ((distinct u v) true))\n",
 	"ufidl_dense_model_scopes.smt2":             "sat\n((x 6) (y 2))\nunsat\nsat\n((x 6) (y 2))\n",
 	"ufidl_congruence_models.smt2":              "sat\n(((f x) 5) ((f y) 7) ((distinct x y) true))\nunsat\nsat\n(((f x) 5) ((f y) 7) ((distinct x y) true))\n",

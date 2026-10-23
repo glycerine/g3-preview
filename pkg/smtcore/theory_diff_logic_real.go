@@ -14,6 +14,7 @@ import (
 // for strict real complements.
 type SMTRealDiffTheory struct {
 	*SMTIntegerDiffTheory
+	mixed             bool
 	realGraph         *SMTInfRationalDiffGraph
 	realZero          SMTTheoryVar
 	realAtoms         []smtIntegerDiffAtom
@@ -36,6 +37,16 @@ func NewSMTRealDiffTheory(family ast.FamilyID) (*SMTRealDiffTheory, error) {
 		realZero:             SMTNullTheoryVar,
 		realAtomByBool:       make(map[int32]int),
 	}, nil
+}
+
+// The concrete mi_ext graph uses the same infinitesimal rational values, but
+// integer atoms use a unit strict-complement step and publish Int numerals.
+func NewSMTMixedDiffTheory(family ast.FamilyID) (*SMTRealDiffTheory, error) {
+	t, err := NewSMTRealDiffTheory(family)
+	if err == nil {
+		t.mixed = true
+	}
+	return t, err
 }
 
 func (t *SMTRealDiffTheory) Initialize(state *SMTInternalizerState) error {
@@ -93,8 +104,14 @@ func (t *SMTRealDiffTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHand
 		return err
 	}
 	if !real {
-		t.realNonDifference = true
-		return nil
+		integer, err := t.integerSort(sort)
+		if err != nil {
+			return err
+		}
+		if !t.mixed || !integer {
+			t.realNonDifference = true
+			return nil
+		}
 	}
 	_, err = t.createRealVariable(node)
 	return err
@@ -216,7 +233,7 @@ func (t *SMTRealDiffTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		return false, err
 	}
 	if numeral {
-		if value.Sign() == 0 {
+		if value.Sign() == 0 && !t.mixed {
 			return true, nil
 		}
 		node, mkErr := state.MkEnode(expression, false, false, true)
@@ -380,7 +397,22 @@ func (t *SMTRealDiffTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (b
 	}
 	var negativeWeight smtInfRational
 	negativeWeight.Neg(&weight)
-	negativeWeight.infinitesimal.Sub(&negativeWeight.infinitesimal, big.NewRat(1, 1))
+	integer := false
+	if t.mixed {
+		sort, err := state.manager.GetSort(lhs)
+		if err != nil {
+			return false, err
+		}
+		integer, err = t.integerSort(sort)
+		if err != nil {
+			return false, err
+		}
+	}
+	if integer {
+		negativeWeight.rational.Sub(&negativeWeight.rational, big.NewRat(1, 1))
+	} else {
+		negativeWeight.infinitesimal.Sub(&negativeWeight.infinitesimal, big.NewRat(1, 1))
+	}
 	negative, err := t.realGraph.AddEdge(int32(target), int32(source), &negativeWeight, literal.Negated())
 	if err != nil {
 		return false, err
@@ -495,6 +527,29 @@ func (t *SMTRealDiffTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if t.realNonDifference {
 		return SMTFinalCheckGiveUp, nil
 	}
+	if t.mixed {
+		t.computeModelDelta()
+		for v, node := range t.variables {
+			sort, err := t.state.manager.GetSort(node.owner)
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			integer, err := t.integerSort(sort)
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			if integer {
+				var scaled, value big.Rat
+				scaled.Mul(&t.delta, &t.realGraph.assignment[v].infinitesimal)
+				value.Add(&t.realGraph.assignment[v].rational, &scaled)
+				// The source rejects a fractional arithmetic-factory Int value.
+				// Detect that model failure before publication.
+				if !value.IsInt() {
+					return SMTFinalCheckGiveUp, nil
+				}
+			}
+		}
+	}
 	return SMTFinalCheckDone, nil
 }
 
@@ -514,6 +569,19 @@ func (t *SMTRealDiffTheory) InternalizeEquality(expression ast.ASTHandle, variab
 	left, err := state.manager.GetArg(expression, 0)
 	if err != nil {
 		return err
+	}
+	if t.mixed {
+		sort, err := state.manager.GetSort(left)
+		if err != nil {
+			return err
+		}
+		integer, err := t.integerSort(sort)
+		if err != nil {
+			return err
+		}
+		if integer {
+			return t.SMTIntegerDiffTheory.InternalizeEquality(expression, variable)
+		}
 	}
 	right, err := state.manager.GetArg(expression, 1)
 	if err != nil {
@@ -589,7 +657,12 @@ func (t *SMTRealDiffTheory) Graph() *SMTInfRationalDiffGraph {
 	return t.realGraph
 }
 
-func (*SMTRealDiffTheory) Name() string { return "real-difference-logic" }
+func (t *SMTRealDiffTheory) Name() string {
+	if t.mixed {
+		return "mixed-difference-logic"
+	}
+	return "real-difference-logic"
+}
 
 func (t *SMTRealDiffTheory) InitializeModel(generator *SMTModelGenerator) error {
 	if t == nil || generator == nil {
@@ -602,28 +675,7 @@ func (t *SMTRealDiffTheory) InitializeModel(generator *SMTModelGenerator) error 
 	if generator.manager != state.manager {
 		return ast.ErrASTDomain
 	}
-	t.delta.SetInt64(1)
-	for index := range t.realGraph.edges {
-		edge := &t.realGraph.edges[index]
-		if !edge.enabled {
-			continue
-		}
-		target := &t.realGraph.assignment[edge.target]
-		source := &t.realGraph.assignment[edge.source]
-		var rationalLimit, infinitesimalLimit big.Rat
-		rationalLimit.Add(&source.rational, &edge.weight.rational)
-		infinitesimalLimit.Add(&source.infinitesimal, &edge.weight.infinitesimal)
-		if target.rational.Cmp(&rationalLimit) >= 0 || target.infinitesimal.Cmp(&infinitesimalLimit) <= 0 {
-			continue
-		}
-		var numerator, denominator, candidate big.Rat
-		numerator.Sub(&rationalLimit, &target.rational)
-		denominator.Sub(&target.infinitesimal, &infinitesimalLimit)
-		candidate.Quo(&numerator, &denominator)
-		if candidate.Cmp(&t.delta) < 0 {
-			t.delta.Set(&candidate)
-		}
-	}
+	t.computeModelDelta()
 	factory, err := protomodel.NewArithmeticFactory(state.manager)
 	if err != nil {
 		return err
@@ -650,9 +702,45 @@ func (t *SMTRealDiffTheory) ModelValue(node *SMTEnode, generator *SMTModelGenera
 	var scaled, value big.Rat
 	scaled.Mul(&t.delta, &assignment.infinitesimal)
 	value.Add(&assignment.rational, &scaled)
-	numeral, err := state.manager.ArithmeticNumeralRat(&value, false)
+	integer := false
+	if t.mixed {
+		sort, err := state.manager.GetSort(node.owner)
+		if err != nil {
+			return nil, err
+		}
+		integer, err = t.integerSort(sort)
+		if err != nil {
+			return nil, err
+		}
+	}
+	numeral, err := state.manager.ArithmeticNumeralRat(&value, integer)
 	if err != nil {
 		return nil, err
 	}
 	return NewSMTExpressionValueProcedure(numeral)
+}
+
+func (t *SMTRealDiffTheory) computeModelDelta() {
+	t.delta.SetInt64(1)
+	for index := range t.realGraph.edges {
+		edge := &t.realGraph.edges[index]
+		if !edge.enabled {
+			continue
+		}
+		target := &t.realGraph.assignment[edge.target]
+		source := &t.realGraph.assignment[edge.source]
+		var rationalLimit, infinitesimalLimit big.Rat
+		rationalLimit.Add(&source.rational, &edge.weight.rational)
+		infinitesimalLimit.Add(&source.infinitesimal, &edge.weight.infinitesimal)
+		if target.rational.Cmp(&rationalLimit) >= 0 || target.infinitesimal.Cmp(&infinitesimalLimit) <= 0 {
+			continue
+		}
+		var numerator, denominator, candidate big.Rat
+		numerator.Sub(&rationalLimit, &target.rational)
+		denominator.Sub(&target.infinitesimal, &infinitesimalLimit)
+		candidate.Quo(&numerator, &denominator)
+		if candidate.Cmp(&t.delta) < 0 {
+			t.delta.Set(&candidate)
+		}
+	}
 }

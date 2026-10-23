@@ -106,9 +106,22 @@ func (k *SMTKernel) replaceUnusedSetupArithmetic(theory SMTTheoryInternalizer) e
 	if err != nil {
 		return err
 	}
+	if theory == nil || theory.FamilyID() != family {
+		return ast.ErrASTDomain
+	}
 	s := k.internalizer
-	old, ok := s.theories[family].(*SMTLinearArithmeticTheory)
-	if !ok || theory == nil || theory.FamilyID() != family || len(old.variables) != 0 || len(s.scopes) != 0 || s.theoriesSetup {
+	old := s.theories[family]
+	if old == nil {
+		return k.RegisterTheory(theory)
+	}
+	unused := false
+	switch previous := old.(type) {
+	case *SMTLinearArithmeticTheory:
+		unused = len(previous.variables) == 0
+	case *SMTDummyTheory:
+		unused = len(previous.variables) == 0 && !previous.theoryExprs
+	}
+	if !unused || len(s.scopes) != 0 || s.theoriesSetup {
 		return ast.ErrASTDomain
 	}
 	position := -1
@@ -124,8 +137,10 @@ func (k *SMTKernel) replaceUnusedSetupArithmetic(theory SMTTheoryInternalizer) e
 	if err := theory.Initialize(s); err != nil {
 		return err
 	}
-	if err := old.Close(); err != nil {
-		return err
+	if closer, ok := old.(interface{ Close() error }); ok {
+		if err := closer.Close(); err != nil {
+			return err
+		}
 	}
 	s.theories[family] = theory
 	s.theoryOrder[position] = theory

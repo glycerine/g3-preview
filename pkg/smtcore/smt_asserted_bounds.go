@@ -18,8 +18,16 @@ func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 		return nil
 	}
 	if !k.smtState.AutoConfig {
+		if err := k.setupBasicArithmetic(); err != nil {
+			return err
+		}
 		k.preprocessingSetupDone = true
 		return nil
+	}
+	if !useStaticFeatures && smtLogicUsesUnknownSetup(k.setupLogic) {
+		if err := k.setupBasicArithmetic(); err != nil {
+			return err
+		}
 	}
 	if err := k.setupBitVectorLogicPolicy(); err != nil {
 		return err
