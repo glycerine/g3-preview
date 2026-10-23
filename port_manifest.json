@@ -113350,7 +113350,10 @@
       "go_targets": [
         "pkg/smtcore/theory_arith_tableau.go",
         "pkg/smtcore/theory_arith_bounds.go",
-        "pkg/smtcore/theory_arith_linear.go"
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/smtcore/theory_arith_fixed_bounds.go",
+        "pkg/smtcore/theory_arith_equality_guards_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTArithmeticRowHoleReusePositionsAndLCM",
@@ -113368,7 +113371,12 @@
         "TestSMTSolverLinearArithmeticEqualityAdapter",
         "TestSMTSolverUFLinearArithmeticCongruence",
         "TestSMTLinearArithmeticStandaloneTermDefinition",
-        "TestSMTLinearArithmeticEqualDefinitionRows"
+        "TestSMTLinearArithmeticEqualDefinitionRows",
+        "TestSMTArithmeticEqualityPropagationHonorsConfigurationAndConflictThreshold",
+        "TestSMTArithmeticEqualityConflictThresholdSurvivesPopAndResetsForSearch",
+        "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -113519,9 +113527,28 @@
             "TestSMTSolverLinearArithmeticEqualityAdapter",
             "TestSMTSolverUFLinearArithmeticCongruence"
           ]
+        },
+        {
+          "name": "propagate_eqs guard for retained fixed and implied arithmetic equalities: honor PropagateEqs and the per-search conflict threshold, count logical arithmetic conflicts separately from cumulative statistics, retain the count across pop/restart, and reset it on init_search_eh",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_fixed_bounds.go",
+            "pkg/smtcore/theory_arith_equality_guards_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticEqualityPropagationHonorsConfigurationAndConflictThreshold",
+            "TestSMTArithmeticEqualityConflictThresholdSurvivesPopAndResetsForSearch",
+            "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate."
+      ],
       "deviations": []
     },
     {
@@ -114173,7 +114200,9 @@
         "pkg/math/simplex/arith_row_conflict_test.go",
         "pkg/smtcore/theory_arith_row_conflict_test.go",
         "pkg/smtcore/theory_arith_pending_bounds.go",
-        "pkg/smtcore/theory_arith_pending_bounds_test.go"
+        "pkg/smtcore/theory_arith_pending_bounds_test.go",
+        "pkg/smtcore/theory_arith_equality_guards_test.go",
+        "pkg/smtcore/theory_arith_grobner.go"
       ],
       "tests": [
         "TestSMTArithmeticTableauAddRowEntryAndDuplicateMerge",
@@ -114216,7 +114245,10 @@
         "TestArithmeticRowConflictSignedBasesAndRelaxationBudget",
         "TestArithmeticRowConflictStrictGapAndUnknownPremises",
         "TestSMTArithmeticInfeasibleRowsUseScopedRelaxedProofPremises",
-        "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes"
+        "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes",
+        "TestSMTArithmeticEqualityPropagationHonorsConfigurationAndConflictThreshold",
+        "TestSMTArithmeticEqualityConflictThresholdSurvivesPopAndResetsForSearch",
+        "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation"
       ],
       "conditionals": [
         {
@@ -115195,13 +115227,31 @@
           "tests": [
             "TestSMTSharedArithmeticFixedRowsScopedProofs"
           ]
+        },
+        {
+          "name": "propagate_eqs guard for retained fixed and implied arithmetic equalities: honor PropagateEqs and the per-search conflict threshold, count logical arithmetic conflicts separately from cumulative statistics, retain the count across pop/restart, and reset it on init_search_eh",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_fixed_bounds.go",
+            "pkg/smtcore/theory_arith_equality_guards_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticEqualityPropagationHonorsConfigurationAndConflictThreshold",
+            "TestSMTArithmeticEqualityConflictThresholdSurvivesPopAndResetsForSearch",
+            "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification.",
         "Division application markers follow theory scopes. Concrete division calls pin generated arithmetic and Boolean terms through recursive axiom internalization. The disabled constant-modulus enumeration option has no active retained setter and is not translated.",
         "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop.",
-        "Shared fixed-value equality propagation now expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the previous conservative fallback; other offset equality propagation and the source fixed-variable table/event integration remain partial."
+        "Shared fixed-value equality propagation now expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the previous conservative fallback; other offset equality propagation and the source fixed-variable table/event integration remain partial.",
+        "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate."
       ],
       "deviations": [
         "Affine definition-bound propagation evaluates retained replay rows before and after nonlinear interval propagation, including sign reversal for negated-square aliases. General row scheduling, propagation to every row variable, and minimal row-bound explanations remain incomplete.",
@@ -115253,7 +115303,8 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/theory_arith_fixed_bounds.go",
         "pkg/smtcore/theory_arith_fixed_bounds_test.go",
-        "pkg/smtcore/theory_arith_bound_dependency.go"
+        "pkg/smtcore/theory_arith_bound_dependency.go",
+        "pkg/smtcore/theory_arith_equality_guards_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
@@ -115264,7 +115315,10 @@
         "TestSMTMixedArithmeticCastsScopedProofs",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestSMTSharedArithmeticFixedRowsScopedProofs"
+        "TestSMTSharedArithmeticFixedRowsScopedProofs",
+        "TestSMTArithmeticEqualityPropagationHonorsConfigurationAndConflictThreshold",
+        "TestSMTArithmeticEqualityConflictThresholdSurvivesPopAndResetsForSearch",
+        "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation"
       ],
       "conditionals": [
         {
@@ -115403,11 +115457,29 @@
           "tests": [
             "TestSMTSharedArithmeticFixedRowsScopedProofs"
           ]
+        },
+        {
+          "name": "propagate_eqs guard for retained fixed and implied arithmetic equalities: honor PropagateEqs and the per-search conflict threshold, count logical arithmetic conflicts separately from cumulative statistics, retain the count across pop/restart, and reset it on init_search_eh",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_fixed_bounds.go",
+            "pkg/smtcore/theory_arith_equality_guards_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticEqualityPropagationHonorsConfigurationAndConflictThreshold",
+            "TestSMTArithmeticEqualityConflictThresholdSurvivesPopAndResetsForSearch",
+            "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification.",
-        "Shared fixed-value equality propagation now expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the previous conservative fallback; other offset equality propagation and the source fixed-variable table/event integration remain partial."
+        "Shared fixed-value equality propagation now expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the previous conservative fallback; other offset equality propagation and the source fixed-variable table/event integration remain partial.",
+        "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate."
       ],
       "deviations": [
         "The linear specialization recognizes active opposite bound pairs, substitutes fixed monomials, and compares affine definition rows directly instead of maintaining the source row-id offset index."

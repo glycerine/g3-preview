@@ -46,7 +46,7 @@ func (t *SMTLinearArithmeticTheory) arithmeticIntervalConflict(interval *smtOldI
 	if len(literals) == 0 {
 		return t.derivedBoundConflict(nil)
 	}
-	t.statistics.conflicts++
+	t.recordArithmeticConflict()
 	return t.state.SetTheoryConflict(t.FamilyID(), literals)
 }
 

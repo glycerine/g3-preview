@@ -79,6 +79,6 @@ func (t *SMTLinearArithmeticTheory) arithmeticGCDConflict(solver *simplex.Solver
 		return err
 	}
 	defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(m, parameters)) }()
-	t.statistics.conflicts++
+	t.recordArithmeticConflict()
 	return t.state.SetTheoryConflict(t.FamilyID(), antecedents.literals, parameters...)
 }

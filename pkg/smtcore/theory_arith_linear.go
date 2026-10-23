@@ -114,6 +114,9 @@ type smtLinearArithmeticStatistics struct {
 // bounds. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	propagateEqualities                  bool
+	propagationThreshold                 uint32
+	conflictCount                        uint32
 	pendingBounds                        []smtArithmeticReplayBound
 	pendingBoundHead                     int
 	strongerLemmas                       bool
@@ -189,6 +192,8 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		return nil, err
 	}
 	t := &SMTLinearArithmeticTheory{
+		propagateEqualities:   true,
+		propagationThreshold:  ^uint32(0),
 		strongerLemmas:        true,
 		branchCutRatio:        2,
 		gcdEnabled:            true,
@@ -223,6 +228,8 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 		return ast.ErrASTHandle
 	}
 	t.equalityAdapter.lazy = config.LazyAdapter
+	t.propagateEqualities = config.PropagateEqs
+	t.propagationThreshold = config.PropagationThreshold
 	t.strongerLemmas = config.StrongerLemmas
 	t.gcdEnabled = config.GCDTest
 	t.ignoreIntegers = config.IgnoreInt
@@ -899,6 +906,9 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	if !t.canPropagateArithmeticEqualities() {
+		return false, nil
+	}
 	for firstIndex, firstAssertion := range t.assertions {
 		firstAtom := &t.atoms[firstAssertion.atom]
 		firstForm, firstOK := smtLinearNormalizedLE(firstAtom, firstAssertion)
@@ -1303,7 +1313,7 @@ func (t *SMTLinearArithmeticTheory) Propagate() error {
 	for _, assertion := range t.assertions {
 		atom := &t.atoms[assertion.atom]
 		if atom.decided && assertion.truth != atom.required {
-			t.statistics.conflicts++
+			t.recordArithmeticConflict()
 			literal := smtLinearAssertionLiteral(atom, assertion)
 			return state.SetTheoryConflict(t.FamilyID(), []SMTLiteral{literal})
 		}
@@ -1312,7 +1322,7 @@ func (t *SMTLinearArithmeticTheory) Propagate() error {
 	if err != nil || feasible || state.inconsistent {
 		return err
 	}
-	t.statistics.conflicts++
+	t.recordArithmeticConflict()
 	literals := make([]SMTLiteral, 0, len(t.assertions))
 	for _, assertion := range t.assertions {
 		literal := NewSMTLiteral(t.atoms[assertion.atom].variable, false)
@@ -1737,7 +1747,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions(validated bool) (bo
 			if truth == assertion.truth {
 				continue
 			}
-			t.statistics.conflicts++
+			t.recordArithmeticConflict()
 			literals := []SMTLiteral{smtLinearAssertionLiteral(atom, assertion)}
 			literals = append(literals, leftLiterals...)
 			literals = append(literals, rightLiterals...)
@@ -1772,7 +1782,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions(validated bool) (bo
 		if !refuted {
 			return false, false, nil
 		}
-		t.statistics.conflicts++
+		t.recordArithmeticConflict()
 		literals := []SMTLiteral{smtLinearAssertionLiteral(atom, assertion)}
 		for _, linearAssertion := range t.assertions {
 			linearAtom := &t.atoms[linearAssertion.atom]
@@ -1789,10 +1799,22 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearAssertions(validated bool) (bo
 }
 
 func (t *SMTLinearArithmeticTheory) InitializeSearch() error {
+	t.conflictCount = 0
 	t.finalCheckIndex = 0
 	t.nonlinearStrategy = 0
 	t.nonlinearGBExhausted = false
 	return t.equalityAdapter.InitializeSearch()
+}
+
+// Source m_num_conflicts is per search and is not restored by scope pops.
+// Lifetime statistics remain cumulative across searches.
+func (t *SMTLinearArithmeticTheory) recordArithmeticConflict() {
+	t.statistics.conflicts++
+	t.conflictCount++
+}
+
+func (t *SMTLinearArithmeticTheory) canPropagateArithmeticEqualities() bool {
+	return t.propagateEqualities && t.conflictCount < t.propagationThreshold
 }
 func (t *SMTLinearArithmeticTheory) Restart() error { return t.equalityAdapter.Restart() }
 

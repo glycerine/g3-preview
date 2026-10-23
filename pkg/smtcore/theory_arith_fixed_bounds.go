@@ -92,6 +92,9 @@ func (t *SMTLinearArithmeticTheory) propagateFixedSharedValues() (bool, error) {
 // Source theory_arith_eq.h fixed_var_eh pushes four endpoint justifications
 // in this order, using zero coefficients for its equality proof rule.
 func (t *SMTLinearArithmeticTheory) propagateFixedEquality(solver *simplex.Solver, first, second uint32) (progress bool, result error) {
+	if !t.canPropagateArithmeticEqualities() {
+		return false, nil
+	}
 	proofs, err := t.state.manager.ProofsEnabled()
 	if err != nil {
 		return false, err

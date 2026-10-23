@@ -323,7 +323,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 		for _, assertion := range t.assertions {
 			literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
 		}
-		t.statistics.conflicts++
+		t.recordArithmeticConflict()
 		err = t.state.SetTheoryConflict(t.FamilyID(), literals)
 	}
 	return conflict, err

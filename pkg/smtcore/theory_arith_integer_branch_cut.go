@@ -186,7 +186,7 @@ func (t *SMTLinearArithmeticTheory) gomoryIntegerColumn(column uint32) (result e
 	}
 	defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(m, parameters)) }()
 	if cut.Conflict {
-		t.statistics.conflicts++
+		t.recordArithmeticConflict()
 		return t.state.SetTheoryConflict(t.FamilyID(), antecedents.literals, parameters...)
 	}
 	var bound ast.ASTHandle

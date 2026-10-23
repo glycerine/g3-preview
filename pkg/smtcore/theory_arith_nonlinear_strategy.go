@@ -60,7 +60,7 @@ func (t *SMTLinearArithmeticTheory) derivedBoundConflict(solver *simplex.Solver)
 				return err
 			}
 			defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(t.state.manager, parameters)) }()
-			t.statistics.conflicts++
+			t.recordArithmeticConflict()
 			return t.state.SetTheoryConflict(t.FamilyID(), antecedents.literals, parameters...)
 		}
 	}
@@ -68,7 +68,7 @@ func (t *SMTLinearArithmeticTheory) derivedBoundConflict(solver *simplex.Solver)
 	for _, assertion := range t.assertions {
 		literals = append(literals, smtLinearAssertionLiteral(&t.atoms[assertion.atom], assertion))
 	}
-	t.statistics.conflicts++
+	t.recordArithmeticConflict()
 	return t.state.SetTheoryConflict(t.FamilyID(), literals)
 }
 
