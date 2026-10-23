@@ -110216,9 +110216,11 @@
         "TestSMTSolverReasonUnknownUsesKernelFailure",
         "TestSMTSolverPublishesRelevantLabelsInInternalizationOrder",
         "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
+        "TestSMTSolverTranslatesWithinManager",
         "TestSMTSolverSetupUsesLinearRealArithmetic",
         "TestSMTSolverLinearArithmeticRejectsNonlinearTerms",
         "TestSMTSolverForwardsFastProgressSamples",
+        "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals",
         "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
       ],
       "assertions": [
@@ -110268,10 +110270,11 @@
         },
         {
           "name": "base-level kernel assertion, proof, named-assertion, logic, and configuration translation",
-          "status": "partial",
+        "status": "ported",
           "go_target": "pkg/smtcore/smt_solver.go",
           "tests": [
             "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
+          "TestSMTSolverTranslatesWithinManager",
             "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
           ]
         },
@@ -110308,12 +110311,26 @@
             "TestSMTSolverFindsBinaryClauseMutexes"
           ]
         },
-        {
-          "name": "registered theory-plugin copying, timed slow progress sampling, and unsat-core minimization and pattern extension",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
-        }
+      {
+        "name": "timed slow progress sampling",
+        "status": "ported",
+        "go_target": "pkg/smtcore/smt_search.go",
+        "tests": [
+          "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals"
+        ]
+      },
+      {
+        "name": "registered theory-plugin copying",
+        "status": "unported",
+        "go_target": null,
+        "tests": []
+      },
+      {
+        "name": "unsat-core minimization and pattern extension",
+        "status": "unported",
+        "go_target": null,
+        "tests": []
+      }
       ],
       "ownership": [
         "SMTSolver owns its SMTKernel, named-assertion adapter, current check result, copied parameter reference, and retained tracked-formula references; it borrows the AST manager, parameter context, quantifier registry, and progress callback."
