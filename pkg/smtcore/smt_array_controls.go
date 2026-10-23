@@ -13,7 +13,7 @@ func (t *SMTArrayTheory) ConfigureArray(config SMTArrayState) error {
 
 func (k *SMTKernel) configureArrayTheories(config SMTArrayState) error {
 	for _, theory := range k.internalizer.theoryOrder {
-		if array, ok := theory.(*SMTArrayTheory); ok {
+		if array := smtArrayCore(theory); array != nil {
 			if err := array.ConfigureArray(config); err != nil {
 				return err
 			}

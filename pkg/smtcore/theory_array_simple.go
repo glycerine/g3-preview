@@ -1,0 +1,79 @@
+// Source: theory_array::internalize_term and setup::setup_arrays (AR_SIMPLE).
+package smtcore
+
+import "github.com/glycerine/g3/pkg/ast"
+
+// SMTSimpleArrayTheory shares store/select and model infrastructure with the
+// full theory. Its immutable operation boundary excludes full-array axioms.
+// The source delayed parent/axiom worklists remain a separate partial port.
+type SMTSimpleArrayTheory struct{ *SMTArrayTheory }
+
+func NewSMTSimpleArrayTheory(family ast.FamilyID) (*SMTSimpleArrayTheory, error) {
+	core, err := NewSMTArrayTheory(family)
+	if err != nil {
+		return nil, err
+	}
+	core.simple = true
+	return &SMTSimpleArrayTheory{core}, nil
+}
+
+func smtArrayCore(theory SMTTheoryInternalizer) *SMTArrayTheory {
+	switch value := theory.(type) {
+	case *SMTArrayTheory:
+		return value
+	case *SMTSimpleArrayTheory:
+		return value.SMTArrayTheory
+	default:
+		return nil
+	}
+}
+
+func (k *SMTKernel) setupArrayBackend() error {
+	family, err := k.manager.ArrayFamilyID()
+	if err != nil {
+		return err
+	}
+	s := k.internalizer
+	old := s.theories[family]
+	core := smtArrayCore(old)
+	if core == nil {
+		return nil
+	}
+	simple := k.smtParams.array.state.Mode == 1
+	if k.smtParams.array.state.Mode != 1 && k.smtParams.array.state.Mode != 3 {
+		return ast.ErrASTDomain
+	}
+	if core.simple == simple {
+		return nil
+	}
+	if core.NumVariables() != 0 || len(core.storeTrail) != 0 || len(core.selectTrail) != 0 || len(s.scopes) != 0 || s.theoriesSetup {
+		return ast.ErrASTDomain
+	}
+	var theory SMTTheoryInternalizer
+	if simple {
+		theory, err = NewSMTSimpleArrayTheory(family)
+	} else {
+		theory, err = NewSMTArrayTheory(family)
+	}
+	if err != nil {
+		return err
+	}
+	if err = smtArrayCore(theory).ConfigureArray(k.smtParams.array.state); err != nil {
+		return err
+	}
+	position := -1
+	for i, registered := range s.theoryOrder {
+		if registered == old {
+			position = i
+			break
+		}
+	}
+	if position < 0 {
+		return ast.ErrASTDomain
+	}
+	if err = theory.Initialize(s); err != nil {
+		return err
+	}
+	s.theories[family], s.theoryOrder[position] = theory, theory
+	return nil
+}

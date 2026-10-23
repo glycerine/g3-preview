@@ -490,7 +490,7 @@ func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 	if err := k.open(); err != nil {
 		return err
 	}
-	if array, ok := theory.(*SMTArrayTheory); ok && k.smtParams != nil {
+	if array := smtArrayCore(theory); array != nil && k.smtParams != nil {
 		if err := array.ConfigureArray(k.smtParams.array.state); err != nil {
 			return err
 		}

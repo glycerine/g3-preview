@@ -45,6 +45,7 @@ type SMTArrayTheory struct {
 	unsupported                           bool
 	statistics                            smtArrayStatistics
 	extensional                           bool
+	simple                                bool
 }
 
 func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
@@ -85,6 +86,13 @@ func (t *SMTArrayTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool
 	if op, array, err := t.arrayOperation(expression); err != nil {
 		return false, err
 	} else if array {
+		if op == ast.ASTArrayOpExt {
+			return false, nil
+		}
+		if t.simple && op != ast.ASTArrayOpSelect && op != ast.ASTArrayOpStore {
+			t.unsupported = true
+			return false, nil
+		}
 		if op == ast.ASTArrayOpSelect || op == ast.ASTArrayOpDefault {
 			_, termErr := t.InternalizeTerm(expression)
 			if termErr != nil {
@@ -127,6 +135,13 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 	op, array, err := t.arrayOperation(expression)
 	if err != nil || !array {
 		return false, err
+	}
+	if op == ast.ASTArrayOpExt {
+		return false, nil
+	}
+	if t.simple && op != ast.ASTArrayOpStore && op != ast.ASTArrayOpSelect {
+		t.unsupported = true
+		return false, nil
 	}
 	count, err := state.manager.GetNumArgs(expression)
 	if err != nil {
@@ -242,6 +257,9 @@ func (t *SMTArrayTheory) assertSelectAxiom(selectExpression, array ast.ASTHandle
 	op, isArray, err := t.arrayOperation(array)
 	if err != nil || !isArray {
 		return err
+	}
+	if t.simple && op != ast.ASTArrayOpStore {
+		return nil
 	}
 	if op != ast.ASTArrayOpConst && op != ast.ASTArrayOpMap && op != ast.ASTArrayOpAsArray && op != ast.ASTArrayOpStore {
 		return nil
@@ -727,6 +745,15 @@ func (t *SMTArrayTheory) InternalizeEquality(expression ast.ASTHandle, variable 
 		return err
 	}
 	arrayEquality := NewSMTLiteral(variable, false)
+	// assert_extensionality_core marks both equality atoms relevant before
+	// adding the witness axiom, so its reads constrain the published model.
+	for _, literal := range []SMTLiteral{arrayEquality, selectEquality} {
+		if literal.Var() >= SMTFirstBoolVar {
+			if err := state.markRelevant(state.boolExpr[literal.Var()]); err != nil {
+				return err
+			}
+		}
+	}
 	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{arrayEquality, selectEquality.Negated()}); err != nil {
 		return err
 	}

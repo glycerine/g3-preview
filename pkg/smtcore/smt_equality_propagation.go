@@ -294,22 +294,27 @@ func (s *SMTInternalizerState) booleanValueEnode(value bool) (*SMTEnode, error) 
 // Source: context::propagate_bool_var_enode. This is also needed when a term
 // enode is attached after its Boolean variable has already been assigned.
 func (s *SMTInternalizerState) propagateBooleanEnode(variable int32, node *SMTEnode) error {
-	if !node.mergeTruthValue {
-		return nil
-	}
 	literal := NewSMTLiteral(variable, false)
 	value, err := s.Assignment(literal)
 	if err != nil || value == lbool.Undef {
 		return err
 	}
-	constant, err := s.booleanValueEnode(value == lbool.True)
-	if err != nil {
-		return err
+	if node.mergeTruthValue {
+		constant, err := s.booleanValueEnode(value == lbool.True)
+		if err != nil {
+			return err
+		}
+		if value == lbool.False {
+			literal = literal.Negated()
+		}
+		if err = s.addEquality(node, constant, NewSMTEqualityEquation(literal)); err != nil || s.inconsistent {
+			return err
+		}
 	}
-	if value == lbool.False {
-		literal = literal.Negated()
-	}
-	return s.addEquality(node, constant, NewSMTEqualityEquation(literal))
+	// Source propagate_bool_var_enode also transfers the assignment to the
+	// other members of the class when merge_tf is disabled. Congruent Boolean
+	// terms can have merged before any member received a truth value.
+	return s.propagateBooleanClass(node.root)
 }
 
 func (s *SMTInternalizerState) propagateEqualityClassRelevancy(first, second *SMTEnode) error {

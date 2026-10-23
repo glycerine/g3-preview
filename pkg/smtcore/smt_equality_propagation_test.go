@@ -19,6 +19,51 @@ func smtUFConstants(t *testing.T, manager *ast.ASTManager, prefix string, count 
 	return sort, values
 }
 
+func TestSMTBooleanClassAssignmentAfterMerge(t *testing.T) {
+	for _, truth := range []bool{false, true} {
+		for _, assignRoot := range []bool{false, true} {
+			m := astTestManager(t)
+			_, _, s := smtInternalizerFixture(t, m, nil)
+			a := smtRelevancyBool(t, m, "late-class-a")
+			b := smtRelevancyBool(t, m, "late-class-b")
+			for _, term := range []ast.ASTHandle{a, b} {
+				astTestMust(t, s.Internalize(term, true))
+				v, _ := s.BoolVar(term)
+				astTestMust(t, s.ensureBooleanEnode(term, v, true, false, false))
+			}
+			left, right := s.context.enodes[a], s.context.enodes[b]
+			astTestMust(t, s.addEquality(left, right, NewSMTEqualityAxiom()))
+			source := left
+			if (source == source.root) != assignRoot {
+				source = right
+			}
+			variable, _ := s.BoolVar(source.owner)
+			for _, value := range []bool{truth, !truth} {
+				astTestMust(t, s.PushScope())
+				literal := NewSMTLiteral(variable, !value)
+				astTestMust(t, s.AssignLiteral(literal, NewSMTBooleanAxiom()))
+				consistent, err := s.PropagateCore()
+				astTestMust(t, err)
+				if !consistent {
+					t.Fatal("consistent merged Boolean class conflicted")
+				}
+				for _, term := range []ast.ASTHandle{a, b} {
+					v, _ := s.BoolVar(term)
+					got, err := s.Assignment(NewSMTLiteral(v, !value))
+					astTestMust(t, err)
+					if got != lbool.True {
+						t.Fatal("assignment did not reach class member", truth, assignRoot, got)
+					}
+					if s.context.enodes[term].mergeTruthValue {
+						t.Fatal("test unexpectedly enabled merge_tf")
+					}
+				}
+				astTestMust(t, s.PopScopes(1))
+			}
+		}
+	}
+}
+
 func TestSMTCoreEqualityTransitivityAndScopeRollback(t *testing.T) {
 	manager, solver := smtSolverFixture(t)
 	_, values := smtUFConstants(t, manager, "core-eq-", 3)

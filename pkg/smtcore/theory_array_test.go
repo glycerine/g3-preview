@@ -75,7 +75,7 @@ func TestSMTArrayReadOverWrite(t *testing.T) {
 			astTestMust(t, err)
 			if status != test.want {
 				reason, _ := solver.ReasonUnknown()
-				theory, _ := solver.kernel.internalizer.theories[family].(*SMTArrayTheory)
+				theory := smtArrayCore(solver.kernel.internalizer.theories[family])
 				t.Fatalf("array status %v, want %v (reason %q, unsupported %v, stores %d, selects %d)", status, test.want, reason, theory.unsupported, len(theory.storeTrail), len(theory.selectTrail))
 			}
 		})
@@ -160,7 +160,7 @@ func TestSMTArrayDefaultThroughEquality(t *testing.T) {
 	astTestMust(t, err)
 	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
 	astTestMust(t, err)
-	solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: params})
+	solver, err := NewSMTSolver(m, nil, "ALL", SMTSolverConfig{Params: params})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, solver.Close()); astTestMust(t, params.Close()) })
 	astTestMust(t, solver.Assert(aliasDefinition))
@@ -265,6 +265,49 @@ func TestSMTArrayExtensionality(t *testing.T) {
 	}
 }
 
+func TestSMTArrayBooleanIndexExhaustion(t *testing.T) {
+	m := astTestManager(t)
+	family, err := m.RegisterArrayPlugin()
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	sort, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), boolean)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "boolean-array-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "boolean-array-right"), sort)
+	astTestMust(t, err)
+	eq, err := m.MkEq(left, right)
+	astTestMust(t, err)
+	neq, err := m.MkNot(eq)
+	astTestMust(t, err)
+	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: params})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()); astTestMust(t, params.Close()) })
+	astTestMust(t, solver.Assert(neq))
+	for _, value := range []bool{true, false} {
+		index, makeErr := m.MkFalse()
+		if value {
+			index, makeErr = m.MkTrue()
+		}
+		astTestMust(t, makeErr)
+		a, makeErr := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{left, index})
+		astTestMust(t, makeErr)
+		b, makeErr := m.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{right, index})
+		astTestMust(t, makeErr)
+		readEq, makeErr := m.MkEq(a, b)
+		astTestMust(t, makeErr)
+		astTestMust(t, solver.Assert(readEq))
+	}
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatalf("Boolean array index exhaustion: %v", status)
+	}
+}
+
 func TestSMTArrayMapRead(t *testing.T) {
 	m := astTestManager(t)
 	family, err := m.RegisterArrayPlugin()
@@ -295,7 +338,7 @@ func TestSMTArrayMapRead(t *testing.T) {
 	astTestMust(t, err)
 	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
 	astTestMust(t, err)
-	solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: params})
+	solver, err := NewSMTSolver(m, nil, "ALL", SMTSolverConfig{Params: params})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, solver.Close()); astTestMust(t, params.Close()) })
 	astTestMust(t, solver.Assert(disequality))
@@ -371,7 +414,7 @@ func TestSMTArrayDefaultConstAndMap(t *testing.T) {
 			astTestMust(t, err)
 			params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
 			astTestMust(t, err)
-			solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: params})
+			solver, err := NewSMTSolver(m, nil, "ALL", SMTSolverConfig{Params: params})
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, solver.Close()); astTestMust(t, params.Close()) })
 			astTestMust(t, solver.Assert(disequality))
@@ -412,7 +455,7 @@ func TestSMTArrayDefaultStoreLargeDomain(t *testing.T) {
 	astTestMust(t, err)
 	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
 	astTestMust(t, err)
-	solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: params})
+	solver, err := NewSMTSolver(m, nil, "ALL", SMTSolverConfig{Params: params})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, solver.Close()); astTestMust(t, params.Close()) })
 	astTestMust(t, solver.Assert(disequality))
@@ -451,7 +494,7 @@ func TestSMTArrayDefaultStoreFiniteDomain(t *testing.T) {
 	astTestMust(t, err)
 	params, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
 	astTestMust(t, err)
-	solver, err := NewSMTSolver(m, nil, "QF_AX", SMTSolverConfig{Params: params})
+	solver, err := NewSMTSolver(m, nil, "ALL", SMTSolverConfig{Params: params})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, solver.Close()); astTestMust(t, params.Close()) })
 	astTestMust(t, solver.Assert(baseValue))

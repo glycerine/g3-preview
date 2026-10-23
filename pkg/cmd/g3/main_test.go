@@ -10,6 +10,8 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"array_simple_boolean_witness_scopes.smt2":   "sat\n(((distinct a b) true))\nunsat\nsat\n(((distinct a b) true))\n",
+	"array_full_boolean_witness_scopes.smt2":     "sat\n(((distinct a b) true))\nunsat\nsat\n(((distinct a b) true))\n",
 	"array_extensional_simple_live_updates.smt2": "sat\nunsat\nsat\nsat\n",
 	"array_extensional_live_updates.smt2":        "sat\nunsat\nsat\nsat\n",
 	"array_extensional_proof_scopes.smt2":        "unsat\nsat\n",
