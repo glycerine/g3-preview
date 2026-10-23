@@ -115186,7 +115186,9 @@
         "pkg/smtcore/theory_arith_grobner.go",
         "pkg/smtcore/theory_arith_grobner_test.go",
         "pkg/smtcore/theory_arith_grobner_square.go",
-        "pkg/smtcore/theory_arith_grobner_square_test.go"
+        "pkg/smtcore/theory_arith_grobner_square_test.go",
+        "pkg/smtcore/theory_arith_nonlinear_branch.go",
+        "pkg/smtcore/theory_arith_nonlinear_branch_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -115200,7 +115202,8 @@
         "TestSMTLibRunnerCPPReference",
         "TestSMTNonlinearGrobnerCoupledEquationsScopedProofs",
         "TestSMTGrobnerPerfectSquareMonomialsAndCrossTerms",
-        "TestSMTNonlinearGrobnerExpandedSquareScopedProofs"
+        "TestSMTNonlinearGrobnerExpandedSquareScopedProofs",
+        "TestSMTNonlinearIntegerBranchesScopedProofsAndModels"
       ],
       "conditionals": [
         {
@@ -115547,7 +115550,20 @@
           ]
         },
         {
-          "name": "nonlinear clustering, max/min bound discovery, strategy rotation, nonlinear branching, Horner reasoning, variable-order perturbation and derived-equation insertion, and irrational models",
+          "name": "find_nl_var_for_branching and branch_nl_int_var: bounded-range priority, source random reservoir, endpoint or zero-equality case split, relevance, true-first phase, and scoped nonlinear round limit",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_nonlinear_branch.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTNonlinearIntegerBranchesScopedProofsAndModels",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "nonlinear clustering, max/min bound discovery, strategy rotation, Horner reasoning, variable-order perturbation and derived-equation insertion, and irrational models",
           "status": "unported",
           "go_target": null,
           "tests": [
@@ -115559,7 +115575,8 @@
       "deviations": [
         "Nonlinear monomials now have independent tableau columns with scoped factor-column lists. Relevant assignments are checked using the same exact rational epsilon as model construction. The Go tableau additionally completes a candidate by evaluating products and affine definitions, then fixes every arithmetic column and rechecks every original row; a failed completion preserves the relaxation. This concrete-model completion is a Go representation adaptation, not a claim to port the remaining source nonlinear search strategies.",
         "One upward/downward interval propagation pass runs during each tableau replay, including each speculative integer branch. Repeated factors use interval powers, downward propagation skips powers greater than one and zero-containing divisors, and integer endpoints are rounded. Derived bounds are reconstructed after pops; failed bounds reject only the current replay or integer branch.",
-        "The Grobner consumer sends concrete typed monomials from definition equations, opposite active bounds, and fixed product columns to math/grobner; it substitutes only unconditional fixed bounds from a branch-free replay, applies the source variable weights and generated-equation threshold, and checks basis equations against exact rational intervals and source expanded perfect-square strengthening. Conflicts conservatively cite all active assertion literals rather than a minimal source dependency graph. Source connected-cluster extraction, complete tableau-row enumeration, iterative nonlinear strategies, max/min discovery, nonlinear branching, Horner reasoning, variable-order perturbation, optional derived-equation insertion, and irrational models remain incomplete."
+        "The Grobner consumer sends concrete typed monomials from definition equations, opposite active bounds, and fixed product columns to math/grobner; it substitutes only unconditional fixed bounds from a branch-free replay, applies the source variable weights and generated-equation threshold, and checks basis equations against exact rational intervals and source expanded perfect-square strengthening. Conflicts conservatively cite all active assertion literals rather than a minimal source dependency graph. Source connected-cluster extraction, complete tableau-row enumeration, iterative nonlinear strategies, max/min discovery, Horner reasoning, variable-order perturbation, optional derived-equation insertion, and irrational models remain incomplete.",
+        "Nonlinear integer branching uses unconditional replay bounds to select a factor of a mismatched integer monomial, preferring the smallest bounded interval and applying the source random reservoir otherwise. New endpoint or zero-equality atoms are marked relevant and true-first without asserting either branch. The nonlinear round count is scoped and obeys arith.nl.rounds. The existing replay representation keeps speculative integer-feasibility bounds separate from the logical bounds used to choose a split."
       ]
     },
     {

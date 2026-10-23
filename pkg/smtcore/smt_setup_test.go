@@ -204,8 +204,12 @@ func TestSMTUnknownLogicSetupInstallsMixedArithmetic(t *testing.T) {
 			astTestMust(t, solver.Assert(positive))
 			status, err := solver.CheckSat(nil)
 			astTestMust(t, err)
-			if status != lbool.Undef {
-				t.Fatal(test.logic, "unsupported nonlinear arithmetic", status)
+			want := lbool.Undef
+			if test.integer {
+				want = lbool.True
+			}
+			if status != want {
+				t.Fatal(test.logic, "nonlinear arithmetic setup", status, want)
 			}
 		})
 	}

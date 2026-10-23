@@ -10,6 +10,9 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"nonlinear_integer_factor_scopes.smt2":      "unsat\nsat\n",
+	"nonlinear_integer_zero_split.smt2":         "sat\n",
+	"nonlinear_integer_upper_split.smt2":        "sat\n",
 	"nonlinear_grobner_expanded_square.smt2":    "unsat\nsat\n",
 	"nonlinear_grobner_rational_square.smt2":    "unsat\n",
 	"nonlinear_grobner_coupled.smt2":            "unsat\nsat\n",

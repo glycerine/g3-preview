@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/simplex"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	z3rand "github.com/glycerine/g3/pkg/util/random"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
@@ -83,6 +84,7 @@ type smtLinearArithmeticScope struct {
 	castTerms, castPredicates int
 	divisionTerms             int
 	nonlinearTerms            int
+	nonlinearRounds           uint32
 }
 
 type smtLinearIntegerBranch struct {
@@ -95,6 +97,7 @@ type smtLinearArithmeticStatistics struct {
 	conflicts, addRows, pivots, assertLower, assertUpper uint64
 	fixedEqualities, offsetEqualities, branches          uint64
 	grobner                                              uint64
+	nonlinearBranches                                    uint64
 }
 
 // SMTLinearArithmeticTheory is the rational linear specialization of the
@@ -104,33 +107,37 @@ type smtLinearArithmeticStatistics struct {
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
 	*SMTTheoryBase
-	solver             *simplex.Solver
-	simplexVariables   []uint32
-	nextSimplex        uint32
-	definitions        map[SMTTheoryVar]smtLinearForm
-	atoms              []smtLinearArithmeticAtom
-	atomByBool         map[int32]int
-	assertions         []smtIntegerDiffAssertion
-	assertionHead      int
-	scopes             []smtLinearArithmeticScope
-	unsupported        bool
-	integer            bool
-	mixed              bool
-	integerColumns     map[uint32]bool
-	castTerms          map[ast.ASTHandle]bool
-	castTermTrail      []ast.ASTHandle
-	castPredicates     map[int32]bool
-	castPredicateTrail []int32
-	divisionTerms      map[ast.ASTHandle]bool
-	divisionTermTrail  []ast.ASTHandle
-	nonlinearColumns   []uint32
-	nonlinearFactors   map[uint32][]uint32
-	nonlinearEnabled   bool
-	nonlinearGB        bool
-	nonlinearGBLimit   uint32
-	delta              big.Rat
-	equalityAdapter    *smtArithmeticEqualityAdapter
-	statistics         smtLinearArithmeticStatistics
+	solver              *simplex.Solver
+	simplexVariables    []uint32
+	nextSimplex         uint32
+	definitions         map[SMTTheoryVar]smtLinearForm
+	atoms               []smtLinearArithmeticAtom
+	atomByBool          map[int32]int
+	assertions          []smtIntegerDiffAssertion
+	assertionHead       int
+	scopes              []smtLinearArithmeticScope
+	unsupported         bool
+	integer             bool
+	mixed               bool
+	integerColumns      map[uint32]bool
+	castTerms           map[ast.ASTHandle]bool
+	castTermTrail       []ast.ASTHandle
+	castPredicates      map[int32]bool
+	castPredicateTrail  []int32
+	divisionTerms       map[ast.ASTHandle]bool
+	divisionTermTrail   []ast.ASTHandle
+	nonlinearColumns    []uint32
+	nonlinearFactors    map[uint32][]uint32
+	nonlinearEnabled    bool
+	nonlinearGB         bool
+	nonlinearGBLimit    uint32
+	nonlinearBranching  bool
+	nonlinearRounds     uint32
+	nonlinearRoundLimit uint32
+	nonlinearRandom     z3rand.Generator
+	delta               big.Rat
+	equalityAdapter     *smtArithmeticEqualityAdapter
+	statistics          smtLinearArithmeticStatistics
 }
 
 func NewSMTLinearArithmeticTheory(family ast.FamilyID) (*SMTLinearArithmeticTheory, error) {
@@ -157,20 +164,22 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		return nil, err
 	}
 	t := &SMTLinearArithmeticTheory{
-		SMTTheoryBase:    base,
-		solver:           simplex.NewSolver(nil),
-		atomByBool:       make(map[int32]int),
-		definitions:      make(map[SMTTheoryVar]smtLinearForm),
-		nextSimplex:      1,
-		integer:          integer,
-		integerColumns:   make(map[uint32]bool),
-		castTerms:        make(map[ast.ASTHandle]bool),
-		castPredicates:   make(map[int32]bool),
-		divisionTerms:    make(map[ast.ASTHandle]bool),
-		nonlinearFactors: make(map[uint32][]uint32),
-		nonlinearEnabled: true,
-		nonlinearGB:      true,
-		nonlinearGBLimit: 512,
+		SMTTheoryBase:       base,
+		solver:              simplex.NewSolver(nil),
+		atomByBool:          make(map[int32]int),
+		definitions:         make(map[SMTTheoryVar]smtLinearForm),
+		nextSimplex:         1,
+		integer:             integer,
+		integerColumns:      make(map[uint32]bool),
+		castTerms:           make(map[ast.ASTHandle]bool),
+		castPredicates:      make(map[int32]bool),
+		divisionTerms:       make(map[ast.ASTHandle]bool),
+		nonlinearFactors:    make(map[uint32][]uint32),
+		nonlinearEnabled:    true,
+		nonlinearGB:         true,
+		nonlinearGBLimit:    512,
+		nonlinearBranching:  true,
+		nonlinearRoundLimit: 1024,
 	}
 	t.equalityAdapter, err = newSMTArithmeticEqualityAdapter(base)
 	if err != nil {
@@ -187,6 +196,9 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 	t.nonlinearEnabled = config.NLArith
 	t.nonlinearGB = config.NLArithGB
 	t.nonlinearGBLimit = config.NLArithGBThreshold
+	t.nonlinearBranching = config.NLArithBranching
+	t.nonlinearRoundLimit = config.NLArithRounds
+	t.nonlinearRandom.SetSeed(config.RandomSeed)
 	return nil
 }
 
@@ -1266,7 +1278,7 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 		_ = t.SMTTheoryBase.PopScopes(1)
 		return err
 	}
-	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail), nonlinearTerms: len(t.nonlinearColumns)})
+	t.scopes = append(t.scopes, smtLinearArithmeticScope{atoms: len(t.atoms), assertions: len(t.assertions), head: t.assertionHead, unsupported: t.unsupported, castTerms: len(t.castTermTrail), castPredicates: len(t.castPredicateTrail), divisionTerms: len(t.divisionTermTrail), nonlinearTerms: len(t.nonlinearColumns), nonlinearRounds: t.nonlinearRounds})
 	return nil
 }
 
@@ -1299,6 +1311,7 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 		delete(t.nonlinearFactors, column)
 	}
 	t.nonlinearColumns = t.nonlinearColumns[:scope.nonlinearTerms]
+	t.nonlinearRounds = scope.nonlinearRounds
 	t.scopes = t.scopes[:level]
 	if err := t.equalityAdapter.PopScopes(count); err != nil {
 		return err
@@ -1381,6 +1394,10 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckContinue, nil
 	}
 	if !satisfied && t.nonlinearEnabled {
+		if t.nonlinearRounds > t.nonlinearRoundLimit {
+			return SMTFinalCheckGiveUp, nil
+		}
+		t.nonlinearRounds++
 		// A branch-and-bound tableau contains speculative bounds. Replay
 		// interval propagation inside buildSimplex, where a contradiction
 		// rejects only that branch rather than the whole SMT context.
@@ -1405,6 +1422,15 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 				return SMTFinalCheckGiveUp, err
 			}
 			if conflict {
+				return SMTFinalCheckContinue, nil
+			}
+		}
+		if t.nonlinearEnabled && t.nonlinearBranching && len(t.nonlinearColumns) != 0 {
+			branched, err := t.branchNonlinearIntegerVariable()
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			if branched {
 				return SMTFinalCheckContinue, nil
 			}
 		}
