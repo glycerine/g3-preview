@@ -115165,7 +115165,9 @@
         "pkg/smtcore/theory_arith_linear.go",
         "pkg/smtcore/theory_arith_nonlinear.go",
         "pkg/smtcore/theory_arith_nonlinear_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/theory_arith_grobner.go",
+        "pkg/smtcore/theory_arith_grobner_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -115176,7 +115178,8 @@
         "TestSMTNonlinearUpwardDownwardAndIntegerIntervals",
         "TestSMTNonlinearCandidateRejectsRelaxedProduct",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTNonlinearGrobnerCoupledEquationsScopedProofs"
       ],
       "conditionals": [
         {
@@ -115496,7 +115499,20 @@
           ]
         },
         {
-          "name": "nonlinear clustering, max/min bound discovery, strategy rotation, branching, Horner and Grobner reasoning, and irrational models",
+          "name": "retained default compute_grobner conflict path: fixed-value substitution, concrete monomials for replayed definition and opposite-bound equations, fixed monomial equations, source variable weights, bounded basis computation, and equation interval inconsistency",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_arith_grobner.go",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTNonlinearGrobnerCoupledEquationsScopedProofs",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "nonlinear clustering, max/min bound discovery, strategy rotation, nonlinear branching, Horner reasoning, Grobner perfect-square consistency, variable-order perturbation and derived-equation insertion, and irrational models",
           "status": "unported",
           "go_target": null,
           "tests": [
@@ -115507,7 +115523,8 @@
       "ownership": [],
       "deviations": [
         "Nonlinear monomials now have independent tableau columns with scoped factor-column lists. Relevant assignments are checked using the same exact rational epsilon as model construction. The Go tableau additionally completes a candidate by evaluating products and affine definitions, then fixes every arithmetic column and rechecks every original row; a failed completion preserves the relaxation. This concrete-model completion is a Go representation adaptation, not a claim to port the remaining source nonlinear search strategies.",
-        "One upward/downward interval propagation pass runs during each tableau replay, including each speculative integer branch. Repeated factors use interval powers, downward propagation skips powers greater than one and zero-containing divisors, and integer endpoints are rounded. Derived bounds are reconstructed after pops; failed bounds reject only the current replay or integer branch. Source monomial scheduling, iterative strategies, minimal bound-dependency explanations, max/min discovery, nonlinear branching, Horner, Grobner reasoning, and irrational models remain incomplete. Existing interval conflicts conservatively cite active assertion premises."
+        "One upward/downward interval propagation pass runs during each tableau replay, including each speculative integer branch. Repeated factors use interval powers, downward propagation skips powers greater than one and zero-containing divisors, and integer endpoints are rounded. Derived bounds are reconstructed after pops; failed bounds reject only the current replay or integer branch.",
+        "The Grobner consumer sends concrete typed monomials from definition equations, opposite active bounds, and fixed product columns to math/grobner; it substitutes only unconditional fixed bounds from a branch-free replay, applies the source variable weights and generated-equation threshold, and checks basis equations against exact rational intervals. Conflicts conservatively cite all active assertion literals rather than a minimal source dependency graph. Source connected-cluster extraction, complete tableau-row enumeration, iterative nonlinear strategies, max/min discovery, nonlinear branching, Horner reasoning, Grobner perfect-square consistency, variable-order perturbation, optional derived-equation insertion, and irrational models remain incomplete."
       ]
     },
     {

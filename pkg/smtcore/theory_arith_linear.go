@@ -94,6 +94,7 @@ type smtLinearIntegerBranch struct {
 type smtLinearArithmeticStatistics struct {
 	conflicts, addRows, pivots, assertLower, assertUpper uint64
 	fixedEqualities, offsetEqualities, branches          uint64
+	grobner                                              uint64
 }
 
 // SMTLinearArithmeticTheory is the rational linear specialization of the
@@ -125,6 +126,8 @@ type SMTLinearArithmeticTheory struct {
 	nonlinearColumns   []uint32
 	nonlinearFactors   map[uint32][]uint32
 	nonlinearEnabled   bool
+	nonlinearGB        bool
+	nonlinearGBLimit   uint32
 	delta              big.Rat
 	equalityAdapter    *smtArithmeticEqualityAdapter
 	statistics         smtLinearArithmeticStatistics
@@ -166,6 +169,8 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		divisionTerms:    make(map[ast.ASTHandle]bool),
 		nonlinearFactors: make(map[uint32][]uint32),
 		nonlinearEnabled: true,
+		nonlinearGB:      true,
+		nonlinearGBLimit: 512,
 	}
 	t.equalityAdapter, err = newSMTArithmeticEqualityAdapter(base)
 	if err != nil {
@@ -180,6 +185,8 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 	}
 	t.equalityAdapter.lazy = config.LazyAdapter
 	t.nonlinearEnabled = config.NLArith
+	t.nonlinearGB = config.NLArithGB
+	t.nonlinearGBLimit = config.NLArithGBThreshold
 	return nil
 }
 
@@ -1378,6 +1385,15 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		}
 	}
 	if !satisfied || !complete {
+		if t.nonlinearEnabled && t.nonlinearGB && len(t.nonlinearColumns) != 0 {
+			conflict, err := t.checkNonlinearGrobner()
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			if conflict {
+				return SMTFinalCheckContinue, nil
+			}
+		}
 		return SMTFinalCheckGiveUp, nil
 	}
 	return SMTFinalCheckDone, nil
@@ -1805,6 +1821,7 @@ func (t *SMTLinearArithmeticTheory) CollectStatistics(target *statistics.Statist
 	target.UpdateUint64("arith offset eqs", t.statistics.offsetEqualities)
 	target.UpdateUint64("arith ineq splits", t.statistics.branches)
 	target.UpdateUint64("arith eq adapter", t.equalityAdapter.NumAxioms())
+	target.UpdateUint64("arith grobner", t.statistics.grobner)
 	return nil
 }
 
