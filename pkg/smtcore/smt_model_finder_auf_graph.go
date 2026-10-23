@@ -29,6 +29,7 @@ type smtModelFinderAUFGraph struct {
 	refs      []ast.ASTRef
 	model     *protomodel.ProtoModel
 	selects   []smtModelFinderSelectVar
+	witnesses map[ast.ASTHandle]ast.ASTHandle
 }
 
 func newSMTModelFinderAUFGraph(finder *SMTModelFinder) *smtModelFinderAUFGraph {

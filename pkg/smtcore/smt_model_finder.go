@@ -16,21 +16,22 @@ import (
 // candidate model before MBQI checks it. The macro and AUF algorithms attach
 // their per-quantifier state to this lifecycle.
 type SMTModelFinder struct {
-	manager       *ast.ASTManager
-	state         *SMTInternalizerState
-	quantifiers   []ast.ASTHandle
-	registered    map[ast.ASTHandle]struct{}
-	sets          map[ast.ASTHandle][]*smtModelFinderInstantiationSet
-	macroUtil     *macros.Util
-	candidates    map[ast.ASTHandle]*macros.Candidates
-	nonGround     map[ast.ASTHandle]map[ast.ASTHandle]struct{}
-	auf           map[ast.ASTHandle]bool
-	chosen        map[ast.ASTHandle]ast.ASTHandle
-	hint          *hintSearchState
-	dependencies  *ast.FuncDeclDependencies
-	forceTemplate uint32
-	scopes        []int
-	closed        bool
+	manager            *ast.ASTManager
+	state              *SMTInternalizerState
+	quantifiers        []ast.ASTHandle
+	registered         map[ast.ASTHandle]struct{}
+	sets               map[ast.ASTHandle][]*smtModelFinderInstantiationSet
+	macroUtil          *macros.Util
+	candidates         map[ast.ASTHandle]*macros.Candidates
+	nonGround          map[ast.ASTHandle]map[ast.ASTHandle]struct{}
+	auf                map[ast.ASTHandle]bool
+	chosen             map[ast.ASTHandle]ast.ASTHandle
+	hint               *hintSearchState
+	dependencies       *ast.FuncDeclDependencies
+	forceTemplate      uint32
+	pendingConstraints []ast.ASTRef
+	scopes             []int
+	closed             bool
 }
 
 func NewSMTModelFinder(state *SMTInternalizerState) (*SMTModelFinder, error) {
@@ -652,6 +653,12 @@ func (f *SMTModelFinder) Close() error {
 	if err := f.dependencies.Close(); err != nil {
 		return err
 	}
+	for i := range f.pendingConstraints {
+		if err := f.manager.DelRef(&f.pendingConstraints[i]); err != nil {
+			return err
+		}
+	}
+	f.pendingConstraints = nil
 	f.closed = true
 	f.quantifiers = nil
 	f.scopes = nil
