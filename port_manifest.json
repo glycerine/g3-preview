@@ -109283,7 +109283,7 @@
           ]
         },
         {
-          "name": "macro-based instantiation-set population from selected-head original relevant enodes, inverse construction and repeated hint-subset driver",
+          "name": "macro-based instantiation-set population from selected-head original relevant enodes, per-model term/inverse reset, inverse construction and repeated hint-subset driver",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_macro_sets.go",
           "tests": [

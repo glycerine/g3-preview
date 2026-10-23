@@ -41,8 +41,8 @@ func TestSMTModelFinderMacroSetsPreserveOriginalRelevantArguments(t *testing.T) 
 	threeNode, err := NewSMTEnode(m, three, state.context.enodes, SMTEnodeOptions{Generation: 1})
 	astTestMust(t, err)
 	astTestMust(t, state.context.RegisterEnode(threeNode, true))
-	smtQuickApplicationNode(t, m, state.context, function, sevenNode, true)
-	smtQuickApplicationNode(t, m, state.context, function, threeNode, false)
+	sevenApplication, _ := smtQuickApplicationNode(t, m, state.context, function, sevenNode, true)
+	threeApplication, _ := smtQuickApplicationNode(t, m, state.context, function, threeNode, false)
 	sevenNode.root = threeNode
 	proto, err := protomodel.NewProtoModel(m, config)
 	astTestMust(t, err)
@@ -60,6 +60,27 @@ func TestSMTModelFinderMacroSetsPreserveOriginalRelevantArguments(t *testing.T) 
 	astTestMust(t, err)
 	if !found || term != seven || generation != 4 {
 		t.Fatal("macro-based inverse was not built", term, generation, found)
+	}
+	astTestMust(t, state.context.SetRelevant(sevenApplication, false))
+	astTestMust(t, state.context.SetRelevant(threeApplication, true))
+	next, err := protomodel.NewProtoModel(m, config)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, next.Close()) })
+	astTestMust(t, finder.FixModel(next))
+	updated, err := finder.instantiationSet(q, 0, false)
+	astTestMust(t, err)
+	if !set.closed || updated == set || updated == nil || len(updated.elements) != 1 || updated.elements[three] != 1 {
+		t.Fatal("new model retained prior terms or ownership", set.closed, updated)
+	}
+	_, _, found, err = finder.Inverse(q, 0, seven)
+	astTestMust(t, err)
+	if found {
+		t.Fatal("new model retained an obsolete inverse entry")
+	}
+	term, generation, found, err = finder.Inverse(q, 0, three)
+	astTestMust(t, err)
+	if !found || term != three || generation != 1 {
+		t.Fatal("new model did not rebuild inverse", term, generation, found)
 	}
 }
 

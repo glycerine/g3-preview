@@ -657,6 +657,18 @@ func (f *SMTModelFinder) FixModel(model *protomodel.ProtoModel) error {
 		return err
 	}
 	allRelevant := append([]ast.ASTHandle(nil), relevant...)
+	// The C++ solver resets AUF nodes and macro-derived sets for each
+	// candidate model. Term copies and inverses must not survive that reset.
+	for _, sets := range f.sets {
+		for i, set := range sets {
+			if set != nil {
+				if err := set.Close(); err != nil {
+					return err
+				}
+				sets[i] = nil
+			}
+		}
+	}
 	for _, quantifier := range relevant {
 		delete(f.chosen, quantifier)
 		if info := f.hint.infos[quantifier]; info != nil {
