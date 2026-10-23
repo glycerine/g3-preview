@@ -118314,6 +118314,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_extensionality.go",
+        "pkg/smtcore/theory_array_extensionality_test.go",
+        "pkg/cmd/g3/test_vectors/array_extensional_disequality_timing.smt2",
         "pkg/smtcore/smt_array_lifecycle.go",
         "pkg/smtcore/smt_array_lifecycle_test.go",
         "pkg/smtcore/theory_array_simple.go",
@@ -118331,6 +118334,8 @@
         "pkg/smtcore/smt_setup.go"
       ],
       "tests": [
+        "TestSMTArrayExtensionalityDisequalityQueueAndRollback",
+        "TestSMTArrayExtensionalitySkipsKnownDisequalReads",
         "TestSMTArrayTranslationBackendsOwnersModelsAndScopes",
         "TestSMTArrayBackendSelection",
         "TestSMTArrayBackendOperationBoundary",
@@ -118434,6 +118439,21 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "new_diseq_eh, assert_extensionality, already_diseq, extensionality can_propagate/propagate and scope reset: deferred witnesses, owner-ID canonicalization, root fingerprints, relevant equal-index disequal-read suppression and live option timing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_extensionality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_extensionality_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayExtensionalityDisequalityQueueAndRollback",
+            "TestSMTArrayExtensionalitySkipsKnownDisequalReads",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "mk_fresh preserves concrete simple/full array plugins with independent AST/enode/axiom state; simple borrows destination fparams and full retains live original source m_params across chained translation",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_array_lifecycle.go",
@@ -118506,6 +118526,7 @@
         "SMTArrayTheory owns concrete Go maps and scoped trails for observed terms, instantiated constructor pairs and epsilon constants while borrowing manager-owned AST handles and context-owned enodes."
       ],
       "deviations": [
+        "Array equality internalization no longer emits extensionality eagerly. Source disequality events enqueue a canonical root pair only after scoped duplicate checks and known relevant read-disequality suppression. Propagation drains the concrete queue; scope pop clears pending work and child fingerprints. A strict runner vector switches extensionality on after equality internalization and before disequality, then checks disabled recovery, raising C++ agreement to 127. Shared-array interface equality and other axiom worklists remain incomplete; base units are now explicitly partial.",
         "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
         "Concrete simple/full backend selection and operation boundaries now follow retained setup policies. Simple accepts store/select; full additionally handles const/map/default/as-array (with source as-array incompleteness); ext witnesses defer to default internalization without unsupported marking in both. Modes 0/2 have no retained source writers: legacy integer mode registration is inside #if 0. Full-operation unit tests use ALL because native QF_AX rejects those extensions. Remaining array controls, delayed worklists and fresh-plugin parameter ownership are still incomplete.",
         "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
@@ -118519,6 +118540,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_extensionality.go",
+        "pkg/smtcore/theory_array_extensionality_test.go",
+        "pkg/cmd/g3/test_vectors/array_extensional_disequality_timing.smt2",
         "pkg/smtcore/smt_array_lifecycle.go",
         "pkg/smtcore/smt_array_lifecycle_test.go",
         "pkg/smtcore/theory_array_simple.go",
@@ -118535,6 +118559,8 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayExtensionalityDisequalityQueueAndRollback",
+        "TestSMTArrayExtensionalitySkipsKnownDisequalReads",
         "TestSMTArrayTranslationBackendsOwnersModelsAndScopes",
         "TestSMTArrayBackendSelection",
         "TestSMTArrayBackendOperationBoundary",
@@ -118557,6 +118583,21 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "new_diseq_eh, assert_extensionality, already_diseq, extensionality can_propagate/propagate and scope reset: deferred witnesses, owner-ID canonicalization, root fingerprints, relevant equal-index disequal-read suppression and live option timing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_extensionality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_extensionality_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayExtensionalityDisequalityQueueAndRollback",
+            "TestSMTArrayExtensionalitySkipsKnownDisequalReads",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "mk_fresh preserves concrete simple/full array plugins with independent AST/enode/axiom state; simple borrows destination fparams and full retains live original source m_params across chained translation",
           "status": "ported",
@@ -118624,6 +118665,7 @@
         "The Go theory owns typed maps and slices in place of source var_data allocation, trail stacks and union-find storage."
       ],
       "deviations": [
+        "Array equality internalization no longer emits extensionality eagerly. Source disequality events enqueue a canonical root pair only after scoped duplicate checks and known relevant read-disequality suppression. Propagation drains the concrete queue; scope pop clears pending work and child fingerprints. A strict runner vector switches extensionality on after equality internalization and before disequality, then checks disabled recovery, raising C++ agreement to 127. Shared-array interface equality and other axiom worklists remain incomplete; base units are now explicitly partial.",
         "Fresh array plugin ownership now follows both source constructors: simple uses destination params while full keeps a live reference to the original source scalar owner through chained translations. Empty constructor placeholders remain destination-selected before source setup. Eight same/cross-manager, configured/pre-setup and simple/full cases check distinct concrete instances, live source/destination extensionality changes, scoped UNSAT/recovery, model read evaluation, source solver closure and chained translation. Other array controls and delayed parent/axiom worklists remain partial.",
         "Concrete simple/full backend selection and operation boundaries now follow retained setup policies. Simple accepts store/select; full additionally handles const/map/default/as-array (with source as-array incompleteness); ext witnesses defer to default internalization without unsupported marking in both. Modes 0/2 have no retained source writers: legacy integer mode registration is inside #if 0. Full-operation unit tests use ALL because native QF_AX rejects those extensions. Remaining array controls, delayed worklists and fresh-plugin parameter ownership are still incomplete.",
         "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
@@ -118635,14 +118677,19 @@
       "path": "src/smt/theory_array_base.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_extensionality.go",
+        "pkg/smtcore/theory_array_extensionality_test.go",
+        "pkg/cmd/g3/test_vectors/array_extensional_disequality_timing.smt2",
         "pkg/cmd/g3/test_vectors/array_simple_boolean_witness_scopes.smt2",
         "pkg/cmd/g3/test_vectors/array_full_boolean_witness_scopes.smt2",
         "pkg/smtcore/theory_array.go",
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTArrayExtensionalityDisequalityQueueAndRollback",
+        "TestSMTArrayExtensionalitySkipsKnownDisequalReads",
         "TestSMTArrayBooleanIndexExhaustion",
         "TestSMTArrayReadOverWrite",
         "TestSMTArrayConstantRead",
@@ -118808,6 +118855,26 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "new_diseq_eh, assert_extensionality, already_diseq, extensionality can_propagate/propagate and scope reset: deferred witnesses, owner-ID canonicalization, root fingerprints, relevant equal-index disequal-read suppression and live option timing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_extensionality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_extensionality_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayExtensionalityDisequalityQueueAndRollback",
+            "TestSMTArrayExtensionalitySkipsKnownDisequalReads",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "remaining store/read axiom worklists and shared-array role detection, collection and final-check interface-equality scheduling",
+          "status": "unported",
+          "tests": []
+        },
+        {
           "name": "assert_extensionality_core marks array equality and witness-read equality relevant before inserting the extensionality axiom",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array.go",
@@ -118852,8 +118919,9 @@
         "Array value procedures retain their existing enode-value dependencies and generated interpretation owner. Reading disabled relevance does not change marks; observed defaults and selects enter the same dependency-before-value model traversal and scoped array trails as filtered terms."
       ],
       "deviations": [
+        "Array equality internalization no longer emits extensionality eagerly. Source disequality events enqueue a canonical root pair only after scoped duplicate checks and known relevant read-disequality suppression. Propagation drains the concrete queue; scope pop clears pending work and child fingerprints. A strict runner vector switches extensionality on after equality internalization and before disequality, then checks disabled recovery, raising C++ agreement to 127. Shared-array interface equality and other axiom worklists remain incomplete; base units are now explicitly partial.",
         "Restored source relevance marking for both extensionality equality atoms. Two strict Boolean-index scripts inspect distinct-array model values, exhaust both Boolean indices to force UNSAT, and restore SAT/models after pop. Together with Boolean class assignment propagation these raise strict runner agreement to 126 scripts.",
-        "Native fingerprint tables and delayed propagation queues are represented by scoped typed pair maps and eager guarded clauses. Go model procedures depend directly on canonical enode roots and register auxiliary functions through ProtoModel. Native interface-equality scheduling has no retained cross-theory array-sort consumer.",
+        "Native fingerprint tables and delayed propagation queues are represented by scoped typed pair maps and eager guarded clauses. Go model procedures depend directly on canonical enode roots and register auxiliary functions through ProtoModel. Shared-array interface-equality scheduling is still required for retained nested array roles and uninterpreted-function parents; the previous no-consumer claim was incorrect.",
         "Observed array model defaults and select entries are no longer lost when relevancy filtering is disabled. Enabled/disabled mode tests inspect actual model interpretation and evaluator results. A new ALL-logic runner vector checks observed and unobserved selects, default fallback 11, scoped additional entries and contradiction recovery against C++, bringing strict comparisons to 95. Direct default(as-array) get-value reduction remains the existing shared C++/Go evaluator behavior and is not changed by this model dependency fix."
       ]
     },
@@ -118861,12 +118929,17 @@
       "path": "src/smt/theory_array_base.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_extensionality.go",
+        "pkg/smtcore/theory_array_extensionality_test.go",
+        "pkg/cmd/g3/test_vectors/array_extensional_disequality_timing.smt2",
         "pkg/smtcore/theory_array.go",
         "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
+        "TestSMTArrayExtensionalityDisequalityQueueAndRollback",
+        "TestSMTArrayExtensionalitySkipsKnownDisequalReads",
         "TestSMTArrayReadOverWrite",
         "TestSMTArrayModelPreservesObservedSelect",
         "TestSMTArrayModelPreservesObservedDefault",
@@ -118887,7 +118960,27 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "complete retained base axiom, scope, statistics and model-value interface",
+          "name": "new_diseq_eh, assert_extensionality, already_diseq, extensionality can_propagate/propagate and scope reset: deferred witnesses, owner-ID canonicalization, root fingerprints, relevant equal-index disequal-read suppression and live option timing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_extensionality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_extensionality_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayExtensionalityDisequalityQueueAndRollback",
+            "TestSMTArrayExtensionalitySkipsKnownDisequalReads",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "remaining store/read axiom worklists and shared-array role detection, collection and final-check interface-equality scheduling",
+          "status": "unported",
+          "tests": []
+        },
+        {
+          "name": "retained base axiom construction and model-value interface; source scheduling and shared-array interface equalities are recorded separately",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array.go",
           "tests": ["TestSMTArrayReadOverWrite", "TestSMTArrayExtensionality", "TestSMTArrayModelPreservesObservedSelect", "TestSMTArrayModelPreservesObservedDefault"]
@@ -118912,7 +119005,8 @@
         "Array value procedures retain their existing enode-value dependencies and generated interpretation owner. Reading disabled relevance does not change marks; observed defaults and selects enter the same dependency-before-value model traversal and scoped array trails as filtered terms."
       ],
       "deviations": [
-        "Queue scheduling and pointer-container helpers are subsumed by eager clauses and the shared SMT/model infrastructure.",
+        "Array equality internalization no longer emits extensionality eagerly. Source disequality events enqueue a canonical root pair only after scoped duplicate checks and known relevant read-disequality suppression. Propagation drains the concrete queue; scope pop clears pending work and child fingerprints. A strict runner vector switches extensionality on after equality internalization and before disequality, then checks disabled recovery, raising C++ agreement to 127. Shared-array interface equality and other axiom worklists remain incomplete; base units are now explicitly partial.",
+        "Extensionality now has a disequality-triggered propagation queue. Store/read queues and shared-array interface-equality scheduling remain incomplete; eager clauses alone do not establish their fidelity.",
         "Observed array model defaults and select entries are no longer lost when relevancy filtering is disabled. Enabled/disabled mode tests inspect actual model interpretation and evaluator results. A new ALL-logic runner vector checks observed and unobserved selects, default fallback 11, scoped additional entries and contradiction recovery against C++, bringing strict comparisons to 95. Direct default(as-array) get-value reduction remains the existing shared C++/Go evaluator behavior and is not changed by this model dependency fix."
       ]
     },

@@ -18,6 +18,7 @@ type smtArrayScope struct {
 	stores, selects, defaults, epsilons int
 	selectAxioms, defaultAxioms         int
 	unsupported                         bool
+	extensionality                      int
 }
 
 type smtArrayAxiomPair struct {
@@ -46,6 +47,9 @@ type SMTArrayTheory struct {
 	statistics                            smtArrayStatistics
 	extensional                           bool
 	simple                                bool
+	extensionalityFingerprints            map[smtArrayEnodePair]bool
+	extensionalityTrail                   []smtArrayEnodePair
+	extensionalityTodo                    []smtArrayEnodePair
 }
 
 func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
@@ -54,14 +58,15 @@ func NewSMTArrayTheory(family ast.FamilyID) (*SMTArrayTheory, error) {
 		return nil, err
 	}
 	return &SMTArrayTheory{
-		SMTTheoryBase: base,
-		extensional:   true,
-		stores:        make(map[ast.ASTHandle]bool),
-		selects:       make(map[ast.ASTHandle]bool),
-		defaults:      make(map[ast.ASTHandle]bool),
-		selectAxioms:  make(map[smtArrayAxiomPair]bool),
-		defaultAxioms: make(map[smtArrayAxiomPair]bool),
-		epsilons:      make(map[ast.ASTHandle]ast.ASTHandle),
+		SMTTheoryBase:              base,
+		extensional:                true,
+		stores:                     make(map[ast.ASTHandle]bool),
+		selects:                    make(map[ast.ASTHandle]bool),
+		defaults:                   make(map[ast.ASTHandle]bool),
+		selectAxioms:               make(map[smtArrayAxiomPair]bool),
+		defaultAxioms:              make(map[smtArrayAxiomPair]bool),
+		epsilons:                   make(map[ast.ASTHandle]ast.ASTHandle),
+		extensionalityFingerprints: make(map[smtArrayEnodePair]bool),
 	}, nil
 }
 
@@ -692,19 +697,10 @@ func (t *SMTArrayTheory) arrayHasLargeDomain(array ast.ASTHandle) (bool, error) 
 	return cardinality >= 1<<20, nil
 }
 
-func (t *SMTArrayTheory) InternalizeEquality(expression ast.ASTHandle, variable int32) error {
+func (*SMTArrayTheory) InternalizeEquality(ast.ASTHandle, int32) error { return nil }
+
+func (t *SMTArrayTheory) assertExtensionalityCore(left, right ast.ASTHandle) error {
 	state, err := t.State()
-	if err != nil {
-		return err
-	}
-	if !t.extensional {
-		return nil
-	}
-	left, err := state.manager.GetArg(expression, 0)
-	if err != nil {
-		return err
-	}
-	right, err := state.manager.GetArg(expression, 1)
 	if err != nil {
 		return err
 	}
@@ -744,7 +740,10 @@ func (t *SMTArrayTheory) InternalizeEquality(expression ast.ASTHandle, variable 
 	if err != nil {
 		return err
 	}
-	arrayEquality := NewSMTLiteral(variable, false)
+	arrayEquality, err := t.MkEqualityLiteral(left, right, true)
+	if err != nil {
+		return err
+	}
 	// assert_extensionality_core marks both equality atoms relevant before
 	// adding the witness axiom, so its reads constrain the published model.
 	for _, literal := range []SMTLiteral{arrayEquality, selectEquality} {
@@ -757,7 +756,6 @@ func (t *SMTArrayTheory) InternalizeEquality(expression ast.ASTHandle, variable 
 	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{arrayEquality, selectEquality.Negated()}); err != nil {
 		return err
 	}
-	t.statistics.extensionality++
 	return nil
 }
 func (t *SMTArrayTheory) NewEquality(left, right SMTTheoryVar) error {
@@ -769,8 +767,7 @@ func (t *SMTArrayTheory) NewEquality(left, right SMTTheoryVar) error {
 	}
 	return t.instantiateEquivalentArrayAxioms()
 }
-func (*SMTArrayTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error { return nil }
-func (*SMTArrayTheory) Assign(int32, bool) error                        { return nil }
+func (*SMTArrayTheory) Assign(int32, bool) error { return nil }
 
 func (t *SMTArrayTheory) instantiateEquivalentArrayAxioms() error {
 	state, err := t.State()
@@ -832,13 +829,14 @@ func (t *SMTArrayTheory) PushScope() error {
 		return err
 	}
 	t.scopes = append(t.scopes, smtArrayScope{
-		stores:        len(t.storeTrail),
-		selects:       len(t.selectTrail),
-		defaults:      len(t.defaultTrail),
-		epsilons:      len(t.epsilonTrail),
-		selectAxioms:  len(t.selectAxiomTrail),
-		defaultAxioms: len(t.defaultAxiomTrail),
-		unsupported:   t.unsupported,
+		stores:         len(t.storeTrail),
+		selects:        len(t.selectTrail),
+		defaults:       len(t.defaultTrail),
+		epsilons:       len(t.epsilonTrail),
+		selectAxioms:   len(t.selectAxiomTrail),
+		defaultAxioms:  len(t.defaultAxiomTrail),
+		unsupported:    t.unsupported,
+		extensionality: len(t.extensionalityTrail),
 	})
 	return nil
 }
@@ -849,6 +847,13 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
+	// Source theory_array_base::pop_scope_eh clears pending work before
+	// dropping the enodes and fingerprints owned by the popped scopes.
+	t.extensionalityTodo = nil
+	for _, pair := range t.extensionalityTrail[scope.extensionality:] {
+		delete(t.extensionalityFingerprints, pair)
+	}
+	t.extensionalityTrail = t.extensionalityTrail[:scope.extensionality]
 	for _, expression := range t.storeTrail[scope.stores:] {
 		delete(t.stores, expression)
 	}
