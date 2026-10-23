@@ -165,7 +165,7 @@ func (t *SMTLinearArithmeticTheory) completeNonlinearCandidate() (bool, error) {
 			return false, nil
 		}
 	}
-	solver, status, err := t.buildSimplexWithValues(nil, values)
+	solver, status, err := t.buildSimplexWithValues(values)
 	if err != nil || status != lbool.True {
 		return false, err
 	}
@@ -374,7 +374,7 @@ func (t *SMTLinearArithmeticTheory) propagateNonlinearBounds(solver *simplex.Sol
 // Source: theory_arith_nl.h is_monomial_linear,
 // get_monomial_fixed_var_product, and propagate_linear_monomial(s).
 // Replaying the resulting equation within this tableau keeps its fixed-bound
-// premises local to the current SMT scope or integer-feasibility branch.
+// premises local to the current logical SMT scope.
 func (t *SMTLinearArithmeticTheory) propagateLinearMonomials(solver *simplex.Solver) (bool, error) {
 	var manager smtArithmeticBoundDependencyManager
 	for _, column := range t.nonlinearColumns {

@@ -25,7 +25,7 @@ func (t *SMTLinearArithmeticTheory) normalizeOptimizedBound(column uint32, lower
 }
 
 func (t *SMTLinearArithmeticTheory) maxMinNonlinearVariables() (bool, error) {
-	solver, status, err := t.buildSimplex(nil)
+	solver, status, err := t.buildSimplex()
 	if err != nil || status == lbool.Undef {
 		return false, err
 	}

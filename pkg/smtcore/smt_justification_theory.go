@@ -178,7 +178,8 @@ func (j *SMTExtTheoryJustification) Release(manager *ast.ASTManager) error {
 
 type SMTExtTheoryPropagationJustification struct {
 	SMTExtTheoryJustification
-	Consequent SMTLiteral
+	Consequent    SMTLiteral
+	returnToOwner bool
 }
 
 func NewSMTExtTheoryPropagationJustification(manager *ast.ASTManager, theory SMTTheoryID, literals []SMTLiteral, equalities []SMTEnodePair, consequent SMTLiteral, parameters []ast.ASTParameter) (*SMTExtTheoryPropagationJustification, error) {
@@ -186,7 +187,14 @@ func NewSMTExtTheoryPropagationJustification(manager *ast.ASTManager, theory SMT
 	if err != nil {
 		return nil, err
 	}
-	return &SMTExtTheoryPropagationJustification{*base, consequent}, nil
+	return &SMTExtTheoryPropagationJustification{SMTExtTheoryJustification: *base, Consequent: consequent}, nil
+}
+
+func (j *SMTExtTheoryPropagationJustification) FromTheory() SMTTheoryID {
+	if j.returnToOwner {
+		return SMTNullTheoryID
+	}
+	return j.theory
 }
 func (j *SMTExtTheoryPropagationJustification) Name() string { return "ext-theory-propagation" }
 

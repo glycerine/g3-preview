@@ -92,13 +92,8 @@ type smtLinearArithmeticScope struct {
 	nonlinearRounds                      uint32
 }
 
-type smtLinearIntegerBranch struct {
-	variable uint32
-	lower    bool
-	value    big.Rat
-}
-
 type smtLinearArithmeticStatistics struct {
+	gomoryCuts                                           uint64
 	gcdTests, gcdConflicts                               uint64
 	maxMin                                               uint64
 	crossNested                                          uint64
@@ -114,6 +109,7 @@ type smtLinearArithmeticStatistics struct {
 // bounds. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	branchCutCounter, branchCutRatio     uint32
 	gcdEnabled, ignoreIntegers           bool
 	finalCheckIndex                      uint32
 	liberalFinalCheck, changedAssignment bool
@@ -181,6 +177,7 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		return nil, err
 	}
 	t := &SMTLinearArithmeticTheory{
+		branchCutRatio:        2,
 		gcdEnabled:            true,
 		liberalFinalCheck:     true,
 		SMTTheoryBase:         base,
@@ -215,6 +212,7 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 	t.equalityAdapter.lazy = config.LazyAdapter
 	t.gcdEnabled = config.GCDTest
 	t.ignoreIntegers = config.IgnoreInt
+	t.branchCutRatio = config.BranchCutRatio
 	t.nonlinearEnabled = config.NLArith
 	t.nonlinearGB = config.NLArithGB
 	t.nonlinearGBLimit = config.NLArithGBThreshold
@@ -1042,18 +1040,18 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 }
 
 func (t *SMTLinearArithmeticTheory) rebuild() (bool, error) {
-	solver, status, err := t.buildSimplex(nil)
+	solver, status, err := t.buildSimplex()
 	if err == nil && status == lbool.True {
 		t.solver = solver
 	}
 	return status == lbool.True, err
 }
 
-func (t *SMTLinearArithmeticTheory) buildSimplex(branches []smtLinearIntegerBranch) (*simplex.Solver, lbool.LBool, error) {
-	return t.buildSimplexWithValues(branches, nil)
+func (t *SMTLinearArithmeticTheory) buildSimplex() (*simplex.Solver, lbool.LBool, error) {
+	return t.buildSimplexWithValues(nil)
 }
 
-func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(branches []smtLinearIntegerBranch, values map[uint32]*big.Rat) (*simplex.Solver, lbool.LBool, error) {
+func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*big.Rat) (*simplex.Solver, lbool.LBool, error) {
 	solver := simplex.NewSolver(nil)
 	for variable := uint32(0); variable < t.nextSimplex; variable++ {
 		solver.EnsureVariable(variable)
@@ -1167,15 +1165,6 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(branches []smtLinearI
 			return solver, lbool.False, nil
 		}
 	}
-	for index := range branches {
-		branch := &branches[index]
-		bound := simplex.RationalInfinitesimal(&branch.value)
-		var err error
-		_, err = smtTightenSimplexBound(solver, branch.variable, branch.lower, bound)
-		if err != nil {
-			return solver, lbool.False, nil
-		}
-	}
 	for column, value := range values {
 		bound := simplex.RationalInfinitesimal(value)
 		if _, err := smtTightenSimplexBound(solver, column, true, bound); err != nil {
@@ -1236,50 +1225,6 @@ func (t *SMTLinearArithmeticTheory) fractionalVariable(solver *simplex.Solver) (
 		}
 	}
 	return 0, simplex.Infinitesimal{}, false
-}
-
-func (t *SMTLinearArithmeticTheory) integerFeasible(branches []smtLinearIntegerBranch, nodes *uint32) (lbool.LBool, error) {
-	const maxNodes = uint32(1024)
-	if *nodes >= maxNodes {
-		return lbool.Undef, nil
-	}
-	*nodes++
-	solver, status, err := t.buildSimplex(branches)
-	if err != nil || status != lbool.True {
-		return status, err
-	}
-	if conflict, err := t.checkArithmeticGCD(solver); err != nil {
-		return lbool.Undef, err
-	} else if conflict {
-		return lbool.False, nil
-	}
-	variable, value, fractional := t.fractionalVariable(solver)
-	if !fractional {
-		t.solver = solver
-		return lbool.True, nil
-	}
-	t.statistics.branches++
-	floor := floorSMTRational(&value.Main)
-	if value.Main.IsInt() && value.Epsilon.Sign() < 0 {
-		floor.Sub(floor, big.NewInt(1))
-	}
-	upper := smtLinearIntegerBranch{variable: variable, value: *new(big.Rat).SetInt(floor)}
-	left := append(append([]smtLinearIntegerBranch(nil), branches...), upper)
-	leftStatus, err := t.integerFeasible(left, nodes)
-	if err != nil || leftStatus == lbool.True {
-		return leftStatus, err
-	}
-	ceil := new(big.Int).Add(floor, big.NewInt(1))
-	lower := smtLinearIntegerBranch{variable: variable, lower: true, value: *new(big.Rat).SetInt(ceil)}
-	right := append(append([]smtLinearIntegerBranch(nil), branches...), lower)
-	rightStatus, err := t.integerFeasible(right, nodes)
-	if err != nil || rightStatus == lbool.True {
-		return rightStatus, err
-	}
-	if leftStatus == lbool.Undef || rightStatus == lbool.Undef {
-		return lbool.Undef, nil
-	}
-	return lbool.False, nil
 }
 
 func (t *SMTLinearArithmeticTheory) Propagate() error {
@@ -1862,6 +1807,7 @@ func (t *SMTLinearArithmeticTheory) CollectStatistics(target *statistics.Statist
 	target.UpdateUint64("arith max-min", t.statistics.maxMin)
 	target.UpdateUint64("arith gcd tests", t.statistics.gcdTests)
 	target.UpdateUint64("arith gcd conflicts", t.statistics.gcdConflicts)
+	target.UpdateUint64("arith gomory cuts", t.statistics.gomoryCuts)
 	return nil
 }
 

@@ -106,7 +106,7 @@ func TestSMTNonlinearClusterInequalityRowsScopedProofs(t *testing.T) {
 								t.Fatal("tableau-row nonlinear proof")
 							}
 						}
-						solver, feasible, err := theory.buildSimplex(nil)
+						solver, feasible, err := theory.buildSimplex()
 						astTestMust(t, err)
 						if feasible != lbool.True {
 							t.Fatal("linear relaxation should remain feasible", feasible)

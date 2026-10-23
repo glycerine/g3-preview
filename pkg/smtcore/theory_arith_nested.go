@@ -520,7 +520,7 @@ func (n *smtNestedArithmetic) terms(form *smtLinearForm) ([]smtNestedTerm, bool,
 }
 
 func (t *SMTLinearArithmeticTheory) checkCrossNestedConsistency() (conflict bool, result error) {
-	solver, status, err := t.buildSimplex(nil)
+	solver, status, err := t.buildSimplex()
 	if err != nil || status != lbool.True {
 		return false, err
 	}

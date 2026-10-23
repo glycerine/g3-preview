@@ -1,6 +1,6 @@
 // Source: src/smt/theory_arith_nl.h process_non_linear's rotating strategies
 // and scoped derived nonlinear bounds. Replay bounds have logical premises;
-// speculative integer-feasibility branches never justify global conflicts.
+// temporary candidate-model assignments never justify logical conflicts.
 package smtcore
 
 import (
@@ -37,7 +37,7 @@ func (t *SMTLinearArithmeticTheory) derivedBoundConflict() error {
 }
 
 func (t *SMTLinearArithmeticTheory) propagateNonlinearStrategyBounds() (bool, error) {
-	solver, status, err := t.buildSimplex(nil)
+	solver, status, err := t.buildSimplex()
 	if err != nil || status == lbool.Undef {
 		return false, err
 	}

@@ -42,8 +42,8 @@ func (t *SMTLinearArithmeticTheory) arithmeticIntegerMask() map[uint32]bool {
 	return integers
 }
 
-// A failed deferred check uses an unconditional replay. Checks inside
-// integerFeasible instead reject only that speculative branch tableau.
+// A failed deferred check uses a replay of current logical assertions;
+// temporary candidate model values never justify a conflict.
 func (t *SMTLinearArithmeticTheory) checkArithmeticGCD(solver *simplex.Solver) (bool, error) {
 	if !t.gcdEnabled {
 		return false, nil

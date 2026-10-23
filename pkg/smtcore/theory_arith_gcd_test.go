@@ -81,7 +81,7 @@ func TestSMTIntegerGCDAndExtendedGCDScopedProofs(t *testing.T) {
 						if !m.IsFalse(fact) {
 							t.Fatal("GCD conflict proof")
 						}
-						if !smtGCDProofHasRule(t, m, proof) {
+						if !smtProofHasTheoryRule(t, m, proof, "gcd-test") {
 							t.Fatal("GCD conflict proof lost gcd-test rule")
 						}
 					}
@@ -110,7 +110,7 @@ func TestSMTIntegerGCDAndExtendedGCDScopedProofs(t *testing.T) {
 	}
 }
 
-func smtGCDProofHasRule(t *testing.T, m *ast.ASTManager, proof ast.ASTHandle) bool {
+func smtProofHasTheoryRule(t *testing.T, m *ast.ASTManager, proof ast.ASTHandle, rule string) bool {
 	t.Helper()
 	stack := []ast.ASTHandle{proof}
 	seen := make(map[ast.ASTHandle]bool)
@@ -139,7 +139,7 @@ func smtGCDProofHasRule(t *testing.T, m *ast.ASTManager, proof ast.ASTHandle) bo
 				astTestMust(t, err)
 				text, _, err := m.Symbols.BareString(symbol)
 				astTestMust(t, err)
-				matched = matched || text == "gcd-test"
+				matched = matched || text == rule
 			}
 			astTestMust(t, m.DelParameter(&parameters[i]))
 		}

@@ -57,9 +57,9 @@ func (t *SMTLinearArithmeticTheory) nonlinearBranchTarget(bounds *simplex.Solver
 }
 
 func (t *SMTLinearArithmeticTheory) branchNonlinearIntegerVariable() (branched bool, result error) {
-	// Source bounds are logical-context bounds. The internal integer
-	// feasibility search may also have speculative bounds in t.solver.
-	bounds, status, err := t.buildSimplex(nil)
+	// Source branch selection uses logical assertion bounds, independently
+	// of temporary values tried by nonlinear model completion.
+	bounds, status, err := t.buildSimplex()
 	if err != nil || status != lbool.True {
 		return false, err
 	}

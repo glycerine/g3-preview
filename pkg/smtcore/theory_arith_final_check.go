@@ -13,9 +13,9 @@ func (t *SMTLinearArithmeticTheory) finalCheckIntegerFeasibility() (SMTFinalChec
 			if t.ignoreIntegers {
 				return SMTFinalCheckGiveUp, nil
 			}
-			// The candidate may contain branch bounds. Only this fresh replay
-			// can support a conflict in the global Boolean search context.
-			bounds, status, err := t.buildSimplex(nil)
+			// Only a replay of logical assertions can justify a conflict;
+			// temporary candidate-model bounds are excluded here.
+			bounds, status, err := t.buildSimplex()
 			if err != nil {
 				return SMTFinalCheckGiveUp, err
 			}
@@ -49,36 +49,11 @@ func (t *SMTLinearArithmeticTheory) finalCheckIntegerFeasibility() (SMTFinalChec
 			if _, _, fractional := t.fractionalVariable(bounds); !fractional {
 				return SMTFinalCheckDone, nil
 			}
-			var nodes uint32
-			status, err = t.integerFeasible(nil, &nodes)
-			if err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-			if status == lbool.Undef {
+			column, found := bounds.ArithmeticIntegerBase(integers, &t.nonlinearRandom)
+			if !found {
 				return SMTFinalCheckGiveUp, nil
 			}
-			if status == lbool.False {
-				state, stateErr := t.State()
-				if stateErr != nil {
-					return SMTFinalCheckGiveUp, stateErr
-				}
-				literals := make([]SMTLiteral, 0, len(t.assertions))
-				for _, assertion := range t.assertions {
-					literal := NewSMTLiteral(t.atoms[assertion.atom].variable, false)
-					if !assertion.truth {
-						literal = literal.Negated()
-					}
-					literals = append(literals, literal)
-				}
-				if len(literals) == 0 {
-					return SMTFinalCheckGiveUp, nil
-				}
-				t.statistics.conflicts++
-				if stateErr = state.SetTheoryConflict(t.FamilyID(), literals); stateErr != nil {
-					return SMTFinalCheckGiveUp, stateErr
-				}
-				return SMTFinalCheckContinue, nil
-			}
+			return t.branchOrCutIntegerColumn(column)
 		}
 	}
 	return SMTFinalCheckDone, nil
@@ -127,9 +102,8 @@ func (t *SMTLinearArithmeticTheory) finalCheckNonlinearArithmetic() (SMTFinalChe
 				return SMTFinalCheckDone, nil
 			}
 		}
-		// A branch-and-bound tableau contains speculative bounds. Replay
-		// interval propagation inside buildSimplex, where a contradiction
-		// rejects only that branch rather than the whole SMT context.
+		// Complete a candidate in a separate replay. Its temporary point
+		// bounds must not become logical assertions if completion fails.
 		if !satisfied {
 			satisfied, err = t.completeNonlinearCandidate()
 			if err != nil {

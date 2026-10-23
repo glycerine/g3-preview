@@ -101,10 +101,9 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 	if t.nonlinearGBExhausted {
 		return false, nil
 	}
-	// The last integer-feasible candidate may contain speculative branch
-	// bounds. Reconstruct the unconditional tableau before substituting
-	// fixed variables or using their intervals to justify a global conflict.
-	solver, status, err := t.buildSimplex(nil)
+	// Reconstruct logical assertion bounds before substituting fixed values;
+	// temporary candidate-model assignments cannot justify a conflict.
+	solver, status, err := t.buildSimplex()
 	if err != nil || status != lbool.True {
 		return false, err
 	}

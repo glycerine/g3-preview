@@ -30,7 +30,7 @@ func (t *SMTLinearArithmeticTheory) propagateFixedSharedValues() (bool, error) {
 	if len(shared) < 2 {
 		return false, nil
 	}
-	solver, status, err := t.buildSimplex(nil)
+	solver, status, err := t.buildSimplex()
 	if err != nil || status == lbool.Undef {
 		return false, err
 	}
