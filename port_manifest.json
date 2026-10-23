@@ -115055,7 +115055,7 @@
           ]
         },
         {
-          "name": "row and affine-definition bound propagation retain weighted premises through scoped numeric replay and fixed shared-value storage; equation provenance and infeasible-row explanation chains remain incomplete",
+          "name": "row and affine-definition bound propagation retain weighted premises through scoped numeric replay and fixed shared-value storage; infeasible-row explanation chains remain incomplete",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
           "go_targets": [
@@ -115943,7 +115943,9 @@
         "pkg/smtcore/theory_arith_nonlinear_dependency_test.go",
         "pkg/smtcore/smt_arith_bound_dependency.go",
         "pkg/math/simplex/bound_dependency.go",
-        "pkg/math/simplex/bound_dependency_test.go"
+        "pkg/math/simplex/bound_dependency_test.go",
+        "pkg/smtcore/theory_arith_grobner_dependency.go",
+        "pkg/smtcore/theory_arith_grobner_dependency_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticSquareNonnegative",
@@ -115973,7 +115975,8 @@
         "TestSMTLinearMonomialZeroFactorExplainsBothBounds",
         "TestSMTLinearMonomialAffineRowRetainsFixedFactorPremises",
         "TestBoundConflictDependenciesOwnAndInvalidateSnapshots",
-        "TestSMTRejectedNonlinearCandidateKeepsLogicalContextConsistent"
+        "TestSMTRejectedNonlinearCandidateKeepsLogicalContextConsistent",
+        "TestSMTGrobnerDependenciesOwnLiteralPolarityAndConsumerLifetime"
       ],
       "conditionals": [
         {
@@ -116284,7 +116287,7 @@
           ]
         },
         {
-          "name": "propagate_nl_upward, propagate_nl_downward for degree-one targets, and update_bounds_using_interval with open/integer endpoints and plain derived-bound dependencies; opposite-bound conflicts retain exact premises; equation and nested-polynomial dependency conflicts remain incomplete",
+          "name": "propagate_nl_upward, propagate_nl_downward for degree-one targets, and update_bounds_using_interval with open/integer endpoints and plain derived-bound dependencies; opposite-bound conflicts retain exact premises; equation and nested-polynomial conflicts retain source premises; interval resource checks remain incomplete",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
           "tests": [
@@ -116310,16 +116313,23 @@
           ]
         },
         {
-          "name": "retained default compute_grobner conflict path: fixed-value substitution, concrete monomials for replayed definition and opposite-bound equations, fixed monomial equations, source variable weights, bounded basis computation, and equation interval inconsistency",
-          "status": "partial",
+          "name": "retained default compute_grobner conflict path: fixed-value and fixed-factor substitution premises, definition and opposite-bound equation dependencies, basis reduction/superposition propagation, source variable weights and limits, selected equation-interval and expanded-square conflict endpoints, and scoped unweighted theory proofs",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_grobner.go",
           "go_targets": [
-            "pkg/cmd/g3/main_test.go"
+            "pkg/cmd/g3/main_test.go",
+            "pkg/smtcore/theory_arith_grobner_dependency.go",
+            "pkg/smtcore/theory_arith_grobner_dependency_test.go",
+            "pkg/smtcore/theory_arith_bound_dependency.go",
+            "pkg/smtcore/theory_arith_grobner_square.go",
+            "pkg/smtcore/theory_arith_grobner_square_test.go"
           ],
           "tests": [
             "TestSMTNonlinearGrobnerCoupledEquationsScopedProofs",
             "TestSMTLibRunnerScripts",
-            "TestSMTLibRunnerCPPReference"
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTGrobnerDependenciesOwnLiteralPolarityAndConsumerLifetime",
+            "TestSMTNonlinearGrobnerExpandedSquareScopedProofs"
           ]
         },
         {
@@ -116492,6 +116502,17 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerNestedUnboundedProofModeReferenceUnknown"
+          ]
+        },
+        {
+          "name": "Grobner equation dependency ownership: retain actual literal polarity in concrete AST dependency graphs, keep creator and equation ownership independent, and release temporary graphs after the basis consumer closes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_grobner_dependency.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_grobner_dependency_test.go"
+          ],
+          "tests": [
+            "TestSMTGrobnerDependenciesOwnLiteralPolarityAndConsumerLifetime"
           ]
         }
       ],

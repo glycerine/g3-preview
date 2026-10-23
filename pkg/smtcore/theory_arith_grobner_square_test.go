@@ -85,6 +85,13 @@ func TestSMTNonlinearGrobnerExpandedSquareScopedProofs(t *testing.T) {
 					astTestMust(t, err)
 					y, err := m.MkConst(astTestSymbol(t, m, "expanded-square-y"), sort)
 					astTestMust(t, err)
+					unrelated, err := m.MkConst(astTestSymbol(t, m, "expanded-square-unrelated"), sort)
+					astTestMust(t, err)
+					unrelatedValue, err := m.ArithmeticRealNumeralText("77")
+					astTestMust(t, err)
+					unrelatedBound, err := m.MkFamilyApp(family, smtArithOpGE, nil, []ast.ASTHandle{unrelated, unrelatedValue})
+					astTestMust(t, err)
+					astTestMust(t, s.Assert(unrelatedBound))
 					xx, err := m.MkArithmeticMul(x, x)
 					astTestMust(t, err)
 					yy, err := m.MkArithmeticMul(y, y)
@@ -126,6 +133,9 @@ func TestSMTNonlinearGrobnerExpandedSquareScopedProofs(t *testing.T) {
 							astTestMust(t, err)
 							if !m.IsFalse(fact) {
 								t.Fatal("expanded square conflict proof")
+							}
+							if smtTestArithmeticExpressionContains(t, m, proof, unrelated) {
+								t.Fatal("expanded-square proof cites unrelated assertion")
 							}
 						}
 						astTestMust(t, s.Pop(1))

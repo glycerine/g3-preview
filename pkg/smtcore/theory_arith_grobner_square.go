@@ -83,12 +83,12 @@ func (t *SMTLinearArithmeticTheory) grobnerMonomialInterval(solver *simplex.Solv
 	return interval, nil
 }
 
-func (t *SMTLinearArithmeticTheory) grobnerSquareInconsistent(solver *simplex.Solver, columns map[ast.ASTHandle]uint32, manager *smtArithmeticBoundDependencyManager, monomials []*grobner.Monomial) (bool, error) {
+func (t *SMTLinearArithmeticTheory) grobnerSquareConflictInterval(solver *simplex.Solver, columns map[ast.ASTHandle]uint32, manager *smtArithmeticBoundDependencyManager, monomials []*grobner.Monomial) (*smtOldInterval, error) {
 	intervals := make([]*smtOldInterval, len(monomials))
 	for i, monomial := range monomials {
 		interval, err := t.grobnerMonomialInterval(solver, columns, manager, monomial)
 		if err != nil {
-			return false, err
+			return nil, err
 		}
 		intervals[i] = interval
 	}
@@ -118,10 +118,10 @@ func (t *SMTLinearArithmeticTheory) grobnerSquareInconsistent(solver *simplex.So
 				}
 				interval := intervals[i].clone()
 				if err := interval.add(intervals[j]); err != nil {
-					return false, err
+					return nil, err
 				}
 				if err := interval.add(intervals[k]); err != nil {
-					return false, err
+					return nil, err
 				}
 				// Keep tighter existing intervals. Replace a recognized
 				// square only when [0,+infinity) improves its lower bound.
@@ -134,18 +134,21 @@ func (t *SMTLinearArithmeticTheory) grobnerSquareInconsistent(solver *simplex.So
 		}
 	}
 	if !removed {
-		return false, nil
+		return nil, nil
 	}
 	sum, err := newSMTOldIntervalHalfBound(manager, new(big.Rat), false, true, nil)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	for i, interval := range intervals {
 		if !deleted[i] {
 			if err = sum.add(interval); err != nil {
-				return false, err
+				return nil, err
 			}
 		}
 	}
-	return !sum.containsZero(), nil
+	if sum.containsZero() {
+		return nil, nil
+	}
+	return sum, nil
 }

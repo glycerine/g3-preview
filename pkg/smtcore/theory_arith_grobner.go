@@ -22,7 +22,7 @@ func smtFixedSimplexColumn(solver *simplex.Solver, column uint32) (*big.Rat, boo
 	return new(big.Rat).Set(&lower.Main), true
 }
 
-func (t *SMTLinearArithmeticTheory) grobnerMonomial(gb *grobner.Solver, solver *simplex.Solver, aliases map[uint32]ast.ASTHandle, coefficient *big.Rat, column uint32) (*grobner.Monomial, error) {
+func (t *SMTLinearArithmeticTheory) grobnerMonomial(gb *grobner.Solver, solver *simplex.Solver, aliases map[uint32]ast.ASTHandle, coefficient *big.Rat, column uint32, fixedColumns *[]uint32) (*grobner.Monomial, error) {
 	coeff := new(big.Rat).Set(coefficient)
 	var variables []ast.ASTHandle
 	var factor func(uint32, bool) error
@@ -39,6 +39,7 @@ func (t *SMTLinearArithmeticTheory) grobnerMonomial(gb *grobner.Solver, solver *
 			return nil
 		}
 		if value, fixed := smtFixedSimplexColumn(solver, current); fixed {
+			*fixedColumns = append(*fixedColumns, current)
 			coeff.Mul(coeff, value)
 			return nil
 		}
@@ -66,8 +67,9 @@ func (t *SMTLinearArithmeticTheory) grobnerMonomial(gb *grobner.Solver, solver *
 	return gb.NewMonomial(coeff, variables)
 }
 
-func (t *SMTLinearArithmeticTheory) assertGrobnerForm(gb *grobner.Solver, solver *simplex.Solver, aliases map[uint32]ast.ASTHandle, form *smtLinearForm) (err error) {
+func (t *SMTLinearArithmeticTheory) assertGrobnerForm(gb *grobner.Solver, solver *simplex.Solver, aliases map[uint32]ast.ASTHandle, form *smtLinearForm, dependencies *smtGrobnerDependencies, premises ...SMTLiteral) (err error) {
 	monomials := make([]*grobner.Monomial, 0, len(form.terms)+1)
+	var fixedColumns []uint32
 	defer func() {
 		if err != nil {
 			for _, monomial := range monomials {
@@ -81,7 +83,7 @@ func (t *SMTLinearArithmeticTheory) assertGrobnerForm(gb *grobner.Solver, solver
 	}
 	sort.Slice(columns, func(i, j int) bool { return columns[i] < columns[j] })
 	for _, column := range columns {
-		monomial, err := t.grobnerMonomial(gb, solver, aliases, form.terms[column], column)
+		monomial, err := t.grobnerMonomial(gb, solver, aliases, form.terms[column], column, &fixedColumns)
 		if err != nil {
 			return err
 		}
@@ -94,7 +96,27 @@ func (t *SMTLinearArithmeticTheory) assertGrobnerForm(gb *grobner.Solver, solver
 		}
 		monomials = append(monomials, monomial)
 	}
-	return gb.AssertMonomialsZero(monomials, ast.ASTDependency{})
+	var root ast.ASTDependency
+	for _, literal := range premises {
+		root, err = dependencies.add(root, literal)
+		if err != nil {
+			return err
+		}
+	}
+	seen := make(map[uint32]bool)
+	for _, column := range fixedColumns {
+		if seen[column] {
+			continue
+		}
+		seen[column] = true
+		for _, lower := range []bool{true, false} {
+			root, err = dependencies.addBound(root, solver, column, lower)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return gb.AssertMonomialsZero(monomials, root)
 }
 
 func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err error) {
@@ -104,8 +126,11 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 	// Reconstruct logical assertion bounds before substituting fixed values;
 	// temporary candidate-model assignments cannot justify a conflict.
 	solver, status, err := t.buildSimplex()
-	if err != nil || status != lbool.True {
+	if err != nil || status == lbool.Undef {
 		return false, err
+	}
+	if status == lbool.False {
+		return true, t.derivedBoundConflict(solver)
 	}
 	cluster, err := t.nonlinearCluster(solver)
 	if err != nil {
@@ -113,6 +138,8 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 	}
 	refs := smtArithmeticDivisionCall{theory: t}
 	defer func() { err = errors.Join(err, refs.close()) }()
+	dependencies := smtGrobnerDependencies{theory: t}
+	defer func() { err = errors.Join(err, dependencies.close()) }()
 	gb, err := grobner.New(t.state.manager)
 	if err != nil {
 		return false, err
@@ -182,7 +209,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 			}
 			form.addTerm(column, entry.Coefficient)
 		}
-		if rowErr = t.assertGrobnerForm(gb, solver, aliases, &form); rowErr != nil {
+		if rowErr = t.assertGrobnerForm(gb, solver, aliases, &form, &dependencies); rowErr != nil {
 			return false, rowErr
 		}
 	}
@@ -198,7 +225,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 		definition := t.definitions[variable]
 		form := definition.clone()
 		form.addTerm(t.simplexVariables[variable], big.NewRat(-1, 1))
-		if err = t.assertGrobnerForm(gb, solver, aliases, &form); err != nil {
+		if err = t.assertGrobnerForm(gb, solver, aliases, &form, &dependencies); err != nil {
 			return false, err
 		}
 	}
@@ -210,7 +237,7 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 		for _, second := range t.assertions[i+1:] {
 			right, ok := smtLinearNormalizedLE(&t.atoms[second.atom], second)
 			if ok && smtLinearFormsOpposite(&left, &right) {
-				if err = t.assertGrobnerForm(gb, solver, aliases, &left); err != nil {
+				if err = t.assertGrobnerForm(gb, solver, aliases, &left, &dependencies, smtLinearAssertionLiteral(&t.atoms[first.atom], first), smtLinearAssertionLiteral(&t.atoms[second.atom], second)); err != nil {
 					return false, err
 				}
 				break
@@ -222,7 +249,11 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 			form := newSMTLinearForm()
 			form.addTerm(column, big.NewRat(1, 1))
 			form.constant.Neg(value)
-			if err = t.assertGrobnerForm(gb, solver, aliases, &form); err != nil {
+			var premises []SMTLiteral
+			for _, lower := range []bool{true, false} {
+				premises = append(premises, dependencies.boundLiterals(solver, column, lower)...)
+			}
+			if err = t.assertGrobnerForm(gb, solver, aliases, &form, &dependencies, premises...); err != nil {
 				return false, err
 			}
 		}
@@ -241,7 +272,8 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 		if !done {
 			t.nonlinearGBExhausted = true
 		}
-		conflict = gb.Inconsistent()
+		basisInconsistent := gb.Inconsistent()
+		conflict = false
 		var manager smtArithmeticBoundDependencyManager
 		for _, equation := range gb.Equations() {
 			if conflict {
@@ -260,14 +292,26 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 					return false, err
 				}
 			}
-			conflict = !sum.containsZero()
-			if !conflict {
-				conflict, err = t.grobnerSquareInconsistent(solver, columns, &manager, equation.Monomials())
-				if err != nil {
-					return false, err
+			if !sum.containsZero() {
+				premises, dependencyErr := dependencies.literals(equation.Dependency())
+				if dependencyErr != nil {
+					return false, dependencyErr
 				}
+				return true, t.arithmeticIntervalConflict(sum, sum.positiveOne(), premises...)
+			}
+			square, squareErr := t.grobnerSquareConflictInterval(solver, columns, &manager, equation.Monomials())
+			if squareErr != nil {
+				return false, squareErr
+			}
+			if square != nil {
+				premises, dependencyErr := dependencies.literals(equation.Dependency())
+				if dependencyErr != nil {
+					return false, dependencyErr
+				}
+				return true, t.arithmeticIntervalConflict(square, square.positiveOne(), premises...)
 			}
 		}
+		conflict = conflict || basisInconsistent
 		if conflict || !t.nonlinearGBPerturbate || t.nonlinearGBExhausted {
 			break
 		}
