@@ -181,6 +181,10 @@ func (c *smtModelFinderAUFClassifier) recognizedLiteral(atom ast.ASTHandle, nega
 }
 
 func (c *smtModelFinderAUFClassifier) isAUFSelect(term ast.ASTHandle) (bool, error) {
+	kind, err := c.finder.manager.GetKind(term)
+	if err != nil || kind != ast.ASTApp {
+		return false, err
+	}
 	family, err := c.finder.manager.GetFamilyID(term)
 	if err != nil {
 		return false, err

@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 )
 
 type smtModelFinderAUFKey struct {
@@ -26,6 +27,8 @@ type smtModelFinderAUFGraph struct {
 	fvars     []smtModelFinderFVar
 	literals  []smtModelFinderAUFLiteral
 	refs      []ast.ASTRef
+	model     *protomodel.ProtoModel
+	selects   []smtModelFinderSelectVar
 }
 
 func newSMTModelFinderAUFGraph(finder *SMTModelFinder) *smtModelFinderAUFGraph {
@@ -104,6 +107,9 @@ func (g *smtModelFinderAUFGraph) collectFVars(quantifier ast.ASTHandle) error {
 		if err != nil {
 			return err
 		}
+		if err := g.collectSelectVars(quantifier, term); err != nil {
+			return err
+		}
 		count, err := g.finder.manager.GetNumArgs(term)
 		if err != nil {
 			return err
@@ -175,6 +181,9 @@ func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 	if err := g.processLiterals(); err != nil {
 		return err
 	}
+	if err := g.processSelectVars(); err != nil {
+		return err
+	}
 	for _, node := range g.nodes {
 		if node.parent == nil {
 			if err := node.makeInstantiationSet(g.finder.manager); err != nil {
@@ -209,6 +218,9 @@ func (g *smtModelFinderAUFGraph) build(quantifiers []ast.ASTHandle) error {
 	if err := g.populateLiterals(); err != nil {
 		return err
 	}
+	if err := g.populateSelectVars(); err != nil {
+		return err
+	}
 	return g.populateOffsets()
 }
 
@@ -238,8 +250,9 @@ func (g *smtModelFinderAUFGraph) close() (result error) {
 	return result
 }
 
-func (f *SMTModelFinder) populateAUFInstantiationSets(quantifiers []ast.ASTHandle) (result error) {
+func (f *SMTModelFinder) populateAUFInstantiationSets(quantifiers []ast.ASTHandle, model *protomodel.ProtoModel) (result error) {
 	graph := newSMTModelFinderAUFGraph(f)
+	graph.model = model
 	defer func() { result = errors.Join(result, graph.close()) }()
 	if err := graph.build(quantifiers); err != nil {
 		return err
