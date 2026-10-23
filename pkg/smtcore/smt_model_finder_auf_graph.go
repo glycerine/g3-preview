@@ -257,5 +257,8 @@ func (f *SMTModelFinder) populateAUFInstantiationSets(quantifiers []ast.ASTHandl
 	if err := graph.build(quantifiers); err != nil {
 		return err
 	}
+	if err := graph.prepareInstantiationSets(); err != nil {
+		return err
+	}
 	return graph.publishInstantiationSets()
 }

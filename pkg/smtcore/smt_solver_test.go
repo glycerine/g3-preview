@@ -144,6 +144,15 @@ func TestSMTSolverMBQIBlocksAndCollectsMultipleIntegerCounterexamples(t *testing
 		astTestMust(t, params.Close())
 	})
 	astTestMust(t, s.Assert(quantifier))
+	// Supply three legal candidate terms so the AUF empty-set singleton
+	// fallback cannot turn this enumeration test into a one-instance refutation.
+	astTestMust(t, s.kernel.internalizer.Internalize(quantifier, true))
+	for _, text := range []string{"1", "2", "3"} {
+		term, err := m.ArithmeticIntegerNumeralText(text)
+		astTestMust(t, err)
+		_, err = s.kernel.internalizer.quantifierManager.modelFinder.InsertInstantiationTerm(quantifier, 0, term, 0)
+		astTestMust(t, err)
+	}
 	status, err := s.CheckSat(nil)
 	astTestMust(t, err)
 	if status != lbool.False {
