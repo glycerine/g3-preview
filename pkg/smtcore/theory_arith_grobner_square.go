@@ -78,6 +78,26 @@ func (t *SMTLinearArithmeticTheory) grobnerMonomialInterval(solver *simplex.Solv
 	return interval, nil
 }
 
+// Source is_inconsistent(I, monomials, dep) copies I and stops once
+// its sum is fully unbounded. Later monomials cannot exclude zero and
+// must not perform additional interval work or consume resources.
+func (t *SMTLinearArithmeticTheory) grobnerSumInterval(solver *simplex.Solver, columns map[ast.ASTHandle]uint32, manager *smtArithmeticBoundDependencyManager, initial *smtOldInterval, monomials []*grobner.Monomial) (*smtOldInterval, error) {
+	sum := initial.clone()
+	for _, monomial := range monomials {
+		interval, err := t.grobnerMonomialInterval(solver, columns, manager, monomial)
+		if err != nil {
+			return nil, err
+		}
+		if err = sum.add(interval); err != nil {
+			return nil, err
+		}
+		if sum.minusInfinity() && sum.plusInfinity() {
+			break
+		}
+	}
+	return sum, nil
+}
+
 func (t *SMTLinearArithmeticTheory) grobnerSquareConflictInterval(solver *simplex.Solver, columns map[ast.ASTHandle]uint32, manager *smtArithmeticBoundDependencyManager, monomials []*grobner.Monomial) (*smtOldInterval, error) {
 	intervals := make([]*smtOldInterval, len(monomials))
 	for i, monomial := range monomials {
@@ -135,12 +155,17 @@ func (t *SMTLinearArithmeticTheory) grobnerSquareConflictInterval(solver *simple
 	if err != nil {
 		return nil, err
 	}
-	for i, interval := range intervals {
+	var remaining []*grobner.Monomial
+	for i, monomial := range monomials {
 		if !deleted[i] {
-			if err = sum.add(interval); err != nil {
-				return nil, err
-			}
+			remaining = append(remaining, monomial)
 		}
+	}
+	// Source invokes is_inconsistent again after selecting squares. This
+	// reevaluates the surviving monomials, including their resource charges.
+	sum, err = t.grobnerSumInterval(solver, columns, manager, sum, remaining)
+	if err != nil {
+		return nil, err
 	}
 	if sum.containsZero() {
 		return nil, nil

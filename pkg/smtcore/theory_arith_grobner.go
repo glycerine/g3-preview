@@ -283,14 +283,9 @@ func (t *SMTLinearArithmeticTheory) checkNonlinearGrobner() (conflict bool, err 
 			if err != nil {
 				return false, err
 			}
-			for _, monomial := range equation.Monomials() {
-				interval, err := t.grobnerMonomialInterval(solver, columns, &manager, monomial)
-				if err != nil {
-					return false, err
-				}
-				if err = sum.add(interval); err != nil {
-					return false, err
-				}
+			sum, err = t.grobnerSumInterval(solver, columns, &manager, sum, equation.Monomials())
+			if err != nil {
+				return false, err
 			}
 			if !sum.containsZero() {
 				premises, dependencyErr := dependencies.literals(equation.Dependency())
