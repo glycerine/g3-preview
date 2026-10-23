@@ -484,6 +484,12 @@ func TestSMTSequenceTheoryReducesEqualLengthBoundaries(t *testing.T) {
 	if status != lbool.False {
 		t.Fatal("equal-length boundary reduction", status)
 	}
+	family, err := m.SequenceFamilyID()
+	astTestMust(t, err)
+	theory, ok := solver.kernel.internalizer.theories[family].(*SMTSequenceTheory)
+	if !ok || !theory.solutions.IsRoot(x) || !theory.solutions.IsRoot(y) {
+		t.Fatal("equal-length reduction installed a word substitution")
+	}
 }
 
 func TestSMTSequenceTheorySplitsFixedLengthPrefixes(t *testing.T) {

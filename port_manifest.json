@@ -117327,7 +117327,7 @@
           "tests": ["TestSMTSequenceTheoryConcreteNonContainsConflict"]
         },
         {
-          "name": "queued equation expansion, concat flattening, empty removal, adjacent string folding, exact, e-graph-equivalent, equal-length and string-boundary cancellation, native word-variable recognition for uninterpreted, extract, replace and at terms, variable/occurs recognition, unit solutions, dependency-preserving equality propagation, and internal draining of solved removals and residual replacements without spurious SAT progress (src/smt/theory_seq.cpp:1341-1648,2856-3066)",
+          "name": "queued equation expansion, concat flattening, empty removal, adjacent string folding, exact and e-graph-equivalent cancellation, native equal-length boundary propagation with residual equation replacement instead of solution-map substitution, string-boundary cancellation, native word-variable recognition for uninterpreted, extract, replace and at terms, variable/occurs recognition, unit solutions, dependency-preserving equality propagation, and internal draining of solved removals and residual replacements without spurious SAT progress (src/smt/theory_seq.cpp:1341-1648,2856-3066)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_solve.go",
           "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict", "TestSMTSequenceTheoryNativeWordVariableClassification", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel"]
@@ -117580,7 +117580,7 @@
           "tests": ["TestSMTSequenceTheoryConcreteWordEquationConflict"]
         },
         {
-          "name": "symbolic word canonicalization, exact, e-graph and equal-length boundary cancellation, occurs checks, unit solution insertion and explained e-graph propagation",
+          "name": "symbolic word canonicalization, exact and e-graph cancellation, native equal-length boundary equality propagation with residual equation replacement, occurs checks, unit solution insertion and explained e-graph propagation",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_solve.go",
           "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries"]
