@@ -116784,7 +116784,8 @@
         "TestSMTSequenceDisequationQueueScopesAndOwnedCases",
         "TestSMTSequenceNonContainsQueueAndAssignmentScopes",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
-        "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary",
+        "TestSMTSequenceTheoryLiteralConflictAndConcatModel",
+        "TestSMTSequenceTheoryAuditsUnresolvedWordEquation",
         "TestSMTSequenceTheoryConcreteWordEquationConflict",
         "TestSMTSequenceTheoryConcreteWordDisequationConflict",
         "TestSMTSequenceTheoryReducedWordDisequationConflict",
@@ -117297,10 +117298,10 @@
           "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes"]
         },
         {
-          "name": "sequence term and atom internalization, structural recognition of generated Skolem words including mixed user/generated concatenations, implemented relation and sequence operations, theory-variable attachment, literal-value equality conflicts, scoped equality and disequality state, final-check boundary, and model-value factory hooks (src/smt/theory_seq.cpp:2225-2255,2616-2785,4053-4130)",
+          "name": "sequence term and atom internalization, structural recognition of generated Skolem words including mixed user/generated concatenations, implemented unit and concat terms plus relation and sequence operations, theory-variable attachment, literal-value equality conflicts, scoped equality and disequality state, native final-check solved-equation audit, and model-value factory hooks (src/smt/theory_seq.cpp:2225-2255,2616-2785,4053-4130)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
-          "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel", "TestSMTSequenceTheorySymbolicNonContainsModel"]
+          "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndConcatModel", "TestSMTSequenceTheoryAuditsUnresolvedWordEquation", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel", "TestSMTSequenceTheorySymbolicNonContainsModel"]
         },
         {
           "name": "solution-map expansion of queued concat leaves and concrete string-word conflict detection with dependency explanations (src/smt/theory_seq.cpp:1341-1533,2856-3066)",
@@ -117327,10 +117328,10 @@
           "tests": ["TestSMTSequenceTheoryConcreteNonContainsConflict"]
         },
         {
-          "name": "queued equation expansion, concat flattening, empty removal, adjacent string folding, exact and e-graph-equivalent cancellation, native equal-length boundary propagation with residual equation replacement instead of solution-map substitution, string-boundary cancellation, native word-variable recognition for uninterpreted, extract, replace and at terms, variable/occurs recognition, unit solutions, dependency-preserving equality propagation, and internal draining of solved removals and residual replacements without spurious SAT progress (src/smt/theory_seq.cpp:1341-1648,2856-3066)",
+          "name": "queued equation expansion, concat flattening, empty removal, adjacent string folding, exact and e-graph-equivalent cancellation, native equal-length boundary propagation with residual equation replacement instead of solution-map substitution, string-boundary cancellation, native word-variable recognition for uninterpreted, extract, replace and at terms, variable/occurs recognition, late generated-word unit completion, dependency-preserving equality propagation, solved-equation removal, and internal draining without spurious SAT progress (src/smt/theory_seq.cpp:1341-1648,2856-3066)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_solve.go",
-          "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict", "TestSMTSequenceTheoryNativeWordVariableClassification", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel"]
+          "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict", "TestSMTSequenceTheoryNativeWordVariableClassification", "TestSMTSequenceTheoryLiteralConflictAndConcatModel", "TestSMTSequenceTheoryAuditsUnresolvedWordEquation", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel"]
         },
         {
           "name": "zero-length leading-variable elimination, exact total-length mismatch conflicts, leading-variable overlap decomposition with stable seq.left and seq.right witnesses for empty and non-fixed prefixes under the exact |b| < |X| <= |b| + |Y| model length guards (fixed string and unit prefixes remain covered by the complete binary word routines), and multi-part prefix and suffix splitting at arithmetic-proven equal total lengths with guarded prefix and residual equalities (src/smt/theory_seq.cpp:482-630,1574-1691)",
@@ -117580,10 +117581,10 @@
           "tests": ["TestSMTSequenceTheoryConcreteWordEquationConflict"]
         },
         {
-          "name": "symbolic word canonicalization, exact and e-graph cancellation, native equal-length boundary equality propagation with residual equation replacement, occurs checks, unit solution insertion and explained e-graph propagation",
+          "name": "symbolic word canonicalization, exact and e-graph cancellation, native equal-length boundary equality propagation with residual equation replacement, occurs checks, ordinary and generated-word unit solution insertion, solved-equation removal, unresolved-equation audit, and explained e-graph propagation",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_solve.go",
-          "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries"]
+          "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryLiteralConflictAndConcatModel", "TestSMTSequenceTheoryAuditsUnresolvedWordEquation"]
         },
         {
           "name": "fixed-string binary word-equation prefix-overlap and shared-tail branching declarations",

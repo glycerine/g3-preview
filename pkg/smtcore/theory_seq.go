@@ -333,7 +333,8 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 	if err != nil {
 		return false, err
 	}
-	implemented := 3 <= op && op <= 10 || op == 27 || op == 28
+	implemented := op == ast.ASTSequenceOpUnit || op == ast.ASTSequenceOpConcat ||
+		3 <= op && op <= 10 || op == 27 || op == 28
 	if !value && !internal && !generated && !implemented && op != 12 {
 		if err = t.markUnsupported(); err != nil {
 			return false, err
@@ -370,7 +371,11 @@ func (t *SMTSequenceTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHand
 	if err != nil {
 		return err
 	}
-	if variable {
+	generated, err := t.generatedSequenceTerm(node.Owner(), make(map[ast.ASTHandle]struct{}))
+	if err != nil {
+		return err
+	}
+	if variable && !generated {
 		return t.addSequenceCoherenceAxiom(node.Owner())
 	}
 	return nil
@@ -1002,7 +1007,11 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if progress {
 		return SMTFinalCheckContinue, nil
 	}
-	if t.unsupported != 0 || regexUnresolved {
+	unresolvedEquation, err := t.hasUnresolvedWordEquation()
+	if err != nil {
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence solved equation audit: %w", err)
+	}
+	if unresolvedEquation || t.unsupported != 0 || regexUnresolved {
 		return SMTFinalCheckGiveUp, nil
 	}
 	return SMTFinalCheckDone, nil

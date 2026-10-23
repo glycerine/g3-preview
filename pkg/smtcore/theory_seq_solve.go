@@ -321,6 +321,40 @@ func (t *SMTSequenceTheory) solveUnitWord(left, right []ast.ASTHandle, dependenc
 	return false, nil
 }
 
+func (t *SMTSequenceTheory) solveGeneratedUnitWord(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
+	for pass := 0; pass < 2; pass++ {
+		if len(left) == 1 {
+			generated, err := t.generatedSequenceTerm(left[0], make(map[ast.ASTHandle]struct{}))
+			if err != nil {
+				return false, err
+			}
+			if generated {
+				cyclic, err := t.occurs(left[0], right)
+				if err != nil {
+					return false, err
+				}
+				if !cyclic {
+					state, stateErr := t.State()
+					if stateErr != nil {
+						return false, stateErr
+					}
+					sort, sortErr := state.manager.GetSort(left[0])
+					if sortErr != nil {
+						return false, sortErr
+					}
+					value, makeErr := t.makeWord(right, sort)
+					if makeErr != nil {
+						return false, makeErr
+					}
+					return t.addSolution(left[0], value, dependency)
+				}
+			}
+		}
+		left, right = right, left
+	}
+	return false, nil
+}
+
 func (t *SMTSequenceTheory) equalWordParts(left, right ast.ASTHandle, dependency *smtSequenceDependency) (bool, *smtSequenceDependency) {
 	if left == right {
 		return true, dependency
@@ -562,9 +596,30 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if err != nil || branched {
 			return branched, err
 		}
+		state, err := t.State()
+		if err != nil {
+			return false, err
+		}
+		before := state.searchProgress()
 		solved, err := t.solveUnitWord(left, right, dependency)
-		if err != nil || solved {
-			return solved, err
+		if err != nil {
+			return false, err
+		}
+		if !solved {
+			solved, err = t.solveGeneratedUnitWord(left, right, dependency)
+			if err != nil {
+				return false, err
+			}
+		}
+		if solved {
+			if err = t.removeEquation(index); err != nil {
+				return false, err
+			}
+			if state.Inconsistent() || state.searchProgress() != before {
+				return true, nil
+			}
+			index--
+			continue
 		}
 		if changed {
 			if err = t.equations.Set(index, id, left, right, dependency); err != nil {
@@ -576,6 +631,58 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		branched, err = t.branchVariablePrefixEquality(left, right)
 		if err != nil || branched {
 			return branched, err
+		}
+	}
+	return false, nil
+}
+
+func (t *SMTSequenceTheory) hasUnresolvedWordEquation() (bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	for index := 0; index < t.equations.Len(); index++ {
+		_, left, right, dependency, err := t.equations.At(index)
+		if err != nil {
+			return false, err
+		}
+		if len(left) == 0 && len(right) == 0 {
+			continue
+		}
+		sample := left
+		if len(sample) == 0 {
+			sample = right
+		}
+		sort, err := state.manager.GetSort(sample[0])
+		if err != nil {
+			return false, err
+		}
+		leftWord, err := t.makeWord(left, sort)
+		if err != nil {
+			return false, err
+		}
+		rightWord, err := t.makeWord(right, sort)
+		if err != nil {
+			return false, err
+		}
+		leftNode, rightNode := state.context.enodes[leftWord], state.context.enodes[rightWord]
+		if leftNode != nil && rightNode != nil && leftNode.Root() == rightNode.Root() {
+			continue
+		}
+		left, dependency, err = t.expandWord(left, dependency)
+		if err != nil {
+			return false, err
+		}
+		right, dependency, err = t.expandWord(right, dependency)
+		if err != nil {
+			return false, err
+		}
+		left, right, _, _, conflict, err := t.cancelWordBoundaries(left, right, dependency)
+		if err != nil {
+			return false, err
+		}
+		if conflict || len(left) != 0 || len(right) != 0 {
+			return true, nil
 		}
 	}
 	return false, nil

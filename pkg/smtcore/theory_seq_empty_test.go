@@ -156,7 +156,7 @@ func TestSMTSequenceLogicsInstallSafeCheckpointTheory(t *testing.T) {
 	}
 }
 
-func TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary(t *testing.T) {
+func TestSMTSequenceTheoryLiteralConflictAndConcatModel(t *testing.T) {
 	for _, logic := range []string{"QF_S", "ALL"} {
 		t.Run(logic, func(t *testing.T) {
 			m, modelConfig := smtModelGeneratorFixture(t)
@@ -197,8 +197,32 @@ func TestSMTSequenceTheoryLiteralConflictAndUnsupportedBoundary(t *testing.T) {
 	astTestMust(t, solver.Assert(equality))
 	status, err := solver.CheckSat(nil)
 	astTestMust(t, err)
-	if status != lbool.Undef {
-		t.Fatal("unported concatenation returned a definitive result", status)
+	if status != lbool.True {
+		t.Fatal("solved symbolic concatenation model", status)
+	}
+}
+
+func TestSMTSequenceTheoryAuditsUnresolvedWordEquation(t *testing.T) {
+	m := astTestManager(t)
+	empty, err := m.MkString("")
+	astTestMust(t, err)
+	sort, err := m.GetSort(empty)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-commute-x"), sort)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "sequence-commute-y"), sort)
+	astTestMust(t, err)
+	family, err := m.SequenceFamilyID()
+	astTestMust(t, err)
+	theory, err := NewSMTSequenceTheory(family)
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.RegisterTheory(theory))
+	astTestMust(t, theory.equations.Push(0, []ast.ASTHandle{x, y}, []ast.ASTHandle{y, x}, nil))
+	unresolved, err := theory.hasUnresolvedWordEquation()
+	astTestMust(t, err)
+	if !unresolved {
+		t.Fatal("commuting word equation reported solved")
 	}
 }
 
