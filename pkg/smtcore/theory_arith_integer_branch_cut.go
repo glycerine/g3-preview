@@ -179,43 +179,7 @@ func (t *SMTLinearArithmeticTheory) gomoryIntegerColumn(column uint32) (result e
 	if len(cut.Terms) == 1 {
 		bound, err = t.integerColumnBound(&refs, t.solver, cut.Terms[0].Column, cut.Lower, &cut.Bound)
 	} else {
-		var terms []ast.ASTHandle
-		allInteger := true
-		for _, term := range cut.Terms {
-			expression, e := t.integerColumnExpression(&refs, t.solver, term.Column)
-			if e != nil {
-				return e
-			}
-			sort, e := m.GetSort(expression)
-			if e != nil {
-				return e
-			}
-			kind, e := m.GetDeclKind(sort)
-			if e != nil {
-				return e
-			}
-			allInteger = allInteger && kind == 1 && term.Coefficient.IsInt()
-			if term.Coefficient.Cmp(big.NewRat(1, 1)) != 0 {
-				numeral, e := refs.hold(m.ArithmeticNumeralRat(&term.Coefficient, kind == 1 && term.Coefficient.IsInt()))
-				if e != nil {
-					return e
-				}
-				expression, e = refs.app(smtArithOpMul, numeral, expression)
-				if e != nil {
-					return e
-				}
-			}
-			terms = append(terms, expression)
-		}
-		polynomial, e := refs.app(smtArithOpAdd, terms...)
-		if e != nil {
-			return e
-		}
-		numeral, e := refs.hold(m.ArithmeticNumeralRat(&cut.Bound, allInteger && cut.Bound.IsInt()))
-		if e != nil {
-			return e
-		}
-		bound, err = refs.app(smtArithOpGE, polynomial, numeral)
+		bound, err = t.integerPolynomialGE(&refs, cut.Terms, &cut.Bound)
 	}
 	if err != nil {
 		return err
@@ -255,6 +219,15 @@ func (t *SMTLinearArithmeticTheory) branchOrCutIntegerColumn(column uint32) (SMT
 		return SMTFinalCheckGiveUp, nil
 	}
 	if t.branchCutCounter%t.branchCutRatio != 0 {
+		if t.integerEqualityBranching {
+			if progress, err := t.branchIntegerEquality(); err != nil || progress {
+				return SMTFinalCheckContinue, err
+			}
+		}
+		// Source reselects after the optional equality split attempt.
+		if selected, found := t.solver.ArithmeticIntegerBase(t.arithmeticIntegerMask(), &t.nonlinearRandom); found {
+			column = selected
+		}
 		return SMTFinalCheckContinue, t.branchIntegerColumn(column)
 	}
 	integers := t.arithmeticIntegerMask()

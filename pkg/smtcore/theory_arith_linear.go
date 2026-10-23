@@ -93,6 +93,7 @@ type smtLinearArithmeticScope struct {
 }
 
 type smtLinearArithmeticStatistics struct {
+	integerEqualityBranches                              uint64
 	gomoryCuts                                           uint64
 	gcdTests, gcdConflicts                               uint64
 	maxMin                                               uint64
@@ -109,6 +110,7 @@ type smtLinearArithmeticStatistics struct {
 // bounds. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	integerEqualityBranching             bool
 	branchCutCounter, branchCutRatio     uint32
 	gcdEnabled, ignoreIntegers           bool
 	finalCheckIndex                      uint32
@@ -213,6 +215,7 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 	t.gcdEnabled = config.GCDTest
 	t.ignoreIntegers = config.IgnoreInt
 	t.branchCutRatio = config.BranchCutRatio
+	t.integerEqualityBranching = config.IntEqBranching
 	t.nonlinearEnabled = config.NLArith
 	t.nonlinearGB = config.NLArithGB
 	t.nonlinearGBLimit = config.NLArithGBThreshold
@@ -1808,6 +1811,7 @@ func (t *SMTLinearArithmeticTheory) CollectStatistics(target *statistics.Statist
 	target.UpdateUint64("arith gcd tests", t.statistics.gcdTests)
 	target.UpdateUint64("arith gcd conflicts", t.statistics.gcdConflicts)
 	target.UpdateUint64("arith gomory cuts", t.statistics.gomoryCuts)
+	target.UpdateUint64("arith eq branches", t.statistics.integerEqualityBranches)
 	return nil
 }
 

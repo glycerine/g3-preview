@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"integer_equality_branch_scopes.smt2":       "unsat\nsat\n((x 1) (y 1))\n",
 	"integer_branch_cut_scopes.smt2":            "sat\n((x 0) (y 1))\nunsat\nsat\n",
 	"mixed_gomory_scopes.smt2":                  "unsat\nsat\n",
 	"integer_freedom_patch_scopes.smt2":         "sat\n((x 1) (y 2))\nunsat\nsat\n",

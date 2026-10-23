@@ -471,6 +471,18 @@ func (s *Solver) RowEntries(r Row) ([]RowEntry, error) { return s.matrix.Entries
 // needed by the retained arithmetic theory's nonlinear cluster traversal.
 func (s *Solver) ColumnRows(variable uint32) []Row { return s.matrix.ColumnRows(variable) }
 
+// BasicRows returns live rows in source row-vector order, including holes
+// reused by later row creation.
+func (s *Solver) BasicRows() []Row {
+	var rows []Row
+	for index, base := range s.rowBase {
+		if base != NullVariable {
+			rows = append(rows, Row{uint32(index)})
+		}
+	}
+	return rows
+}
+
 func (s *Solver) BasicRow(variable uint32) (Row, bool) {
 	if !s.isBase(variable) {
 		return Row{}, false
