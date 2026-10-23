@@ -3167,6 +3167,45 @@ func TestSMTSequenceTheoryCompletesSymbolicUnboundedRegexModel(t *testing.T) {
 	}
 }
 
+func TestSMTSequenceTheoryCompletesNegativeSymbolicUnboundedRegexModel(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	zero, err := m.BitVectorNumeralUnsigned(0, 8)
+	astTestMust(t, err)
+	byteSort, err := m.GetSort(zero)
+	astTestMust(t, err)
+	character, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-negative-symbolic-byte"), byteSort)
+	astTestMust(t, err)
+	unit, err := m.MkSequenceUnit(character)
+	astTestMust(t, err)
+	sequenceSort, err := m.GetSort(unit)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "sequence-regex-negative-symbolic-x"), sequenceSort)
+	astTestMust(t, err)
+	unitRegex, err := m.MkSequenceToRegex(unit)
+	astTestMust(t, err)
+	star, err := m.MkRegexStar(unitRegex)
+	astTestMust(t, err)
+	membership, err := m.MkSequenceInRegex(x, star)
+	astTestMust(t, err)
+	notMembership, err := m.MkNot(membership)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(notMembership))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		reason, reasonErr := solver.ReasonUnknown()
+		astTestMust(t, reasonErr)
+		t.Fatal("negative symbolic unbounded regex model remained incomplete", status, reason)
+	}
+}
+
 func TestSMTSequenceTheoryClosesEmptyNegativeRegexComplement(t *testing.T) {
 	m, modelConfig := smtModelGeneratorFixture(t)
 	a, err := m.MkString("a")

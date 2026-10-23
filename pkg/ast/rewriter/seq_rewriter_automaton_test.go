@@ -165,6 +165,15 @@ func TestSequenceRewriterShortestRegexByteString(t *testing.T) {
 	if lengthExhaustive || len(lengths) != 3 || lengths[0] != 1 || lengths[1] != 2 || lengths[2] != 3 {
 		t.Fatal("symbolic regex lengths", lengths, lengthExhaustive)
 	}
+	symbolicStar, err := m.MkRegexStar(symbolicRegex)
+	astTestMust(t, err)
+	symbolicComplement, err := m.MkRegexComplement(symbolicStar)
+	astTestMust(t, err)
+	lengths, lengthExhaustive, err = rw.RegexAcceptedLengths(symbolicComplement, 3)
+	astTestMust(t, err)
+	if lengthExhaustive || len(lengths) != 3 || lengths[0] != 1 || lengths[1] != 2 || lengths[2] != 3 {
+		t.Fatal("symbolic complement lengths", lengths, lengthExhaustive)
+	}
 	lengths, lengthExhaustive, err = rw.RegexAcceptedLengths(symbolicRegex, 2)
 	astTestMust(t, err)
 	if !lengthExhaustive || len(lengths) != 1 || lengths[0] != 1 {

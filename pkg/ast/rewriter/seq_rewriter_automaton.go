@@ -216,8 +216,9 @@ func (a *sequenceAutomaton) statesReachingFinal() []bool {
 }
 
 type sequenceAutomatonBuilder struct {
-	rewriter *SequenceRewriter
-	refs     []ast.ASTRef
+	rewriter           *SequenceRewriter
+	refs               []ast.ASTRef
+	allowUnknownLabels bool
 }
 
 func (b *sequenceAutomatonBuilder) close() (err error) {
@@ -399,6 +400,9 @@ func (b *sequenceAutomatonBuilder) labelSatisfiable(label *sequenceAutomatonLabe
 		}
 	}
 	if b.rewriter.solver == nil {
+		if b.allowUnknownLabels {
+			return true, true, nil
+		}
 		return false, false, nil
 	}
 	sort, err := b.labelSort(label)
@@ -811,7 +815,7 @@ func (r *SequenceRewriter) RegexAcceptedLengths(regex ast.ASTHandle, limit int) 
 	if limit <= 0 {
 		return nil, false, ast.ErrASTDomain
 	}
-	builder := &sequenceAutomatonBuilder{rewriter: r}
+	builder := &sequenceAutomatonBuilder{rewriter: r, allowUnknownLabels: true}
 	defer func() { result = errors.Join(result, builder.close()) }()
 	automaton, err := builder.regex(regex)
 	if err != nil || automaton == nil {
