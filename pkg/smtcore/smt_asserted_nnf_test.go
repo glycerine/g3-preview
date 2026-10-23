@@ -133,6 +133,7 @@ func TestSMTAssertedNNFDefinitionNamesFollowUserScopes(t *testing.T) {
 
 func smtAssertedNNFNamesScopeCase(t *testing.T, proofs bool) {
 	m, solver := smtAssertedNNFFixture(t, proofs)
+	smtDisableAutoConfig(t, solver)
 	// Exercise NNF naming before value propagation can replace q by true.
 	// This source preprocessor field has no public parameter accessor.
 	solver.kernel.preprocessState.PropagateValues = false

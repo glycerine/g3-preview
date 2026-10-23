@@ -12,6 +12,7 @@ import (
 func smtAssertedDistributionFixture(t *testing.T, proofs bool) (*ast.ASTManager, *SMTSolver, ast.ASTHandle, ast.ASTHandle) {
 	t.Helper()
 	m, solver := smtAssertedNNFFixture(t, proofs)
+	smtDisableAutoConfig(t, solver)
 	u, err := m.MkUninterpretedSort(astTestSymbol(t, m, "distribute-U"), nil)
 	astTestMust(t, err)
 	x, err := m.MkVar(1, u)

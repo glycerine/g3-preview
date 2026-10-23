@@ -117,7 +117,7 @@ func TestSMTQuantifiedSearchRequiresModelValidation(t *testing.T) {
 	m, solver := smtAssertedNNFFixture(t, false)
 	local, err := solver.kernel.paramContext.NewValue()
 	astTestMust(t, err)
-	for _, name := range []string{"mbqi", "preprocess"} {
+	for _, name := range []string{"mbqi", "preprocess", "auto_config"} {
 		astTestMust(t, solver.kernel.paramContext.SetBoolName(&local, &name, false))
 	}
 	name := "relevancy"

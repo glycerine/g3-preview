@@ -18,6 +18,7 @@ type smtAssertedITEFixture struct {
 func smtNewAssertedITEFixture(t *testing.T, proofs, double, nonground bool) smtAssertedITEFixture {
 	t.Helper()
 	m, solver := smtAssertedNNFFixture(t, proofs)
+	smtDisableAutoConfig(t, solver)
 	u, err := m.MkUninterpretedSort(astTestSymbol(t, m, "asserted-ite-U"), nil)
 	astTestMust(t, err)
 	b, err := m.MkBoolSort()
