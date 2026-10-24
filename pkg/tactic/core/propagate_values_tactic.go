@@ -93,8 +93,13 @@ func (t *PropagateValuesTactic) IncRef() error {
 	return nil
 }
 func (t *PropagateValuesTactic) DecRef() error {
-	if err := t.open(); err != nil {
-		return err
+	// A failed cleanup may leave no executable rewriter/occurrence counter.
+	// Counted source destruction still owns and must retire that partial state.
+	if t == nil || t.self != t {
+		return ast.ErrASTHandle
+	}
+	if t.closed {
+		return arena.ErrClosed
 	}
 	if t.refs == 0 {
 		return arena.ErrBounds

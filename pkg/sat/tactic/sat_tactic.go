@@ -60,8 +60,16 @@ type SATApplicationFailure struct {
 	application *satTacticApplication
 }
 
-func (e *SATApplicationFailure) Error() string { return e.Cause.Error() }
-func (e *SATApplicationFailure) Unwrap() error { return e.Cause }
+func (e *SATApplicationFailure) Error() string        { return e.Cause.Error() }
+func (e *SATApplicationFailure) Unwrap() error        { return e.Cause }
+func (e *SATApplicationFailure) OriginalCause() error { return e.Cause }
+func (e *SATApplicationFailure) CleanupCause() error  { return e.Cause }
+func (e *SATApplicationFailure) RuntimeOwner() *umemory.Runtime {
+	if e.Owner == nil {
+		return nil
+	}
+	return e.Owner.context.Numerals().RuntimeOwner()
+}
 func (e *SATApplicationFailure) Cleanup() error {
 	t := e.Owner
 	if t == nil || t.closed {

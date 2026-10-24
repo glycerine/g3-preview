@@ -2358,6 +2358,7 @@
       "production_files": [
         "preprocess.go",
         "solver.go",
+        "solver_cleanup_failure.go",
         "solver_consequences.go",
         "solver_interface.go",
         "solver_model.go",
@@ -2731,6 +2732,7 @@
         "util/control",
         "util/diagnostic",
         "util/lbool",
+        "util/memory",
         "util/messages",
         "util/params",
         "util/statistics",
@@ -3027,17 +3029,24 @@
       "package": "tactic/smtlogics",
       "imports": [
         "ackermannization",
+        "arena",
         "ast",
+        "model",
+        "sat/sat_solver",
         "sat/tactic",
         "smtcore",
+        "solver",
         "tactic",
         "tactic/aig",
         "tactic/arith",
         "tactic/bv",
         "tactic/core",
         "tactic/smtlogics/params",
+        "util/diagnostic",
+        "util/lbool",
         "util/memory",
-        "util/params"
+        "util/params",
+        "util/symbol"
       ],
       "production_files": [
         "qfaufbv_tactic.go",
@@ -3047,6 +3056,9 @@
         "qflia_tactic.go",
         "qflra_tactic.go",
         "qfuf_tactic.go",
+        "qfufbv_ackr_model_converter.go",
+        "qfufbv_ackr_strategy.go",
+        "qfufbv_ackr_tactic.go",
         "qfufbv_tactic.go"
       ]
     },

@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -411,6 +412,12 @@ func (s *TacticSolver) CheckSatCore(assumptions []ast.ASTHandle) (status lbool.L
 	status, reason, err = tactic.CheckSat(s.tactic, goal, md, labels, proofRef, core)
 	if err != nil {
 		s.traceException(err)
+		// A retained Go owner is not a recoverable source tactic exception.
+		// Preserve its cleanup receipt instead of reducing it to a string.
+		var owned memory.ConstructionFailure
+		if errors.As(err, &owned) {
+			return lbool.Undef, err
+		}
 		var fatal z3exception.Z3Error
 		if errors.As(err, &fatal) {
 			return lbool.Undef, err

@@ -262,6 +262,9 @@ func (s *Solver) Close() error {
 	}
 	if s.core != nil {
 		if err := s.core.Close(); err != nil {
+			if s.core.StoppedCleanupCause() != nil {
+				return &CleanupFailure{owner: s, cause: err}
+			}
 			return err
 		}
 		s.core = nil

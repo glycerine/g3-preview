@@ -141,6 +141,13 @@ func (c *SMTCachedVarSubstitution) Reset() error {
 	if err := c.open(); err != nil {
 		return err
 	}
+	if err := c.clearEntries(); err != nil {
+		return err
+	}
+	return c.substitution.Reset()
+}
+
+func (c *SMTCachedVarSubstitution) clearEntries() error {
 	for len(c.ordered) != 0 {
 		last := len(c.ordered) - 1
 		entry := c.ordered[last]
@@ -154,7 +161,7 @@ func (c *SMTCachedVarSubstitution) Reset() error {
 		c.ordered = c.ordered[:last]
 	}
 	c.entries = make(map[ast.ASTHandle]map[int][]*smtCachedSubstitutionEntry)
-	return c.substitution.Reset()
+	return nil
 }
 
 func (c *SMTCachedVarSubstitution) Close() error {
@@ -164,11 +171,14 @@ func (c *SMTCachedVarSubstitution) Close() error {
 	if c.closed {
 		return nil
 	}
-	if err := c.Reset(); err != nil {
+	if err := c.clearEntries(); err != nil {
 		return err
 	}
-	if err := c.substitution.Close(); err != nil {
-		return err
+	if c.substitution != nil {
+		if err := c.substitution.Close(); err != nil {
+			return err
+		}
+		c.substitution = nil
 	}
 	c.closed = true
 	return nil

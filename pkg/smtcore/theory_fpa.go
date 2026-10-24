@@ -155,6 +155,9 @@ func (t *SMTFloatingPointTheory) Initialize(state *SMTInternalizerState) (result
 	}
 	rw, err := rewriter.NewFPA2BVRewriter(state.manager, converter)
 	if err != nil {
+		if rw != nil {
+			err = errors.Join(err, rw.Close())
+		}
 		return errors.Join(fmt.Errorf("floating-point rewriter construction: %w", err), converter.Close())
 	}
 	t.rewriter = rw

@@ -76,6 +76,9 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 	}
 	substitute, err := NewSMTCachedVarSubstitution(state.manager)
 	if err != nil {
+		if substitute != nil {
+			err = errors.Join(err, substitute.Close())
+		}
 		return nil, err
 	}
 	builder, err := NewSMTQIInstanceBuilder(state.manager, checker, substitute, state.quantifiers.costs)

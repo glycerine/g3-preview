@@ -2,7 +2,6 @@
 package rewriter
 
 import (
-	"errors"
 	"math"
 	"reflect"
 
@@ -30,7 +29,7 @@ type FPA2BVRewriter struct {
 }
 
 // NewFPA2BVRewriter borrows the manager and converter. The converter must
-// outlive the rewriter.
+// outlive the rewriter. A nonnil partial result must close even on error.
 func NewFPA2BVRewriter(m *ast.ASTManager, converter *astfpa.Converter) (owner *FPA2BVRewriter, result error) {
 	if m == nil || converter == nil {
 		return nil, ast.ErrASTHandle
@@ -46,12 +45,10 @@ func NewFPA2BVRewriter(m *ast.ASTManager, converter *astfpa.Converter) (owner *F
 	owner.config.maxSteps = math.MaxUint32
 	owner.config.maxMemory = math.MaxUint64
 	traversal, err := NewTraversal(m, &owner.config)
+	owner.traversal = traversal
 	if err != nil {
-		m.Budget().Release(bytes)
-		owner.header = 0
 		return owner, err
 	}
-	owner.traversal = traversal
 	return owner, nil
 }
 
@@ -115,7 +112,10 @@ func (r *FPA2BVRewriter) Close() (result error) {
 		return nil
 	}
 	if r.traversal != nil {
-		result = errors.Join(result, r.traversal.Close())
+		if err := r.traversal.Close(); err != nil {
+			return err
+		}
+		r.traversal = nil
 	}
 	r.manager.Budget().Release(r.header)
 	r.header = 0

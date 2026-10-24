@@ -282,10 +282,12 @@ func (k *SMTKernel) configurePreprocessing(context *uparams.ParamsContext, globa
 		enabled = fullState.Preprocess
 	}
 	value, err := rewriter.NewTheoryRewriter(k.manager, context, globals, params)
+	// Construction may return a partial owner. Publish it before inspecting
+	// the error so kernel destruction can retire the allocated configuration.
+	k.preprocessor = value
 	if err != nil {
 		return err
 	}
-	k.preprocessor = value
 	k.internalizer.theoryRewriter = value
 	k.preprocess = enabled
 	if err = k.setAssertedEliminateAnd(false); err != nil {

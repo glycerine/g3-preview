@@ -35,12 +35,25 @@ func TestSMTLibRunnerQFUFBVBranchEvidence(t *testing.T) {
 	testArithmeticStrategyBranchEvidence(t, "qfufbv")
 }
 
+func TestSMTLibRunnerQFUFBVAckrBranchEvidence(t *testing.T) {
+	testArithmeticStrategyBranchEvidence(t, "qfufbv_ackr")
+}
+
 func testArithmeticStrategyBranchEvidence(t *testing.T, prefix string) {
 	t.Helper()
 	cases := []struct {
 		name            string
 		require, forbid []string
 	}{
+		{"qfufbv_ackr_proof_refusal.smt2", []string{"(qfufbv_ackr ", "(smt.tactic start)"}, []string{"(bv-bound-chk ", "(bv-size-reduction ", "(sat-status"}},
+		{"qfufbv_ackr_core_refusal.smt2", []string{"(qfufbv_ackr ", "(smt.tactic start)"}, []string{"(bv-bound-chk ", "(bv-size-reduction ", "(sat-status"}},
+		{"qfufbv_ackr_smt_fallback.smt2", []string{"(smt.tactic start)"}, []string{"(qfufbv_ackr ", "(sat-status"}},
+		{"qfufbv_ackr_smt_eager.smt2", []string{"(qfufbv_ackr ", "(smt.tactic start)"}, []string{"(sat-status"}},
+		{"qfufbv_ackr_smt_lazy.smt2", []string{"(qfufbv_ackr ", "(smt.tactic start)"}, []string{"(sat-status"}},
+		{"qfufbv_ackr_sat_eager.smt2", []string{"(qfufbv_ackr ", "(bit-blaster ", "(sat-status"}, nil},
+		{"qfufbv_ackr_sat_lazy.smt2", []string{"(qfufbv_ackr ", "(ackermannize ", "(bv1-blaster ", "(smt.tactic start)"}, []string{"(card2bv "}},
+		{"qfufbv_ackr_incsat_eager.smt2", []string{"(qfufbv_ackr ", "(card2bv ", "(bit-blaster "}, []string{"(sat-status", "(smt.tactic start)"}},
+		{"qfufbv_ackr_incsat_lazy.smt2", []string{"(qfufbv_ackr ", "(card2bv ", "(bit-blaster "}, []string{"(sat-status", "(smt.tactic start)"}},
 		{"qfufbv_smt_models_scopes.smt2", []string{"(reduce-args ", "(smt.tactic start)"}, []string{"(bit-blaster ", "(sat-status"}},
 		{"qfufbv_solver_smt_models_scopes.smt2", []string{"(reduce-args ", "(smt.tactic start)"}, []string{"(bit-blaster ", "(sat-status"}},
 		{"qfufbv_reduce_models_scopes.smt2", []string{"(:reduced-funcs 1)", "(smt.tactic start)"}, []string{"(bit-blaster ", "(sat-status"}},
@@ -83,6 +96,9 @@ func testArithmeticStrategyBranchEvidence(t *testing.T, prefix string) {
 		{"qfidl_proof_route.smt2", []string{"(smt.tactic start)"}, []string{"(diff-neq ", "(sat-status"}},
 	}
 	for _, tc := range cases {
+		if prefix == "qfufbv" && strings.HasPrefix(tc.name, "qfufbv_ackr_") {
+			continue
+		}
 		if !strings.HasPrefix(tc.name, prefix+"_") {
 			continue
 		}
@@ -227,6 +243,15 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"qfufbv_ackr_proof_refusal.smt2":               "unknown\n(:reason-unknown \"qfufbv_ackr does not support proof production\")\nsat\n",
+	"qfufbv_ackr_core_refusal.smt2":                "unknown\n(:reason-unknown \"qfufbv_ackr does not support unsat core production\")\nsat\n",
+	"qfufbv_ackr_smt_fallback.smt2":                "sat\n((x 1))\n",
+	"qfufbv_ackr_smt_eager.smt2":                   "sat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\nunsat\nsat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\n",
+	"qfufbv_ackr_smt_lazy.smt2":                    "sat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\nunsat\nsat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\n",
+	"qfufbv_ackr_sat_eager.smt2":                   "sat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\nunsat\nsat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\n",
+	"qfufbv_ackr_sat_lazy.smt2":                    "sat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\nunsat\nsat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\n",
+	"qfufbv_ackr_incsat_eager.smt2":                "sat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\nunsat\nsat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\n",
+	"qfufbv_ackr_incsat_lazy.smt2":                 "sat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\nunsat\nsat\n(((bvult x y) true) ((bvult (f x) (f y)) true))\n",
 	"qfufbv_solver_assumptions.smt2":               "unsat\n(p)\nsat\n((p false))\nunsat\nsat\n((p false))\n",
 	"qfufbv_core.smt2":                             "unsat\n(impossible)\n",
 	"qfufbv_limits_recovery.smt2":                  "unknown\n(:reason-unknown \"max. steps exceeded\")\nsat\n(((bvult x y) true)\n ((bvult (f x) (f y)) true))\n",

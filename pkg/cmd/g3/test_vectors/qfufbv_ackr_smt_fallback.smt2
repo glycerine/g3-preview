@@ -1,0 +1,8 @@
+(set-logic ALL)
+(set-option :produce-models true)
+(declare-const x Int)
+(assert (>= x 0))
+(assert (<= x 1))
+(assert (not (= x 0)))
+(check-sat-using qfufbv_ackr)
+(get-value (x))

@@ -20354,7 +20354,9 @@
       "go_targets": [
         "pkg/ast/rewriter/fpa2bv_rewriter.go",
         "pkg/ast/fpa/fpa2bv_conversions.go",
-        "pkg/ast/ast_fpa_numeral.go"
+        "pkg/ast/ast_fpa_numeral.go",
+        "pkg/ast/rewriter/fpa2bv_constructor_frontier_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
@@ -20365,7 +20367,9 @@
         "TestFPA2BVRewriterToRealDispatch",
         "TestFPA2BVRewriterFromRealDispatch",
         "TestFPA2BVRewriterLowUnspecifiedDispatch",
-        "TestConverterFiniteNumeral"
+        "TestConverterFiniteNumeral",
+        "TestFPA2BVRewriterConstructorAllocationFrontiers",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -20400,7 +20404,9 @@
           "name": "traversal lifecycle, resource limits, constants, finite numerals, rounding modes, special values, structural operations, predicates, comparisons, extrema, IEEE packing, uninterpreted functions, and quantified FP variables",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
-          "go_targets": ["pkg/ast/fpa/fpa2bv_converter_test.go"],
+          "go_targets": [
+            "pkg/ast/fpa/fpa2bv_converter_test.go"
+          ],
           "tests": [
             "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
             "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
@@ -20411,7 +20417,9 @@
           "name": "floating-point addition, subtraction, multiplication, division, remainder, fused multiply-add, square root, and round-to-integral dispatch through component-wise FP selection and the shared normalization rounder",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa2bv_rewriter.go",
-          "go_targets": ["pkg/ast/fpa/fpa2bv_converter_test.go"],
+          "go_targets": [
+            "pkg/ast/fpa/fpa2bv_converter_test.go"
+          ],
           "tests": [
             "TestConverterAddSubtractSpecialCasesAndSymbolicShape",
             "TestConverterMultiplySpecialCasesAndSymbolicShape",
@@ -20422,33 +20430,31 @@
             "TestConverterFMASpecialCasesAndSymbolicShape",
             "TestFPA2BVRewriterArithmeticDispatch"
           ]
-        }
-        ,
+        },
         {
           "name": "IEEE bit-vector assembly, three-field assembly, floating format conversion, signed/unsigned bit-vector conversion in both directions, and real conversion in both directions with significand normalization, sticky-bit collapse, exponent clamping, range checks, symbolic side constraints, and shared rounding",
           "status": "ported",
           "go_target": "pkg/ast/fpa/fpa2bv_format.go",
-          "go_targets": ["pkg/ast/rewriter/fpa2bv_rewriter_test.go"],
+          "go_targets": [
+            "pkg/ast/rewriter/fpa2bv_rewriter_test.go"
+          ],
           "tests": [
             "TestConverterFloatFormatConversionSpecialCasesAndSymbolicShape",
             "TestConverterSignedUnsignedIntegerConversions",
             "TestConverterFloatToBitVectorConversions",
             "TestConverterFloatToRealConversion",
             "TestConverterRealToFloatConversions",
-            "TestFPA2BVRewriterToFPFormatDispatch"
-            ,
-            "TestFPA2BVRewriterToBVDispatch"
-            ,
-            "TestFPA2BVRewriterToRealDispatch"
-            ,
-            "TestFPA2BVRewriterFromRealDispatch"
-            ,
+            "TestFPA2BVRewriterToFPFormatDispatch",
+            "TestFPA2BVRewriterToBVDispatch",
+            "TestFPA2BVRewriterToRealDispatch",
+            "TestFPA2BVRewriterFromRealDispatch",
             "TestFPA2BVRewriterLowUnspecifiedDispatch"
           ]
         }
       ],
       "ownership": [
-        "The Go rewriter owns its traversal and reserved owner storage while borrowing ASTManager and Converter; Close releases traversal state before converter and manager teardown."
+        "The Go rewriter owns its traversal and reserved owner storage while borrowing ASTManager and Converter; Close releases traversal state before converter and manager teardown.",
+        "A partially constructed traversal is stored before returning its error. A nonnil partial FPA2BV rewriter must close; its actual traversal and header remain reachable until successful destruction, including stopped Close retry."
       ],
       "deviations": []
     },
@@ -20460,7 +20466,9 @@
       "go_targets": [
         "pkg/ast/rewriter/fpa2bv_rewriter.go",
         "pkg/ast/fpa/fpa2bv_conversions.go",
-        "pkg/ast/ast_fpa_numeral.go"
+        "pkg/ast/ast_fpa_numeral.go",
+        "pkg/ast/rewriter/fpa2bv_constructor_frontier_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
@@ -20471,7 +20479,9 @@
         "TestFPA2BVRewriterToRealDispatch",
         "TestFPA2BVRewriterFromRealDispatch",
         "TestFPA2BVRewriterLowUnspecifiedDispatch",
-        "TestConverterFiniteNumeral"
+        "TestConverterFiniteNumeral",
+        "TestFPA2BVRewriterConstructorAllocationFrontiers",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -20493,22 +20503,18 @@
           "tests": [
             "TestFPA2BVRewriterSpecialsComparisonsAndSMTEquality",
             "TestFPA2BVRewriterQuantifiedVariablesAndUninterpretedFunctions",
-            "TestFPA2BVRewriterArithmeticDispatch"
-            ,
-            "TestFPA2BVRewriterToFPFormatDispatch"
-            ,
-            "TestFPA2BVRewriterToBVDispatch"
-            ,
-            "TestFPA2BVRewriterToRealDispatch"
-            ,
-            "TestFPA2BVRewriterFromRealDispatch"
-            ,
+            "TestFPA2BVRewriterArithmeticDispatch",
+            "TestFPA2BVRewriterToFPFormatDispatch",
+            "TestFPA2BVRewriterToBVDispatch",
+            "TestFPA2BVRewriterToRealDispatch",
+            "TestFPA2BVRewriterFromRealDispatch",
             "TestFPA2BVRewriterLowUnspecifiedDispatch"
           ]
         }
       ],
       "ownership": [
-        "The wrapper borrows the converter and manager and owns the traversal engine until Close."
+        "The wrapper borrows the converter and manager and owns the traversal engine until Close.",
+        "A partially constructed traversal is stored before returning its error. A nonnil partial FPA2BV rewriter must close; its actual traversal and header remain reachable until successful destruction, including stopped Close retry."
       ],
       "deviations": []
     },
@@ -41718,7 +41724,17 @@
         "pkg/tactic/tactic_goal_empty_proof_test.go",
         "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
         "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+        "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_eager.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_lazy.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_eager.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_lazy.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_eager.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_lazy.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_fallback.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -41785,7 +41801,8 @@
         "TestCard2BVAllocationFrontiers",
         "TestCard2BVCancellationAndClosedTraceRecovery",
         "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
-        "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences"
+        "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+        "TestSMTLibRunnerQFUFBVAckrBranchEvidence"
       ],
       "conditionals": [
         {
@@ -42236,7 +42253,9 @@
       "ownership": [
         "The command parser returns one counted tactic reference. Composition factories acquire children; command execution owns the using_params/timeout wrappers, goal and temporary result refs. Context owns the independent SimpleCheckSatResult until replacement or teardown, and ordinary solver scopes stay separate."
       ],
-      "deviations": []
+      "deviations": [
+        "The retained qfufbv_ackr factory is registered through the concrete source tactic-name dispatch, with command output forwarded to its selected SAT backend. Existing incremental context/scopes remain separate from explicit check-sat-using execution."
+      ]
     },
     {
       "path": "src/cmd_context/tactic_cmds.h",
@@ -100485,7 +100504,10 @@
         "pkg/sat/sat_solver/solver_weighted.go",
         "pkg/sat/sat_solver/solver_weighted_test.go",
         "pkg/sat/sat_solver/solver_trace.go",
-        "pkg/sat/sat_solver/solver_trace_test.go"
+        "pkg/sat/sat_solver/solver_trace_test.go",
+        "pkg/sat/sat_solver/solver_cleanup_failure.go",
+        "pkg/sat/sat_solver/solver_cleanup_failure_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestIncrementalSolverChecksScopesAndModelsCPP",
@@ -100520,7 +100542,9 @@
         "TestIncrementalSolverDIMACSRepeatedAndConsequencesCPP",
         "TestIncrementalSolverDiagnosticAllocationFrontiers",
         "TestIncrementalSolverReasonCStringBoundary",
-        "TestIncrementalSolverWeightedBitVectorsCPP"
+        "TestIncrementalSolverWeightedBitVectorsCPP",
+        "TestIncrementalSolverCleanupReceiptPreservesObservedCause",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -100805,7 +100829,8 @@
       ],
       "ownership": [
         "The partial encoder borrows the actual SAT core and evaluator services. It owns copied internal parameters, scoped Expr2Var, persistent bit blaster, counted preprocessing composition, last result and per-compilation translator. Pending partial constructors and concrete child closers remain owned across stopped reset/destruction. Translation temporaries borrow the scoped atom map rather than duplicating its roots.",
-        "The incremental Solver owns its SAT runtime/core/encoder, copied base and internal parameters, original formula/tracker/core roots, latest compiled input goal and counted model/converter chain. Lexical assumption, model, evaluator and format owners remain reachable across stopped cleanup. Models returned through AcquireModel hold independent counted references. Constructor/check/complex-assumption/model/repeated-model/interpreted-atom reservation frontiers reach success with zero charged storage after fixture destruction. Consequence expressions remain rooted until the next consequence call or solver destruction. Failed translated targets and AST translators remain reachable through the source solver; returned solvers borrow the selected target services. Consequence/repeated-query, mutex and same/different-manager translation allocation frontiers reach success with zero charged storage after cleanup. Weighted display owns soft activation roots and pending formatter state; weights clear before reached SAT output. A persistent DIMACS stream stays owned until SAT destruction, remains bound across repeated checks/consequence calls and is forwarded through the selected output writer. Weighted, trace/model and DIMACS reservation frontiers reach success with zero charged storage after cleanup."
+        "The incremental Solver owns its SAT runtime/core/encoder, copied base and internal parameters, original formula/tracker/core roots, latest compiled input goal and counted model/converter chain. Lexical assumption, model, evaluator and format owners remain reachable across stopped cleanup. Models returned through AcquireModel hold independent counted references. Constructor/check/complex-assumption/model/repeated-model/interpreted-atom reservation frontiers reach success with zero charged storage after fixture destruction. Consequence expressions remain rooted until the next consequence call or solver destruction. Failed translated targets and AST translators remain reachable through the source solver; returned solvers borrow the selected target services. Consequence/repeated-query, mutex and same/different-manager translation allocation frontiers reach success with zero charged storage after cleanup. Weighted display owns soft activation roots and pending formatter state; weights clear before reached SAT output. A persistent DIMACS stream stays owned until SAT destruction, remains bound across repeated checks/consequence calls and is forwarded through the selected output writer. Weighted, trace/model and DIMACS reservation frontiers reach success with zero charged storage after cleanup.",
+        "An already observed SAT debug-destructor stop returns a typed CleanupFailure receipt. Ordinary Close preserves the immutable cause and does not acknowledge it; explicit receipt cleanup acknowledges only that recorded boundary and finishes the real owner. Nested backend reservation campaigns and a direct cause/runtime/history regression verify cleanup."
       ],
       "deviations": [
         "The concrete class implements the complete retained inc_sat_solver state machine through actual SAT algorithms, counted models/converters, original-formula translation, source diagnostics and weighted output. Runtime construction borrows the supplied global SAT parameter registry and actual numeral process accounting. Source base/derived parameter shadowing is preserved. Native Go maps, concrete Expr2Var and insertion-ordered index dictionaries replace source project containers without source hashing. QF_UFBV backend/strategy registration is a separate consumer port.",
@@ -100825,7 +100850,10 @@
         "pkg/sat/sat_solver/solver_interface.go",
         "pkg/sat/sat_solver/solver_interface_test.go",
         "pkg/sat/sat_solver/solver_weighted.go",
-        "pkg/sat/sat_solver/solver_weighted_test.go"
+        "pkg/sat/sat_solver/solver_weighted_test.go",
+        "pkg/sat/sat_solver/solver_cleanup_failure.go",
+        "pkg/sat/sat_solver/solver_cleanup_failure_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestIncrementalSolverTranslationOriginalRootsAndTargetServices",
@@ -100835,7 +100863,9 @@
         "TestIncrementalSolverWeightedRationalValidationAndOverflow",
         "TestIncrementalSolverWeightedAllocationFrontiers",
         "TestIncrementalSolverWeightedBoundsAndWriterRecovery",
-        "TestIncrementalSolverWeightedBitVectorsCPP"
+        "TestIncrementalSolverWeightedBitVectorsCPP",
+        "TestIncrementalSolverCleanupReceiptPreservesObservedCause",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -100882,7 +100912,8 @@
         }
       ],
       "ownership": [
-        "A nonnil partial constructor result must close. The solver owns its SAT runtime/core/encoder and counted results while evaluator services are borrowed. Translation returns an independent solver; stopped translated constructors remain reachable for cleanup."
+        "A nonnil partial constructor result must close. The solver owns its SAT runtime/core/encoder and counted results while evaluator services are borrowed. Translation returns an independent solver; stopped translated constructors remain reachable for cleanup.",
+        "An already observed SAT debug-destructor stop returns a typed CleanupFailure receipt. Ordinary Close preserves the immutable cause and does not acknowledge it; explicit receipt cleanup acknowledges only that recorded boundary and finishes the real owner. Nested backend reservation campaigns and a direct cause/runtime/history regression verify cleanup."
       ],
       "deviations": [
         "Concrete Go constructors preserve mk_inc_sat_solver; DisplayWeighted preserves the live rational-weight wrapper. The solver is a native solver.Solver implementation. External strategy/optimization consumers retain their separate remaining integration work."
@@ -102130,7 +102161,9 @@
         "pkg/sat/sat_asymm_branch.go",
         "pkg/sat/sat_simplifier.go",
         "pkg/sat/sat_global_service_test.go",
-        "pkg/cmd/g3/test_vectors/sat_global_options.smt2"
+        "pkg/cmd/g3/test_vectors/sat_global_options.smt2",
+        "pkg/solver/tactic_solver.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestSATSolverBorrowedGlobalServiceCurrentModuleAndLocalOverrides",
@@ -102157,7 +102190,8 @@
         "TestSATTacticAllocationFrontiers",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestSATTacticConditionalInvariantAndVerboseStatus"
+        "TestSATTacticConditionalInvariantAndVerboseStatus",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -102408,7 +102442,8 @@
       "ownership": [
         "The manager-independent tactic owns its parameter snapshot and accumulated statistics. Each application owns a fresh native SAT runtime/solver/translator and releases them lexically; no SMT solver substitutes for the SAT engine. Result goals are borrowed, while result model converters and dependencies own their references. Dependency map keys retain AST references across the input goal reset, including signed and compound labels.",
         "SATApplicationFailure retains the concrete stopped application owner if destruction refuses. Explicit cleanup acknowledges only an already observed immutable source SAT destructor guard through CleanupStopped; ordinary Close keeps refusing. Consumed dependency/AST release prefixes, models, converters and runtime owners stay retained for retry. Source assertions are preserved in their selected profiles.",
-        "Native Go slices/maps/insdict.Dict replace C++ assumption/core containers. Explicit temporary counted references unwind the two clean wrappers and using_params preprocessor factory on construction/update failures. Source inactive cleanup is a no-op except for releasing previously stopped Go owners."
+        "Native Go slices/maps/insdict.Dict replace C++ assumption/core containers. Explicit temporary counted references unwind the two clean wrappers and using_params preprocessor factory on construction/update failures. Source inactive cleanup is a no-op except for releasing previously stopped Go owners.",
+        "The existing SATApplicationFailure receipt implements the concrete construction-failure ownership contract. Nested tactic solvers propagate that receipt instead of reducing it to an unknown-result string, preserving explicit cleanup and immutable observed destructor history."
       ],
       "deviations": [
         "The C++ allocator consolidation and AST hash-table capacity compaction at cpp64 are storage-management operations replaced by native Go storage ownership; no C++ allocator/hash-capacity emulation or forced Go GC is introduced. The #if 0 verbose fragment at cpp117-119 remains excluded.",
@@ -102448,7 +102483,9 @@
         "pkg/sat/sat_asymm_branch.go",
         "pkg/sat/sat_simplifier.go",
         "pkg/sat/sat_global_service_test.go",
-        "pkg/cmd/g3/test_vectors/sat_global_options.smt2"
+        "pkg/cmd/g3/test_vectors/sat_global_options.smt2",
+        "pkg/solver/tactic_solver.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestSATSolverBorrowedGlobalServiceCurrentModuleAndLocalOverrides",
@@ -102460,7 +102497,8 @@
         "TestSATPreprocessorFactoryParameterPrecedence",
         "TestSATTacticAllocationFrontiers",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -102510,7 +102548,8 @@
       "ownership": [
         "The manager-independent tactic owns its parameter snapshot and accumulated statistics. Each application owns a fresh native SAT runtime/solver/translator and releases them lexically; no SMT solver substitutes for the SAT engine. Result goals are borrowed, while result model converters and dependencies own their references. Dependency map keys retain AST references across the input goal reset, including signed and compound labels.",
         "SATApplicationFailure retains the concrete stopped application owner if destruction refuses. Explicit cleanup acknowledges only an already observed immutable source SAT destructor guard through CleanupStopped; ordinary Close keeps refusing. Consumed dependency/AST release prefixes, models, converters and runtime owners stay retained for retry. Source assertions are preserved in their selected profiles.",
-        "Native Go slices/maps/insdict.Dict replace C++ assumption/core containers. Explicit temporary counted references unwind the two clean wrappers and using_params preprocessor factory on construction/update failures. Source inactive cleanup is a no-op except for releasing previously stopped Go owners."
+        "Native Go slices/maps/insdict.Dict replace C++ assumption/core containers. Explicit temporary counted references unwind the two clean wrappers and using_params preprocessor factory on construction/update failures. Source inactive cleanup is a no-op except for releasing previously stopped Go owners.",
+        "The existing SATApplicationFailure receipt implements the concrete construction-failure ownership contract. Nested tactic solvers propagate that receipt instead of reducing it to an unknown-result string, preserving explicit cleanup and immutable observed destructor history."
       ],
       "deviations": [
         "The C++ allocator consolidation and AST hash-table capacity compaction at cpp64 are storage-management operations replaced by native Go storage ownership; no C++ allocator/hash-capacity emulation or forced Go GC is introduced. The #if 0 verbose fragment at cpp117-119 remains excluded.",
@@ -104236,11 +104275,15 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/cached_var_subst.go"
+        "pkg/smtcore/cached_var_subst.go",
+        "pkg/smtcore/smt_preprocessor_constructor_frontier_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestSMTCachedVarSubstitutionSourceOrderCacheAndReset",
-        "TestSMTCachedVarSubstitutionGuards"
+        "TestSMTCachedVarSubstitutionGuards",
+        "TestSMTKernelPreprocessorConstructionAllocationFrontiers",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -104266,7 +104309,8 @@
         }
       ],
       "ownership": [
-        "Each cache entry owns AST references for its quantifier, binding owners, and result; enodes and call arguments are borrowed. Reset releases every cache-owned reference."
+        "Each cache entry owns AST references for its quantifier, binding owners, and result; enodes and call arguments are borrowed. Reset releases every cache-owned reference.",
+        "Close releases cached roots and the actual partial substitution without requiring an executable Reset. Operational Reset retains its source behavior; incomplete construction is still safely destructible."
       ],
       "deviations": [
         "Native typed maps, slices, and explicit AST references replace raw flexible keys, region allocation, and the C++ map. Failed substitutions are never published, preserving the source rollback invariant without a transient null entry."
@@ -104278,11 +104322,15 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/cached_var_subst.go"
+        "pkg/smtcore/cached_var_subst.go",
+        "pkg/smtcore/smt_preprocessor_constructor_frontier_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestSMTCachedVarSubstitutionSourceOrderCacheAndReset",
-        "TestSMTCachedVarSubstitutionGuards"
+        "TestSMTCachedVarSubstitutionGuards",
+        "TestSMTKernelPreprocessorConstructionAllocationFrontiers",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -104307,7 +104355,8 @@
         }
       ],
       "ownership": [
-        "SMTCachedVarSubstitution owns its AST substitution engine and cache records and borrows its AST manager."
+        "SMTCachedVarSubstitution owns its AST substitution engine and cache records and borrows its AST manager.",
+        "Close releases cached roots and the actual partial substitution without requiring an executable Reset. Operational Reset retains its source behavior; incomplete construction is still safely destructible."
       ],
       "deviations": [
         "The concrete retained key uses quantifier AST handles and SMTEnode owners rather than an unused generic pointer payload."
@@ -110601,7 +110650,9 @@
         "pkg/tactic/smtlogics/qfidl_tactic_test.go",
         "pkg/smtcore/smt_clause_simplification_test.go",
         "pkg/cmd/g3/test_vectors/qfaufbv_proof.smt2",
-        "pkg/cmd/g3/test_vectors/qfaufbv_solver_proof.smt2"
+        "pkg/cmd/g3/test_vectors/qfaufbv_solver_proof.smt2",
+        "pkg/smtcore/smt_preprocessor_constructor_frontier_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -110667,7 +110718,9 @@
         "TestSMTQuantifiedSearchRequiresModelValidation",
         "TestSMTRelevancyNegatedArgumentsAndLiteralWatches",
         "TestSMTBoundedWeightedDisequalitiesModel",
-        "TestSMTClauseSimplificationRetainsWrappedRegionProofReason"
+        "TestSMTClauseSimplificationRetainsWrappedRegionProofReason",
+        "TestSMTKernelPreprocessorConstructionAllocationFrontiers",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -111939,7 +111992,8 @@
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records.",
         "The theory notification trail stores Boolean variable IDs without AST ownership. Scope rollback restores eligibility for subsequent assignments and relevance events.",
         "Search reads the quantifier manager-owned acceptedModel at the ground completion boundary. A checked candidate transfers through the existing generated-model path; an unchecked candidate cannot publish a SAT result.",
-        "When replacing a satisfied auxiliary clause reason, transfer the actual record.owner into state-owned justifications even if false-tail simplification has wrapped it below the current antecedent; deletion must not release the still-borrowed proof wrapper. The direct regression reconstructs the surviving literal proof after two simplification stages."
+        "When replacing a satisfied auxiliary clause reason, transfer the actual record.owner into state-owned justifications even if false-tail simplification has wrapped it below the current antecedent; deletion must not release the still-borrowed proof wrapper. The direct regression reconstructs the surviving literal proof after two simplification stages.",
+        "Preprocessing publishes a returned partial TheoryRewriter into the actual kernel owner before inspecting its construction error; solver/kernel teardown therefore closes the allocated configuration on every reached reservation failure."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -116241,7 +116295,10 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_quantifier_manager_test.go",
         "pkg/smtcore/smt_internalizer_state.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/cached_var_subst.go",
+        "pkg/smtcore/smt_preprocessor_constructor_frontier_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
@@ -116258,7 +116315,9 @@
         "TestSMTLibRunnerCPPReference",
         "TestSMTQuantifierManagerNewEnodesAndCursorRollback",
         "TestSMTQuantifiedSearchRequiresModelValidation",
-        "TestSMTQuantifierLiveParamsPreservePendingAndConstructorCaches"
+        "TestSMTQuantifierLiveParamsPreservePendingAndConstructorCaches",
+        "TestSMTKernelPreprocessorConstructionAllocationFrontiers",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -116395,7 +116454,8 @@
         "SMTQuantifierRegistry borrows quantifier AST handles, enode bindings, its queue schedule and cost model; it owns native statistic maps, insertion-ordered quantifier slices, and the scoped fingerprint set. SMTQuantifierManager owns its cached substitution and composes the registry, checker, rewriter, queue and internalizer through concrete typed references. SMTKernel owns the default cost model and closes it after the manager; an explicitly supplied registry retains caller ownership of its cost model.",
         "Quantifier activity borrows the shared relevance query and retains the true-assignment guard. quantified_model_relevancy.smt2 disables E-matching and filtering, checks identity-function model values, and rejects a scoped conflicting ground fact. Reverting the activity predicate makes Go incorrectly return SAT for that conflict.",
         "The quantifier manager stores an integer cursor into the internalizer-owned enode stack and saves it alongside activation scopes. Pop restores the cursor before removed enodes can be reused; the manager borrows nodes during notification and creates no extra AST or enode owner.",
-        "Parameter updates mutate concrete manager and queue scalar views in place. Existing fingerprints, deferred entries, instantiated trails, enode cursors and cost-expression ASTRefs retain their owners and lifetimes."
+        "Parameter updates mutate concrete manager and queue scalar views in place. Existing fingerprints, deferred entries, instantiated trails, enode cursors and cost-expression ASTRefs retain their owners and lifetimes.",
+        "Quantifier-manager construction closes a returned partial cached substitution before propagating its error. A half-built VarSubstitution remains owned through its actual Close boundary."
       ],
       "deviations": [
         "The source public add_instance forwarding bug that passes max_generation as max_top_generation is preserved. Finite MBQI uses a concrete Go model checker, honors mbqi.id prefixes, and resets and grows the source counterexample and iteration limits on each search. Auxiliary-solver checking and full model-finder adjustment remain open.",
@@ -117956,7 +118016,9 @@
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_solver_core.go",
         "pkg/smtcore/smt_kernel.go",
-        "pkg/smtcore/smt_dyn_ack_manager.go"
+        "pkg/smtcore/smt_dyn_ack_manager.go",
+        "pkg/smtcore/smt_preprocessor_constructor_frontier_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -117977,7 +118039,9 @@
         "TestSMTSolverLinearArithmeticAcceptsNonlinearZeroCandidate",
         "TestSMTSolverForwardsFastProgressSamples",
         "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals",
-        "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
+        "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites",
+        "TestSMTKernelPreprocessorConstructionAllocationFrontiers",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -118062,11 +118126,11 @@
         },
         {
           "name": "base-level kernel assertion, proof, named-assertion, logic, and configuration translation",
-        "status": "ported",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_solver.go",
           "tests": [
             "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
-          "TestSMTSolverTranslatesWithinManager",
+            "TestSMTSolverTranslatesWithinManager",
             "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
           ]
         },
@@ -118103,38 +118167,41 @@
             "TestSMTSolverFindsBinaryClauseMutexes"
           ]
         },
-      {
-        "name": "timed slow progress sampling",
-        "status": "ported",
-        "go_target": "pkg/smtcore/smt_search.go",
-        "tests": [
-          "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals"
-        ]
-      },
-      {
-        "name": "registered concrete theory-plugin copying during translation: retained arithmetic and BV types are preserved; other theory families remain incomplete",
-        "status": "partial",
-        "go_target": "pkg/smtcore/smt_solver.go",
-        "tests": ["TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState"]
-      },
-      {
-        "name": "distance-bounded and nonlocal quantifier-pattern unsat-core extension",
-        "status": "ported",
-        "go_target": "pkg/smtcore/smt_solver_core.go",
-        "tests": [
-          "TestSMTSolverExtendsUnsatCoreThroughQuantifierPatterns",
-          "TestSMTSolverExtendsUnsatCoreWithNonlocalPatterns"
-        ]
-      },
-      {
-        "name": "unsat-core MUS minimization guarded by m_minimizing_core",
-        "status": "reference_only",
-        "go_target": null,
-        "tests": []
-      }
+        {
+          "name": "timed slow progress sampling",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_search.go",
+          "tests": [
+            "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals"
+          ]
+        },
+        {
+          "name": "registered concrete theory-plugin copying during translation: retained arithmetic and BV types are preserved; other theory families remain incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "tests": [
+            "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState"
+          ]
+        },
+        {
+          "name": "distance-bounded and nonlocal quantifier-pattern unsat-core extension",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver_core.go",
+          "tests": [
+            "TestSMTSolverExtendsUnsatCoreThroughQuantifierPatterns",
+            "TestSMTSolverExtendsUnsatCoreWithNonlocalPatterns"
+          ]
+        },
+        {
+          "name": "unsat-core MUS minimization guarded by m_minimizing_core",
+          "status": "reference_only",
+          "go_target": null,
+          "tests": []
+        }
       ],
       "ownership": [
-        "SMTSolver owns its SMTKernel, named-assertion adapter, current check result, copied parameter reference, and retained tracked-formula references; it borrows the AST manager, parameter context, quantifier registry, and progress callback."
+        "SMTSolver owns its SMTKernel, named-assertion adapter, current check result, copied parameter reference, and retained tracked-formula references; it borrows the AST manager, parameter context, quantifier registry, and progress callback.",
+        "Preprocessing publishes a returned partial TheoryRewriter into the actual kernel owner before inspecting its construction error; solver/kernel teardown therefore closes the allocated configuration on every reached reservation failure."
       ],
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
@@ -127398,14 +127465,18 @@
         "pkg/smtcore/proto_model/fpa_factory.go",
         "pkg/smtcore/smt_setup.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
-        "pkg/model/fpa/bv2fpa_model.go"
+        "pkg/model/fpa/bv2fpa_model.go",
+        "pkg/ast/rewriter/fpa2bv_constructor_frontier_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestSMTFloatingPointIEEEAndStructuralEqualities",
         "TestSMTFloatingPointWrappedConstantAndScopes",
         "TestSMTFloatingPointConversionTermsAndArithmetic",
         "TestSMTFloatingPointModelReconstructsWrappedConstants",
-        "TestSMTFloatingPointModelFinalizesConvertedFunction"
+        "TestSMTFloatingPointModelFinalizesConvertedFunction",
+        "TestFPA2BVRewriterConstructorAllocationFrontiers",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -127671,7 +127742,8 @@
       ],
       "ownership": [
         "SMTFloatingPointTheory owns its converter, rewriter, scoped conversion references and model-finalization temporaries; FlushExtraAssertions transfers owned assertion references to the theory for assertion and release.",
-        "The proto-model owns the registered floating-point value factory, while model procedures borrow context enodes and return manager-owned AST values through the model generator protocol."
+        "The proto-model owns the registered floating-point value factory, while model procedures borrow context enodes and return manager-owned AST values through the model generator protocol.",
+        "Floating-point theory initialization closes a returned partial FPA2BV rewriter before releasing its converter on failure. Generic SMT backend setup reaches this owner even when the current input uses only UF/BV."
       ],
       "deviations": [
         "The retained Go internalizer installs an eager biconditional when each FPA atom or structural equality is internalized, so the native assignment callback's polarity-specific implication is redundant.",
@@ -127686,11 +127758,15 @@
       "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_fpa.go",
-        "pkg/smtcore/proto_model/fpa_factory.go"
+        "pkg/smtcore/proto_model/fpa_factory.go",
+        "pkg/ast/rewriter/fpa2bv_constructor_frontier_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestSMTFloatingPointModelReconstructsWrappedConstants",
-        "TestSMTFloatingPointModelFinalizesConvertedFunction"
+        "TestSMTFloatingPointModelFinalizesConvertedFunction",
+        "TestFPA2BVRewriterConstructorAllocationFrontiers",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -127726,7 +127802,8 @@
         }
       ],
       "ownership": [
-        "Concrete Go interfaces replace the nested native callback classes; the theory owns conversion state and the proto-model owns its registered factory."
+        "Concrete Go interfaces replace the nested native callback classes; the theory owns conversion state and the proto-model owns its registered factory.",
+        "Floating-point theory initialization closes a returned partial FPA2BV rewriter before releasing its converter on failure. Generic SMT backend setup reaches this owner even when the current input uses only UF/BV."
       ],
       "deviations": [
         "The native fresh-value factory method is itself unimplemented; the Go factory implements the retained canonical-value operations and deliberately reports that it cannot manufacture an unbounded fresh FP value."
@@ -131959,14 +132036,17 @@
       "status": "ported",
       "go_targets": [
         "pkg/solver/tactic_solver.go",
-        "pkg/solver/tactic_solver_test.go"
+        "pkg/solver/tactic_solver_test.go",
+        "pkg/sat/tactic/sat_tactic.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestTacticSolverSATUnknownScopesAndFailureReason",
         "TestTacticSolverTrackedCoreProofFactoriesAndTranslation",
         "TestTacticSolverBaseLevelTranslation",
         "TestTacticFactoryToSolverFactory",
-        "TestTacticSolverExceptionTransportAndTrace"
+        "TestTacticSolverExceptionTransportAndTrace",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -132012,7 +132092,8 @@
       "ownership": [
         "TacticSolver owns independent ASTRef pins for assertions, an owned parameter snapshot, its current result, named-assumption adapter and one retained tactic reference.",
         "CheckSatCore owns its goal, model reference, proof reference and dependency reference for the invocation and copies all published result values before cleanup.",
-        "Both factory forms own their tactic or tactic-factory resource until explicit Close and can create multiple independent solvers."
+        "Both factory forms own their tactic or tactic-factory resource until explicit Close and can create multiple independent solvers.",
+        "A caught owning Go construction/cleanup failure is propagated with its real owner before ordinary source exception-to-unknown conversion. Valid source solving and non-owning tactic-exception behavior remain unchanged."
       ],
       "deviations": [
         "TacticSolverConfig supplies explicit parameter, evaluator and trace services that were process-global or implicit in the source.",
@@ -132026,13 +132107,16 @@
       "status": "ported",
       "go_targets": [
         "pkg/solver/tactic_solver.go",
-        "pkg/solver/tactic_solver_test.go"
+        "pkg/solver/tactic_solver_test.go",
+        "pkg/sat/tactic/sat_tactic.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestTacticSolverSATUnknownScopesAndFailureReason",
         "TestTacticSolverTrackedCoreProofFactoriesAndTranslation",
         "TestTacticSolverBaseLevelTranslation",
-        "TestTacticFactoryToSolverFactory"
+        "TestTacticFactoryToSolverFactory",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -132059,7 +132143,8 @@
         }
       ],
       "ownership": [
-        "Constructors retain tactics and copy parameters; typed Factory values expose explicit Close for source destructor ownership."
+        "Constructors retain tactics and copy parameters; typed Factory values expose explicit Close for source destructor ownership.",
+        "A caught owning Go construction/cleanup failure is propagated with its real owner before ordinary source exception-to-unknown conversion. Valid source solving and non-owning tactic-exception behavior remain unchanged."
       ],
       "deviations": [
         "A configuration object carries explicit Go services alongside the source constructor arguments."
@@ -141889,7 +141974,9 @@
         "pkg/tactic/goal_shared_occurrences.go",
         "pkg/ast/rewriter/th_rewriter.go",
         "pkg/ast/ast_expr_substitution_ops.go",
-        "pkg/tactic/core/strategy_constructor_frontiers_test.go"
+        "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+        "pkg/tactic/core/propagate_values_stopped_cleanup_release_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestPropagateValuesDirectionalRoundsAndCPPApply",
@@ -141901,7 +141988,9 @@
         "TestPropagateValuesEndTraceAndStreamRefusal",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestCoreStrategyPrerequisiteConstructorFrontiers"
+        "TestCoreStrategyPrerequisiteConstructorFrontiers",
+        "TestPropagateValuesCountedReleaseAfterFailedCleanupReconstruction",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -142010,7 +142099,8 @@
         }
       ],
       "ownership": [
-        "The tactic owns its parameter snapshot, theory rewriter, shared-occurrence owner and optional concrete expression substitution. Each processed result uses counted AST/proof/dependency references across goal updates and cache resets. Cleanup detaches and destroys the implementation, then reconstructs it from the retained parameter snapshot; translated tactics own independent implementations and parameter references. Returned goals own the final proofs and dependencies independently of tactic cleanup."
+        "The tactic owns its parameter snapshot, theory rewriter, shared-occurrence owner and optional concrete expression substitution. Each processed result uses counted AST/proof/dependency references across goal updates and cache resets. Cleanup detaches and destroys the implementation, then reconstructs it from the retained parameter snapshot; translated tactics own independent implementations and parameter references. Returned goals own the final proofs and dependencies independently of tactic cleanup.",
+        "Counted destruction validates ownership rather than executable rewriter/occurrence state, so failed Cleanup reconstruction cannot strand the real tactic header."
       ],
       "deviations": [
         "The borrowed goal and directional loop state are local Go variables during Apply instead of mutable imp fields; the project algorithm and traversal order are unchanged."
@@ -142028,7 +142118,9 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/tactic/goal_shared_occurrences.go",
         "pkg/ast/rewriter/th_rewriter.go",
-        "pkg/ast/ast_expr_substitution_ops.go"
+        "pkg/ast/ast_expr_substitution_ops.go",
+        "pkg/tactic/core/propagate_values_stopped_cleanup_release_test.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
       ],
       "tests": [
         "TestPropagateValuesDirectionalRoundsAndCPPApply",
@@ -142039,7 +142131,9 @@
         "TestPropagateValuesQuantifierRootsAndSharedGroundAtoms",
         "TestPropagateValuesEndTraceAndStreamRefusal",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestPropagateValuesCountedReleaseAfterFailedCleanupReconstruction",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -142082,7 +142176,8 @@
         }
       ],
       "ownership": [
-        "The tactic owns its parameter snapshot, theory rewriter, shared-occurrence owner and optional concrete expression substitution. Each processed result uses counted AST/proof/dependency references across goal updates and cache resets. Cleanup detaches and destroys the implementation, then reconstructs it from the retained parameter snapshot; translated tactics own independent implementations and parameter references. Returned goals own the final proofs and dependencies independently of tactic cleanup."
+        "The tactic owns its parameter snapshot, theory rewriter, shared-occurrence owner and optional concrete expression substitution. Each processed result uses counted AST/proof/dependency references across goal updates and cache resets. Cleanup detaches and destroys the implementation, then reconstructs it from the retained parameter snapshot; translated tactics own independent implementations and parameter references. Returned goals own the final proofs and dependencies independently of tactic cleanup.",
+        "Counted destruction validates ownership rather than executable rewriter/occurrence state, so failed Cleanup reconstruction cannot strand the real tactic header."
       ],
       "deviations": [
         "The borrowed goal and directional loop state are local Go variables during Apply instead of mutable imp fields; the project algorithm and traversal order are unchanged."
@@ -148934,22 +149029,54 @@
       "path": "src/tactic/smtlogics/qfufbv_ackr_model_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
+      ],
+      "tests": [
+        "TestQFUFBVAckrRawBackendModelsSurviveClose",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_qfufbv_ackr_model_converter delegates to the retained fixed Ackermannization model converter",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
+          ],
+          "tests": [
+            "TestQFUFBVAckrRawBackendModelsSurviveClose",
+            "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The wrapper borrows manager/Info/abstract-model inputs during construction. The concrete converter acquires counted Info/model roots and remains independent of the lexical Lackr/backend/tactic owner."
+      ],
+      "deviations": [
+        "The source wrapper calls the fixed mk_ackr_model_converter overload. No dead lazy converter or universal model adapter is introduced."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfufbv_ackr_model_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
+      ],
+      "tests": [
+        "TestQFUFBVAckrRawBackendModelsSurviveClose",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -148960,17 +149087,35 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_qfufbv_ackr_model_converter delegates to the retained fixed Ackermannization model converter",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
+          ],
+          "tests": [
+            "TestQFUFBVAckrRawBackendModelsSurviveClose",
+            "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The wrapper borrows manager/Info/abstract-model inputs during construction. The concrete converter acquires counted Info/model roots and remains independent of the lexical Lackr/backend/tactic owner."
+      ],
+      "deviations": [
+        "The source wrapper calls the fixed mk_ackr_model_converter overload. No dead lazy converter or universal model adapter is introduced."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfufbv_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/smtlogics/qfufbv_tactic.go",
         "pkg/tactic/smtlogics/qfufbv_tactic_test.go",
@@ -148990,7 +149135,20 @@
         "pkg/cmd/g3/test_vectors/qfufbv_solver_proof.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_solver_reduce_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_solver_sat_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/qfufbv_solver_smt_models_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/qfufbv_solver_smt_models_scopes.smt2",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_strategy.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_eager.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_lazy.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_eager.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_lazy.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_eager.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_lazy.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_fallback.smt2"
       ],
       "tests": [
         "TestQFUFBVTacticConstructorAllocationFrontiers",
@@ -148998,7 +149156,14 @@
         "TestQFUFBVTacticModelSurvivesStrategyClose",
         "TestSMTLibRunnerQFUFBVBranchEvidence",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestQFUFBVAckrRawBackendModelsSurviveClose",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+        "TestQFUFBVAckrConstructorSnapshotAndTranslationBackendReset",
+        "TestQFUFBVAckrRefusalOrderAndMetadata",
+        "TestQFUFBVAckrUnknownLeavesNoResultGoal",
+        "TestQFUFBVAckrTraceAndClosedStream",
+        "TestSMTLibRunnerQFUFBVAckrBranchEvidence"
       ],
       "assertions": [
         {
@@ -149006,8 +149171,8 @@
           "text": "SASSERT(sat != NULL);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "mk_qfufbv_preamble: simplify/propagate/equation/unconstrained preamble, proof/core-guarded reduce-args and BV size reduction, maximum BV sharing",
@@ -149142,23 +149307,104 @@
           ]
         },
         {
-          "name": "qfufbv_ackr_tactic and mk_qfufbv_preamble1/mk_qfufbv_ackr_tactic: alternate solver-backed eager/lazy Ackermannization, BV bound checks, backend selection and fixed/lazy model-converter integration",
-          "status": "unported",
-          "reason": "Retained alternate strategy remains open; ordinary qfufbv does not require these implementations."
+          "name": "qfufbv_ackr_tactic constructor, parameter snapshots/backend-only updates, statistics/reset, no-op cleanup, raw translation resetting backend flags, core-before-proof refusal and source trace/report/result metadata",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_strategy.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestQFUFBVAckrRawBackendModelsSurviveClose",
+            "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+            "TestQFUFBVAckrConstructorSnapshotAndTranslationBackendReset",
+            "TestQFUFBVAckrRefusalOrderAndMetadata",
+            "TestQFUFBVAckrUnknownLeavesNoResultGoal",
+            "TestQFUFBVAckrTraceAndClosedStream"
+          ]
+        },
+        {
+          "name": "setup_sat and solver-backed eager/lazy Lackr: QF_AUFBV/tactic solver, QF_BV/tactic solver or native incremental SAT, forced backend models, source unknown-result publication and counted fixed UF model conversion",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_strategy.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_fallback.smt2"
+          ],
+          "tests": [
+            "TestQFUFBVAckrRawBackendModelsSurviveClose",
+            "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+            "TestQFUFBVAckrConstructorSnapshotAndTranslationBackendReset",
+            "TestQFUFBVAckrRefusalOrderAndMetadata",
+            "TestQFUFBVAckrUnknownLeavesNoResultGoal",
+            "TestQFUFBVAckrTraceAndClosedStream",
+            "TestSMTLibRunnerQFUFBVAckrBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "mk_qfufbv_preamble1 and mk_qfufbv_ackr_tactic: fixed final simplifier options, guarded BV bounds/size reduction, UF/BV probe, SMT fallback and qfufbv_ackr command registration",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_strategy.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_fallback.smt2"
+          ],
+          "tests": [
+            "TestQFUFBVAckrRawBackendModelsSurviveClose",
+            "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+            "TestQFUFBVAckrConstructorSnapshotAndTranslationBackendReset",
+            "TestQFUFBVAckrRefusalOrderAndMetadata",
+            "TestQFUFBVAckrUnknownLeavesNoResultGoal",
+            "TestQFUFBVAckrTraceAndClosedStream",
+            "TestSMTLibRunnerQFUFBVAckrBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Ordinary strategy construction retains concrete child tactics, probes, local parameter snapshots and failed owners until the root acquires them. Output is borrowed from the session. Saved original formulas remain true in reconstructed models after strategy destruction; fresh helper declarations do not escape. Alternate Ackermannization ownership remains unaudited."
+        "Ordinary strategy construction retains concrete child tactics, probes, local parameter snapshots and failed owners until the root acquires them. Output is borrowed from the session. Saved original formulas remain true in reconstructed models after strategy destruction; fresh helper declarations do not escape. Alternate Ackermannization owns the copied constructor dictionary and lexical backend, Lackr, temporary goal, Info/model references and unpublished converter. Concrete child construction owners and typed failure receipts remain reachable until actual cleanup completes. Published fixed converters/models survive tactic/backend destruction without abstraction or bit helper declarations escaping."
       ],
       "deviations": [
-        "The ordinary preamble and conditional are represented through existing concrete Go tactical combinators. The nested QF_BV strategy receives default constructor parameters and the final outer update forwards user parameters, matching source snapshot behavior. Native errors/retryable cleanup replace exception unwinding; no unused template adapter is introduced."
+        "The ordinary preamble and conditional are represented through existing concrete Go tactical combinators. The nested QF_BV strategy receives default constructor parameters and the final outer update forwards user parameters, matching source snapshot behavior. Native errors/retryable cleanup replace exception unwinding; no unused template adapter is introduced.",
+        "The alternate strategy preserves all three actual source backends, constructor defaults, backend-only parameter updates and source raw translation reset. Its raw tactic clears only model-converter metadata, preserves other result prefixes and adds no depth increment. Unknown solving yields no result goal. Go counted child owners replace scoped tactic_ref/scoped_ptr lifetime; no fallback solver replaces a retained algorithm.",
+        "The unused ctx_simp_p dictionary and commented-out context simplifier in preamble1 have no retained consumer and are not recreated. QF_BV backend selection may legitimately use its equality/BV1/SMT branch for an initial or successful lazy abstraction; branch evidence checks actual source strategy behavior rather than forcing every SAT-backend call through the native SAT tactic."
       ]
     },
     {
       "path": "src/tactic/smtlogics/qfufbv_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/smtlogics/qfufbv_tactic.go",
         "pkg/tactic/smtlogics/qfufbv_tactic_test.go",
@@ -149178,7 +149424,20 @@
         "pkg/cmd/g3/test_vectors/qfufbv_solver_proof.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_solver_reduce_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_solver_sat_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/qfufbv_solver_smt_models_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/qfufbv_solver_smt_models_scopes.smt2",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_strategy.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_eager.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_lazy.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_eager.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_lazy.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_eager.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_lazy.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_fallback.smt2"
       ],
       "tests": [
         "TestQFUFBVTacticConstructorAllocationFrontiers",
@@ -149186,7 +149445,14 @@
         "TestQFUFBVTacticModelSurvivesStrategyClose",
         "TestSMTLibRunnerQFUFBVBranchEvidence",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestQFUFBVAckrRawBackendModelsSurviveClose",
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+        "TestQFUFBVAckrConstructorSnapshotAndTranslationBackendReset",
+        "TestQFUFBVAckrRefusalOrderAndMetadata",
+        "TestQFUFBVAckrUnknownLeavesNoResultGoal",
+        "TestQFUFBVAckrTraceAndClosedStream",
+        "TestSMTLibRunnerQFUFBVAckrBranchEvidence"
       ],
       "conditionals": [
         {
@@ -149198,8 +149464,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "mk_qfufbv_preamble: simplify/propagate/equation/unconstrained preamble, proof/core-guarded reduce-args and BV size reduction, maximum BV sharing",
@@ -149334,16 +149600,97 @@
           ]
         },
         {
-          "name": "qfufbv_ackr_tactic and mk_qfufbv_preamble1/mk_qfufbv_ackr_tactic: alternate solver-backed eager/lazy Ackermannization, BV bound checks, backend selection and fixed/lazy model-converter integration",
-          "status": "unported",
-          "reason": "Retained alternate strategy remains open; ordinary qfufbv does not require these implementations."
+          "name": "qfufbv_ackr_tactic constructor, parameter snapshots/backend-only updates, statistics/reset, no-op cleanup, raw translation resetting backend flags, core-before-proof refusal and source trace/report/result metadata",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_strategy.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestQFUFBVAckrRawBackendModelsSurviveClose",
+            "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+            "TestQFUFBVAckrConstructorSnapshotAndTranslationBackendReset",
+            "TestQFUFBVAckrRefusalOrderAndMetadata",
+            "TestQFUFBVAckrUnknownLeavesNoResultGoal",
+            "TestQFUFBVAckrTraceAndClosedStream"
+          ]
+        },
+        {
+          "name": "setup_sat and solver-backed eager/lazy Lackr: QF_AUFBV/tactic solver, QF_BV/tactic solver or native incremental SAT, forced backend models, source unknown-result publication and counted fixed UF model conversion",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_strategy.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_fallback.smt2"
+          ],
+          "tests": [
+            "TestQFUFBVAckrRawBackendModelsSurviveClose",
+            "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+            "TestQFUFBVAckrConstructorSnapshotAndTranslationBackendReset",
+            "TestQFUFBVAckrRefusalOrderAndMetadata",
+            "TestQFUFBVAckrUnknownLeavesNoResultGoal",
+            "TestQFUFBVAckrTraceAndClosedStream",
+            "TestSMTLibRunnerQFUFBVAckrBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "mk_qfufbv_preamble1 and mk_qfufbv_ackr_tactic: fixed final simplifier options, guarded BV bounds/size reduction, UF/BV probe, SMT fallback and qfufbv_ackr command registration",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_strategy.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_model_converter.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_sat_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_eager.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_lazy.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_fallback.smt2"
+          ],
+          "tests": [
+            "TestQFUFBVAckrRawBackendModelsSurviveClose",
+            "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+            "TestQFUFBVAckrConstructorSnapshotAndTranslationBackendReset",
+            "TestQFUFBVAckrRefusalOrderAndMetadata",
+            "TestQFUFBVAckrUnknownLeavesNoResultGoal",
+            "TestQFUFBVAckrTraceAndClosedStream",
+            "TestSMTLibRunnerQFUFBVAckrBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Ordinary strategy construction retains concrete child tactics, probes, local parameter snapshots and failed owners until the root acquires them. Output is borrowed from the session. Saved original formulas remain true in reconstructed models after strategy destruction; fresh helper declarations do not escape. Alternate Ackermannization ownership remains unaudited."
+        "Ordinary strategy construction retains concrete child tactics, probes, local parameter snapshots and failed owners until the root acquires them. Output is borrowed from the session. Saved original formulas remain true in reconstructed models after strategy destruction; fresh helper declarations do not escape. Alternate Ackermannization owns the copied constructor dictionary and lexical backend, Lackr, temporary goal, Info/model references and unpublished converter. Concrete child construction owners and typed failure receipts remain reachable until actual cleanup completes. Published fixed converters/models survive tactic/backend destruction without abstraction or bit helper declarations escaping."
       ],
       "deviations": [
-        "The ordinary preamble and conditional are represented through existing concrete Go tactical combinators. The nested QF_BV strategy receives default constructor parameters and the final outer update forwards user parameters, matching source snapshot behavior. Native errors/retryable cleanup replace exception unwinding; no unused template adapter is introduced."
+        "The ordinary preamble and conditional are represented through existing concrete Go tactical combinators. The nested QF_BV strategy receives default constructor parameters and the final outer update forwards user parameters, matching source snapshot behavior. Native errors/retryable cleanup replace exception unwinding; no unused template adapter is introduced.",
+        "The alternate strategy preserves all three actual source backends, constructor defaults, backend-only parameter updates and source raw translation reset. Its raw tactic clears only model-converter metadata, preserves other result prefixes and adds no depth increment. Unknown solving yields no result goal. Go counted child owners replace scoped tactic_ref/scoped_ptr lifetime; no fallback solver replaces a retained algorithm.",
+        "The unused ctx_simp_p dictionary and commented-out context simplifier in preamble1 have no retained consumer and are not recreated. QF_BV backend selection may legitimately use its equality/BV1/SMT branch for an initial or successful lazy abstraction; branch evidence checks actual source strategy behavior rather than forcing every SAT-backend call through the native SAT tactic."
       ]
     },
     {
@@ -149404,14 +149751,45 @@
       "path": "src/tactic/smtlogics/qfufbv_tactic_params.pyg",
       "component": "tactic",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/params/gparams_catalog_collectors.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestQFUFBVAckrConstructorSnapshotAndTranslationBackendReset",
+        "TestSMTLibRunnerQFUFBVAckrBranchEvidence",
+        "TestSMTLibRunnerCPPReference"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "ackermannization sat_backend/inc_sat_backend Boolean descriptors, false defaults and local/module/default accessor precedence",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/params/gparams_catalog_collectors.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic.go",
+            "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestQFUFBVAckrConstructorSnapshotAndTranslationBackendReset",
+            "TestSMTLibRunnerQFUFBVAckrBranchEvidence",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "Generated source values use the existing concrete global-parameter catalog and counted module snapshot. The raw tactic stores its constructor dictionary separately from later backend-only selection updates."
+      ],
+      "deviations": [
+        "Concrete typed accessor calls replace generated C++ getters; raw tactic descriptors remain empty as inherited from source tactic, while exported global module descriptors retain both Boolean settings."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfufnra_tactic.cpp",
