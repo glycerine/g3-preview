@@ -10,6 +10,9 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"propagate_values_model_scopes.smt2":           "sat\n((a true) (b false) (c true))\nunsat\nsat\n((a true) (b false) (c true))\n",
+	"propagate_values_core.smt2":                   "unsat\n(negative implication positive)\n",
+	"propagate_values_proof.smt2":                  "unsat\n",
 	"tactic_model_scopes.smt2":                     "sat\n((a true))\nunsat\nsat\n((a true))\nsat\n((a true))\n",
 	"tactic_unsat_core.smt2":                       "unsat\n(positive negative)\nsat\n",
 	"tactic_false_proof.smt2":                      "unsat\n((set-logic QF_UF)\n(proof\n(asserted false)))\n",

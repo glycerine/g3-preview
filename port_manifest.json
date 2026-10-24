@@ -39259,7 +39259,9 @@
         "pkg/cmd_context/tactic_commands_test.go",
         "pkg/parsers/smt2/tactics.go",
         "pkg/parsers/smt2/tactics_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/tactic/core/propagate_values_tactic.go",
+        "pkg/tactic/core/propagate_values_tactic_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -39401,7 +39403,8 @@
             "pkg/cmd_context/tactic_commands.go",
             "pkg/cmd_context/tactic_commands_test.go",
             "pkg/parsers/smt2/tactics_test.go",
-            "pkg/cmd/g3/main_test.go"
+            "pkg/cmd/g3/main_test.go",
+            "pkg/tactic/core/propagate_values_tactic.go"
           ],
           "tests": [
             "TestCommandContextUnknownTacticLeavesInitializationOptionsAvailable",
@@ -39410,7 +39413,7 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMT2TacticCombinatorsAndTypedParameters"
           ],
-          "reason": "Only the currently connected smt, simplify, elim-and, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
+          "reason": "Only the currently connected smt, simplify, elim-and, propagate-values, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
         },
         {
           "name": "remaining apply/help/user-tactic/probe command integration and execution options (src/cmd_context/tactic_cmds.cpp)",
@@ -39433,7 +39436,9 @@
         "pkg/cmd_context/tactic_commands_test.go",
         "pkg/parsers/smt2/tactics.go",
         "pkg/parsers/smt2/tactics_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/tactic/core/propagate_values_tactic.go",
+        "pkg/tactic/core/propagate_values_tactic_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -39491,7 +39496,8 @@
             "pkg/cmd_context/tactic_commands.go",
             "pkg/cmd_context/tactic_commands_test.go",
             "pkg/parsers/smt2/tactics_test.go",
-            "pkg/cmd/g3/main_test.go"
+            "pkg/cmd/g3/main_test.go",
+            "pkg/tactic/core/propagate_values_tactic.go"
           ],
           "tests": [
             "TestCommandContextUnknownTacticLeavesInitializationOptionsAvailable",
@@ -39500,7 +39506,7 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMT2TacticCombinatorsAndTypedParameters"
           ],
-          "reason": "Only the currently connected smt, simplify, elim-and, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
+          "reason": "Only the currently connected smt, simplify, elim-and, propagate-values, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
         },
         {
           "name": "remaining apply/help/user-tactic/probe command integration and execution options (src/cmd_context/tactic_cmds.cpp)",
@@ -133134,9 +133140,27 @@
       "path": "src/tactic/core/propagate_values_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/propagate_values_tactic.go",
+        "pkg/tactic/core/propagate_values_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/tactic/goal_shared_occurrences.go",
+        "pkg/ast/rewriter/th_rewriter.go",
+        "pkg/ast/ast_expr_substitution_ops.go"
+      ],
+      "tests": [
+        "TestPropagateValuesDirectionalRoundsAndCPPApply",
+        "TestPropagateValuesNumericEqualityBothOrientations",
+        "TestPropagateValuesCarriesProofAndAllUsedDependencies",
+        "TestPropagateValuesDefaultRoundsTranslationAndParameterSnapshot",
+        "TestPropagateValuesRewriteFailureCleanupAndRecovery",
+        "TestPropagateValuesQuantifierRootsAndSharedGroundAtoms",
+        "TestPropagateValuesEndTraceAndStreamRefusal",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 143,
@@ -133147,19 +133171,117 @@
           "text": "SASSERT(m_goal->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "imp::operator(): shared-atom tracking, alternating forward/backward passes, original size/round boundaries, inconsistent/zero-round exits, redundancy elimination, depth and converter outputs",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/propagate_values_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/propagate_values_tactic_test.go",
+            "pkg/tactic/goal_shared_occurrences.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestPropagateValuesDirectionalRoundsAndCPPApply",
+            "TestPropagateValuesNumericEqualityBothOrientations",
+            "TestPropagateValuesDefaultRoundsTranslationAndParameterSnapshot",
+            "TestPropagateValuesQuantifierRootsAndSharedGroundAtoms",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "is_shared/is_shared_neg/is_shared_eq, process_current and push_result: positive/negative Boolean facts, either equality orientation with a concrete value, proof modus ponens/iff construction, dependency joins and used-dependency reset",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/propagate_values_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/propagate_values_tactic_test.go",
+            "pkg/ast/ast_expr_substitution_ops.go",
+            "pkg/ast/rewriter/th_rewriter.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestPropagateValuesDirectionalRoundsAndCPPApply",
+            "TestPropagateValuesNumericEqualityBothOrientations",
+            "TestPropagateValuesCarriesProofAndAllUsedDependencies",
+            "TestPropagateValuesQuantifierRootsAndSharedGroundAtoms",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "constructor, updt_params/updt_params_core, collect_param_descrs, cleanup, translate and destructor: native four-round default and unchanged legacy two-round descriptor text, counted snapshots and rewriter/substitution ownership",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/propagate_values_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/propagate_values_tactic_test.go"
+          ],
+          "tests": [
+            "TestPropagateValuesDefaultRoundsTranslationAndParameterSnapshot",
+            "TestPropagateValuesRewriteFailureCleanupAndRecovery",
+            "TestPropagateValuesEndTraceAndStreamRefusal"
+          ]
+        },
+        {
+          "name": "operator() rewriter_exception to tactic_exception boundary, source sortedness guards, propagate_values/propagate_values_core/shallow_context_simplifier_bug traces and round progress reporting",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/propagate_values_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/propagate_values_tactic_test.go"
+          ],
+          "tests": [
+            "TestPropagateValuesRewriteFailureCleanupAndRecovery",
+            "TestPropagateValuesEndTraceAndStreamRefusal"
+          ]
+        },
+        {
+          "name": "mk_propagate_values_tactic and retained propagate-values command factory binding",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/propagate_values_tactic.go",
+          "go_targets": [
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns its parameter snapshot, theory rewriter, shared-occurrence owner and optional concrete expression substitution. Each processed result uses counted AST/proof/dependency references across goal updates and cache resets. Cleanup detaches and destroys the implementation, then reconstructs it from the retained parameter snapshot; translated tactics own independent implementations and parameter references. Returned goals own the final proofs and dependencies independently of tactic cleanup."
+      ],
+      "deviations": [
+        "The borrowed goal and directional loop state are local Go variables during Apply instead of mutable imp fields; the project algorithm and traversal order are unchanged."
+      ]
     },
     {
       "path": "src/tactic/core/propagate_values_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/propagate_values_tactic.go",
+        "pkg/tactic/core/propagate_values_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/tactic/goal_shared_occurrences.go",
+        "pkg/ast/rewriter/th_rewriter.go",
+        "pkg/ast/ast_expr_substitution_ops.go"
+      ],
+      "tests": [
+        "TestPropagateValuesDirectionalRoundsAndCPPApply",
+        "TestPropagateValuesNumericEqualityBothOrientations",
+        "TestPropagateValuesCarriesProofAndAllUsedDependencies",
+        "TestPropagateValuesDefaultRoundsTranslationAndParameterSnapshot",
+        "TestPropagateValuesRewriteFailureCleanupAndRecovery",
+        "TestPropagateValuesQuantifierRootsAndSharedGroundAtoms",
+        "TestPropagateValuesEndTraceAndStreamRefusal",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -133170,11 +133292,42 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_propagate_values_tactic and retained propagate-values command factory binding",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/propagate_values_tactic.go",
+          "go_targets": [
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "constructor, updt_params/updt_params_core, collect_param_descrs, cleanup, translate and destructor: native four-round default and unchanged legacy two-round descriptor text, counted snapshots and rewriter/substitution ownership",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/propagate_values_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/propagate_values_tactic_test.go"
+          ],
+          "tests": [
+            "TestPropagateValuesDefaultRoundsTranslationAndParameterSnapshot",
+            "TestPropagateValuesRewriteFailureCleanupAndRecovery",
+            "TestPropagateValuesEndTraceAndStreamRefusal"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns its parameter snapshot, theory rewriter, shared-occurrence owner and optional concrete expression substitution. Each processed result uses counted AST/proof/dependency references across goal updates and cache resets. Cleanup detaches and destroys the implementation, then reconstructs it from the retained parameter snapshot; translated tactics own independent implementations and parameter references. Returned goals own the final proofs and dependencies independently of tactic cleanup."
+      ],
+      "deviations": [
+        "The borrowed goal and directional loop state are local Go variables during Apply instead of mutable imp fields; the project algorithm and traversal order are unchanged."
+      ]
     },
     {
       "path": "src/tactic/core/reduce_args_tactic.cpp",

@@ -1,0 +1,8 @@
+(set-logic QF_UF)
+(set-option :produce-proofs true)
+(declare-const a Bool)
+(declare-const b Bool)
+(assert a)
+(assert (or (not a) b))
+(assert (not b))
+(check-sat-using (then propagate-values smt))
