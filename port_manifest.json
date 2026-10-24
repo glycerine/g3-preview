@@ -106519,7 +106519,8 @@
         "pkg/smtcore/smt_asserted_bounds.go",
         "pkg/smtcore/smt_asserted_bounds_test.go",
         "pkg/smtcore/smt_asserted_driver.go",
-        "pkg/smtcore/smt_asserted_driver_test.go"
+        "pkg/smtcore/smt_asserted_driver_test.go",
+        "pkg/smtcore/smt_asserted_publication_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -106564,7 +106565,14 @@
         "TestSMTAssertedDriverInconsistencyStopsAssertionAndRestoresScope",
         "TestSMTAssertedDriverSkippedPassDoesNotPollCancellation",
         "TestSMTAssertedDriverStopsBeforeNNFOnPropagationConflict",
-        "TestSMTAssertedMacroPostOperationDoesNotPropagateValues"
+        "TestSMTAssertedMacroPostOperationDoesNotPropagateValues",
+        "TestSMTAssertedInjectivityCanceledRowsDoNotPublish",
+        "TestSMTAssertedNNFCancellationBeforeSwapAndRetry",
+        "TestSMTAssertedTermITEDefinitionPreservesUnchangedConjunction",
+        "TestSMTAssertedPublicationAllocationFrontiers",
+        "TestSMTAssertedMacroSwapPrecedesCanceledPostReduction",
+        "TestSMTAssertedPropagationMarksUnchangedFalseFromRawSwap",
+        "TestSMTAssertedReductionPreservesUnchangedRowsAndEagerConflict"
       ],
       "conditionals": [
         {
@@ -106827,7 +106835,27 @@
           ]
         },
         {
-          "name": "remaining preprocessing setup/reset details, per-row cancellation/publication audit and driver verbose/trace/debug diagnostics",
+          "name": "simplify_fmls and nnf_cnf local owning output vectors, source per-row cancellation/publication boundaries, unchanged-row preservation, exact raw swaps, post-swap reductions and scoped eager inconsistency state",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_reduce.go",
+          "go_targets": [
+            "pkg/smtcore/smt_asserted_formulas.go",
+            "pkg/smtcore/smt_asserted_nnf.go",
+            "pkg/smtcore/smt_asserted_macros.go",
+            "pkg/smtcore/smt_kernel.go"
+          ],
+          "tests": [
+            "TestSMTAssertedInjectivityCanceledRowsDoNotPublish",
+            "TestSMTAssertedNNFCancellationBeforeSwapAndRetry",
+            "TestSMTAssertedTermITEDefinitionPreservesUnchangedConjunction",
+            "TestSMTAssertedPublicationAllocationFrontiers",
+            "TestSMTAssertedMacroSwapPrecedesCanceledPostReduction",
+            "TestSMTAssertedPropagationMarksUnchangedFalseFromRawSwap",
+            "TestSMTAssertedReductionPreservesUnchangedRowsAndEagerConflict"
+          ]
+        },
+        {
+          "name": "remaining preprocessing setup/reset details and driver verbose/trace/debug diagnostics",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -106839,12 +106867,14 @@
         "The kernel owns its accumulated assertion-rewriter parameter reference until close, and pins incoming formula/proof handles before phase changes flush cached ASTs. Tests that reuse original formulas after preprocessing retain independent AST references.",
         "Negated-disjunction assertion flattening uses the source mk_not helper, eliminating double negations and simplifying Boolean constants consistently with not-or elimination proofs.",
         "The kernel owns the pattern inference rewriter until close. The transformed formula batch pins inferred quantifiers and composed proofs; model-finder identities refer to those transformed quantifiers, preserving their source QIDs.",
-        "The kernel owns the maximize_bv_sharing rewriter and pushes/pops its operand cache with assertion scopes. Bit2int owns its per-pass cache until transformed formula/proof rows have acquired references."
+        "The kernel owns the maximize_bv_sharing rewriter and pushes/pops its operand cache with assertion scopes. Bit2int owns its per-pass cache until transformed formula/proof rows have acquired references.",
+        "Each generic simplifier and NNF owns its local transformed/flattened vector until source per-row cancellation checks permit a raw swap. Unchanged generic rows preserve original justifications, including conjunctive definitions. Post-operations run on the published vector; the NNF main composed proof is pinned during theory rewriting. Four allocation-frontier campaigns cover injectivity and NNF with proofs disabled/enabled and release all charged fixture storage.",
+        "Inconsistency is the explicit scoped source flag rather than a scan of published formulas: canceled local-vector transformations retain eager conflict state, while native allocation errors restore prior/published conflict state. User scope snapshots restore this flag on pop independently of the sticky has-quantifiers flag."
       ],
       "deviations": [
         "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager.",
         "Go expands stored definitions before committing later assertions independently of new-discovery and ordinary-preprocessing flags. Definitions removed from the assertion list therefore remain effective after parameter changes and when quasi_macros is enabled without macro_finder.",
-        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; source diagnostic hooks and complete per-row cancellation fidelity remain unaudited, so this source unit remains partial."
+        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; remaining setup/reset details and source driver diagnostic hooks remain unaudited, so this source unit remains partial."
       ]
     },
     {
@@ -106878,7 +106908,8 @@
         "pkg/smtcore/smt_asserted_bounds.go",
         "pkg/smtcore/smt_asserted_bounds_test.go",
         "pkg/smtcore/smt_asserted_driver.go",
-        "pkg/smtcore/smt_asserted_driver_test.go"
+        "pkg/smtcore/smt_asserted_driver_test.go",
+        "pkg/smtcore/smt_asserted_publication_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -106923,7 +106954,14 @@
         "TestSMTAssertedDriverInconsistencyStopsAssertionAndRestoresScope",
         "TestSMTAssertedDriverSkippedPassDoesNotPollCancellation",
         "TestSMTAssertedDriverStopsBeforeNNFOnPropagationConflict",
-        "TestSMTAssertedMacroPostOperationDoesNotPropagateValues"
+        "TestSMTAssertedMacroPostOperationDoesNotPropagateValues",
+        "TestSMTAssertedInjectivityCanceledRowsDoNotPublish",
+        "TestSMTAssertedNNFCancellationBeforeSwapAndRetry",
+        "TestSMTAssertedTermITEDefinitionPreservesUnchangedConjunction",
+        "TestSMTAssertedPublicationAllocationFrontiers",
+        "TestSMTAssertedMacroSwapPrecedesCanceledPostReduction",
+        "TestSMTAssertedPropagationMarksUnchangedFalseFromRawSwap",
+        "TestSMTAssertedReductionPreservesUnchangedRowsAndEagerConflict"
       ],
       "conditionals": [
         {
@@ -107134,7 +107172,27 @@
           ]
         },
         {
-          "name": "remaining preprocessing setup/reset details, per-row cancellation/publication audit and driver verbose/trace/debug diagnostics",
+          "name": "simplify_fmls and nnf_cnf local owning output vectors, source per-row cancellation/publication boundaries, unchanged-row preservation, exact raw swaps, post-swap reductions and scoped eager inconsistency state",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_reduce.go",
+          "go_targets": [
+            "pkg/smtcore/smt_asserted_formulas.go",
+            "pkg/smtcore/smt_asserted_nnf.go",
+            "pkg/smtcore/smt_asserted_macros.go",
+            "pkg/smtcore/smt_kernel.go"
+          ],
+          "tests": [
+            "TestSMTAssertedInjectivityCanceledRowsDoNotPublish",
+            "TestSMTAssertedNNFCancellationBeforeSwapAndRetry",
+            "TestSMTAssertedTermITEDefinitionPreservesUnchangedConjunction",
+            "TestSMTAssertedPublicationAllocationFrontiers",
+            "TestSMTAssertedMacroSwapPrecedesCanceledPostReduction",
+            "TestSMTAssertedPropagationMarksUnchangedFalseFromRawSwap",
+            "TestSMTAssertedReductionPreservesUnchangedRowsAndEagerConflict"
+          ]
+        },
+        {
+          "name": "remaining preprocessing setup/reset details and driver verbose/trace/debug diagnostics",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -107146,11 +107204,13 @@
         "The kernel owns its accumulated assertion-rewriter parameter reference until close, and pins incoming formula/proof handles before phase changes flush cached ASTs. Tests that reuse original formulas after preprocessing retain independent AST references.",
         "Negated-disjunction assertion flattening uses the source mk_not helper, eliminating double negations and simplifying Boolean constants consistently with not-or elimination proofs.",
         "The kernel owns the pattern inference rewriter until close. The transformed formula batch pins inferred quantifiers and composed proofs; model-finder identities refer to those transformed quantifiers, preserving their source QIDs.",
-        "The kernel owns the maximize_bv_sharing rewriter and pushes/pops its operand cache with assertion scopes. Bit2int owns its per-pass cache until transformed formula/proof rows have acquired references."
+        "The kernel owns the maximize_bv_sharing rewriter and pushes/pops its operand cache with assertion scopes. Bit2int owns its per-pass cache until transformed formula/proof rows have acquired references.",
+        "Each generic simplifier and NNF owns its local transformed/flattened vector until source per-row cancellation checks permit a raw swap. Unchanged generic rows preserve original justifications, including conjunctive definitions. Post-operations run on the published vector; the NNF main composed proof is pinned during theory rewriting. Four allocation-frontier campaigns cover injectivity and NNF with proofs disabled/enabled and release all charged fixture storage.",
+        "Inconsistency is the explicit scoped source flag rather than a scan of published formulas: canceled local-vector transformations retain eager conflict state, while native allocation errors restore prior/published conflict state. User scope snapshots restore this flag on pop independently of the sticky has-quantifiers flag."
       ],
       "deviations": [
         "The concrete retained subset is integrated with SMTKernel rather than exposed as a preprocessing class.",
-        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; source diagnostic hooks and complete per-row cancellation fidelity remain unaudited, so this source unit remains partial."
+        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; remaining setup/reset details and source driver diagnostic hooks remain unaudited, so this source unit remains partial."
       ]
     },
     {

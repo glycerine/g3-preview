@@ -70,6 +70,8 @@ type SMTKernel struct {
 
 	// Source m_has_quantifiers is sticky, including across scope pops.
 	assertedHasQuantifiers bool
+	assertedInconsistent   bool
+	assertedScopeConflicts []bool
 	assertedParams         uparams.ParamsRef
 	assertedParamsReady    bool
 	assertedElimAnd        bool
@@ -640,6 +642,7 @@ func (k *SMTKernel) Assert(formula, proof ast.ASTHandle) error {
 	}
 	k.assertedHasQuantifiers = k.assertedHasQuantifiers || hasQuantifiers
 	limit := len(k.assertions)
+	wasInconsistent := k.assertedInconsistent
 	if err = k.pushAssertion(formula, proof); err == nil {
 		return nil
 	}
@@ -651,6 +654,7 @@ func (k *SMTKernel) Assert(formula, proof ast.ASTHandle) error {
 		err = errors.Join(err, k.manager.DecRef(assertion.Formula))
 	}
 	k.assertions = k.assertions[:limit]
+	k.assertedInconsistent = wasInconsistent
 	return err
 }
 
@@ -726,6 +730,7 @@ func (k *SMTKernel) Push() error {
 		return errors.Join(err, k.bvSharing.PopScope(1), k.definedNames.Pop(1), k.assertedMacros.PopScope(1))
 	}
 	k.scopes = append(k.scopes, len(k.assertions))
+	k.assertedScopeConflicts = append(k.assertedScopeConflicts, k.assertedInconsistent)
 	return nil
 }
 
@@ -766,6 +771,8 @@ func (k *SMTKernel) Pop(count uint32) error {
 		k.assertedHead = limit
 	}
 	k.scopes = k.scopes[:level]
+	k.assertedInconsistent = k.assertedScopeConflicts[level]
+	k.assertedScopeConflicts = k.assertedScopeConflicts[:level]
 	return nil
 }
 
@@ -1142,6 +1149,9 @@ func (k *SMTKernel) Close() error {
 	}
 	if result == nil {
 		k.assertions = nil
+		k.scopes = nil
+		k.assertedScopeConflicts = nil
+		k.assertedInconsistent = false
 		k.internalizer = nil
 		k.checker = nil
 		k.relevancy = nil

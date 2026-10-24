@@ -11,6 +11,7 @@ import (
 )
 
 func (k *SMTKernel) refinePendingInjectivityAxioms() (result error) {
+	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
 	if !k.preprocess || !k.preprocessState.RefineInjectivityAxiom || !k.assertedHasQuantifiers || k.assertedHead == len(k.assertions) {
 		return nil
 	}
@@ -58,12 +59,15 @@ func (k *SMTKernel) refinePendingInjectivityAxioms() (result error) {
 				changed = true
 			}
 		}
-		if err := batch.Insert(row); err != nil {
+		if err := k.appendTransformedAssertion(batch, assertion, row.Expression, row.Proof); err != nil {
+			return err
+		}
+		if canceled, err := k.manager.Canceled(); canceled || err != nil {
 			return err
 		}
 	}
 	if !changed {
 		return nil
 	}
-	return k.replacePendingFormulaBatch(batch, false)
+	return k.finishAssertedPass(batch, false)
 }

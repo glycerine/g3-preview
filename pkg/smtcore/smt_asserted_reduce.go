@@ -10,6 +10,22 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 )
 
+// Native allocation errors can return before the local source vector is
+// swapped. Preserve only conflict state that was already present or belongs to
+// published rows; ordinary cancellation retains the source's eager flag.
+func (k *SMTKernel) restoreAssertedConflictOnError(previous bool, result *error) {
+	if *result == nil {
+		return
+	}
+	k.assertedInconsistent = previous
+	for _, row := range k.assertions {
+		if k.manager.IsFalse(row.Formula) {
+			k.assertedInconsistent = true
+			break
+		}
+	}
+}
+
 func (k *SMTKernel) setAssertedEliminateAnd(flag bool) error {
 	if !k.preprocess || k.preprocessor == nil || (k.assertedPhaseReady && k.assertedElimAnd == flag) {
 		return nil
@@ -46,6 +62,7 @@ func (k *SMTKernel) setAssertedEliminateAnd(flag bool) error {
 }
 
 func (k *SMTKernel) reducePendingAssertions() (result error) {
+	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
 	if !k.preprocess || k.preprocessor == nil || k.assertedHead == len(k.assertions) {
 		return nil
 	}
@@ -55,14 +72,50 @@ func (k *SMTKernel) reducePendingAssertions() (result error) {
 	}
 	defer func() { result = errors.Join(result, batch.Close()) }()
 	for _, row := range k.assertions[k.assertedHead:] {
-		if err := batch.Insert(macros.Formula{Expression: row.Formula, Proof: row.Proof}); err != nil {
+		formula, proof, err := k.preprocessAssertion(row.Formula, row.Proof)
+		if err != nil {
+			return err
+		}
+		err = k.appendTransformedAssertion(batch, row, formula, proof)
+		err = errors.Join(err, k.manager.DecRef(formula), k.manager.DecRef(proof))
+		if err != nil {
+			return err
+		}
+		if canceled, err := k.manager.Canceled(); canceled || err != nil {
 			return err
 		}
 	}
-	return k.replacePendingFormulaBatch(batch, true)
+	return k.swapPendingFormulaBatch(batch)
+}
+
+func (k *SMTKernel) reduceAndSolveAssertions() error {
+	if k.preprocessor != nil {
+		if err := k.preprocessor.Reset(); err != nil {
+			return err
+		}
+	}
+	return k.reducePendingAssertions()
+}
+
+func (k *SMTKernel) appendTransformedAssertion(batch *macros.FormulaBatch, original SMTKernelAssertion, formula, proof ast.ASTHandle) error {
+	if original.Formula == formula {
+		return batch.Insert(macros.Formula{Expression: original.Formula, Proof: original.Proof})
+	}
+	return k.pushAssertionInto(formula, proof, batch)
+}
+
+func (k *SMTKernel) finishAssertedPass(batch *macros.FormulaBatch, reduce bool) error {
+	if err := k.swapPendingFormulaBatch(batch); err != nil {
+		return err
+	}
+	if reduce {
+		return k.reduceAndSolveAssertions()
+	}
+	return nil
 }
 
 func (k *SMTKernel) distributePendingUniversals() (result error) {
+	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
 	if !k.preprocess || !k.preprocessState.DistributeForall || k.assertedHead == len(k.assertions) {
 		return nil
 	}
@@ -96,6 +149,9 @@ func (k *SMTKernel) distributePendingUniversals() (result error) {
 		if err := k.appendSimplifiedAssertion(batch, assertion, out, proof); err != nil {
 			return err
 		}
+		if canceled, err := k.manager.Canceled(); canceled || err != nil {
+			return err
+		}
 	}
-	return k.replacePendingFormulaBatch(batch, true)
+	return k.finishAssertedPass(batch, true)
 }

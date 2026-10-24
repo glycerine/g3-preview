@@ -10,6 +10,7 @@ import (
 )
 
 func (k *SMTKernel) normalizePendingAssertions() (result error) {
+	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
 	if !k.preprocess || k.assertedHead == len(k.assertions) {
 		return nil
 	}
@@ -34,22 +35,22 @@ func (k *SMTKernel) normalizePendingAssertions() (result error) {
 	}
 	defer func() { result = errors.Join(result, batch.Close()) }()
 	for _, assertion := range k.assertions[k.assertedHead:] {
-		if err := k.appendNormalizedAssertion(proc, batch, assertion); err != nil {
+		if canceled, err := k.appendNormalizedAssertion(proc, batch, assertion); canceled || err != nil {
 			return err
 		}
 	}
-	return k.replacePendingMacroBatch(batch)
+	return k.swapPendingFormulaBatch(batch)
 }
 
-func (k *SMTKernel) appendNormalizedAssertion(proc *normal_forms.NNF, batch *macros.FormulaBatch, assertion SMTKernelAssertion) (result error) {
+func (k *SMTKernel) appendNormalizedAssertion(proc *normal_forms.NNF, batch *macros.FormulaBatch, assertion SMTKernelAssertion) (canceled bool, result error) {
 	out, err := k.manager.NewRef(ast.ASTHandle{})
 	if err != nil {
-		return err
+		return false, err
 	}
 	defer func() { result = errors.Join(result, k.manager.DelRef(&out)) }()
 	proof, err := k.manager.NewRef(ast.ASTHandle{})
 	if err != nil {
-		return err
+		return false, err
 	}
 	defer func() { result = errors.Join(result, k.manager.DelRef(&proof)) }()
 	var definitions, definitionProofs []ast.ASTRef
@@ -62,42 +63,66 @@ func (k *SMTKernel) appendNormalizedAssertion(proc *normal_forms.NNF, batch *mac
 		}
 	}()
 	if err = proc.Transform(assertion.Formula, &definitions, &definitionProofs, out, proof); err != nil {
-		return err
+		return false, err
+	}
+	if canceled, err := k.manager.Canceled(); canceled || err != nil {
+		return canceled, err
 	}
 	proofs, err := k.manager.ProofsEnabled()
 	if err != nil {
-		return err
+		return false, err
 	}
 	for i, definition := range definitions {
 		value, err := k.manager.RefGet(definition)
 		if err != nil {
-			return err
+			return false, err
 		}
 		var p ast.ASTHandle
 		if proofs {
 			p, err = k.manager.RefGet(definitionProofs[i])
 			if err != nil {
-				return err
+				return false, err
 			}
 		}
-		if err = batch.Insert(macros.Formula{Expression: value, Proof: p}); err != nil {
-			return err
+		if canceled, err := k.appendNNFRewritten(batch, value, p); canceled || err != nil {
+			return canceled, err
 		}
 	}
 	value, err := k.manager.RefGet(out)
 	if err != nil {
-		return err
+		return false, err
 	}
 	var p ast.ASTHandle
 	if proofs {
 		rewrite, err := k.manager.RefGet(proof)
 		if err != nil {
-			return err
+			return false, err
 		}
 		p, err = k.manager.MkProofModusPonens(assertion.Proof, rewrite)
 		if err != nil {
-			return err
+			return false, err
 		}
+		// Source push_todo_prs owns this composed proof while the theory
+		// rewriter processes the normalized main formula.
+		held, err := k.manager.NewRef(p)
+		if err != nil {
+			return false, err
+		}
+		defer func() { result = errors.Join(result, k.manager.DelRef(&held)) }()
 	}
-	return batch.Insert(macros.Formula{Expression: value, Proof: p})
+	return k.appendNNFRewritten(batch, value, p)
+}
+
+// NNF checks cancellation both after normalization and after rewriting each
+// introduced definition/main row, before pushing it into the local vector.
+func (k *SMTKernel) appendNNFRewritten(batch *macros.FormulaBatch, formula, proof ast.ASTHandle) (canceled bool, result error) {
+	value, p, err := k.preprocessAssertion(formula, proof)
+	if err != nil {
+		return false, err
+	}
+	defer func() { result = errors.Join(result, k.manager.DecRef(value), k.manager.DecRef(p)) }()
+	if canceled, err := k.manager.Canceled(); canceled || err != nil {
+		return canceled, err
+	}
+	return false, k.pushAssertionInto(value, p, batch)
 }

@@ -17,6 +17,7 @@ const (
 )
 
 func (k *SMTKernel) liftPendingITEs(nonground bool) (result error) {
+	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
 	if !k.preprocess || k.assertedHead == len(k.assertions) {
 		return nil
 	}
@@ -67,11 +68,15 @@ func (k *SMTKernel) liftPendingITEs(nonground bool) (result error) {
 		if err := k.appendSimplifiedAssertion(batch, assertion, out, proof); err != nil {
 			return err
 		}
+		if canceled, err := k.manager.Canceled(); canceled || err != nil {
+			return err
+		}
 	}
-	return k.replacePendingFormulaBatch(batch, true)
+	return k.finishAssertedPass(batch, true)
 }
 
 func (k *SMTKernel) eliminatePendingTermITEs() (result error) {
+	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
 	if !k.preprocess || !k.preprocessState.EliminateTermITE ||
 		k.preprocessState.LiftITE == smtLiftITEFull || k.assertedHead == len(k.assertions) {
 		return nil
@@ -105,6 +110,9 @@ func (k *SMTKernel) eliminatePendingTermITEs() (result error) {
 		if err := k.appendSimplifiedAssertion(batch, assertion, out, proof); err != nil {
 			return err
 		}
+		if canceled, err := k.manager.Canceled(); canceled || err != nil {
+			return err
+		}
 	}
 	// Source post_op appends the generated definitions after all transformed
 	// original assertions, then reduces the entire pending suffix.
@@ -125,7 +133,7 @@ func (k *SMTKernel) eliminatePendingTermITEs() (result error) {
 			return err
 		}
 	}
-	return k.replacePendingFormulaBatch(batch, true)
+	return k.finishAssertedPass(batch, true)
 }
 
 // appendSimplifiedAssertion follows simplify_fmls::operator(): unchanged
@@ -157,5 +165,5 @@ func (k *SMTKernel) appendSimplifiedAssertion(batch *macros.FormulaBatch, assert
 			return err
 		}
 	}
-	return batch.Insert(row)
+	return k.appendTransformedAssertion(batch, assertion, row.Expression, row.Proof)
 }

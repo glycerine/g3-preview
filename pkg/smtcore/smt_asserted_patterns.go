@@ -10,6 +10,7 @@ import (
 )
 
 func (k *SMTKernel) inferPendingPatterns() (result error) {
+	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
 	if !k.preprocess || !k.smtState.Ematching || k.patternInference == nil || k.assertedHead == len(k.assertions) {
 		return nil
 	}
@@ -47,7 +48,10 @@ func (k *SMTKernel) inferPendingPatterns() (result error) {
 		if err = k.appendSimplifiedAssertion(batch, row, out, proof); err != nil {
 			return err
 		}
+		if canceled, err := k.manager.Canceled(); canceled || err != nil {
+			return err
+		}
 	}
 	// Source inference has no reduce_and_solve post-operation.
-	return k.replacePendingFormulaBatch(batch, false)
+	return k.finishAssertedPass(batch, false)
 }

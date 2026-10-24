@@ -11,6 +11,7 @@ import (
 )
 
 func (k *SMTKernel) applyPendingBit2Int() (result error) {
+	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
 	if !k.preprocess || !k.preprocessState.SimplifyBitToInt || k.assertedHead == len(k.assertions) {
 		return nil
 	}
@@ -43,11 +44,15 @@ func (k *SMTKernel) applyPendingBit2Int() (result error) {
 		if err = k.appendSimplifiedAssertion(batch, row, out, proof); err != nil {
 			return err
 		}
+		if canceled, err := k.manager.Canceled(); canceled || err != nil {
+			return err
+		}
 	}
-	return k.replacePendingFormulaBatch(batch, true)
+	return k.finishAssertedPass(batch, true)
 }
 
 func (k *SMTKernel) maximizePendingBVSharing() (result error) {
+	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
 	if !k.preprocess || !k.preprocessState.MaxBVSharing || k.assertedHead == len(k.assertions) {
 		return nil
 	}
@@ -73,7 +78,13 @@ func (k *SMTKernel) maximizePendingBVSharing() (result error) {
 		if err = k.appendSimplifiedAssertion(batch, row, out, proof); err != nil {
 			return err
 		}
+		if canceled, err := k.manager.Canceled(); canceled || err != nil {
+			return err
+		}
 	}
-	// Source max_bv_sharing_fn invokes the ordinary asserted reduction pass.
-	return k.replacePendingFormulaBatch(batch, true)
+	// Source max_bv_sharing_fn invokes ordinary reduction without a cache flush.
+	if err := k.swapPendingFormulaBatch(batch); err != nil {
+		return err
+	}
+	return k.reducePendingAssertions()
 }

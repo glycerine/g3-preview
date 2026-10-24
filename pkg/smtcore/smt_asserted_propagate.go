@@ -187,6 +187,9 @@ func (k *SMTKernel) rewritePendingAssertion(index int) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	if k.manager.IsFalse(formula) {
+		k.assertedInconsistent = true
+	}
 	if formula == old.Formula {
 		if k.preprocess {
 			err = k.manager.DecRef(formula)

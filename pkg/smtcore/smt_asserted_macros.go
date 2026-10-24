@@ -30,17 +30,17 @@ func (k *SMTKernel) findPendingMacros() (result error) {
 	return k.replacePendingMacroBatch(batch)
 }
 
-func (k *SMTKernel) replacePendingMacroBatch(batch *macros.FormulaBatch) (result error) {
-	return k.replacePendingFormulaBatch(batch, true)
+func (k *SMTKernel) replacePendingMacroBatch(batch *macros.FormulaBatch) error {
+	if err := k.swapPendingFormulaBatch(batch); err != nil {
+		return err
+	}
+	return k.reduceAndSolveAssertions()
 }
 
-// replacePendingFormulaBatch implements the source justified-formula swap.
-// Passes with a reduce_and_solve post-operation rewrite the resulting rows;
-// other passes only flatten their transformed assertions.
-func (k *SMTKernel) replacePendingFormulaBatch(batch *macros.FormulaBatch, reduce bool) (result error) {
+// swapPendingFormulaBatch copies already justified, flattened rows. Source
+// swap_asserted_formulas does not push, rewrite or poll cancellation again.
+func (k *SMTKernel) swapPendingFormulaBatch(batch *macros.FormulaBatch) (result error) {
 	original := k.assertions
-	// Keep the old references alive until all replacement assertions have
-	// acquired theirs. On failure, retain the original pending formula list.
 	k.assertions = append([]SMTKernelAssertion(nil), original[:k.assertedHead]...)
 	defer func() {
 		if result != nil {
@@ -59,19 +59,7 @@ func (k *SMTKernel) replacePendingFormulaBatch(batch *macros.FormulaBatch, reduc
 		if err != nil {
 			return err
 		}
-		if !k.preprocess || !reduce {
-			if err = k.pushAssertion(row.Expression, row.Proof); err != nil {
-				return err
-			}
-			continue
-		}
-		formula, proof, err := k.preprocessAssertion(row.Expression, row.Proof)
-		if err != nil {
-			return err
-		}
-		err = k.pushAssertion(formula, proof)
-		err = errors.Join(err, k.manager.DecRef(proof), k.manager.DecRef(formula))
-		if err != nil {
+		if err := k.appendAssertion(row.Expression, row.Proof); err != nil {
 			return err
 		}
 	}

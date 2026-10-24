@@ -119,6 +119,9 @@ func TestSMTAssertedTermITEEliminationDefinitionsAndGuards(t *testing.T) {
 				if mode == "no-preprocessing" {
 					k.preprocess = false
 				}
+				// The retained driver invokes term elimination after the NNF
+				// phase has enabled conjunction elimination.
+				astTestMust(t, k.setAssertedEliminateAnd(true))
 				astTestMust(t, k.eliminatePendingTermITEs())
 				n, err := k.definedNames.NumNames()
 				astTestMust(t, err)

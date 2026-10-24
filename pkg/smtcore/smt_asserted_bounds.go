@@ -91,6 +91,7 @@ func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 }
 
 func (k *SMTKernel) eliminatePendingBounds() (result error) {
+	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
 	if !k.preprocess || !k.preprocessState.EliminateBounds || k.assertedHead == len(k.assertions) {
 		return nil
 	}
@@ -126,6 +127,9 @@ func (k *SMTKernel) eliminatePendingBounds() (result error) {
 		if err = k.appendSimplifiedAssertion(batch, row, out, proof); err != nil {
 			return err
 		}
+		if canceled, err := k.manager.Canceled(); canceled || err != nil {
+			return err
+		}
 	}
-	return k.replacePendingFormulaBatch(batch, true)
+	return k.finishAssertedPass(batch, true)
 }

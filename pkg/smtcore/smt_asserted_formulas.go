@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/macros"
 )
 
 // DisplayAssertedFormulas renders the asserted-formula manager view, including
@@ -43,15 +44,7 @@ func (k *SMTKernel) DisplayAssertedFormulas(out io.Writer) error {
 }
 
 func (k *SMTKernel) assertedFormulasInconsistent() bool {
-	if k == nil || k.manager == nil {
-		return false
-	}
-	for _, assertion := range k.assertions {
-		if k.manager.IsFalse(assertion.Formula) {
-			return true
-		}
-	}
-	return false
+	return k != nil && k.assertedInconsistent
 }
 
 // AssertionInconsistencyProof returns the borrowed proof attached to the first
@@ -82,6 +75,12 @@ func (k *SMTKernel) appendAssertion(formula, proof ast.ASTHandle) error {
 }
 
 func (k *SMTKernel) pushAssertion(formula, proof ast.ASTHandle) error {
+	return k.pushAssertionInto(formula, proof, nil)
+}
+
+// A nil batch is the public assertion vector. Simplification uses a separate
+// owning vector until the source cancellation check permits its swap.
+func (k *SMTKernel) pushAssertionInto(formula, proof ast.ASTHandle, batch *macros.FormulaBatch) error {
 	if k.assertedFormulasInconsistent() {
 		return nil
 	}
@@ -109,7 +108,7 @@ func (k *SMTKernel) pushAssertion(formula, proof ast.ASTHandle) error {
 					return err
 				}
 			}
-			if err = k.pushAssertion(child, childProof); err != nil {
+			if err = k.pushAssertionInto(child, childProof, batch); err != nil {
 				return fmt.Errorf("push conjunction child %d: %w", index, err)
 			}
 		}
@@ -145,14 +144,22 @@ func (k *SMTKernel) pushAssertion(formula, proof ast.ASTHandle) error {
 				if err != nil {
 					return err
 				}
-				if err = k.pushAssertion(negated, childProof); err != nil {
+				if err = k.pushAssertionInto(negated, childProof, batch); err != nil {
 					return fmt.Errorf("push negated disjunction child %d: %w", index, err)
 				}
 			}
 			return nil
 		}
 	}
-	return k.appendAssertion(formula, proof)
+	if batch == nil {
+		err = k.appendAssertion(formula, proof)
+	} else {
+		err = batch.Insert(macros.Formula{Expression: formula, Proof: proof})
+	}
+	if err == nil && k.manager.IsFalse(formula) {
+		k.assertedInconsistent = true
+	}
+	return err
 }
 
 func (k *SMTKernel) preprocessAssertion(formula, proof ast.ASTHandle) (result, resultProof ast.ASTHandle, err error) {
