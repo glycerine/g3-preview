@@ -509,6 +509,7 @@ digraph packages {
   "tactic/smtlogics" -> "arena";
   "tactic/smtlogics" -> "ast";
   "tactic/smtlogics" -> "model";
+  "tactic/smtlogics" -> "qe";
   "tactic/smtlogics" -> "sat/sat_solver";
   "tactic/smtlogics" -> "sat/tactic";
   "tactic/smtlogics" -> "smtcore";

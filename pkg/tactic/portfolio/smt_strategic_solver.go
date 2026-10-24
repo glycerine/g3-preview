@@ -1,6 +1,6 @@
 // Source: src/tactic/portfolio/smt_strategic_solver.cpp retained QF_AUFLIA and
 // QF_LRA/QF_UF/QF_IDL/QF_LIA/QF_BV/QF_AUFBV/QF_ABV/QF_UFBV and
-// UFLRA/AUFLIA/AUFLIRA/AUFNIRA branches and
+// UFNIA/UFLRA/AUFLIA/AUFLIRA/AUFNIRA branches and
 // smt_strategic_solver_factory::operator().
 package portfolio
 
@@ -115,6 +115,14 @@ func NewUFLRAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mo
 		return nil, err
 	}
 	return newStrategicSolver(m, strategy, "UFLRA", p, proofs, models, cores, config)
+}
+
+func NewUFNIAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
+	strategy, err := smtlogics.NewUFNIATactic(m, p, config)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolver(m, strategy, "UFNIA", p, proofs, models, cores, config)
 }
 
 func NewAUFLIAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {

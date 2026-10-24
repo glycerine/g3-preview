@@ -1,5 +1,5 @@
 // Source: src/tactic/smtlogics/quant_tactics.cpp retained preprocessing and
-// mk_uflra_tactic/mk_auflia_tactic/mk_auflira_tactic/mk_aufnira_tactic.
+// mk_ufnia_tactic/mk_uflra_tactic/mk_auflia_tactic/mk_auflira_tactic/mk_aufnira_tactic.
 package smtlogics
 
 import (
@@ -7,6 +7,7 @@ import (
 	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/qe"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/tactic/core"
@@ -41,25 +42,38 @@ func (w quantTraceBodyWriter) Write(p []byte) (int, error) {
 }
 
 func NewUFLRATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig) (tactic.Tactic, error) {
-	return newQuantifiedArithmeticTactic(m, p, config, false)
+	return newQuantifiedArithmeticTactic(m, p, config, quantStandard)
+}
+
+func NewUFNIATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig) (tactic.Tactic, error) {
+	return newQuantifiedArithmeticTactic(m, p, config, quantUFNIA)
 }
 
 func NewAUFLIATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig) (tactic.Tactic, error) {
-	return newQuantifiedArithmeticTactic(m, p, config, true)
+	return newQuantifiedArithmeticTactic(m, p, config, quantAUFLIA)
 }
 
 func NewAUFLIRATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig) (tactic.Tactic, error) {
-	return newQuantifiedArithmeticTactic(m, p, config, false)
+	return newQuantifiedArithmeticTactic(m, p, config, quantStandard)
 }
 
 func NewAUFNIRATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig) (tactic.Tactic, error) {
-	return newQuantifiedArithmeticTactic(m, p, config, false)
+	return newQuantifiedArithmeticTactic(m, p, config, quantStandard)
 }
 
+type quantifiedStrategy uint8
+
+const (
+	quantStandard quantifiedStrategy = iota
+	quantAUFLIA
+	quantUFNIA
+)
+
 // AUFLIA disables Gaussian elimination and tries qi.cost=0 only when the
-// preprocessed goal has at most 128 expressions. Other retained factories here
-// use the source pattern-guarded solve-eqs and a single SMT stage.
-func newQuantifiedArithmeticTactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig, auflia bool) (result tactic.Tactic, err error) {
+// preprocessed goal has at most 128 expressions. UFNIA also disables Gaussian
+// elimination and runs QE-lite before SMT. The remaining factories use the
+// source pattern-guarded solve-eqs and a single SMT stage.
+func newQuantifiedArithmeticTactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig, strategy quantifiedStrategy) (result tactic.Tactic, err error) {
 	c, g := config.Params, config.Globals
 	if m == nil || c == nil || g == nil || g.Context != c {
 		return nil, uparams.ErrParamsOwner
@@ -82,7 +96,7 @@ func newQuantifiedArithmeticTactic(m *ast.ASTManager, p *uparams.ParamsRef, conf
 		}
 	}()
 	var qi *uparams.ParamsRef
-	if auflia {
+	if strategy == quantAUFLIA {
 		qi = b.params()
 		key, value := "qi.cost", "0"
 		if b.err == nil {
@@ -126,7 +140,7 @@ func newQuantifiedArithmeticTactic(m *ast.ASTManager, p *uparams.ParamsRef, conf
 		return nil, b.err
 	}
 	var solve tactic.Tactic
-	if auflia {
+	if strategy == quantAUFLIA || strategy == quantUFNIA {
 		solve = b.keep(tactic.NewSkipTactic(), nil)
 	} else {
 		pattern := b.probe(tactic.NewProbe(m.Budget(), tactic.ProbeHasPattern, 0))
@@ -145,7 +159,11 @@ func newQuantifiedArithmeticTactic(m *ast.ASTManager, p *uparams.ParamsRef, conf
 		b.keep(core.MakeEliminateUnconstrainedTactic(m, c, g, nil, config.ModelEvaluator)),
 		b.keep(core.MakeSimplifyTactic(m, c, g, nil)))
 	var backend tactic.Tactic
-	if auflia {
+	var elimination tactic.Tactic
+	if strategy == quantUFNIA {
+		elimination = b.keep(qe.NewLiteTactic(m, p, qe.Config{Context: c, Globals: g, Cooperation: config.ModelEvaluator.Cooperation, Trace: config.ModelEvaluator.Trace}))
+	}
+	if strategy == quantAUFLIA {
 		count := b.probe(tactic.NewProbe(m.Budget(), tactic.ProbeNumExprs, 0))
 		limit := b.probe(tactic.NewProbe(m.Budget(), tactic.ProbeConstant, 128))
 		var large tactic.ProbeEvaluator
@@ -160,7 +178,11 @@ func newQuantifiedArithmeticTactic(m *ast.ASTManager, p *uparams.ParamsRef, conf
 	if b.err != nil {
 		return nil, b.err
 	}
-	result, err = tactic.NewAndThenTactic(pre, backend)
+	if strategy == quantUFNIA {
+		result, err = tactic.NewAndThenTactic(pre, elimination, backend)
+	} else {
+		result, err = tactic.NewAndThenTactic(pre, backend)
+	}
 	if err != nil {
 		return nil, err
 	}

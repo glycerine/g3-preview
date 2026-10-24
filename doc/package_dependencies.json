@@ -3077,6 +3077,7 @@
         "arena",
         "ast",
         "model",
+        "qe",
         "sat/sat_solver",
         "sat/tactic",
         "smtcore",

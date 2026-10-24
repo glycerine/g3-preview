@@ -427,10 +427,14 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 		}
 	}
 	substitution, err := rewriter.NewVarSubstitution(c.manager, true)
+	// Member construction can return a charged partial owner. Retain its
+	// cleanup even when construction stops before the reducer is ready.
+	if substitution != nil {
+		defer func() { result = errors.Join(result, substitution.Close()) }()
+	}
 	if err != nil {
 		return false, err
 	}
-	defer func() { result = errors.Join(result, substitution.Close()) }()
 	ground, err := c.manager.NewRef(ast.ASTHandle{})
 	if err != nil {
 		return false, err

@@ -39862,7 +39862,9 @@
         "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
         "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -40486,6 +40488,28 @@
             "TestQuantifiedArithmeticTranslatedProofAndCore",
             "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
             "TestSMTLibRunnerAUFLIAExpressionLimit",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained UFNIA factory and combined strategic dispatch: seven-stage no-solve-eqs preprocessing, actual QE-lite elimination, then SMT; parameter propagation, ordinary and explicit tactic execution, scoped models and named cores",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -41821,7 +41845,9 @@
         "pkg/cmd/g3/test_vectors/qe_light_projection.smt2",
         "pkg/cmd/g3/test_vectors/qe_light_model.smt2",
         "pkg/cmd/g3/test_vectors/qe_light_core.smt2",
-        "pkg/cmd/g3/test_vectors/qe_light_fm.smt2"
+        "pkg/cmd/g3/test_vectors/qe_light_fm.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -42399,6 +42425,28 @@
             "TestLiteTacticProofNullGuardAndNonQuantifiedSkip",
             "TestLiteTacticAllocationFrontiersTraceReportAndCountedClose",
             "TestSMTLibRunnerQELightProjectionModelAndCore"
+          ]
+        },
+        {
+          "name": "Retained UFNIA factory and combined strategic dispatch: seven-stage no-solve-eqs preprocessing, actual QE-lite elimination, then SMT; parameter propagation, ordinary and explicit tactic execution, scoped models and named cores",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -115506,7 +115554,8 @@
         "pkg/smtcore/smt_quantifier_manager.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_singleton_quantifier_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/tactic/smtlogics/quant_tactics_test.go"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -115527,7 +115576,8 @@
         "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse",
         "TestSMTSolverQuantifiedSingletonDomainContradiction",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestQuantifiedArithmeticAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -115676,7 +115726,8 @@
         }
       ],
       "ownership": [
-        "SMTModelChecker borrows the internalizer, registry and candidate proto-model. Temporary instantiated, evaluated and Skolem expressions are held by checked AST references and released after the auxiliary solver closes; acquired counterexample models are explicitly released."
+        "SMTModelChecker borrows the internalizer, registry and candidate proto-model. Temporary instantiated, evaluated and Skolem expressions are held by checked AST references and released after the auxiliary solver closes; acquired counterexample models are explicitly released.",
+        "auxiliaryCounterexamples registers cleanup for the actual VarSubstitution owner before checking member-construction errors; quantified UFNIA allocation frontiers verify release of partial reducer storage as well as successful auxiliary solving."
       ],
       "deviations": [
         "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in a fresh solver using the parent logic and parameter services. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. Blocking clauses enumerate distinct auxiliary models up to m_max_cexs. Populated model-finder inverse maps restrict Skolem values and replace matching auxiliary values with retained context terms; an unrestricted complete model is retained as the source fallback when restrictions yield no instance. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; newly deduplicated instances enter the retained queue immediately instead of waiting for a separate restart callback. Recursive-function checking remains open, pending a retained recursive-function producer."
@@ -146459,7 +146510,9 @@
         "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
         "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
       ],
       "tests": [
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
@@ -146759,6 +146812,28 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained UFNIA factory and combined strategic dispatch: seven-stage no-solve-eqs preprocessing, actual QE-lite elimination, then SMT; parameter propagation, ordinary and explicit tactic execution, scoped models and named cores",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -146804,7 +146879,9 @@
         "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
         "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
       ],
       "tests": [
         "TestCommandContextQFLIACombinedSolverProofResult",
@@ -146898,6 +146975,28 @@
             "TestQuantifiedArithmeticTranslatedProofAndCore",
             "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
             "TestSMTLibRunnerAUFLIAExpressionLimit",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained UFNIA factory and combined strategic dispatch: seven-stage no-solve-eqs preprocessing, actual QE-lite elimination, then SMT; parameter propagation, ordinary and explicit tactic execution, scoped models and named cores",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -150767,7 +150866,9 @@
         "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
         "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
       ],
       "tests": [
         "TestQuantifiedArithmeticModelsSurviveStrategyClose",
@@ -150813,13 +150914,36 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained UFNIA factory and combined strategic dispatch: seven-stage no-solve-eqs preprocessing, actual QE-lite elimination, then SMT; parameter propagation, ordinary and explicit tactic execution, scoped models and named cores",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Construction retains concrete counted tactics/probes and parameter snapshots until composition ownership transfers. QuantifiedConstructionFailure retains stopped actual owners. Models and translated proofs/cores survive strategy cleanup. Source qi_cost trace evaluates later operands after output failure. Constructor/application allocation frontiers reach success with zero charged fixture storage."
+        "Construction retains concrete counted tactics/probes and parameter snapshots until composition ownership transfers. QuantifiedConstructionFailure retains stopped actual owners. Models and translated proofs/cores survive strategy cleanup. Source qi_cost trace evaluates later operands after output failure. Constructor/application allocation frontiers reach success with zero charged fixture storage.",
+        "UFNIA retains its counted QE-lite child through construction, cleanup and fresh-manager translation. Quantified constructor/application failure campaigns cover the nonlinear model-checker auxiliary substitution, including cleanup of partially constructed VarSubstitution owners; all charged fixture storage is released."
       ],
       "deviations": [
-        "UFNIA with QE-lite and LRA/LIA/LIRA with QE-lite, QSAT and QE remain unported; those factories are not replaced by direct SMT substitutes. The complete source unit and header remain partial."
+        "LRA/LIA/LIRA still require QSAT and full QE; those factories remain unported and are not replaced by direct SMT substitutes. The complete source unit and header remain partial. UFNIA inherits the source QE-lite null-proof defect for quantified proof-enabled goals; native AST guards refuse that invalid source path without fabricating a proof."
       ]
     },
     {
@@ -150843,7 +150967,9 @@
         "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
         "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
       ],
       "tests": [
         "TestQuantifiedArithmeticModelsSurviveStrategyClose",
@@ -150899,13 +151025,36 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained UFNIA factory and combined strategic dispatch: seven-stage no-solve-eqs preprocessing, actual QE-lite elimination, then SMT; parameter propagation, ordinary and explicit tactic execution, scoped models and named cores",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Construction retains concrete counted tactics/probes and parameter snapshots until composition ownership transfers. QuantifiedConstructionFailure retains stopped actual owners. Models and translated proofs/cores survive strategy cleanup. Source qi_cost trace evaluates later operands after output failure. Constructor/application allocation frontiers reach success with zero charged fixture storage."
+        "Construction retains concrete counted tactics/probes and parameter snapshots until composition ownership transfers. QuantifiedConstructionFailure retains stopped actual owners. Models and translated proofs/cores survive strategy cleanup. Source qi_cost trace evaluates later operands after output failure. Constructor/application allocation frontiers reach success with zero charged fixture storage.",
+        "UFNIA retains its counted QE-lite child through construction, cleanup and fresh-manager translation. Quantified constructor/application failure campaigns cover the nonlinear model-checker auxiliary substitution, including cleanup of partially constructed VarSubstitution owners; all charged fixture storage is released."
       ],
       "deviations": [
-        "UFNIA with QE-lite and LRA/LIA/LIRA with QE-lite, QSAT and QE remain unported; those factories are not replaced by direct SMT substitutes. The complete source unit and header remain partial."
+        "LRA/LIA/LIRA still require QSAT and full QE; those factories remain unported and are not replaced by direct SMT substitutes. The complete source unit and header remain partial. UFNIA inherits the source QE-lite null-proof defect for quantified proof-enabled goals; native AST guards refuse that invalid source path without fabricating a proof."
       ]
     },
     {

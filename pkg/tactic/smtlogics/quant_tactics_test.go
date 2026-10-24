@@ -19,7 +19,7 @@ import (
 )
 
 func TestQuantifiedArithmeticModelsSurviveStrategyClose(t *testing.T) {
-	for _, name := range []string{"uflra", "auflia", "auflira", "aufnira"} {
+	for _, name := range []string{"uflra", "auflia", "auflira", "aufnira", "ufnia"} {
 		t.Run(name, func(t *testing.T) {
 			c := qfliaContext(t, `(set-logic ALL)(declare-const x Int)(declare-fun f (Int) Int)(assert (forall ((t Int)) (>= (f t) t)))(assert (= x (f 3)))(assert (<= x 5))`)
 			m, err := c.Manager()
@@ -76,13 +76,19 @@ func TestQuantifiedArithmeticModelsSurviveStrategyClose(t *testing.T) {
 }
 
 func TestQuantifiedArithmeticAllocationFrontiers(t *testing.T) {
-	for _, name := range []string{"uflra", "auflia"} {
+	for _, name := range []string{"uflra", "auflia", "ufnia"} {
 		for _, phase := range []string{"constructor", "apply"} {
 			t.Run(name+"/"+phase, func(t *testing.T) {
 				success := false
 				for stop := int64(0); stop < 8192 && !success; stop++ {
 					t.Run(fmt.Sprint(stop), func(t *testing.T) {
-						c := qfliaContext(t, `(set-logic ALL)(declare-const x Int)(declare-fun f (Int) Int)(assert (>= x 0))(assert (<= x 3))(assert (>= (f x) 1))(assert (<= (f x) 2))`)
+						script := `(set-logic ALL)(declare-const x Int)(declare-fun f (Int) Int)(assert (>= x 0))(assert (<= x 3))(assert (>= (f x) 1))(assert (<= (f x) 2))`
+						if name == "ufnia" {
+							// Exercise QE traversal and nonlinear SMT, including owned
+							// quantifier state on every injected apply failure.
+							script = `(set-logic ALL)(declare-const x Int)(declare-fun f (Int) Int)(assert (forall ((t Int)) (! (>= (f t) (* t t)) :pattern ((f t)))))(assert (= x (f 3)))(assert (<= x 10))`
+						}
+						c := qfliaContext(t, script)
 						m, err := c.Manager()
 						qfaufliaMust(t, err)
 						var r tactic.Tactic
@@ -168,8 +174,14 @@ func TestAUFLIAQICostTraceAndClosedOutput(t *testing.T) {
 }
 
 func TestQuantifiedArithmeticTranslatedProofAndCore(t *testing.T) {
-	for _, name := range []string{"uflra", "auflia", "auflira", "aufnira"} {
-		for _, proofs := range []bool{false, true} {
+	for _, name := range []string{"uflra", "auflia", "auflira", "aufnira", "ufnia"} {
+		modes := []bool{false, true}
+		if name == "ufnia" {
+			// Source QE-lite dereferences an empty proof on quantified
+			// proof-enabled goals. Its native refusal is tested in qe.
+			modes = []bool{false}
+		}
+		for _, proofs := range modes {
 			t.Run(fmt.Sprintf("%s/proofs=%v", name, proofs), func(t *testing.T) {
 				option := "produce-unsat-cores"
 				mode := ast.ASTProofDisabled

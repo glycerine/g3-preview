@@ -287,6 +287,8 @@ func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 		return nil, err
 	}
 	switch c.logic {
+	case "UFNIA":
+		c.solver, err = portfolio.NewUFNIAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "UFLRA":
 		c.solver, err = portfolio.NewUFLRAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "AUFLIA":
