@@ -65,7 +65,7 @@ func (s *Solver) Translate(m *ast.ASTManager, p *uparams.ParamsRef) (result solv
 	}
 	w := &solverTranslation{}
 	s.translations = append(s.translations, w)
-	w.target, err = NewIncrementalSolverWithConfig(m, p, IncrementalSolverConfig{Services: services, TargetServices: s.targetServices})
+	w.target, err = NewIncrementalSolverWithConfig(m, p, IncrementalSolverConfig{Services: services, TargetServices: s.targetServices, Output: s.output})
 	if err != nil {
 		return nil, err
 	}

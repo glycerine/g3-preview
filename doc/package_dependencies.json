@@ -2344,9 +2344,11 @@
         "tactic/arith",
         "tactic/bv",
         "tactic/core",
+        "util/diagnostic",
         "util/lbool",
         "util/memory",
         "util/messages",
+        "util/numeral",
         "util/params",
         "util/statistics",
         "util/symbol",
@@ -2358,7 +2360,9 @@
         "solver.go",
         "solver_consequences.go",
         "solver_interface.go",
-        "solver_model.go"
+        "solver_model.go",
+        "solver_trace.go",
+        "solver_weighted.go"
       ]
     },
     {

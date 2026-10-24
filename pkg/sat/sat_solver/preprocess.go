@@ -3,6 +3,7 @@ package sat_solver
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"reflect"
 
@@ -340,9 +341,21 @@ func (r *IncrementalEncoder) Compile(g *tactic.Goal) (lbool.LBool, error) {
 	if proofs {
 		return lbool.Undef, z3exception.NewDefaultException("generation of proof objects is not supported in this mode")
 	}
+	if err = incrementalTrace(r.services, "internalize_goal", 399, func(out io.Writer) error { return g.Display(out) }); err != nil {
+		return lbool.Undef, err
+	}
 	if err = r.pipeline.root.Apply(g, &r.last); err != nil {
 		var exception tactic.TacticException
 		if errors.As(err, &exception) {
+			if e := incrementalVerbose(0, "exception in tactic "+exception.Message()+"\n"); e != nil {
+				return lbool.Undef, e
+			}
+			if e := incrementalTrace(r.services, "internalize_goal", 405, func(out io.Writer) error {
+				_, e := io.WriteString(out, "exception: "+exception.Message()+"\n")
+				return e
+			}); e != nil {
+				return lbool.Undef, e
+			}
 			r.retired = append(r.retired, r.pipeline)
 			r.pipeline = nil
 			if cleanup := r.drainRetired(); cleanup != nil {
@@ -357,7 +370,13 @@ func (r *IncrementalEncoder) Compile(g *tactic.Goal) (lbool.LBool, error) {
 		return lbool.Undef, err
 	}
 	if len(r.last.Goals) != 1 {
+		if err = incrementalVerbose(0, fmt.Sprintf("size of subgoals is not 1, it is: %d\n", len(r.last.Goals))); err != nil {
+			return lbool.Undef, err
+		}
 		return lbool.Undef, nil
+	}
+	if err = incrementalTrace(r.services, "internalize_goal", 416, func(out io.Writer) error { return r.last.Goals[0].DisplayWithDependencies(out) }); err != nil {
+		return lbool.Undef, err
 	}
 	if r.translation != nil {
 		if err = r.translation.Close(); err != nil {

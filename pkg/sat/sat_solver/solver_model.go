@@ -3,6 +3,7 @@ package sat_solver
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
@@ -107,6 +108,16 @@ func (s *Solver) extractModel() (err error) {
 	defer func() { s.retainFailure(err); err = errors.Join(err, s.drainModelWork(), s.drainConverters()) }()
 	current, err := s.core.SourceModelIsCurrent()
 	if err != nil {
+		return err
+	}
+	if err = s.emit("extract_model", 644, func(out io.Writer) error {
+		state := "absent"
+		if current {
+			state = "present"
+		}
+		_, e := io.WriteString(out, "retrieve model "+state+"\n")
+		return e
+	}); err != nil {
 		return err
 	}
 	if !current {
@@ -240,6 +251,26 @@ func (s *Solver) extractModel() (err error) {
 				return e
 			}
 			if !s.manager.IsTrue(v) {
+				if e = s.emit("extract_model", 682, func(out io.Writer) error {
+					if _, e := io.WriteString(out, "Evaluation failed: "); e != nil {
+						return e
+					}
+					if e := s.writeExpression(out, f); e != nil {
+						return e
+					}
+					if _, e := io.WriteString(out, " to "); e != nil {
+						return e
+					}
+					if e := s.writeExpression(out, v); e != nil {
+						return e
+					}
+					if _, e := io.WriteString(out, "\n"); e != nil {
+						return e
+					}
+					return current.WriteSMT2(out, s.services.Context, s.services.Globals, 0)
+				}); e != nil {
+					return e
+				}
 				return ast.ErrASTDomain
 			}
 		}

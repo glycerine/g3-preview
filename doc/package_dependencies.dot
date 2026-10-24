@@ -319,9 +319,11 @@ digraph packages {
   "sat/sat_solver" -> "tactic/arith";
   "sat/sat_solver" -> "tactic/bv";
   "sat/sat_solver" -> "tactic/core";
+  "sat/sat_solver" -> "util/diagnostic";
   "sat/sat_solver" -> "util/lbool";
   "sat/sat_solver" -> "util/memory";
   "sat/sat_solver" -> "util/messages";
+  "sat/sat_solver" -> "util/numeral";
   "sat/sat_solver" -> "util/params";
   "sat/sat_solver" -> "util/statistics";
   "sat/sat_solver" -> "util/symbol";

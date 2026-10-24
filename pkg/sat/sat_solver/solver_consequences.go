@@ -3,6 +3,8 @@ package sat_solver
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -11,7 +13,14 @@ import (
 	"github.com/glycerine/g3/pkg/util/messages"
 )
 
-func (s *Solver) internalizeVariable(v ast.ASTHandle, variables *[]sat.BoolVar) (bool, error) {
+func (s *Solver) internalizeVariable(v ast.ASTHandle, variables *[]sat.BoolVar) (complete bool, err error) {
+	start := len(*variables)
+	bitvector := false
+	defer func() {
+		if err == nil {
+			err = s.emitVariable(v, (*variables)[start:], complete, bitvector)
+		}
+	}()
 	kind, err := s.manager.GetKind(v)
 	if err != nil || kind != ast.ASTApp {
 		return false, err
@@ -59,7 +68,8 @@ func (s *Solver) internalizeVariable(v ast.ASTHandle, variables *[]sat.BoolVar) 
 	if err != nil {
 		return false, err
 	}
-	complete := true
+	complete = true
+	bitvector = true
 	for i := uint32(0); i < count; i++ {
 		bit, e := s.manager.GetArg(bits, i)
 		if e != nil {
@@ -90,6 +100,18 @@ func (s *Solver) fixedVariable(variable ast.ASTHandle, byVariable map[sat.BoolVa
 	for _, bit := range bits {
 		index, found := byVariable[bit]
 		if !found {
+			if e := s.emit("extract_fixed_variable", 510, func(out io.Writer) error {
+				if _, e := io.WriteString(out, "variable is not bound "); e != nil {
+					return e
+				}
+				if e := s.writeExpression(out, variable); e != nil {
+					return e
+				}
+				_, e := io.WriteString(out, "\n")
+				return e
+			}); e != nil {
+				return ast.ASTHandle{}, false, e
+			}
 			return ast.ASTHandle{}, false, nil
 		}
 		row := rows[index]
@@ -182,6 +204,20 @@ func (s *Solver) GetConsequences(asms, variables []ast.ASTHandle) (status lbool.
 	if err = s.encoder.initPreprocess(); err != nil {
 		return lbool.Undef, nil, err
 	}
+	if err = s.emit("get_consequences_core", 266, func(out io.Writer) error {
+		for _, values := range [][]ast.ASTHandle{asms, variables} {
+			text, e := s.formatExpressions(values)
+			if e != nil {
+				return e
+			}
+			if _, e = io.WriteString(out, text+"\n"); e != nil {
+				return e
+			}
+		}
+		return nil
+	}); err != nil {
+		return lbool.Undef, nil, err
+	}
 	if err = s.core.PopToBaseLevel(); err != nil {
 		return lbool.Undef, nil, err
 	}
@@ -199,7 +235,12 @@ func (s *Solver) GetConsequences(asms, variables []ast.ASTHandle) (status lbool.
 	if err != nil || status != lbool.True {
 		return status, nil, err
 	}
+	dimacs, err := s.prepareDIMACS()
+	if err != nil {
+		return lbool.Undef, nil, err
+	}
 	status, rows, err := s.core.GetConsequences(s.assumptions, bvars)
+	err = errors.Join(err, s.finishDIMACS(dimacs, false))
 	if err != nil {
 		return status, nil, err
 	}
@@ -211,6 +252,22 @@ func (s *Solver) GetConsequences(asms, variables []ast.ASTHandle) (status lbool.
 	}
 	byVariable := make(map[sat.BoolVar]int)
 	for i, row := range rows {
+		if e := s.emit("get_consequences_core", 291, func(out io.Writer) error {
+			for j, l := range row {
+				if j > 0 {
+					if _, e := io.WriteString(out, " "); e != nil {
+						return e
+					}
+				}
+				if _, e := fmt.Fprint(out, l.String()); e != nil {
+					return e
+				}
+			}
+			_, e := io.WriteString(out, "\n")
+			return e
+		}); e != nil {
+			return status, nil, e
+		}
 		if len(row) == 0 {
 			return status, nil, ast.ErrASTDomain
 		}

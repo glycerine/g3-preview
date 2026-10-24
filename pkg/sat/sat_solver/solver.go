@@ -3,7 +3,10 @@ package sat_solver
 
 import (
 	"errors"
+	"io"
+	"os"
 	"reflect"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
@@ -16,6 +19,7 @@ import (
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -34,13 +38,15 @@ type checkWork struct {
 	original    map[ast.ASTHandle]ast.ASTHandle
 }
 
-// Solver is the retained incremental SAT state machine. Weighted-display,
-// diagnostics and strategy factory integration remain separate operations.
-// A nonnil partial constructor result must close.
+// Solver implements the retained incremental SAT state machine, including
+// models, consequences, diagnostics and weighted output. Evaluator services
+// are borrowed. A nonnil partial constructor result must close.
 type Solver struct {
 	self                         *Solver
 	manager                      *ast.ASTManager
 	services                     model.ModelEvaluatorConfig
+	output                       io.Writer
+	dimacs                       *utext.NumericTextStream
 	targetServices               func(*ast.ASTManager) (model.ModelEvaluatorConfig, error)
 	runtime                      *sat.Runtime
 	core                         *sat.Solver
@@ -52,6 +58,7 @@ type Solver struct {
 	head                         uint32
 	scopes                       []solverScope
 	assumptions                  []sat.Literal
+	weights                      []uint32
 	model                        tactic.ModelRef
 	mc0                          *converterOwner
 	converters                   []*converterOwner
@@ -72,6 +79,7 @@ type Solver struct {
 type IncrementalSolverConfig struct {
 	Services       model.ModelEvaluatorConfig
 	TargetServices func(*ast.ASTManager) (model.ModelEvaluatorConfig, error)
+	Output         io.Writer
 }
 
 func NewIncrementalSolver(m *ast.ASTManager, p *uparams.ParamsRef, services model.ModelEvaluatorConfig) (*Solver, error) {
@@ -91,7 +99,11 @@ func NewIncrementalSolverWithConfig(m *ast.ASTManager, p *uparams.ParamsRef, con
 	if err := m.Budget().Reserve(n); err != nil {
 		return nil, err
 	}
-	s := &Solver{manager: m, services: services, targetServices: config.TargetServices, header: n, unknown: "no reason given", status: lbool.Undef}
+	output := config.Output
+	if output == nil {
+		output = os.Stdout
+	}
+	s := &Solver{manager: m, services: services, output: output, targetServices: config.TargetServices, header: n, unknown: "no reason given", status: lbool.Undef}
 	s.self = s
 	var err error
 	s.baseParams, err = c.NewValue()
@@ -104,7 +116,7 @@ func NewIncrementalSolverWithConfig(m *ast.ASTManager, p *uparams.ParamsRef, con
 		s.internalReady = err == nil
 	}
 	if err == nil {
-		s.runtime, err = sat.NewRuntime(sat.RuntimeConfig{Budget: m.Budget(), ParamsContext: c})
+		s.runtime, err = sat.NewRuntime(sat.RuntimeConfig{Budget: m.Budget(), ParamsContext: c, Globals: services.Globals, Process: m.NumeralService().RuntimeOwner().ProcessOwner()})
 	}
 	if err == nil {
 		s.core, err = sat.NewSATSolver(sat.SolverConfig{ParamsContext: c, Params: s.baseParams, RLimit: m.ResourceLimit(), Budget: m.Budget(), Runtime: s.runtime, TraceTags: services.Trace})
@@ -254,6 +266,12 @@ func (s *Solver) Close() error {
 		}
 		s.core = nil
 	}
+	if s.dimacs != nil {
+		if err := s.dimacs.Close(); err != nil {
+			return err
+		}
+		s.dimacs = nil
+	}
 	if s.runtime != nil {
 		if err := s.runtime.Close(); err != nil {
 			return err
@@ -329,7 +347,7 @@ func (s *Solver) SetReasonUnknown(v string) error {
 	if err := s.open(); err != nil {
 		return err
 	}
-	s.unknown = v
+	s.unknown, _, _ = strings.Cut(v, "\x00")
 	return nil
 }
 func (s *Solver) Labels() ([]usymbol.Symbol, error) { return nil, s.open() }
@@ -397,6 +415,15 @@ func (s *Solver) CollectStatistics(st *statistics.Statistics) error {
 }
 func (s *Solver) Assert(h ast.ASTHandle) error {
 	if err := s.open(); err != nil {
+		return err
+	}
+	if err := s.emit("assert_expr", 231, func(out io.Writer) error {
+		if err := s.writeExpression(out, h); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
 		return err
 	}
 	return s.hold(&s.formulas, h)
@@ -528,6 +555,9 @@ func (s *Solver) compile(g *tactic.Goal) (lbool.LBool, error) {
 				return status, e
 			}
 			s.unknown = "interpreted atoms sent to SAT solver " + text
+			if e = s.emitUnknown(); e != nil {
+				return status, e
+			}
 		}
 	}
 	return status, err
@@ -586,10 +616,24 @@ func (s *Solver) internalizeAssumptions(asms []ast.ASTHandle) (status lbool.LBoo
 		deps[b.Expression] = b.Literal
 	}
 	s.assumptions = s.assumptions[:0]
-	for _, forms := range [][]ast.ASTHandle{asms, s.tracked} {
-		for _, f := range forms {
+	j := 0
+	for group, forms := range [][]ast.ASTHandle{asms, s.tracked} {
+		for i, f := range forms {
 			if l, found := deps[f]; found {
 				s.assumptions = append(s.assumptions, l)
+				if group == 0 && len(s.weights) > 0 {
+					// Only the explicit assumptions compact source m_weights;
+					// automatic trackers have no corresponding weight entries.
+					if i != j {
+						if i >= len(s.weights) || j >= len(s.weights) {
+							return lbool.Undef, deps, arena.ErrBounds
+						}
+						s.weights[j] = s.weights[i]
+					}
+				}
+				if group == 0 {
+					j++
+				}
 			}
 		}
 	}
@@ -620,7 +664,7 @@ func (s *Solver) isLiteral(h ast.ASTHandle) (bool, error) {
 func (s *Solver) CheckSat(asms []ast.ASTHandle) (status lbool.LBool, err error) {
 	defer func() {
 		s.retainFailure(err)
-		err = errors.Join(err, s.drainChecks(), s.drainGoals())
+		err = errors.Join(err, s.drainChecks(), s.drainGoals(), s.drainModelWork())
 		if err == nil {
 			s.status = status
 		}
@@ -666,6 +710,9 @@ func (s *Solver) CheckSat(asms []ast.ASTHandle) (status lbool.LBool, err error) 
 		w.assumptions = append(w.assumptions, a)
 		w.original[a] = f
 	}
+	if err = s.emitVector("check_sat", 156, w.assumptions); err != nil {
+		return lbool.Undef, err
+	}
 	if err = s.model.Set(nil); err != nil {
 		return lbool.Undef, err
 	}
@@ -678,7 +725,12 @@ func (s *Solver) CheckSat(asms []ast.ASTHandle) (status lbool.LBool, err error) 
 	if err != nil || status != lbool.True {
 		return status, err
 	}
+	dimacs, err := s.prepareDIMACS()
+	if err != nil {
+		return lbool.Undef, err
+	}
 	status, err = s.core.Check(s.assumptions)
+	err = errors.Join(err, s.finishDIMACS(dimacs, status == lbool.Undef))
 	if err != nil {
 		return status, err
 	}
@@ -692,7 +744,7 @@ func (s *Solver) CheckSat(asms []ast.ASTHandle) (status lbool.LBool, err error) 
 		if e != nil {
 			return status, e
 		}
-		for _, l := range deps {
+		for f, l := range deps {
 			value, e := values.Read(l.Variable())
 			if e != nil {
 				return status, e
@@ -701,6 +753,9 @@ func (s *Solver) CheckSat(asms []ast.ASTHandle) (status lbool.LBool, err error) 
 				value = value.Negated()
 			}
 			if value != lbool.True {
+				if e = s.badAssumption(f); e != nil {
+					return status, e
+				}
 				return status, z3exception.NewDefaultException("bad state")
 			}
 		}
@@ -708,6 +763,9 @@ func (s *Solver) CheckSat(asms []ast.ASTHandle) (status lbool.LBool, err error) 
 	return status, nil
 }
 func (s *Solver) extractCore(deps map[ast.ASTHandle]sat.Literal, originals map[ast.ASTHandle]ast.ASTHandle) error {
+	if err := s.emitCore(deps, originals); err != nil {
+		return err
+	}
 	inverse := make(map[uint32]ast.ASTHandle)
 	for f, l := range deps {
 		inverse[l.Index()] = f
