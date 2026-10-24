@@ -15,6 +15,15 @@ import (
 )
 
 func TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput(t *testing.T) {
+	testArithmeticStrategicDIMACS(t, "QF_IDL")
+}
+
+func TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput(t *testing.T) {
+	testArithmeticStrategicDIMACS(t, "QF_LIA")
+}
+
+func testArithmeticStrategicDIMACS(t *testing.T, logic string) {
+	t.Helper()
 	c, err := cmd_context.NewStandaloneContext()
 	if err != nil {
 		t.Fatal(err)
@@ -24,7 +33,7 @@ func TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput(t *testing.T) {
 			t.Error(err)
 		}
 	})
-	const setup = `(set-logic QF_IDL)
+	setup := `(set-logic ` + logic + `)
 (set-option :sat.dimacs.display true)
 (declare-const a Int)(declare-const b Int)(declare-const c Int)
 (assert (and (>= a 0)(<= a 1)(>= b 0)(<= b 1)(>= c 0)(<= c 1)))

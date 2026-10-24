@@ -138153,7 +138153,8 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/tactic/goal_shared_occurrences.go",
         "pkg/ast/rewriter/th_rewriter.go",
-        "pkg/ast/ast_expr_substitution_ops.go"
+        "pkg/ast/ast_expr_substitution_ops.go",
+        "pkg/tactic/core/strategy_constructor_frontiers_test.go"
       ],
       "tests": [
         "TestPropagateValuesDirectionalRoundsAndCPPApply",
@@ -138164,7 +138165,8 @@
         "TestPropagateValuesQuantifierRootsAndSharedGroundAtoms",
         "TestPropagateValuesEndTraceAndStreamRefusal",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestCoreStrategyPrerequisiteConstructorFrontiers"
       ],
       "assertions": [
         {
@@ -138252,6 +138254,23 @@
           "tests": [
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Constructor allocation-prefix unwind: close partially initialized implementation owners without invoking normal substitution APIs; preserve an actual stopped simplify owner when cleanup refuses",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/propagate_values_tactic.go",
+            "pkg/tactic/core/propagate_values_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/tactic/goal_shared_occurrences.go",
+            "pkg/ast/rewriter/th_rewriter.go",
+            "pkg/ast/ast_expr_substitution_ops.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go"
+          ],
+          "tests": [
+            "TestCoreStrategyPrerequisiteConstructorFrontiers"
           ]
         }
       ],
@@ -138417,7 +138436,8 @@
         "pkg/tactic/core/simplify_tactic.go",
         "pkg/tactic/core/simplify_tactic_test.go",
         "pkg/tactic/core/simplify_native_trace_test.go",
-        "pkg/ast/rewriter/rewriter_types.go"
+        "pkg/ast/rewriter/rewriter_types.go",
+        "pkg/tactic/core/strategy_constructor_frontiers_test.go"
       ],
       "tests": [
         "TestSimplifyTacticProofDependenciesDepthAndCleanup",
@@ -138426,7 +138446,8 @@
         "TestSimplifyTacticTranslationOwnsParamsAcrossManagers",
         "TestSimplifyTacticSolverCompositionScopesAndUndecided",
         "TestSimplifyTacticCPPApplyReference",
-        "TestSimplifyTacticTraceStagesAndStreamRefusal"
+        "TestSimplifyTacticTraceStagesAndStreamRefusal",
+        "TestCoreStrategyPrerequisiteConstructorFrontiers"
       ],
       "assertions": [
         {
@@ -138550,6 +138571,20 @@
           "status": "reference_only",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "Constructor allocation-prefix unwind: close partially initialized implementation owners without invoking normal substitution APIs; preserve an actual stopped simplify owner when cleanup refuses",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic.go",
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go"
+          ],
+          "tests": [
+            "TestCoreStrategyPrerequisiteConstructorFrontiers"
+          ]
         }
       ],
       "ownership": [
@@ -138720,7 +138755,8 @@
         "pkg/ast/rewriter/expr_replacer.go",
         "pkg/ast/ast_num_occurs.go",
         "pkg/tactic/core/solve_eqs_trace.go",
-        "pkg/tactic/core/solve_eqs_trace_test.go"
+        "pkg/tactic/core/solve_eqs_trace_test.go",
+        "pkg/tactic/core/strategy_constructor_frontiers_test.go"
       ],
       "tests": [
         "TestSolveEquationsBooleanDefinitionsAndIndependentModel",
@@ -138733,7 +138769,8 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSolveEquationsExactTraceAndVerbose",
-        "TestSolveEquationsSortTraceAndStreamRefusal"
+        "TestSolveEquationsSortTraceAndStreamRefusal",
+        "TestCoreStrategyPrerequisiteConstructorFrontiers"
       ],
       "conditionals": [
         {
@@ -138972,6 +139009,27 @@
           "tests": [
             "TestSolveEquationsExactTraceAndVerbose",
             "TestSolveEquationsSortTraceAndStreamRefusal"
+          ]
+        },
+        {
+          "name": "Constructor allocation-prefix unwind: close partially initialized implementation owners without invoking normal substitution APIs; preserve an actual stopped simplify owner when cleanup refuses",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/solve_eqs_tactic.go",
+            "pkg/tactic/core/solve_eqs_candidates.go",
+            "pkg/tactic/core/solve_eqs_order.go",
+            "pkg/tactic/core/solve_eqs_tactic_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/tactic/tactic_extension_model.go",
+            "pkg/ast/rewriter/expr_replacer.go",
+            "pkg/ast/ast_num_occurs.go",
+            "pkg/tactic/core/solve_eqs_trace.go",
+            "pkg/tactic/core/solve_eqs_trace_test.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go"
+          ],
+          "tests": [
+            "TestCoreStrategyPrerequisiteConstructorFrontiers"
           ]
         }
       ],
@@ -141173,7 +141231,19 @@
         "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
         "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
         "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
-        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
+        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2",
+        "pkg/tactic/smtlogics/qflia_tactic.go",
+        "pkg/tactic/smtlogics/qflia_tactic_test.go",
+        "pkg/cmd_context/qflia_solver_test.go",
+        "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
       ],
       "tests": [
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
@@ -141186,7 +141256,10 @@
         "TestCommandContextQFUFCombinedSolverProofResult",
         "TestSMTLibRunnerQFIDLBranchEvidence",
         "TestCommandContextQFIDLCombinedSolverProofResult",
-        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
+        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput",
+        "TestCommandContextQFLIACombinedSolverProofResult",
+        "TestSMTLibRunnerQFLIABranchEvidence",
+        "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -141277,6 +141350,44 @@
           ]
         },
         {
+          "name": "QF_LIA mk_tactic_for_logic branch and factory operator(): full QF_LIA tactic solver and incremental SMT under combined-solver ordinary, scoped, assumption, fallback and result-provider policies, with current borrowed SAT output transport",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        },
+        {
           "name": "Remaining logic dispatcher branches, default tactic/FD/incremental-SAT special solvers and general stored-logic strategic solver_factory owner and public factory constructor",
           "status": "unported"
         }
@@ -141285,7 +141396,7 @@
         "Construction uses local counted tactic/solver references. The returned combined solver owns both child solvers; the tactic solver owns the concrete strategy. Context closes the combined owner before manager/services teardown. Evaluator/parameter services are borrowed through the same concrete configuration used by the incremental backend."
       ],
       "deviations": [
-        "The retained QF_AUFLIA, QF_LRA, QF_UF and QF_IDL branches use shared combined-solver construction. Other branches and the general default dispatcher remain unported. Concrete Go entry points name the completed strategies. The output-taking QF_IDL constructor borrows an io.Writer; existing constructors default to os.Stdout."
+        "Retained QF_AUFLIA, QF_LRA, QF_UF, QF_IDL and QF_LIA branches use shared combined-solver construction. Other branches and the general default dispatcher remain unported. Output-taking QF_IDL/QF_LIA constructors borrow io.Writer; convenience factories default to os.Stdout."
       ]
     },
     {
@@ -141293,8 +141404,32 @@
       "component": "tactic",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/tactic/smtlogics/qflia_tactic.go",
+        "pkg/tactic/smtlogics/qflia_tactic_test.go",
+        "pkg/cmd_context/qflia_solver_test.go",
+        "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2",
+        "pkg/tactic/arith/quasi_pb_probe.go",
+        "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/context.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestCommandContextQFLIACombinedSolverProofResult",
+        "TestSMTLibRunnerQFLIABranchEvidence",
+        "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -141307,9 +141442,50 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "QF_LIA mk_tactic_for_logic branch and factory operator(): full QF_LIA tactic solver and incremental SMT under combined-solver ordinary, scoped, assumption, fallback and result-provider policies, with current borrowed SAT output transport",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Retained QF_AUFLIA, QF_LRA, QF_UF, QF_IDL and QF_LIA branches use shared combined-solver construction. Other branches and the general default dispatcher remain unported. Output-taking QF_IDL/QF_LIA constructors borrow io.Writer; convenience factories default to os.Stdout."
+      ]
     },
     {
       "path": "src/tactic/probe.cpp",
@@ -142868,22 +143044,434 @@
       "path": "src/tactic/smtlogics/qflia_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qflia_tactic.go",
+        "pkg/tactic/smtlogics/qflia_tactic_test.go",
+        "pkg/tactic/arith/quasi_pb_probe.go",
+        "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/qflia_solver_test.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+      ],
+      "tests": [
+        "TestQFLIATacticModelSurvivesStrategyClose",
+        "TestQFLIATacticTranslatedProofAndCoreRoutes",
+        "TestQFLIATacticConstructorAllocationFrontiers",
+        "TestQFLIAQuasiPBProbeCPP",
+        "TestQFLIATacticCPP",
+        "TestCommandContextQFLIACombinedSolverProofResult",
+        "TestCoreStrategyPrerequisiteConstructorFrontiers",
+        "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTLibRunnerQFLIABranchEvidence"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "quasi_pb_probe bounds-only classification, ignored strictness and at-most-one non-01 variable; mk_is_quasi_pb_probe NOT is-unbounded conjunction and short circuit",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        },
+        {
+          "name": "No-cut SMT helpers: auto_config=false, branch_cut_ratio=10000000, fixed random seeds, optional relevancy=0, source annotations and nested parameter precedence",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        },
+        {
+          "name": "BV-to-SAT: simplify/propagate-values/solve-eqs/max-BV-sharing/bit-blast/AIG/native-SAT with flat=false, som=false, dynamic PSM and extra ITE encoding",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        },
+        {
+          "name": "PB route: is-pb/proof/core guards, 80000-expression boundary, retained ILP/undecided attempt and PB-to-BV/QF_BV/native-SAT fallback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        },
+        {
+          "name": "LIA-to-SAT route: bounded/proof/core guards, propagation/normalization/LIA-to-PB and fixed PB-to-BV/SAT policies",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        },
+        {
+          "name": "ILP model finder: ILP/unbounded conjunction, metadata guards, inequality propagation, two no-cut SMT attempts and bounded under-approximation attempts with source bounds/timeouts and undecided guard",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        },
+        {
+          "name": "Bounded route: unbounded refusal, three timed no-cut SMT attempts including disabled relevancy, source seeds/timeouts and undecided guard",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        },
+        {
+          "name": "mk_qflia_tactic nested preamble, contextual simplifier and ITE/LHS policies, ordered ILP/PB/quasi-PB/bounded/SMT alternatives, main fixed parameters and final caller update",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        },
+        {
+          "name": "Temporary counted owners, constructor failure roots, inherited tactic translation/cleanup, independent model/proof/core ownership and borrowed SAT output transport",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        }
+      ],
+      "ownership": [
+        "Construction retains concrete raw tactic owners separately from their clean/composition wrappers until publication. Child wrappers own independent parameter snapshots. A refused unwind retains its actual owners and retries cleanup; probes retain stopped bound-manager owners. The caller acquires the uncounted root; result models, proofs and dependencies retain independent owning references. Command output and process services are borrowed."
+      ],
+      "deviations": [
+        "The unused no_cut_p local and commented-out MIP calls have no retained execution path and are omitted. Native Go slices implement ownership trails; no STL internals or generic adapters are ported. The output-taking factory borrows io.Writer for SAT DIMACS output.",
+        "The quasi-PB probe is available through its typed factory; the general SMT-LIB probe-expression frontend remains a separate unported surface, as for other arithmetic probes. The general default strategy dispatcher, public API completion and higher engines remain open."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qflia_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qflia_tactic.go",
+        "pkg/tactic/smtlogics/qflia_tactic_test.go",
+        "pkg/tactic/arith/quasi_pb_probe.go",
+        "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/qflia_solver_test.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+        "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+      ],
+      "tests": [
+        "TestQFLIATacticModelSurvivesStrategyClose",
+        "TestQFLIATacticTranslatedProofAndCoreRoutes",
+        "TestQFLIATacticConstructorAllocationFrontiers",
+        "TestQFLIAQuasiPBProbeCPP",
+        "TestQFLIATacticCPP",
+        "TestCommandContextQFLIACombinedSolverProofResult",
+        "TestCoreStrategyPrerequisiteConstructorFrontiers",
+        "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTLibRunnerQFLIABranchEvidence"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -142894,11 +143482,55 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained mk_qflia_tactic and mk_is_quasi_pb_probe declarations, concrete typed Go factories and builtin qflia tactic registration",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic_test.go",
+            "pkg/tactic/arith/quasi_pb_probe.go",
+            "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qflia_solver_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qflia_solver_bounded.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_core_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pb_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_proof_guard.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
+            "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+          ],
+          "tests": [
+            "TestQFLIATacticModelSurvivesStrategyClose",
+            "TestQFLIATacticTranslatedProofAndCoreRoutes",
+            "TestQFLIATacticConstructorAllocationFrontiers",
+            "TestQFLIAQuasiPBProbeCPP",
+            "TestQFLIATacticCPP",
+            "TestCommandContextQFLIACombinedSolverProofResult",
+            "TestCoreStrategyPrerequisiteConstructorFrontiers",
+            "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        }
+      ],
+      "ownership": [
+        "Construction retains concrete raw tactic owners separately from their clean/composition wrappers until publication. Child wrappers own independent parameter snapshots. A refused unwind retains its actual owners and retries cleanup; probes retain stopped bound-manager owners. The caller acquires the uncounted root; result models, proofs and dependencies retain independent owning references. Command output and process services are borrowed."
+      ],
+      "deviations": [
+        "The unused no_cut_p local and commented-out MIP calls have no retained execution path and are omitted. Native Go slices implement ownership trails; no STL internals or generic adapters are ported. The output-taking factory borrows io.Writer for SAT DIMACS output.",
+        "The quasi-PB probe is available through its typed factory; the general SMT-LIB probe-expression frontend remains a separate unported surface, as for other arithmetic probes. The general default strategy dispatcher, public API completion and higher engines remain open."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qflra_tactic.cpp",

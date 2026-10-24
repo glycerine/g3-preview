@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -30,6 +31,28 @@ type SimplifyTactic struct {
 }
 
 var _ tactic.Tactic = (*SimplifyTactic)(nil)
+
+// SimplifyConstructionFailure retains the actual partially constructed owner
+// when a rewriter destructor's debug/resource guard refuses cleanup.
+type SimplifyConstructionFailure struct {
+	owner          *SimplifyTactic
+	cause, cleanup error
+}
+
+func (e *SimplifyConstructionFailure) Error() string        { return e.Unwrap().Error() }
+func (e *SimplifyConstructionFailure) Unwrap() error        { return errors.Join(e.cause, e.cleanup) }
+func (e *SimplifyConstructionFailure) OriginalCause() error { return e.cause }
+func (e *SimplifyConstructionFailure) CleanupCause() error  { return e.cleanup }
+func (e *SimplifyConstructionFailure) RuntimeOwner() *memory.Runtime {
+	return e.owner.manager.NumeralService().RuntimeOwner()
+}
+func (e *SimplifyConstructionFailure) Cleanup() error { return e.owner.Close() }
+func (t *SimplifyTactic) constructionFailure(cause error) error {
+	if cleanup := t.Close(); cleanup != nil {
+		return &SimplifyConstructionFailure{owner: t, cause: cause, cleanup: cleanup}
+	}
+	return cause
+}
 
 func NewSimplifyTactic(m *ast.ASTManager, context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) (*SimplifyTactic, error) {
 	if m == nil || context == nil || globals == nil || globals.Context != context {
@@ -52,12 +75,12 @@ func NewSimplifyTactic(m *ast.ASTManager, context *uparams.ParamsContext, global
 	t.paramsReady = true
 	if params != nil {
 		if err = context.Assign(&t.params, params); err != nil {
-			return nil, errors.Join(err, t.Close())
+			return nil, t.constructionFailure(err)
 		}
 	}
 	t.rewriter, err = rewriter.NewTheoryRewriter(m, context, globals, &t.params)
 	if err != nil {
-		return nil, errors.Join(err, t.Close())
+		return nil, t.constructionFailure(err)
 	}
 	return t, nil
 }

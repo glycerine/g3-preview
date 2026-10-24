@@ -16,10 +16,26 @@ import (
 )
 
 func TestSMTLibRunnerQFIDLBranchEvidence(t *testing.T) {
+	testArithmeticStrategyBranchEvidence(t, "qfidl")
+}
+
+func TestSMTLibRunnerQFLIABranchEvidence(t *testing.T) {
+	testArithmeticStrategyBranchEvidence(t, "qflia")
+}
+
+func testArithmeticStrategyBranchEvidence(t *testing.T, prefix string) {
+	t.Helper()
 	cases := []struct {
 		name            string
 		require, forbid []string
 	}{
+		{"qflia_solver_pb_sat_pipeline.smt2", []string{"(pb-tactic start)", "(pb2bv ", "(bit-blaster ", "(sat-status"}, nil},
+		{"qflia_solver_quasi_pb.smt2", []string{"(lia2sat-tactic start)", "(lia2pb ", "(pb2bv "}, []string{"(bounded-tactic start)"}},
+		{"qflia_solver_bounded.smt2", []string{"(bounded-tactic start)", "(no-cut-smt-tactic start)", "(smt.tactic start)"}, []string{"(sat-status"}},
+		{"qflia_solver_unbounded_ilp.smt2", []string{"(ilp-model-finder-tactic start)", "(no-cut-smt-tactic start)", "(smt.tactic start)"}, []string{"(pb-tactic start)", "(sat-status"}},
+		{"qflia_solver_unbounded_disjunction.smt2", []string{"(bounded-tactic start)", "(smt.tactic start)"}, []string{"(no-cut-smt-tactic start)", "(sat-status"}},
+		{"qflia_solver_core_guard.smt2", nil, []string{"(sat-status"}},
+		{"qflia_solver_proof_guard.smt2", nil, []string{"(sat-status"}},
 		{"qfidl_solver_disequality_models_scopes.smt2", []string{"(diff-neq :num-exprs 0"}, []string{"(sat-status"}},
 		{"qfidl_solver_disequality_pigeonhole.smt2", []string{"(diff-neq :num-exprs 1"}, []string{"(lia2pb ", "(sat-status"}},
 		{"qfidl_solver_bv_sat_pipeline.smt2", []string{"(pb2bv ", "(bit-blaster ", "(sat-status"}, nil},
@@ -34,6 +50,9 @@ func TestSMTLibRunnerQFIDLBranchEvidence(t *testing.T) {
 		{"qfidl_proof_route.smt2", []string{"(smt.tactic start)"}, []string{"(diff-neq ", "(sat-status"}},
 	}
 	for _, tc := range cases {
+		if !strings.HasPrefix(tc.name, prefix+"_") {
+			continue
+		}
 		t.Run(tc.name, func(t *testing.T) {
 			script, err := os.ReadFile(filepath.Join("test_vectors", tc.name))
 			if err != nil {
@@ -175,6 +194,15 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"qflia_solver_pb_sat_pipeline.smt2":            "sat\n((a 1)\n (b 0)\n (c 1)\n (d 1)\n (e 0)\n (f 1)\n (g 0)\n (h 1)\n (i 0))\nunsat\nsat\n((a 1)\n (b 0)\n (c 1)\n (d 1)\n (e 0)\n (f 1)\n (g 0)\n (h 1)\n (i 0))\n",
+	"qflia_solver_unbounded_ilp.smt2":              "sat\n(((>= (+ x y) 1) true)\n ((<= (+ (* 2 x) y) 3) true)\n ((>= (+ x (* 2 y)) 0) true))\n",
+	"qflia_solver_pseudo_Boolean.smt2":             "sat\n(((>= (+ (* 2 x) (* 3 y) (* 5 z)) 7) true)\n ((not (= x y)) true))\n",
+	"qflia_solver_quasi_pb.smt2":                   "sat\n((x 90)\n (y 1))\n",
+	"qflia_solver_bounded.smt2":                    "sat\n(((not (= x y)) true)\n ((or (>= (+ x y) 219) (<= (+ x y) 201)) true))\n",
+	"qflia_solver_unbounded_disjunction.smt2":      "sat\n(((not (= x y)) true)\n ((>= (+ (* 2 x) y) 2) true))\n",
+	"qflia_solver_proof_guard.smt2":                "unsat\n",
+	"qflia_solver_core_guard.smt2":                 "unsat\n",
+	"qflia_solver_models_scopes.smt2":              "sat\n((x 7))\nunsat\nsat\n((x 7))\n",
 	"add_bounds_default_models_scopes.smt2":        "sat\n((x 1))\nunknown\n(:reason-unknown \"under-approximated goal found to be unsat\")\nsat\n((x 1))\n",
 	"add_bounds_existing_bounds.smt2":              "unknown\n(:reason-unknown \"under-approximated goal found to be unsat\")\nsat\n(((and (>= x 10) (<= x 20)) true))\n",
 	"add_bounds_negative_params.smt2":              "sat\n(((and (>= x (- 16)) (<= x (- 1))) true))\n",

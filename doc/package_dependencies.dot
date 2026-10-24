@@ -465,6 +465,7 @@ digraph packages {
   "tactic/smtlogics" -> "tactic/bv";
   "tactic/smtlogics" -> "tactic/core";
   "tactic/smtlogics" -> "tactic/smtlogics/params";
+  "tactic/smtlogics" -> "util/memory";
   "tactic/smtlogics" -> "util/params";
   "tactic/smtlogics/params" [style=filled, fillcolor="#eeeeee"];
   "tactic/smtlogics/params" -> "util/params";

@@ -476,7 +476,9 @@ func (t *PropagateValuesTactic) pushResult(goal *tactic.Goal, index uint32, valu
 }
 
 func (t *PropagateValuesTactic) clearSubstitution() error {
-	if t.rewriter != nil {
+	// A failed constructor can leave a partial rewriter with no substitution.
+	// Close can release that owner; its public methods require initialization.
+	if t.hasSubstitution && t.rewriter != nil {
 		if err := t.rewriter.SetSubstitution(nil); err != nil {
 			return err
 		}

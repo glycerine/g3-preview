@@ -2845,6 +2845,7 @@
         "propagate_ineq_memory_trace.go",
         "propagate_ineq_outer_memory_trace.go",
         "propagate_ineq_tactic.go",
+        "quasi_pb_probe.go",
         "unbounded_probe.go"
       ]
     },
@@ -2960,11 +2961,13 @@
         "tactic/bv",
         "tactic/core",
         "tactic/smtlogics/params",
+        "util/memory",
         "util/params"
       ],
       "production_files": [
         "qfauflia_tactic.go",
         "qfidl_tactic.go",
+        "qflia_tactic.go",
         "qflra_tactic.go",
         "qfuf_tactic.go"
       ]

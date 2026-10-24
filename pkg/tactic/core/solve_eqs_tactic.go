@@ -193,7 +193,9 @@ func (t *SolveEquationsTactic) SetProgressCallback(func(uint32)) error { return 
 func (t *SolveEquationsTactic) Reset() error                           { return t.Cleanup() }
 
 func (t *SolveEquationsTactic) clearState() error {
-	if t.replacer != nil {
+	// Constructor unwind may own a partial replacer without either mapping.
+	// Detach installed mappings only; Close handles partial implementation roots.
+	if t.replacer != nil && (t.hasSubstitution || t.hasNormalized) {
 		if err := t.replacer.SetSubstitution(nil); err != nil {
 			return err
 		}
