@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/tactic/arith"
 	"github.com/glycerine/g3/pkg/tactic/core"
 	"github.com/glycerine/g3/pkg/tactic/smtlogics"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -25,7 +26,7 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return nil, err
 	}
 	switch name {
-	case "smt", "simplify", "elim-and", "propagate-values", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
+	case "smt", "simplify", "elim-and", "propagate-values", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -54,6 +55,8 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return smtlogics.NewQFUFTactic(m, nil, c.config)
 	case "symmetry-reduce":
 		return core.NewSymmetryReduceTactic(m, c.config.Params, c.config.Globals)
+	case "fix-dl-var":
+		return arith.MakeFixDLVarTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
 	case "skip":
 		return tactic.NewSkipTactic(), nil
 	case "fail":

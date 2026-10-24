@@ -130089,9 +130089,27 @@
       "path": "src/tactic/arith/fix_dl_var_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/fix_dl_var_tactic.go",
+        "pkg/tactic/arith/fix_dl_var_target.go",
+        "pkg/tactic/arith/fix_dl_var_trace.go",
+        "pkg/tactic/arith/fix_dl_var_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestFixDLVarRewritesAndReconstructsIntegerAndRealModels",
+        "TestFixDLVarNestedPenaltyBoundaryAndSharedAtoms",
+        "TestFixDLVarRefusalsAndEmptyGoalDoNotChangeDepth",
+        "TestFixDLVarChoiceTraceAndStreamRefusal",
+        "TestFixDLVarFailureShapeTrace",
+        "TestFixDLVarCPPApply",
+        "TestFixDLVarTranslationPolicyAndCleanup",
+        "TestFixDLVarAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 256,
@@ -130102,19 +130120,163 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_target recognizer: arithmetic-sort constants, foreign-family uninterpreted terms, numeral operand swap, exact (+ t (* -1 s)) atoms and numeral-first (+ k c) offsets; reject unsupported shapes without modifying the goal",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/fix_dl_var_target.go",
+          "go_targets": [
+            "pkg/tactic/arith/fix_dl_var_tactic.go",
+            "pkg/tactic/arith/fix_dl_var_target.go",
+            "pkg/tactic/arith/fix_dl_var_trace.go",
+            "pkg/tactic/arith/fix_dl_var_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestFixDLVarRewritesAndReconstructsIntegerAndRealModels",
+            "TestFixDLVarRefusalsAndEmptyGoalDoNotChangeDepth",
+            "TestFixDLVarFailureShapeTrace",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "is_target visit/process/process_eq/process_app/process_arith: occurrence increment before shared marking, root negation stripping, direct arithmetic unit classification, nested Boolean atoms and source foreign-argument nested=false rule",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/fix_dl_var_target.go",
+          "go_targets": [
+            "pkg/tactic/arith/fix_dl_var_tactic.go",
+            "pkg/tactic/arith/fix_dl_var_target.go",
+            "pkg/tactic/arith/fix_dl_var_trace.go",
+            "pkg/tactic/arith/fix_dl_var_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestFixDLVarRewritesAndReconstructsIntegerAndRealModels",
+            "TestFixDLVarNestedPenaltyBoundaryAndSharedAtoms",
+            "TestFixDLVarRefusalsAndEmptyGoalDoNotChangeDepth",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "is_target most_occs overloads and operator(): prefer non-nested occurrences unless total occurrences strictly exceed ten times the best unit count; quiet recognition failure and borrowed per-goal visited storage",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/fix_dl_var_target.go",
+          "go_targets": [
+            "pkg/tactic/arith/fix_dl_var_tactic.go",
+            "pkg/tactic/arith/fix_dl_var_target.go",
+            "pkg/tactic/arith/fix_dl_var_trace.go",
+            "pkg/tactic/arith/fix_dl_var_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestFixDLVarNestedPenaltyBoundaryAndSharedAtoms",
+            "TestFixDLVarChoiceTraceAndStreamRefusal",
+            "TestFixDLVarFailureShapeTrace"
+          ]
+        },
+        {
+          "name": "imp::operator(): choose Int/Real zero, owning expression substitution and extension model definition, theory rewriting with modus-ponens proof composition and unchanged core dependencies, stop at inconsistency, depth only on a selected variable, publish result",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/fix_dl_var_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/fix_dl_var_tactic.go",
+            "pkg/tactic/arith/fix_dl_var_target.go",
+            "pkg/tactic/arith/fix_dl_var_trace.go",
+            "pkg/tactic/arith/fix_dl_var_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestFixDLVarRewritesAndReconstructsIntegerAndRealModels",
+            "TestFixDLVarRefusalsAndEmptyGoalDoNotChangeDepth",
+            "TestFixDLVarCPPApply",
+            "TestFixDLVarTranslationPolicyAndCleanup",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "fix_dl_var_tactic construction/destruction, stored parameter updates, translation, theory-rewriter descriptions, exception translation, allocate-before-retire cleanup and clean factory registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/fix_dl_var_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/fix_dl_var_tactic.go",
+            "pkg/tactic/arith/fix_dl_var_target.go",
+            "pkg/tactic/arith/fix_dl_var_trace.go",
+            "pkg/tactic/arith/fix_dl_var_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestFixDLVarRewritesAndReconstructsIntegerAndRealModels",
+            "TestFixDLVarTranslationPolicyAndCleanup",
+            "TestFixDLVarAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Live fix_dl_var/fix_dl_var_choice failure/shape/choice/final-goal traces, fixing-at-zero verbose event, both tactic reports and debug well-sorted checks",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/fix_dl_var_trace.go",
+          "go_targets": [
+            "pkg/tactic/arith/fix_dl_var_tactic.go",
+            "pkg/tactic/arith/fix_dl_var_target.go",
+            "pkg/tactic/arith/fix_dl_var_trace.go",
+            "pkg/tactic/arith/fix_dl_var_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestFixDLVarChoiceTraceAndStreamRefusal",
+            "TestFixDLVarFailureShapeTrace",
+            "TestFixDLVarCPPApply",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns one charged enclosing header, an independent parameter copy and the theory rewriter. Constructor failure closes partial children. Cleanup constructs the new implementation before retiring the old one, and failed construction leaves the old rewriter usable. Translation owns a separate parameter/rewriter graph. Model-converter results retain the selected variable declaration and sort-correct zero independently of tactic cleanup/close.",
+        "Each application borrows graph handles through its goal, owns the temporary substitution and output/proof references, clears the rewriter borrowed substitution before destroying that owner, and publishes only original core dependencies. Constructor, apply and cleanup allocation-frontier tests under both proof modes require complete charged-storage release. Native lookup maps and discovery slices replace the C++ occurrence/mark containers."
+      ],
+      "deviations": [
+        "Equal occurrence counts use deterministic discovery order instead of C++ obj_map hash iteration, so a tied variable and its diagnostic name may differ. Unique-weight native comparisons match exact rewritten formulas and depth.",
+        "The source canonical arithmetic shapes and traversal quirks are preserved rather than broadening recognition to equivalent syntax. SMT-LIB scripts run simplify first, as in the retained QF_IDL preamble; raw numeral negation is not itself a numeral node. Malformed unary arithmetic Boolean atoms produce a checked Go domain error for the source two-argument precondition."
+      ]
     },
     {
       "path": "src/tactic/arith/fix_dl_var_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/fix_dl_var_tactic.go",
+        "pkg/tactic/arith/fix_dl_var_target.go",
+        "pkg/tactic/arith/fix_dl_var_trace.go",
+        "pkg/tactic/arith/fix_dl_var_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestFixDLVarRewritesAndReconstructsIntegerAndRealModels",
+        "TestFixDLVarNestedPenaltyBoundaryAndSharedAtoms",
+        "TestFixDLVarRefusalsAndEmptyGoalDoNotChangeDepth",
+        "TestFixDLVarChoiceTraceAndStreamRefusal",
+        "TestFixDLVarFailureShapeTrace",
+        "TestFixDLVarCPPApply",
+        "TestFixDLVarTranslationPolicyAndCleanup",
+        "TestFixDLVarAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 24,
@@ -130125,11 +130287,43 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_fix_dl_var_tactic declaration, default empty params and ADD_TACTIC fix-dl-var registration with clean wrapper",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/fix_dl_var_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/fix_dl_var_tactic.go",
+            "pkg/tactic/arith/fix_dl_var_target.go",
+            "pkg/tactic/arith/fix_dl_var_trace.go",
+            "pkg/tactic/arith/fix_dl_var_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestFixDLVarRewritesAndReconstructsIntegerAndRealModels",
+            "TestFixDLVarNestedPenaltyBoundaryAndSharedAtoms",
+            "TestFixDLVarRefusalsAndEmptyGoalDoNotChangeDepth",
+            "TestFixDLVarChoiceTraceAndStreamRefusal",
+            "TestFixDLVarFailureShapeTrace",
+            "TestFixDLVarCPPApply",
+            "TestFixDLVarTranslationPolicyAndCleanup",
+            "TestFixDLVarAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns one charged enclosing header, an independent parameter copy and the theory rewriter. Constructor failure closes partial children. Cleanup constructs the new implementation before retiring the old one, and failed construction leaves the old rewriter usable. Translation owns a separate parameter/rewriter graph. Model-converter results retain the selected variable declaration and sort-correct zero independently of tactic cleanup/close.",
+        "Each application borrows graph handles through its goal, owns the temporary substitution and output/proof references, clears the rewriter borrowed substitution before destroying that owner, and publishes only original core dependencies. Constructor, apply and cleanup allocation-frontier tests under both proof modes require complete charged-storage release. Native lookup maps and discovery slices replace the C++ occurrence/mark containers."
+      ],
+      "deviations": [
+        "Equal occurrence counts use deterministic discovery order instead of C++ obj_map hash iteration, so a tied variable and its diagnostic name may differ. Unique-weight native comparisons match exact rewritten formulas and depth.",
+        "The source canonical arithmetic shapes and traversal quirks are preserved rather than broadening recognition to equivalent syntax. SMT-LIB scripts run simplify first, as in the retained QF_IDL preamble; raw numeral negation is not itself a numeral node. Malformed unary arithmetic Boolean atoms produce a checked Go domain error for the source two-argument precondition."
+      ]
     },
     {
       "path": "src/tactic/arith/fm_tactic.cpp",

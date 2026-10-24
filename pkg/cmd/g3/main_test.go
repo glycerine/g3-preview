@@ -10,6 +10,13 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"fix_dl_absolute_refusal.smt2":                 "sat\n((x 5) ((<= (- x y) 2) true))\n",
+	"fix_dl_core.smt2":                             "unsat\n(forward backward)\n",
+	"fix_dl_foreign_offset.smt2":                   "sat\n((x 0) ((p (+ 2 x)) true))\n",
+	"fix_dl_model_scopes.smt2":                     "sat\n((x 0) ((<= (- x y) 2) true))\nunsat\nsat\n((x 0))\n",
+	"fix_dl_parameter_recovery.smt2":               "unknown\nsat\n((x 0))\n",
+	"fix_dl_proof.smt2":                            "unsat\n",
+	"fix_dl_real_models.smt2":                      "sat\n((x 0.0) ((< (- x y) (/ 1 3)) true) ((<= (- x z) (- (/ 1 7))) true))\n",
 	"symmetry_ranges_scopes.smt2":                  "sat\n(((distinct x y) true))\nunsat\nsat\n",
 	"symmetry_function_support.smt2":               "sat\n(((distinct (f a) (f b)) true))\nunsat\nsat\n",
 	"symmetry_asymmetric.smt2":                     "sat\n(((R a b) true) ((R b a) false))\n",
