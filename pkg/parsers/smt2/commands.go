@@ -35,6 +35,9 @@ type commandParser struct {
 // Unsupported commands fail explicitly. Command-local AST references are
 // released after execution; the context owns declarations and assertions.
 func ParseCommands(context *cmd_context.Context, input io.Reader, out io.Writer) (result error) {
+	if err := context.SetRegularOutput(out); err != nil {
+		return err
+	}
 	compliant, err := context.Compliant()
 	if err != nil {
 		return err

@@ -1,0 +1,7 @@
+(set-logic QF_IDL)
+(declare-const x Int)
+(declare-const y Int)
+(declare-const z Int)
+(assert (and (>= x 0) (<= x 1) (>= y 0) (<= y 1) (>= z 0) (<= z 1)))
+(assert (distinct x y z))
+(check-sat)

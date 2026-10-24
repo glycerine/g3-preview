@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 
@@ -60,6 +61,7 @@ type Context struct {
 	owned                            *contextServices
 	closed                           bool
 	initializationError              error
+	regularOutput                    io.Writer
 }
 
 func NewContext(config smtcore.SMTSolverConfig) (*Context, error) {
@@ -96,6 +98,28 @@ func (c *Context) valid() error {
 		return fmt.Errorf("closed command context")
 	}
 	return nil
+}
+
+// SetRegularOutput borrows the command session's current output transport.
+// Source: cmd_context.h set_regular_stream(std::ostream&). Existing solver
+// strategies resolve this writer when printing, so a later parser session can
+// change the destination without reconstructing the solver.
+func (c *Context) SetRegularOutput(output io.Writer) error {
+	if err := c.valid(); err != nil {
+		return err
+	}
+	c.regularOutput = output
+	return nil
+}
+
+type contextRegularOutput struct{ context *Context }
+
+func (w contextRegularOutput) Write(data []byte) (int, error) {
+	output := w.context.regularOutput
+	if output == nil {
+		output = os.Stdout
+	}
+	return output.Write(data)
 }
 
 func (c *Context) Compliant() (bool, error) {
@@ -268,6 +292,8 @@ func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 		c.solver, err = portfolio.NewQFLRAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "QF_UF":
 		c.solver, err = portfolio.NewQFUFStrategicSolver(m, &c.params, proofs, models, cores, c.config)
+	case "QF_IDL":
+		c.solver, err = portfolio.NewQFIDLStrategicSolverWithOutput(m, &c.params, proofs, models, cores, c.config, contextRegularOutput{c})
 	default:
 		var direct *smtcore.SMTSolver
 		direct, err = smtcore.NewSMTSolver(m, &c.params, c.logic, c.config)

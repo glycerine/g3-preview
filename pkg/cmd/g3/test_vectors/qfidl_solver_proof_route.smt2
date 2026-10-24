@@ -1,0 +1,6 @@
+(set-logic QF_IDL)
+(set-option :produce-proofs true)
+(declare-const x Int)
+(assert (>= x 3))
+(assert (<= x 2))
+(check-sat)

@@ -2,6 +2,9 @@ package smt2
 
 import (
 	"bytes"
+	"os"
+	"os/exec"
+	"sort"
 	"strings"
 	"testing"
 
@@ -10,6 +13,79 @@ import (
 	_ "github.com/glycerine/g3/pkg/engine"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
+
+func TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput(t *testing.T) {
+	c, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := c.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	const setup = `(set-logic QF_IDL)
+(set-option :sat.dimacs.display true)
+(declare-const a Int)(declare-const b Int)(declare-const c Int)
+(assert (and (>= a 0)(<= a 1)(>= b 0)(<= b 1)(>= c 0)(<= c 1)))
+(assert (or (= a 1)(= b 1)))
+(assert (or (= a 0)(= b 1)))
+(assert (or (= b 0)(= c 1)))
+(assert (or (= a 0)(= c 0)))
+`
+	var initial, first, second bytes.Buffer
+	if err := ParseCommands(c, strings.NewReader(setup), &initial); err != nil {
+		t.Fatal(err)
+	}
+	// The strategy is already constructed with the initial parser writer.
+	// Each subsequent parse must supply the current transport to its SAT child.
+	firstLength := 0
+	for _, output := range []*bytes.Buffer{&first, &second} {
+		if err := ParseCommands(c, strings.NewReader("(check-sat)"), output); err != nil {
+			t.Fatal(err, output.String())
+		}
+		if !strings.Contains(output.String(), "p cnf ") || !strings.HasSuffix(output.String(), "unknown\n") {
+			t.Fatal("missing DIMACS/refusal in the current parser output", output.String())
+		}
+		if output == &first {
+			firstLength = first.Len()
+		}
+	}
+	if initial.Len() != 0 || first.Len() != firstLength {
+		t.Fatal("strategy retained an earlier output transport", initial.String(), first.String(), second.String())
+	}
+	if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
+		cmd := exec.Command(reference, "-in")
+		cmd.Stdin = strings.NewReader(setup + "(check-sat)\n(check-sat)\n")
+		var output, diagnostics bytes.Buffer
+		cmd.Stdout, cmd.Stderr = &output, &diagnostics
+		if err := cmd.Run(); err != nil {
+			t.Fatal(err, output.String(), diagnostics.String())
+		}
+		// Source goal2sat prints its inverse atom map in hash-table order.
+		// Compare every mapping within each dump, preserving clause order and
+		// the separation between the two independent solver applications.
+		normalize := func(text string) string {
+			lines := strings.Split(text, "\n")
+			for i := 0; i < len(lines); {
+				if !strings.HasPrefix(lines[i], "c ") {
+					i++
+					continue
+				}
+				end := i + 1
+				for end < len(lines) && strings.HasPrefix(lines[end], "c ") {
+					end++
+				}
+				sort.Strings(lines[i:end])
+				i = end
+			}
+			return strings.Join(strings.Fields(strings.Join(lines, "\n")), " ")
+		}
+		if normalize(output.String()) != normalize(first.String()+second.String()) {
+			t.Fatal("DIMACS/refusal differs from C++", output.String(), first.String()+second.String())
+		}
+	}
+}
 
 func TestSMT2CommandsRejectMalformedInputBeforeEffects(t *testing.T) {
 	for _, command := range []string{"(assert false extra)", "(declare-fun p () Bool extra)", "(declare-const p (Array))", "(declare-const p (Array Bool))", "(push 1 extra)", "(assert (forall ((x Bool))", "(get-info)", "(get-info reason-unknown)", "(get-info :reason-unknown extra)", "(get-info :reason-unknown"} {

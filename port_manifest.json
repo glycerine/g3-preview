@@ -38051,7 +38051,15 @@
         "pkg/cmd_context/qfauflia_solver_test.go",
         "pkg/cmd_context/reason_unknown.go",
         "pkg/cmd_context/reason_unknown_test.go",
-        "pkg/parsers/smt2/commands_test.go"
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/tactic/smtlogics/qfidl_tactic.go",
+        "pkg/cmd_context/qfidl_solver_test.go",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_pigeonhole.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -38067,7 +38075,10 @@
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
         "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting",
         "TestCommandContextReasonUnknownStateAndEscaping",
-        "TestSMT2CommandsRejectMalformedInputBeforeEffects"
+        "TestSMT2CommandsRejectMalformedInputBeforeEffects",
+        "TestSMTLibRunnerQFIDLBranchEvidence",
+        "TestCommandContextQFIDLCombinedSolverProofResult",
+        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
       ],
       "conditionals": [
         {
@@ -38406,12 +38417,40 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained lazy QF_IDL strategic solver installation and current regular-output writer transport for SAT DIMACS diagnostics",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "go_targets": [
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/tactic/smtlogics/qfidl_tactic.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfidl_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_pigeonhole.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFIDLBranchEvidence",
+            "TestCommandContextQFIDLCombinedSolverProofResult",
+            "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
+          ]
         }
       ],
       "ownership": [
         "The command context owns its lazily created AST manager and SMTSolver, original assertion and optional core-tag ASTRefs, function/sort declaration trails and local params. Standalone sessions own and close the borrowed solver-service graph after context resources are released.",
         "Scoped declarations are restored in trail order; global declarations survive pop and close with the session. Temporary returned model references and evaluators are closed after printing.",
-        "Macro declarations own body and parameter-sort ASTRefs; caller-owned application result references survive temporary substitution cleanup and scoped definition removal."
+        "Macro declarations own body and parameter-sort ASTRefs; caller-owned application result references survive temporary substitution cleanup and scoped definition removal.",
+        "The context borrows the current io.Writer. Its strategic SAT child resolves that writer through the owning context at emission time, including subsequent parser invocations; closing the context does not close the writer."
       ],
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete."
@@ -38429,14 +38468,28 @@
         "pkg/cmd_context/results.go",
         "pkg/cmd_context/context_test.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/cmd_context/macros.go"
+        "pkg/cmd_context/macros.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/tactic/smtlogics/qfidl_tactic.go",
+        "pkg/cmd_context/qfidl_solver_test.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_pigeonhole.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
       ],
       "tests": [
         "TestCommandContextScopesDeclarationsAndModel",
         "TestCommandContextNamedCoreAndProof",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestCommandContextDefinitionOwnershipAndScopes"
+        "TestCommandContextDefinitionOwnershipAndScopes",
+        "TestSMTLibRunnerQFIDLBranchEvidence",
+        "TestCommandContextQFIDLCombinedSolverProofResult",
+        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
       ],
       "conditionals": [
         {
@@ -38534,12 +38587,40 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "set_regular_stream(std::ostream&) retained borrowed transport: current parser writer is resolved when an already constructed strategic SAT child prints, across repeated ParseCommands sessions",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "go_targets": [
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/tactic/smtlogics/qfidl_tactic.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfidl_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_pigeonhole.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFIDLBranchEvidence",
+            "TestCommandContextQFIDLCombinedSolverProofResult",
+            "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
+          ]
         }
       ],
       "ownership": [
         "The command context owns its lazily created AST manager and SMTSolver, original assertion and optional core-tag ASTRefs, function/sort declaration trails and local params. Standalone sessions own and close the borrowed solver-service graph after context resources are released.",
         "Scoped declarations are restored in trail order; global declarations survive pop and close with the session. Temporary returned model references and evaluators are closed after printing.",
-        "Macro declarations own body and parameter-sort ASTRefs; caller-owned application result references survive temporary substitution cleanup and scoped definition removal."
+        "Macro declarations own body and parameter-sort ASTRefs; caller-owned application result references survive temporary substitution cleanup and scoped definition removal.",
+        "The context borrows the current io.Writer. Its strategic SAT child resolves that writer through the owning context at emission time, including subsequent parser invocations; closing the context does not close the writer."
       ],
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete."
@@ -86831,7 +86912,16 @@
         "pkg/parsers/smt2/datatypes_test.go",
         "pkg/cmd_context/datatype_declarations.go",
         "pkg/cmd_context/reason_unknown.go",
-        "pkg/cmd_context/reason_unknown_test.go"
+        "pkg/cmd_context/reason_unknown_test.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/tactic/smtlogics/qfidl_tactic.go",
+        "pkg/cmd_context/qfidl_solver_test.go",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_pigeonhole.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -86861,7 +86951,10 @@
         "TestSMT2TacticCombinatorsAndTypedParameters",
         "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
         "TestSMT2DatatypeRefusalsBeforeDeclarationPublication",
-        "TestCommandContextReasonUnknownStateAndEscaping"
+        "TestCommandContextReasonUnknownStateAndEscaping",
+        "TestSMTLibRunnerQFIDLBranchEvidence",
+        "TestCommandContextQFIDLCombinedSolverProofResult",
+        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
       ],
       "assertions": [
         {
@@ -87626,13 +87719,41 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained ParseCommands regular-stream installation: the context borrows each invocation writer before lazy solver creation or resumed checks; SAT DIMACS and command result output reach the same current writer",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "go_targets": [
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/tactic/smtlogics/qfidl_tactic.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfidl_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_pigeonhole.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFIDLBranchEvidence",
+            "TestCommandContextQFIDLCombinedSolverProofResult",
+            "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
+          ]
         }
       ],
       "ownership": [
         "Each parsed command holds ASTRefs for all constructed terms/sorts until the command context acquires its declaration/assertion references. Existing concrete local binding and var-shifting helpers own quantifier/let frames and are unwound on success and error.",
         "Default-model get-value keeps expanded AST expressions pinned in command-local references and independently caches original input term strings. The scanner cache end is saved before each token advance; copied term strings survive cache reset and are passed alongside concrete AST handles to result output. Definitions, quoted identifiers, let terms and internal whitespace are echoed without AST expansion. Empty lists and quantified terms are rejected before result output. The rational_square_interval_scopes.smt2 C++ comparison checks exact 121/225 values after scoped rational square constraints. Indexed optimization-model queries remain outside this increment.",
         "Unsigned input rejects overflow, negative values for this path and trailing arguments before effects. Front-end timeout/rlimit values use the local unsigned parameter frame. Module values are parsed and owned by the source catalog, retaining its declared type even for integer input to Double options such as smt.restart_factor; no local UInt shadows that value. The catalog rejects unknown names and incompatible Boolean types. Floating-point, bit-vector and other remaining option-value branches are not claimed.",
-        "Quantifier metadata belongs to a concrete ASTQuantifierSpec local to its recursive grammar frame. Command-local ASTRefs retain parsed pattern terms and pattern applications until the resulting quantifier is owned by the command context. Parser option snapshots release their temporary ParamsRef owner immediately; rejected metadata unwinds the existing local-binding and command-root cleanup."
+        "Quantifier metadata belongs to a concrete ASTQuantifierSpec local to its recursive grammar frame. Command-local ASTRefs retain parsed pattern terms and pattern applications until the resulting quantifier is owned by the command context. Parser option snapshots release their temporary ParamsRef owner immediately; rejected metadata unwinds the existing local-binding and command-root cleanup.",
+        "The context borrows the current io.Writer. Its strategic SAT child resolves that writer through the owning context at emission time, including subsequent parser invocations; closing the context does not close the writer."
       ],
       "deviations": [
         "The retained Array constructor now parses all supplied sort arguments, using the final sort as range and preceding sorts as domains, matching native variadic array sorts. Empty/unary constructors are rejected before installing the declaration. Two multidimensional store/read scope scripts, with proofs disabled/enabled, now run through the public parser and compare against C++; strict runner agreement is 130.",
@@ -139295,7 +139416,17 @@
         "pkg/tactic/smtlogics/qfuf_tactic.go",
         "pkg/tactic/smtlogics/qfuf_tactic_test.go",
         "pkg/cmd_context/tactic_commands.go",
-        "pkg/cmd_context/qfuf_solver_test.go"
+        "pkg/cmd_context/qfuf_solver_test.go",
+        "pkg/tactic/smtlogics/qfidl_tactic.go",
+        "pkg/cmd_context/qfidl_solver_test.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/commands_test.go",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_pigeonhole.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
       ],
       "tests": [
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
@@ -139305,7 +139436,10 @@
         "TestCommandContextQFLRACombinedSolverProofResult",
         "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates",
         "TestQFUFTacticModelSurvivesStrategyClose",
-        "TestCommandContextQFUFCombinedSolverProofResult"
+        "TestCommandContextQFUFCombinedSolverProofResult",
+        "TestSMTLibRunnerQFIDLBranchEvidence",
+        "TestCommandContextQFIDLCombinedSolverProofResult",
+        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -139369,6 +139503,33 @@
           ]
         },
         {
+          "name": "QF_IDL mk_tactic_for_logic branch and factory operator(): complete QF_IDL tactic solver plus incremental SMT under combined-solver nonincremental/incremental, assumptions, result-provider and fallback policies; optional borrowed output transport reaches the native SAT stage",
+          "status": "ported",
+          "go_target": "pkg/tactic/portfolio/smt_strategic_solver.go",
+          "go_targets": [
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/tactic/smtlogics/qfidl_tactic.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfidl_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_disequality_pigeonhole.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFIDLBranchEvidence",
+            "TestCommandContextQFIDLCombinedSolverProofResult",
+            "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
+          ]
+        },
+        {
           "name": "Remaining logic dispatcher branches, default tactic/FD/incremental-SAT special solvers and general stored-logic strategic solver_factory owner and public factory constructor",
           "status": "unported"
         }
@@ -139377,7 +139538,7 @@
         "Construction uses local counted tactic/solver references. The returned combined solver owns both child solvers; the tactic solver owns the concrete strategy. Context closes the combined owner before manager/services teardown. Evaluator/parameter services are borrowed through the same concrete configuration used by the incremental backend."
       ],
       "deviations": [
-        "The retained QF_AUFLIA, QF_LRA and QF_UF branches are connected through shared combined-solver construction. Other logic branches and the general default dispatcher remain explicitly unported; concrete Go entry points name the completed strategies."
+        "The retained QF_AUFLIA, QF_LRA, QF_UF and QF_IDL branches use shared combined-solver construction. Other branches and the general default dispatcher remain unported. Concrete Go entry points name the completed strategies. The output-taking QF_IDL constructor borrows an io.Writer; existing constructors default to os.Stdout."
       ]
     },
     {

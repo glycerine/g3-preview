@@ -20,6 +20,12 @@ func TestSMTLibRunnerQFIDLBranchEvidence(t *testing.T) {
 		name            string
 		require, forbid []string
 	}{
+		{"qfidl_solver_disequality_models_scopes.smt2", []string{"(diff-neq :num-exprs 0"}, []string{"(sat-status"}},
+		{"qfidl_solver_disequality_pigeonhole.smt2", []string{"(diff-neq :num-exprs 1"}, []string{"(lia2pb ", "(sat-status"}},
+		{"qfidl_solver_bv_sat_pipeline.smt2", []string{"(pb2bv ", "(bit-blaster ", "(sat-status"}, nil},
+		{"qfidl_solver_smt_fallback.smt2", []string{"(diff-neq ", "(pb2bv ", "(smt.tactic start)"}, []string{"(sat-status"}},
+		{"qfidl_solver_core_route.smt2", nil, []string{"(diff-neq ", "(sat-status"}},
+		{"qfidl_solver_proof_route.smt2", nil, []string{"(diff-neq ", "(sat-status"}},
 		{"qfidl_disequality_models_scopes.smt2", []string{"(diff-neq :num-exprs 0"}, []string{"(sat-status"}},
 		{"qfidl_disequality_pigeonhole.smt2", []string{"(diff-neq :num-exprs 1"}, []string{"(lia2pb ", "(sat-status"}},
 		{"qfidl_bv_sat_pipeline.smt2", []string{"(pb2bv ", "(bit-blaster ", "(sat-status"}, nil},
@@ -169,6 +175,12 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"qfidl_solver_bv_sat_pipeline.smt2":            "sat\n((a 0)\n (b 1)\n (c 1))\nunsat\nsat\n((a 0)\n (b 1)\n (c 1))\n",
+	"qfidl_solver_core_route.smt2":                 "unsat\n(lo hi)\n",
+	"qfidl_solver_disequality_models_scopes.smt2":  "sat\n((x 0)\n (y 1)\n (z 2))\nunsat\nsat\n((x 0)\n (y 1)\n (z 2))\n",
+	"qfidl_solver_disequality_pigeonhole.smt2":     "unsat\n",
+	"qfidl_solver_proof_route.smt2":                "unsat\n",
+	"qfidl_solver_smt_fallback.smt2":               "sat\n(((and (= (- x y) 37) (>= x 0) (<= x 100) (>= y 0) (<= y 100)) true))\nunsat\nsat\n(((= (- x y) 37) true))\n",
 	"qfidl_bv_sat_pipeline.smt2":                   "sat\n((a 1)\n (b 0)\n (c 1)\n (d 1)\n (e 0)\n (f 1)\n (g 0)\n (h 1)\n (i 0))\nunsat\nsat\n((a 1)\n (b 0)\n (c 1)\n (d 1)\n (e 0)\n (f 1)\n (g 0)\n (h 1)\n (i 0))\n",
 	"qfidl_core_route.smt2":                        "unsat\n(lo hi)\n",
 	"qfidl_disequality_models_scopes.smt2":         "sat\n((x 0)\n (y 1)\n (z 2))\nunsat\nsat\n((x 0)\n (y 1)\n (z 2))\n",
