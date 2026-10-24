@@ -538,12 +538,18 @@ func (p *commandParser) sort() (ast.ASTHandle, error) {
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}
+		if !p.context.BuiltinSortAvailable(name) {
+			return ast.ASTHandle{}, fmt.Errorf("unknown sort %s", name)
+		}
 		if name != "BitVec" || len(indices) != 1 {
 			return ast.ASTHandle{}, fmt.Errorf("unsupported indexed sort %s", name)
 		}
 		return p.pin(m.BitVectorSort(indices[0]))
 	}
 	if name == "Array" {
+		if !p.context.BuiltinSortAvailable(name) {
+			return ast.ASTHandle{}, fmt.Errorf("unknown sort %s", name)
+		}
 		var sorts []ast.ASTHandle
 		for p.token != RightParenToken {
 			value, err := p.sort()

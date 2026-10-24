@@ -47,3 +47,12 @@ func (m *ASTManager) FamilyIDForSymbol(name usymbol.Symbol) (FamilyID, error) {
 	defer m.mu.Unlock()
 	return m.families.GetID(name)
 }
+
+// FamilyName returns the borrowed symbol from ast_manager::get_family_name.
+func (m *ASTManager) FamilyName(family FamilyID) (usymbol.Symbol, error) {
+	if err := m.lock(); err != nil {
+		return usymbol.Symbol{}, err
+	}
+	defer m.mu.Unlock()
+	return m.families.GetName(family)
+}

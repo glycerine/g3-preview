@@ -11428,7 +11428,15 @@
         "pkg/ast/ast_dependency_consumed_test.go",
         "pkg/ast/ast_label.go",
         "pkg/ast/ast_parameter_memory_trace.go",
-        "pkg/ast/ast_parameter_memory_trace_debug_test.go"
+        "pkg/ast/ast_parameter_memory_trace_debug_test.go",
+        "pkg/cmd_context/check_logic.go",
+        "pkg/cmd_context/check_logic_test.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/datatype_declarations.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/check_logic_test.go",
+        "pkg/ast/ast_decl_parameter_access.go"
       ],
       "tests": [
         "TestASTFuncDeclInfoSourceText",
@@ -11574,7 +11582,12 @@
         "TestASTLabelConcreteSymbolBufferAndRecognition",
         "TestASTLabelTemporaryParametersOnReservationFailure",
         "TestASTSkolemDeclarationFlagForPatternInference",
-        "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy"
+        "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy",
+        "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+        "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+        "TestLogicCheckerDifferenceTraceAndClosedStream",
+        "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+        "TestSMT2LogicValidationCPP"
       ],
       "conditionals": [
         {
@@ -11855,19 +11868,28 @@
           "name": "source parameter ostream and attached func_decl_info display for the retained defined declaration domain: six parameter kinds, family/kind and nine flags",
           "status": "ported",
           "go_target": "pkg/ast/ast_func_decl_info_text.go",
-          "tests": ["TestASTFuncDeclInfoSourceText", "TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain"]
+          "tests": [
+            "TestASTFuncDeclInfoSourceText",
+            "TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain"
+          ]
         },
         {
           "name": "ast_manager::check_sort/check_sorts_core/check_sorts shallow arity, domain, associative-child and int/real compatibility checks with caught warning (ast.cpp:1958-2030)",
           "status": "ported",
           "go_target": "pkg/ast/ast_check_sorts.go",
-          "tests": ["TestASTCheckSortsShallowWarningsAndAssociativeChild", "TestASTCheckSortsArithmeticCoercionUsesSourceFamily"]
+          "tests": [
+            "TestASTCheckSortsShallowWarningsAndAssociativeChild",
+            "TestASTCheckSortsArithmeticCoercionUsesSourceFamily"
+          ]
         },
         {
           "name": "PARAM_DOUBLE non-finite or out-of-range declaration metadata stops at undefined source unsigned hash conversion; Go registration refuses it",
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_parameter.go",
-          "tests": ["TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain", "TestASTParameterDoubleHashSourceDomain"]
+          "tests": [
+            "TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain",
+            "TestASTParameterDoubleHashSourceDomain"
+          ]
         },
         {
           "name": "family_manager constructor next0 and concrete symbol/name members",
@@ -12070,19 +12092,25 @@
           "name": "update_quantifier_weight TRACE after identity check and before replacement construction (ast.cpp:2454)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_update_trace.go",
-          "tests": ["TestASTQuantifierWeightTraceBeforeReplacement"]
+          "tests": [
+            "TestASTQuantifierWeightTraceBeforeReplacement"
+          ]
         },
         {
           "name": "mk_app chainable branch TRACE before adjacent pair-buffer construction (ast.cpp:2195)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_app_trace.go",
-          "tests": ["TestASTChainableTraceOnlyOnLongNonflatBranch"]
+          "tests": [
+            "TestASTChainableTraceOnlyOnLongNonflatBranch"
+          ]
         },
         {
           "name": "mk_app app_ground TRACE after every successful application path with retained low-level printer (ast.cpp:2207)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_app_trace.go",
-          "tests": ["TestASTAppGroundTraceAfterApplicationConstruction"]
+          "tests": [
+            "TestASTAppGroundTraceAfterApplicationConstruction"
+          ]
         },
         {
           "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection with diagnostic transport",
@@ -12227,8 +12255,13 @@
           "name": "ast_manager::mk_fresh_var_name shared fresh-id scalar for pulled duplicate binders (ast.cpp:2246-2251; ast.h:1827)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_fresh_factories.go",
-          "go_targets": ["pkg/ast/normal_forms/pull_boolean.go", "pkg/ast/pattern/pull_boolean_test.go"],
-          "tests": ["TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"]
+          "go_targets": [
+            "pkg/ast/normal_forms/pull_boolean.go",
+            "pkg/ast/pattern/pull_boolean_test.go"
+          ],
+          "tests": [
+            "TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames"
+          ]
         },
         {
           "name": "Concrete basic Boolean factories and is_not argument unwrap (src/ast/ast.h:1984,2008-2018,2039-2046)",
@@ -12300,7 +12333,9 @@
           "name": "retained mk_pattern overloads and is_pattern recognizer (src/ast/ast.h:1867-1874)",
           "status": "ported",
           "go_target": "pkg/ast/ast_pattern.go",
-          "go_targets": ["pkg/ast/rewriter/inj_axiom_test.go"],
+          "go_targets": [
+            "pkg/ast/rewriter/inj_axiom_test.go"
+          ],
           "tests": [
             "TestSimplifyInjectivityAxiomBuildsInverseAndPattern"
           ]
@@ -12311,6 +12346,24 @@
           "go_target": "pkg/ast/ast_core_accessors.go",
           "tests": [
             "TestASTSkolemDeclarationFlagForPatternInference"
+          ]
+        },
+        {
+          "name": "ast_manager::get_family_name(family_id) borrowed symbol accessor used by concrete logic-validation theory diagnostics",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_decl_parameter_access.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren"
           ]
         }
       ],
@@ -37983,28 +38036,197 @@
       "path": "src/cmd_context/check_logic.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/cmd_context/check_logic.go",
+        "pkg/cmd_context/check_logic_test.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/datatype_declarations.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/check_logic_test.go",
+        "pkg/ast/ast_decl_parameter_access.go"
+      ],
+      "tests": [
+        "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+        "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+        "TestLogicCheckerDifferenceTraceAndClosedStream",
+        "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+        "TestSMT2LogicValidationCPP"
+      ],
       "assertions": [
         {
           "line": 295,
           "text": "SASSERT(n->get_num_args() == 2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "check_logic constructor/destructor/reset/set_logic/get_last_error: optional borrowed-manager state, all 27 explicit source flag profiles, unknown-profile bypass, cleared diagnostic on reset and retained diagnostic on successful checks",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "check_sort and operator()(func_decl*): source null-family/user-sort distinction, integer/real/BV capabilities, general-array early success and BV-array arity/domain/range checks; UF arity check before domain and range",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "is_int/is_numeral/check_mul/check_div: exact unary-minus/to_real peeling and rational division recognition; at most one nonnumeral multiplicand and numeral-divisor restrictions; ordinary binary divisor AST invariant guarded explicitly",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "is_diff_var/same_args/is_arith/is_offset/is_diff_arg/check_diff_predicate/check_diff_arg/check_diff_args: offset descent, ITE and arbitrary UF application variables, numeral-side swap, two-variable subtraction and equal-arity repeated sums; preserve source check_diff_args inspection of n rather than its arguments",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "operator()(var*/app*/quantifier*) and concrete quick_for_each_expr traversal: application/variable sort checks, arithmetic and cast restrictions, built-in/sequence/DT/PB family gates, actual family-name diagnostics, and source postorder body/pattern/no-pattern visitation",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "fail/fail_non_diff and failed transport: persistent last_error exposed through Go errors, source TRACE expression before difference refusal, and ostream badbit preserving the policy diagnostic while operand failures propagate",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        }
+      ],
+      "ownership": [
+        "LogicChecker is value state embedded in its command context, borrowing the initialized AST manager and family identities. Reset clears the borrower and diagnostic; no AST nodes, sorts, declarations or service owners are retained. Each concrete traversal owns native Go scratch frames, visited-handle and application maps only until that call returns. Context resets the checker before manager teardown. Refused ordinary declarations release their temporary AST reference without publication; assertion validation precedes result invalidation and ownership transfer. Trace formatting releases its temporary text stream."
+      ],
+      "deviations": [
+        "The reached C++ imp allocation and destructor become an embedded Go value and Reset; the failed exception/bool/last_error protocol is surfaced as an error plus LastError without clearing it on success. Go scratch slices and maps replace traversal containers and marks without porting STL or unused templates.",
+        "The live caller initializes declaration plugins before SetLogic. Native registered family identities are borrowed instead of constructing duplicate C++ utility owners. Unknown profiles remain permissive, general arrays do not recursively check their sorts, and the source check_diff_args behavior and repeated-sum acceptance are intentionally preserved.",
+        "A malformed binary-division arity is rejected explicitly in Go; well-formed retained arithmetic declarations enforce the source SASSERT(n->get_num_args() == 2) invariant. Header guards are represented by normal Go package compilation."
+      ]
     },
     {
       "path": "src/cmd_context/check_logic.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/cmd_context/check_logic.go",
+        "pkg/cmd_context/check_logic_test.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/datatype_declarations.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/check_logic_test.go",
+        "pkg/ast/ast_decl_parameter_access.go"
+      ],
+      "tests": [
+        "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+        "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+        "TestLogicCheckerDifferenceTraceAndClosedStream",
+        "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+        "TestSMT2LogicValidationCPP"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -38015,11 +38237,150 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "check_logic constructor/destructor/reset/set_logic/get_last_error: optional borrowed-manager state, all 27 explicit source flag profiles, unknown-profile bypass, cleared diagnostic on reset and retained diagnostic on successful checks",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "check_sort and operator()(func_decl*): source null-family/user-sort distinction, integer/real/BV capabilities, general-array early success and BV-array arity/domain/range checks; UF arity check before domain and range",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "is_int/is_numeral/check_mul/check_div: exact unary-minus/to_real peeling and rational division recognition; at most one nonnumeral multiplicand and numeral-divisor restrictions; ordinary binary divisor AST invariant guarded explicitly",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "is_diff_var/same_args/is_arith/is_offset/is_diff_arg/check_diff_predicate/check_diff_arg/check_diff_args: offset descent, ITE and arbitrary UF application variables, numeral-side swap, two-variable subtraction and equal-arity repeated sums; preserve source check_diff_args inspection of n rather than its arguments",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "operator()(var*/app*/quantifier*) and concrete quick_for_each_expr traversal: application/variable sort checks, arithmetic and cast restrictions, built-in/sequence/DT/PB family gates, actual family-name diagnostics, and source postorder body/pattern/no-pattern visitation",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "fail/fail_non_diff and failed transport: persistent last_error exposed through Go errors, source TRACE expression before difference refusal, and ostream badbit preserving the policy diagnostic while operand failures propagate",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/check_logic.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        }
+      ],
+      "ownership": [
+        "LogicChecker is value state embedded in its command context, borrowing the initialized AST manager and family identities. Reset clears the borrower and diagnostic; no AST nodes, sorts, declarations or service owners are retained. Each concrete traversal owns native Go scratch frames, visited-handle and application maps only until that call returns. Context resets the checker before manager teardown. Refused ordinary declarations release their temporary AST reference without publication; assertion validation precedes result invalidation and ownership transfer. Trace formatting releases its temporary text stream."
+      ],
+      "deviations": [
+        "The reached C++ imp allocation and destructor become an embedded Go value and Reset; the failed exception/bool/last_error protocol is surfaced as an error plus LastError without clearing it on success. Go scratch slices and maps replace traversal containers and marks without porting STL or unused templates.",
+        "The live caller initializes declaration plugins before SetLogic. Native registered family identities are borrowed instead of constructing duplicate C++ utility owners. Unknown profiles remain permissive, general arrays do not recursively check their sorts, and the source check_diff_args behavior and repeated-sum acceptance are intentionally preserved.",
+        "A malformed binary-division arity is rejected explicitly in Go; well-formed retained arithmetic declarations enforce the source SASSERT(n->get_num_args() == 2) invariant. Header guards are represented by normal Go package compilation."
+      ]
     },
     {
       "path": "src/cmd_context/cmd_context.cpp",
@@ -38059,7 +38420,11 @@
         "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
         "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
         "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
-        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
+        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2",
+        "pkg/cmd_context/check_logic.go",
+        "pkg/cmd_context/check_logic_test.go",
+        "pkg/parsers/smt2/check_logic_test.go",
+        "pkg/ast/ast_decl_parameter_access.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -38078,7 +38443,12 @@
         "TestSMT2CommandsRejectMalformedInputBeforeEffects",
         "TestSMTLibRunnerQFIDLBranchEvidence",
         "TestCommandContextQFIDLCombinedSolverProofResult",
-        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
+        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput",
+        "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+        "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+        "TestLogicCheckerDifferenceTraceAndClosedStream",
+        "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+        "TestSMT2LogicValidationCPP"
       ],
       "conditionals": [
         {
@@ -38444,6 +38814,50 @@
             "TestCommandContextQFIDLCombinedSolverProofResult",
             "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
           ]
+        },
+        {
+          "name": "Retained logic checker integration after manager/solver initialization and before ordinary/datatype function insertion or assertions: refusal leaves ordinary declaration/assertion publication and prior check result unchanged; reset before manager teardown",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "Retained init_manager_core/register_builtin_ops/sorts logic_has_arith/bv/array/seq gates: plugins stay installed while existing command names are selectively published; real-only NRA profiles omit Int, hidden builtin sort names may be declared by users, and missing non-nullary function names use the source unknown function/constant diagnostic",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/applications.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
+          ]
         }
       ],
       "ownership": [
@@ -38479,7 +38893,12 @@
         "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
         "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
         "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
-        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
+        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2",
+        "pkg/cmd_context/check_logic.go",
+        "pkg/cmd_context/check_logic_test.go",
+        "pkg/cmd_context/datatype_declarations.go",
+        "pkg/parsers/smt2/check_logic_test.go",
+        "pkg/ast/ast_decl_parameter_access.go"
       ],
       "tests": [
         "TestCommandContextScopesDeclarationsAndModel",
@@ -38489,7 +38908,12 @@
         "TestCommandContextDefinitionOwnershipAndScopes",
         "TestSMTLibRunnerQFIDLBranchEvidence",
         "TestCommandContextQFIDLCombinedSolverProofResult",
-        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
+        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput",
+        "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+        "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+        "TestLogicCheckerDifferenceTraceAndClosedStream",
+        "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+        "TestSMT2LogicValidationCPP"
       ],
       "conditionals": [
         {
@@ -38613,6 +39037,28 @@
             "TestSMTLibRunnerQFIDLBranchEvidence",
             "TestCommandContextQFIDLCombinedSolverProofResult",
             "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
+          ]
+        },
+        {
+          "name": "Retained logic checker integration after manager/solver initialization and before ordinary/datatype function insertion or assertions: refusal leaves ordinary declaration/assertion publication and prior check result unchanged; reset before manager teardown",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
           ]
         }
       ],
@@ -86921,7 +87367,12 @@
         "pkg/cmd/g3/test_vectors/qfidl_solver_smt_fallback.smt2",
         "pkg/cmd/g3/test_vectors/qfidl_solver_core_route.smt2",
         "pkg/cmd/g3/test_vectors/qfidl_solver_proof_route.smt2",
-        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2"
+        "pkg/cmd/g3/test_vectors/qfidl_solver_bv_sat_pipeline.smt2",
+        "pkg/cmd_context/check_logic.go",
+        "pkg/cmd_context/check_logic_test.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/parsers/smt2/check_logic_test.go",
+        "pkg/ast/ast_decl_parameter_access.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -86954,7 +87405,12 @@
         "TestCommandContextReasonUnknownStateAndEscaping",
         "TestSMTLibRunnerQFIDLBranchEvidence",
         "TestCommandContextQFIDLCombinedSolverProofResult",
-        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
+        "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput",
+        "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+        "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+        "TestLogicCheckerDifferenceTraceAndClosedStream",
+        "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+        "TestSMT2LogicValidationCPP"
       ],
       "assertions": [
         {
@@ -87745,6 +88201,28 @@
             "TestSMTLibRunnerQFIDLBranchEvidence",
             "TestCommandContextQFIDLCombinedSolverProofResult",
             "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput"
+          ]
+        },
+        {
+          "name": "Retained logic-gated indexed BitVec/Array sort lookup and command-level validation comparisons: hidden names refuse before declaration publication; valid source-permissive forms and later ParseCommands invocations remain usable",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "go_targets": [
+            "pkg/cmd_context/check_logic.go",
+            "pkg/cmd_context/check_logic_test.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/ast/ast_decl_parameter_access.go"
+          ],
+          "tests": [
+            "TestLogicCheckerSortPoliciesAndBorrowedLifetime",
+            "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
+            "TestLogicCheckerDifferenceTraceAndClosedStream",
+            "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
+            "TestSMT2LogicValidationCPP"
           ]
         }
       ],

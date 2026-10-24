@@ -880,6 +880,7 @@
         "tactic/portfolio",
         "tactic/smtlogics",
         "util/cooperate",
+        "util/diagnostic",
         "util/escaped",
         "util/lbool",
         "util/numeral",
@@ -891,6 +892,7 @@
       ],
       "production_files": [
         "applications.go",
+        "check_logic.go",
         "context.go",
         "datatype_declarations.go",
         "function_references.go",

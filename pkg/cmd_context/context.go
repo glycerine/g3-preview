@@ -62,6 +62,7 @@ type Context struct {
 	closed                           bool
 	initializationError              error
 	regularOutput                    io.Writer
+	logicChecker                     LogicChecker
 }
 
 func NewContext(config smtcore.SMTSolverConfig) (*Context, error) {
@@ -307,6 +308,9 @@ func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 	if err = c.solver.SetProduceModels(models); err != nil {
 		return nil, err
 	}
+	if err = c.logicChecker.SetLogic(m, c.logic); err != nil {
+		return nil, err
+	}
 	return m, nil
 }
 
@@ -315,7 +319,7 @@ func (c *Context) DeclareSort(name string) (ast.ASTHandle, error) {
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	if _, found := c.sorts[name]; found || name == "Bool" || name == "Int" || name == "Real" || name == "Array" || name == "BitVec" || name == "String" {
+	if _, found := c.sorts[name]; found || c.BuiltinSortAvailable(name) {
 		return ast.ASTHandle{}, fmt.Errorf("sort already defined %s", name)
 	}
 	symbol, err := m.Symbols.Intern(name)
@@ -343,6 +347,9 @@ func (c *Context) LookupSort(name string) (ast.ASTHandle, error) {
 	if s, found := c.sorts[name]; found {
 		return s, nil
 	}
+	if !c.BuiltinSortAvailable(name) {
+		return ast.ASTHandle{}, fmt.Errorf("unknown sort %s", name)
+	}
 	if name == "Bool" {
 		return m.MkBoolSort()
 	}
@@ -367,16 +374,10 @@ func (c *Context) LookupSort(name string) (ast.ASTHandle, error) {
 	return ast.ASTHandle{}, fmt.Errorf("unknown sort %s", name)
 }
 
-func (c *Context) DeclareFunction(name string, domain []ast.ASTHandle, rangeSort ast.ASTHandle) (ast.ASTHandle, error) {
+func (c *Context) DeclareFunction(name string, domain []ast.ASTHandle, rangeSort ast.ASTHandle) (result ast.ASTHandle, err error) {
 	m, err := c.Manager()
 	if err != nil {
 		return ast.ASTHandle{}, err
-	}
-	if c.containsMacro(name, domain) {
-		return ast.ASTHandle{}, fmt.Errorf("invalid declaration, named expression already defined with this name %s", name)
-	}
-	if _, found := c.builtins[name]; found {
-		return ast.ASTHandle{}, fmt.Errorf("invalid declaration, builtin symbol %s", name)
 	}
 	symbol, err := m.Symbols.Intern(name)
 	if err != nil {
@@ -386,23 +387,42 @@ func (c *Context) DeclareFunction(name string, domain []ast.ASTHandle, rangeSort
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
+	ref, err := m.NewRef(d)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	published := false
+	defer func() {
+		if !published {
+			err = errors.Join(err, m.DelRef(&ref))
+		}
+	}()
+	if err = c.logicChecker.CheckDeclaration(d); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if c.containsMacro(name, domain) {
+		return ast.ASTHandle{}, fmt.Errorf("invalid declaration, named expression already defined with this name %s", name)
+	}
+	if _, found := c.builtins[name]; found {
+		return ast.ASTHandle{}, fmt.Errorf("invalid declaration, builtin symbol %s", name)
+	}
 	for _, prior := range c.functions[name] {
 		if prior == d {
 			return ast.ASTHandle{}, fmt.Errorf("invalid declaration, '%s' (with the given signature) already declared", name)
 		}
 	}
-	ref, err := m.NewRef(d)
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
 	c.functions[name] = append(c.functions[name], d)
 	c.functionTrail = append(c.functionTrail, declaration{name, d, ref})
+	published = true
 	return d, nil
 }
 
 func (c *Context) Assert(formula ast.ASTHandle, name string) (result error) {
 	m, err := c.Manager()
 	if err != nil {
+		return err
+	}
+	if err = c.logicChecker.CheckExpression(formula); err != nil {
 		return err
 	}
 	ref, err := m.NewRef(formula)
@@ -594,6 +614,7 @@ func (c *Context) Close() error {
 		c.solver = nil
 	}
 	if c.manager != nil {
+		c.logicChecker.Reset()
 		if err := c.restoreMacros(0); err != nil {
 			return err
 		}

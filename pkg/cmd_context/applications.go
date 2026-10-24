@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/solver"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -43,43 +44,72 @@ func (c *Context) initBuiltins() error {
 	if err != nil {
 		return err
 	}
-	if err = m.GetArithmeticOpNames(&names, logic); err != nil {
-		return err
-	}
-	if err = c.addBuiltinNames(family, &names); err != nil {
-		return err
+	if c.logic == "" || solver.LogicHasArithmetic(c.logic) {
+		if err = m.GetArithmeticOpNames(&names, logic); err != nil {
+			return err
+		}
+		if err = c.addBuiltinNames(family, &names); err != nil {
+			return err
+		}
 	}
 	family, err = m.RegisterBitVectorPlugin()
 	if err != nil {
 		return err
 	}
-	if err = m.GetBitVectorOpNames(&names, logic); err != nil {
-		return err
-	}
-	if err = c.addBuiltinNames(family, &names); err != nil {
-		return err
+	if c.logic == "" || solver.LogicHasBitVector(c.logic) {
+		if err = m.GetBitVectorOpNames(&names, logic); err != nil {
+			return err
+		}
+		if err = c.addBuiltinNames(family, &names); err != nil {
+			return err
+		}
 	}
 	family, err = m.ArrayFamilyID()
 	if err != nil {
 		return err
 	}
-	if err = m.GetArrayOpNames(&names, logic); err != nil {
-		return err
-	}
-	if err = c.addBuiltinNames(family, &names); err != nil {
-		return err
+	if c.logic == "" || solver.LogicHasArray(c.logic) {
+		if err = m.GetArrayOpNames(&names, logic); err != nil {
+			return err
+		}
+		if err = c.addBuiltinNames(family, &names); err != nil {
+			return err
+		}
 	}
 	family, err = m.SequenceFamilyID()
 	if err != nil {
 		return err
 	}
-	if err = m.GetSequenceOpNames(&names, logic); err != nil {
-		return err
-	}
-	if err = c.addBuiltinNames(family, &names); err != nil {
-		return err
+	if c.logic == "" || solver.LogicHasSequence(c.logic) {
+		if err = m.GetSequenceOpNames(&names, logic); err != nil {
+			return err
+		}
+		if err = c.addBuiltinNames(family, &names); err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+// BuiltinSortAvailable follows the logic-gated source sort-name installation.
+// Plugins remain installed in the AST manager even when their names are hidden
+// from the command language.
+func (c *Context) BuiltinSortAvailable(name string) bool {
+	switch name {
+	case "Bool":
+		return true
+	case "Int":
+		return (c.logic == "" || solver.LogicHasArithmetic(c.logic)) && c.logic != "NRA" && c.logic != "QF_NRA" && c.logic != "QF_UFNRA"
+	case "Real":
+		return c.logic == "" || solver.LogicHasArithmetic(c.logic)
+	case "BitVec":
+		return c.logic == "" || solver.LogicHasBitVector(c.logic)
+	case "Array":
+		return c.logic == "" || solver.LogicHasArray(c.logic)
+	case "String", "StringSequence":
+		return c.logic == "" || solver.LogicHasSequence(c.logic)
+	}
+	return false
 }
 
 func (c *Context) MakeApp(name string, args []ast.ASTHandle, indices []ast.ASTParameter, rangeSort ast.ASTHandle) (ast.ASTHandle, error) {
@@ -121,6 +151,12 @@ func (c *Context) MakeApp(name string, args []ast.ASTHandle, indices []ast.ASTPa
 	}
 	if len(indices) != 0 {
 		return ast.ASTHandle{}, fmt.Errorf("invalid use of indexed identifier, unknown builtin function %s", name)
+	}
+	if len(c.functions[name]) == 0 {
+		if len(args) == 0 {
+			return ast.ASTHandle{}, fmt.Errorf("unknown constant %s", name)
+		}
+		return ast.ASTHandle{}, fmt.Errorf("unknown function/constant %s", name)
 	}
 	// Source func_decls::find returns the sole declaration directly. MkApp
 	// then validates arity and performs the manager's arithmetic coercions.

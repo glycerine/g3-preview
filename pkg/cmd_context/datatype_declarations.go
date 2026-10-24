@@ -30,7 +30,7 @@ func (c *Context) DeclareDatatypes(definitions []ast.DatatypeDefinition) (result
 			return e
 		}
 		names[i] = name
-		if _, found := c.sorts[name]; found || seen[name] || name == "Bool" || name == "Int" || name == "Real" || name == "Array" || name == "BitVec" || name == "String" {
+		if _, found := c.sorts[name]; found || seen[name] || c.BuiltinSortAvailable(name) {
 			return fmt.Errorf("sort already defined %s", name)
 		}
 		seen[name] = true
@@ -83,6 +83,9 @@ func (c *Context) DeclareDatatypes(definitions []ast.DatatypeDefinition) (result
 
 func (c *Context) insertDatatypeFunction(d ast.ASTHandle) error {
 	m := c.manager
+	if err := c.logicChecker.CheckDeclaration(d); err != nil {
+		return err
+	}
 	symbol, err := m.GetASTName(d)
 	if err != nil {
 		return err
