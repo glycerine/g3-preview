@@ -2297,6 +2297,7 @@
         "sat_solver_propagation_control.go",
         "sat_solver_propagation_trace.go",
         "sat_solver_report_params.go",
+        "sat_solver_results_boundary.go",
         "sat_solver_runtime.go",
         "sat_solver_scalar_runtime.go",
         "sat_solver_search.go",
@@ -2345,6 +2346,7 @@
         "tactic/core",
         "util/lbool",
         "util/memory",
+        "util/messages",
         "util/params",
         "util/statistics",
         "util/symbol",
@@ -2354,6 +2356,8 @@
       "production_files": [
         "preprocess.go",
         "solver.go",
+        "solver_consequences.go",
+        "solver_interface.go",
         "solver_model.go"
       ]
     },

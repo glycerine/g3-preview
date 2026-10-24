@@ -34,19 +34,21 @@ type checkWork struct {
 	original    map[ast.ASTHandle]ast.ASTHandle
 }
 
-// Solver is the retained incremental SAT state machine. Consequence/mutex,
-// weighted-display and complete solver.Solver factory integration are separate
-// remaining source operations. A nonnil partial constructor result must close.
+// Solver is the retained incremental SAT state machine. Weighted-display,
+// diagnostics and strategy factory integration remain separate operations.
+// A nonnil partial constructor result must close.
 type Solver struct {
 	self                         *Solver
 	manager                      *ast.ASTManager
 	services                     model.ModelEvaluatorConfig
+	targetServices               func(*ast.ASTManager) (model.ModelEvaluatorConfig, error)
 	runtime                      *sat.Runtime
 	core                         *sat.Solver
 	encoder                      *IncrementalEncoder
 	baseParams, internalParams   uparams.ParamsRef
 	baseReady, internalReady     bool
 	formulas, tracked, unsatCore []ast.ASTHandle
+	consequences                 []ast.ASTHandle
 	head                         uint32
 	scopes                       []solverScope
 	assumptions                  []sat.Literal
@@ -58,6 +60,7 @@ type Solver struct {
 	lastGoal                     *tactic.Goal
 	goals                        []*tactic.Goal
 	checks                       []*checkWork
+	translations                 []*solverTranslation
 	failures                     []memory.ConstructionFailure
 	status                       lbool.LBool
 	unknown                      string
@@ -66,7 +69,17 @@ type Solver struct {
 	closed                       bool
 }
 
+type IncrementalSolverConfig struct {
+	Services       model.ModelEvaluatorConfig
+	TargetServices func(*ast.ASTManager) (model.ModelEvaluatorConfig, error)
+}
+
 func NewIncrementalSolver(m *ast.ASTManager, p *uparams.ParamsRef, services model.ModelEvaluatorConfig) (*Solver, error) {
+	return NewIncrementalSolverWithConfig(m, p, IncrementalSolverConfig{Services: services})
+}
+
+func NewIncrementalSolverWithConfig(m *ast.ASTManager, p *uparams.ParamsRef, config IncrementalSolverConfig) (*Solver, error) {
+	services := config.Services
 	c, g := services.Context, services.Globals
 	if m == nil || c == nil || g == nil || g.Context != c || services.Memory == nil || services.Cooperation == nil {
 		return nil, ast.ErrASTHandle
@@ -78,7 +91,7 @@ func NewIncrementalSolver(m *ast.ASTManager, p *uparams.ParamsRef, services mode
 	if err := m.Budget().Reserve(n); err != nil {
 		return nil, err
 	}
-	s := &Solver{manager: m, services: services, header: n, unknown: "no reason given", status: lbool.Undef}
+	s := &Solver{manager: m, services: services, targetServices: config.TargetServices, header: n, unknown: "no reason given", status: lbool.Undef}
 	s.self = s
 	var err error
 	s.baseParams, err = c.NewValue()
@@ -191,6 +204,9 @@ func (s *Solver) Close() error {
 	if s.closed {
 		return nil
 	}
+	if err := s.drainTranslations(); err != nil {
+		return err
+	}
 	for len(s.failures) > 0 {
 		i := len(s.failures) - 1
 		if err := s.failures[i].Cleanup(); err != nil {
@@ -227,7 +243,7 @@ func (s *Solver) Close() error {
 	if err := s.drainGoals(); err != nil {
 		return err
 	}
-	for _, roots := range []*[]ast.ASTHandle{&s.unsatCore, &s.tracked, &s.formulas} {
+	for _, roots := range []*[]ast.ASTHandle{&s.consequences, &s.unsatCore, &s.tracked, &s.formulas} {
 		if err := releaseRoots(s.manager, roots, 0); err != nil {
 			return err
 		}

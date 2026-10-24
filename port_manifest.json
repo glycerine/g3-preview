@@ -100474,7 +100474,12 @@
         "pkg/sat/tactic/sat_boolean_model.go",
         "pkg/sat/tactic/sat_tactic_trace.go",
         "pkg/tactic/core/simplify_tactic.go",
-        "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
+        "pkg/tactic/core/simplify_stopped_cleanup_release_test.go",
+        "pkg/sat/sat_solver/solver_consequences.go",
+        "pkg/sat/sat_solver/solver_consequences_test.go",
+        "pkg/sat/sat_solver/solver_interface.go",
+        "pkg/sat/sat_solver/solver_interface_test.go",
+        "pkg/sat/sat_solver_results_boundary.go"
       ],
       "tests": [
         "TestIncrementalSolverChecksScopesAndModelsCPP",
@@ -100491,7 +100496,15 @@
         "TestSATGoalBorrowedAtomMapIncrementalScopesAndOwnership",
         "TestSATGoalBorrowedAtomMapDependenciesAndPerCallInterpretedAtoms",
         "TestSATGoalBorrowedAtomMapBooleanModelIncludesEarlierAtoms",
-        "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction"
+        "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction",
+        "TestIncrementalSolverConsequencesCPP",
+        "TestIncrementalSolverWideConsequencesCPP",
+        "TestIncrementalSolverConsequencesTrackedScopes",
+        "TestIncrementalSolverMutexesPendingAndSigned",
+        "TestIncrementalSolverConsequenceAndMutexAllocationFrontiers",
+        "TestIncrementalSolverTranslationOriginalRootsAndTargetServices",
+        "TestIncrementalSolverTranslationAllocationFrontiers",
+        "TestIncrementalSolverSolverTacticIntegration"
       ],
       "assertions": [
         {
@@ -100660,7 +100673,53 @@
           ]
         },
         {
-          "name": "Complete solver.Solver factory/facade, translation, consequences/mutexes, weighted display and remaining trace/verbose/DIMACS diagnostics",
+          "name": "Specialized SAT consequences and mutexes: mapped Boolean/BV variables, complete fixed-value reconstruction, source literal-set LIFO premises, assumption cores, scoped trackers and signed binary-clause cliques; trace sites remain",
+          "status": "partial",
+          "go_targets": [
+            "pkg/sat/sat_solver/solver.go",
+            "pkg/sat/sat_solver/solver_consequences.go",
+            "pkg/sat/sat_solver/solver_consequences_test.go",
+            "pkg/sat/sat_solver/solver_interface.go",
+            "pkg/sat/sat_solver/solver_interface_test.go",
+            "pkg/sat/sat_solver_results_boundary.go"
+          ],
+          "tests": [
+            "TestIncrementalSolverConsequencesCPP",
+            "TestIncrementalSolverWideConsequencesCPP",
+            "TestIncrementalSolverConsequencesTrackedScopes",
+            "TestIncrementalSolverMutexesPendingAndSigned",
+            "TestIncrementalSolverConsequenceAndMutexAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Base-level translation of original formulas and trackers, original non-base refusal, independent target services and explicit partial-target ownership",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/sat_solver/solver.go",
+            "pkg/sat/sat_solver/solver_interface.go",
+            "pkg/sat/sat_solver/solver_interface_test.go"
+          ],
+          "tests": [
+            "TestIncrementalSolverTranslationOriginalRootsAndTargetServices",
+            "TestIncrementalSolverTranslationAllocationFrontiers",
+            "TestIncrementalSolverSolverTacticIntegration"
+          ]
+        },
+        {
+          "name": "Concrete solver.Solver interface and mk_inc_sat_solver constructor, source inherited preferred_sat/display and integration with the existing solver2tactic adapter",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/sat_solver/solver.go",
+            "pkg/sat/sat_solver/solver_interface.go",
+            "pkg/sat/sat_solver/solver_interface_test.go"
+          ],
+          "tests": [
+            "TestIncrementalSolverTranslationOriginalRootsAndTargetServices",
+            "TestIncrementalSolverSolverTacticIntegration"
+          ]
+        },
+        {
+          "name": "Weighted display/inc_sat_display and remaining trace/verbose/DIMACS diagnostics; QF_UFBV backend/strategy registration is a separate consumer port",
           "status": "unported",
           "go_targets": [],
           "tests": []
@@ -100668,20 +100727,29 @@
       ],
       "ownership": [
         "The partial encoder borrows the actual SAT core and evaluator services. It owns copied internal parameters, scoped Expr2Var, persistent bit blaster, counted preprocessing composition, last result and per-compilation translator. Pending partial constructors and concrete child closers remain owned across stopped reset/destruction. Translation temporaries borrow the scoped atom map rather than duplicating its roots.",
-        "The incremental Solver owns its SAT runtime/core/encoder, copied base and internal parameters, original formula/tracker/core roots, latest compiled input goal and counted model/converter chain. Lexical assumption, model, evaluator and format owners remain reachable across stopped cleanup. Models returned through AcquireModel hold independent counted references. Constructor/check/complex-assumption/model/repeated-model/interpreted-atom reservation frontiers reach success with zero charged storage after fixture destruction. Full factory/consequence/translation ownership auditing remains incomplete."
+        "The incremental Solver owns its SAT runtime/core/encoder, copied base and internal parameters, original formula/tracker/core roots, latest compiled input goal and counted model/converter chain. Lexical assumption, model, evaluator and format owners remain reachable across stopped cleanup. Models returned through AcquireModel hold independent counted references. Constructor/check/complex-assumption/model/repeated-model/interpreted-atom reservation frontiers reach success with zero charged storage after fixture destruction. Consequence expressions remain rooted until the next consequence call or solver destruction. Failed translated targets and AST translators remain reachable through the source solver; returned solvers borrow the selected target services. Consequence/repeated-query, mutex and same/different-manager translation allocation frontiers reach success with zero charged storage after cleanup. Weighted-display and remaining diagnostic ownership auditing remain incomplete."
       ],
       "deviations": [
-        "The concrete Solver implements assertion/check/core/model state, but does not yet implement the complete solver.Solver interface: translation, consequences, mutexes, weighted display and remaining diagnostics are outstanding. No fallback facade or substituted tactic-only solver is supplied. Source base and derived m_params shadowing is preserved: user settings update the base snapshot while the SAT core receives internal elim_vars=false. Native Go maps and concrete Expr2Var replace source project containers without porting source hashing.",
-        "Source accumulates bit-blaster model converters across checks/scopes. That chain is preserved; original BV interpretations are reconstructed before bit constants are filtered. Source retains the previous unsat core on a later SAT check and permanently asserts equality guards for complex assumptions. Incomplete failed model conversion stays owned for Close and is explicitly pending rather than exposing a half-converted model. Unsupported-atom reason formatting preserves the vector printer's leading line break."
+        "The concrete class now implements solver.Solver through the actual SAT algorithms and original-formula translation, with independent target-service resolution for distinct parameter/numeral owners. Weighted display and remaining diagnostics are outstanding; no complete-source claim is made. No fallback facade or substituted tactic-only solver is supplied. Source base/derived parameter shadowing is preserved. Native Go maps, concrete Expr2Var and insertion-ordered index dictionaries replace source project containers without porting source hashing.",
+        "Source accumulates bit-blaster model converters across checks/scopes. That chain is preserved; original BV interpretations are reconstructed before bit constants are filtered. Source retains the previous unsat core on a later SAT check and permanently asserts equality guards for complex assumptions. Incomplete failed model conversion stays owned for Close and is explicitly pending rather than exposing a half-converted model. Unsupported-atom reason formatting preserves the vector printer's leading line break.",
+        "Source SAT antecedent index_set is an unordered hashtable, while the Go SAT core uses approved insertion-ordered insdict. Multi-premise conjunction order can therefore differ. C++ consequence comparisons normalize only conjunction operand order, preserving all other syntax, values, premise membership and result order. The incremental source literal_set LIFO extraction order itself is preserved."
       ]
     },
     {
       "path": "src/sat/sat_solver/inc_sat_solver.h",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/sat/sat_solver/solver.go",
+        "pkg/sat/sat_solver/solver_interface.go",
+        "pkg/sat/sat_solver/solver_interface_test.go"
+      ],
+      "tests": [
+        "TestIncrementalSolverTranslationOriginalRootsAndTargetServices",
+        "TestIncrementalSolverTranslationAllocationFrontiers",
+        "TestIncrementalSolverSolverTacticIntegration"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -100694,9 +100762,34 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "mk_inc_sat_solver: concrete counted solver.Solver owner, original source state and independently resolved translation services",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/sat_solver/solver.go",
+            "pkg/sat/sat_solver/solver_interface.go",
+            "pkg/sat/sat_solver/solver_interface_test.go"
+          ],
+          "tests": [
+            "TestIncrementalSolverTranslationOriginalRootsAndTargetServices",
+            "TestIncrementalSolverTranslationAllocationFrontiers",
+            "TestIncrementalSolverSolverTacticIntegration"
+          ]
+        },
+        {
+          "name": "inc_sat_display weighted output wrapper",
+          "status": "unported",
+          "go_targets": [],
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "A nonnil partial constructor result must close. The solver owns its SAT runtime/core/encoder and counted results while evaluator services are borrowed. Translation returns an independent solver; stopped translated constructors remain reachable for cleanup."
+      ],
+      "deviations": [
+        "The factory constructor and complete solver.Solver interface are implemented; the header remains partial because inc_sat_display is still unported."
+      ]
     },
     {
       "path": "src/sat/sat_types.h",
