@@ -1,0 +1,8 @@
+(set-logic QF_UF)
+(set-option :produce-proofs true)
+(declare-const p Bool)
+(assert p)
+(assert (not p))
+(check-sat-using aig)
+(get-info :reason-unknown)
+(check-sat-using (or-else aig smt))

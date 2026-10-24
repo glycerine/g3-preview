@@ -129158,10 +129158,19 @@
       "path": "src/tactic/aig/aig_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/aig/aig_tactic.go",
-        "pkg/tactic/aig/aig_tactic_memory_trace.go"
+        "pkg/tactic/aig/aig_tactic_memory_trace.go",
+        "pkg/tactic/aig/aig_tactic_adapter.go",
+        "pkg/tactic/aig/aig_tactic_adapter_test.go",
+        "pkg/tactic/aig/aig_tactic_test.go",
+        "pkg/tactic/aig/aig_checkpoint_test.go",
+        "pkg/tactic/aig/aig_tactic_assert_debug_test.go",
+        "pkg/tactic/aig/aig_tactic_memory_trace_debug_test.go",
+        "pkg/tactic/aig/aig_constructor_memory_prefix_debug_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestAIGPassPerAssertionPreservesDependenciesAndDepth",
@@ -129171,7 +129180,10 @@
         "TestAIGPassCollectParamDescrsSourceOrderAndMetadata",
         "TestAIGPassSourceEntryWellSortedAssertionPrecedesManager",
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
-        "TestAIGTacticConstructorFailureMemoryTracePrefixes"
+        "TestAIGTacticConstructorFailureMemoryTracePrefixes",
+        "TestAIGTacticCPPGoalShapes",
+        "TestAIGTacticBorrowedGoalsPolicyAndTranslation",
+        "TestAIGTacticAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -129183,12 +129195,12 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "aig_tactic per-assertion and whole-goal rewrite, proof/core guards and result depth",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/aig/aig_tactic.go",
           "tests": [
             "TestAIGPassPerAssertionPreservesDependenciesAndDepth",
@@ -129198,7 +129210,7 @@
         },
         {
           "name": "updt_params max_memory sentinel/megabytes, gate encoding and per-assertion branch selection",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/aig/aig_tactic.go",
           "tests": [
             "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch"
@@ -129214,7 +129226,7 @@
         },
         {
           "name": "SASSERT goal well-sorted checks before and after rewriting under the process debug switch",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/aig/aig_tactic.go",
           "tests": [
             "TestAIGPassSourceEntryWellSortedAssertionPrecedesManager",
@@ -129223,35 +129235,63 @@
         },
         {
           "name": "mk_aig_manager source alloc/dealloc wrapper over concrete per-application AIG manager",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/aig/aig_tactic_memory_trace.go",
           "tests": [
             "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
             "TestAIGTacticConstructorFailureMemoryTracePrefixes"
           ]
+        },
+        {
+          "name": "Manager-independent standard tactic factory, scalar parameter snapshots, copied scalar translation, refcount lifecycle, pre-result-reset proof refusal, borrowed result ownership and source clean wrapper/SMT-LIB registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_tactic_adapter.go",
+          "go_targets": [
+            "pkg/tactic/aig/aig_tactic_adapter_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestAIGTacticCPPGoalShapes",
+            "TestAIGTacticBorrowedGoalsPolicyAndTranslation",
+            "TestAIGTacticAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
-        "Each Apply call owns a fresh AIG manager and closes its intermediate AIG and AST references after goal updates. The returned goal has one additional owner reference."
+        "The standard tactic owns its scalar policy and header while borrowing parameter/cooperation services. Each application creates and destroys an AIG manager using the goal AST manager. Borrowed result goals do not consume the caller reference; the legacy Pass API still returns its independent owning reference. Stopped manager/ref cleanup remains attached to Pass for retry by Cleanup/Close. Translation copies the three policy scalars into a fresh tactic and does not retain application state or AST-manager identity. Constructor and both per-assertion/whole-goal allocation campaigns release all charged storage after fixture teardown."
       ],
       "deviations": [
-        "Pass reads source max_memory, gate-encoding and per-assertion parameters, and binds memory/cancellation/cooperation checkpoints to its fresh AIG manager. Its descriptor collector registers source-ordered max_memory and aig_per_assertion metadata through util/params. The source SASSERT gate now checks goal well-sortedness at both source positions; a malformed entry goal reaches the process debug failure before manager construction. The tactic's alloc/dealloc memory wrapper and separate aig_manager::imp owner emit source-ordered records over independently charged Go owners. Constructor-refusal wrapper and imp allocation records now occur before child construction; translation, generated registration, display and bound assertion action continuations remain open."
+        "Explicit parameter and cooperation services replace source process globals. The standard tactic is manager-independent like the source class; applying or translating checks the shared symbol/numeral services. Whole-goal core refusal remains after result reset and AIG-manager construction; proof refusal remains before result reset.",
+        "Native Go cleanup keeps stopped destructor owners reachable for retry; successful Cleanup remains a no-op. The existing concrete Pass keeps its owning-result API, while the standard adapter uses the shared rewrite body and publishes a borrowed goal. Source entry well-sorted assertions precede report/manager construction.",
+        "The source descriptor intentionally exposes max_memory and aig_per_assertion, while aig_default_gate_encoding remains usable through direct parameter updates without adding an unsupported descriptor. SAT tactic and final strategy wiring remain separate units."
       ]
     },
     {
       "path": "src/tactic/aig/aig_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/tactic/aig/aig_tactic.go"
+        "pkg/tactic/aig/aig_tactic.go",
+        "pkg/tactic/aig/aig_tactic_adapter.go",
+        "pkg/tactic/aig/aig_tactic_adapter_test.go",
+        "pkg/tactic/aig/aig_tactic_test.go",
+        "pkg/tactic/aig/aig_checkpoint_test.go",
+        "pkg/tactic/aig/aig_tactic_assert_debug_test.go",
+        "pkg/tactic/aig/aig_tactic_memory_trace_debug_test.go",
+        "pkg/tactic/aig/aig_constructor_memory_prefix_debug_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestAIGPassPerAssertionPreservesDependenciesAndDepth",
         "TestAIGPassWholeGoalCombinesAndRejectsCore",
         "TestAIGPassRejectsProofBeforeGoalMutation",
         "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch",
-        "TestAIGPassCollectParamDescrsSourceOrderAndMetadata"
+        "TestAIGPassCollectParamDescrsSourceOrderAndMetadata",
+        "TestAIGTacticCPPGoalShapes",
+        "TestAIGTacticBorrowedGoalsPolicyAndTranslation",
+        "TestAIGTacticAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -129263,25 +129303,41 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "mk_aig_tactic concrete construction and goal application",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/aig/aig_tactic.go",
           "tests": [
             "TestAIGPassPerAssertionPreservesDependenciesAndDepth",
             "TestAIGPassWholeGoalCombinesAndRejectsCore",
             "TestAIGPassRejectsProofBeforeGoalMutation"
           ]
+        },
+        {
+          "name": "Manager-independent standard tactic factory, scalar parameter snapshots, copied scalar translation, refcount lifecycle, pre-result-reset proof refusal, borrowed result ownership and source clean wrapper/SMT-LIB registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_tactic_adapter.go",
+          "go_targets": [
+            "pkg/tactic/aig/aig_tactic_adapter_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestAIGTacticCPPGoalShapes",
+            "TestAIGTacticBorrowedGoalsPolicyAndTranslation",
+            "TestAIGTacticAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
-        "Pass borrows the goal and constructs a per-application AIG manager; source registration and params_ref ownership remain open."
+        "The standard tactic owns its scalar policy and header while borrowing parameter/cooperation services. Each application creates and destroys an AIG manager using the goal AST manager. Borrowed result goals do not consume the caller reference; the legacy Pass API still returns its independent owning reference. Stopped manager/ref cleanup remains attached to Pass for retry by Cleanup/Close. Translation copies the three policy scalars into a fresh tactic and does not retain application state or AST-manager identity. Constructor and both per-assertion/whole-goal allocation campaigns release all charged storage after fixture teardown."
       ],
       "deviations": [
-        "Concrete Pass constructor, parameter updater and descriptor collector serve direct Go callers; generated registration remains open."
+        "Explicit parameter and cooperation services replace source process globals. The standard tactic is manager-independent like the source class; applying or translating checks the shared symbol/numeral services. Whole-goal core refusal remains after result reset and AIG-manager construction; proof refusal remains before result reset.",
+        "Native Go cleanup keeps stopped destructor owners reachable for retry; successful Cleanup remains a no-op. The existing concrete Pass keeps its owning-result API, while the standard adapter uses the shared rewrite body and publishes a borrowed goal. Source entry well-sorted assertions precede report/manager construction.",
+        "The source descriptor intentionally exposes max_memory and aig_per_assertion, while aig_default_gate_encoding remains usable through direct parameter updates without adding an unsupported descriptor. SAT tactic and final strategy wiring remain separate units."
       ]
     },
     {

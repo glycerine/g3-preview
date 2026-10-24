@@ -21,6 +21,8 @@ type Pass struct {
 	maxMemory           uint64
 	cooperation         *cooperate.Cooperation
 	paramsSymbols       *usymbol.Manager
+	manager             *Manager
+	pendingRefs         []*Ref
 }
 
 func NewPass() *Pass {
@@ -77,9 +79,39 @@ func (p *Pass) BindCooperation(owner *cooperate.Cooperation) error {
 
 func (p *Pass) closeManager(m *Manager) error {
 	if err := m.Close(); err != nil {
+		p.manager = m
 		return err
 	}
 	m.traceTacticDeallocated()
+	if p.manager == m {
+		p.manager = nil
+	}
+	return nil
+}
+
+func (p *Pass) closeRef(r *Ref) error {
+	err := r.Close()
+	if err != nil && !r.closed {
+		p.pendingRefs = append(p.pendingRefs, r)
+	}
+	return err
+}
+
+// Close retries a stopped application destructor. Successful applications
+// have no retained manager or references, matching source cleanup's no-op.
+func (p *Pass) Close() error {
+	if p == nil {
+		return ErrOwner
+	}
+	for len(p.pendingRefs) > 0 {
+		if err := p.pendingRefs[0].Close(); err != nil {
+			return err
+		}
+		p.pendingRefs = p.pendingRefs[1:]
+	}
+	if p.manager != nil {
+		return p.closeManager(p.manager)
+	}
 	return nil
 }
 
@@ -105,12 +137,12 @@ func (p *Pass) rewriteOne(m *Manager, g *tactic.Goal, i uint32) (err error) {
 	if err != nil {
 		return err
 	}
-	defer func() { err = errors.Join(err, r.Close()) }()
+	defer func() { err = errors.Join(err, p.closeRef(r)) }()
 	shared, err := m.MaxSharing(r)
 	if err != nil {
 		return err
 	}
-	closeErr := r.Close()
+	closeErr := p.closeRef(r)
 	r = shared
 	if closeErr != nil {
 		return closeErr
@@ -154,7 +186,7 @@ func (p *Pass) rewriteGoal(m *Manager, g *tactic.Goal) (err error) {
 	if err != nil {
 		return err
 	}
-	defer func() { err = errors.Join(err, r.Close()) }()
+	defer func() { err = errors.Join(err, p.closeRef(r)) }()
 	if err = g.Reset(); err != nil {
 		return err
 	}
@@ -162,7 +194,7 @@ func (p *Pass) rewriteGoal(m *Manager, g *tactic.Goal) (err error) {
 	if err != nil {
 		return err
 	}
-	closeErr := r.Close()
+	closeErr := p.closeRef(r)
 	r = shared
 	if closeErr != nil {
 		return closeErr
@@ -170,66 +202,69 @@ func (p *Pass) rewriteGoal(m *Manager, g *tactic.Goal) (err error) {
 	return m.ToGoal(r, g)
 }
 
-// Apply rewrites the input goal in place and returns an additional owning
-// goal reference, matching goal_ref_buffer::push_back in the source tactic.
-func (p *Pass) Apply(g *tactic.Goal) (out *tactic.Goal, err error) {
-	defer func() {
-		if err != nil && out != nil {
-			err = errors.Join(err, out.DecRef())
-			out = nil
-		}
-	}()
+func (p *Pass) apply(g *tactic.Goal) (err error) {
 	if p == nil || g == nil {
-		return nil, ErrOwner
+		return ErrOwner
 	}
 	if err = g.CheckOwner(); err != nil {
-		return nil, err
+		return err
 	}
 	if p.paramsSymbols != nil && p.paramsSymbols != g.Manager().Symbols {
-		return nil, ErrOwner
+		return ErrOwner
 	}
 	proofs, err := g.ProofsEnabled()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if proofs {
-		return nil, tactic.NewTacticException("aig does not support proof production")
+		return tactic.NewTacticException("aig does not support proof production")
+	}
+	if err = p.Close(); err != nil {
+		return err
+	}
+	if err = assertGoalWellSorted(g, 69); err != nil {
+		return err
 	}
 	report, err := tactic.NewTacticReport("aig", g)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if report != nil {
 		defer func() { err = errors.Join(err, report.Close()) }()
 	}
-	if err = assertGoalWellSorted(g, 69); err != nil {
-		return nil, err
-	}
 	m, err := newManagerWithGateEncoding(g.Manager(), p.DefaultGateEncoding, true)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if err = m.SetMaxMemory(p.maxMemory); err != nil {
-		return nil, errors.Join(err, p.closeManager(m))
+		return errors.Join(err, p.closeManager(m))
 	}
 	if p.cooperation != nil {
 		if err = m.BindCooperation(p.cooperation); err != nil {
-			return nil, errors.Join(err, p.closeManager(m))
+			return errors.Join(err, p.closeManager(m))
 		}
 	}
 	if err = p.rewriteGoal(m, g); err != nil {
-		return nil, errors.Join(err, p.closeManager(m))
+		return errors.Join(err, p.closeManager(m))
 	}
 	if err = assertGoalWellSorted(g, 90); err != nil {
-		return nil, errors.Join(err, p.closeManager(m))
+		return errors.Join(err, p.closeManager(m))
 	}
 	if err = p.closeManager(m); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Apply rewrites the goal and returns the independent source goal reference.
+func (p *Pass) Apply(g *tactic.Goal) (*tactic.Goal, error) {
+	if err := p.apply(g); err != nil {
 		return nil, err
 	}
-	if err = g.IncDepth(); err != nil {
+	if err := g.IncDepth(); err != nil {
 		return nil, err
 	}
-	if err = g.IncRef(); err != nil {
+	if err := g.IncRef(); err != nil {
 		return nil, err
 	}
 	return g, nil

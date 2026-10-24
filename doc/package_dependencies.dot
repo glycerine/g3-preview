@@ -114,6 +114,7 @@ digraph packages {
   "cmd_context" -> "smtcore";
   "cmd_context" -> "solver";
   "cmd_context" -> "tactic";
+  "cmd_context" -> "tactic/aig";
   "cmd_context" -> "tactic/arith";
   "cmd_context" -> "tactic/bv";
   "cmd_context" -> "tactic/core";

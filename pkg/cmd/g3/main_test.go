@@ -80,6 +80,11 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"aig_models_scopes.smt2":                       "sat\n((p true) (q false) (r false))\nunsat\nsat\n((p true) (q false) (r false))\n",
+	"aig_core_modes.smt2":                          "unknown\n(:reason-unknown \"aig does not support unsat core production\")\nunsat\n(nq choice np)\n",
+	"aig_proof_guard.smt2":                         "unknown\n(:reason-unknown \"aig does not support proof production\")\nunsat\n",
+	"aig_memory_recovery.smt2":                     "unknown\n(:reason-unknown \"max. memory exceeded\")\nsat\n(((or p q) true))\n",
+	"aig_bit_blast_pipeline.smt2":                  "sat\n((x 1) (y 1) (z 1) (w 1))\n",
 	"bit_blast_division_refusal.smt2":              "unknown\n(:reason-unknown \"operator is not supported, you must simplify the goal before applying bit-blasting\")\nsat\n((x #x6) (y #x3))\n",
 	"bit_blast_disabled_arithmetic.smt2":           "sat\n((x #x1) (y #x2))\n",
 	"bit_blast_full_uf.smt2":                       "sat\n((x #x2) ((= (f x) #x5) true))\n",

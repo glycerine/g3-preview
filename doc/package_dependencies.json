@@ -872,6 +872,7 @@
         "smtcore",
         "solver",
         "tactic",
+        "tactic/aig",
         "tactic/arith",
         "tactic/bv",
         "tactic/core",
@@ -2773,6 +2774,7 @@
         "aig_max_sharing_trace.go",
         "aig_simplify.go",
         "aig_tactic.go",
+        "aig_tactic_adapter.go",
         "aig_tactic_memory_trace.go"
       ]
     },

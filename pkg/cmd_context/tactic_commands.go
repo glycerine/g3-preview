@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/tactic/aig"
 	"github.com/glycerine/g3/pkg/tactic/arith"
 	"github.com/glycerine/g3/pkg/tactic/bv"
 	"github.com/glycerine/g3/pkg/tactic/core"
@@ -39,7 +40,7 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return nil, err
 	}
 	switch name {
-	case "smt", "simplify", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
+	case "smt", "simplify", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -62,6 +63,8 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return bv.MakeMaxBVSharingTactic(m, c.config.Params, nil, c.config.ModelEvaluator.Cooperation)
 	case "bit-blast":
 		return bv.MakeBitBlasterTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator.Cooperation)
+	case "aig":
+		return aig.MakeTactic(c.config.Params, nil, c.config.ModelEvaluator.Cooperation)
 	case "solve-eqs":
 		return core.MakeSolveEquationsTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
 	case "elim-uncnstr":
