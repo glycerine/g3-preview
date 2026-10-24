@@ -7,17 +7,19 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/messages"
-	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Engine is the concrete AST specialization of bit_blaster_tpl. Inputs borrow
 // their handles. Returned reference slices own their expressions and must be
 // released by the caller.
 type Engine struct {
-	config    *Config
-	maxMemory uint64
+	config      *Config
+	maxMemory   uint64
+	cooperation *cooperate.Cooperation
 }
 
 func NewEngine(config *Config) (*Engine, error) {
@@ -39,16 +41,35 @@ func (e *Engine) checkpoint() error {
 	if e == nil || e.config == nil || e.config.manager == nil {
 		return ast.ErrASTHandle
 	}
-	if e.config.manager.Budget().Used() > e.maxMemory {
-		return z3exception.NewDefaultException(messages.MaxMemory)
+	runtime := e.config.manager.NumeralService().RuntimeOwner()
+	used, err := runtime.AllocationSize()
+	if err != nil {
+		return err
+	}
+	if used > e.maxMemory {
+		return rewriter.NewRewriterException(messages.MaxMemory)
 	}
 	canceled, err := e.config.manager.Canceled()
 	if err != nil {
 		return err
 	}
 	if canceled {
-		return z3exception.NewDefaultException(messages.Canceled)
+		return rewriter.NewRewriterException(e.config.manager.ResourceLimit().CancelMessage())
 	}
+	if e.cooperation != nil {
+		return e.cooperation.Cooperate("bit-blaster")
+	}
+	return nil
+}
+
+func (e *Engine) BindCooperation(owner *cooperate.Cooperation) error {
+	if e == nil || e.config == nil || owner == nil {
+		return ast.ErrASTHandle
+	}
+	if _, err := owner.Enabled(); err != nil {
+		return err
+	}
+	e.cooperation = owner
 	return nil
 }
 

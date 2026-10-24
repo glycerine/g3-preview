@@ -1,0 +1,8 @@
+(set-logic QF_UFBV)
+(set-option :produce-models true)
+(declare-fun f ((_ BitVec 4)) (_ BitVec 4))
+(declare-const x (_ BitVec 4))
+(assert (= (f x) #x5))
+(assert (= x #x2))
+(check-sat-using (then (using-params bit-blast :blast_full true) smt))
+(get-value (x (= (f x) #x5)))

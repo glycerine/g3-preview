@@ -9,7 +9,7 @@ import (
 	parent "github.com/glycerine/g3/pkg/ast/rewriter"
 )
 
-var ErrUnsupportedOperator = errors.New("operator is not supported, you must simplify the goal before applying bit-blasting")
+var ErrUnsupportedOperator = parent.NewRewriterException("operator is not supported, you must simplify the goal before applying bit-blasting")
 
 func (r *BitBlasterRewriter) reduceNumeral(decl ast.ASTHandle, out ast.ASTRef) (result error) {
 	term, err := r.manager.RewriterMakeApp(decl, ast.SliceArguments(nil))
@@ -100,6 +100,9 @@ func (r *BitBlasterRewriter) blastBVTerm(term ast.ASTHandle, out ast.ASTRef) (re
 }
 
 func (r *BitBlasterRewriter) reduceApp(decl ast.ASTHandle, args ast.AppArguments, out ast.ASTRef) (parent.RewriteStatus, error) {
+	if err := r.traceApplication(decl, args, false); err != nil {
+		return parent.RewriteFailed, err
+	}
 	family, err := r.manager.GetFamilyID(decl)
 	if err != nil {
 		return parent.RewriteFailed, err
@@ -257,6 +260,9 @@ func (r *BitBlasterRewriter) reduceApp(decl ast.ASTHandle, args ast.AppArguments
 		case 55, 56, 57, 58:
 			return parent.RewriteFailed, nil
 		default:
+			if err := r.traceApplication(decl, args, true); err != nil {
+				return parent.RewriteFailed, err
+			}
 			return parent.RewriteFailed, ErrUnsupportedOperator
 		}
 	}

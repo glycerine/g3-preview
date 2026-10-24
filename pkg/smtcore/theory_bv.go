@@ -1452,12 +1452,10 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 		if argErr != nil {
 			return false, argErr
 		}
-		if isBV, bvErr := state.manager.IsBitVector(argument); bvErr != nil {
-			return false, bvErr
-		} else if isBV || op == 57 {
-			if argErr = state.Internalize(argument, false); argErr != nil {
-				return false, argErr
-			}
+		// Source process_args internalizes every argument in term context.
+		// MKBV's Boolean arguments need enodes too when BV reflection is on.
+		if argErr = state.Internalize(argument, false); argErr != nil {
+			return false, argErr
 		}
 	}
 	node := state.context.enodes[expression]

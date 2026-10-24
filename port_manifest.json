@@ -24925,7 +24925,7 @@
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_bv_bit_blaster.go",
         "pkg/ast/rewriter/bit_blaster/rewriter_core.go",
@@ -24933,7 +24933,11 @@
         "pkg/ast/rewriter/bit_blaster/rewriter_dispatch.go",
         "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go",
         "pkg/ast/rewriter/bit_blaster/gates.go",
-        "pkg/ast/rewriter/bool_rewriter_public.go"
+        "pkg/ast/rewriter/bool_rewriter_public.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_trace.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_proof_resources_test.go",
+        "pkg/tactic/bv/bit_blaster_tactic_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestASTBitBlasterBitFactories",
@@ -24944,7 +24948,12 @@
         "TestBitBlasterRewriterDispatcherDivisionPolicy",
         "TestBitBlasterRewriterTraversalAndStepAccounting",
         "TestBitBlasterRewriterBlastFullVariable",
-        "TestBitBlasterRewriterQuantifierExpansion"
+        "TestBitBlasterRewriterQuantifierExpansion",
+        "TestBitBlasterRewriterProofOutputAndConstantKeyLifetime",
+        "TestBitBlasterSourceProcessMemoryAndCooperation",
+        "TestBitBlasterTacticCPPGoalShapes",
+        "TestBitBlasterTacticAllocationFrontiers",
+        "TestSMTLibRunnerBitBlastStepFrontiers"
       ],
       "conditionals": [
         {
@@ -25129,7 +25138,7 @@
         },
         {
           "name": "full-term fallback, quantifier binding rewrite, traversal operator, cleanup and step accounting",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go",
           "tests": [
             "TestBitBlasterRewriterTraversalAndStepAccounting",
@@ -25138,36 +25147,59 @@
           ]
         },
         {
-          "name": "Source proof-enabled rewriter_tpl specialization/output proof and process-memory/cooperation resource callback fidelity remain incomplete: constructor currently always uses NewTraversal and callback reads arena budget usage",
-          "status": "partial",
+          "name": "Proof-selected traversal/output, source process-memory/cooperation guards, original declaration cache roots with retryable pop/destruction, distinct blaster_cfg XOR3/carry construction, typed unsupported exception and live dispatch traces",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bit_blaster/rewriter_core.go",
           "go_targets": [
-            "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go"
+            "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go",
+            "pkg/ast/rewriter/bit_blaster/rewriter_trace.go",
+            "pkg/ast/rewriter/bit_blaster/rewriter_dispatch.go",
+            "pkg/ast/rewriter/bit_blaster/gates.go",
+            "pkg/ast/rewriter/bit_blaster/rewriter_proof_resources_test.go",
+            "pkg/tactic/bv/bit_blaster_tactic_test.go",
+            "pkg/cmd/g3/main_test.go"
           ],
-          "evidence": "Direct implementation audit against bit_blaster_rewriter.cpp:140-145,625-635,682-684: source selects m.proofs_enabled(), checks memory::get_allocation_size(), and cooperates before the step guard; Go has no proof-output rewrite entry point and uses Budget().Used()."
+          "tests": [
+            "TestBitBlasterRewriterProofOutputAndConstantKeyLifetime",
+            "TestBitBlasterSourceProcessMemoryAndCooperation",
+            "TestBitBlasterTacticCPPGoalShapes",
+            "TestBitBlasterTacticAllocationFrontiers",
+            "TestSMTLibRunnerBitBlastStepFrontiers"
+          ]
         }
       ],
       "ownership": [
-        "Bit vectors use owning ASTRef slices. Constant-cache entries own one assembled mkbv reference and release entries in reverse insertion order on pop or close. Quantifier replacement bindings own AST references through the matching reduce-quantifier callback and are also retired by cleanup or close after interrupted traversal."
+        "Bit vectors use owning ASTRef slices. Constant-cache entries own one assembled mkbv reference and release entries in reverse insertion order on pop or close. Quantifier replacement bindings own AST references through the matching reduce-quantifier callback and are also retired by cleanup or close after interrupted traversal.",
+        "Constant cache keys now own original declaration references independently of generated MKBV values; traversal cleanup retains both source mapping vectors, while pop and destruction consume references through resumable roots. The proof-enabled source specialization and output surface are selected at construction."
       ],
       "deviations": [
-        "The concrete Go traversal is the existing no-proof specialization; all source callbacks produce null proofs. The private source Boolean reducer's flat=false and elim_and=true shape is retained by the configured gate adapter.",
-        "Completion audit reopened this unit on 2026-10-24 before bit-blast tactic integration: proof specialization/output and source process-memory/cooperation guards need implementation and focused verification. Existing no-proof algorithm tests do not prove that missing surface."
+        "The source proof/no-proof traversal specialization is selected at construction. Callbacks supply null local proofs and the original traversal constructs rewrite/congruence proofs. The rewriter's concrete gate configuration preserves flat=false, elim_and=true, right-associated XOR3 and unsorted carry construction independently of the SMT bit-blaster gate configuration."
       ]
     },
     {
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/bit_blaster/rewriter_core.go",
-        "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go"
+        "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_trace.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_dispatch.go",
+        "pkg/ast/rewriter/bit_blaster/gates.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_proof_resources_test.go",
+        "pkg/tactic/bv/bit_blaster_tactic_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestBitBlasterRewriterConstantCacheScopes",
         "TestBitBlasterRewriterGetBitsAndAssemble",
-        "TestBitBlasterRewriterTraversalAndStepAccounting"
+        "TestBitBlasterRewriterTraversalAndStepAccounting",
+        "TestBitBlasterRewriterProofOutputAndConstantKeyLifetime",
+        "TestBitBlasterSourceProcessMemoryAndCooperation",
+        "TestBitBlasterTacticCPPGoalShapes",
+        "TestBitBlasterTacticAllocationFrontiers",
+        "TestSMTLibRunnerBitBlastStepFrontiers"
       ],
       "conditionals": [
         {
@@ -25189,7 +25221,7 @@
         },
         {
           "name": "manager/step access, cleanup and rewrite operator",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go",
           "tests": [
             "TestBitBlasterRewriterGetBitsAndAssemble",
@@ -25197,21 +25229,32 @@
           ]
         },
         {
-          "name": "Source proof-enabled rewriter_tpl specialization/output proof and process-memory/cooperation resource callback fidelity remain incomplete: constructor currently always uses NewTraversal and callback reads arena budget usage",
-          "status": "partial",
+          "name": "Proof-selected traversal/output, source process-memory/cooperation guards, original declaration cache roots with retryable pop/destruction, distinct blaster_cfg XOR3/carry construction, typed unsupported exception and live dispatch traces",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bit_blaster/rewriter_core.go",
           "go_targets": [
-            "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go"
+            "pkg/ast/rewriter/bit_blaster/rewriter_traversal.go",
+            "pkg/ast/rewriter/bit_blaster/rewriter_trace.go",
+            "pkg/ast/rewriter/bit_blaster/rewriter_dispatch.go",
+            "pkg/ast/rewriter/bit_blaster/gates.go",
+            "pkg/ast/rewriter/bit_blaster/rewriter_proof_resources_test.go",
+            "pkg/tactic/bv/bit_blaster_tactic_test.go",
+            "pkg/cmd/g3/main_test.go"
           ],
-          "evidence": "Direct implementation audit against bit_blaster_rewriter.cpp:140-145,625-635,682-684: source selects m.proofs_enabled(), checks memory::get_allocation_size(), and cooperates before the step guard; Go has no proof-output rewrite entry point and uses Budget().Used()."
+          "tests": [
+            "TestBitBlasterRewriterProofOutputAndConstantKeyLifetime",
+            "TestBitBlasterSourceProcessMemoryAndCooperation",
+            "TestBitBlasterTacticCPPGoalShapes",
+            "TestBitBlasterTacticAllocationFrontiers",
+            "TestSMTLibRunnerBitBlastStepFrontiers"
+          ]
         }
       ],
       "ownership": [
-        "The Go owner borrows its AST manager and explicitly owns cached AST references until Pop or Close."
+        "The Go owner borrows its AST manager and explicitly owns cached AST references until Pop or Close.",
+        "Constant cache keys now own original declaration references independently of generated MKBV values; traversal cleanup retains both source mapping vectors, while pop and destruction consume references through resumable roots. The proof-enabled source specialization and output surface are selected at construction."
       ],
-      "deviations": [
-        "Completion audit reopened this unit on 2026-10-24 before bit-blast tactic integration: proof specialization/output and source process-memory/cooperation guards need implementation and focused verification. Existing no-proof algorithm tests do not prove that missing surface."
-      ]
+      "deviations": []
     },
     {
       "path": "src/ast/rewriter/bit_blaster/bit_blaster_tpl.h",
@@ -25227,7 +25270,9 @@
         "pkg/ast/rewriter/bit_blaster/engine_signed_division.go",
         "pkg/ast/rewriter/bit_blaster/engine_rotate.go",
         "pkg/ast/rewriter/bit_blaster/engine_multiplier.go",
-        "pkg/ast/rewriter/bit_blaster/engine_overflow.go"
+        "pkg/ast/rewriter/bit_blaster/engine_overflow.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_proof_resources_test.go",
+        "pkg/ast/rewriter/rewriter_types.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
@@ -25247,7 +25292,8 @@
         "TestBitBlasterMultiplierNumeralAndMinusOnePaths",
         "TestBitBlasterReachedDiscardedConstantCaseCircuit",
         "TestBitBlasterLoopCheckpointMemoryLimit",
-        "TestBitBlasterMultiplicationBoundsExhaustiveConstants"
+        "TestBitBlasterMultiplicationBoundsExhaustiveConstants",
+        "TestBitBlasterSourceProcessMemoryAndCooperation"
       ],
       "conditionals": [
         {
@@ -25316,6 +25362,18 @@
           "name": "Wallace-tree and Booth multiplier modes",
           "status": "dead_deleted",
           "reason": "No retained constructor enables m_use_wtm or m_use_bcm; the disabled radix-4 branch is also excluded by #if 1."
+        },
+        {
+          "name": "Template checkpoint reads source process allocation before cancellation and cooperate(bit-blaster), preserving typed rewriter_exception and source cancel message",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bit_blaster/rewriter_proof_resources_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestBitBlasterSourceProcessMemoryAndCooperation"
+          ]
         }
       ],
       "ownership": [
@@ -25341,7 +25399,9 @@
         "pkg/ast/rewriter/bit_blaster/engine_signed_division.go",
         "pkg/ast/rewriter/bit_blaster/engine_rotate.go",
         "pkg/ast/rewriter/bit_blaster/engine_multiplier.go",
-        "pkg/ast/rewriter/bit_blaster/engine_overflow.go"
+        "pkg/ast/rewriter/bit_blaster/engine_overflow.go",
+        "pkg/ast/rewriter/bit_blaster/rewriter_proof_resources_test.go",
+        "pkg/ast/rewriter/rewriter_types.go"
       ],
       "tests": [
         "TestBitBlasterArithmeticExhaustiveConstants",
@@ -25361,7 +25421,8 @@
         "TestBitBlasterMultiplierNumeralAndMinusOnePaths",
         "TestBitBlasterReachedDiscardedConstantCaseCircuit",
         "TestBitBlasterLoopCheckpointMemoryLimit",
-        "TestBitBlasterMultiplicationBoundsExhaustiveConstants"
+        "TestBitBlasterMultiplicationBoundsExhaustiveConstants",
+        "TestBitBlasterSourceProcessMemoryAndCooperation"
       ],
       "conditionals": [
         {
@@ -25632,6 +25693,18 @@
           "name": "Wallace-tree, Booth, and disabled radix-4 multiplier alternatives",
           "status": "dead_deleted",
           "reason": "Retained constructors leave m_use_wtm and m_use_bcm false, and the radix-4 source is under the inactive #else of #if 1."
+        },
+        {
+          "name": "Template checkpoint reads source process allocation before cancellation and cooperate(bit-blaster), preserving typed rewriter_exception and source cancel message",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bit_blaster/engine_arithmetic.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bit_blaster/rewriter_proof_resources_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestBitBlasterSourceProcessMemoryAndCooperation"
+          ]
         }
       ],
       "ownership": [
@@ -121543,7 +121616,8 @@
         "pkg/smtcore/smt_setup_bv_test.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/theory_bv_boolean_gates.go",
-        "pkg/smtcore/theory_bv_boolean_gates_test.go"
+        "pkg/smtcore/theory_bv_boolean_gates_test.go",
+        "pkg/smtcore/theory_bv_mkbv_test.go"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -121579,7 +121653,8 @@
         "TestSMTLibRunnerCPPReference",
         "TestSMTBitVectorLogicSetupProfiles",
         "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates",
-        "TestSMTBitVectorCarryXor3SourceClausesAndScopes"
+        "TestSMTBitVectorCarryXor3SourceClausesAndScopes",
+        "TestSMTBitVectorMKBVBooleanArgumentsEnodesAndScopes"
       ],
       "conditionals": [
         {
@@ -122036,6 +122111,18 @@
             "TestSMTBitVectorCarryXor3SourceClausesAndScopes",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "process_args internalizes all term arguments, including MKBV Boolean arguments before reflected enode construction; exact bit identity and scope rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_mkbv_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTBitVectorMKBVBooleanArgumentsEnodesAndScopes"
           ]
         }
       ],
@@ -133280,28 +133367,107 @@
       "path": "src/tactic/bv/bit_blaster_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/bv/bit_blaster_tactic.go",
+        "pkg/tactic/bv/bit_blaster_tactic_trace.go",
+        "pkg/tactic/bv/bit_blaster_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestBitBlasterTacticCPPGoalShapes",
+        "TestBitBlasterTacticLifecycleExternalRewriterAndTrace",
+        "TestBitBlasterTacticAllocationFrontiers",
+        "TestSMTLibRunnerBitBlastStepFrontiers"
+      ],
       "assertions": [
         {
           "line": 115,
           "text": "SASSERT(!m_rewriter);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Owned base rewriter and borrowed external-rewriter factory overload, copied parameters, live active-parameter forwarding, cleanup replacement, translation guard and refcount destruction",
+          "status": "ported",
+          "go_target": "pkg/tactic/bv/bit_blaster_tactic.go",
+          "go_targets": [
+            "pkg/tactic/bv/bit_blaster_tactic_trace.go",
+            "pkg/tactic/bv/bit_blaster_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestBitBlasterTacticCPPGoalShapes",
+            "TestBitBlasterTacticLifecycleExternalRewriterAndTrace",
+            "TestBitBlasterTacticAllocationFrontiers",
+            "TestSMTLibRunnerBitBlastStepFrontiers"
+          ]
+        },
+        {
+          "name": "Application proof/quantifier guard, sequential changed-only goal updates, step accumulation, dependency forwarding, conditional model converter, depth/result publication and rewriter cleanup",
+          "status": "ported",
+          "go_target": "pkg/tactic/bv/bit_blaster_tactic.go",
+          "go_targets": [
+            "pkg/tactic/bv/bit_blaster_tactic_trace.go",
+            "pkg/tactic/bv/bit_blaster_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestBitBlasterTacticCPPGoalShapes",
+            "TestBitBlasterTacticLifecycleExternalRewriterAndTrace",
+            "TestBitBlasterTacticAllocationFrontiers",
+            "TestSMTLibRunnerBitBlastStepFrontiers"
+          ]
+        },
+        {
+          "name": "Typed rewriter_exception catch to tactic_exception; source descriptors, inherited statistics/hooks, live pre/application/post traces and clean factory/SMT-LIB wiring",
+          "status": "ported",
+          "go_target": "pkg/tactic/bv/bit_blaster_tactic.go",
+          "go_targets": [
+            "pkg/tactic/bv/bit_blaster_tactic_trace.go",
+            "pkg/tactic/bv/bit_blaster_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestBitBlasterTacticCPPGoalShapes",
+            "TestBitBlasterTacticLifecycleExternalRewriterAndTrace",
+            "TestBitBlasterTacticAllocationFrontiers",
+            "TestSMTLibRunnerBitBlastStepFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns copied parameters, its base rewriter, output/proof references and retired implementations. The external rewriter overload borrows the caller owner, which survives tactic cleanup/destruction and retains scoped constant mappings. Model converters independently pin all original declarations and generated bit assemblies before cleanup retires rewriter state. Borrowed result goals remain owned by their original caller. Constructor, proof/model-enabled application and populated cleanup reservation-frontier campaigns release all charged roots."
+      ],
+      "deviations": [
+        "Explicit parameter/global/cooperation services replace source process globals. Concrete typed Go owners replace C++ placement allocation; stopped retirements stay available for retry. Native map iteration preserves the source obj_map lack of an ordering contract.",
+        "Both actual retained factory overloads are implemented, including the external rewriter consumed by src/sat/sat_solver/inc_sat_solver.cpp. Debug translation rejects an external rewriter; release translation constructs a new owned rewriter, as in source. AIG/SAT tactic and final strategy integration remain separate work."
+      ]
     },
     {
       "path": "src/tactic/bv/bit_blaster_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/bv/bit_blaster_tactic.go",
+        "pkg/tactic/bv/bit_blaster_tactic_trace.go",
+        "pkg/tactic/bv/bit_blaster_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestBitBlasterTacticCPPGoalShapes",
+        "TestBitBlasterTacticLifecycleExternalRewriterAndTrace",
+        "TestBitBlasterTacticAllocationFrontiers",
+        "TestSMTLibRunnerBitBlastStepFrontiers"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -133312,11 +133478,68 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Owned base rewriter and borrowed external-rewriter factory overload, copied parameters, live active-parameter forwarding, cleanup replacement, translation guard and refcount destruction",
+          "status": "ported",
+          "go_target": "pkg/tactic/bv/bit_blaster_tactic.go",
+          "go_targets": [
+            "pkg/tactic/bv/bit_blaster_tactic_trace.go",
+            "pkg/tactic/bv/bit_blaster_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestBitBlasterTacticCPPGoalShapes",
+            "TestBitBlasterTacticLifecycleExternalRewriterAndTrace",
+            "TestBitBlasterTacticAllocationFrontiers",
+            "TestSMTLibRunnerBitBlastStepFrontiers"
+          ]
+        },
+        {
+          "name": "Application proof/quantifier guard, sequential changed-only goal updates, step accumulation, dependency forwarding, conditional model converter, depth/result publication and rewriter cleanup",
+          "status": "ported",
+          "go_target": "pkg/tactic/bv/bit_blaster_tactic.go",
+          "go_targets": [
+            "pkg/tactic/bv/bit_blaster_tactic_trace.go",
+            "pkg/tactic/bv/bit_blaster_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestBitBlasterTacticCPPGoalShapes",
+            "TestBitBlasterTacticLifecycleExternalRewriterAndTrace",
+            "TestBitBlasterTacticAllocationFrontiers",
+            "TestSMTLibRunnerBitBlastStepFrontiers"
+          ]
+        },
+        {
+          "name": "Typed rewriter_exception catch to tactic_exception; source descriptors, inherited statistics/hooks, live pre/application/post traces and clean factory/SMT-LIB wiring",
+          "status": "ported",
+          "go_target": "pkg/tactic/bv/bit_blaster_tactic.go",
+          "go_targets": [
+            "pkg/tactic/bv/bit_blaster_tactic_trace.go",
+            "pkg/tactic/bv/bit_blaster_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestBitBlasterTacticCPPGoalShapes",
+            "TestBitBlasterTacticLifecycleExternalRewriterAndTrace",
+            "TestBitBlasterTacticAllocationFrontiers",
+            "TestSMTLibRunnerBitBlastStepFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns copied parameters, its base rewriter, output/proof references and retired implementations. The external rewriter overload borrows the caller owner, which survives tactic cleanup/destruction and retains scoped constant mappings. Model converters independently pin all original declarations and generated bit assemblies before cleanup retires rewriter state. Borrowed result goals remain owned by their original caller. Constructor, proof/model-enabled application and populated cleanup reservation-frontier campaigns release all charged roots."
+      ],
+      "deviations": [
+        "Explicit parameter/global/cooperation services replace source process globals. Concrete typed Go owners replace C++ placement allocation; stopped retirements stay available for retry. Native map iteration preserves the source obj_map lack of an ordering contract.",
+        "Both actual retained factory overloads are implemented, including the external rewriter consumed by src/sat/sat_solver/inc_sat_solver.cpp. Debug translation rejects an external rewriter; release translation constructs a new owned rewriter, as in source. AIG/SAT tactic and final strategy integration remain separate work."
+      ]
     },
     {
       "path": "src/tactic/bv/bv1_blaster_tactic.cpp",

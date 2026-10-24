@@ -46,7 +46,49 @@ func TestSMTLibRunnerMaxBVSharingStepFrontiers(t *testing.T) {
 	}
 }
 
+func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
+	reference := os.Getenv("G3_CPP_REFERENCE")
+	if reference == "" {
+		t.Skip("set G3_CPP_REFERENCE to prebuilt z3")
+	}
+	for limit := 0; limit <= 60; limit++ {
+		t.Run(fmt.Sprint(limit), func(t *testing.T) {
+			script := fmt.Sprintf(`(set-logic QF_BV)
+(declare-const a (_ BitVec 3))
+(declare-const b (_ BitVec 3))
+(declare-const c (_ BitVec 3))
+(assert (= (bvadd a b) c))
+(assert (= (bvmul a c) b))
+(check-sat-using (using-params bit-blast :max_steps %d))
+(get-info :reason-unknown)
+`, limit)
+			var actual bytes.Buffer
+			if err := run(strings.NewReader(script), &actual); err != nil {
+				t.Fatal(err, actual.String())
+			}
+			cmd := exec.Command(reference, "-in")
+			cmd.Stdin = strings.NewReader(script)
+			native, err := cmd.CombinedOutput()
+			if err != nil {
+				t.Fatal(err, string(native))
+			}
+			if canonicalOutput(actual.String()) != canonicalOutput(string(native)) {
+				t.Fatalf("Go: %s\nC++: %s", actual.String(), native)
+			}
+		})
+	}
+}
+
 var scriptResults = map[string]string{
+	"bit_blast_division_refusal.smt2":              "unknown\n(:reason-unknown \"operator is not supported, you must simplify the goal before applying bit-blasting\")\nsat\n((x #x6) (y #x3))\n",
+	"bit_blast_disabled_arithmetic.smt2":           "sat\n((x #x1) (y #x2))\n",
+	"bit_blast_full_uf.smt2":                       "sat\n((x #x2) ((= (f x) #x5) true))\n",
+	"bit_blast_models_scopes.smt2":                 "sat\n((x #x0d) (y #x03) ((bvudiv x y) #x04) ((bvurem x y) #x01))\nunsat\nsat\n((x #x0d) (y #x03))\n",
+	"bit_blast_cores.smt2":                         "unsat\n(yvalue sum xvalue)\n",
+	"bit_blast_limits.smt2":                        "unknown\n(:reason-unknown \"max. steps exceeded\")\nsat\n((x #x2))\n",
+	"bit_blast_proof_quant_guard.smt2":             "unknown\n(:reason-unknown \"quantified variable blasting does not support proof generation\")\nunsat\nunsat\n",
+	"bit_blast_quantified.smt2":                    "sat\n",
+	"bit_blast_pb_pipeline.smt2":                   "sat\n((x 1) (y 1) (z 1) (w 1))\n",
 	"max_bv_sharing_atomic_limit.smt2":             "sat\n((p true))\n",
 	"max_bv_sharing_model_scopes.smt2":             "sat\n((x #x01) (y #x02) (z #x03) (w #x04))\nunsat\nsat\n((x #x01) (y #x02) (z #x03) (w #x04))\n",
 	"max_bv_sharing_limit_recovery.smt2":           "(error \"tactic failed: max. steps exceeded\")\n(:reason-unknown \"max. steps exceeded\")\n(error \"tactic failed: max. steps exceeded\")\n(:reason-unknown \"max. steps exceeded\")\nsat\n((p false))\n",

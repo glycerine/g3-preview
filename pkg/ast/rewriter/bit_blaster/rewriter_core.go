@@ -7,6 +7,8 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	parent "github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 type RewriterParams struct {
@@ -32,9 +34,11 @@ type BitBlasterRewriter struct {
 	traversal *parent.Traversal
 	cache     map[ast.ASTHandle]ast.ASTRef
 	keys      []ast.ASTHandle
+	keyRoots  []ast.ASTRef
 	limits    []int
 	bindings  []ast.ASTRef
 	closed    bool
+	trace     *diagnostic.TraceTags
 }
 
 func NewBitBlasterRewriter(m *ast.ASTManager, params *RewriterParams) (*BitBlasterRewriter, error) {
@@ -72,7 +76,12 @@ func NewBitBlasterRewriter(m *ast.ASTManager, params *RewriterParams) (*BitBlast
 		cache:   make(map[ast.ASTHandle]ast.ASTRef),
 	}
 	r.self, r.config.owner = r, r
-	r.traversal, err = parent.NewTraversal(m, &r.config)
+	proofs, err := m.ProofsEnabled()
+	if err == nil && proofs {
+		r.traversal, err = parent.NewProofTraversal(m, &r.config)
+	} else if err == nil {
+		r.traversal, err = parent.NewTraversal(m, &r.config)
+	}
 	if err != nil {
 		if r.traversal != nil {
 			err = errors.Join(err, r.traversal.Close())
@@ -95,6 +104,13 @@ func (r *BitBlasterRewriter) UpdateParams(params RewriterParams) error {
 	}
 	r.params = params
 	return r.blaster.SetMaxMemoryMB(params.MaxMemoryMB)
+}
+
+func (r *BitBlasterRewriter) BindCooperation(owner *cooperate.Cooperation) error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	return r.blaster.BindCooperation(owner)
 }
 
 func (r *BitBlasterRewriter) Manager() (*ast.ASTManager, error) {
@@ -131,14 +147,9 @@ func (r *BitBlasterRewriter) Pop(scopes uint32) (result error) {
 	}
 	newScopeCount := len(r.limits) - int(scopes)
 	limit := r.limits[newScopeCount]
-	for i := len(r.keys); i > limit; {
-		i--
-		key := r.keys[i]
-		ref := r.cache[key]
-		delete(r.cache, key)
-		result = errors.Join(result, r.manager.DelRef(&ref))
+	if err := r.releaseCache(limit); err != nil {
+		return err
 	}
-	r.keys = r.keys[:limit]
 	r.limits = r.limits[:newScopeCount]
 	return result
 }
@@ -261,8 +272,37 @@ func (r *BitBlasterRewriter) makeConstant(decl ast.ASTHandle, out ast.ASTRef) (r
 	if err = r.manager.SetRef(out, assembled); err != nil {
 		return errors.Join(err, r.manager.DelRef(&owned))
 	}
+	keyRoot, err := r.manager.NewRef(decl)
+	if err != nil {
+		return errors.Join(err, r.manager.DelRef(&owned))
+	}
 	r.cache[decl] = owned
 	r.keys = append(r.keys, decl)
+	r.keyRoots = append(r.keyRoots, keyRoot)
+	return nil
+}
+
+func (r *BitBlasterRewriter) releaseCache(limit int) error {
+	for len(r.keys) > limit {
+		i := len(r.keys) - 1
+		key := r.keys[i]
+		ref := r.cache[key]
+		if ref != (ast.ASTRef{}) {
+			err := r.manager.DelRef(&ref)
+			r.cache[key] = ref
+			if err != nil {
+				return err
+			}
+		}
+		if r.keyRoots[i] != (ast.ASTRef{}) {
+			if err := r.manager.DelRef(&r.keyRoots[i]); err != nil {
+				return err
+			}
+		}
+		delete(r.cache, key)
+		r.keys = r.keys[:i]
+		r.keyRoots = r.keyRoots[:i]
+	}
 	return nil
 }
 
@@ -274,12 +314,16 @@ func (r *BitBlasterRewriter) Close() (result error) {
 		return nil
 	}
 	if r.traversal != nil {
-		result = errors.Join(result, r.traversal.Close())
+		if err := r.traversal.Close(); err != nil {
+			return err
+		}
+		r.traversal = nil
 	}
-	result = errors.Join(result, r.releaseBindings(0))
-	for _, key := range r.keys {
-		ref := r.cache[key]
-		result = errors.Join(result, r.manager.DelRef(&ref))
+	if err := r.releaseBindings(0); err != nil {
+		return err
+	}
+	if err := r.releaseCache(0); err != nil {
+		return err
 	}
 	r.cache = nil
 	r.keys = nil

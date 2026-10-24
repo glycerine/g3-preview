@@ -35,6 +35,10 @@ func newRewriterException(message string) rewriterException {
 	return rewriterException{z3exception.NewDefaultException(message)}
 }
 
+// NewRewriterException preserves typed catches in clients implementing source
+// rewriter configurations and bit-blaster template checkpoints.
+func NewRewriterException(message string) error { return newRewriterException(message) }
+
 func (e rewriterException) Unwrap() error { return e.DefaultException }
 
 // IsRewriterException supports the source's typed catch at tactic boundaries

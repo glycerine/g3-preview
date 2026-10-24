@@ -39,7 +39,7 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return nil, err
 	}
 	switch name {
-	case "smt", "simplify", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
+	case "smt", "simplify", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -60,6 +60,8 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return arith.MakePropagateIneqsTactic(m, c.config.Params, nil)
 	case "max-bv-sharing":
 		return bv.MakeMaxBVSharingTactic(m, c.config.Params, nil, c.config.ModelEvaluator.Cooperation)
+	case "bit-blast":
+		return bv.MakeBitBlasterTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator.Cooperation)
 	case "solve-eqs":
 		return core.MakeSolveEquationsTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
 	case "elim-uncnstr":

@@ -790,11 +790,13 @@
       "imports": [
         "ast",
         "ast/rewriter",
+        "util/cooperate",
+        "util/diagnostic",
         "util/memory",
         "util/messages",
+        "util/params",
         "util/symbol",
-        "util/text",
-        "util/z3exception"
+        "util/text"
       ],
       "production_files": [
         "bit_blaster.go",
@@ -811,6 +813,7 @@
         "rewriter_core.go",
         "rewriter_dispatch.go",
         "rewriter_reduce.go",
+        "rewriter_trace.go",
         "rewriter_traversal.go",
         "util_smt_bit_blaster_params.go"
       ]
@@ -2836,6 +2839,7 @@
         "arena",
         "ast",
         "ast/rewriter",
+        "ast/rewriter/bit_blaster",
         "model",
         "tactic",
         "util/cooperate",
@@ -2847,6 +2851,8 @@
       ],
       "production_files": [
         "bit_blaster_model_converter.go",
+        "bit_blaster_tactic.go",
+        "bit_blaster_tactic_trace.go",
         "max_bv_sharing_goal.go",
         "max_bv_sharing_reduce.go",
         "max_bv_sharing_tactic.go",

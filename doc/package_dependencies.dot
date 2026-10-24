@@ -87,11 +87,13 @@ digraph packages {
   "ast/rewriter/bit_blaster" [style=filled, fillcolor="#eeeeee"];
   "ast/rewriter/bit_blaster" -> "ast";
   "ast/rewriter/bit_blaster" -> "ast/rewriter";
+  "ast/rewriter/bit_blaster" -> "util/cooperate";
+  "ast/rewriter/bit_blaster" -> "util/diagnostic";
   "ast/rewriter/bit_blaster" -> "util/memory";
   "ast/rewriter/bit_blaster" -> "util/messages";
+  "ast/rewriter/bit_blaster" -> "util/params";
   "ast/rewriter/bit_blaster" -> "util/symbol";
   "ast/rewriter/bit_blaster" -> "util/text";
-  "ast/rewriter/bit_blaster" -> "util/z3exception";
   "ast/substitution" [style=filled, fillcolor="#eeeeee"];
   "ast/substitution" -> "ast";
   "ast/substitution" -> "util/hash";
@@ -412,6 +414,7 @@ digraph packages {
   "tactic/bv" -> "arena";
   "tactic/bv" -> "ast";
   "tactic/bv" -> "ast/rewriter";
+  "tactic/bv" -> "ast/rewriter/bit_blaster";
   "tactic/bv" -> "model";
   "tactic/bv" -> "tactic";
   "tactic/bv" -> "util/cooperate";

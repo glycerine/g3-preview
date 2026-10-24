@@ -11,7 +11,6 @@ import (
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/messages"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
-	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 type bitBlasterTraversalConfiguration struct {
@@ -25,15 +24,17 @@ func (c *bitBlasterTraversalConfiguration) MaxStepsExceeded(steps uint32) (bool,
 	if err := c.owner.open(); err != nil {
 		return false, err
 	}
-	canceled, err := c.owner.manager.Canceled()
+	if c.owner.blaster.cooperation != nil {
+		if err := c.owner.blaster.cooperation.Cooperate("bit blaster"); err != nil {
+			return false, err
+		}
+	}
+	used, err := c.owner.manager.NumeralService().RuntimeOwner().AllocationSize()
 	if err != nil {
 		return false, err
 	}
-	if canceled {
-		return false, z3exception.NewDefaultException(messages.Canceled)
-	}
-	if c.owner.manager.Budget().Used() > memory.MegabytesToBytes(c.owner.params.MaxMemoryMB) {
-		return false, z3exception.NewDefaultException(messages.MaxMemory)
+	if used > memory.MegabytesToBytes(c.owner.params.MaxMemoryMB) {
+		return false, parent.NewRewriterException(messages.MaxMemory)
 	}
 	return steps > c.owner.params.MaxSteps, nil
 }
@@ -42,11 +43,13 @@ func (r *BitBlasterRewriter) releaseBindings(limit int) (result error) {
 	if limit < 0 || limit > len(r.bindings) {
 		return ast.ErrASTDomain
 	}
-	for i := len(r.bindings); i > limit; {
-		i--
-		result = errors.Join(result, r.manager.DelRef(&r.bindings[i]))
+	for len(r.bindings) > limit {
+		i := len(r.bindings) - 1
+		if err := r.manager.DelRef(&r.bindings[i]); err != nil {
+			return err
+		}
+		r.bindings = r.bindings[:i]
 	}
-	r.bindings = r.bindings[:limit]
 	return result
 }
 
@@ -257,12 +260,19 @@ func (c *bitBlasterTraversalConfiguration) ReduceQuantifier(old, body ast.ASTHan
 	return true, nil
 }
 
-// Rewrite applies the retained no-proof traversal to root.
+// Rewrite applies the retained traversal while discarding its proof output.
 func (r *BitBlasterRewriter) Rewrite(root ast.ASTHandle, out ast.ASTRef) error {
 	if err := r.open(); err != nil {
 		return err
 	}
 	return r.traversal.Rewrite(root, out)
+}
+
+func (r *BitBlasterRewriter) RewriteWithProof(root ast.ASTHandle, out, proof ast.ASTRef) error {
+	if err := r.open(); err != nil {
+		return err
+	}
+	return r.traversal.RewriteWithProof(root, out, proof)
 }
 
 func (r *BitBlasterRewriter) NumSteps() (uint32, error) {

@@ -1,0 +1,8 @@
+(set-logic QF_BV)
+(set-option :produce-models true)
+(declare-const x (_ BitVec 4))
+(assert (= (bvadd x #x1) #x3))
+(check-sat-using (using-params bit-blast :max_steps 0))
+(get-info :reason-unknown)
+(check-sat-using (or-else (using-params bit-blast :max_steps 0) smt))
+(get-value (x))

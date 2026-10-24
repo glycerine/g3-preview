@@ -13,11 +13,12 @@ import (
 // Config is the concrete bit_blaster_cfg gate layer. The arithmetic bit-vector
 // template is a separate source unit; this value borrows its AST manager.
 type Config struct {
-	manager *ast.ASTManager
-	family  ast.FamilyID
-	params  SMTBitBlasterParams
-	flat    bool
-	elimAnd bool
+	manager       *ast.ASTManager
+	family        ast.FamilyID
+	params        SMTBitBlasterParams
+	flat          bool
+	elimAnd       bool
+	rewriterGates bool
 }
 
 func NewConfig(m *ast.ASTManager, family ast.FamilyID, params SMTBitBlasterParams) (*Config, error) {
@@ -30,7 +31,7 @@ func NewConfig(m *ast.ASTManager, family ast.FamilyID, params SMTBitBlasterParam
 func newRewriterConfig(m *ast.ASTManager, family ast.FamilyID) (*Config, error) {
 	c, err := NewConfig(m, family, SMTBitBlasterParams{})
 	if err == nil {
-		c.flat, c.elimAnd = false, true
+		c.flat, c.elimAnd, c.rewriterGates = false, true, true
 	}
 	return c, err
 }
@@ -63,6 +64,21 @@ func (c *Config) simplify(op int32, out ast.ASTRef, args ...ast.ASTHandle) error
 }
 
 func (c *Config) MkXor3(a, b, d ast.ASTHandle, out ast.ASTRef) (result error) {
+	if c.rewriterGates {
+		tmp, err := c.manager.NewRef(ast.ASTHandle{})
+		if err != nil {
+			return err
+		}
+		defer func() { result = errors.Join(result, c.manager.DelRef(&tmp)) }()
+		if err = c.simplify(ast.ASTOpXor, tmp, b, d); err != nil {
+			return err
+		}
+		h, err := c.manager.RefGet(tmp)
+		if err != nil {
+			return err
+		}
+		return c.simplify(ast.ASTOpXor, out, a, h)
+	}
 	v, err := c.sorted(a, b, d)
 	if err != nil {
 		return err
@@ -143,11 +159,14 @@ func (c *Config) MkXor3(a, b, d ast.ASTHandle, out ast.ASTRef) (result error) {
 }
 
 func (c *Config) MkCarry(a, b, d ast.ASTHandle, out ast.ASTRef) (result error) {
-	v, err := c.sorted(a, b, d)
-	if err != nil {
-		return err
+	var err error
+	if !c.rewriterGates {
+		v, e := c.sorted(a, b, d)
+		if e != nil {
+			return e
+		}
+		a, b, d = v[0], v[1], v[2]
 	}
-	a, b, d = v[0], v[1], v[2]
 	if !c.params.ExtGates {
 		pairs := [3][2]ast.ASTHandle{{a, b}, {a, d}, {b, d}}
 		terms := make([]ast.ASTHandle, 3)
