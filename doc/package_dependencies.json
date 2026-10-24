@@ -2203,6 +2203,7 @@
         "projection_literals.go",
         "projection_partition.go",
         "projection_preprocess.go",
+        "qmax.go",
         "qsat_kernel.go",
         "qsat_preparation.go",
         "qsat_recursive.go",
@@ -2210,6 +2211,7 @@
         "qsat_search_loop.go",
         "qsat_search_maximize.go",
         "qsat_search_projection.go",
+        "qsat_tactic.go",
         "trace.go",
         "variable_selection.go"
       ]

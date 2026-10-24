@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-fun opaque (Bool) Bool)
+(assert (opaque (forall ((b Bool)) b)))
+(assert (not (opaque false)))
+(check-sat-using (then qe_rec smt))

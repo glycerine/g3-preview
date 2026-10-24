@@ -41861,7 +41861,21 @@
         "pkg/cmd/g3/test_vectors/qe_light_core.smt2",
         "pkg/cmd/g3/test_vectors/qe_light_fm.smt2",
         "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
+        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2",
+        "pkg/qe/qsat_tactic.go",
+        "pkg/qe/qsat_tactic_test.go",
+        "pkg/qe/qmax.go",
+        "pkg/qe/qmax_test.go",
+        "pkg/qe/qsat_search_projection.go",
+        "pkg/cmd/g3/qsat_test.go",
+        "pkg/cmd/g3/test_vectors/qsat_alternating_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/qsat_integer_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/qsat_model.smt2",
+        "pkg/cmd/g3/test_vectors/qe2_linear_projection.smt2",
+        "pkg/cmd/g3/test_vectors/qe2_nested_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/qe_rec_blocked_terms.smt2",
+        "pkg/cmd/g3/test_vectors/qe_rec_free_boolean.smt2",
+        "pkg/cmd/g3/test_vectors/qsat_scopes.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -41940,7 +41954,15 @@
         "TestLiteTacticParamsCleanupTranslationAndNoOpSurfaces",
         "TestLiteTacticProofNullGuardAndNonQuantifiedSkip",
         "TestLiteTacticAllocationFrontiersTraceReportAndCountedClose",
-        "TestSMTLibRunnerQELightProjectionModelAndCore"
+        "TestSMTLibRunnerQELightProjectionModelAndCore",
+        "TestQSATTacticGoalsModelsAndOwnerLifetime",
+        "TestQSATTacticCancelTranslationStatisticsAndIgnoredHooks",
+        "TestQSATTacticUnsatAndRecursiveFreeBoolean",
+        "TestQSATTacticAllocationFrontiers",
+        "TestQMaxRetainedOptimizerSurface",
+        "TestQMaxAllocationFrontiers",
+        "TestQMaxQuantifiedRealBoundCPP",
+        "TestSMTLibRunnerQSATAndQuantifierElimination"
       ],
       "conditionals": [
         {
@@ -42462,10 +42484,42 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained qsat/qe2/qe_rec command-context factory registration and check-sat-using composition with the native quantified engine, saved-model conversion and session scopes",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/qsat_tactic.go",
+            "pkg/qe/qsat_tactic_test.go",
+            "pkg/qe/qmax.go",
+            "pkg/qe/qmax_test.go",
+            "pkg/qe/qsat_search_projection.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qsat_test.go",
+            "pkg/cmd/g3/test_vectors/qsat_alternating_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_integer_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_linear_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_blocked_terms.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_free_boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_scopes.smt2"
+          ],
+          "tests": [
+            "TestQSATTacticGoalsModelsAndOwnerLifetime",
+            "TestQSATTacticCancelTranslationStatisticsAndIgnoredHooks",
+            "TestQSATTacticUnsatAndRecursiveFreeBoolean",
+            "TestQSATTacticAllocationFrontiers",
+            "TestQMaxRetainedOptimizerSurface",
+            "TestQMaxAllocationFrontiers",
+            "TestQMaxQuantifiedRealBoundCPP",
+            "TestSMTLibRunnerQSATAndQuantifierElimination"
+          ]
         }
       ],
       "ownership": [
-        "The command parser returns one counted tactic reference. Composition factories acquire children; command execution owns the using_params/timeout wrappers, goal and temporary result refs. Context owns the independent SimpleCheckSatResult until replacement or teardown, and ordinary solver scopes stay separate."
+        "The command parser returns one counted tactic reference. Composition factories acquire children; command execution owns the using_params/timeout wrappers, goal and temporary result refs. Context owns the independent SimpleCheckSatResult until replacement or teardown, and ordinary solver scopes stay separate.",
+        "Command factories return the actual uncounted QSATTactic owner; existing parser/tactical wrappers acquire counted references and use its native Apply/model-converter results. CLI fixtures exercise retained scopes and value extraction through the real runner. Unrelated apply/help command bodies remain unfinished."
       ],
       "deviations": [
         "The retained qfufbv_ackr factory is registered through the concrete source tactic-name dispatch, with command output forwarded to its selected SAT backend. Existing incremental context/scopes remain separate from explicit check-sat-using execution.",
@@ -94512,7 +94566,7 @@
       "path": "src/qe/qsat.cpp",
       "component": "qe",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/qe/predicate_abstraction.go",
         "pkg/qe/predicate_assumptions.go",
@@ -94537,7 +94591,21 @@
         "pkg/ast/rewriter/var_shifter_export.go",
         "pkg/ast/rewriter/var_substitution.go",
         "pkg/ast/rewriter/var_shifter.go",
-        "pkg/ast/ast_expr_abstract.go"
+        "pkg/ast/ast_expr_abstract.go",
+        "pkg/qe/qsat_tactic.go",
+        "pkg/qe/qsat_tactic_test.go",
+        "pkg/qe/qmax.go",
+        "pkg/qe/qmax_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/qsat_test.go",
+        "pkg/cmd/g3/test_vectors/qsat_alternating_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/qsat_integer_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/qsat_model.smt2",
+        "pkg/cmd/g3/test_vectors/qe2_linear_projection.smt2",
+        "pkg/cmd/g3/test_vectors/qe2_nested_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/qe_rec_blocked_terms.smt2",
+        "pkg/cmd/g3/test_vectors/qe_rec_free_boolean.smt2",
+        "pkg/cmd/g3/test_vectors/qsat_scopes.smt2"
       ],
       "tests": [
         "TestMaxLevelSentinelMergeAndDisplay",
@@ -94567,7 +94635,15 @@
         "TestQSATSearchCPPMaximumBounds",
         "TestQSATRecursiveCPPFormulaEquivalence",
         "TestQSATRecursiveSharedDAGAndExtractionShift",
-        "TestQSATRecursiveAllocationFrontiers"
+        "TestQSATRecursiveAllocationFrontiers",
+        "TestQSATTacticGoalsModelsAndOwnerLifetime",
+        "TestQSATTacticCancelTranslationStatisticsAndIgnoredHooks",
+        "TestQSATTacticUnsatAndRecursiveFreeBoolean",
+        "TestQSATTacticAllocationFrontiers",
+        "TestQMaxRetainedOptimizerSurface",
+        "TestQMaxAllocationFrontiers",
+        "TestQMaxQuantifiedRealBoundCPP",
+        "TestSMTLibRunnerQSATAndQuantifierElimination"
       ],
       "conditionals": [
         {
@@ -94737,8 +94813,8 @@
           "text": "SASSERT(validate_defs(\"maximize_model3\"));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "max_level: UINT_MAX sentinel, existential/universal maximum and merge, structural equality and e/a display",
@@ -94943,6 +95019,99 @@
             "TestQSATRecursiveSharedDAGAndExtractionShift",
             "TestQSATRecursiveAllocationFrontiers"
           ]
+        },
+        {
+          "name": "qsat tactic operator: source output reset, conjunction, SAT/QE/recursive mode dispatch, goal reset/depth/append, saved-model/filter converter composition and unknown-goal append/exception",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/qsat_tactic.go",
+            "pkg/qe/qsat_tactic_test.go",
+            "pkg/qe/qmax.go",
+            "pkg/qe/qmax_test.go",
+            "pkg/qe/qsat_search_projection.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qsat_test.go",
+            "pkg/cmd/g3/test_vectors/qsat_alternating_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_integer_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_linear_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_blocked_terms.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_free_boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_scopes.smt2"
+          ],
+          "tests": [
+            "TestQSATTacticGoalsModelsAndOwnerLifetime",
+            "TestQSATTacticCancelTranslationStatisticsAndIgnoredHooks",
+            "TestQSATTacticUnsatAndRecursiveFreeBoolean",
+            "TestQSATTacticAllocationFrontiers",
+            "TestQMaxRetainedOptimizerSurface",
+            "TestQMaxAllocationFrontiers",
+            "TestQMaxQuantifiedRealBoundCPP",
+            "TestSMTLibRunnerQSATAndQuantifierElimination"
+          ]
+        },
+        {
+          "name": "Tactic lifetime/translation/parameter/statistics surface and mk_qsat_tactic/mk_qe2_tactic/mk_qe_rec_tactic factories: ignored user parameter/descriptor/logic/progress hooks, reset/cleanup, source duplicate predicate statistics, refcount ownership and same-mode translation",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/qsat_tactic.go",
+            "pkg/qe/qsat_tactic_test.go",
+            "pkg/qe/qmax.go",
+            "pkg/qe/qmax_test.go",
+            "pkg/qe/qsat_search_projection.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qsat_test.go",
+            "pkg/cmd/g3/test_vectors/qsat_alternating_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_integer_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_linear_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_blocked_terms.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_free_boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_scopes.smt2"
+          ],
+          "tests": [
+            "TestQSATTacticGoalsModelsAndOwnerLifetime",
+            "TestQSATTacticCancelTranslationStatisticsAndIgnoredHooks",
+            "TestQSATTacticUnsatAndRecursiveFreeBoolean",
+            "TestQSATTacticAllocationFrontiers",
+            "TestQMaxRetainedOptimizerSurface",
+            "TestQMaxAllocationFrontiers",
+            "TestQMaxQuantifiedRealBoundCPP",
+            "TestSMTLibRunnerQSATAndQuantifierElimination"
+          ]
+        },
+        {
+          "name": "qmax::imp constructor/destructor/operator/collect_statistics retained by opt_context::maximize_quantified: concrete native QMax owner forwarding to the actual quantified optimization search and owning model/value outputs",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/qsat_tactic.go",
+            "pkg/qe/qsat_tactic_test.go",
+            "pkg/qe/qmax.go",
+            "pkg/qe/qmax_test.go",
+            "pkg/qe/qsat_search_projection.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qsat_test.go",
+            "pkg/cmd/g3/test_vectors/qsat_alternating_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_integer_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_linear_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_blocked_terms.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_free_boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_scopes.smt2"
+          ],
+          "tests": [
+            "TestQSATTacticGoalsModelsAndOwnerLifetime",
+            "TestQSATTacticCancelTranslationStatisticsAndIgnoredHooks",
+            "TestQSATTacticUnsatAndRecursiveFreeBoolean",
+            "TestQSATTacticAllocationFrontiers",
+            "TestQMaxRetainedOptimizerSurface",
+            "TestQMaxAllocationFrontiers",
+            "TestQMaxQuantifiedRealBoundCPP",
+            "TestSMTLibRunnerQSATAndQuantifierElimination"
+          ]
         }
       ],
       "ownership": [
@@ -94950,23 +95119,26 @@
         "Private qsatPreparation owns the actual prefix reference vectors and PredicateAbstraction state for the pending search owner. Per-call state retains the lexical local-variable vector, proof reference, concrete LabelRewriter/QuantifierHoister, each actual hoist result and stopped construction-failure receipts until cleanup succeeds. Reset clears prefixes/expression levels while preserving the predicate model filter and declaration levels as source does. Nine first-success allocation campaigns cover construction, SAT/QE alternation, mixed prefixes, labels, blocked occurrences, reuse and open/closed traces; all charged fixture storage is released.",
         "Private qsatKernel owns the actual SMTSolver, private ParamsRef, retired replacement solvers and stopped child-failure receipts. New solvers are created before replacing the old owner; old solver destruction remains retryable. Acquired models and copied core ASTRefs remain live after reset/destruction. Six first-success allocation campaigns cover construction, reset, assertion, core extraction and open/closed core tracing; all charged fixture storage is released. It uses the existing concrete SMT facade and introduces no alternate solver or callback adapter.",
         "Private qsatSearch owns the complete retained search state, concrete MBP/dual kernels/preparation, actual current/saved tactic.ModelRefs and learned/projection/free-variable ASTRef vectors. Each round retains its lexical roots, mutable vector headers, acquired model references and model evaluators until that round ends; stopped rounds retain child construction-failure receipts. Constructor failure cleanup avoids retaining a receipt back to the same owner. Ten first-success allocation campaigns cover construction, reset, preparation, SAT, multi-level backtracking, QE, open/closed tracing and finite/strict optimization; all charged fixture storage is released and unknown is not counted as a completed campaign.",
-        "Recursive frames retain actual local ASTRefs, binder-variable vectors, concrete VarSubstitution/inverse VarShifter/ExprAbstractor owners and child failures through outer cleanup. Source member reset is separate from operation cleanup, so nested elimination preserves its caller lexical frames. checkLoop now releases terminal-round lexical owners on every normal return, including direct recursive/optimization callers. Six first-success allocation campaigns cover existential/alternating/under-term recursion, extraction and open/closed tracing; all charged fixture storage is released."
+        "Recursive frames retain actual local ASTRefs, binder-variable vectors, concrete VarSubstitution/inverse VarShifter/ExprAbstractor owners and child failures through outer cleanup. Source member reset is separate from operation cleanup, so nested elimination preserves its caller lexical frames. checkLoop now releases terminal-round lexical owners on every normal return, including direct recursive/optimization callers. Six first-success allocation campaigns cover existential/alternating/under-term recursion, extraction and open/closed tracing; all charged fixture storage is released.",
+        "QSATTactic owns its concrete qsatSearch. Actual lexical ASTRefs, source TacticReport and counted model-converter slots survive stopped cleanup; the result and persistent search filter retain their own converter/model references. QMax owns its actual optimization search and child failure receipts. Seven tactic and two QMax first-success allocation campaigns release all charged storage. Models/converters remain usable after tactic/search destruction. Constructor failure, copied/closed owners, cancellation, cleanup/reuse, statistics and same-service cross-manager translation are verified."
       ],
       "deviations": [
-        "max_level, pred_abs and the retained hoist/filter/level/suffix-variable preparation methods are ported. The native QSAT kernel wrapper is also ported; alternating search/projection/backtracking and the private optimization entry are now ported. Recursive AST elimination is now ported; tactic/factory integration and the external qmax wrapper remain unfinished, with model-based projection now available. The search remains private until recursive elimination and tactic/factory integration are complete. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule.",
+        "All retained max_level, pred_abs, kernel, alternating search/projection/backtracking, recursive elimination, tactic/factory and qmax paths are ported. The native command context registers qsat/qe2/qe_rec and the retained optimizer uses the concrete QMax wrapper. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. Seven independent C++ predicate-definition comparisons establish equivalence and satisfiable extensions without claiming identical internal fresh names or schedules; further search/recursive/CLI/optimization evidence is recorded below.",
         "Fifty-six direct cases cover fourteen formula shapes in all four source modes, including dependent Boolean/integer prefixes, real universal variables, negative polarity, mixed connectives, ITE branches, labels, repeated declaration names and source-inaccessible term occurrences. Twenty-eight prebuilt C++ comparisons independently reconstruct the native alternating prefix as SMT-LIB text and establish equivalence for every assignment to original free parameters. Only fresh hoisted variables are rebound; source free parameters remain free. Hoisting is tested as its own retained stage, without claiming QSAT search/tactic completion.",
-        "The native solver facade gates model publication explicitly, so qsatKernel sets its actual SetProduceModels flag to implement the source private model=true setting. It preserves model=true, relevancy_lvl=0 and case_split_strategy=CS_ACTIVITY_WITH_CACHE (2), constructs the initial solver before overrides and passes the stored overrides to reset. Native integration checks independent Boolean/arithmetic kernels, literal assumption cores, model/core lifetime across reset, preparation-to-predicate-definition handoff and source trace metadata. A prebuilt C++ arithmetic assumption-conflict comparison passes. The complete retained alternating search is now ported; tactic/factory integration remains unfinished.",
+        "The native solver facade gates model publication explicitly, so qsatKernel sets its actual SetProduceModels flag to implement the source private model=true setting. It preserves model=true, relevancy_lvl=0 and case_split_strategy=CS_ACTIVITY_WITH_CACHE (2), constructs the initial solver before overrides and passes the stored overrides to reset. Native integration checks independent Boolean/arithmetic kernels, literal assumption cores, model/core lifetime across reset, preparation-to-predicate-definition handoff and source trace metadata. A prebuilt C++ arithmetic assumption-conflict comparison passes. The complete retained alternating search is now ported; tactic/factory integration is now ported.",
         "Twenty-six native search results agree with the prebuilt C++ qsat tactic, including dependent Boolean/integer quantifiers, real universal bounds, polarity, mixed connectives and labels. Thirteen independently checked QE answers are logically equivalent to their original formulas. Ordinary C++ SMT decides the equivalence query first; full QE is an oracle-only fallback for unknown arithmetic queries. The old reference simplify/qe/smt pipeline incorrectly reports sat for the positive-label disagreement where ordinary SMT and qe2 return unsat; native output is not repaired. Source-inaccessible quantified term arguments are tested at preparation and excluded from search because the retained source atom abstraction requires application nodes throughout.",
-        "Unused minimize_core and check_fmls reached only from disabled validation bodies are deliberately omitted. Source validate_core/validate_project/validate_model return true before #if 0 bodies, so no additional solver-validation pass is activated. Final Close releases retained owners without recreating solvers solely for the C++ destructor reset; those newly recreated solvers have no retained consumer. Optimization uses existing concrete simplex.Optimum/math-big values with deep copies and standard Go formatting for its reached value forms. Full QE, tactic/CLI/API integration and higher-engine goals remain unfinished.",
+        "Unused minimize_core and check_fmls reached only from disabled validation bodies are deliberately omitted. Source validate_core/validate_project/validate_model return true before #if 0 bodies, so no additional solver-validation pass is activated. Final Close releases retained owners without recreating solvers solely for the C++ destructor reset; those newly recreated solvers have no retained consumer. Optimization uses existing concrete simplex.Optimum/math-big values with deep copies and standard Go formatting for its reached value forms. The independent full multitheory QE manager, remaining public API integration and higher-engine goals remain unfinished.",
         "Two further C++ checks prove the actual final native optimization improvement bound is infeasible and a bound derived from the returned native model is attainable, for closed and strict maxima. The final reset-statistics increment is separately checked in native and checked/debug/trace profiles; predicate counts retain their source unsigned statistic type.",
-        "The old C++ qe_rec executable segfaults on exists x:Bool. x or free and forall x:Bool. x or free because elim initializes bound-variable levels but atom abstraction finds an uninitialized free Boolean entry. The native recursive caller computes ordinary existing dependency levels before atom abstraction; explicit bound levels remain intact and free parameters receive the empty sentinel. Fourteen independent C++ formula-equivalence checks validate the resulting formulas for every free-parameter assignment, including quantified term arguments inaccessible to the top-level hoister. C++ ordinary SMT is the primary oracle and full QE only an unknown fallback; the crashing qe_rec entry is not used as that oracle. The algorithm, source swap-with-last residual order and no-extra-rewrite behavior are retained."
+        "The old C++ qe_rec executable segfaults on exists x:Bool. x or free and forall x:Bool. x or free because elim initializes bound-variable levels but atom abstraction finds an uninitialized free Boolean entry. The native recursive caller computes ordinary existing dependency levels before atom abstraction; explicit bound levels remain intact and free parameters receive the empty sentinel. Fourteen independent C++ formula-equivalence checks validate the resulting formulas for every free-parameter assignment, including quantified term arguments inaccessible to the top-level hoister. C++ ordinary SMT is the primary oracle and full QE only an unknown fallback; the crashing qe_rec entry is not used as that oracle. The algorithm, source swap-with-last residual order and no-extra-rewrite behavior are retained.",
+        "Retained qsat/qe2/qe_rec tactics and qmax are complete. Constructor/update parameters, descriptor collection, logic and progress hooks remain source no-ops; translation preserves mode and uses the same borrowed services. Source recursive reconstruction does not add a final theory rewrite, so semantically false Boolean residue need not be syntactically marked inconsistent until a following SMT tactic. Proof/core outputs are cleared as source does; the source TODO proof/core algorithms are not invented. The unused namespace-level maximize convenience function has no retained production caller and is deliberately omitted; opt_context reaches qmax directly.",
+        "Eight actual Go CLI scripts match the prebuilt C++ executable, including quantified Boolean/integer UNSAT, quantified SAT with model values, QE2/recursive pipelines, quantified term arguments and push/pop scopes. The free-Boolean qe_rec regression uses C++ qsat on the same input because the old qe_rec entry crashes; native output is not repaired. A standalone built Go executable also matches these scripts. The quantified optimization case forall y:Real. y>=x or y<3 returns maximum x=3; C++ proves improving the returned native value is impossible and the returned model value is attainable."
       ]
     },
     {
       "path": "src/qe/qsat.h",
       "component": "qe",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/qe/predicate_abstraction.go",
         "pkg/qe/predicate_assumptions.go",
@@ -94991,7 +95163,21 @@
         "pkg/ast/rewriter/var_shifter_export.go",
         "pkg/ast/rewriter/var_substitution.go",
         "pkg/ast/rewriter/var_shifter.go",
-        "pkg/ast/ast_expr_abstract.go"
+        "pkg/ast/ast_expr_abstract.go",
+        "pkg/qe/qsat_tactic.go",
+        "pkg/qe/qsat_tactic_test.go",
+        "pkg/qe/qmax.go",
+        "pkg/qe/qmax_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/qsat_test.go",
+        "pkg/cmd/g3/test_vectors/qsat_alternating_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/qsat_integer_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/qsat_model.smt2",
+        "pkg/cmd/g3/test_vectors/qe2_linear_projection.smt2",
+        "pkg/cmd/g3/test_vectors/qe2_nested_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/qe_rec_blocked_terms.smt2",
+        "pkg/cmd/g3/test_vectors/qe_rec_free_boolean.smt2",
+        "pkg/cmd/g3/test_vectors/qsat_scopes.smt2"
       ],
       "tests": [
         "TestMaxLevelSentinelMergeAndDisplay",
@@ -95021,7 +95207,15 @@
         "TestQSATSearchCPPMaximumBounds",
         "TestQSATRecursiveCPPFormulaEquivalence",
         "TestQSATRecursiveSharedDAGAndExtractionShift",
-        "TestQSATRecursiveAllocationFrontiers"
+        "TestQSATRecursiveAllocationFrontiers",
+        "TestQSATTacticGoalsModelsAndOwnerLifetime",
+        "TestQSATTacticCancelTranslationStatisticsAndIgnoredHooks",
+        "TestQSATTacticUnsatAndRecursiveFreeBoolean",
+        "TestQSATTacticAllocationFrontiers",
+        "TestQMaxRetainedOptimizerSurface",
+        "TestQMaxAllocationFrontiers",
+        "TestQMaxQuantifiedRealBoundCPP",
+        "TestSMTLibRunnerQSATAndQuantifierElimination"
       ],
       "conditionals": [
         {
@@ -95033,8 +95227,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "max_level: UINT_MAX sentinel, existential/universal maximum and merge, structural equality and e/a display",
@@ -95107,6 +95301,99 @@
             "TestQSATPreparationAllocationFrontiers",
             "TestQSATPreparationCPPPrefixEquivalence"
           ]
+        },
+        {
+          "name": "qsat tactic operator: source output reset, conjunction, SAT/QE/recursive mode dispatch, goal reset/depth/append, saved-model/filter converter composition and unknown-goal append/exception",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/qsat_tactic.go",
+            "pkg/qe/qsat_tactic_test.go",
+            "pkg/qe/qmax.go",
+            "pkg/qe/qmax_test.go",
+            "pkg/qe/qsat_search_projection.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qsat_test.go",
+            "pkg/cmd/g3/test_vectors/qsat_alternating_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_integer_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_linear_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_blocked_terms.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_free_boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_scopes.smt2"
+          ],
+          "tests": [
+            "TestQSATTacticGoalsModelsAndOwnerLifetime",
+            "TestQSATTacticCancelTranslationStatisticsAndIgnoredHooks",
+            "TestQSATTacticUnsatAndRecursiveFreeBoolean",
+            "TestQSATTacticAllocationFrontiers",
+            "TestQMaxRetainedOptimizerSurface",
+            "TestQMaxAllocationFrontiers",
+            "TestQMaxQuantifiedRealBoundCPP",
+            "TestSMTLibRunnerQSATAndQuantifierElimination"
+          ]
+        },
+        {
+          "name": "Tactic lifetime/translation/parameter/statistics surface and mk_qsat_tactic/mk_qe2_tactic/mk_qe_rec_tactic factories: ignored user parameter/descriptor/logic/progress hooks, reset/cleanup, source duplicate predicate statistics, refcount ownership and same-mode translation",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/qsat_tactic.go",
+            "pkg/qe/qsat_tactic_test.go",
+            "pkg/qe/qmax.go",
+            "pkg/qe/qmax_test.go",
+            "pkg/qe/qsat_search_projection.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qsat_test.go",
+            "pkg/cmd/g3/test_vectors/qsat_alternating_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_integer_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_linear_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_blocked_terms.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_free_boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_scopes.smt2"
+          ],
+          "tests": [
+            "TestQSATTacticGoalsModelsAndOwnerLifetime",
+            "TestQSATTacticCancelTranslationStatisticsAndIgnoredHooks",
+            "TestQSATTacticUnsatAndRecursiveFreeBoolean",
+            "TestQSATTacticAllocationFrontiers",
+            "TestQMaxRetainedOptimizerSurface",
+            "TestQMaxAllocationFrontiers",
+            "TestQMaxQuantifiedRealBoundCPP",
+            "TestSMTLibRunnerQSATAndQuantifierElimination"
+          ]
+        },
+        {
+          "name": "qmax::imp constructor/destructor/operator/collect_statistics retained by opt_context::maximize_quantified: concrete native QMax owner forwarding to the actual quantified optimization search and owning model/value outputs",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/qsat_tactic.go",
+            "pkg/qe/qsat_tactic_test.go",
+            "pkg/qe/qmax.go",
+            "pkg/qe/qmax_test.go",
+            "pkg/qe/qsat_search_projection.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qsat_test.go",
+            "pkg/cmd/g3/test_vectors/qsat_alternating_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_integer_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_linear_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe2_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_blocked_terms.smt2",
+            "pkg/cmd/g3/test_vectors/qe_rec_free_boolean.smt2",
+            "pkg/cmd/g3/test_vectors/qsat_scopes.smt2"
+          ],
+          "tests": [
+            "TestQSATTacticGoalsModelsAndOwnerLifetime",
+            "TestQSATTacticCancelTranslationStatisticsAndIgnoredHooks",
+            "TestQSATTacticUnsatAndRecursiveFreeBoolean",
+            "TestQSATTacticAllocationFrontiers",
+            "TestQMaxRetainedOptimizerSurface",
+            "TestQMaxAllocationFrontiers",
+            "TestQMaxQuantifiedRealBoundCPP",
+            "TestSMTLibRunnerQSATAndQuantifierElimination"
+          ]
         }
       ],
       "ownership": [
@@ -95114,16 +95401,19 @@
         "Private qsatPreparation owns the actual prefix reference vectors and PredicateAbstraction state for the pending search owner. Per-call state retains the lexical local-variable vector, proof reference, concrete LabelRewriter/QuantifierHoister, each actual hoist result and stopped construction-failure receipts until cleanup succeeds. Reset clears prefixes/expression levels while preserving the predicate model filter and declaration levels as source does. Nine first-success allocation campaigns cover construction, SAT/QE alternation, mixed prefixes, labels, blocked occurrences, reuse and open/closed traces; all charged fixture storage is released.",
         "Private qsatKernel owns the actual SMTSolver, private ParamsRef, retired replacement solvers and stopped child-failure receipts. New solvers are created before replacing the old owner; old solver destruction remains retryable. Acquired models and copied core ASTRefs remain live after reset/destruction. Six first-success allocation campaigns cover construction, reset, assertion, core extraction and open/closed core tracing; all charged fixture storage is released. It uses the existing concrete SMT facade and introduces no alternate solver or callback adapter.",
         "Private qsatSearch owns the complete retained search state, concrete MBP/dual kernels/preparation, actual current/saved tactic.ModelRefs and learned/projection/free-variable ASTRef vectors. Each round retains its lexical roots, mutable vector headers, acquired model references and model evaluators until that round ends; stopped rounds retain child construction-failure receipts. Constructor failure cleanup avoids retaining a receipt back to the same owner. Ten first-success allocation campaigns cover construction, reset, preparation, SAT, multi-level backtracking, QE, open/closed tracing and finite/strict optimization; all charged fixture storage is released and unknown is not counted as a completed campaign.",
-        "Recursive frames retain actual local ASTRefs, binder-variable vectors, concrete VarSubstitution/inverse VarShifter/ExprAbstractor owners and child failures through outer cleanup. Source member reset is separate from operation cleanup, so nested elimination preserves its caller lexical frames. checkLoop now releases terminal-round lexical owners on every normal return, including direct recursive/optimization callers. Six first-success allocation campaigns cover existential/alternating/under-term recursion, extraction and open/closed tracing; all charged fixture storage is released."
+        "Recursive frames retain actual local ASTRefs, binder-variable vectors, concrete VarSubstitution/inverse VarShifter/ExprAbstractor owners and child failures through outer cleanup. Source member reset is separate from operation cleanup, so nested elimination preserves its caller lexical frames. checkLoop now releases terminal-round lexical owners on every normal return, including direct recursive/optimization callers. Six first-success allocation campaigns cover existential/alternating/under-term recursion, extraction and open/closed tracing; all charged fixture storage is released.",
+        "QSATTactic owns its concrete qsatSearch. Actual lexical ASTRefs, source TacticReport and counted model-converter slots survive stopped cleanup; the result and persistent search filter retain their own converter/model references. QMax owns its actual optimization search and child failure receipts. Seven tactic and two QMax first-success allocation campaigns release all charged storage. Models/converters remain usable after tactic/search destruction. Constructor failure, copied/closed owners, cancellation, cleanup/reuse, statistics and same-service cross-manager translation are verified."
       ],
       "deviations": [
-        "max_level, pred_abs and the retained hoist/filter/level/suffix-variable preparation methods are ported. The native QSAT kernel wrapper is also ported; alternating search/projection/backtracking and the private optimization entry are now ported. Recursive AST elimination is now ported; tactic/factory integration and the external qmax wrapper remain unfinished, with model-based projection now available. The search remains private until recursive elimination and tactic/factory integration are complete. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule.",
+        "All retained max_level, pred_abs, kernel, alternating search/projection/backtracking, recursive elimination, tactic/factory and qmax paths are ported. The native command context registers qsat/qe2/qe_rec and the retained optimizer uses the concrete QMax wrapper. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. Seven independent C++ predicate-definition comparisons establish equivalence and satisfiable extensions without claiming identical internal fresh names or schedules; further search/recursive/CLI/optimization evidence is recorded below.",
         "Fifty-six direct cases cover fourteen formula shapes in all four source modes, including dependent Boolean/integer prefixes, real universal variables, negative polarity, mixed connectives, ITE branches, labels, repeated declaration names and source-inaccessible term occurrences. Twenty-eight prebuilt C++ comparisons independently reconstruct the native alternating prefix as SMT-LIB text and establish equivalence for every assignment to original free parameters. Only fresh hoisted variables are rebound; source free parameters remain free. Hoisting is tested as its own retained stage, without claiming QSAT search/tactic completion.",
-        "The native solver facade gates model publication explicitly, so qsatKernel sets its actual SetProduceModels flag to implement the source private model=true setting. It preserves model=true, relevancy_lvl=0 and case_split_strategy=CS_ACTIVITY_WITH_CACHE (2), constructs the initial solver before overrides and passes the stored overrides to reset. Native integration checks independent Boolean/arithmetic kernels, literal assumption cores, model/core lifetime across reset, preparation-to-predicate-definition handoff and source trace metadata. A prebuilt C++ arithmetic assumption-conflict comparison passes. The complete retained alternating search is now ported; tactic/factory integration remains unfinished.",
+        "The native solver facade gates model publication explicitly, so qsatKernel sets its actual SetProduceModels flag to implement the source private model=true setting. It preserves model=true, relevancy_lvl=0 and case_split_strategy=CS_ACTIVITY_WITH_CACHE (2), constructs the initial solver before overrides and passes the stored overrides to reset. Native integration checks independent Boolean/arithmetic kernels, literal assumption cores, model/core lifetime across reset, preparation-to-predicate-definition handoff and source trace metadata. A prebuilt C++ arithmetic assumption-conflict comparison passes. The complete retained alternating search is now ported; tactic/factory integration is now ported.",
         "Twenty-six native search results agree with the prebuilt C++ qsat tactic, including dependent Boolean/integer quantifiers, real universal bounds, polarity, mixed connectives and labels. Thirteen independently checked QE answers are logically equivalent to their original formulas. Ordinary C++ SMT decides the equivalence query first; full QE is an oracle-only fallback for unknown arithmetic queries. The old reference simplify/qe/smt pipeline incorrectly reports sat for the positive-label disagreement where ordinary SMT and qe2 return unsat; native output is not repaired. Source-inaccessible quantified term arguments are tested at preparation and excluded from search because the retained source atom abstraction requires application nodes throughout.",
-        "Unused minimize_core and check_fmls reached only from disabled validation bodies are deliberately omitted. Source validate_core/validate_project/validate_model return true before #if 0 bodies, so no additional solver-validation pass is activated. Final Close releases retained owners without recreating solvers solely for the C++ destructor reset; those newly recreated solvers have no retained consumer. Optimization uses existing concrete simplex.Optimum/math-big values with deep copies and standard Go formatting for its reached value forms. Full QE, tactic/CLI/API integration and higher-engine goals remain unfinished.",
+        "Unused minimize_core and check_fmls reached only from disabled validation bodies are deliberately omitted. Source validate_core/validate_project/validate_model return true before #if 0 bodies, so no additional solver-validation pass is activated. Final Close releases retained owners without recreating solvers solely for the C++ destructor reset; those newly recreated solvers have no retained consumer. Optimization uses existing concrete simplex.Optimum/math-big values with deep copies and standard Go formatting for its reached value forms. The independent full multitheory QE manager, remaining public API integration and higher-engine goals remain unfinished.",
         "Two further C++ checks prove the actual final native optimization improvement bound is infeasible and a bound derived from the returned native model is attainable, for closed and strict maxima. The final reset-statistics increment is separately checked in native and checked/debug/trace profiles; predicate counts retain their source unsigned statistic type.",
-        "The old C++ qe_rec executable segfaults on exists x:Bool. x or free and forall x:Bool. x or free because elim initializes bound-variable levels but atom abstraction finds an uninitialized free Boolean entry. The native recursive caller computes ordinary existing dependency levels before atom abstraction; explicit bound levels remain intact and free parameters receive the empty sentinel. Fourteen independent C++ formula-equivalence checks validate the resulting formulas for every free-parameter assignment, including quantified term arguments inaccessible to the top-level hoister. C++ ordinary SMT is the primary oracle and full QE only an unknown fallback; the crashing qe_rec entry is not used as that oracle. The algorithm, source swap-with-last residual order and no-extra-rewrite behavior are retained."
+        "The old C++ qe_rec executable segfaults on exists x:Bool. x or free and forall x:Bool. x or free because elim initializes bound-variable levels but atom abstraction finds an uninitialized free Boolean entry. The native recursive caller computes ordinary existing dependency levels before atom abstraction; explicit bound levels remain intact and free parameters receive the empty sentinel. Fourteen independent C++ formula-equivalence checks validate the resulting formulas for every free-parameter assignment, including quantified term arguments inaccessible to the top-level hoister. C++ ordinary SMT is the primary oracle and full QE only an unknown fallback; the crashing qe_rec entry is not used as that oracle. The algorithm, source swap-with-last residual order and no-extra-rewrite behavior are retained.",
+        "Retained qsat/qe2/qe_rec tactics and qmax are complete. Constructor/update parameters, descriptor collection, logic and progress hooks remain source no-ops; translation preserves mode and uses the same borrowed services. Source recursive reconstruction does not add a final theory rewrite, so semantically false Boolean residue need not be syntactically marked inconsistent until a following SMT tactic. Proof/core outputs are cleared as source does; the source TODO proof/core algorithms are not invented. The unused namespace-level maximize convenience function has no retained production caller and is deliberately omitted; opt_context reaches qmax directly.",
+        "Eight actual Go CLI scripts match the prebuilt C++ executable, including quantified Boolean/integer UNSAT, quantified SAT with model values, QE2/recursive pipelines, quantified term arguments and push/pop scopes. The free-Boolean qe_rec regression uses C++ qsat on the same input because the old qe_rec entry crashes; native output is not repaired. A standalone built Go executable also matches these scripts. The quantified optimization case forall y:Real. y>=x or y<3 returns maximum x=3; C++ proves improving the returned native value is impossible and the returned model value is attainable."
       ]
     },
     {
@@ -243961,14 +244251,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "a20bfbf2b273d76f60e2d087227a929adad2ec9f",
+    "commit": "c2cedb2cee38afd97fd2f5c04323a6d1c61dee86",
     "command": "go -C pkg test ./... -count=1 -timeout=30m",
-    "started_utc": "2026-10-24 21:34:17.839377 UTC",
-    "completed_utc": "2026-10-24 21:47:40.042075 UTC",
+    "started_utc": "2026-10-24 22:34:30.089231 UTC",
+    "completed_utc": "2026-10-24 22:48:13.861246 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-a20bfbf2.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-a20bfbf2.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-a20bfbf2.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-c2cedb2c.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-c2cedb2c.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-c2cedb2c.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -243984,9 +244274,9 @@
     "package_timeout": "30m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 707.936,
+    "lp_seconds": 725.344,
     "checkout_held_unchanged": true,
-    "scope_warning": "Clean isolated exact-HEAD checkout; includes QE-lite integration, UFNIA, predicate abstraction, arithmetic projection, MBP common preprocessing and datatype projection. Excludes the subsequent array-projection increment, which has focused native and checked/debug/trace integration checks."
+    "scope_warning": "Clean isolated exact-HEAD checkout; includes array/MBP completion and QSAT preparation, native kernel and alternating search/optimization core. Excludes subsequent recursive elimination and tactic/QMax/CLI integration increments, which have focused native and checked/debug/trace integration evidence."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

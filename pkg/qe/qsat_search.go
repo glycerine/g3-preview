@@ -15,8 +15,8 @@ import (
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
-// The search stays private until recursive elimination and tactic integration
-// are complete. All solving uses the two actual retained SMT kernels.
+// qsatSearch is the shared concrete engine of the QSAT/QE tactics and QMax.
+// All solving uses the two actual retained SMT kernels.
 type qsatSearch struct {
 	self                                                     *qsatSearch
 	manager                                                  *ast.ASTManager

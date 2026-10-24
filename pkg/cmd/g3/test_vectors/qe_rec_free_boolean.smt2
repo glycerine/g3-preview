@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const p Bool)
+(assert (exists ((x Bool)) (or x p)))
+(assert (not p))
+(check-sat-using (then qe_rec smt))

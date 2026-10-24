@@ -1,0 +1,7 @@
+(set-option :produce-models true)
+(set-logic ALL)
+(declare-const k Int)
+(assert (= k 3))
+(assert (forall ((b Bool)) (or b (not b))))
+(check-sat-using qsat)
+(get-value (k))

@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const k Int)
+(assert (exists ((x Int)) (and (= x (+ k 1)) (> x k))))
+(assert (< k 0))
+(check-sat-using (then qe2 smt))

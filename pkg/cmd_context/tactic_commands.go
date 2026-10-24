@@ -51,7 +51,7 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return nil, err
 	}
 	switch name {
-	case "qe-light", "smt", "sat", "sat-preprocess", "simplify", "ctx-simplify", "add-bounds", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "bv1-blast", "bv_bound_chk", "reduce-bv-size", "reduce-args", "ackermannize_bv", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "card2bv", "pb2bv", "qfbv", "qfaufbv", "qfufbv", "qfufbv_ackr", "qfidl", "qflia", "qfauflia", "qflra", "qfuf", "ufnia", "uflra", "auflia", "auflira", "aufnira", "skip", "fail", "fail-if-undecided":
+	case "qe-light", "qsat", "qe2", "qe_rec", "smt", "sat", "sat-preprocess", "simplify", "ctx-simplify", "add-bounds", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "bv1-blast", "bv_bound_chk", "reduce-bv-size", "reduce-args", "ackermannize_bv", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "card2bv", "pb2bv", "qfbv", "qfaufbv", "qfufbv", "qfufbv_ackr", "qfidl", "qflia", "qfauflia", "qflra", "qfuf", "ufnia", "uflra", "auflia", "auflira", "aufnira", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -60,6 +60,21 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return nil, err
 	}
 	switch name {
+	case "qsat", "qe2", "qe_rec":
+		config := qe.Config{Context: c.config.Params, Globals: c.config.Globals, Cooperation: c.config.ModelEvaluator.Cooperation, Trace: c.config.ModelEvaluator.Trace}
+		var created *qe.QSATTactic
+		switch name {
+		case "qsat":
+			created, err = qe.NewQSATTactic(m, nil, config)
+		case "qe2":
+			created, err = qe.NewQE2Tactic(m, nil, config)
+		case "qe_rec":
+			created, err = qe.NewQERecursiveTactic(m, nil, config)
+		}
+		if created == nil {
+			return nil, err
+		}
+		return created, err
 	case "qe-light":
 		created, err := qe.NewLiteTactic(m, nil, qe.Config{Context: c.config.Params, Globals: c.config.Globals, Cooperation: c.config.ModelEvaluator.Cooperation})
 		if created == nil {

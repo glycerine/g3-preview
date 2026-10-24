@@ -77,6 +77,19 @@ func (s *qsatSearch) initialize(formula ast.ASTRef) (err error) {
 		return err
 	}
 	defer s.finish(c, &err)
+	if err = s.preparation.abstraction.emit("operator()", 1247, func(w io.Writer) error {
+		h, e := s.manager.RefGet(formula)
+		if e != nil {
+			return e
+		}
+		if e = writeExpression(s.manager, s.config, w, h); e != nil {
+			return e
+		}
+		_, _ = io.WriteString(w, "\n")
+		return nil
+	}); err != nil {
+		return err
+	}
 	if s.mode != qsatSAT {
 		h, e := s.manager.RefGet(formula)
 		if e != nil {
@@ -93,7 +106,21 @@ func (s *qsatSearch) initialize(formula ast.ASTRef) (err error) {
 	if err = s.preparation.hoist(s.mode, formula); err != nil {
 		return err
 	}
-	return s.prepareKernels(c, formula)
+	if err = s.prepareKernels(c, formula); err != nil {
+		return err
+	}
+	return s.preparation.abstraction.emit("operator()", 1258, func(w io.Writer) error {
+		_, _ = io.WriteString(w, "ex: ")
+		h, e := s.manager.RefGet(formula)
+		if e != nil {
+			return e
+		}
+		if e = writeExpression(s.manager, s.config, w, h); e != nil {
+			return e
+		}
+		_, _ = io.WriteString(w, "\n")
+		return nil
+	})
 }
 func (s *qsatSearch) getCore(core *[]ast.ASTRef, level uint32) error {
 	if err := s.requireDefinitions("get_core"); err != nil {
