@@ -1,0 +1,6 @@
+(set-option :produce-proofs true)
+(set-logic QF_AUFLIA)
+(declare-const x Int)
+(assert (= x 0))
+(assert (>= x 1))
+(check-sat-using qfauflia)

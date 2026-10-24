@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
+	"github.com/glycerine/g3/pkg/tactic/portfolio"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
@@ -42,7 +43,7 @@ type Context struct {
 	params                           uparams.ParamsRef
 	paramsReady                      bool
 	manager                          *ast.ASTManager
-	solver                           *smtcore.SMTSolver
+	solver                           solver.Solver
 	tacticResult                     *solver.SimpleCheckSatResult
 	logic                            string
 	functions                        map[string][]ast.ASTHandle
@@ -260,7 +261,15 @@ func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 	if err = c.parameters.GetSolverParams(m, &c.params, &proofs, &models, &cores); err != nil {
 		return nil, err
 	}
-	c.solver, err = smtcore.NewSMTSolver(m, &c.params, c.logic, c.config)
+	if c.logic == "QF_AUFLIA" {
+		c.solver, err = portfolio.NewQFAUFLIAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
+	} else {
+		var direct *smtcore.SMTSolver
+		direct, err = smtcore.NewSMTSolver(m, &c.params, c.logic, c.config)
+		if err == nil {
+			c.solver = direct
+		}
+	}
 	if err != nil {
 		return nil, err
 	}

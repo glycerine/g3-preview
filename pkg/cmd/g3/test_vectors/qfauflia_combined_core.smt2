@@ -1,0 +1,7 @@
+(set-option :produce-unsat-cores true)
+(set-logic QF_AUFLIA)
+(declare-const x Int)
+(assert (! (= x 0) :named zero))
+(assert (! (>= x 1) :named lower))
+(check-sat)
+(get-unsat-core)

@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/tactic/core"
+	"github.com/glycerine/g3/pkg/tactic/smtlogics"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -24,7 +25,7 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return nil, err
 	}
 	switch name {
-	case "smt", "simplify", "elim-and", "propagate-values", "solve-eqs", "elim-uncnstr", "skip", "fail", "fail-if-undecided":
+	case "smt", "simplify", "elim-and", "propagate-values", "solve-eqs", "elim-uncnstr", "qfauflia", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -45,6 +46,8 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return core.MakeSolveEquationsTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
 	case "elim-uncnstr":
 		return core.MakeEliminateUnconstrainedTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
+	case "qfauflia":
+		return smtlogics.NewQFAUFLIATactic(m, nil, c.config)
 	case "skip":
 		return tactic.NewSkipTactic(), nil
 	case "fail":

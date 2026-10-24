@@ -16,6 +16,6 @@ import (
 	_ "github.com/glycerine/g3/pkg/sat"
 	_ "github.com/glycerine/g3/pkg/solver"
 	_ "github.com/glycerine/g3/pkg/tactic/sls"
-	_ "github.com/glycerine/g3/pkg/tactic/smtlogics"
+	_ "github.com/glycerine/g3/pkg/tactic/smtlogics/params"
 	_ "github.com/glycerine/g3/pkg/util/lp"
 )

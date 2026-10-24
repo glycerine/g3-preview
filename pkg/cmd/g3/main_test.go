@@ -10,6 +10,15 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"qfauflia_combined_model_scopes.smt2":          "sat\n((x 2) ((= (select a y) 9) true) ((and (>= y 2) (<= y 4)) true))\nunsat\nsat\n((x 2) ((= (select a y) 9) true) ((and (>= y 2) (<= y 4)) true))\n",
+	"qfauflia_combined_assumptions.smt2":           "sat\nsat\nunsat\nsat\nunsat\nsat\n",
+	"qfauflia_combined_core.smt2":                  "unsat\n(zero lower)\n",
+	"qfauflia_combined_proof.smt2":                 "unsat\n",
+	"qfauflia_model_scopes.smt2":                   "sat\n((x 2) ((= (select a y) 9) true) ((and (>= y 2) (<= y 4)) true))\nunsat\nsat\n((x 2) ((= (select a y) 9) true) ((and (>= y 2) (<= y 4)) true))\n",
+	"qfauflia_as_array_scopes.smt2":                "sat\nunsat\nsat\n",
+	"qfauflia_core.smt2":                           "unsat\n(lower zero)\n",
+	"qfauflia_proof.smt2":                          "unsat\n",
+	"qfauflia_parameter_recovery.smt2":             "unknown\nsat\n(((and (>= x 0) (<= x 3)) true))\nsat\n(((and (>= x 0) (<= x 3)) true))\n",
 	"elim_uncnstr_signed_bounds.smt2":              "sat\n(((bvsle a #x8) true) ((bvsle #x7 b) true) ((bvule c #xf) true) ((bvule #xf d) true) ((<= 4 i) true) ((>= 8 j) true))\n",
 	"elim_uncnstr_constructor_singleton.smt2":      "sat\n(((f (box i)) true))\nunsat\nsat\n",
 	"elim_uncnstr_uninterpreted_guard.smt2":        "unsat\n",

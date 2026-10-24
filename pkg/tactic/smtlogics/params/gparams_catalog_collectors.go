@@ -1,5 +1,6 @@
-// Parameter collectors remain with the C++ definitions they translate.
-package smtlogics
+// Parameter collectors remain below the SMT strategy factories, so their
+// source initialization does not pull the backend into its own dependencies.
+package params
 
 import (
 	uparams "github.com/glycerine/g3/pkg/util/params"

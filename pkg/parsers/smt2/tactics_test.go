@@ -19,6 +19,7 @@ func TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking(t *testing.T) {
 		"(check-sat-using (using-params smt :max_conflicts true))",
 		"(check-sat-using (using-params smt :candidate_models 1))",
 		"(check-sat-using (using-params smt :unported_parameter 1))",
+		"(check-sat-using (using-params qfauflia :array.simplify true))",
 		"(check-sat-using smt :rlimit false)",
 	} {
 		t.Run(text, func(t *testing.T) {

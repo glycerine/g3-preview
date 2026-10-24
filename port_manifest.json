@@ -37868,7 +37868,10 @@
         "pkg/cmd_context/tactic_commands_test.go",
         "pkg/parsers/smt2/datatypes.go",
         "pkg/parsers/smt2/datatypes_test.go",
-        "pkg/cmd_context/datatype_declarations.go"
+        "pkg/cmd_context/datatype_declarations.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/tactic/smtlogics/qfauflia_tactic.go",
+        "pkg/cmd_context/qfauflia_solver_test.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -37880,7 +37883,9 @@
         "TestCommandContextTacticResultsScopesAndModelLifetime",
         "TestCommandContextAssertGoalPreservesOrderProofsAndNames",
         "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
-        "TestSMT2DatatypeRefusalsBeforeDeclarationPublication"
+        "TestSMT2DatatypeRefusalsBeforeDeclarationPublication",
+        "TestCommandContextQFAUFLIACombinedSolverProofResult",
+        "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting"
       ],
       "conditionals": [
         {
@@ -38180,6 +38185,24 @@
           "tests": [
             "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
             "TestSMT2DatatypeRefusalsBeforeDeclarationPublication",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained QF_AUFLIA strategic solver installation during lazy context construction: generic solver.Solver ownership/result dispatch selects the tactic/incremental combined backend for ordinary check-sat, push/pop, assumptions, model and proof/core publication; other strategy branches remain open",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/context.go",
+          "go_targets": [
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/tactic/smtlogics/qfauflia_tactic.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfauflia_solver_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextQFAUFLIACombinedSolverProofResult",
+            "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -39295,7 +39318,9 @@
         "pkg/tactic/core/elim_uncnstr_array_datatype.go",
         "pkg/tactic/core/elim_uncnstr_trace.go",
         "pkg/tactic/core/elim_uncnstr_tactic_test.go",
-        "pkg/tactic/core/elim_uncnstr_trace_test.go"
+        "pkg/tactic/core/elim_uncnstr_trace_test.go",
+        "pkg/tactic/smtlogics/qfauflia_tactic.go",
+        "pkg/tactic/smtlogics/qfauflia_tactic_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -39313,7 +39338,9 @@
         "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
         "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
         "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
-        "TestEliminateUnconstrainedExactTraceAndStreamRefusal"
+        "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+        "TestQFAUFLIATacticModelConverterSurvivesStrategyClose",
+        "TestQFAUFLIATacticTranslationAndProofLifetime"
       ],
       "conditionals": [
         {
@@ -39435,7 +39462,7 @@
           "reason": "Command print_* / max_memory options, process control-C handler, result/model validation and trace/watch reporting remain to be integrated."
         },
         {
-          "name": "sexpr2tactic retained concrete factories and and-then/then, or-else, using-params/with/!, repeat, try-for, fail-if-branching and skip-if-failed; typed descriptor validation and counted parse-result ownership; retained elim-uncnstr factory now connected",
+          "name": "sexpr2tactic retained concrete factories and and-then/then, or-else, using-params/with/!, repeat, try-for, fail-if-branching and skip-if-failed; typed descriptor validation and counted parse-result ownership; retained elim-uncnstr factory now connected; retained qfauflia strategy factory now connected",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/tactics.go",
           "go_targets": [
@@ -39452,7 +39479,9 @@
             "pkg/tactic/core/elim_uncnstr_array_datatype.go",
             "pkg/tactic/core/elim_uncnstr_trace.go",
             "pkg/tactic/core/elim_uncnstr_tactic_test.go",
-            "pkg/tactic/core/elim_uncnstr_trace_test.go"
+            "pkg/tactic/core/elim_uncnstr_trace_test.go",
+            "pkg/tactic/smtlogics/qfauflia_tactic.go",
+            "pkg/tactic/smtlogics/qfauflia_tactic_test.go"
           ],
           "tests": [
             "TestCommandContextUnknownTacticLeavesInitializationOptionsAvailable",
@@ -39464,7 +39493,9 @@
             "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
             "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
             "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
-            "TestEliminateUnconstrainedExactTraceAndStreamRefusal"
+            "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+            "TestQFAUFLIATacticModelConverterSurvivesStrategyClose",
+            "TestQFAUFLIATacticTranslationAndProofLifetime"
           ],
           "reason": "Only the currently connected smt, simplify, elim-and, propagate-values, solve-eqs, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
         },
@@ -136426,14 +136457,52 @@
       "path": "src/tactic/portfolio/smt_strategic_solver.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/tactic/smtlogics/qfauflia_tactic.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/qfauflia_solver_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestCommandContextQFAUFLIACombinedSolverProofResult",
+        "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained QF_AUFLIA mk_tactic_for_logic branch and factory operator(): concrete QF_AUFLIA tactic2solver plus incremental SMT solver under the existing combined-solver mode, timeout/unknown fallback, assumption routing and result-provider policy",
+          "status": "ported",
+          "go_target": "pkg/tactic/portfolio/smt_strategic_solver.go",
+          "go_targets": [
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/tactic/smtlogics/qfauflia_tactic.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfauflia_solver_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextQFAUFLIACombinedSolverProofResult",
+            "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Remaining logic dispatcher branches, default tactic/FD/incremental-SAT special solvers and general stored-logic strategic solver_factory owner and public factory constructor",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Construction uses local counted tactic/solver references. The returned combined solver owns both child solvers; the tactic solver owns the concrete strategy. Context closes the combined owner before manager/services teardown. Evaluator/parameter services are borrowed through the same concrete configuration used by the incremental backend."
+      ],
+      "deviations": [
+        "Only the now-complete retained QF_AUFLIA branch is connected. Other logic branches and the general default dispatcher remain explicitly unported; the Go entry point names the concrete completed strategy."
+      ]
     },
     {
       "path": "src/tactic/portfolio/smt_strategic_solver.h",
@@ -137640,22 +137709,64 @@
       "path": "src/tactic/smtlogics/qfauflia_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qfauflia_tactic.go",
+        "pkg/tactic/smtlogics/qfauflia_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestQFAUFLIATacticModelConverterSurvivesStrategyClose",
+        "TestQFAUFLIATacticTranslationAndProofLifetime",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_qfauflia_tactic: simplify -> propagate-values -> solve-eqs -> elim-uncnstr -> simplify preamble under fixed elim_and/som/sort_store=true parameters, followed by SMT under fixed array.simplify=false; final user parameter update through both scoped wrappers, translation and result ownership",
+          "status": "ported",
+          "go_target": "pkg/tactic/smtlogics/qfauflia_tactic.go",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfauflia_tactic.go",
+            "pkg/tactic/smtlogics/qfauflia_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestQFAUFLIATacticModelConverterSurvivesStrategyClose",
+            "TestQFAUFLIATacticTranslationAndProofLifetime",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "A concrete and-then graph owns the five preprocessing tactics and SMT tactic through standard counted wrappers. Local counted construction owners retire after the final uncounted composite is published, including failed construction. Fixed ParamsRef owners are copied by their using-params wrappers. Model/proof/core results remain independent of strategy cleanup and close; shared explicit evaluator/cooperation services outlive the strategy."
+      ],
+      "deviations": [
+        "Go supplies explicit shared backend/evaluator/parameter services. The unused ctx_simp_p local and unused propagate_ineqs include have no retained effect and are omitted."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfauflia_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qfauflia_tactic.go",
+        "pkg/tactic/smtlogics/qfauflia_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestQFAUFLIATacticModelConverterSurvivesStrategyClose",
+        "TestQFAUFLIATacticTranslationAndProofLifetime",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -137666,11 +137777,33 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_qfauflia_tactic: simplify -> propagate-values -> solve-eqs -> elim-uncnstr -> simplify preamble under fixed elim_and/som/sort_store=true parameters, followed by SMT under fixed array.simplify=false; final user parameter update through both scoped wrappers, translation and result ownership",
+          "status": "ported",
+          "go_target": "pkg/tactic/smtlogics/qfauflia_tactic.go",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfauflia_tactic.go",
+            "pkg/tactic/smtlogics/qfauflia_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestQFAUFLIATacticModelConverterSurvivesStrategyClose",
+            "TestQFAUFLIATacticTranslationAndProofLifetime",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "A concrete and-then graph owns the five preprocessing tactics and SMT tactic through standard counted wrappers. Local counted construction owners retire after the final uncounted composite is published, including failed construction. Fixed ParamsRef owners are copied by their using-params wrappers. Model/proof/core results remain independent of strategy cleanup and close; shared explicit evaluator/cooperation services outlive the strategy."
+      ],
+      "deviations": [
+        "Go supplies explicit shared backend/evaluator/parameter services. The unused ctx_simp_p local and unused propagate_ineqs include have no retained effect and are omitted."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfbv_tactic.cpp",
@@ -138032,7 +138165,7 @@
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
-        "pkg/tactic/smtlogics/gparams_catalog_collectors.go",
+        "pkg/tactic/smtlogics/params/gparams_catalog_collectors.go",
         "pkg/util/params/util_gparams_catalog_dispatch.go"
       ],
       "tests": [
@@ -138058,7 +138191,7 @@
         {
           "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
           "status": "ported",
-          "go_target": "pkg/tactic/smtlogics/gparams_catalog_collectors.go",
+          "go_target": "pkg/tactic/smtlogics/params/gparams_catalog_collectors.go",
           "tests": [
             "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
             "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
@@ -138074,7 +138207,9 @@
       "ownership": [
         "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
       ],
-      "deviations": []
+      "deviations": [
+        "The existing static collector lives in smtlogics/params so lower-layer catalog initialization can remain independent of smtlogics strategy factories that depend on the SMT backend. Collector names, metadata, order and registration semantics are unchanged."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfufbv_tactic_params.pyg",
