@@ -10,8 +10,10 @@ digraph packages {
   "ackermannization" -> "ast";
   "ackermannization" -> "ast/rewriter";
   "ackermannization" -> "model";
+  "ackermannization" -> "solver";
   "ackermannization" -> "tactic";
   "ackermannization" -> "util/diagnostic";
+  "ackermannization" -> "util/lbool";
   "ackermannization" -> "util/memory";
   "ackermannization" -> "util/params";
   "ackermannization" -> "util/symbol";

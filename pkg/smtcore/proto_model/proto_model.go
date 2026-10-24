@@ -34,9 +34,12 @@ func NewProtoModel(m *ast.ASTManager, config model.ModelEvaluatorConfig) (p *Pro
 	if err != nil {
 		return nil, err
 	}
+	// Named returns may set p to nil before this deferred unwind runs.
+	// Keep the actual allocated owner until its cleanup finishes.
+	owner := p
 	defer func() {
 		if err != nil {
-			err = errors.Join(err, p.Close())
+			err = errors.Join(err, owner.Close())
 		}
 	}()
 	if err = p.core.Core().SetValueProvider(p); err != nil {

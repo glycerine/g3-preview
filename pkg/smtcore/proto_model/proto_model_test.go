@@ -35,6 +35,11 @@ func protoPin(t *testing.T, m *ast.ASTManager, h ast.ASTHandle) ast.ASTRef {
 }
 func protoFixture(t *testing.T) (*ast.ASTManager, *ProtoModel) {
 	t.Helper()
+	m, p, _ := protoFixtureWithConfig(t)
+	return m, p
+}
+func protoFixtureWithConfig(t *testing.T) (*ast.ASTManager, *ProtoModel, model.ModelEvaluatorConfig) {
+	t.Helper()
 	budget := arena.NewBudget(^uint64(0))
 	symbols, err := usymbol.NewManager(usymbol.Config{Budget: budget, PageSize: 64, DescriptorPageSize: 2})
 	protoMust(t, err)
@@ -55,6 +60,7 @@ func protoFixture(t *testing.T) (*ast.ASTManager, *ProtoModel) {
 	protoMust(t, err)
 	manager, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numerals, Budget: budget})
 	protoMust(t, err)
+	protoMust(t, manager.RegisterDeclarationPlugins())
 	configuration := model.ModelEvaluatorConfig{Context: context, Globals: globals, Params: &params, Memory: memory, Cooperation: cooperation}
 	proto, err := NewProtoModel(manager, configuration)
 	protoMust(t, err)
@@ -73,7 +79,7 @@ func protoFixture(t *testing.T) (*ast.ASTManager, *ProtoModel) {
 			t.Fatalf("prototype-model fixture retained %d bytes", used)
 		}
 	})
-	return manager, proto
+	return manager, proto, configuration
 }
 
 func TestValueFactoriesSomeFreshFreezeAndNumericValues(t *testing.T) {

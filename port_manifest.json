@@ -4030,14 +4030,18 @@
       "path": "src/ackermannization/lackr.cpp",
       "component": "ackermannization",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ackermannization/eager.go",
         "pkg/ackermannization/helper.go",
         "pkg/ackermannization/info.go",
         "pkg/ackermannization/ackermannization_cpp_test.go",
         "pkg/ackermannization/model_converter_test.go",
-        "pkg/ackermannization/tactic_test.go"
+        "pkg/ackermannization/tactic_test.go",
+        "pkg/ackermannization/lackr.go",
+        "pkg/ackermannization/lackr_test.go",
+        "pkg/ackermannization/lazy_model_check.go",
+        "pkg/ackermannization/lazy_model_check_test.go"
       ],
       "tests": [
         "TestAckermannizationExactGoalsCPP",
@@ -4047,7 +4051,14 @@
         "TestAckermannTacticAppendFallbackAndStatistics",
         "TestAckermannLemmaBoundSourceOverflow",
         "TestAckermannConstructorSnapshotAndRefusalOrder",
-        "TestAckermannTacticAllocationFrontiers"
+        "TestAckermannTacticAllocationFrontiers",
+        "TestLazyModelCheckCongruenceCPP",
+        "TestLazyModelCheckRebuildCompletionAndTrace",
+        "TestLazyModelCheckAllocationFrontiers",
+        "TestLackrSolverEagerLazyCPPAndModelLifetime",
+        "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+        "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+        "TestLackrAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -4087,8 +4098,8 @@
           "text": "SASSERT(m_is_init);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained mk_ackermann/init/collect_terms/abstract/ackr/eager_enc path: source postorder traversal, quantifier refusal, fresh abstraction before bound refusal, distinct-argument pruning and rewritten congruence lemmas",
@@ -4099,7 +4110,11 @@
             "pkg/ackermannization/info.go",
             "pkg/ackermannization/ackermannization_cpp_test.go",
             "pkg/ackermannization/model_converter_test.go",
-            "pkg/ackermannization/tactic_test.go"
+            "pkg/ackermannization/tactic_test.go",
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
           ],
           "tests": [
             "TestAckermannizationExactGoalsCPP",
@@ -4109,32 +4124,79 @@
             "TestAckermannTacticAppendFallbackAndStatistics",
             "TestAckermannLemmaBoundSourceOverflow",
             "TestAckermannConstructorSnapshotAndRefusalOrder",
-            "TestAckermannTacticAllocationFrontiers"
+            "TestAckermannTacticAllocationFrontiers",
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
           ]
         },
         {
           "name": "Solver-backed eager/lazy solving, abstraction push, get_model and lazy model-constructor integration retained by QF_UFBV",
-          "status": "unported",
-          "reason": "Only the solver-free mk_ackermann path is implemented; retained QF_UFBV consumers still require these algorithms."
+          "status": "ported",
+          "reason": "Only the solver-free mk_ackermann path is implemented; retained QF_UFBV consumers still require these algorithms.",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Solver-backed construction, constructor parameter snapshot versus eager-only updates, source initial unknown handling, lazy iteration checkpoint/refinement ordering and counted model/info accessors",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
-        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children.",
+        "Concrete encoding state is shared by the existing encoding tactic and one-shot solver-backed Lackr. Backend and statistics are borrowed; copied parameters, formulas, abstraction/lemma roots and rewriter state are owned. Lazy checker, candidate/final models, partial constructors and acquired references retain actual owners through stopped cleanup. Fixed model conversion independently owns Info/model references after Lackr and backend destruction."
       ],
       "deviations": [
-        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported.",
+        "Retained solver-backed eager/lazy paths are complete at the library layer. QF_UFBV Ackermannization tactic/backend selection, incremental SAT and preamble wiring remain separate integration work. No unused lazy model-converter reconstruction is ported."
       ]
     },
     {
       "path": "src/ackermannization/lackr.h",
       "component": "ackermannization",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ackermannization/eager.go",
         "pkg/ackermannization/ackermannization_cpp_test.go",
         "pkg/ackermannization/model_converter_test.go",
-        "pkg/ackermannization/tactic_test.go"
+        "pkg/ackermannization/tactic_test.go",
+        "pkg/ackermannization/lackr.go",
+        "pkg/ackermannization/lackr_test.go",
+        "pkg/ackermannization/lazy_model_check.go",
+        "pkg/ackermannization/lazy_model_check_test.go"
       ],
       "tests": [
         "TestAckermannizationExactGoalsCPP",
@@ -4144,7 +4206,14 @@
         "TestAckermannTacticAppendFallbackAndStatistics",
         "TestAckermannLemmaBoundSourceOverflow",
         "TestAckermannConstructorSnapshotAndRefusalOrder",
-        "TestAckermannTacticAllocationFrontiers"
+        "TestAckermannTacticAllocationFrontiers",
+        "TestLazyModelCheckCongruenceCPP",
+        "TestLazyModelCheckRebuildCompletionAndTrace",
+        "TestLazyModelCheckAllocationFrontiers",
+        "TestLackrSolverEagerLazyCPPAndModelLifetime",
+        "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+        "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+        "TestLackrAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -4156,8 +4225,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete retained MkAckermann eager encoder and statistics, borrowed services/form snapshot and owned rewrite/substitution/lemma roots",
@@ -4166,7 +4235,11 @@
             "pkg/ackermannization/eager.go",
             "pkg/ackermannization/ackermannization_cpp_test.go",
             "pkg/ackermannization/model_converter_test.go",
-            "pkg/ackermannization/tactic_test.go"
+            "pkg/ackermannization/tactic_test.go",
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
           ],
           "tests": [
             "TestAckermannizationExactGoalsCPP",
@@ -4176,29 +4249,85 @@
             "TestAckermannTacticAppendFallbackAndStatistics",
             "TestAckermannLemmaBoundSourceOverflow",
             "TestAckermannConstructorSnapshotAndRefusalOrder",
-            "TestAckermannTacticAllocationFrontiers"
+            "TestAckermannTacticAllocationFrontiers",
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
           ]
         },
         {
           "name": "Solver-backed eager/lazy solving, abstraction push, get_model and lazy model-constructor integration retained by QF_UFBV",
-          "status": "unported",
-          "reason": "Only the solver-free mk_ackermann path is implemented; retained QF_UFBV consumers still require these algorithms."
+          "status": "ported",
+          "reason": "Only the solver-free mk_ackermann path is implemented; retained QF_UFBV consumers still require these algorithms.",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Solver-backed construction, constructor parameter snapshot versus eager-only updates, source initial unknown handling, lazy iteration checkpoint/refinement ordering and counted model/info accessors",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
-        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children.",
+        "Concrete encoding state is shared by the existing encoding tactic and one-shot solver-backed Lackr. Backend and statistics are borrowed; copied parameters, formulas, abstraction/lemma roots and rewriter state are owned. Lazy checker, candidate/final models, partial constructors and acquired references retain actual owners through stopped cleanup. Fixed model conversion independently owns Info/model references after Lackr and backend destruction."
       ],
       "deviations": [
-        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported.",
+        "Retained solver-backed eager/lazy paths are complete at the library layer. QF_UFBV Ackermannization tactic/backend selection, incremental SAT and preamble wiring remain separate integration work. No unused lazy model-converter reconstruction is ported."
       ]
     },
     {
       "path": "src/ackermannization/lackr_model_constructor.cpp",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/lackr.go",
+        "pkg/ackermannization/lackr_test.go",
+        "pkg/ackermannization/lazy_model_check.go",
+        "pkg/ackermannization/lazy_model_check_test.go"
+      ],
+      "tests": [
+        "TestLazyModelCheckCongruenceCPP",
+        "TestLazyModelCheckRebuildCompletionAndTrace",
+        "TestLazyModelCheckAllocationFrontiers",
+        "TestLackrSolverEagerLazyCPPAndModelLifetime",
+        "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+        "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+        "TestLackrAllocationFrontiers"
+      ],
       "assertions": [
         {
           "line": 127,
@@ -4249,19 +4378,176 @@
           "text": "SASSERT(m_state == CHECKED);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained checker/implementation construction and destruction; counted Info and abstract model, owned empty model and lazily allocated evaluator",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Check clears conflicts, destroys old caches before replacement and visits abstract-model constants in insertion order, restoring original terms or ordinary constants",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Postorder check_term/_check_stack traversal, shared visited marks, source conflict short circuit and memoized application values",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "evaluate/eval_cached/mk_value and constants: numerals bypass memoization; missing interpretations use model some-value without mutating the source model",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Uninterpreted congruence uses evaluated-argument application keys, abstraction interpretations, first source/value retention and exact ordered conflict pairs",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Interpreted applications evaluate in the empty model; source model_constructor TRACE/CTRACE sites tolerate closed streams",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "get_conflicts source state guard and copied conflict list for retained lazy refinement",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Unreached make_model/add_entry reconstruction, constructor reference-count wrapper and unused Boolean/BV fallback after unconditional return",
+          "status": "dead_deleted",
+          "go_targets": [],
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Each check owns fresh value/application maps with AST key/value/source roots and an evaluator/empty model. Info and the abstract model are counted for stopped/retried cleanup and conflict access. Scratch roots retire after memoization; consumed releases retire ownership even on deletion errors. Partial evaluators remain reachable for cleanup. Conflict lists borrow original terms from counted Info and are copied to callers."
+      ],
+      "deviations": [
+        "Only lackr::lazy reaches this class and uses check/get_conflicts. make_model is called only by unused lackr_model_converter_lazy; its two empty map loops, add_entry and reference-count wrapper are not ported. Code following make_value_interpreted_function's unconditional return is unreachable. Unused embedded Boolean/BV fallback helpers are omitted; actual interpreted evaluation uses the ported model evaluator. Native Go maps/slices replace project containers without source hashing."
+      ]
     },
     {
       "path": "src/ackermannization/lackr_model_constructor.h",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/lackr.go",
+        "pkg/ackermannization/lackr_test.go",
+        "pkg/ackermannization/lazy_model_check.go",
+        "pkg/ackermannization/lazy_model_check_test.go"
+      ],
+      "tests": [
+        "TestLazyModelCheckCongruenceCPP",
+        "TestLazyModelCheckRebuildCompletionAndTrace",
+        "TestLazyModelCheckAllocationFrontiers",
+        "TestLackrSolverEagerLazyCPPAndModelLifetime",
+        "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+        "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+        "TestLackrAllocationFrontiers"
+      ],
       "conditionals": [
         {
           "line": 18,
@@ -4278,17 +4564,161 @@
           "text": "SASSERT(m_state == CONFLICT);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained checker/implementation construction and destruction; counted Info and abstract model, owned empty model and lazily allocated evaluator",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Check clears conflicts, destroys old caches before replacement and visits abstract-model constants in insertion order, restoring original terms or ordinary constants",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Postorder check_term/_check_stack traversal, shared visited marks, source conflict short circuit and memoized application values",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "evaluate/eval_cached/mk_value and constants: numerals bypass memoization; missing interpretations use model some-value without mutating the source model",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Uninterpreted congruence uses evaluated-argument application keys, abstraction interpretations, first source/value retention and exact ordered conflict pairs",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Interpreted applications evaluate in the empty model; source model_constructor TRACE/CTRACE sites tolerate closed streams",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "get_conflicts source state guard and copied conflict list for retained lazy refinement",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/lackr.go",
+            "pkg/ackermannization/lackr_test.go",
+            "pkg/ackermannization/lazy_model_check.go",
+            "pkg/ackermannization/lazy_model_check_test.go"
+          ],
+          "tests": [
+            "TestLazyModelCheckCongruenceCPP",
+            "TestLazyModelCheckRebuildCompletionAndTrace",
+            "TestLazyModelCheckAllocationFrontiers",
+            "TestLackrSolverEagerLazyCPPAndModelLifetime",
+            "TestLackrUnknownFirstCheckAndConstructorSnapshot",
+            "TestLackrQuantifierRefusalCancellationAndClosedTrace",
+            "TestLackrAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Unreached make_model/add_entry reconstruction, constructor reference-count wrapper and unused Boolean/BV fallback after unconditional return",
+          "status": "dead_deleted",
+          "go_targets": [],
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Each check owns fresh value/application maps with AST key/value/source roots and an evaluator/empty model. Info and the abstract model are counted for stopped/retried cleanup and conflict access. Scratch roots retire after memoization; consumed releases retire ownership even on deletion errors. Partial evaluators remain reachable for cleanup. Conflict lists borrow original terms from counted Info and are copied to callers."
+      ],
+      "deviations": [
+        "Only lackr::lazy reaches this class and uses check/get_conflicts. make_model is called only by unused lackr_model_converter_lazy; its two empty map loops, add_entry and reference-count wrapper are not ported. Code following make_value_interpreted_function's unconditional return is unreachable. Unused embedded Boolean/BV fallback helpers are omitted; actual interpreted evaluation uses the ported model evaluator. Native Go maps/slices replace project containers without source hashing."
+      ]
     },
     {
       "path": "src/ackermannization/lackr_model_converter_lazy.cpp",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -4305,17 +4735,19 @@
           "text": "SASSERT(model_constructor.get());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Retained-source audit: recursive searches find no call/construction/include outside this implementation and its own header; only the CMake compilation entry remains. The unused header and implementation factory signatures differ. Live QF_UFBV instead calls mk_qfufbv_ackr_model_converter, delegating to the ported fixed ackr_model_converter. Lazy converter translation and make_model reconstruction are unreachable and are not ported."
+      ]
     },
     {
       "path": "src/ackermannization/lackr_model_converter_lazy.h",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -4328,11 +4760,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Retained-source audit: recursive searches find no call/construction/include outside this implementation and its own header; only the CMake compilation entry remains. The unused header and implementation factory signatures differ. Live QF_UFBV instead calls mk_qfufbv_ackr_model_converter, delegating to the ported fixed ackr_model_converter. Lazy converter translation and make_model reconstruction are unreachable and are not ported."
+      ]
     },
     {
       "path": "src/api/CMakeLists.txt",
@@ -107342,8 +107776,22 @@
       "component": "smt",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/proto_model.go", "pkg/smtcore/proto_model/cleanup.go", "pkg/model/model_package_boundary.go", "pkg/smtcore/proto_model/proto_model_test.go", "pkg/smtcore/proto_model/cleanup_test.go"],
-      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues", "TestProtoModelCompletionCleanupEvaluationAndFinalModel", "TestProtoModelCleanupOwnsRewrittenFallbackUntilInstalled"],
+      "go_targets": [
+        "pkg/smtcore/proto_model/proto_model.go",
+        "pkg/smtcore/proto_model/cleanup.go",
+        "pkg/model/model_package_boundary.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/cleanup_test.go",
+        "pkg/smtcore/proto_model/constructor_failure_test.go",
+        "pkg/ackermannization/lackr_test.go"
+      ],
+      "tests": [
+        "TestValueFactoriesSomeFreshFreezeAndNumericValues",
+        "TestProtoModelCompletionCleanupEvaluationAndFinalModel",
+        "TestProtoModelCleanupOwnsRewrittenFallbackUntilInstalled",
+        "TestProtoModelConstructorFailureRetainsAllocatedOwner",
+        "TestLackrAllocationFrontiers"
+      ],
       "assertions": [
         {
           "line": 72,
@@ -107372,9 +107820,37 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "construction, factory dispatch, evaluation, auxiliary registration/reregistration, cleanup, universes, compression, partial completion, and final-model conversion", "status": "ported", "go_target": "pkg/smtcore/proto_model/proto_model.go", "tests": ["TestProtoModelCompletionCleanupEvaluationAndFinalModel"]}],
-      "ownership": ["ProtoModel owns its construction model, evaluator, theory rewriter, registered factories and auxiliary-declaration set; FinalModel produces independent interpretation copies before closing the construction owner. Cleanup retains rewritten expressions through fallback installation, matching the source trail lifetime."],
-      "deviations": ["Reregistration and final conversion copy function interpretations before retiring their source owners; this preserves independent Go ownership instead of transferring raw C++ pointers."]
+      "methods": [
+        {
+          "name": "construction, factory dispatch, evaluation, auxiliary registration/reregistration, cleanup, universes, compression, partial completion, and final-model conversion",
+          "status": "ported",
+          "go_target": "pkg/smtcore/proto_model/proto_model.go",
+          "tests": [
+            "TestProtoModelCompletionCleanupEvaluationAndFinalModel"
+          ]
+        },
+        {
+          "name": "Constructor unwind retains the allocated owner separately from a nil named return; direct and solver-driven reservation frontiers",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/proto_model.go",
+            "pkg/smtcore/proto_model/constructor_failure_test.go",
+            "pkg/smtcore/proto_model/proto_model_test.go",
+            "pkg/ackermannization/lackr_test.go"
+          ],
+          "tests": [
+            "TestProtoModelConstructorFailureRetainsAllocatedOwner",
+            "TestLackrAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "ProtoModel owns its construction model, evaluator, theory rewriter, registered factories and auxiliary-declaration set; FinalModel produces independent interpretation copies before closing the construction owner. Cleanup retains rewritten expressions through fallback installation, matching the source trail lifetime.",
+        "Failed constructor unwind captures the actual allocated prototype model independently of its named result, so returning nil cannot discard core/evaluator/rewriter owners before cleanup. The test fixture registers declaration plugins before constructing source-debug evaluator helpers."
+      ],
+      "deviations": [
+        "Reregistration and final conversion copy function interpretations before retiring their source owners; this preserves independent Go ownership instead of transferring raw C++ pointers."
+      ]
     },
     {
       "path": "src/smt/proto_model/proto_model.h",

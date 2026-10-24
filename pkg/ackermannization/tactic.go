@@ -16,18 +16,23 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
+// encodingState is the concrete state shared by the encoding tactic and the
+// solver-backed lackr implementation. Services are borrowed by both owners.
+type encodingState struct {
+	manager  *ast.ASTManager
+	context  *uparams.ParamsContext
+	globals  *uparams.GlobalParamsService
+	services model.ModelEvaluatorConfig
+	params   uparams.ParamsRef // Constructor snapshot; updt_params does not replace it.
+	stats    *Stats
+	trace    *diagnostic.TraceTags
+}
 type Tactic struct {
+	encodingState
 	self        *Tactic
-	manager     *ast.ASTManager
-	context     *uparams.ParamsContext
-	globals     *uparams.GlobalParamsService
-	services    model.ModelEvaluatorConfig
-	params      uparams.ParamsRef // Constructor snapshot; updt_params does not replace it.
 	paramsReady bool
 	limit       float64 // Source has no defined pre-updt_params value; retained callers initialize it.
-	stats       Stats
 	pending     []*eagerEncoder
-	trace       *diagnostic.TraceTags
 	refs        uint32
 	header      uint64
 	closed      bool
@@ -47,7 +52,7 @@ func NewTactic(m *ast.ASTManager, p *uparams.ParamsRef, services model.ModelEval
 	if err := m.Budget().Reserve(n); err != nil {
 		return nil, err
 	}
-	t := &Tactic{manager: m, context: c, globals: g, services: services, header: n}
+	t := &Tactic{encodingState: encodingState{manager: m, context: c, globals: g, services: services, stats: &Stats{}}, header: n}
 	t.self = t
 	var err error
 	t.params, err = c.NewValue()
@@ -120,7 +125,7 @@ func (t *Tactic) Close() error {
 	t.closed = true
 	return nil
 }
-func (t *Tactic) readEager(p *uparams.ParamsRef) (value bool, err error) {
+func (t *encodingState) readEager(p *uparams.ParamsRef) (value bool, err error) {
 	global, err := t.globals.SourceGetModuleName("ackermannization")
 	if err != nil {
 		return false, err
@@ -185,7 +190,7 @@ func (t *Tactic) Apply(g *tactic.Goal, result *tactic.TacticResult) (err error) 
 	}); err != nil {
 		return err
 	}
-	r := &eagerEncoder{owner: t, groups: make(termGroups)}
+	r := &eagerEncoder{owner: &t.encodingState, groups: make(termGroups)}
 	t.pending = append(t.pending, r)
 	defer func() {
 		var failure memory.ConstructionFailure

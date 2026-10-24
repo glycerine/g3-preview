@@ -18,7 +18,7 @@ type Stats struct{ Iterations, Constraints uint32 }
 func (s *Stats) Reset() { s.Iterations = 0; s.Constraints = 0 }
 
 type eagerEncoder struct {
-	owner                     *Tactic
+	owner                     *encodingState
 	forms, abstracted, lemmas []ast.ASTHandle
 	held, scratch             []ast.ASTHandle
 	groups                    termGroups
@@ -27,6 +27,7 @@ type eagerEncoder struct {
 	simplifier                *rewriter.TheoryRewriter
 	out, simplified           ast.ASTRef
 	eager                     bool
+	initialized               bool
 	failures                  []memory.ConstructionFailure
 }
 
@@ -70,21 +71,29 @@ func (r *eagerEncoder) label(function string, line int, label string, h ast.ASTH
 	})
 }
 func (r *eagerEncoder) construct(g *tactic.Goal) error {
-	m := r.owner.manager
 	n, err := g.Size()
 	if err != nil {
 		return err
 	}
+	var forms []ast.ASTHandle
 	for i := uint32(0); i < n; i++ {
 		f, err := g.Form(i)
 		if err != nil {
 			return err
 		}
-		if err = r.hold(f, false); err != nil {
+		forms = append(forms, f)
+	}
+	return r.constructForms(forms)
+}
+func (r *eagerEncoder) constructForms(forms []ast.ASTHandle) error {
+	m := r.owner.manager
+	for _, f := range forms {
+		if err := r.hold(f, false); err != nil {
 			return err
 		}
 		r.forms = append(r.forms, f)
 	}
+	var err error
 	r.simplifier, err = rewriter.NewTheoryRewriter(m, r.owner.context, r.owner.globals, nil)
 	if err != nil {
 		return err
@@ -403,22 +412,8 @@ func (r *eagerEncoder) mkAckermann(g *tactic.Goal, limit float64) (bool, error) 
 	if limit <= 0 {
 		return false, nil
 	}
-	if err := r.simplifier.UpdateParams(&r.owner.params); err != nil {
-		return false, err
-	}
-	info, err := NewInfo(r.owner.manager)
-	if err != nil {
-		return false, err
-	}
-	r.info = info
-	if err = info.IncRef(); err != nil {
-		return false, err
-	}
-	collected, err := r.collect()
-	if err != nil || !collected {
-		return false, err
-	}
-	if err = r.abstract(); err != nil {
+	initialized, err := r.initialize()
+	if err != nil || !initialized {
 		return false, err
 	}
 	if !math.IsInf(limit, 1) && r.groups.bound() > limit {
@@ -437,6 +432,31 @@ func (r *eagerEncoder) mkAckermann(g *tactic.Goal, limit float64) (bool, error) 
 			return false, err
 		}
 	}
+	return true, nil
+}
+func (r *eagerEncoder) initialize() (bool, error) {
+	if ast.ASTSourceDebug && r.initialized {
+		return false, ast.ErrASTDomain
+	}
+	if err := r.simplifier.UpdateParams(&r.owner.params); err != nil {
+		return false, err
+	}
+	info, err := NewInfo(r.owner.manager)
+	if err != nil {
+		return false, err
+	}
+	r.info = info
+	if err = info.IncRef(); err != nil {
+		return false, err
+	}
+	collected, err := r.collect()
+	if err != nil || !collected {
+		return false, err
+	}
+	if err = r.abstract(); err != nil {
+		return false, err
+	}
+	r.initialized = true
 	return true, nil
 }
 func (r *eagerEncoder) Close() error {
