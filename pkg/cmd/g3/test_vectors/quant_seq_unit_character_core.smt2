@@ -1,0 +1,7 @@
+(set-logic ALL)
+(set-option :produce-unsat-cores true)
+(declare-const c (_ BitVec 8))
+(assert (! (= c #x61) :named character))
+(assert (! (not (= (seq.unit c) "a")) :named different))
+(check-sat-using smt)
+(get-unsat-core)

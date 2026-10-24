@@ -1,5 +1,6 @@
 // Source: src/tactic/portfolio/smt_strategic_solver.cpp retained QF_AUFLIA and
-// QF_LRA/QF_UF/QF_IDL/QF_LIA/QF_BV/QF_AUFBV/QF_ABV/QF_UFBV branches and
+// QF_LRA/QF_UF/QF_IDL/QF_LIA/QF_BV/QF_AUFBV/QF_ABV/QF_UFBV and
+// UFLRA/AUFLIA/AUFLIRA/AUFNIRA branches and
 // smt_strategic_solver_factory::operator().
 package portfolio
 
@@ -106,6 +107,38 @@ func NewQFUFBVStrategicSolverWithOutput(m *ast.ASTManager, p *uparams.ParamsRef,
 		return nil, err
 	}
 	return newStrategicSolver(m, strategy, "QF_UFBV", p, proofs, models, cores, config)
+}
+
+func NewUFLRAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
+	strategy, err := smtlogics.NewUFLRATactic(m, p, config)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolver(m, strategy, "UFLRA", p, proofs, models, cores, config)
+}
+
+func NewAUFLIAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
+	strategy, err := smtlogics.NewAUFLIATactic(m, p, config)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolver(m, strategy, "AUFLIA", p, proofs, models, cores, config)
+}
+
+func NewAUFLIRAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
+	strategy, err := smtlogics.NewAUFLIRATactic(m, p, config)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolver(m, strategy, "AUFLIRA", p, proofs, models, cores, config)
+}
+
+func NewAUFNIRAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
+	strategy, err := smtlogics.NewAUFNIRATactic(m, p, config)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolver(m, strategy, "AUFNIRA", p, proofs, models, cores, config)
 }
 
 func newStrategicSolver(m *ast.ASTManager, strategy tactic.Tactic, logic string, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (result solver.Solver, err error) {

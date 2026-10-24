@@ -39833,7 +39833,19 @@
         "pkg/parsers/smt2/tactics_test.go",
         "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
         "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+        "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2",
+        "pkg/tactic/smtlogics/quant_tactics.go",
+        "pkg/tactic/smtlogics/quant_tactics_test.go",
+        "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -39879,7 +39891,13 @@
         "TestCard2BVCancellationAndClosedTraceRecovery",
         "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
         "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
-        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking"
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+        "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+        "TestQuantifiedArithmeticAllocationFrontiers",
+        "TestAUFLIAQICostTraceAndClosedOutput",
+        "TestQuantifiedArithmeticTranslatedProofAndCore",
+        "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+        "TestSMTLibRunnerAUFLIAExpressionLimit"
       ],
       "conditionals": [
         {
@@ -40419,6 +40437,38 @@
             "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
             "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
             "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained UFLRA/AUFLIA/AUFLIRA/AUFNIRA strategy selection and command registration: actual tactic2solver plus incremental SMT under combined-solver policy, with quantified scoped models, proofs and original unsat cores",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestAUFLIAQICostTraceAndClosedOutput",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+            "TestSMTLibRunnerAUFLIAExpressionLimit",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -41734,7 +41784,19 @@
         "pkg/cmd/g3/test_vectors/qfufbv_ackr_incsat_lazy.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_ackr_core_refusal.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_ackr_proof_refusal.smt2",
-        "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_fallback.smt2"
+        "pkg/cmd/g3/test_vectors/qfufbv_ackr_smt_fallback.smt2",
+        "pkg/tactic/smtlogics/quant_tactics.go",
+        "pkg/tactic/smtlogics/quant_tactics_test.go",
+        "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -41802,7 +41864,13 @@
         "TestCard2BVCancellationAndClosedTraceRecovery",
         "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
         "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
-        "TestSMTLibRunnerQFUFBVAckrBranchEvidence"
+        "TestSMTLibRunnerQFUFBVAckrBranchEvidence",
+        "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+        "TestQuantifiedArithmeticAllocationFrontiers",
+        "TestAUFLIAQICostTraceAndClosedOutput",
+        "TestQuantifiedArithmeticTranslatedProofAndCore",
+        "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+        "TestSMTLibRunnerAUFLIAExpressionLimit"
       ],
       "conditionals": [
         {
@@ -42245,6 +42313,38 @@
             "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
             "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
             "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained UFLRA/AUFLIA/AUFLIRA/AUFNIRA strategy selection and command registration: actual tactic2solver plus incremental SMT under combined-solver policy, with quantified scoped models, proofs and original unsat cores",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestAUFLIAQICostTraceAndClosedOutput",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+            "TestSMTLibRunnerAUFLIAExpressionLimit",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -113434,7 +113534,19 @@
         "pkg/smtcore/smt_relevancy_test.go",
         "pkg/smtcore/theory_arith_bounded_disequalities_test.go",
         "pkg/smtcore/smt_conflict_proof.go",
-        "pkg/cmd/g3/test_vectors/max_bv_sharing_proofs.smt2"
+        "pkg/cmd/g3/test_vectors/max_bv_sharing_proofs.smt2",
+        "pkg/smtcore/smt_aux_clause_core_test.go",
+        "pkg/tactic/smtlogics/quant_tactics_test.go",
+        "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
       ],
       "tests": [
         "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
@@ -113477,7 +113589,9 @@
         "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits",
         "TestSMTRelevancyNegatedArgumentsAndLiteralWatches",
         "TestSMTBoundedWeightedDisequalitiesModel",
-        "TestSMTInternalizerGateProofReservedConstants"
+        "TestSMTInternalizerGateProofReservedConstants",
+        "TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions",
+        "TestQuantifiedArithmeticTranslatedProofAndCore"
       ],
       "conditionals": [
         {
@@ -114022,11 +114136,38 @@
           "tests": [
             "TestSMTInternalizerGateProofReservedConstants"
           ]
+        },
+        {
+          "name": "mk_clause auxiliary simplification retains removed false disjuncts through unit-resolution even with a null antecedent and no proof, preserving unit/conflict assumption cores for new QI lemmas",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_internalizer.go",
+            "pkg/smtcore/smt_aux_clause_core_test.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+          ],
+          "tests": [
+            "TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "SMTInternalizationOrder borrows the AST manager and checker context; native maps and slices own traversal colors, theory-family configuration, and returned order values.",
-        "SMTInternalizerState owns references for registered Boolean expressions, enode owners, and retained clause proofs; it owns its congruence table, variable arrays, watch lists, scopes, clauses, assignment and theory-variable trails, registered theory order, and pending congruence records, and borrows the checker context, registered theory plugins, and optional relevancy propagator and quantifier registry."
+        "SMTInternalizerState owns references for registered Boolean expressions, enode owners, and retained clause proofs; it owns its congruence table, variable arrays, watch lists, scopes, clauses, assignment and theory-variable trails, registered theory order, and pending congruence records, and borrows the checker context, registered theory plugins, and optional relevancy propagator and quantifier registry.",
+        "Unit-resolution antecedents and sequence equality evidence borrow scoped literals/enodes owned by the internalizer. Propagated empty equalities retain original dependencies; guessed model characters are not used as conflict evidence."
       ],
       "deviations": [
         "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
@@ -128492,7 +128633,22 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_disequality_solve.go", "pkg/smtcore/theory_seq_disequality_fixed.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_tail_bound.go", "pkg/smtcore/theory_seq_fixed_length.go", "pkg/smtcore/theory_seq_length_split.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_extensionality.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_extract_special.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_ground.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go",
-        "pkg/smtcore/theory_seq_extensionality_test.go"
+        "pkg/smtcore/theory_seq_extensionality_test.go",
+        "pkg/smtcore/theory_seq_empty_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
+        "pkg/smtcore/theory_seq_unit_evidence_test.go",
+        "pkg/cmd/g3/test_vectors/quant_seq_boundary_equality_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_boundary_length_core.smt2"
       ],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
@@ -128566,7 +128722,10 @@
         "TestSMTSequenceTheoryClosesExhaustedSymbolicRegexLengths",
         "TestSMTSequenceTheoryClosesExhaustedFiniteRegexLanguage",
         "TestSMTSequenceTheoryBranchesConcreteRegexWitness",
-        "TestSMTSequenceExtensionalityHonorsDisabledRelevancy"
+        "TestSMTSequenceExtensionalityHonorsDisabledRelevancy",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTSequenceUnitConcreteCharacterRetainsEqualityEvidence"
       ],
       "conditionals": [
         {
@@ -129225,12 +129384,58 @@
           "tests": [
             "TestSMTSequenceExtensionalityHonorsDisabledRelevancy"
           ]
+        },
+        {
+          "name": "reduce_eq/set_empty propagates each component equal to empty with original dependency; concrete units use established character equalities with evidence; newly cached regex refinement counts as source m_new_propagation even when clauses are already satisfied",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_seq.go",
+            "pkg/smtcore/theory_seq_solve.go",
+            "pkg/smtcore/theory_seq_empty_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+          ],
+          "tests": [
+            "TestSMTSequenceTheoryBranchesVariablePrefixAcrossFixedWord",
+            "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition",
+            "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "linearize/set_conflict retains established enode equality antecedents through ext_theory_conflict_justification; concrete character, equivalent word-boundary and equal-length evidence use explicit null literals rather than the Go zero value true literal",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_seq.go",
+            "pkg/smtcore/theory_seq_solve.go",
+            "pkg/smtcore/theory_seq_unit_evidence_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_seq_boundary_equality_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_boundary_length_core.smt2"
+          ],
+          "tests": [
+            "TestSMTSequenceUnitConcreteCharacterRetainsEqualityEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "The solution and exclusion trails own AST references for every stored key and value; maps and dependency nodes borrow those live trail values, and reverse scope rollback releases them after restoring prior mappings.",
         "SMTSequenceTheory owns its scoped solution and exclusion tables and borrows e-graph nodes and SAT literals; registered SequenceFactory lifetime is owned by ProtoModel.",
-        "Relevance checks borrow the existing concrete context policy and create no relevance marks or owners. Sequence interface equalities retain the existing internalizer scope lifetime."
+        "Relevance checks borrow the existing concrete context policy and create no relevance marks or owners. Sequence interface equalities retain the existing internalizer scope lifetime.",
+        "Unit-resolution antecedents and sequence equality evidence borrow scoped literals/enodes owned by the internalizer. Propagated empty equalities retain original dependencies; guessed model characters are not used as conflict evidence.",
+        "Extended sequence conflicts borrow actual scoped enodes and literal evidence, validate asserted literals, and preserve both original core labels. Explicit SMTNullLiteral selects equality evidence for all retained equality-only sequence assumption constructions."
       ],
       "deviations": [
         "Concrete Go maps replace obj_map and pair hash tables. Dependency joins use an immutable concrete assumption DAG and iterative stable linearization rather than the native scoped_dependency_manager template.",
@@ -129242,7 +129447,23 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_tail_bound.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go"],
+      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_tail_bound.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go",
+        "pkg/smtcore/theory_seq_empty_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
+        "pkg/smtcore/theory_seq_unit_evidence_test.go",
+        "pkg/cmd/g3/test_vectors/quant_seq_boundary_equality_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_boundary_length_core.smt2"
+      ],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
         "TestSMTSequenceExclusionTableCanonicalPairsAndScopes",
@@ -129272,7 +129493,13 @@
         "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms",
         "TestSMTSequenceTheoryIndexAxioms",
         "TestSMTSequenceTheoryReplaceAxioms",
-        "TestSMTSequenceTheoryRegexMembershipReduction"
+        "TestSMTSequenceTheoryRegexMembershipReduction",
+        "TestSMTSequenceTheoryBranchesVariablePrefixAcrossFixedWord",
+        "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition",
+        "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTSequenceUnitConcreteCharacterRetainsEqualityEvidence"
       ],
       "conditionals": [
         {
@@ -129428,11 +129655,57 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "reduce_eq/set_empty propagates each component equal to empty with original dependency; concrete units use established character equalities with evidence; newly cached regex refinement counts as source m_new_propagation even when clauses are already satisfied",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_seq.go",
+            "pkg/smtcore/theory_seq_solve.go",
+            "pkg/smtcore/theory_seq_empty_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+          ],
+          "tests": [
+            "TestSMTSequenceTheoryBranchesVariablePrefixAcrossFixedWord",
+            "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition",
+            "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "linearize/set_conflict retains established enode equality antecedents through ext_theory_conflict_justification; concrete character, equivalent word-boundary and equal-length evidence use explicit null literals rather than the Go zero value true literal",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_seq.go",
+            "pkg/smtcore/theory_seq_solve.go",
+            "pkg/smtcore/theory_seq_unit_evidence_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_seq_boundary_equality_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_boundary_length_core.smt2"
+          ],
+          "tests": [
+            "TestSMTSequenceUnitConcreteCharacterRetainsEqualityEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Concrete solution and exclusion owners retain their AST handles through ASTRef trails and borrow e-graph nodes and SAT literals in immutable dependency assumptions.",
-        "SMTSequenceTheory owns the concrete scoped state objects and borrows its initialized SMT context through SMTTheoryBase."
+        "SMTSequenceTheory owns the concrete scoped state objects and borrows its initialized SMT context through SMTTheoryBase.",
+        "Unit-resolution antecedents and sequence equality evidence borrow scoped literals/enodes owned by the internalizer. Propagated empty equalities retain original dependencies; guessed model characters are not used as conflict evidence.",
+        "Extended sequence conflicts borrow actual scoped enodes and literal evidence, validate asserted literals, and preserve both original core labels. Explicit SMTNullLiteral selects equality evidence for all retained equality-only sequence assumption constructions."
       ],
       "deviations": [
         "Go slices and maps replace scoped native vectors and hash tables; source-private templates are represented only for the live sequence instantiation."
@@ -145630,7 +145903,19 @@
         "pkg/cmd/g3/test_vectors/qfufbv_solver_proof.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_solver_reduce_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_solver_sat_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/qfufbv_solver_smt_models_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/qfufbv_solver_smt_models_scopes.smt2",
+        "pkg/tactic/smtlogics/quant_tactics.go",
+        "pkg/tactic/smtlogics/quant_tactics_test.go",
+        "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
       ],
       "tests": [
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
@@ -145660,7 +145945,13 @@
         "TestQFUFBVTacticConstructorAllocationFrontiers",
         "TestQFUFBVTacticTranslatedProofAndCoreRoutes",
         "TestQFUFBVTacticModelSurvivesStrategyClose",
-        "TestSMTLibRunnerQFUFBVBranchEvidence"
+        "TestSMTLibRunnerQFUFBVBranchEvidence",
+        "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+        "TestQuantifiedArithmeticAllocationFrontiers",
+        "TestAUFLIAQICostTraceAndClosedOutput",
+        "TestQuantifiedArithmeticTranslatedProofAndCore",
+        "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+        "TestSMTLibRunnerAUFLIAExpressionLimit"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -145892,6 +146183,38 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained UFLRA/AUFLIA/AUFLIRA/AUFNIRA strategy selection and command registration: actual tactic2solver plus incremental SMT under combined-solver policy, with quantified scoped models, proofs and original unsat cores",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestAUFLIAQICostTraceAndClosedOutput",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+            "TestSMTLibRunnerAUFLIAExpressionLimit",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -145905,7 +146228,7 @@
       "path": "src/tactic/portfolio/smt_strategic_solver.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/tactic/smtlogics/qflia_tactic.go",
         "pkg/tactic/smtlogics/qflia_tactic_test.go",
@@ -145925,12 +146248,32 @@
         "pkg/cmd_context/context.go",
         "pkg/tactic/portfolio/smt_strategic_solver.go",
         "pkg/parsers/smt2/commands_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/tactic/smtlogics/quant_tactics.go",
+        "pkg/tactic/smtlogics/quant_tactics_test.go",
+        "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
       ],
       "tests": [
         "TestCommandContextQFLIACombinedSolverProofResult",
         "TestSMTLibRunnerQFLIABranchEvidence",
-        "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput"
+        "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+        "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+        "TestQuantifiedArithmeticAllocationFrontiers",
+        "TestAUFLIAQICostTraceAndClosedOutput",
+        "TestQuantifiedArithmeticTranslatedProofAndCore",
+        "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+        "TestSMTLibRunnerAUFLIAExpressionLimit",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -145981,6 +146324,38 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerQFLIABranchEvidence"
+          ]
+        },
+        {
+          "name": "Retained UFLRA/AUFLIA/AUFLIRA/AUFNIRA strategy selection and command registration: actual tactic2solver plus incremental SMT under combined-solver policy, with quantified scoped models, proofs and original unsat cores",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestAUFLIAQICostTraceAndClosedOutput",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+            "TestSMTLibRunnerAUFLIAExpressionLimit",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -149831,22 +150206,111 @@
       "path": "src/tactic/smtlogics/quant_tactics.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/smtlogics/quant_tactics.go",
+        "pkg/tactic/smtlogics/quant_tactics_test.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+      ],
+      "tests": [
+        "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+        "TestQuantifiedArithmeticAllocationFrontiers",
+        "TestAUFLIAQICostTraceAndClosedOutput",
+        "TestQuantifiedArithmeticTranslatedProofAndCore",
+        "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+        "TestSMTLibRunnerAUFLIAExpressionLimit",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "mk_quant_preprocessor/mk_no_solve_eq_preprocessor and complete UFLRA/AUFLIA/AUFLIRA/AUFNIRA factories: fixed preprocessing parameters, pattern-guarded solve-eqs, disabled AUFLIA Gaussian elimination, strict >128 expression guard and qi.cost=0 attempt with fail-if-undecided fallback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestAUFLIAQICostTraceAndClosedOutput",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+            "TestSMTLibRunnerAUFLIAExpressionLimit",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "Construction retains concrete counted tactics/probes and parameter snapshots until composition ownership transfers. QuantifiedConstructionFailure retains stopped actual owners. Models and translated proofs/cores survive strategy cleanup. Source qi_cost trace evaluates later operands after output failure. Constructor/application allocation frontiers reach success with zero charged fixture storage."
+      ],
+      "deviations": [
+        "UFNIA with QE-lite and LRA/LIA/LIRA with QE-lite, QSAT and QE remain unported; those factories are not replaced by direct SMT substitutes. The complete source unit and header remain partial."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/quant_tactics.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/smtlogics/quant_tactics.go",
+        "pkg/tactic/smtlogics/quant_tactics_test.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+      ],
+      "tests": [
+        "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+        "TestQuantifiedArithmeticAllocationFrontiers",
+        "TestAUFLIAQICostTraceAndClosedOutput",
+        "TestQuantifiedArithmeticTranslatedProofAndCore",
+        "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+        "TestSMTLibRunnerAUFLIAExpressionLimit",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -149859,9 +150323,46 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "mk_quant_preprocessor/mk_no_solve_eq_preprocessor and complete UFLRA/AUFLIA/AUFLIRA/AUFNIRA factories: fixed preprocessing parameters, pattern-guarded solve-eqs, disabled AUFLIA Gaussian elimination, strict >128 expression guard and qi.cost=0 attempt with fail-if-undecided fallback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/quant_tactics_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_auflia_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflia_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_auflira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_aufnira_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_bounded_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_empty_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+          ],
+          "tests": [
+            "TestQuantifiedArithmeticModelsSurviveStrategyClose",
+            "TestQuantifiedArithmeticAllocationFrontiers",
+            "TestAUFLIAQICostTraceAndClosedOutput",
+            "TestQuantifiedArithmeticTranslatedProofAndCore",
+            "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+            "TestSMTLibRunnerAUFLIAExpressionLimit",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "Construction retains concrete counted tactics/probes and parameter snapshots until composition ownership transfers. QuantifiedConstructionFailure retains stopped actual owners. Models and translated proofs/cores survive strategy cleanup. Source qi_cost trace evaluates later operands after output failure. Constructor/application allocation frontiers reach success with zero charged fixture storage."
+      ],
+      "deviations": [
+        "UFNIA with QE-lite and LRA/LIA/LIRA with QE-lite, QSAT and QE remain unported; those factories are not replaced by direct SMT substitutes. The complete source unit and header remain partial."
+      ]
     },
     {
       "path": "src/tactic/tactic.cpp",

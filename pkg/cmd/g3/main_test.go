@@ -39,12 +39,103 @@ func TestSMTLibRunnerQFUFBVAckrBranchEvidence(t *testing.T) {
 	testArithmeticStrategyBranchEvidence(t, "qfufbv_ackr")
 }
 
+func TestSMTLibRunnerQuantifiedArithmeticBranchEvidence(t *testing.T) {
+	testArithmeticStrategyBranchEvidence(t, "quant")
+}
+
+func TestSMTLibRunnerAUFLIAExpressionLimit(t *testing.T) {
+	// The quantified body contributes four nodes and each distinct ground
+	// application contributes two. MBQI disabled with auto-config disabled
+	// makes the first SMT attempt inconclusive, exposing the fallback count.
+	for _, n := range []int{62, 63} {
+		t.Run(fmt.Sprint(4+2*n), func(t *testing.T) {
+			var script strings.Builder
+			script.WriteString("(set-logic AUFLIA)(declare-fun p (Int) Bool)(assert (forall ((x Int)) (! (p x) :pattern ((p x)))))\n")
+			for i := 0; i < n; i++ {
+				fmt.Fprintf(&script, "(assert (p %d))\n", i)
+			}
+			script.WriteString("(check-sat-using (using-params auflia :auto_config false :mbqi false))\n")
+			level, err := diagnostic.ProcessVerbosityLevel()
+			if err != nil {
+				t.Fatal(err)
+			}
+			previous, err := diagnostic.BorrowProcessVerboseStream()
+			if err != nil {
+				t.Fatal(err)
+			}
+			stream, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() {
+				if err := diagnostic.SetProcessVerboseStream(previous); err != nil {
+					t.Error(err)
+				}
+				if err := diagnostic.SetProcessVerbosityLevel(level); err != nil {
+					t.Error(err)
+				}
+				if err := stream.Close(); err != nil {
+					t.Error(err)
+				}
+			})
+			if err = diagnostic.SetProcessVerboseStream(stream); err != nil {
+				t.Fatal(err)
+			}
+			if err = diagnostic.SetProcessVerbosityLevel(10); err != nil {
+				t.Fatal(err)
+			}
+			var out bytes.Buffer
+			if err = run(strings.NewReader(script.String()), &out); err != nil {
+				t.Fatal(err, out.String())
+			}
+			verbose, err := stream.String()
+			if err != nil {
+				t.Fatal(err)
+			}
+			want := 2
+			if n == 63 {
+				want = 1
+			}
+			check := func(origin, output, log string) {
+				t.Helper()
+				if canonicalOutput(output) != "unknown" {
+					t.Fatal(origin, "unexpected result", output)
+				}
+				if got := strings.Count(log, "(smt.tactic start)"); got != want {
+					t.Fatalf("%s: %d SMT attempts, want %d\n%s", origin, got, want, log)
+				}
+				if !strings.Contains(log, fmt.Sprintf("(simplifier :num-exprs %d ", 4+2*n)) {
+					t.Fatal(origin, "fixture lost expression boundary", log)
+				}
+			}
+			check("Go", out.String(), verbose)
+			if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
+				var native, log bytes.Buffer
+				cmd := exec.Command(reference, "-v:10", "-in")
+				cmd.Stdin = strings.NewReader(script.String())
+				cmd.Stdout = &native
+				cmd.Stderr = &log
+				if err := cmd.Run(); err != nil {
+					t.Fatal(err, native.String(), log.String())
+				}
+				check("C++", native.String(), log.String())
+			}
+		})
+	}
+}
+
 func testArithmeticStrategyBranchEvidence(t *testing.T, prefix string) {
 	t.Helper()
 	cases := []struct {
 		name            string
 		require, forbid []string
 	}{
+		{"quant_auflia_core.smt2", []string{"(ctx-simplify ", "(smt.tactic start)"}, []string{"(solve_eqs ", "(sat-status"}},
+		{"quant_uflra_proof.smt2", []string{"(ctx-simplify ", "(smt.tactic start)"}, []string{"(solve_eqs ", "(sat-status"}},
+		{"quant_uflra_models_scopes.smt2", []string{"(ctx-simplify ", "(smt.tactic start)"}, []string{"(solve_eqs ", "(sat-status"}},
+		{"quant_auflia_models_scopes.smt2", []string{"(ctx-simplify ", "(smt.tactic start)"}, []string{"(solve_eqs ", "(sat-status"}},
+		{"quant_auflira_models_scopes.smt2", []string{"(ctx-simplify ", "(solve_eqs ", "(smt.tactic start)"}, []string{"(sat-status"}},
+		{"quant_aufnira_models_scopes.smt2", []string{"(ctx-simplify ", "(smt.tactic start)"}, []string{"(solve_eqs ", "(sat-status"}},
 		{"qfufbv_ackr_proof_refusal.smt2", []string{"(qfufbv_ackr ", "(smt.tactic start)"}, []string{"(bv-bound-chk ", "(bv-size-reduction ", "(sat-status"}},
 		{"qfufbv_ackr_core_refusal.smt2", []string{"(qfufbv_ackr ", "(smt.tactic start)"}, []string{"(bv-bound-chk ", "(bv-size-reduction ", "(sat-status"}},
 		{"qfufbv_ackr_smt_fallback.smt2", []string{"(smt.tactic start)"}, []string{"(qfufbv_ackr ", "(sat-status"}},
@@ -243,6 +334,18 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"quant_seq_boundary_equality_core.smt2":        "unsat\n(same words)\n",
+	"quant_seq_boundary_length_core.smt2":          "unsat\n(length words)\n",
+	"quant_seq_unit_character_core.smt2":           "unsat\n(character different)\n",
+	"quant_seq_empty_backjump.smt2":                "unsat\n",
+	"quant_seq_regex_backjump.smt2":                "unsat\n",
+	"quant_seq_bounded_regex_backjump.smt2":        "unsat\n",
+	"quant_auflia_core.smt2":                       "unsat\n(axiom negative)\nunsat\n(axiom negative)\nunsat\n(axiom negative)\n",
+	"quant_uflra_proof.smt2":                       "unsat\nunsat\n",
+	"quant_uflra_models_scopes.smt2":               "sat\n(((>= x 3) true))\nsat\n(((>= x 3) true))\nunsat\nsat\n(((>= x 3) true))\n",
+	"quant_auflia_models_scopes.smt2":              "sat\n(((>= x 3) true))\nsat\n(((>= x 3) true))\nunsat\nsat\n(((>= x 3) true))\n",
+	"quant_auflira_models_scopes.smt2":             "sat\n(((>= x 3) true) ((= i 4) true))\nsat\n(((>= x 3) true) ((= i 4) true))\nunsat\nsat\n(((>= x 3) true) ((= i 4) true))\n",
+	"quant_aufnira_models_scopes.smt2":             "sat\n(((>= x 9) true))\nsat\n(((>= x 9) true))\nunsat\nsat\n(((>= x 9) true))\n",
 	"qfufbv_ackr_proof_refusal.smt2":               "unknown\n(:reason-unknown \"qfufbv_ackr does not support proof production\")\nsat\n",
 	"qfufbv_ackr_core_refusal.smt2":                "unknown\n(:reason-unknown \"qfufbv_ackr does not support unsat core production\")\nsat\n",
 	"qfufbv_ackr_smt_fallback.smt2":                "sat\n((x 1))\n",

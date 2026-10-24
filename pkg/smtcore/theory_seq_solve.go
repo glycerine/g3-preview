@@ -367,7 +367,7 @@ func (t *SMTSequenceTheory) equalWordParts(left, right ast.ASTHandle, dependency
 	if leftNode == nil || rightNode == nil || leftNode.Root() != rightNode.Root() {
 		return false, dependency
 	}
-	equality := t.dependencies.Leaf(smtSequenceAssumption{left: leftNode, right: rightNode})
+	equality := t.dependencies.Leaf(smtSequenceAssumption{left: leftNode, right: rightNode, literal: SMTNullLiteral})
 	return true, t.dependencies.Join(dependency, equality)
 }
 
@@ -496,7 +496,7 @@ func (t *SMTSequenceTheory) reduceEqualLengthBoundary(index int, id uint32, left
 		if leftNode == nil || rightNode == nil || leftNode.Root() != rightNode.Root() {
 			continue
 		}
-		lengthEquality := t.dependencies.Leaf(smtSequenceAssumption{left: leftNode, right: rightNode})
+		lengthEquality := t.dependencies.Leaf(smtSequenceAssumption{left: leftNode, right: rightNode, literal: SMTNullLiteral})
 		dependency = t.dependencies.Join(dependency, lengthEquality)
 		leftBoundary, rightBoundary := left[li], right[ri]
 		if front {
@@ -545,6 +545,57 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if len(left) == 0 && len(right) == 0 {
 			if err = t.removeEquation(index); err != nil {
 				return false, err
+			}
+			index--
+			continue
+		}
+		// seq_rewriter::reduce_eq/set_empty: a concatenation equals empty
+		// precisely when every remaining component equals empty. Preserve the
+		// equation's dependency for each propagated component equality.
+		if len(left) == 0 || len(right) == 0 {
+			parts := left
+			if len(parts) == 0 {
+				parts = right
+			}
+			state, stateErr := t.State()
+			if stateErr != nil {
+				return false, stateErr
+			}
+			progress := false
+			for _, part := range parts {
+				text, fixed, makeErr := state.manager.SequenceStringValue(part)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				_, unit, makeErr := state.manager.SequenceUnitArgument(part)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				if unit || fixed && text != "" {
+					return true, t.setDependencyConflict(dependency)
+				}
+				sort, makeErr := state.manager.GetSort(part)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				empty, makeErr := state.manager.MkSequenceEmpty(sort)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				changed, makeErr := t.propagateWordEquality(part, empty, dependency)
+				if makeErr != nil {
+					return false, makeErr
+				}
+				progress = progress || changed
+				if state.Inconsistent() {
+					return true, nil
+				}
+			}
+			if err = t.removeEquation(index); err != nil {
+				return false, err
+			}
+			if progress {
+				return true, nil
 			}
 			index--
 			continue

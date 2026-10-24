@@ -3059,7 +3059,8 @@
         "qfufbv_ackr_model_converter.go",
         "qfufbv_ackr_strategy.go",
         "qfufbv_ackr_tactic.go",
-        "qfufbv_tactic.go"
+        "qfufbv_tactic.go",
+        "quant_tactics.go"
       ]
     },
     {

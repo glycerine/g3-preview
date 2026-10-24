@@ -1,0 +1,8 @@
+(set-logic ALL)
+(set-option :produce-unsat-cores true)
+(declare-const x String)
+(declare-const y String)
+(assert (! (= (str.len x) (str.len y)) :named length))
+(assert (! (= (str.++ x "a") (str.++ y "aa")) :named words))
+(check-sat-using smt)
+(get-unsat-core)

@@ -165,8 +165,16 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 			return err
 		}
 	}
-	if justification != nil && len(removedFalse) != 0 {
-		updated, err := NewSMTUnitResolutionJustification(justification.InRegion(), justification, removedFalse)
+	// Source mk_clause wraps even a null antecedent when simplifying an
+	// auxiliary clause. Those true literals still explain the removed false
+	// disjuncts; dropping them loses assumption cores for new QI lemmas.
+	// A concrete proof already carries this resolution in the branch above.
+	if len(removedFalse) != 0 && (justification != nil || proof.IsNull()) {
+		region := true
+		if justification != nil {
+			region = justification.InRegion()
+		}
+		updated, err := NewSMTUnitResolutionJustification(region, justification, removedFalse)
 		if err != nil {
 			return err
 		}

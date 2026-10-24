@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 // SMTSequenceTheory is the incremental sequence-theory shell.  It completely
@@ -452,27 +453,44 @@ func (t *SMTSequenceTheory) concreteDistinct(left, right ast.ASTHandle) (bool, b
 }
 
 func (t *SMTSequenceTheory) setDependencyConflict(dependency *smtSequenceDependency) error {
-	assumptions := t.dependencies.Linearize(dependency)
-	literals := make([]SMTLiteral, 0, len(assumptions))
-	seen := make(map[SMTLiteral]struct{})
-	for _, assumption := range assumptions {
-		if assumption.literal == SMTNullLiteral {
-			return t.markUnsupported()
-		}
-		if _, found := seen[assumption.literal]; found {
-			continue
-		}
-		seen[assumption.literal] = struct{}{}
-		literals = append(literals, assumption.literal)
-	}
-	if len(literals) == 0 {
+	literals, equalities := t.dependencyEvidence(dependency)
+	if len(literals) == 0 && len(equalities) == 0 {
 		return t.markUnsupported()
 	}
 	state, err := t.State()
 	if err != nil {
 		return err
 	}
-	return state.SetTheoryConflict(t.FamilyID(), literals)
+	// Source linearize refuses a dependency whose literals are no longer
+	// asserted. Equality antecedents remain actual scoped enode evidence.
+	for _, literal := range literals {
+		value, err := state.Assignment(literal)
+		if err != nil {
+			return err
+		}
+		if value != lbool.True {
+			return nil
+		}
+	}
+	if len(equalities) == 0 {
+		return state.SetTheoryConflict(t.FamilyID(), literals)
+	}
+	if state.Inconsistent() {
+		return nil
+	}
+	owner, err := NewSMTExtTheoryConflictJustification(state.manager, t.FamilyID(), literals, equalities, nil)
+	if err != nil {
+		return err
+	}
+	wrapped, err := NewSMTBooleanJustification(owner)
+	if err != nil {
+		return errors.Join(err, owner.Release(state.manager))
+	}
+	state.inconsistent = true
+	state.conflict = wrapped
+	state.conflictLiteral = SMTNullLiteral
+	state.statistics.NumConflicts++
+	return nil
 }
 
 func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) error {
@@ -739,6 +757,30 @@ func (t *SMTSequenceTheory) concreteString(expression ast.ASTHandle, dependency 
 	if text, matched, textErr := state.manager.SequenceStringValue(expression); textErr != nil || matched {
 		return text, matched, dependency, textErr
 	}
+	if element, unit, unitErr := state.manager.SequenceUnitArgument(expression); unitErr != nil {
+		return "", false, dependency, unitErr
+	} else if unit {
+		value, fixed, valueErr := state.manager.SequenceUnitByteElementValue(element)
+		if valueErr != nil || fixed {
+			return string([]byte{value}), fixed, dependency, valueErr
+		}
+		// Canonization of a unit also uses established character equalities.
+		// Keep that equality evidence when the concrete word explains a
+		// conflict, rather than reading a guessed model character.
+		if node := state.context.enodes[element]; node != nil {
+			for current := node.Next(); current != node; current = current.Next() {
+				value, fixed, valueErr = state.manager.SequenceUnitByteElementValue(current.Owner())
+				if valueErr != nil {
+					return "", false, dependency, valueErr
+				}
+				if fixed {
+					dependency = t.dependencies.Join(dependency, t.dependencies.Leaf(smtSequenceAssumption{left: node, right: current, literal: SMTNullLiteral}))
+					return string([]byte{value}), true, dependency, nil
+				}
+			}
+		}
+		return "", false, dependency, nil
+	}
 	left, right, concat, err := state.manager.SequenceConcatParts(expression)
 	if err != nil || !concat {
 		return "", false, dependency, err
@@ -948,6 +990,12 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if regexProgress, err = propagateAxioms(reportedRegexProgress); err != nil {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence regex propagation: %w", err)
 	} else if regexProgress || reportedRegexProgress {
+		if !regexProgress {
+			// Source m_new_propagation includes a newly recorded regex
+			// refinement even when its clauses are already satisfied. The
+			// next final check must inspect the remaining word equations.
+			state.theoryProgress++
+		}
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.addLengthLowerBoundDecomposition()

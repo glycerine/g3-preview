@@ -287,6 +287,14 @@ func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 		return nil, err
 	}
 	switch c.logic {
+	case "UFLRA":
+		c.solver, err = portfolio.NewUFLRAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
+	case "AUFLIA":
+		c.solver, err = portfolio.NewAUFLIAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
+	case "AUFLIRA":
+		c.solver, err = portfolio.NewAUFLIRAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
+	case "AUFNIRA":
+		c.solver, err = portfolio.NewAUFNIRAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "QF_AUFLIA":
 		c.solver, err = portfolio.NewQFAUFLIAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "QF_LRA":

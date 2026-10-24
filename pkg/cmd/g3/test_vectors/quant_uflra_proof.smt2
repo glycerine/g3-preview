@@ -1,0 +1,7 @@
+(set-logic UFLRA)
+(set-option :produce-proofs true)
+(declare-fun f (Real) Real)
+(assert (forall ((x Real)) (! (>= (f x) x) :pattern ((f x)))))
+(assert (< (f 0) 0))
+(check-sat-using uflra)
+(check-sat)
