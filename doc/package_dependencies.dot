@@ -117,6 +117,7 @@ digraph packages {
   "cmd_context" -> "tactic/portfolio";
   "cmd_context" -> "tactic/smtlogics";
   "cmd_context" -> "util/cooperate";
+  "cmd_context" -> "util/escaped";
   "cmd_context" -> "util/lbool";
   "cmd_context" -> "util/numeral";
   "cmd_context" -> "util/params";

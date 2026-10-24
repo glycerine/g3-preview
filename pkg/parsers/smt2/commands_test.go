@@ -12,7 +12,7 @@ import (
 )
 
 func TestSMT2CommandsRejectMalformedInputBeforeEffects(t *testing.T) {
-	for _, command := range []string{"(assert false extra)", "(declare-fun p () Bool extra)", "(declare-const p (Array))", "(declare-const p (Array Bool))", "(push 1 extra)", "(assert (forall ((x Bool))"} {
+	for _, command := range []string{"(assert false extra)", "(declare-fun p () Bool extra)", "(declare-const p (Array))", "(declare-const p (Array Bool))", "(push 1 extra)", "(assert (forall ((x Bool))", "(get-info)", "(get-info reason-unknown)", "(get-info :reason-unknown extra)", "(get-info :reason-unknown"} {
 		t.Run(command, func(t *testing.T) {
 			context, err := cmd_context.NewStandaloneContext()
 			if err != nil {
@@ -26,6 +26,9 @@ func TestSMT2CommandsRejectMalformedInputBeforeEffects(t *testing.T) {
 			var out bytes.Buffer
 			if err := ParseCommands(context, strings.NewReader(command), &out); err == nil {
 				t.Fatal("malformed command was accepted")
+			}
+			if strings.HasPrefix(command, "(get-info") && out.Len() != 0 {
+				t.Fatal("malformed query emitted output", out.String())
 			}
 			if strings.HasPrefix(command, "(assert") {
 				status, err := context.CheckSat(nil)

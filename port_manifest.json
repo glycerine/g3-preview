@@ -33385,7 +33385,9 @@
         "pkg/ast/rewriter/arith_algebraic.go",
         "pkg/ast/rewriter/arith_rewriter_test.go",
         "pkg/ast/rewriter/polynomial_shapes.go",
-        "pkg/ast/rewriter/polynomial_shapes_test.go"
+        "pkg/ast/rewriter/polynomial_shapes_test.go",
+        "pkg/tactic/arith/diff_neq_integration_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -33488,7 +33490,10 @@
         "TestArithRewriterPolynomialCancellation",
         "TestArithRewriterAdvancedPolynomialModes",
         "TestArithmeticPolynomialShapeRecognizers",
-        "TestBitVectorPolynomialShapeRecognizers"
+        "TestBitVectorPolynomialShapeRecognizers",
+        "TestDiffNeqParsedShiftedPipeline",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "assertions": [
         {
@@ -33745,6 +33750,23 @@
             "TestArithRewriterAdvancedPolynomialModes",
             "TestArithmeticPolynomialShapeRecognizers",
             "TestBitVectorPolynomialShapeRecognizers"
+          ]
+        },
+        {
+          "name": "Arithmetic mk_nflat_mul_core single nonnumeral factor: distribute scalar over addition only when hoist_cmul is false, independent of flat/SOM; preserve hoisted single factors and unit-coefficient return before multi-factor SOM expansion",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/arith_polynomial.go",
+          "go_targets": [
+            "pkg/ast/rewriter/arith_polynomial.go",
+            "pkg/ast/rewriter/arith_rewriter_test.go",
+            "pkg/tactic/arith/diff_neq_integration_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestArithRewriterAdvancedPolynomialModes",
+            "TestDiffNeqParsedShiftedPipeline",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -37608,7 +37630,9 @@
         "pkg/parsers/smt2/commands.go",
         "pkg/parsers/smt2/expressions.go",
         "pkg/parsers/smt2/commands_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd_context/reason_unknown.go",
+        "pkg/cmd_context/reason_unknown_test.go"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -37621,7 +37645,8 @@
         "TestSMT2GetValueRejectsEmptyAndQuantifiedTermsBeforeOutput",
         "TestCommandContextUnsignedOptionsValidateTypesAndUpdateLiveSolver",
         "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
-        "TestSMT2UnsignedOptionsRejectRangeAndTrailingArguments"
+        "TestSMT2UnsignedOptionsRejectRangeAndTrailingArguments",
+        "TestCommandContextReasonUnknownStateAndEscaping"
       ],
       "conditionals": [
         {
@@ -37724,6 +37749,24 @@
             "pkg/cmd/g3/main_test.go"
           ],
           "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Selected get_info_cmd :reason-unknown branch: source escaped quotation and current-result reason; other get-info attributes remain unported",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/reason_unknown.go",
+          "go_targets": [
+            "pkg/cmd_context/reason_unknown.go",
+            "pkg/cmd_context/reason_unknown_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextReasonUnknownStateAndEscaping",
+            "TestSMT2CommandsRejectMalformedInputBeforeEffects",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -37877,7 +37920,10 @@
         "pkg/cmd_context/datatype_declarations.go",
         "pkg/tactic/portfolio/smt_strategic_solver.go",
         "pkg/tactic/smtlogics/qfauflia_tactic.go",
-        "pkg/cmd_context/qfauflia_solver_test.go"
+        "pkg/cmd_context/qfauflia_solver_test.go",
+        "pkg/cmd_context/reason_unknown.go",
+        "pkg/cmd_context/reason_unknown_test.go",
+        "pkg/parsers/smt2/commands_test.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -37891,7 +37937,9 @@
         "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
         "TestSMT2DatatypeRefusalsBeforeDeclarationPublication",
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
-        "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting"
+        "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting",
+        "TestCommandContextReasonUnknownStateAndEscaping",
+        "TestSMT2CommandsRejectMalformedInputBeforeEffects"
       ],
       "conditionals": [
         {
@@ -38209,6 +38257,24 @@
           "tests": [
             "TestCommandContextQFAUFLIACombinedSolverProofResult",
             "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "reason_unknown: no-current-check text or current solver/tactic reason, with result invalidation across context scopes",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/reason_unknown.go",
+          "go_targets": [
+            "pkg/cmd_context/reason_unknown.go",
+            "pkg/cmd_context/reason_unknown_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextReasonUnknownStateAndEscaping",
+            "TestSMT2CommandsRejectMalformedInputBeforeEffects",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -86619,7 +86685,9 @@
         "pkg/cmd_context/tactic_commands.go",
         "pkg/parsers/smt2/datatypes.go",
         "pkg/parsers/smt2/datatypes_test.go",
-        "pkg/cmd_context/datatype_declarations.go"
+        "pkg/cmd_context/datatype_declarations.go",
+        "pkg/cmd_context/reason_unknown.go",
+        "pkg/cmd_context/reason_unknown_test.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -86648,7 +86716,8 @@
         "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
         "TestSMT2TacticCombinatorsAndTypedParameters",
         "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
-        "TestSMT2DatatypeRefusalsBeforeDeclarationPublication"
+        "TestSMT2DatatypeRefusalsBeforeDeclarationPublication",
+        "TestCommandContextReasonUnknownStateAndEscaping"
       ],
       "assertions": [
         {
@@ -87392,6 +87461,24 @@
           "tests": [
             "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
             "TestSMT2DatatypeRefusalsBeforeDeclarationPublication",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Selected get-info :reason-unknown command grammar: require one keyword and completed command before output; other information attributes and general recovery remain unported",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/reason_unknown.go",
+          "go_targets": [
+            "pkg/cmd_context/reason_unknown.go",
+            "pkg/cmd_context/reason_unknown_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextReasonUnknownStateAndEscaping",
+            "TestSMT2CommandsRejectMalformedInputBeforeEffects",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -130017,9 +130104,28 @@
       "path": "src/tactic/arith/diff_neq_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/diff_neq_tactic.go",
+        "pkg/tactic/arith/diff_neq_compile.go",
+        "pkg/tactic/arith/diff_neq_search.go",
+        "pkg/tactic/arith/diff_neq_trace.go",
+        "pkg/tactic/arith/diff_neq_test.go",
+        "pkg/tactic/arith/diff_neq_integration_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestDiffNeqExhaustiveSmallDomains",
+        "TestDiffNeqBacktrackingStatisticsAndIndependentModel",
+        "TestDiffNeqRefusalsLimitsAndCancellation",
+        "TestDiffNeqGuardsAndExactTrace",
+        "TestDiffNeqResourceScopeTranslationAndEmptyGoals",
+        "TestDiffNeqAllocationFrontiers",
+        "TestDiffNeqParsedShiftedPipeline",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 78,
@@ -130046,19 +130152,173 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "imp constructor/updt_params/throw_not_supported/num_vars/mk_var/process_le/process_neq/check_unbounded/compile: exact bounded Int fragment, first-seen variables, signed offsets, both sum orders and positive-only parameter clamp after negative limit computation",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/diff_neq_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/diff_neq_tactic.go",
+            "pkg/tactic/arith/diff_neq_compile.go",
+            "pkg/tactic/arith/diff_neq_search.go",
+            "pkg/tactic/arith/diff_neq_trace.go",
+            "pkg/tactic/arith/diff_neq_test.go",
+            "pkg/tactic/arith/diff_neq_integration_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestDiffNeqExhaustiveSmallDomains",
+            "TestDiffNeqBacktrackingStatisticsAndIndependentModel",
+            "TestDiffNeqRefusalsLimitsAndCancellation",
+            "TestDiffNeqGuardsAndExactTrace",
+            "TestDiffNeqResourceScopeTranslationAndEmptyGoals",
+            "TestDiffNeqAllocationFrontiers",
+            "TestDiffNeqParsedShiftedPipeline",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "init_forbidden/choose_value/extend_model/resolve_conflict/search: concrete int32 finite-domain backtracking, ordered forbidden flags, conflict count, per-decision cancellation and source cleanup schedule",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/diff_neq_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/diff_neq_tactic.go",
+            "pkg/tactic/arith/diff_neq_compile.go",
+            "pkg/tactic/arith/diff_neq_search.go",
+            "pkg/tactic/arith/diff_neq_trace.go",
+            "pkg/tactic/arith/diff_neq_test.go",
+            "pkg/tactic/arith/diff_neq_integration_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestDiffNeqExhaustiveSmallDomains",
+            "TestDiffNeqBacktrackingStatisticsAndIndependentModel",
+            "TestDiffNeqRefusalsLimitsAndCancellation",
+            "TestDiffNeqGuardsAndExactTrace",
+            "TestDiffNeqResourceScopeTranslationAndEmptyGoals",
+            "TestDiffNeqAllocationFrontiers",
+            "TestDiffNeqParsedShiftedPipeline",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "mk_model/operator(): proof/core guards, inconsistent early return, stored independent model, SAT goal reset or UNSAT false, progress/depth/result publication and source well-sorted guards",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/diff_neq_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/diff_neq_tactic.go",
+            "pkg/tactic/arith/diff_neq_compile.go",
+            "pkg/tactic/arith/diff_neq_search.go",
+            "pkg/tactic/arith/diff_neq_trace.go",
+            "pkg/tactic/arith/diff_neq_test.go",
+            "pkg/tactic/arith/diff_neq_integration_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestDiffNeqExhaustiveSmallDomains",
+            "TestDiffNeqBacktrackingStatisticsAndIndependentModel",
+            "TestDiffNeqRefusalsLimitsAndCancellation",
+            "TestDiffNeqGuardsAndExactTrace",
+            "TestDiffNeqResourceScopeTranslationAndEmptyGoals",
+            "TestDiffNeqAllocationFrontiers",
+            "TestDiffNeqParsedShiftedPipeline",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "display/display_model and all compile/operator/search TRACE sites with exact source formatting and conditional stream handling",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/diff_neq_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/diff_neq_tactic.go",
+            "pkg/tactic/arith/diff_neq_compile.go",
+            "pkg/tactic/arith/diff_neq_search.go",
+            "pkg/tactic/arith/diff_neq_trace.go",
+            "pkg/tactic/arith/diff_neq_test.go",
+            "pkg/tactic/arith/diff_neq_integration_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestDiffNeqExhaustiveSmallDomains",
+            "TestDiffNeqBacktrackingStatisticsAndIndependentModel",
+            "TestDiffNeqRefusalsLimitsAndCancellation",
+            "TestDiffNeqGuardsAndExactTrace",
+            "TestDiffNeqResourceScopeTranslationAndEmptyGoals",
+            "TestDiffNeqAllocationFrontiers",
+            "TestDiffNeqParsedShiftedPipeline",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "outer constructor/destructor/translate/updt_params/collect_param_descrs/collect_statistics/reset_statistics/operator()/cleanup and clean factory: source parameter snapshot updates, fresh implementation publication and retained conflict statistics",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/diff_neq_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/diff_neq_tactic.go",
+            "pkg/tactic/arith/diff_neq_compile.go",
+            "pkg/tactic/arith/diff_neq_search.go",
+            "pkg/tactic/arith/diff_neq_trace.go",
+            "pkg/tactic/arith/diff_neq_test.go",
+            "pkg/tactic/arith/diff_neq_integration_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestDiffNeqExhaustiveSmallDomains",
+            "TestDiffNeqBacktrackingStatisticsAndIndependentModel",
+            "TestDiffNeqRefusalsLimitsAndCancellation",
+            "TestDiffNeqGuardsAndExactTrace",
+            "TestDiffNeqResourceScopeTranslationAndEmptyGoals",
+            "TestDiffNeqAllocationFrontiers",
+            "TestDiffNeqParsedShiftedPipeline",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns its copied parameter reference and one AST reference for each first-seen variable. Native Go slices/maps replace C++ vectors/maps; the bounded forbidden array has explicit budget accounting. Model publication retains an independent owning model through the stored-model converter. Cleanup publishes a fresh implementation and preserves conflicts before releasing the old one; stopped releases retain the concrete retired implementation for retry. Constructor, SAT/UNSAT application and populated cleanup allocation-frontier campaigns verify zero charged storage after teardown."
+      ],
+      "deviations": [
+        "Concrete int32 search replaces source int in its 32-bit source profile; native Go storage replaces STL/project vector/hashmap mechanics. Conflicts before the first search are deterministically zero instead of the source uninitialized member. Go owner/copy/closed checks and explicit errors replace native invalid-pointer domains. No SAT-backed substitute or widened input fragment is used."
+      ]
     },
     {
       "path": "src/tactic/arith/diff_neq_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/diff_neq_tactic.go",
+        "pkg/tactic/arith/diff_neq_compile.go",
+        "pkg/tactic/arith/diff_neq_search.go",
+        "pkg/tactic/arith/diff_neq_trace.go",
+        "pkg/tactic/arith/diff_neq_test.go",
+        "pkg/tactic/arith/diff_neq_integration_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestDiffNeqExhaustiveSmallDomains",
+        "TestDiffNeqBacktrackingStatisticsAndIndependentModel",
+        "TestDiffNeqRefusalsLimitsAndCancellation",
+        "TestDiffNeqGuardsAndExactTrace",
+        "TestDiffNeqResourceScopeTranslationAndEmptyGoals",
+        "TestDiffNeqAllocationFrontiers",
+        "TestDiffNeqParsedShiftedPipeline",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 23,
@@ -130069,11 +130329,42 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained mk_diff_neq_tactic declaration and clean factory",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/diff_neq_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/diff_neq_tactic.go",
+            "pkg/tactic/arith/diff_neq_compile.go",
+            "pkg/tactic/arith/diff_neq_search.go",
+            "pkg/tactic/arith/diff_neq_trace.go",
+            "pkg/tactic/arith/diff_neq_test.go",
+            "pkg/tactic/arith/diff_neq_integration_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestDiffNeqExhaustiveSmallDomains",
+            "TestDiffNeqBacktrackingStatisticsAndIndependentModel",
+            "TestDiffNeqRefusalsLimitsAndCancellation",
+            "TestDiffNeqGuardsAndExactTrace",
+            "TestDiffNeqResourceScopeTranslationAndEmptyGoals",
+            "TestDiffNeqAllocationFrontiers",
+            "TestDiffNeqParsedShiftedPipeline",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns its copied parameter reference and one AST reference for each first-seen variable. Native Go slices/maps replace C++ vectors/maps; the bounded forbidden array has explicit budget accounting. Model publication retains an independent owning model through the stored-model converter. Cleanup publishes a fresh implementation and preserves conflicts before releasing the old one; stopped releases retain the concrete retired implementation for retry. Constructor, SAT/UNSAT application and populated cleanup allocation-frontier campaigns verify zero charged storage after teardown."
+      ],
+      "deviations": [
+        "Concrete int32 search replaces source int in its 32-bit source profile; native Go storage replaces STL/project vector/hashmap mechanics. Conflicts before the first search are deterministically zero instead of the source uninitialized member. Go owner/copy/closed checks and explicit errors replace native invalid-pointer domains. No SAT-backed substitute or widened input fragment is used."
+      ]
     },
     {
       "path": "src/tactic/arith/elim01_tactic.cpp",

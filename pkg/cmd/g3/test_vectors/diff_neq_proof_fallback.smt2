@@ -1,0 +1,6 @@
+(set-option :produce-proofs true)
+(set-logic QF_LIA)
+(declare-const x Int)
+(assert (>= x 1))
+(assert (<= x 0))
+(check-sat-using (or-else diff-neq smt))

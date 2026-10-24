@@ -1,0 +1,8 @@
+(set-logic QF_LIA)
+(declare-const x Int)
+(assert (>= x 1))
+(assert (<= x 1))
+(check-sat-using diff-neq)
+(get-info :reason-unknown)
+(check-sat-using (or-else diff-neq smt))
+(get-value (x))

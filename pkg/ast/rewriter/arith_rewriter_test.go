@@ -2,6 +2,7 @@ package rewriter
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -1080,23 +1081,37 @@ func TestArithRewriterAdvancedPolynomialModes(t *testing.T) {
 		}
 	})
 
-	t.Run("coefficient-distribution-and-hoisting", func(t *testing.T) {
+	for _, flat := range []bool{false, true} {
+		t.Run(fmt.Sprintf("coefficient-distribution-flat-%t", flat), func(t *testing.T) {
+			r, x, y, _ := newFixture(t, map[string]bool{"flat": flat}, nil)
+			i2 := arithRewriterNumeral(t, r.manager, "2", true)
+			sum, err := r.app(arithOpAdd, x, y)
+			astTestMust(t, err)
+			astTestPin(t, r.manager, sum)
+			status, result := arithRewriterCore(t, r, arithOpMul, i2, sum)
+			if status != Rewrite2 {
+				t.Fatal("coefficient distribution status", status)
+			}
+			_, terms, matched, err := r.operation(result, arithOpAdd)
+			astTestMust(t, err)
+			if !matched || len(terms) != 2 {
+				t.Fatal("coefficient distribution", matched, len(terms))
+			}
+			arithRewriterWantOperation(t, r, terms[0], arithOpMul, i2, x)
+			arithRewriterWantOperation(t, r, terms[1], arithOpMul, i2, y)
+		})
+	}
+
+	t.Run("coefficient-hoisting", func(t *testing.T) {
 		r, x, y, _ := newFixture(t, map[string]bool{"hoist_cmul": true}, nil)
 		i2 := arithRewriterNumeral(t, r.manager, "2", true)
 		sum, err := r.app(arithOpAdd, x, y)
 		astTestMust(t, err)
 		astTestPin(t, r.manager, sum)
 		status, result := arithRewriterCore(t, r, arithOpMul, i2, sum)
-		if status != Rewrite2 {
-			t.Fatal("coefficient distribution status", status)
+		if status != RewriteFailed {
+			t.Fatal("hoisted coefficient must remain factored", status, result)
 		}
-		_, terms, matched, err := r.operation(result, arithOpAdd)
-		astTestMust(t, err)
-		if !matched || len(terms) != 2 {
-			t.Fatal("coefficient distribution", matched, len(terms))
-		}
-		arithRewriterWantOperation(t, r, terms[0], arithOpMul, i2, x)
-		arithRewriterWantOperation(t, r, terms[1], arithOpMul, i2, y)
 
 		left, err := r.app(arithOpMul, i2, x)
 		astTestMust(t, err)
@@ -1112,6 +1127,22 @@ func TestArithRewriterAdvancedPolynomialModes(t *testing.T) {
 			t.Fatal("coefficient hoisting", matched, len(factors))
 		}
 		arithRewriterWantOperation(t, r, factors[1], arithOpAdd, x, y)
+	})
+	t.Run("single-factor-before-sum-of-monomials", func(t *testing.T) {
+		r, x, y, _ := newFixture(t, map[string]bool{"som": true, "hoist_cmul": true}, nil)
+		sum, err := r.app(arithOpAdd, x, y)
+		astTestMust(t, err)
+		astTestPin(t, r.manager, sum)
+		i2 := arithRewriterNumeral(t, r.manager, "2", true)
+		status, _ := arithRewriterCore(t, r, arithOpMul, i2, sum)
+		if status != RewriteFailed {
+			t.Fatal("SOM expanded a hoisted single factor", status)
+		}
+		i1 := arithRewriterNumeral(t, r.manager, "1", true)
+		status, result := arithRewriterCore(t, r, arithOpMul, i1, sum)
+		if status != RewriteDone || result != sum {
+			t.Fatal("unit coefficient must return the single factor", status, result, sum)
+		}
 	})
 
 	t.Run("pairwise-multiplication-hoisting", func(t *testing.T) {

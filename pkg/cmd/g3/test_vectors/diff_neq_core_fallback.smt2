@@ -1,0 +1,7 @@
+(set-option :produce-unsat-cores true)
+(set-logic QF_LIA)
+(declare-const x Int)
+(assert (! (>= x 1) :named lower))
+(assert (! (<= x 0) :named upper))
+(check-sat-using (or-else diff-neq smt))
+(get-unsat-core)

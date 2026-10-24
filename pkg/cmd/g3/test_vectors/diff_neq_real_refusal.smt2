@@ -1,0 +1,8 @@
+(set-logic QF_LRA)
+(declare-const x Real)
+(assert (>= x 0))
+(assert (<= x 1))
+(check-sat-using diff-neq)
+(get-info :reason-unknown)
+(check-sat-using (or-else diff-neq smt))
+(get-value ((and (>= x 0) (<= x 1))))

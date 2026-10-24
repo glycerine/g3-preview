@@ -229,7 +229,7 @@ func (r *ArithRewriter) expandSumOfMonomials(factors []ast.ASTHandle, coefficien
 }
 
 func (r *ArithRewriter) distributeCoefficient(coefficient *big.Rat, factor, term ast.ASTHandle) (ast.ASTHandle, bool, error) {
-	if !r.hoistCoeff || coefficient.Cmp(big.NewRat(1, 1)) == 0 {
+	if r.hoistCoeff || coefficient.Cmp(big.NewRat(1, 1)) == 0 {
 		return ast.ASTHandle{}, false, nil
 	}
 	_, children, sum, err := r.operation(factor, arithOpAdd)
@@ -778,7 +778,7 @@ func (r *ArithRewriter) rewriteMul(args ast.AppArguments, out ast.ASTRef) (Rewri
 			return Rewrite2, r.manager.SetRef(out, result)
 		}
 	}
-	if r.sumOfMonomials {
+	if r.sumOfMonomials && len(factors) > 1 {
 		if result, expanded, e := r.expandSumOfMonomials(factors, coefficient, first); e != nil {
 			return RewriteFailed, e
 		} else if expanded {

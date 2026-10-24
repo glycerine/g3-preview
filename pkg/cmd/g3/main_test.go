@@ -10,6 +10,16 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"diff_neq_backtrack_model.smt2":                "sat\n((x 1) (y 0))\nsat\n((x 1) (y 0))\n",
+	"diff_neq_core_fallback.smt2":                  "unsat\n(lower upper)\n",
+	"diff_neq_dl_pipeline_scopes.smt2":             "sat\n((x 0) (y 0) (z 1))\nunsat\nsat\n((x 0) (y 0) (z 1))\n",
+	"diff_neq_parameter_recovery.smt2":             "unknown\n(:reason-unknown \"goal is not diff neq\")\nsat\n((x 0))\n",
+	"diff_neq_proof_fallback.smt2":                 "unsat\n",
+	"diff_neq_real_refusal.smt2":                   "unknown\n(:reason-unknown \"goal is not diff neq\")\nsat\n(((and (>= x 0) (<= x 1)) true))\n",
+	"diff_neq_refusal_fallback.smt2":               "unknown\n(:reason-unknown \"goal is not diff neq\")\nsat\n((x 1))\n",
+	"diff_neq_shifted_model.smt2":                  "sat\n((x (- 2)) (y 5))\n",
+	"diff_neq_signed_offsets.smt2":                 "sat\n((x 0) (y 2))\n",
+	"diff_neq_triangle_unsat.smt2":                 "unsat\n",
 	"normalize_bounds_core.smt2":                   "unsat\n(lower upper)\n",
 	"normalize_bounds_disjunction.smt2":            "sat\n((x 2))\n",
 	"normalize_bounds_fix_dl_pipeline.smt2":        "sat\n((x 0) ((<= (- x y) 2) true) ((<= (- x z) 3) true) ((<= (- x w) 4) true))\nunsat\nsat\n",

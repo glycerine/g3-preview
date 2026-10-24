@@ -329,6 +329,24 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		success = false
+	case "get-info":
+		if p.token != KeywordToken {
+			return false, fmt.Errorf("information keyword expected")
+		}
+		key := p.scanner.ID()
+		if err = p.advance(); err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if key != ":reason-unknown" {
+			return false, fmt.Errorf("unsupported information attribute %s", key)
+		}
+		if err = p.context.WriteReasonUnknown(p.out); err != nil {
+			return false, err
+		}
+		success = false
 	case "get-model":
 		if err = p.requireEnd(); err != nil {
 			return false, err
