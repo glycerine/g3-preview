@@ -1,0 +1,8 @@
+(set-logic QF_BV)
+(set-option :produce-proofs true)
+(declare-const x (_ BitVec 8))
+(assert (bvsle #x03 x))
+(assert (bvsle x #x02))
+(check-sat-using reduce-bv-size)
+(get-info :reason-unknown)
+(check-sat-using (or-else reduce-bv-size smt))

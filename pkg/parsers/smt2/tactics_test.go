@@ -22,6 +22,8 @@ func TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking(t *testing.T) {
 		"(check-sat-using (using-params qfauflia :array.simplify true))",
 		"(check-sat-using (using-params qflra :max_steps 0))",
 		"(check-sat-using (using-params normalize-bounds :max_steps 0))",
+		"(check-sat-using (using-params reduce-bv-size :max_steps 0))",
+		"(check-sat-using (using-params reduce-bv-size :max_memory 0))",
 		"(check-sat-using (using-params qflra :arith.least_error_pivot true))",
 		"(check-sat-using smt :rlimit false)",
 	} {

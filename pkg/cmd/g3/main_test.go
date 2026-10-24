@@ -194,6 +194,13 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"bv_size_signed_models_scopes.smt2":            "sat\n((x #xff))\nunsat\nsat\n((x #xff))\n",
+	"bv_size_negative_model.smt2":                  "sat\n((x #xff)\n ((bvsle #xf8 x) true)\n ((bvsle x #xff) true))\n",
+	"bv_size_positive_model.smt2":                  "sat\n((x #x03))\n",
+	"bv_size_singleton_model.smt2":                 "sat\n((x #xfb))\n",
+	"bv_size_unsigned_unchanged.smt2":              "unknown\n(:reason-unknown \"incomplete\")\nsat\n((x #x02))\n",
+	"bv_size_proof_refusal.smt2":                   "unknown\n(:reason-unknown \"bv-size-reduction does not support proof production\")\nunsat\n",
+	"bv_size_core_refusal.smt2":                    "unknown\n(:reason-unknown \"bv-size-reduction does not support unsat core production\")\nunsat\n(lo hi)\n",
 	"bv1_blast_models_scopes.smt2":                 "sat\n((x #xa5))\nunsat\nsat\n((x #xa5))\n",
 	"bv1_blast_uf_models.smt2":                     "sat\n((x #b101)\n ((f x) #b101)\n ((= (f x) x) true))\n",
 	"bv1_blast_core_route.smt2":                    "unsat\n(five conflict)\n",

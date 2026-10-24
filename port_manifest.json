@@ -136087,9 +136087,34 @@
       "path": "src/tactic/bv/bv_size_reduction_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/bv/bv_size_reduction_tactic.go",
+        "pkg/tactic/bv/bv_size_reduction_bounds.go",
+        "pkg/tactic/bv/bv_size_reduction_trace.go",
+        "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+        "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/tactics_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+      ],
+      "tests": [
+        "TestBVSizeReductionExactGoalsCPP",
+        "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+        "TestBVSizeReductionMetadataGuardsAndCancellation",
+        "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+        "TestBVSizeReductionAllocationFrontiers",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 158,
@@ -136126,19 +136151,365 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Raw tactic/imp construction and clean factory: borrowed manager/services, default expression replacer, copied translation and intentionally ignored factory/update parameters with no descriptors",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_size_reduction_tactic.go",
+            "pkg/tactic/bv/bv_size_reduction_bounds.go",
+            "pkg/tactic/bv/bv_size_reduction_trace.go",
+            "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+            "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+          ],
+          "tests": [
+            "TestBVSizeReductionExactGoalsCPP",
+            "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+            "TestBVSizeReductionMetadataGuardsAndCancellation",
+            "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+            "TestBVSizeReductionAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "update_signed_lower/update_signed_upper monotone max/min tightening and collect_bounds direct signed-LE matching, one outer negation, uninterpreted constant/numeral operands and signed normalization",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_size_reduction_tactic.go",
+            "pkg/tactic/bv/bv_size_reduction_bounds.go",
+            "pkg/tactic/bv/bv_size_reduction_trace.go",
+            "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+            "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+          ],
+          "tests": [
+            "TestBVSizeReductionExactGoalsCPP",
+            "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+            "TestBVSizeReductionMetadataGuardsAndCancellation",
+            "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+            "TestBVSizeReductionAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Negated signed comparisons: +/-1 strict-bound conversion and deliberate omission of infeasible signed-extreme wraparound bounds",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_size_reduction_tactic.go",
+            "pkg/tactic/bv/bv_size_reduction_bounds.go",
+            "pkg/tactic/bv/bv_size_reduction_trace.go",
+            "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+            "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+          ],
+          "tests": [
+            "TestBVSizeReductionExactGoalsCPP",
+            "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+            "TestBVSizeReductionMetadataGuardsAndCancellation",
+            "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+            "TestBVSizeReductionAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Signed narrowing: contradictory interval assertion, singleton numerals, conservative negative/mixed/nonnegative bit-width formulas, fresh constants, all-one/zero concat prefixes and sign extension",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_size_reduction_tactic.go",
+            "pkg/tactic/bv/bv_size_reduction_bounds.go",
+            "pkg/tactic/bv/bv_size_reduction_trace.go",
+            "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+            "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+          ],
+          "tests": [
+            "TestBVSizeReductionExactGoalsCPP",
+            "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+            "TestBVSizeReductionMetadataGuardsAndCancellation",
+            "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+            "TestBVSizeReductionAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Concrete expression substitution and default replacer: unchanged non-target assertions, whole-goal updates with source null proof/dependency defaults and reached cancellation transport",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_size_reduction_tactic.go",
+            "pkg/tactic/bv/bv_size_reduction_bounds.go",
+            "pkg/tactic/bv/bv_size_reduction_trace.go",
+            "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+            "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+          ],
+          "tests": [
+            "TestBVSizeReductionExactGoalsCPP",
+            "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+            "TestBVSizeReductionMetadataGuardsAndCancellation",
+            "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+            "TestBVSizeReductionAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Lazy extension/filter converters, fresh-helper filtering, source concat order and indexed reconstruction, independent result references and early-return converter ownership",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_size_reduction_tactic.go",
+            "pkg/tactic/bv/bv_size_reduction_bounds.go",
+            "pkg/tactic/bv/bv_size_reduction_trace.go",
+            "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+            "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+          ],
+          "tests": [
+            "TestBVSizeReductionExactGoalsCPP",
+            "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+            "TestBVSizeReductionMetadataGuardsAndCancellation",
+            "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+            "TestBVSizeReductionAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Outer well-sorted assertions and proof/core refusal before result reset, inconsistent/no-substitution early returns, unconditional depth/subgoal publication and source report/progress boundaries",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_size_reduction_tactic.go",
+            "pkg/tactic/bv/bv_size_reduction_bounds.go",
+            "pkg/tactic/bv/bv_size_reduction_trace.go",
+            "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+            "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+          ],
+          "tests": [
+            "TestBVSizeReductionExactGoalsCPP",
+            "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+            "TestBVSizeReductionMetadataGuardsAndCancellation",
+            "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+            "TestBVSizeReductionAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Persistent raw bound maps, selective extension reset and filter lifetime, retained borrowed-substitution roots and successful converter reset/publication",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_size_reduction_tactic.go",
+            "pkg/tactic/bv/bv_size_reduction_bounds.go",
+            "pkg/tactic/bv/bv_size_reduction_trace.go",
+            "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+            "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+          ],
+          "tests": [
+            "TestBVSizeReductionExactGoalsCPP",
+            "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+            "TestBVSizeReductionMetadataGuardsAndCancellation",
+            "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+            "TestBVSizeReductionAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Destructive placement-style cleanup: release old implementation before rebuilding, retain stopped partial owners, explicit recovery/close and unchanged source policy",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_size_reduction_tactic.go",
+            "pkg/tactic/bv/bv_size_reduction_bounds.go",
+            "pkg/tactic/bv/bv_size_reduction_trace.go",
+            "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+            "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+          ],
+          "tests": [
+            "TestBVSizeReductionExactGoalsCPP",
+            "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+            "TestBVSizeReductionMetadataGuardsAndCancellation",
+            "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+            "TestBVSizeReductionAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "All live before/after, bound collection, map dump, interval and width TRACE sites, source expression/symbol formatting, progress output and closed-stream tolerance",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_size_reduction_tactic.go",
+            "pkg/tactic/bv/bv_size_reduction_bounds.go",
+            "pkg/tactic/bv/bv_size_reduction_trace.go",
+            "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+            "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+          ],
+          "tests": [
+            "TestBVSizeReductionExactGoalsCPP",
+            "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+            "TestBVSizeReductionMetadataGuardsAndCancellation",
+            "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+            "TestBVSizeReductionAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Unsigned bound maps/update helpers, unsigned collection/reduction branches and their positive-bound assertions; imp::checkpoint",
+          "status": "dead_deleted",
+          "reason": "Both unsigned consumers are disabled by #if 0, so the unsigned maps and update helpers have no live retained path. checkpoint is declared but never called. The live default expression replacer performs cancellation checks only when rewriting is actually reached."
+        }
+      ],
+      "ownership": [
+        "The tactic owns one implementation storage charge, default replacer, retained AST keys/scratch roots and concrete signed-bound values. A borrowed expression substitution remains owned while the replacer can reference it; superseded/unborrowed substitutions are released and stopped prefixes stay owned for cleanup. Extension/filter fields hold counted references until result publication; consumed destructor refusals retain their actual converter owners. Result models independently own their declarations/definitions. Services are borrowed; translation uses a fresh target manager with registered plugins. Cleanup follows source destruction-before-reconstruction and leaves a partial owner on failure until retry or close."
+      ],
+      "deviations": [
+        "Native Go maps and math/big values replace project storage without reproducing STL/obj_map bucket internals; source hash iteration order is not emulated. Source algorithms and signed interval formulas are retained. Disabled unsigned code and the unused explicit checkpoint are omitted under the retained-consumer rule.",
+        "The Go boundary retains actual substitution/key roots across raw calls to keep borrowed references valid. The clean factory resets that state after successful applications. This completes this QF_BV prerequisite; Ackermannization, full QF_BV/default strategy dispatch, public API completion and higher engines remain open."
+      ]
     },
     {
       "path": "src/tactic/bv/bv_size_reduction_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/bv/bv_size_reduction_tactic.go",
+        "pkg/tactic/bv/bv_size_reduction_bounds.go",
+        "pkg/tactic/bv/bv_size_reduction_trace.go",
+        "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+        "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/tactics_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+        "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+      ],
+      "tests": [
+        "TestBVSizeReductionExactGoalsCPP",
+        "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+        "TestBVSizeReductionMetadataGuardsAndCancellation",
+        "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+        "TestBVSizeReductionAllocationFrontiers",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 24,
@@ -136149,11 +136520,48 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained mk_bv_size_reduction_tactic declaration, ignored parameter argument, typed Go factory and reduce-bv-size builtin registration",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_size_reduction_tactic.go",
+            "pkg/tactic/bv/bv_size_reduction_bounds.go",
+            "pkg/tactic/bv/bv_size_reduction_trace.go",
+            "pkg/tactic/bv/bv_size_reduction_tactic_test.go",
+            "pkg/tactic/bv/bv_size_reduction_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_size_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_negative_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_positive_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_signed_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_singleton_model.smt2",
+            "pkg/cmd/g3/test_vectors/bv_size_unsigned_unchanged.smt2"
+          ],
+          "tests": [
+            "TestBVSizeReductionExactGoalsCPP",
+            "TestBVSizeReductionModelLifetimeFilteringAndPlacementCleanup",
+            "TestBVSizeReductionMetadataGuardsAndCancellation",
+            "TestBVSizeReductionRawStateTranslationIgnoredParamsAndTrace",
+            "TestBVSizeReductionAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns one implementation storage charge, default replacer, retained AST keys/scratch roots and concrete signed-bound values. A borrowed expression substitution remains owned while the replacer can reference it; superseded/unborrowed substitutions are released and stopped prefixes stay owned for cleanup. Extension/filter fields hold counted references until result publication; consumed destructor refusals retain their actual converter owners. Result models independently own their declarations/definitions. Services are borrowed; translation uses a fresh target manager with registered plugins. Cleanup follows source destruction-before-reconstruction and leaves a partial owner on failure until retry or close."
+      ],
+      "deviations": [
+        "Native Go maps and math/big values replace project storage without reproducing STL/obj_map bucket internals; source hash iteration order is not emulated. Source algorithms and signed interval formulas are retained. Disabled unsigned code and the unused explicit checkpoint are omitted under the retained-consumer rule.",
+        "The Go boundary retains actual substitution/key roots across raw calls to keep borrowed references valid. The clean factory resets that state after successful applications. This completes this QF_BV prerequisite; Ackermannization, full QF_BV/default strategy dispatch, public API completion and higher engines remain open."
+      ]
     },
     {
       "path": "src/tactic/bv/bvarray2uf_rewriter.cpp",

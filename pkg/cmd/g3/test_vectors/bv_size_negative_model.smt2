@@ -1,0 +1,8 @@
+(set-logic QF_BV)
+(set-option :produce-models true)
+(declare-const x (_ BitVec 8))
+(assert (bvsle #xf8 x))
+(assert (bvsle x #xff))
+(assert (= ((_ extract 2 0) x) #b111))
+(check-sat-using (then reduce-bv-size smt))
+(get-value (x (bvsle #xf8 x) (bvsle x #xff)))
