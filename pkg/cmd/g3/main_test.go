@@ -12,6 +12,10 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"propagate_ineqs_model_scopes.smt2":            "sat\n((x 2.0) (y 5.0))\nunsat\nsat\n((x 2.0) (y 5.0))\n",
+	"propagate_ineqs_core_fallback.smt2":           "unknown\n(:reason-unknown \"propagate-ineqs does not support unsat core production\")\nunsat\n(lo hi)\n",
+	"propagate_ineqs_pb_pipeline.smt2":             "sat\n((x 7) (y 7))\n",
+	"propagate_ineqs_proof_fallback.smt2":          "unknown\n(:reason-unknown \"propagate-ineqs does not support proof production\")\nunsat\n",
 	"pb2bv_equal_vector_model.smt2":                "sat\n((x 1) (y 1) (z 0) (w 0))\n",
 	"pb2bv_refusal_fallback.smt2":                  "unknown\n(:reason-unknown \"goal is in a fragment unsupported by pb2bv. Offending expression: x\")\nsat\n(((> x 0) true))\n",
 	"pb2bv_proof_fallback.smt2":                    "unsat\n",

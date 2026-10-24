@@ -2821,6 +2821,7 @@
         "pb2bv_trace.go",
         "polynomial_builder.go",
         "polynomial_trace.go",
+        "propagate_ineq_adapter.go",
         "propagate_ineq_clean.go",
         "propagate_ineq_memory_trace.go",
         "propagate_ineq_outer_memory_trace.go",

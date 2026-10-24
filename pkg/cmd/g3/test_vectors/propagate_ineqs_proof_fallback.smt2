@@ -1,0 +1,8 @@
+(set-logic QF_LIA)
+(set-option :produce-proofs true)
+(declare-const x Int)
+(assert (> x 2))
+(assert (< x 1))
+(check-sat-using propagate-ineqs)
+(get-info :reason-unknown)
+(check-sat-using (or-else propagate-ineqs smt))

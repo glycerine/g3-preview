@@ -132516,7 +132516,7 @@
       "path": "src/tactic/arith/propagate_ineqs_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
         "pkg/tactic/tactic_goal_inequality_memory_trace.go",
@@ -132532,7 +132532,11 @@
         "pkg/tactic/arith/propagate_ineq_tactic_test.go",
         "pkg/tactic/arith/propagate_ineq_clean.go",
         "pkg/tactic/arith/propagate_ineq_clean_test.go",
-        "pkg/tactic/arith/polynomial_trace.go"
+        "pkg/tactic/arith/polynomial_trace.go",
+        "pkg/tactic/arith/propagate_ineq_adapter.go",
+        "pkg/tactic/arith/propagate_ineq_adapter_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate",
@@ -132547,7 +132551,10 @@
         "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot",
         "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
         "TestInequalityRestoredGoalSourceTrace",
-        "TestInequalitySourceDisplayBoundsStrictAndUnbounded"
+        "TestInequalitySourceDisplayBoundsStrictAndUnbounded",
+        "TestPropagateIneqsAdapterGoalsGuardsAndTranslation",
+        "TestPropagateIneqsAdapterAllocationFrontiers",
+        "TestPropagateIneqsAdapterCPPGoalShapes"
       ],
       "assertions": [
         {
@@ -132567,8 +132574,8 @@
           "text": "SASSERT(r->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete propagate_ineqs_tactic outer allocations at cpp47 and cpp61 and final tactic.h:43 deallocation through debug memory wrappers",
@@ -132691,9 +132698,21 @@
           "tests": [
             "TestInequalityRestoredGoalSourceTrace"
           ]
+        },
+        {
+          "name": "Standard tactic virtual boundary, private unsynchronized numeral owner, pre-reset proof/core guards, borrowed/transferred result ownership, cleanup and translation; clean factory and SMT-LIB command integration",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/propagate_ineq_adapter.go",
+          "tests": [
+            "TestPropagateIneqsAdapterGoalsGuardsAndTranslation",
+            "TestPropagateIneqsAdapterAllocationFrontiers",
+            "TestPropagateIneqsAdapterCPPGoalShapes"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The standard tactic adapter owns the concrete implementation, copied parameters, private unsynchronized rational manager and stopped new goals awaiting closure. Borrowed no-bound goals use AddGoal, while newly constructed goals transfer with TakeGoal. Translation constructs independent numerical and implementation owners. The clean factory invokes cleanup after successful applications. A failed private numeral constructor retains its charged child through ConstructionFailure; the adapter explicitly cleans that owner before unwinding its own header. Allocation-frontier tests cover native and checked/debug/trace construction, application and populated cleanup."
+      ],
       "deviations": []
     },
     {
@@ -132705,12 +132724,19 @@
         "pkg/tactic/arith/propagate_ineq_tactic.go",
         "pkg/tactic/arith/propagate_ineq_tactic_test.go",
         "pkg/tactic/arith/propagate_ineq_clean.go",
-        "pkg/tactic/arith/propagate_ineq_clean_test.go"
+        "pkg/tactic/arith/propagate_ineq_clean_test.go",
+        "pkg/tactic/arith/propagate_ineq_adapter.go",
+        "pkg/tactic/arith/propagate_ineq_adapter_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
         "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot",
-        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
+        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
+        "TestPropagateIneqsAdapterGoalsGuardsAndTranslation",
+        "TestPropagateIneqsAdapterAllocationFrontiers",
+        "TestPropagateIneqsAdapterCPPGoalShapes"
       ],
       "conditionals": [
         {
@@ -132734,13 +132760,23 @@
             "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot",
             "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
           ]
+        },
+        {
+          "name": "Standard tactic virtual boundary, private unsynchronized numeral owner, pre-reset proof/core guards, borrowed/transferred result ownership, cleanup and translation; clean factory and SMT-LIB command integration",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/propagate_ineq_adapter.go",
+          "tests": [
+            "TestPropagateIneqsAdapterGoalsGuardsAndTranslation",
+            "TestPropagateIneqsAdapterAllocationFrontiers",
+            "TestPropagateIneqsAdapterCPPGoalShapes"
+          ]
         }
       ],
       "ownership": [
         "The concrete clean wrapper owns its inner tactic and calls cleanup only after successful application, preserving the borrowed input or transferring the result goal to the caller."
       ],
       "deviations": [
-        "The Go constructor accepts explicit borrowed rational and parameter services in place of the C++ process-global services; nil parameters represent the source default empty params_ref."
+        "Explicit AST and parameter services replace source process globals; the standard tactic adapter owns its private rational manager. The older concrete API retains explicit borrowed rational services for its existing consumers."
       ]
     },
     {
