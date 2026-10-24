@@ -64,10 +64,8 @@ func (t *SMTArrayTheory) instantiateMapRead(observer, mapped *SMTEnode) (bool, e
 func (t *SMTArrayTheory) mergeFullArrayClasses(root uint32, second *smtArrayVarData) error {
 	first := t.arrayData[root]
 	for _, mapped := range second.maps {
-		for _, store := range first.stores {
-			if err := t.setStoreBaseUpward(store); err != nil {
-				return err
-			}
+		if err := t.setArrayUpward(root); err != nil {
+			return err
 		}
 		first.maps = append(first.maps, mapped)
 		if err := t.arrayTrail.PushUndo(func() { first.maps = first.maps[:len(first.maps)-1] }); err != nil {
@@ -88,13 +86,14 @@ func (t *SMTArrayTheory) mergeFullArrayClasses(root uint32, second *smtArrayVarD
 		}
 	}
 	for _, node := range second.consts {
-		for _, store := range first.stores {
-			if err := t.setStoreBaseUpward(store); err != nil {
-				return err
-			}
+		if err := t.setArrayUpward(root); err != nil {
+			return err
 		}
 		first.consts = append(first.consts, node)
 		if err := t.arrayTrail.PushUndo(func() { first.consts = first.consts[:len(first.consts)-1] }); err != nil {
+			return err
+		}
+		if _, err := t.instantiateConstructorDefault(node.owner); err != nil {
 			return err
 		}
 		for _, read := range first.parentSelects {
@@ -104,13 +103,14 @@ func (t *SMTArrayTheory) mergeFullArrayClasses(root uint32, second *smtArrayVarD
 		}
 	}
 	for _, node := range second.asArrays {
-		for _, store := range first.stores {
-			if err := t.setStoreBaseUpward(store); err != nil {
-				return err
-			}
+		if err := t.setArrayUpward(root); err != nil {
+			return err
 		}
 		first.asArrays = append(first.asArrays, node)
 		if err := t.arrayTrail.PushUndo(func() { first.asArrays = first.asArrays[:len(first.asArrays)-1] }); err != nil {
+			return err
+		}
+		if _, err := t.instantiateConstructorDefault(node.owner); err != nil {
 			return err
 		}
 		for _, read := range first.parentSelects {

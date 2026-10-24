@@ -163,10 +163,10 @@ func (t *SMTArrayTheory) setArrayUpward(variable uint32) error {
 
 func (t *SMTArrayTheory) addArrayStore(variable uint32, store *SMTEnode) error {
 	data := t.arrayData[t.arrayUnion.Find(variable)]
-	for _, previous := range data.stores {
-		if err := t.setStoreBaseUpward(previous); err != nil {
-			return err
-		}
+	// Retained AlwaysPropUpward is true: add_store marks the class before
+	// inserting the new constructor, then propagates through its new input.
+	if err := t.setArrayUpward(variable); err != nil {
+		return err
 	}
 	data.stores = append(data.stores, store)
 	if err := t.arrayTrail.PushUndo(func() { data.stores = data.stores[:len(data.stores)-1] }); err != nil {

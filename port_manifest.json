@@ -118586,6 +118586,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_constructor_merge_test.go",
         "pkg/smtcore/theory_array_sorts.go",
         "pkg/smtcore/theory_array_sorts_test.go",
         "pkg/cmd/g3/test_vectors/array_explicit_extensionality_scopes.smt2",
@@ -118628,6 +118629,7 @@
         "pkg/smtcore/smt_setup.go"
       ],
       "tests": [
+        "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback",
         "TestSMTArraySortDeclarationsOwnedAndScoped",
         "TestSMTFullArrayExplicitExtensionalityOriginalFingerprint",
         "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
@@ -118747,6 +118749,19 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "add_store/add_map/add_const/add_as_array mark the receiving private array class upward before appending constructors, propagate through old and new inputs, revisit const/as-array default fingerprints, enable delayed non-overwriting parent-store read axioms in strong mode, and undo flags/lists/private merges on scope pop; retained AlwaysPropUpward is true and weak mode suppresses upward flags",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_parents.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_constructor_merge_test.go",
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_full_parents.go"
+          ],
+          "tests": [
+            "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback"
+          ]
+        },
         {
           "name": "register_sort eagerly retains per-dimension extensionality declarations for attached array sorts, restore_sorts/pop/destruction release scoped ownership, witness axioms reuse registered declarations, full internalize_term/internalize_atom handle explicit array-ext with Boolean enode flags while simple falls back, and fingerprints check original node pairs before current roots",
           "status": "ported",
@@ -118956,6 +118971,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_constructor_merge_test.go",
         "pkg/smtcore/theory_array_sorts.go",
         "pkg/smtcore/theory_array_sorts_test.go",
         "pkg/cmd/g3/test_vectors/array_explicit_extensionality_scopes.smt2",
@@ -118997,6 +119013,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback",
         "TestSMTArraySortDeclarationsOwnedAndScoped",
         "TestSMTFullArrayExplicitExtensionalityOriginalFingerprint",
         "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
@@ -119036,6 +119053,19 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "add_store/add_map/add_const/add_as_array mark the receiving private array class upward before appending constructors, propagate through old and new inputs, revisit const/as-array default fingerprints, enable delayed non-overwriting parent-store read axioms in strong mode, and undo flags/lists/private merges on scope pop; retained AlwaysPropUpward is true and weak mode suppresses upward flags",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_parents.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_constructor_merge_test.go",
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_full_parents.go"
+          ],
+          "tests": [
+            "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback"
+          ]
+        },
         {
           "name": "register_sort eagerly retains per-dimension extensionality declarations for attached array sorts, restore_sorts/pop/destruction release scoped ownership, witness axioms reuse registered declarations, full internalize_term/internalize_atom handle explicit array-ext with Boolean enode flags while simple falls back, and fingerprints check original node pairs before current roots",
           "status": "ported",
@@ -119911,6 +119941,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_constructor_merge_test.go",
         "pkg/smtcore/theory_array_sorts.go",
         "pkg/smtcore/theory_array_sorts_test.go",
         "pkg/smtcore/theory_array_extensionality.go",
@@ -119955,6 +119986,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback",
         "TestSMTArraySortDeclarationsOwnedAndScoped",
         "TestSMTFullArrayExplicitExtensionalityOriginalFingerprint",
         "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
@@ -120131,6 +120163,19 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "add_store/add_map/add_const/add_as_array mark the receiving private array class upward before appending constructors, propagate through old and new inputs, revisit const/as-array default fingerprints, enable delayed non-overwriting parent-store read axioms in strong mode, and undo flags/lists/private merges on scope pop; retained AlwaysPropUpward is true and weak mode suppresses upward flags",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_parents.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_constructor_merge_test.go",
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_full_parents.go"
+          ],
+          "tests": [
+            "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback"
+          ]
+        },
         {
           "name": "register_sort eagerly retains per-dimension extensionality declarations for attached array sorts, restore_sorts/pop/destruction release scoped ownership, witness axioms reuse registered declarations, full internalize_term/internalize_atom handle explicit array-ext with Boolean enode flags while simple falls back, and fingerprints check original node pairs before current roots",
           "status": "ported",
@@ -120362,6 +120407,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_constructor_merge_test.go",
         "pkg/smtcore/theory_array_sorts.go",
         "pkg/smtcore/theory_array_sorts_test.go",
         "pkg/smtcore/theory_array_extensionality.go",
@@ -120404,6 +120450,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback",
         "TestSMTArraySortDeclarationsOwnedAndScoped",
         "TestSMTFullArrayExplicitExtensionalityOriginalFingerprint",
         "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
@@ -120439,6 +120486,19 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "add_store/add_map/add_const/add_as_array mark the receiving private array class upward before appending constructors, propagate through old and new inputs, revisit const/as-array default fingerprints, enable delayed non-overwriting parent-store read axioms in strong mode, and undo flags/lists/private merges on scope pop; retained AlwaysPropUpward is true and weak mode suppresses upward flags",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_parents.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_constructor_merge_test.go",
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_full_parents.go"
+          ],
+          "tests": [
+            "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback"
+          ]
+        },
         {
           "name": "register_sort eagerly retains per-dimension extensionality declarations for attached array sorts, restore_sorts/pop/destruction release scoped ownership, witness axioms reuse registered declarations, full internalize_term/internalize_atom handle explicit array-ext with Boolean enode flags while simple falls back, and fingerprints check original node pairs before current roots",
           "status": "ported",
