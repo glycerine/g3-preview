@@ -92446,9 +92446,23 @@
       "path": "src/qe/qe_datatypes.cpp",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/qe/datatype_projection.go",
+        "pkg/qe/datatype_equations.go",
+        "pkg/qe/datatype_projection_test.go",
+        "pkg/qe/datatype_projection_cpp_test.go",
+        "pkg/qe/projection_literals.go",
+        "pkg/qe/trace.go"
+      ],
+      "tests": [
+        "TestDatatypeProjectionConstructorsModelsAndVariables",
+        "TestDatatypeProjectionForeignFieldLifting",
+        "TestDatatypeProjectionAllocationFrontiers",
+        "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+        "TestDatatypeProjectionCPPExistentialImplication",
+        "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+      ],
       "assertions": [
         {
           "line": 46,
@@ -92475,19 +92489,119 @@
           "text": "SASSERT(acc.size() == a->get_num_args());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "datatype_project_plugin constructor/destructor/get_family_id and single-variable operator(): retained model value and occurs-check owner; nonconstructor early return; recursive/nonrecursive choice and native owner/domain guards",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/datatype_projection.go",
+            "pkg/qe/datatype_equations.go",
+            "pkg/qe/datatype_projection_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestDatatypeProjectionConstructorsModelsAndVariables",
+            "TestDatatypeProjectionForeignFieldLifting",
+            "TestDatatypeProjectionAllocationFrontiers",
+            "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+            "TestDatatypeProjectionCPPExistentialImplication",
+            "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+          ]
+        },
+        {
+          "name": "project_nonrec/reduce: fresh constructor-field constants registered in the actual model, constructor substitution, concrete safe replacement and theory rewriting; source leaves additional-variable vector unchanged",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/datatype_projection.go",
+            "pkg/qe/datatype_equations.go",
+            "pkg/qe/datatype_projection_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestDatatypeProjectionConstructorsModelsAndVariables",
+            "TestDatatypeProjectionForeignFieldLifting",
+            "TestDatatypeProjectionAllocationFrontiers",
+            "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+            "TestDatatypeProjectionCPPExistentialImplication",
+            "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+          ]
+        },
+        {
+          "name": "project_rec and solve formula/application overloads/access: first available constructor equation, shared first-equal-model-value negated-distinct recovery, recursive accessor descent, ordered sibling equalities/recognizers, matching-constructor access and constructor-unfolding fallback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/datatype_projection.go",
+            "pkg/qe/datatype_equations.go",
+            "pkg/qe/datatype_projection_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestDatatypeProjectionConstructorsModelsAndVariables",
+            "TestDatatypeProjectionForeignFieldLifting",
+            "TestDatatypeProjectionAllocationFrontiers",
+            "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+            "TestDatatypeProjectionCPPExistentialImplication",
+            "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+          ]
+        },
+        {
+          "name": "solve/lift_foreign/reduce_eq/contains_foreign: non-Boolean non-datatype projection-variable selection, memoized app-only reachability, right-constructor preference, raw field equations/recognizers and source swap-with-last literal order",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/datatype_projection.go",
+            "pkg/qe/datatype_equations.go",
+            "pkg/qe/datatype_projection_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestDatatypeProjectionConstructorsModelsAndVariables",
+            "TestDatatypeProjectionForeignFieldLifting",
+            "TestDatatypeProjectionAllocationFrontiers",
+            "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+            "TestDatatypeProjectionCPPExistentialImplication",
+            "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+          ]
+        }
+      ],
+      "ownership": [
+        "DatatypeProjection borrows the AST manager/config and owns its actual persistent model-value ASTRef and ContainsApp target checker. Per-call state retains evaluated values, erased formula roots, reconstructed accessor/constructor/recognizer ASTRefs, partial model evaluator, safe replacers, theory rewriters and construction-failure receipts until cleanup succeeds. Actual model registrations, fresh field interpretations and completed caller-vector writes remain owned on errors. Seventeen first-success reservation campaigns cover constructor, nonrecursive/enum/recursive/direct/nested/negated-distinct/fallback projection, repeated-owner replacement, foreign-field lifting and open/closed tracing; all charged fixture storage is released."
+      ],
+      "deviations": [
+        "Concrete Go maps/slices and standard string handling replace source pointer containers and field-name string internals. Source project_nonrec does not append its fresh field constants to vars; the native implementation preserves that behavior and registers their interpretations in the supplied model. The source nonconstructor-value early return is retained for absent-variable/incomplete-model calls. No retained method throws cant_project, so its unreachable catch is not represented by a synthetic exception/plugin adapter; actual native child failures propagate with owning cleanup receipts. Shared project_plugin::pick_equality is implemented once with the actual caller reference vector retaining evaluated values. Array projection, the complete MBP driver and QSAT/full QE remain separate unfinished work.",
+        "Nine prebuilt C++ cases establish that unchanged native output implies the original with its target existentially quantified and remains satisfiable, including fresh model-field symbols. Three more establish equivalence/nonvacuity of foreign-field lifting. These are logical and model-preservation comparisons, without claiming observation of C++ internal fresh names or allocation order. The C++ oracle uses full QE only to decide quantified counterexample formulas; native results receive no extra elimination pass."
+      ]
     },
     {
       "path": "src/qe/qe_datatypes.h",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/qe/datatype_projection.go",
+        "pkg/qe/datatype_equations.go",
+        "pkg/qe/datatype_projection_test.go",
+        "pkg/qe/datatype_projection_cpp_test.go",
+        "pkg/qe/projection_literals.go",
+        "pkg/qe/trace.go"
+      ],
+      "tests": [
+        "TestDatatypeProjectionConstructorsModelsAndVariables",
+        "TestDatatypeProjectionForeignFieldLifting",
+        "TestDatatypeProjectionAllocationFrontiers",
+        "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+        "TestDatatypeProjectionCPPExistentialImplication",
+        "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -92498,11 +92612,97 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "datatype_project_plugin constructor/destructor/get_family_id and single-variable operator(): retained model value and occurs-check owner; nonconstructor early return; recursive/nonrecursive choice and native owner/domain guards",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/datatype_projection.go",
+            "pkg/qe/datatype_equations.go",
+            "pkg/qe/datatype_projection_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestDatatypeProjectionConstructorsModelsAndVariables",
+            "TestDatatypeProjectionForeignFieldLifting",
+            "TestDatatypeProjectionAllocationFrontiers",
+            "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+            "TestDatatypeProjectionCPPExistentialImplication",
+            "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+          ]
+        },
+        {
+          "name": "project_nonrec/reduce: fresh constructor-field constants registered in the actual model, constructor substitution, concrete safe replacement and theory rewriting; source leaves additional-variable vector unchanged",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/datatype_projection.go",
+            "pkg/qe/datatype_equations.go",
+            "pkg/qe/datatype_projection_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestDatatypeProjectionConstructorsModelsAndVariables",
+            "TestDatatypeProjectionForeignFieldLifting",
+            "TestDatatypeProjectionAllocationFrontiers",
+            "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+            "TestDatatypeProjectionCPPExistentialImplication",
+            "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+          ]
+        },
+        {
+          "name": "project_rec and solve formula/application overloads/access: first available constructor equation, shared first-equal-model-value negated-distinct recovery, recursive accessor descent, ordered sibling equalities/recognizers, matching-constructor access and constructor-unfolding fallback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/datatype_projection.go",
+            "pkg/qe/datatype_equations.go",
+            "pkg/qe/datatype_projection_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestDatatypeProjectionConstructorsModelsAndVariables",
+            "TestDatatypeProjectionForeignFieldLifting",
+            "TestDatatypeProjectionAllocationFrontiers",
+            "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+            "TestDatatypeProjectionCPPExistentialImplication",
+            "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+          ]
+        },
+        {
+          "name": "solve/lift_foreign/reduce_eq/contains_foreign: non-Boolean non-datatype projection-variable selection, memoized app-only reachability, right-constructor preference, raw field equations/recognizers and source swap-with-last literal order",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/datatype_projection.go",
+            "pkg/qe/datatype_equations.go",
+            "pkg/qe/datatype_projection_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestDatatypeProjectionConstructorsModelsAndVariables",
+            "TestDatatypeProjectionForeignFieldLifting",
+            "TestDatatypeProjectionAllocationFrontiers",
+            "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+            "TestDatatypeProjectionCPPExistentialImplication",
+            "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+          ]
+        }
+      ],
+      "ownership": [
+        "DatatypeProjection borrows the AST manager/config and owns its actual persistent model-value ASTRef and ContainsApp target checker. Per-call state retains evaluated values, erased formula roots, reconstructed accessor/constructor/recognizer ASTRefs, partial model evaluator, safe replacers, theory rewriters and construction-failure receipts until cleanup succeeds. Actual model registrations, fresh field interpretations and completed caller-vector writes remain owned on errors. Seventeen first-success reservation campaigns cover constructor, nonrecursive/enum/recursive/direct/nested/negated-distinct/fallback projection, repeated-owner replacement, foreign-field lifting and open/closed tracing; all charged fixture storage is released."
+      ],
+      "deviations": [
+        "Concrete Go maps/slices and standard string handling replace source pointer containers and field-name string internals. Source project_nonrec does not append its fresh field constants to vars; the native implementation preserves that behavior and registers their interpretations in the supplied model. The source nonconstructor-value early return is retained for absent-variable/incomplete-model calls. No retained method throws cant_project, so its unreachable catch is not represented by a synthetic exception/plugin adapter; actual native child failures propagate with owning cleanup receipts. Shared project_plugin::pick_equality is implemented once with the actual caller reference vector retaining evaluated values. Array projection, the complete MBP driver and QSAT/full QE remain separate unfinished work.",
+        "Nine prebuilt C++ cases establish that unchanged native output implies the original with its target existentially quantified and remains satisfiable, including fresh model-field symbols. Three more establish equivalence/nonvacuity of foreign-field lifting. These are logical and model-preservation comparisons, without claiming observation of C++ internal fresh names or allocation order. The C++ oracle uses full QE only to decide quantified counterexample formulas; native results receive no extra elimination pass."
+      ]
     },
     {
       "path": "src/qe/qe_dl_plugin.cpp",
@@ -93197,7 +93397,11 @@
         "pkg/qe/trace.go",
         "pkg/ast/rewriter/expr_safe_replace.go",
         "pkg/ast/expr_functors.go",
-        "pkg/ast/ast_for_each_expr.go"
+        "pkg/ast/ast_for_each_expr.go",
+        "pkg/qe/datatype_projection.go",
+        "pkg/qe/datatype_equations.go",
+        "pkg/qe/datatype_projection_test.go",
+        "pkg/qe/datatype_projection_cpp_test.go"
       ],
       "tests": [
         "TestArithmeticProjectionModelPreservationAndVariables",
@@ -93209,7 +93413,13 @@
         "TestProjectionPreprocessAllocationFrontiers",
         "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
         "TestProjectionPreprocessCPPCubeImplication",
-        "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
+        "TestProjectionPreprocessCPPEqualityAndBooleanProjection",
+        "TestDatatypeProjectionConstructorsModelsAndVariables",
+        "TestDatatypeProjectionForeignFieldLifting",
+        "TestDatatypeProjectionAllocationFrontiers",
+        "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+        "TestDatatypeProjectionCPPExistentialImplication",
+        "TestDatatypeProjectionCPPForeignEqualityEquivalence"
       ],
       "assertions": [
         {
@@ -93373,10 +93583,11 @@
       ],
       "ownership": [
         "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced.",
-        "The private projectionPreprocessor retains its concrete theory rewriter and actual per-call ASTRefs, model evaluator, safe replacers, ContainsApp owners, ASTExprMarks and construction-failure receipts. Erased expressions remain rooted while their children are borrowed. Caller vectors retain completed appends/replacements and source compaction. Fourteen first-success reservation campaigns cover constructor, literal/Boolean/nested extraction, equality/cycle solving, Boolean projection, filtering and open/closed tracing; all charged fixture storage is released. Successful extraction resets its shared Boolean-visited set for reuse."
+        "The private projectionPreprocessor retains its concrete theory rewriter and actual per-call ASTRefs, model evaluator, safe replacers, ContainsApp owners, ASTExprMarks and construction-failure receipts. Erased expressions remain rooted while their children are borrowed. Caller vectors retain completed appends/replacements and source compaction. Fourteen first-success reservation campaigns cover constructor, literal/Boolean/nested extraction, equality/cycle solving, Boolean projection, filtering and open/closed tracing; all charged fixture storage is released. Successful extraction resets its shared Boolean-visited set for reuse.",
+        "The same concrete pickProjectionEquality helper serves MBP extraction and recursive datatype solving, with evaluated model values and the selected equality held in each actual caller's mutable ASTRef vector through stopped cleanup."
       ],
       "deviations": [
-        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, datatype/array projection and their cheap solve hooks, partition_values/partition_args, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
+        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, array projection and its cheap solve hook, partition_values/partition_args, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
       ]
     },
     {
@@ -93400,7 +93611,11 @@
         "pkg/qe/trace.go",
         "pkg/ast/rewriter/expr_safe_replace.go",
         "pkg/ast/expr_functors.go",
-        "pkg/ast/ast_for_each_expr.go"
+        "pkg/ast/ast_for_each_expr.go",
+        "pkg/qe/datatype_projection.go",
+        "pkg/qe/datatype_equations.go",
+        "pkg/qe/datatype_projection_test.go",
+        "pkg/qe/datatype_projection_cpp_test.go"
       ],
       "tests": [
         "TestArithmeticProjectionModelPreservationAndVariables",
@@ -93412,7 +93627,13 @@
         "TestProjectionPreprocessAllocationFrontiers",
         "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
         "TestProjectionPreprocessCPPCubeImplication",
-        "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
+        "TestProjectionPreprocessCPPEqualityAndBooleanProjection",
+        "TestDatatypeProjectionConstructorsModelsAndVariables",
+        "TestDatatypeProjectionForeignFieldLifting",
+        "TestDatatypeProjectionAllocationFrontiers",
+        "TestDatatypeProjectionReuseTraceAndOwnerGuards",
+        "TestDatatypeProjectionCPPExistentialImplication",
+        "TestDatatypeProjectionCPPForeignEqualityEquivalence"
       ],
       "conditionals": [
         {
@@ -93536,10 +93757,11 @@
       ],
       "ownership": [
         "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced.",
-        "The private projectionPreprocessor retains its concrete theory rewriter and actual per-call ASTRefs, model evaluator, safe replacers, ContainsApp owners, ASTExprMarks and construction-failure receipts. Erased expressions remain rooted while their children are borrowed. Caller vectors retain completed appends/replacements and source compaction. Fourteen first-success reservation campaigns cover constructor, literal/Boolean/nested extraction, equality/cycle solving, Boolean projection, filtering and open/closed tracing; all charged fixture storage is released. Successful extraction resets its shared Boolean-visited set for reuse."
+        "The private projectionPreprocessor retains its concrete theory rewriter and actual per-call ASTRefs, model evaluator, safe replacers, ContainsApp owners, ASTExprMarks and construction-failure receipts. Erased expressions remain rooted while their children are borrowed. Caller vectors retain completed appends/replacements and source compaction. Fourteen first-success reservation campaigns cover constructor, literal/Boolean/nested extraction, equality/cycle solving, Boolean projection, filtering and open/closed tracing; all charged fixture storage is released. Successful extraction resets its shared Boolean-visited set for reuse.",
+        "The same concrete pickProjectionEquality helper serves MBP extraction and recursive datatype solving, with evaluated model values and the selected equality held in each actual caller's mutable ASTRef vector through stopped cleanup."
       ],
       "deviations": [
-        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, datatype/array projection and their cheap solve hooks, partition_values/partition_args, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
+        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, array projection and its cheap solve hook, partition_values/partition_args, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
       ]
     },
     {

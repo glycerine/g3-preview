@@ -2165,6 +2165,8 @@
         "arithmetic_project.go",
         "arithmetic_projection.go",
         "array_der.go",
+        "datatype_equations.go",
+        "datatype_projection.go",
         "equality_der.go",
         "equality_der_conjunctions.go",
         "equality_der_definitions.go",

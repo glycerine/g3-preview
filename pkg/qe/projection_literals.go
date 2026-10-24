@@ -12,18 +12,44 @@ func (c *projectionPreprocessCall) negate(h ast.ASTHandle) (ast.ASTHandle, error
 	return c.hold(c.owner.manager.MkNotSimplified(h))
 }
 func (c *projectionPreprocessCall) pickEquality(distinct projectionApplication) (ast.ASTHandle, error) {
+	out, err := c.ref(ast.ASTHandle{})
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = pickProjectionEquality(c.owner.manager, c.evaluator, distinct.args, &c.refs, out); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return c.owner.manager.RefGet(out)
+}
+
+// The actual caller's mutable reference vector owns every evaluated value
+// through stopped cleanup. Both MBP preprocessing and datatype solving reach
+// this concrete project_plugin::pick_equality implementation.
+func pickProjectionEquality(m *ast.ASTManager, evaluator *model.ModelEvaluator, args []ast.ASTHandle, roots *[]ast.ASTRef, out ast.ASTRef) error {
 	values := make(map[ast.ASTHandle]ast.ASTHandle)
-	for _, h := range distinct.args {
-		v, err := c.eval(h)
+	for _, h := range args {
+		r, err := m.NewRef(ast.ASTHandle{})
 		if err != nil {
-			return ast.ASTHandle{}, err
+			return err
+		}
+		*roots = append(*roots, r)
+		if err = evaluator.Evaluate(h, r); err != nil {
+			return err
+		}
+		v, err := m.RefGet(r)
+		if err != nil {
+			return err
 		}
 		if previous, ok := values[v]; ok {
-			return c.hold(c.owner.manager.MkEq(h, previous))
+			eq, err := m.MkEq(h, previous)
+			if err != nil {
+				return err
+			}
+			return m.SetRef(out, eq)
 		}
 		values[v] = h
 	}
-	return ast.ASTHandle{}, ast.ErrASTDomain
+	return ast.ErrASTDomain
 }
 
 func (p *projectionPreprocessor) extractNestedBooleans(c *projectionPreprocessCall, forms *[]ast.ASTRef, formula ast.ASTHandle) (found bool, err error) {
