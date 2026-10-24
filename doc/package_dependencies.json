@@ -2163,6 +2163,7 @@
         "equality_der_order.go",
         "equality_der_quantifier.go",
         "equality_der_trace.go",
+        "fm_recognizer.go",
         "occurs.go",
         "trace.go"
       ]

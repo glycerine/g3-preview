@@ -92132,7 +92132,9 @@
         "pkg/qe/equality_der_test.go",
         "pkg/qe/equality_der_quantifier_test.go",
         "pkg/qe/equality_der_frontier_test.go",
-        "pkg/qe/equality_der_cpp_test.go"
+        "pkg/qe/equality_der_cpp_test.go",
+        "pkg/qe/fm_recognizer.go",
+        "pkg/qe/fm_recognizer_test.go"
       ],
       "tests": [
         "TestVariableTestCopiesSetComplementAndDeclarationBoundary",
@@ -92153,7 +92155,10 @@
         "TestEqualityDERDatatypeFlatteningAndConstructorRefusal",
         "TestEqualityDERAllocationFrontiers",
         "TestEqualityDERSparseDefinitionsTrace",
-        "TestEqualityDERCPPProjectionNormalForms"
+        "TestEqualityDERCPPProjectionNormalForms",
+        "TestFMRecognitionSourceNormalForms",
+        "TestFMForbiddenSetInputOrderAndAnnotations",
+        "TestFMRecognitionSourceTraceAndClosedStream"
       ],
       "conditionals": [
         {
@@ -92399,16 +92404,31 @@
             "TestEqualityDERSparseDefinitionsTrace",
             "TestEqualityDERCPPProjectionNormalForms"
           ]
+        },
+        {
+          "name": "fm::fm is_literal/is_constraint, is_var, is_linear_mon_core/is_linear_mon, is_linear_pol, is_linear_ineq, is_occ and init_forbidden_set/forbidden_proc: source normal forms, selected/coerced variables, duplicate refusal, sequential forbidden-index discovery and annotation-inclusive traversal",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/fm_recognizer.go",
+            "pkg/qe/fm_recognizer_test.go"
+          ],
+          "tests": [
+            "TestFMRecognitionSourceNormalForms",
+            "TestFMForbiddenSetInputOrderAndAnnotations",
+            "TestFMRecognitionSourceTraceAndClosedStream"
+          ]
         }
       ],
       "ownership": [
         "ArrayDER borrows its concrete selector and parameter/cooperation/trace services and owns a reusable ASTExprMark. Caller conjunction ASTRef slices retain updated formula ownership and completed prefixes on error. Lexical ExprSafeReplace/output owners remain reachable through ArrayDERFailure if destruction stops; explicit cleanup retries actual retained owners. Constructor, select/disequality, enabled trace and closed-trace reservation campaigns reach first success with zero charged fixture storage.",
-        "EqualityDER owns reusable substitution/theory rewriting state and a constructor parameter snapshot; selector and Config services are borrowed. Lexical AST references, native numeral-service values, Boolean rewriters and selectors remain reachable through a typed construction-failure receipt until cleanup completes. Mutable conjunction slices retain completed writes on error. Seven allocation campaigns reach first success with zero charged fixture storage, including large rational coefficients, proofs and open/closed trace streams."
+        "EqualityDER owns reusable substitution/theory rewriting state and a constructor parameter snapshot; selector and Config services are borrowed. Lexical AST references, native numeral-service values, Boolean rewriters and selectors remain reachable through a typed construction-failure receipt until cleanup completes. Mutable conjunction slices retain completed writes on error. Seven allocation campaigns reach first success with zero charged fixture storage, including large rational coefficients, proofs and open/closed trace streams.",
+        "FM recognition borrows the AST manager, concrete VariableTest and Config services. Forbidden indices and traversal membership use native maps and slices. The private recognizer introduces no second AST/numeral owner; tests release all fixture-charged storage. Open/closed trace paths preserve source expression evaluation and formula recognition."
       ],
       "deviations": [
         "Fourier-Motzkin elimination, qe_lite public overloads, full traversal configuration and qe-light tactic remain unported. Equality DER and array DER are complete prerequisites; no Go qe-light registration or quantified-strategy substitute is added prematurely.",
         "C++ returns UNKNOWN for the raw quantified-array equivalence queries. Six comparisons instead match actual C++ QE-lite output against the native array pass followed only by C++ simplification. The fixtures account for source flatten_and child-slot order and normalize only tactic depth and whitespace; formula and precision content remain exact. Source acceptance of duplicate index variables is preserved in direct structural tests rather than strengthened.",
-        "Equality DER preserves source is_var_diseq passing the original negated expression to is_var_eq, including its universal arithmetic-disequality refusal. The raw quantifier reduction keeps declaration slots and accumulates proofs; the operator wrapper resets proofs and removes unused variables only after a change. Seven prebuilt C++ projection comparisons preserve formula/precision content and normalize only whitespace/tactic depth; the native result receives source simplification without an additional elimination pass."
+        "Equality DER preserves source is_var_diseq passing the original negated expression to is_var_eq, including its universal arithmetic-disequality refusal. The raw quantifier reduction keeps declaration slots and accumulates proofs; the operator wrapper resets proofs and removes unused variables only after a change. Seven prebuilt C++ projection comparisons preserve formula/precision content and normalize only whitespace/tactic depth; the native result receives source simplification without an additional elimination pass.",
+        "Fourier-Motzkin input recognition and forbidden-variable discovery are ported as the private fmRecognizer prerequisite. Constraint construction/normalization, subsumption, candidate ordering, resolution/elimination and the public FM owner/entry point remain unported. No partial FM elimination entry point is exposed."
       ]
     },
     {
