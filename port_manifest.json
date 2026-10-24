@@ -34501,7 +34501,8 @@
         "pkg/ast/rewriter/traversal.go",
         "pkg/ast/rewriter/rewriter_roots.go",
         "pkg/ast/rewriter/rewriter_roots_test.go",
-        "pkg/ast/normal_forms/pull_quant_test.go"
+        "pkg/ast/normal_forms/pull_quant_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
@@ -34523,7 +34524,9 @@
         "TestVarSubstitutionNativeColdBindingGrowth",
         "TestTraversalProofCongruenceRewriteAndReflexivity",
         "TestPullQuantProofTraversalPreservesBindersAndMetadata",
-        "TestPullNestedQuantifiersRewritesBelowApplications"
+        "TestPullNestedQuantifiersRewritesBelowApplications",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -34754,7 +34757,8 @@
         "Original base rewriting infrastructure, forward/inverse shifting and both traversal specializations are translated. Unsupported REWRITE_RULE and proof-mode non-ground macro expansion preserve the source's own unimplemented states. Cancellation resets; step-limit interruption preserves frames for Resume. Trace formatting remains with the separate rewriter.cpp trace-profile audit.",
         "The public concrete Traversal exposes explicit no-proof and proof-generating constructors through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point.",
         "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added.",
-        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit."
+        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit.",
+        "The release-native definition_coercions.smt2 vector accepts an Int macro argument in a Real binder, but source process_var at line49 asserts exact replacement sort before enclosing-application coercion in debug builds. The runner now checks that exact debug precondition refusal and independently checks the C++ release result, rather than demanding release/debug equivalence in this source-excluded domain."
       ]
     },
     {
@@ -106936,7 +106940,10 @@
         "pkg/smtcore/theory_arith_shared.go",
         "pkg/smtcore/smt_assume_eq.go",
         "pkg/smtcore/smt_assume_eq_test.go",
-        "pkg/smtcore/theory_arith_assume_eq_test.go"
+        "pkg/smtcore/theory_arith_assume_eq_test.go",
+        "pkg/smtcore/smt_relevancy.go",
+        "pkg/smtcore/smt_relevancy_test.go",
+        "pkg/smtcore/theory_arith_bounded_disequalities_test.go"
       ],
       "tests": [
         "TestSMTGeneratedModelCleansMacroFallbackConstants",
@@ -106996,7 +107003,9 @@
         "TestSMTSharedArithmeticFixedRowsScopedProofs",
         "TestSMTAssumeEqualityScopedPhaseAndRelevancy",
         "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
-        "TestSMTQuantifiedSearchRequiresModelValidation"
+        "TestSMTQuantifiedSearchRequiresModelValidation",
+        "TestSMTRelevancyNegatedArgumentsAndLiteralWatches",
+        "TestSMTBoundedWeightedDisequalitiesModel"
       ],
       "conditionals": [
         {
@@ -108227,6 +108236,23 @@
           ],
           "go_targets": [
             "pkg/cmd/g3/main_test.go"
+          ]
+        },
+        {
+          "name": "Selected find_assignment false/NOT/current Boolean assignment paths and add_rel_watch literal-to-positive-expression/sign projection used by the relevance propagator",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevancy.go",
+          "go_targets": [
+            "pkg/smtcore/smt_relevancy.go",
+            "pkg/smtcore/smt_relevancy_test.go",
+            "pkg/smtcore/theory_arith_bounded_disequalities_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTRelevancyNegatedArgumentsAndLiteralWatches",
+            "TestSMTBoundedWeightedDisequalitiesModel",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -109669,7 +109695,10 @@
         "pkg/smtcore/smt_theory.go",
         "pkg/smtcore/smt_equality_propagation.go",
         "pkg/smtcore/smt_boolean_term_value_test.go",
-        "pkg/smtcore/smt_internalizer_test.go"
+        "pkg/smtcore/smt_internalizer_test.go",
+        "pkg/smtcore/smt_relevancy.go",
+        "pkg/smtcore/smt_relevancy_test.go",
+        "pkg/smtcore/theory_arith_bounded_disequalities_test.go"
       ],
       "tests": [
         "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
@@ -109709,7 +109738,9 @@
         "TestSMTBooleanTermTruthValueCongruenceAndProof",
         "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
         "TestSMTInternalizerScopedEnodeFlagOnExistingGate",
-        "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits"
+        "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits",
+        "TestSMTRelevancyNegatedArgumentsAndLiteralWatches",
+        "TestSMTBoundedWeightedDisequalitiesModel"
       ],
       "conditionals": [
         {
@@ -110224,6 +110255,23 @@
           "tests": [
             "TestSMTInternalizerScopedEnodeFlagOnExistingGate",
             "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits"
+          ]
+        },
+        {
+          "name": "add_and_rel_watches/add_or_rel_watches/add_ite_rel_watches: pass child literals through add_rel_watch before installing relevance events, including negated children and cached watch restoration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevancy.go",
+          "go_targets": [
+            "pkg/smtcore/smt_relevancy.go",
+            "pkg/smtcore/smt_relevancy_test.go",
+            "pkg/smtcore/theory_arith_bounded_disequalities_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTRelevancyNegatedArgumentsAndLiteralWatches",
+            "TestSMTBoundedWeightedDisequalitiesModel",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -112968,7 +113016,9 @@
         "pkg/smtcore/smt_relevancy.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/parsers/smt2/commands_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_relevancy_test.go",
+        "pkg/smtcore/theory_arith_bounded_disequalities_test.go"
       ],
       "tests": [
         "TestSMTRelevancyBooleanConnectivePropagation",
@@ -112977,7 +113027,11 @@
         "TestSMTRelevancyDisabledAndTermITEHandler",
         "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
         "TestSMT2RelevancyUpdatesRestoreCachedBooleanAndTermITEWatches",
-        "TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect"
+        "TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect",
+        "TestSMTRelevancyNegatedArgumentsAndLiteralWatches",
+        "TestSMTBoundedWeightedDisequalitiesModel",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -113159,6 +113213,23 @@
             "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
             "TestSMT2RelevancyUpdatesRestoreCachedBooleanAndTermITEWatches",
             "TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect"
+          ]
+        },
+        {
+          "name": "Source assignment lookup and signed literal watches: resolve NOT through its underlying Boolean atom and false constants; install AND/OR/ITE watches on the positive internalized expression with the source literal sign; normalize restored cached watches before deduplication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevancy.go",
+          "go_targets": [
+            "pkg/smtcore/smt_relevancy.go",
+            "pkg/smtcore/smt_relevancy_test.go",
+            "pkg/smtcore/theory_arith_bounded_disequalities_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTRelevancyNegatedArgumentsAndLiteralWatches",
+            "TestSMTBoundedWeightedDisequalitiesModel",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -131084,9 +131155,26 @@
       "path": "src/tactic/arith/lia2pb_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/lia2pb_tactic.go",
+        "pkg/tactic/arith/lia2pb_check.go",
+        "pkg/tactic/arith/lia2pb_apply.go",
+        "pkg/tactic/arith/lia2pb_trace.go",
+        "pkg/tactic/arith/lia2pb_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestLIA2PBConvertedDisequalities",
+        "TestLIA2PBModelGridAndBoundDependencies",
+        "TestLIA2PBAllocationFrontiers",
+        "TestLIA2PBPolicyUpdatesCleanupAndTranslation",
+        "TestLIA2PBFragmentAndProofGuards",
+        "TestLIA2PBExactTraceAndOwnerGuards",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 196,
@@ -131101,19 +131189,137 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "imp constructor/updt_params_core/updt_params/is_target_core/is_bounded/is_target/has_target/check_num_bits: source zero-lower/nonnegative-upper recognition, bit limits and uint32 aggregate threshold",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/lia2pb_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/lia2pb_tactic.go",
+            "pkg/tactic/arith/lia2pb_check.go",
+            "pkg/tactic/arith/lia2pb_apply.go",
+            "pkg/tactic/arith/lia2pb_trace.go",
+            "pkg/tactic/arith/lia2pb_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestLIA2PBConvertedDisequalities",
+            "TestLIA2PBModelGridAndBoundDependencies",
+            "TestLIA2PBAllocationFrontiers",
+            "TestLIA2PBPolicyUpdatesCleanupAndTranslation",
+            "TestLIA2PBFragmentAndProofGuards",
+            "TestLIA2PBExactTraceAndOwnerGuards",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "visitor and check: concrete mark-all postorder walk ignoring patterns; basic operators, linear numeral multiplication, constant Int/Real partial mode, arithmetic-range application and variable/quantifier refusals",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/lia2pb_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/lia2pb_tactic.go",
+            "pkg/tactic/arith/lia2pb_check.go",
+            "pkg/tactic/arith/lia2pb_apply.go",
+            "pkg/tactic/arith/lia2pb_trace.go",
+            "pkg/tactic/arith/lia2pb_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestLIA2PBConvertedDisequalities",
+            "TestLIA2PBModelGridAndBoundDependencies",
+            "TestLIA2PBAllocationFrontiers",
+            "TestLIA2PBPolicyUpdatesCleanupAndTranslation",
+            "TestLIA2PBFragmentAndProofGuards",
+            "TestLIA2PBExactTraceAndOwnerGuards",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "imp::operator(): source proof guard and result reset order, per-call bound/rewriter/dependency reset, inconsistent/no-target depth behavior, bit-weighted fresh 0-1 variables, joined bound dependencies, extension-then-filter models, dependency-aware rewriting and progress/depth publication",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/lia2pb_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/lia2pb_tactic.go",
+            "pkg/tactic/arith/lia2pb_check.go",
+            "pkg/tactic/arith/lia2pb_apply.go",
+            "pkg/tactic/arith/lia2pb_trace.go",
+            "pkg/tactic/arith/lia2pb_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestLIA2PBConvertedDisequalities",
+            "TestLIA2PBModelGridAndBoundDependencies",
+            "TestLIA2PBAllocationFrontiers",
+            "TestLIA2PBPolicyUpdatesCleanupAndTranslation",
+            "TestLIA2PBFragmentAndProofGuards",
+            "TestLIA2PBExactTraceAndOwnerGuards",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "all live lia2pb TRACE sites, exact parameter descriptions, outer constructor/destructor/updated parameter snapshot/translate/operator exception conversion/cleanup, and clean factory",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/lia2pb_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/lia2pb_tactic.go",
+            "pkg/tactic/arith/lia2pb_check.go",
+            "pkg/tactic/arith/lia2pb_apply.go",
+            "pkg/tactic/arith/lia2pb_trace.go",
+            "pkg/tactic/arith/lia2pb_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestLIA2PBConvertedDisequalities",
+            "TestLIA2PBModelGridAndBoundDependencies",
+            "TestLIA2PBAllocationFrontiers",
+            "TestLIA2PBPolicyUpdatesCleanupAndTranslation",
+            "TestLIA2PBFragmentAndProofGuards",
+            "TestLIA2PBExactTraceAndOwnerGuards",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns the copied parameter snapshot, concrete bound manager, theory rewriter and newly joined bound-dependency roots. Parameter updates change both the outer snapshot and implementation. Cleanup constructs and publishes a fresh implementation before retiring the old one; interrupted teardown retains its concrete owner for retry. Per-call substitutions own definitions and dependencies, while lexical references protect bit-weighted terms and numerals until publication. Extension/filter converters reconstruct originals before deleting helper declarations and remain valid after tactic closure. Constructor, core-enabled apply with nonnull bound dependencies and populated cleanup allocation-frontier tests verify charged-storage teardown."
+      ],
+      "deviations": [
+        "Native Go slices/maps and exact big.Rat values replace C++ container/numeral mechanics. Dependencies use arena handles, so the source trace pointer is represented by its Go handle identity, preserving null as 0; pointer spelling is process-specific. Concrete owner/copy/closed guards and explicit errors replace undefined native domains. Source debug guards and proof-generation refusal remain in place; no Boolean or generic SMT substitute is used for the conversion."
+      ]
     },
     {
       "path": "src/tactic/arith/lia2pb_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/lia2pb_tactic.go",
+        "pkg/tactic/arith/lia2pb_check.go",
+        "pkg/tactic/arith/lia2pb_apply.go",
+        "pkg/tactic/arith/lia2pb_trace.go",
+        "pkg/tactic/arith/lia2pb_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestLIA2PBConvertedDisequalities",
+        "TestLIA2PBModelGridAndBoundDependencies",
+        "TestLIA2PBAllocationFrontiers",
+        "TestLIA2PBPolicyUpdatesCleanupAndTranslation",
+        "TestLIA2PBFragmentAndProofGuards",
+        "TestLIA2PBExactTraceAndOwnerGuards",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -131124,11 +131330,40 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained mk_lia2pb_tactic declaration and clean factory",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/lia2pb_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/lia2pb_tactic.go",
+            "pkg/tactic/arith/lia2pb_check.go",
+            "pkg/tactic/arith/lia2pb_apply.go",
+            "pkg/tactic/arith/lia2pb_trace.go",
+            "pkg/tactic/arith/lia2pb_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestLIA2PBConvertedDisequalities",
+            "TestLIA2PBModelGridAndBoundDependencies",
+            "TestLIA2PBAllocationFrontiers",
+            "TestLIA2PBPolicyUpdatesCleanupAndTranslation",
+            "TestLIA2PBFragmentAndProofGuards",
+            "TestLIA2PBExactTraceAndOwnerGuards",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns the copied parameter snapshot, concrete bound manager, theory rewriter and newly joined bound-dependency roots. Parameter updates change both the outer snapshot and implementation. Cleanup constructs and publishes a fresh implementation before retiring the old one; interrupted teardown retains its concrete owner for retry. Per-call substitutions own definitions and dependencies, while lexical references protect bit-weighted terms and numerals until publication. Extension/filter converters reconstruct originals before deleting helper declarations and remain valid after tactic closure. Constructor, core-enabled apply with nonnull bound dependencies and populated cleanup allocation-frontier tests verify charged-storage teardown."
+      ],
+      "deviations": [
+        "Native Go slices/maps and exact big.Rat values replace C++ container/numeral mechanics. Dependencies use arena handles, so the source trace pointer is represented by its Go handle identity, preserving null as 0; pointer spelling is process-specific. Concrete owner/copy/closed guards and explicit errors replace undefined native domains. Source debug guards and proof-generation refusal remain in place; no Boolean or generic SMT substitute is used for the conversion."
+      ]
     },
     {
       "path": "src/tactic/arith/linear_equation.cpp",

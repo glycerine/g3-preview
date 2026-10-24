@@ -1,6 +1,7 @@
 package smtcore
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -14,6 +15,56 @@ func smtRelevancyBool(t *testing.T, m *ast.ASTManager, name string) ast.ASTHandl
 	value, err := m.MkConst(astTestSymbol(t, m, name), boolean)
 	astTestMust(t, err)
 	return value
+}
+
+func TestSMTRelevancyNegatedArgumentsAndLiteralWatches(t *testing.T) {
+	for _, conjunction := range []bool{false, true} {
+		for _, assignedFirst := range []bool{false, true} {
+			t.Run(fmt.Sprint(conjunction, "/", assignedFirst), func(t *testing.T) {
+				m := astTestManager(t)
+				a := smtRelevancyBool(t, m, "negated-watch-a")
+				b := smtRelevancyBool(t, m, "negated-watch-b")
+				notA, err := m.MkNot(a)
+				astTestMust(t, err)
+				parent, err := m.MkOr(notA, b)
+				if conjunction {
+					parent, err = m.MkAnd(notA, b)
+				}
+				astTestMust(t, err)
+				context, err := NewSMTCheckerContext(m)
+				astTestMust(t, err)
+				astTestMust(t, context.SetAssignment(parent, lbool.FromBool(!conjunction)))
+				propagator, err := NewSMTRelevancyPropagator(context, true)
+				astTestMust(t, err)
+				if assignedFirst {
+					astTestMust(t, context.SetAssignment(a, lbool.FromBool(conjunction)))
+				}
+				if conjunction {
+					astTestMust(t, propagator.AddAndWatches(parent))
+				} else {
+					astTestMust(t, propagator.AddOrWatches(parent))
+				}
+				astTestMust(t, propagator.MarkRelevant(parent))
+				astTestMust(t, propagator.Propagate())
+				if !assignedFirst {
+					if propagator.IsRelevant(a) {
+						t.Fatal("undefined branch became relevant")
+					}
+					astTestMust(t, context.SetAssignment(a, lbool.FromBool(conjunction)))
+					astTestMust(t, propagator.AssignmentEvent(a, conjunction))
+					astTestMust(t, propagator.Propagate())
+				}
+				if !propagator.IsRelevant(notA) || !propagator.IsRelevant(a) || propagator.IsRelevant(b) {
+					t.Fatal("signed child selection lost the underlying atom")
+				}
+				falseTerm, err := m.MkFalse()
+				astTestMust(t, err)
+				if propagator.assignment(falseTerm) != lbool.False {
+					t.Fatal("source false constant assignment")
+				}
+			})
+		}
+	}
 }
 
 func TestSMTRelevancyBooleanConnectivePropagation(t *testing.T) {

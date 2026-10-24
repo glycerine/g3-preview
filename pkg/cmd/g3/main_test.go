@@ -7,9 +7,18 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
 )
 
 var scriptResults = map[string]string{
+	"arith_negated_weighted_branches.smt2":         "sat\n(((and (>= (+ a (* 2 b) (* 4 c)) 6) (<= (+ a (* 2 b) (* 4 c)) 7)) true))\nunsat\nsat\n(((and (>= (+ a (* 2 b) (* 4 c)) 6) (<= (+ a (* 2 b) (* 4 c)) 7)) true))\n",
+	"lia2pb_model_scopes.smt2":                     "sat\n((x 5) (y 2))\nunsat\nsat\n((x 5) (y 2))\n",
+	"lia2pb_core.smt2":                             "unsat\n(total yhi ylo xlo xhi)\n",
+	"lia2pb_partial.smt2":                          "unknown\n(:reason-unknown \"goal is in a fragment unsupported by lia2pb\")\nsat\n((x 3) (y 2))\n",
+	"lia2pb_budget_recovery.smt2":                  "unknown\n(:reason-unknown \"lia2pb failed, number of necessary bits exceeds specified threshold (use option :lia2pb-total-bits to increase threshold)\")\nsat\n(((and (>= x 6) (<= x 7)) true))\n",
+	"lia2pb_proof_fallback.smt2":                   "unsat\n",
+	"lia2pb_shifted_pipeline.smt2":                 "sat\n((x 2) (y 7))\n",
 	"diff_neq_backtrack_model.smt2":                "sat\n((x 1) (y 0))\nsat\n((x 1) (y 0))\n",
 	"diff_neq_core_fallback.smt2":                  "unsat\n(lower upper)\n",
 	"diff_neq_dl_pipeline_scopes.smt2":             "sat\n((x 0) (y 0) (z 1))\nunsat\nsat\n((x 0) (y 0) (z 1))\n",
@@ -243,7 +252,11 @@ func TestSMTLibRunnerScripts(t *testing.T) {
 				t.Fatal(err)
 			}
 			var out bytes.Buffer
-			if err = run(bytes.NewReader(script), &out); err != nil {
+			err = run(bytes.NewReader(script), &out)
+			if sourceDebugMacroCoercionRefusal(t, name, err, &out) {
+				return
+			}
+			if err != nil {
 				t.Fatal(err, out.String())
 			}
 			if canonicalOutput(out.String()) != canonicalOutput(expected) {
@@ -251,6 +264,20 @@ func TestSMTLibRunnerScripts(t *testing.T) {
 			}
 		})
 	}
+}
+
+// The native executable is a release build. Its macro substitution accepts
+// Int arguments in Real binders, while rewriter_def.h:49 asserts exact binder
+// and replacement sorts in source debug builds, before application coercion.
+func sourceDebugMacroCoercionRefusal(t *testing.T, name string, err error, out *bytes.Buffer) bool {
+	t.Helper()
+	if !ast.ASTSourceDebug || name != "definition_coercions.smt2" {
+		return false
+	}
+	if err == nil || err.Error() != "line 3 column 26: "+ast.ErrASTDomain.Error() || out.Len() != 0 {
+		t.Fatal("source debug macro-binding sort assertion", err, out.String())
+	}
+	return true
 }
 
 // Explicitly opt in to the repository's C++ executable. Ordinary Go semantic
@@ -267,7 +294,9 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 				t.Fatal(err)
 			}
 			var goOutput bytes.Buffer
-			if err = run(bytes.NewReader(script), &goOutput); err != nil {
+			err = run(bytes.NewReader(script), &goOutput)
+			debugRefusal := sourceDebugMacroCoercionRefusal(t, name, err, &goOutput)
+			if err != nil && !debugRefusal {
 				t.Fatal(err, goOutput.String())
 			}
 			cmd := exec.Command(reference, "-in")
@@ -275,6 +304,12 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 			cppOutput, err := cmd.CombinedOutput()
 			if err != nil {
 				t.Fatal("C++ reference", err, string(cppOutput))
+			}
+			if debugRefusal {
+				if canonicalOutput(string(cppOutput)) != canonicalOutput(scriptResults[name]) {
+					t.Fatal("native macro coercion result", string(cppOutput))
+				}
+				return
 			}
 			if canonicalOutput(goOutput.String()) != canonicalOutput(string(cppOutput)) {
 				t.Fatalf("Go/C++ mismatch\nGo:\n%s\nC++:\n%s", goOutput.String(), cppOutput)

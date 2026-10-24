@@ -1,0 +1,7 @@
+(set-logic QF_LIA)
+(set-option :produce-proofs true)
+(declare-const x Int)
+(assert (>= x 0))
+(assert (<= x 3))
+(assert (> (* 2 x) 6))
+(check-sat-using (or-else (then simplify lia2pb smt) smt))

@@ -71,10 +71,55 @@ func (p *SMTRelevancyPropagator) IsRelevant(expression ast.ASTHandle) bool {
 }
 
 func (p *SMTRelevancyPropagator) assignment(expression ast.ASTHandle) lbool.LBool {
+	// Source context::find_assignment reads the positive internalized atom
+	// beneath a NOT; NOT applications do not have their own Boolean variable.
+	if p.context.manager.IsFalse(expression) {
+		return lbool.False
+	}
+	if child, err := p.negatedArgument(expression); err == nil && !child.IsNull() {
+		return p.context.assignments[child].Negated()
+	}
 	if value, found := p.context.assignments[expression]; found {
 		return value
 	}
 	return lbool.Undef
+}
+
+func (p *SMTRelevancyPropagator) negatedArgument(expression ast.ASTHandle) (ast.ASTHandle, error) {
+	m := p.context.manager
+	kind, err := m.GetKind(expression)
+	if err != nil || kind != ast.ASTApp {
+		return ast.ASTHandle{}, err
+	}
+	family, err := m.GetFamilyID(expression)
+	if err != nil || family != m.BasicFamilyID() {
+		return ast.ASTHandle{}, err
+	}
+	op, err := m.GetDeclKind(expression)
+	if err != nil || op != ast.ASTOpNot {
+		return ast.ASTHandle{}, err
+	}
+	return m.GetArg(expression, 0)
+}
+
+// Source context::add_rel_watch receives a literal, then watches its positive
+// expression and signed truth value. Normalize before looking up watch keys.
+func (p *SMTRelevancyPropagator) literalWatch(expression ast.ASTHandle, value bool) (ast.ASTHandle, bool, error) {
+	for {
+		child, err := p.negatedArgument(expression)
+		if err != nil || child.IsNull() {
+			return expression, value, err
+		}
+		expression, value = child, !value
+	}
+}
+
+func (p *SMTRelevancyPropagator) addLiteralWatch(expression ast.ASTHandle, value bool, handler smtRelevancyHandler) error {
+	expression, value, err := p.literalWatch(expression, value)
+	if err != nil {
+		return err
+	}
+	return p.addWatch(expression, value, handler)
 }
 
 func (p *SMTRelevancyPropagator) setRelevant(expression ast.ASTHandle) {
@@ -278,7 +323,11 @@ func (p *SMTRelevancyPropagator) AddAndWatches(parent ast.ASTHandle) error {
 		if err != nil {
 			return err
 		}
-		if err = p.addWatch(child, false, handler); err != nil {
+		child, value, err := p.literalWatch(child, false)
+		if err != nil {
+			return err
+		}
+		if err = p.addWatch(child, value, handler); err != nil {
 			return err
 		}
 	}
@@ -298,7 +347,11 @@ func (p *SMTRelevancyPropagator) AddOrWatches(parent ast.ASTHandle) error {
 		if err != nil {
 			return err
 		}
-		if err = p.addWatch(child, true, handler); err != nil {
+		child, value, err := p.literalWatch(child, true)
+		if err != nil {
+			return err
+		}
+		if err = p.addWatch(child, value, handler); err != nil {
 			return err
 		}
 	}
@@ -315,10 +368,10 @@ func (p *SMTRelevancyPropagator) AddITEWatches(parent ast.ASTHandle) error {
 		return err
 	}
 	handler := smtRelevancyHandler{kind: smtRelevancyITE, target: parent}
-	if err = p.addWatch(condition, true, handler); err != nil {
+	if err = p.addLiteralWatch(condition, true, handler); err != nil {
 		return err
 	}
-	return p.addWatch(condition, false, handler)
+	return p.addLiteralWatch(condition, false, handler)
 }
 
 // Cached assertions internalized with filtering disabled have no watches.
@@ -331,6 +384,11 @@ func (p *SMTRelevancyPropagator) restoreExpressionWatches(root ast.ASTHandle) er
 	}
 	m := p.context.manager
 	ensureWatch := func(expression ast.ASTHandle, value bool, handler smtRelevancyHandler) error {
+		var err error
+		expression, value, err = p.literalWatch(expression, value)
+		if err != nil {
+			return err
+		}
 		watches := p.negativeWatch[expression]
 		if value {
 			watches = p.positiveWatch[expression]
@@ -451,10 +509,10 @@ func (p *SMTRelevancyPropagator) AddTermITEWatches(parent, thenEquality, elseEqu
 		return err
 	}
 	handler := smtRelevancyHandler{kind: smtRelevancyTermITE, target: parent, thenEquality: thenEquality, elseEquality: elseEquality}
-	if err = p.addWatch(condition, true, handler); err != nil {
+	if err = p.addLiteralWatch(condition, true, handler); err != nil {
 		return err
 	}
-	if err = p.addWatch(condition, false, handler); err != nil {
+	if err = p.addLiteralWatch(condition, false, handler); err != nil {
 		return err
 	}
 	return p.addHandler(parent, handler)
