@@ -12,9 +12,8 @@ import (
 
 var ErrSATBooleanModelInterpreted = errors.New("sat: interpreted atoms require source sat2goal recovery")
 
-// Original SAT-tactic model registration fragment. Its caller supplies the
-// SAT model after a successful check. It does not perform a check, infer a
-// result, evaluate formulas or replace the unported tactic/model converters.
+// SAT-tactic model registration. The caller supplies the SAT model after a
+// successful Boolean check; interpreted atoms use residual-goal recovery.
 func BuildBooleanModel(tr *GoalTranslator, values sat.Model) (md *model.ModelCore, err error) {
 	if err = tr.open(); err != nil {
 		return nil, err
@@ -40,7 +39,13 @@ func BuildBooleanModel(tr *GoalTranslator, values sat.Model) (md *model.ModelCor
 			}
 		}
 	}()
+	if err = tr.traceSATModelValues(values); err != nil {
+		return md, err
+	}
 	for h, value := range tr.Atoms.All() {
+		if err = tr.traceSATModelAtom(h, value); err != nil {
+			return md, err
+		}
 		value, e := values.Read(sat.BoolVar(value))
 		if e != nil {
 			return md, e
@@ -64,6 +69,9 @@ func BuildBooleanModel(tr *GoalTranslator, values sat.Model) (md *model.ModelCor
 		if e = md.RegisterConstant(declaration, interpretation); e != nil {
 			return md, e
 		}
+	}
+	if err = tr.traceSATModel(md); err != nil {
+		return md, err
 	}
 	return md, nil
 }

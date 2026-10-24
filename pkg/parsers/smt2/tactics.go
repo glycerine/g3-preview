@@ -21,7 +21,7 @@ func (p *commandParser) parseTactic() (result tactic.Tactic, err error) {
 		if e != nil {
 			return nil, e
 		}
-		result, err = p.context.NewBuiltinTactic(name)
+		result, err = p.context.NewBuiltinTacticWithOutput(name, p.out)
 		if err != nil {
 			return nil, err
 		}

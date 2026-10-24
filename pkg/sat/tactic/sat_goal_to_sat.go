@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
+	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
@@ -27,6 +28,9 @@ func (e satGoalUnsupportedOperator) Error() string {
 	return "operator " + e.formula + " not supported, apply simplifier before invoking translator"
 }
 func (e satGoalUnsupportedOperator) Unwrap() error { return ErrSATGoalUnsupported }
+func (e satGoalUnsupportedOperator) As(target interface{}) bool {
+	return errors.As(tactic.NewTacticException(e.Error()), target)
+}
 
 type satGoalFrame struct {
 	term       ast.ASTHandle
@@ -45,6 +49,7 @@ type GoalTranslator struct {
 	Limit                                     *control.Reslimit
 	cooperation                               *cooperate.Cooperation
 	traceTags                                 *diagnostic.TraceTags
+	printer                                   *uparams.GlobalParamsService
 	cache                                     map[ast.ASTHandle]uint32
 	Atoms                                     insdict.Dict[ast.ASTHandle, uint32]
 	interfaces                                map[ast.ASTHandle]bool
@@ -88,8 +93,11 @@ func NewGoalTranslator(m *ast.ASTManager, s *sat.Solver) (tr *GoalTranslator, er
 	tr.self = tr
 	defer func() {
 		if err != nil {
-			err = errors.Join(err, tr.Close())
-			tr = nil
+			if cleanup := tr.Close(); cleanup != nil {
+				err = errors.Join(err, cleanup)
+			} else {
+				tr = nil
+			}
 		}
 	}()
 	hashIdentity := func(h ast.ASTHandle) uint64 {
@@ -412,14 +420,14 @@ func (tr *GoalTranslator) process(h ast.ASTHandle) error {
 			}
 		}
 		if !tr.Limit.Inc() {
-			return fmt.Errorf("goal2sat: %s", tr.Limit.CancelMessage())
+			return tactic.NewTacticException(tr.Limit.CancelMessage())
 		}
 		size, e := tr.solver.RuntimeOwner().AllocationSize()
 		if e != nil {
 			return e
 		}
 		if size > tr.maxMemory {
-			return fmt.Errorf("goal2sat: max. memory exceeded")
+			return tactic.NewTacticException(tactic.TacticMaxMemoryMessage)
 		}
 		i := len(tr.frames) - 1
 		fr := tr.frames[i]

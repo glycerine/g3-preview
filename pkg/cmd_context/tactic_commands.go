@@ -5,8 +5,11 @@ package cmd_context
 import (
 	"errors"
 	"fmt"
+	"io"
+	"os"
 
 	"github.com/glycerine/g3/pkg/ast"
+	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic"
@@ -36,11 +39,17 @@ func (e TacticCommandFailure) Unwrap() error { return e.Cause }
 // NewBuiltinTactic returns the uncounted tactic produced by a retained native
 // factory. The parser or composition wrapper must acquire its own reference.
 func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
+	return c.NewBuiltinTacticWithOutput(name, os.Stdout)
+}
+
+// NewBuiltinTacticWithOutput supplies the command session's stdout transport
+// to tactics that emit source diagnostic output, including DIMACS instances.
+func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tactic.Tactic, error) {
 	if err := c.valid(); err != nil {
 		return nil, err
 	}
 	switch name {
-	case "smt", "simplify", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
+	case "smt", "sat", "sat-preprocess", "simplify", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -51,6 +60,10 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 	switch name {
 	case "smt":
 		return smtcore.NewSMTTactic(m, nil, c.config)
+	case "sat":
+		return sattactic.MakeSATTactic(c.config.Params, nil, c.config.ModelEvaluator, output)
+	case "sat-preprocess":
+		return sattactic.MakeSATPreprocessorTactic(c.config.Params, nil, c.config.ModelEvaluator, output)
 	case "simplify":
 		return core.MakeSimplifyTactic(m, c.config.Params, c.config.Globals, nil)
 	case "elim-and":

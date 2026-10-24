@@ -217,6 +217,9 @@ func (tr *GoalTranslator) traceGoalAndResult() error {
 
 func (tr *GoalTranslator) traceGoalFormula(h ast.ASTHandle) (body string, result error) {
 	global := uparams.BorrowProcessGlobalParamsService()
+	if tr.printer != nil {
+		global = tr.printer
+	}
 	if global == nil || global.Context == nil {
 		return "", uparams.ErrGlobalParamsOwner
 	}

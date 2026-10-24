@@ -1,0 +1,7 @@
+(set-logic QF_UF)
+(declare-const p Bool)
+(declare-const q Bool)
+(declare-const r Bool)
+(assert (= (or p q) r))
+(check-sat-using (using-params sat :dimacs.display true))
+(get-info :reason-unknown)

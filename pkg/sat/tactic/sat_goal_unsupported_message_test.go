@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestSATGoalTranslatorSourceUnsupportedSMT2Diagnostic(t *testing.T) {
@@ -20,6 +22,11 @@ func TestSATGoalTranslatorSourceUnsupportedSMT2Diagnostic(t *testing.T) {
 	err = tr.Compile([]ast.ASTHandle{h})
 	if !errors.Is(err, ErrSATGoalUnsupported) {
 		t.Fatalf("unsupported source operator class: %v", err)
+	}
+	var tacticError tactic.TacticException
+	var baseError z3exception.Z3Exception
+	if !errors.As(err, &tacticError) || !errors.As(err, &baseError) {
+		t.Fatal("source tactic/base exception classes were lost", err)
 	}
 	want := "operator (xor p q) not supported, apply simplifier before invoking translator"
 	if err.Error() != want {

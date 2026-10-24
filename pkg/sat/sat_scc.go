@@ -73,7 +73,7 @@ func (c *satSCC) Update(local *uparams.ParamsRef) (err error) {
 		return e
 	}
 	cfg := c.lifecycle.propagation.config
-	g, e := cfg.globals.GetModuleName("sat")
+	g, e := cfg.moduleParams()
 	if e != nil {
 		return e
 	}

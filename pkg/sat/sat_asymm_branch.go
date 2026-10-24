@@ -73,7 +73,7 @@ func (a *satAsymmBranch) Update(p *uparams.ParamsRef) (err error) {
 		return e
 	}
 	cfg := a.lifecycle.propagation.config
-	g, e := cfg.globals.GetModuleName("sat")
+	g, e := cfg.moduleParams()
 	if e != nil {
 		return e
 	}

@@ -121,7 +121,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	}()
 	// Source m_config is the first owning member. Its symbol/parameter body is
 	// unchanged, followed by source stats reset and default m_rand construction.
-	if s.config, err = newSATMainConfig(c.Runtime.globals, &c.Params, c.Budget); err != nil {
+	if s.config, err = newSATMainConfigWithService(c.Runtime.globals, c.Runtime.globalService, &c.Params, c.Budget); err != nil {
 		return s, err
 	}
 	if s.decision, err = newSATColdDecision(c.Budget); err != nil {

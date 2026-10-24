@@ -111,6 +111,7 @@ digraph packages {
   "cmd_context" -> "ast";
   "cmd_context" -> "ast/rewriter";
   "cmd_context" -> "model";
+  "cmd_context" -> "sat/tactic";
   "cmd_context" -> "smtcore";
   "cmd_context" -> "solver";
   "cmd_context" -> "tactic";
@@ -305,6 +306,8 @@ digraph packages {
   "sat/tactic" -> "util/lbool";
   "sat/tactic" -> "util/memory";
   "sat/tactic" -> "util/params";
+  "sat/tactic" -> "util/statistics";
+  "sat/tactic" -> "util/symbol";
   "sat/tactic" -> "util/text";
   "shell" [style=filled, fillcolor="#eeeeee"];
   "shell" -> "arena";

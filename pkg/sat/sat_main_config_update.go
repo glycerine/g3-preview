@@ -66,7 +66,7 @@ func (m *satMainConfig) Update(p *uparams.ParamsRef) (err error) {
 	if e := m.context.Check(p); e != nil {
 		return e
 	}
-	g, e := m.globals.GetModuleName("sat")
+	g, e := m.moduleParams()
 	if e != nil {
 		return e
 	}

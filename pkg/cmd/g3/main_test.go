@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 
@@ -80,6 +81,15 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"sat_global_options.smt2":                      "unknown\n(:reason-unknown \"incomplete\")\nsat\n((p false)\n (q true))\nsat\n((p false)\n (q true))\np cnf 2 2\n-1 0\n1 2 0\nc 0 p\nc 1 q\nunknown\n(:reason-unknown \"incomplete\")\nsat\n((p false)\n (q true))\nsat\n((p false)\n (q true))\n",
+	"sat_boolean_models_scopes.smt2":               "sat\n((p false)\n (q true)\n (r false))\nunsat\nsat\n((p false)\n (q true)\n (r false))\n",
+	"sat_cores.smt2":                               "unsat\n(choice nq np)\n",
+	"sat_dimacs.smt2":                              "p cnf 4 5\n-1 3 0\n-2 3 0\n-3 4 0\n3 -4 0\n1 2 -3 0\nc 0 p\nc 1 q\nc 3 r\nunknown\n(:reason-unknown \"incomplete\")\n",
+	"sat_interpreted_residual.smt2":                "unknown\n(:reason-unknown \"incomplete\")\nsat\n((x 2)\n (p false))\nunsat\nsat\n((x 2)\n (p false))\n",
+	"sat_limit_recovery.smt2":                      "unknown\n(:reason-unknown \"incomplete\")\nsat\n((p false)\n (q true))\n",
+	"sat_pb_bv_pipeline.smt2":                      "sat\n((x 1)\n (y 1)\n (z 1)\n (w 1))\nunsat\nsat\n((x 1)\n (y 1)\n (z 1)\n (w 1))\n",
+	"sat_preprocess_pipeline.smt2":                 "sat\n((p true)\n (q false)\n (r true))\n",
+	"sat_unsupported_guard.smt2":                   "unknown\n(:reason-unknown \"operator (xor p q) not supported, apply simplifier before invoking translator\")\nsat\n((p true)\n (q false))\n",
 	"aig_models_scopes.smt2":                       "sat\n((p true) (q false) (r false))\nunsat\nsat\n((p true) (q false) (r false))\n",
 	"aig_core_modes.smt2":                          "unknown\n(:reason-unknown \"aig does not support unsat core production\")\nunsat\n(nq choice np)\n",
 	"aig_proof_guard.smt2":                         "unknown\n(:reason-unknown \"aig does not support proof production\")\nunsat\n",
@@ -414,11 +424,24 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 				}
 				return
 			}
-			if canonicalOutput(goOutput.String()) != canonicalOutput(string(cppOutput)) {
+			if canonicalReferenceOutput(name, goOutput.String()) != canonicalReferenceOutput(name, string(cppOutput)) {
 				t.Fatalf("Go/C++ mismatch\nGo:\n%s\nC++:\n%s", goOutput.String(), cppOutput)
 			}
 		})
 	}
+}
+
+func canonicalReferenceOutput(name, output string) string {
+	if name == "sat_cores.smt2" {
+		// Source dep2asm is an unordered obj_map. This vector requires all
+		// three labels, so compare the exact core membership, not hash order.
+		fields := strings.Fields(strings.NewReplacer("(", " ", ")", " ").Replace(output))
+		if len(fields) == 4 && fields[0] == "unsat" {
+			sort.Strings(fields[1:])
+			return strings.Join(fields, " ")
+		}
+	}
+	return canonicalOutput(output)
 }
 
 // Keep this reference limitation separate from the agreement set. Direct smt

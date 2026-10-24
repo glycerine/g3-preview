@@ -90099,9 +90099,20 @@
         "pkg/sat/sat_integrity_checker.go",
         "pkg/sat/sat_integrity_checker_test.go",
         "pkg/sat/sat_solver_integrity.go",
-        "pkg/sat/sat_integrity_asymm_test.go"
+        "pkg/sat/sat_integrity_asymm_test.go",
+        "pkg/sat/sat_solver_runtime.go",
+        "pkg/sat/sat_main_config.go",
+        "pkg/sat/sat_main_config_update.go",
+        "pkg/sat/sat_solver.go",
+        "pkg/sat/sat_scc.go",
+        "pkg/sat/sat_simplifier.go",
+        "pkg/sat/sat_global_service_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/sat_global_options.smt2"
       ],
       "tests": [
+        "TestSATSolverBorrowedGlobalServiceCurrentModuleAndLocalOverrides",
+        "TestSMTLibRunnerCPPReference",
         "TestSATAsymmDefaultAndSourceEarlyExits",
         "TestSATAsymmProcessActualBinaryReduction",
         "TestSATAsymmSatisfiedAndNoReduction",
@@ -91592,9 +91603,19 @@
         "pkg/sat/sat_main_config_descrs.go",
         "pkg/sat/sat_main_config_descrs_test.go",
         "pkg/sat/sat_main_config.go",
-        "pkg/sat/sat_main_config_update.go"
+        "pkg/sat/sat_main_config_update.go",
+        "pkg/sat/sat_solver_runtime.go",
+        "pkg/sat/sat_solver.go",
+        "pkg/sat/sat_scc.go",
+        "pkg/sat/sat_asymm_branch.go",
+        "pkg/sat/sat_simplifier.go",
+        "pkg/sat/sat_global_service_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/sat_global_options.smt2"
       ],
       "tests": [
+        "TestSATSolverBorrowedGlobalServiceCurrentModuleAndLocalOverrides",
+        "TestSMTLibRunnerCPPReference",
         "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
         "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
         "TestSATMainConfigGeneratedDescriptorNativeStorage",
@@ -91679,9 +91700,19 @@
         "pkg/sat/sat_main_config_descrs.go",
         "pkg/sat/sat_main_config_descrs_test.go",
         "pkg/sat/sat_main_config.go",
-        "pkg/sat/sat_main_config_update.go"
+        "pkg/sat/sat_main_config_update.go",
+        "pkg/sat/sat_solver_runtime.go",
+        "pkg/sat/sat_solver.go",
+        "pkg/sat/sat_scc.go",
+        "pkg/sat/sat_asymm_branch.go",
+        "pkg/sat/sat_simplifier.go",
+        "pkg/sat/sat_global_service_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/sat_global_options.smt2"
       ],
       "tests": [
+        "TestSATSolverBorrowedGlobalServiceCurrentModuleAndLocalOverrides",
+        "TestSMTLibRunnerCPPReference",
         "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
         "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
         "TestSATMainConfigGeneratedDescriptorNativeStorage",
@@ -93855,9 +93886,20 @@
         "pkg/sat/sat_integrity_checker.go",
         "pkg/sat/sat_integrity_checker_test.go",
         "pkg/sat/sat_solver_integrity.go",
-        "pkg/sat/sat_integrity_asymm_test.go"
+        "pkg/sat/sat_integrity_asymm_test.go",
+        "pkg/sat/sat_solver_runtime.go",
+        "pkg/sat/sat_main_config.go",
+        "pkg/sat/sat_main_config_update.go",
+        "pkg/sat/sat_solver.go",
+        "pkg/sat/sat_asymm_branch.go",
+        "pkg/sat/sat_simplifier.go",
+        "pkg/sat/sat_global_service_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/sat_global_options.smt2"
       ],
       "tests": [
+        "TestSATSolverBorrowedGlobalServiceCurrentModuleAndLocalOverrides",
+        "TestSMTLibRunnerCPPReference",
         "TestSATSCCDefaultEquivalenceAndActualConverter",
         "TestSATSCCExternalRootAndContradiction",
         "TestSATElimEqsAllClauseAritiesAndModels",
@@ -94181,9 +94223,20 @@
         "pkg/sat/sat_solver_conflict_span.go",
         "pkg/sat/sat_var_queue.go",
         "pkg/sat/sat_var_queue_oracle_test.go",
-        "pkg/sat/sat_var_queue_native_test.go"
+        "pkg/sat/sat_var_queue_native_test.go",
+        "pkg/sat/sat_solver_runtime.go",
+        "pkg/sat/sat_main_config.go",
+        "pkg/sat/sat_main_config_update.go",
+        "pkg/sat/sat_solver.go",
+        "pkg/sat/sat_scc.go",
+        "pkg/sat/sat_asymm_branch.go",
+        "pkg/sat/sat_global_service_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/sat_global_options.smt2"
       ],
       "tests": [
+        "TestSATSolverBorrowedGlobalServiceCurrentModuleAndLocalOverrides",
+        "TestSMTLibRunnerCPPReference",
         "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
         "TestSATClauseUseListsSameAddressReconstruction",
         "TestSATClauseUseListsOuterGrowthInvalidatesChild",
@@ -95051,9 +95104,16 @@
         "pkg/sat/sat_var_queue_native_test.go",
         "pkg/sat/sat_solver_search_verbose.go",
         "pkg/sat/sat_solver_unsat_core_verbose.go",
-        "pkg/sat/sat_solver_consequence_verbose.go"
+        "pkg/sat/sat_solver_consequence_verbose.go",
+        "pkg/sat/sat_main_config.go",
+        "pkg/sat/sat_main_config_update.go",
+        "pkg/sat/sat_global_service_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/sat_global_options.smt2"
       ],
       "tests": [
+        "TestSATSolverBorrowedGlobalServiceCurrentModuleAndLocalOverrides",
+        "TestSMTLibRunnerCPPReference",
         "TestSATSolverScopesNativeGrowthAndPop",
         "TestSATSolverClauseCoreFiniteSimplification",
         "TestSATSolverClauseCoreWatchSelection",
@@ -98754,7 +98814,10 @@
         "pkg/sat/tactic/sat_model_converter.go",
         "pkg/sat/tactic/sat_model_converter_test.go",
         "pkg/sat/sat_model_converter_boundary.go",
-        "pkg/sat/sat_package_boundary.go"
+        "pkg/sat/sat_package_boundary.go",
+        "pkg/sat/tactic/sat_tactic.go",
+        "pkg/sat/tactic/sat_tactic_test.go",
+        "pkg/sat/tactic/sat_goal_unsupported_message_test.go"
       ],
       "tests": [
         "TestSATGoalTranslatorSourceUnsupportedSMT2Diagnostic",
@@ -98782,7 +98845,9 @@
         "TestSATGoalRecoveryModelConverterCPP",
         "TestSATModelConverterReconstructionAndAuxiliaryFiltering",
         "TestSATModelConverterTranslationDropsEliminationLog",
-        "TestSATModelConverterAllocationFrontiers"
+        "TestSATModelConverterAllocationFrontiers",
+        "TestSATTacticCancellationBoundaryAndResidualTranslation",
+        "TestSATTacticAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -98993,10 +99058,11 @@
         "Translation cache and Boolean-interface sets use native Go maps. Atom ownership and dependency assumption iteration use insdict.Dict v0.10.1 with full origin/slot/generation identity hashing and insertion-order iteration. Each atom owns one acquired reference; consumed keys are deleted before cleanup reports errors. Dependency keys borrow caller goal ownership. Removed satGoalASTMap probing, capacity and simulated backing reservations; actual SAT variable/clause, AST factory and cooperation owners remain.",
         "Fresh compound dependency guards retain owning trail references; dep2asm original label keys remain borrowed as in source.",
         "CompileGoal dependency, formula and combined-dependency scratch use native []ASTHandle slices. DependencyLinearize returns native slice output directly; no ASTExprVector codec or ASTHandleVector adapter is used here. Dependency keys and caller goal ownership remain unchanged.",
-        "The AST SAT model converter independently copies the concrete SAT elimination log, owns every indexed atom reference and its auxiliary filter, and borrows evaluator services. Evaluation references/evaluators and consumed atom-release prefixes remain owned across stopped cleanup. Recovery publishes the converter after the complete inverse map, before asserting units/clauses; later failures return that owner. Source translation retains the filter and all atoms but deliberately leaves the SAT log empty."
+        "The AST SAT model converter independently copies the concrete SAT elimination log, owns every indexed atom reference and its auxiliary filter, and borrows evaluator services. Evaluation references/evaluators and consumed atom-release prefixes remain owned across stopped cleanup. Recovery publishes the converter after the complete inverse map, before asserting units/clauses; later failures return that owner. Source translation retains the filter and all atoms but deliberately leaves the SAT log empty.",
+        "The SAT tactic supplies the translator with its explicit borrowed global-parameter printer owner, so unsupported-operator diagnostics and DIMACS atom annotations work without a process-global binding. A constructor whose close stops returns its real translator owner instead of dropping its references."
       ],
       "deviations": [
-        "Goal dependency guards, dep2asm, unsupported-operator SMT2 diagnostics and sat2goal recovery/model conversion are implemented. Wrapper parameter updates, retained has_unsupported_bool inspection, interpreted-atom wrapper state and public SAT tactic integration remain open. Translation checkpoints borrow the actual AST-manager resource limit; recovery now raises source tactic_exception diagnostics. No whole-unit or public API completion is claimed.",
+        "Goal dependency guards, dep2asm, unsupported-operator SMT2 diagnostics, sat2goal recovery/model conversion and public SAT tactic integration are implemented. Source checkpoint failures and unsupported operators retain their tactic_exception classification. Wrapper parameter updates, retained has_unsupported_bool inspection and interpreted-atom wrapper state remain open, so this source unit is still partial. Translation checkpoints borrow the actual AST-manager resource limit.",
         "Strict memory-checkpoint tests use an explicit real caller Runtime allocation; native SAT backing no longer guarantees a positive Runtime allocation counter. The checkpoint still reads the actual Runtime counter, without fabricated slice-allocation events."
       ]
     },
@@ -99027,13 +99093,44 @@
       "path": "src/sat/tactic/sat_tactic.cpp",
       "component": "sat",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/sat/tactic/sat_boolean_model.go",
-        "pkg/sat/tactic/sat_goal_dependencies.go"
+        "pkg/sat/tactic/sat_goal_dependencies.go",
+        "pkg/sat/tactic/sat_tactic.go",
+        "pkg/sat/tactic/sat_tactic_trace.go",
+        "pkg/sat/tactic/sat_tactic_test.go",
+        "pkg/sat/sat_tactic_boundary.go",
+        "pkg/sat/tactic/sat_goal_to_sat.go",
+        "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+        "pkg/sat/tactic/sat_goal_recovery.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/tactics.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/sat_boolean_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/sat_cores.smt2",
+        "pkg/cmd/g3/test_vectors/sat_dimacs.smt2",
+        "pkg/cmd/g3/test_vectors/sat_interpreted_residual.smt2",
+        "pkg/cmd/g3/test_vectors/sat_limit_recovery.smt2",
+        "pkg/cmd/g3/test_vectors/sat_pb_bv_pipeline.smt2",
+        "pkg/cmd/g3/test_vectors/sat_preprocess_pipeline.smt2",
+        "pkg/cmd/g3/test_vectors/sat_unsupported_guard.smt2",
+        "pkg/sat/tactic/sat_goal_dependencies_test.go",
+        "pkg/model/model_core_test.go",
+        "pkg/model/model_lifecycle_test.go",
+        "pkg/sat/sat_solver_runtime.go",
+        "pkg/sat/sat_main_config.go",
+        "pkg/sat/sat_main_config_update.go",
+        "pkg/sat/sat_solver.go",
+        "pkg/sat/sat_scc.go",
+        "pkg/sat/sat_asymm_branch.go",
+        "pkg/sat/sat_simplifier.go",
+        "pkg/sat/sat_global_service_test.go",
+        "pkg/cmd/g3/test_vectors/sat_global_options.smt2"
       ],
       "tests": [
+        "TestSATSolverBorrowedGlobalServiceCurrentModuleAndLocalOverrides",
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
         "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
@@ -99047,7 +99144,17 @@
         "TestSATGoalDependenciesSignedAssumptionsAndCore",
         "TestSATGoalDependenciesFormulaLabelShortcutAndInterface",
         "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable",
-        "TestSATGoalDependenciesNativeDiscoveryOrderAndRepeatedLabels"
+        "TestSATGoalDependenciesNativeDiscoveryOrderAndRepeatedLabels",
+        "TestSATTacticBooleanTruthTablesAndStatistics",
+        "TestSATTacticDependencyKeysSurviveGoalReset",
+        "TestSATTacticCancellationBoundaryAndResidualTranslation",
+        "TestSATTacticCPPGoalRecoveryAndLiveDiagnostics",
+        "TestSATTacticDescriptorsProofProfilesAndBorrowedGoals",
+        "TestSATPreprocessorFactoryParameterPrecedence",
+        "TestSATTacticAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSATTacticConditionalInvariantAndVerboseStatus"
       ],
       "conditionals": [
         {
@@ -99077,64 +99184,281 @@
           "text": "SASSERT(m_imp == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "SAT Boolean registration fragment allocates original derived model",
-          "status": "partial",
-          "go_target": "pkg/model/model_lifecycle.go",
-          "go_targets": ["pkg/model/model_sat_allocation.go", "pkg/model/model_sat_memory_trace_debug_test.go"],
-          "tests": [
-            "TestModelDerivedConstructorAndVirtualReferenceDestruction",
-            "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
-            "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
-            "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
-            "TestModelConverterToModelOriginalAllocationAndApplication",
-            "TestModelDerivedConstructorHeaderRefusalUnwinds",
-            "TestSATBooleanModelMemoryWrapperFollowsCoreOwner"
-          ]
-        },
-        {
-          "name": "imp::operator() Boolean model registration fragment",
-          "status": "partial",
-          "go_target": "pkg/sat/tactic/sat_boolean_model.go",
-          "tests": [
-            "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose",
-            "TestSATBooleanModelSkipsUndefinedSourceRows",
-            "TestSATBooleanModelMatchesOriginalGoalTruthTable",
-            "TestSATBooleanModelRejectsInterpretedRecoveryBranch",
-            "TestSATBooleanModelMemoryWrapperFollowsCoreOwner"
-          ],
-          "go_targets": [
-            "pkg/model/model_core_test.go"
-          ]
-        },
-        {
-          "name": "imp::dep2assumptions collection with native insertion-order dictionary iteration",
+          "name": "imp construction, original manager resource limit, proof-mode SASSERT, scoped_set_imp and destructor/cleanup guards",
           "status": "ported",
-          "go_target": "pkg/sat/tactic/sat_goal_dependencies.go",
+          "go_targets": [
+            "pkg/sat/tactic/sat_tactic.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/sat/tactic/sat_tactic_test.go",
+            "pkg/sat/sat_tactic_boundary.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/sat_boolean_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/sat_cores.smt2",
+            "pkg/cmd/g3/test_vectors/sat_dimacs.smt2",
+            "pkg/cmd/g3/test_vectors/sat_interpreted_residual.smt2",
+            "pkg/cmd/g3/test_vectors/sat_limit_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/sat_pb_bv_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_preprocess_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_unsupported_guard.smt2"
+          ],
           "tests": [
-            "TestSATGoalDependenciesSignedAssumptionsAndCore",
-            "TestSATGoalDependenciesFormulaLabelShortcutAndInterface",
-            "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable",
-            "TestSATGoalDependenciesNativeDiscoveryOrderAndRepeatedLabels"
+            "TestSATTacticBooleanTruthTablesAndStatistics",
+            "TestSATTacticDescriptorsProofProfilesAndBorrowedGoals",
+            "TestSATTacticAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "imp::operator() output initialization, proof refusal, redundancy elimination, source Boolean translation and label retention across goal reset",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/tactic/sat_tactic.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/sat/tactic/sat_tactic_test.go",
+            "pkg/sat/sat_tactic_boundary.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/sat_boolean_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/sat_cores.smt2",
+            "pkg/cmd/g3/test_vectors/sat_dimacs.smt2",
+            "pkg/cmd/g3/test_vectors/sat_interpreted_residual.smt2",
+            "pkg/cmd/g3/test_vectors/sat_limit_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/sat_pb_bv_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_preprocess_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_unsupported_guard.smt2"
+          ],
+          "tests": [
+            "TestSATTacticDependencyKeysSurviveGoalReset",
+            "TestSATTacticDescriptorsProofProfilesAndBorrowedGoals",
+            "TestSATTacticCPPGoalRecoveryAndLiveDiagnostics"
+          ]
+        },
+        {
+          "name": "SAT check, UNSAT core mapping, Boolean model registration and interpreted/UNKNOWN sat2goal recovery",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/tactic/sat_tactic.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/sat/tactic/sat_tactic_test.go",
+            "pkg/sat/sat_tactic_boundary.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/sat_boolean_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/sat_cores.smt2",
+            "pkg/cmd/g3/test_vectors/sat_dimacs.smt2",
+            "pkg/cmd/g3/test_vectors/sat_interpreted_residual.smt2",
+            "pkg/cmd/g3/test_vectors/sat_limit_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/sat_pb_bv_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_preprocess_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_unsupported_guard.smt2"
+          ],
+          "tests": [
+            "TestSATTacticBooleanTruthTablesAndStatistics",
+            "TestSATTacticDependencyKeysSurviveGoalReset",
+            "TestSATTacticCancellationBoundaryAndResidualTranslation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "dep2assumptions and mk_asm2dep with concrete insertion-ordered dictionaries and native slices/maps",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/tactic/sat_tactic.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/sat/tactic/sat_tactic_test.go",
+            "pkg/sat/sat_tactic_boundary.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/sat_boolean_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/sat_cores.smt2",
+            "pkg/cmd/g3/test_vectors/sat_dimacs.smt2",
+            "pkg/cmd/g3/test_vectors/sat_interpreted_residual.smt2",
+            "pkg/cmd/g3/test_vectors/sat_limit_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/sat_pb_bv_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_preprocess_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_unsupported_guard.smt2"
+          ],
+          "tests": [
+            "TestSATTacticDependencyKeysSurviveGoalReset",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "sat_tactic parameters/descriptors, fresh application owners, exception-class catch, accumulated/reset statistics, translation and inherited hooks",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/tactic/sat_tactic.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/sat/tactic/sat_tactic_test.go",
+            "pkg/sat/sat_tactic_boundary.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/sat_boolean_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/sat_cores.smt2",
+            "pkg/cmd/g3/test_vectors/sat_dimacs.smt2",
+            "pkg/cmd/g3/test_vectors/sat_interpreted_residual.smt2",
+            "pkg/cmd/g3/test_vectors/sat_limit_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/sat_pb_bv_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_preprocess_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_unsupported_guard.smt2"
+          ],
+          "tests": [
+            "TestSATTacticBooleanTruthTablesAndStatistics",
+            "TestSATTacticCancellationBoundaryAndResidualTranslation",
+            "TestSATTacticDescriptorsProofProfilesAndBorrowedGoals",
+            "TestSATTacticAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "mk_sat_tactic and mk_sat_preprocessor_tactic clean/using_params factories, fixed max_conflicts precedence, runner registration and stdout transport",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/tactic/sat_tactic.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/sat/tactic/sat_tactic_test.go",
+            "pkg/sat/sat_tactic_boundary.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/sat_boolean_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/sat_cores.smt2",
+            "pkg/cmd/g3/test_vectors/sat_dimacs.smt2",
+            "pkg/cmd/g3/test_vectors/sat_interpreted_residual.smt2",
+            "pkg/cmd/g3/test_vectors/sat_limit_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/sat_pb_bv_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_preprocess_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_unsupported_guard.smt2"
+          ],
+          "tests": [
+            "TestSATPreprocessorFactoryParameterPrecedence",
+            "TestSATTacticAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Live before_sat_solver, sat_solver_unknown, sat_dimacs, sat_tactic and sat_stats TRACE sites; conditional invariant/status and DIMACS annotations",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/tactic/sat_tactic.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/sat/tactic/sat_tactic_test.go",
+            "pkg/sat/sat_tactic_boundary.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/sat_boolean_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/sat_cores.smt2",
+            "pkg/cmd/g3/test_vectors/sat_dimacs.smt2",
+            "pkg/cmd/g3/test_vectors/sat_interpreted_residual.smt2",
+            "pkg/cmd/g3/test_vectors/sat_limit_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/sat_pb_bv_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_preprocess_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_unsupported_guard.smt2"
+          ],
+          "tests": [
+            "TestSATTacticCPPGoalRecoveryAndLiveDiagnostics",
+            "TestSATTacticBooleanTruthTablesAndStatistics",
+            "TestSMTLibRunnerCPPReference",
+            "TestSATTacticConditionalInvariantAndVerboseStatus"
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The manager-independent tactic owns its parameter snapshot and accumulated statistics. Each application owns a fresh native SAT runtime/solver/translator and releases them lexically; no SMT solver substitutes for the SAT engine. Result goals are borrowed, while result model converters and dependencies own their references. Dependency map keys retain AST references across the input goal reset, including signed and compound labels.",
+        "SATApplicationFailure retains the concrete stopped application owner if destruction refuses. Explicit cleanup acknowledges only an already observed immutable source SAT destructor guard through CleanupStopped; ordinary Close keeps refusing. Consumed dependency/AST release prefixes, models, converters and runtime owners stay retained for retry. Source assertions are preserved in their selected profiles.",
+        "Native Go slices/maps/insdict.Dict replace C++ assumption/core containers. Explicit temporary counted references unwind the two clean wrappers and using_params preprocessor factory on construction/update failures. Source inactive cleanup is a no-op except for releasing previously stopped Go owners."
+      ],
       "deviations": [
-        "The Boolean registration fragment now constructs the original derived model with its initial constant/function/universe tables. It does not implement the SAT tactic, proof/core paths, UNKNOWN/interpreted recovery converters or public context/solver APIs.",
-        "Strict memory-checkpoint tests use an explicit real caller Runtime allocation; native SAT backing no longer guarantees a positive Runtime allocation counter. The checkpoint still reads the actual Runtime counter, without fabricated slice-allocation events."
+        "The C++ allocator consolidation and AST hash-table capacity compaction at cpp64 are storage-management operations replaced by native Go storage ownership; no C++ allocator/hash-capacity emulation or forced Go GC is introduced. The #if 0 verbose fragment at cpp117-119 remains excluded.",
+        "Source dep2asm is unordered. Go uses insertion-order iteration and native literal-to-label maps; the three-required-label core comparison checks exact membership independently of unspecified hash traversal order. Other new CLI vectors and residual goals/converter displays compare C++ output exactly after whitespace/fresh-name normalization. Public Go API integration, QF_IDL strategy wiring and higher engines remain separate work."
       ]
     },
     {
       "path": "src/sat/tactic/sat_tactic.h",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/sat/tactic/sat_tactic.go",
+        "pkg/sat/tactic/sat_tactic_trace.go",
+        "pkg/sat/tactic/sat_tactic_test.go",
+        "pkg/sat/sat_tactic_boundary.go",
+        "pkg/sat/tactic/sat_goal_to_sat.go",
+        "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+        "pkg/sat/tactic/sat_goal_recovery.go",
+        "pkg/sat/tactic/sat_boolean_model.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/tactics.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/sat_boolean_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/sat_cores.smt2",
+        "pkg/cmd/g3/test_vectors/sat_dimacs.smt2",
+        "pkg/cmd/g3/test_vectors/sat_interpreted_residual.smt2",
+        "pkg/cmd/g3/test_vectors/sat_limit_recovery.smt2",
+        "pkg/cmd/g3/test_vectors/sat_pb_bv_pipeline.smt2",
+        "pkg/cmd/g3/test_vectors/sat_preprocess_pipeline.smt2",
+        "pkg/cmd/g3/test_vectors/sat_unsupported_guard.smt2",
+        "pkg/sat/sat_solver_runtime.go",
+        "pkg/sat/sat_main_config.go",
+        "pkg/sat/sat_main_config_update.go",
+        "pkg/sat/sat_solver.go",
+        "pkg/sat/sat_scc.go",
+        "pkg/sat/sat_asymm_branch.go",
+        "pkg/sat/sat_simplifier.go",
+        "pkg/sat/sat_global_service_test.go",
+        "pkg/cmd/g3/test_vectors/sat_global_options.smt2"
+      ],
+      "tests": [
+        "TestSATSolverBorrowedGlobalServiceCurrentModuleAndLocalOverrides",
+        "TestSATTacticBooleanTruthTablesAndStatistics",
+        "TestSATTacticDependencyKeysSurviveGoalReset",
+        "TestSATTacticCancellationBoundaryAndResidualTranslation",
+        "TestSATTacticCPPGoalRecoveryAndLiveDiagnostics",
+        "TestSATTacticDescriptorsProofProfilesAndBorrowedGoals",
+        "TestSATPreprocessorFactoryParameterPrecedence",
+        "TestSATTacticAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -99145,11 +99469,50 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_sat_tactic and mk_sat_preprocessor_tactic clean/using_params factories, fixed max_conflicts precedence, runner registration and stdout transport",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/tactic/sat_tactic.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/sat/tactic/sat_tactic_test.go",
+            "pkg/sat/sat_tactic_boundary.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/sat_boolean_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/sat_cores.smt2",
+            "pkg/cmd/g3/test_vectors/sat_dimacs.smt2",
+            "pkg/cmd/g3/test_vectors/sat_interpreted_residual.smt2",
+            "pkg/cmd/g3/test_vectors/sat_limit_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/sat_pb_bv_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_preprocess_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/sat_unsupported_guard.smt2"
+          ],
+          "tests": [
+            "TestSATPreprocessorFactoryParameterPrecedence",
+            "TestSATTacticAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager-independent tactic owns its parameter snapshot and accumulated statistics. Each application owns a fresh native SAT runtime/solver/translator and releases them lexically; no SMT solver substitutes for the SAT engine. Result goals are borrowed, while result model converters and dependencies own their references. Dependency map keys retain AST references across the input goal reset, including signed and compound labels.",
+        "SATApplicationFailure retains the concrete stopped application owner if destruction refuses. Explicit cleanup acknowledges only an already observed immutable source SAT destructor guard through CleanupStopped; ordinary Close keeps refusing. Consumed dependency/AST release prefixes, models, converters and runtime owners stay retained for retry. Source assertions are preserved in their selected profiles.",
+        "Native Go slices/maps/insdict.Dict replace C++ assumption/core containers. Explicit temporary counted references unwind the two clean wrappers and using_params preprocessor factory on construction/update failures. Source inactive cleanup is a no-op except for releasing previously stopped Go owners."
+      ],
+      "deviations": [
+        "The C++ allocator consolidation and AST hash-table capacity compaction at cpp64 are storage-management operations replaced by native Go storage ownership; no C++ allocator/hash-capacity emulation or forced Go GC is introduced. The #if 0 verbose fragment at cpp117-119 remains excluded.",
+        "Source dep2asm is unordered. Go uses insertion-order iteration and native literal-to-label maps; the three-required-label core comparison checks exact membership independently of unspecified hash traversal order. Other new CLI vectors and residual goals/converter displays compare C++ output exactly after whitespace/fresh-name normalization. Public Go API integration, QF_IDL strategy wiring and higher engines remain separate work."
+      ]
     },
     {
       "path": "src/shell/CMakeLists.txt",

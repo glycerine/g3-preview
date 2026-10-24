@@ -166,7 +166,7 @@ func (s *satSimplifier) Update(p *uparams.ParamsRef) (err error) {
 		return e
 	}
 	cfg := s.lifecycle.propagation.config
-	g, e := cfg.globals.GetModuleName("sat")
+	g, e := cfg.moduleParams()
 	if e != nil {
 		return e
 	}

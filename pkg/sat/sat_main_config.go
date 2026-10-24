@@ -96,32 +96,46 @@ type satMainConfigState struct {
 // SymbolManager are borrowed and must outlive it. Arithmetic/configuration is
 // confined by the caller; Budget is also owner-confined. Never copy this header.
 type satMainConfig struct {
-	self       *satMainConfig
-	globals    *uparams.GlobalParams
-	context    *uparams.ParamsContext
-	symbols    *usymbol.Manager
-	budget     *arena.Budget
-	state      satMainConfigState
-	cached     [11]usymbol.Symbol
-	ownerBytes uint64
-	closed     bool
+	self          *satMainConfig
+	globals       *uparams.GlobalParams
+	globalService *uparams.GlobalParamsService
+	context       *uparams.ParamsContext
+	symbols       *usymbol.Manager
+	budget        *arena.Budget
+	state         satMainConfigState
+	cached        [11]usymbol.Symbol
+	ownerBytes    uint64
+	closed        bool
 }
 
 func newSATMainConfig(g *uparams.GlobalParams, p *uparams.ParamsRef, b *arena.Budget) (*satMainConfig, error) {
-	if g == nil {
+	return newSATMainConfigWithService(g, nil, p, b)
+}
+func newSATMainConfigWithService(g *uparams.GlobalParams, service *uparams.GlobalParamsService, p *uparams.ParamsRef, b *arena.Budget) (*satMainConfig, error) {
+	if g == nil && service == nil {
 		return nil, ErrSATMainConfigOwner
 	}
-	if e := g.CheckOpen(); e != nil {
-		return nil, e
+	var context *uparams.ParamsContext
+	var symbols *usymbol.Manager
+	if service != nil {
+		if e := service.CheckOpen(); e != nil {
+			return nil, e
+		}
+		context, symbols = service.Context, service.Symbols
+	} else {
+		if e := g.CheckOpen(); e != nil {
+			return nil, e
+		}
+		context, symbols = g.Context(), g.Symbols()
 	}
-	if e := g.Context().Check(p); e != nil {
+	if e := context.Check(p); e != nil {
 		return nil, e
 	}
 	n := uint64(reflect.TypeOf(satMainConfig{}).Size())
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	m := &satMainConfig{globals: g, context: g.Context(), symbols: g.Symbols(), budget: b, ownerBytes: n}
+	m := &satMainConfig{globals: g, globalService: service, context: context, symbols: symbols, budget: b, ownerBytes: n}
 	m.self = m
 	// Source initializer preceding all eleven symbol constructors.
 	m.state.RestartMax = 0
@@ -151,7 +165,17 @@ func (m *satMainConfig) open() error {
 	if m.closed {
 		return arena.ErrClosed
 	}
+	if m.globalService != nil {
+		return m.globalService.CheckOpen()
+	}
 	return m.globals.CheckOpen()
+}
+
+func (m *satMainConfig) moduleParams() (uparams.ParamsRef, error) {
+	if m.globalService != nil {
+		return m.globalService.SourceGetModuleName("sat")
+	}
+	return m.globals.GetModuleName("sat")
 }
 func (m *satMainConfig) State() (satMainConfigState, error) {
 	if e := m.open(); e != nil {
@@ -170,7 +194,7 @@ func (m *satMainConfig) Clone(b *arena.Budget) (*satMainConfig, error) {
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	r := &satMainConfig{globals: m.globals, context: m.context, symbols: m.symbols, budget: b, state: m.state, cached: m.cached, ownerBytes: n}
+	r := &satMainConfig{globals: m.globals, globalService: m.globalService, context: m.context, symbols: m.symbols, budget: b, state: m.state, cached: m.cached, ownerBytes: n}
 	r.self = r
 	return r, nil
 }

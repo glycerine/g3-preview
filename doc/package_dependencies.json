@@ -869,6 +869,7 @@
         "ast",
         "ast/rewriter",
         "model",
+        "sat/tactic",
         "smtcore",
         "solver",
         "tactic",
@@ -2299,6 +2300,7 @@
         "sat_solver_watch_store.go",
         "sat_storage_nodebug.go",
         "sat_storage_vector.go",
+        "sat_tactic_boundary.go",
         "sat_types.go",
         "sat_var_queue.go",
         "sat_watched.go"
@@ -2318,6 +2320,8 @@
         "util/lbool",
         "util/memory",
         "util/params",
+        "util/statistics",
+        "util/symbol",
         "util/text"
       ],
       "production_files": [
@@ -2327,7 +2331,9 @@
         "sat_goal_recovery.go",
         "sat_goal_to_sat.go",
         "sat_goal_to_sat_trace.go",
-        "sat_model_converter.go"
+        "sat_model_converter.go",
+        "sat_tactic.go",
+        "sat_tactic_trace.go"
       ]
     },
     {
