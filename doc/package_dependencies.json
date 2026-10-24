@@ -2887,6 +2887,9 @@
       ],
       "production_files": [
         "collect_occs.go",
+        "ctx_simplify_rewrite.go",
+        "ctx_simplify_tactic.go",
+        "ctx_simplify_trace.go",
         "elim_uncnstr_array_datatype.go",
         "elim_uncnstr_basic.go",
         "elim_uncnstr_bv.go",

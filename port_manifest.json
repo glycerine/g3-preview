@@ -40047,7 +40047,21 @@
         "pkg/tactic/core/elim_uncnstr_tactic_test.go",
         "pkg/tactic/core/elim_uncnstr_trace_test.go",
         "pkg/tactic/smtlogics/qfauflia_tactic.go",
-        "pkg/tactic/smtlogics/qfauflia_tactic_test.go"
+        "pkg/tactic/smtlogics/qfauflia_tactic_test.go",
+        "pkg/tactic/core/ctx_simplify_tactic.go",
+        "pkg/tactic/core/ctx_simplify_rewrite.go",
+        "pkg/tactic/core/ctx_simplify_trace.go",
+        "pkg/tactic/core/ctx_simplify_tactic_test.go",
+        "pkg/tactic/core/ctx_simplify_cpp_test.go",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -40069,7 +40083,15 @@
         "TestQFAUFLIATacticModelConverterSurvivesStrategyClose",
         "TestQFAUFLIATacticTranslationAndProofLifetime",
         "TestCommandContextTacticExceptionBoundary",
-        "TestSMTLibRunnerMaxBVSharingStepFrontiers"
+        "TestSMTLibRunnerMaxBVSharingStepFrontiers",
+        "TestContextSimplifyExactGoalsCPP",
+        "TestContextSimplifyDepthAndStepFrontiersCPP",
+        "TestContextSimplifySharedBooleanDAGsCPP",
+        "TestContextSimplifyConstructorAllocationFrontiers",
+        "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+        "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+        "TestContextSimplifyClosedTraceAndCleanupRefusal",
+        "TestContextSimplifyTranslationParameterSnapshot"
       ],
       "conditionals": [
         {
@@ -40244,6 +40266,41 @@
           "tests": [
             "TestCommandContextTacticExceptionBoundary",
             "TestSMTLibRunnerMaxBVSharingStepFrontiers"
+          ]
+        },
+        {
+          "name": "Registered concrete ctx-simplify factory in the retained tactic registry/SMT-LIB check-sat-using surface; source apply output is used as an external oracle for library goal results, while the Go apply command remains a separate unported obligation",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/tactic_commands.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -135893,9 +135950,37 @@
       "path": "src/tactic/core/ctx_simplify_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/ctx_simplify_tactic.go",
+        "pkg/tactic/core/ctx_simplify_rewrite.go",
+        "pkg/tactic/core/ctx_simplify_trace.go",
+        "pkg/tactic/core/ctx_simplify_tactic_test.go",
+        "pkg/tactic/core/ctx_simplify_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+      ],
+      "tests": [
+        "TestContextSimplifyExactGoalsCPP",
+        "TestContextSimplifyDepthAndStepFrontiersCPP",
+        "TestContextSimplifySharedBooleanDAGsCPP",
+        "TestContextSimplifyConstructorAllocationFrontiers",
+        "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+        "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+        "TestContextSimplifyClosedTraceAndCleanupRefusal",
+        "TestContextSimplifyTranslationParameterSnapshot",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 116,
@@ -136002,19 +136087,299 @@
           "text": "SASSERT(g.is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "ctx_propagate_assertions constructor/assert_expr/assert_eq_val/assert_eq_core/simplify/push/pop/scope_level/translate and simplifier::shared: original and stripped-not sharing gates, signed Boolean assumptions, positive value equalities, ignored repeated keys at depth cutoff, owned key trail and exact scope restoration; concrete typed virtual simplifier contract",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "imp construction/destruction/updt_params/checkpoint/shared/check_cache: source occurrence settings, mk_simplified_app construction snapshot, local memory/depth/step/blowup policy, cooperation then allocation-size then cancellation checkpoint, and selected source assertion profiles",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "cached_result/cache_cell/cache_core/cache/restore_cache/pop/is_cached: shared-only owned keys/values, scope-indexed stacked results, reverse undo, exact current-scope cache hits and native root lifetime across restoration diagnostics",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "simplify/simplify_or_and/simplify_ite/simplify_app: output reset and soft depth/step gates before checkpoints, may_simplify/cache/assertion lookup, exact step increments, forward/backward Boolean passes and signed assertions, ITE branch scopes, unchanged-app fast path and concrete simplified-app rebuilding",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "expr_size/process/process_goal/operator()(goal&): application-DAG size, proof-mode per-form simplification and optional blowup bailout, rewrite/modus-ponens proofs, non-proof forward/backward cross-form propagation only without dependencies, additive occurrence recount and source verbose report",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "ctx_simplify_tactic constructor/destructor/translate/updt_params/get_param_descrs/operator()/cleanup and mk_ctx_simplify_tactic: stored parameter snapshot, four exact descriptors, fresh translated simplifier, cleared converters/core, goal depth and retained subgoal publication, build-before-swap cleanup and clean factory wrapper",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained TRACE/CTRACE/debug invariant sites: full/bounded expression diagnostics, cache IDs/levels and restoration, ITE rebuilding, proof-mode size/step diagnostics and selected destruction/cache assertions; closed ostream failures preserve algorithm execution",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns its parameter snapshot and active implementation. Each implementation owns the concrete virtual simplifier, occurrence state, simplified-app functor, scoped cache and cache undo records. Assertion trails own keys while values remain borrowed from active formula frames; cache cells own keys and each stacked result. Recursive scratch references transfer into argument buffers and release in source lexical order. Refusals retain outstanding cleanup frames/implementations on the tactic. Cleanup constructs replacement state before swapping and releases retired state; translation starts with a fresh target-manager simplifier and copied parameters. Returned goals/proofs outlive cleanup and tactic closure. Parameter, memory, cooperation and printer services are borrowed."
+      ],
+      "deviations": [
+        "Native Go maps keyed by concrete AST handles and slices of scoped cache records replace C++ hash tables, AST-ID-sized storage and small-object allocator containers; no STL layout, capacity or unused template implementation is reproduced. The source virtual simplifier surface is expressed as a concrete AST-typed Go interface, with the retained default assertion simplifier implemented.",
+        "Go explicit AST references protect the old cached result across diagnostic printing after cache ownership is removed. Interrupted restoration retains its undo records and diagnostic root; cleanup can finish all remaining undo levels after the simplifier has already popped. Constructor/finalizer refusals retain actual owned roots rather than copying their state.",
+        "The unreachable assert_eq_bug CTRACE after the preceding contains-and-return guard is omitted. The source destructor vector-cell invariant becomes an empty native cache/owned-cell invariant; malformed native ownership/scope inputs receive explicit errors. Headers use ordinary Go package compilation. The unchanged simplified-app parameter snapshot across updt_params, fresh cleanup rebuild, max_steps/max_depth soft cutoffs and additive second occurrence pass are intentionally preserved."
+      ]
     },
     {
       "path": "src/tactic/core/ctx_simplify_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/ctx_simplify_tactic.go",
+        "pkg/tactic/core/ctx_simplify_rewrite.go",
+        "pkg/tactic/core/ctx_simplify_trace.go",
+        "pkg/tactic/core/ctx_simplify_tactic_test.go",
+        "pkg/tactic/core/ctx_simplify_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+        "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+      ],
+      "tests": [
+        "TestContextSimplifyExactGoalsCPP",
+        "TestContextSimplifyDepthAndStepFrontiersCPP",
+        "TestContextSimplifySharedBooleanDAGsCPP",
+        "TestContextSimplifyConstructorAllocationFrontiers",
+        "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+        "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+        "TestContextSimplifyClosedTraceAndCleanupRefusal",
+        "TestContextSimplifyTranslationParameterSnapshot",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -136025,11 +136390,263 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "ctx_propagate_assertions constructor/assert_expr/assert_eq_val/assert_eq_core/simplify/push/pop/scope_level/translate and simplifier::shared: original and stripped-not sharing gates, signed Boolean assumptions, positive value equalities, ignored repeated keys at depth cutoff, owned key trail and exact scope restoration; concrete typed virtual simplifier contract",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "imp construction/destruction/updt_params/checkpoint/shared/check_cache: source occurrence settings, mk_simplified_app construction snapshot, local memory/depth/step/blowup policy, cooperation then allocation-size then cancellation checkpoint, and selected source assertion profiles",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "cached_result/cache_cell/cache_core/cache/restore_cache/pop/is_cached: shared-only owned keys/values, scope-indexed stacked results, reverse undo, exact current-scope cache hits and native root lifetime across restoration diagnostics",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "simplify/simplify_or_and/simplify_ite/simplify_app: output reset and soft depth/step gates before checkpoints, may_simplify/cache/assertion lookup, exact step increments, forward/backward Boolean passes and signed assertions, ITE branch scopes, unchanged-app fast path and concrete simplified-app rebuilding",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "expr_size/process/process_goal/operator()(goal&): application-DAG size, proof-mode per-form simplification and optional blowup bailout, rewrite/modus-ponens proofs, non-proof forward/backward cross-form propagation only without dependencies, additive occurrence recount and source verbose report",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "ctx_simplify_tactic constructor/destructor/translate/updt_params/get_param_descrs/operator()/cleanup and mk_ctx_simplify_tactic: stored parameter snapshot, four exact descriptors, fresh translated simplifier, cleared converters/core, goal depth and retained subgoal publication, build-before-swap cleanup and clean factory wrapper",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained TRACE/CTRACE/debug invariant sites: full/bounded expression diagnostics, cache IDs/levels and restoration, ITE rebuilding, proof-mode size/step diagnostics and selected destruction/cache assertions; closed ostream failures preserve algorithm execution",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/ctx_simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/ctx_simplify_tactic.go",
+            "pkg/tactic/core/ctx_simplify_rewrite.go",
+            "pkg/tactic/core/ctx_simplify_trace.go",
+            "pkg/tactic/core/ctx_simplify_tactic_test.go",
+            "pkg/tactic/core/ctx_simplify_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cache.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_cores.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_forward_backward.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_ite.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_limits.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
+            "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+          ],
+          "tests": [
+            "TestContextSimplifyExactGoalsCPP",
+            "TestContextSimplifyDepthAndStepFrontiersCPP",
+            "TestContextSimplifySharedBooleanDAGsCPP",
+            "TestContextSimplifyConstructorAllocationFrontiers",
+            "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
+            "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
+            "TestContextSimplifyClosedTraceAndCleanupRefusal",
+            "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns its parameter snapshot and active implementation. Each implementation owns the concrete virtual simplifier, occurrence state, simplified-app functor, scoped cache and cache undo records. Assertion trails own keys while values remain borrowed from active formula frames; cache cells own keys and each stacked result. Recursive scratch references transfer into argument buffers and release in source lexical order. Refusals retain outstanding cleanup frames/implementations on the tactic. Cleanup constructs replacement state before swapping and releases retired state; translation starts with a fresh target-manager simplifier and copied parameters. Returned goals/proofs outlive cleanup and tactic closure. Parameter, memory, cooperation and printer services are borrowed."
+      ],
+      "deviations": [
+        "Native Go maps keyed by concrete AST handles and slices of scoped cache records replace C++ hash tables, AST-ID-sized storage and small-object allocator containers; no STL layout, capacity or unused template implementation is reproduced. The source virtual simplifier surface is expressed as a concrete AST-typed Go interface, with the retained default assertion simplifier implemented.",
+        "Go explicit AST references protect the old cached result across diagnostic printing after cache ownership is removed. Interrupted restoration retains its undo records and diagnostic root; cleanup can finish all remaining undo levels after the simplifier has already popped. Constructor/finalizer refusals retain actual owned roots rather than copying their state.",
+        "The unreachable assert_eq_bug CTRACE after the preceding contains-and-return guard is omitted. The source destructor vector-cell invariant becomes an empty native cache/owned-cell invariant; malformed native ownership/scope inputs receive explicit errors. Headers use ordinary Go package compilation. The unchanged simplified-app parameter snapshot across updt_params, fresh cleanup rebuild, max_steps/max_depth soft cutoffs and additive second occurrence pass are intentionally preserved."
+      ]
     },
     {
       "path": "src/tactic/core/der_tactic.cpp",

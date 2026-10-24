@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-const x Int)
+(declare-const y Int)
+(declare-const p Bool)
+(declare-const q Bool)
+(declare-const r Bool)
+(assert (or p (and (not p) q)))
+(check-sat-using (then ctx-simplify smt))

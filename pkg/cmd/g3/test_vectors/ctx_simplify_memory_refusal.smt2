@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-const p Bool)
+(declare-const q Bool)
+(assert (or p (and (not p) q)))
+(check-sat-using (using-params ctx-simplify :max_memory 0))
+(get-info :reason-unknown)
+(check-sat-using (then (using-params ctx-simplify :max_memory 0 :max_steps 0) smt))
+(check-sat-using (then ctx-simplify smt))

@@ -175,6 +175,15 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"ctx_simplify_memory_refusal.smt2":             "unknown\n(:reason-unknown \"max. memory exceeded\")\nsat\nsat\n",
+	"ctx_simplify_forward_backward.smt2":           "sat\n",
+	"ctx_simplify_ite.smt2":                        "sat\n",
+	"ctx_simplify_or.smt2":                         "sat\n",
+	"ctx_simplify_cache.smt2":                      "sat\n",
+	"ctx_simplify_cores.smt2":                      "unsat\nunsat\n(a b)\n",
+	"ctx_simplify_proofs.smt2":                     "unsat\nunsat\n",
+	"ctx_simplify_limits.smt2":                     "sat\nsat\nsat\nsat\nsat\n",
+	"ctx_simplify_models_scopes.smt2":              "sat\n((x 3)\n (y 4))\nunsat\nsat\n((x 3)\n (y 4))\n",
 	"qfidl_solver_bv_sat_pipeline.smt2":            "sat\n((a 0)\n (b 1)\n (c 1))\nunsat\nsat\n((a 0)\n (b 1)\n (c 1))\n",
 	"qfidl_solver_core_route.smt2":                 "unsat\n(lo hi)\n",
 	"qfidl_solver_disequality_models_scopes.smt2":  "sat\n((x 0)\n (y 1)\n (z 2))\nunsat\nsat\n((x 0)\n (y 1)\n (z 2))\n",
