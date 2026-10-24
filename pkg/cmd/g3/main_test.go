@@ -194,6 +194,12 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"bv1_blast_models_scopes.smt2":                 "sat\n((x #xa5))\nunsat\nsat\n((x #xa5))\n",
+	"bv1_blast_uf_models.smt2":                     "sat\n((x #b101)\n ((f x) #b101)\n ((= (f x) x) true))\n",
+	"bv1_blast_core_route.smt2":                    "unsat\n(five conflict)\n",
+	"bv1_blast_proof_route.smt2":                   "unsat\n",
+	"bv1_blast_refusal_fallback.smt2":              "unknown\n(:reason-unknown \"bv1 blaster cannot be applied to goal\")\nsat\n(((= (bvadd x x) #b0110) true))\n",
+	"bv1_blast_step_memory_limits.smt2":            "(error \"tactic failed: max. steps exceeded\")\n(:reason-unknown \"max. steps exceeded\")\nunknown\n(:reason-unknown \"max. memory exceeded\")\nsat\n((x #xa))\n",
 	"qflia_solver_pb_sat_pipeline.smt2":            "sat\n((a 1)\n (b 0)\n (c 1)\n (d 1)\n (e 0)\n (f 1)\n (g 0)\n (h 1)\n (i 0))\nunsat\nsat\n((a 1)\n (b 0)\n (c 1)\n (d 1)\n (e 0)\n (f 1)\n (g 0)\n (h 1)\n (i 0))\n",
 	"qflia_solver_unbounded_ilp.smt2":              "sat\n(((>= (+ x y) 1) true)\n ((<= (+ (* 2 x) y) 3) true)\n ((>= (+ x (* 2 y)) 0) true))\n",
 	"qflia_solver_pseudo_Boolean.smt2":             "sat\n(((>= (+ (* 2 x) (* 3 y) (* 5 z)) 7) true)\n ((not (= x y)) true))\n",

@@ -1,0 +1,8 @@
+(set-logic ALL)
+(set-option :produce-models true)
+(declare-const x (_ BitVec 3))
+(declare-fun f ((_ BitVec 3)) (_ BitVec 3))
+(assert (= x #b101))
+(assert (= (f x) x))
+(check-sat-using (then bv1-blast smt))
+(get-value (x (f x) (= (f x) x)))

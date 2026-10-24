@@ -425,6 +425,7 @@ digraph packages {
   "tactic/bv" -> "util/cooperate";
   "tactic/bv" -> "util/diagnostic";
   "tactic/bv" -> "util/memory";
+  "tactic/bv" -> "util/messages";
   "tactic/bv" -> "util/params";
   "tactic/bv" -> "util/symbol";
   "tactic/bv" -> "util/text";

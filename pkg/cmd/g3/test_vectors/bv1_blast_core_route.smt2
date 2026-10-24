@@ -1,0 +1,7 @@
+(set-logic QF_BV)
+(set-option :produce-unsat-cores true)
+(declare-const x (_ BitVec 4))
+(assert (! (= x #b0101) :named five))
+(assert (! (= ((_ extract 2 1) x) #b11) :named conflict))
+(check-sat-using (then bv1-blast smt))
+(get-unsat-core)

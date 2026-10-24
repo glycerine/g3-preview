@@ -2861,6 +2861,7 @@
         "util/cooperate",
         "util/diagnostic",
         "util/memory",
+        "util/messages",
         "util/params",
         "util/symbol",
         "util/text"
@@ -2869,6 +2870,9 @@
         "bit_blaster_model_converter.go",
         "bit_blaster_tactic.go",
         "bit_blaster_tactic_trace.go",
+        "bv1_blaster_probe.go",
+        "bv1_blaster_rewriter.go",
+        "bv1_blaster_tactic.go",
         "max_bv_sharing_goal.go",
         "max_bv_sharing_reduce.go",
         "max_bv_sharing_tactic.go",

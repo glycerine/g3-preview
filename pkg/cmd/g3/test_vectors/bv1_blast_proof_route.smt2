@@ -1,0 +1,6 @@
+(set-logic QF_BV)
+(set-option :produce-proofs true)
+(declare-const x (_ BitVec 4))
+(assert (= x #b0101))
+(assert (= ((_ extract 2 1) x) #b11))
+(check-sat-using (then bv1-blast smt))

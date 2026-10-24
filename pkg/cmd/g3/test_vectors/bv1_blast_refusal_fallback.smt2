@@ -1,0 +1,8 @@
+(set-logic QF_BV)
+(set-option :produce-models true)
+(declare-const x (_ BitVec 4))
+(assert (= (bvadd x x) #b0110))
+(check-sat-using bv1-blast)
+(get-info :reason-unknown)
+(check-sat-using (or-else bv1-blast smt))
+(get-value ((= (bvadd x x) #b0110)))

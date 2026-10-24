@@ -135397,9 +135397,34 @@
       "path": "src/tactic/bv/bv1_blaster_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/bv/bv1_blaster_tactic.go",
+        "pkg/tactic/bv/bv1_blaster_rewriter.go",
+        "pkg/tactic/bv/bv1_blaster_probe.go",
+        "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+        "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+        "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+        "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+        "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+      ],
+      "tests": [
+        "TestBV1BlasterExactGoalsCPP",
+        "TestBV1EqualityProbeAndRefusalsCPP",
+        "TestBV1BlasterConstructorAllocationFrontiers",
+        "TestBV1BlasterStepFrontiersCPP",
+        "TestBV1BlasterModelConverterSurvivesTacticClose",
+        "TestBV1BlasterCachePolicyTranslationAndCleanup",
+        "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+        "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 223,
@@ -135476,19 +135501,365 @@
           "text": "SASSERT(num == 1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "rw_cfg construction, owned one-bit numerals, max_memory/max_steps/unused produce_models policy reads, live parameter updates and source proof specialization of rewriter_tpl",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv1_blaster_tactic.go",
+            "pkg/tactic/bv/bv1_blaster_rewriter.go",
+            "pkg/tactic/bv/bv1_blaster_probe.go",
+            "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+            "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+          ],
+          "tests": [
+            "TestBV1BlasterExactGoalsCPP",
+            "TestBV1EqualityProbeAndRefusalsCPP",
+            "TestBV1BlasterConstructorAllocationFrontiers",
+            "TestBV1BlasterStepFrontiersCPP",
+            "TestBV1BlasterModelConverterSurvivesTacticClose",
+            "TestBV1BlasterCachePolicyTranslationAndCleanup",
+            "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+            "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "max_steps_exceeded cooperation task, process-allocation memory comparison and tactic_exception, strict step bound and preserved rewriter_exception transport",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv1_blaster_tactic.go",
+            "pkg/tactic/bv/bv1_blaster_rewriter.go",
+            "pkg/tactic/bv/bv1_blaster_probe.go",
+            "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+            "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+          ],
+          "tests": [
+            "TestBV1BlasterExactGoalsCPP",
+            "TestBV1EqualityProbeAndRefusalsCPP",
+            "TestBV1BlasterConstructorAllocationFrontiers",
+            "TestBV1BlasterStepFrontiersCPP",
+            "TestBV1BlasterModelConverterSurvivesTacticClose",
+            "TestBV1BlasterCachePolicyTranslationAndCleanup",
+            "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+            "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "get_bits one-concat-level view; mk_const wide fresh BV1 declarations, constant mapping, unchanged BV1 constants and owning mapping/model roots",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv1_blaster_tactic.go",
+            "pkg/tactic/bv/bv1_blaster_rewriter.go",
+            "pkg/tactic/bv/bv1_blaster_probe.go",
+            "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+            "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+          ],
+          "tests": [
+            "TestBV1BlasterExactGoalsCPP",
+            "TestBV1EqualityProbeAndRefusalsCPP",
+            "TestBV1BlasterConstructorAllocationFrontiers",
+            "TestBV1BlasterStepFrontiersCPP",
+            "TestBV1BlasterModelConverterSurvivesTacticClose",
+            "TestBV1BlasterCachePolicyTranslationAndCleanup",
+            "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+            "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "blast_bv_term fallback for foreign BV-valued applications, descending extracts and MSB-first concat assembly",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv1_blaster_tactic.go",
+            "pkg/tactic/bv/bv1_blaster_rewriter.go",
+            "pkg/tactic/bv/bv1_blaster_probe.go",
+            "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+            "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+          ],
+          "tests": [
+            "TestBV1BlasterExactGoalsCPP",
+            "TestBV1EqualityProbeAndRefusalsCPP",
+            "TestBV1BlasterConstructorAllocationFrontiers",
+            "TestBV1BlasterStepFrontiersCPP",
+            "TestBV1BlasterModelConverterSurvivesTacticClose",
+            "TestBV1BlasterCachePolicyTranslationAndCleanup",
+            "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+            "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "reduce_eq reverse bit equality order, reduce_ite bit order, arbitrary-width numeral decomposition, extract slice indexing and one-level concat flattening",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv1_blaster_tactic.go",
+            "pkg/tactic/bv/bv1_blaster_rewriter.go",
+            "pkg/tactic/bv/bv1_blaster_probe.go",
+            "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+            "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+          ],
+          "tests": [
+            "TestBV1BlasterExactGoalsCPP",
+            "TestBV1EqualityProbeAndRefusalsCPP",
+            "TestBV1BlasterConstructorAllocationFrontiers",
+            "TestBV1BlasterStepFrontiersCPP",
+            "TestBV1BlasterModelConverterSurvivesTacticClose",
+            "TestBV1BlasterCachePolicyTranslationAndCleanup",
+            "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+            "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "reduce_app concrete AST dispatch and unchanged non-BV applications, null proof outputs and source traversal-generated proofs",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv1_blaster_tactic.go",
+            "pkg/tactic/bv/bv1_blaster_rewriter.go",
+            "pkg/tactic/bv/bv1_blaster_probe.go",
+            "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+            "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+          ],
+          "tests": [
+            "TestBV1BlasterExactGoalsCPP",
+            "TestBV1EqualityProbeAndRefusalsCPP",
+            "TestBV1BlasterConstructorAllocationFrontiers",
+            "TestBV1BlasterStepFrontiersCPP",
+            "TestBV1BlasterModelConverterSurvivesTacticClose",
+            "TestBV1BlasterCachePolicyTranslationAndCleanup",
+            "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+            "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "visitor/is_target shared-expression traversal, refusal of variables/quantifiers/all unsupported BV operators including XOR, and source acceptance of foreign theory/UF applications",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv1_blaster_tactic.go",
+            "pkg/tactic/bv/bv1_blaster_rewriter.go",
+            "pkg/tactic/bv/bv1_blaster_probe.go",
+            "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+            "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+          ],
+          "tests": [
+            "TestBV1BlasterExactGoalsCPP",
+            "TestBV1EqualityProbeAndRefusalsCPP",
+            "TestBV1BlasterConstructorAllocationFrontiers",
+            "TestBV1BlasterStepFrontiersCPP",
+            "TestBV1BlasterModelConverterSurvivesTacticClose",
+            "TestBV1BlasterCachePolicyTranslationAndCleanup",
+            "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+            "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "imp application converter reset, refusal-before-report, per-form rewriting and accumulated steps, unconditional goal updates, modus-ponens proofs, original dependencies, unconditional model converter under goal metadata, depth/subgoal publication and no-op cfg.cleanup",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv1_blaster_tactic.go",
+            "pkg/tactic/bv/bv1_blaster_rewriter.go",
+            "pkg/tactic/bv/bv1_blaster_probe.go",
+            "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+            "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+          ],
+          "tests": [
+            "TestBV1BlasterExactGoalsCPP",
+            "TestBV1EqualityProbeAndRefusalsCPP",
+            "TestBV1BlasterConstructorAllocationFrontiers",
+            "TestBV1BlasterStepFrontiersCPP",
+            "TestBV1BlasterModelConverterSurvivesTacticClose",
+            "TestBV1BlasterCachePolicyTranslationAndCleanup",
+            "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+            "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Tactic factory/clean wrapper, retained raw cache across Apply, build-before-swap cleanup, constructor/retired-owner unwind, reference lifetime, translation and inherited hooks/descriptors",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv1_blaster_tactic.go",
+            "pkg/tactic/bv/bv1_blaster_rewriter.go",
+            "pkg/tactic/bv/bv1_blaster_probe.go",
+            "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+            "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+          ],
+          "tests": [
+            "TestBV1BlasterExactGoalsCPP",
+            "TestBV1EqualityProbeAndRefusalsCPP",
+            "TestBV1BlasterConstructorAllocationFrontiers",
+            "TestBV1BlasterStepFrontiersCPP",
+            "TestBV1BlasterModelConverterSurvivesTacticClose",
+            "TestBV1BlasterCachePolicyTranslationAndCleanup",
+            "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+            "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "is_qfbv_eq_probe constructs and destroys a complete temporary BV1 tactic on each evaluation before checking target syntax; concrete counted Go probe boundary",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv1_blaster_tactic.go",
+            "pkg/tactic/bv/bv1_blaster_rewriter.go",
+            "pkg/tactic/bv/bv1_blaster_probe.go",
+            "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+            "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+          ],
+          "tests": [
+            "TestBV1BlasterExactGoalsCPP",
+            "TestBV1EqualityProbeAndRefusalsCPP",
+            "TestBV1BlasterConstructorAllocationFrontiers",
+            "TestBV1BlasterStepFrontiersCPP",
+            "TestBV1BlasterModelConverterSurvivesTacticClose",
+            "TestBV1BlasterCachePolicyTranslationAndCleanup",
+            "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+            "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "reduce_bin_xor/reduce_xor including disabled alternative encoding; cleanup_buffers; unreachable quantifier/pattern callbacks",
+          "status": "dead_deleted",
+          "reason": "The public application path always runs is_target first; that visitor rejects every BV XOR, variable and quantifier anywhere in the original goal. No retained caller can execute the XOR or quantifier/pattern callbacks. cleanup_buffers has no call site; the live cfg.cleanup call resolves to the empty default_rewriter_cfg implementation. The disabled #else alternative is omitted."
+        }
+      ],
+      "ownership": [
+        "The tactic owns its parameter snapshot and current/retired concrete traversal configurations. Each configuration owns one-bit numerals, original declaration keys, assembled concat mappings, traversal state and scratch references. Scratch release consumes only successful prefixes. Refused constructor/unwind roots remain reachable for retry. Model converters independently retain original declarations and bit expressions; published goals are borrowed. Parameters, cooperation and process services are borrowed, and translation uses a fresh target manager with registered declaration plugins."
+      ],
+      "deviations": [
+        "Go slices/maps implement project state without reproducing STL buffers, obj_map internals or templates. Only the live proof/no-proof traversal specializations and concrete AST values are used. Unreachable XOR/quantifier paths and unused cleanup_buffers are omitted under the retained-consumer rule.",
+        "The typed equality-fragment probe is available to strategy construction; the general SMT-LIB probe-expression frontend remains separate. This closes a QF_BV prerequisite, not QF_BV composition, size reduction, Ackermannization, general default strategy dispatch, public API completion or higher engines."
+      ]
     },
     {
       "path": "src/tactic/bv/bv1_blaster_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/bv/bv1_blaster_tactic.go",
+        "pkg/tactic/bv/bv1_blaster_rewriter.go",
+        "pkg/tactic/bv/bv1_blaster_probe.go",
+        "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+        "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+        "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+        "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+        "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+      ],
+      "tests": [
+        "TestBV1BlasterExactGoalsCPP",
+        "TestBV1EqualityProbeAndRefusalsCPP",
+        "TestBV1BlasterConstructorAllocationFrontiers",
+        "TestBV1BlasterStepFrontiersCPP",
+        "TestBV1BlasterModelConverterSurvivesTacticClose",
+        "TestBV1BlasterCachePolicyTranslationAndCleanup",
+        "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+        "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 25,
@@ -135499,11 +135870,48 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained mk_bv1_blaster_tactic and mk_is_qfbv_eq_probe declarations, typed Go factories and builtin bv1-blast registration",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv1_blaster_tactic.go",
+            "pkg/tactic/bv/bv1_blaster_rewriter.go",
+            "pkg/tactic/bv/bv1_blaster_probe.go",
+            "pkg/tactic/bv/bv1_blaster_tactic_test.go",
+            "pkg/tactic/bv/bv1_blaster_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv1_blast_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_refusal_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_step_memory_limits.smt2",
+            "pkg/cmd/g3/test_vectors/bv1_blast_uf_models.smt2"
+          ],
+          "tests": [
+            "TestBV1BlasterExactGoalsCPP",
+            "TestBV1EqualityProbeAndRefusalsCPP",
+            "TestBV1BlasterConstructorAllocationFrontiers",
+            "TestBV1BlasterStepFrontiersCPP",
+            "TestBV1BlasterModelConverterSurvivesTacticClose",
+            "TestBV1BlasterCachePolicyTranslationAndCleanup",
+            "TestBV1BlasterCancellationMemoryAndCooperationGuards",
+            "TestBV1BlasterApplicationAndCleanupAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns its parameter snapshot and current/retired concrete traversal configurations. Each configuration owns one-bit numerals, original declaration keys, assembled concat mappings, traversal state and scratch references. Scratch release consumes only successful prefixes. Refused constructor/unwind roots remain reachable for retry. Model converters independently retain original declarations and bit expressions; published goals are borrowed. Parameters, cooperation and process services are borrowed, and translation uses a fresh target manager with registered declaration plugins."
+      ],
+      "deviations": [
+        "Go slices/maps implement project state without reproducing STL buffers, obj_map internals or templates. Only the live proof/no-proof traversal specializations and concrete AST values are used. Unreachable XOR/quantifier paths and unused cleanup_buffers are omitted under the retained-consumer rule.",
+        "The typed equality-fragment probe is available to strategy construction; the general SMT-LIB probe-expression frontend remains separate. This closes a QF_BV prerequisite, not QF_BV composition, size reduction, Ackermannization, general default strategy dispatch, public API completion or higher engines."
+      ]
     },
     {
       "path": "src/tactic/bv/bv_bound_chk_tactic.cpp",
