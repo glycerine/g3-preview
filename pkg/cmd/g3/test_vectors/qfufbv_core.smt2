@@ -1,0 +1,8 @@
+(set-logic QF_UFBV)
+(set-option :produce-unsat-cores true)
+(declare-fun f ((_ BitVec 4)) (_ BitVec 4))
+(declare-const x (_ BitVec 4))
+(declare-const y (_ BitVec 4))
+(assert (! (and (bvult (f x) (f y)) (bvult (f y) (f x))) :named impossible))
+(check-sat-using qfufbv)
+(get-unsat-core)

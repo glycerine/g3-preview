@@ -137,6 +137,9 @@ func TestQFAUFBVTacticModelSurvivesStrategyClose(t *testing.T) {
 	qfaufliaMust(t, err)
 	t.Cleanup(func() { qfaufliaMust(t, goal.Close()) })
 	qfaufliaMust(t, c.AssertGoal(goal))
+	original, err := tactic.NewGoalCopy(goal)
+	qfaufliaMust(t, err)
+	t.Cleanup(func() { qfaufliaMust(t, original.Close()) })
 	var result tactic.TacticResult
 	t.Cleanup(func() { qfaufliaMust(t, result.Close()) })
 	qfaufliaMust(t, r.Apply(goal, &result))
@@ -159,10 +162,13 @@ func TestQFAUFBVTacticModelSurvivesStrategyClose(t *testing.T) {
 	evaluator, err := model.NewModelEvaluator(md, model.ModelEvaluatorConfig{Context: globals.Context, Globals: globals, Memory: m.NumeralService().RuntimeOwner(), Cooperation: coop})
 	qfaufliaMust(t, err)
 	t.Cleanup(func() { qfaufliaMust(t, evaluator.Close()) })
-	size, err := goal.Size()
+	size, err := original.Size()
 	qfaufliaMust(t, err)
+	if size == 0 {
+		t.Fatal("original model check is empty")
+	}
 	for i := uint32(0); i < size; i++ {
-		formula, err := goal.Form(i)
+		formula, err := original.Form(i)
 		qfaufliaMust(t, err)
 		value, err := evaluator.EvaluateValue(formula)
 		qfaufliaMust(t, err)

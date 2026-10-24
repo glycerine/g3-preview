@@ -1,0 +1,8 @@
+(set-logic QF_UFBV)
+(set-option :produce-proofs true)
+(declare-fun f ((_ BitVec 4)) (_ BitVec 4))
+(declare-const x (_ BitVec 4))
+(declare-const y (_ BitVec 4))
+(assert (bvult (f x) (f y)))
+(assert (bvult (f y) (f x)))
+(check-sat)

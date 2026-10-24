@@ -31,12 +31,24 @@ func TestSMTLibRunnerQFAUFBVBranchEvidence(t *testing.T) {
 	testArithmeticStrategyBranchEvidence(t, "qfaufbv")
 }
 
+func TestSMTLibRunnerQFUFBVBranchEvidence(t *testing.T) {
+	testArithmeticStrategyBranchEvidence(t, "qfufbv")
+}
+
 func testArithmeticStrategyBranchEvidence(t *testing.T, prefix string) {
 	t.Helper()
 	cases := []struct {
 		name            string
 		require, forbid []string
 	}{
+		{"qfufbv_smt_models_scopes.smt2", []string{"(reduce-args ", "(smt.tactic start)"}, []string{"(bit-blaster ", "(sat-status"}},
+		{"qfufbv_solver_smt_models_scopes.smt2", []string{"(reduce-args ", "(smt.tactic start)"}, []string{"(bit-blaster ", "(sat-status"}},
+		{"qfufbv_reduce_models_scopes.smt2", []string{"(:reduced-funcs 1)", "(smt.tactic start)"}, []string{"(bit-blaster ", "(sat-status"}},
+		{"qfufbv_solver_reduce_models_scopes.smt2", []string{"(:reduced-funcs 1)", "(smt.tactic start)"}, []string{"(bit-blaster ", "(sat-status"}},
+		{"qfufbv_sat_models_scopes.smt2", []string{"(:reduced-funcs 1)", "(bit-blaster ", "(aig ", "(sat-status"}, nil},
+		{"qfufbv_solver_sat_models_scopes.smt2", []string{"(:reduced-funcs 1)", "(bit-blaster ", "(aig ", "(sat-status"}, nil},
+		{"qfufbv_proof.smt2", []string{"(smt.tactic start)"}, []string{"(reduce-args ", "(bv-size-reduction ", "(sat-status"}},
+		{"qfufbv_core.smt2", []string{"(smt.tactic start)"}, []string{"(reduce-args ", "(bv-size-reduction ", "(sat-status"}},
 		{"qfaufbv_models_scopes.smt2", []string{"(bv-size-reduction ", "(max-bv-sharing ", "(smt.tactic start)"}, []string{"(sat-status"}},
 		{"qfaufbv_solver_models_scopes.smt2", []string{"(bv-size-reduction ", "(max-bv-sharing ", "(smt.tactic start)"}, []string{"(sat-status"}},
 		{"qfaufbv_extensional_models.smt2", []string{"(bv-size-reduction ", "(max-bv-sharing ", "(smt.tactic start)"}, []string{"(sat-status"}},
@@ -215,6 +227,18 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"qfufbv_solver_assumptions.smt2":               "unsat\n(p)\nsat\n((p false))\nunsat\nsat\n((p false))\n",
+	"qfufbv_core.smt2":                             "unsat\n(impossible)\n",
+	"qfufbv_limits_recovery.smt2":                  "unknown\n(:reason-unknown \"max. steps exceeded\")\nsat\n(((bvult x y) true)\n ((bvult (f x) (f y)) true))\n",
+	"qfufbv_proof.smt2":                            "unsat\n",
+	"qfufbv_reduce_models_scopes.smt2":             "sat\n(((bvult x y) true)\n ((bvult (f #x1 x) (f #x1 y)) true))\nunsat\nsat\n(((bvult x y) true)\n ((bvult (f #x1 x) (f #x1 y)) true))\n",
+	"qfufbv_sat_models_scopes.smt2":                "sat\n(((= (bvmul x y) #x6) true)\n ((bvult x y) true)\n ((= (f #x0) #x1) true))\nunsat\nsat\n(((= (bvmul x y) #x6) true)\n ((bvult x y) true)\n ((= (f #x0) #x1) true))\n",
+	"qfufbv_smt_models_scopes.smt2":                "sat\n(((bvult x y) true)\n ((bvult (f x) (f y)) true))\nunsat\nsat\n(((bvult x y) true)\n ((bvult (f x) (f y)) true))\n",
+	"qfufbv_solver_core.smt2":                      "unsat\n(impossible)\n",
+	"qfufbv_solver_proof.smt2":                     "unsat\n",
+	"qfufbv_solver_reduce_models_scopes.smt2":      "sat\n(((bvult x y) true)\n ((bvult (f #x1 x) (f #x1 y)) true))\nunsat\nsat\n(((bvult x y) true)\n ((bvult (f #x1 x) (f #x1 y)) true))\n",
+	"qfufbv_solver_sat_models_scopes.smt2":         "sat\n(((= (bvmul x y) #x6) true)\n ((bvult x y) true)\n ((= (f #x0) #x1) true))\nunsat\nsat\n(((= (bvmul x y) #x6) true)\n ((bvult x y) true)\n ((= (f #x0) #x1) true))\n",
+	"qfufbv_solver_smt_models_scopes.smt2":         "sat\n(((bvult x y) true)\n ((bvult (f x) (f y)) true))\nunsat\nsat\n(((bvult x y) true)\n ((bvult (f x) (f y)) true))\n",
 	"reduce_args_common_ground_model.smt2":         "sat\n(((f a x) true)\n ((f a y) false)\n ((distinct x y) true))\n",
 	"reduce_args_core_refusal.smt2":                "unknown\n(:reason-unknown \"reduce-args does not support unsat core production\")\nunsat\n(yes no)\n",
 	"reduce_args_mixed_sort_model.smt2":            "sat\n(((f 1 p x) #xa)\n ((f 2 q y) #xb))\n",

@@ -3000,7 +3000,8 @@
         "qfidl_tactic.go",
         "qflia_tactic.go",
         "qflra_tactic.go",
-        "qfuf_tactic.go"
+        "qfuf_tactic.go",
+        "qfufbv_tactic.go"
       ]
     },
     {
