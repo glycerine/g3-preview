@@ -290,6 +290,15 @@ digraph packages {
   "parsers/util" -> "util/params";
   "pkg" [style=filled, fillcolor="#eeeeee"];
   "portcheck" [style=filled, fillcolor="#eeeeee"];
+  "qe" [style=filled, fillcolor="#eeeeee"];
+  "qe" -> "ast";
+  "qe" -> "ast/rewriter";
+  "qe" -> "tactic";
+  "qe" -> "util/cooperate";
+  "qe" -> "util/diagnostic";
+  "qe" -> "util/memory";
+  "qe" -> "util/params";
+  "qe" -> "util/text";
   "sat" [style=filled, fillcolor="#eeeeee"];
   "sat" -> "arena";
   "sat" -> "util/cliques";

@@ -92096,9 +92096,28 @@
       "path": "src/qe/qe_lite.cpp",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/qe/variable_test.go",
+        "pkg/qe/array_der.go",
+        "pkg/qe/trace.go",
+        "pkg/qe/occurs.go",
+        "pkg/qe/qe_test.go",
+        "pkg/qe/array_der_test.go",
+        "pkg/qe/array_der_cpp_test.go",
+        "pkg/qe/occurs_test.go"
+      ],
+      "tests": [
+        "TestVariableTestCopiesSetComplementAndDeclarationBoundary",
+        "TestArrayDERSelectSubstitutionBothOrientationsAndMultipleIndices",
+        "TestArrayDERSelectFreshnessAndBooleanEqualityRefusals",
+        "TestArrayDERSubstitutionShiftsInsideQuantifierAndPattern",
+        "TestArrayDERIndexDisequalityAndSourceFreshnessGuards",
+        "TestArrayDERSelectorUpdateCancellationAndOwnerGuards",
+        "TestArrayDERTraceClosedStreamAndAllocationFrontiers",
+        "TestArrayDERCPPProjectionNormalForms",
+        "TestQEOccursVariableShiftsThroughBodiesAndIgnoresPatterns"
+      ],
       "conditionals": [
         {
           "line": 1715,
@@ -92281,9 +92300,49 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "eq::occurs_var checks application children and recurses through quantifier bodies with shifted indices and an independent visited set per binder frame; annotations are intentionally ignored",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/occurs.go",
+            "pkg/qe/occurs_test.go"
+          ],
+          "tests": [
+            "TestQEOccursVariableShiftsThroughBodiesAndIgnoresPatterns"
+          ]
+        },
+        {
+          "name": "ar::der solve_select, solve_neq_select, marked expression traversal and operator(): concrete selected array/index variables, source freshness guards, multi-index store substitution, binder/pattern-safe replacement, literal-order writes, cooperation-before-cancellation and source solve_select trace",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/variable_test.go",
+            "pkg/qe/array_der.go",
+            "pkg/qe/trace.go",
+            "pkg/qe/occurs.go",
+            "pkg/qe/qe_test.go",
+            "pkg/qe/array_der_test.go",
+            "pkg/qe/array_der_cpp_test.go",
+            "pkg/qe/occurs_test.go"
+          ],
+          "tests": [
+            "TestArrayDERSelectSubstitutionBothOrientationsAndMultipleIndices",
+            "TestArrayDERSelectFreshnessAndBooleanEqualityRefusals",
+            "TestArrayDERSubstitutionShiftsInsideQuantifierAndPattern",
+            "TestArrayDERIndexDisequalityAndSourceFreshnessGuards",
+            "TestArrayDERSelectorUpdateCancellationAndOwnerGuards",
+            "TestArrayDERTraceClosedStreamAndAllocationFrontiers",
+            "TestArrayDERCPPProjectionNormalForms"
+          ]
+        }
+      ],
+      "ownership": [
+        "ArrayDER borrows its concrete selector and parameter/cooperation/trace services and owns a reusable ASTExprMark. Caller conjunction ASTRef slices retain updated formula ownership and completed prefixes on error. Lexical ExprSafeReplace/output owners remain reachable through ArrayDERFailure if destruction stops; explicit cleanup retries actual retained owners. Constructor, select/disequality, enabled trace and closed-trace reservation campaigns reach first success with zero charged fixture storage."
+      ],
+      "deviations": [
+        "Equality DER beyond occurs_var, the Fourier-Motzkin pass, qe_lite public overloads, traversal configuration and qe-light tactic remain unported. No Go qe-light command or quantified-strategy substitution is registered prematurely.",
+        "C++ returns UNKNOWN for the raw quantified-array equivalence queries. Six comparisons instead match actual C++ QE-lite output against the native array pass followed only by C++ simplification. The fixtures account for source flatten_and child-slot order and normalize only tactic depth and whitespace; formula and precision content remain exact. Source acceptance of duplicate index variables is preserved in direct structural tests rather than strengthened."
+      ]
     },
     {
       "path": "src/qe/qe_lite.h",
@@ -92506,9 +92565,28 @@
       "path": "src/qe/qe_vartest.h",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/qe/variable_test.go",
+        "pkg/qe/array_der.go",
+        "pkg/qe/trace.go",
+        "pkg/qe/occurs.go",
+        "pkg/qe/qe_test.go",
+        "pkg/qe/array_der_test.go",
+        "pkg/qe/array_der_cpp_test.go",
+        "pkg/qe/occurs_test.go"
+      ],
+      "tests": [
+        "TestVariableTestCopiesSetComplementAndDeclarationBoundary",
+        "TestArrayDERSelectSubstitutionBothOrientationsAndMultipleIndices",
+        "TestArrayDERSelectFreshnessAndBooleanEqualityRefusals",
+        "TestArrayDERSubstitutionShiftsInsideQuantifierAndPattern",
+        "TestArrayDERIndexDisequalityAndSourceFreshnessGuards",
+        "TestArrayDERSelectorUpdateCancellationAndOwnerGuards",
+        "TestArrayDERTraceClosedStreamAndAllocationFrontiers",
+        "TestArrayDERCPPProjectionNormalForms",
+        "TestQEOccursVariableShiftsThroughBodiesAndIgnoresPatterns"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -92519,11 +92597,31 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete is_variable_test set/complement constructors copy selected indices; declaration-count constructor and operator() preserve the strict index bound and reject nonvariables",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/variable_test.go",
+            "pkg/qe/qe_test.go",
+            "pkg/qe/array_der.go",
+            "pkg/qe/array_der_test.go"
+          ],
+          "tests": [
+            "TestVariableTestCopiesSetComplementAndDeclarationBoundary",
+            "TestArrayDERSelectorUpdateCancellationAndOwnerGuards",
+            "TestArrayDERTraceClosedStreamAndAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "VariableTest owns copied native map storage, reserves its cold header and index backing through the borrowed manager budget, and releases both on Close. Input mutations do not change selection. Copied/closed owners are rejected; the manager outlives the selector."
+      ],
+      "deviations": [
+        "Every retained is_variable_proc instantiation is the concrete is_variable_test. Native *VariableTest with three source modes replaces the abstract predicate boundary; no universal expression callback or C++ uint_set implementation is introduced."
+      ]
     },
     {
       "path": "src/qe/qsat.cpp",

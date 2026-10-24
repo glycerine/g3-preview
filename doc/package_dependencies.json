@@ -2142,6 +2142,24 @@
       ]
     },
     {
+      "package": "qe",
+      "imports": [
+        "ast",
+        "ast/rewriter",
+        "tactic",
+        "util/cooperate",
+        "util/diagnostic",
+        "util/memory",
+        "util/params",
+        "util/text"
+      ],
+      "production_files": [
+        "array_der.go",
+        "occurs.go",
+        "trace.go"
+      ]
+    },
+    {
       "package": "sat",
       "imports": [
         "arena",
