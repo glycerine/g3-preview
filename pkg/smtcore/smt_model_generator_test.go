@@ -219,6 +219,7 @@ func smtModelGeneratorFixture(t *testing.T) (*ast.ASTManager, model.ModelEvaluat
 	astTestMust(t, err)
 	manager, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numerals, Budget: budget})
 	astTestMust(t, err)
+	astTestMust(t, manager.RegisterDeclarationPlugins())
 	t.Cleanup(func() {
 		astTestMust(t, manager.Close())
 		astTestMust(t, cooperation.Close())
@@ -259,6 +260,50 @@ func TestSMTModelGeneratorBuildsAndPinsRootValues(t *testing.T) {
 	}
 	if err = generator.BuildValues([]*SMTEnode{node}, map[*SMTEnode]SMTModelValueProcedure{node: procedure}); !errors.Is(err, ast.ErrASTDomain) {
 		t.Fatal("duplicate build", err)
+	}
+}
+
+func TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse(t *testing.T) {
+	for _, enode := range []bool{false, true} {
+		t.Run(fmt.Sprint(enode), func(t *testing.T) {
+			m, config := smtModelGeneratorFixture(t)
+			expression := smtRelevancyBool(t, m, "model-unassigned-boolean")
+			context, err := NewSMTCheckerContext(m)
+			astTestMust(t, err)
+			state, err := NewSMTInternalizerState(m, context, nil)
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, state.Close()) })
+			_, err = state.MkBoolVar(expression)
+			astTestMust(t, err)
+			if enode {
+				_, err = state.MkEnode(expression, false, false, true)
+				astTestMust(t, err)
+			}
+			astTestMust(t, context.SetRelevant(expression, true))
+			generator, err := NewSMTModelGenerator(m)
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, generator.Close()) })
+			astTestMust(t, generator.SetContext(context))
+			astTestMust(t, generator.InitializeModel(config))
+			err = generator.BuildStateValues(state)
+			if enode && smtcoreSourceDebug {
+				if !errors.Is(err, ast.ErrASTDomain) {
+					t.Fatal("missing native undefined-enode debug guard", err)
+				}
+				return
+			}
+			astTestMust(t, err)
+			finalModel, err := generator.FinalModel()
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, finalModel.Close()) })
+			declaration, err := m.GetDecl(expression)
+			astTestMust(t, err)
+			value, err := finalModel.Core().ConstantInterpretation(declaration)
+			astTestMust(t, err)
+			if !m.IsFalse(value) {
+				t.Fatal("unassigned Boolean did not get native false candidate value", value)
+			}
+		})
 	}
 }
 

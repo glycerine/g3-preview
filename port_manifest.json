@@ -111659,7 +111659,8 @@
         "pkg/smtcore/smt_model_reservation_regression_test.go",
         "pkg/smtcore/theory_arith_assume_eq_test.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/smtcore/smt_internalizer_state.go"
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_tactic_native_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -111680,7 +111681,9 @@
         "TestSMTModelGeneratorHonorsDisabledRelevancyForValuesAndFunctions",
         "TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse",
+        "TestSMTTacticCPPApplyReference"
       ],
       "assertions": [
         {
@@ -111870,6 +111873,19 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "mk_bool_model: l_true maps to true, every other assignment including l_undef maps to false; undefined Boolean enode assignment SASSERT is conditional on source debug mode",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_generator_test.go",
+            "pkg/smtcore/smt_tactic_native_test.go"
+          ],
+          "tests": [
+            "TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse",
+            "TestSMTTacticCPPApplyReference"
+          ]
         }
       ],
       "ownership": [
@@ -111894,7 +111910,8 @@
         "pkg/smtcore/smt_asserted_macros.go",
         "pkg/smtcore/smt_asserted_macros_test.go",
         "pkg/smtcore/smt_asserted_quasi_macros_test.go",
-        "pkg/smtcore/smt_model_reservation_regression_test.go"
+        "pkg/smtcore/smt_model_reservation_regression_test.go",
+        "pkg/smtcore/smt_tactic_native_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -111912,7 +111929,9 @@
         "TestSMTAssertedMacroExpansionPreservesUnsatProof",
         "TestSMTAssertedMacroPublishesPermutedArguments",
         "TestSMTAssertedQuasiMacrosPublishConditionalModel",
-        "TestSMTModelGeneratorReservesExistingValuesBeforeFreshAllocation"
+        "TestSMTModelGeneratorReservesExistingValuesBeforeFreshAllocation",
+        "TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse",
+        "TestSMTTacticCPPApplyReference"
       ],
       "conditionals": [
         {
@@ -111992,6 +112011,19 @@
           "go_target": "pkg/smtcore/smt_model_generator.go",
           "tests": [
             "TestSMTModelGeneratorReservesExistingValuesBeforeFreshAllocation"
+          ]
+        },
+        {
+          "name": "mk_bool_model: l_true maps to true, every other assignment including l_undef maps to false; undefined Boolean enode assignment SASSERT is conditional on source debug mode",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_generator_test.go",
+            "pkg/smtcore/smt_tactic_native_test.go"
+          ],
+          "tests": [
+            "TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse",
+            "TestSMTTacticCPPApplyReference"
           ]
         }
       ],
@@ -114728,20 +114760,28 @@
       "path": "src/smt/tactic/smt_tactic.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
+        "pkg/smtcore/smt_tactic_impl.go",
+        "pkg/smtcore/smt_tactic.go",
+        "pkg/smtcore/smt_tactic_test.go",
+        "pkg/smtcore/smt_tactic_native_test.go",
         "pkg/solver/solver_tactic.go",
         "pkg/smtcore/smt_solver.go",
-        "pkg/smtcore/smt_tactic.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/tactic/tactic_stored_model.go",
+        "pkg/util/lp/gparams_catalog_collectors.go"
       ],
       "tests": [
-        "TestSolverTacticSATProducesModelConverter",
-        "TestSolverTacticUNSATRestoresCoreAndProof",
-        "TestSolverTacticUnknownBecomesTacticException",
-        "TestSolverTacticCrossManagerTranslation",
-        "TestSolverTacticApproximationPolicy",
-        "TestSolverTacticCanAcceptConfiguredApproximationAndCandidate",
-        "TestSMTSolverPreparesIncompleteTheoryCandidateModel",
+        "TestSMTTacticPreservesDerivedInputProof",
+        "TestSMTTacticProofCoreGuardAndGoalDependency",
+        "TestSMTTacticSnapshotsRelevantModelLabels",
+        "TestSMTTacticKeepsStatisticsOnUnknownAndApproximationFailure",
+        "TestSMTTacticParameterSnapshotsLogicAndLiveProgress",
+        "TestSMTTacticTranslationSurvivesSourceClosure",
+        "TestSMTTacticThroughTacticSolverScopesAndModel",
+        "TestSMTTacticPublishesIndependentModelsAcrossApplications",
+        "TestSMTTacticCPPApplyReference",
         "TestNewSMTTacticUsingCopiesAndFixesAutoConfig"
       ],
       "assertions": [
@@ -114770,43 +114810,89 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "goal clause/dependency extraction, solver assertion/check, SAT model conversion, UNSAT proof/core reconstruction and unknown failure",
+          "name": "operator(): fresh scoped context, original goal proofs, clause/dependency extraction and simultaneous proof/core guard; SAT model/label/filter snapshot and UNSAT goal-local proof/dependency outputs",
           "status": "ported",
-          "go_target": "pkg/solver/solver_tactic.go",
+          "go_target": "pkg/smtcore/smt_tactic_impl.go",
+          "go_targets": [
+            "pkg/smtcore/smt_tactic_test.go",
+            "pkg/smtcore/smt_tactic_native_test.go",
+            "pkg/solver/solver_tactic.go",
+            "pkg/tactic/tactic_stored_model.go"
+          ],
           "tests": [
-            "TestSolverTacticSATProducesModelConverter",
-            "TestSolverTacticUNSATRestoresCoreAndProof",
-            "TestSolverTacticUnknownBecomesTacticException"
+            "TestSMTTacticPreservesDerivedInputProof",
+            "TestSMTTacticProofCoreGuardAndGoalDependency",
+            "TestSMTTacticSnapshotsRelevantModelLabels",
+            "TestSMTTacticThroughTacticSolverScopesAndModel",
+            "TestSMTTacticPublishesIndependentModelsAcrossApplications",
+            "TestSMTTacticCPPApplyReference"
           ]
         },
         {
-          "name": "SMT kernel construction, logic selection, parameter update, progress forwarding, statistics and cross-manager translation",
-          "status": "platform_replacement",
-          "go_target": "pkg/smtcore/smt_solver.go",
-          "go_targets": ["pkg/solver/solver_tactic.go"],
+          "name": "constructor, scoped_init_ctx, updt_params, set_logic, progress callback, statistics on normal and exceptional exits, cleanup/reset and translate: separate persistent smt_params and params_ref snapshots",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_tactic_impl.go",
+          "go_targets": [
+            "pkg/smtcore/smt_tactic_test.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver.go"
+          ],
           "tests": [
-            "TestSolverTacticCrossManagerTranslation",
-            "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites",
-            "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions"
+            "TestSMTTacticKeepsStatisticsOnUnknownAndApproximationFailure",
+            "TestSMTTacticParameterSnapshotsLogicAndLiveProgress",
+            "TestSMTTacticTranslationSurvivesSourceClosure"
           ]
         },
         {
-          "name": "candidate_models and fail_if_inconclusive policy for under/over-approximated goals",
+          "name": "candidate_models and fail_if_inconclusive: conflict-limit candidates, unknown failure and approximation policy",
           "status": "ported",
-          "go_target": "pkg/solver/solver_tactic.go",
-          "go_targets": ["pkg/smtcore/smt_solver.go"],
+          "go_target": "pkg/smtcore/smt_tactic_impl.go",
+          "go_targets": [
+            "pkg/smtcore/smt_tactic_test.go",
+            "pkg/smtcore/smt_tactic_native_test.go",
+            "pkg/smtcore/smt_model_generator.go"
+          ],
           "tests": [
-            "TestSolverTacticApproximationPolicy",
-            "TestSolverTacticCanAcceptConfiguredApproximationAndCandidate",
-            "TestSMTSolverPreparesIncompleteTheoryCandidateModel"
+            "TestSMTTacticKeepsStatisticsOnUnknownAndApproximationFailure",
+            "TestSMTTacticCPPApplyReference"
           ]
+        },
+        {
+          "name": "collect_param_descrs: candidate/failure policy, SMT helper and LP parameter descriptors",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_tactic_impl.go",
+          "go_targets": [
+            "pkg/smtcore/smt_tactic_test.go",
+            "pkg/util/lp/gparams_catalog_collectors.go"
+          ],
+          "tests": [
+            "TestSMTTacticParameterSnapshotsLogicAndLiveProgress"
+          ]
+        },
+        {
+          "name": "mk_smt_tactic and mk_smt_tactic_using typed factories and sticky auto_config wrapper",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_tactic.go",
+          "go_targets": [
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/smtcore/smt_tactic_test.go"
+          ],
+          "tests": [
+            "TestNewSMTTacticUsingCopiesAndFixesAutoConfig",
+            "TestSMTTacticPublishesIndependentModelsAcrossApplications"
+          ]
+        },
+        {
+          "name": "remaining verbose/trace diagnostic fidelity audit (src/smt/tactic/smt_tactic.cpp)",
+          "status": "unported"
         }
       ],
       "ownership": [
-        "SolverTactic owns a parameter snapshot and statistics, holds a counted Solver reference, creates a translated solver per Apply, and closes extracted clauses and the translated solver on every exit. SMTSolver owns its kernel and retained assertions."
+        "SMTTactic owns a counted parameter snapshot, persistent SMTParams, cumulative statistics and any fallback global-parameter services. Each Apply creates and closes a fresh solver/kernel and clause extraction; returned goal proofs/dependencies and model/label converters remain independently owned. Translation shares only caller-owned process services and creates independent fallback globals."
       ],
       "deviations": [
-        "Go composes the general SolverTactic adapter with SMTSolver instead of embedding an SMT kernel in a dedicated tactic class."
+        "The Go tactic owns the concrete SMT kernel through a temporary SMTSolver for result/model services. It no longer substitutes the generic solver2tactic control flow.",
+        "Managers must share process symbol/numeral services for parameter snapshots; unsupported foreign service owners are rejected."
       ]
     },
     {
@@ -114815,14 +114901,21 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/solver/solver_tactic.go",
-        "pkg/smtcore/smt_solver.go",
-        "pkg/smtcore/smt_tactic.go"
+        "pkg/smtcore/smt_tactic_impl.go",
+        "pkg/smtcore/smt_tactic.go",
+        "pkg/smtcore/smt_tactic_test.go",
+        "pkg/smtcore/smt_tactic_native_test.go"
       ],
       "tests": [
-        "TestSolverTacticSATProducesModelConverter",
-        "TestSolverTacticUNSATRestoresCoreAndProof",
-        "TestSolverTacticUnknownBecomesTacticException",
+        "TestSMTTacticPreservesDerivedInputProof",
+        "TestSMTTacticProofCoreGuardAndGoalDependency",
+        "TestSMTTacticSnapshotsRelevantModelLabels",
+        "TestSMTTacticKeepsStatisticsOnUnknownAndApproximationFailure",
+        "TestSMTTacticParameterSnapshotsLogicAndLiveProgress",
+        "TestSMTTacticTranslationSurvivesSourceClosure",
+        "TestSMTTacticThroughTacticSolverScopesAndModel",
+        "TestSMTTacticPublishesIndependentModelsAcrossApplications",
+        "TestSMTTacticCPPApplyReference",
         "TestNewSMTTacticUsingCopiesAndFixesAutoConfig"
       ],
       "conditionals": [
@@ -114839,28 +114932,36 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "SMT solver-to-tactic construction surface",
-          "status": "platform_replacement",
-          "go_target": "pkg/solver/solver_tactic.go",
+          "name": "mk_smt_tactic: concrete SMT tactic constructor and native translation constructor semantics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_tactic_impl.go",
+          "go_targets": [
+            "pkg/smtcore/smt_tactic_test.go"
+          ],
           "tests": [
-            "TestSolverTacticSATProducesModelConverter",
-            "TestSolverTacticUNSATRestoresCoreAndProof"
+            "TestSMTTacticParameterSnapshotsLogicAndLiveProgress",
+            "TestSMTTacticTranslationSurvivesSourceClosure"
           ]
         },
         {
           "name": "mk_smt_tactic_using auto-config convenience factory",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_tactic.go",
+          "go_targets": [
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/smtcore/smt_tactic_test.go"
+          ],
           "tests": [
-            "TestNewSMTTacticUsingCopiesAndFixesAutoConfig"
+            "TestNewSMTTacticUsingCopiesAndFixesAutoConfig",
+            "TestSMTTacticPublishesIndependentModelsAcrossApplications"
           ]
         }
       ],
       "ownership": [
-        "The retained Go API constructs the solver and adapter explicitly, so ownership remains visible instead of being hidden behind a raw tactic factory pointer."
+        "Typed factories return an uncounted tactic. Wrappers and retained callers acquire counted ownership; each application owns and destroys its separate context."
       ],
       "deviations": [
-        "No global named-tactic registry wrapper has been added because retained callers use the typed NewSMTTacticUsing factory directly."
+        "No global named-tactic registry wrapper has been added because retained callers use typed factories directly."
       ]
     },
     {

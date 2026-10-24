@@ -153,6 +153,10 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 // asserted formulas enter the retained formula stack. It must be configured
 // before the first assertion is stored.
 func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) error {
+	return k.configurePreprocessing(context, globals, params, nil)
+}
+
+func (k *SMTKernel) configurePreprocessing(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef, sourceParams *SMTParams) error {
 	if err := k.open(); err != nil {
 		return err
 	}
@@ -174,7 +178,14 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 			return err
 		}
 	}
-	full, err := NewSMTParams(context, params, globals, k.manager.Budget())
+	var full *SMTParams
+	if sourceParams == nil {
+		full, err = NewSMTParams(context, params, globals, k.manager.Budget())
+	} else if sourceParams.Context != context || sourceParams.Globals != globals {
+		return uparams.ErrParamsOwner
+	} else {
+		full, err = sourceParams.Clone()
+	}
 	if err != nil {
 		if full != nil {
 			err = errors.Join(err, full.Close())
@@ -190,8 +201,10 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	// smt_solver constructs smt_params and its context first, then invokes the
 	// full updt_params overload. That second step updates embedded bases such as
 	// dyn_ack_params, whose constructors intentionally saw an empty params_ref.
-	if err = full.Update(params); err != nil {
-		return errors.Join(err, full.Close())
+	if sourceParams == nil {
+		if err = full.Update(params); err != nil {
+			return errors.Join(err, full.Close())
+		}
 	}
 	fullState, err := full.State()
 	if err != nil {
@@ -250,7 +263,12 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	k.smtState = fullState
 	k.arithState = arithmetic
 	k.bvState = bitVector
-	state, err := k.readPreprocessorState(context, globals, params)
+	var state SMTPreprocessorState
+	if sourceParams == nil {
+		state, err = k.readPreprocessorState(context, globals, params)
+	} else {
+		state, err = full.preprocess.State()
+	}
 	if err != nil {
 		return err
 	}
@@ -259,6 +277,9 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 	enabled, err := context.GetBoolName(params, &name, true)
 	if err != nil {
 		return err
+	}
+	if sourceParams != nil {
+		enabled = fullState.Preprocess
 	}
 	value, err := rewriter.NewTheoryRewriter(k.manager, context, globals, params)
 	if err != nil {

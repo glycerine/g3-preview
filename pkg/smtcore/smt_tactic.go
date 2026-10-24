@@ -6,7 +6,6 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
@@ -31,30 +30,22 @@ func NewSMTTacticUsing(m *ast.ASTManager, p *uparams.ParamsRef, logic string, au
 	if err = config.Params.SetBoolName(&params, &autoName, autoConfig); err != nil {
 		return nil, err
 	}
-	base, err := NewSMTSolver(m, &params, logic, config)
+	base, err := NewSMTTactic(m, &params, config)
 	if err != nil {
 		return nil, err
 	}
-	if err = base.SetProduceModels(base.kernel.smtState.Model); err != nil {
-		return nil, errors.Join(err, base.Close())
-	}
-	tacticConfig := solver.SolverTacticConfig{Params: config.Params}
-	if config.TargetConfig != nil {
-		tacticConfig.TargetConfig = func(target *ast.ASTManager) (solver.SolverTacticConfig, error) {
-			targetConfig, e := config.TargetConfig(target)
-			if e != nil {
-				return solver.SolverTacticConfig{}, e
-			}
-			return solver.SolverTacticConfig{Params: targetConfig.Params, TargetConfig: tacticConfig.TargetConfig}, nil
+	if logic != "" {
+		sym, e := m.Symbols.Intern(logic)
+		if e == nil {
+			e = base.SetLogic(sym)
+		}
+		if e != nil {
+			return nil, errors.Join(e, base.Close())
 		}
 	}
-	adapter, err := solver.NewSolverTactic(base, tacticConfig)
+	result, err = tactic.NewUsingParamsTactic(config.Params, base, &params)
 	if err != nil {
 		return nil, errors.Join(err, base.Close())
-	}
-	result, err = tactic.NewUsingParamsTactic(config.Params, adapter, &params)
-	if err != nil {
-		return nil, errors.Join(err, adapter.Close())
 	}
 	return result, nil
 }

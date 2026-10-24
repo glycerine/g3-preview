@@ -84,6 +84,11 @@ func smtSolverGlobals(m *ast.ASTManager, config SMTSolverConfig) (*uparams.Globa
 }
 
 func NewSMTSolver(m *ast.ASTManager, p *uparams.ParamsRef, logic string, config SMTSolverConfig) (*SMTSolver, error) {
+	return newSMTSolver(m, p, logic, config, nil)
+}
+
+// Tactics pass a persistent fparams snapshot to their temporary context.
+func newSMTSolver(m *ast.ASTManager, p *uparams.ParamsRef, logic string, config SMTSolverConfig, sourceParams *SMTParams) (*SMTSolver, error) {
 	if m == nil || config.Params == nil {
 		return nil, uparams.ErrParamsOwner
 	}
@@ -130,7 +135,7 @@ func NewSMTSolver(m *ast.ASTManager, p *uparams.ParamsRef, logic string, config 
 	if err != nil {
 		return nil, cleanupServices(errors.Join(err, config.Params.Del(&value)))
 	}
-	if err = kernel.ConfigurePreprocessing(config.Params, globals, &value); err != nil {
+	if err = kernel.configurePreprocessing(config.Params, globals, &value, sourceParams); err != nil {
 		return nil, cleanupServices(errors.Join(err, kernel.Close(), config.Params.Del(&value)))
 	}
 	if err = smtInstallRetainedSetup(kernel, m, logic); err != nil {

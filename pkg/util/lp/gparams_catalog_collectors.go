@@ -13,6 +13,10 @@ func catalogInsert(d *uparams.ParamDescrs, key string, kind uparams.ParamKind, d
 }
 
 // Source: src/util/lp/lp_params.pyg
+func CollectParamDescrs(d *uparams.ParamDescrs) error {
+	return catalogCollectLpParams(d)
+}
+
 func catalogCollectLpParams(d *uparams.ParamDescrs) error {
 	if e := catalogInsert(d, "rep_freq", uparams.ParamUInt, "the report frequency, in how many iterations print the cost and other info ", "0", "lp"); e != nil {
 		return e

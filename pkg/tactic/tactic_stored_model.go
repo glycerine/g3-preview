@@ -27,6 +27,12 @@ type tacticStoredModelConverter struct {
 func NewStoredModel(md *model.ModelCore) (ModelConverter, error) {
 	return newTacticStoredModelWithLabels(md, nil)
 }
+
+// NewStoredModelWithLabels retains an SMT context's model and label snapshot.
+func NewStoredModelWithLabels(md *model.ModelCore, labels []usymbol.Symbol) (ModelConverter, error) {
+	return newTacticStoredModelWithLabels(md, labels)
+}
+
 func newTacticStoredModelWithLabels(md *model.ModelCore, labels []usymbol.Symbol) (result ModelConverter, err error) {
 	if md == nil {
 		return nil, nil

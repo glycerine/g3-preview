@@ -232,7 +232,7 @@ func (g *SMTModelGenerator) discoverValueProcedures(state *SMTInternalizerState)
 				value, valueErr = g.manager.MkTrue()
 			} else if !g.manager.IsFalse(node.owner) {
 				assignment := g.context.assignments[node.owner]
-				if assignment == lbool.Undef {
+				if smtcoreSourceDebug && assignment == lbool.Undef {
 					return nil, nil, ast.ErrASTDomain
 				}
 				if assignment == lbool.True {
@@ -363,9 +363,8 @@ func (g *SMTModelGenerator) publishConstantInterpretations(state *SMTInternalize
 			continue
 		}
 		assignment := state.assignment[NewSMTLiteral(variable, false).Index()]
-		if assignment == lbool.Undef {
-			return ast.ErrASTDomain
-		}
+		// mk_bool_model chooses false for every assignment other than
+		// l_true, including an unassigned atom in an incomplete candidate.
 		value, err := g.manager.MkFalse()
 		if assignment == lbool.True {
 			value, err = g.manager.MkTrue()
