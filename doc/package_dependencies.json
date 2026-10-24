@@ -2190,6 +2190,8 @@
         "occurs.go",
         "predicate_abstraction.go",
         "predicate_assumptions.go",
+        "projection_literals.go",
+        "projection_preprocess.go",
         "trace.go",
         "variable_selection.go"
       ]

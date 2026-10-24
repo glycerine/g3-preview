@@ -210,15 +210,8 @@ func (c *arithmeticProjectionCall) project(vars, forms *[]ast.ASTRef) error {
 	}
 	if err := p.emit("operator()", 362, func(w io.Writer) error {
 		_, _ = io.WriteString(w, "remaining vars: ")
-		for _, r := range *vars {
-			h, e := m.RefGet(r)
-			if e != nil {
-				return e
-			}
-			if e = writeExpression(m, p.config, w, h); e != nil {
-				return e
-			}
-			_, _ = io.WriteString(w, " ")
+		if e := writeExpressionVector(m, p.config, w, *vars); e != nil {
+			return e
 		}
 		_, _ = io.WriteString(w, "\n")
 		for _, id := range selected {

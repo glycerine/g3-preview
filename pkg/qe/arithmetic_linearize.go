@@ -98,7 +98,7 @@ func (c *arithmeticProjectionCall) linearizeTerm(multiplier *big.Rat, h ast.ASTH
 			}
 			return p.appendRef(forms, args[0])
 		}
-		not, err := c.hold(m.MkNot(args[0]))
+		not, err := c.hold(m.MkNotSimplified(args[0]))
 		if err != nil {
 			return err
 		}

@@ -103,12 +103,17 @@ func arithmeticCase(t *testing.T, mode string) *arithmeticProjectionCase {
 	case "modulo":
 		mod := f.own(m.MkFamilyApp(f.r.arithmetic, 13, nil, []ast.ASTHandle{x, number("3")}))
 		forms = append(forms, f.own(m.MkEq(mod, number("2"))))
-	case "ite-true", "ite-false":
+	case "ite-true", "ite-false", "ite-negated-condition":
 		left, right := y, z
 		if mode == "ite-false" {
 			left, right = z, y
 		}
-		branch := f.own(m.MkIte(b, left, right))
+		condition := b
+		if mode == "ite-negated-condition" {
+			condition = f.own(m.MkNot(b))
+			left, right = z, y
+		}
+		branch := f.own(m.MkIte(condition, left, right))
 		forms = []ast.ASTHandle{cmp(2, z, x), cmp(2, x, branch)}
 	case "opaque":
 		forms = []ast.ASTHandle{cmp(2, f.own(m.MkArithmeticMul(x, x)), y)}
@@ -148,7 +153,7 @@ func arithmeticEvaluate(t *testing.T, f *fmFixture, md *model.Model, forms []ast
 	}
 }
 
-var arithmeticProjectionModes = []string{"real-bounds", "strict", "negated-ge", "disequality", "distinct", "negative-distinct", "integer-equality", "integer-equality-negative", "integer-equality-modulo", "integer-nonunit", "modulo", "ite-true", "ite-false", "opaque", "boolean-residue", "coefficient", "large-coefficient", "zero-coefficient"}
+var arithmeticProjectionModes = []string{"real-bounds", "strict", "negated-ge", "disequality", "distinct", "negative-distinct", "integer-equality", "integer-equality-negative", "integer-equality-modulo", "integer-nonunit", "modulo", "ite-true", "ite-false", "ite-negated-condition", "opaque", "boolean-residue", "coefficient", "large-coefficient", "zero-coefficient"}
 
 func TestArithmeticProjectionModelPreservationAndVariables(t *testing.T) {
 	for _, mode := range arithmeticProjectionModes {
@@ -302,7 +307,7 @@ func TestArithmeticProjectionMaximizeModelsAndBounds(t *testing.T) {
 }
 
 func TestArithmeticProjectionAllocationFrontiers(t *testing.T) {
-	for _, phase := range []string{"constructor", "real-bounds", "integer-equality", "integer-equality-modulo", "integer-nonunit", "modulo", "ite-true", "disequality", "distinct", "negative-distinct", "large-coefficient", "opaque", "singleton", "maximize", "maximize-strict", "maximize-unbounded", "trace", "closed-trace"} {
+	for _, phase := range []string{"constructor", "real-bounds", "integer-equality", "integer-equality-modulo", "integer-nonunit", "modulo", "ite-true", "ite-negated-condition", "disequality", "distinct", "negative-distinct", "large-coefficient", "opaque", "singleton", "maximize", "maximize-strict", "maximize-unbounded", "trace", "closed-trace"} {
 		t.Run(phase, func(t *testing.T) {
 			success := false
 			for stop := int64(0); stop < 4096 && !success; stop++ {

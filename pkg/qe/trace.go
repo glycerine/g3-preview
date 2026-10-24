@@ -35,6 +35,24 @@ func (w traceBodyWriter) Flush() error {
 
 func diagnosticEndl(out io.Writer) error { return diagnostic.WriteTraceEndl(out) }
 
+// ast_smt2_pp(expr_ref_vector) uses mk_seq: a forced line break precedes
+// every expression, with no enclosing delimiters and no empty-vector text.
+func writeExpressionVector(m *ast.ASTManager, config Config, out io.Writer, forms []ast.ASTRef) error {
+	for _, r := range forms {
+		if _, err := io.WriteString(out, "\n"); err != nil {
+			return err
+		}
+		h, err := m.RefGet(r)
+		if err != nil {
+			return err
+		}
+		if err = writeExpression(m, config, out, h); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func writeExpression(m *ast.ASTManager, config Config, out io.Writer, expression ast.ASTHandle) (err error) {
 	stream, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: m.Budget()})
 	if err != nil {

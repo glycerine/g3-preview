@@ -91620,7 +91620,8 @@
         "pkg/qe/arithmetic_projection_test.go",
         "pkg/qe/arithmetic_projection_cpp_test.go",
         "pkg/math/simplex/model_based_opt.go",
-        "pkg/math/simplex/model_based_opt_test.go"
+        "pkg/math/simplex/model_based_opt_test.go",
+        "pkg/qe/trace.go"
       ],
       "tests": [
         "TestArithmeticProjectionModelPreservationAndVariables",
@@ -91752,14 +91753,30 @@
             "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
             "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
           ]
+        },
+        {
+          "name": "False ITE branch uses actual ast_util mk_not simplification, including not(not b)->b; source vector trace formatting uses leading forced line breaks without delimiters",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_linearize.go",
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication"
+          ]
         }
       ],
       "ownership": [
-        "The concrete owning projection service borrows manager/config; each call retains actual lexical ASTRefs, mutable singleton/local formula vectors, partial model evaluator, ASTExprMark and construction-failure receipts until cleanup succeeds. Source recursive term protection reuses the existing typed all-mark AST visitor, including quantifier annotations. Caller vectors own successful appends, compaction and completed replacements on errors. Eighteen first-success campaigns cover constructor, real/integer/nonunit/modular/ITE/distinct/disequality/large-coefficient/opaque projections, singleton, bounded/strict/unbounded maximization and open/closed tracing; all charged fixture storage is released."
+        "The concrete owning projection service borrows manager/config; each call retains actual lexical ASTRefs, mutable singleton/local formula vectors, partial model evaluator, ASTExprMark and construction-failure receipts until cleanup succeeds. Source recursive term protection reuses the existing typed all-mark AST visitor, including quantifier annotations. Caller vectors own successful appends, compaction and completed replacements on errors. Nineteen first-success campaigns cover constructor, real/integer/nonunit/modular/ITE/distinct/disequality/large-coefficient/opaque projections, singleton, bounded/strict/unbounded maximization and open/closed tracing; all charged fixture storage is released."
       ],
       "deviations": [
         "Exact math/big.Rat coefficients share the existing concrete simplex.ModelBasedOpt representation; AST numeral construction still uses the owning native numeral service. Concrete insertion-ordered coefficient/ID dictionaries use approved insdict v0.10.1; no C++ hash layout or STL containers are ported. Source root-only marking of residue formulas is preserved; recursive marking protects nonprojected registered arithmetic terms. The unused imp::n_sign and free arith_project wrapper (reached only from src/test) are omitted. The independent qe_mbp dispatcher, array/datatype projection plugins and QSAT/full QE drivers remain separate unported work.",
-        "The existing simplex bridge now eliminates integer equality rows by exact positive scaling, including scaling divisibility moduli, instead of producing fractional integer coefficients. Source resolve routes equality rows through an inequality-only integer helper whose debug assertions require t_le inputs; the native equality branch deliberately avoids that invalid helper domain and inequality slack cuts. The separate source false-initialized unit-bound flags are preserved, retaining its integer representative selection. Eighteen prebuilt C++ implication/nonvacuity checks verify the native projected constraints; two more verify closed/strict optimum bounds. The C++ oracle uses full QE only to decide quantified counterexample queries after its default SMT returned unknown; native output is submitted unchanged."
+        "The existing simplex bridge now eliminates integer equality rows by exact positive scaling, including scaling divisibility moduli, instead of producing fractional integer coefficients. Source resolve routes equality rows through an inequality-only integer helper whose debug assertions require t_le inputs; the native equality branch deliberately avoids that invalid helper domain and inequality slack cuts. The separate source false-initialized unit-bound flags are preserved, retaining its integer representative selection. Nineteen prebuilt C++ implication/nonvacuity checks verify the native projected constraints; two more verify closed/strict optimum bounds. The C++ oracle uses full QE only to decide quantified counterexample queries after its default SMT returned unknown; native output is submitted unchanged."
       ]
     },
     {
@@ -91775,7 +91792,8 @@
         "pkg/qe/arithmetic_projection_test.go",
         "pkg/qe/arithmetic_projection_cpp_test.go",
         "pkg/math/simplex/model_based_opt.go",
-        "pkg/math/simplex/model_based_opt_test.go"
+        "pkg/math/simplex/model_based_opt_test.go",
+        "pkg/qe/trace.go"
       ],
       "tests": [
         "TestArithmeticProjectionModelPreservationAndVariables",
@@ -91875,14 +91893,30 @@
             "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
             "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
           ]
+        },
+        {
+          "name": "False ITE branch uses actual ast_util mk_not simplification, including not(not b)->b; source vector trace formatting uses leading forced line breaks without delimiters",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_linearize.go",
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication"
+          ]
         }
       ],
       "ownership": [
-        "The concrete owning projection service borrows manager/config; each call retains actual lexical ASTRefs, mutable singleton/local formula vectors, partial model evaluator, ASTExprMark and construction-failure receipts until cleanup succeeds. Source recursive term protection reuses the existing typed all-mark AST visitor, including quantifier annotations. Caller vectors own successful appends, compaction and completed replacements on errors. Eighteen first-success campaigns cover constructor, real/integer/nonunit/modular/ITE/distinct/disequality/large-coefficient/opaque projections, singleton, bounded/strict/unbounded maximization and open/closed tracing; all charged fixture storage is released."
+        "The concrete owning projection service borrows manager/config; each call retains actual lexical ASTRefs, mutable singleton/local formula vectors, partial model evaluator, ASTExprMark and construction-failure receipts until cleanup succeeds. Source recursive term protection reuses the existing typed all-mark AST visitor, including quantifier annotations. Caller vectors own successful appends, compaction and completed replacements on errors. Nineteen first-success campaigns cover constructor, real/integer/nonunit/modular/ITE/distinct/disequality/large-coefficient/opaque projections, singleton, bounded/strict/unbounded maximization and open/closed tracing; all charged fixture storage is released."
       ],
       "deviations": [
         "Exact math/big.Rat coefficients share the existing concrete simplex.ModelBasedOpt representation; AST numeral construction still uses the owning native numeral service. Concrete insertion-ordered coefficient/ID dictionaries use approved insdict v0.10.1; no C++ hash layout or STL containers are ported. Source root-only marking of residue formulas is preserved; recursive marking protects nonprojected registered arithmetic terms. The unused imp::n_sign and free arith_project wrapper (reached only from src/test) are omitted. The independent qe_mbp dispatcher, array/datatype projection plugins and QSAT/full QE drivers remain separate unported work.",
-        "The existing simplex bridge now eliminates integer equality rows by exact positive scaling, including scaling divisibility moduli, instead of producing fractional integer coefficients. Source resolve routes equality rows through an inequality-only integer helper whose debug assertions require t_le inputs; the native equality branch deliberately avoids that invalid helper domain and inequality slack cuts. The separate source false-initialized unit-bound flags are preserved, retaining its integer representative selection. Eighteen prebuilt C++ implication/nonvacuity checks verify the native projected constraints; two more verify closed/strict optimum bounds. The C++ oracle uses full QE only to decide quantified counterexample queries after its default SMT returned unknown; native output is submitted unchanged."
+        "The existing simplex bridge now eliminates integer equality rows by exact positive scaling, including scaling divisibility moduli, instead of producing fractional integer coefficients. Source resolve routes equality rows through an inequality-only integer helper whose debug assertions require t_le inputs; the native equality branch deliberately avoids that invalid helper domain and inequality slack cuts. The separate source false-initialized unit-bound flags are preserved, retaining its integer representative selection. Nineteen prebuilt C++ implication/nonvacuity checks verify the native projected constraints; two more verify closed/strict optimum bounds. The C++ oracle uses full QE only to decide quantified counterexample queries after its default SMT returned unknown; native output is submitted unchanged."
       ]
     },
     {
@@ -93155,12 +93189,27 @@
         "pkg/qe/arithmetic_projection_test.go",
         "pkg/qe/arithmetic_projection_cpp_test.go",
         "pkg/math/simplex/model_based_opt.go",
-        "pkg/math/simplex/model_based_opt_test.go"
+        "pkg/math/simplex/model_based_opt_test.go",
+        "pkg/qe/projection_preprocess.go",
+        "pkg/qe/projection_literals.go",
+        "pkg/qe/projection_preprocess_test.go",
+        "pkg/qe/projection_preprocess_cpp_test.go",
+        "pkg/qe/trace.go",
+        "pkg/ast/rewriter/expr_safe_replace.go",
+        "pkg/ast/expr_functors.go",
+        "pkg/ast/ast_for_each_expr.go"
       ],
       "tests": [
         "TestArithmeticProjectionModelPreservationAndVariables",
         "TestArithmeticProjectionAllocationFrontiers",
-        "TestArithmeticProjectionCPPModelBasedImplication"
+        "TestArithmeticProjectionCPPModelBasedImplication",
+        "TestProjectionPreprocessLiteralSourceOrderAndModels",
+        "TestProjectionPreprocessEqualityOrientationChainsAndCycles",
+        "TestProjectionPreprocessBooleanProjectionAndPatternFiltering",
+        "TestProjectionPreprocessAllocationFrontiers",
+        "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
+        "TestProjectionPreprocessCPPCubeImplication",
+        "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
       ],
       "assertions": [
         {
@@ -93228,13 +93277,106 @@
             "TestArithmeticProjectionAllocationFrontiers",
             "TestArithmeticProjectionCPPModelBasedImplication"
           ]
+        },
+        {
+          "name": "project_plugin::pick_equality, erase and push_back reached by literal extraction: first duplicate model value, source swap-with-last erase and true-skipping append",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/projection_preprocess.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/projection_preprocess_test.go",
+            "pkg/qe/projection_preprocess_cpp_test.go",
+            "pkg/qe/trace.go",
+            "pkg/ast/rewriter/expr_safe_replace.go",
+            "pkg/ast/expr_functors.go",
+            "pkg/ast/ast_for_each_expr.go"
+          ],
+          "tests": [
+            "TestProjectionPreprocessLiteralSourceOrderAndModels",
+            "TestProjectionPreprocessEqualityOrientationChainsAndCycles",
+            "TestProjectionPreprocessBooleanProjectionAndPatternFiltering",
+            "TestProjectionPreprocessAllocationFrontiers",
+            "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
+            "TestProjectionPreprocessCPPCubeImplication",
+            "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
+          ]
+        },
+        {
+          "name": "mbp::impl::extract_literals/extract_bools: source dynamic literal-vector order, model-selected Boolean cubes for positive/negative connectives, nested Boolean substitution and per-extraction Boolean deduplication/reset",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/projection_preprocess.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/projection_preprocess_test.go",
+            "pkg/qe/projection_preprocess_cpp_test.go",
+            "pkg/qe/trace.go",
+            "pkg/ast/rewriter/expr_safe_replace.go",
+            "pkg/ast/expr_functors.go",
+            "pkg/ast/ast_for_each_expr.go"
+          ],
+          "tests": [
+            "TestProjectionPreprocessLiteralSourceOrderAndModels",
+            "TestProjectionPreprocessEqualityOrientationChainsAndCycles",
+            "TestProjectionPreprocessBooleanProjectionAndPatternFiltering",
+            "TestProjectionPreprocessAllocationFrontiers",
+            "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
+            "TestProjectionPreprocessCPPCubeImplication",
+            "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
+          ]
+        },
+        {
+          "name": "mbp::impl::solve/reduce_eq: cheap equality solving with right-selected orientation, occurs checking, immediate substitution/theory rewriting of residue, source erased-slot revisit and variable compaction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/projection_preprocess.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/projection_preprocess_test.go",
+            "pkg/qe/projection_preprocess_cpp_test.go",
+            "pkg/qe/trace.go",
+            "pkg/ast/rewriter/expr_safe_replace.go",
+            "pkg/ast/expr_functors.go",
+            "pkg/ast/ast_for_each_expr.go"
+          ],
+          "tests": [
+            "TestProjectionPreprocessLiteralSourceOrderAndModels",
+            "TestProjectionPreprocessEqualityOrientationChainsAndCycles",
+            "TestProjectionPreprocessBooleanProjectionAndPatternFiltering",
+            "TestProjectionPreprocessAllocationFrontiers",
+            "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
+            "TestProjectionPreprocessCPPCubeImplication",
+            "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
+          ]
+        },
+        {
+          "name": "mbp::impl::filter_variables/project_bools and vector mark_rec reachability: all-node/annotation-aware filtering, model Boolean substitution, theory rewriting, true removal and source compaction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/projection_preprocess.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/projection_preprocess_test.go",
+            "pkg/qe/projection_preprocess_cpp_test.go",
+            "pkg/qe/trace.go",
+            "pkg/ast/rewriter/expr_safe_replace.go",
+            "pkg/ast/expr_functors.go",
+            "pkg/ast/ast_for_each_expr.go"
+          ],
+          "tests": [
+            "TestProjectionPreprocessLiteralSourceOrderAndModels",
+            "TestProjectionPreprocessEqualityOrientationChainsAndCycles",
+            "TestProjectionPreprocessBooleanProjectionAndPatternFiltering",
+            "TestProjectionPreprocessAllocationFrontiers",
+            "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
+            "TestProjectionPreprocessCPPCubeImplication",
+            "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
+          ]
         }
       ],
       "ownership": [
-        "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced."
+        "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced.",
+        "The private projectionPreprocessor retains its concrete theory rewriter and actual per-call ASTRefs, model evaluator, safe replacers, ContainsApp owners, ASTExprMarks and construction-failure receipts. Erased expressions remain rooted while their children are borrowed. Caller vectors retain completed appends/replacements and source compaction. Fourteen first-success reservation campaigns cover constructor, literal/Boolean/nested extraction, equality/cycle solving, Boolean projection, filtering and open/closed tracing; all charged fixture storage is released. Successful extraction resets its shared Boolean-visited set for reuse."
       ],
       "deviations": [
-        "Only the single-expression marking helper reached by the retained arithmetic plugin is credited. The project-plugin interface/other helpers, mbp driver, Boolean literal extraction, equation solving, array/datatype dispatch and maximize wrapper remain unported."
+        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, datatype/array projection and their cheap solve hooks, partition_values/partition_args, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
       ]
     },
     {
@@ -93250,12 +93392,27 @@
         "pkg/qe/arithmetic_projection_test.go",
         "pkg/qe/arithmetic_projection_cpp_test.go",
         "pkg/math/simplex/model_based_opt.go",
-        "pkg/math/simplex/model_based_opt_test.go"
+        "pkg/math/simplex/model_based_opt_test.go",
+        "pkg/qe/projection_preprocess.go",
+        "pkg/qe/projection_literals.go",
+        "pkg/qe/projection_preprocess_test.go",
+        "pkg/qe/projection_preprocess_cpp_test.go",
+        "pkg/qe/trace.go",
+        "pkg/ast/rewriter/expr_safe_replace.go",
+        "pkg/ast/expr_functors.go",
+        "pkg/ast/ast_for_each_expr.go"
       ],
       "tests": [
         "TestArithmeticProjectionModelPreservationAndVariables",
         "TestArithmeticProjectionAllocationFrontiers",
-        "TestArithmeticProjectionCPPModelBasedImplication"
+        "TestArithmeticProjectionCPPModelBasedImplication",
+        "TestProjectionPreprocessLiteralSourceOrderAndModels",
+        "TestProjectionPreprocessEqualityOrientationChainsAndCycles",
+        "TestProjectionPreprocessBooleanProjectionAndPatternFiltering",
+        "TestProjectionPreprocessAllocationFrontiers",
+        "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
+        "TestProjectionPreprocessCPPCubeImplication",
+        "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
       ],
       "conditionals": [
         {
@@ -93283,13 +93440,106 @@
             "TestArithmeticProjectionAllocationFrontiers",
             "TestArithmeticProjectionCPPModelBasedImplication"
           ]
+        },
+        {
+          "name": "project_plugin::pick_equality, erase and push_back reached by literal extraction: first duplicate model value, source swap-with-last erase and true-skipping append",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/projection_preprocess.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/projection_preprocess_test.go",
+            "pkg/qe/projection_preprocess_cpp_test.go",
+            "pkg/qe/trace.go",
+            "pkg/ast/rewriter/expr_safe_replace.go",
+            "pkg/ast/expr_functors.go",
+            "pkg/ast/ast_for_each_expr.go"
+          ],
+          "tests": [
+            "TestProjectionPreprocessLiteralSourceOrderAndModels",
+            "TestProjectionPreprocessEqualityOrientationChainsAndCycles",
+            "TestProjectionPreprocessBooleanProjectionAndPatternFiltering",
+            "TestProjectionPreprocessAllocationFrontiers",
+            "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
+            "TestProjectionPreprocessCPPCubeImplication",
+            "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
+          ]
+        },
+        {
+          "name": "mbp::impl::extract_literals/extract_bools: source dynamic literal-vector order, model-selected Boolean cubes for positive/negative connectives, nested Boolean substitution and per-extraction Boolean deduplication/reset",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/projection_preprocess.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/projection_preprocess_test.go",
+            "pkg/qe/projection_preprocess_cpp_test.go",
+            "pkg/qe/trace.go",
+            "pkg/ast/rewriter/expr_safe_replace.go",
+            "pkg/ast/expr_functors.go",
+            "pkg/ast/ast_for_each_expr.go"
+          ],
+          "tests": [
+            "TestProjectionPreprocessLiteralSourceOrderAndModels",
+            "TestProjectionPreprocessEqualityOrientationChainsAndCycles",
+            "TestProjectionPreprocessBooleanProjectionAndPatternFiltering",
+            "TestProjectionPreprocessAllocationFrontiers",
+            "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
+            "TestProjectionPreprocessCPPCubeImplication",
+            "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
+          ]
+        },
+        {
+          "name": "mbp::impl::solve/reduce_eq: cheap equality solving with right-selected orientation, occurs checking, immediate substitution/theory rewriting of residue, source erased-slot revisit and variable compaction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/projection_preprocess.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/projection_preprocess_test.go",
+            "pkg/qe/projection_preprocess_cpp_test.go",
+            "pkg/qe/trace.go",
+            "pkg/ast/rewriter/expr_safe_replace.go",
+            "pkg/ast/expr_functors.go",
+            "pkg/ast/ast_for_each_expr.go"
+          ],
+          "tests": [
+            "TestProjectionPreprocessLiteralSourceOrderAndModels",
+            "TestProjectionPreprocessEqualityOrientationChainsAndCycles",
+            "TestProjectionPreprocessBooleanProjectionAndPatternFiltering",
+            "TestProjectionPreprocessAllocationFrontiers",
+            "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
+            "TestProjectionPreprocessCPPCubeImplication",
+            "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
+          ]
+        },
+        {
+          "name": "mbp::impl::filter_variables/project_bools and vector mark_rec reachability: all-node/annotation-aware filtering, model Boolean substitution, theory rewriting, true removal and source compaction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/projection_preprocess.go",
+            "pkg/qe/projection_literals.go",
+            "pkg/qe/projection_preprocess_test.go",
+            "pkg/qe/projection_preprocess_cpp_test.go",
+            "pkg/qe/trace.go",
+            "pkg/ast/rewriter/expr_safe_replace.go",
+            "pkg/ast/expr_functors.go",
+            "pkg/ast/ast_for_each_expr.go"
+          ],
+          "tests": [
+            "TestProjectionPreprocessLiteralSourceOrderAndModels",
+            "TestProjectionPreprocessEqualityOrientationChainsAndCycles",
+            "TestProjectionPreprocessBooleanProjectionAndPatternFiltering",
+            "TestProjectionPreprocessAllocationFrontiers",
+            "TestProjectionPreprocessTraceVectorsAndOwnerGuards",
+            "TestProjectionPreprocessCPPCubeImplication",
+            "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
+          ]
         }
       ],
       "ownership": [
-        "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced."
+        "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced.",
+        "The private projectionPreprocessor retains its concrete theory rewriter and actual per-call ASTRefs, model evaluator, safe replacers, ContainsApp owners, ASTExprMarks and construction-failure receipts. Erased expressions remain rooted while their children are borrowed. Caller vectors retain completed appends/replacements and source compaction. Fourteen first-success reservation campaigns cover constructor, literal/Boolean/nested extraction, equality/cycle solving, Boolean projection, filtering and open/closed tracing; all charged fixture storage is released. Successful extraction resets its shared Boolean-visited set for reuse."
       ],
       "deviations": [
-        "Only the single-expression marking helper reached by the retained arithmetic plugin is credited. The project-plugin interface/other helpers, mbp driver, Boolean literal extraction, equation solving, array/datatype dispatch and maximize wrapper remain unported."
+        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, datatype/array projection and their cheap solve hooks, partition_values/partition_args, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
       ]
     },
     {
