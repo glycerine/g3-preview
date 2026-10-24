@@ -305,6 +305,7 @@ digraph packages {
   "qe" -> "util/memory";
   "qe" -> "util/numeral";
   "qe" -> "util/params";
+  "qe" -> "util/statistics";
   "qe" -> "util/symbol";
   "qe" -> "util/text";
   "sat" [style=filled, fillcolor="#eeeeee"];

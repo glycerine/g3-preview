@@ -2158,6 +2158,7 @@
         "util/memory",
         "util/numeral",
         "util/params",
+        "util/statistics",
         "util/symbol",
         "util/text"
       ],
@@ -2204,6 +2205,10 @@
         "projection_preprocess.go",
         "qsat_kernel.go",
         "qsat_preparation.go",
+        "qsat_search.go",
+        "qsat_search_loop.go",
+        "qsat_search_maximize.go",
+        "qsat_search_projection.go",
         "trace.go",
         "variable_selection.go"
       ]
