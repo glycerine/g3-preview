@@ -1,0 +1,7 @@
+(set-logic QF_BV)
+(set-option :rewriter.bv_ineq_consistency_test_max 100)
+(declare-const x (_ BitVec 257))
+(declare-const p Bool)
+(assert (not p))
+(assert (or p (and (bvule x (_ bv2 257)) (bvule (_ bv3 257) x))))
+(check-sat-using (then bv_bound_chk smt))

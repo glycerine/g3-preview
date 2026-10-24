@@ -1,0 +1,8 @@
+(set-logic QF_BV)
+(set-option :produce-proofs true)
+(declare-const p Bool)
+(assert p)
+(assert (not p))
+(check-sat-using bv_bound_chk)
+(get-info :reason-unknown)
+(check-sat-using (or-else bv_bound_chk smt))

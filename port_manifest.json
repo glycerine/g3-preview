@@ -41213,7 +41213,16 @@
         "pkg/cmd/g3/test_vectors/qfufbv_solver_proof.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_solver_reduce_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_solver_sat_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/qfufbv_solver_smt_models_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/qfufbv_solver_smt_models_scopes.smt2",
+        "pkg/tactic/bv/bv_bound_chk_tactic.go",
+        "pkg/tactic/bv/bv_bound_chk_config.go",
+        "pkg/tactic/bv/bv_bound_chk_trace.go",
+        "pkg/tactic/bv/bv_bound_chk_tactic_test.go",
+        "pkg/tactic/bv/bv_bound_chk_cpp_test.go",
+        "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
+        "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -41269,7 +41278,11 @@
         "TestQFUFBVTacticConstructorAllocationFrontiers",
         "TestQFUFBVTacticTranslatedProofAndCoreRoutes",
         "TestQFUFBVTacticModelSurvivesStrategyClose",
-        "TestSMTLibRunnerQFUFBVBranchEvidence"
+        "TestSMTLibRunnerQFUFBVBranchEvidence",
+        "TestBVBoundCheckExactGoalsCPP",
+        "TestBVBoundCheckStatisticsCleanupAndGuards",
+        "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
+        "TestBVBoundCheckAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -41653,6 +41666,33 @@
             "TestQFUFBVTacticTranslatedProofAndCoreRoutes",
             "TestQFUFBVTacticModelSurvivesStrategyClose",
             "TestSMTLibRunnerQFUFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Register bv_bound_chk raw bound-checking tactic, source empty descriptors and proof/core refusal recovery",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_bound_chk_tactic.go",
+            "pkg/tactic/bv/bv_bound_chk_config.go",
+            "pkg/tactic/bv/bv_bound_chk_trace.go",
+            "pkg/tactic/bv/bv_bound_chk_tactic_test.go",
+            "pkg/tactic/bv/bv_bound_chk_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
+          ],
+          "tests": [
+            "TestBVBoundCheckExactGoalsCPP",
+            "TestBVBoundCheckStatisticsCleanupAndGuards",
+            "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
+            "TestBVBoundCheckAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -137298,9 +137338,30 @@
       "path": "src/tactic/bv/bv_bound_chk_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/bv/bv_bound_chk_tactic.go",
+        "pkg/tactic/bv/bv_bound_chk_config.go",
+        "pkg/tactic/bv/bv_bound_chk_trace.go",
+        "pkg/tactic/bv/bv_bound_chk_tactic_test.go",
+        "pkg/tactic/bv/bv_bound_chk_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/tactics_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
+        "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
+      ],
+      "tests": [
+        "TestBVBoundCheckExactGoalsCPP",
+        "TestBVBoundCheckStatisticsCleanupAndGuards",
+        "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
+        "TestBVBoundCheckAllocationFrontiers",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 162,
@@ -137315,19 +137376,207 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Raw factory and implementation construction; owned copied parameters, default Boolean helper and non-proof traversal; target-manager translation and no parameter descriptors",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_bound_chk_tactic.go",
+            "pkg/tactic/bv/bv_bound_chk_config.go",
+            "pkg/tactic/bv/bv_bound_chk_trace.go",
+            "pkg/tactic/bv/bv_bound_chk_tactic_test.go",
+            "pkg/tactic/bv/bv_bound_chk_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
+          ],
+          "tests": [
+            "TestBVBoundCheckExactGoalsCPP",
+            "TestBVBoundCheckStatisticsCleanupAndGuards",
+            "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
+            "TestBVBoundCheckAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Configuration policy update in source order: consistency count, raw byte memory limit and strict greater-than rewrite step limit; cooperation before limits",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_bound_chk_tactic.go",
+            "pkg/tactic/bv/bv_bound_chk_config.go",
+            "pkg/tactic/bv/bv_bound_chk_trace.go",
+            "pkg/tactic/bv/bv_bound_chk_tactic_test.go",
+            "pkg/tactic/bv/bv_bound_chk_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
+          ],
+          "tests": [
+            "TestBVBoundCheckExactGoalsCPP",
+            "TestBVBoundCheckStatisticsCleanupAndGuards",
+            "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
+            "TestBVBoundCheckAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Basic-family application reduction via lexical BVBounds, null rewrite proof and success statistics including true disjunctions in unsat bv bounds",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_bound_chk_tactic.go",
+            "pkg/tactic/bv/bv_bound_chk_config.go",
+            "pkg/tactic/bv/bv_bound_chk_trace.go",
+            "pkg/tactic/bv/bv_bound_chk_tactic_test.go",
+            "pkg/tactic/bv/bv_bound_chk_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
+          ],
+          "tests": [
+            "TestBVBoundCheckExactGoalsCPP",
+            "TestBVBoundCheckStatisticsCleanupAndGuards",
+            "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
+            "TestBVBoundCheckAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Goal rewriting with proof-before-core refusal before result reset, inconsistent short circuit, default configuration cleanup only, depth increment and borrowed original goal publication",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_bound_chk_tactic.go",
+            "pkg/tactic/bv/bv_bound_chk_config.go",
+            "pkg/tactic/bv/bv_bound_chk_trace.go",
+            "pkg/tactic/bv/bv_bound_chk_tactic_test.go",
+            "pkg/tactic/bv/bv_bound_chk_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
+          ],
+          "tests": [
+            "TestBVBoundCheckExactGoalsCPP",
+            "TestBVBoundCheckStatisticsCleanupAndGuards",
+            "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
+            "TestBVBoundCheckAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Build-before-swap cleanup preserving old executable state on failed construction, retained partial owners and shared statistics; independent reset and collection",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_bound_chk_tactic.go",
+            "pkg/tactic/bv/bv_bound_chk_config.go",
+            "pkg/tactic/bv/bv_bound_chk_trace.go",
+            "pkg/tactic/bv/bv_bound_chk_tactic_test.go",
+            "pkg/tactic/bv/bv_bound_chk_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
+          ],
+          "tests": [
+            "TestBVBoundCheckExactGoalsCPP",
+            "TestBVBoundCheckStatisticsCleanupAndGuards",
+            "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
+            "TestBVBoundCheckAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Source TRACE/CTRACE goal and successful application diagnostics, exact sites and tolerated output-stream failure",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_bound_chk_tactic.go",
+            "pkg/tactic/bv/bv_bound_chk_config.go",
+            "pkg/tactic/bv/bv_bound_chk_trace.go",
+            "pkg/tactic/bv/bv_bound_chk_tactic_test.go",
+            "pkg/tactic/bv/bv_bound_chk_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
+          ],
+          "tests": [
+            "TestBVBoundCheckExactGoalsCPP",
+            "TestBVBoundCheckStatisticsCleanupAndGuards",
+            "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
+            "TestBVBoundCheckAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns copied parameters, charged tactic/implementation storage, a non-proof traversal, the default Boolean rewriter and an output AST reference. Manager, parameter services, memory runtime, cooperation and trace tags are borrowed. Temporary RewriterParams snapshots and failed replacement implementations retain their actual owners for retry. Cleanup constructs the replacement before publishing it and preserves shared statistics. Result goals are borrowed; translation uses independent copied parameter state and a fresh target manager."
+      ],
+      "deviations": [
+        "Uses the already ported concrete BVBounds algorithms and native Go owners, with no C++ standard-library or unused template port. Full default strategy dispatch, alternate QF_UFBV solver-backed Ackermannization and higher engine integration remain incomplete."
+      ]
     },
     {
       "path": "src/tactic/bv/bv_bound_chk_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/bv/bv_bound_chk_tactic.go",
+        "pkg/tactic/bv/bv_bound_chk_config.go",
+        "pkg/tactic/bv/bv_bound_chk_trace.go",
+        "pkg/tactic/bv/bv_bound_chk_tactic_test.go",
+        "pkg/tactic/bv/bv_bound_chk_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/tactics_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
+        "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
+      ],
+      "tests": [
+        "TestBVBoundCheckExactGoalsCPP",
+        "TestBVBoundCheckStatisticsCleanupAndGuards",
+        "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
+        "TestBVBoundCheckAllocationFrontiers",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -137338,11 +137587,43 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained mk_bv_bound_chk_tactic declaration, raw factory, copied parameter defaults and bv_bound_chk builtin registration",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/bv/bv_bound_chk_tactic.go",
+            "pkg/tactic/bv/bv_bound_chk_config.go",
+            "pkg/tactic/bv/bv_bound_chk_trace.go",
+            "pkg/tactic/bv/bv_bound_chk_tactic_test.go",
+            "pkg/tactic/bv/bv_bound_chk_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
+          ],
+          "tests": [
+            "TestBVBoundCheckExactGoalsCPP",
+            "TestBVBoundCheckStatisticsCleanupAndGuards",
+            "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
+            "TestBVBoundCheckAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns copied parameters, charged tactic/implementation storage, a non-proof traversal, the default Boolean rewriter and an output AST reference. Manager, parameter services, memory runtime, cooperation and trace tags are borrowed. Temporary RewriterParams snapshots and failed replacement implementations retain their actual owners for retry. Cleanup constructs the replacement before publishing it and preserves shared statistics. Result goals are borrowed; translation uses independent copied parameter state and a fresh target manager."
+      ],
+      "deviations": [
+        "Uses the already ported concrete BVBounds algorithms and native Go owners, with no C++ standard-library or unused template port. Full default strategy dispatch, alternate QF_UFBV solver-backed Ackermannization and higher engine integration remain incomplete."
+      ]
     },
     {
       "path": "src/tactic/bv/bv_bounds_tactic.cpp",
