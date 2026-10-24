@@ -1,0 +1,7 @@
+(set-logic QF_LIA)
+(declare-const x Int)
+(assert (>= x (- 5)))
+(assert (<= x (- 2)))
+(assert (= x (- 3)))
+(check-sat-using (then normalize-bounds smt))
+(get-model)

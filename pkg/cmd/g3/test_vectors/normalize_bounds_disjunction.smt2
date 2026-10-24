@@ -1,0 +1,7 @@
+(set-logic QF_LIA)
+(declare-const x Int)
+(assert (or (= x (- 3)) (= x 5) (= 2 x)))
+(assert (not (= x (- 3))))
+(assert (not (= x 5)))
+(check-sat-using (then normalize-bounds smt))
+(get-value (x))

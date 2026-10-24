@@ -129026,22 +129026,165 @@
       "path": "src/tactic/arith/bound_manager.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/bound_manager.go",
+        "pkg/tactic/arith/bound_manager_trace.go",
+        "pkg/tactic/arith/bound_manager_test.go",
+        "pkg/tactic/arith/normalize_bounds_tactic.go",
+        "pkg/tactic/arith/normalize_bounds_trace.go",
+        "pkg/tactic/arith/normalize_bounds_test.go",
+        "pkg/tactic/tactic_filter_model.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/parsers/smt2/tactics_test.go"
+      ],
+      "tests": [
+        "TestBoundManagerComparisonSemantics",
+        "TestBoundManagerEqualityDisjunctionNegationAndOrder",
+        "TestBoundManagerImprovementDependenciesAndAccumulation",
+        "TestBoundManagerDisplayTraceAndOwnership",
+        "TestBoundManagerKeepsExactlyOneVariableReferenceUntilReset",
+        "TestNormalizeBoundsModelsProofsAndCoreDependencies",
+        "TestNormalizeBoundsNoOpAndConstructorParameterSnapshot",
+        "TestNormalizeBoundsCPPApplyAndTrace",
+        "TestNormalizeBoundsAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "swap_decl/neg/norm, is_lower/is_strict and recursive unary-minus numeral recognition: exact rational bounds with strict Int endpoint normalization",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_manager.go",
+          "go_targets": [
+            "pkg/tactic/arith/bound_manager.go",
+            "pkg/tactic/arith/bound_manager_trace.go",
+            "pkg/tactic/arith/bound_manager_test.go",
+            "pkg/tactic/arith/normalize_bounds_tactic.go",
+            "pkg/tactic/arith/normalize_bounds_trace.go",
+            "pkg/tactic/arith/normalize_bounds_test.go",
+            "pkg/tactic/tactic_filter_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/tactics_test.go"
+          ],
+          "tests": [
+            "TestBoundManagerComparisonSemantics",
+            "TestBoundManagerEqualityDisjunctionNegationAndOrder"
+          ]
+        },
+        {
+          "name": "expression/goal collection: integer equality disjunction hulls, direct equality endpoints, repeated NOT stripping for arithmetic comparisons, swapped operands, arithmetic-family/constant guards and goal dependency forwarding; accumulate until reset",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_manager.go",
+          "go_targets": [
+            "pkg/tactic/arith/bound_manager.go",
+            "pkg/tactic/arith/bound_manager_trace.go",
+            "pkg/tactic/arith/bound_manager_test.go",
+            "pkg/tactic/arith/normalize_bounds_tactic.go",
+            "pkg/tactic/arith/normalize_bounds_trace.go",
+            "pkg/tactic/arith/normalize_bounds_test.go",
+            "pkg/tactic/tactic_filter_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/tactics_test.go"
+          ],
+          "tests": [
+            "TestBoundManagerComparisonSemantics",
+            "TestBoundManagerEqualityDisjunctionNegationAndOrder",
+            "TestBoundManagerImprovementDependenciesAndAccumulation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "insert_lower/insert_upper: strictness-aware improvements, nonnull-only dependency replacement and unique first-bound variable insertion/INC; has_lower/upper and borrowed dependency access",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_manager.go",
+          "go_targets": [
+            "pkg/tactic/arith/bound_manager.go",
+            "pkg/tactic/arith/bound_manager_trace.go",
+            "pkg/tactic/arith/bound_manager_test.go",
+            "pkg/tactic/arith/normalize_bounds_tactic.go",
+            "pkg/tactic/arith/normalize_bounds_trace.go",
+            "pkg/tactic/arith/normalize_bounds_test.go",
+            "pkg/tactic/tactic_filter_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/tactics_test.go"
+          ],
+          "tests": [
+            "TestBoundManagerImprovementDependenciesAndAccumulation",
+            "TestBoundManagerDisplayTraceAndOwnership",
+            "TestBoundManagerKeepsExactlyOneVariableReferenceUntilReset"
+          ]
+        },
+        {
+          "name": "constructor/destructor/manager, source-order variable iteration, reset variable DEC and table finalization, exact display of finite/strict/infinite endpoints and all live bound_manager traces",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_manager.go",
+          "go_targets": [
+            "pkg/tactic/arith/bound_manager.go",
+            "pkg/tactic/arith/bound_manager_trace.go",
+            "pkg/tactic/arith/bound_manager_test.go",
+            "pkg/tactic/arith/normalize_bounds_tactic.go",
+            "pkg/tactic/arith/normalize_bounds_trace.go",
+            "pkg/tactic/arith/normalize_bounds_test.go",
+            "pkg/tactic/tactic_filter_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/tactics_test.go"
+          ],
+          "tests": [
+            "TestBoundManagerDisplayTraceAndOwnership",
+            "TestBoundManagerKeepsExactlyOneVariableReferenceUntilReset",
+            "TestNormalizeBoundsAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "BoundManager owns one acquired AST reference per distinct bounded expression in first-bound order; dependencies remain borrowed exactly as in the source maps. Reset releases each acquired reference once and handles consumed deletion errors without a second DEC on retry. The manager and parameter/diagnostic services are borrowed. The sole-owner test verifies the variable survives external reference release and disappears after reset.",
+        "Native lookup maps and a separate ordered slice replace source obj_map/ptr_vector storage. big.Rat values are detached on insertion and query so returned Go values cannot mutate stored endpoints. Display and traces borrow owning roots and release temporary numeric/format streams."
+      ],
+      "deviations": [
+        "Go returns explicit found/strict/error values and a detached slice of borrowed variable handles instead of C++ output references and pointer iterators. Borrowed dependency replacement quirks, first-seen order, recognition limits and accumulation are preserved. No C++ containers or hash internals are ported."
+      ]
     },
     {
       "path": "src/tactic/arith/bound_manager.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/bound_manager.go",
+        "pkg/tactic/arith/bound_manager_trace.go",
+        "pkg/tactic/arith/bound_manager_test.go",
+        "pkg/tactic/arith/normalize_bounds_tactic.go",
+        "pkg/tactic/arith/normalize_bounds_trace.go",
+        "pkg/tactic/arith/normalize_bounds_test.go",
+        "pkg/tactic/tactic_filter_model.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/parsers/smt2/tactics_test.go"
+      ],
+      "tests": [
+        "TestBoundManagerComparisonSemantics",
+        "TestBoundManagerEqualityDisjunctionNegationAndOrder",
+        "TestBoundManagerImprovementDependenciesAndAccumulation",
+        "TestBoundManagerDisplayTraceAndOwnership",
+        "TestBoundManagerKeepsExactlyOneVariableReferenceUntilReset",
+        "TestNormalizeBoundsModelsProofsAndCoreDependencies",
+        "TestNormalizeBoundsNoOpAndConstructorParameterSnapshot",
+        "TestNormalizeBoundsCPPApplyAndTrace",
+        "TestNormalizeBoundsAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -129052,11 +129195,48 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete rational limit/dependency maps, constructor/destructor/manager, expression and goal calls, lower/upper and presence/dependency access, insertion-order bounded-variable iteration, reset/display and internally consumed neg/norm declarations",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_manager.go",
+          "go_targets": [
+            "pkg/tactic/arith/bound_manager.go",
+            "pkg/tactic/arith/bound_manager_trace.go",
+            "pkg/tactic/arith/bound_manager_test.go",
+            "pkg/tactic/arith/normalize_bounds_tactic.go",
+            "pkg/tactic/arith/normalize_bounds_trace.go",
+            "pkg/tactic/arith/normalize_bounds_test.go",
+            "pkg/tactic/tactic_filter_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/tactics_test.go"
+          ],
+          "tests": [
+            "TestBoundManagerComparisonSemantics",
+            "TestBoundManagerEqualityDisjunctionNegationAndOrder",
+            "TestBoundManagerImprovementDependenciesAndAccumulation",
+            "TestBoundManagerDisplayTraceAndOwnership",
+            "TestBoundManagerKeepsExactlyOneVariableReferenceUntilReset",
+            "TestNormalizeBoundsModelsProofsAndCoreDependencies",
+            "TestNormalizeBoundsNoOpAndConstructorParameterSnapshot",
+            "TestNormalizeBoundsCPPApplyAndTrace",
+            "TestNormalizeBoundsAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking"
+          ]
+        }
+      ],
+      "ownership": [
+        "BoundManager owns one acquired AST reference per distinct bounded expression in first-bound order; dependencies remain borrowed exactly as in the source maps. Reset releases each acquired reference once and handles consumed deletion errors without a second DEC on retry. The manager and parameter/diagnostic services are borrowed. The sole-owner test verifies the variable survives external reference release and disappears after reset.",
+        "Native lookup maps and a separate ordered slice replace source obj_map/ptr_vector storage. big.Rat values are detached on insertion and query so returned Go values cannot mutate stored endpoints. Display and traces borrow owning roots and release temporary numeric/format streams."
+      ],
+      "deviations": [
+        "Go returns explicit found/strict/error values and a detached slice of borrowed variable handles instead of C++ output references and pointer iterators. Borrowed dependency replacement quirks, first-seen order, recognition limits and accumulation are preserved. No C++ containers or hash internals are ported."
+      ]
     },
     {
       "path": "src/tactic/arith/bound_propagator.cpp",
@@ -130934,22 +131114,148 @@
       "path": "src/tactic/arith/normalize_bounds_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/normalize_bounds_tactic.go",
+        "pkg/tactic/arith/normalize_bounds_trace.go",
+        "pkg/tactic/arith/normalize_bounds_test.go",
+        "pkg/tactic/arith/bound_manager.go",
+        "pkg/tactic/tactic_filter_model.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/parsers/smt2/tactics_test.go"
+      ],
+      "tests": [
+        "TestNormalizeBoundsModelsProofsAndCoreDependencies",
+        "TestNormalizeBoundsNoOpAndConstructorParameterSnapshot",
+        "TestNormalizeBoundsCPPApplyAndTrace",
+        "TestNormalizeBoundsAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "imp parameter updates/is_target/has_lowers: default Int-only, optional Real normalization, nonzero lower endpoint guard, preserve strict lower bounds and no-op depth behavior",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/normalize_bounds_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/normalize_bounds_tactic.go",
+            "pkg/tactic/arith/normalize_bounds_trace.go",
+            "pkg/tactic/arith/normalize_bounds_test.go",
+            "pkg/tactic/arith/bound_manager.go",
+            "pkg/tactic/tactic_filter_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/tactics_test.go"
+          ],
+          "tests": [
+            "TestNormalizeBoundsModelsProofsAndCoreDependencies",
+            "TestNormalizeBoundsNoOpAndConstructorParameterSnapshot",
+            "TestNormalizeBoundsCPPApplyAndTrace",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "imp::operator(): collect source bounds, create fresh sort-correct x_prime+lower definitions, install owning substitution, extension-then-filter model reconstruction, progress count, theory rewriting, modus-ponens proof composition and unchanged original dependencies; increment depth after rewriting",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/normalize_bounds_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/normalize_bounds_tactic.go",
+            "pkg/tactic/arith/normalize_bounds_trace.go",
+            "pkg/tactic/arith/normalize_bounds_test.go",
+            "pkg/tactic/arith/bound_manager.go",
+            "pkg/tactic/tactic_filter_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/tactics_test.go"
+          ],
+          "tests": [
+            "TestNormalizeBoundsModelsProofsAndCoreDependencies",
+            "TestNormalizeBoundsCPPApplyAndTrace",
+            "TestNormalizeBoundsAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "outer constructor/destructor/translation, implementation-only UpdateParams with immutable constructor m_params snapshot, exact two advertised parameter descriptions, rewriter exception conversion and clean factory; allocate/publish fresh implementation before retiring old during cleanup",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/normalize_bounds_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/normalize_bounds_tactic.go",
+            "pkg/tactic/arith/normalize_bounds_trace.go",
+            "pkg/tactic/arith/normalize_bounds_test.go",
+            "pkg/tactic/arith/bound_manager.go",
+            "pkg/tactic/tactic_filter_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/tactics_test.go"
+          ],
+          "tests": [
+            "TestNormalizeBoundsNoOpAndConstructorParameterSnapshot",
+            "TestNormalizeBoundsAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking"
+          ]
+        },
+        {
+          "name": "has_lowers diagnostic for each inspected variable and final-goal TRACE, normalize-bounds tactic report and :normalized-bounds progress",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/normalize_bounds_trace.go",
+          "go_targets": [
+            "pkg/tactic/arith/normalize_bounds_tactic.go",
+            "pkg/tactic/arith/normalize_bounds_trace.go",
+            "pkg/tactic/arith/normalize_bounds_test.go",
+            "pkg/tactic/arith/bound_manager.go",
+            "pkg/tactic/tactic_filter_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/tactics_test.go"
+          ],
+          "tests": [
+            "TestNormalizeBoundsCPPApplyAndTrace",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns the constructor parameter snapshot, concrete BoundManager and TheoryRewriter. Live parameter updates modify only the implementation; cleanup/translation intentionally use the constructor snapshot as in the source. Cleanup publishes the newly built implementation before deleting the old one. A stopped Go teardown keeps its retired concrete owner for safe retry. Constructor/apply/populated-cleanup frontier tests cover both proof modes and zero charged-storage teardown.",
+        "Applications own temporary expression substitutions and proof/output references, protect fresh constants until definitions are published, and retain reconstructed original values through an extension converter followed by a filter for every helper declaration. Converters own their definitions independently of tactic cleanup/close. Original core dependencies are forwarded unchanged. The exported concrete FilterModelConverter alias permits typed Insert calls without a generic adapter."
+      ],
+      "deviations": [
+        "Go names the constructor, clean factory and ownership methods explicitly. The source constructor-parameter snapshot behavior is preserved, including cleanup/translation ignoring subsequent implementation-only updates. Fresh generated symbol counters are manager-specific; native apply comparisons normalize that spelling while preserving identity, formulas and depth."
+      ]
     },
     {
       "path": "src/tactic/arith/normalize_bounds_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/normalize_bounds_tactic.go",
+        "pkg/tactic/arith/normalize_bounds_trace.go",
+        "pkg/tactic/arith/normalize_bounds_test.go",
+        "pkg/tactic/arith/bound_manager.go",
+        "pkg/tactic/tactic_filter_model.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/parsers/smt2/tactics_test.go"
+      ],
+      "tests": [
+        "TestNormalizeBoundsModelsProofsAndCoreDependencies",
+        "TestNormalizeBoundsNoOpAndConstructorParameterSnapshot",
+        "TestNormalizeBoundsCPPApplyAndTrace",
+        "TestNormalizeBoundsAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -130960,11 +131266,41 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_normalize_bounds_tactic declaration, empty default params and ADD_TACTIC normalize-bounds registration via source clean wrapper",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/normalize_bounds_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/normalize_bounds_tactic.go",
+            "pkg/tactic/arith/normalize_bounds_trace.go",
+            "pkg/tactic/arith/normalize_bounds_test.go",
+            "pkg/tactic/arith/bound_manager.go",
+            "pkg/tactic/tactic_filter_model.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/parsers/smt2/tactics_test.go"
+          ],
+          "tests": [
+            "TestNormalizeBoundsModelsProofsAndCoreDependencies",
+            "TestNormalizeBoundsNoOpAndConstructorParameterSnapshot",
+            "TestNormalizeBoundsCPPApplyAndTrace",
+            "TestNormalizeBoundsAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns the constructor parameter snapshot, concrete BoundManager and TheoryRewriter. Live parameter updates modify only the implementation; cleanup/translation intentionally use the constructor snapshot as in the source. Cleanup publishes the newly built implementation before deleting the old one. A stopped Go teardown keeps its retired concrete owner for safe retry. Constructor/apply/populated-cleanup frontier tests cover both proof modes and zero charged-storage teardown.",
+        "Applications own temporary expression substitutions and proof/output references, protect fresh constants until definitions are published, and retain reconstructed original values through an extension converter followed by a filter for every helper declaration. Converters own their definitions independently of tactic cleanup/close. Original core dependencies are forwarded unchanged. The exported concrete FilterModelConverter alias permits typed Insert calls without a generic adapter."
+      ],
+      "deviations": [
+        "Go names the constructor, clean factory and ownership methods explicitly. The source constructor-parameter snapshot behavior is preserved, including cleanup/translation ignoring subsequent implementation-only updates. Fresh generated symbol counters are manager-specific; native apply comparisons normalize that spelling while preserving identity, formulas and depth."
+      ]
     },
     {
       "path": "src/tactic/arith/pb2bv_model_converter.cpp",

@@ -10,6 +10,14 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"normalize_bounds_core.smt2":                   "unsat\n(lower upper)\n",
+	"normalize_bounds_disjunction.smt2":            "sat\n((x 2))\n",
+	"normalize_bounds_fix_dl_pipeline.smt2":        "sat\n((x 0) ((<= (- x y) 2) true) ((<= (- x z) 3) true) ((<= (- x w) 4) true))\nunsat\nsat\n",
+	"normalize_bounds_int_model_scopes.smt2":       "sat\n(model (define-fun x () Int 7)\n)\nunsat\nsat\n((x 7))\n",
+	"normalize_bounds_negative_model.smt2":         "sat\n(model (define-fun x () Int (- 3))\n)\n",
+	"normalize_bounds_proof.smt2":                  "unsat\n",
+	"normalize_bounds_real_default.smt2":           "sat\n((x (/ 2.0 3.0)))\n",
+	"normalize_bounds_real_opt_in.smt2":            "sat\n(((and (> x (/ 1 3)) (<= x (/ 2 3))) true))\nunsat\nsat\n",
 	"fix_dl_absolute_refusal.smt2":                 "sat\n((x 5) ((<= (- x y) 2) true))\n",
 	"fix_dl_core.smt2":                             "unsat\n(forward backward)\n",
 	"fix_dl_foreign_offset.smt2":                   "sat\n((x 0) ((p (+ 2 x)) true))\n",

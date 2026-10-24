@@ -1,0 +1,5 @@
+(set-logic QF_LRA)
+(declare-const x Real)
+(assert (= x (/ 2 3)))
+(check-sat-using (then normalize-bounds smt))
+(get-value (x))

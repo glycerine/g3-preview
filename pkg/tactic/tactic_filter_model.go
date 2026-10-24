@@ -22,6 +22,9 @@ type tacticFilterModelConverter struct {
 	globals      *uparams.GlobalParamsService
 }
 
+// FilterModelConverter exposes the concrete retained arithmetic-tactic owner.
+type FilterModelConverter = tacticFilterModelConverter
+
 func NewFilterModel(m *ast.ASTManager) (*tacticFilterModelConverter, error) {
 	if m == nil {
 		return nil, ast.ErrASTHandle

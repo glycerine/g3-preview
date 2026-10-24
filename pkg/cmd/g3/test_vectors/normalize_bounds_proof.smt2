@@ -1,0 +1,6 @@
+(set-option :produce-proofs true)
+(set-logic QF_LIA)
+(declare-const x Int)
+(assert (>= x 5))
+(assert (<= x 4))
+(check-sat-using (then normalize-bounds smt))
