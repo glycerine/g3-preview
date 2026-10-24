@@ -1,7 +1,11 @@
 // Source: src/ast/rewriter/rewriter_types.h:29-49.
 package rewriter
 
-import "github.com/glycerine/g3/pkg/util/z3exception"
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/util/z3exception"
+)
 
 type brStatus uint32
 
@@ -32,3 +36,10 @@ func newRewriterException(message string) rewriterException {
 }
 
 func (e rewriterException) Unwrap() error { return e.DefaultException }
+
+// IsRewriterException supports the source's typed catch at tactic boundaries
+// without treating AST ownership or parameter errors as rewrite failures.
+func IsRewriterException(err error) bool {
+	var exception rewriterException
+	return errors.As(err, &exception)
+}

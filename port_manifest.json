@@ -34837,9 +34837,13 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/tactic/core/simplify_tactic.go",
+        "pkg/tactic/core/simplify_tactic_test.go",
+        "pkg/ast/rewriter/rewriter_types_source_test.go",
         "pkg/ast/rewriter/rewriter_types.go"
       ],
       "tests": [
+        "TestSimplifyTacticConvertsRewriteExceptionAndRecovers",
         "TestRewriterTypesSourceStatusesAndExceptionHierarchy",
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
         "TestBoolRewriterACOneLevelFlatteningAndSpill",
@@ -34876,6 +34880,20 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "typed source rewriter_exception catch predicate consumed by simplify_tactic, preserving ordinary ownership/parameter errors as distinct failures",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/rewriter_types.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic.go",
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/ast/rewriter/rewriter_types_source_test.go"
+          ],
+          "tests": [
+            "TestRewriterTypesSourceStatusesAndExceptionHierarchy",
+            "TestSimplifyTacticConvertsRewriteExceptionAndRecovers"
+          ]
+        },
         {
           "name": "br_status and unsigned2br_status",
           "status": "ported",
@@ -132917,9 +132935,22 @@
       "path": "src/tactic/core/simplify_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/simplify_tactic.go",
+        "pkg/tactic/core/simplify_tactic_test.go",
+        "pkg/tactic/core/simplify_native_trace_test.go",
+        "pkg/ast/rewriter/rewriter_types.go"
+      ],
+      "tests": [
+        "TestSimplifyTacticProofDependenciesDepthAndCleanup",
+        "TestSimplifyTacticConvertsRewriteExceptionAndRecovers",
+        "TestEliminateAndFactoryStickyParamsAndTranslation",
+        "TestSimplifyTacticTranslationOwnsParamsAcrossManagers",
+        "TestSimplifyTacticSolverCompositionScopesAndUndecided",
+        "TestSimplifyTacticCPPApplyReference",
+        "TestSimplifyTacticTraceStagesAndStreamRefusal"
+      ],
       "assertions": [
         {
           "line": 46,
@@ -132930,19 +132961,147 @@
           "text": "SASSERT(g.is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor/destructor, owned parameter snapshots and theory-rewriter lifetime, reference counts and copied-owner refusal",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestSimplifyTacticProofDependenciesDepthAndCleanup",
+            "TestSimplifyTacticConvertsRewriteExceptionAndRecovers",
+            "TestEliminateAndFactoryStickyParamsAndTranslation",
+            "TestSimplifyTacticTranslationOwnsParamsAcrossManagers",
+            "TestSimplifyTacticSolverCompositionScopesAndUndecided"
+          ]
+        },
+        {
+          "name": "imp::operator(): source well-sorted guards, report scope, initial formula-count traversal, proof modus ponens, unchanged dependencies, redundancy elimination and unsigned rewrite-step accumulation",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestSimplifyTacticProofDependenciesDepthAndCleanup",
+            "TestSimplifyTacticSolverCompositionScopesAndUndecided",
+            "TestSimplifyTacticCPPApplyReference"
+          ]
+        },
+        {
+          "name": "public operator(): in-place single result, depth increment, null converters/core, and typed rewriter_exception to tactic_exception boundary",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestSimplifyTacticProofDependenciesDepthAndCleanup",
+            "TestSimplifyTacticConvertsRewriteExceptionAndRecovers",
+            "TestSimplifyTacticSolverCompositionScopesAndUndecided"
+          ]
+        },
+        {
+          "name": "updt_params, static and virtual parameter descriptions, fresh-rewriter cleanup/reset and get_num_steps",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestSimplifyTacticProofDependenciesDepthAndCleanup",
+            "TestSimplifyTacticConvertsRewriteExceptionAndRecovers",
+            "TestSimplifyTacticTranslationOwnsParamsAcrossManagers"
+          ]
+        },
+        {
+          "name": "translate: fresh simplifier on a target AST manager sharing retained process services, copied parameters surviving source mutation/destruction",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestEliminateAndFactoryStickyParamsAndTranslation",
+            "TestSimplifyTacticTranslationOwnsParamsAcrossManagers"
+          ]
+        },
+        {
+          "name": "mk_simplify_tactic clean wrapper and mk_elim_and_tactic using_params wrapper with sticky elim_and override",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestEliminateAndFactoryStickyParamsAndTranslation",
+            "TestSimplifyTacticSolverCompositionScopesAndUndecided",
+            "TestSimplifyTacticCPPApplyReference"
+          ]
+        },
+        {
+          "name": "before/after simplifier TRACE sites and dependency display before public depth increment, source trace erasure and ostream refusal semantics",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestSimplifyTacticTraceStagesAndStreamRefusal"
+          ]
+        },
+        {
+          "name": "imp::reset has no retained source caller; public cleanup reconstructs the rewriter instead",
+          "status": "reference_only",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "SimplifyTactic borrows the AST manager and parameter/global services; it owns a charged Go header, one copied ParamsRef, and its theory rewriter. Apply pins rewritten expressions and proofs until Goal.Update takes ownership and preserves borrowed dependencies. Tactic results borrow the input goal as in the existing tactic interface. Factory wrappers own child tactic references. Cleanup releases and recreates the rewriter while keeping parameters; Close releases all owned references and is idempotent."
+      ],
+      "deviations": [
+        "The retained C++ process shares symbol/numeral services across AST managers. Translation supports that domain and refuses unrelated Go service owners instead of dropping parameter settings. The std::move expression in source cleanup resolves to params_ref copy construction (params_ref has no move constructor), so stored settings remain intact. Tactic factory annotations are represented by concrete Go factories; default portfolio composition, public name registration and CLI tactic/fallback integration remain separate incomplete source units. The standalone tactic is checked directly against native apply simplify/elim-and and through the existing TacticSolver."
+      ]
     },
     {
       "path": "src/tactic/core/simplify_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/simplify_tactic.go",
+        "pkg/tactic/core/simplify_tactic_test.go",
+        "pkg/tactic/core/simplify_native_trace_test.go",
+        "pkg/ast/rewriter/rewriter_types.go"
+      ],
+      "tests": [
+        "TestSimplifyTacticProofDependenciesDepthAndCleanup",
+        "TestSimplifyTacticConvertsRewriteExceptionAndRecovers",
+        "TestEliminateAndFactoryStickyParamsAndTranslation",
+        "TestSimplifyTacticTranslationOwnsParamsAcrossManagers",
+        "TestSimplifyTacticSolverCompositionScopesAndUndecided",
+        "TestSimplifyTacticCPPApplyReference",
+        "TestSimplifyTacticTraceStagesAndStreamRefusal"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -132953,11 +133112,120 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor/destructor, owned parameter snapshots and theory-rewriter lifetime, reference counts and copied-owner refusal",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestSimplifyTacticProofDependenciesDepthAndCleanup",
+            "TestSimplifyTacticConvertsRewriteExceptionAndRecovers",
+            "TestEliminateAndFactoryStickyParamsAndTranslation",
+            "TestSimplifyTacticTranslationOwnsParamsAcrossManagers",
+            "TestSimplifyTacticSolverCompositionScopesAndUndecided"
+          ]
+        },
+        {
+          "name": "imp::operator(): source well-sorted guards, report scope, initial formula-count traversal, proof modus ponens, unchanged dependencies, redundancy elimination and unsigned rewrite-step accumulation",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestSimplifyTacticProofDependenciesDepthAndCleanup",
+            "TestSimplifyTacticSolverCompositionScopesAndUndecided",
+            "TestSimplifyTacticCPPApplyReference"
+          ]
+        },
+        {
+          "name": "public operator(): in-place single result, depth increment, null converters/core, and typed rewriter_exception to tactic_exception boundary",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestSimplifyTacticProofDependenciesDepthAndCleanup",
+            "TestSimplifyTacticConvertsRewriteExceptionAndRecovers",
+            "TestSimplifyTacticSolverCompositionScopesAndUndecided"
+          ]
+        },
+        {
+          "name": "updt_params, static and virtual parameter descriptions, fresh-rewriter cleanup/reset and get_num_steps",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestSimplifyTacticProofDependenciesDepthAndCleanup",
+            "TestSimplifyTacticConvertsRewriteExceptionAndRecovers",
+            "TestSimplifyTacticTranslationOwnsParamsAcrossManagers"
+          ]
+        },
+        {
+          "name": "translate: fresh simplifier on a target AST manager sharing retained process services, copied parameters surviving source mutation/destruction",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestEliminateAndFactoryStickyParamsAndTranslation",
+            "TestSimplifyTacticTranslationOwnsParamsAcrossManagers"
+          ]
+        },
+        {
+          "name": "mk_simplify_tactic clean wrapper and mk_elim_and_tactic using_params wrapper with sticky elim_and override",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestEliminateAndFactoryStickyParamsAndTranslation",
+            "TestSimplifyTacticSolverCompositionScopesAndUndecided",
+            "TestSimplifyTacticCPPApplyReference"
+          ]
+        },
+        {
+          "name": "before/after simplifier TRACE sites and dependency display before public depth increment, source trace erasure and ostream refusal semantics",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/simplify_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/simplify_tactic_test.go",
+            "pkg/tactic/core/simplify_native_trace_test.go",
+            "pkg/ast/rewriter/rewriter_types.go"
+          ],
+          "tests": [
+            "TestSimplifyTacticTraceStagesAndStreamRefusal"
+          ]
+        }
+      ],
+      "ownership": [
+        "SimplifyTactic borrows the AST manager and parameter/global services; it owns a charged Go header, one copied ParamsRef, and its theory rewriter. Apply pins rewritten expressions and proofs until Goal.Update takes ownership and preserves borrowed dependencies. Tactic results borrow the input goal as in the existing tactic interface. Factory wrappers own child tactic references. Cleanup releases and recreates the rewriter while keeping parameters; Close releases all owned references and is idempotent."
+      ],
+      "deviations": [
+        "The retained C++ process shares symbol/numeral services across AST managers. Translation supports that domain and refuses unrelated Go service owners instead of dropping parameter settings. The std::move expression in source cleanup resolves to params_ref copy construction (params_ref has no move constructor), so stored settings remain intact. Tactic factory annotations are represented by concrete Go factories; default portfolio composition, public name registration and CLI tactic/fallback integration remain separate incomplete source units. The standalone tactic is checked directly against native apply simplify/elim-and and through the existing TacticSolver."
+      ]
     },
     {
       "path": "src/tactic/core/solve_eqs_tactic.cpp",

@@ -23,6 +23,9 @@ func TestRewriterTypesSourceStatusesAndExceptionHierarchy(t *testing.T) {
 	if !errors.As(err, &concrete) {
 		t.Fatal("rewriter_exception concrete catch failed")
 	}
+	if !IsRewriterException(err) || IsRewriterException(errors.New("ordinary failure")) || IsRewriterException(nil) {
+		t.Fatal("exported rewriter-exception catch predicate lost its concrete identity")
+	}
 	var base z3exception.DefaultException
 	if !errors.As(err, &base) || base.Message() != "rewrite stopped" {
 		t.Fatalf("default_exception base catch = %#v", base)
