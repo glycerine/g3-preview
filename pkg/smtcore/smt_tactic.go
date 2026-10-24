@@ -35,6 +35,9 @@ func NewSMTTacticUsing(m *ast.ASTManager, p *uparams.ParamsRef, logic string, au
 	if err != nil {
 		return nil, err
 	}
+	if err = base.SetProduceModels(base.kernel.smtState.Model); err != nil {
+		return nil, errors.Join(err, base.Close())
+	}
 	tacticConfig := solver.SolverTacticConfig{Params: config.Params}
 	if config.TargetConfig != nil {
 		tacticConfig.TargetConfig = func(target *ast.ASTManager) (solver.SolverTacticConfig, error) {

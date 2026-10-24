@@ -392,6 +392,11 @@ func (s *SMTSolver) SetProduceModels(value bool) error {
 	}
 	s.produceModels = value
 	config := s.config.ModelEvaluator
+	if config.Context == nil {
+		// Keep default evaluator services local to this kernel, including
+		// when a solver is translated for an individual tactic application.
+		config = s.kernel.modelConfig
+	}
 	config.Params = &s.params
 	return s.kernel.ConfigureModelGeneration(value, config)
 }
