@@ -132356,9 +132356,16 @@
       "path": "src/tactic/core/collect_occs.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/collect_occs.go",
+        "pkg/tactic/core/collect_occs_test.go"
+      ],
+      "tests": [
+        "TestCollectOccurrencesSharedDAGAndGoalRoots",
+        "TestCollectOccurrencesQuantifierBodySkipsPatterns",
+        "TestCollectOccurrencesLeafBodiesAndRepeatedEdges"
+      ],
       "assertions": [
         {
           "line": 45,
@@ -132369,19 +132376,44 @@
           "text": "SASSERT(!m_stack.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained fresh collect_occs invocation: explicit DFS, shared visited marks across goal roots, repeated constant edges, first-discovery variable order, quantifier-body traversal without pattern/no-pattern traversal, exclusion of bound variables and interpreted constants, fresh per-round marks and output",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/collect_occs.go",
+          "go_targets": [
+            "pkg/tactic/core/collect_occs_test.go"
+          ],
+          "tests": [
+            "TestCollectOccurrencesSharedDAGAndGoalRoots",
+            "TestCollectOccurrencesQuantifierBodySkipsPatterns",
+            "TestCollectOccurrencesLeafBodiesAndRepeatedEdges"
+          ]
+        }
+      ],
+      "ownership": [
+        "All handles borrow their lifetime from an unchanged goal. Per-invocation DFS frames and lookup-only visited/repeated Go maps are ephemeral; the returned ordered slice borrows single-occurrence constants. No AST references or traversal marks survive the invocation."
+      ],
+      "deviations": [
+        "Both retained source call sites create a fresh collector and an empty destination. Go uses a concrete package-local function for those invocations, without retaining the unused reusable source collector interface or porting its STL/hash-table internals."
+      ]
     },
     {
       "path": "src/tactic/core/collect_occs.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/collect_occs.go",
+        "pkg/tactic/core/collect_occs_test.go"
+      ],
+      "tests": [
+        "TestCollectOccurrencesSharedDAGAndGoalRoots",
+        "TestCollectOccurrencesQuantifierBodySkipsPatterns",
+        "TestCollectOccurrencesLeafBodiesAndRepeatedEdges"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -132392,11 +132424,29 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained fresh collect_occs invocation: explicit DFS, shared visited marks across goal roots, repeated constant edges, first-discovery variable order, quantifier-body traversal without pattern/no-pattern traversal, exclusion of bound variables and interpreted constants, fresh per-round marks and output",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/collect_occs.go",
+          "go_targets": [
+            "pkg/tactic/core/collect_occs_test.go"
+          ],
+          "tests": [
+            "TestCollectOccurrencesSharedDAGAndGoalRoots",
+            "TestCollectOccurrencesQuantifierBodySkipsPatterns",
+            "TestCollectOccurrencesLeafBodiesAndRepeatedEdges"
+          ]
+        }
+      ],
+      "ownership": [
+        "All handles borrow their lifetime from an unchanged goal. Per-invocation DFS frames and lookup-only visited/repeated Go maps are ephemeral; the returned ordered slice borrows single-occurrence constants. No AST references or traversal marks survive the invocation."
+      ],
+      "deviations": [
+        "Both retained source call sites create a fresh collector and an empty destination. Go uses a concrete package-local function for those invocations, without retaining the unused reusable source collector interface or porting its STL/hash-table internals."
+      ]
     },
     {
       "path": "src/tactic/core/collect_statistics_tactic.cpp",
