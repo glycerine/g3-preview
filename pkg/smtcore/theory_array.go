@@ -44,7 +44,7 @@ type SMTArrayTheory struct {
 	defaultFingerprints                   map[*SMTEnode]bool
 	defaultFingerprintTrail               []*SMTEnode
 	equalityAxioms                        map[smtArrayExpressionPair]bool
-	epsilons                              map[ast.ASTHandle]ast.ASTHandle
+	epsilons                              map[ast.ASTHandle]ast.ASTHandle // owns one reference per cached value
 	epsilonTrail                          []ast.ASTHandle
 	scopes                                []smtArrayScope
 	unsupported                           bool
@@ -376,6 +376,11 @@ func (t *SMTArrayTheory) arrayEpsilon(sort ast.ASTHandle) (ast.ASTHandle, error)
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
+	// Source m_sort2epsilon is an owning ast2ast_trailmap. Keep the fresh value
+	// alive independently of temporary expressions and their references.
+	if err = state.manager.IncRef(epsilon); err != nil {
+		return ast.ASTHandle{}, err
+	}
 	t.epsilons[sort] = epsilon
 	t.epsilonTrail = append(t.epsilonTrail, sort)
 	return epsilon, nil
@@ -575,8 +580,8 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	for _, expression := range t.defaultTrail[scope.defaults:] {
 		delete(t.defaults, expression)
 	}
-	for _, sort := range t.epsilonTrail[scope.epsilons:] {
-		delete(t.epsilons, sort)
+	if err := t.restoreArrayEpsilons(scope.epsilons); err != nil {
+		return err
 	}
 	for _, node := range t.defaultFingerprintTrail[scope.defaultFingerprints:] {
 		delete(t.defaultFingerprints, node)
@@ -584,7 +589,6 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	t.storeTrail = t.storeTrail[:scope.stores]
 	t.selectTrail = t.selectTrail[:scope.selects]
 	t.defaultTrail = t.defaultTrail[:scope.defaults]
-	t.epsilonTrail = t.epsilonTrail[:scope.epsilons]
 	t.defaultFingerprintTrail = t.defaultFingerprintTrail[:scope.defaultFingerprints]
 	t.unsupported = scope.unsupported
 	t.scopes = t.scopes[:level]

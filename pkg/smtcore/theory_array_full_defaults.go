@@ -9,6 +9,23 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
+// The epsilon value's declaration also owns its result sort, keeping the
+// borrowed sort key valid until the cache entry is removed.
+func (t *SMTArrayTheory) restoreArrayEpsilons(limit int) error {
+	if limit < 0 || limit > len(t.epsilonTrail) {
+		return ast.ErrASTDomain
+	}
+	for len(t.epsilonTrail) > limit {
+		sort := t.epsilonTrail[len(t.epsilonTrail)-1]
+		if err := t.state.manager.DecRef(t.epsilons[sort]); err != nil {
+			return err
+		}
+		delete(t.epsilons, sort)
+		t.epsilonTrail = t.epsilonTrail[:len(t.epsilonTrail)-1]
+	}
+	return nil
+}
+
 func (t *SMTArrayTheory) instantiateConstructorDefault(constructor ast.ASTHandle) (added bool, err error) {
 	s, err := t.State()
 	if err != nil {

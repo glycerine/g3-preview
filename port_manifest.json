@@ -119941,6 +119941,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_epsilon_test.go",
         "pkg/smtcore/theory_array_constructor_merge_test.go",
         "pkg/smtcore/theory_array_sorts.go",
         "pkg/smtcore/theory_array_sorts_test.go",
@@ -119986,6 +119987,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTFullArrayEpsilonCacheOwnsValuesAcrossTemporaryReferences",
         "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback",
         "TestSMTArraySortDeclarationsOwnedAndScoped",
         "TestSMTFullArrayExplicitExtensionalityOriginalFingerprint",
@@ -120163,6 +120165,20 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "mk_epsilon retains an owning reference in the concrete sort-to-epsilon trail map, independent of temporary expressions; value declarations keep sort keys alive, child pop releases child ownership, and theory destruction releases base entries even without registered array sorts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_epsilon_test.go",
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_full_defaults.go",
+            "pkg/smtcore/theory_array_sorts.go"
+          ],
+          "tests": [
+            "TestSMTFullArrayEpsilonCacheOwnsValuesAcrossTemporaryReferences"
+          ]
+        },
         {
           "name": "add_store/add_map/add_const/add_as_array mark the receiving private array class upward before appending constructors, propagate through old and new inputs, revisit const/as-array default fingerprints, enable delayed non-overwriting parent-store read axioms in strong mode, and undo flags/lists/private merges on scope pop; retained AlwaysPropUpward is true and weak mode suppresses upward flags",
           "status": "ported",
@@ -120407,6 +120423,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_epsilon_test.go",
         "pkg/smtcore/theory_array_constructor_merge_test.go",
         "pkg/smtcore/theory_array_sorts.go",
         "pkg/smtcore/theory_array_sorts_test.go",
@@ -120450,6 +120467,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTFullArrayEpsilonCacheOwnsValuesAcrossTemporaryReferences",
         "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback",
         "TestSMTArraySortDeclarationsOwnedAndScoped",
         "TestSMTFullArrayExplicitExtensionalityOriginalFingerprint",
@@ -120486,6 +120504,20 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "mk_epsilon retains an owning reference in the concrete sort-to-epsilon trail map, independent of temporary expressions; value declarations keep sort keys alive, child pop releases child ownership, and theory destruction releases base entries even without registered array sorts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_epsilon_test.go",
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_full_defaults.go",
+            "pkg/smtcore/theory_array_sorts.go"
+          ],
+          "tests": [
+            "TestSMTFullArrayEpsilonCacheOwnsValuesAcrossTemporaryReferences"
+          ]
+        },
         {
           "name": "add_store/add_map/add_const/add_as_array mark the receiving private array class upward before appending constructors, propagate through old and new inputs, revisit const/as-array default fingerprints, enable delayed non-overwriting parent-store read axioms in strong mode, and undo flags/lists/private merges on scope pop; retained AlwaysPropUpward is true and weak mode suppresses upward flags",
           "status": "ported",

@@ -65,10 +65,13 @@ func (t *SMTArrayTheory) Close() error {
 	if t == nil {
 		return ast.ErrASTHandle
 	}
-	if len(t.sortTrail) == 0 {
+	if len(t.sortTrail) == 0 && len(t.epsilonTrail) == 0 {
 		return nil
 	}
 	if _, err := t.State(); err != nil {
+		return err
+	}
+	if err := t.restoreArrayEpsilons(0); err != nil {
 		return err
 	}
 	return t.restoreArraySorts(0)
