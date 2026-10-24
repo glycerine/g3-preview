@@ -104,8 +104,13 @@ func (t *SimplifyTactic) IncRef() error {
 }
 
 func (t *SimplifyTactic) DecRef() error {
-	if err := t.open(); err != nil {
-		return err
+	// Reference release must also destroy a non-executable owner left by a
+	// failed cleanup/reconstruction. The source dec_ref has no live-imp check.
+	if t == nil || t.self != t {
+		return ast.ErrASTHandle
+	}
+	if t.closed {
+		return arena.ErrClosed
 	}
 	if t.refs == 0 {
 		return arena.ErrBounds

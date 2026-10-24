@@ -42,9 +42,10 @@ type satGoalFrame struct {
 // solver. Goal dependencies, tactic/model converters and public API factories
 // remain separate callers. Caller assertions must stay alive through Compile.
 type GoalTranslator struct {
-	self    *GoalTranslator
-	manager *ast.ASTManager
-	solver  *sat.Solver
+	self        *GoalTranslator
+	manager     *ast.ASTManager
+	sharedAtoms *ast.Expr2Var // Borrowed source atom2bool_var for incremental callers.
+	solver      *sat.Solver
 	// Borrow the AST manager's original resource limit for translation checkpoints.
 	Limit                                     *control.Reslimit
 	cooperation                               *cooperate.Cooperation
@@ -129,6 +130,11 @@ func (tr *GoalTranslator) open() error {
 	if tr.failed {
 		return ErrSATGoalFailed
 	}
+	if tr.sharedAtoms != nil {
+		if _, err := tr.sharedAtoms.Manager(); err != nil {
+			return err
+		}
+	}
 	return tr.solver.CheckOwner()
 }
 
@@ -203,6 +209,7 @@ func (tr *GoalTranslator) Close() error {
 	tr.interpreted = nil
 	tr.frames = nil
 	tr.results = nil
+	tr.sharedAtoms = nil
 	b.Release(tr.ownerBytes)
 	tr.ownerBytes = 0
 	tr.closed = true
@@ -236,7 +243,11 @@ func (tr *GoalTranslator) Variable(h ast.ASTHandle) (sat.BoolVar, error) {
 	if _, e := tr.manager.GetKind(h); e != nil {
 		return sat.NullBoolVar, e
 	}
-	if v, found := tr.Atoms.Get2(h); found {
+	v, found, err := tr.atomVariable(h)
+	if err != nil {
+		return sat.NullBoolVar, err
+	}
+	if found {
 		return sat.BoolVar(v), nil
 	}
 	return sat.NullBoolVar, nil
@@ -281,7 +292,10 @@ func (tr *GoalTranslator) convertAtom(h ast.ASTHandle, root, sign bool) error {
 	if !isBool {
 		return ast.ErrASTDomain
 	}
-	value, found := tr.Atoms.Get2(h)
+	value, found, e := tr.atomVariable(h)
+	if e != nil {
+		return e
+	}
 	var l sat.Literal
 	if found {
 		l = sat.MakeLiteral(sat.BoolVar(value), false)
@@ -308,15 +322,14 @@ func (tr *GoalTranslator) convertAtom(h ast.ASTHandle, root, sign bool) error {
 			if e != nil {
 				return e
 			}
-			if !uninterpreted {
+			if !uninterpreted && tr.sharedAtoms == nil {
 				if e = tr.traceInterpretedAtom(h); e != nil {
 					return e
 				}
 			}
-			if e = tr.manager.IncRef(h); e != nil {
+			if e = tr.insertAtom(h, uint32(v)); e != nil {
 				return e
 			}
-			tr.Atoms.Set(h, uint32(v))
 			l = sat.MakeLiteral(v, false)
 			if e = tr.traceGoalNewVar(v, h); e != nil {
 				return e

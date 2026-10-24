@@ -100459,9 +100459,29 @@
       "path": "src/sat/sat_solver/inc_sat_solver.cpp",
       "component": "sat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/sat/sat_solver/preprocess.go",
+        "pkg/sat/sat_solver/preprocess_test.go",
+        "pkg/sat/tactic/sat_goal_incremental.go",
+        "pkg/sat/tactic/sat_goal_incremental_test.go",
+        "pkg/sat/tactic/sat_goal_to_sat.go",
+        "pkg/sat/tactic/sat_goal_recovery.go",
+        "pkg/sat/tactic/sat_boolean_model.go",
+        "pkg/sat/tactic/sat_tactic_trace.go",
+        "pkg/tactic/core/simplify_tactic.go",
+        "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
+      ],
+      "tests": [
+        "TestIncrementalEncoderPersistentBitBindingsAndUserScopesCPP",
+        "TestIncrementalEncoderPBAndUnsupportedInterpretedAtoms",
+        "TestIncrementalEncoderAllocationFrontiers",
+        "TestIncrementalEncoderProofRefusalAndTacticExceptionScopeRecovery",
+        "TestSATGoalBorrowedAtomMapIncrementalScopesAndOwnership",
+        "TestSATGoalBorrowedAtomMapDependenciesAndPerCallInterpretedAtoms",
+        "TestSATGoalBorrowedAtomMapBooleanModelIncludesEarlierAtoms",
+        "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction"
+      ],
       "assertions": [
         {
           "line": 122,
@@ -100530,9 +100550,98 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Persistent preprocessing state and init_preprocess: card2bv, two fixed-parameter simplifiers, max BV sharing, external bit blasting and rebuild/reset ordering",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/sat_solver/preprocess.go",
+            "pkg/sat/sat_solver/preprocess_test.go",
+            "pkg/sat/tactic/sat_goal_incremental.go",
+            "pkg/sat/tactic/sat_goal_incremental_test.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/tactic/core/simplify_tactic.go",
+            "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
+          ],
+          "tests": [
+            "TestIncrementalEncoderPersistentBitBindingsAndUserScopesCPP",
+            "TestIncrementalEncoderPBAndUnsupportedInterpretedAtoms",
+            "TestIncrementalEncoderAllocationFrontiers",
+            "TestIncrementalEncoderProofRefusalAndTacticExceptionScopeRecovery",
+            "TestSATGoalBorrowedAtomMapIncrementalScopesAndOwnership",
+            "TestSATGoalBorrowedAtomMapDependenciesAndPerCallInterpretedAtoms",
+            "TestSATGoalBorrowedAtomMapBooleanModelIncludesEarlierAtoms",
+            "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction"
+          ]
+        },
+        {
+          "name": "Compile portion of internalize_goal: result reset, model/proof guards, one-subgoal requirement, borrowed persistent atom mapping, interpreted-atom refusal and tactic-exception preprocessor/bit-blaster retirement",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/sat_solver/preprocess.go",
+            "pkg/sat/sat_solver/preprocess_test.go",
+            "pkg/sat/tactic/sat_goal_incremental.go",
+            "pkg/sat/tactic/sat_goal_incremental_test.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/tactic/core/simplify_tactic.go",
+            "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
+          ],
+          "tests": [
+            "TestIncrementalEncoderPersistentBitBindingsAndUserScopesCPP",
+            "TestIncrementalEncoderPBAndUnsupportedInterpretedAtoms",
+            "TestIncrementalEncoderAllocationFrontiers",
+            "TestIncrementalEncoderProofRefusalAndTacticExceptionScopeRecovery",
+            "TestSATGoalBorrowedAtomMapIncrementalScopesAndOwnership",
+            "TestSATGoalBorrowedAtomMapDependenciesAndPerCallInterpretedAtoms",
+            "TestSATGoalBorrowedAtomMapBooleanModelIncludesEarlierAtoms",
+            "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction"
+          ]
+        },
+        {
+          "name": "User scopes over SAT core, bit-vector declaration cache and Expr2Var mapping: source push/pop order, over-pop clamp and scope replay after a new bit blaster",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/sat_solver/preprocess.go",
+            "pkg/sat/sat_solver/preprocess_test.go",
+            "pkg/sat/tactic/sat_goal_incremental.go",
+            "pkg/sat/tactic/sat_goal_incremental_test.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/tactic/core/simplify_tactic.go",
+            "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
+          ],
+          "tests": [
+            "TestIncrementalEncoderPersistentBitBindingsAndUserScopesCPP",
+            "TestIncrementalEncoderPBAndUnsupportedInterpretedAtoms",
+            "TestIncrementalEncoderAllocationFrontiers",
+            "TestIncrementalEncoderProofRefusalAndTacticExceptionScopeRecovery",
+            "TestSATGoalBorrowedAtomMapIncrementalScopesAndOwnership",
+            "TestSATGoalBorrowedAtomMapDependenciesAndPerCallInterpretedAtoms",
+            "TestSATGoalBorrowedAtomMapBooleanModelIncludesEarlierAtoms",
+            "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction"
+          ]
+        },
+        {
+          "name": "Full inc_sat_solver facade/factory: original formula queue/head/scopes, source base-versus-shadow parameter policy, assumptions/tracking/cores, actual checks/results, model extraction, translation, consequences/mutexes, weighted display and all diagnostics",
+          "status": "unported",
+          "go_targets": [],
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The partial encoder borrows the actual SAT core and evaluator services. It owns copied internal parameters, scoped Expr2Var, persistent bit blaster, counted preprocessing composition, last result and per-compilation translator. Pending partial constructors and concrete child closers remain owned across stopped reset/destruction. Translation temporaries borrow the scoped atom map rather than duplicating its roots. Full solver/model ownership and facade auditing remain incomplete."
+      ],
+      "deviations": [
+        "This increment ports the persistent preprocessing/internalization component and its source scope operations, not the complete solver.Solver factory. There is no fallback facade or substituted tactic-only solver. The standalone component receives the source internal parameter dictionary; the source facade's separate base/shadow parameter behavior remains to port. Diagnostic trace/verbose/reason-unknown formatting for internalize_goal remains outstanding. Native Go maps and concrete Expr2Var replace source project containers without porting source hashing."
+      ]
     },
     {
       "path": "src/sat/sat_solver/inc_sat_solver.h",
@@ -101311,7 +101420,15 @@
       "go_targets": [
         "pkg/sat/tactic/sat_goal_recovery.go",
         "pkg/sat/tactic/sat_goal_interface.go",
-        "pkg/sat/tactic/sat_goal_to_sat.go"
+        "pkg/sat/tactic/sat_goal_to_sat.go",
+        "pkg/sat/sat_solver/preprocess.go",
+        "pkg/sat/sat_solver/preprocess_test.go",
+        "pkg/sat/tactic/sat_goal_incremental.go",
+        "pkg/sat/tactic/sat_goal_incremental_test.go",
+        "pkg/sat/tactic/sat_boolean_model.go",
+        "pkg/sat/tactic/sat_tactic_trace.go",
+        "pkg/tactic/core/simplify_tactic.go",
+        "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
       ],
       "tests": [
         "TestSATGoalInverseLiteralOwnership",
@@ -101323,7 +101440,15 @@
         "TestSATGoalDependenciesSignedAssumptionsAndCore",
         "TestSATGoalDependenciesFormulaLabelShortcutAndInterface",
         "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable",
-        "TestSATGoalDependenciesNativeDiscoveryOrderAndRepeatedLabels"
+        "TestSATGoalDependenciesNativeDiscoveryOrderAndRepeatedLabels",
+        "TestIncrementalEncoderPersistentBitBindingsAndUserScopesCPP",
+        "TestIncrementalEncoderPBAndUnsupportedInterpretedAtoms",
+        "TestIncrementalEncoderAllocationFrontiers",
+        "TestIncrementalEncoderProofRefusalAndTacticExceptionScopeRecovery",
+        "TestSATGoalBorrowedAtomMapIncrementalScopesAndOwnership",
+        "TestSATGoalBorrowedAtomMapDependenciesAndPerCallInterpretedAtoms",
+        "TestSATGoalBorrowedAtomMapBooleanModelIncludesEarlierAtoms",
+        "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -101355,6 +101480,32 @@
             "TestSATGoalDependenciesSignedAssumptionsAndCore",
             "TestSATGoalDependenciesFormulaLabelShortcutAndInterface",
             "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable"
+          ]
+        },
+        {
+          "name": "to_bool_var and inverse/model iteration over a borrowed scoped Expr2Var; preserve SAT sentinel at the package boundary and original key-root ownership",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/sat_solver/preprocess.go",
+            "pkg/sat/sat_solver/preprocess_test.go",
+            "pkg/sat/tactic/sat_goal_incremental.go",
+            "pkg/sat/tactic/sat_goal_incremental_test.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/tactic/core/simplify_tactic.go",
+            "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
+          ],
+          "tests": [
+            "TestIncrementalEncoderPersistentBitBindingsAndUserScopesCPP",
+            "TestIncrementalEncoderPBAndUnsupportedInterpretedAtoms",
+            "TestIncrementalEncoderAllocationFrontiers",
+            "TestIncrementalEncoderProofRefusalAndTacticExceptionScopeRecovery",
+            "TestSATGoalBorrowedAtomMapIncrementalScopesAndOwnership",
+            "TestSATGoalBorrowedAtomMapDependenciesAndPerCallInterpretedAtoms",
+            "TestSATGoalBorrowedAtomMapBooleanModelIncludesEarlierAtoms",
+            "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction"
           ]
         }
       ],
@@ -101404,7 +101555,15 @@
         "pkg/sat/sat_package_boundary.go",
         "pkg/sat/tactic/sat_tactic.go",
         "pkg/sat/tactic/sat_tactic_test.go",
-        "pkg/sat/tactic/sat_goal_unsupported_message_test.go"
+        "pkg/sat/tactic/sat_goal_unsupported_message_test.go",
+        "pkg/sat/sat_solver/preprocess.go",
+        "pkg/sat/sat_solver/preprocess_test.go",
+        "pkg/sat/tactic/sat_goal_incremental.go",
+        "pkg/sat/tactic/sat_goal_incremental_test.go",
+        "pkg/sat/tactic/sat_boolean_model.go",
+        "pkg/sat/tactic/sat_tactic_trace.go",
+        "pkg/tactic/core/simplify_tactic.go",
+        "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
       ],
       "tests": [
         "TestSATGoalTranslatorSourceUnsupportedSMT2Diagnostic",
@@ -101434,7 +101593,15 @@
         "TestSATModelConverterTranslationDropsEliminationLog",
         "TestSATModelConverterAllocationFrontiers",
         "TestSATTacticCancellationBoundaryAndResidualTranslation",
-        "TestSATTacticAllocationFrontiers"
+        "TestSATTacticAllocationFrontiers",
+        "TestIncrementalEncoderPersistentBitBindingsAndUserScopesCPP",
+        "TestIncrementalEncoderPBAndUnsupportedInterpretedAtoms",
+        "TestIncrementalEncoderAllocationFrontiers",
+        "TestIncrementalEncoderProofRefusalAndTacticExceptionScopeRecovery",
+        "TestSATGoalBorrowedAtomMapIncrementalScopesAndOwnership",
+        "TestSATGoalBorrowedAtomMapDependenciesAndPerCallInterpretedAtoms",
+        "TestSATGoalBorrowedAtomMapBooleanModelIncludesEarlierAtoms",
+        "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction"
       ],
       "assertions": [
         {
@@ -101639,6 +101806,32 @@
             "TestSATModelConverterTranslationDropsEliminationLog",
             "TestSATModelConverterAllocationFrontiers"
           ]
+        },
+        {
+          "name": "Borrowed scoped Expr2Var mapping for incremental callers, source default_external, separate compilation caches, per-call interpreted atoms and concrete dep2asm snapshots; model/recovery/trace consumers include older mapped atoms",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/sat_solver/preprocess.go",
+            "pkg/sat/sat_solver/preprocess_test.go",
+            "pkg/sat/tactic/sat_goal_incremental.go",
+            "pkg/sat/tactic/sat_goal_incremental_test.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/tactic/core/simplify_tactic.go",
+            "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
+          ],
+          "tests": [
+            "TestIncrementalEncoderPersistentBitBindingsAndUserScopesCPP",
+            "TestIncrementalEncoderPBAndUnsupportedInterpretedAtoms",
+            "TestIncrementalEncoderAllocationFrontiers",
+            "TestIncrementalEncoderProofRefusalAndTacticExceptionScopeRecovery",
+            "TestSATGoalBorrowedAtomMapIncrementalScopesAndOwnership",
+            "TestSATGoalBorrowedAtomMapDependenciesAndPerCallInterpretedAtoms",
+            "TestSATGoalBorrowedAtomMapBooleanModelIncludesEarlierAtoms",
+            "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction"
+          ]
         }
       ],
       "ownership": [
@@ -101646,7 +101839,8 @@
         "Fresh compound dependency guards retain owning trail references; dep2asm original label keys remain borrowed as in source.",
         "CompileGoal dependency, formula and combined-dependency scratch use native []ASTHandle slices. DependencyLinearize returns native slice output directly; no ASTExprVector codec or ASTHandleVector adapter is used here. Dependency keys and caller goal ownership remain unchanged.",
         "The AST SAT model converter independently copies the concrete SAT elimination log, owns every indexed atom reference and its auxiliary filter, and borrows evaluator services. Evaluation references/evaluators and consumed atom-release prefixes remain owned across stopped cleanup. Recovery publishes the converter after the complete inverse map, before asserting units/clauses; later failures return that owner. Source translation retains the filter and all atoms but deliberately leaves the SAT log empty.",
-        "The SAT tactic supplies the translator with its explicit borrowed global-parameter printer owner, so unsupported-operator diagnostics and DIMACS atom annotations work without a process-global binding. A constructor whose close stops returns its real translator owner instead of dropping its references."
+        "The SAT tactic supplies the translator with its explicit borrowed global-parameter printer owner, so unsupported-operator diagnostics and DIMACS atom annotations work without a process-global binding. A constructor whose close stops returns its real translator owner instead of dropping its references.",
+        "Incremental translators borrow the original Expr2Var owner and never retain or release a duplicate map root. Closing one translator leaves scoped atom identities alive. Default standalone translators retain their existing owned insertion-ordered atom dictionary. Fresh compilation caches and interpreted/dependency lists remain translator-local; source UINT_MAX lookup misses are converted before constructing SAT literals."
       ],
       "deviations": [
         "Goal dependency guards, dep2asm, unsupported-operator SMT2 diagnostics, sat2goal recovery/model conversion and public SAT tactic integration are implemented. Source checkpoint failures and unsupported operators retain their tactic_exception classification. Wrapper parameter updates, retained has_unsupported_bool inspection and interpreted-atom wrapper state remain open, so this source unit is still partial. Translation checkpoints borrow the actual AST-manager resource limit.",
@@ -142164,7 +142358,16 @@
         "pkg/tactic/core/simplify_tactic_test.go",
         "pkg/tactic/core/simplify_native_trace_test.go",
         "pkg/ast/rewriter/rewriter_types.go",
-        "pkg/tactic/core/strategy_constructor_frontiers_test.go"
+        "pkg/tactic/core/strategy_constructor_frontiers_test.go",
+        "pkg/sat/sat_solver/preprocess.go",
+        "pkg/sat/sat_solver/preprocess_test.go",
+        "pkg/sat/tactic/sat_goal_incremental.go",
+        "pkg/sat/tactic/sat_goal_incremental_test.go",
+        "pkg/sat/tactic/sat_goal_to_sat.go",
+        "pkg/sat/tactic/sat_goal_recovery.go",
+        "pkg/sat/tactic/sat_boolean_model.go",
+        "pkg/sat/tactic/sat_tactic_trace.go",
+        "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
       ],
       "tests": [
         "TestSimplifyTacticProofDependenciesDepthAndCleanup",
@@ -142174,7 +142377,15 @@
         "TestSimplifyTacticSolverCompositionScopesAndUndecided",
         "TestSimplifyTacticCPPApplyReference",
         "TestSimplifyTacticTraceStagesAndStreamRefusal",
-        "TestCoreStrategyPrerequisiteConstructorFrontiers"
+        "TestCoreStrategyPrerequisiteConstructorFrontiers",
+        "TestIncrementalEncoderPersistentBitBindingsAndUserScopesCPP",
+        "TestIncrementalEncoderPBAndUnsupportedInterpretedAtoms",
+        "TestIncrementalEncoderAllocationFrontiers",
+        "TestIncrementalEncoderProofRefusalAndTacticExceptionScopeRecovery",
+        "TestSATGoalBorrowedAtomMapIncrementalScopesAndOwnership",
+        "TestSATGoalBorrowedAtomMapDependenciesAndPerCallInterpretedAtoms",
+        "TestSATGoalBorrowedAtomMapBooleanModelIncludesEarlierAtoms",
+        "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction"
       ],
       "assertions": [
         {
@@ -142312,10 +142523,37 @@
           "tests": [
             "TestCoreStrategyPrerequisiteConstructorFrontiers"
           ]
+        },
+        {
+          "name": "Counted release after failed cleanup/reconstruction checks ownership rather than requiring an executable rewriter, allowing private tactic compositions to unwind their partial child",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/sat_solver/preprocess.go",
+            "pkg/sat/sat_solver/preprocess_test.go",
+            "pkg/sat/tactic/sat_goal_incremental.go",
+            "pkg/sat/tactic/sat_goal_incremental_test.go",
+            "pkg/sat/tactic/sat_goal_to_sat.go",
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_boolean_model.go",
+            "pkg/sat/tactic/sat_tactic_trace.go",
+            "pkg/tactic/core/simplify_tactic.go",
+            "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
+          ],
+          "tests": [
+            "TestIncrementalEncoderPersistentBitBindingsAndUserScopesCPP",
+            "TestIncrementalEncoderPBAndUnsupportedInterpretedAtoms",
+            "TestIncrementalEncoderAllocationFrontiers",
+            "TestIncrementalEncoderProofRefusalAndTacticExceptionScopeRecovery",
+            "TestSATGoalBorrowedAtomMapIncrementalScopesAndOwnership",
+            "TestSATGoalBorrowedAtomMapDependenciesAndPerCallInterpretedAtoms",
+            "TestSATGoalBorrowedAtomMapBooleanModelIncludesEarlierAtoms",
+            "TestSimplifyCountedReleaseAfterFailedCleanupReconstruction"
+          ]
         }
       ],
       "ownership": [
-        "SimplifyTactic borrows the AST manager and parameter/global services; it owns a charged Go header, one copied ParamsRef, and its theory rewriter. Apply pins rewritten expressions and proofs until Goal.Update takes ownership and preserves borrowed dependencies. Tactic results borrow the input goal as in the existing tactic interface. Factory wrappers own child tactic references. Cleanup releases and recreates the rewriter while keeping parameters; Close releases all owned references and is idempotent."
+        "SimplifyTactic borrows the AST manager and parameter/global services; it owns a charged Go header, one copied ParamsRef, and its theory rewriter. Apply pins rewritten expressions and proofs until Goal.Update takes ownership and preserves borrowed dependencies. Tactic results borrow the input goal as in the existing tactic interface. Factory wrappers own child tactic references. Cleanup releases and recreates the rewriter while keeping parameters; Close releases all owned references and is idempotent.",
+        "A failed Cleanup may leave no executable rewriter while the counted tactic still owns parameters/storage. DecRef now validates the owner/closed/reference state without requiring live implementation state, then performs the actual destructor on the final count. A direct regression and preprocessing construction/compile/recompile reservation frontiers verify release after stopped reset."
       ],
       "deviations": [
         "The retained C++ process shares symbol/numeral services across AST managers. Translation supports that domain and refuses unrelated Go service owners instead of dropping parameter settings. The std::move expression in source cleanup resolves to params_ref copy construction (params_ref has no move constructor), so stored settings remain intact. Tactic factory annotations are represented by concrete Go factories; default portfolio composition, public name registration and CLI tactic/fallback integration remain separate incomplete source units. The standalone tactic is checked directly against native apply simplify/elim-and and through the existing TacticSolver."

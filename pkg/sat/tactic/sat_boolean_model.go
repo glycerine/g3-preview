@@ -42,16 +42,21 @@ func BuildBooleanModel(tr *GoalTranslator, values sat.Model) (md *model.ModelCor
 	if err = tr.traceSATModelValues(values); err != nil {
 		return md, err
 	}
-	for h, value := range tr.Atoms.All() {
+	entries, err := tr.atomEntries()
+	if err != nil {
+		return md, err
+	}
+	for _, entry := range entries {
+		h, value := entry.Expr, entry.Variable
 		if err = tr.traceSATModelAtom(h, value); err != nil {
 			return md, err
 		}
-		value, e := values.Read(sat.BoolVar(value))
+		actual, e := values.Read(sat.BoolVar(value))
 		if e != nil {
 			return md, e
 		}
 		var interpretation ast.ASTHandle
-		switch value {
+		switch actual {
 		case lbool.True:
 			interpretation, e = tr.manager.MkTrue()
 		case lbool.False:

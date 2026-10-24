@@ -36,7 +36,12 @@ func (t *SATTactic) traceInterpreted(tr *GoalTranslator, interpreted bool) error
 		if _, err := fmt.Fprintf(w, "interpreted_atoms: %d\n", flag); err != nil {
 			return err
 		}
-		for atom := range tr.Atoms.All() {
+		entries, err := tr.atomEntries()
+		if err != nil {
+			return err
+		}
+		for _, entry := range entries {
+			atom := entry.Expr
 			constant, err := tr.isUninterpretedConstant(atom)
 			if err != nil {
 				return err
@@ -74,7 +79,12 @@ func (t *SATTactic) traceDIMACS(s *sat.Solver) error {
 	})
 }
 func (t *SATTactic) writeDIMACSAtoms(tr *GoalTranslator) error {
-	for atom, v := range tr.Atoms.All() {
+	entries, err := tr.atomEntries()
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		atom, v := entry.Expr, entry.Variable
 		text, err := tr.traceGoalFormula(atom)
 		if err != nil {
 			return err

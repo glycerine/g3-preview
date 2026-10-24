@@ -2330,6 +2330,28 @@
       ]
     },
     {
+      "package": "sat/sat_solver",
+      "imports": [
+        "arena",
+        "ast",
+        "ast/rewriter/bit_blaster",
+        "model",
+        "sat",
+        "sat/tactic",
+        "tactic",
+        "tactic/arith",
+        "tactic/bv",
+        "tactic/core",
+        "util/lbool",
+        "util/memory",
+        "util/params",
+        "util/z3exception"
+      ],
+      "production_files": [
+        "preprocess.go"
+      ]
+    },
+    {
       "package": "sat/tactic",
       "imports": [
         "arena",
@@ -2350,6 +2372,7 @@
       "production_files": [
         "sat_boolean_model.go",
         "sat_goal_dependencies.go",
+        "sat_goal_incremental.go",
         "sat_goal_interface.go",
         "sat_goal_recovery.go",
         "sat_goal_to_sat.go",
