@@ -2990,6 +2990,7 @@
         "util/params"
       ],
       "production_files": [
+        "qfaufbv_tactic.go",
         "qfauflia_tactic.go",
         "qfbv_tactic.go",
         "qfidl_tactic.go",

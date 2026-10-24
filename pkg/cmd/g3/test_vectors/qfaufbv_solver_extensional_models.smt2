@@ -1,0 +1,8 @@
+(set-logic QF_ABV)
+(set-option :produce-models true)
+(declare-const a (Array (_ BitVec 2) (_ BitVec 4)))
+(declare-const b (Array (_ BitVec 2) (_ BitVec 4)))
+(assert (distinct a b))
+(assert (= (select a #b00) (select b #b00)))
+(check-sat)
+(get-value ((distinct a b) (= (select a #b00) (select b #b00))))

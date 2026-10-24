@@ -1,0 +1,8 @@
+(set-logic QF_AUFBV)
+(set-option :produce-proofs true)
+(declare-const a (Array (_ BitVec 4) (_ BitVec 4)))
+(declare-const i (_ BitVec 4))
+(declare-const j (_ BitVec 4))
+(assert (bvult (select a i) (select a j)))
+(assert (bvult (select a j) (select a i)))
+(check-sat-using qfaufbv)

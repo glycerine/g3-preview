@@ -299,6 +299,10 @@ func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 		c.solver, err = portfolio.NewQFLIAStrategicSolverWithOutput(m, &c.params, proofs, models, cores, c.config, contextRegularOutput{c})
 	case "QF_BV":
 		c.solver, err = portfolio.NewQFBVStrategicSolverWithOutput(m, &c.params, proofs, models, cores, c.config, contextRegularOutput{c})
+	case "QF_AUFBV":
+		c.solver, err = portfolio.NewQFAUFBVStrategicSolver(m, &c.params, proofs, models, cores, c.config)
+	case "QF_ABV":
+		c.solver, err = portfolio.NewQFABVStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	default:
 		var direct *smtcore.SMTSolver
 		direct, err = smtcore.NewSMTSolver(m, &c.params, c.logic, c.config)

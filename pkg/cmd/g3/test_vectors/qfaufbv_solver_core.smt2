@@ -1,0 +1,6 @@
+(set-logic QF_AUFBV)
+(set-option :produce-unsat-cores true)
+(declare-const a (Array (_ BitVec 4) (_ BitVec 4)))
+(assert (! (= (bvmul (select a #x0) (select a #x0)) #x2) :named impossible))
+(check-sat)
+(get-unsat-core)

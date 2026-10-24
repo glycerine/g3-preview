@@ -108,3 +108,75 @@ func TestSMTClauseSimplificationRetainsProofReasons(t *testing.T) {
 		t.Fatal("retained clause proof is closed", err)
 	}
 }
+
+func TestSMTClauseSimplificationRetainsWrappedRegionProofReason(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	var expressions []ast.ASTHandle
+	var literals []SMTLiteral
+	for _, name := range []string{"wrapped-reason-a", "wrapped-reason-b", "wrapped-reason-c"} {
+		expression := smtRelevancyBool(t, m, name)
+		astTestMust(t, state.Internalize(expression, true))
+		variable, _ := state.BoolVar(expression)
+		expressions = append(expressions, expression)
+		literals = append(literals, NewSMTLiteral(variable, false))
+	}
+	fact, err := m.MkOrArgs(expressions)
+	astTestMust(t, err)
+	proof, err := m.MkProofHypothesis(fact)
+	astTestMust(t, err)
+	astTestMust(t, state.addClause(literals, false, proof))
+	astTestMust(t, state.AssignLiteral(literals[2].Negated(), NewSMTBooleanAxiom()))
+	consistent, err := state.PropagateCore()
+	astTestMust(t, err)
+	if !consistent {
+		t.Fatal("unexpected first propagation conflict")
+	}
+	deleted, err := state.simplifyClause(&state.clauses[0])
+	astTestMust(t, err)
+	if deleted {
+		t.Fatal("partially simplified clause was deleted")
+	}
+	if _, wrapped := state.clauses[0].clause.Justification().(*SMTUnitResolutionJustification); !wrapped {
+		t.Fatal("false tail did not wrap the original region proof")
+	}
+	astTestMust(t, state.AssignLiteral(literals[1].Negated(), NewSMTBooleanAxiom()))
+	consistent, err = state.PropagateCore()
+	astTestMust(t, err)
+	if !consistent {
+		t.Fatal("unexpected second propagation conflict")
+	}
+	astTestMust(t, state.simplifyClausesAtBase(0))
+	if len(state.clauses) != 0 {
+		t.Fatal("satisfied clause was not deleted")
+	}
+	justification, found := state.booleanData[literals[0].Var()].Justification().Justification()
+	if !found {
+		t.Fatal("missing surviving propagation reason")
+	}
+	for {
+		if unit, ok := justification.(*SMTUnitResolutionJustification); ok {
+			justification = unit.Antecedent
+			continue
+		}
+		wrapper, ok := justification.(*SMTJustificationProofWrapper)
+		if !ok {
+			t.Fatal("missing original proof wrapper")
+		}
+		retained, err := wrapper.Proof()
+		astTestMust(t, err)
+		if retained != proof {
+			t.Fatal("original proof was replaced")
+		}
+		break
+	}
+	builder := &smtConflictProofBuilder{state: state, marked: make(map[int32]struct{}), literal: make(map[SMTLiteral]ast.ASTHandle), objects: make(map[SMTJustification]ast.ASTHandle), equality: make(map[smtEnodePairKey]ast.ASTHandle)}
+	result, err := builder.literalProof(literals[0])
+	astTestMust(t, err)
+	got, err := m.GetProofFact(result)
+	astTestMust(t, err)
+	if got != expressions[0] {
+		t.Fatal("surviving proof has the wrong fact")
+	}
+}

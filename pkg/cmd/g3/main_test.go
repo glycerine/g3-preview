@@ -27,12 +27,21 @@ func TestSMTLibRunnerQFBVBranchEvidence(t *testing.T) {
 	testArithmeticStrategyBranchEvidence(t, "qfbv")
 }
 
+func TestSMTLibRunnerQFAUFBVBranchEvidence(t *testing.T) {
+	testArithmeticStrategyBranchEvidence(t, "qfaufbv")
+}
+
 func testArithmeticStrategyBranchEvidence(t *testing.T, prefix string) {
 	t.Helper()
 	cases := []struct {
 		name            string
 		require, forbid []string
 	}{
+		{"qfaufbv_models_scopes.smt2", []string{"(bv-size-reduction ", "(max-bv-sharing ", "(smt.tactic start)"}, []string{"(sat-status"}},
+		{"qfaufbv_solver_models_scopes.smt2", []string{"(bv-size-reduction ", "(max-bv-sharing ", "(smt.tactic start)"}, []string{"(sat-status"}},
+		{"qfaufbv_extensional_models.smt2", []string{"(bv-size-reduction ", "(max-bv-sharing ", "(smt.tactic start)"}, []string{"(sat-status"}},
+		{"qfaufbv_core.smt2", []string{"(max-bv-sharing ", "(smt.tactic start)"}, []string{"(bv-size-reduction ", "(sat-status"}},
+		{"qfaufbv_proof.smt2", []string{"(max-bv-sharing ", "(smt.tactic start)"}, []string{"(bv-size-reduction ", "(sat-status"}},
 		{"qfbv_sat_models_scopes.smt2", []string{"(ackermannize ", "(bit-blaster ", "(aig ", "(sat-status"}, []string{"(bv1-blaster "}},
 		{"qfbv_solver_sat_models_scopes.smt2", []string{"(ackermannize ", "(bit-blaster ", "(aig ", "(sat-status"}, []string{"(bv1-blaster "}},
 		{"qfbv_equality_models.smt2", []string{"(bv1-blaster ", "(smt.tactic start)"}, []string{"(bit-blaster ", "(sat-status"}},
@@ -206,6 +215,16 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"qfaufbv_core.smt2":                            "unsat\n(impossible)\n",
+	"qfaufbv_extensional_models.smt2":              "sat\n(((distinct a b) true)\n ((= (select a #b00) (select b #b00)) true))\n",
+	"qfaufbv_limits_recovery.smt2":                 "unknown\n(:reason-unknown \"max. steps exceeded\")\nsat\n(((= (bvmul (select a i) (select a i)) #x9) true))\n",
+	"qfaufbv_models_scopes.smt2":                   "sat\n(((= (select a i) #x23) true)\n ((= (select a j) #x45) true)\n ((bvult (f i) (f j)) true)\n ((bvult i j) true))\nunsat\nsat\n(((= (select a i) #x23) true)\n ((= (select a j) #x45) true)\n ((bvult (f i) (f j)) true))\n",
+	"qfaufbv_proof.smt2":                           "unsat\n",
+	"qfaufbv_solver_core.smt2":                     "unsat\n(impossible)\n",
+	"qfaufbv_solver_extensional_models.smt2":       "sat\n(((distinct a b) true)\n ((= (select a #b00) (select b #b00)) true))\n",
+	"qfaufbv_solver_models_scopes.smt2":            "sat\n(((= (select a i) #x23) true)\n ((= (select a j) #x45) true)\n ((bvult (f i) (f j)) true)\n ((bvult i j) true))\nunsat\nsat\n(((= (select a i) #x23) true)\n ((= (select a j) #x45) true)\n ((bvult (f i) (f j)) true))\n",
+	"qfaufbv_solver_proof.smt2":                    "unsat\n",
+	"qfaufbv_store_sort_models.smt2":               "sat\n(((= (select b i) #x01) true)\n ((= (select b j) #x02) true)\n ((bvult i j) true))\n",
 	"qfbv_limits_recovery.smt2":                    "unknown\n(:reason-unknown \"max. steps exceeded\")\nsat\n(((= (bvmul x y) #x6) true)\n ((bvult x y) true))\n",
 	"qfbv_core.smt2":                               "unsat\n(impossible)\n",
 	"qfbv_div0_fallback.smt2":                      "sat\n(((bvult (bvudiv x #x0) (bvudiv y #x0)) false)\n ((distinct x y) true))\n",

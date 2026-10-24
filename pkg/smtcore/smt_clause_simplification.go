@@ -50,11 +50,13 @@ func (s *SMTInternalizerState) replaceSatisfiedClauseReasons(record *SMTInternal
 				return err
 			}
 			s.ownedJustifications = append(s.ownedJustifications, updated)
-		} else if record.owner == antecedent {
+		} else if record.owner != nil {
 			// Auxiliary clauses normally own their region proof wrapper through
-			// the record. The replacement reason still borrows that wrapper.
+			// the record. Earlier simplification can wrap it in unit-resolution
+			// reasons, so the original owner may be below antecedent in the
+			// chain. The replacement reason still borrows that original owner.
+			s.ownedJustifications = append(s.ownedJustifications, record.owner)
 			record.owner = nil
-			s.ownedJustifications = append(s.ownedJustifications, antecedent)
 		}
 	}
 	return nil
