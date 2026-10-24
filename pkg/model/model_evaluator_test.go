@@ -15,6 +15,10 @@ import (
 )
 
 func evaluatorFixture(t *testing.T) (*ast.ASTManager, *model.Model, *model.ModelEvaluator, *uparams.ParamsContext, *uparams.ParamsRef, model.ModelEvaluatorConfig) {
+	return evaluatorFixturePlugins(t, true)
+}
+
+func evaluatorFixturePlugins(t *testing.T, installPlugins bool) (*ast.ASTManager, *model.Model, *model.ModelEvaluator, *uparams.ParamsContext, *uparams.ParamsRef, model.ModelEvaluatorConfig) {
 	c, sy, q := paramsTestOwner(t)
 	b := arena.NewBudget(^uint64(0))
 	catalog, e := uparams.NewGlobalParamsCatalog(sy, uparams.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
@@ -41,6 +45,9 @@ func evaluatorFixture(t *testing.T) (*ast.ASTManager, *model.Model, *model.Model
 	m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
 	astTestMust(t, e)
 	t.Cleanup(func() { astTestMust(t, m.Close()) })
+	if installPlugins {
+		astTestMust(t, m.RegisterDeclarationPlugins())
+	}
 	md, e := model.NewModel(m)
 	astTestMust(t, e)
 	t.Cleanup(func() { astTestMust(t, md.Close()) })

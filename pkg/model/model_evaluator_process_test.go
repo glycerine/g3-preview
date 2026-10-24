@@ -70,6 +70,7 @@ func TestModelEvaluatorSharedProcessMemoryAndCohort(t *testing.T) {
 	astTestMust(t, foreignAST.Close())
 	astTestMust(t, foreignNumerals.Close())
 	astTestMust(t, foreignRuntime.Close())
+	astTestMust(t, m.RegisterDeclarationPlugins())
 	ev, e := model.NewModelEvaluator(md.Core(), config)
 	astTestMust(t, e)
 	sort, e := m.MkBoolSort()

@@ -412,12 +412,14 @@ digraph packages {
   "tactic/bv" -> "arena";
   "tactic/bv" -> "ast";
   "tactic/bv" -> "ast/rewriter";
+  "tactic/bv" -> "model";
   "tactic/bv" -> "tactic";
   "tactic/bv" -> "util/cooperate";
   "tactic/bv" -> "util/diagnostic";
   "tactic/bv" -> "util/memory";
   "tactic/bv" -> "util/params";
   "tactic/bv" -> "util/symbol";
+  "tactic/bv" -> "util/text";
   "tactic/core" [style=filled, fillcolor="#eeeeee"];
   "tactic/core" -> "arena";
   "tactic/core" -> "ast";

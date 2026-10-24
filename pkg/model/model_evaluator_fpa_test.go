@@ -9,11 +9,14 @@ import (
 )
 
 func TestModelEvaluatorFPAEqualityAndApplicationReduction(t *testing.T) {
-	m, _, ev, _, _, _ := evaluatorFixture(t)
+	// Release permits a utility with no FPA plugin; source debug utility
+	// construction asserts plugin presence. Preserve the release regression
+	// while exercising the full reducer under the valid debug setup.
+	m, _, ev, _, _, _ := evaluatorFixturePlugins(t, ast.ASTSourceDebug)
 	prior, err := m.ExistingFloatingPointFamilyID()
 	astTestMust(t, err)
-	if prior != ast.NullFamilyID {
-		t.Fatal("floating-point plugin unexpectedly registered")
+	if (prior != ast.NullFamilyID) != ast.ASTSourceDebug {
+		t.Fatal("floating-point plugin initialization profile", prior)
 	}
 	plainDecl := modelTestFunctionDecl(t, m, "eval-before-fpa")
 	plainArg, err := m.MkTrue()
