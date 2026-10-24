@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -33,6 +34,7 @@ type SolveEquationsTactic struct {
 	maxOccurrences                 uint32
 	steps, eliminated, refs        uint32
 	ownerBytes                     uint64
+	trace                          *diagnostic.TraceTags
 	proofs, cores, models, closed  bool
 }
 
@@ -232,7 +234,12 @@ func (t *SolveEquationsTactic) Translate(m *ast.ASTManager) (tactic.Tactic, erro
 	if err := t.open(); err != nil {
 		return nil, err
 	}
-	return NewSolveEquationsTactic(m, t.context, t.globals, &t.params, t.services)
+	translated, err := NewSolveEquationsTactic(m, t.context, t.globals, &t.params, t.services)
+	if err != nil {
+		return nil, err
+	}
+	translated.trace = t.trace
+	return translated, nil
 }
 func (t *SolveEquationsTactic) Close() error {
 	if t == nil || t.self != t {
@@ -344,6 +351,9 @@ func (t *SolveEquationsTactic) Apply(goal *tactic.Goal, result *tactic.TacticRes
 				}
 				break
 			}
+			if err = t.reportEliminations(); err != nil {
+				return err
+			}
 			t.eliminated += uint32(len(t.ordered))
 			if t.models {
 				if converter == nil {
@@ -369,12 +379,18 @@ func (t *SolveEquationsTactic) Apply(goal *tactic.Goal, result *tactic.TacticRes
 					}
 				}
 			}
+			if err = t.traceRound(goal, converter); err != nil {
+				return err
+			}
 		}
 	}
 	if err = goal.IncDepth(); err != nil {
 		return err
 	}
 	if err = result.AddGoal(goal); err != nil {
+		return err
+	}
+	if err = t.traceGoal("solve_eqs", "operator()", 780, "", goal); err != nil {
 		return err
 	}
 	if sorted, e := goal.IsWellSorted(); e != nil {
@@ -403,8 +419,15 @@ func (t *SolveEquationsTactic) collectOccurrences(goal *tactic.Goal) error {
 	}
 	return t.occs.CountAll(forms)
 }
-func (t *SolveEquationsTactic) checkOccurrences(term ast.ASTHandle) bool {
-	return t.maxOccurrences == ^uint32(0) || t.occs.GetNumOccurrences(term) <= t.maxOccurrences
+func (t *SolveEquationsTactic) checkOccurrences(term ast.ASTHandle) (bool, error) {
+	if t.maxOccurrences == ^uint32(0) {
+		return true, nil
+	}
+	num := t.occs.GetNumOccurrences(term)
+	if err := t.traceOccurrences(term, num); err != nil {
+		return false, err
+	}
+	return num <= t.maxOccurrences, nil
 }
 func (t *SolveEquationsTactic) find(s ast.ASTExprSubstitution, key ast.ASTHandle) (def, proof ast.ASTHandle, dep ast.ASTDependency, err error) {
 	found, err := t.manager.ExprSubstitutionFindDependency(s, key, &def, &proof, &dep)
@@ -440,7 +463,7 @@ func (t *SolveEquationsTactic) collect(goal *tactic.Goal) error {
 		}
 		t.steps++
 	}
-	return nil
+	return t.traceVariables("collect", 428, "candidate vars:\n", t.variables)
 }
 func (t *SolveEquationsTactic) collectCandidate(goal *tactic.Goal, index uint32) (err error) {
 	frame := solveEquationFrame{manager: t.manager}
@@ -570,7 +593,10 @@ func (t *SolveEquationsTactic) normalize() (err error) {
 			return err
 		}
 	}
-	return t.manager.ExprSubstitutionReset(t.substitution)
+	if err = t.manager.ExprSubstitutionReset(t.substitution); err != nil {
+		return err
+	}
+	return t.traceNormalized()
 }
 
 func (t *SolveEquationsTactic) substitute(goal *tactic.Goal) (err error) {
@@ -598,6 +624,9 @@ func (t *SolveEquationsTactic) substitute(goal *tactic.Goal) (err error) {
 		f, e := goal.Form(i)
 		if e != nil {
 			return e
+		}
+		if err = t.traceExpression("gaussian_leak", "substitute", 642, "processing:\n", f); err != nil {
+			return err
 		}
 		if t.candidateSet[f] {
 			delete(t.candidateSet, f)
@@ -629,6 +658,9 @@ func (t *SolveEquationsTactic) substitute(goal *tactic.Goal) (err error) {
 		err = func() error {
 			value, e := t.manager.RefGet(out)
 			if e != nil {
+				return e
+			}
+			if e = t.traceSubstitution(f, value); e != nil {
 				return e
 			}
 			pr, e := t.manager.RefGet(proof)
@@ -676,5 +708,8 @@ func (t *SolveEquationsTactic) substitute(goal *tactic.Goal) (err error) {
 			return e
 		}
 	}
-	return goal.ElimTrue()
+	if err = goal.ElimTrue(); err != nil {
+		return err
+	}
+	return t.traceGoal("solve_eqs", "substitute", 666, "after applying substitution\n", goal)
 }

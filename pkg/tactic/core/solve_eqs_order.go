@@ -4,6 +4,7 @@ package core
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/ast"
+	"io"
 )
 
 type solveEquationFrame struct {
@@ -81,6 +82,12 @@ func (t *SolveEquationsTactic) children(term ast.ASTHandle) ([]ast.ASTHandle, er
 }
 
 func (t *SolveEquationsTactic) sortVariables() (err error) {
+	if err = t.emit("solve_eqs_bug", "sort_vars", 438, func(out io.Writer) error {
+		_, e := io.WriteString(out, "sorting vars...\n")
+		return e
+	}); err != nil {
+		return err
+	}
 	t.ordered = nil
 	saved := solveEquationFrame{manager: t.manager}
 	defer func() { err = errors.Join(err, saved.Close()) }()
@@ -101,6 +108,9 @@ func (t *SolveEquationsTactic) sortVariables() (err error) {
 			last := len(todo) - 1
 			term := todo[last].term
 			t.steps++
+			if err = t.traceExpression("solve_eqs_bug", "sort_vars", 466, "processing:\n", term); err != nil {
+				return err
+			}
 			count, e := t.manager.GetRefCount(term)
 			if e != nil {
 				return e
@@ -185,6 +195,9 @@ func (t *SolveEquationsTactic) sortVariables() (err error) {
 		if !t.candidateVars[v] {
 			delete(t.candidateSet, t.candidates[i])
 		}
+	}
+	if err = t.traceVariables("sort_vars", 569, "ordered vars:\n", t.ordered); err != nil {
+		return err
 	}
 	clear(t.candidateVars)
 	return nil

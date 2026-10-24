@@ -133713,7 +133713,7 @@
       "path": "src/tactic/core/solve_eqs_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/core/solve_eqs_tactic.go",
         "pkg/tactic/core/solve_eqs_candidates.go",
@@ -133723,7 +133723,9 @@
         "pkg/cmd_context/tactic_commands.go",
         "pkg/tactic/tactic_extension_model.go",
         "pkg/ast/rewriter/expr_replacer.go",
-        "pkg/ast/ast_num_occurs.go"
+        "pkg/ast/ast_num_occurs.go",
+        "pkg/tactic/core/solve_eqs_trace.go",
+        "pkg/tactic/core/solve_eqs_trace_test.go"
       ],
       "tests": [
         "TestSolveEquationsBooleanDefinitionsAndIndependentModel",
@@ -133734,7 +133736,9 @@
         "TestSolveEquationsOccurrenceLimitAndLiteralException",
         "TestSolveEquationsITEOrientationsAndPolicy",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSolveEquationsExactTraceAndVerbose",
+        "TestSolveEquationsSortTraceAndStreamRefusal"
       ],
       "conditionals": [
         {
@@ -133961,8 +133965,19 @@
           ]
         },
         {
-          "name": "remaining solve_eqs/solve_eqs_bug/solve_eqs_bug2/solve_eqs_subst/solve_eqs_round/gaussian_leak traces and verbose round/elimination diagnostics",
-          "status": "unported"
+          "name": "All live solve_eqs, solve_eqs_check_occs, solve_eqs_bug, solve_eqs_bug2, solve_eqs_subst, solve_eqs_round and gaussian_leak diagnostic sites, source expression/goal/model-converter formatting, verbose elimination output, erased-trace behavior and stream-failure tolerance",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/solve_eqs_trace.go",
+          "go_targets": [
+            "pkg/tactic/core/solve_eqs_tactic.go",
+            "pkg/tactic/core/solve_eqs_order.go",
+            "pkg/tactic/core/solve_eqs_candidates.go",
+            "pkg/tactic/core/solve_eqs_trace_test.go"
+          ],
+          "tests": [
+            "TestSolveEquationsExactTraceAndVerbose",
+            "TestSolveEquationsSortTraceAndStreamRefusal"
+          ]
         }
       ],
       "ownership": [

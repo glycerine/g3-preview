@@ -46,7 +46,14 @@ func (t *SolveEquationsTactic) trivial(left, right ast.ASTHandle) (solvedEquatio
 		if err != nil {
 			return solvedEquation{}, false, err
 		}
-		if occurs || !t.checkOccurrences(pair[0]) {
+		if occurs {
+			continue
+		}
+		acceptable, err := t.checkOccurrences(pair[0])
+		if err != nil {
+			return solvedEquation{}, false, err
+		}
+		if !acceptable {
 			continue
 		}
 		solution := solvedEquation{variable: pair[0], definition: pair[1]}
@@ -163,6 +170,11 @@ func (t *SolveEquationsTactic) solve(term ast.ASTHandle, frame *solveEquationFra
 			return solution, false, err
 		}
 	}
+	if !negative {
+		if err = t.traceExpression("solve_eqs_bug2", "solve", 369, "eliminating: ", term); err != nil {
+			return solution, false, err
+		}
+	}
 	return solution, true, nil
 }
 
@@ -225,7 +237,14 @@ func (t *SolveEquationsTactic) solveITE(term ast.ASTHandle, frame *solveEquation
 				break
 			}
 		}
-		if occurs || !t.checkOccurrences(variable) {
+		if occurs {
+			continue
+		}
+		acceptable, e := t.checkOccurrences(variable)
+		if e != nil {
+			return solvedEquation{}, false, e
+		}
+		if !acceptable {
 			continue
 		}
 		definition, e := m.MkIte(condition, left, right)
@@ -379,7 +398,14 @@ func (t *SolveEquationsTactic) solveArithmeticSum(lhs, rhs, equation ast.ASTHand
 				return solution, false, err
 			}
 		}
-		if t.candidateVars[candidate] || !t.checkOccurrences(candidate) {
+		if t.candidateVars[candidate] {
+			continue
+		}
+		acceptable, e := t.checkOccurrences(candidate)
+		if e != nil {
+			return solution, false, e
+		}
+		if !acceptable {
 			continue
 		}
 		occurs, e := t.occursElsewhere(candidate, args, i, rhs)
