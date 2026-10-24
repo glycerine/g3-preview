@@ -2148,6 +2148,7 @@
         "arena",
         "ast",
         "ast/rewriter",
+        "model",
         "tactic",
         "util/cooperate",
         "util/diagnostic",
@@ -2182,6 +2183,8 @@
         "lite_tactic.go",
         "lite_traversal.go",
         "occurs.go",
+        "predicate_abstraction.go",
+        "predicate_assumptions.go",
         "trace.go",
         "variable_selection.go"
       ]

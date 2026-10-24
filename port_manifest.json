@@ -93078,9 +93078,24 @@
       "path": "src/qe/qsat.cpp",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/qe/predicate_abstraction.go",
+        "pkg/qe/predicate_assumptions.go",
+        "pkg/qe/predicate_abstraction_test.go",
+        "pkg/qe/predicate_abstraction_cpp_test.go"
+      ],
+      "tests": [
+        "TestMaxLevelSentinelMergeAndDisplay",
+        "TestPredicateAbstractionLevelsRoundTripAndReset",
+        "TestPredicateAbstractionSimultaneousMapsAndPredicateSuppression",
+        "TestPredicateAbstractionScopedModelAssumptions",
+        "TestPredicateAbstractionAssumptionDefinitionsAndModelFiltering",
+        "TestPredicateAbstractionFreeVariablesValidationAndGuards",
+        "TestPredicateAbstractionAllocationFrontiers",
+        "TestPredicateAbstractionDisplay",
+        "TestPredicateAbstractionCPPDefinitionEquivalence"
+      ],
       "conditionals": [
         {
           "line": 1078,
@@ -93251,17 +93266,91 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "max_level: UINT_MAX sentinel, existential/universal maximum and merge, structural equality and e/a display",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/predicate_abstraction.go",
+            "pkg/qe/predicate_assumptions.go",
+            "pkg/qe/predicate_abstraction_test.go"
+          ],
+          "tests": [
+            "TestMaxLevelSentinelMergeAndDisplay"
+          ]
+        },
+        {
+          "name": "pred_abs: constructor/reset, application/declaration levels, bottom-up memoized level propagation, predicate maps and fresh filtered Boolean declarations, atomic abstraction, simultaneous concrete/abstract rebuilding, body-only free-constant extraction and statistics/display",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/predicate_abstraction.go",
+            "pkg/qe/predicate_assumptions.go",
+            "pkg/qe/predicate_abstraction_test.go",
+            "pkg/qe/predicate_abstraction_cpp_test.go"
+          ],
+          "tests": [
+            "TestMaxLevelSentinelMergeAndDisplay",
+            "TestPredicateAbstractionLevelsRoundTripAndReset",
+            "TestPredicateAbstractionSimultaneousMapsAndPredicateSuppression",
+            "TestPredicateAbstractionScopedModelAssumptions",
+            "TestPredicateAbstractionAssumptionDefinitionsAndModelFiltering",
+            "TestPredicateAbstractionFreeVariablesValidationAndGuards",
+            "TestPredicateAbstractionAllocationFrontiers",
+            "TestPredicateAbstractionDisplay",
+            "TestPredicateAbstractionCPPDefinitionEquivalence"
+          ]
+        },
+        {
+          "name": "pred_abs: scoped model-based assumptions with alternating future levels, polarity-aware assumption literals and model registration, definition validation, borrowed filter-model converter and explicit native destruction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/predicate_abstraction.go",
+            "pkg/qe/predicate_assumptions.go",
+            "pkg/qe/predicate_abstraction_test.go",
+            "pkg/qe/predicate_abstraction_cpp_test.go"
+          ],
+          "tests": [
+            "TestMaxLevelSentinelMergeAndDisplay",
+            "TestPredicateAbstractionLevelsRoundTripAndReset",
+            "TestPredicateAbstractionSimultaneousMapsAndPredicateSuppression",
+            "TestPredicateAbstractionScopedModelAssumptions",
+            "TestPredicateAbstractionAssumptionDefinitionsAndModelFiltering",
+            "TestPredicateAbstractionFreeVariablesValidationAndGuards",
+            "TestPredicateAbstractionAllocationFrontiers",
+            "TestPredicateAbstractionDisplay",
+            "TestPredicateAbstractionCPPDefinitionEquivalence"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete map-key ASTRefs, formula trail, per-level predicate ASTRefs, scoped assumption ASTRefs and a counted filter-model converter preserve the actual source owners. Reset preserves declaration levels and the filter, matching source; final Close releases the filter count and enclosing charge. Caller output vector appends and completed replacements remain owned on errors. Pending lexical formula references, model evaluators and construction-failure receipts are retained until cleanup succeeds. Eleven first-success campaigns cover constructor, abstraction, rebuilding, assumption creation/retrieval, validation, display, open/closed tracing, model tracing and final close, releasing all charged fixture storage."
+      ],
+      "deviations": [
+        "Only max_level and pred_abs are ported. The QSAT kernel, quantifier preparation, projection/search loop, tactics/factories, QE modes, qmax and maximize entry point remain unported, pending model-based projection and full QE prerequisites. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule."
+      ]
     },
     {
       "path": "src/qe/qsat.h",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/qe/predicate_abstraction.go",
+        "pkg/qe/predicate_assumptions.go",
+        "pkg/qe/predicate_abstraction_test.go",
+        "pkg/qe/predicate_abstraction_cpp_test.go"
+      ],
+      "tests": [
+        "TestMaxLevelSentinelMergeAndDisplay",
+        "TestPredicateAbstractionLevelsRoundTripAndReset",
+        "TestPredicateAbstractionSimultaneousMapsAndPredicateSuppression",
+        "TestPredicateAbstractionScopedModelAssumptions",
+        "TestPredicateAbstractionAssumptionDefinitionsAndModelFiltering",
+        "TestPredicateAbstractionFreeVariablesValidationAndGuards",
+        "TestPredicateAbstractionAllocationFrontiers",
+        "TestPredicateAbstractionDisplay",
+        "TestPredicateAbstractionCPPDefinitionEquivalence"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -93274,9 +93363,68 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "max_level: UINT_MAX sentinel, existential/universal maximum and merge, structural equality and e/a display",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/predicate_abstraction.go",
+            "pkg/qe/predicate_assumptions.go",
+            "pkg/qe/predicate_abstraction_test.go"
+          ],
+          "tests": [
+            "TestMaxLevelSentinelMergeAndDisplay"
+          ]
+        },
+        {
+          "name": "pred_abs: constructor/reset, application/declaration levels, bottom-up memoized level propagation, predicate maps and fresh filtered Boolean declarations, atomic abstraction, simultaneous concrete/abstract rebuilding, body-only free-constant extraction and statistics/display",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/predicate_abstraction.go",
+            "pkg/qe/predicate_assumptions.go",
+            "pkg/qe/predicate_abstraction_test.go",
+            "pkg/qe/predicate_abstraction_cpp_test.go"
+          ],
+          "tests": [
+            "TestMaxLevelSentinelMergeAndDisplay",
+            "TestPredicateAbstractionLevelsRoundTripAndReset",
+            "TestPredicateAbstractionSimultaneousMapsAndPredicateSuppression",
+            "TestPredicateAbstractionScopedModelAssumptions",
+            "TestPredicateAbstractionAssumptionDefinitionsAndModelFiltering",
+            "TestPredicateAbstractionFreeVariablesValidationAndGuards",
+            "TestPredicateAbstractionAllocationFrontiers",
+            "TestPredicateAbstractionDisplay",
+            "TestPredicateAbstractionCPPDefinitionEquivalence"
+          ]
+        },
+        {
+          "name": "pred_abs: scoped model-based assumptions with alternating future levels, polarity-aware assumption literals and model registration, definition validation, borrowed filter-model converter and explicit native destruction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/predicate_abstraction.go",
+            "pkg/qe/predicate_assumptions.go",
+            "pkg/qe/predicate_abstraction_test.go",
+            "pkg/qe/predicate_abstraction_cpp_test.go"
+          ],
+          "tests": [
+            "TestMaxLevelSentinelMergeAndDisplay",
+            "TestPredicateAbstractionLevelsRoundTripAndReset",
+            "TestPredicateAbstractionSimultaneousMapsAndPredicateSuppression",
+            "TestPredicateAbstractionScopedModelAssumptions",
+            "TestPredicateAbstractionAssumptionDefinitionsAndModelFiltering",
+            "TestPredicateAbstractionFreeVariablesValidationAndGuards",
+            "TestPredicateAbstractionAllocationFrontiers",
+            "TestPredicateAbstractionDisplay",
+            "TestPredicateAbstractionCPPDefinitionEquivalence"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete map-key ASTRefs, formula trail, per-level predicate ASTRefs, scoped assumption ASTRefs and a counted filter-model converter preserve the actual source owners. Reset preserves declaration levels and the filter, matching source; final Close releases the filter count and enclosing charge. Caller output vector appends and completed replacements remain owned on errors. Pending lexical formula references, model evaluators and construction-failure receipts are retained until cleanup succeeds. Eleven first-success campaigns cover constructor, abstraction, rebuilding, assumption creation/retrieval, validation, display, open/closed tracing, model tracing and final close, releasing all charged fixture storage."
+      ],
+      "deviations": [
+        "Only max_level and pred_abs are ported. The QSAT kernel, quantifier preparation, projection/search loop, tactics/factories, QE modes, qmax and maximize entry point remain unported, pending model-based projection and full QE prerequisites. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule."
+      ]
     },
     {
       "path": "src/sat/CMakeLists.txt",

@@ -295,6 +295,7 @@ digraph packages {
   "qe" -> "arena";
   "qe" -> "ast";
   "qe" -> "ast/rewriter";
+  "qe" -> "model";
   "qe" -> "tactic";
   "qe" -> "util/cooperate";
   "qe" -> "util/diagnostic";
