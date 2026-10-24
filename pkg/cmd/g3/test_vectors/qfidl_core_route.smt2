@@ -1,0 +1,7 @@
+(set-logic QF_IDL)
+(set-option :produce-unsat-cores true)
+(declare-const x Int)
+(assert (! (>= x 3) :named lo))
+(assert (! (<= x 2) :named hi))
+(check-sat-using qfidl)
+(get-unsat-core)

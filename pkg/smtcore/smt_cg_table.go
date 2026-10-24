@@ -2,7 +2,41 @@
 // src/smt/smt_cg_table.cpp.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"encoding/binary"
+	"github.com/glycerine/g3/pkg/ast"
+)
+
+// Native Go signature keys replace the source per-declaration unary, binary,
+// commutative-binary and n-ary hash tables. Binary keys use root pointers
+// directly; n-ary suffix owner identities select collision buckets whose
+// entries still pass the exact source congruence comparison.
+type smtCongruenceKey struct {
+	first, second *SMTEnode
+	tail          string
+}
+type smtCongruenceBucket struct {
+	id      uint32
+	entries map[smtCongruenceKey][]*SMTEnode
+}
+
+func smtCongruenceSignature(node *SMTEnode) smtCongruenceKey {
+	key := smtCongruenceKey{first: node.arguments[0].root}
+	if len(node.arguments) > 1 {
+		key.second = node.arguments[1].root
+	}
+	if len(node.arguments) > 2 {
+		data := make([]byte, 0, 16*(len(node.arguments)-2))
+		for _, arg := range node.arguments[2:] {
+			h := arg.root.owner
+			data = binary.LittleEndian.AppendUint64(data, h.Origin())
+			data = binary.LittleEndian.AppendUint32(data, h.Slot())
+			data = binary.LittleEndian.AppendUint32(data, h.Generation())
+		}
+		key.tail = string(data)
+	}
+	return key
+}
 
 type SMTCongruenceInsertResult struct {
 	Node     *SMTEnode
@@ -12,7 +46,7 @@ type SMTCongruenceInsertResult struct {
 type SMTCongruenceTable struct {
 	self         *SMTCongruenceTable
 	manager      *ast.ASTManager
-	tables       map[ast.ASTHandle][]*SMTEnode
+	tables       map[ast.ASTHandle]*smtCongruenceBucket
 	declarations []ast.ASTHandle
 	resetIndex   int
 	closed       bool
@@ -22,7 +56,7 @@ func NewSMTCongruenceTable(manager *ast.ASTManager) (*SMTCongruenceTable, error)
 	if manager == nil {
 		return nil, ast.ErrASTDomain
 	}
-	table := &SMTCongruenceTable{manager: manager, tables: make(map[ast.ASTHandle][]*SMTEnode)}
+	table := &SMTCongruenceTable{manager: manager, tables: make(map[ast.ASTHandle]*smtCongruenceBucket)}
 	table.self = table
 	return table, nil
 }
@@ -45,7 +79,8 @@ func (t *SMTCongruenceTable) validateNode(node *SMTEnode) error {
 }
 
 func (t *SMTCongruenceTable) ensureTable(node *SMTEnode) error {
-	if _, found := t.tables[node.declaration]; found {
+	if bucket, found := t.tables[node.declaration]; found {
+		node.functionDeclID = bucket.id
 		return nil
 	}
 	if err := t.manager.IncRef(node.declaration); err != nil {
@@ -53,7 +88,7 @@ func (t *SMTCongruenceTable) ensureTable(node *SMTEnode) error {
 	}
 	node.functionDeclID = uint32(len(t.declarations))
 	t.declarations = append(t.declarations, node.declaration)
-	t.tables[node.declaration] = nil
+	t.tables[node.declaration] = &smtCongruenceBucket{id: node.functionDeclID, entries: make(map[smtCongruenceKey][]*SMTEnode)}
 	return nil
 }
 
@@ -64,16 +99,14 @@ func (t *SMTCongruenceTable) Insert(node *SMTEnode) (SMTCongruenceInsertResult, 
 	if err := t.ensureTable(node); err != nil {
 		return SMTCongruenceInsertResult{}, err
 	}
-	for _, candidate := range t.tables[node.declaration] {
-		congruent, commuted, err := SMTEnodesCongruent(candidate, node)
-		if err != nil {
-			return SMTCongruenceInsertResult{}, err
-		}
-		if congruent {
-			return SMTCongruenceInsertResult{Node: candidate, Commuted: commuted}, nil
-		}
+	if candidate, commuted, err := t.Find(node); err != nil {
+		return SMTCongruenceInsertResult{}, err
+	} else if candidate != nil {
+		return SMTCongruenceInsertResult{Node: candidate, Commuted: commuted}, nil
 	}
-	t.tables[node.declaration] = append(t.tables[node.declaration], node)
+	key := smtCongruenceSignature(node)
+	bucket := t.tables[node.declaration]
+	bucket.entries[key] = append(bucket.entries[key], node)
 	return SMTCongruenceInsertResult{Node: node}, nil
 }
 
@@ -81,7 +114,23 @@ func (t *SMTCongruenceTable) Find(node *SMTEnode) (*SMTEnode, bool, error) {
 	if err := t.validateNode(node); err != nil {
 		return nil, false, err
 	}
-	for _, candidate := range t.tables[node.declaration] {
+	bucket := t.tables[node.declaration]
+	if bucket == nil {
+		return nil, false, nil
+	}
+	key := smtCongruenceSignature(node)
+	if found, commuted, err := smtFindCongruence(bucket.entries[key], node); found != nil || err != nil {
+		return found, commuted, err
+	}
+	if node.commutative && len(node.arguments) == 2 && key.first != key.second {
+		key.first, key.second = key.second, key.first
+		return smtFindCongruence(bucket.entries[key], node)
+	}
+	return nil, false, nil
+}
+
+func smtFindCongruence(entries []*SMTEnode, node *SMTEnode) (*SMTEnode, bool, error) {
+	for _, candidate := range entries {
 		congruent, commuted, err := SMTEnodesCongruent(candidate, node)
 		if err != nil {
 			return nil, false, err
@@ -107,18 +156,27 @@ func (t *SMTCongruenceTable) Erase(node *SMTEnode) (bool, error) {
 	if err := t.validateNode(node); err != nil {
 		return false, err
 	}
-	bucket := t.tables[node.declaration]
-	for i, candidate := range bucket {
-		congruent, _, err := SMTEnodesCongruent(candidate, node)
-		if err != nil {
-			return false, err
-		}
-		if !congruent {
+	candidate, _, err := t.Find(node)
+	if err != nil {
+		return false, err
+	}
+	if candidate == nil {
+		return false, nil
+	}
+	key := smtCongruenceSignature(candidate)
+	entries := t.tables[node.declaration].entries
+	bucket := entries[key]
+	for i, entry := range bucket {
+		if entry != candidate {
 			continue
 		}
 		copy(bucket[i:], bucket[i+1:])
 		bucket[len(bucket)-1] = nil
-		t.tables[node.declaration] = bucket[:len(bucket)-1]
+		if len(bucket) == 1 {
+			delete(entries, key)
+		} else {
+			entries[key] = bucket[:len(bucket)-1]
+		}
 		return true, nil
 	}
 	return false, nil
@@ -144,7 +202,7 @@ func (t *SMTCongruenceTable) Reset() error {
 		}
 	}
 	t.declarations = nil
-	t.tables = make(map[ast.ASTHandle][]*SMTEnode)
+	t.tables = make(map[ast.ASTHandle]*smtCongruenceBucket)
 	return nil
 }
 
@@ -153,13 +211,15 @@ func (t *SMTCongruenceTable) CheckInvariant() error {
 		return err
 	}
 	for _, bucket := range t.tables {
-		for _, node := range bucket {
-			contained, err := t.ContainsPointer(node)
-			if err != nil {
-				return err
-			}
-			if !contained {
-				return ast.ErrASTDomain
+		for _, entries := range bucket.entries {
+			for _, node := range entries {
+				contained, err := t.ContainsPointer(node)
+				if err != nil {
+					return err
+				}
+				if !contained {
+					return ast.ErrASTDomain
+				}
 			}
 		}
 	}

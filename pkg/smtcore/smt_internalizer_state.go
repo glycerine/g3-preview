@@ -64,17 +64,13 @@ type smtInternalizerNotifyTrail struct {
 type smtEqualityNodeSnapshot struct {
 	node            *SMTEnode
 	root, next      *SMTEnode
-	congruence      *SMTEnode
 	classSize       uint32
-	parents         []*SMTEnode
 	theoryVariables SMTTheoryVarList
 	trans           SMTTransJustification
 }
 
 type smtEqualitySnapshot struct {
-	nodes         []smtEqualityNodeSnapshot
-	disequalities map[smtEnodePairKey]struct{}
-	reasons       map[smtEnodePairKey]SMTLiteral
+	nodes []smtEqualityNodeSnapshot
 }
 
 type SMTTheoryPropagation struct {
@@ -727,12 +723,18 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	if scope.equalityLimit < 0 || scope.equalityLimit > len(s.equalityTrail) {
 		return ast.ErrASTDomain
 	}
+	equalitiesRestored := len(s.equalityTrail) > scope.equalityLimit
 	for len(s.equalityTrail) > scope.equalityLimit {
 		index := len(s.equalityTrail) - 1
 		entry := s.equalityTrail[index]
 		s.equalityTrail = s.equalityTrail[:index]
 		if err := s.restoreEqualitySnapshot(entry); err != nil {
 			return fmt.Errorf("restore equality snapshot: %w", err)
+		}
+	}
+	if equalitiesRestored {
+		if err := s.rebuildCongruence(); err != nil {
+			return fmt.Errorf("restore congruence index: %w", err)
 		}
 	}
 	if scope.disequalities == nil {

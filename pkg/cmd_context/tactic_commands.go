@@ -49,7 +49,7 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return nil, err
 	}
 	switch name {
-	case "smt", "sat", "sat-preprocess", "simplify", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
+	case "smt", "sat", "sat-preprocess", "simplify", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfidl", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -84,6 +84,8 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return core.MakeEliminateUnconstrainedTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
 	case "qfauflia":
 		return smtlogics.NewQFAUFLIATactic(m, nil, c.config)
+	case "qfidl":
+		return smtlogics.NewQFIDLTacticWithOutput(m, nil, c.config, output)
 	case "qflra":
 		return smtlogics.NewQFLRATactic(m, nil, c.config)
 	case "qfuf":

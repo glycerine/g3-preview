@@ -70,6 +70,83 @@ func TestSMTCongruenceTableExactCommutativeInsertFindEraseReset(t *testing.T) {
 	astTestMust(t, table.Close())
 }
 
+func TestSMTCongruenceTableNativeSignaturesAndNaryCollisions(t *testing.T) {
+	m := astTestManager(t)
+	sort, err := m.MkSort(symbol.Numerical(2700), ast.ASTSortInfo{})
+	astTestMust(t, err)
+	var terms []ast.ASTHandle
+	var nodes []*SMTEnode
+	for i := 0; i < 4; i++ {
+		h, n := smtEnodeConstant(t, m, uint32(2701+i), sort, 0)
+		terms = append(terms, h)
+		nodes = append(nodes, n)
+	}
+	declaration := smtCGTestDeclaration(t, m, 2710, sort, ast.ASTFuncFlags{Commutative: true})
+	table, err := NewSMTCongruenceTable(m)
+	astTestMust(t, err)
+	defer func() { astTestMust(t, table.Close()) }()
+	var representatives [4][4]*SMTEnode
+	for i := 0; i < 4; i++ {
+		for j := 0; j < 4; j++ {
+			n := smtCGTestApplication(t, m, declaration, []ast.ASTHandle{terms[i], terms[j]}, []*SMTEnode{nodes[i], nodes[j]})
+			inserted, err := table.Insert(n)
+			astTestMust(t, err)
+			if i <= j {
+				representatives[i][j] = n
+				if inserted.Node != n || inserted.Commuted {
+					t.Fatal("first unordered pair", i, j)
+				}
+			} else if inserted.Node != representatives[j][i] || !inserted.Commuted {
+				t.Fatal("reverse unordered pair", i, j)
+			}
+			if n.FunctionDeclID() != 0 {
+				t.Fatal("declaration id must be assigned to every inserted node", n.FunctionDeclID())
+			}
+		}
+	}
+	astTestMust(t, table.CheckInvariant())
+	astTestMust(t, table.Reset())
+	info, err := m.NewFuncDeclInfo(ast.NullFamilyID, -1, nil, ast.ASTFuncFlags{}, false)
+	astTestMust(t, err)
+	f, err := m.MkFuncDeclWithInfo(symbol.Numerical(2711), []ast.ASTHandle{sort, sort, sort}, sort, info)
+	astTestMust(t, err)
+	astTestMust(t, m.DelFuncDeclInfo(&info))
+	var triples [4][4][4]*SMTEnode
+	for i := 0; i < 4; i++ {
+		for j := 0; j < 4; j++ {
+			for k := 0; k < 4; k++ {
+				n := smtCGTestApplication(t, m, f, []ast.ASTHandle{terms[i], terms[j], terms[k]}, []*SMTEnode{nodes[i], nodes[j], nodes[k]})
+				inserted, err := table.Insert(n)
+				astTestMust(t, err)
+				if inserted.Node != n || inserted.Commuted {
+					t.Fatal("distinct ordered triple collapsed", i, j, k)
+				}
+				triples[i][j][k] = n
+			}
+		}
+	}
+	// A separate root with the same AST owner deliberately collides in the
+	// n-ary suffix key. The exact root comparison must keep it independent.
+	alias, err := NewSMTEnode(m, terms[2], nil, SMTEnodeOptions{})
+	astTestMust(t, err)
+	collision := smtCGTestApplication(t, m, f, []ast.ASTHandle{terms[0], terms[1], terms[2]}, []*SMTEnode{nodes[0], nodes[1], alias})
+	inserted, err := table.Insert(collision)
+	astTestMust(t, err)
+	if inserted.Node != collision {
+		t.Fatal("owner identity collision changed congruence")
+	}
+	if found, _, err := table.Find(triples[0][1][2]); err != nil || found != triples[0][1][2] {
+		t.Fatal(found, err)
+	}
+	if erased, err := table.Erase(collision); err != nil || !erased {
+		t.Fatal(erased, err)
+	}
+	if found, _, err := table.Find(triples[0][1][2]); err != nil || found != triples[0][1][2] {
+		t.Fatal("collision erase removed a different class", found, err)
+	}
+	astTestMust(t, table.CheckInvariant())
+}
+
 func TestSMTAlmostCongruenceTableGroupsSpecialRoots(t *testing.T) {
 	manager := astTestManager(t)
 	sort, err := manager.MkSort(symbol.Numerical(2610), ast.ASTSortInfo{})

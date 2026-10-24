@@ -11,7 +11,95 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
+
+func TestSMTLibRunnerQFIDLBranchEvidence(t *testing.T) {
+	cases := []struct {
+		name            string
+		require, forbid []string
+	}{
+		{"qfidl_disequality_models_scopes.smt2", []string{"(diff-neq :num-exprs 0"}, []string{"(sat-status"}},
+		{"qfidl_disequality_pigeonhole.smt2", []string{"(diff-neq :num-exprs 1"}, []string{"(lia2pb ", "(sat-status"}},
+		{"qfidl_bv_sat_pipeline.smt2", []string{"(pb2bv ", "(bit-blaster ", "(sat-status"}, nil},
+		{"qfidl_smt_fallback.smt2", []string{"(diff-neq ", "(pb2bv ", "(smt.tactic start)"}, []string{"(sat-status"}},
+		{"qfidl_core_route.smt2", []string{"(smt.tactic start)"}, []string{"(diff-neq ", "(sat-status"}},
+		{"qfidl_proof_route.smt2", []string{"(smt.tactic start)"}, []string{"(diff-neq ", "(sat-status"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			script, err := os.ReadFile(filepath.Join("test_vectors", tc.name))
+			if err != nil {
+				t.Fatal(err)
+			}
+			level, err := diagnostic.ProcessVerbosityLevel()
+			if err != nil {
+				t.Fatal(err)
+			}
+			previous, err := diagnostic.BorrowProcessVerboseStream()
+			if err != nil {
+				t.Fatal(err)
+			}
+			stream, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() {
+				for _, err := range []error{diagnostic.SetProcessVerbosityLevel(level), diagnostic.SetProcessVerboseStream(previous), stream.Close()} {
+					if err != nil {
+						t.Error(err)
+					}
+				}
+			}()
+			if err = diagnostic.SetProcessVerboseStream(stream); err != nil {
+				t.Fatal(err)
+			}
+			if err = diagnostic.SetProcessVerbosityLevel(10); err != nil {
+				t.Fatal(err)
+			}
+			var output bytes.Buffer
+			if err = run(bytes.NewReader(script), &output); err != nil {
+				t.Fatal(err, output.String())
+			}
+			goVerbose, err := stream.String()
+			if err != nil {
+				t.Fatal(err)
+			}
+			check := func(origin, text string) {
+				t.Helper()
+				for _, s := range tc.require {
+					if !strings.Contains(text, s) {
+						t.Fatalf("%s missing route evidence %q\n%s", origin, s, text)
+					}
+				}
+				for _, s := range tc.forbid {
+					if strings.Contains(text, s) {
+						t.Fatalf("%s entered unexpected stage %q\n%s", origin, s, text)
+					}
+				}
+			}
+			check("Go", goVerbose)
+			if canonicalOutput(output.String()) != canonicalOutput(scriptResults[tc.name]) {
+				t.Fatal("diagnostics changed the result", output.String())
+			}
+			if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
+				var native, verbose bytes.Buffer
+				cmd := exec.Command(reference, "-v:10", "-in")
+				cmd.Stdin = bytes.NewReader(script)
+				cmd.Stdout = &native
+				cmd.Stderr = &verbose
+				if err = cmd.Run(); err != nil {
+					t.Fatal(err, native.String(), verbose.String())
+				}
+				check("C++", verbose.String())
+				if canonicalOutput(native.String()) != canonicalOutput(output.String()) {
+					t.Fatal("source result mismatch", native.String(), output.String())
+				}
+			}
+		})
+	}
+}
 
 func TestSMTLibRunnerMaxBVSharingStepFrontiers(t *testing.T) {
 	reference := os.Getenv("G3_CPP_REFERENCE")
@@ -81,6 +169,14 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"qfidl_bv_sat_pipeline.smt2":                   "sat\n((a 1)\n (b 0)\n (c 1)\n (d 1)\n (e 0)\n (f 1)\n (g 0)\n (h 1)\n (i 0))\nunsat\nsat\n((a 1)\n (b 0)\n (c 1)\n (d 1)\n (e 0)\n (f 1)\n (g 0)\n (h 1)\n (i 0))\n",
+	"qfidl_core_route.smt2":                        "unsat\n(lo hi)\n",
+	"qfidl_disequality_models_scopes.smt2":         "sat\n((x 0)\n (y 1)\n (z 2))\nunsat\nsat\n((x 0)\n (y 1)\n (z 2))\n",
+	"qfidl_disequality_pigeonhole.smt2":            "unsat\n",
+	"qfidl_limits_fallback.smt2":                   "unknown\n(:reason-unknown \"max. steps exceeded\")\nsat\n((x 7))\n",
+	"qfidl_parameter_scopes.smt2":                  "sat\n((x 7))\n",
+	"qfidl_proof_route.smt2":                       "unsat\n",
+	"qfidl_smt_fallback.smt2":                      "sat\n(((and (= (- x y) 37) (>= x 0) (<= x 100) (>= y 0) (<= y 100)) true))\nunsat\nsat\n(((= (- x y) 37) true))\n",
 	"sat_global_options.smt2":                      "unknown\n(:reason-unknown \"incomplete\")\nsat\n((p false)\n (q true))\nsat\n((p false)\n (q true))\np cnf 2 2\n-1 0\n1 2 0\nc 0 p\nc 1 q\nunknown\n(:reason-unknown \"incomplete\")\nsat\n((p false)\n (q true))\nsat\n((p false)\n (q true))\n",
 	"sat_boolean_models_scopes.smt2":               "sat\n((p false)\n (q true)\n (r false))\nunsat\nsat\n((p false)\n (q true)\n (r false))\n",
 	"sat_cores.smt2":                               "unsat\n(choice nq np)\n",

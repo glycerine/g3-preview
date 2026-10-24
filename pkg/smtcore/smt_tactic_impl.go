@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/lp"
 	"github.com/glycerine/g3/pkg/util/messages"
@@ -128,13 +129,35 @@ func (t *SMTTactic) Apply(in *tactic.Goal, result *tactic.TacticResult) (err err
 	if in == nil || result == nil || in.Manager() != t.manager || t.active != nil {
 		return ast.ErrASTHandle
 	}
-	if sorted, e := in.IsWellSorted(); e != nil {
-		return e
-	} else if !sorted {
-		return ast.ErrASTDomain
+	verbose, err := diagnostic.ProcessVerboseEnabled(10)
+	if err != nil {
+		return err
+	}
+	if verbose {
+		stream, e := diagnostic.BorrowProcessVerboseStream()
+		if e != nil {
+			return e
+		}
+		if e = stream.AppendCString("(smt.tactic start)\n"); e != nil {
+			return e
+		}
+		if e = stream.Flush(); e != nil {
+			return e
+		}
 	}
 	if err = result.Prepare(t.manager); err != nil {
 		return err
+	}
+	assertions, err := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+	if err != nil {
+		return err
+	}
+	if assertions {
+		if sorted, e := in.IsWellSorted(); e != nil {
+			return e
+		} else if !sorted {
+			return ast.ErrASTDomain
+		}
 	}
 	logic := ""
 	if t.logic != (usymbol.Symbol{}) {

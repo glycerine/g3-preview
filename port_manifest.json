@@ -106186,8 +106186,16 @@
       "component": "smt",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/smtcore/smt_cg_table.go"],
-      "tests": ["TestSMTCongruenceTableExactCommutativeInsertFindEraseReset"],
+      "go_targets": [
+        "pkg/smtcore/smt_cg_table.go",
+        "pkg/smtcore/smt_cg_table_test.go",
+        "pkg/smtcore/smt_equality_incremental_test.go"
+      ],
+      "tests": [
+        "TestSMTCongruenceTableExactCommutativeInsertFindEraseReset",
+        "TestSMTCongruenceTableNativeSignaturesAndNaryCollisions",
+        "TestSMTIncrementalCongruenceAndDisequalityNestedRollback"
+      ],
       "conditionals": [
         {
           "line": 25,
@@ -106291,25 +106299,52 @@
           "name": "active declaration table creation, declaration indexing, reset, no-op display and debug invariant",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_cg_table.go",
-          "tests": ["TestSMTCongruenceTableExactCommutativeInsertFindEraseReset"]
+          "tests": [
+            "TestSMTCongruenceTableExactCommutativeInsertFindEraseReset"
+          ]
         },
         {
           "name": "disabled preprocessor branch containing the legacy single-table implementation",
           "status": "dead_deleted",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "Native root-signature indexing for unary, binary, commutative binary and n-ary applications; exact collision checks and every-node declaration-id assignment",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_cg_table.go",
+            "pkg/smtcore/smt_cg_table_test.go",
+            "pkg/smtcore/smt_equality_incremental_test.go"
+          ],
+          "tests": [
+            "TestSMTCongruenceTableNativeSignaturesAndNaryCollisions",
+            "TestSMTIncrementalCongruenceAndDisequalityNestedRollback"
+          ]
         }
       ],
-      "ownership": ["The table retains each indexed function declaration and borrows stored enodes."],
-      "deviations": ["Declaration-keyed Go slices replace four specialized native hash-table layouts; equality and commutativity behavior is preserved without porting hash-container internals."]
+      "ownership": [
+        "The table retains each indexed function declaration and borrows stored enodes."
+      ],
+      "deviations": [
+        "Native per-declaration Go maps index root-pointer signatures. N-ary suffix owner identities select collision buckets, which still use the concrete exact congruence comparison. Commutative binary queries check both orientations. Tagged C++ table pointers, capacity/rehash internals and declaration-wide linear scans are not reproduced."
+      ]
     },
     {
       "path": "src/smt/smt_cg_table.h",
       "component": "smt",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/smtcore/smt_cg_table.go"],
-      "tests": ["TestSMTCongruenceTableExactCommutativeInsertFindEraseReset"],
+      "go_targets": [
+        "pkg/smtcore/smt_cg_table.go",
+        "pkg/smtcore/smt_cg_table_test.go",
+        "pkg/smtcore/smt_equality_incremental_test.go"
+      ],
+      "tests": [
+        "TestSMTCongruenceTableExactCommutativeInsertFindEraseReset",
+        "TestSMTCongruenceTableNativeSignaturesAndNaryCollisions",
+        "TestSMTIncrementalCongruenceAndDisequalityNestedRollback"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -106457,17 +106492,36 @@
           "name": "active per-declaration congruence table insert, erase, contains, find, pointer containment and reset interface",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_cg_table.go",
-          "tests": ["TestSMTCongruenceTableExactCommutativeInsertFindEraseReset"]
+          "tests": [
+            "TestSMTCongruenceTableExactCommutativeInsertFindEraseReset"
+          ]
         },
         {
           "name": "disabled preprocessor branch containing the legacy table interface",
           "status": "dead_deleted",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "Native root-signature indexing for unary, binary, commutative binary and n-ary applications; exact collision checks and every-node declaration-id assignment",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_cg_table.go",
+            "pkg/smtcore/smt_cg_table_test.go",
+            "pkg/smtcore/smt_equality_incremental_test.go"
+          ],
+          "tests": [
+            "TestSMTCongruenceTableNativeSignaturesAndNaryCollisions",
+            "TestSMTIncrementalCongruenceAndDisequalityNestedRollback"
+          ]
         }
       ],
-      "ownership": ["The manager is borrowed; declaration references are owned until Reset or Close; enode pointers are borrowed."],
-      "deviations": ["Go map keys use AST handles and buckets use slices; linear bucket comparison calls the concrete enode congruence algorithm and avoids porting native tagged table pointers."]
+      "ownership": [
+        "The manager is borrowed; declaration references are owned until Reset or Close; enode pointers are borrowed."
+      ],
+      "deviations": [
+        "Native per-declaration Go maps index root-pointer signatures. N-ary suffix owner identities select collision buckets, which still use the concrete exact congruence comparison. Commutative binary queries check both orientations. Tagged C++ table pointers, capacity/rehash internals and declaration-wide linear scans are not reproduced."
+      ]
     },
     {
       "path": "src/smt/smt_checker.cpp",
@@ -107495,9 +107549,16 @@
         "pkg/smtcore/theory_arith_assume_eq_test.go",
         "pkg/smtcore/smt_relevancy.go",
         "pkg/smtcore/smt_relevancy_test.go",
-        "pkg/smtcore/theory_arith_bounded_disequalities_test.go"
+        "pkg/smtcore/theory_arith_bounded_disequalities_test.go",
+        "pkg/smtcore/smt_equality_incremental_test.go",
+        "pkg/smtcore/smt_cg_table.go",
+        "pkg/smtcore/smt_cg_table_test.go",
+        "pkg/tactic/smtlogics/qfidl_tactic_test.go"
       ],
       "tests": [
+        "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
+        "TestSMTCongruenceTableNativeSignaturesAndNaryCollisions",
+        "TestQFIDLTacticFiveThousandConstantBoundaryCPP",
         "TestSMTGeneratedModelCleansMacroFallbackConstants",
         "TestSMTGeneratedModelCompressionHonorsLiveParameter",
         "TestSMTArrayModelPreservesObservedSelect",
@@ -115861,7 +115922,8 @@
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/tactic/tactic_stored_model.go",
-        "pkg/util/lp/gparams_catalog_collectors.go"
+        "pkg/util/lp/gparams_catalog_collectors.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTTacticPreservesDerivedInputProof",
@@ -115873,7 +115935,8 @@
         "TestSMTTacticThroughTacticSolverScopesAndModel",
         "TestSMTTacticPublishesIndependentModelsAcrossApplications",
         "TestSMTTacticCPPApplyReference",
-        "TestNewSMTTacticUsingCopiesAndFixesAutoConfig"
+        "TestNewSMTTacticUsingCopiesAndFixesAutoConfig",
+        "TestSMTLibRunnerQFIDLBranchEvidence"
       ],
       "assertions": [
         {
@@ -115976,6 +116039,19 @@
         {
           "name": "remaining verbose/trace diagnostic fidelity audit (src/smt/tactic/smt_tactic.cpp)",
           "status": "unported"
+        },
+        {
+          "name": "Source cpp153-155 entry verbosity marker, converter reset before well-sorted SASSERT, and selected assertion profile",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/smtcore/smt_tactic_native_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerQFIDLBranchEvidence",
+            "TestSMTTacticCPPApplyReference"
+          ]
         }
       ],
       "ownership": [
@@ -140663,22 +140739,174 @@
       "path": "src/tactic/smtlogics/qfidl_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qfidl_tactic.go",
+        "pkg/tactic/smtlogics/qfidl_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/qfidl_bv_sat_pipeline.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_core_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_disequality_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_disequality_pigeonhole.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_limits_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_parameter_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_proof_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_smt_fallback.smt2"
+      ],
+      "tests": [
+        "TestQFIDLTacticModelSurvivesStrategyClose",
+        "TestQFIDLTacticTranslatedProofAndCoreRoutes",
+        "TestQFIDLTacticFiveThousandConstantBoundaryCPP",
+        "TestQFIDLTacticConstructorAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTLibRunnerQFIDLBranchEvidence"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_qfidl_tactic parameter scopes, nine-stage nested preamble and final updt_params",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfidl_tactic.go",
+            "pkg/tactic/smtlogics/qfidl_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfidl_bv_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_disequality_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_disequality_pigeonhole.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_limits_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_parameter_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_smt_fallback.smt2"
+          ],
+          "tests": [
+            "TestQFIDLTacticModelSurvivesStrategyClose",
+            "TestQFIDLTacticTranslatedProofAndCoreRoutes",
+            "TestQFIDLTacticFiveThousandConstantBoundaryCPP",
+            "TestQFIDLTacticConstructorAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFIDLBranchEvidence"
+          ]
+        },
+        {
+          "name": "Finite difference-disequality attempt, LIA/PB/BV conversion, is-qfbv guard, actual bit-blast/AIG/SAT composition and SMT fallback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfidl_tactic.go",
+            "pkg/tactic/smtlogics/qfidl_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfidl_bv_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_disequality_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_disequality_pigeonhole.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_limits_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_parameter_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_smt_fallback.smt2"
+          ],
+          "tests": [
+            "TestQFIDLTacticModelSurvivesStrategyClose",
+            "TestQFIDLTacticTranslatedProofAndCoreRoutes",
+            "TestQFIDLTacticFiveThousandConstantBoundaryCPP",
+            "TestQFIDLTacticConstructorAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFIDLBranchEvidence"
+          ]
+        },
+        {
+          "name": "Strict non-Boolean-constant threshold and proof/core metadata condition, direct SMT routing",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfidl_tactic.go",
+            "pkg/tactic/smtlogics/qfidl_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfidl_bv_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_disequality_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_disequality_pigeonhole.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_limits_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_parameter_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_smt_fallback.smt2"
+          ],
+          "tests": [
+            "TestQFIDLTacticFiveThousandConstantBoundaryCPP",
+            "TestQFIDLTacticTranslatedProofAndCoreRoutes",
+            "TestSMTLibRunnerQFIDLBranchEvidence"
+          ]
+        },
+        {
+          "name": "Constructor ownership/unwind, inherited composite translation, model/proof/core lifetime",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfidl_tactic.go",
+            "pkg/tactic/smtlogics/qfidl_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfidl_bv_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_disequality_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_disequality_pigeonhole.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_limits_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_parameter_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_smt_fallback.smt2"
+          ],
+          "tests": [
+            "TestQFIDLTacticModelSurvivesStrategyClose",
+            "TestQFIDLTacticTranslatedProofAndCoreRoutes",
+            "TestQFIDLTacticFiveThousandConstantBoundaryCPP",
+            "TestQFIDLTacticConstructorAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFIDLBranchEvidence"
+          ]
+        }
+      ],
+      "ownership": [
+        "The factory owns temporary counted tactic/probe references and parameter values until the returned conditional graph retains them. Child using_params wrappers keep independent parameter snapshots. The caller acquires the returned uncounted tactic; result models, proofs and dependencies own their references independently of strategy closure. All stages use the original shared process services."
+      ],
+      "deviations": [
+        "The source pull_ite_p local is initialized but never consumed; that unused policy is omitted. No C++ standard-library or hash-container internals are reproduced. An explicit output-taking Go factory supplies the command writer to the retained SAT stage.",
+        "This completes this explicit strategy factory and runner registration, not general strategy dispatch, the public Go API or higher engines."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfidl_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qfidl_tactic.go",
+        "pkg/tactic/smtlogics/qfidl_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/qfidl_bv_sat_pipeline.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_core_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_disequality_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_disequality_pigeonhole.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_limits_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_parameter_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_proof_route.smt2",
+        "pkg/cmd/g3/test_vectors/qfidl_smt_fallback.smt2"
+      ],
+      "tests": [
+        "TestQFIDLTacticModelSurvivesStrategyClose",
+        "TestQFIDLTacticTranslatedProofAndCoreRoutes",
+        "TestQFIDLTacticFiveThousandConstantBoundaryCPP",
+        "TestQFIDLTacticConstructorAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTLibRunnerQFIDLBranchEvidence"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -140689,11 +140917,44 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained mk_qfidl_tactic declaration and builtin qfidl registration",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfidl_tactic.go",
+            "pkg/tactic/smtlogics/qfidl_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfidl_bv_sat_pipeline.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_core_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_disequality_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_disequality_pigeonhole.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_limits_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_parameter_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_proof_route.smt2",
+            "pkg/cmd/g3/test_vectors/qfidl_smt_fallback.smt2"
+          ],
+          "tests": [
+            "TestQFIDLTacticModelSurvivesStrategyClose",
+            "TestQFIDLTacticTranslatedProofAndCoreRoutes",
+            "TestQFIDLTacticFiveThousandConstantBoundaryCPP",
+            "TestQFIDLTacticConstructorAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerQFIDLBranchEvidence"
+          ]
+        }
+      ],
+      "ownership": [
+        "The factory owns temporary counted tactic/probe references and parameter values until the returned conditional graph retains them. Child using_params wrappers keep independent parameter snapshots. The caller acquires the returned uncounted tactic; result models, proofs and dependencies own their references independently of strategy closure. All stages use the original shared process services."
+      ],
+      "deviations": [
+        "The source pull_ite_p local is initialized but never consumed; that unused policy is omitted. No C++ standard-library or hash-container internals are reproduced. An explicit output-taking Go factory supplies the command writer to the retained SAT stage.",
+        "This completes this explicit strategy factory and runner registration, not general strategy dispatch, the public Go API or higher engines."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qflia_tactic.cpp",

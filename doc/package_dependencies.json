@@ -2944,14 +2944,19 @@
       "package": "tactic/smtlogics",
       "imports": [
         "ast",
+        "sat/tactic",
         "smtcore",
         "tactic",
+        "tactic/aig",
+        "tactic/arith",
+        "tactic/bv",
         "tactic/core",
         "tactic/smtlogics/params",
         "util/params"
       ],
       "production_files": [
         "qfauflia_tactic.go",
+        "qfidl_tactic.go",
         "qflra_tactic.go",
         "qfuf_tactic.go"
       ]

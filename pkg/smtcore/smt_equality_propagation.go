@@ -19,39 +19,38 @@ func cloneSMTTheoryVariables(source SMTTheoryVarList) SMTTheoryVarList {
 	return result
 }
 
-func (s *SMTInternalizerState) equalitySnapshot() smtEqualitySnapshot {
+func (s *SMTInternalizerState) equalitySnapshot(from, to *SMTEnode) smtEqualitySnapshot {
 	snapshot := smtEqualitySnapshot{
-		nodes:         make([]smtEqualityNodeSnapshot, 0, len(s.enodeStack)),
-		disequalities: make(map[smtEnodePairKey]struct{}, len(s.context.disequalities)),
-		reasons:       make(map[smtEnodePairKey]SMTLiteral, len(s.disequalityReasons)),
+		nodes: make([]smtEqualityNodeSnapshot, 0, int(from.classSize)+1),
 	}
-	for _, node := range s.enodeStack {
+	// Union changes roots and the transitivity path only in the smaller
+	// class, plus the target root's list link, size and theory variables.
+	// Parent/congruence indexes are derived again after rollback; copying the
+	// entire context at every merge creates quadratic retained trail storage.
+	for node := from; ; node = node.next {
 		snapshot.nodes = append(snapshot.nodes, smtEqualityNodeSnapshot{
-			node: node, root: node.root, next: node.next, congruence: node.congruence,
-			classSize: node.classSize, parents: append([]*SMTEnode(nil), node.parents...),
+			node: node, root: node.root, next: node.next,
+			classSize:       node.classSize,
 			theoryVariables: cloneSMTTheoryVariables(node.theoryVariables), trans: node.trans,
 		})
+		if node.next == from {
+			break
+		}
 	}
-	for key := range s.context.disequalities {
-		snapshot.disequalities[key] = struct{}{}
-	}
-	for key, literal := range s.disequalityReasons {
-		snapshot.reasons[key] = literal
-	}
+	snapshot.nodes = append(snapshot.nodes, smtEqualityNodeSnapshot{node: to, root: to.root, next: to.next, classSize: to.classSize, theoryVariables: cloneSMTTheoryVariables(to.theoryVariables), trans: to.trans})
 	return snapshot
 }
 
 func (s *SMTInternalizerState) restoreEqualitySnapshot(snapshot smtEqualitySnapshot) error {
 	for _, saved := range snapshot.nodes {
-		saved.node.root, saved.node.next, saved.node.congruence = saved.root, saved.next, saved.congruence
+		saved.node.root, saved.node.next = saved.root, saved.next
 		saved.node.classSize = saved.classSize
-		saved.node.parents = append(saved.node.parents[:0], saved.parents...)
 		saved.node.theoryVariables = cloneSMTTheoryVariables(saved.theoryVariables)
 		saved.node.trans = saved.trans
 	}
-	s.context.disequalities = snapshot.disequalities
-	s.disequalityReasons = snapshot.reasons
-	return s.rebuildCongruence(false)
+	// PushScope owns the complete disequality snapshot. PopScopes restores
+	// it after all union trails, before invoking theory callbacks.
+	return nil
 }
 
 func smtInvertTrans(node *SMTEnode) {
@@ -123,10 +122,17 @@ func (s *SMTInternalizerState) mergeTheoryVariables(from, to *SMTEnode) error {
 	return nil
 }
 
-func (s *SMTInternalizerState) remapDisequalities() error {
-	rebuilt := make(map[smtEnodePairKey]struct{}, len(s.context.disequalities))
-	reasons := make(map[smtEnodePairKey]SMTLiteral, len(s.disequalityReasons))
+func (s *SMTInternalizerState) remapDisequalities(from *SMTEnode) error {
+	type update struct {
+		old, next smtEnodePairKey
+		reason    SMTLiteral
+		collapsed bool
+	}
+	var changed []update
 	for key := range s.context.disequalities {
+		if key.first != from && key.second != from {
+			continue
+		}
 		if key.first.root == key.second.root {
 			proof, err := NewSMTEqualityPropagationJustification(key.first, key.second)
 			if err != nil {
@@ -135,20 +141,29 @@ func (s *SMTInternalizerState) remapDisequalities() error {
 			if err = s.setEqualityConflict(proof, s.disequalityReasons[key]); err != nil {
 				return err
 			}
+			changed = append(changed, update{old: key, collapsed: true})
 			continue
 		}
 		mapped, err := smtCheckerPair(key.first, key.second)
 		if err != nil {
 			return fmt.Errorf("map disequality roots: %w", err)
 		}
-		rebuilt[mapped] = struct{}{}
-		reasons[mapped] = s.disequalityReasons[key]
+		changed = append(changed, update{old: key, next: mapped, reason: s.disequalityReasons[key]})
 	}
-	s.context.disequalities, s.disequalityReasons = rebuilt, reasons
+	for _, u := range changed {
+		delete(s.context.disequalities, u.old)
+		delete(s.disequalityReasons, u.old)
+	}
+	for _, u := range changed {
+		if !u.collapsed {
+			s.context.disequalities[u.next] = struct{}{}
+			s.disequalityReasons[u.next] = u.reason
+		}
+	}
 	return nil
 }
 
-func (s *SMTInternalizerState) rebuildCongruence(enqueue bool) error {
+func (s *SMTInternalizerState) rebuildCongruence() error {
 	if err := s.congruence.Reset(); err != nil {
 		return err
 	}
@@ -176,31 +191,79 @@ func (s *SMTInternalizerState) rebuildCongruence(enqueue bool) error {
 			return err
 		}
 		node.congruence = inserted.Node
-		if enqueue && inserted.Node != node && inserted.Node.root != node.root {
-			s.pending = append(s.pending, SMTInternalizerCongruence{Node: node, Existing: inserted.Node, Commuted: inserted.Commuted})
-		}
 	}
 	return nil
 }
 
-func (s *SMTInternalizerState) propagateTrueEqualities() error {
-	for _, node := range s.enodeStack {
-		if !node.IsTrueEquality() {
+func (s *SMTInternalizerState) propagateTrueEquality(node *SMTEnode) error {
+	if !node.IsTrueEquality() {
+		return nil
+	}
+	variable, found := s.boolVar[node.owner]
+	if !found {
+		return nil
+	}
+	assigned, err := s.Assignment(NewSMTLiteral(variable, false))
+	if err != nil {
+		return err
+	}
+	if assigned == lbool.True {
+		return nil
+	}
+	justification, err := NewSMTEqualityPropagationJustification(node.arguments[0], node.arguments[1])
+	if err != nil {
+		return err
+	}
+	wrapped, err := NewSMTBooleanJustification(justification)
+	if err != nil {
+		return err
+	}
+	if err = s.AssignLiteral(NewSMTLiteral(variable, false), wrapped); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Source context::remove_parents_from_cg_table / reinsert_parents_into_cg_table.
+// Only parents of the class whose roots change need a new signature. The Go
+// parent vectors also retain nonrepresentatives for concrete enode deletion.
+func (s *SMTInternalizerState) detachCongruenceParents(from, to *SMTEnode) (map[*SMTEnode]bool, error) {
+	alreadyTarget := make(map[*SMTEnode]bool, len(from.parents))
+	for _, parent := range from.parents {
+		for _, arg := range parent.arguments {
+			if arg.root == to {
+				alreadyTarget[parent] = true
+				break
+			}
+		}
+		if parent.congruenceEnabled && parent.congruence == parent && !parent.IsTrueEquality() {
+			if _, err := s.congruence.Erase(parent); err != nil {
+				return nil, err
+			}
+		}
+	}
+	return alreadyTarget, nil
+}
+func (s *SMTInternalizerState) reinsertCongruenceParents(from, to *SMTEnode, alreadyTarget map[*SMTEnode]bool) error {
+	for _, parent := range from.parents {
+		if !alreadyTarget[parent] {
+			to.parents = append(to.parents, parent)
+		}
+		if !parent.congruenceEnabled || parent.IsTrueEquality() {
+			parent.congruence = parent
 			continue
 		}
-		variable, found := s.boolVar[node.owner]
-		if !found {
-			continue
-		}
-		justification, err := NewSMTEqualityPropagationJustification(node.arguments[0], node.arguments[1])
+		inserted, err := s.congruence.Insert(parent)
 		if err != nil {
 			return err
 		}
-		wrapped, err := NewSMTBooleanJustification(justification)
-		if err != nil {
-			return err
+		parent.congruence = inserted.Node
+		if inserted.Node != parent && inserted.Node.root != parent.root {
+			s.pending = append(s.pending, SMTInternalizerCongruence{Node: parent, Existing: inserted.Node, Commuted: inserted.Commuted})
 		}
-		if err = s.AssignLiteral(NewSMTLiteral(variable, false), wrapped); err != nil {
+	}
+	for _, parent := range from.parents {
+		if err := s.propagateTrueEquality(parent); err != nil {
 			return err
 		}
 		if s.inconsistent {
@@ -244,6 +307,16 @@ func (s *SMTInternalizerState) propagateBooleanClass(root *SMTEnode) error {
 	for node := root; ; node = node.next {
 		if variable, found := s.boolVar[node.owner]; found && node != source {
 			literal := NewSMTLiteral(variable, value == lbool.False)
+			assigned, e := s.Assignment(literal)
+			if e != nil {
+				return e
+			}
+			if assigned == lbool.True {
+				if node.next == root {
+					break
+				}
+				continue
+			}
 			var justification SMTJustification
 			var err error
 			if s.manager.IsTrue(source.owner) || s.manager.IsFalse(source.owner) {
@@ -378,7 +451,7 @@ func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification 
 	if (r1.classSize > r2.classSize && !r2.interpreted) || r1.interpreted {
 		left, right, r1, r2 = right, left, r2, r1
 	}
-	s.equalityTrail = append(s.equalityTrail, s.equalitySnapshot())
+	s.equalityTrail = append(s.equalityTrail, s.equalitySnapshot(r1, r2))
 	if err := s.propagateEqualityClassRelevancy(r1, r2); err != nil {
 		return fmt.Errorf("propagate equality-class relevancy: %w", err)
 	}
@@ -387,6 +460,10 @@ func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification 
 	}
 	smtInvertTrans(left)
 	left.trans = SMTTransJustification{Target: right, Justification: justification}
+	alreadyTarget, err := s.detachCongruenceParents(r1, r2)
+	if err != nil {
+		return fmt.Errorf("detach congruence parents: %w", err)
+	}
 	for current := r1; ; current = current.next {
 		current.root = r2
 		if current.next == r1 {
@@ -395,6 +472,9 @@ func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification 
 	}
 	r1.next, r2.next = r2.next, r1.next
 	r2.classSize += r1.classSize
+	if err := s.reinsertCongruenceParents(r1, r2, alreadyTarget); err != nil {
+		return fmt.Errorf("reinsert congruence parents: %w", err)
+	}
 	if s.quantifierManager != nil {
 		s.quantifierManager.mam.AddEquality(r1, r2)
 	}
@@ -404,14 +484,8 @@ func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification 
 	if s.inconsistent {
 		return nil
 	}
-	if err := s.remapDisequalities(); err != nil {
+	if err := s.remapDisequalities(r1); err != nil {
 		return fmt.Errorf("remap disequalities: %w", err)
-	}
-	if err := s.rebuildCongruence(true); err != nil {
-		return fmt.Errorf("rebuild congruence: %w", err)
-	}
-	if err := s.propagateTrueEqualities(); err != nil {
-		return fmt.Errorf("propagate true equalities: %w", err)
 	}
 	return nil
 }
