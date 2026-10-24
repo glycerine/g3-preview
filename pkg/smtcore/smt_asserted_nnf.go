@@ -11,7 +11,7 @@ import (
 
 func (k *SMTKernel) normalizePendingAssertions() (result error) {
 	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
-	if !k.preprocess || k.assertedHead == len(k.assertions) {
+	if !k.preprocess {
 		return nil
 	}
 	apply := k.preprocessState.NNFCNF || (k.assertedHasQuantifiers &&

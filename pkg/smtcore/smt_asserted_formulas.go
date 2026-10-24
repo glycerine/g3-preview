@@ -39,7 +39,11 @@ func (k *SMTKernel) DisplayAssertedFormulas(out io.Writer) error {
 			return err
 		}
 	}
-	_, err = fmt.Fprintf(out, "inconsistent: %t\n", k.assertedFormulasInconsistent())
+	inconsistent := 0
+	if k.assertedFormulasInconsistent() {
+		inconsistent = 1
+	}
+	_, err = fmt.Fprintf(out, "inconsistent: %d\n", inconsistent)
 	return err
 }
 

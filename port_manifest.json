@@ -13724,14 +13724,18 @@
       "status": "ported",
       "go_targets": [
         "pkg/ast/ast_low_level_printer.go",
-        "pkg/ast/ast_low_level_bounded.go"
+        "pkg/ast/ast_low_level_bounded.go",
+        "pkg/ast/ast_low_level_definitions_test.go"
       ],
       "tests": [
         "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
         "TestASTLowLevelPrinterNativeDeclarationIdentityMarks",
         "TestASTLowLevelPrinterNativeLargeNumeralFormatting",
         "TestASTLowLevelPrinterNativeWideAndDeepPostorder",
-        "TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds"
+        "TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds",
+        "TestASTLowLevelDefinitionsShareVisitedAcrossRoots",
+        "TestASTLowLevelDefinitionCallerMarksAndOwnerGuards",
+        "TestASTLowLevelProofUsesCallerVisitedMark"
       ],
       "conditionals": [
         {
@@ -13750,7 +13754,10 @@
           "name": "Reached depth-three ast_ll_bounded_pp expression/variable/reference printer for deletion diagnostics (ast_ll_pp.cpp:274-328)",
           "status": "ported",
           "go_target": "pkg/ast/ast_low_level_bounded.go",
-          "tests": ["TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds", "TestASTDeleteNodeBugTraceBeforeWorklist"]
+          "tests": [
+            "TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds",
+            "TestASTDeleteNodeBugTraceBeforeWorklist"
+          ]
         },
         {
           "name": "Actual trace overload low-level postorder and separate insertion chains (src/ast/ast_ll_pp.cpp:21-320)",
@@ -13771,21 +13778,27 @@
           ]
         },
         {
-          "name": "caller-supplied visited-mark ast_ll_pp and ast_def_ll_pp overloads used only by unretained proof/SMT source units",
-          "status": "reference_only",
-          "tests": []
+          "name": "retained ast_def_ll_pp noncompact expression definitions and ast_ll_pp compact proof overloads sharing the caller concrete ASTMark; source mark-after-process and separate declaration/expression planes",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_low_level_printer.go",
+          "tests": [
+            "TestASTLowLevelDefinitionsShareVisitedAcrossRoots",
+            "TestASTLowLevelDefinitionCallerMarksAndOwnerGuards",
+            "TestASTLowLevelProofUsesCallerVisitedMark"
+          ]
         }
       ],
       "ownership": [
         "The inline lexical frame borrows AST nodes in a native []astNodeRef stack and map[astNodeRef]struct{} identity marks; the output stream and caller handle remain borrowed.",
         "Only the acquired numeral and tracked numeral insertion own numerical state. Numeral cleanup/ACK precedes dropping traversal storage, and retryable owning cleanup preserves unfinished state in the manager frame.",
-        "The bounded printer shares the same checked lexical frame and borrows every recursively displayed node."
+        "The bounded printer shares the same checked lexical frame and borrows every recursively displayed node.",
+        "External-mark printing borrows the actual caller ASTMark in the existing manager lexical frame, updates its expression/declaration planes and clears the borrow after completion. Fresh assertion-definition batches own one mark until the batch ends. Independent calls preserve visitation, while reset, compact-root behavior, proof traversal and copied/foreign/closed owner refusals are checked."
       ],
       "deviations": [
-        "The caller-supplied visited-mark overloads are reference-only because their consumers are unretained proof and SMT source units. Every retained caller uses DisplayLowLevel or DisplayBoundedLowLevel.",
         "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised.",
         "Native traversal collections preserve the source LIFO order, declaration/domain/range and parameter visitation, mark-after-process behavior and exact compact output. Independent literal output checks cover 257 shared variables with duplicate arguments and 257 nested quantifiers with reservations disabled, plus unchanged reference counts and lexical reuse. Erased container allocation faults add no C++ vector or bitmap implementation credit.",
-        "AST_LL_PP_SHOW_FAMILY_NAME is disabled in the preserved source and remains absent from the Go build."
+        "AST_LL_PP_SHOW_FAMILY_NAME is disabled in the preserved source and remains absent from the Go build.",
+        "Retained external-mark callers use the concrete compact expression/proof and noncompact expression-definition specializations. Go methods replace their stream-wrapper overloads; no unused universal visitor or arbitrary template adapter is introduced. The existing local-map printer remains the ordinary non-shared path."
       ]
     },
     {
@@ -13793,8 +13806,18 @@
       "component": "ast",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/ast/ast_low_level_printer.go", "pkg/ast/ast_low_level_bounded.go"],
-      "tests": ["TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags", "TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds"],
+      "go_targets": [
+        "pkg/ast/ast_low_level_printer.go",
+        "pkg/ast/ast_low_level_bounded.go",
+        "pkg/ast/ast_low_level_definitions_test.go"
+      ],
+      "tests": [
+        "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
+        "TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds",
+        "TestASTLowLevelDefinitionsShareVisitedAcrossRoots",
+        "TestASTLowLevelDefinitionCallerMarksAndOwnerGuards",
+        "TestASTLowLevelProofUsesCallerVisitedMark"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -13812,20 +13835,31 @@
           "name": "Reached mk_ll_pp and mk_bounded_pp printer declarations used by AST traces",
           "status": "ported",
           "go_target": "pkg/ast/ast_low_level_bounded.go",
-          "go_targets": ["pkg/ast/ast_low_level_printer.go"],
-          "tests": ["TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags", "TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds"]
+          "go_targets": [
+            "pkg/ast/ast_low_level_printer.go"
+          ],
+          "tests": [
+            "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
+            "TestASTBoundedLowLevelPrinterSourceDepthAndNodeKinds"
+          ]
         },
         {
-          "name": "caller-supplied visited-mark ast_ll_pp and ast_def_ll_pp declarations with no retained consumer",
-          "status": "reference_only",
-          "tests": []
+          "name": "retained ast_def_ll_pp noncompact expression definitions and ast_ll_pp compact proof overloads sharing the caller concrete ASTMark; source mark-after-process and separate declaration/expression planes",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_low_level_printer.go",
+          "tests": [
+            "TestASTLowLevelDefinitionsShareVisitedAcrossRoots",
+            "TestASTLowLevelDefinitionCallerMarksAndOwnerGuards",
+            "TestASTLowLevelProofUsesCallerVisitedMark"
+          ]
         }
       ],
       "ownership": [
-        "DisplayLowLevel and DisplayBoundedLowLevel borrow the manager, AST handle and NumericTextStream. Their manager-owned lexical frame owns only temporary traversal and numeral state until cleanup."
+        "DisplayLowLevel and DisplayBoundedLowLevel borrow the manager, AST handle and NumericTextStream. Their manager-owned lexical frame owns only temporary traversal and numeral state until cleanup.",
+        "External-mark printing borrows the actual caller ASTMark in the existing manager lexical frame, updates its expression/declaration planes and clears the borrow after completion. Fresh assertion-definition batches own one mark until the batch ends. Independent calls preserve visitation, while reset, compact-root behavior, proof traversal and copied/foreign/closed owner refusals are checked."
       ],
       "deviations": [
-        "Go methods replace the source stream-wrapper structs for retained callers; visited-mark overloads used only by unretained units are reference-only."
+        "Retained external-mark callers use the concrete compact expression/proof and noncompact expression-definition specializations. Go methods replace their stream-wrapper overloads; no unused universal visitor or arbitrary template adapter is introduced. The existing local-map printer remains the ordinary non-shared path."
       ]
     },
     {
@@ -106520,7 +106554,11 @@
         "pkg/smtcore/smt_asserted_bounds_test.go",
         "pkg/smtcore/smt_asserted_driver.go",
         "pkg/smtcore/smt_asserted_driver_test.go",
-        "pkg/smtcore/smt_asserted_publication_test.go"
+        "pkg/smtcore/smt_asserted_publication_test.go",
+        "pkg/smtcore/smt_asserted_diagnostics.go",
+        "pkg/smtcore/smt_asserted_setup.go",
+        "pkg/smtcore/smt_asserted_diagnostics_test.go",
+        "pkg/smtcore/smt_kernel_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -106572,7 +106610,15 @@
         "TestSMTAssertedPublicationAllocationFrontiers",
         "TestSMTAssertedMacroSwapPrecedesCanceledPostReduction",
         "TestSMTAssertedPropagationMarksUnchangedFalseFromRawSwap",
-        "TestSMTAssertedReductionPreservesUnchangedRowsAndEagerConflict"
+        "TestSMTAssertedReductionPreservesUnchangedRowsAndEagerConflict",
+        "TestSMTAssertedSetupMutatesSharedSourcePolicies",
+        "TestSMTAssertedVerbosePassNamesSizeAndSkippedGuards",
+        "TestSMTAssertedLowLevelDisplayUsesSharedDefinitions",
+        "TestSMTAssertedDriverTraceMetadataAndRefusals",
+        "TestSMTAssertedTraceDefinitionAllocationFrontiers",
+        "TestSMTAssertedVerbosePassSequenceCPPReference",
+        "TestSMTAssertedWellSortedConditionalErasure",
+        "TestSMTAssertedMacroTraceDisplaysHeadAndDefinition"
       ],
       "conditionals": [
         {
@@ -106855,9 +106901,57 @@
           ]
         },
         {
-          "name": "remaining preprocessing setup/reset details and driver verbose/trace/debug diagnostics",
+          "name": "setup shared parameter mutations after logic/basic setup, redundant non-ground ITE suppression, relevancy-lemma suppression and scope-pop rewriter cache flush",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_setup.go",
+          "go_targets": [
+            "pkg/smtcore/smt_asserted_bounds.go",
+            "pkg/smtcore/smt_kernel.go"
+          ],
+          "tests": [
+            "TestSMTAssertedSetupMutatesSharedSourcePolicies",
+            "TestSMTKernelScopesRestoreAssertionsAndContext"
+          ]
+        },
+        {
+          "name": "reduce/invoke verbose pass names and shared-DAG expression totals, source-gated well-sorted checks, driver/simplifier/quasi-macro trace metadata, fresh shared-definition display and actual macro head/definition printing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_diagnostics.go",
+          "go_targets": [
+            "pkg/smtcore/smt_asserted_driver.go",
+            "pkg/smtcore/smt_asserted_reduce.go"
+          ],
+          "tests": [
+            "TestSMTAssertedVerbosePassNamesSizeAndSkippedGuards",
+            "TestSMTAssertedLowLevelDisplayUsesSharedDefinitions",
+            "TestSMTAssertedDriverTraceMetadataAndRefusals",
+            "TestSMTAssertedTraceDefinitionAllocationFrontiers",
+            "TestSMTAssertedVerbosePassSequenceCPPReference",
+            "TestSMTAssertedWellSortedConditionalErasure",
+            "TestSMTAssertedMacroTraceDisplaysHeadAndDefinition"
+          ]
+        },
+        {
+          "name": "source generic post-operations and traces with an empty pending suffix; quasi-macro iterations publish each changed vector before continuing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_macros.go",
+          "go_targets": [
+            "pkg/smtcore/smt_asserted_reduce.go"
+          ],
+          "tests": [
+            "TestSMTAssertedQuasiMacrosPublishConditionalModel",
+            "TestSMTAssertedVerbosePassSequenceCPPReference"
+          ]
+        },
+        {
+          "name": "remaining assertion/scope/value-propagation/NNF/injectivity diagnostic hooks and retained-method audit",
           "status": "unported",
           "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "unused asserted_formulas::reset: retained kernel::reset destroys and reconstructs its context instead of calling this helper",
+          "status": "reference_only",
           "tests": []
         }
       ],
@@ -106869,12 +106963,14 @@
         "The kernel owns the pattern inference rewriter until close. The transformed formula batch pins inferred quantifiers and composed proofs; model-finder identities refer to those transformed quantifiers, preserving their source QIDs.",
         "The kernel owns the maximize_bv_sharing rewriter and pushes/pops its operand cache with assertion scopes. Bit2int owns its per-pass cache until transformed formula/proof rows have acquired references.",
         "Each generic simplifier and NNF owns its local transformed/flattened vector until source per-row cancellation checks permit a raw swap. Unchanged generic rows preserve original justifications, including conjunctive definitions. Post-operations run on the published vector; the NNF main composed proof is pinned during theory rewriting. Four allocation-frontier campaigns cover injectivity and NNF with proofs disabled/enabled and release all charged fixture storage.",
-        "Inconsistency is the explicit scoped source flag rather than a scan of published formulas: canceled local-vector transformations retain eager conflict state, while native allocation errors restore prior/published conflict state. User scope snapshots restore this flag on pop independently of the sticky has-quantifiers flag."
+        "Inconsistency is the explicit scoped source flag rather than a scan of published formulas: canceled local-vector transformations retain eager conflict state, while native allocation errors restore prior/published conflict state. User scope snapshots restore this flag on pop independently of the sticky has-quantifiers flag.",
+        "The diagnostic bridge borrows the selected verbose/trace services, uses a short-lived owning numeric stream for low-level output and the existing manager-owned AST printer frame, and retains no roots after completed printing. Two open/refused trace allocation campaigns release all charged fixture storage. Sticky ostream refusals still evaluate pretty-printer operands; conditional well-sorted operands are erased outside the source debug/tag/assertion gates."
       ],
       "deviations": [
         "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager.",
         "Go expands stored definitions before committing later assertions independently of new-discovery and ordinary-preprocessing flags. Definitions removed from the assertion list therefore remain effective after parameter changes and when quasi_macros is enabled without macro_finder.",
-        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; remaining setup/reset details and source driver diagnostic hooks remain unaudited, so this source unit remains partial."
+        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; remaining per-method diagnostic hooks and retained-method audit remain unfinished, so this source unit remains partial.",
+        "IF_IVERBOSE is erased in the selected _EXTERNAL_RELEASE source profile, including smt.reducing; ordinary IF_VERBOSE labels remain live. Independent prebuilt C++ comparisons verify complete selected pass order and shared-expression totals for ground and macro assertions. The unused reset helper is not ported; the surrounding live reset lifecycle reconstructs the context."
       ]
     },
     {
@@ -106909,7 +107005,11 @@
         "pkg/smtcore/smt_asserted_bounds_test.go",
         "pkg/smtcore/smt_asserted_driver.go",
         "pkg/smtcore/smt_asserted_driver_test.go",
-        "pkg/smtcore/smt_asserted_publication_test.go"
+        "pkg/smtcore/smt_asserted_publication_test.go",
+        "pkg/smtcore/smt_asserted_diagnostics.go",
+        "pkg/smtcore/smt_asserted_setup.go",
+        "pkg/smtcore/smt_asserted_diagnostics_test.go",
+        "pkg/smtcore/smt_kernel_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -106961,7 +107061,15 @@
         "TestSMTAssertedPublicationAllocationFrontiers",
         "TestSMTAssertedMacroSwapPrecedesCanceledPostReduction",
         "TestSMTAssertedPropagationMarksUnchangedFalseFromRawSwap",
-        "TestSMTAssertedReductionPreservesUnchangedRowsAndEagerConflict"
+        "TestSMTAssertedReductionPreservesUnchangedRowsAndEagerConflict",
+        "TestSMTAssertedSetupMutatesSharedSourcePolicies",
+        "TestSMTAssertedVerbosePassNamesSizeAndSkippedGuards",
+        "TestSMTAssertedLowLevelDisplayUsesSharedDefinitions",
+        "TestSMTAssertedDriverTraceMetadataAndRefusals",
+        "TestSMTAssertedTraceDefinitionAllocationFrontiers",
+        "TestSMTAssertedVerbosePassSequenceCPPReference",
+        "TestSMTAssertedWellSortedConditionalErasure",
+        "TestSMTAssertedMacroTraceDisplaysHeadAndDefinition"
       ],
       "conditionals": [
         {
@@ -107192,9 +107300,57 @@
           ]
         },
         {
-          "name": "remaining preprocessing setup/reset details and driver verbose/trace/debug diagnostics",
+          "name": "setup shared parameter mutations after logic/basic setup, redundant non-ground ITE suppression, relevancy-lemma suppression and scope-pop rewriter cache flush",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_setup.go",
+          "go_targets": [
+            "pkg/smtcore/smt_asserted_bounds.go",
+            "pkg/smtcore/smt_kernel.go"
+          ],
+          "tests": [
+            "TestSMTAssertedSetupMutatesSharedSourcePolicies",
+            "TestSMTKernelScopesRestoreAssertionsAndContext"
+          ]
+        },
+        {
+          "name": "reduce/invoke verbose pass names and shared-DAG expression totals, source-gated well-sorted checks, driver/simplifier/quasi-macro trace metadata, fresh shared-definition display and actual macro head/definition printing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_diagnostics.go",
+          "go_targets": [
+            "pkg/smtcore/smt_asserted_driver.go",
+            "pkg/smtcore/smt_asserted_reduce.go"
+          ],
+          "tests": [
+            "TestSMTAssertedVerbosePassNamesSizeAndSkippedGuards",
+            "TestSMTAssertedLowLevelDisplayUsesSharedDefinitions",
+            "TestSMTAssertedDriverTraceMetadataAndRefusals",
+            "TestSMTAssertedTraceDefinitionAllocationFrontiers",
+            "TestSMTAssertedVerbosePassSequenceCPPReference",
+            "TestSMTAssertedWellSortedConditionalErasure",
+            "TestSMTAssertedMacroTraceDisplaysHeadAndDefinition"
+          ]
+        },
+        {
+          "name": "source generic post-operations and traces with an empty pending suffix; quasi-macro iterations publish each changed vector before continuing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_macros.go",
+          "go_targets": [
+            "pkg/smtcore/smt_asserted_reduce.go"
+          ],
+          "tests": [
+            "TestSMTAssertedQuasiMacrosPublishConditionalModel",
+            "TestSMTAssertedVerbosePassSequenceCPPReference"
+          ]
+        },
+        {
+          "name": "remaining assertion/scope/value-propagation/NNF/injectivity diagnostic hooks and retained-method audit",
           "status": "unported",
           "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "unused asserted_formulas::reset: retained kernel::reset destroys and reconstructs its context instead of calling this helper",
+          "status": "reference_only",
           "tests": []
         }
       ],
@@ -107206,11 +107362,13 @@
         "The kernel owns the pattern inference rewriter until close. The transformed formula batch pins inferred quantifiers and composed proofs; model-finder identities refer to those transformed quantifiers, preserving their source QIDs.",
         "The kernel owns the maximize_bv_sharing rewriter and pushes/pops its operand cache with assertion scopes. Bit2int owns its per-pass cache until transformed formula/proof rows have acquired references.",
         "Each generic simplifier and NNF owns its local transformed/flattened vector until source per-row cancellation checks permit a raw swap. Unchanged generic rows preserve original justifications, including conjunctive definitions. Post-operations run on the published vector; the NNF main composed proof is pinned during theory rewriting. Four allocation-frontier campaigns cover injectivity and NNF with proofs disabled/enabled and release all charged fixture storage.",
-        "Inconsistency is the explicit scoped source flag rather than a scan of published formulas: canceled local-vector transformations retain eager conflict state, while native allocation errors restore prior/published conflict state. User scope snapshots restore this flag on pop independently of the sticky has-quantifiers flag."
+        "Inconsistency is the explicit scoped source flag rather than a scan of published formulas: canceled local-vector transformations retain eager conflict state, while native allocation errors restore prior/published conflict state. User scope snapshots restore this flag on pop independently of the sticky has-quantifiers flag.",
+        "The diagnostic bridge borrows the selected verbose/trace services, uses a short-lived owning numeric stream for low-level output and the existing manager-owned AST printer frame, and retains no roots after completed printing. Two open/refused trace allocation campaigns release all charged fixture storage. Sticky ostream refusals still evaluate pretty-printer operands; conditional well-sorted operands are erased outside the source debug/tag/assertion gates."
       ],
       "deviations": [
         "The concrete retained subset is integrated with SMTKernel rather than exposed as a preprocessing class.",
-        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; remaining setup/reset details and source driver diagnostic hooks remain unaudited, so this source unit remains partial."
+        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; remaining per-method diagnostic hooks and retained-method audit remain unfinished, so this source unit remains partial.",
+        "IF_IVERBOSE is erased in the selected _EXTERNAL_RELEASE source profile, including smt.reducing; ordinary IF_VERBOSE labels remain live. Independent prebuilt C++ comparisons verify complete selected pass order and shared-expression totals for ground and macro assertions. The unused reset helper is not ported; the surrounding live reset lifecycle reconstructs the context."
       ]
     },
     {
@@ -244365,14 +244523,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "c2cedb2cee38afd97fd2f5c04323a6d1c61dee86",
+    "commit": "a427c25e02e3419387577420c1610622454f899c",
     "command": "go -C pkg test ./... -count=1 -timeout=30m",
-    "started_utc": "2026-10-24 22:34:30.089231 UTC",
-    "completed_utc": "2026-10-24 22:48:13.861246 UTC",
+    "started_utc": "2026-10-24 23:33:19.707435 UTC",
+    "completed_utc": "2026-10-24 23:46:56.439176 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-c2cedb2c.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-c2cedb2c.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-c2cedb2c.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-a427c25e.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-a427c25e.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-a427c25e.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -244388,9 +244546,9 @@
     "package_timeout": "30m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 725.344,
+    "lp_seconds": 711.6,
     "checkout_held_unchanged": true,
-    "scope_warning": "Clean isolated exact-HEAD checkout; includes array/MBP completion and QSAT preparation, native kernel and alternating search/optimization core. Excludes subsequent recursive elimination and tactic/QMax/CLI integration increments, which have focused native and checked/debug/trace integration evidence."
+    "scope_warning": "Clean isolated exact-HEAD checkout; includes QSAT recursive elimination, tactic/QMax/CLI integration and both asserted-formula driver and per-row publication increments. Excludes subsequent assertion diagnostic/setup and caller-mark printer work, which has focused native and checked/debug/trace integration evidence."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

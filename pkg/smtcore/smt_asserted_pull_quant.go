@@ -12,7 +12,7 @@ import (
 
 func (k *SMTKernel) pullPendingNestedQuantifiers() (result error) {
 	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
-	if !k.preprocess || !k.preprocessState.PullNestedQuantifiers || !k.assertedHasQuantifiers || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.preprocessState.PullNestedQuantifiers || !k.assertedHasQuantifiers {
 		return nil
 	}
 	proc, err := normal_forms.NewPullNestedQuantifiers(k.manager)
@@ -41,7 +41,6 @@ func (k *SMTKernel) pullPendingNestedQuantifiers() (result error) {
 	if err != nil {
 		return err
 	}
-	changed := false
 	for _, assertion := range k.assertions[k.assertedHead:] {
 		if err := proc.RewriteWithProof(assertion.Formula, out, proof); err != nil {
 			return err
@@ -52,7 +51,6 @@ func (k *SMTKernel) pullPendingNestedQuantifiers() (result error) {
 		}
 		row := macros.Formula{Expression: value, Proof: assertion.Proof}
 		if value != assertion.Formula {
-			changed = true
 			if proofs {
 				rewrite, err := k.manager.RefGet(proof)
 				if err != nil {
@@ -76,9 +74,6 @@ func (k *SMTKernel) pullPendingNestedQuantifiers() (result error) {
 		if canceled, err := k.manager.Canceled(); canceled || err != nil {
 			return err
 		}
-	}
-	if !changed {
-		return nil
 	}
 	return k.finishAssertedPass(batch, false)
 }

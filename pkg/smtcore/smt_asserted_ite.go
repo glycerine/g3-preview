@@ -18,7 +18,7 @@ const (
 
 func (k *SMTKernel) liftPendingITEs(nonground bool) (result error) {
 	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
-	if !k.preprocess || k.assertedHead == len(k.assertions) {
+	if !k.preprocess {
 		return nil
 	}
 	kind := k.preprocessState.LiftITE
@@ -78,7 +78,7 @@ func (k *SMTKernel) liftPendingITEs(nonground bool) (result error) {
 func (k *SMTKernel) eliminatePendingTermITEs() (result error) {
 	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
 	if !k.preprocess || !k.preprocessState.EliminateTermITE ||
-		k.preprocessState.LiftITE == smtLiftITEFull || k.assertedHead == len(k.assertions) {
+		k.preprocessState.LiftITE == smtLiftITEFull {
 		return nil
 	}
 	proc, err := NewSMTTermITEEliminator(k.manager, k.definedNames)

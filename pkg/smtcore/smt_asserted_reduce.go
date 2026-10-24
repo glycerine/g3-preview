@@ -63,7 +63,7 @@ func (k *SMTKernel) setAssertedEliminateAnd(flag bool) error {
 
 func (k *SMTKernel) reducePendingAssertions() (result error) {
 	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
-	if !k.preprocess || k.preprocessor == nil || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || k.preprocessor == nil {
 		return nil
 	}
 	batch, err := macros.NewFormulaBatch(k.manager)
@@ -85,10 +85,15 @@ func (k *SMTKernel) reducePendingAssertions() (result error) {
 			return err
 		}
 	}
-	return k.swapPendingFormulaBatch(batch)
+	if err := k.swapPendingFormulaBatch(batch); err != nil {
+		return err
+	}
+	return k.traceAssertedState("asserted_formulas", "operator()", 416, false)
 }
 
 func (k *SMTKernel) reduceAndSolveAssertions() error {
+	// Source IF_IVERBOSE is erased in the selected _EXTERNAL_RELEASE
+	// profile; the ordinary IF_VERBOSE pass labels remain enabled.
 	if k.preprocessor != nil {
 		if err := k.preprocessor.Reset(); err != nil {
 			return err
@@ -108,6 +113,9 @@ func (k *SMTKernel) finishAssertedPass(batch *macros.FormulaBatch, reduce bool) 
 	if err := k.swapPendingFormulaBatch(batch); err != nil {
 		return err
 	}
+	if err := k.traceAssertedState("asserted_formulas", "operator()", 416, false); err != nil {
+		return err
+	}
 	if reduce {
 		return k.reduceAndSolveAssertions()
 	}
@@ -116,7 +124,7 @@ func (k *SMTKernel) finishAssertedPass(batch *macros.FormulaBatch, reduce bool) 
 
 func (k *SMTKernel) distributePendingUniversals() (result error) {
 	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
-	if !k.preprocess || !k.preprocessState.DistributeForall || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.preprocessState.DistributeForall {
 		return nil
 	}
 	if !k.assertedHasQuantifiers {

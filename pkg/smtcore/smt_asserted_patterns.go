@@ -11,7 +11,7 @@ import (
 
 func (k *SMTKernel) inferPendingPatterns() (result error) {
 	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
-	if !k.preprocess || !k.smtState.Ematching || k.patternInference == nil || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.smtState.Ematching || k.patternInference == nil {
 		return nil
 	}
 	if !k.assertedHasQuantifiers {

@@ -69,6 +69,9 @@ func (k *SMTKernel) invokeAssertedPass(pass assertedPass) (proceed bool, cancele
 	if !k.shouldApplyAssertedPass(pass) {
 		return true, false, nil
 	}
+	if err := assertedVerbose(10, "(smt."+pass.sourceName()+")\n"); err != nil {
+		return false, false, err
+	}
 	switch pass {
 	case assertedPropagate:
 		err = k.propagatePendingAssertions()
@@ -102,12 +105,24 @@ func (k *SMTKernel) invokeAssertedPass(pass assertedPass) (proceed bool, cancele
 		err = k.maximizePendingBVSharing()
 	}
 	if err != nil {
-		return false, false, fmt.Errorf("asserted preprocessing pass %d: %w", pass, err)
+		return false, false, fmt.Errorf("asserted preprocessing %s: %w", pass.sourceName(), err)
+	}
+	if err := k.assertedVerboseSize(); err != nil {
+		return false, false, err
+	}
+	if err := k.traceAssertedState("reduce_step_ll", "invoke", 285, true); err != nil {
+		return false, false, err
+	}
+	if err := k.checkAssertedWellSorted(286); err != nil {
+		return false, false, err
 	}
 	if k.assertedFormulasInconsistent() {
-		return false, false, nil
+		return false, false, k.traceAssertedAfterReduce("invoke", 288, 289)
 	}
 	canceled, err = k.manager.Canceled()
+	if err == nil && canceled {
+		err = k.traceAssertedAfterReduce("invoke", 288, 289)
+	}
 	return !canceled && err == nil, canceled, err
 }
 
@@ -140,6 +155,12 @@ func (k *SMTKernel) reduceAssertedPending() (bool, error) {
 			return false, err
 		}
 	}
+	if err := k.traceAssertedState("before_reduce", "reduce", 238, false); err != nil {
+		return false, err
+	}
+	if err := k.checkAssertedWellSorted(239); err != nil {
+		return false, err
+	}
 	if err := k.setAssertedEliminateAnd(false); err != nil {
 		return false, err
 	}
@@ -160,10 +181,22 @@ func (k *SMTKernel) reduceAssertedPending() (bool, error) {
 			return !canceled && err == nil, err
 		}
 	}
+	if err := assertedVerbose(10, "(smt.simplifier-done)\n"); err != nil {
+		return false, err
+	}
+	if err := k.traceAssertedAfterReduce("reduce", 263, 264); err != nil {
+		return false, err
+	}
+	if err := k.traceAssertedMacros(); err != nil {
+		return false, err
+	}
 	if k.preprocessor != nil {
 		if err := k.preprocessor.Reset(); err != nil {
 			return false, err
 		}
+	}
+	if err := k.checkAssertedWellSorted(267); err != nil {
+		return false, err
 	}
 	return true, nil
 }

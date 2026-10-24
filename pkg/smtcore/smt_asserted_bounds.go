@@ -24,6 +24,7 @@ func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 		if err := k.setupArrayBackend(); err != nil {
 			return err
 		}
+		k.setupAssertedPolicies()
 		k.preprocessingSetupDone = true
 		return nil
 	}
@@ -86,13 +87,14 @@ func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 	if err := k.setupArrayBackend(); err != nil {
 		return err
 	}
+	k.setupAssertedPolicies()
 	k.preprocessingSetupDone = true
 	return nil
 }
 
 func (k *SMTKernel) eliminatePendingBounds() (result error) {
 	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
-	if !k.preprocess || !k.preprocessState.EliminateBounds || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.preprocessState.EliminateBounds {
 		return nil
 	}
 	if !k.assertedHasQuantifiers {

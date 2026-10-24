@@ -1,4 +1,4 @@
-// Source: src/ast/ast_ll_pp.cpp:21-320; src/ast/for_each_ast.h:27-125;
+// Source: src/ast/ast_ll_pp.cpp:21-324; src/ast/for_each_ast.h:27-125;
 // src/ast/for_each_ast.cpp:37-48. Native Go traversal collections.
 package ast
 
@@ -18,6 +18,7 @@ import (
 type astLowLevelFrame struct {
 	stack                                []astNodeRef
 	marks                                map[astNodeRef]struct{}
+	visited                              *ASTMark
 	invocation                           uint64
 	Active, sourceDone                   bool
 	bodyCause, destructorCause, ownCause error
@@ -67,6 +68,7 @@ func (m *ASTManager) llFrameDestroy(owning bool) error {
 	}
 	f.stack = nil
 	f.marks = nil
+	f.visited = nil
 	f.sourceDone = true
 	if owning && f.numeralInsertion.Active() {
 		if e := m.numerals.CompleteNumeralInsertion(&f.numeralInsertion, true); e != nil {
@@ -79,6 +81,10 @@ func (m *ASTManager) llFrameDestroy(owning bool) error {
 	return nil
 }
 func (m *ASTManager) lowLevelPrint(out *utext.NumericTextStream, r astNodeRef, onlyExprs, compact bool) (result error) {
+	return m.lowLevelPrintWithVisited(out, r, r, onlyExprs, compact, nil)
+}
+
+func (m *ASTManager) lowLevelPrintWithVisited(out *utext.NumericTextStream, r, root astNodeRef, onlyExprs, compact bool, visited *ASTMark) (result error) {
 	f := &m.LowLevel
 	if f.Active {
 		return ErrASTPending
@@ -99,8 +105,11 @@ func (m *ASTManager) lowLevelPrint(out *utext.NumericTextStream, r astNodeRef, o
 		f.Active = false
 		return e
 	}
-	f.marks = make(map[astNodeRef]struct{})
-	p := astLowLevelPrinter{manager: m, out: out, root: r, onlyExprs: onlyExprs, compact: compact, arithFamily: fid, frame: f}
+	f.visited = visited
+	if visited == nil {
+		f.marks = make(map[astNodeRef]struct{})
+	}
+	p := astLowLevelPrinter{manager: m, out: out, root: root, onlyExprs: onlyExprs, compact: compact, arithFamily: fid, frame: f}
 	defer func() {
 		if result != nil && f.bodyCause == nil {
 			f.bodyCause = result
@@ -119,7 +128,11 @@ func (m *ASTManager) lowLevelPrint(out *utext.NumericTextStream, r astNodeRef, o
 		if e = m.validNode(curr); e != nil {
 			return e
 		}
-		if _, marked := f.marks[curr]; marked {
+		marked, err := p.marked(curr)
+		if err != nil {
+			return err
+		}
+		if marked {
 			f.stack[len(f.stack)-1] = astNodeRef{}
 			f.stack = f.stack[:len(f.stack)-1]
 			continue
@@ -149,14 +162,22 @@ func (m *ASTManager) lowLevelPrint(out *utext.NumericTextStream, r astNodeRef, o
 				if !complete {
 					continue
 				}
-				if _, yes := f.marks[d.rangeSort]; !yes {
+				yes, err := p.marked(d.rangeSort)
+				if err != nil {
+					return err
+				}
+				if !yes {
 					f.stack = append(f.stack, d.rangeSort)
 					continue
 				}
 			}
 		case ASTApp:
 			a := m.appAt(curr.slot)
-			if _, yes := f.marks[a.decl]; !yes {
+			yes, err := p.marked(a.decl)
+			if err != nil {
+				return err
+			}
+			if !yes {
 				f.stack = append(f.stack, a.decl)
 				continue
 			}
@@ -183,7 +204,11 @@ func (m *ASTManager) lowLevelPrint(out *utext.NumericTextStream, r astNodeRef, o
 			if !complete {
 				continue
 			}
-			if _, yes := f.marks[q.body]; !yes {
+			yes, err := p.marked(q.body)
+			if err != nil {
+				return err
+			}
+			if !yes {
 				f.stack = append(f.stack, q.body)
 				continue
 			}
@@ -194,12 +219,27 @@ func (m *ASTManager) lowLevelPrint(out *utext.NumericTextStream, r astNodeRef, o
 		if e = p.process(curr); e != nil {
 			return e
 		}
-		f.marks[curr] = struct{}{}
+		if visited != nil {
+			if err := visited.state.mark(m, m.external(curr), true); err != nil {
+				return err
+			}
+		} else {
+			f.marks[curr] = struct{}{}
+		}
 		f.stack[len(f.stack)-1] = astNodeRef{}
 		f.stack = f.stack[:len(f.stack)-1]
 	}
 	return nil
 }
+
+func (p *astLowLevelPrinter) marked(r astNodeRef) (bool, error) {
+	if p.frame.visited != nil {
+		return p.frame.visited.state.marked(p.manager, p.manager.external(r))
+	}
+	_, marked := p.frame.marks[r]
+	return marked, nil
+}
+
 func (p *astLowLevelPrinter) arguments(raw arena.SmallBytesRef, n uint32) (bool, error) {
 	all := true
 	for i := uint32(0); i < n; i++ {
@@ -210,7 +250,11 @@ func (p *astLowLevelPrinter) arguments(raw arena.SmallBytesRef, n uint32) (bool,
 		if e = p.manager.validNode(r); e != nil {
 			return false, e
 		}
-		if _, yes := p.frame.marks[r]; !yes {
+		yes, err := p.marked(r)
+		if err != nil {
+			return false, err
+		}
+		if !yes {
 			p.frame.stack = append(p.frame.stack, r)
 			all = false
 		}
@@ -251,7 +295,11 @@ func (p *astLowLevelPrinter) parameters(info *astInfoRecord) (bool, error) {
 			if e = p.manager.validNode(r); e != nil {
 				return false, e
 			}
-			if _, yes := p.frame.marks[r]; !yes {
+			yes, err := p.marked(r)
+			if err != nil {
+				return false, err
+			}
+			if !yes {
 				p.frame.stack = append(p.frame.stack, r)
 				all = false
 			}
@@ -820,4 +868,56 @@ func (m *ASTManager) DisplayLowLevel(out *utext.NumericTextStream, h ASTHandle, 
 		return e
 	}
 	return m.lowLevelPrint(out, r, onlyExprs, compact)
+}
+
+// DisplayLowLevelExpressionDefinitions is the retained asserted-formula
+// ast_def_ll_pp specialization: only expressions, noncompact definitions and
+// one visited set shared across all roots. The source printer has no root to
+// inline; callers retain the expressions while the native marks borrow them.
+func (m *ASTManager) DisplayLowLevelExpressionDefinitions(out *utext.NumericTextStream, roots []ASTHandle) (result error) {
+	visited, err := NewASTMark(m)
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, visited.Close()) }()
+	for _, h := range roots {
+		if err := m.DisplayLowLevelDefinitionWithVisited(out, h, visited); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// DisplayLowLevelWithVisited is the retained proof trace overload: expression
+// traversal with compact output and the caller's existing concrete AST mark.
+func (m *ASTManager) DisplayLowLevelWithVisited(out *utext.NumericTextStream, h ASTHandle, visited *ASTMark) error {
+	return m.displayLowLevelWithVisited(out, h, visited, false)
+}
+
+// DisplayLowLevelDefinitionWithVisited is the context/assertion definition
+// overload, using expression-only, noncompact output and no inlined root.
+func (m *ASTManager) DisplayLowLevelDefinitionWithVisited(out *utext.NumericTextStream, h ASTHandle, visited *ASTMark) error {
+	return m.displayLowLevelWithVisited(out, h, visited, true)
+}
+
+func (m *ASTManager) displayLowLevelWithVisited(out *utext.NumericTextStream, h ASTHandle, visited *ASTMark, definition bool) error {
+	if err := m.lock(); err != nil {
+		return err
+	}
+	defer m.mu.Unlock()
+	if visited == nil || visited.state.owner.manager != m {
+		return ErrASTHandle
+	}
+	if err := visited.state.owner.check(); err != nil {
+		return err
+	}
+	r, err := m.internal(h)
+	if err != nil {
+		return err
+	}
+	root := r
+	if definition {
+		root = astNodeRef{}
+	}
+	return m.lowLevelPrintWithVisited(out, r, root, true, !definition, visited)
 }

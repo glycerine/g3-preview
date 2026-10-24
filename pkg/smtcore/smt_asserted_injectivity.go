@@ -12,7 +12,7 @@ import (
 
 func (k *SMTKernel) refinePendingInjectivityAxioms() (result error) {
 	defer k.restoreAssertedConflictOnError(k.assertedInconsistent, &result)
-	if !k.preprocess || !k.preprocessState.RefineInjectivityAxiom || !k.assertedHasQuantifiers || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.preprocessState.RefineInjectivityAxiom || !k.assertedHasQuantifiers {
 		return nil
 	}
 	batch, err := macros.NewFormulaBatch(k.manager)
@@ -29,7 +29,6 @@ func (k *SMTKernel) refinePendingInjectivityAxioms() (result error) {
 	if err != nil {
 		return err
 	}
-	changed := false
 	for _, assertion := range k.assertions[k.assertedHead:] {
 		row := macros.Formula{Expression: assertion.Formula, Proof: assertion.Proof}
 		kind, err := k.manager.GetKind(assertion.Formula)
@@ -56,7 +55,6 @@ func (k *SMTKernel) refinePendingInjectivityAxioms() (result error) {
 						return err
 					}
 				}
-				changed = true
 			}
 		}
 		if err := k.appendTransformedAssertion(batch, assertion, row.Expression, row.Proof); err != nil {
@@ -65,9 +63,6 @@ func (k *SMTKernel) refinePendingInjectivityAxioms() (result error) {
 		if canceled, err := k.manager.Canceled(); canceled || err != nil {
 			return err
 		}
-	}
-	if !changed {
-		return nil
 	}
 	return k.finishAssertedPass(batch, false)
 }

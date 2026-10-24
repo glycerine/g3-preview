@@ -773,6 +773,9 @@ func (k *SMTKernel) Pop(count uint32) error {
 	k.scopes = k.scopes[:level]
 	k.assertedInconsistent = k.assertedScopeConflicts[level]
 	k.assertedScopeConflicts = k.assertedScopeConflicts[:level]
+	if k.preprocessor != nil {
+		return k.preprocessor.Reset()
+	}
 	return nil
 }
 

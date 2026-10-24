@@ -140,7 +140,7 @@ func TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof(t *testing.T) {
 	astTestMust(t, kernel.Assert(a, ast.ASTHandle{}))
 	var before strings.Builder
 	astTestMust(t, kernel.DisplayAssertedFormulas(&before))
-	if got := before.String(); got != "asserted formulas:\n[HEAD] ==>\nasserted-display-a\ninconsistent: false\n" {
+	if got := before.String(); got != "asserted formulas:\n[HEAD] ==>\nasserted-display-a\ninconsistent: 0\n" {
 		t.Fatal("pending asserted-formula display", got)
 	}
 	if proof, err := kernel.AssertionInconsistencyProof(); err != nil || !proof.IsNull() {
@@ -170,7 +170,7 @@ func TestSMTKernelAssertedFormulaDisplayAndInconsistencyProof(t *testing.T) {
 	}
 	var inconsistent strings.Builder
 	astTestMust(t, kernel.DisplayAssertedFormulas(&inconsistent))
-	if !strings.Contains(inconsistent.String(), "inconsistent: true") {
+	if !strings.Contains(inconsistent.String(), "inconsistent: 1") {
 		t.Fatal("inconsistent asserted-formula display", inconsistent.String())
 	}
 }

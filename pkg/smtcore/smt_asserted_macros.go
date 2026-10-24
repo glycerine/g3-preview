@@ -11,7 +11,7 @@ import (
 )
 
 func (k *SMTKernel) findPendingMacros() (result error) {
-	if !k.preprocess || !k.preprocessState.MacroFinder || !k.assertedHasQuantifiers || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.preprocessState.MacroFinder || !k.assertedHasQuantifiers {
 		return nil
 	}
 	inputs := make([]macros.Formula, 0, len(k.assertions)-k.assertedHead)
@@ -69,7 +69,7 @@ func (k *SMTKernel) swapPendingFormulaBatch(batch *macros.FormulaBatch) (result 
 // Discovery flags do not change definitions already removed from the formula
 // list. Expand those definitions before committing any later assertions.
 func (k *SMTKernel) expandPendingMacros() (result error) {
-	if !k.assertedMacros.HasMacros() || k.assertedHead == len(k.assertions) {
+	if !k.assertedMacros.HasMacros() {
 		return nil
 	}
 	batch, err := macros.NewFormulaBatch(k.manager)
@@ -110,12 +110,11 @@ func (k *SMTKernel) expandPendingMacros() (result error) {
 // applyPendingQuasiMacros follows the source repeated quasi-macro pass. Each
 // batch owns the formulas until the next pass has acquired its references.
 func (k *SMTKernel) applyPendingQuasiMacros() (result error) {
-	if !k.preprocess || !k.preprocessState.QuasiMacros || !k.assertedHasQuantifiers || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.preprocessState.QuasiMacros || !k.assertedHasQuantifiers {
 		return nil
 	}
-	var inputs []macros.Formula
-	for _, assertion := range k.assertions[k.assertedHead:] {
-		inputs = append(inputs, macros.Formula{Expression: assertion.Formula, Proof: assertion.Proof})
+	if err := k.traceAssertedState("before_quasi_macros", "apply_quasi_macros", 338, false); err != nil {
+		return err
 	}
 	proc, err := macros.NewQuasiMacros(k.manager, k.assertedMacros)
 	if err != nil {
@@ -128,29 +127,30 @@ func (k *SMTKernel) applyPendingQuasiMacros() (result error) {
 		}
 	}()
 	for {
+		var inputs []macros.Formula
+		for _, assertion := range k.assertions[k.assertedHead:] {
+			inputs = append(inputs, macros.Formula{Expression: assertion.Formula, Proof: assertion.Proof})
+		}
 		next, changed, err := proc.Apply(inputs)
 		if err != nil {
 			return err
-		}
-		if batch != nil {
-			if err = batch.Close(); err != nil {
-				return errors.Join(err, next.Close())
-			}
 		}
 		batch = next
 		if !changed {
 			break
 		}
-		inputs = nil
-		for i := 0; i < batch.Len(); i++ {
-			row, err := batch.At(i)
-			if err != nil {
-				return err
-			}
-			inputs = append(inputs, row)
+		if err := k.swapPendingFormulaBatch(batch); err != nil {
+			return err
 		}
+		if err := batch.Close(); err != nil {
+			return err
+		}
+		batch = nil
 	}
-	return k.replacePendingMacroBatch(batch)
+	if err := k.traceAssertedState("after_quasi_macros", "apply_quasi_macros", 347, false); err != nil {
+		return err
+	}
+	return k.reduceAndSolveAssertions()
 }
 
 func (g *SMTModelGenerator) registerAssertedMacros(manager *macros.Manager) (result error) {
