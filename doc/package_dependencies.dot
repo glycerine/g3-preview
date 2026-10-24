@@ -300,6 +300,7 @@ digraph packages {
   "qe" -> "tactic";
   "qe" -> "util/cooperate";
   "qe" -> "util/diagnostic";
+  "qe" -> "util/lbool";
   "qe" -> "util/memory";
   "qe" -> "util/numeral";
   "qe" -> "util/params";

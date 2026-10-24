@@ -92193,9 +92193,23 @@
       "path": "src/qe/qe_arrays.cpp",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/qe/array_projection.go",
+        "pkg/qe/array_projection_equalities.go",
+        "pkg/qe/array_projection_selects.go",
+        "pkg/qe/projection_partition.go",
+        "pkg/qe/array_projection_test.go",
+        "pkg/qe/array_projection_cpp_test.go",
+        "pkg/qe/trace.go"
+      ],
+      "tests": [
+        "TestArrayProjectionSourceModelsVariablesAndRefusals",
+        "TestArrayProjectionUnknownIndicesRollback",
+        "TestArrayProjectionReuseNoopAndOwnerGuards",
+        "TestArrayProjectionAllocationFrontiers",
+        "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+      ],
       "assertions": [
         {
           "line": 48,
@@ -92230,19 +92244,119 @@
           "text": "VERIFY (model.eval (sel, val));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "array_project_plugin constructor/destructor/get_family_id, no-op solve and single-variable operator(): equality-first projection, source trace sites and owner/model/domain guards",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/array_projection.go",
+            "pkg/qe/array_projection_equalities.go",
+            "pkg/qe/array_projection_selects.go",
+            "pkg/qe/projection_partition.go",
+            "pkg/qe/array_projection_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArrayProjectionSourceModelsVariablesAndRefusals",
+            "TestArrayProjectionUnknownIndicesRollback",
+            "TestArrayProjectionReuseNoopAndOwnerGuards",
+            "TestArrayProjectionAllocationFrontiers",
+            "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+          ]
+        },
+        {
+          "name": "indices/compare/contains/mk_eq and solve_eq/solve: model index classification, source first-undefined behavior, exact normal-refusal rollback, repeated/distinct store chains and interpreted restoration variables",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/array_projection.go",
+            "pkg/qe/array_projection_equalities.go",
+            "pkg/qe/array_projection_selects.go",
+            "pkg/qe/projection_partition.go",
+            "pkg/qe/array_projection_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArrayProjectionSourceModelsVariablesAndRefusals",
+            "TestArrayProjectionUnknownIndicesRollback",
+            "TestArrayProjectionReuseNoopAndOwnerGuards",
+            "TestArrayProjectionAllocationFrontiers",
+            "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+          ]
+        },
+        {
+          "name": "contains_x/is_update_x/is_diseq_x/check_diseqs/elim_diseqs: source app traversal and unique direct selects, bare-target disequality removal and conservative store-disequality refusal",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/array_projection.go",
+            "pkg/qe/array_projection_equalities.go",
+            "pkg/qe/array_projection_selects.go",
+            "pkg/qe/projection_partition.go",
+            "pkg/qe/array_projection_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArrayProjectionSourceModelsVariablesAndRefusals",
+            "TestArrayProjectionUnknownIndicesRollback",
+            "TestArrayProjectionReuseNoopAndOwnerGuards",
+            "TestArrayProjectionAllocationFrontiers",
+            "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+          ]
+        },
+        {
+          "name": "ackermanize_select/remove_true: fresh interpreted sel variables, replacement by evaluated model values, syntactic true removal and shared argument/value partitioning",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/array_projection.go",
+            "pkg/qe/array_projection_equalities.go",
+            "pkg/qe/array_projection_selects.go",
+            "pkg/qe/projection_partition.go",
+            "pkg/qe/array_projection_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArrayProjectionSourceModelsVariablesAndRefusals",
+            "TestArrayProjectionUnknownIndicesRollback",
+            "TestArrayProjectionReuseNoopAndOwnerGuards",
+            "TestArrayProjectionAllocationFrontiers",
+            "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+          ]
+        }
+      ],
+      "ownership": [
+        "ArrayProjection owns its persistent concrete ContainsApp checker. Actual per-call ASTRefs retain erased equations, select terms, model values and reconstructed witnesses; lazy ModelEvaluator, safe replacers and stopped construction-failure receipts remain reachable until cleanup succeeds. Caller vectors and model retain completed writes/registrations. Twenty first-success allocation campaigns cover construction, scalar/Boolean/multidimensional/array-valued/nested reads, disequalities, equality/store chains, reuse and open/closed success/refusal tracing; all charged fixture storage is released."
+      ],
+      "deviations": [
+        "The source commented-out rw_cfg and its NOT_IMPLEMENTED_YET comparator are unreachable and deliberately omitted. No select/store reducer or universal rewriter adapter is activated. Source is_update_x do/while(false) recognizes only the bare target; store disequalities remain refused. Store equality retains the source loop bound checking all but the final index. Ackermann reduction appends fresh interpreted sel variables but replaces selects with model values, preserving the source behavior. Go maps provide lookup only; explicit slices preserve source traversal/representative order.",
+        "Seventeen prebuilt C++ cases check unchanged native output implies the original under an explicit symbolic array witness and remains satisfiable; refused cases check unchanged-formula equivalence. SMT-LIB let delegates witness substitution to the C++ parser independently of native replacement. This constructive implication proves existence for arbitrary remaining parameters satisfying the output. It avoids the reference executable returning unknown on quantified-array queries; no native result receives additional elimination or repair. Complete MBP dispatch, QSAT and full QE remain unfinished."
+      ]
     },
     {
       "path": "src/qe/qe_arrays.h",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/qe/array_projection.go",
+        "pkg/qe/array_projection_equalities.go",
+        "pkg/qe/array_projection_selects.go",
+        "pkg/qe/projection_partition.go",
+        "pkg/qe/array_projection_test.go",
+        "pkg/qe/array_projection_cpp_test.go",
+        "pkg/qe/trace.go"
+      ],
+      "tests": [
+        "TestArrayProjectionSourceModelsVariablesAndRefusals",
+        "TestArrayProjectionUnknownIndicesRollback",
+        "TestArrayProjectionReuseNoopAndOwnerGuards",
+        "TestArrayProjectionAllocationFrontiers",
+        "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -92253,11 +92367,97 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "array_project_plugin constructor/destructor/get_family_id, no-op solve and single-variable operator(): equality-first projection, source trace sites and owner/model/domain guards",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/array_projection.go",
+            "pkg/qe/array_projection_equalities.go",
+            "pkg/qe/array_projection_selects.go",
+            "pkg/qe/projection_partition.go",
+            "pkg/qe/array_projection_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArrayProjectionSourceModelsVariablesAndRefusals",
+            "TestArrayProjectionUnknownIndicesRollback",
+            "TestArrayProjectionReuseNoopAndOwnerGuards",
+            "TestArrayProjectionAllocationFrontiers",
+            "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+          ]
+        },
+        {
+          "name": "indices/compare/contains/mk_eq and solve_eq/solve: model index classification, source first-undefined behavior, exact normal-refusal rollback, repeated/distinct store chains and interpreted restoration variables",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/array_projection.go",
+            "pkg/qe/array_projection_equalities.go",
+            "pkg/qe/array_projection_selects.go",
+            "pkg/qe/projection_partition.go",
+            "pkg/qe/array_projection_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArrayProjectionSourceModelsVariablesAndRefusals",
+            "TestArrayProjectionUnknownIndicesRollback",
+            "TestArrayProjectionReuseNoopAndOwnerGuards",
+            "TestArrayProjectionAllocationFrontiers",
+            "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+          ]
+        },
+        {
+          "name": "contains_x/is_update_x/is_diseq_x/check_diseqs/elim_diseqs: source app traversal and unique direct selects, bare-target disequality removal and conservative store-disequality refusal",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/array_projection.go",
+            "pkg/qe/array_projection_equalities.go",
+            "pkg/qe/array_projection_selects.go",
+            "pkg/qe/projection_partition.go",
+            "pkg/qe/array_projection_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArrayProjectionSourceModelsVariablesAndRefusals",
+            "TestArrayProjectionUnknownIndicesRollback",
+            "TestArrayProjectionReuseNoopAndOwnerGuards",
+            "TestArrayProjectionAllocationFrontiers",
+            "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+          ]
+        },
+        {
+          "name": "ackermanize_select/remove_true: fresh interpreted sel variables, replacement by evaluated model values, syntactic true removal and shared argument/value partitioning",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/array_projection.go",
+            "pkg/qe/array_projection_equalities.go",
+            "pkg/qe/array_projection_selects.go",
+            "pkg/qe/projection_partition.go",
+            "pkg/qe/array_projection_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArrayProjectionSourceModelsVariablesAndRefusals",
+            "TestArrayProjectionUnknownIndicesRollback",
+            "TestArrayProjectionReuseNoopAndOwnerGuards",
+            "TestArrayProjectionAllocationFrontiers",
+            "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+          ]
+        }
+      ],
+      "ownership": [
+        "ArrayProjection owns its persistent concrete ContainsApp checker. Actual per-call ASTRefs retain erased equations, select terms, model values and reconstructed witnesses; lazy ModelEvaluator, safe replacers and stopped construction-failure receipts remain reachable until cleanup succeeds. Caller vectors and model retain completed writes/registrations. Twenty first-success allocation campaigns cover construction, scalar/Boolean/multidimensional/array-valued/nested reads, disequalities, equality/store chains, reuse and open/closed success/refusal tracing; all charged fixture storage is released."
+      ],
+      "deviations": [
+        "The source commented-out rw_cfg and its NOT_IMPLEMENTED_YET comparator are unreachable and deliberately omitted. No select/store reducer or universal rewriter adapter is activated. Source is_update_x do/while(false) recognizes only the bare target; store disequalities remain refused. Store equality retains the source loop bound checking all but the final index. Ackermann reduction appends fresh interpreted sel variables but replaces selects with model values, preserving the source behavior. Go maps provide lookup only; explicit slices preserve source traversal/representative order.",
+        "Seventeen prebuilt C++ cases check unchanged native output implies the original under an explicit symbolic array witness and remains satisfiable; refused cases check unchanged-formula equivalence. SMT-LIB let delegates witness substitution to the C++ parser independently of native replacement. This constructive implication proves existence for arbitrary remaining parameters satisfying the output. It avoids the reference executable returning unknown on quantified-array queries; no native result receives additional elimination or repair. Complete MBP dispatch, QSAT and full QE remain unfinished."
+      ]
     },
     {
       "path": "src/qe/qe_bool_plugin.cpp",
@@ -93401,7 +93601,13 @@
         "pkg/qe/datatype_projection.go",
         "pkg/qe/datatype_equations.go",
         "pkg/qe/datatype_projection_test.go",
-        "pkg/qe/datatype_projection_cpp_test.go"
+        "pkg/qe/datatype_projection_cpp_test.go",
+        "pkg/qe/array_projection.go",
+        "pkg/qe/array_projection_equalities.go",
+        "pkg/qe/array_projection_selects.go",
+        "pkg/qe/projection_partition.go",
+        "pkg/qe/array_projection_test.go",
+        "pkg/qe/array_projection_cpp_test.go"
       ],
       "tests": [
         "TestArithmeticProjectionModelPreservationAndVariables",
@@ -93419,7 +93625,12 @@
         "TestDatatypeProjectionAllocationFrontiers",
         "TestDatatypeProjectionReuseTraceAndOwnerGuards",
         "TestDatatypeProjectionCPPExistentialImplication",
-        "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+        "TestDatatypeProjectionCPPForeignEqualityEquivalence",
+        "TestArrayProjectionSourceModelsVariablesAndRefusals",
+        "TestArrayProjectionUnknownIndicesRollback",
+        "TestArrayProjectionReuseNoopAndOwnerGuards",
+        "TestArrayProjectionAllocationFrontiers",
+        "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
       ],
       "assertions": [
         {
@@ -93579,15 +93790,36 @@
             "TestProjectionPreprocessCPPCubeImplication",
             "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
           ]
+        },
+        {
+          "name": "project_plugin::partition_values/partition_args: evaluated-value grouping, first representatives, ordered raw equalities/distinctness and per-index argument partitions",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/array_projection.go",
+            "pkg/qe/array_projection_equalities.go",
+            "pkg/qe/array_projection_selects.go",
+            "pkg/qe/projection_partition.go",
+            "pkg/qe/array_projection_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArrayProjectionSourceModelsVariablesAndRefusals",
+            "TestArrayProjectionUnknownIndicesRollback",
+            "TestArrayProjectionReuseNoopAndOwnerGuards",
+            "TestArrayProjectionAllocationFrontiers",
+            "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+          ]
         }
       ],
       "ownership": [
         "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced.",
         "The private projectionPreprocessor retains its concrete theory rewriter and actual per-call ASTRefs, model evaluator, safe replacers, ContainsApp owners, ASTExprMarks and construction-failure receipts. Erased expressions remain rooted while their children are borrowed. Caller vectors retain completed appends/replacements and source compaction. Fourteen first-success reservation campaigns cover constructor, literal/Boolean/nested extraction, equality/cycle solving, Boolean projection, filtering and open/closed tracing; all charged fixture storage is released. Successful extraction resets its shared Boolean-visited set for reuse.",
-        "The same concrete pickProjectionEquality helper serves MBP extraction and recursive datatype solving, with evaluated model values and the selected equality held in each actual caller's mutable ASTRef vector through stopped cleanup."
+        "The same concrete pickProjectionEquality helper serves MBP extraction and recursive datatype solving, with evaluated model values and the selected equality held in each actual caller's mutable ASTRef vector through stopped cleanup.",
+        "Shared partition helpers retain evaluated values in the actual caller ASTRef vector and append owning equality/distinct references to the caller literal vector. No generic callback owner or unused template instantiation is introduced."
       ],
       "deviations": [
-        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, array projection and its cheap solve hook, partition_values/partition_args, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
+        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
       ]
     },
     {
@@ -93615,7 +93847,13 @@
         "pkg/qe/datatype_projection.go",
         "pkg/qe/datatype_equations.go",
         "pkg/qe/datatype_projection_test.go",
-        "pkg/qe/datatype_projection_cpp_test.go"
+        "pkg/qe/datatype_projection_cpp_test.go",
+        "pkg/qe/array_projection.go",
+        "pkg/qe/array_projection_equalities.go",
+        "pkg/qe/array_projection_selects.go",
+        "pkg/qe/projection_partition.go",
+        "pkg/qe/array_projection_test.go",
+        "pkg/qe/array_projection_cpp_test.go"
       ],
       "tests": [
         "TestArithmeticProjectionModelPreservationAndVariables",
@@ -93633,7 +93871,12 @@
         "TestDatatypeProjectionAllocationFrontiers",
         "TestDatatypeProjectionReuseTraceAndOwnerGuards",
         "TestDatatypeProjectionCPPExistentialImplication",
-        "TestDatatypeProjectionCPPForeignEqualityEquivalence"
+        "TestDatatypeProjectionCPPForeignEqualityEquivalence",
+        "TestArrayProjectionSourceModelsVariablesAndRefusals",
+        "TestArrayProjectionUnknownIndicesRollback",
+        "TestArrayProjectionReuseNoopAndOwnerGuards",
+        "TestArrayProjectionAllocationFrontiers",
+        "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
       ],
       "conditionals": [
         {
@@ -93753,15 +93996,36 @@
             "TestProjectionPreprocessCPPCubeImplication",
             "TestProjectionPreprocessCPPEqualityAndBooleanProjection"
           ]
+        },
+        {
+          "name": "project_plugin::partition_values/partition_args: evaluated-value grouping, first representatives, ordered raw equalities/distinctness and per-index argument partitions",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/array_projection.go",
+            "pkg/qe/array_projection_equalities.go",
+            "pkg/qe/array_projection_selects.go",
+            "pkg/qe/projection_partition.go",
+            "pkg/qe/array_projection_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/trace.go"
+          ],
+          "tests": [
+            "TestArrayProjectionSourceModelsVariablesAndRefusals",
+            "TestArrayProjectionUnknownIndicesRollback",
+            "TestArrayProjectionReuseNoopAndOwnerGuards",
+            "TestArrayProjectionAllocationFrontiers",
+            "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+          ]
         }
       ],
       "ownership": [
         "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced.",
         "The private projectionPreprocessor retains its concrete theory rewriter and actual per-call ASTRefs, model evaluator, safe replacers, ContainsApp owners, ASTExprMarks and construction-failure receipts. Erased expressions remain rooted while their children are borrowed. Caller vectors retain completed appends/replacements and source compaction. Fourteen first-success reservation campaigns cover constructor, literal/Boolean/nested extraction, equality/cycle solving, Boolean projection, filtering and open/closed tracing; all charged fixture storage is released. Successful extraction resets its shared Boolean-visited set for reuse.",
-        "The same concrete pickProjectionEquality helper serves MBP extraction and recursive datatype solving, with evaluated model values and the selected equality held in each actual caller's mutable ASTRef vector through stopped cleanup."
+        "The same concrete pickProjectionEquality helper serves MBP extraction and recursive datatype solving, with evaluated model values and the selected equality held in each actual caller's mutable ASTRef vector through stopped cleanup.",
+        "Shared partition helpers retain evaluated values in the actual caller ASTRef vector and append owning equality/distinct references to the caller literal vector. No generic callback owner or unused template instantiation is introduced."
       ],
       "deviations": [
-        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, array projection and its cheap solve hook, partition_values/partition_args, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
+        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
       ]
     },
     {
@@ -243121,14 +243385,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "4611fd29f988b2a65c43ae96184bd8aa02c4830c",
+    "commit": "a20bfbf2b273d76f60e2d087227a929adad2ec9f",
     "command": "go -C pkg test ./... -count=1 -timeout=30m",
-    "started_utc": "2026-10-24 19:24:54 UTC",
-    "completed_utc": "2026-10-24 19:38:13 UTC",
+    "started_utc": "2026-10-24 21:34:17.839377 UTC",
+    "completed_utc": "2026-10-24 21:47:40.042075 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-4611fd29.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-4611fd29.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-4611fd29.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-a20bfbf2.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-a20bfbf2.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-a20bfbf2.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -243144,9 +243408,9 @@
     "package_timeout": "30m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 707.084,
+    "lp_seconds": 707.936,
     "checkout_held_unchanged": true,
-    "scope_warning": "Clean isolated exact-HEAD checkout; includes quantified strategies, equality DER, array DER and complete retained Fourier-Motzkin elimination. Excludes the subsequent Lite public-overload/traversal increment, which has focused native and checked/debug/trace integration checks."
+    "scope_warning": "Clean isolated exact-HEAD checkout; includes QE-lite integration, UFNIA, predicate abstraction, arithmetic projection, MBP common preprocessing and datatype projection. Excludes the subsequent array-projection increment, which has focused native and checked/debug/trace integration checks."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
