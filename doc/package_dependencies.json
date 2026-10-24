@@ -2163,13 +2163,17 @@
         "equality_der_order.go",
         "equality_der_quantifier.go",
         "equality_der_trace.go",
+        "fm_candidates.go",
         "fm_constraint_arithmetic.go",
         "fm_constraint_expression.go",
         "fm_constraint_parse.go",
         "fm_constraint_trace.go",
         "fm_constraints.go",
+        "fm_elimination.go",
         "fm_recognizer.go",
+        "fm_resolution.go",
         "fm_subsumption.go",
+        "fourier_motzkin.go",
         "occurs.go",
         "trace.go"
       ]

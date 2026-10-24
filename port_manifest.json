@@ -92143,7 +92143,15 @@
         "pkg/qe/fm_subsumption.go",
         "pkg/qe/fm_constraints_test.go",
         "pkg/qe/fm_subsumption_test.go",
-        "pkg/qe/fm_constraints_cpp_test.go"
+        "pkg/qe/fm_constraints_cpp_test.go",
+        "pkg/qe/fm_candidates.go",
+        "pkg/qe/fm_resolution.go",
+        "pkg/qe/fm_elimination.go",
+        "pkg/qe/fourier_motzkin.go",
+        "pkg/qe/fm_resolution_test.go",
+        "pkg/qe/fourier_motzkin_test.go",
+        "pkg/qe/fourier_motzkin_cpp_test.go",
+        "pkg/qe/fourier_motzkin_frontier_test.go"
       ],
       "tests": [
         "TestVariableTestCopiesSetComplementAndDeclarationBoundary",
@@ -92174,7 +92182,14 @@
         "TestFMSubsumptionPolynomialLiteralAndStrictness",
         "TestFMRegistrationBackwardSubsumptionAndConstantConstraints",
         "TestFMConstraintNormalizationCPPLogicalEquivalence",
-        "TestFMConstraintCopiesConstructorOperands"
+        "TestFMConstraintCopiesConstructorOperands",
+        "TestFMCandidateStableOrderCostsAndIntegerBounds",
+        "TestFMResolutionCoefficientsCancellationStrictnessAndLiterals",
+        "TestFMEliminationGrowthCutoffsAndFinalPairBoundary",
+        "TestFourierMotzkinDriverProjectionAndRepeatedBooleanRuns",
+        "TestFourierMotzkinQuantifierRefusalCancellationAndOwnerGuards",
+        "TestFourierMotzkinCPPProjectionNormalForms",
+        "TestFourierMotzkinAllocationFrontiersAndClosedTrace"
       ],
       "conditionals": [
         {
@@ -92422,7 +92437,7 @@
           ]
         },
         {
-          "name": "fm::fm is_literal/is_constraint, is_var, is_linear_mon_core/is_linear_mon, is_linear_pol, is_linear_ineq, is_occ and init_forbidden_set/forbidden_proc: source normal forms, selected/coerced variables, duplicate refusal, sequential forbidden-index discovery and annotation-inclusive traversal",
+          "name": "fm::fm is_literal, is_var, is_linear_mon_core, is_linear_pol, is_linear_ineq, is_occ and init_forbidden_set/forbidden_proc: source normal forms, selected/coerced variables, duplicate refusal, sequential forbidden-index discovery and annotation-inclusive traversal",
           "status": "ported",
           "go_targets": [
             "pkg/qe/fm_recognizer.go",
@@ -92457,20 +92472,45 @@
             "TestFMConstraintNormalizationCPPLogicalEquivalence",
             "TestFMConstraintCopiesConstructorOperands"
           ]
+        },
+        {
+          "name": "Complete retained fm::fm algorithm and owning entry point: saturated cost and stable candidate order, cleanup/analyze/can_eliminate, dead marking, get_coeff/resolve, source growth and work cutoffs, copy_remaining, checkpoint, initialization/input ingestion/quantifier refusal, mutable conjunction commit, selector update and destruction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/fm_candidates.go",
+            "pkg/qe/fm_resolution.go",
+            "pkg/qe/fm_elimination.go",
+            "pkg/qe/fourier_motzkin.go",
+            "pkg/qe/fm_resolution_test.go",
+            "pkg/qe/fourier_motzkin_test.go",
+            "pkg/qe/fourier_motzkin_cpp_test.go",
+            "pkg/qe/fourier_motzkin_frontier_test.go"
+          ],
+          "tests": [
+            "TestFMCandidateStableOrderCostsAndIntegerBounds",
+            "TestFMResolutionCoefficientsCancellationStrictnessAndLiterals",
+            "TestFMEliminationGrowthCutoffsAndFinalPairBoundary",
+            "TestFourierMotzkinDriverProjectionAndRepeatedBooleanRuns",
+            "TestFourierMotzkinQuantifierRefusalCancellationAndOwnerGuards",
+            "TestFourierMotzkinCPPProjectionNormalForms",
+            "TestFourierMotzkinAllocationFrontiersAndClosedTrace"
+          ]
         }
       ],
       "ownership": [
         "ArrayDER borrows its concrete selector and parameter/cooperation/trace services and owns a reusable ASTExprMark. Caller conjunction ASTRef slices retain updated formula ownership and completed prefixes on error. Lexical ExprSafeReplace/output owners remain reachable through ArrayDERFailure if destruction stops; explicit cleanup retries actual retained owners. Constructor, select/disequality, enabled trace and closed-trace reservation campaigns reach first success with zero charged fixture storage.",
         "EqualityDER owns reusable substitution/theory rewriting state and a constructor parameter snapshot; selector and Config services are borrowed. Lexical AST references, native numeral-service values, Boolean rewriters and selectors remain reachable through a typed construction-failure receipt until cleanup completes. Mutable conjunction slices retain completed writes on error. Seven allocation campaigns reach first success with zero charged fixture storage, including large rational coefficients, proofs and open/closed trace streams.",
         "FM recognition borrows the AST manager, concrete VariableTest and Config services. Forbidden indices and traversal membership use native maps and slices. The private recognizer introduces no second AST/numeral owner; tests release all fixture-charged storage. Open/closed trace paths preserve source expression evaluation and formula recognition.",
-        "Private fmStore retains actual partially constructed constraints before coefficient allocation, with concrete owned numeral-service values, copied literal/variable slices and pinned arithmetic/Boolean expressions. fmScope owns lexical numbers, expression references and stopped child failure receipts until retryable cleanup completes; fmStoreFailure retains the real owner. Eleven first-success reservation campaigns cover construction, parsing, normalization, output, registration, subsumption, row deletion, owner closure and enabled/closed diagnostics, all with zero charged fixture storage. Output references survive store destruction."
+        "Private fmStore retains actual partially constructed constraints before coefficient allocation, with concrete owned numeral-service values, copied literal/variable slices and pinned arithmetic/Boolean expressions. fmScope owns lexical numbers, expression references and stopped child failure receipts until retryable cleanup completes; fmStoreFailure retains the real owner. Eleven first-success reservation campaigns cover construction, parsing, normalization, output, registration, subsumption, row deletion, owner closure and enabled/closed diagnostics, all with zero charged fixture storage. Output references survive store destruction.",
+        "FourierMotzkin borrows manager, concrete selector and Config services and owns a fresh fmStore per application, including the completed output references retained until the next call or Close. All newly resolved constraints are published to the actual store before numeral allocation; rejected batches retire their concrete owners. Typed child construction-failure receipts remain reachable through FourierMotzkinFailure if cleanup stops. Eleven complete-driver reservation campaigns cover constructor, real and large-coefficient resolution, integer success/refusal, literal resolution, inconsistency, tautology, repeated Boolean calls and enabled/closed tracing, with zero charged fixture storage."
       ],
       "deviations": [
-        "Fourier-Motzkin elimination, qe_lite public overloads, full traversal configuration and qe-light tactic remain unported. Equality DER and array DER are complete prerequisites; no Go qe-light registration or quantified-strategy substitute is added prematurely.",
+        "qe_lite public overloads, full traversal configuration and qe-light tactic remain unported. Equality DER, array DER and the complete retained Fourier-Motzkin phase are ready prerequisites; no Go qe-light registration or quantified-strategy substitute is added prematurely.",
         "C++ returns UNKNOWN for the raw quantified-array equivalence queries. Six comparisons instead match actual C++ QE-lite output against the native array pass followed only by C++ simplification. The fixtures account for source flatten_and child-slot order and normalize only tactic depth and whitespace; formula and precision content remain exact. Source acceptance of duplicate index variables is preserved in direct structural tests rather than strengthened.",
         "Equality DER preserves source is_var_diseq passing the original negated expression to is_var_eq, including its universal arithmetic-disequality refusal. The raw quantifier reduction keeps declaration slots and accumulates proofs; the operator wrapper resets proofs and removes unused variables only after a change. Seven prebuilt C++ projection comparisons preserve formula/precision content and normalize only whitespace/tactic depth; the native result receives source simplification without an additional elimination pass.",
-        "Fourier-Motzkin recognition, forbidden-variable discovery, constraint construction/normalization, expression conversion, registration and backward subsumption are ported as private prerequisites. Candidate ordering, bound analysis, resolution/elimination and the owning FM entry point remain unported. No partial public FM elimination entry point is exposed.",
-        "Source init_use_list always calls add_constraint with null dependencies, and resolution joins only those null dependencies; no unused dependency payload or unused constraint mark bit is introduced. Native pointer identity and maps replace source ID/hash/set storage while preserving swap-erase and LIFO order. register_constraint source trace dereferences c after del_constraint(c); the native port formats the live constraint before deletion to retain the diagnostic without a dangling pointer. Ten C++ counterexample queries verify exact normalization/conversion equivalence (all UNSAT), with no extra elimination pass applied to native results."
+        "The complete retained FM phase uses concrete native variables, literals, numeral-service values and AST references. Unused source is_constraint/is_linear_mon wrappers, copy_constraints, tmp_clauses and no-op save_constraints are not ported; native slices/maps replace container/ID storage without C++ standard-library replication.",
+        "Source init_use_list always calls add_constraint with null dependencies, and resolution joins only those null dependencies; no unused dependency payload or unused constraint mark bit is introduced. Native pointer identity and maps replace source ID/hash/set storage while preserving swap-erase and LIFO order. register_constraint source trace dereferences c after del_constraint(c); the native port formats the live constraint before deletion to retain the diagnostic without a dangling pointer. Ten C++ counterexample queries verify exact normalization/conversion equivalence (all UNSAT), with no extra elimination pass applied to native results.",
+        "Source fm::fm::init resets m_expr2var twice and does not reset m_expr2bvar after clearing the Boolean expression/sign vectors. A fresh native run resets both expression-index maps, preventing stale Boolean indices on repeated calls; repeated unresolved Boolean-clause inputs verify the repair. Ten exact prebuilt C++ QE-lite projection comparisons include large coefficients, integer unit/nonunit bounds, Boolean clauses, one-sided/strict bounds, inconsistency, tautology and literal-only resolution. Initial source simplification restores native negative numeral nodes serialized as unary-minus SMT-LIB syntax; native results receive only final source simplification. Formula/precision content stays exact; only whitespace/tactic depth is normalized."
       ]
     },
     {
@@ -241672,7 +241712,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 714.734,
     "checkout_held_unchanged": true,
-    "scope_warning": "Clean isolated exact-HEAD checkout; includes quantified strategies and QE variable/array prerequisites. Excludes the current uncommitted equality DER increment, which has focused native and checked/debug/trace integration checks."
+    "scope_warning": "Clean isolated exact-HEAD checkout; includes quantified strategies and QE variable/array prerequisites. Excludes subsequent equality DER and Fourier-Motzkin increments, which have focused native and checked/debug/trace integration checks."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
