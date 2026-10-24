@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-datatypes () ((Box (box (val Int))) (Nat (zero) (succ (pred Nat)))))
+(declare-const b Box)
+(declare-const n Nat)
+(assert (= (val b) 7))
+(assert (not (= n zero)))
+(check-sat-using (then elim-uncnstr smt))
+(get-value ((val b) (not (= n zero))))

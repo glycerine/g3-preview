@@ -214,6 +214,10 @@ func (p *commandParser) command() (bool, error) {
 		if err := p.skipSExpr(); err != nil {
 			return false, err
 		}
+	case "declare-datatype", "declare-datatypes":
+		if err = p.declareDatatypes(name == "declare-datatype"); err != nil {
+			return false, err
+		}
 	case "declare-sort":
 		name, err := p.symbol()
 		if err != nil {

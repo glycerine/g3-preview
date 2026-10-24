@@ -24,7 +24,7 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return nil, err
 	}
 	switch name {
-	case "smt", "simplify", "elim-and", "propagate-values", "solve-eqs", "skip", "fail", "fail-if-undecided":
+	case "smt", "simplify", "elim-and", "propagate-values", "solve-eqs", "elim-uncnstr", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -43,6 +43,8 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return core.NewPropagateValuesTactic(m, c.config.Params, c.config.Globals, nil)
 	case "solve-eqs":
 		return core.MakeSolveEquationsTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
+	case "elim-uncnstr":
+		return core.MakeEliminateUnconstrainedTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
 	case "skip":
 		return tactic.NewSkipTactic(), nil
 	case "fail":

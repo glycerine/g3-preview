@@ -1,0 +1,7 @@
+(set-logic QF_UF)
+(declare-const a Bool)
+(declare-const b Bool)
+(declare-const c Bool)
+(assert (or (not a) (= b c)))
+(check-sat-using (then elim-uncnstr smt))
+(get-value ((or (not a) (= b c))))

@@ -1,0 +1,8 @@
+(set-option :produce-proofs true)
+(set-logic UF)
+(declare-sort U 0)
+(declare-const a U)
+(declare-const b U)
+(assert (forall ((x U) (y U)) (= x y)))
+(assert (not (= a b)))
+(check-sat-using (then elim-uncnstr smt))

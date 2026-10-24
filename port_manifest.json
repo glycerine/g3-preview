@@ -37865,7 +37865,10 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd_context/macros.go",
         "pkg/cmd_context/tactic_commands.go",
-        "pkg/cmd_context/tactic_commands_test.go"
+        "pkg/cmd_context/tactic_commands_test.go",
+        "pkg/parsers/smt2/datatypes.go",
+        "pkg/parsers/smt2/datatypes_test.go",
+        "pkg/cmd_context/datatype_declarations.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -37875,7 +37878,9 @@
         "TestSMTLibRunnerCPPReference",
         "TestCommandContextDefinitionOwnershipAndScopes",
         "TestCommandContextTacticResultsScopesAndModelLifetime",
-        "TestCommandContextAssertGoalPreservesOrderProofsAndNames"
+        "TestCommandContextAssertGoalPreservesOrderProofsAndNames",
+        "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
+        "TestSMT2DatatypeRefusalsBeforeDeclarationPublication"
       ],
       "conditionals": [
         {
@@ -38158,6 +38163,23 @@
           ],
           "tests": [
             "TestCommandContextTacticResultsScopesAndModelLifetime",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "dt_eh concrete datatype publication: register canonical sorts, constructors, recognizers and accessors in the current scoped/global declaration trails, preserve typed overloads and roll back declaration bindings after publication refusal; parametric pdecl ownership remains open",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/datatype_declarations.go",
+          "go_targets": [
+            "pkg/parsers/smt2/datatypes.go",
+            "pkg/parsers/smt2/datatypes_test.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
+            "TestSMT2DatatypeRefusalsBeforeDeclarationPublication",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -39265,7 +39287,15 @@
         "pkg/tactic/core/solve_eqs_tactic.go",
         "pkg/tactic/core/solve_eqs_candidates.go",
         "pkg/tactic/core/solve_eqs_order.go",
-        "pkg/tactic/core/solve_eqs_tactic_test.go"
+        "pkg/tactic/core/solve_eqs_tactic_test.go",
+        "pkg/tactic/core/elim_uncnstr_tactic.go",
+        "pkg/tactic/core/elim_uncnstr_rewriter.go",
+        "pkg/tactic/core/elim_uncnstr_basic.go",
+        "pkg/tactic/core/elim_uncnstr_bv.go",
+        "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+        "pkg/tactic/core/elim_uncnstr_trace.go",
+        "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+        "pkg/tactic/core/elim_uncnstr_trace_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -39278,7 +39308,12 @@
         "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestSMT2TacticCombinatorsAndTypedParameters"
+        "TestSMT2TacticCombinatorsAndTypedParameters",
+        "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+        "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+        "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+        "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+        "TestEliminateUnconstrainedExactTraceAndStreamRefusal"
       ],
       "conditionals": [
         {
@@ -39400,7 +39435,7 @@
           "reason": "Command print_* / max_memory options, process control-C handler, result/model validation and trace/watch reporting remain to be integrated."
         },
         {
-          "name": "sexpr2tactic retained concrete factories and and-then/then, or-else, using-params/with/!, repeat, try-for, fail-if-branching and skip-if-failed; typed descriptor validation and counted parse-result ownership",
+          "name": "sexpr2tactic retained concrete factories and and-then/then, or-else, using-params/with/!, repeat, try-for, fail-if-branching and skip-if-failed; typed descriptor validation and counted parse-result ownership; retained elim-uncnstr factory now connected",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/tactics.go",
           "go_targets": [
@@ -39409,14 +39444,27 @@
             "pkg/parsers/smt2/tactics_test.go",
             "pkg/cmd/g3/main_test.go",
             "pkg/tactic/core/propagate_values_tactic.go",
-            "pkg/tactic/core/solve_eqs_tactic.go"
+            "pkg/tactic/core/solve_eqs_tactic.go",
+            "pkg/tactic/core/elim_uncnstr_tactic.go",
+            "pkg/tactic/core/elim_uncnstr_rewriter.go",
+            "pkg/tactic/core/elim_uncnstr_basic.go",
+            "pkg/tactic/core/elim_uncnstr_bv.go",
+            "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+            "pkg/tactic/core/elim_uncnstr_trace.go",
+            "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+            "pkg/tactic/core/elim_uncnstr_trace_test.go"
           ],
           "tests": [
             "TestCommandContextUnknownTacticLeavesInitializationOptionsAvailable",
             "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference",
-            "TestSMT2TacticCombinatorsAndTypedParameters"
+            "TestSMT2TacticCombinatorsAndTypedParameters",
+            "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+            "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+            "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+            "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+            "TestEliminateUnconstrainedExactTraceAndStreamRefusal"
           ],
           "reason": "Only the currently connected smt, simplify, elim-and, propagate-values, solve-eqs, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
         },
@@ -86531,7 +86579,10 @@
         "pkg/parsers/smt2/annotations_test.go",
         "pkg/parsers/smt2/tactics.go",
         "pkg/parsers/smt2/tactics_test.go",
-        "pkg/cmd_context/tactic_commands.go"
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/datatypes.go",
+        "pkg/parsers/smt2/datatypes_test.go",
+        "pkg/cmd_context/datatype_declarations.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -86558,7 +86609,9 @@
         "TestSMT2NestedQuantifierMetadataAndNoPatternsStayLocal",
         "TestSMT2QuantifierAttributesRejectWrongScopesAndBadPatterns",
         "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
-        "TestSMT2TacticCombinatorsAndTypedParameters"
+        "TestSMT2TacticCombinatorsAndTypedParameters",
+        "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
+        "TestSMT2DatatypeRefusalsBeforeDeclarationPublication"
       ],
       "assertions": [
         {
@@ -87216,7 +87269,7 @@
           ]
         },
         {
-          "name": "remaining parser grammar and command recovery: recursive functions, parametric/datatype declarations, pattern/other attributes, complete qualified local resolution, options and extensions",
+          "name": "remaining parser grammar and command recovery: recursive functions, parametric datatype declarations, pattern/other attributes, complete qualified local resolution, options and extensions",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -87288,6 +87341,23 @@
             "TestSMT2TacticCombinatorsAndTypedParameters"
           ],
           "reason": "The command is connected for the retained concrete tactic/combinator set; remaining tactic/probe grammar and execution-option surface are tracked in tactic_cmds.cpp."
+        },
+        {
+          "name": "parse_declare_datatype(s), parse_datatype_dec and parse_constructor_decls concrete forms: legacy and SMT2.6 nullary mutually recursive declarations, pending direct sibling fields, bare/parenthesized constructors, recognizer naming, missing-reference-before-duplicate validation and publication after complete command syntax; parametric/nested recursive sort constructors and full declaration diagnostics remain open",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/datatypes.go",
+          "go_targets": [
+            "pkg/parsers/smt2/datatypes.go",
+            "pkg/parsers/smt2/datatypes_test.go",
+            "pkg/cmd_context/datatype_declarations.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
+            "TestSMT2DatatypeRefusalsBeforeDeclarationPublication",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -110828,7 +110898,9 @@
         "pkg/smtcore/smt_model_checker_budget_test.go",
         "pkg/smtcore/smt_model_checker_lifecycle_test.go",
         "pkg/smtcore/smt_quantifier_manager.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_singleton_quantifier_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -110846,7 +110918,10 @@
         "TestSMTSolverMBQIFallsBackWhenInstantiationSetHasNoCounterexample",
         "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample",
         "TestSMTModelCheckerContextRecoveryUsesOldestEqualityMember",
-        "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse"
+        "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse",
+        "TestSMTSolverQuantifiedSingletonDomainContradiction",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "assertions": [
         {
@@ -110971,6 +111046,26 @@
           "tests": [
             "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
             "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters"
+          ]
+        },
+        {
+          "name": "Finite-domain counterpart of check/add_instance: require inverse recovery for every restricted binding; when no restricted witness exists, recover every complete witness binding from context instead of mixing the two phases, preserving per-quantifier caps and duplicate-witness invalidity",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_singleton_quantifier_test.go",
+            "pkg/smtcore/smt_model_checker_inverse_test.go",
+            "pkg/smtcore/smt_model_checker_budget_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTSolverQuantifiedSingletonDomainContradiction",
+            "TestSMTModelCheckerCounterexampleCapAppliesToEveryQuantifier",
+            "TestSMTModelCheckerFiniteUniverseRecoversModelFinderTerm",
+            "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -121793,7 +121888,9 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/theory_datatype.go"
+        "pkg/smtcore/theory_datatype.go",
+        "pkg/smtcore/smt_singleton_datatype_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -121803,7 +121900,10 @@
         "TestSMTDatatypeQFDTSetup",
         "TestSMTDatatypeConstructorModelValue",
         "TestSMTDatatypeInfiniteRecognizerSplit",
-        "TestSMTDatatypeDistinctConstructorsConflict"
+        "TestSMTDatatypeDistinctConstructorsConflict",
+        "TestSMTDatatypeSingletonExcludesDisequality",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "assertions": [
         {
@@ -122022,19 +122122,45 @@
           "name": "constructor, accessor, recognizer and update-field internalization with exclusive and exhaustive constructor axioms",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_datatype.go",
-          "tests": ["TestSMTDatatypeRecognizerCases", "TestSMTDatatypeConstructorAccessor", "TestSMTDatatypeUpdateFieldAxioms"]
+          "tests": [
+            "TestSMTDatatypeRecognizerCases",
+            "TestSMTDatatypeConstructorAccessor",
+            "TestSMTDatatypeUpdateFieldAxioms"
+          ]
         },
         {
           "name": "constructor disjointness, recursive occurs checking, lazy infinite-sort splitting and scoped rollback",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_datatype.go",
-          "tests": ["TestSMTDatatypeDistinctConstructorsConflict", "TestSMTDatatypeRecursiveOccursCheck", "TestSMTDatatypeInfiniteRecognizerSplit"]
+          "tests": [
+            "TestSMTDatatypeDistinctConstructorsConflict",
+            "TestSMTDatatypeRecursiveOccursCheck",
+            "TestSMTDatatypeInfiniteRecognizerSplit"
+          ]
         },
         {
           "name": "datatype model-factory registration and constructor value procedures",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_datatype.go",
-          "tests": ["TestSMTDatatypeConstructorModelValue"]
+          "tests": [
+            "TestSMTDatatypeConstructorModelValue"
+          ]
+        },
+        {
+          "name": "mk_var retained constructor/single-constructor branches and assert_is_constructor_axiom: eagerly assert v = C(accessors(v)) with a null antecedent for non-constructor values of a one-constructor datatype, independently of auxiliary-recognizer relevancy; share reconstruction with the assigned-recognizer branch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/smt_singleton_datatype_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeSingletonExcludesDisequality",
+            "TestSMTDatatypeQFDTSetup",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -132862,9 +132988,29 @@
       "path": "src/tactic/core/elim_uncnstr_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/elim_uncnstr_tactic.go",
+        "pkg/tactic/core/elim_uncnstr_rewriter.go",
+        "pkg/tactic/core/elim_uncnstr_basic.go",
+        "pkg/tactic/core/elim_uncnstr_bv.go",
+        "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+        "pkg/tactic/core/elim_uncnstr_trace.go",
+        "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+        "pkg/tactic/core/elim_uncnstr_trace_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/tactic/core/collect_occs.go"
+      ],
+      "tests": [
+        "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+        "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+        "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+        "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+        "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 120,
@@ -132939,19 +133085,245 @@
           "text": "SASSERT(num == 1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "rw_cfg and rw: retained concrete proof/no-proof rewriter traversal, ground-argument gate, borrowed single-occurrence membership, application/fresh-constant cache across rounds, scoped construction references and definition-introduction/apply-def proofs",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/elim_uncnstr_rewriter.go",
+          "go_targets": [
+            "pkg/tactic/core/elim_uncnstr_tactic.go",
+            "pkg/tactic/core/elim_uncnstr_rewriter.go",
+            "pkg/tactic/core/elim_uncnstr_basic.go",
+            "pkg/tactic/core/elim_uncnstr_bv.go",
+            "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+            "pkg/tactic/core/elim_uncnstr_trace.go",
+            "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+            "pkg/tactic/core/elim_uncnstr_trace_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+            "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+            "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+            "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+            "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "process_basic_app, process_eq and mk_diff: ITE priorities, Boolean connectives, interpreted/non-singleton equality guards, recursive interpreted-array difference witnesses and recursive datatype constructor witnesses",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/elim_uncnstr_basic.go",
+          "go_targets": [
+            "pkg/tactic/core/elim_uncnstr_tactic.go",
+            "pkg/tactic/core/elim_uncnstr_rewriter.go",
+            "pkg/tactic/core/elim_uncnstr_basic.go",
+            "pkg/tactic/core/elim_uncnstr_bv.go",
+            "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+            "pkg/tactic/core/elim_uncnstr_trace.go",
+            "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+            "pkg/tactic/core/elim_uncnstr_trace_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+            "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+            "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+            "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+            "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "process_add, process_arith_mul, process_le_ge and process_arith_app: first unconstrained addend, all-variable products, real nonzero coefficient inverses, integer coefficient refusal and oriented inequality model definitions",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/elim_uncnstr_basic.go",
+          "go_targets": [
+            "pkg/tactic/core/elim_uncnstr_tactic.go",
+            "pkg/tactic/core/elim_uncnstr_rewriter.go",
+            "pkg/tactic/core/elim_uncnstr_basic.go",
+            "pkg/tactic/core/elim_uncnstr_bv.go",
+            "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+            "pkg/tactic/core/elim_uncnstr_trace.go",
+            "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+            "pkg/tactic/core/elim_uncnstr_trace_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+            "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+            "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+            "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+            "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "process_bv_mul/extract/div/concat/le/app: modular inverses, division identities, extraction padding, reverse concatenation slices, signed/unsigned bounds and deliberate inequality refusal with proofs enabled",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/elim_uncnstr_bv.go",
+          "go_targets": [
+            "pkg/tactic/core/elim_uncnstr_tactic.go",
+            "pkg/tactic/core/elim_uncnstr_rewriter.go",
+            "pkg/tactic/core/elim_uncnstr_basic.go",
+            "pkg/tactic/core/elim_uncnstr_bv.go",
+            "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+            "pkg/tactic/core/elim_uncnstr_trace.go",
+            "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+            "pkg/tactic/core/elim_uncnstr_trace_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+            "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+            "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+            "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+            "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "process_array_app and process_datatype_app: const-array select reconstruction, store definition order, datatype accessor/constructor models, recognizer refusal when models are required and fully-interpreted accessor-domain guards",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+          "go_targets": [
+            "pkg/tactic/core/elim_uncnstr_tactic.go",
+            "pkg/tactic/core/elim_uncnstr_rewriter.go",
+            "pkg/tactic/core/elim_uncnstr_basic.go",
+            "pkg/tactic/core/elim_uncnstr_bv.go",
+            "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+            "pkg/tactic/core/elim_uncnstr_trace.go",
+            "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+            "pkg/tactic/core/elim_uncnstr_trace_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+            "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+            "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+            "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+            "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "operator(), init_mc and init_rw: fresh per-round occurrence collection, source initially-modified round policy, persistent abstraction cache, depth/no-variable behavior, original dependencies, proof modus ponens, filter-after-extension model composition and independent result lifetime",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/elim_uncnstr_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/elim_uncnstr_tactic.go",
+            "pkg/tactic/core/elim_uncnstr_rewriter.go",
+            "pkg/tactic/core/elim_uncnstr_basic.go",
+            "pkg/tactic/core/elim_uncnstr_bv.go",
+            "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+            "pkg/tactic/core/elim_uncnstr_trace.go",
+            "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+            "pkg/tactic/core/elim_uncnstr_trace_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+            "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+            "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+            "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+            "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "constructor, updt_params, translate, parameter descriptors, cleanup, statistics/reset, destructor and clean factory: unlimited memory sentinel, memory/cooperation/step checks, independent translated policy snapshots and interrupted-invocation ownership retirement",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/elim_uncnstr_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/elim_uncnstr_tactic.go",
+            "pkg/tactic/core/elim_uncnstr_rewriter.go",
+            "pkg/tactic/core/elim_uncnstr_basic.go",
+            "pkg/tactic/core/elim_uncnstr_bv.go",
+            "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+            "pkg/tactic/core/elim_uncnstr_trace.go",
+            "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+            "pkg/tactic/core/elim_uncnstr_trace_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+            "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+            "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+            "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+            "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "All live elim_uncnstr, elim_uncnstr_bug and elim_uncnstr_bug_ll diagnostics, bounded low-level/SMT2 expression formatting, goal/converter display, erased traces and stream failure tolerance",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/elim_uncnstr_trace.go",
+          "go_targets": [
+            "pkg/tactic/core/elim_uncnstr_tactic.go",
+            "pkg/tactic/core/elim_uncnstr_rewriter.go",
+            "pkg/tactic/core/elim_uncnstr_basic.go",
+            "pkg/tactic/core/elim_uncnstr_bv.go",
+            "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+            "pkg/tactic/core/elim_uncnstr_trace.go",
+            "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+            "pkg/tactic/core/elim_uncnstr_trace_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+            "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+            "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+            "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+            "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns counted params, a proof-capable concrete traversal/configuration and a counted extension model converter. Configuration cache domains and fresh expressions have independent AST refs. Per-reduction scoped refs retire intermediates after result/proof/converter publication. Published concatenation owns filter and extension converters independently of tactic cleanup/close; reverse application reconstructs definitions before filtering fresh declarations. Explicit memory/cooperation/evaluator services are borrowed."
+      ],
+      "deviations": [
+        "Go borrows explicit parameter, model-evaluator, memory and cooperation services instead of source process globals.",
+        "The unordered source hash-table diagnostic listing of unconstrained variables uses deterministic DFS discovery order in Go; algorithmic membership uses lookup-only Go maps and does not depend on map iteration. No C++ container internals are ported.",
+        "Previous interrupted invocation owners are explicitly retired before replacement; cleanup preserves the last eliminated-application statistic."
+      ]
     },
     {
       "path": "src/tactic/core/elim_uncnstr_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/elim_uncnstr_tactic.go",
+        "pkg/tactic/core/elim_uncnstr_rewriter.go",
+        "pkg/tactic/core/elim_uncnstr_basic.go",
+        "pkg/tactic/core/elim_uncnstr_bv.go",
+        "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+        "pkg/tactic/core/elim_uncnstr_trace.go",
+        "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+        "pkg/tactic/core/elim_uncnstr_trace_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+        "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+        "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+        "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+        "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -132962,11 +133334,42 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_elim_uncnstr_tactic clean factory and retained elim-uncnstr command registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/elim_uncnstr_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/elim_uncnstr_tactic.go",
+            "pkg/tactic/core/elim_uncnstr_rewriter.go",
+            "pkg/tactic/core/elim_uncnstr_basic.go",
+            "pkg/tactic/core/elim_uncnstr_bv.go",
+            "pkg/tactic/core/elim_uncnstr_array_datatype.go",
+            "pkg/tactic/core/elim_uncnstr_trace.go",
+            "pkg/tactic/core/elim_uncnstr_tactic_test.go",
+            "pkg/tactic/core/elim_uncnstr_trace_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd_context/tactic_commands.go"
+          ],
+          "tests": [
+            "TestEliminateUnconstrainedProofCoreAndIndependentModel",
+            "TestEliminateUnconstrainedDepthStatisticsAndRecovery",
+            "TestEliminateUnconstrainedMemoryGuardAndParameterTranslation",
+            "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
+            "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The factory returns an uncounted clean wrapper owning its concrete child through the standard tactic reference contract."
+      ],
+      "deviations": [
+        "Go passes explicit shared services needed by model reconstruction and resource checks."
+      ]
     },
     {
       "path": "src/tactic/core/injectivity_tactic.cpp",

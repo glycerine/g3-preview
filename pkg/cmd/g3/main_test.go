@@ -10,6 +10,19 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"elim_uncnstr_signed_bounds.smt2":              "sat\n(((bvsle a #x8) true) ((bvsle #x7 b) true) ((bvule c #xf) true) ((bvule #xf d) true) ((<= 4 i) true) ((>= 8 j) true))\n",
+	"elim_uncnstr_constructor_singleton.smt2":      "sat\n(((f (box i)) true))\nunsat\nsat\n",
+	"elim_uncnstr_uninterpreted_guard.smt2":        "unsat\n",
+	"elim_uncnstr_ite_models.smt2":                 "sat\n(((= (ite c1 x y) 4) true) ((= (ite c2 z 2) 5) true) ((= (ite c3 2 w) 6) true))\n",
+	"elim_uncnstr_bv_division_models.smt2":         "sat\n(((= (bvudiv a b) #x17) true) ((= (bvsdiv c d) #xfd) true) ((= (bvmul (_ bv3 128) x) (_ bv12 128)) true) ((= (bvmul #x02 y) #x06) true))\n",
+	"elim_uncnstr_datatype_scopes.smt2":            "sat\nsat\n(((is-on f) true))\nsat\n",
+	"elim_uncnstr_boolean.smt2":                    "sat\n(((or (not a) (= b c)) true))\n",
+	"elim_uncnstr_arithmetic.smt2":                 "sat\n(((= (+ (* 2.0 x) y) 17.0) true) (i 3) ((<= j 4) true) ((>= k 8) true))\n",
+	"elim_uncnstr_bitvectors.smt2":                 "sat\n(((= (bvmul #x03 x) #x0c) true) ((= ((_ extract 5 2) y) #xa) true) ((= (bvnot z) #x12) true) ((= (concat a b) #xab) true) ((= (bvor c d) #xf) true) ((bvule e #x0) true))\n",
+	"elim_uncnstr_arrays.smt2":                     "sat\n(((select a true) 9) ((= (store b false v) ((as const (Array Bool Int)) 7)) true))\n",
+	"elim_uncnstr_datatypes.smt2":                  "sat\n(((val b) 7) ((not (= n zero)) true))\n",
+	"elim_uncnstr_core_scopes.smt2":                "sat\n(((not a) true) ((or a b) true))\nunsat\n(other negative disjunction)\nsat\n(((not a) true) ((or a b) true))\n",
+	"elim_uncnstr_proofs.smt2":                     "sat\nunsat\n",
 	"solve_eqs_boolean_scopes.smt2":                "sat\n((a true) (b true))\nunsat\nsat\n((a true) (b true))\n",
 	"solve_eqs_real_definitions.smt2":              "sat\n((x 2.0) (y 1.0))\n",
 	"solve_eqs_ite_definitions.smt2":               "sat\n(((ite c (= x 2) (= x 3)) true))\n",

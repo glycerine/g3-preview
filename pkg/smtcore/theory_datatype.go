@@ -267,21 +267,29 @@ func (t *SMTDatatypeTheory) ensureVariable(node *SMTEnode) error {
 	if err != nil {
 		return err
 	}
-	infinite, err := state.manager.SortIsInfinite(sort)
-	if err != nil {
-		return err
-	}
-	if !infinite {
-		if err = t.publishCases(node.owner, sort); err != nil {
-			return err
-		}
-	}
 	constructor, matched, err := state.manager.DatatypeConstructorApp(node.owner)
 	if err != nil {
 		return err
 	}
 	if matched {
 		return t.publishConstructor(node.owner, constructor)
+	}
+	constructors, err := state.manager.DatatypeConstructors(sort)
+	if err != nil {
+		return err
+	}
+	if len(constructors) == 1 {
+		// Source mk_var asserts reconstruction unconditionally for a
+		// one-constructor datatype. Waiting for a recognizer assignment can
+		// omit it when that auxiliary recognizer is not relevant.
+		return t.assertConstructor(node.owner, constructors[0], SMTNullLiteral)
+	}
+	infinite, err := state.manager.SortIsInfinite(sort)
+	if err != nil {
+		return err
+	}
+	if !infinite {
+		return t.publishCases(node.owner, sort)
 	}
 	return nil
 }
@@ -451,6 +459,21 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 		t.reconstructedTrail = append(t.reconstructedTrail, expression)
 		return nil
 	}
+	if err = t.assertConstructor(value, constructor, NewSMTLiteral(variable, false)); err != nil {
+		return err
+	}
+	t.reconstructed[expression] = true
+	t.reconstructedTrail = append(t.reconstructedTrail, expression)
+	return nil
+}
+
+// Source assert_is_constructor_axiom; antecedent is null for the eager
+// single-constructor case and the recognizer literal for assigned cases.
+func (t *SMTDatatypeTheory) assertConstructor(value, constructor ast.ASTHandle, antecedent SMTLiteral) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
 	accessors, err := state.manager.DatatypeConstructorAccessors(constructor)
 	if err != nil {
 		return err
@@ -466,12 +489,7 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 	if err != nil {
 		return err
 	}
-	if err = t.equalityAxiom(value, constructed, NewSMTLiteral(variable, false)); err != nil {
-		return err
-	}
-	t.reconstructed[expression] = true
-	t.reconstructedTrail = append(t.reconstructedTrail, expression)
-	return nil
+	return t.equalityAxiom(value, constructed, antecedent)
 }
 
 func (t *SMTDatatypeTheory) PushScope() error {

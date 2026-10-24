@@ -1,0 +1,8 @@
+(set-logic ALL)
+(declare-const a (Array Bool Int))
+(declare-const b (Array Bool Int))
+(declare-const v Int)
+(assert (= (select a true) 9))
+(assert (= (store b false v) ((as const (Array Bool Int)) 7)))
+(check-sat-using (then elim-uncnstr smt))
+(get-value ((select a true) (= (store b false v) ((as const (Array Bool Int)) 7))))

@@ -203,22 +203,24 @@ func (c *SMTModelChecker) addFiniteCounterexample(quantifier ast.ASTHandle, valu
 		return false, ast.ErrASTDomain
 	}
 	bindings := append([]ast.ASTHandle(nil), values[:count]...)
-	for i, value := range bindings {
-		if c.modelFinder != nil {
-			term, _, found, err := c.modelFinder.Inverse(quantifier, uint32(i), value)
-			if err != nil {
-				return false, err
-			}
-			if found {
-				bindings[i] = term
-				continue
-			}
-		}
-		if term := c.valueTerms[value]; !term.IsNull() {
-			bindings[i] = term
-		}
+	if c.modelFinder == nil {
+		// Standalone finite checking has no instantiation-set phase. Keep
+		// its per-quantifier cap while recovering complete context bindings.
+		_, err = c.addCounterexample(quantifier, values[:count])
+		return !c.exhausted && err == nil, err
 	}
-	return c.enqueueCounterexample(quantifier, bindings, true)
+	for i, value := range bindings {
+		term, _, found, err := c.modelFinder.Inverse(quantifier, uint32(i), value)
+		if err != nil || !found {
+			return false, err
+		}
+		bindings[i] = term
+	}
+	// A restricted counterexample must recover every binding from the
+	// instantiation sets. Source add_instance(use_inv=true) never combines
+	// inverse terms with representatives from the unrestricted context.
+	_, err = c.enqueueCounterexample(quantifier, bindings, true)
+	return !c.exhausted && err == nil, err
 }
 
 func (c *SMTModelChecker) addAuxiliaryBlockingClause(auxiliary *SMTSolver, skolems, values []ast.ASTHandle, finite []bool) (result error) {
@@ -603,6 +605,8 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 	}
 	values := make([]ast.ASTHandle, count)
 	found := false
+	restricted := false
+	var complete []ast.ASTHandle
 	var visit func(uint32) error
 	visit = func(index uint32) (result error) {
 		if *remaining == 0 {
@@ -660,16 +664,34 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 			return nil
 		}
 		found = true
-		_, err = c.addFiniteCounterexample(quantifier, values)
+		if complete == nil {
+			complete = append([]ast.ASTHandle{}, values...)
+		}
+		accepted, err := c.addFiniteCounterexample(quantifier, values)
 		if err != nil {
 			return err
 		}
-		if !c.exhausted {
+		if accepted {
+			restricted = true
 			*remaining--
 		}
 		return nil
 	}
-	return found, visit(0)
+	if err = visit(0); err != nil {
+		return false, err
+	}
+	if found && !hasInfinite && !restricted && *remaining != 0 {
+		// No restricted witness exists. Recover the entire complete witness
+		// from the candidate context, as in source check's complete_cex path.
+		_, err = c.addCounterexample(quantifier, complete)
+		if err != nil {
+			return false, err
+		}
+		if !c.exhausted {
+			*remaining--
+		}
+	}
+	return found, nil
 }
 
 // Check returns true when every supplied quantifier holds in the candidate
