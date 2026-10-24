@@ -1,0 +1,8 @@
+(set-logic QF_UF)
+(declare-const a Bool)
+(declare-const b Bool)
+(declare-fun f (Bool) Bool)
+(assert (= a (f b)))
+(assert (= b (f a)))
+(check-sat-using (then solve-eqs smt))
+(get-value ((= a (f b)) (= b (f a))))

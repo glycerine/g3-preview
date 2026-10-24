@@ -1,0 +1,6 @@
+(set-logic QF_LIA)
+(declare-const c Bool)
+(declare-const x Int)
+(assert (ite c (= x 2) (= x 3)))
+(check-sat-using (then solve-eqs smt))
+(get-value ((ite c (= x 2) (= x 3))))

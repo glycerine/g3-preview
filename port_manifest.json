@@ -39261,7 +39261,11 @@
         "pkg/parsers/smt2/tactics_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/tactic/core/propagate_values_tactic.go",
-        "pkg/tactic/core/propagate_values_tactic_test.go"
+        "pkg/tactic/core/propagate_values_tactic_test.go",
+        "pkg/tactic/core/solve_eqs_tactic.go",
+        "pkg/tactic/core/solve_eqs_candidates.go",
+        "pkg/tactic/core/solve_eqs_order.go",
+        "pkg/tactic/core/solve_eqs_tactic_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -39404,7 +39408,8 @@
             "pkg/cmd_context/tactic_commands_test.go",
             "pkg/parsers/smt2/tactics_test.go",
             "pkg/cmd/g3/main_test.go",
-            "pkg/tactic/core/propagate_values_tactic.go"
+            "pkg/tactic/core/propagate_values_tactic.go",
+            "pkg/tactic/core/solve_eqs_tactic.go"
           ],
           "tests": [
             "TestCommandContextUnknownTacticLeavesInitializationOptionsAvailable",
@@ -39413,7 +39418,7 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMT2TacticCombinatorsAndTypedParameters"
           ],
-          "reason": "Only the currently connected smt, simplify, elim-and, propagate-values, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
+          "reason": "Only the currently connected smt, simplify, elim-and, propagate-values, solve-eqs, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
         },
         {
           "name": "remaining apply/help/user-tactic/probe command integration and execution options (src/cmd_context/tactic_cmds.cpp)",
@@ -39438,7 +39443,11 @@
         "pkg/parsers/smt2/tactics_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/tactic/core/propagate_values_tactic.go",
-        "pkg/tactic/core/propagate_values_tactic_test.go"
+        "pkg/tactic/core/propagate_values_tactic_test.go",
+        "pkg/tactic/core/solve_eqs_tactic.go",
+        "pkg/tactic/core/solve_eqs_candidates.go",
+        "pkg/tactic/core/solve_eqs_order.go",
+        "pkg/tactic/core/solve_eqs_tactic_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -39497,7 +39506,8 @@
             "pkg/cmd_context/tactic_commands_test.go",
             "pkg/parsers/smt2/tactics_test.go",
             "pkg/cmd/g3/main_test.go",
-            "pkg/tactic/core/propagate_values_tactic.go"
+            "pkg/tactic/core/propagate_values_tactic.go",
+            "pkg/tactic/core/solve_eqs_tactic.go"
           ],
           "tests": [
             "TestCommandContextUnknownTacticLeavesInitializationOptionsAvailable",
@@ -39506,7 +39516,7 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMT2TacticCombinatorsAndTypedParameters"
           ],
-          "reason": "Only the currently connected smt, simplify, elim-and, propagate-values, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
+          "reason": "Only the currently connected smt, simplify, elim-and, propagate-values, solve-eqs, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
         },
         {
           "name": "remaining apply/help/user-tactic/probe command integration and execution options (src/cmd_context/tactic_cmds.cpp)",
@@ -133703,9 +133713,29 @@
       "path": "src/tactic/core/solve_eqs_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/core/solve_eqs_tactic.go",
+        "pkg/tactic/core/solve_eqs_candidates.go",
+        "pkg/tactic/core/solve_eqs_order.go",
+        "pkg/tactic/core/solve_eqs_tactic_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/tactic/tactic_extension_model.go",
+        "pkg/ast/rewriter/expr_replacer.go",
+        "pkg/ast/ast_num_occurs.go"
+      ],
+      "tests": [
+        "TestSolveEquationsBooleanDefinitionsAndIndependentModel",
+        "TestSolveEquationsTranslationPolicyAndCancellation",
+        "TestSolveEquationsCycleBreakAndCPPApply",
+        "TestSolveEquationsArithmeticCoefficientPolicy",
+        "TestSolveEquationsProofAndTransitiveCoreSurviveCleanup",
+        "TestSolveEquationsOccurrenceLimitAndLiteralException",
+        "TestSolveEquationsITEOrientationsAndPolicy",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 168,
@@ -133814,19 +133844,158 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "live trivial_solve, solve_ite/core, solve_arith/core and Boolean literal solving: occurs checks, candidate exclusion, ITE orientations, rational real coefficients and integer unit-coefficient restrictions",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/solve_eqs_candidates.go",
+          "go_targets": [
+            "pkg/tactic/core/solve_eqs_tactic.go",
+            "pkg/tactic/core/solve_eqs_order.go",
+            "pkg/tactic/core/solve_eqs_tactic_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSolveEquationsCycleBreakAndCPPApply",
+            "TestSolveEquationsArithmeticCoefficientPolicy",
+            "TestSolveEquationsOccurrenceLimitAndLiteralException",
+            "TestSolveEquationsITEOrientationsAndPolicy",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "collect_num_occs and collect: shared visited set across goal formulas, no quantifier-body occurrence traversal, candidate order, original proof/dependency collection and literal occurrence-limit exception",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/solve_eqs_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/solve_eqs_order.go",
+            "pkg/tactic/core/solve_eqs_tactic_test.go",
+            "pkg/ast/ast_num_occurs.go"
+          ],
+          "tests": [
+            "TestSolveEquationsCycleBreakAndCPPApply",
+            "TestSolveEquationsProofAndTransitiveCoreSurviveCleanup",
+            "TestSolveEquationsOccurrenceLimitAndLiteralException"
+          ]
+        },
+        {
+          "name": "sort_vars: source explicit DFS, reference-count-gated done marking, quantifier body/pattern/no-pattern child order, cycle cut and saved expression references, ordered definitions and candidate-statement cleanup",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/solve_eqs_order.go",
+          "go_targets": [
+            "pkg/tactic/core/solve_eqs_tactic.go",
+            "pkg/tactic/core/solve_eqs_tactic_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSolveEquationsBooleanDefinitionsAndIndependentModel",
+            "TestSolveEquationsCycleBreakAndCPPApply",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "normalize and substitute: simplifying-replacer definition normalization, transitive proofs/dependencies, cache reset at substitution boundaries, removal of defining candidates, changed goal updates and true elimination",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/solve_eqs_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/solve_eqs_tactic_test.go",
+            "pkg/ast/rewriter/expr_replacer.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSolveEquationsBooleanDefinitionsAndIndependentModel",
+            "TestSolveEquationsArithmeticCoefficientPolicy",
+            "TestSolveEquationsProofAndTransitiveCoreSurviveCleanup",
+            "TestSolveEquationsITEOrientationsAndPolicy",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "save_elim_vars and operator(): repeated elimination rounds, extension-model reconstruction, UNSAT model-converter discard, independent goal proof/core lifetime and depth/result publication",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/solve_eqs_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/solve_eqs_tactic_test.go",
+            "pkg/tactic/tactic_extension_model.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSolveEquationsBooleanDefinitionsAndIndependentModel",
+            "TestSolveEquationsProofAndTransitiveCoreSurviveCleanup",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "constructor, policy update without replacing/reconfiguring the existing replacer, parameter descriptors, fresh-manager translate, cleanup retaining eliminated-variable statistics, reset_statistics, destructor and clean mk_solve_eqs_tactic factory",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/solve_eqs_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/solve_eqs_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSolveEquationsBooleanDefinitionsAndIndependentModel",
+            "TestSolveEquationsTranslationPolicyAndCancellation",
+            "TestSolveEquationsOccurrenceLimitAndLiteralException",
+            "TestSolveEquationsITEOrientationsAndPolicy",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "checkpoint resource-limit cancellation/cooperation and eliminated-variable progress report",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/solve_eqs_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/solve_eqs_tactic_test.go"
+          ],
+          "tests": [
+            "TestSolveEquationsTranslationPolicyAndCancellation"
+          ]
+        },
+        {
+          "name": "remaining solve_eqs/solve_eqs_bug/solve_eqs_bug2/solve_eqs_subst/solve_eqs_round/gaussian_leak traces and verbose round/elimination diagnostics",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The tactic owns counted params, one concrete simplifying expr_replacer and two expression substitutions. Candidate/ordered vectors borrow substitution/goal references. Cycle cuts save both variable and definition in owning AST refs until all DFS frames are retired. Normalized results transfer owning rewrite dependencies into goal/substitution refs. Published extension-model converters own eliminated definitions independently of tactic cleanup/close. Borrowed evaluator/cooperation services outlive the tactic and its converters."
+      ],
+      "deviations": [
+        "Retained source factories all use the simplifying replacer; the unused externally supplied replacer overload and unreachable null-imp-replacer construction path are not added as universal adapters.",
+        "The #if 0 nonlinear solver and add_pos/nonzero hints whose only reads belong to that disabled solver are omitted.",
+        "Go carries explicit model-evaluator/cooperation services to replace source process globals."
+      ]
     },
     {
       "path": "src/tactic/core/solve_eqs_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/solve_eqs_tactic.go",
+        "pkg/tactic/core/solve_eqs_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestSolveEquationsBooleanDefinitionsAndIndependentModel",
+        "TestSolveEquationsTranslationPolicyAndCancellation",
+        "TestSolveEquationsCycleBreakAndCPPApply",
+        "TestSolveEquationsArithmeticCoefficientPolicy",
+        "TestSolveEquationsProofAndTransitiveCoreSurviveCleanup",
+        "TestSolveEquationsOccurrenceLimitAndLiteralException",
+        "TestSolveEquationsITEOrientationsAndPolicy",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -133837,11 +134006,32 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_solve_eqs_tactic retained default simplifying-replacer instantiation and clean wrapper, typed Go construction services and command factory binding",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/solve_eqs_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/solve_eqs_tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSolveEquationsBooleanDefinitionsAndIndependentModel",
+            "TestSolveEquationsTranslationPolicyAndCancellation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "Raw construction returns an uncounted tactic; clean/composition wrappers acquire their own counted child reference. Constructor failure closes acquired parameter/replacer ownership, and published converters retain eliminated definitions after the tactic is destroyed."
+      ],
+      "deviations": [
+        "The optional external expr_replacer pointer has no retained non-null caller, so the public Go factory exposes only the concrete simplifying-replacer path."
+      ]
     },
     {
       "path": "src/tactic/core/split_clause_tactic.cpp",

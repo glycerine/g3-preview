@@ -22,6 +22,10 @@ type tacticExtensionModelConverter struct {
 	function   *model.FunctionInterpretation
 }
 
+// ExtensionModelConverter reconstructs the concrete definitions eliminated by
+// a tactic. Its model-converter ownership contract is unchanged.
+type ExtensionModelConverter = tacticExtensionModelConverter
+
 func NewExtensionModel(m *ast.ASTManager, services model.ModelEvaluatorConfig) (*tacticExtensionModelConverter, error) {
 	if m == nil || services.Context == nil || services.Globals == nil || services.Memory == nil || services.Cooperation == nil {
 		return nil, ast.ErrASTHandle

@@ -10,6 +10,13 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"solve_eqs_boolean_scopes.smt2":                "sat\n((a true) (b true))\nunsat\nsat\n((a true) (b true))\n",
+	"solve_eqs_real_definitions.smt2":              "sat\n((x 2.0) (y 1.0))\n",
+	"solve_eqs_ite_definitions.smt2":               "sat\n(((ite c (= x 2) (= x 3)) true))\n",
+	"solve_eqs_core.smt2":                          "unsat\n(positive equality negative)\n",
+	"solve_eqs_cycle.smt2":                         "sat\n(((= a (f b)) true) ((= b (f a)) true))\n",
+	"solve_eqs_as_array_scopes.smt2":               "sat\nunsat\nsat\n",
+	"solve_eqs_proof.smt2":                         "unsat\n",
 	"propagate_values_model_scopes.smt2":           "sat\n((a true) (b false) (c true))\nunsat\nsat\n((a true) (b false) (c true))\n",
 	"propagate_values_core.smt2":                   "unsat\n(negative implication positive)\n",
 	"propagate_values_proof.smt2":                  "unsat\n",

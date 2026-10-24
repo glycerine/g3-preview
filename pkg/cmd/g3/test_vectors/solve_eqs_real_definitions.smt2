@@ -1,0 +1,7 @@
+(set-logic QF_LRA)
+(declare-const x Real)
+(declare-const y Real)
+(assert (= (+ x y) 3.0))
+(assert (= y 1.0))
+(check-sat-using solve-eqs)
+(get-value (x y))
