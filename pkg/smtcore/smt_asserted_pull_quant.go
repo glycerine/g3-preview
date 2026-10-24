@@ -11,7 +11,7 @@ import (
 )
 
 func (k *SMTKernel) pullPendingNestedQuantifiers() (result error) {
-	if !k.preprocess || !k.preprocessState.PullNestedQuantifiers || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.preprocessState.PullNestedQuantifiers || !k.assertedHasQuantifiers || k.assertedHead == len(k.assertions) {
 		return nil
 	}
 	proc, err := normal_forms.NewPullNestedQuantifiers(k.manager)

@@ -82,6 +82,9 @@ func (k *SMTKernel) appendAssertion(formula, proof ast.ASTHandle) error {
 }
 
 func (k *SMTKernel) pushAssertion(formula, proof ast.ASTHandle) error {
+	if k.assertedFormulasInconsistent() {
+		return nil
+	}
 	if k.manager.IsTrue(formula) {
 		return nil
 	}

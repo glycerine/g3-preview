@@ -13,15 +13,7 @@ func (k *SMTKernel) inferPendingPatterns() (result error) {
 	if !k.preprocess || !k.smtState.Ematching || k.patternInference == nil || k.assertedHead == len(k.assertions) {
 		return nil
 	}
-	quantified := false
-	for _, row := range k.assertions[k.assertedHead:] {
-		has, err := k.manager.HasQuantifiers(row.Formula)
-		if err != nil {
-			return err
-		}
-		quantified = quantified || has
-	}
-	if !quantified {
+	if !k.assertedHasQuantifiers {
 		return nil
 	}
 	out, err := k.manager.NewRef(ast.ASTHandle{})

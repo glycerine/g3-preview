@@ -336,6 +336,8 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"asserted_driver_inconsistency_scopes.smt2":    "unsat\nsat\nunsat\nsat\n",
+	"asserted_driver_quantifier_scopes.smt2":       "sat\nunsat\nsat\n",
 	"quant_seq_boundary_equality_core.smt2":        "unsat\n(same words)\n",
 	"quant_seq_boundary_length_core.smt2":          "unsat\n(length words)\n",
 	"quant_seq_unit_character_core.smt2":           "unsat\n(character different)\n",

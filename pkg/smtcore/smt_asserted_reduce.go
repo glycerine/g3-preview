@@ -66,15 +66,7 @@ func (k *SMTKernel) distributePendingUniversals() (result error) {
 	if !k.preprocess || !k.preprocessState.DistributeForall || k.assertedHead == len(k.assertions) {
 		return nil
 	}
-	quantified := false
-	for _, row := range k.assertions[k.assertedHead:] {
-		has, err := k.manager.HasQuantifiers(row.Formula)
-		if err != nil {
-			return err
-		}
-		quantified = quantified || has
-	}
-	if !quantified {
+	if !k.assertedHasQuantifiers {
 		return nil
 	}
 	proc, err := rewriter.NewDistributeForall(k.manager, k.paramContext, k.paramGlobals)

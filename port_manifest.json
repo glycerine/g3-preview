@@ -106517,7 +106517,9 @@
         "pkg/smtcore/smt_asserted_bv.go",
         "pkg/smtcore/smt_asserted_bv_test.go",
         "pkg/smtcore/smt_asserted_bounds.go",
-        "pkg/smtcore/smt_asserted_bounds_test.go"
+        "pkg/smtcore/smt_asserted_bounds_test.go",
+        "pkg/smtcore/smt_asserted_driver.go",
+        "pkg/smtcore/smt_asserted_driver_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -106556,7 +106558,13 @@
         "TestSMTAssertedBit2IntGuardsAndProofs",
         "TestSMTAssertedBVSharingScopesAndProofs",
         "TestSMTAssertedBoundEliminationGuardsProofsAndScopes",
-        "TestSMTAssertedBoundsSourceSetupAndUpdates"
+        "TestSMTAssertedBoundsSourceSetupAndUpdates",
+        "TestSMTAssertedDriverCancellationAndResume",
+        "TestSMTAssertedDriverQuantifierFlagSurvivesRewriteAndPop",
+        "TestSMTAssertedDriverInconsistencyStopsAssertionAndRestoresScope",
+        "TestSMTAssertedDriverSkippedPassDoesNotPollCancellation",
+        "TestSMTAssertedDriverStopsBeforeNNFOnPropagationConflict",
+        "TestSMTAssertedMacroPostOperationDoesNotPropagateValues"
       ],
       "conditionals": [
         {
@@ -106801,7 +106809,25 @@
           ]
         },
         {
-          "name": "remaining pending-formula reduction passes and quantifier transforms",
+          "name": "reduce/invoke retained pass ordering, should_apply guards, source cancellation-count boundaries, inconsistency early stops, sticky original-input quantifier state across rewriting and pop, one forward/reverse value-propagation pair and rewrite-only macro/NNF post-operations",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_driver.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_asserted_propagate.go",
+            "pkg/smtcore/smt_asserted_macros.go"
+          ],
+          "tests": [
+            "TestSMTAssertedDriverCancellationAndResume",
+            "TestSMTAssertedDriverQuantifierFlagSurvivesRewriteAndPop",
+            "TestSMTAssertedDriverInconsistencyStopsAssertionAndRestoresScope",
+            "TestSMTAssertedDriverSkippedPassDoesNotPollCancellation",
+            "TestSMTAssertedDriverStopsBeforeNNFOnPropagationConflict",
+            "TestSMTAssertedMacroPostOperationDoesNotPropagateValues"
+          ]
+        },
+        {
+          "name": "remaining preprocessing setup/reset details, per-row cancellation/publication audit and driver verbose/trace/debug diagnostics",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -106817,7 +106843,8 @@
       ],
       "deviations": [
         "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager.",
-        "Go expands stored definitions before committing later assertions independently of new-discovery and ordinary-preprocessing flags. Definitions removed from the assertion list therefore remain effective after parameter changes and when quasi_macros is enabled without macro_finder."
+        "Go expands stored definitions before committing later assertions independently of new-discovery and ordinary-preprocessing flags. Definitions removed from the assertion list therefore remain effective after parameter changes and when quasi_macros is enabled without macro_finder.",
+        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; source diagnostic hooks and complete per-row cancellation fidelity remain unaudited, so this source unit remains partial."
       ]
     },
     {
@@ -106849,7 +106876,9 @@
         "pkg/smtcore/smt_asserted_bv.go",
         "pkg/smtcore/smt_asserted_bv_test.go",
         "pkg/smtcore/smt_asserted_bounds.go",
-        "pkg/smtcore/smt_asserted_bounds_test.go"
+        "pkg/smtcore/smt_asserted_bounds_test.go",
+        "pkg/smtcore/smt_asserted_driver.go",
+        "pkg/smtcore/smt_asserted_driver_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -106888,7 +106917,13 @@
         "TestSMTAssertedBit2IntGuardsAndProofs",
         "TestSMTAssertedBVSharingScopesAndProofs",
         "TestSMTAssertedBoundEliminationGuardsProofsAndScopes",
-        "TestSMTAssertedBoundsSourceSetupAndUpdates"
+        "TestSMTAssertedBoundsSourceSetupAndUpdates",
+        "TestSMTAssertedDriverCancellationAndResume",
+        "TestSMTAssertedDriverQuantifierFlagSurvivesRewriteAndPop",
+        "TestSMTAssertedDriverInconsistencyStopsAssertionAndRestoresScope",
+        "TestSMTAssertedDriverSkippedPassDoesNotPollCancellation",
+        "TestSMTAssertedDriverStopsBeforeNNFOnPropagationConflict",
+        "TestSMTAssertedMacroPostOperationDoesNotPropagateValues"
       ],
       "conditionals": [
         {
@@ -107081,7 +107116,25 @@
           ]
         },
         {
-          "name": "setup, reset, and remaining pending-formula reductions",
+          "name": "reduce/invoke retained pass ordering, should_apply guards, source cancellation-count boundaries, inconsistency early stops, sticky original-input quantifier state across rewriting and pop, one forward/reverse value-propagation pair and rewrite-only macro/NNF post-operations",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_driver.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_asserted_propagate.go",
+            "pkg/smtcore/smt_asserted_macros.go"
+          ],
+          "tests": [
+            "TestSMTAssertedDriverCancellationAndResume",
+            "TestSMTAssertedDriverQuantifierFlagSurvivesRewriteAndPop",
+            "TestSMTAssertedDriverInconsistencyStopsAssertionAndRestoresScope",
+            "TestSMTAssertedDriverSkippedPassDoesNotPollCancellation",
+            "TestSMTAssertedDriverStopsBeforeNNFOnPropagationConflict",
+            "TestSMTAssertedMacroPostOperationDoesNotPropagateValues"
+          ]
+        },
+        {
+          "name": "remaining preprocessing setup/reset details, per-row cancellation/publication audit and driver verbose/trace/debug diagnostics",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -107096,7 +107149,8 @@
         "The kernel owns the maximize_bv_sharing rewriter and pushes/pops its operand cache with assertion scopes. Bit2int owns its per-pass cache until transformed formula/proof rows have acquired references."
       ],
       "deviations": [
-        "The concrete retained subset is integrated with SMTKernel rather than exposed as a preprocessing class."
+        "The concrete retained subset is integrated with SMTKernel rather than exposed as a preprocessing class.",
+        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; source diagnostic hooks and complete per-row cancellation fidelity remain unaudited, so this source unit remains partial."
       ]
     },
     {

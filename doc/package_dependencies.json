@@ -2555,6 +2555,7 @@
         "smt_array_lifecycle.go",
         "smt_asserted_bounds.go",
         "smt_asserted_bv.go",
+        "smt_asserted_driver.go",
         "smt_asserted_formulas.go",
         "smt_asserted_injectivity.go",
         "smt_asserted_ite.go",

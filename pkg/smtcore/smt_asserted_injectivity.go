@@ -11,7 +11,7 @@ import (
 )
 
 func (k *SMTKernel) refinePendingInjectivityAxioms() (result error) {
-	if !k.preprocess || !k.preprocessState.RefineInjectivityAxiom || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.preprocessState.RefineInjectivityAxiom || !k.assertedHasQuantifiers || k.assertedHead == len(k.assertions) {
 		return nil
 	}
 	batch, err := macros.NewFormulaBatch(k.manager)

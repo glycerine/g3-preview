@@ -13,16 +13,8 @@ func (k *SMTKernel) normalizePendingAssertions() (result error) {
 	if !k.preprocess || k.assertedHead == len(k.assertions) {
 		return nil
 	}
-	apply := k.preprocessState.NNFCNF
-	if !apply && k.internalizer.quantifierManager != nil && k.internalizer.quantifierManager.mbqi {
-		for _, assertion := range k.assertions[k.assertedHead:] {
-			quantified, err := k.manager.HasQuantifiers(assertion.Formula)
-			if err != nil {
-				return err
-			}
-			apply = apply || quantified
-		}
-	}
+	apply := k.preprocessState.NNFCNF || (k.assertedHasQuantifiers &&
+		k.internalizer.quantifierManager != nil && k.internalizer.quantifierManager.mbqi)
 	if !apply {
 		return nil
 	}

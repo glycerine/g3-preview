@@ -68,6 +68,8 @@ type SMTKernel struct {
 	timerClock       func() (uint64, error)
 	closed           bool
 
+	// Source m_has_quantifiers is sticky, including across scope pops.
+	assertedHasQuantifiers bool
 	assertedParams         uparams.ParamsRef
 	assertedParamsReady    bool
 	assertedElimAnd        bool
@@ -616,6 +618,13 @@ func (k *SMTKernel) Assert(formula, proof ast.ASTHandle) error {
 		return err
 	}
 	defer k.manager.DelRef(&inputProof)
+	if k.assertedFormulasInconsistent() {
+		return nil
+	}
+	hasQuantifiers, err := k.manager.HasQuantifiers(formula)
+	if err != nil {
+		return err
+	}
 	if err = k.setAssertedEliminateAnd(false); err != nil {
 		return err
 	}
@@ -629,6 +638,7 @@ func (k *SMTKernel) Assert(formula, proof ast.ASTHandle) error {
 			defer k.manager.DecRef(proof)
 		}
 	}
+	k.assertedHasQuantifiers = k.assertedHasQuantifiers || hasQuantifiers
 	limit := len(k.assertions)
 	if err = k.pushAssertion(formula, proof); err == nil {
 		return nil
@@ -652,73 +662,9 @@ func (k *SMTKernel) Assertions() []SMTKernelAssertion {
 }
 
 func (k *SMTKernel) internalizePending() error {
-	if k.assertedHead == len(k.assertions) {
-		return nil
-	}
-	if k.assertedMacros.HasMacros() {
-		if err := k.expandPendingMacros(); err != nil {
-			return fmt.Errorf("expand asserted macros: %w", err)
-		}
-		if err := k.findPendingMacros(); err != nil {
-			return err
-		}
-	}
-	if err := k.setAssertedEliminateAnd(false); err != nil {
+	ready, err := k.reduceAssertedPending()
+	if err != nil || !ready {
 		return err
-	}
-	if err := k.propagatePendingAssertions(); err != nil {
-		return err
-	}
-	if err := k.findPendingMacros(); err != nil {
-		return fmt.Errorf("find asserted macros: %w", err)
-	}
-	if err := k.normalizePendingAssertions(); err != nil {
-		return fmt.Errorf("normalize asserted formulas: %w", err)
-	}
-	if err := k.setAssertedEliminateAnd(true); err != nil {
-		return err
-	}
-	if err := k.reducePendingAssertions(); err != nil {
-		return fmt.Errorf("reduce normalized assertions: %w", err)
-	}
-	if err := k.pullPendingNestedQuantifiers(); err != nil {
-		return fmt.Errorf("pull asserted nested quantifiers: %w", err)
-	}
-	if err := k.liftPendingITEs(false); err != nil {
-		return fmt.Errorf("lift asserted term ITEs: %w", err)
-	}
-	if err := k.liftPendingITEs(true); err != nil {
-		return fmt.Errorf("lift asserted nonground term ITEs: %w", err)
-	}
-	if err := k.eliminatePendingTermITEs(); err != nil {
-		return fmt.Errorf("eliminate asserted term ITEs: %w", err)
-	}
-	if err := k.refinePendingInjectivityAxioms(); err != nil {
-		return fmt.Errorf("refine asserted injectivity axioms: %w", err)
-	}
-	if err := k.distributePendingUniversals(); err != nil {
-		return fmt.Errorf("distribute asserted universals: %w", err)
-	}
-	if err := k.findPendingMacros(); err != nil {
-		return fmt.Errorf("find normalized macros: %w", err)
-	}
-	if err := k.applyPendingQuasiMacros(); err != nil {
-		return fmt.Errorf("apply asserted quasi-macros: %w", err)
-	}
-	if err := k.applyPendingBit2Int(); err != nil {
-		return fmt.Errorf("propagate asserted bit-vectors over integers: %w", err)
-	}
-	if err := k.eliminatePendingBounds(); err != nil {
-		return fmt.Errorf("eliminate asserted quantifier bounds: %w", err)
-	}
-	if err := k.inferPendingPatterns(); err != nil {
-		return fmt.Errorf("infer asserted quantifier patterns: %w", err)
-	}
-	if err := k.maximizePendingBVSharing(); err != nil {
-		return fmt.Errorf("maximize asserted bit-vector sharing: %w", err)
-	}
-	if err := k.reducePendingAssertions(); err != nil {
-		return fmt.Errorf("reduce final assertions: %w", err)
 	}
 	for k.assertedHead < len(k.assertions) {
 		assertion := k.assertions[k.assertedHead]

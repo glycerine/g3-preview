@@ -11,21 +11,12 @@ import (
 )
 
 func (k *SMTKernel) findPendingMacros() (result error) {
-	if !k.preprocess || !k.preprocessState.MacroFinder || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.preprocessState.MacroFinder || !k.assertedHasQuantifiers || k.assertedHead == len(k.assertions) {
 		return nil
 	}
-	hasQuantifiers := k.assertedMacros.HasMacros()
 	inputs := make([]macros.Formula, 0, len(k.assertions)-k.assertedHead)
 	for _, assertion := range k.assertions[k.assertedHead:] {
-		nested, err := k.manager.HasQuantifiers(assertion.Formula)
-		if err != nil {
-			return err
-		}
-		hasQuantifiers = hasQuantifiers || nested
 		inputs = append(inputs, macros.Formula{Expression: assertion.Formula, Proof: assertion.Proof})
-	}
-	if !hasQuantifiers {
-		return nil
 	}
 	finder, err := macros.NewFinder(k.manager, k.assertedMacros)
 	if err != nil {
@@ -40,10 +31,7 @@ func (k *SMTKernel) findPendingMacros() (result error) {
 }
 
 func (k *SMTKernel) replacePendingMacroBatch(batch *macros.FormulaBatch) (result error) {
-	if err := k.replacePendingFormulaBatch(batch, true); err != nil {
-		return err
-	}
-	return k.propagatePendingAssertions()
+	return k.replacePendingFormulaBatch(batch, true)
 }
 
 // replacePendingFormulaBatch implements the source justified-formula swap.
@@ -134,21 +122,12 @@ func (k *SMTKernel) expandPendingMacros() (result error) {
 // applyPendingQuasiMacros follows the source repeated quasi-macro pass. Each
 // batch owns the formulas until the next pass has acquired its references.
 func (k *SMTKernel) applyPendingQuasiMacros() (result error) {
-	if !k.preprocess || !k.preprocessState.QuasiMacros || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.preprocessState.QuasiMacros || !k.assertedHasQuantifiers || k.assertedHead == len(k.assertions) {
 		return nil
 	}
 	var inputs []macros.Formula
-	hasQuantifiers := false
 	for _, assertion := range k.assertions[k.assertedHead:] {
-		nested, err := k.manager.HasQuantifiers(assertion.Formula)
-		if err != nil {
-			return err
-		}
-		hasQuantifiers = hasQuantifiers || nested
 		inputs = append(inputs, macros.Formula{Expression: assertion.Formula, Proof: assertion.Proof})
-	}
-	if !hasQuantifiers {
-		return nil
 	}
 	proc, err := macros.NewQuasiMacros(k.manager, k.assertedMacros)
 	if err != nil {

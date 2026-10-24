@@ -208,7 +208,8 @@ func (k *SMTKernel) propagatePendingAssertions() (result error) {
 	if !k.preprocess || !k.preprocessState.PropagateValues || k.preprocessor == nil || k.assertedHead == len(k.assertions) {
 		return nil
 	}
-	for iteration := 0; iteration < 2; iteration++ {
+	// Source ++num_iterations < 2 permits one forward/reverse pair.
+	for iteration := 0; iteration < 1; iteration++ {
 		changed := false
 		for _, reverse := range []bool{false, true} {
 			substitution, err := k.manager.NewExprSubstitution()
@@ -247,6 +248,7 @@ func (k *SMTKernel) propagatePendingAssertions() (result error) {
 		if !changed {
 			break
 		}
+		return k.reducePendingAssertions()
 	}
 	return nil
 }
