@@ -7,10 +7,26 @@
     {
       "package": "ackermannization",
       "imports": [
-        "util/params"
+        "arena",
+        "ast",
+        "ast/rewriter",
+        "model",
+        "tactic",
+        "util/diagnostic",
+        "util/memory",
+        "util/params",
+        "util/symbol",
+        "util/text"
       ],
       "production_files": [
-        "gparams_catalog_collectors.go"
+        "bound_probe.go",
+        "eager.go",
+        "gparams_catalog_collectors.go",
+        "helper.go",
+        "info.go",
+        "model_converter.go",
+        "tactic.go",
+        "trace.go"
       ]
     },
     {
@@ -865,6 +881,7 @@
     {
       "package": "cmd_context",
       "imports": [
+        "ackermannization",
         "arena",
         "ast",
         "ast/rewriter",

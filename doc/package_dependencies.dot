@@ -6,7 +6,16 @@ digraph packages {
   label="Go production imports: consumer -> dependency";
   labelloc=t;
   "ackermannization" [style=filled, fillcolor="#eeeeee"];
+  "ackermannization" -> "arena";
+  "ackermannization" -> "ast";
+  "ackermannization" -> "ast/rewriter";
+  "ackermannization" -> "model";
+  "ackermannization" -> "tactic";
+  "ackermannization" -> "util/diagnostic";
+  "ackermannization" -> "util/memory";
   "ackermannization" -> "util/params";
+  "ackermannization" -> "util/symbol";
+  "ackermannization" -> "util/text";
   "api" [style=filled, fillcolor="#eeeeee"];
   "api" -> "arena";
   "api" -> "ast";
@@ -107,6 +116,7 @@ digraph packages {
   "cmd/portcheck" [style=filled, fillcolor="#eeeeee"];
   "cmd/portcheck" -> "portcheck";
   "cmd_context" [style=filled, fillcolor="#eeeeee"];
+  "cmd_context" -> "ackermannization";
   "cmd_context" -> "arena";
   "cmd_context" -> "ast";
   "cmd_context" -> "ast/rewriter";

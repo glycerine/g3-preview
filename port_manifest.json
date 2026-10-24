@@ -2853,14 +2853,26 @@
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/ackermannization/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/ackermannization/tactic.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -2889,6 +2901,26 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "Live concrete runtime accessor in Tactic.readEager using local/module fallback and source default; generated full-surface audit remains open",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/tactic.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
@@ -2900,12 +2932,47 @@
       "path": "src/ackermannization/ackermannization_params.pyg",
       "component": "ackermannization",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ackermannization/tactic.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Live concrete runtime accessor in Tactic.readEager using local/module fallback and source default; generated full-surface audit remains open",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/tactic.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -2913,22 +2980,114 @@
       "path": "src/ackermannization/ackermannize_bv_model_converter.cpp",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/model_converter.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "BV wrapper delegates to ordinary Ackermann model-converter factory",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/model_converter.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+      ]
     },
     {
       "path": "src/ackermannization/ackermannize_bv_model_converter.h",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/model_converter.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -2939,38 +3098,208 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete retained BV model-converter factory declaration",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/model_converter.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+      ]
     },
     {
       "path": "src/ackermannization/ackermannize_bv_tactic.cpp",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/tactic.go",
+        "pkg/ackermannization/eager.go",
+        "pkg/ackermannization/trace.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 68,
           "text": "SASSERT(resg->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Constructor parameter snapshot, update-only lemma limit, core-before-proof refusal, result model-converter clearing and source no-op cleanup",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/tactic.go",
+            "pkg/ackermannization/eager.go",
+            "pkg/ackermannization/trace.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Success appends a fresh configuration-copy goal and increments its depth; limit/quantifier fallback replaces results with original goal; constraints accumulate/reset and translation uses constructor snapshot",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/tactic.go",
+            "pkg/ackermannization/eager.go",
+            "pkg/ackermannization/trace.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported.",
+        "C++ leaves the lemma-limit field uninitialized until updt_params; retained Go callers initialize it via UpdateParams before use. The Go apply command is still a separate frontend obligation; check-sat-using is integrated."
+      ]
     },
     {
       "path": "src/ackermannization/ackermannize_bv_tactic.h",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/tactic.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -2981,11 +3310,50 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete Ackermannize-BV factory and retained registry integration",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/tactic.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported.",
+        "C++ leaves the lemma-limit field uninitialized until updt_params; retained Go callers initialize it via UpdateParams before use. The Go apply command is still a separate frontend obligation; check-sat-using is integrated."
+      ]
     },
     {
       "path": "src/ackermannization/ackermannize_bv_tactic_params.hpp",
@@ -2996,14 +3364,26 @@
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/ackermannization/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/ackermannization/tactic.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -3032,6 +3412,26 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "Live concrete runtime accessor in Tactic.UpdateParams using local/module fallback and source default; generated full-surface audit remains open",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/tactic.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
@@ -3043,12 +3443,47 @@
       "path": "src/ackermannization/ackermannize_bv_tactic_params.pyg",
       "component": "ackermannization",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ackermannization/tactic.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Live concrete runtime accessor in Tactic.UpdateParams using local/module fallback and source default; generated full-surface audit remains open",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/tactic.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -3056,22 +3491,77 @@
       "path": "src/ackermannization/ackr_bound_probe.cpp",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/bound_probe.go",
+        "pkg/ackermannization/helper.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Count unique live applications in goal roots and quantifier bodies while ignoring patterns; source bound trace and probe factory",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/bound_probe.go",
+            "pkg/ackermannization/helper.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+      ]
     },
     {
       "path": "src/ackermannization/ackr_bound_probe.h",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/bound_probe.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers"
+      ],
       "conditionals": [
         {
           "line": 18,
@@ -3082,32 +3572,110 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete counted bound-probe factory and evaluation surface",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/bound_probe.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+      ]
     },
     {
       "path": "src/ackermannization/ackr_helper.cpp",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/helper.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Sum per-declaration congruence bounds using source unsigned choose-two arithmetic",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/helper.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+      ]
     },
     {
       "path": "src/ackermannization/ackr_helper.h",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/helper.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -3124,19 +3692,58 @@
           "text": "SASSERT(std::numeric_limits<unsigned>().max() & 32);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete live term groups, uninterpreted/plugin selection and exact bit-16 overflow guard including wrapped out-of-range results",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/helper.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+      ]
     },
     {
       "path": "src/ackermannization/ackr_info.h",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/info.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers"
+      ],
       "conditionals": [
         {
           "line": 16,
@@ -3165,19 +3772,73 @@
           "text": "SASSERT(rv);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Owned abstraction/substitution maps, seal/default replacement, inverse declaration lookup, counted destruction and sealed/unsealed target-manager translation",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/info.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+      ]
     },
     {
       "path": "src/ackermannization/ackr_model_converter.cpp",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/model_converter.go",
+        "pkg/ackermannization/trace.go",
+        "pkg/ackermannization/info.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 43,
@@ -3196,19 +3857,121 @@
           "text": "SASSERT(sz == term->get_num_args());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Ordinary/fixed abstract-model conversion, dynamic completion-grown constant iteration, copied functions/universes, abstracted argument evaluation and first duplicate-entry retention",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/model_converter.go",
+            "pkg/ackermannization/trace.go",
+            "pkg/ackermannization/info.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Default else values, abstraction filtering, indexed/unindexed entry points, source diagnostics, normal/fixed target-manager translation and independent counted lifetimes",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/model_converter.go",
+            "pkg/ackermannization/trace.go",
+            "pkg/ackermannization/info.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+      ]
     },
     {
       "path": "src/ackermannization/ackr_model_converter.h",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/ackermannization/model_converter.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 16,
@@ -3219,19 +3982,73 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete ordinary and fixed model-converter factories",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/model_converter.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+      ]
     },
     {
       "path": "src/ackermannization/lackr.cpp",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ackermannization/eager.go",
+        "pkg/ackermannization/helper.go",
+        "pkg/ackermannization/info.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers"
+      ],
       "assertions": [
         {
           "line": 55,
@@ -3272,17 +4089,63 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained mk_ackermann/init/collect_terms/abstract/ackr/eager_enc path: source postorder traversal, quantifier refusal, fresh abstraction before bound refusal, distinct-argument pruning and rewritten congruence lemmas",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/eager.go",
+            "pkg/ackermannization/helper.go",
+            "pkg/ackermannization/info.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Solver-backed eager/lazy solving, abstraction push, get_model and lazy model-constructor integration retained by QF_UFBV",
+          "status": "unported",
+          "reason": "Only the solver-free mk_ackermann path is implemented; retained QF_UFBV consumers still require these algorithms."
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+      ]
     },
     {
       "path": "src/ackermannization/lackr.h",
       "component": "ackermannization",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ackermannization/eager.go",
+        "pkg/ackermannization/ackermannization_cpp_test.go",
+        "pkg/ackermannization/model_converter_test.go",
+        "pkg/ackermannization/tactic_test.go"
+      ],
+      "tests": [
+        "TestAckermannizationExactGoalsCPP",
+        "TestAckermannBoundProbeCPP",
+        "TestAckermannModelCompletionAndDuplicateEntries",
+        "TestAckermannModelAllocationFrontiers",
+        "TestAckermannTacticAppendFallbackAndStatistics",
+        "TestAckermannLemmaBoundSourceOverflow",
+        "TestAckermannConstructorSnapshotAndRefusalOrder",
+        "TestAckermannTacticAllocationFrontiers"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -3295,9 +4158,39 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete retained MkAckermann eager encoder and statistics, borrowed services/form snapshot and owned rewrite/substitution/lemma roots",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ackermannization/eager.go",
+            "pkg/ackermannization/ackermannization_cpp_test.go",
+            "pkg/ackermannization/model_converter_test.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannizationExactGoalsCPP",
+            "TestAckermannBoundProbeCPP",
+            "TestAckermannModelCompletionAndDuplicateEntries",
+            "TestAckermannModelAllocationFrontiers",
+            "TestAckermannTacticAppendFallbackAndStatistics",
+            "TestAckermannLemmaBoundSourceOverflow",
+            "TestAckermannConstructorSnapshotAndRefusalOrder",
+            "TestAckermannTacticAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "Solver-backed eager/lazy solving, abstraction push, get_model and lazy model-constructor integration retained by QF_UFBV",
+          "status": "unported",
+          "reason": "Only the solver-free mk_ackermann path is implemented; retained QF_UFBV consumers still require these algorithms."
+        }
+      ],
+      "ownership": [
+        "The manager and evaluator services are borrowed; counted Info, formula/substitution roots, goals and converters retain independent concrete owners. Failed application/conversion work stays reachable for cleanup retry, including consumed releases and partially constructed children."
+      ],
+      "deviations": [
+        "Go maps/slices replace C++ hash containers and buffers; hash enumeration order and fresh identifier spelling are not emulated. Explicit errors and retryable cleanup replace exceptions and scoped destruction; no C++ standard-library internals are ported."
+      ]
     },
     {
       "path": "src/ackermannization/lackr_model_constructor.cpp",
@@ -40073,7 +40966,16 @@
         "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
         "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
         "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
-        "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+        "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -40342,6 +41244,27 @@
             "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
             "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
             "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Registered retained ackermannize_bv factory for check-sat-using: scoped models, nested congruence, div0 congruence, limit fallback and proof/core refusal",
+          "status": "ported",
+          "go_targets": [
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/ackermann_boolean_models.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_div0_congruence.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_limit_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
           ],
           "tests": [
             "TestSMTLibRunnerScripts",
@@ -144982,7 +145905,8 @@
         "pkg/tactic/tactic_report.go",
         "pkg/tactic/tactic_report_test.go",
         "pkg/tactic/bv/max_bv_sharing_goal.go",
-        "pkg/tactic/ufbv/rewrite_tactic.go"
+        "pkg/tactic/ufbv/rewrite_tactic.go",
+        "pkg/ackermannization/tactic_test.go"
       ],
       "tests": [
         "TestBaseTacticSkipFailUndecidedAndExecCleanup",
@@ -144994,7 +145918,8 @@
         "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate",
         "TestTacticReportReadsProcessMemoryAndWritesSourceOrder",
         "TestTacticProgressPositiveVerboseGateAndSourceFormat",
-        "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal"
+        "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
+        "TestAckermannTacticAppendFallbackAndStatistics"
       ],
       "conditionals": [
         {
@@ -145047,7 +145972,10 @@
           "name": "Concrete UFBV rewriter tactic outer allocations at ufbv_rewriter_tactic.cpp:85,121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
-          "tests": ["TestUFBVRewriterTranslateOwnsDestinationImplementation", "TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
+          "tests": [
+            "TestUFBVRewriterTranslateOwnsDestinationImplementation",
+            "TestUFBVRewriterImpMemoryCleanupSwapAndClose"
+          ]
         },
         {
           "name": "tactic_report source verbosity level and scoped constructor/destructor for retained BV/UFBV tactics (tactic.h:103-120)",
@@ -145055,6 +145983,17 @@
           "go_target": "pkg/tactic/tactic_report.go",
           "tests": [
             "TestTacticReportReadsProcessMemoryAndWritesSourceOrder"
+          ]
+        },
+        {
+          "name": "BindManager preserves populated goal/metadata buffers for the retained Ackermannization success-append convention; fallback still resets through Prepare",
+          "status": "platform_replacement",
+          "go_targets": [
+            "pkg/tactic/tactic_base.go",
+            "pkg/ackermannization/tactic_test.go"
+          ],
+          "tests": [
+            "TestAckermannTacticAppendFallbackAndStatistics"
           ]
         }
       ],

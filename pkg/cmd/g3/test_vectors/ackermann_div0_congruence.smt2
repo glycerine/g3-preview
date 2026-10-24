@@ -1,0 +1,6 @@
+(set-logic QF_BV)
+(declare-const x (_ BitVec 4))
+(declare-const y (_ BitVec 4))
+(assert (= x y))
+(assert (not (= (bvudiv x #x0) (bvudiv y #x0))))
+(check-sat-using (then (using-params simplify :hi_div0 false) ackermannize_bv smt))

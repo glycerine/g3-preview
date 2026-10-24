@@ -1,0 +1,7 @@
+(set-logic QF_UF)
+(set-option :produce-models true)
+(declare-fun f (Bool) Bool)
+(assert (f true))
+(assert (not (f false)))
+(check-sat-using (then ackermannize_bv smt))
+(get-value ((f true) (f false)))

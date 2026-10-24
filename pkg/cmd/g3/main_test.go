@@ -194,6 +194,15 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"ackermann_models_scopes.smt2":                 "sat\n((x #x1)\n (y #x2)\n ((f x) #x3)\n ((f y) #x4))\nunsat\nsat\n(((f x) #x3)\n ((f y) #x4))\n",
+	"ackermann_nested_model.smt2":                  "sat\n(((g x) #x2)\n ((f (g x)) #x7)\n ((f y) #x7)\n ((= (f (g x)) (f y)) true))\n",
+	"ackermann_nested_unsat.smt2":                  "unsat\n",
+	"ackermann_boolean_models.smt2":                "sat\n(((f true) true)\n ((f false) false))\n",
+	"ackermann_usort_models.smt2":                  "sat\n(((distinct x y) true)\n ((= (f x) y) true)\n ((= (f y) x) true))\n",
+	"ackermann_limit_fallback.smt2":                "unknown\n(:reason-unknown \"incomplete\")\nsat\n(((f #x0) #x1)\n ((f #x1) #x2)\n ((f #x2) #x3))\n",
+	"ackermann_proof_refusal.smt2":                 "unknown\n(:reason-unknown \"ackermannize does not support proof production\")\nunsat\n",
+	"ackermann_core_refusal.smt2":                  "unknown\n(:reason-unknown \"ackermannize does not support unsat core production\")\nunsat\n(eq conflict)\n",
+	"ackermann_div0_congruence.smt2":               "unsat\n",
 	"bv_size_signed_models_scopes.smt2":            "sat\n((x #xff))\nunsat\nsat\n((x #xff))\n",
 	"bv_size_negative_model.smt2":                  "sat\n((x #xff)\n ((bvsle #xf8 x) true)\n ((bvsle x #xff) true))\n",
 	"bv_size_positive_model.smt2":                  "sat\n((x #x03))\n",

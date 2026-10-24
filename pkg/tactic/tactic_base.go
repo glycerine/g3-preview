@@ -94,6 +94,16 @@ func (r *TacticResult) prepare(m *ast.ASTManager) error {
 // Prepare resets a result for a tactic implemented in another package. It is
 // the package boundary counterpart of tactic's result-buffer initialization.
 func (r *TacticResult) Prepare(m *ast.ASTManager) error { return r.prepare(m) }
+
+// BindManager preserves existing buffers for source tactics that append goals
+// rather than resetting them. Prepare remains the resetting entry point.
+func (r *TacticResult) BindManager(m *ast.ASTManager) error {
+	if r == nil || r.closed || m == nil || (r.manager != nil && r.manager != m) {
+		return ast.ErrASTHandle
+	}
+	r.manager = m
+	return nil
+}
 func (r *TacticResult) AddGoal(g *Goal) error {
 	if r == nil || r.closed || g == nil || g.manager != r.manager {
 		return ast.ErrASTHandle

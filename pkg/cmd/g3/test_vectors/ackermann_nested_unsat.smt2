@@ -1,0 +1,8 @@
+(set-logic QF_UFBV)
+(declare-const x (_ BitVec 4))
+(declare-const y (_ BitVec 4))
+(declare-fun f ((_ BitVec 4)) (_ BitVec 4))
+(declare-fun g ((_ BitVec 4)) (_ BitVec 4))
+(assert (= (g x) y))
+(assert (not (= (f (g x)) (f y))))
+(check-sat-using (then ackermannize_bv smt))
