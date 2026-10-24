@@ -1,0 +1,5 @@
+(set-logic ALL)
+(declare-const k Int)
+(assert (exists ((x Int)) (and (= x 3) (= k x))))
+(check-sat-using (then qe-light smt))
+(get-value (k))

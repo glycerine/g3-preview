@@ -41813,7 +41813,15 @@
         "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
         "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
+        "pkg/qe/lite_tactic.go",
+        "pkg/qe/lite_tactic_test.go",
+        "pkg/qe/lite_tactic_frontier_test.go",
+        "pkg/cmd/g3/qe_light_test.go",
+        "pkg/cmd/g3/test_vectors/qe_light_projection.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_model.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_core.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_fm.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -41887,7 +41895,12 @@
         "TestAUFLIAQICostTraceAndClosedOutput",
         "TestQuantifiedArithmeticTranslatedProofAndCore",
         "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
-        "TestSMTLibRunnerAUFLIAExpressionLimit"
+        "TestSMTLibRunnerAUFLIAExpressionLimit",
+        "TestLiteTacticGoalDependenciesAppendDepthAndCancellation",
+        "TestLiteTacticParamsCleanupTranslationAndNoOpSurfaces",
+        "TestLiteTacticProofNullGuardAndNonQuantifiedSkip",
+        "TestLiteTacticAllocationFrontiersTraceReportAndCountedClose",
+        "TestSMTLibRunnerQELightProjectionModelAndCore"
       ],
       "conditionals": [
         {
@@ -42365,13 +42378,36 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained qe-light native factory dispatch through check-sat-using, including source tactic composition, returned model values and named unsat-core dependencies",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/lite_tactic.go",
+            "pkg/qe/lite_tactic_test.go",
+            "pkg/qe/lite_tactic_frontier_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qe_light_test.go",
+            "pkg/cmd/g3/test_vectors/qe_light_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_core.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_fm.smt2"
+          ],
+          "tests": [
+            "TestLiteTacticGoalDependenciesAppendDepthAndCancellation",
+            "TestLiteTacticParamsCleanupTranslationAndNoOpSurfaces",
+            "TestLiteTacticProofNullGuardAndNonQuantifiedSkip",
+            "TestLiteTacticAllocationFrontiersTraceReportAndCountedClose",
+            "TestSMTLibRunnerQELightProjectionModelAndCore"
+          ]
         }
       ],
       "ownership": [
         "The command parser returns one counted tactic reference. Composition factories acquire children; command execution owns the using_params/timeout wrappers, goal and temporary result refs. Context owns the independent SimpleCheckSatResult until replacement or teardown, and ordinary solver scopes stay separate."
       ],
       "deviations": [
-        "The retained qfufbv_ackr factory is registered through the concrete source tactic-name dispatch, with command output forwarded to its selected SAT backend. Existing incremental context/scopes remain separate from explicit check-sat-using execution."
+        "The retained qfufbv_ackr factory is registered through the concrete source tactic-name dispatch, with command output forwarded to its selected SAT backend. Existing incremental context/scopes remain separate from explicit check-sat-using execution.",
+        "qe-light is available through the retained check-sat-using command. The broader apply/help/registry command surfaces remain separate unported work; the four new CLI vectors use actual supported command execution and require no fallback solver for the QE-only contradictions."
       ]
     },
     {
@@ -92113,9 +92149,9 @@
       "path": "src/qe/qe_lite.cpp",
       "component": "qe",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/qe/variable_test.go",
+        "pkg/qe/variable_selection.go",
         "pkg/qe/array_der.go",
         "pkg/qe/trace.go",
         "pkg/qe/occurs.go",
@@ -92159,7 +92195,16 @@
         "pkg/qe/lite_test.go",
         "pkg/qe/lite_proof_test.go",
         "pkg/qe/lite_frontier_test.go",
-        "pkg/qe/lite_cpp_test.go"
+        "pkg/qe/lite_cpp_test.go",
+        "pkg/qe/lite_tactic.go",
+        "pkg/qe/lite_tactic_test.go",
+        "pkg/qe/lite_tactic_frontier_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/qe_light_test.go",
+        "pkg/cmd/g3/test_vectors/qe_light_projection.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_model.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_core.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_fm.smt2"
       ],
       "tests": [
         "TestVariableTestCopiesSetComplementAndDeclarationBoundary",
@@ -92207,7 +92252,12 @@
         "TestLiteArrayOptionAndOwnerGuards",
         "TestLiteNoProofTraversalPreservesCallerProofReference",
         "TestLiteAllocationFrontiersAndClosedTrace",
-        "TestLiteCPPFullTraversalNormalForms"
+        "TestLiteCPPFullTraversalNormalForms",
+        "TestLiteTacticGoalDependenciesAppendDepthAndCancellation",
+        "TestLiteTacticParamsCleanupTranslationAndNoOpSurfaces",
+        "TestLiteTacticProofNullGuardAndNonQuantifiedSkip",
+        "TestLiteTacticAllocationFrontiersTraceReportAndCountedClose",
+        "TestSMTLibRunnerQELightProjectionModelAndCore"
       ],
       "conditionals": [
         {
@@ -92389,8 +92439,8 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "eq::occurs_var checks application children and recurses through quantifier bodies with shifted indices and an independent visited set per binder frame; annotations are intentionally ignored",
@@ -92407,7 +92457,7 @@
           "name": "ar::der solve_select, solve_neq_select, marked expression traversal and operator(): concrete selected array/index variables, source freshness guards, multi-index store substitution, binder/pattern-safe replacement, literal-order writes, cooperation-before-cancellation and source solve_select trace",
           "status": "ported",
           "go_targets": [
-            "pkg/qe/variable_test.go",
+            "pkg/qe/variable_selection.go",
             "pkg/qe/array_der.go",
             "pkg/qe/trace.go",
             "pkg/qe/occurs.go",
@@ -92540,6 +92590,28 @@
             "TestLiteAllocationFrontiersAndClosedTrace",
             "TestLiteCPPFullTraversalNormalForms"
           ]
+        },
+        {
+          "name": "qe_lite_tactic and mk_qe_lite_tactic: source goal/converter handling, dependency-preserving quantified updates, depth/result append, cancellation-before-cooperation, report/trace, stored-parameter update, cleanup reconstruction, translation, empty descriptors/statistics and counted destruction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/lite_tactic.go",
+            "pkg/qe/lite_tactic_test.go",
+            "pkg/qe/lite_tactic_frontier_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qe_light_test.go",
+            "pkg/cmd/g3/test_vectors/qe_light_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_core.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_fm.smt2"
+          ],
+          "tests": [
+            "TestLiteTacticGoalDependenciesAppendDepthAndCancellation",
+            "TestLiteTacticParamsCleanupTranslationAndNoOpSurfaces",
+            "TestLiteTacticProofNullGuardAndNonQuantifiedSkip",
+            "TestLiteTacticAllocationFrontiersTraceReportAndCountedClose",
+            "TestSMTLibRunnerQELightProjectionModelAndCore"
+          ]
         }
       ],
       "ownership": [
@@ -92548,23 +92620,25 @@
         "FM recognition borrows the AST manager, concrete VariableTest and Config services. Forbidden indices and traversal membership use native maps and slices. The private recognizer introduces no second AST/numeral owner; tests release all fixture-charged storage. Open/closed trace paths preserve source expression evaluation and formula recognition.",
         "Private fmStore retains actual partially constructed constraints before coefficient allocation, with concrete owned numeral-service values, copied literal/variable slices and pinned arithmetic/Boolean expressions. fmScope owns lexical numbers, expression references and stopped child failure receipts until retryable cleanup completes; fmStoreFailure retains the real owner. Eleven first-success reservation campaigns cover construction, parsing, normalization, output, registration, subsumption, row deletion, owner closure and enabled/closed diagnostics, all with zero charged fixture storage. Output references survive store destruction.",
         "FourierMotzkin borrows manager, concrete selector and Config services and owns a fresh fmStore per application, including the completed output references retained until the next call or Close. All newly resolved constraints are published to the actual store before numeral allocation; rejected batches retire their concrete owners. Typed child construction-failure receipts remain reachable through FourierMotzkinFailure if cleanup stops. Eleven complete-driver reservation campaigns cover constructor, real and large-coefficient resolution, integer success/refusal, literal resolution, inconsistency, tautology, repeated Boolean calls and enabled/closed tracing, with zero charged fixture storage.",
-        "Lite owns EqualityDER, FourierMotzkin, optional-use ArrayDER, the original typed Traversal with concrete liteConfiguration, default TheoryRewriter and a native empty construction selector. Config/manager are borrowed. Its lexical call owner retains mutable reference-vector headers, scalar refs, selectors, Boolean reducers, abstractors, substitution owners and stopped child construction receipts until cleanup succeeds. Ten first-success campaigns include constructor, conjunction/expression/constant overloads, traversal, proof-enabled constant/traversal paths, array replacement and open/closed tracing; all fixtures release charged storage."
+        "Lite owns EqualityDER, FourierMotzkin, optional-use ArrayDER, the original typed Traversal with concrete liteConfiguration, default TheoryRewriter and a native empty construction selector. Config/manager are borrowed. Its lexical call owner retains mutable reference-vector headers, scalar refs, selectors, Boolean reducers, abstractors, substitution owners and stopped child construction receipts until cleanup succeeds. Ten first-success campaigns include constructor, conjunction/expression/constant overloads, traversal, proof-enabled constant/traversal paths, array replacement and open/closed tracing; all fixtures release charged storage.",
+        "LiteTactic owns copied parameters and Lite implementation, retaining actual lexical proof/formula references, tactic reports and child construction-failure receipts. Final counted destruction consumes the reference before retryable owner cleanup. Failed translation preserves a genuine nil interface when no partial owner exists. Eight first-success campaigns cover constructor, apply, cleanup, translation, counted close, open/closed tracing and the verbose report, with zero charged fixture storage."
       ],
       "deviations": [
-        "The qe_lite core class, all public overloads, full traversal and three retained elimination phases are ported. qe_lite_tactic, mk_qe_lite_tactic and qe-light registration remain unported; no quantified-strategy substitute is added prematurely.",
+        "All retained qe_lite core, tactic and factory paths are ported and qe-light is registered for check-sat-using. Unused debug_diff is deliberately omitted. The source no-proof traversal leaves new_pr null; native GetProofFact rejects that undefined source domain rather than dereferencing a null pointer.",
         "C++ returns UNKNOWN for the raw quantified-array equivalence queries. Six comparisons instead match actual C++ QE-lite output against the native array pass followed only by C++ simplification. The fixtures account for source flatten_and child-slot order and normalize only tactic depth and whitespace; formula and precision content remain exact. Source acceptance of duplicate index variables is preserved in direct structural tests rather than strengthened.",
         "Equality DER preserves source is_var_diseq passing the original negated expression to is_var_eq, including its universal arithmetic-disequality refusal. The raw quantifier reduction keeps declaration slots and accumulates proofs; the operator wrapper resets proofs and removes unused variables only after a change. Seven prebuilt C++ projection comparisons preserve formula/precision content and normalize only whitespace/tactic depth; the native result receives source simplification without an additional elimination pass.",
         "The complete retained FM phase uses concrete native variables, literals, numeral-service values and AST references. Unused source is_constraint/is_linear_mon wrappers, copy_constraints, tmp_clauses and no-op save_constraints are not ported; native slices/maps replace container/ID storage without C++ standard-library replication.",
         "Source init_use_list always calls add_constraint with null dependencies, and resolution joins only those null dependencies; no unused dependency payload or unused constraint mark bit is introduced. Native pointer identity and maps replace source ID/hash/set storage while preserving swap-erase and LIFO order. register_constraint source trace dereferences c after del_constraint(c); the native port formats the live constraint before deletion to retain the diagnostic without a dangling pointer. Ten C++ counterexample queries verify exact normalization/conversion equivalence (all UNSAT), with no extra elimination pass applied to native results.",
         "Source fm::fm::init resets m_expr2var twice and does not reset m_expr2bvar after clearing the Boolean expression/sign vectors. A fresh native run resets both expression-index maps, preventing stale Boolean indices on repeated calls; repeated unresolved Boolean-clause inputs verify the repair. Ten exact prebuilt C++ QE-lite projection comparisons include large coefficients, integer unit/nonunit bounds, Boolean clauses, one-sided/strict bounds, inconsistency, tautology and literal-only resolution. Initial source simplification restores native negative numeral nodes serialized as unary-minus SMT-LIB syntax; native results receive only final source simplification. Formula/precision content stays exact; only whitespace/tactic depth is normalized.",
-        "elim_star reuses the existing concrete AST Traversal and DefaultConfiguration, overriding only ReduceQuantifier with the live Lite consumer; no universal adapter or copied traversal is introduced. The source no-proof round preserves its caller proof reference. Constant abstraction preserves raw reciprocal products and filters variables from the reduced body only. Thirteen exact prebuilt C++ full-traversal comparisons include universal quantifiers, arrays and nested patterns retaining their binder. Source initial simplification recovers negative numeral nodes from SMT-LIB serialization; the native result receives final simplification without another elimination pass."
+        "elim_star reuses the existing concrete AST Traversal and DefaultConfiguration, overriding only ReduceQuantifier with the live Lite consumer; no universal adapter or copied traversal is introduced. The source no-proof round preserves its caller proof reference. Constant abstraction preserves raw reciprocal products and filters variables from the reduced body only. Thirteen exact prebuilt C++ full-traversal comparisons include universal quantifiers, arrays and nested patterns retaining their binder. Source initial simplification recovers negative numeral nodes from SMT-LIB serialization; the native result receives final simplification without another elimination pass.",
+        "The prebuilt C++ executable segfaults (exit -11, core dumps disabled) on quantified proof-enabled qe-light execution, matching source get_fact(new_pr) on the unchanged null proof. The native tactic returns its AST owner/domain guard before committing the goal. Ordinary native execution, dependency identity, stored versus active parameters, fresh-manager translation and nonquantified proof-enabled skipping are verified. Four real CLI input files match C++ exactly, including QE-only contradictions, a returned value and a named unsat core. The selector implementation was moved from test-only variable_test.go to production variable_selection.go; normal and checked/debug/trace builds verify production availability."
       ]
     },
     {
       "path": "src/qe/qe_lite.h",
       "component": "qe",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/qe/lite.go",
         "pkg/qe/lite_indices.go",
@@ -92574,7 +92648,16 @@
         "pkg/qe/lite_proof_test.go",
         "pkg/qe/lite_frontier_test.go",
         "pkg/qe/lite_cpp_test.go",
-        "pkg/qe/fm_recognizer_test.go"
+        "pkg/qe/fm_recognizer_test.go",
+        "pkg/qe/lite_tactic.go",
+        "pkg/qe/lite_tactic_test.go",
+        "pkg/qe/lite_tactic_frontier_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/qe_light_test.go",
+        "pkg/cmd/g3/test_vectors/qe_light_projection.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_model.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_core.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_fm.smt2"
       ],
       "tests": [
         "TestLiteConjunctionPipelineAndComplementSelection",
@@ -92586,7 +92669,12 @@
         "TestLiteArrayOptionAndOwnerGuards",
         "TestLiteNoProofTraversalPreservesCallerProofReference",
         "TestLiteAllocationFrontiersAndClosedTrace",
-        "TestLiteCPPFullTraversalNormalForms"
+        "TestLiteCPPFullTraversalNormalForms",
+        "TestLiteTacticGoalDependenciesAppendDepthAndCancellation",
+        "TestLiteTacticParamsCleanupTranslationAndNoOpSurfaces",
+        "TestLiteTacticProofNullGuardAndNonQuantifiedSkip",
+        "TestLiteTacticAllocationFrontiersTraceReportAndCountedClose",
+        "TestSMTLibRunnerQELightProjectionModelAndCore"
       ],
       "conditionals": [
         {
@@ -92598,8 +92686,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "qe_lite constructor/destructor and all four owning overloads; impl unique-nonground branch and index-set/complement conjunction/disjunction pipeline; constant abstraction, declaration-preserving equality DER, used-variable filtering and standard unabstracting substitution; concrete elim_cfg/elim_star no-proof full traversal with universal dualization, annotations and default theory rewriting",
@@ -92630,14 +92718,56 @@
         },
         {
           "name": "mk_qe_lite_tactic factory declaration and qe-light registration",
-          "status": "unported"
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/lite_tactic.go",
+            "pkg/qe/lite_tactic_test.go",
+            "pkg/qe/lite_tactic_frontier_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qe_light_test.go",
+            "pkg/cmd/g3/test_vectors/qe_light_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_core.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_fm.smt2"
+          ],
+          "tests": [
+            "TestLiteTacticGoalDependenciesAppendDepthAndCancellation",
+            "TestLiteTacticParamsCleanupTranslationAndNoOpSurfaces",
+            "TestLiteTacticProofNullGuardAndNonQuantifiedSkip",
+            "TestLiteTacticAllocationFrontiersTraceReportAndCountedClose",
+            "TestSMTLibRunnerQELightProjectionModelAndCore"
+          ]
+        },
+        {
+          "name": "qe_lite_tactic and mk_qe_lite_tactic: source goal/converter handling, dependency-preserving quantified updates, depth/result append, cancellation-before-cooperation, report/trace, stored-parameter update, cleanup reconstruction, translation, empty descriptors/statistics and counted destruction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/lite_tactic.go",
+            "pkg/qe/lite_tactic_test.go",
+            "pkg/qe/lite_tactic_frontier_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qe_light_test.go",
+            "pkg/cmd/g3/test_vectors/qe_light_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_core.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_fm.smt2"
+          ],
+          "tests": [
+            "TestLiteTacticGoalDependenciesAppendDepthAndCancellation",
+            "TestLiteTacticParamsCleanupTranslationAndNoOpSurfaces",
+            "TestLiteTacticProofNullGuardAndNonQuantifiedSkip",
+            "TestLiteTacticAllocationFrontiersTraceReportAndCountedClose",
+            "TestSMTLibRunnerQELightProjectionModelAndCore"
+          ]
         }
       ],
       "ownership": [
-        "Lite owns EqualityDER, FourierMotzkin, optional-use ArrayDER, the original typed Traversal with concrete liteConfiguration, default TheoryRewriter and a native empty construction selector. Config/manager are borrowed. Its lexical call owner retains mutable reference-vector headers, scalar refs, selectors, Boolean reducers, abstractors, substitution owners and stopped child construction receipts until cleanup succeeds. Ten first-success campaigns include constructor, conjunction/expression/constant overloads, traversal, proof-enabled constant/traversal paths, array replacement and open/closed tracing; all fixtures release charged storage."
+        "Lite owns EqualityDER, FourierMotzkin, optional-use ArrayDER, the original typed Traversal with concrete liteConfiguration, default TheoryRewriter and a native empty construction selector. Config/manager are borrowed. Its lexical call owner retains mutable reference-vector headers, scalar refs, selectors, Boolean reducers, abstractors, substitution owners and stopped child construction receipts until cleanup succeeds. Ten first-success campaigns include constructor, conjunction/expression/constant overloads, traversal, proof-enabled constant/traversal paths, array replacement and open/closed tracing; all fixtures release charged storage.",
+        "LiteTactic owns copied parameters and Lite implementation, retaining actual lexical proof/formula references, tactic reports and child construction-failure receipts. Final counted destruction consumes the reference before retryable owner cleanup. Failed translation preserves a genuine nil interface when no partial owner exists. Eight first-success campaigns cover constructor, apply, cleanup, translation, counted close, open/closed tracing and the verbose report, with zero charged fixture storage."
       ],
       "deviations": [
-        "All qe_lite class overloads are ported. The tactic/factory declaration remains unported and no qe-light registration is added prematurely. The full traversal uses the source no-proof specialization and leaves the caller proof reference unchanged; the constants overload invokes equality DER alone and does not add Fourier-Motzkin or a final theory rewrite."
+        "All qe_lite class overloads and the tactic/factory declaration are ported. The full traversal uses the source no-proof specialization and leaves the caller proof reference unchanged; the constants overload invokes equality DER alone and adds neither Fourier-Motzkin nor a final theory rewrite.",
+        "The prebuilt C++ executable segfaults (exit -11, core dumps disabled) on quantified proof-enabled qe-light execution, matching source get_fact(new_pr) on the unchanged null proof. The native tactic returns its AST owner/domain guard before committing the goal. Ordinary native execution, dependency identity, stored versus active parameters, fresh-manager translation and nonquantified proof-enabled skipping are verified. Four real CLI input files match C++ exactly, including QE-only contradictions, a returned value and a named unsat core. The selector implementation was moved from test-only variable_test.go to production variable_selection.go; normal and checked/debug/trace builds verify production availability."
       ]
     },
     {
@@ -92840,7 +92970,7 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/qe/variable_test.go",
+        "pkg/qe/variable_selection.go",
         "pkg/qe/array_der.go",
         "pkg/qe/trace.go",
         "pkg/qe/occurs.go",
@@ -92877,7 +93007,7 @@
           "name": "Concrete is_variable_test set/complement constructors copy selected indices; declaration-count constructor and operator() preserve the strict index bound and reject nonvariables",
           "status": "ported",
           "go_targets": [
-            "pkg/qe/variable_test.go",
+            "pkg/qe/variable_selection.go",
             "pkg/qe/qe_test.go",
             "pkg/qe/array_der.go",
             "pkg/qe/array_der_test.go"
@@ -103175,9 +103305,25 @@
       "path": "src/shell/install_tactic.cpp",
       "component": "shell",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/qe/lite_tactic.go",
+        "pkg/qe/lite_tactic_test.go",
+        "pkg/qe/lite_tactic_frontier_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/qe_light_test.go",
+        "pkg/cmd/g3/test_vectors/qe_light_projection.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_model.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_core.smt2",
+        "pkg/cmd/g3/test_vectors/qe_light_fm.smt2"
+      ],
+      "tests": [
+        "TestLiteTacticGoalDependenciesAppendDepthAndCancellation",
+        "TestLiteTacticParamsCleanupTranslationAndNoOpSurfaces",
+        "TestLiteTacticProofNullGuardAndNonQuantifiedSkip",
+        "TestLiteTacticAllocationFrontiersTraceReportAndCountedClose",
+        "TestSMTLibRunnerQELightProjectionModelAndCore"
+      ],
       "registrations": [
         {
           "line": 201,
@@ -103354,9 +103500,36 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "qe-light generated factory slot __Z3_local_factory_7 (line 101) and ADD_TACTIC_CMD binding (line 210), using the native LiteTactic factory and concrete command-name dispatch",
+          "status": "platform_replacement",
+          "go_targets": [
+            "pkg/qe/lite_tactic.go",
+            "pkg/qe/lite_tactic_test.go",
+            "pkg/qe/lite_tactic_frontier_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/qe_light_test.go",
+            "pkg/cmd/g3/test_vectors/qe_light_projection.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_model.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_core.smt2",
+            "pkg/cmd/g3/test_vectors/qe_light_fm.smt2"
+          ],
+          "tests": [
+            "TestLiteTacticGoalDependenciesAppendDepthAndCancellation",
+            "TestLiteTacticParamsCleanupTranslationAndNoOpSurfaces",
+            "TestLiteTacticProofNullGuardAndNonQuantifiedSkip",
+            "TestLiteTacticAllocationFrontiersTraceReportAndCountedClose",
+            "TestSMTLibRunnerQELightProjectionModelAndCore"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native LiteTactic returned uncounted by command dispatch; parser/composition acquires the counted owner. No C++ generated factory-class or container replica is introduced."
+      ],
+      "deviations": [
+        "Only the retained qe-light factory slot is credited by this increment. Other generated tactic/probe registrations and help metadata in this source unit remain unaudited/unported here."
+      ]
     },
     {
       "path": "src/shell/lp_frontend.cpp",

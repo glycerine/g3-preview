@@ -63,6 +63,9 @@ func newFMFixtureProofs(t *testing.T, proofs bool) *fmFixture {
 		}
 	})
 	fmMust(t, g.InitializeSource())
+	previous, err := params.BindProcessGlobalParamsService(g)
+	fmMust(t, err)
+	t.Cleanup(func() { _, err := params.BindProcessGlobalParamsService(previous); fmMust(t, err) })
 	coop, err := cooperate.NewCooperation(m.Budget())
 	fmMust(t, err)
 	t.Cleanup(func() { fmMust(t, coop.Close()) })

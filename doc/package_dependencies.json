@@ -890,6 +890,7 @@
         "ast",
         "ast/rewriter",
         "model",
+        "qe",
         "sat/tactic",
         "smtcore",
         "solver",
@@ -2178,9 +2179,11 @@
         "lite.go",
         "lite_constants.go",
         "lite_indices.go",
+        "lite_tactic.go",
         "lite_traversal.go",
         "occurs.go",
-        "trace.go"
+        "trace.go",
+        "variable_selection.go"
       ]
     },
     {

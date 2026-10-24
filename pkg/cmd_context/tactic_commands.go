@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ackermannization"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/qe"
 	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
@@ -50,7 +51,7 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return nil, err
 	}
 	switch name {
-	case "smt", "sat", "sat-preprocess", "simplify", "ctx-simplify", "add-bounds", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "bv1-blast", "bv_bound_chk", "reduce-bv-size", "reduce-args", "ackermannize_bv", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "card2bv", "pb2bv", "qfbv", "qfaufbv", "qfufbv", "qfufbv_ackr", "qfidl", "qflia", "qfauflia", "qflra", "qfuf", "uflra", "auflia", "auflira", "aufnira", "skip", "fail", "fail-if-undecided":
+	case "qe-light", "smt", "sat", "sat-preprocess", "simplify", "ctx-simplify", "add-bounds", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "bv1-blast", "bv_bound_chk", "reduce-bv-size", "reduce-args", "ackermannize_bv", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "card2bv", "pb2bv", "qfbv", "qfaufbv", "qfufbv", "qfufbv_ackr", "qfidl", "qflia", "qfauflia", "qflra", "qfuf", "uflra", "auflia", "auflira", "aufnira", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -59,6 +60,12 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return nil, err
 	}
 	switch name {
+	case "qe-light":
+		created, err := qe.NewLiteTactic(m, nil, qe.Config{Context: c.config.Params, Globals: c.config.Globals, Cooperation: c.config.ModelEvaluator.Cooperation})
+		if created == nil {
+			return nil, err
+		}
+		return created, err
 	case "smt":
 		return smtcore.NewSMTTactic(m, nil, c.config)
 	case "sat":

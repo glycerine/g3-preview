@@ -1,0 +1,7 @@
+(set-option :produce-unsat-cores true)
+(set-logic ALL)
+(declare-fun P (Int) Bool)
+(assert (! (forall ((x Int)) (or (not (= x 4)) (P x))) :named quantified))
+(assert (! (not (P 4)) :named negated))
+(check-sat-using (then qe-light smt))
+(get-unsat-core)

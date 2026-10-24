@@ -123,6 +123,7 @@ digraph packages {
   "cmd_context" -> "ast";
   "cmd_context" -> "ast/rewriter";
   "cmd_context" -> "model";
+  "cmd_context" -> "qe";
   "cmd_context" -> "sat/tactic";
   "cmd_context" -> "smtcore";
   "cmd_context" -> "solver";
