@@ -10,6 +10,16 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"symmetry_ranges_scopes.smt2":                  "sat\n(((distinct x y) true))\nunsat\nsat\n",
+	"symmetry_function_support.smt2":               "sat\n(((distinct (f a) (f b)) true))\nunsat\nsat\n",
+	"symmetry_asymmetric.smt2":                     "sat\n(((R a b) true) ((R b a) false))\n",
+	"symmetry_proof_guard.smt2":                    "unsat\n",
+	"qfuf_ranges_scopes.smt2":                      "sat\n(((distinct x y) true))\nunsat\nsat\n",
+	"qfuf_combined_ranges_scopes.smt2":             "sat\n(((distinct x y) true))\nunsat\nsat\n",
+	"qfuf_core.smt2":                               "unsat\n(different equal)\n",
+	"qfuf_combined_core.smt2":                      "unsat\n(equal different)\n",
+	"qfuf_proof.smt2":                              "unsat\n",
+	"qfuf_parameter_recovery.smt2":                 "unknown\nsat\n(((distinct (f a) (f b)) true))\nsat\n",
 	"qflra_combined_assumptions.smt2":              "sat\nsat\nunsat\nsat\nunsat\nsat\n",
 	"qflra_combined_core.smt2":                     "unsat\n(positive nonpositive)\n",
 	"qflra_core.smt2":                              "unsat\n(positive nonpositive)\n",

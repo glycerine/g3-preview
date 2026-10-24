@@ -266,6 +266,8 @@ func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 		c.solver, err = portfolio.NewQFAUFLIAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "QF_LRA":
 		c.solver, err = portfolio.NewQFLRAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
+	case "QF_UF":
+		c.solver, err = portfolio.NewQFUFStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	default:
 		var direct *smtcore.SMTSolver
 		direct, err = smtcore.NewSMTSolver(m, &c.params, c.logic, c.config)

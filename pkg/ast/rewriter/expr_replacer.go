@@ -213,8 +213,9 @@ func NewDefaultExprReplacer(m *ast.ASTManager) (*DefaultExprReplacer, error) {
 		return nil, err
 	}
 	if err := r.engine.initMode(m, &r.cfg, proofs); err != nil {
-		m.BudgetField.Release(n)
-		return nil, err
+		// initMode may already own caches, shifters and result references.
+		// Its Close releases both those partial children and the header.
+		return nil, errors.Join(err, r.Close())
 	}
 	return r, nil
 }

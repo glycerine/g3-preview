@@ -25,7 +25,7 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return nil, err
 	}
 	switch name {
-	case "smt", "simplify", "elim-and", "propagate-values", "solve-eqs", "elim-uncnstr", "qfauflia", "qflra", "skip", "fail", "fail-if-undecided":
+	case "smt", "simplify", "elim-and", "propagate-values", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -50,6 +50,10 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return smtlogics.NewQFAUFLIATactic(m, nil, c.config)
 	case "qflra":
 		return smtlogics.NewQFLRATactic(m, nil, c.config)
+	case "qfuf":
+		return smtlogics.NewQFUFTactic(m, nil, c.config)
+	case "symmetry-reduce":
+		return core.NewSymmetryReduceTactic(m, c.config.Params, c.config.Globals)
 	case "skip":
 		return tactic.NewSkipTactic(), nil
 	case "fail":

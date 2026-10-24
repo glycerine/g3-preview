@@ -30866,14 +30866,16 @@
       "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/expr_replacer.go",
-        "pkg/ast/rewriter/expr_replacer_test.go"
+        "pkg/ast/rewriter/expr_replacer_test.go",
+        "pkg/tactic/core/symmetry_reduce_test.go"
       ],
       "tests": [
         "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
         "TestDefaultExprReplacerCollectsUsedDependencies",
         "TestSimplifyingExprReplacerTheoryRewriteAndDependencyTransfer",
         "TestDefaultExprReplacerProofOverload",
-        "TestTheoryRewriterProofTraversal"
+        "TestTheoryRewriterProofTraversal",
+        "TestSymmetryConstructorAllocationFrontiers"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -30907,7 +30909,8 @@
       ],
       "ownership": [
         "DefaultExprReplacer borrows its selected ASTExprSubstitution, owns the rewriter traversal/cache and one accumulated ASTDependency reference, and transfers a nonnull dependency result to the caller. ApplySubstitution owns and destroys its temporary substitution after clearing the borrowed pointer.",
-        "SimplifyingExprReplacer owns its TheoryRewriter, borrows substitutions, and increments a used ASTDependency before resetting the theory rewriter so ownership transfers safely to the caller."
+        "SimplifyingExprReplacer owns its TheoryRewriter, borrows substitutions, and increments a used ASTDependency before resetting the theory rewriter so ownership transfers safely to the caller.",
+        "A failed default replacer initMode now closes all already-owned rewrite caches, shifters and result references together with the enclosing header. The symmetry constructor sweeps every reservation through success under both proof modes and requires complete charged-storage release."
       ],
       "deviations": [
         "Go named methods replace C++ overloads. Dependency results use an explicit owning return that callers release with DependencyDec."
@@ -30920,14 +30923,16 @@
       "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/expr_replacer.go",
-        "pkg/ast/rewriter/expr_replacer_test.go"
+        "pkg/ast/rewriter/expr_replacer_test.go",
+        "pkg/tactic/core/symmetry_reduce_test.go"
       ],
       "tests": [
         "TestDefaultExprReplacerNestedSubstitutionAndScopedApply",
         "TestDefaultExprReplacerCollectsUsedDependencies",
         "TestSimplifyingExprReplacerTheoryRewriteAndDependencyTransfer",
         "TestDefaultExprReplacerProofOverload",
-        "TestTheoryRewriterProofTraversal"
+        "TestTheoryRewriterProofTraversal",
+        "TestSymmetryConstructorAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -30970,7 +30975,8 @@
         }
       ],
       "ownership": [
-        "Both Go owners have explicit Close methods; expression substitutions remain borrowed and dependency outputs have documented caller ownership."
+        "Both Go owners have explicit Close methods; expression substitutions remain borrowed and dependency outputs have documented caller ownership.",
+        "A failed default replacer initMode now closes all already-owned rewrite caches, shifters and result references together with the enclosing header. The symmetry constructor sweeps every reservation through success under both proof modes and requires complete charged-storage release."
       ],
       "deviations": [
         "Go uses named methods in place of C++ operator overloads."
@@ -134613,9 +134619,29 @@
       "path": "src/tactic/core/symmetry_reduce_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/symmetry_reduce_tactic.go",
+        "pkg/tactic/core/symmetry_reduce_graph.go",
+        "pkg/tactic/core/symmetry_reduce_rewriter.go",
+        "pkg/tactic/core/symmetry_reduce_trace.go",
+        "pkg/tactic/core/symmetry_reduce_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestSymmetryReduceAddsOrbitRestrictionsAndPreservesModels",
+        "TestSymmetryReduceRejectsEqualColorNonSymmetries",
+        "TestSymmetryNormalizationSortsWithoutFlattening",
+        "TestSymmetryNormalizationPreservesQuantifierAnnotations",
+        "TestSymmetryReduceGuardsDepthTranslationAndTrace",
+        "TestSymmetryOccurrencesAndTermPreference",
+        "TestSymmetryConstructorAllocationFrontiers",
+        "TestSymmetryApplyAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSymmetryReduceCPPApply"
+      ],
       "assertions": [
         {
           "line": 192,
@@ -134642,19 +134668,148 @@
           "text": "VERIFY(occs.find(t1, weight1));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "ac_rewriter and ac_rewriter_cfg/star: associative-commutative/distinct argument ID sorting, binary commutative swap, no flattening, no pattern rewriting and proof-disabled source traversal",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/symmetry_reduce_rewriter.go",
+          "go_targets": [
+            "pkg/tactic/core/symmetry_reduce_tactic.go",
+            "pkg/tactic/core/symmetry_reduce_graph.go",
+            "pkg/tactic/core/symmetry_reduce_rewriter.go",
+            "pkg/tactic/core/symmetry_reduce_trace.go",
+            "pkg/tactic/core/symmetry_reduce_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSymmetryNormalizationSortsWithoutFlattening",
+            "TestSymmetryNormalizationPreservesQuantifierAnnotations",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "to_formula; compute_occurrences/sort_colors/max_depth; merge_colors and compute_inv_app; find_candidate_permutations with sort/occurrence/depth partition and null-family constant guards",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/symmetry_reduce_graph.go",
+          "go_targets": [
+            "pkg/tactic/core/symmetry_reduce_tactic.go",
+            "pkg/tactic/core/symmetry_reduce_graph.go",
+            "pkg/tactic/core/symmetry_reduce_rewriter.go",
+            "pkg/tactic/core/symmetry_reduce_trace.go",
+            "pkg/tactic/core/symmetry_reduce_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSymmetryReduceAddsOrbitRestrictionsAndPreservesModels",
+            "TestSymmetryReduceRejectsEqualColorNonSymmetries",
+            "TestSymmetryNormalizationPreservesQuantifierAnnotations",
+            "TestSymmetryOccurrencesAndTermPreference"
+          ]
+        },
+        {
+          "name": "invariant_by_permutations, check_swap/check_cycle/check_substitution, normalize through the existing concrete default expression replacer and AC traversal",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/symmetry_reduce_rewriter.go",
+          "go_targets": [
+            "pkg/tactic/core/symmetry_reduce_tactic.go",
+            "pkg/tactic/core/symmetry_reduce_graph.go",
+            "pkg/tactic/core/symmetry_reduce_rewriter.go",
+            "pkg/tactic/core/symmetry_reduce_trace.go",
+            "pkg/tactic/core/symmetry_reduce_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSymmetryReduceAddsOrbitRestrictionsAndPreservesModels",
+            "TestSymmetryReduceRejectsEqualColorNonSymmetries",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "select_terms/is_range_restriction, select_most_promising_term, compute_used_in/cts_delta, select_const and mk_member; iterative goal strengthening with exact source arity/weight/support preference",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/symmetry_reduce_graph.go",
+          "go_targets": [
+            "pkg/tactic/core/symmetry_reduce_tactic.go",
+            "pkg/tactic/core/symmetry_reduce_graph.go",
+            "pkg/tactic/core/symmetry_reduce_rewriter.go",
+            "pkg/tactic/core/symmetry_reduce_trace.go",
+            "pkg/tactic/core/symmetry_reduce_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSymmetryReduceAddsOrbitRestrictionsAndPreservesModels",
+            "TestSymmetryOccurrencesAndTermPreference",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSymmetryReduceCPPApply"
+          ]
+        },
+        {
+          "name": "symmetry_reduce_tactic constructor/destructor/translate, proof/core refusal before clearing results, inconsistent/empty goal paths, depth increment, no-op cleanup, factory with unused params; tactic_report/progress and all live symmetry_reduce trace sites",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/symmetry_reduce_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/symmetry_reduce_tactic.go",
+            "pkg/tactic/core/symmetry_reduce_graph.go",
+            "pkg/tactic/core/symmetry_reduce_rewriter.go",
+            "pkg/tactic/core/symmetry_reduce_trace.go",
+            "pkg/tactic/core/symmetry_reduce_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSymmetryReduceGuardsDepthTranslationAndTrace",
+            "TestSymmetryConstructorAllocationFrontiers",
+            "TestSymmetryApplyAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The uncounted tactic owns one charged enclosing header, the concrete no-proof AC traversal and default expression replacer. Cleanup is a source no-op; Close releases persistent rewrite caches and temporary result references before the borrowed manager/services close. Each application owns its temporary formula/substitution/reference frame and publishes added assertions into the goal. Native slices/maps borrow graph handles through the pinned formula. No model/proof/core converter is introduced. Constructor and apply allocation-frontier tests require zero charged storage after fixture teardown."
+      ],
+      "deviations": [
+        "Lookup maps plus deterministic postorder discovery slices replace C++ obj_map/u_map hash iteration. This may select a different valid symmetric representative, color ID, candidate order or trace listing; source partition tests, swap/cycle identity checks and term-selection algorithm are retained.",
+        "Unused parents/siblings refinement, the unused merge_colors refinement-result consumer and C++ container hash helpers have no retained call path and are omitted.",
+        "Annotation-only applications do not receive source max-depth colors because that traversal deliberately ignores patterns. The source VERIFY(colors1.find) precondition is checked as a Go domain error instead of reading an unavailable color; the QF_UF strategy is quantifier-free. Normalization still preserves both annotation kinds and expression traversal includes them as in the source."
+      ]
     },
     {
       "path": "src/tactic/core/symmetry_reduce_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/symmetry_reduce_tactic.go",
+        "pkg/tactic/core/symmetry_reduce_graph.go",
+        "pkg/tactic/core/symmetry_reduce_rewriter.go",
+        "pkg/tactic/core/symmetry_reduce_trace.go",
+        "pkg/tactic/core/symmetry_reduce_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestSymmetryReduceAddsOrbitRestrictionsAndPreservesModels",
+        "TestSymmetryReduceRejectsEqualColorNonSymmetries",
+        "TestSymmetryNormalizationSortsWithoutFlattening",
+        "TestSymmetryNormalizationPreservesQuantifierAnnotations",
+        "TestSymmetryReduceGuardsDepthTranslationAndTrace",
+        "TestSymmetryOccurrencesAndTermPreference",
+        "TestSymmetryConstructorAllocationFrontiers",
+        "TestSymmetryApplyAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSymmetryReduceCPPApply"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -134665,11 +134820,45 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_symmetry_reduce_tactic declaration and ADD_TACTIC symmetry-reduce registration; factory parameters have no source consumer",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/symmetry_reduce_tactic.go",
+          "go_targets": [
+            "pkg/tactic/core/symmetry_reduce_tactic.go",
+            "pkg/tactic/core/symmetry_reduce_graph.go",
+            "pkg/tactic/core/symmetry_reduce_rewriter.go",
+            "pkg/tactic/core/symmetry_reduce_trace.go",
+            "pkg/tactic/core/symmetry_reduce_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSymmetryReduceAddsOrbitRestrictionsAndPreservesModels",
+            "TestSymmetryReduceRejectsEqualColorNonSymmetries",
+            "TestSymmetryNormalizationSortsWithoutFlattening",
+            "TestSymmetryNormalizationPreservesQuantifierAnnotations",
+            "TestSymmetryReduceGuardsDepthTranslationAndTrace",
+            "TestSymmetryOccurrencesAndTermPreference",
+            "TestSymmetryConstructorAllocationFrontiers",
+            "TestSymmetryApplyAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSymmetryReduceCPPApply"
+          ]
+        }
+      ],
+      "ownership": [
+        "The uncounted tactic owns one charged enclosing header, the concrete no-proof AC traversal and default expression replacer. Cleanup is a source no-op; Close releases persistent rewrite caches and temporary result references before the borrowed manager/services close. Each application owns its temporary formula/substitution/reference frame and publishes added assertions into the goal. Native slices/maps borrow graph handles through the pinned formula. No model/proof/core converter is introduced. Constructor and apply allocation-frontier tests require zero charged storage after fixture teardown."
+      ],
+      "deviations": [
+        "Lookup maps plus deterministic postorder discovery slices replace C++ obj_map/u_map hash iteration. This may select a different valid symmetric representative, color ID, candidate order or trace listing; source partition tests, swap/cycle identity checks and term-selection algorithm are retained.",
+        "Unused parents/siblings refinement, the unused merge_colors refinement-result consumer and C++ container hash helpers have no retained call path and are omitted.",
+        "Annotation-only applications do not receive source max-depth colors because that traversal deliberately ignores patterns. The source VERIFY(colors1.find) precondition is checked as a Go domain error instead of reading an unavailable color; the QF_UF strategy is quantifier-free. Normalization still preserves both annotation kinds and expression traversal includes them as in the source."
+      ]
     },
     {
       "path": "src/tactic/core/tseitin_cnf_tactic.cpp",
@@ -136496,7 +136685,11 @@
         "pkg/cmd_context/qfauflia_solver_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/tactic/smtlogics/qflra_tactic.go",
-        "pkg/cmd_context/qflra_solver_test.go"
+        "pkg/cmd_context/qflra_solver_test.go",
+        "pkg/tactic/smtlogics/qfuf_tactic.go",
+        "pkg/tactic/smtlogics/qfuf_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/qfuf_solver_test.go"
       ],
       "tests": [
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
@@ -136504,7 +136697,9 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestCommandContextQFLRACombinedSolverProofResult",
-        "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates"
+        "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates",
+        "TestQFUFTacticModelSurvivesStrategyClose",
+        "TestCommandContextQFUFCombinedSolverProofResult"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -136548,6 +136743,26 @@
           ]
         },
         {
+          "name": "Retained QF_UF mk_tactic_for_logic branch and factory operator(): concrete QF_UF tactic solver plus incremental SMT solver under the existing combined-solver mode, assumption/fallback routing and owning result-provider policy",
+          "status": "ported",
+          "go_target": "pkg/tactic/portfolio/smt_strategic_solver.go",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfuf_tactic.go",
+            "pkg/tactic/smtlogics/qfuf_tactic_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfuf_solver_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestQFUFTacticModelSurvivesStrategyClose",
+            "TestCommandContextQFUFCombinedSolverProofResult",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "Remaining logic dispatcher branches, default tactic/FD/incremental-SAT special solvers and general stored-logic strategic solver_factory owner and public factory constructor",
           "status": "unported"
         }
@@ -136556,7 +136771,7 @@
         "Construction uses local counted tactic/solver references. The returned combined solver owns both child solvers; the tactic solver owns the concrete strategy. Context closes the combined owner before manager/services teardown. Evaluator/parameter services are borrowed through the same concrete configuration used by the incremental backend."
       ],
       "deviations": [
-        "The retained QF_AUFLIA and QF_LRA branches are connected through the shared combined-solver construction. Other logic branches and the general default dispatcher remain explicitly unported; concrete Go entry points name the completed strategies."
+        "The retained QF_AUFLIA, QF_LRA and QF_UF branches are connected through shared combined-solver construction. Other logic branches and the general default dispatcher remain explicitly unported; concrete Go entry points name the completed strategies."
       ]
     },
     {
@@ -138174,22 +138389,73 @@
       "path": "src/tactic/smtlogics/qfuf_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qfuf_tactic.go",
+        "pkg/tactic/smtlogics/qfuf_tactic_test.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/qfuf_solver_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestQFUFTacticModelSurvivesStrategyClose",
+        "TestCommandContextQFUFCombinedSolverProofResult",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_qfuf_tactic source sequence: simplify, propagate-values, solve-eqs, second simplify under fixed pull_cheap_ite/local_ctx/local_ctx_limit params, symmetry reduction guarded by no-proofs/no-cores, then SMT; factory declaration and builtin registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/smtlogics/qfuf_tactic.go",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfuf_tactic.go",
+            "pkg/tactic/smtlogics/qfuf_tactic_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfuf_solver_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestQFUFTacticModelSurvivesStrategyClose",
+            "TestCommandContextQFUFCombinedSolverProofResult",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "Construction acquires local counted owners for each concrete tactic and wrapper, releases them in reverse order and returns one uncounted composition. The graph owns its children and parameter copies. Guarded symmetry remains owned even when proof/core flags skip its execution. Result converters retain reconstructed models independently of strategy cleanup/close."
+      ],
+      "deviations": [
+        "The factory preserves source parameter scopes and child order. Remaining algorithms and heuristic ordering differences are tracked in the corresponding child source units."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfuf_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qfuf_tactic.go",
+        "pkg/tactic/smtlogics/qfuf_tactic_test.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/qfuf_solver_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestQFUFTacticModelSurvivesStrategyClose",
+        "TestCommandContextQFUFCombinedSolverProofResult",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -138200,11 +138466,36 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_qfuf_tactic source sequence: simplify, propagate-values, solve-eqs, second simplify under fixed pull_cheap_ite/local_ctx/local_ctx_limit params, symmetry reduction guarded by no-proofs/no-cores, then SMT; factory declaration and builtin registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/smtlogics/qfuf_tactic.go",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfuf_tactic.go",
+            "pkg/tactic/smtlogics/qfuf_tactic_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfuf_solver_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestQFUFTacticModelSurvivesStrategyClose",
+            "TestCommandContextQFUFCombinedSolverProofResult",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "Construction acquires local counted owners for each concrete tactic and wrapper, releases them in reverse order and returns one uncounted composition. The graph owns its children and parameter copies. Guarded symmetry remains owned even when proof/core flags skip its execution. Result converters retain reconstructed models independently of strategy cleanup/close."
+      ],
+      "deviations": [
+        "The factory preserves source parameter scopes and child order. Remaining algorithms and heuristic ordering differences are tracked in the corresponding child source units."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfufbv_ackr_model_converter.cpp",

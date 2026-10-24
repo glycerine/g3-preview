@@ -1,5 +1,5 @@
 // Source: src/tactic/portfolio/smt_strategic_solver.cpp retained QF_AUFLIA and
-// QF_LRA branches and smt_strategic_solver_factory::operator().
+// QF_LRA/QF_UF branches and smt_strategic_solver_factory::operator().
 package portfolio
 
 import (
@@ -31,6 +31,14 @@ func NewQFLRAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mo
 		return nil, err
 	}
 	return newStrategicSolver(m, strategy, "QF_LRA", p, proofs, models, cores, config)
+}
+
+func NewQFUFStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
+	strategy, err := smtlogics.NewQFUFTactic(m, p, config)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolver(m, strategy, "QF_UF", p, proofs, models, cores, config)
 }
 
 func newStrategicSolver(m *ast.ASTManager, strategy tactic.Tactic, logic string, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (result solver.Solver, err error) {
