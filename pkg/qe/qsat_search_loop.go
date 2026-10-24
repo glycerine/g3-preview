@@ -272,9 +272,15 @@ func (s *qsatSearch) checkLoop() (status lbool.LBool, err error) {
 			}
 		case lbool.False:
 			if s.level == 0 {
+				if err = s.closeRound(c); err != nil {
+					return lbool.Undef, err
+				}
 				return lbool.False, nil
 			}
 			if s.level == 1 && s.mode == qsatSAT {
+				if err = s.closeRound(c); err != nil {
+					return lbool.Undef, err
+				}
 				return lbool.True, nil
 			}
 			md, e = s.current.Get()
@@ -304,22 +310,35 @@ func (s *qsatSearch) checkLoop() (status lbool.LBool, err error) {
 					return lbool.Undef, e
 				}
 				if !ok {
+					if err = s.closeRound(c); err != nil {
+						return lbool.Undef, err
+					}
 					return lbool.Undef, nil
 				}
 			}
 		case lbool.Undef:
+			if err = s.closeRound(c); err != nil {
+				return lbool.Undef, err
+			}
 			return lbool.Undef, nil
 		default:
 			return lbool.Undef, ast.ErrASTDomain
 		}
 		// End the actual round's lexical owners before the next solver call.
 		// Failed-round owners stay on pending for the outer cleanup receipt.
-		if err = c.close(); err != nil {
+		if err = s.closeRound(c); err != nil {
 			return lbool.Undef, err
 		}
-		if s.pending[len(s.pending)-1] != c {
-			return lbool.Undef, ast.ErrASTHandle
-		}
-		s.pending = s.pending[:len(s.pending)-1]
 	}
+}
+
+func (s *qsatSearch) closeRound(c *qsatSearchCall) error {
+	if err := c.close(); err != nil {
+		return err
+	}
+	if len(s.pending) == 0 || s.pending[len(s.pending)-1] != c {
+		return ast.ErrASTHandle
+	}
+	s.pending = s.pending[:len(s.pending)-1]
+	return nil
 }

@@ -35672,7 +35672,10 @@
         "pkg/ast/rewriter/rewriter_engine_proof.go",
         "pkg/ast/rewriter/rewriter_configuration.go",
         "pkg/ast/rewriter/rewriter_roots.go",
-        "pkg/ast/rewriter/rewriter_roots_test.go"
+        "pkg/ast/rewriter/rewriter_roots_test.go",
+        "pkg/ast/rewriter/var_shifter_export.go",
+        "pkg/qe/qsat_recursive.go",
+        "pkg/qe/qsat_recursive_test.go"
       ],
       "tests": [
         "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
@@ -35696,7 +35699,10 @@
         "TestRewriterNativeResultAndProofRootsGrowth",
         "TestRewriterNativeRootOnlyReferenceAliasReplacement",
         "TestRewriterNativeFrameAndScopeGrowth",
-        "TestVarSubstitutionNativeColdBindingGrowth"
+        "TestVarSubstitutionNativeColdBindingGrowth",
+        "TestQSATRecursiveCPPFormulaEquivalence",
+        "TestQSATRecursiveSharedDAGAndExtractionShift",
+        "TestQSATRecursiveAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -35861,7 +35867,8 @@
       "deviations": [
         "Original base rewriting infrastructure, forward/inverse shifting, no-proof and proof-generating traversal/configuration, and cache tracing are translated. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. Model evaluation and external public APIs remain separate source-unit obligations.",
         "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added.",
-        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit."
+        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit.",
+        "The existing concrete inverse variable shifter is now exposed through NewInverseVarShifter for retained QE binder extraction. No new traversal or adapter replaces the source specialization; recursive extraction checks declaration order, outer-variable shifting and every stopped allocation through its actual caller owner."
       ]
     },
     {
@@ -35877,7 +35884,10 @@
         "pkg/ast/rewriter/rewriter_configuration.go",
         "pkg/ast/rewriter/traversal.go",
         "pkg/ast/rewriter/rewriter_roots.go",
-        "pkg/ast/rewriter/rewriter_roots_test.go"
+        "pkg/ast/rewriter/rewriter_roots_test.go",
+        "pkg/ast/rewriter/var_shifter_export.go",
+        "pkg/qe/qsat_recursive.go",
+        "pkg/qe/qsat_recursive_test.go"
       ],
       "tests": [
         "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
@@ -35906,7 +35916,10 @@
         "TestRewriterNativeRootOnlyReferenceAliasReplacement",
         "TestRewriterNativeFrameAndScopeGrowth",
         "TestVarSubstitutionNativeColdBindingGrowth",
-        "TestTraversalProofCongruenceRewriteAndReflexivity"
+        "TestTraversalProofCongruenceRewriteAndReflexivity",
+        "TestQSATRecursiveCPPFormulaEquivalence",
+        "TestQSATRecursiveSharedDAGAndExtractionShift",
+        "TestQSATRecursiveAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -36022,7 +36035,8 @@
         "Original base rewriting infrastructure, forward/inverse shifting and both traversal specializations are translated. Unsupported REWRITE_RULE and proof-mode non-ground macro expansion preserve the source's own unimplemented states. Cancellation resets; step-limit interruption preserves frames for Resume. Trace formatting remains with the separate rewriter.cpp trace-profile audit.",
         "The public concrete Traversal exposes explicit no-proof and proof-generating constructors through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point.",
         "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added.",
-        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit."
+        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit.",
+        "The existing concrete inverse variable shifter is now exposed through NewInverseVarShifter for retained QE binder extraction. No new traversal or adapter replaces the source specialization; recursive extraction checks declaration order, outer-variable shifting and every stopped allocation through its actual caller owner."
       ]
     },
     {
@@ -91341,9 +91355,22 @@
       "path": "src/qe/qe.cpp",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/qe/qsat_recursive.go",
+        "pkg/qe/qsat_recursive_test.go",
+        "pkg/qe/qsat_search.go",
+        "pkg/qe/qsat_search_loop.go",
+        "pkg/ast/rewriter/var_shifter_export.go",
+        "pkg/ast/rewriter/var_substitution.go",
+        "pkg/ast/rewriter/var_shifter.go",
+        "pkg/ast/ast_expr_abstract.go"
+      ],
+      "tests": [
+        "TestQSATRecursiveCPPFormulaEquivalence",
+        "TestQSATRecursiveSharedDAGAndExtractionShift",
+        "TestQSATRecursiveAllocationFrontiers"
+      ],
       "conditionals": [
         {
           "line": 1217,
@@ -91574,17 +91601,54 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained extract_vars helper/declaration reached by qsat::elim_rec: declaration-order fresh x constants, standard-order variable substitution and inverse shift of the complete supplied vector length",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/qsat_recursive.go",
+            "pkg/qe/qsat_recursive_test.go",
+            "pkg/qe/qsat_search.go",
+            "pkg/qe/qsat_search_loop.go",
+            "pkg/ast/rewriter/var_shifter_export.go",
+            "pkg/ast/rewriter/var_substitution.go",
+            "pkg/ast/rewriter/var_shifter.go",
+            "pkg/ast/ast_expr_abstract.go"
+          ],
+          "tests": [
+            "TestQSATRecursiveCPPFormulaEquivalence",
+            "TestQSATRecursiveSharedDAGAndExtractionShift",
+            "TestQSATRecursiveAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The actual qsatSearchCall retains extracted constants, mutable binder vectors, substituted temporary/body ASTRefs, concrete substitution and inverse-shifter owners until cleanup succeeds; no generic callback/template adapter is introduced."
+      ],
+      "deviations": [
+        "Only extract_vars reached by retained QSAT recursive elimination is ported. The complete multitheory expr_quant_elim manager/algorithms and other retained declarations in qe.cpp/.h remain unfinished. Existing native AST substitution, inverse shifting and expression abstraction implement the concrete reached types."
+      ]
     },
     {
       "path": "src/qe/qe.h",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/qe/qsat_recursive.go",
+        "pkg/qe/qsat_recursive_test.go",
+        "pkg/qe/qsat_search.go",
+        "pkg/qe/qsat_search_loop.go",
+        "pkg/ast/rewriter/var_shifter_export.go",
+        "pkg/ast/rewriter/var_substitution.go",
+        "pkg/ast/rewriter/var_shifter.go",
+        "pkg/ast/ast_expr_abstract.go"
+      ],
+      "tests": [
+        "TestQSATRecursiveCPPFormulaEquivalence",
+        "TestQSATRecursiveSharedDAGAndExtractionShift",
+        "TestQSATRecursiveAllocationFrontiers"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -91603,9 +91667,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained extract_vars helper/declaration reached by qsat::elim_rec: declaration-order fresh x constants, standard-order variable substitution and inverse shift of the complete supplied vector length",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/qsat_recursive.go",
+            "pkg/qe/qsat_recursive_test.go",
+            "pkg/qe/qsat_search.go",
+            "pkg/qe/qsat_search_loop.go",
+            "pkg/ast/rewriter/var_shifter_export.go",
+            "pkg/ast/rewriter/var_substitution.go",
+            "pkg/ast/rewriter/var_shifter.go",
+            "pkg/ast/ast_expr_abstract.go"
+          ],
+          "tests": [
+            "TestQSATRecursiveCPPFormulaEquivalence",
+            "TestQSATRecursiveSharedDAGAndExtractionShift",
+            "TestQSATRecursiveAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The actual qsatSearchCall retains extracted constants, mutable binder vectors, substituted temporary/body ASTRefs, concrete substitution and inverse-shifter owners until cleanup succeeds; no generic callback/template adapter is introduced."
+      ],
+      "deviations": [
+        "Only extract_vars reached by retained QSAT recursive elimination is ported. The complete multitheory expr_quant_elim manager/algorithms and other retained declarations in qe.cpp/.h remain unfinished. Existing native AST substitution, inverse shifting and expression abstraction implement the concrete reached types."
+      ]
     },
     {
       "path": "src/qe/qe_arith.cpp",
@@ -94443,7 +94531,13 @@
         "pkg/qe/qsat_search_loop.go",
         "pkg/qe/qsat_search_projection.go",
         "pkg/qe/qsat_search_maximize.go",
-        "pkg/qe/qsat_search_test.go"
+        "pkg/qe/qsat_search_test.go",
+        "pkg/qe/qsat_recursive.go",
+        "pkg/qe/qsat_recursive_test.go",
+        "pkg/ast/rewriter/var_shifter_export.go",
+        "pkg/ast/rewriter/var_substitution.go",
+        "pkg/ast/rewriter/var_shifter.go",
+        "pkg/ast/ast_expr_abstract.go"
       ],
       "tests": [
         "TestMaxLevelSentinelMergeAndDisplay",
@@ -94470,7 +94564,10 @@
         "TestQSATSearchMaximizeModelsAndBounds",
         "TestQSATSearchAllocationFrontiers",
         "TestQSATSearchResetPreservesUnsignedPredicateStatistics",
-        "TestQSATSearchCPPMaximumBounds"
+        "TestQSATSearchCPPMaximumBounds",
+        "TestQSATRecursiveCPPFormulaEquivalence",
+        "TestQSATRecursiveSharedDAGAndExtractionShift",
+        "TestQSATRecursiveAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -94827,21 +94924,42 @@
             "TestQSATSearchResetPreservesUnsignedPredicateStatistics",
             "TestQSATSearchCPPMaximumBounds"
           ]
+        },
+        {
+          "name": "elim_rec/elim: source iterative application-DAG reconstruction, recursive binder extraction, universal duality, two-block nonforced MBP search, source residual-variable deduplication and existential rebinding; original-formula fallback on inconclusive search",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/qsat_recursive.go",
+            "pkg/qe/qsat_recursive_test.go",
+            "pkg/qe/qsat_search.go",
+            "pkg/qe/qsat_search_loop.go",
+            "pkg/ast/rewriter/var_shifter_export.go",
+            "pkg/ast/rewriter/var_substitution.go",
+            "pkg/ast/rewriter/var_shifter.go",
+            "pkg/ast/ast_expr_abstract.go"
+          ],
+          "tests": [
+            "TestQSATRecursiveCPPFormulaEquivalence",
+            "TestQSATRecursiveSharedDAGAndExtractionShift",
+            "TestQSATRecursiveAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
         "Concrete map-key ASTRefs, formula trail, per-level predicate ASTRefs, scoped assumption ASTRefs and a counted filter-model converter preserve the actual source owners. Reset preserves declaration levels and the filter, matching source; final Close releases the filter count and enclosing charge. Caller output vector appends and completed replacements remain owned on errors. Pending lexical formula references, model evaluators and construction-failure receipts are retained until cleanup succeeds. Eleven first-success campaigns cover constructor, abstraction, rebuilding, assumption creation/retrieval, validation, display, open/closed tracing, model tracing and final close, releasing all charged fixture storage.",
         "Private qsatPreparation owns the actual prefix reference vectors and PredicateAbstraction state for the pending search owner. Per-call state retains the lexical local-variable vector, proof reference, concrete LabelRewriter/QuantifierHoister, each actual hoist result and stopped construction-failure receipts until cleanup succeeds. Reset clears prefixes/expression levels while preserving the predicate model filter and declaration levels as source does. Nine first-success allocation campaigns cover construction, SAT/QE alternation, mixed prefixes, labels, blocked occurrences, reuse and open/closed traces; all charged fixture storage is released.",
         "Private qsatKernel owns the actual SMTSolver, private ParamsRef, retired replacement solvers and stopped child-failure receipts. New solvers are created before replacing the old owner; old solver destruction remains retryable. Acquired models and copied core ASTRefs remain live after reset/destruction. Six first-success allocation campaigns cover construction, reset, assertion, core extraction and open/closed core tracing; all charged fixture storage is released. It uses the existing concrete SMT facade and introduces no alternate solver or callback adapter.",
-        "Private qsatSearch owns the complete retained search state, concrete MBP/dual kernels/preparation, actual current/saved tactic.ModelRefs and learned/projection/free-variable ASTRef vectors. Each round retains its lexical roots, mutable vector headers, acquired model references and model evaluators until that round ends; stopped rounds retain child construction-failure receipts. Constructor failure cleanup avoids retaining a receipt back to the same owner. Ten first-success allocation campaigns cover construction, reset, preparation, SAT, multi-level backtracking, QE, open/closed tracing and finite/strict optimization; all charged fixture storage is released and unknown is not counted as a completed campaign."
+        "Private qsatSearch owns the complete retained search state, concrete MBP/dual kernels/preparation, actual current/saved tactic.ModelRefs and learned/projection/free-variable ASTRef vectors. Each round retains its lexical roots, mutable vector headers, acquired model references and model evaluators until that round ends; stopped rounds retain child construction-failure receipts. Constructor failure cleanup avoids retaining a receipt back to the same owner. Ten first-success allocation campaigns cover construction, reset, preparation, SAT, multi-level backtracking, QE, open/closed tracing and finite/strict optimization; all charged fixture storage is released and unknown is not counted as a completed campaign.",
+        "Recursive frames retain actual local ASTRefs, binder-variable vectors, concrete VarSubstitution/inverse VarShifter/ExprAbstractor owners and child failures through outer cleanup. Source member reset is separate from operation cleanup, so nested elimination preserves its caller lexical frames. checkLoop now releases terminal-round lexical owners on every normal return, including direct recursive/optimization callers. Six first-success allocation campaigns cover existential/alternating/under-term recursion, extraction and open/closed tracing; all charged fixture storage is released."
       ],
       "deviations": [
-        "max_level, pred_abs and the retained hoist/filter/level/suffix-variable preparation methods are ported. The native QSAT kernel wrapper is also ported; alternating search/projection/backtracking and the private optimization entry are now ported. Recursive AST elimination, tactic/factory integration and the external qmax wrapper remain unfinished, with model-based projection now available. The search remains private until recursive elimination and tactic/factory integration are complete. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule.",
+        "max_level, pred_abs and the retained hoist/filter/level/suffix-variable preparation methods are ported. The native QSAT kernel wrapper is also ported; alternating search/projection/backtracking and the private optimization entry are now ported. Recursive AST elimination is now ported; tactic/factory integration and the external qmax wrapper remain unfinished, with model-based projection now available. The search remains private until recursive elimination and tactic/factory integration are complete. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule.",
         "Fifty-six direct cases cover fourteen formula shapes in all four source modes, including dependent Boolean/integer prefixes, real universal variables, negative polarity, mixed connectives, ITE branches, labels, repeated declaration names and source-inaccessible term occurrences. Twenty-eight prebuilt C++ comparisons independently reconstruct the native alternating prefix as SMT-LIB text and establish equivalence for every assignment to original free parameters. Only fresh hoisted variables are rebound; source free parameters remain free. Hoisting is tested as its own retained stage, without claiming QSAT search/tactic completion.",
         "The native solver facade gates model publication explicitly, so qsatKernel sets its actual SetProduceModels flag to implement the source private model=true setting. It preserves model=true, relevancy_lvl=0 and case_split_strategy=CS_ACTIVITY_WITH_CACHE (2), constructs the initial solver before overrides and passes the stored overrides to reset. Native integration checks independent Boolean/arithmetic kernels, literal assumption cores, model/core lifetime across reset, preparation-to-predicate-definition handoff and source trace metadata. A prebuilt C++ arithmetic assumption-conflict comparison passes. The complete retained alternating search is now ported; tactic/factory integration remains unfinished.",
         "Twenty-six native search results agree with the prebuilt C++ qsat tactic, including dependent Boolean/integer quantifiers, real universal bounds, polarity, mixed connectives and labels. Thirteen independently checked QE answers are logically equivalent to their original formulas. Ordinary C++ SMT decides the equivalence query first; full QE is an oracle-only fallback for unknown arithmetic queries. The old reference simplify/qe/smt pipeline incorrectly reports sat for the positive-label disagreement where ordinary SMT and qe2 return unsat; native output is not repaired. Source-inaccessible quantified term arguments are tested at preparation and excluded from search because the retained source atom abstraction requires application nodes throughout.",
-        "Unused minimize_core and check_fmls reached only from disabled validation bodies are deliberately omitted. Source validate_core/validate_project/validate_model return true before #if 0 bodies, so no additional solver-validation pass is activated. Final Close releases retained owners without recreating solvers solely for the C++ destructor reset; those newly recreated solvers have no retained consumer. Optimization uses existing concrete simplex.Optimum/math-big values with deep copies and standard Go formatting for its reached value forms. Full QE, recursive elimination, tactic/CLI/API integration and higher-engine goals remain unfinished.",
-        "Two further C++ checks prove the actual final native optimization improvement bound is infeasible and a bound derived from the returned native model is attainable, for closed and strict maxima. The final reset-statistics increment is separately checked in native and checked/debug/trace profiles; predicate counts retain their source unsigned statistic type."
+        "Unused minimize_core and check_fmls reached only from disabled validation bodies are deliberately omitted. Source validate_core/validate_project/validate_model return true before #if 0 bodies, so no additional solver-validation pass is activated. Final Close releases retained owners without recreating solvers solely for the C++ destructor reset; those newly recreated solvers have no retained consumer. Optimization uses existing concrete simplex.Optimum/math-big values with deep copies and standard Go formatting for its reached value forms. Full QE, tactic/CLI/API integration and higher-engine goals remain unfinished.",
+        "Two further C++ checks prove the actual final native optimization improvement bound is infeasible and a bound derived from the returned native model is attainable, for closed and strict maxima. The final reset-statistics increment is separately checked in native and checked/debug/trace profiles; predicate counts retain their source unsigned statistic type.",
+        "The old C++ qe_rec executable segfaults on exists x:Bool. x or free and forall x:Bool. x or free because elim initializes bound-variable levels but atom abstraction finds an uninitialized free Boolean entry. The native recursive caller computes ordinary existing dependency levels before atom abstraction; explicit bound levels remain intact and free parameters receive the empty sentinel. Fourteen independent C++ formula-equivalence checks validate the resulting formulas for every free-parameter assignment, including quantified term arguments inaccessible to the top-level hoister. C++ ordinary SMT is the primary oracle and full QE only an unknown fallback; the crashing qe_rec entry is not used as that oracle. The algorithm, source swap-with-last residual order and no-extra-rewrite behavior are retained."
       ]
     },
     {
@@ -94867,7 +94985,13 @@
         "pkg/qe/qsat_search_loop.go",
         "pkg/qe/qsat_search_projection.go",
         "pkg/qe/qsat_search_maximize.go",
-        "pkg/qe/qsat_search_test.go"
+        "pkg/qe/qsat_search_test.go",
+        "pkg/qe/qsat_recursive.go",
+        "pkg/qe/qsat_recursive_test.go",
+        "pkg/ast/rewriter/var_shifter_export.go",
+        "pkg/ast/rewriter/var_substitution.go",
+        "pkg/ast/rewriter/var_shifter.go",
+        "pkg/ast/ast_expr_abstract.go"
       ],
       "tests": [
         "TestMaxLevelSentinelMergeAndDisplay",
@@ -94894,7 +95018,10 @@
         "TestQSATSearchMaximizeModelsAndBounds",
         "TestQSATSearchAllocationFrontiers",
         "TestQSATSearchResetPreservesUnsignedPredicateStatistics",
-        "TestQSATSearchCPPMaximumBounds"
+        "TestQSATSearchCPPMaximumBounds",
+        "TestQSATRecursiveCPPFormulaEquivalence",
+        "TestQSATRecursiveSharedDAGAndExtractionShift",
+        "TestQSATRecursiveAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -94986,15 +95113,17 @@
         "Concrete map-key ASTRefs, formula trail, per-level predicate ASTRefs, scoped assumption ASTRefs and a counted filter-model converter preserve the actual source owners. Reset preserves declaration levels and the filter, matching source; final Close releases the filter count and enclosing charge. Caller output vector appends and completed replacements remain owned on errors. Pending lexical formula references, model evaluators and construction-failure receipts are retained until cleanup succeeds. Eleven first-success campaigns cover constructor, abstraction, rebuilding, assumption creation/retrieval, validation, display, open/closed tracing, model tracing and final close, releasing all charged fixture storage.",
         "Private qsatPreparation owns the actual prefix reference vectors and PredicateAbstraction state for the pending search owner. Per-call state retains the lexical local-variable vector, proof reference, concrete LabelRewriter/QuantifierHoister, each actual hoist result and stopped construction-failure receipts until cleanup succeeds. Reset clears prefixes/expression levels while preserving the predicate model filter and declaration levels as source does. Nine first-success allocation campaigns cover construction, SAT/QE alternation, mixed prefixes, labels, blocked occurrences, reuse and open/closed traces; all charged fixture storage is released.",
         "Private qsatKernel owns the actual SMTSolver, private ParamsRef, retired replacement solvers and stopped child-failure receipts. New solvers are created before replacing the old owner; old solver destruction remains retryable. Acquired models and copied core ASTRefs remain live after reset/destruction. Six first-success allocation campaigns cover construction, reset, assertion, core extraction and open/closed core tracing; all charged fixture storage is released. It uses the existing concrete SMT facade and introduces no alternate solver or callback adapter.",
-        "Private qsatSearch owns the complete retained search state, concrete MBP/dual kernels/preparation, actual current/saved tactic.ModelRefs and learned/projection/free-variable ASTRef vectors. Each round retains its lexical roots, mutable vector headers, acquired model references and model evaluators until that round ends; stopped rounds retain child construction-failure receipts. Constructor failure cleanup avoids retaining a receipt back to the same owner. Ten first-success allocation campaigns cover construction, reset, preparation, SAT, multi-level backtracking, QE, open/closed tracing and finite/strict optimization; all charged fixture storage is released and unknown is not counted as a completed campaign."
+        "Private qsatSearch owns the complete retained search state, concrete MBP/dual kernels/preparation, actual current/saved tactic.ModelRefs and learned/projection/free-variable ASTRef vectors. Each round retains its lexical roots, mutable vector headers, acquired model references and model evaluators until that round ends; stopped rounds retain child construction-failure receipts. Constructor failure cleanup avoids retaining a receipt back to the same owner. Ten first-success allocation campaigns cover construction, reset, preparation, SAT, multi-level backtracking, QE, open/closed tracing and finite/strict optimization; all charged fixture storage is released and unknown is not counted as a completed campaign.",
+        "Recursive frames retain actual local ASTRefs, binder-variable vectors, concrete VarSubstitution/inverse VarShifter/ExprAbstractor owners and child failures through outer cleanup. Source member reset is separate from operation cleanup, so nested elimination preserves its caller lexical frames. checkLoop now releases terminal-round lexical owners on every normal return, including direct recursive/optimization callers. Six first-success allocation campaigns cover existential/alternating/under-term recursion, extraction and open/closed tracing; all charged fixture storage is released."
       ],
       "deviations": [
-        "max_level, pred_abs and the retained hoist/filter/level/suffix-variable preparation methods are ported. The native QSAT kernel wrapper is also ported; alternating search/projection/backtracking and the private optimization entry are now ported. Recursive AST elimination, tactic/factory integration and the external qmax wrapper remain unfinished, with model-based projection now available. The search remains private until recursive elimination and tactic/factory integration are complete. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule.",
+        "max_level, pred_abs and the retained hoist/filter/level/suffix-variable preparation methods are ported. The native QSAT kernel wrapper is also ported; alternating search/projection/backtracking and the private optimization entry are now ported. Recursive AST elimination is now ported; tactic/factory integration and the external qmax wrapper remain unfinished, with model-based projection now available. The search remains private until recursive elimination and tactic/factory integration are complete. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule.",
         "Fifty-six direct cases cover fourteen formula shapes in all four source modes, including dependent Boolean/integer prefixes, real universal variables, negative polarity, mixed connectives, ITE branches, labels, repeated declaration names and source-inaccessible term occurrences. Twenty-eight prebuilt C++ comparisons independently reconstruct the native alternating prefix as SMT-LIB text and establish equivalence for every assignment to original free parameters. Only fresh hoisted variables are rebound; source free parameters remain free. Hoisting is tested as its own retained stage, without claiming QSAT search/tactic completion.",
         "The native solver facade gates model publication explicitly, so qsatKernel sets its actual SetProduceModels flag to implement the source private model=true setting. It preserves model=true, relevancy_lvl=0 and case_split_strategy=CS_ACTIVITY_WITH_CACHE (2), constructs the initial solver before overrides and passes the stored overrides to reset. Native integration checks independent Boolean/arithmetic kernels, literal assumption cores, model/core lifetime across reset, preparation-to-predicate-definition handoff and source trace metadata. A prebuilt C++ arithmetic assumption-conflict comparison passes. The complete retained alternating search is now ported; tactic/factory integration remains unfinished.",
         "Twenty-six native search results agree with the prebuilt C++ qsat tactic, including dependent Boolean/integer quantifiers, real universal bounds, polarity, mixed connectives and labels. Thirteen independently checked QE answers are logically equivalent to their original formulas. Ordinary C++ SMT decides the equivalence query first; full QE is an oracle-only fallback for unknown arithmetic queries. The old reference simplify/qe/smt pipeline incorrectly reports sat for the positive-label disagreement where ordinary SMT and qe2 return unsat; native output is not repaired. Source-inaccessible quantified term arguments are tested at preparation and excluded from search because the retained source atom abstraction requires application nodes throughout.",
-        "Unused minimize_core and check_fmls reached only from disabled validation bodies are deliberately omitted. Source validate_core/validate_project/validate_model return true before #if 0 bodies, so no additional solver-validation pass is activated. Final Close releases retained owners without recreating solvers solely for the C++ destructor reset; those newly recreated solvers have no retained consumer. Optimization uses existing concrete simplex.Optimum/math-big values with deep copies and standard Go formatting for its reached value forms. Full QE, recursive elimination, tactic/CLI/API integration and higher-engine goals remain unfinished.",
-        "Two further C++ checks prove the actual final native optimization improvement bound is infeasible and a bound derived from the returned native model is attainable, for closed and strict maxima. The final reset-statistics increment is separately checked in native and checked/debug/trace profiles; predicate counts retain their source unsigned statistic type."
+        "Unused minimize_core and check_fmls reached only from disabled validation bodies are deliberately omitted. Source validate_core/validate_project/validate_model return true before #if 0 bodies, so no additional solver-validation pass is activated. Final Close releases retained owners without recreating solvers solely for the C++ destructor reset; those newly recreated solvers have no retained consumer. Optimization uses existing concrete simplex.Optimum/math-big values with deep copies and standard Go formatting for its reached value forms. Full QE, tactic/CLI/API integration and higher-engine goals remain unfinished.",
+        "Two further C++ checks prove the actual final native optimization improvement bound is infeasible and a bound derived from the returned native model is attainable, for closed and strict maxima. The final reset-statistics increment is separately checked in native and checked/debug/trace profiles; predicate counts retain their source unsigned statistic type.",
+        "The old C++ qe_rec executable segfaults on exists x:Bool. x or free and forall x:Bool. x or free because elim initializes bound-variable levels but atom abstraction finds an uninitialized free Boolean entry. The native recursive caller computes ordinary existing dependency levels before atom abstraction; explicit bound levels remain intact and free parameters receive the empty sentinel. Fourteen independent C++ formula-equivalence checks validate the resulting formulas for every free-parameter assignment, including quantified term arguments inaccessible to the top-level hoister. C++ ordinary SMT is the primary oracle and full QE only an unknown fallback; the crashing qe_rec entry is not used as that oracle. The algorithm, source swap-with-last residual order and no-extra-rewrite behavior are retained."
       ]
     },
     {

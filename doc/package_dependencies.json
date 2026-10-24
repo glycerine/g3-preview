@@ -2205,6 +2205,7 @@
         "projection_preprocess.go",
         "qsat_kernel.go",
         "qsat_preparation.go",
+        "qsat_recursive.go",
         "qsat_search.go",
         "qsat_search_loop.go",
         "qsat_search_maximize.go",

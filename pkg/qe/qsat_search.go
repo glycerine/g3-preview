@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/math/simplex"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/tactic"
@@ -38,13 +39,16 @@ type qsatSearch struct {
 	closed                                                   bool
 }
 type qsatSearchCall struct {
-	owner        *qsatSearch
-	refs         []ast.ASTRef
-	vectors      []*[]ast.ASTRef
-	evaluators   []*model.ModelEvaluator
-	acquired     []*model.ModelCore
-	modelCleanup *model.ModelCore
-	failures     []memory.ConstructionFailure
+	owner         *qsatSearch
+	refs          []ast.ASTRef
+	vectors       []*[]ast.ASTRef
+	evaluators    []*model.ModelEvaluator
+	substitutions []*rewriter.VarSubstitution
+	shifters      []*rewriter.VarShifter
+	abstractors   []*ast.ExprAbstractor
+	acquired      []*model.ModelCore
+	modelCleanup  *model.ModelCore
+	failures      []memory.ConstructionFailure
 }
 type qsatSearchFailure struct {
 	owner          *qsatSearch
@@ -175,6 +179,30 @@ func (c *qsatSearchCall) close() error {
 		}
 		c.evaluators = c.evaluators[:i]
 	}
+	for len(c.shifters) > 0 {
+		i := len(c.shifters) - 1
+		if err := c.shifters[i].Close(); err != nil {
+			c.retain(err)
+			return err
+		}
+		c.shifters = c.shifters[:i]
+	}
+	for len(c.substitutions) > 0 {
+		i := len(c.substitutions) - 1
+		if err := c.substitutions[i].Close(); err != nil {
+			c.retain(err)
+			return err
+		}
+		c.substitutions = c.substitutions[:i]
+	}
+	for len(c.abstractors) > 0 {
+		i := len(c.abstractors) - 1
+		if err := c.abstractors[i].Close(); err != nil {
+			c.retain(err)
+			return err
+		}
+		c.abstractors = c.abstractors[:i]
+	}
 	if c.modelCleanup != nil {
 		if err := c.modelCleanup.Close(); err != nil {
 			return err
@@ -276,6 +304,12 @@ func (s *qsatSearch) reset() (err error) {
 		return err
 	}
 	defer s.finish(c, &err)
+	return s.resetState()
+}
+
+// Nested recursive elimination resets source members while its caller's
+// lexical frames remain on pending. The outer operation owns their cleanup.
+func (s *qsatSearch) resetState() (err error) {
 	s.stats.Reset()
 	for _, k := range []*qsatKernel{s.forall, s.exists} {
 		solver, e := k.solver()
