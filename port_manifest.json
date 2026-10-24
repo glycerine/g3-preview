@@ -70200,8 +70200,32 @@
       "component": "math",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/math/simplex/model_based_opt.go", "pkg/math/simplex/model_based_opt_test.go"],
-      "tests": ["TestModelBasedOptMaximizeSourceExamples", "TestModelBasedOptStrictAndUnbounded", "TestModelBasedOptProjectRealBounds", "TestModelBasedOptProjectIntegerEqualityAndModulo", "TestModelBasedOptProjectIntegerNonUnitBounds"],
+      "go_targets": [
+        "pkg/math/simplex/model_based_opt.go",
+        "pkg/math/simplex/model_based_opt_test.go",
+        "pkg/qe/arithmetic_projection.go",
+        "pkg/qe/arithmetic_linearize.go",
+        "pkg/qe/arithmetic_project.go",
+        "pkg/qe/arithmetic_maximize.go",
+        "pkg/qe/arithmetic_projection_test.go",
+        "pkg/qe/arithmetic_projection_cpp_test.go"
+      ],
+      "tests": [
+        "TestModelBasedOptMaximizeSourceExamples",
+        "TestModelBasedOptStrictAndUnbounded",
+        "TestModelBasedOptProjectRealBounds",
+        "TestModelBasedOptProjectIntegerEqualityAndModulo",
+        "TestModelBasedOptProjectIntegerNonUnitBounds",
+        "TestArithmeticProjectionModelPreservationAndVariables",
+        "TestArithmeticProjectionSingletonAndNoopHooks",
+        "TestArithmeticProjectionSourceAndOwnerGuards",
+        "TestArithmeticProjectionMaximizeModelsAndBounds",
+        "TestArithmeticProjectionAllocationFrontiers",
+        "TestArithmeticProjectionCPPModelBasedImplication",
+        "TestArithmeticProjectionCPPMaximumBounds",
+        "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+        "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+      ],
       "assertions": [
         {
           "line": 53,
@@ -70350,17 +70374,79 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "model-based maximize, projection, integer cuts, modular/equality elimination, row lifecycle, and display", "status": "ported", "go_target": "pkg/math/simplex/model_based_opt.go", "tests": ["TestModelBasedOptMaximizeSourceExamples", "TestModelBasedOptProjectIntegerNonUnitBounds"]}],
+      "methods": [
+        {
+          "name": "model-based maximize, projection, integer cuts, modular/equality elimination, row lifecycle, and display",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/model_based_opt.go",
+          "tests": [
+            "TestModelBasedOptMaximizeSourceExamples",
+            "TestModelBasedOptProjectIntegerNonUnitBounds"
+          ]
+        },
+        {
+          "name": "Integer equality elimination preserves integral row coefficients and scales divisibility moduli; source false-initialized unit flags retain its representative-bound strategy instead of enabling the integer cross-product shortcut",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_projection.go",
+            "pkg/qe/arithmetic_linearize.go",
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_maximize.go",
+            "pkg/qe/arithmetic_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/math/simplex/model_based_opt.go",
+            "pkg/math/simplex/model_based_opt_test.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionSingletonAndNoopHooks",
+            "TestArithmeticProjectionSourceAndOwnerGuards",
+            "TestArithmeticProjectionMaximizeModelsAndBounds",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication",
+            "TestArithmeticProjectionCPPMaximumBounds",
+            "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+            "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": ["The concrete Go implementation uses math/big.Rat values and ordinary slices while preserving exact local maximization, strict-bound infinitesimals, model-guided real/integer projection, equality solving, divisibility substitution, integer cuts, row retirement, and live-row extraction."]
+      "deviations": [
+        "The concrete Go implementation uses math/big.Rat values and ordinary slices while preserving exact local maximization, strict-bound infinitesimals, model-guided real/integer projection, equality solving, divisibility substitution, integer cuts, row retirement, and live-row extraction.",
+        "Arithmetic AST integration exposed fractional integer coefficients from the older native equality-substitution branch. Exact positive scaling now preserves equality semantics and divisibility moduli. This intentionally avoids source resolve's inequality-only integer helper for equality rows (its SASSERT domain requires t_le), without applying inequality slack cuts. Bound-selection flags separately match source false initialization. Native regressions verify exact 2z<=3y, modulus 6 for y-4, and four representative rows instead of six integer FM pairs; native arithmetic projection is checked for model preservation and C++ implication/nonvacuity."
+      ]
     },
     {
       "path": "src/math/simplex/model_based_opt.h",
       "component": "math",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/math/simplex/model_based_opt.go", "pkg/math/simplex/model_based_opt_test.go"],
-      "tests": ["TestModelBasedOptMaximizeSourceExamples", "TestModelBasedOptStrictAndUnbounded", "TestModelBasedOptProjectRealBounds", "TestModelBasedOptProjectIntegerEqualityAndModulo", "TestModelBasedOptProjectIntegerNonUnitBounds"],
+      "go_targets": [
+        "pkg/math/simplex/model_based_opt.go",
+        "pkg/math/simplex/model_based_opt_test.go",
+        "pkg/qe/arithmetic_projection.go",
+        "pkg/qe/arithmetic_linearize.go",
+        "pkg/qe/arithmetic_project.go",
+        "pkg/qe/arithmetic_maximize.go",
+        "pkg/qe/arithmetic_projection_test.go",
+        "pkg/qe/arithmetic_projection_cpp_test.go"
+      ],
+      "tests": [
+        "TestModelBasedOptMaximizeSourceExamples",
+        "TestModelBasedOptStrictAndUnbounded",
+        "TestModelBasedOptProjectRealBounds",
+        "TestModelBasedOptProjectIntegerEqualityAndModulo",
+        "TestModelBasedOptProjectIntegerNonUnitBounds",
+        "TestArithmeticProjectionModelPreservationAndVariables",
+        "TestArithmeticProjectionSingletonAndNoopHooks",
+        "TestArithmeticProjectionSourceAndOwnerGuards",
+        "TestArithmeticProjectionMaximizeModelsAndBounds",
+        "TestArithmeticProjectionAllocationFrontiers",
+        "TestArithmeticProjectionCPPModelBasedImplication",
+        "TestArithmeticProjectionCPPMaximumBounds",
+        "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+        "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -70373,9 +70459,47 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "concrete model-based optimization types and public operations", "status": "ported", "go_target": "pkg/math/simplex/model_based_opt.go", "tests": ["TestModelBasedOptStrictAndUnbounded", "TestModelBasedOptProjectIntegerEqualityAndModulo"]}],
+      "methods": [
+        {
+          "name": "concrete model-based optimization types and public operations",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/model_based_opt.go",
+          "tests": [
+            "TestModelBasedOptStrictAndUnbounded",
+            "TestModelBasedOptProjectIntegerEqualityAndModulo"
+          ]
+        },
+        {
+          "name": "Integer equality elimination preserves integral row coefficients and scales divisibility moduli; source false-initialized unit flags retain its representative-bound strategy instead of enabling the integer cross-product shortcut",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_projection.go",
+            "pkg/qe/arithmetic_linearize.go",
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_maximize.go",
+            "pkg/qe/arithmetic_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/math/simplex/model_based_opt.go",
+            "pkg/math/simplex/model_based_opt_test.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionSingletonAndNoopHooks",
+            "TestArithmeticProjectionSourceAndOwnerGuards",
+            "TestArithmeticProjectionMaximizeModelsAndBounds",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication",
+            "TestArithmeticProjectionCPPMaximumBounds",
+            "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+            "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": ["ModelBasedOpt, LinearTerm, OptRow, Optimum, Relation, Project, Maximize, LiveRows, and display methods provide the retained concrete API without C++ template or stream adapters."]
+      "deviations": [
+        "ModelBasedOpt, LinearTerm, OptRow, Optimum, Relation, Project, Maximize, LiveRows, and display methods provide the retained concrete API without C++ template or stream adapters.",
+        "Arithmetic AST integration exposed fractional integer coefficients from the older native equality-substitution branch. Exact positive scaling now preserves equality semantics and divisibility moduli. This intentionally avoids source resolve's inequality-only integer helper for equality rows (its SASSERT domain requires t_le), without applying inequality slack cuts. Bound-selection flags separately match source false initialization. Native regressions verify exact 2z<=3y, modulus 6 for y-4, and four representative rows instead of six integer FM pairs; native arithmetic projection is checked for model preservation and C++ implication/nonvacuity."
+      ]
     },
     {
       "path": "src/math/simplex/network_flow.h",
@@ -91487,9 +91611,28 @@
       "path": "src/qe/qe_arith.cpp",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/qe/arithmetic_projection.go",
+        "pkg/qe/arithmetic_linearize.go",
+        "pkg/qe/arithmetic_project.go",
+        "pkg/qe/arithmetic_maximize.go",
+        "pkg/qe/arithmetic_projection_test.go",
+        "pkg/qe/arithmetic_projection_cpp_test.go",
+        "pkg/math/simplex/model_based_opt.go",
+        "pkg/math/simplex/model_based_opt_test.go"
+      ],
+      "tests": [
+        "TestArithmeticProjectionModelPreservationAndVariables",
+        "TestArithmeticProjectionSingletonAndNoopHooks",
+        "TestArithmeticProjectionSourceAndOwnerGuards",
+        "TestArithmeticProjectionMaximizeModelsAndBounds",
+        "TestArithmeticProjectionAllocationFrontiers",
+        "TestArithmeticProjectionCPPModelBasedImplication",
+        "TestArithmeticProjectionCPPMaximumBounds",
+        "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+        "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+      ],
       "assertions": [
         {
           "line": 66,
@@ -91532,19 +91675,119 @@
           "text": "SASSERT(validate_model(eval, fmls0));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "arith_project_plugin constructor/destructor, get_family_id, source no-op solve and singleton/vector projection overloads; actual model-based optimization bridge, dynamic ITE side-literal processing, residue and opaque-term protection, source variable selection and typed live-row reconstruction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_projection.go",
+            "pkg/qe/arithmetic_linearize.go",
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_maximize.go",
+            "pkg/qe/arithmetic_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/math/simplex/model_based_opt.go",
+            "pkg/math/simplex/model_based_opt_test.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionSingletonAndNoopHooks",
+            "TestArithmeticProjectionSourceAndOwnerGuards",
+            "TestArithmeticProjectionMaximizeModelsAndBounds",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication",
+            "TestArithmeticProjectionCPPMaximumBounds",
+            "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+            "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+          ]
+        },
+        {
+          "name": "imp::linearize literal/term overloads, insert_mul, is_numeral and extract_coefficients: model-oriented disequality/distinct, syntactic scalar coefficients, ITE branches, modulo/divisibility rows, model completion and all retained qe trace sites",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_projection.go",
+            "pkg/qe/arithmetic_linearize.go",
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_maximize.go",
+            "pkg/qe/arithmetic_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/math/simplex/model_based_opt.go",
+            "pkg/math/simplex/model_based_opt_test.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionSingletonAndNoopHooks",
+            "TestArithmeticProjectionSourceAndOwnerGuards",
+            "TestArithmeticProjectionMaximizeModelsAndBounds",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication",
+            "TestArithmeticProjectionCPPMaximumBounds",
+            "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+            "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+          ]
+        },
+        {
+          "name": "imp::maximize/validate_model and public maximize: concrete real objective, bounded/strict/infinite optimum, model updates for uninterpreted constants and source weak/strong improvement bounds",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_projection.go",
+            "pkg/qe/arithmetic_linearize.go",
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_maximize.go",
+            "pkg/qe/arithmetic_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/math/simplex/model_based_opt.go",
+            "pkg/math/simplex/model_based_opt_test.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionSingletonAndNoopHooks",
+            "TestArithmeticProjectionSourceAndOwnerGuards",
+            "TestArithmeticProjectionMaximizeModelsAndBounds",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication",
+            "TestArithmeticProjectionCPPMaximumBounds",
+            "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+            "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete owning projection service borrows manager/config; each call retains actual lexical ASTRefs, mutable singleton/local formula vectors, partial model evaluator, ASTExprMark and construction-failure receipts until cleanup succeeds. Source recursive term protection reuses the existing typed all-mark AST visitor, including quantifier annotations. Caller vectors own successful appends, compaction and completed replacements on errors. Eighteen first-success campaigns cover constructor, real/integer/nonunit/modular/ITE/distinct/disequality/large-coefficient/opaque projections, singleton, bounded/strict/unbounded maximization and open/closed tracing; all charged fixture storage is released."
+      ],
+      "deviations": [
+        "Exact math/big.Rat coefficients share the existing concrete simplex.ModelBasedOpt representation; AST numeral construction still uses the owning native numeral service. Concrete insertion-ordered coefficient/ID dictionaries use approved insdict v0.10.1; no C++ hash layout or STL containers are ported. Source root-only marking of residue formulas is preserved; recursive marking protects nonprojected registered arithmetic terms. The unused imp::n_sign and free arith_project wrapper (reached only from src/test) are omitted. The independent qe_mbp dispatcher, array/datatype projection plugins and QSAT/full QE drivers remain separate unported work.",
+        "The existing simplex bridge now eliminates integer equality rows by exact positive scaling, including scaling divisibility moduli, instead of producing fractional integer coefficients. Source resolve routes equality rows through an inequality-only integer helper whose debug assertions require t_le inputs; the native equality branch deliberately avoids that invalid helper domain and inequality slack cuts. The separate source false-initialized unit-bound flags are preserved, retaining its integer representative selection. Eighteen prebuilt C++ implication/nonvacuity checks verify the native projected constraints; two more verify closed/strict optimum bounds. The C++ oracle uses full QE only to decide quantified counterexample queries after its default SMT returned unknown; native output is submitted unchanged."
+      ]
     },
     {
       "path": "src/qe/qe_arith.h",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/qe/arithmetic_projection.go",
+        "pkg/qe/arithmetic_linearize.go",
+        "pkg/qe/arithmetic_project.go",
+        "pkg/qe/arithmetic_maximize.go",
+        "pkg/qe/arithmetic_projection_test.go",
+        "pkg/qe/arithmetic_projection_cpp_test.go",
+        "pkg/math/simplex/model_based_opt.go",
+        "pkg/math/simplex/model_based_opt_test.go"
+      ],
+      "tests": [
+        "TestArithmeticProjectionModelPreservationAndVariables",
+        "TestArithmeticProjectionSingletonAndNoopHooks",
+        "TestArithmeticProjectionSourceAndOwnerGuards",
+        "TestArithmeticProjectionMaximizeModelsAndBounds",
+        "TestArithmeticProjectionAllocationFrontiers",
+        "TestArithmeticProjectionCPPModelBasedImplication",
+        "TestArithmeticProjectionCPPMaximumBounds",
+        "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+        "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+      ],
       "conditionals": [
         {
           "line": 8,
@@ -91555,11 +91798,92 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "arith_project_plugin constructor/destructor, get_family_id, source no-op solve and singleton/vector projection overloads; actual model-based optimization bridge, dynamic ITE side-literal processing, residue and opaque-term protection, source variable selection and typed live-row reconstruction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_projection.go",
+            "pkg/qe/arithmetic_linearize.go",
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_maximize.go",
+            "pkg/qe/arithmetic_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/math/simplex/model_based_opt.go",
+            "pkg/math/simplex/model_based_opt_test.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionSingletonAndNoopHooks",
+            "TestArithmeticProjectionSourceAndOwnerGuards",
+            "TestArithmeticProjectionMaximizeModelsAndBounds",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication",
+            "TestArithmeticProjectionCPPMaximumBounds",
+            "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+            "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+          ]
+        },
+        {
+          "name": "imp::linearize literal/term overloads, insert_mul, is_numeral and extract_coefficients: model-oriented disequality/distinct, syntactic scalar coefficients, ITE branches, modulo/divisibility rows, model completion and all retained qe trace sites",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_projection.go",
+            "pkg/qe/arithmetic_linearize.go",
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_maximize.go",
+            "pkg/qe/arithmetic_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/math/simplex/model_based_opt.go",
+            "pkg/math/simplex/model_based_opt_test.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionSingletonAndNoopHooks",
+            "TestArithmeticProjectionSourceAndOwnerGuards",
+            "TestArithmeticProjectionMaximizeModelsAndBounds",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication",
+            "TestArithmeticProjectionCPPMaximumBounds",
+            "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+            "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+          ]
+        },
+        {
+          "name": "imp::maximize/validate_model and public maximize: concrete real objective, bounded/strict/infinite optimum, model updates for uninterpreted constants and source weak/strong improvement bounds",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_projection.go",
+            "pkg/qe/arithmetic_linearize.go",
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_maximize.go",
+            "pkg/qe/arithmetic_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/math/simplex/model_based_opt.go",
+            "pkg/math/simplex/model_based_opt_test.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionSingletonAndNoopHooks",
+            "TestArithmeticProjectionSourceAndOwnerGuards",
+            "TestArithmeticProjectionMaximizeModelsAndBounds",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication",
+            "TestArithmeticProjectionCPPMaximumBounds",
+            "TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus",
+            "TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete owning projection service borrows manager/config; each call retains actual lexical ASTRefs, mutable singleton/local formula vectors, partial model evaluator, ASTExprMark and construction-failure receipts until cleanup succeeds. Source recursive term protection reuses the existing typed all-mark AST visitor, including quantifier annotations. Caller vectors own successful appends, compaction and completed replacements on errors. Eighteen first-success campaigns cover constructor, real/integer/nonunit/modular/ITE/distinct/disequality/large-coefficient/opaque projections, singleton, bounded/strict/unbounded maximization and open/closed tracing; all charged fixture storage is released."
+      ],
+      "deviations": [
+        "Exact math/big.Rat coefficients share the existing concrete simplex.ModelBasedOpt representation; AST numeral construction still uses the owning native numeral service. Concrete insertion-ordered coefficient/ID dictionaries use approved insdict v0.10.1; no C++ hash layout or STL containers are ported. Source root-only marking of residue formulas is preserved; recursive marking protects nonprojected registered arithmetic terms. The unused imp::n_sign and free arith_project wrapper (reached only from src/test) are omitted. The independent qe_mbp dispatcher, array/datatype projection plugins and QSAT/full QE drivers remain separate unported work.",
+        "The existing simplex bridge now eliminates integer equality rows by exact positive scaling, including scaling divisibility moduli, instead of producing fractional integer coefficients. Source resolve routes equality rows through an inequality-only integer helper whose debug assertions require t_le inputs; the native equality branch deliberately avoids that invalid helper domain and inequality slack cuts. The separate source false-initialized unit-bound flags are preserved, retaining its integer representative selection. Eighteen prebuilt C++ implication/nonvacuity checks verify the native projected constraints; two more verify closed/strict optimum bounds. The C++ oracle uses full QE only to decide quantified counterexample queries after its default SMT returned unknown; native output is submitted unchanged."
+      ]
     },
     {
       "path": "src/qe/qe_arith_plugin.cpp",
@@ -92822,9 +93146,22 @@
       "path": "src/qe/qe_mbp.cpp",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/qe/arithmetic_projection.go",
+        "pkg/qe/arithmetic_linearize.go",
+        "pkg/qe/arithmetic_project.go",
+        "pkg/qe/arithmetic_maximize.go",
+        "pkg/qe/arithmetic_projection_test.go",
+        "pkg/qe/arithmetic_projection_cpp_test.go",
+        "pkg/math/simplex/model_based_opt.go",
+        "pkg/math/simplex/model_based_opt_test.go"
+      ],
+      "tests": [
+        "TestArithmeticProjectionModelPreservationAndVariables",
+        "TestArithmeticProjectionAllocationFrontiers",
+        "TestArithmeticProjectionCPPModelBasedImplication"
+      ],
       "assertions": [
         {
           "line": 59,
@@ -92877,17 +93214,49 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained project_plugin::mark_rec(expr_mark&,expr*) call used by arithmetic projection to protect all subexpressions of nonprojected terms; existing typed AST all-mark visitor, including quantifier annotations",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_projection.go",
+            "pkg/qe/arithmetic_projection_test.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication"
+          ]
+        }
+      ],
+      "ownership": [
+        "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced."
+      ],
+      "deviations": [
+        "Only the single-expression marking helper reached by the retained arithmetic plugin is credited. The project-plugin interface/other helpers, mbp driver, Boolean literal extraction, equation solving, array/datatype dispatch and maximize wrapper remain unported."
+      ]
     },
     {
       "path": "src/qe/qe_mbp.h",
       "component": "qe",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/qe/arithmetic_projection.go",
+        "pkg/qe/arithmetic_linearize.go",
+        "pkg/qe/arithmetic_project.go",
+        "pkg/qe/arithmetic_maximize.go",
+        "pkg/qe/arithmetic_projection_test.go",
+        "pkg/qe/arithmetic_projection_cpp_test.go",
+        "pkg/math/simplex/model_based_opt.go",
+        "pkg/math/simplex/model_based_opt_test.go"
+      ],
+      "tests": [
+        "TestArithmeticProjectionModelPreservationAndVariables",
+        "TestArithmeticProjectionAllocationFrontiers",
+        "TestArithmeticProjectionCPPModelBasedImplication"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -92900,9 +93269,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained project_plugin::mark_rec(expr_mark&,expr*) call used by arithmetic projection to protect all subexpressions of nonprojected terms; existing typed AST all-mark visitor, including quantifier annotations",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/arithmetic_project.go",
+            "pkg/qe/arithmetic_projection.go",
+            "pkg/qe/arithmetic_projection_test.go"
+          ],
+          "tests": [
+            "TestArithmeticProjectionModelPreservationAndVariables",
+            "TestArithmeticProjectionAllocationFrontiers",
+            "TestArithmeticProjectionCPPModelBasedImplication"
+          ]
+        }
+      ],
+      "ownership": [
+        "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced."
+      ],
+      "deviations": [
+        "Only the single-expression marking helper reached by the retained arithmetic plugin is credited. The project-plugin interface/other helpers, mbp driver, Boolean literal extraction, equation solving, array/datatype dispatch and maximize wrapper remain unported."
+      ]
     },
     {
       "path": "src/qe/qe_sat_tactic.cpp",

@@ -281,6 +281,26 @@ func (m *ModelBasedOpt) resolve(source uint32, a1 *big.Rat, destination, x uint3
 	if a2.Sign() == 0 {
 		return nil
 	}
+	if m.integers[x] && m.rows[source].Relation == Equal {
+		// Equality substitution must retain integral rows. Dividing by a1
+		// produced fractional coefficients that cannot be reconstructed as
+		// integer ASTs. Scale the destination and eliminate exactly instead;
+		// inequality-only slack cuts do not apply to an equality source.
+		factor := absRat(a1)
+		m.scale(destination, factor)
+		if m.rows[destination].Relation == Divides {
+			m.rows[destination].Modulus.Mul(&m.rows[destination].Modulus, factor)
+		}
+		multiple := new(big.Rat).Set(a2)
+		if a1.Sign() > 0 {
+			multiple.Neg(multiple)
+		}
+		if err := m.combine(destination, multiple, source, false); err != nil {
+			return err
+		}
+		m.normalize(destination)
+		return nil
+	}
 	if m.integers[x] && m.rows[source].Relation != Equal {
 		return m.resolveInteger(source, a1, destination, a2, x)
 	}
@@ -671,7 +691,9 @@ func (m *ModelBasedOpt) projectOne(x uint32) error {
 	upperIndex, lowerIndex := NullVariable, NullVariable
 	var upperValue, lowerValue *big.Rat
 	upperStrict, lowerStrict := false, false
-	upperUnit, lowerUnit := true, true
+	// The retained source initializes both flags false and updates them with
+	// &=, leaving the small cross-product shortcut disabled for integers.
+	upperUnit, lowerUnit := false, false
 	seen := make(map[uint32]bool)
 	for _, row := range m.incidence[x] {
 		if seen[row] {

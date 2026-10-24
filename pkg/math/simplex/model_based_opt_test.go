@@ -43,6 +43,59 @@ func TestModelBasedOptMaximizeSourceExamples(t *testing.T) {
 	}
 }
 
+func TestModelBasedOptIntegerEqualityPreservesIntegralRowsAndModulus(t *testing.T) {
+	opt := NewModelBasedOpt()
+	x := opt.AddVariable(big.NewRat(2, 1), true)
+	y := opt.AddVariable(big.NewRat(4, 1), true)
+	z := opt.AddVariable(big.NewRat(1, 1), true)
+	addOptConstraint(t, opt, []LinearTerm{optTerm(x, 2), optTerm(y, -1)}, 0, Equal)
+	addOptConstraint(t, opt, []LinearTerm{optTerm(x, -3), optTerm(z, 1)}, 0, LessEqual)
+	if err := opt.AddDivides([]LinearTerm{optTerm(x, 1)}, big.NewRat(-2, 1), big.NewRat(3, 1)); err != nil {
+		t.Fatal(err)
+	}
+	if err := opt.Project(x); err != nil {
+		t.Fatal(err)
+	}
+	bound, modulus := false, false
+	for _, r := range opt.LiveRows() {
+		for _, v := range r.Terms {
+			if !v.Coefficient.IsInt() || v.Variable == x {
+				t.Fatal("integer row lost its domain", r)
+			}
+		}
+		if r.Relation == LessEqual && len(r.Terms) == 2 {
+			bound = r.Terms[0].Variable == y && r.Terms[0].Coefficient.Cmp(big.NewRat(-3, 1)) == 0 && r.Terms[1].Variable == z && r.Terms[1].Coefficient.Cmp(big.NewRat(2, 1)) == 0 && r.Constant.Sign() == 0
+		}
+		if r.Relation == Divides && r.Modulus.Cmp(big.NewRat(6, 1)) == 0 {
+			modulus = len(r.Terms) == 1 && r.Terms[0].Variable == y && r.Terms[0].Coefficient.Cmp(big.NewRat(1, 1)) == 0 && r.Constant.Cmp(big.NewRat(-4, 1)) == 0
+		}
+	}
+	if !bound || !modulus {
+		t.Fatal("expected 2z <= 3y and 6 divides y-4", opt.LiveRows())
+	}
+}
+
+func TestModelBasedOptIntegerUnitBoundsRetainSourceRepresentative(t *testing.T) {
+	opt := NewModelBasedOpt()
+	x := opt.AddVariable(big.NewRat(5, 1), true)
+	for _, value := range []int64{10, 11} {
+		u := opt.AddVariable(big.NewRat(value, 1), true)
+		addOptConstraint(t, opt, []LinearTerm{optTerm(x, 1), optTerm(u, -1)}, 0, LessEqual)
+	}
+	for _, value := range []int64{0, 1, 2} {
+		l := opt.AddVariable(big.NewRat(value, 1), true)
+		addOptConstraint(t, opt, []LinearTerm{optTerm(x, -1), optTerm(l, 1)}, 0, LessEqual)
+	}
+	if err := opt.Project(x); err != nil {
+		t.Fatal(err)
+	}
+	// Source picks the tight upper representative. Its order constraint and
+	// three lower/upper resolvents give four rows, versus six FM pairs.
+	if got := len(opt.LiveRows()); got != 4 {
+		t.Fatal("integer source bound strategy", got, opt.LiveRows())
+	}
+}
+
 func TestModelBasedOptStrictAndUnbounded(t *testing.T) {
 	strict := NewModelBasedOpt()
 	x := strict.AddVariable(big.NewRat(2, 1), false)

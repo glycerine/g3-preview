@@ -2148,6 +2148,7 @@
         "arena",
         "ast",
         "ast/rewriter",
+        "math/simplex",
         "model",
         "tactic",
         "util/cooperate",
@@ -2159,6 +2160,10 @@
         "util/text"
       ],
       "production_files": [
+        "arithmetic_linearize.go",
+        "arithmetic_maximize.go",
+        "arithmetic_project.go",
+        "arithmetic_projection.go",
         "array_der.go",
         "equality_der.go",
         "equality_der_conjunctions.go",
