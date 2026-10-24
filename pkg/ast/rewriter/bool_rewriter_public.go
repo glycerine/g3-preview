@@ -45,6 +45,14 @@ func (rw *boolRewriter) MkAnd(args []ast.ASTHandle, out ast.ASTRef) error {
 	}
 	return rw.mkAnd(args, out)
 }
+
+// MkOr is the configured lexical Boolean constructor used by QE-lite DER.
+func (rw *boolRewriter) MkOr(args []ast.ASTHandle, out ast.ASTRef) error {
+	if err := rw.configuredOpen(); err != nil {
+		return err
+	}
+	return rw.mkOr(args, out)
+}
 func (rw *boolRewriter) MkNot(arg ast.ASTHandle, out ast.ASTRef) error {
 	if err := rw.configuredOpen(); err != nil {
 		return err

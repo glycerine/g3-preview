@@ -2144,17 +2144,25 @@
     {
       "package": "qe",
       "imports": [
+        "arena",
         "ast",
         "ast/rewriter",
         "tactic",
         "util/cooperate",
         "util/diagnostic",
         "util/memory",
+        "util/numeral",
         "util/params",
         "util/text"
       ],
       "production_files": [
         "array_der.go",
+        "equality_der.go",
+        "equality_der_conjunctions.go",
+        "equality_der_definitions.go",
+        "equality_der_order.go",
+        "equality_der_quantifier.go",
+        "equality_der_trace.go",
         "occurs.go",
         "trace.go"
       ]

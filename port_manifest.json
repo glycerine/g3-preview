@@ -27436,7 +27436,9 @@
         "pkg/ast/rewriter/bool_rewriter_public.go",
         "pkg/ast/rewriter/bool_rewriter_native_context_test.go",
         "pkg/tactic/arith/pb2bv_encoding.go",
-        "pkg/tactic/arith/pb2bv_tactic_test.go"
+        "pkg/tactic/arith/pb2bv_tactic_test.go",
+        "pkg/qe/equality_der_quantifier.go",
+        "pkg/qe/equality_der_quantifier_test.go"
       ],
       "tests": [
         "TestModel2ExprEntryConditionSourceArityAndReferenceScope",
@@ -27474,7 +27476,9 @@
         "TestPB2BVTacticAllocationFrontiers",
         "TestPB2BVProbeRefusalsParametersAndMemory",
         "TestPB2BVRootTraceAndProofGuard",
-        "TestPB2BVCPPEncodingShapes"
+        "TestPB2BVCPPEncodingShapes",
+        "TestEqualityDERQuantifierCorePatternsParameterSnapshotAndProofs",
+        "TestEqualityDERUniversalDisequalitySourceRefusalAndIdentityProof"
       ],
       "conditionals": [
         {
@@ -27599,6 +27603,19 @@
             "TestPB2BVProbeRefusalsParametersAndMemory",
             "TestPB2BVRootTraceAndProofGuard",
             "TestPB2BVCPPEncodingShapes"
+          ]
+        },
+        {
+          "name": "Configured BoolRewriter.MkOr forwarding for retained eq::der universal quantifier consumer, with existing owner guard and output-reference contract",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ast/rewriter/bool_rewriter_public.go",
+            "pkg/qe/equality_der_quantifier.go",
+            "pkg/qe/equality_der_quantifier_test.go"
+          ],
+          "tests": [
+            "TestEqualityDERQuantifierCorePatternsParameterSnapshotAndProofs",
+            "TestEqualityDERUniversalDisequalitySourceRefusalAndIdentityProof"
           ]
         }
       ],
@@ -92105,7 +92122,17 @@
         "pkg/qe/qe_test.go",
         "pkg/qe/array_der_test.go",
         "pkg/qe/array_der_cpp_test.go",
-        "pkg/qe/occurs_test.go"
+        "pkg/qe/occurs_test.go",
+        "pkg/qe/equality_der.go",
+        "pkg/qe/equality_der_definitions.go",
+        "pkg/qe/equality_der_order.go",
+        "pkg/qe/equality_der_conjunctions.go",
+        "pkg/qe/equality_der_quantifier.go",
+        "pkg/qe/equality_der_trace.go",
+        "pkg/qe/equality_der_test.go",
+        "pkg/qe/equality_der_quantifier_test.go",
+        "pkg/qe/equality_der_frontier_test.go",
+        "pkg/qe/equality_der_cpp_test.go"
       ],
       "tests": [
         "TestVariableTestCopiesSetComplementAndDeclarationBoundary",
@@ -92116,7 +92143,17 @@
         "TestArrayDERSelectorUpdateCancellationAndOwnerGuards",
         "TestArrayDERTraceClosedStreamAndAllocationFrontiers",
         "TestArrayDERCPPProjectionNormalForms",
-        "TestQEOccursVariableShiftsThroughBodiesAndIgnoresPatterns"
+        "TestQEOccursVariableShiftsThroughBodiesAndIgnoresPatterns",
+        "TestEqualityDERSelectorCancellationAndOwnerGuards",
+        "TestEqualityDERChainsCyclesAndOccursRefusals",
+        "TestEqualityDERArithmeticCoefficientAndITEBranches",
+        "TestEqualityDERUnconstrainedDisequalityAndBooleanLiterals",
+        "TestEqualityDERQuantifierCorePatternsParameterSnapshotAndProofs",
+        "TestEqualityDERUniversalDisequalitySourceRefusalAndIdentityProof",
+        "TestEqualityDERDatatypeFlatteningAndConstructorRefusal",
+        "TestEqualityDERAllocationFrontiers",
+        "TestEqualityDERSparseDefinitionsTrace",
+        "TestEqualityDERCPPProjectionNormalForms"
       ],
       "conditionals": [
         {
@@ -92334,14 +92371,44 @@
             "TestArrayDERTraceClosedStreamAndAllocationFrontiers",
             "TestArrayDERCPPProjectionNormalForms"
           ]
+        },
+        {
+          "name": "eq::der complete concrete equality-elimination class: arithmetic and ITE definitions, source preference and cycle order, datatype flattening, unconstrained disequalities, conjunction fixed point, quantifier core and unused-variable/proof wrapper",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/equality_der.go",
+            "pkg/qe/equality_der_definitions.go",
+            "pkg/qe/equality_der_order.go",
+            "pkg/qe/equality_der_conjunctions.go",
+            "pkg/qe/equality_der_quantifier.go",
+            "pkg/qe/equality_der_trace.go",
+            "pkg/qe/equality_der_test.go",
+            "pkg/qe/equality_der_quantifier_test.go",
+            "pkg/qe/equality_der_frontier_test.go",
+            "pkg/qe/equality_der_cpp_test.go"
+          ],
+          "tests": [
+            "TestEqualityDERSelectorCancellationAndOwnerGuards",
+            "TestEqualityDERChainsCyclesAndOccursRefusals",
+            "TestEqualityDERArithmeticCoefficientAndITEBranches",
+            "TestEqualityDERUnconstrainedDisequalityAndBooleanLiterals",
+            "TestEqualityDERQuantifierCorePatternsParameterSnapshotAndProofs",
+            "TestEqualityDERUniversalDisequalitySourceRefusalAndIdentityProof",
+            "TestEqualityDERDatatypeFlatteningAndConstructorRefusal",
+            "TestEqualityDERAllocationFrontiers",
+            "TestEqualityDERSparseDefinitionsTrace",
+            "TestEqualityDERCPPProjectionNormalForms"
+          ]
         }
       ],
       "ownership": [
-        "ArrayDER borrows its concrete selector and parameter/cooperation/trace services and owns a reusable ASTExprMark. Caller conjunction ASTRef slices retain updated formula ownership and completed prefixes on error. Lexical ExprSafeReplace/output owners remain reachable through ArrayDERFailure if destruction stops; explicit cleanup retries actual retained owners. Constructor, select/disequality, enabled trace and closed-trace reservation campaigns reach first success with zero charged fixture storage."
+        "ArrayDER borrows its concrete selector and parameter/cooperation/trace services and owns a reusable ASTExprMark. Caller conjunction ASTRef slices retain updated formula ownership and completed prefixes on error. Lexical ExprSafeReplace/output owners remain reachable through ArrayDERFailure if destruction stops; explicit cleanup retries actual retained owners. Constructor, select/disequality, enabled trace and closed-trace reservation campaigns reach first success with zero charged fixture storage.",
+        "EqualityDER owns reusable substitution/theory rewriting state and a constructor parameter snapshot; selector and Config services are borrowed. Lexical AST references, native numeral-service values, Boolean rewriters and selectors remain reachable through a typed construction-failure receipt until cleanup completes. Mutable conjunction slices retain completed writes on error. Seven allocation campaigns reach first success with zero charged fixture storage, including large rational coefficients, proofs and open/closed trace streams."
       ],
       "deviations": [
-        "Equality DER beyond occurs_var, the Fourier-Motzkin pass, qe_lite public overloads, traversal configuration and qe-light tactic remain unported. No Go qe-light command or quantified-strategy substitution is registered prematurely.",
-        "C++ returns UNKNOWN for the raw quantified-array equivalence queries. Six comparisons instead match actual C++ QE-lite output against the native array pass followed only by C++ simplification. The fixtures account for source flatten_and child-slot order and normalize only tactic depth and whitespace; formula and precision content remain exact. Source acceptance of duplicate index variables is preserved in direct structural tests rather than strengthened."
+        "Fourier-Motzkin elimination, qe_lite public overloads, full traversal configuration and qe-light tactic remain unported. Equality DER and array DER are complete prerequisites; no Go qe-light registration or quantified-strategy substitute is added prematurely.",
+        "C++ returns UNKNOWN for the raw quantified-array equivalence queries. Six comparisons instead match actual C++ QE-lite output against the native array pass followed only by C++ simplification. The fixtures account for source flatten_and child-slot order and normalize only tactic depth and whitespace; formula and precision content remain exact. Source acceptance of duplicate index variables is preserved in direct structural tests rather than strengthened.",
+        "Equality DER preserves source is_var_diseq passing the original negated expression to is_var_eq, including its universal arithmetic-disequality refusal. The raw quantifier reduction keeps declaration slots and accumulates proofs; the operator wrapper resets proofs and removes unused variables only after a change. Seven prebuilt C++ projection comparisons preserve formula/precision content and normalize only whitespace/tactic depth; the native result receives source simplification without an additional elimination pass."
       ]
     },
     {
@@ -241518,14 +241585,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "ba17ca4ccb7f941e6f65295a38c190ff3a89fa47",
-    "command": "cd pkg && go test ./... -count=1; default 10m deadline reached only in util/lp, then go test ./util/lp -count=1 -timeout=20m",
-    "started_utc": "2026-10-20 15:29:41 UTC",
-    "completed_utc": "2026-10-20 15:52:06 UTC",
+    "commit": "21cf25563a56067c86ad08749364c3fa0fff1fc4",
+    "command": "go -C pkg test ./... -count=1 -timeout=30m",
+    "started_utc": "2026-10-24 18:23:23 UTC",
+    "completed_utc": "2026-10-24 18:36:47 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-polynomial-complete-ba17ca4c.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-lp-polynomial-complete-ba17ca4c.log",
-    "verified_file": "/mnt/oldrog/tmp/g3-algebraic-whole-unit-audit.txt",
+    "log": "/mnt/oldrog/tmp/g3-native-21cf2556.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-21cf2556.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-21cf2556.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -241538,16 +241605,12 @@
       16
     ],
     "GOMAXPROCS": 4,
-    "package_timeout": "default 10m; util/lp rerun 20m",
-    "packages_with_ok_result": 68,
-    "packages_without_test_files": 11,
-    "ast_seconds": 12.507,
-    "polynomial_seconds": 108.84,
-    "lp_seconds": 699.725,
-    "numeral_seconds": 58.883,
-    "session_id": 39266,
-    "checkout_held_unchanged": false,
-    "scope_warning": "All native packages passed on the same ba17ca4c Go source state. The initial module command reached only the default 10-minute util/lp package deadline while actively multiplying large integers; the complete LP package then passed unchanged with -timeout=20m. The only uncommitted files were the manifest and progress ledger that do not alter package implementation."
+    "package_timeout": "30m",
+    "packages_with_ok_result": 88,
+    "packages_without_test_files": 7,
+    "lp_seconds": 714.734,
+    "checkout_held_unchanged": true,
+    "scope_warning": "Clean isolated exact-HEAD checkout; includes quantified strategies and QE variable/array prerequisites. Excludes the current uncommitted equality DER increment, which has focused native and checked/debug/trace integration checks."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

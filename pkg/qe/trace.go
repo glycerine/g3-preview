@@ -26,6 +26,15 @@ type traceBodyWriter struct{ out io.Writer }
 
 func (w traceBodyWriter) Write(p []byte) (int, error) { _, _ = w.out.Write(p); return len(p), nil }
 
+func (w traceBodyWriter) Flush() error {
+	if out, ok := w.out.(interface{ Flush() error }); ok {
+		_ = out.Flush()
+	}
+	return nil
+}
+
+func diagnosticEndl(out io.Writer) error { return diagnostic.WriteTraceEndl(out) }
+
 func writeExpression(m *ast.ASTManager, config Config, out io.Writer, expression ast.ASTHandle) (err error) {
 	stream, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: m.Budget()})
 	if err != nil {

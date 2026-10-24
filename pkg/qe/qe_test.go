@@ -27,9 +27,16 @@ type fixture struct {
 }
 
 func setup(t *testing.T) *fixture {
+	return setupProofs(t, false)
+}
+
+func setupProofs(t *testing.T, proofs bool) *fixture {
 	t.Helper()
 	c, err := cmd_context.NewStandaloneContext()
 	must(t, err)
+	if proofs {
+		must(t, c.SetBoolOption("produce-proofs", true))
+	}
 	f := &fixture{}
 	t.Cleanup(func() {
 		must(t, c.Close())
