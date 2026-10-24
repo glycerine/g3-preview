@@ -2804,6 +2804,7 @@
         "util/text"
       ],
       "production_files": [
+        "add_bounds_tactic.go",
         "bound_config.go",
         "bound_display.go",
         "bound_equation_store.go",
@@ -2838,11 +2839,13 @@
         "pb2bv_trace.go",
         "polynomial_builder.go",
         "polynomial_trace.go",
+        "probe_arith.go",
         "propagate_ineq_adapter.go",
         "propagate_ineq_clean.go",
         "propagate_ineq_memory_trace.go",
         "propagate_ineq_outer_memory_trace.go",
-        "propagate_ineq_tactic.go"
+        "propagate_ineq_tactic.go",
+        "unbounded_probe.go"
       ]
     },
     {

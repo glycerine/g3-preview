@@ -1,0 +1,6 @@
+(set-logic QF_LIA)
+(set-option :produce-models true)
+(declare-const x Int)
+(assert (< x 0))
+(check-sat-using (then (using-params add-bounds :add_bound_lower -16 :add_bound_upper -1) smt))
+(get-value ((and (>= x (- 16)) (<= x (- 1)))))

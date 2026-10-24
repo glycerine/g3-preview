@@ -175,6 +175,12 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"add_bounds_default_models_scopes.smt2":        "sat\n((x 1))\nunknown\n(:reason-unknown \"under-approximated goal found to be unsat\")\nsat\n((x 1))\n",
+	"add_bounds_existing_bounds.smt2":              "unknown\n(:reason-unknown \"under-approximated goal found to be unsat\")\nsat\n(((and (>= x 10) (<= x 20)) true))\n",
+	"add_bounds_negative_params.smt2":              "sat\n(((and (>= x (- 16)) (<= x (- 1))) true))\n",
+	"add_bounds_fractional_real.smt2":              "sat\n(((and (>= x 0.5) (<= x 1.5)) true))\n",
+	"add_bounds_boolean_precise.smt2":              "sat\nunsat\n",
+	"add_bounds_proof_under.smt2":                  "unknown\n(:reason-unknown \"under-approximated goal found to be unsat\")\n",
 	"ctx_simplify_memory_refusal.smt2":             "unknown\n(:reason-unknown \"max. memory exceeded\")\nsat\nsat\n",
 	"ctx_simplify_forward_backward.smt2":           "sat\n",
 	"ctx_simplify_ite.smt2":                        "sat\n",

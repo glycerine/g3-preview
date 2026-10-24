@@ -1,0 +1,6 @@
+(set-logic QF_LRA)
+(set-option :produce-models true)
+(declare-const x Real)
+(assert (> x 0))
+(check-sat-using (then (using-params add-bounds :add_bound_lower 0.5 :add_bound_upper 1.5) smt))
+(get-value ((and (>= x 0.5) (<= x 1.5))))

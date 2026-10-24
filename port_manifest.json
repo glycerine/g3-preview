@@ -40061,7 +40061,19 @@
         "pkg/cmd/g3/test_vectors/ctx_simplify_memory_refusal.smt2",
         "pkg/cmd/g3/test_vectors/ctx_simplify_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/ctx_simplify_or.smt2",
-        "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2"
+        "pkg/cmd/g3/test_vectors/ctx_simplify_proofs.smt2",
+        "pkg/tactic/arith/add_bounds_tactic.go",
+        "pkg/tactic/arith/unbounded_probe.go",
+        "pkg/tactic/arith/probe_arith.go",
+        "pkg/tactic/arith/add_bounds_tactic_test.go",
+        "pkg/tactic/arith/add_bounds_cpp_test.go",
+        "pkg/tactic/arith/probe_arith_cpp_test.go",
+        "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -40091,7 +40103,15 @@
         "TestContextSimplifySoftLimitsCancellationAndFreshCleanup",
         "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
         "TestContextSimplifyClosedTraceAndCleanupRefusal",
-        "TestContextSimplifyTranslationParameterSnapshot"
+        "TestContextSimplifyTranslationParameterSnapshot",
+        "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+        "TestAddBoundsConstructorAllocationFrontiers",
+        "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+        "TestAddBoundsTranslationAndRationalParameterSnapshot",
+        "TestArithmeticFragmentProbeNativeContracts",
+        "TestArithmeticFragmentProbeAcrossManagerDomains",
+        "TestArithmeticFragmentProbesCPP",
+        "TestArithmeticQFUFNRAMetadataGuardsCPP"
       ],
       "conditionals": [
         {
@@ -40299,6 +40319,31 @@
             "TestContextSimplifyTraceScopeRestorationAndProofLifetime",
             "TestContextSimplifyClosedTraceAndCleanupRefusal",
             "TestContextSimplifyTranslationParameterSnapshot",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Registered retained add-bounds clean factory for SMT-LIB check-sat-using: source rational parameters, introduced-bound under-approximation, unknown on under-approximated UNSAT, models/scopes and proof-mode behavior",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/tactic_commands.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -130507,29 +130552,182 @@
       "path": "src/tactic/arith/add_bounds_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
+      "status": "ported",
       "go_targets": [
         "pkg/cmd/g3/main_test.go",
-        "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2"
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2",
+        "pkg/tactic/arith/add_bounds_tactic.go",
+        "pkg/tactic/arith/unbounded_probe.go",
+        "pkg/tactic/arith/probe_arith.go",
+        "pkg/tactic/arith/add_bounds_tactic_test.go",
+        "pkg/tactic/arith/add_bounds_cpp_test.go",
+        "pkg/tactic/arith/probe_arith_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
       ],
       "tests": [
-        "TestSMTLibRunnerUTVPINonincrementalStrategyGap"
+        "TestSMTLibRunnerUTVPINonincrementalStrategyGap",
+        "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+        "TestAddBoundsConstructorAllocationFrontiers",
+        "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+        "TestAddBoundsTranslationAndRationalParameterSnapshot",
+        "TestArithmeticFragmentProbeNativeContracts",
+        "TestArithmeticFragmentProbeAcrossManagerDomains",
+        "TestArithmeticFragmentProbesCPP",
+        "TestArithmeticQFUFNRAMetadataGuardsCPP",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_unbounded_proc/is_unbounded/is_unbounded_probe/mk_is_unbounded_probe: collect actual goal bounds, visit original expression DAG in source postorder including quantifier metadata, and detect arithmetic uninterpreted constants missing either bound; typed ProbeEvaluator ownership/composition",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/add_bounds_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "add_bounds_tactic::imp construction/updt_params/add_bound_proc/operator(): rational lower/upper defaults and sequential policy updates, empty uncollected bound_manager, both source lower/upper absence tests and their LE-upper/GE-lower insertions, one visit per original shared expression and fixed initial goal size",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/add_bounds_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "add_bounds_tactic constructor/destructor/translate/updt_params/collect_param_descrs/operator()/cleanup and mk_add_bounds_tactic: stored parameter snapshots, two exact numeral descriptors, target-manager reconstruction, converter/core reset, depth and retained subgoal publication, UNDER precision union only after inserted bounds, progress/TRACE and build-before-swap clean factory",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/add_bounds_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns its parameter snapshot, active numeric policy and pending real rational/default temporaries; parsed values are copied into native big.Rat policy fields. The active visitor borrows its goal and original handles, and owns a fresh bound manager until unwind. Source numeric constructors receive a scoped AST reference until assertion publication. Cleanup builds replacement policy before swapping; failed constructors whose real unwind refuses expose the already charged owner through memory.ConstructionFailure. The probe owns its cold reference metadata and any bound-manager cleanup still outstanding, borrowing parameter/global services. Returned goals own appended assertions/proofs independently of the tactic."
+      ],
       "deviations": [
-        "Confirmed integration gap: the native nonincremental strategic pipeline solves the mixed integer/real sum fixture as SAT, while its incremental UTVPI core (after push) refuses a fractional Int candidate as UNKNOWN. Go currently uses the direct core and returns UNKNOWN in both cases. The explicit gap regression verifies those separate results; it is not part of the strict C++ agreement count. The strategic pipeline remains unported."
+        "Preserves the source add-bounds quirk: its bound manager is never populated from the goal, so both bounds are appended even to already bounded variables. The is-unbounded probe does populate its own manager. No optimization or repaired interpretation is substituted.",
+        "Native Go traversal frames/maps and big.Rat policy storage replace C++ traversal containers and persistent rational wrappers. The original-root snapshot and postorder visitation, including quantifier bodies/patterns/no-patterns, are preserved without copying STL or fast-mark layout. Parameter reads still use the real typed ParamsContext numeral getter, including its source type conversions.",
+        "The Go probe borrows the concrete bound-manager parameter/global service domain. Native invalid/copy/closed-owner inputs receive explicit errors. Constructors/finalizers retain any actual cleanup roots rather than relying on C++ destructor unwinding."
       ]
     },
     {
       "path": "src/tactic/arith/add_bounds_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/add_bounds_tactic.go",
+        "pkg/tactic/arith/unbounded_probe.go",
+        "pkg/tactic/arith/probe_arith.go",
+        "pkg/tactic/arith/add_bounds_tactic_test.go",
+        "pkg/tactic/arith/add_bounds_cpp_test.go",
+        "pkg/tactic/arith/probe_arith_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+      ],
+      "tests": [
+        "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+        "TestAddBoundsConstructorAllocationFrontiers",
+        "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+        "TestAddBoundsTranslationAndRationalParameterSnapshot",
+        "TestArithmeticFragmentProbeNativeContracts",
+        "TestArithmeticFragmentProbeAcrossManagerDomains",
+        "TestArithmeticFragmentProbesCPP",
+        "TestArithmeticQFUFNRAMetadataGuardsCPP",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -130540,11 +130738,117 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_unbounded_proc/is_unbounded/is_unbounded_probe/mk_is_unbounded_probe: collect actual goal bounds, visit original expression DAG in source postorder including quantifier metadata, and detect arithmetic uninterpreted constants missing either bound; typed ProbeEvaluator ownership/composition",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/add_bounds_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "add_bounds_tactic::imp construction/updt_params/add_bound_proc/operator(): rational lower/upper defaults and sequential policy updates, empty uncollected bound_manager, both source lower/upper absence tests and their LE-upper/GE-lower insertions, one visit per original shared expression and fixed initial goal size",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/add_bounds_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "add_bounds_tactic constructor/destructor/translate/updt_params/collect_param_descrs/operator()/cleanup and mk_add_bounds_tactic: stored parameter snapshots, two exact numeral descriptors, target-manager reconstruction, converter/core reset, depth and retained subgoal publication, UNDER precision union only after inserted bounds, progress/TRACE and build-before-swap clean factory",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/add_bounds_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns its parameter snapshot, active numeric policy and pending real rational/default temporaries; parsed values are copied into native big.Rat policy fields. The active visitor borrows its goal and original handles, and owns a fresh bound manager until unwind. Source numeric constructors receive a scoped AST reference until assertion publication. Cleanup builds replacement policy before swapping; failed constructors whose real unwind refuses expose the already charged owner through memory.ConstructionFailure. The probe owns its cold reference metadata and any bound-manager cleanup still outstanding, borrowing parameter/global services. Returned goals own appended assertions/proofs independently of the tactic."
+      ],
+      "deviations": [
+        "Preserves the source add-bounds quirk: its bound manager is never populated from the goal, so both bounds are appended even to already bounded variables. The is-unbounded probe does populate its own manager. No optimization or repaired interpretation is substituted.",
+        "Native Go traversal frames/maps and big.Rat policy storage replace C++ traversal containers and persistent rational wrappers. The original-root snapshot and postorder visitation, including quantifier bodies/patterns/no-patterns, are preserved without copying STL or fast-mark layout. Parameter reads still use the real typed ParamsContext numeral getter, including its source type conversions.",
+        "The Go probe borrows the concrete bound-manager parameter/global service domain. Native invalid/copy/closed-owner inputs receive explicit errors. Constructors/finalizers retain any actual cleanup roots rather than relying on C++ destructor unwinding."
+      ]
     },
     {
       "path": "src/tactic/arith/arith_bounds_tactic.cpp",
@@ -133819,22 +134123,222 @@
       "path": "src/tactic/arith/probe_arith.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/add_bounds_tactic.go",
+        "pkg/tactic/arith/unbounded_probe.go",
+        "pkg/tactic/arith/probe_arith.go",
+        "pkg/tactic/arith/add_bounds_tactic_test.go",
+        "pkg/tactic/arith/add_bounds_cpp_test.go",
+        "pkg/tactic/arith/probe_arith_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+      ],
+      "tests": [
+        "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+        "TestAddBoundsConstructorAllocationFrontiers",
+        "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+        "TestAddBoundsTranslationAndRationalParameterSnapshot",
+        "TestArithmeticFragmentProbeNativeContracts",
+        "TestArithmeticFragmentProbeAcrossManagerDomains",
+        "TestArithmeticFragmentProbesCPP",
+        "TestArithmeticQFUFNRAMetadataGuardsCPP",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_non_qflira_functor/is_non_qfauflira_functor and QF_LIA/QF_AUFLIA/QF_LRA/QF_LIRA probe classes/factories: exact sort gates, binary numeral-first multiplication, cast rules, UF-constant versus UF-application checks and source array-operation refusal",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/probe_arith.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "is_lp/is_ilp and is_ilp_probe/mk_is_ilp_probe: positive arithmetic equalities or comparisons after stripping negations, strict QF_LIA recognition and non-Boolean term-ITE refusal",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/probe_arith.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "is_non_nira_functor and QF_NIA/QF_NRA/NIA/NRA/NIRA/LIA/LRA/LIRA probes/factories: exact quantified-variable sorts, arithmetic operator/cast/divisor/power/irrational branches, numeral-first linear multiplication and source is_int real-flag rejection; rejection TRACE with compatible printer domain",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/probe_arith.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "is_non_qfufnra_functor/is_qfufnra/is_qfufnra_probe/mk_is_qfufnra_probe: source permissive foreign theories, binary-real-product/nonlinear power witness, numeral divisor/exponent restrictions, cast refusal and proof/core short-circuit gates",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/probe_arith.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "arith_degree_probe/arith_bw_probe and average/maximum degree/coefficient-bit-width factories",
+          "status": "unported"
+        },
+        {
+          "name": "is_mip/is_mip_probe/mk_is_mip_probe",
+          "status": "dead_deleted",
+          "reason": "No probe registration; its only source consumer is inside the disabled #if 0 MIP strategy in src/tactic/smtlogics/qflra_tactic.cpp. Omitted under the retained-consumer rule."
+        }
+      ],
+      "ownership": [
+        "ArithmeticFragmentProbe owns only its charged reference metadata and kind. It borrows compatible printer configuration and trace output; Eval itself retains no AST nodes or goal state and classifies the supplied manager domain independently. Traversal maps/frames borrow handles only within the call. The existing typed ProbeEvaluator composition increments/decrements the child owner. Diagnostic formats and temporary text streams release their concrete roots."
+      ],
+      "deviations": [
+        "The retained fourteen Boolean fragment/ILP probe classes share cold typed metadata and switch over concrete source algorithms; there are no any-valued adapters or generic template ports. Polynomial degree and coefficient-width statistics remain explicitly unported.",
+        "Preserves syntactic quirks rather than mathematical generalization: QF linear probes require numeral-first binary products and reject subtraction/unary-minus forms; QF_AUFLIA accepts array-sorted UF terms but rejects array-family select/store operations; QF_UFNRA requires its actual nonlinear witness and retains the source permissive other-theory behavior.",
+        "The MIP probe family is omitted because its only source consumer is disabled. Source process printer globals become borrowed compatible native configuration, with a current-domain/default printer when evaluated against a different manager domain."
+      ]
     },
     {
       "path": "src/tactic/arith/probe_arith.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/add_bounds_tactic.go",
+        "pkg/tactic/arith/unbounded_probe.go",
+        "pkg/tactic/arith/probe_arith.go",
+        "pkg/tactic/arith/add_bounds_tactic_test.go",
+        "pkg/tactic/arith/add_bounds_cpp_test.go",
+        "pkg/tactic/arith/probe_arith_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+        "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+      ],
+      "tests": [
+        "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+        "TestAddBoundsConstructorAllocationFrontiers",
+        "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+        "TestAddBoundsTranslationAndRationalParameterSnapshot",
+        "TestArithmeticFragmentProbeNativeContracts",
+        "TestArithmeticFragmentProbeAcrossManagerDomains",
+        "TestArithmeticFragmentProbesCPP",
+        "TestArithmeticQFUFNRAMetadataGuardsCPP",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -133845,11 +134349,159 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_non_qflira_functor/is_non_qfauflira_functor and QF_LIA/QF_AUFLIA/QF_LRA/QF_LIRA probe classes/factories: exact sort gates, binary numeral-first multiplication, cast rules, UF-constant versus UF-application checks and source array-operation refusal",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/probe_arith.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "is_lp/is_ilp and is_ilp_probe/mk_is_ilp_probe: positive arithmetic equalities or comparisons after stripping negations, strict QF_LIA recognition and non-Boolean term-ITE refusal",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/probe_arith.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "is_non_nira_functor and QF_NIA/QF_NRA/NIA/NRA/NIRA/LIA/LRA/LIRA probes/factories: exact quantified-variable sorts, arithmetic operator/cast/divisor/power/irrational branches, numeral-first linear multiplication and source is_int real-flag rejection; rejection TRACE with compatible printer domain",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/probe_arith.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "is_non_qfufnra_functor/is_qfufnra/is_qfufnra_probe/mk_is_qfufnra_probe: source permissive foreign theories, binary-real-product/nonlinear power witness, numeral divisor/exponent restrictions, cast refusal and proof/core short-circuit gates",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/probe_arith.go",
+          "go_targets": [
+            "pkg/tactic/arith/add_bounds_tactic.go",
+            "pkg/tactic/arith/unbounded_probe.go",
+            "pkg/tactic/arith/probe_arith.go",
+            "pkg/tactic/arith/add_bounds_tactic_test.go",
+            "pkg/tactic/arith/add_bounds_cpp_test.go",
+            "pkg/tactic/arith/probe_arith_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/add_bounds_boolean_precise.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_default_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_existing_bounds.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_fractional_real.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_negative_params.smt2",
+            "pkg/cmd/g3/test_vectors/add_bounds_proof_under.smt2"
+          ],
+          "tests": [
+            "TestAddBoundsExactGoalsAndUnboundedProbeCPP",
+            "TestAddBoundsConstructorAllocationFrontiers",
+            "TestAddBoundsPrecisionTraceAndCleanupRefusal",
+            "TestAddBoundsTranslationAndRationalParameterSnapshot",
+            "TestArithmeticFragmentProbeNativeContracts",
+            "TestArithmeticFragmentProbeAcrossManagerDomains",
+            "TestArithmeticFragmentProbesCPP",
+            "TestArithmeticQFUFNRAMetadataGuardsCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "arith_degree_probe/arith_bw_probe and average/maximum degree/coefficient-bit-width factories",
+          "status": "unported"
+        },
+        {
+          "name": "is_mip/is_mip_probe/mk_is_mip_probe",
+          "status": "dead_deleted",
+          "reason": "No probe registration; its only source consumer is inside the disabled #if 0 MIP strategy in src/tactic/smtlogics/qflra_tactic.cpp. Omitted under the retained-consumer rule."
+        }
+      ],
+      "ownership": [
+        "ArithmeticFragmentProbe owns only its charged reference metadata and kind. It borrows compatible printer configuration and trace output; Eval itself retains no AST nodes or goal state and classifies the supplied manager domain independently. Traversal maps/frames borrow handles only within the call. The existing typed ProbeEvaluator composition increments/decrements the child owner. Diagnostic formats and temporary text streams release their concrete roots."
+      ],
+      "deviations": [
+        "The retained fourteen Boolean fragment/ILP probe classes share cold typed metadata and switch over concrete source algorithms; there are no any-valued adapters or generic template ports. Polynomial degree and coefficient-width statistics remain explicitly unported.",
+        "Preserves syntactic quirks rather than mathematical generalization: QF linear probes require numeral-first binary products and reject subtraction/unary-minus forms; QF_AUFLIA accepts array-sorted UF terms but rejects array-family select/store operations; QF_UFNRA requires its actual nonlinear witness and retains the source permissive other-theory behavior.",
+        "The MIP probe family is omitted because its only source consumer is disabled. Source process printer globals become borrowed compatible native configuration, with a current-domain/default printer when evaluated against a different manager domain."
+      ]
     },
     {
       "path": "src/tactic/arith/propagate_ineqs_tactic.cpp",

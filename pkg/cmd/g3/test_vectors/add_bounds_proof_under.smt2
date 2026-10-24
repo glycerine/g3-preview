@@ -1,0 +1,6 @@
+(set-logic QF_LIA)
+(set-option :produce-proofs true)
+(declare-const x Int)
+(assert (> x 4))
+(check-sat-using (then add-bounds smt))
+(get-info :reason-unknown)
