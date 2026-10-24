@@ -1,0 +1,8 @@
+(set-logic QF_BV)
+(set-option :produce-proofs true)
+(declare-const x (_ BitVec 8))
+(declare-const y (_ BitVec 8))
+(declare-const z (_ BitVec 8))
+(assert (= (bvor x y z) #x00))
+(assert (= x #x01))
+(check-sat-using (then max-bv-sharing smt))

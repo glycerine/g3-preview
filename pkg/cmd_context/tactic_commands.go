@@ -11,13 +11,26 @@ import (
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/tactic/arith"
+	"github.com/glycerine/g3/pkg/tactic/bv"
 	"github.com/glycerine/g3/pkg/tactic/core"
 	"github.com/glycerine/g3/pkg/tactic/smtlogics"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
+
+// TacticCommandFailure is the caught source z3_exception branch of the
+// check-sat-using command. The parser prints its diagnostic and continues.
+// Source z3_error values and Go ownership failures continue to propagate.
+type TacticCommandFailure struct {
+	Cause   error
+	Message string
+}
+
+func (e TacticCommandFailure) Error() string { return e.Message }
+func (e TacticCommandFailure) Unwrap() error { return e.Cause }
 
 // NewBuiltinTactic returns the uncounted tactic produced by a retained native
 // factory. The parser or composition wrapper must acquire its own reference.
@@ -26,7 +39,7 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return nil, err
 	}
 	switch name {
-	case "smt", "simplify", "elim-and", "propagate-values", "propagate-ineqs", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
+	case "smt", "simplify", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -45,6 +58,8 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return core.NewPropagateValuesTactic(m, c.config.Params, c.config.Globals, nil)
 	case "propagate-ineqs":
 		return arith.MakePropagateIneqsTactic(m, c.config.Params, nil)
+	case "max-bv-sharing":
+		return bv.MakeMaxBVSharingTactic(m, c.config.Params, nil, c.config.ModelEvaluator.Cooperation)
 	case "solve-eqs":
 		return core.MakeSolveEquationsTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
 	case "elim-uncnstr":
@@ -233,6 +248,25 @@ func (c *Context) CheckSatUsing(selected tactic.Tactic, options *uparams.ParamsR
 	}
 	status, reason, checkErr := tactic.CheckSat(wrapped, goal, &md, &labels, proofRef, &dep)
 	if checkErr != nil {
+		var fatal z3exception.Z3Error
+		var source z3exception.Z3Exception
+		if !errors.As(checkErr, &fatal) && errors.As(checkErr, &source) {
+			if e := c.tacticResult.SetStatus(lbool.Undef); e != nil {
+				return lbool.Undef, errors.Join(checkErr, e)
+			}
+			if e := c.tacticResult.SetReasonUnknown(source.Message()); e != nil {
+				return lbool.Undef, errors.Join(checkErr, e)
+			}
+			c.status, c.checked = lbool.Undef, true
+			stats, e := c.tacticResult.Statistics()
+			if e != nil {
+				return lbool.Undef, errors.Join(checkErr, e)
+			}
+			for key, value := range wrapped.CollectStatistics() {
+				stats.UpdateDouble(statistics.Key(key), value)
+			}
+			return lbool.Undef, TacticCommandFailure{Cause: checkErr, Message: source.Message()}
+		}
 		return lbool.Undef, checkErr
 	}
 	r := c.tacticResult

@@ -1,0 +1,6 @@
+(set-logic QF_BV)
+(set-option :produce-models true)
+(declare-const p Bool)
+(assert p)
+(check-sat-using (then (using-params max-bv-sharing :max_steps 0 :max_memory 0) smt))
+(get-value (p))

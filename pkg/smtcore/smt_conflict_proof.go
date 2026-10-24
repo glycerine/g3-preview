@@ -222,6 +222,12 @@ func (b *smtConflictProofBuilder) clauseProof(clause *SMTClause) (ast.ASTHandle,
 }
 
 func (b *smtConflictProofBuilder) literalProof(literal SMTLiteral) (ast.ASTHandle, error) {
+	// Source context initialization gives true_bool_var a true-proof
+	// justification. The Go state keeps this reserved variable out of the
+	// ordinary Boolean data table.
+	if literal == SMTTrueLiteral {
+		return b.state.manager.MkProofTrue()
+	}
 	if proof, found := b.literal[literal]; found {
 		return proof, nil
 	}

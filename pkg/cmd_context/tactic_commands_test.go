@@ -1,12 +1,55 @@
 package cmd_context
 
 import (
+	"errors"
+	"fmt"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
+
+type commandExceptionTactic struct {
+	tactic.Tactic
+	failure error
+}
+
+func (t *commandExceptionTactic) Apply(*tactic.Goal, *tactic.TacticResult) error { return t.failure }
+
+func TestCommandContextTacticExceptionBoundary(t *testing.T) {
+	for _, entry := range []struct {
+		name    string
+		failure error
+		caught  bool
+	}{
+		{"source", fmt.Errorf("Go operation context: %w", z3exception.NewDefaultException("rewriter stopped")), true},
+		{"fatal", z3exception.MustZ3Error(z3exception.ErrorInternalFatal), false},
+		{"owner", arena.ErrInvalidSlot, false},
+	} {
+		t.Run(entry.name, func(t *testing.T) {
+			c := contextFixture(t)
+			selected := &commandExceptionTactic{Tactic: tactic.NewSkipTactic(), failure: entry.failure}
+			status, err := c.CheckSatUsing(selected, nil)
+			var command TacticCommandFailure
+			if errors.As(err, &command) != entry.caught || status != lbool.Undef || !errors.Is(err, entry.failure) {
+				t.Fatal("exception classification", status, err)
+			}
+			if entry.caught {
+				if command.Error() != "rewriter stopped" {
+					t.Fatal("source message gained Go context", command.Error())
+				}
+				reason, err := c.ReasonUnknown()
+				contextMust(t, err)
+				if reason != "rewriter stopped" {
+					t.Fatal("caught result reason", reason)
+				}
+			}
+		})
+	}
+}
 
 func TestCommandContextTacticResultsScopesAndModelLifetime(t *testing.T) {
 	c := contextFixture(t)

@@ -124,6 +124,9 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 			return nil
 		}
 		if literal == SMTFalseLiteral {
+			if !proof.IsNull() {
+				removedFalse = append(removedFalse, SMTTrueLiteral)
+			}
 			continue
 		}
 		if _, found := seen[literal.Negated()]; found {
@@ -679,6 +682,21 @@ func (s *SMTInternalizerState) argumentLiterals(expression ast.ASTHandle) ([]SMT
 func (s *SMTInternalizerState) clauseLiteralExpressions(literals []SMTLiteral) ([]ast.ASTHandle, error) {
 	result := make([]ast.ASTHandle, len(literals))
 	for index, literal := range literals {
+		// The reserved true variable has no boolExpr entry in the Go
+		// table. Gate definitions still include true/false literals before
+		// clause simplification, so reconstruct their source expressions.
+		if literal == SMTTrueLiteral || literal == SMTFalseLiteral {
+			var err error
+			if literal == SMTTrueLiteral {
+				result[index], err = s.manager.MkTrue()
+			} else {
+				result[index], err = s.manager.MkFalse()
+			}
+			if err != nil {
+				return nil, err
+			}
+			continue
+		}
 		expression, err := s.BoolExpression(literal.Var())
 		if err != nil {
 			return nil, err

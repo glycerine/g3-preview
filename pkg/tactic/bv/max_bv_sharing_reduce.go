@@ -1,7 +1,13 @@
 // Source: src/tactic/bv/max_bv_sharing_tactic.cpp:29-226.
 package bv
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"fmt"
+	"io"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 type expressionPair struct{ left, right ast.ASTHandle }
 
@@ -14,6 +20,7 @@ type SharingReducer struct {
 	maxArgs uint32
 	pairs   [4]map[expressionPair]struct{}
 	roots   []ast.ASTRef
+	trace   *diagnostic.TraceTags
 	closed  bool
 }
 
@@ -146,6 +153,9 @@ func (r *SharingReducer) ReduceApp(decl ast.ASTHandle, args []ast.ASTHandle) (as
 				if e != nil {
 					return ast.ASTHandle{}, false, e
 				}
+				if e = r.traceDetail(132, fmt.Sprintf("reusing args: %d %d\n", i, j)); e != nil {
+					return ast.ASTHandle{}, false, e
+				}
 				work[i] = h
 				work = append(work[:j], work[j+1:]...)
 				reused = true
@@ -156,7 +166,15 @@ func (r *SharingReducer) ReduceApp(decl ast.ASTHandle, args []ast.ASTHandle) (as
 			break
 		}
 	}
+	if len(work) == 1 {
+		if e = r.traceDetail(176, "tree-loop: num_args: 1\n"); e != nil {
+			return ast.ASTHandle{}, false, e
+		}
+	}
 	for len(work) > 1 {
+		if e = r.traceDetail(176, fmt.Sprintf("tree-loop: num_args: %d\n", len(work))); e != nil {
+			return ast.ASTHandle{}, false, e
+		}
 		next := make([]ast.ASTHandle, 0, (len(work)+1)/2)
 		for i := 0; i < len(work); i += 2 {
 			if i+1 == len(work) {
@@ -188,7 +206,19 @@ func (r *SharingReducer) ReduceApp(decl ast.ASTHandle, args []ast.ASTHandle) (as
 	return result, true, nil
 }
 
-func (r *SharingReducer) Close() error {
+func (r *SharingReducer) traceDetail(line int, text string) error {
+	tags := r.trace
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	err := tags.EmitConditional("bv_sharing_detail", "reduce_ac_app", "src/tactic/bv/max_bv_sharing_tactic.cpp", line, func() bool { return true }, func(w io.Writer) error { _, err := io.WriteString(w, text); return err })
+	if tags.IsStreamFailure(err) {
+		return nil
+	}
+	return err
+}
+
+func (r *SharingReducer) clearPairs() error {
 	if r == nil {
 		return ast.ErrASTHandle
 	}
@@ -207,6 +237,16 @@ func (r *SharingReducer) Close() error {
 		r.roots = r.roots[:i]
 	}
 	r.pairs = [4]map[expressionPair]struct{}{}
+	return nil
+}
+
+func (r *SharingReducer) Close() error {
+	if r == nil {
+		return ast.ErrASTHandle
+	}
+	if err := r.clearPairs(); err != nil {
+		return err
+	}
 	r.closed = true
 	return nil
 }

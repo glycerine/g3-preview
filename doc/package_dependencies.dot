@@ -113,6 +113,7 @@ digraph packages {
   "cmd_context" -> "solver";
   "cmd_context" -> "tactic";
   "cmd_context" -> "tactic/arith";
+  "cmd_context" -> "tactic/bv";
   "cmd_context" -> "tactic/core";
   "cmd_context" -> "tactic/portfolio";
   "cmd_context" -> "tactic/smtlogics";
@@ -124,6 +125,7 @@ digraph packages {
   "cmd_context" -> "util/statistics";
   "cmd_context" -> "util/symbol";
   "cmd_context" -> "util/text";
+  "cmd_context" -> "util/z3exception";
   "engine" [style=filled, fillcolor="#eeeeee"];
   "engine" -> "ackermannization";
   "engine" -> "arena";
@@ -409,10 +411,13 @@ digraph packages {
   "tactic/bv" [style=filled, fillcolor="#eeeeee"];
   "tactic/bv" -> "arena";
   "tactic/bv" -> "ast";
+  "tactic/bv" -> "ast/rewriter";
   "tactic/bv" -> "tactic";
   "tactic/bv" -> "util/cooperate";
+  "tactic/bv" -> "util/diagnostic";
   "tactic/bv" -> "util/memory";
   "tactic/bv" -> "util/params";
+  "tactic/bv" -> "util/symbol";
   "tactic/core" [style=filled, fillcolor="#eeeeee"];
   "tactic/core" -> "arena";
   "tactic/core" -> "ast";

@@ -870,6 +870,7 @@
         "solver",
         "tactic",
         "tactic/arith",
+        "tactic/bv",
         "tactic/core",
         "tactic/portfolio",
         "tactic/smtlogics",
@@ -880,7 +881,8 @@
         "util/params",
         "util/statistics",
         "util/symbol",
-        "util/text"
+        "util/text",
+        "util/z3exception"
       ],
       "production_files": [
         "applications.go",
@@ -2833,15 +2835,19 @@
       "imports": [
         "arena",
         "ast",
+        "ast/rewriter",
         "tactic",
         "util/cooperate",
+        "util/diagnostic",
         "util/memory",
-        "util/params"
+        "util/params",
+        "util/symbol"
       ],
       "production_files": [
         "max_bv_sharing_goal.go",
-        "max_bv_sharing_proof.go",
-        "max_bv_sharing_reduce.go"
+        "max_bv_sharing_reduce.go",
+        "max_bv_sharing_tactic.go",
+        "max_bv_sharing_traversal.go"
       ]
     },
     {

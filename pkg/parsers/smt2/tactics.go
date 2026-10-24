@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/glycerine/g3/pkg/cmd_context"
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
@@ -278,6 +279,11 @@ func (p *commandParser) checkSatUsing() (err error) {
 	}
 	status, err := p.context.CheckSatUsing(selected, &options)
 	if err != nil {
+		var failure cmd_context.TacticCommandFailure
+		if errors.As(err, &failure) {
+			_, err = fmt.Fprintf(p.out, "(error \"tactic failed: %s\")\n", failure.Error())
+			return err
+		}
 		return err
 	}
 	text := "unknown"

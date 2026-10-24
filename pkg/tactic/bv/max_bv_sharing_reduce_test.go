@@ -111,7 +111,9 @@ func TestSharingGoalPassSourceParamsAndResourceLimits(t *testing.T) {
 	limited, e := tactic.NewGoal(m, false, true, false)
 	sharingMust(t, e)
 	t.Cleanup(func() { sharingMust(t, limited.Close()) })
-	sharingMust(t, limited.Assert(p))
+	notP, e := m.MkNot(p)
+	sharingMust(t, e)
+	sharingMust(t, limited.Assert(notP))
 	stepsKey := "max_steps"
 	sharingMust(t, ctx.SetUIntName(params, &stepsKey, 0))
 	sharingMust(t, pass.UpdateParams(ctx, params))
@@ -190,7 +192,9 @@ func TestSharingGoalPassReadsSharedProcessMemory(t *testing.T) {
 	goal, e := tactic.NewGoal(m, false, true, false)
 	sharingMust(t, e)
 	t.Cleanup(func() { sharingMust(t, goal.Close()) })
-	sharingMust(t, goal.Assert(atom))
+	notAtom, e := m.MkNot(atom)
+	sharingMust(t, e)
+	sharingMust(t, goal.Assert(notAtom))
 	key := "max_memory"
 	sharingMust(t, c.SetUIntName(&v, &key, 1))
 	pass, e := NewSharingGoalPassWithParams(m, c, &v)

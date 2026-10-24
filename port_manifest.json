@@ -39446,7 +39446,9 @@
         "TestEliminateUnconstrainedBVProofGuardAndCPPApply",
         "TestEliminateUnconstrainedExactTraceAndStreamRefusal",
         "TestQFAUFLIATacticModelConverterSurvivesStrategyClose",
-        "TestQFAUFLIATacticTranslationAndProofLifetime"
+        "TestQFAUFLIATacticTranslationAndProofLifetime",
+        "TestCommandContextTacticExceptionBoundary",
+        "TestSMTLibRunnerMaxBVSharingStepFrontiers"
       ],
       "conditionals": [
         {
@@ -39608,6 +39610,20 @@
         {
           "name": "remaining apply/help/user-tactic/probe command integration and execution options (src/cmd_context/tactic_cmds.cpp)",
           "status": "unported"
+        },
+        {
+          "name": "check_sat_using_tactict_cmd::execute source z3_exception diagnostic/reason/statistics publication and command continuation, preserving z3_error rethrow; selected max-bv-sharing factory wiring",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/tactic_commands.go",
+          "go_targets": [
+            "pkg/parsers/smt2/tactics.go",
+            "pkg/cmd_context/tactic_commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextTacticExceptionBoundary",
+            "TestSMTLibRunnerMaxBVSharingStepFrontiers"
+          ]
         }
       ],
       "ownership": [
@@ -109728,7 +109744,9 @@
         "pkg/smtcore/smt_internalizer_test.go",
         "pkg/smtcore/smt_relevancy.go",
         "pkg/smtcore/smt_relevancy_test.go",
-        "pkg/smtcore/theory_arith_bounded_disequalities_test.go"
+        "pkg/smtcore/theory_arith_bounded_disequalities_test.go",
+        "pkg/smtcore/smt_conflict_proof.go",
+        "pkg/cmd/g3/test_vectors/max_bv_sharing_proofs.smt2"
       ],
       "tests": [
         "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
@@ -109770,7 +109788,8 @@
         "TestSMTInternalizerScopedEnodeFlagOnExistingGate",
         "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits",
         "TestSMTRelevancyNegatedArgumentsAndLiteralWatches",
-        "TestSMTBoundedWeightedDisequalitiesModel"
+        "TestSMTBoundedWeightedDisequalitiesModel",
+        "TestSMTInternalizerGateProofReservedConstants"
       ],
       "conditionals": [
         {
@@ -110302,6 +110321,18 @@
             "TestSMTBoundedWeightedDisequalitiesModel",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Gate proof literal reconstruction for reserved true/false variable and resolution of discarded false disjuncts through the true-proof justification installed by source smt_context.cpp:246-255",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer.go",
+          "go_targets": [
+            "pkg/smtcore/smt_conflict_proof.go",
+            "pkg/smtcore/smt_internalizer_test.go"
+          ],
+          "tests": [
+            "TestSMTInternalizerGateProofReservedConstants"
           ]
         }
       ],
@@ -133704,11 +133735,15 @@
       "path": "src/tactic/bv/max_bv_sharing_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/bv/max_bv_sharing_reduce.go",
         "pkg/tactic/bv/max_bv_sharing_goal.go",
-        "pkg/tactic/bv/max_bv_sharing_proof.go"
+        "pkg/tactic/bv/max_bv_sharing_traversal.go",
+        "pkg/tactic/bv/max_bv_sharing_tactic.go",
+        "pkg/tactic/bv/max_bv_sharing_reduce_test.go",
+        "pkg/tactic/bv/max_bv_sharing_tactic_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSharingReducerOrderedPairsReuseAndNumeralPosition",
@@ -133719,7 +133754,11 @@
         "TestSharingGoalPassProofQuantifierIntroduction",
         "TestSharingGoalPassSourceParamsAndResourceLimits",
         "TestSharingGoalPassConstantITEPrunesUnselectedPairCache",
-        "TestSharingGoalPassReadsSharedProcessMemory"
+        "TestSharingGoalPassReadsSharedProcessMemory",
+        "TestMaxBVSharingCPPGoalShapes",
+        "TestMaxBVSharingLifecycleAndTrace",
+        "TestMaxBVSharingAllocationFrontiers",
+        "TestSMTLibRunnerMaxBVSharingStepFrontiers"
       ],
       "conditionals": [
         {
@@ -133753,8 +133792,8 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "rw_cfg concrete BV expr-pair caches and reduce_ac_app ordered reuse/tree grouping",
@@ -133766,7 +133805,7 @@
         },
         {
           "name": "goal application, bottom-up AST and quantifier traversal, nonproof constant-ITE branch pruning, pair reuse across sequential goal updates, and depth transition",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/bv/max_bv_sharing_goal.go",
           "tests": [
             "TestSharingGoalPassReusesEarlierFormulaAndUpdatesDepth",
@@ -133777,7 +133816,7 @@
         {
           "name": "proof-enabled local rewrite, congruence, transitivity, quantifier introduction, and goal modus ponens",
           "status": "ported",
-          "go_target": "pkg/tactic/bv/max_bv_sharing_proof.go",
+          "go_target": "pkg/tactic/bv/max_bv_sharing_traversal.go",
           "tests": [
             "TestSharingGoalPassProofChainsCongruenceAndRewrite",
             "TestSharingGoalPassProofQuantifierIntroduction"
@@ -133785,29 +133824,63 @@
         },
         {
           "name": "rw_cfg updt_params and max_steps_exceeded settings for max_args, max_steps, and max_memory",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/bv/max_bv_sharing_goal.go",
           "tests": [
             "TestSharingGoalPassSourceParamsAndResourceLimits",
             "TestSharingGoalPassReadsSharedProcessMemory"
           ]
+        },
+        {
+          "name": "Source rewriter_tpl proof/no-proof traversal, shared caches, exact resource checkpoints, sequential goal updates and standard tactic lifecycle, copied parameters, cleanup, translation, descriptors, live traces and clean factory",
+          "status": "ported",
+          "go_target": "pkg/tactic/bv/max_bv_sharing_tactic.go",
+          "go_targets": [
+            "pkg/tactic/bv/max_bv_sharing_traversal.go",
+            "pkg/tactic/bv/max_bv_sharing_tactic_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestMaxBVSharingCPPGoalShapes",
+            "TestMaxBVSharingLifecycleAndTrace",
+            "TestMaxBVSharingAllocationFrontiers",
+            "TestSMTLibRunnerMaxBVSharingStepFrontiers"
+          ]
+        },
+        {
+          "name": "Disabled #if 0 chain circuit and unused ref_count_lt comparator/sort alternatives have no retained consumer",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
-        "The concrete reducer retains cached pair operands and generated apps as AST roots through Close. The goal pass retains rebuilt applications, quantifiers, and proof nodes until goal updates acquire their own roots. On successful publication, Apply adds an independent goal reference corresponding to goal_ref_buffer::push_back; the caller releases it with DecRef. Parameter values are copied from the borrowed ParamsContext; full tactic lifecycle remains unported."
+        "The tactic owns a parameter snapshot and a concrete implementation containing the original rewriter traversal, pair reducer and output/proof references. Pair operands and intermediate applications remain pinned until successful pair-cache cleanup; traversal caches and outputs retain their own roots. Cleanup constructs a replacement and retains a stopped retirement for retry. Translation owns independent implementation state. Successful results borrow the input goal; the legacy concrete goal API explicitly adds its independent reference. Constructor, proof-enabled apply and populated-cleanup allocation campaigns pass with zero charged storage after fixture teardown."
       ],
       "deviations": [
-        "The four obj_pair_hashtable<expr,expr> instantiations use typed Go maps keyed by ordered AST-handle pairs; C++ hash buckets are not retained.",
-        "The max_memory guard reads the AST numeral Runtime's source allocation counter, including other Runtimes with the same ProcessAccounting owner. AST arena allocations remain outside that counter. Rewriter frame steps are counted along the concrete recursive traversal; conditional-fold and cache-shortcut step equivalence remains unaudited."
+        "Native typed Go maps and ASTRef trails replace ordered expression-pair hash tables and source temporary containers. The former recursive goal/proof walkers are removed; both public APIs use the original ported rewriter_tpl traversal, including proof specialization, cache decisions, constant-ITE pruning and resource callback ordering.",
+        "The source std::move(m_params) in cleanup binds its copy constructor because this fork defines no params_ref move constructor; the stored snapshot is preserved across repeated cleanup and translation. The inactive chain circuit and unused comparator are omitted.",
+        "Go allocation refusal preserves retryable cleanup ownership when rebuilding the implementation. Source undefined/assertion-excluded inputs retain explicit Go domain errors."
       ]
     },
     {
       "path": "src/tactic/bv/max_bv_sharing_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/bv/max_bv_sharing_reduce.go",
+        "pkg/tactic/bv/max_bv_sharing_goal.go",
+        "pkg/tactic/bv/max_bv_sharing_traversal.go",
+        "pkg/tactic/bv/max_bv_sharing_tactic.go",
+        "pkg/tactic/bv/max_bv_sharing_reduce_test.go",
+        "pkg/tactic/bv/max_bv_sharing_tactic_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestMaxBVSharingCPPGoalShapes",
+        "TestMaxBVSharingLifecycleAndTrace",
+        "TestMaxBVSharingAllocationFrontiers",
+        "TestSMTLibRunnerMaxBVSharingStepFrontiers"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -133818,11 +133891,34 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Source rewriter_tpl proof/no-proof traversal, shared caches, exact resource checkpoints, sequential goal updates and standard tactic lifecycle, copied parameters, cleanup, translation, descriptors, live traces and clean factory",
+          "status": "ported",
+          "go_target": "pkg/tactic/bv/max_bv_sharing_tactic.go",
+          "go_targets": [
+            "pkg/tactic/bv/max_bv_sharing_traversal.go",
+            "pkg/tactic/bv/max_bv_sharing_tactic_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestMaxBVSharingCPPGoalShapes",
+            "TestMaxBVSharingLifecycleAndTrace",
+            "TestMaxBVSharingAllocationFrontiers",
+            "TestSMTLibRunnerMaxBVSharingStepFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns a parameter snapshot and a concrete implementation containing the original rewriter traversal, pair reducer and output/proof references. Pair operands and intermediate applications remain pinned until successful pair-cache cleanup; traversal caches and outputs retain their own roots. Cleanup constructs a replacement and retains a stopped retirement for retry. Translation owns independent implementation state. Successful results borrow the input goal; the legacy concrete goal API explicitly adds its independent reference. Constructor, proof-enabled apply and populated-cleanup allocation campaigns pass with zero charged storage after fixture teardown."
+      ],
+      "deviations": [
+        "Native typed Go maps and ASTRef trails replace ordered expression-pair hash tables and source temporary containers. The former recursive goal/proof walkers are removed; both public APIs use the original ported rewriter_tpl traversal, including proof specialization, cache decisions, constant-ITE pruning and resource callback ordering.",
+        "The source std::move(m_params) in cleanup binds its copy constructor because this fork defines no params_ref move constructor; the stored snapshot is preserved across repeated cleanup and translation. The inactive chain circuit and unused comparator are omitted.",
+        "Go allocation refusal preserves retryable cleanup ownership when rebuilding the implementation. Source undefined/assertion-excluded inputs retain explicit Go domain errors."
+      ]
     },
     {
       "path": "src/tactic/converter.h",

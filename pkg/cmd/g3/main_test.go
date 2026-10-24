@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,7 +12,47 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
+func TestSMTLibRunnerMaxBVSharingStepFrontiers(t *testing.T) {
+	reference := os.Getenv("G3_CPP_REFERENCE")
+	if reference == "" {
+		t.Skip("set G3_CPP_REFERENCE to prebuilt z3")
+	}
+	for limit := 0; limit <= 40; limit++ {
+		t.Run(fmt.Sprint(limit), func(t *testing.T) {
+			script := fmt.Sprintf(`(set-logic QF_BV)
+(declare-const a (_ BitVec 8))
+(declare-const b (_ BitVec 8))
+(declare-const c (_ BitVec 8))
+(declare-const d (_ BitVec 8))
+(assert (= (bvadd a b) c))
+(assert (= (bvadd b c a d) (bvadd a b c d)))
+(check-sat-using (using-params max-bv-sharing :max_steps %d))
+(get-info :reason-unknown)
+`, limit)
+			var actual bytes.Buffer
+			if err := run(strings.NewReader(script), &actual); err != nil {
+				t.Fatal(err, actual.String())
+			}
+			cmd := exec.Command(reference, "-in")
+			cmd.Stdin = strings.NewReader(script)
+			native, err := cmd.CombinedOutput()
+			if err != nil {
+				t.Fatal(err, string(native))
+			}
+			if canonicalOutput(actual.String()) != canonicalOutput(string(native)) {
+				t.Fatalf("Go: %s\nC++: %s", actual.String(), native)
+			}
+		})
+	}
+}
+
 var scriptResults = map[string]string{
+	"max_bv_sharing_atomic_limit.smt2":             "sat\n((p true))\n",
+	"max_bv_sharing_model_scopes.smt2":             "sat\n((x #x01) (y #x02) (z #x03) (w #x04))\nunsat\nsat\n((x #x01) (y #x02) (z #x03) (w #x04))\n",
+	"max_bv_sharing_limit_recovery.smt2":           "(error \"tactic failed: max. steps exceeded\")\n(:reason-unknown \"max. steps exceeded\")\n(error \"tactic failed: max. steps exceeded\")\n(:reason-unknown \"max. steps exceeded\")\nsat\n((p false))\n",
+	"max_bv_sharing_proofs.smt2":                   "unsat\n",
+	"max_bv_sharing_cores.smt2":                    "unsat\n(zero one)\n",
+	"max_bv_sharing_pb_pipeline.smt2":              "sat\n((x 1) (y 1) (z 1) (w 1))\n",
 	"propagate_ineqs_model_scopes.smt2":            "sat\n((x 2.0) (y 5.0))\nunsat\nsat\n((x 2.0) (y 5.0))\n",
 	"propagate_ineqs_core_fallback.smt2":           "unknown\n(:reason-unknown \"propagate-ineqs does not support unsat core production\")\nunsat\n(lo hi)\n",
 	"propagate_ineqs_pb_pipeline.smt2":             "sat\n((x 7) (y 7))\n",

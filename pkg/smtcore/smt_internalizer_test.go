@@ -21,6 +21,48 @@ func smtInternalizerFixture(t *testing.T, m *ast.ASTManager, registry *SMTQuanti
 	return context, relevancy, state
 }
 
+func TestSMTInternalizerGateProofReservedConstants(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	a := smtRelevancyBool(t, m, "gate-proof-constant-a")
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, state.Internalize(a, true))
+	literal, err := state.Literal(a)
+	astTestMust(t, err)
+	for _, constant := range []SMTLiteral{SMTTrueLiteral, SMTFalseLiteral} {
+		proof, err := state.gateClauseProof([]SMTLiteral{literal, constant, constant})
+		astTestMust(t, err)
+		fact, err := m.GetProofFact(proof)
+		astTestMust(t, err)
+		if op, err := m.GetDeclKind(fact); err != nil || op != ast.ASTOpOr {
+			t.Fatal("definition proof must retain unsimplified OR", op, err)
+		}
+		value, err := m.GetArg(fact, 1)
+		astTestMust(t, err)
+		if (constant == SMTTrueLiteral && !m.IsTrue(value)) || (constant == SMTFalseLiteral && !m.IsFalse(value)) {
+			t.Fatal("reserved literal proof expression", constant, value)
+		}
+	}
+	falsehood, err := m.MkFalse()
+	astTestMust(t, err)
+	gate, err := m.MkIff(a, falsehood)
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(gate, true))
+	constantGate, err := m.MkIff(falsehood, falsehood)
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(constantGate, true))
+	constantLiteral, err := state.Literal(constantGate)
+	astTestMust(t, err)
+	builder := &smtConflictProofBuilder{state: state, marked: make(map[int32]struct{}), literal: make(map[SMTLiteral]ast.ASTHandle), objects: make(map[SMTJustification]ast.ASTHandle), equality: make(map[smtEnodePairKey]ast.ASTHandle)}
+	proof, err := builder.literalProof(constantLiteral)
+	astTestMust(t, err)
+	fact, err := m.GetProofFact(proof)
+	astTestMust(t, err)
+	if fact != constantGate {
+		t.Fatal("false disjunct elimination did not produce a unit proof", fact, constantGate)
+	}
+}
+
 func TestSMTInternalizerScopedEnodeFlagOnExistingGate(t *testing.T) {
 	m := astTestManager(t)
 	a := smtRelevancyBool(t, m, "scoped-enode-a")
