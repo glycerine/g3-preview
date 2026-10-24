@@ -98750,7 +98750,11 @@
         "pkg/sat/tactic/sat_goal_to_sat.go",
         "pkg/sat/tactic/sat_goal_interface.go",
         "pkg/sat/tactic/sat_goal_dependencies.go",
-        "pkg/ast/ast_resource_limit_test.go"
+        "pkg/ast/ast_resource_limit_test.go",
+        "pkg/sat/tactic/sat_model_converter.go",
+        "pkg/sat/tactic/sat_model_converter_test.go",
+        "pkg/sat/sat_model_converter_boundary.go",
+        "pkg/sat/sat_package_boundary.go"
       ],
       "tests": [
         "TestSATGoalTranslatorSourceUnsupportedSMT2Diagnostic",
@@ -98774,7 +98778,11 @@
         "TestSATGoalDependenciesSignedAssumptionsAndCore",
         "TestSATGoalDependenciesFormulaLabelShortcutAndInterface",
         "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable",
-        "TestSATGoalDependenciesNativeDiscoveryOrderAndRepeatedLabels"
+        "TestSATGoalDependenciesNativeDiscoveryOrderAndRepeatedLabels",
+        "TestSATGoalRecoveryModelConverterCPP",
+        "TestSATModelConverterReconstructionAndAuxiliaryFiltering",
+        "TestSATModelConverterTranslationDropsEliminationLog",
+        "TestSATModelConverterAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -98869,48 +98877,72 @@
           "name": "Retained unsupported Boolean operator source SMT2 diagnostic with process-bound parameters; standalone manager fallback retains AST identity (cpp192-197)",
           "status": "partial",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
-          "tests": ["TestSATGoalTranslatorSourceUnsupportedSMT2Diagnostic", "TestSATGoalTranslatorRejectsUnnormalizedSourceOperators"]
+          "tests": [
+            "TestSATGoalTranslatorSourceUnsupportedSMT2Diagnostic",
+            "TestSATGoalTranslatorRejectsUnnormalizedSourceOperators"
+          ]
         },
         {
           "name": "Retained goal overload sat TRACE of final formula before process, after self-label skip (cpp480)",
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
-          "tests": ["TestSATGoalDependencyFormulaSourceTrace"]
+          "tests": [
+            "TestSATGoalDependencyFormulaSourceTrace"
+          ]
         },
         {
           "name": "Retained imp atom, unsupported-operator, OR/AND/IFF and nonroot-AND-result TRACE sites (cpp132,192,204,244,282,325)",
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
-          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+          "tests": [
+            "TestSATGoalTranslatorResultStackSourceTrace"
+          ]
         },
         {
           "name": "Retained imp::process start/remaining and four mk_clause overload TRACE sites (cpp88-103,380,421)",
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
-          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+          "tests": [
+            "TestSATGoalTranslatorResultStackSourceTrace"
+          ]
         },
         {
           "name": "Retained imp::process goal2sat_bug result-stack and converting TRACE checkpoints (cpp396,415)",
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
-          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+          "tests": [
+            "TestSATGoalTranslatorResultStackSourceTrace"
+          ]
         },
         {
           "name": "goal2sat::imp::updt_params max_memory conversion through util.h megabytes_to_bytes (cpp80-82)",
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
-          "tests": ["TestSATGoalTranslatorSourceMaxMemorySizeTSentinel"]
+          "tests": [
+            "TestSATGoalTranslatorSourceMaxMemorySizeTSentinel"
+          ]
         },
         {
-          "name": "sat2goal::imp formula recovery/checkpoints (model converters outstanding)",
-          "status": "partial",
+          "name": "sat2goal::imp formula recovery, model publication and source tactic-exception checkpoints",
+          "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_recovery.go",
           "tests": [
             "TestSATGoalInverseLiteralOwnership",
             "TestSATGoalRecoveryIndependentBinaryTruthTables",
             "TestSATGoalRecoveryFreshUnitsLearnedAndCheckpoints",
             "TestSATGoalRecoveryLongClauseBufferGrowth",
-            "TestSATGoalTranslatorSharedProcessMemoryCheckpoint"
+            "TestSATGoalTranslatorSharedProcessMemoryCheckpoint",
+            "TestSATGoalRecoveryModelConverterCPP",
+            "TestSATModelConverterReconstructionAndAuxiliaryFiltering",
+            "TestSATModelConverterTranslationDropsEliminationLog",
+            "TestSATModelConverterAllocationFrontiers"
+          ],
+          "go_targets": [
+            "pkg/sat/tactic/sat_goal_recovery.go",
+            "pkg/sat/tactic/sat_goal_recovery_test.go",
+            "pkg/sat/tactic/sat_model_converter.go",
+            "pkg/sat/tactic/sat_model_converter_test.go",
+            "pkg/ast/ast_resource_limit_test.go"
           ]
         },
         {
@@ -98939,15 +98971,32 @@
             "TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable",
             "TestSATGoalDependenciesNativeDiscoveryOrderAndRepeatedLabels"
           ]
+        },
+        {
+          "name": "sat2goal::imp::sat_model_converter construction, indexed atoms/filter ownership, evaluation, SAT-log reconstruction, source translation, display and live sat_mc traces (cpp556-678)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/sat/tactic/sat_model_converter.go",
+            "pkg/sat/tactic/sat_model_converter_test.go",
+            "pkg/sat/sat_model_converter_boundary.go",
+            "pkg/sat/sat_package_boundary.go"
+          ],
+          "tests": [
+            "TestSATGoalRecoveryModelConverterCPP",
+            "TestSATModelConverterReconstructionAndAuxiliaryFiltering",
+            "TestSATModelConverterTranslationDropsEliminationLog",
+            "TestSATModelConverterAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
         "Translation cache and Boolean-interface sets use native Go maps. Atom ownership and dependency assumption iteration use insdict.Dict v0.10.1 with full origin/slot/generation identity hashing and insertion-order iteration. Each atom owns one acquired reference; consumed keys are deleted before cleanup reports errors. Dependency keys borrow caller goal ownership. Removed satGoalASTMap probing, capacity and simulated backing reservations; actual SAT variable/clause, AST factory and cooperation owners remain.",
         "Fresh compound dependency guards retain owning trail references; dep2asm original label keys remain borrowed as in source.",
-        "CompileGoal dependency, formula and combined-dependency scratch use native []ASTHandle slices. DependencyLinearize returns native slice output directly; no ASTExprVector codec or ASTHandleVector adapter is used here. Dependency keys and caller goal ownership remain unchanged."
+        "CompileGoal dependency, formula and combined-dependency scratch use native []ASTHandle slices. DependencyLinearize returns native slice output directly; no ASTExprVector codec or ASTHandleVector adapter is used here. Dependency keys and caller goal ownership remain unchanged.",
+        "The AST SAT model converter independently copies the concrete SAT elimination log, owns every indexed atom reference and its auxiliary filter, and borrows evaluator services. Evaluation references/evaluators and consumed atom-release prefixes remain owned across stopped cleanup. Recovery publishes the converter after the complete inverse map, before asserting units/clauses; later failures return that owner. Source translation retains the filter and all atoms but deliberately leaves the SAT log empty."
       ],
       "deviations": [
-        "Goal dependency guards and dep2asm now follow the source goal overload, including signed labels, fresh compound guards, repeated-key replacement and skip_dep. Unsupported-operator SMT2 diagnostics, wrapper parameter updates and public tactic integration remain unported. sat2goal formula recovery follows source units/binaries/originals/optional-learned order with fresh auxiliary atoms; its model-converter construction/application remains unported. Translation checkpoints borrow the AST manager's actual inline resource limit; no whole-unit or public API completion is claimed.",
+        "Goal dependency guards, dep2asm, unsupported-operator SMT2 diagnostics and sat2goal recovery/model conversion are implemented. Wrapper parameter updates, retained has_unsupported_bool inspection, interpreted-atom wrapper state and public SAT tactic integration remain open. Translation checkpoints borrow the actual AST-manager resource limit; recovery now raises source tactic_exception diagnostics. No whole-unit or public API completion is claimed.",
         "Strict memory-checkpoint tests use an explicit real caller Runtime allocation; native SAT backing no longer guarantees a positive Runtime allocation counter. The checkpoint still reads the actual Runtime counter, without fabricated slice-allocation events."
       ]
     },

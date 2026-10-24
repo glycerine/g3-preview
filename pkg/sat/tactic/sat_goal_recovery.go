@@ -5,11 +5,11 @@ package tactic
 
 import (
 	"errors"
-	"fmt"
 	"github.com/glycerine/g3/pkg/util/lbool"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/tactic"
 )
@@ -94,10 +94,19 @@ func (tr *GoalTranslator) inverseAtoms(out *satGoalLiteralExpressions) error {
 	return nil
 }
 
-// This is the original sat2goal formula-recovery portion. Model-converter
-// construction/application is a separate outstanding dependency; this helper
-// neither reports solver status nor supplies a model converter to a tactic.
+// Formula-only entry point used by callers that do not request a model.
 func recoverSATGoalFormulas(tr *GoalTranslator, g *tactic.Goal, learned bool, maxMemory uint64) (err error) {
+	return recoverSATGoal(tr, g, learned, maxMemory, model.ModelEvaluatorConfig{}, nil)
+}
+
+// RecoverSATGoal implements sat2goal, including the optional model converter.
+// The caller owns a returned converter even when later clause recovery fails.
+func RecoverSATGoal(tr *GoalTranslator, g *tactic.Goal, learned bool, maxMemory uint64, services model.ModelEvaluatorConfig) (mc tactic.ModelConverter, err error) {
+	err = recoverSATGoal(tr, g, learned, maxMemory, services, &mc)
+	return mc, err
+}
+
+func recoverSATGoal(tr *GoalTranslator, g *tactic.Goal, learned bool, maxMemory uint64, services model.ModelEvaluatorConfig, out *tactic.ModelConverter) (err error) {
 	if err = tr.open(); err != nil {
 		return err
 	}
@@ -125,19 +134,42 @@ func recoverSATGoalFormulas(tr *GoalTranslator, g *tactic.Goal, learned bool, ma
 			return e
 		}
 		if canceled {
-			return fmt.Errorf("sat2goal: %s", m.ResourceLimit().CancelMessage())
+			return tactic.NewTacticException(m.ResourceLimit().CancelMessage())
 		}
 		bytes, e := s.RuntimeOwner().AllocationSize()
 		if e != nil {
 			return e
 		}
 		if bytes > maxMemory {
-			return fmt.Errorf("sat2goal: max. memory exceeded")
+			return tactic.NewTacticException(tactic.TacticMaxMemoryMessage)
 		}
 		return nil
 	}
 	var expressions satGoalLiteralExpressions
 	defer func() { err = errors.Join(err, expressions.close(m)) }()
+	var converter *SATModelConverter
+	published := false
+	models, e := g.ModelsEnabled()
+	if e != nil {
+		return e
+	}
+	if out != nil && models {
+		converter, err = NewSATModelConverter(m, s, services)
+		if err != nil {
+			if converter != nil {
+				*out = converter
+			}
+			return err
+		}
+		defer func() {
+			if !published {
+				if cleanup := converter.Close(); cleanup != nil {
+					*out = converter
+					err = errors.Join(err, cleanup)
+				}
+			}
+		}()
+	}
 	n, e := s.SourceNumVars()
 	if e != nil {
 		return e
@@ -163,6 +195,11 @@ func recoverSATGoalFormulas(tr *GoalTranslator, g *tactic.Goal, learned bool, ma
 			if e != nil {
 				return e
 			}
+			if converter != nil {
+				if e = converter.Insert(aux, true); e != nil {
+					return e
+				}
+			}
 			if e = expressions.set(m, 2*v, aux); e != nil {
 				return e
 			}
@@ -173,9 +210,20 @@ func recoverSATGoalFormulas(tr *GoalTranslator, g *tactic.Goal, learned bool, ma
 			if e = expressions.set(m, 2*v+1, neg); e != nil {
 				return e
 			}
-		} else if expressions.values[2*v+1].IsNull() {
-			return sat.ErrSATAssertion
+		} else {
+			if converter != nil {
+				if e = converter.Insert(expressions.values[2*v], false); e != nil {
+					return e
+				}
+			}
+			if expressions.values[2*v+1].IsNull() {
+				return sat.ErrSATAssertion
+			}
 		}
+	}
+	if out != nil && converter != nil {
+		*out = converter
+		published = true
 	}
 	for v := uint32(0); v < n; v++ {
 		if e = checkpoint(); e != nil {

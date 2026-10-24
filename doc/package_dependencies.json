@@ -2168,6 +2168,7 @@
         "sat_main_config.go",
         "sat_main_config_descrs.go",
         "sat_main_config_update.go",
+        "sat_model_converter_boundary.go",
         "sat_model_converter_trace.go",
         "sat_package_boundary.go",
         "sat_scc.go",
@@ -2325,7 +2326,8 @@
         "sat_goal_interface.go",
         "sat_goal_recovery.go",
         "sat_goal_to_sat.go",
-        "sat_goal_to_sat_trace.go"
+        "sat_goal_to_sat_trace.go",
+        "sat_model_converter.go"
       ]
     },
     {

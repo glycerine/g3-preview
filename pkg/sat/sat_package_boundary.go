@@ -8,9 +8,15 @@ import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func (s *Solver) Budget() *arena.Budget                         { return s.budget }
-func (s *Solver) RuntimeOwner() *umemory.Runtime                { return s.runtime.memory }
-func (s *Solver) CheckOwner() error                             { return s.open() }
+func (s *Solver) Budget() *arena.Budget          { return s.budget }
+func (s *Solver) RuntimeOwner() *umemory.Runtime { return s.runtime.memory }
+func (s *Solver) CheckOwner() error              { return s.open() }
+func (s *Solver) PopToBaseLevel() error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	return s.popToBase()
+}
 func (s *Solver) SourceInconsistent() (bool, error)             { return s.sourceInconsistent() }
 func (s *Solver) SourceNumVars() (uint32, error)                { return s.sourceNumVars() }
 func (s *Solver) SourceValueVar(v BoolVar) (lbool.LBool, error) { return s.sourceValueVar(v) }
