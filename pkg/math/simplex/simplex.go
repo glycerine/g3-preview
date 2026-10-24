@@ -77,17 +77,21 @@ type Stats struct{ NumPivots, NumInfeasible, NumChecks uint64 }
 // Solver is the concrete exact tableau used by both retained mpz and mpq
 // consumers. Integer rows are accepted through AddIntegerRow.
 type Solver struct {
-	arithmeticBoundAtoms map[arithmeticBoundKey][]arithmeticBoundAtom
-	boundConflict        []BoundDependency
-	boundConflictKnown   bool
-	limit                *control.Reslimit
-	matrix               Matrix
-	vars                 []variableInfo
-	rowBase              []uint32
-	patch                map[uint32]bool
-	maxIterations        uint32
-	infeasible           uint32
-	Stats                Stats
+	arithmeticBoundAtoms     map[arithmeticBoundKey][]arithmeticBoundAtom
+	boundConflict            []BoundDependency
+	boundConflictKnown       bool
+	limit                    *control.Reslimit
+	matrix                   Matrix
+	vars                     []variableInfo
+	rowBase                  []uint32
+	patch                    map[uint32]bool
+	maxIterations            uint32
+	arithmeticPolicy         bool
+	arithmeticPivotStrategy  uint32
+	arithmeticBlandThreshold uint32
+	arithmeticBland          bool
+	infeasible               uint32
+	Stats                    Stats
 }
 
 func NewSolver(limit *control.Reslimit) *Solver {
@@ -362,6 +366,12 @@ func (s *Solver) selectPivot(base uint32, below bool) (uint32, *big.Rat) {
 		if !can {
 			continue
 		}
+		if s.arithmeticBland {
+			if v < result {
+				result = v
+			}
+			continue
+		}
 		dep, col := s.nonFreeDependencies(v), s.matrix.ColumnSize(v)
 		if dep < bestDep || (dep == bestDep && (col < bestCol || (col == bestCol && v < result))) {
 			result = v
@@ -441,13 +451,27 @@ func (s *Solver) MakeFeasible() (lbool.LBool, error) {
 	s.boundConflict, s.boundConflictKnown = nil, false
 	s.Stats.NumChecks++
 	s.infeasible = NullVariable
+	s.arithmeticBland = false
+	var left map[uint32]bool
+	if s.arithmeticPolicy {
+		left = make(map[uint32]bool)
+	}
+	var repeated uint32
 	for iteration := uint32(0); ; iteration++ {
-		v := s.selectPatch()
+		var v uint32
+		if s.arithmeticPolicy {
+			v = s.selectArithmeticPatch()
+		} else {
+			v = s.selectPatch()
+		}
 		if v == NullVariable {
 			return lbool.True, nil
 		}
 		if (s.limit != nil && !s.limit.Inc()) || iteration > s.maxIterations {
 			return lbool.Undef, nil
+		}
+		if s.arithmeticPolicy {
+			s.checkArithmeticBlands(v, left, &repeated)
 		}
 		ok, err := s.makeVariableFeasible(v)
 		if err != nil {

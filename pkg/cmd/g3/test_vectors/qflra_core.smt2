@@ -1,0 +1,7 @@
+(set-option :produce-unsat-cores true)
+(set-logic QF_LRA)
+(declare-const x Real)
+(assert (! (> x 0) :named positive))
+(assert (! (<= x 0) :named nonpositive))
+(check-sat-using qflra)
+(get-unsat-core)

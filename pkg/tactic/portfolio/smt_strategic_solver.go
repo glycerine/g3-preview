@@ -1,5 +1,5 @@
-// Source: src/tactic/portfolio/smt_strategic_solver.cpp retained QF_AUFLIA
-// branch of mk_tactic_for_logic and smt_strategic_solver_factory::operator().
+// Source: src/tactic/portfolio/smt_strategic_solver.cpp retained QF_AUFLIA and
+// QF_LRA branches and smt_strategic_solver_factory::operator().
 package portfolio
 
 import (
@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
+	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/tactic/smtlogics"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
@@ -21,11 +22,23 @@ func NewQFAUFLIAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs,
 	if err != nil {
 		return nil, err
 	}
+	return newStrategicSolver(m, strategy, "QF_AUFLIA", p, proofs, models, cores, config)
+}
+
+func NewQFLRAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
+	strategy, err := smtlogics.NewQFLRATactic(m, p, config)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolver(m, strategy, "QF_LRA", p, proofs, models, cores, config)
+}
+
+func newStrategicSolver(m *ast.ASTManager, strategy tactic.Tactic, logic string, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (result solver.Solver, err error) {
 	if err = strategy.IncRef(); err != nil {
 		return nil, err
 	}
 	defer func() { err = errors.Join(err, strategy.DecRef()) }()
-	first, err := solver.NewTacticSolver(m, strategy, p, proofs, models, cores, "QF_AUFLIA", solver.TacticSolverConfig{
+	first, err := solver.NewTacticSolver(m, strategy, p, proofs, models, cores, logic, solver.TacticSolverConfig{
 		Params: config.Params,
 		EvaluatorFactory: func(md *model.ModelCore) (solver.ConsequenceEvaluator, error) {
 			return model.NewModelEvaluator(md, config.ModelEvaluator)
@@ -38,7 +51,7 @@ func NewQFAUFLIAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs,
 		return nil, err
 	}
 	defer func() { err = errors.Join(err, first.DecRef()) }()
-	second, err := smtcore.NewSMTSolver(m, p, "QF_AUFLIA", config)
+	second, err := smtcore.NewSMTSolver(m, p, logic, config)
 	if err != nil {
 		return nil, err
 	}

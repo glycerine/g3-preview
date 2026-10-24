@@ -10,6 +10,13 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"qflra_combined_assumptions.smt2":              "sat\nsat\nunsat\nsat\nunsat\nsat\n",
+	"qflra_combined_core.smt2":                     "unsat\n(positive nonpositive)\n",
+	"qflra_core.smt2":                              "unsat\n(positive nonpositive)\n",
+	"qflra_proof.smt2":                             "unsat\n",
+	"qflra_combined_model_scopes.smt2":             "sat\n(((and (> x 0) (< x (/ 1 3)) (= y (+ x (/ 1 7)))) true))\nunsat\nsat\n",
+	"qflra_model_scopes.smt2":                      "sat\n(((and (> x 0) (< x (/ 1 3)) (= y (+ x (/ 1 7)))) true))\nunsat\nsat\n",
+	"qflra_parameter_overrides.smt2":               "sat\nsat\n(((and (>= (+ x y) 1) (>= (+ x (* 2 y)) 3)) true))\nsat\n",
 	"qfauflia_combined_model_scopes.smt2":          "sat\n((x 2) ((= (select a y) 9) true) ((and (>= y 2) (<= y 4)) true))\nunsat\nsat\n((x 2) ((= (select a y) 9) true) ((and (>= y 2) (<= y 4)) true))\n",
 	"qfauflia_combined_assumptions.smt2":           "sat\nsat\nunsat\nsat\nunsat\nsat\n",
 	"qfauflia_combined_core.smt2":                  "unsat\n(zero lower)\n",

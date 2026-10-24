@@ -119,6 +119,7 @@ type SMTLinearArithmeticTheory struct {
 	equalityBounds                       []smtArithmeticEqualityEndpoints
 	propagateEqualities                  bool
 	propagationThreshold                 uint32
+	pivotStrategy, blandThreshold        uint32
 	conflictCount                        uint32
 	pendingBounds                        []smtArithmeticReplayBound
 	pendingBoundHead                     int
@@ -197,6 +198,7 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 	t := &SMTLinearArithmeticTheory{
 		propagateEqualities:   true,
 		propagationThreshold:  ^uint32(0),
+		blandThreshold:        1000,
 		strongerLemmas:        true,
 		branchCutRatio:        2,
 		gcdEnabled:            true,
@@ -234,6 +236,8 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 	t.equalityBoundsEnabled = config.EqBounds
 	t.propagateEqualities = config.PropagateEqs
 	t.propagationThreshold = config.PropagationThreshold
+	t.pivotStrategy, t.blandThreshold = config.PivotStrategy, config.BlandsRuleThreshold
+	t.solver.SetArithmeticPivotPolicy(t.pivotStrategy, t.blandThreshold)
 	t.strongerLemmas = config.StrongerLemmas
 	t.gcdEnabled = config.GCDTest
 	t.ignoreIntegers = config.IgnoreInt
@@ -1105,6 +1109,7 @@ func (t *SMTLinearArithmeticTheory) buildSimplexWithValues(values map[uint32]*bi
 
 func (t *SMTLinearArithmeticTheory) buildSimplexReplay(values map[uint32]*big.Rat, seeds map[uint32]simplex.Infinitesimal) (*simplex.Solver, lbool.LBool, error) {
 	solver := simplex.NewSolver(nil)
+	solver.SetArithmeticPivotPolicy(t.pivotStrategy, t.blandThreshold)
 	for variable := uint32(0); variable < t.nextSimplex; variable++ {
 		solver.EnsureVariable(variable)
 	}

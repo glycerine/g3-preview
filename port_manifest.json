@@ -116357,7 +116357,12 @@
         "pkg/smtcore/theory_arith_pending_bounds.go",
         "pkg/smtcore/theory_arith_pending_bounds_test.go",
         "pkg/smtcore/theory_arith_equality_guards_test.go",
-        "pkg/smtcore/theory_arith_grobner.go"
+        "pkg/smtcore/theory_arith_grobner.go",
+        "pkg/math/simplex/arithmetic_pivot.go",
+        "pkg/math/simplex/arithmetic_pivot_test.go",
+        "pkg/math/simplex/simplex.go",
+        "pkg/smtcore/theory_arith_pivot_test.go",
+        "pkg/cmd_context/qflra_solver_test.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
@@ -116406,7 +116411,12 @@
         "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes",
         "TestSMTArithmeticEqualityPropagationHonorsConfigurationAndConflictThreshold",
         "TestSMTArithmeticEqualityConflictThresholdSurvivesPopAndResetsForSearch",
-        "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation"
+        "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation",
+        "TestArithmeticPivotPolicyChangesFeasiblePath",
+        "TestArithmeticPivotStrictErrorAndStalePatch",
+        "TestArithmeticBlandThresholdAndEligiblePivot",
+        "TestSMTArithmeticPivotPolicySurvivesReplay",
+        "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates"
       ],
       "conditionals": [
         {
@@ -117420,6 +117430,26 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "select_lg_error_var/select_var_to_fix greatest/least/smallest infinitesimal bound-error selection and make_feasible repeated-leaving-variable Bland fallback, including smallest eligible entering variable and per-search reset; consume configured policy on live and rebuilt SMT tableaus",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/arithmetic_pivot.go",
+          "go_targets": [
+            "pkg/math/simplex/arithmetic_pivot.go",
+            "pkg/math/simplex/arithmetic_pivot_test.go",
+            "pkg/math/simplex/simplex.go",
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_pivot_test.go",
+            "pkg/cmd_context/qflra_solver_test.go"
+          ],
+          "tests": [
+            "TestArithmeticPivotPolicyChangesFeasiblePath",
+            "TestArithmeticPivotStrictErrorAndStalePatch",
+            "TestArithmeticBlandThresholdAndEligiblePivot",
+            "TestSMTArithmeticPivotPolicySurvivesReplay",
+            "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates"
+          ]
         }
       ],
       "ownership": [
@@ -117440,7 +117470,8 @@
         "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
         "Replay comparison rows now reuse the first column with identical concrete linear coefficients; sorted column IDs and exact rational coefficient strings identify the expression independently of the RHS constant. Applying every assertion through bound tightening preserves earlier stronger bounds. This restores source expression sharing, so equality adapters fix one expression column and the live deferred integer GCD checks see its rational constant. Tests cover repeated weaker lower/upper assertions, unbounded parity contradictions, bounded extended-GCD contradictions, mixed fixed-real premises and scope restoration.",
         "Integer feasibility no longer runs a hidden recursive bounded search. Its remaining fractional model is repaired through source Boolean branching and mixed-integer Gomory propagation, sharing SMT scope restoration, conflict learning, proofs and models with the other theories. Candidate-model point bounds remain confined to separate replays. The branch/cut counter persists as in the source and its configured ratio controls alternation. Current focused tests force both paths and repeated scopes.",
-        "Euclidean arithmetic bounds are now scoped alongside existing numeric replay facts. Comparison-column facts are stored by the exact logical polynomial coefficient key rather than a shifting auxiliary column ID, and replay tightens the current shared expression column. The arithmetic theory owns the source-equivalent Euclidean numeral-manager lifetime and exposes checked cleanup through the existing optional theory Close hook. Temporary model-completion point bounds are never premises for Euclidean facts."
+        "Euclidean arithmetic bounds are now scoped alongside existing numeric replay facts. Comparison-column facts are stored by the exact logical polynomial coefficient key rather than a shifting auxiliary column ID, and replay tightens the current shared expression column. The arithmetic theory owns the source-equivalent Euclidean numeral-manager lifetime and exposes checked cleanup through the existing optional theory Close hook. Temporary model-completion point bounds are never premises for Euclidean facts.",
+        "Concrete SMT arithmetic pivot selection now consumes the previously parsed strategy and Bland threshold through the shared exact tableau. Equal-error candidates use ascending variable ID instead of C++ heap traversal order; existing normal entering-variable ties also remain deterministic rather than randomized. These are heuristic ordering differences. Source tableau trace/assertion sites and other incomplete arithmetic algorithms remain scoped to this partial unit."
       ]
     },
     {
@@ -136463,13 +136494,17 @@
         "pkg/tactic/smtlogics/qfauflia_tactic.go",
         "pkg/cmd_context/context.go",
         "pkg/cmd_context/qfauflia_solver_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/tactic/smtlogics/qflra_tactic.go",
+        "pkg/cmd_context/qflra_solver_test.go"
       ],
       "tests": [
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
         "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestCommandContextQFLRACombinedSolverProofResult",
+        "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -136493,6 +136528,26 @@
           ]
         },
         {
+          "name": "Retained QF_LRA mk_tactic_for_logic branch and factory operator(): concrete QF_LRA tactic2solver and incremental SMT solver under ordinary combined-solver mode, assumption routing and result ownership",
+          "status": "ported",
+          "go_target": "pkg/tactic/portfolio/smt_strategic_solver.go",
+          "go_targets": [
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/tactic/smtlogics/qfauflia_tactic.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfauflia_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/tactic/smtlogics/qflra_tactic.go",
+            "pkg/cmd_context/qflra_solver_test.go"
+          ],
+          "tests": [
+            "TestCommandContextQFLRACombinedSolverProofResult",
+            "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "Remaining logic dispatcher branches, default tactic/FD/incremental-SAT special solvers and general stored-logic strategic solver_factory owner and public factory constructor",
           "status": "unported"
         }
@@ -136501,7 +136556,7 @@
         "Construction uses local counted tactic/solver references. The returned combined solver owns both child solvers; the tactic solver owns the concrete strategy. Context closes the combined owner before manager/services teardown. Evaluator/parameter services are borrowed through the same concrete configuration used by the incremental backend."
       ],
       "deviations": [
-        "Only the now-complete retained QF_AUFLIA branch is connected. Other logic branches and the general default dispatcher remain explicitly unported; the Go entry point names the concrete completed strategy."
+        "The retained QF_AUFLIA and QF_LRA branches are connected through the shared combined-solver construction. Other logic branches and the general default dispatcher remain explicitly unported; concrete Go entry points name the completed strategies."
       ]
     },
     {
@@ -137917,9 +137972,21 @@
       "path": "src/tactic/smtlogics/qflra_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qflra_tactic.go",
+        "pkg/tactic/smtlogics/qflra_tactic_test.go",
+        "pkg/cmd_context/qflra_solver_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestQFLRATacticTranslationAndProofLifetime",
+        "TestCommandContextQFLRACombinedSolverProofResult",
+        "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 50,
@@ -137942,19 +138009,55 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_qflra_tactic live #else factory: SMT tactic with innermost fixed arith.greatest_error_pivot=true and outer caller params, inherited parameter descriptions/statistics, updates, translation and proof/model/core results; builtin registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/smtlogics/qflra_tactic.go",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflra_tactic.go",
+            "pkg/tactic/smtlogics/qflra_tactic_test.go",
+            "pkg/cmd_context/qflra_solver_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestQFLRATacticTranslationAndProofLifetime",
+            "TestCommandContextQFLRACombinedSolverProofResult",
+            "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The returned uncounted using-params graph owns its backend through counted child references and owns copies of both parameter scopes. Temporary constructor references and params are released on every path. Translation owns a fresh backend and scope copies; results retain proof/model references independently of tactic cleanup."
+      ],
+      "deviations": [
+        "Disabled #if 0 MIP/parallel alternatives and unused main/context/LHS/to-real parameter locals have no retained consumer and are omitted. The live factory is reproduced exactly; arithmetic solving and diagnostic gaps remain tracked in their own partial source units."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qflra_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qflra_tactic.go",
+        "pkg/tactic/smtlogics/qflra_tactic_test.go",
+        "pkg/cmd_context/qflra_solver_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestQFLRATacticTranslationAndProofLifetime",
+        "TestCommandContextQFLRACombinedSolverProofResult",
+        "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -137965,11 +138068,35 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_qflra_tactic declaration, default empty params and ADD_TACTIC qflra registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/smtlogics/qflra_tactic.go",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qflra_tactic.go",
+            "pkg/tactic/smtlogics/qflra_tactic_test.go",
+            "pkg/cmd_context/qflra_solver_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestQFLRATacticTranslationAndProofLifetime",
+            "TestCommandContextQFLRACombinedSolverProofResult",
+            "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The returned uncounted using-params graph owns its backend through counted child references and owns copies of both parameter scopes. Temporary constructor references and params are released on every path. Translation owns a fresh backend and scope copies; results retain proof/model references independently of tactic cleanup."
+      ],
+      "deviations": [
+        "Disabled #if 0 MIP/parallel alternatives and unused main/context/LHS/to-real parameter locals have no retained consumer and are omitted. The live factory is reproduced exactly; arithmetic solving and diagnostic gaps remain tracked in their own partial source units."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfnia_tactic.cpp",

@@ -261,9 +261,12 @@ func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 	if err = c.parameters.GetSolverParams(m, &c.params, &proofs, &models, &cores); err != nil {
 		return nil, err
 	}
-	if c.logic == "QF_AUFLIA" {
+	switch c.logic {
+	case "QF_AUFLIA":
 		c.solver, err = portfolio.NewQFAUFLIAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
-	} else {
+	case "QF_LRA":
+		c.solver, err = portfolio.NewQFLRAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
+	default:
 		var direct *smtcore.SMTSolver
 		direct, err = smtcore.NewSMTSolver(m, &c.params, c.logic, c.config)
 		if err == nil {
