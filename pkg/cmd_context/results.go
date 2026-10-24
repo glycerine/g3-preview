@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -122,7 +123,7 @@ func (c *Context) WriteUnsatCore(out io.Writer) error {
 	if !c.checked || c.status != lbool.False || !state.UnsatCore {
 		return fmt.Errorf("unsat core is not available")
 	}
-	core, err := c.solver.UnsatCore()
+	core, err := c.checkSatResult().UnsatCore()
 	if err != nil {
 		return err
 	}
@@ -148,17 +149,68 @@ func (c *Context) WriteProof(out io.Writer) error {
 	if err != nil {
 		return err
 	}
-	if !c.checked || c.status != lbool.False || !state.Proof {
+	if !state.Proof {
+		return fmt.Errorf("proof construction is not enabled, use command (set-option :produce-proofs true)")
+	}
+	if !c.checked || c.status != lbool.False {
 		return fmt.Errorf("proof is not available")
 	}
-	proof, err := c.solver.Proof()
+	proof, err := c.checkSatResult().Proof()
 	if err != nil {
 		return err
 	}
 	if proof.IsNull() {
 		return fmt.Errorf("proof is not available")
 	}
-	if err = c.WriteExpression(out, proof); err != nil {
+	if state.WellSortedCheck {
+		good, e := c.manager.IsWellSorted(proof, nil)
+		if e != nil {
+			return e
+		}
+		if !good {
+			return fmt.Errorf("proof is not well sorted")
+		}
+	}
+	pp, err := ast.NewPPParams(c.config.Params, c.config.Globals, nil)
+	if err != nil {
+		return err
+	}
+	pretty, err := pp.PrettyProof()
+	if err = errors.Join(err, pp.Close()); err != nil {
+		return err
+	}
+	if pretty {
+		err = c.WriteExpression(out, proof)
+	} else {
+		printer, e := ast.NewLegacySMTPrinter(c.manager)
+		if e != nil {
+			return e
+		}
+		var logic usymbol.Symbol
+		if c.logic != "" {
+			logic, e = c.manager.Symbols.Intern(c.logic)
+			if e != nil {
+				return e
+			}
+		}
+		declaredName := func(h ast.ASTHandle) (string, error) {
+			name, e := c.manager.GetASTName(h)
+			if e != nil {
+				return "", e
+			}
+			return c.manager.Symbols.String(name)
+		}
+		config := ast.LegacySMTBenchmarkConfig{Logic: logic,
+			IsDeclaredSort: func(h ast.ASTHandle) (bool, error) {
+				name, e := declaredName(h)
+				_, found := c.sorts[name]
+				return found, e
+			},
+			IsDeclaredFunc: func(h ast.ASTHandle) (bool, error) { name, e := declaredName(h); return len(c.functions[name]) != 0, e },
+		}
+		err = printer.DisplayBenchmark(out, proof, config)
+	}
+	if err != nil {
 		return err
 	}
 	_, err = io.WriteString(out, "\n")

@@ -1,0 +1,7 @@
+(set-logic QF_UF)
+(declare-const a Bool)
+(assert a)
+(check-sat-using fail)
+(check-sat)
+(check-sat-using (or-else fail (then skip smt)))
+(get-value (a))

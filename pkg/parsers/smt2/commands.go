@@ -294,6 +294,11 @@ func (p *commandParser) command() (bool, error) {
 		if err != nil {
 			return false, err
 		}
+	case "check-sat-using":
+		if err := p.checkSatUsing(); err != nil {
+			return false, err
+		}
+		success = false
 	case "check-sat", "check-sat-assuming":
 		var assumptions []ast.ASTHandle
 		if name == "check-sat-assuming" {

@@ -10,6 +10,13 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"tactic_model_scopes.smt2":                     "sat\n((a true))\nunsat\nsat\n((a true))\nsat\n((a true))\n",
+	"tactic_unsat_core.smt2":                       "unsat\n(positive negative)\nsat\n",
+	"tactic_false_proof.smt2":                      "unsat\n((set-logic QF_UF)\n(proof\n(asserted false)))\n",
+	"tactic_pretty_proof.smt2":                     "unsat\n(asserted false)\n",
+	"tactic_unknown_recovery.smt2":                 "unknown\nunsat\nunsat\n",
+	"tactic_failure_recovery.smt2":                 "unknown\nsat\nsat\n((a true))\n",
+	"tactic_resource_limit_recovery.smt2":          "unknown\nsat\nsat\n((a true))\n",
 	"array_as_array_direct_core_scopes.smt2":       "unknown\nunknown\nunknown\n",
 	"model_macro_cleanup_scopes.smt2":              "sat\n((c false) ((f false) false) ((f true) false))\nsat\n((c true) ((f false) false) ((f true) true))\nsat\n((c false) ((f false) false) ((f true) false))\n",
 	"model_compact_live_updates.smt2":              "sat\n(model (define-fun f ((x!0 Bool)) Bool (ite (= x!0 false) false (ite (= x!0 true) false false)))\n)\nsat\n(model (define-fun f ((x!0 Bool)) Bool false)\n)\n(((f false) false) ((f true) false))\nsat\n(model (define-fun f ((x!0 Bool)) Bool (ite (= x!0 false) false (ite (= x!0 true) false false)))\n)\n",

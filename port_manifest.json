@@ -37708,6 +37708,19 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "get-proof default legacy SMT2 proof benchmark display: current check result, well-sorted guard, pp.pretty_proof selection, logic and declaration-name filtering through ast_smt_pp",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/results.go",
+          "go_targets": [
+            "pkg/ast/ast_smt_legacy_benchmark.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -37850,7 +37863,9 @@
         "pkg/cmd_context/results.go",
         "pkg/cmd_context/context_test.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/cmd_context/macros.go"
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/tactic_commands_test.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -37858,7 +37873,9 @@
         "TestCommandContextNamedCoreAndProof",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestCommandContextDefinitionOwnershipAndScopes"
+        "TestCommandContextDefinitionOwnershipAndScopes",
+        "TestCommandContextTacticResultsScopesAndModelLifetime",
+        "TestCommandContextAssertGoalPreservesOrderProofsAndNames"
       ],
       "conditionals": [
         {
@@ -38128,6 +38145,22 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "last-check result selection across ordinary check-sat and check-sat-using: owned tactic result, borrowed incremental solver result, assertion/scope invalidation, independent acquired model lifetime and teardown",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/tactic_commands.go",
+          "go_targets": [
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/results.go",
+            "pkg/cmd_context/tactic_commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextTacticResultsScopesAndModelLifetime",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -38271,9 +38304,18 @@
       "path": "src/cmd_context/cmd_context_to_goal.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/tactic_commands_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestCommandContextAssertGoalPreservesOrderProofsAndNames",
+        "TestCommandContextTacticProofCoreFrontendGuard",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 34,
@@ -38284,19 +38326,46 @@
           "text": "SASSERT(ctx.begin_assertion_names() == ctx.end_assertion_names());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "assert_exprs_from: source frontend proof/core refusal, assertion order, asserted proofs and original assertion-name dependency leaves including unnamed assertions",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/tactic_commands.go",
+          "go_targets": [
+            "pkg/cmd_context/tactic_commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextAssertGoalPreservesOrderProofsAndNames",
+            "TestCommandContextTacticProofCoreFrontendGuard",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "Context borrows its retained assertion and name handles while Goal.AssertWithProof acquires its own formula/proof/dependency references. The copied goal remains valid after command-context assertion scopes are popped. The Go assertion row keeps formula and name together instead of separate source pointer vectors."
+      ],
       "deviations": []
     },
     {
       "path": "src/cmd_context/cmd_context_to_goal.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/tactic_commands_test.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestCommandContextAssertGoalPreservesOrderProofsAndNames",
+        "TestCommandContextTacticProofCoreFrontendGuard",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -38307,10 +38376,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "assert_exprs_from: source frontend proof/core refusal, assertion order, asserted proofs and original assertion-name dependency leaves including unnamed assertions",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/tactic_commands.go",
+          "go_targets": [
+            "pkg/cmd_context/tactic_commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextAssertGoalPreservesOrderProofsAndNames",
+            "TestCommandContextTacticProofCoreFrontendGuard",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "Context borrows its retained assertion and name handles while Goal.AssertWithProof acquires its own formula/proof/dependency references. The copied goal remains valid after command-context assertion scopes are popped. The Go assertion row keeps formula and name together instead of separate source pointer vectors."
+      ],
       "deviations": []
     },
     {
@@ -39167,13 +39254,25 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/tactic_command.go"
+        "pkg/smtcore/tactic_command.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/tactic_commands_test.go",
+        "pkg/parsers/smt2/tactics.go",
+        "pkg/parsers/smt2/tactics_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
         "TestTacticManagerDestructorFinalizesTacticsBeforeProbes",
-        "TestTacticManagerMetadataCapturesSourceDescriptionValue"
+        "TestTacticManagerMetadataCapturesSourceDescriptionValue",
+        "TestCommandContextTacticResultsScopesAndModelLifetime",
+        "TestCommandContextTacticProofCoreFrontendGuard",
+        "TestCommandContextUnknownTacticLeavesInitializationOptionsAvailable",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMT2TacticCombinatorsAndTypedParameters"
       ],
       "conditionals": [
         {
@@ -39277,8 +39376,50 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "check_sat_using_tactict_cmd::execute retained core: context-default parameter merge, logic, context-to-goal assertion transfer, scoped resource/timeout handling, tactic check and persistent model/proof/core/label/statistics result publication",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/tactic_commands.go",
+          "go_targets": [
+            "pkg/cmd_context/tactic_commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextTacticResultsScopesAndModelLifetime",
+            "TestCommandContextTacticProofCoreFrontendGuard",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "reason": "Command print_* / max_memory options, process control-C handler, result/model validation and trace/watch reporting remain to be integrated."
+        },
+        {
+          "name": "sexpr2tactic retained concrete factories and and-then/then, or-else, using-params/with/!, repeat, try-for, fail-if-branching and skip-if-failed; typed descriptor validation and counted parse-result ownership",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/tactics.go",
+          "go_targets": [
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/tactic_commands_test.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextUnknownTacticLeavesInitializationOptionsAvailable",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMT2TacticCombinatorsAndTypedParameters"
+          ],
+          "reason": "Only the currently connected smt, simplify, elim-and, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
+        },
+        {
+          "name": "remaining apply/help/user-tactic/probe command integration and execution options (src/cmd_context/tactic_cmds.cpp)",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The command parser returns one counted tactic reference. Composition factories acquire children; command execution owns the using_params/timeout wrappers, goal and temporary result refs. Context owns the independent SimpleCheckSatResult until replacement or teardown, and ordinary solver scopes stay separate."
+      ],
       "deviations": []
     },
     {
@@ -39287,13 +39428,25 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/tactic_command.go"
+        "pkg/smtcore/tactic_command.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/tactic_commands_test.go",
+        "pkg/parsers/smt2/tactics.go",
+        "pkg/parsers/smt2/tactics_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
         "TestTacticManagerCopiedForeignAndClosedGuards",
-        "TestTacticManagerMetadataCapturesSourceDescriptionValue"
+        "TestTacticManagerMetadataCapturesSourceDescriptionValue",
+        "TestCommandContextTacticResultsScopesAndModelLifetime",
+        "TestCommandContextTacticProofCoreFrontendGuard",
+        "TestCommandContextUnknownTacticLeavesInitializationOptionsAvailable",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMT2TacticCombinatorsAndTypedParameters"
       ],
       "conditionals": [
         {
@@ -39313,8 +39466,50 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "check_sat_using_tactict_cmd::execute retained core: context-default parameter merge, logic, context-to-goal assertion transfer, scoped resource/timeout handling, tactic check and persistent model/proof/core/label/statistics result publication",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/tactic_commands.go",
+          "go_targets": [
+            "pkg/cmd_context/tactic_commands_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextTacticResultsScopesAndModelLifetime",
+            "TestCommandContextTacticProofCoreFrontendGuard",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "reason": "Command print_* / max_memory options, process control-C handler, result/model validation and trace/watch reporting remain to be integrated."
+        },
+        {
+          "name": "sexpr2tactic retained concrete factories and and-then/then, or-else, using-params/with/!, repeat, try-for, fail-if-branching and skip-if-failed; typed descriptor validation and counted parse-result ownership",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/tactics.go",
+          "go_targets": [
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/tactic_commands_test.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextUnknownTacticLeavesInitializationOptionsAvailable",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMT2TacticCombinatorsAndTypedParameters"
+          ],
+          "reason": "Only the currently connected smt, simplify, elim-and, skip, fail and fail-if-undecided concrete factories are available. User tactic declarations, probes/conditional/parallel combinators and the remaining builtin factory registry are not connected."
+        },
+        {
+          "name": "remaining apply/help/user-tactic/probe command integration and execution options (src/cmd_context/tactic_cmds.cpp)",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The command parser returns one counted tactic reference. Composition factories acquire children; command execution owns the using_params/timeout wrappers, goal and temporary result refs. Context owns the independent SimpleCheckSatResult until replacement or teardown, and ordinary solver scopes stay separate."
+      ],
       "deviations": []
     },
     {
@@ -86317,7 +86512,10 @@
         "pkg/cmd_context/context.go",
         "pkg/cmd_context/context_test.go",
         "pkg/parsers/smt2/annotations.go",
-        "pkg/parsers/smt2/annotations_test.go"
+        "pkg/parsers/smt2/annotations_test.go",
+        "pkg/parsers/smt2/tactics.go",
+        "pkg/parsers/smt2/tactics_test.go",
+        "pkg/cmd_context/tactic_commands.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -86342,7 +86540,9 @@
         "TestSMT2QuantifierAttributesPreserveMultiPatternsAndMetadata",
         "TestSMT2QuantifierPatternValidationAndParserOptions",
         "TestSMT2NestedQuantifierMetadataAndNoPatternsStayLocal",
-        "TestSMT2QuantifierAttributesRejectWrongScopesAndBadPatterns"
+        "TestSMT2QuantifierAttributesRejectWrongScopesAndBadPatterns",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+        "TestSMT2TacticCombinatorsAndTypedParameters"
       ],
       "assertions": [
         {
@@ -87054,6 +87254,24 @@
           "go_targets": [
             "pkg/cmd/g3/main_test.go"
           ]
+        },
+        {
+          "name": "check-sat-using command dispatch and retained tactic-expression grammar, typed using-params attributes and timeout keyword parsing before command effects",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/tactics.go",
+          "go_targets": [
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMT2TacticCombinatorsAndTypedParameters"
+          ],
+          "reason": "The command is connected for the retained concrete tactic/combinator set; remaining tactic/probe grammar and execution-option surface are tracked in tactic_cmds.cpp."
         }
       ],
       "ownership": [

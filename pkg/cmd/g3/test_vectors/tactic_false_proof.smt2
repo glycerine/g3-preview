@@ -1,0 +1,5 @@
+(set-logic QF_UF)
+(set-option :produce-proofs true)
+(assert false)
+(check-sat-using (then simplify smt))
+(get-proof)

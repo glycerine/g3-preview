@@ -1,0 +1,6 @@
+(set-logic QF_UF)
+(set-option :produce-proofs true)
+(set-option :pp.pretty-proof true)
+(assert false)
+(check-sat-using smt)
+(get-proof)

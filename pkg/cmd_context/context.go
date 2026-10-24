@@ -43,6 +43,7 @@ type Context struct {
 	paramsReady                      bool
 	manager                          *ast.ASTManager
 	solver                           *smtcore.SMTSolver
+	tacticResult                     *solver.SimpleCheckSatResult
 	logic                            string
 	functions                        map[string][]ast.ASTHandle
 	sorts                            map[string]ast.ASTHandle
@@ -499,6 +500,9 @@ func (c *Context) CheckSat(assumptions []ast.ASTHandle) (lbool.LBool, error) {
 		return lbool.Undef, err
 	}
 	c.checked = false
+	if err := c.clearTacticResult(); err != nil {
+		return lbool.Undef, err
+	}
 	status, err := c.solver.CheckSat(assumptions)
 	if err == nil {
 		c.status, c.checked = status, true
@@ -514,7 +518,7 @@ func (c *Context) Model() (*model.ModelCore, error) {
 	if !c.checked || c.status != lbool.True || !state.Model {
 		return nil, fmt.Errorf("model is not available")
 	}
-	return c.solver.AcquireModel()
+	return c.checkSatResult().AcquireModel()
 }
 
 func (c *Context) WriteModel(out io.Writer) (result error) {
@@ -539,6 +543,9 @@ func (c *Context) Close() error {
 	}
 	if c.closed {
 		return nil
+	}
+	if err := c.clearTacticResult(); err != nil {
+		return err
 	}
 	if c.solver != nil {
 		if err := c.solver.Close(); err != nil {
