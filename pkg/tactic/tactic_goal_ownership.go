@@ -9,6 +9,11 @@ import (
 )
 
 func goalIncExpr(m *ast.ASTManager, h ast.ASTHandle) error {
+	// Source expression-reference arrays can contain empty proof entries.
+	// Goal formula operations validate nonnull expressions before storage.
+	if h.IsNull() {
+		return m.IncRef(h)
+	}
 	kind, e := m.GetKind(h)
 	if e != nil {
 		return e

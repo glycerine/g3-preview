@@ -39816,7 +39816,18 @@
         "pkg/cmd/g3/test_vectors/qfufbv_solver_proof.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_solver_reduce_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/qfufbv_solver_sat_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/qfufbv_solver_smt_models_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/qfufbv_solver_smt_models_scopes.smt2",
+        "pkg/tactic/arith/card2bv_tactic.go",
+        "pkg/tactic/arith/card2bv_trace.go",
+        "pkg/tactic/arith/card2bv_tactic_test.go",
+        "pkg/tactic/arith/card2bv_cpp_test.go",
+        "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+        "pkg/tactic/tactic_goal_ownership.go",
+        "pkg/tactic/tactic_goal_empty_proof_test.go",
+        "pkg/parsers/smt2/tactics_test.go",
+        "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+        "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -39854,7 +39865,15 @@
         "TestQFUFBVTacticConstructorAllocationFrontiers",
         "TestQFUFBVTacticTranslatedProofAndCoreRoutes",
         "TestQFUFBVTacticModelSurvivesStrategyClose",
-        "TestSMTLibRunnerQFUFBVBranchEvidence"
+        "TestSMTLibRunnerQFUFBVBranchEvidence",
+        "TestCard2BVExactGoalsCPP",
+        "TestCard2BVSideConstraintsCoreAndIndependentModel",
+        "TestCard2BVParametersTranslationInconsistencyAndTrace",
+        "TestCard2BVAllocationFrontiers",
+        "TestCard2BVCancellationAndClosedTraceRecovery",
+        "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+        "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking"
       ],
       "conditionals": [
         {
@@ -40362,6 +40381,38 @@
             "TestQFUFBVTacticTranslatedProofAndCoreRoutes",
             "TestQFUFBVTacticModelSurvivesStrategyClose",
             "TestSMTLibRunnerQFUFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Install pseudo-Boolean plugin operator names with source unspecified/ALL/QF_FD logic visibility and reuse indexed declaration/application dispatch",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/card2bv_tactic.go",
+            "pkg/tactic/arith/card2bv_trace.go",
+            "pkg/tactic/arith/card2bv_tactic_test.go",
+            "pkg/tactic/arith/card2bv_cpp_test.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/tactic/tactic_goal_ownership.go",
+            "pkg/tactic/tactic_goal_empty_proof_test.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+          ],
+          "tests": [
+            "TestCard2BVExactGoalsCPP",
+            "TestCard2BVSideConstraintsCoreAndIndependentModel",
+            "TestCard2BVParametersTranslationInconsistencyAndTrace",
+            "TestCard2BVAllocationFrontiers",
+            "TestCard2BVCancellationAndClosedTraceRecovery",
+            "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+            "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -41656,7 +41707,18 @@
         "pkg/cmd/g3/test_vectors/bv_bound_core_refusal.smt2",
         "pkg/cmd/g3/test_vectors/bv_bound_inconsistent.smt2",
         "pkg/cmd/g3/test_vectors/bv_bound_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2"
+        "pkg/cmd/g3/test_vectors/bv_bound_proof_refusal.smt2",
+        "pkg/tactic/arith/card2bv_tactic.go",
+        "pkg/tactic/arith/card2bv_trace.go",
+        "pkg/tactic/arith/card2bv_tactic_test.go",
+        "pkg/tactic/arith/card2bv_cpp_test.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+        "pkg/tactic/tactic_goal_ownership.go",
+        "pkg/tactic/tactic_goal_empty_proof_test.go",
+        "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+        "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -41716,7 +41778,14 @@
         "TestBVBoundCheckExactGoalsCPP",
         "TestBVBoundCheckStatisticsCleanupAndGuards",
         "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
-        "TestBVBoundCheckAllocationFrontiers"
+        "TestBVBoundCheckAllocationFrontiers",
+        "TestCard2BVExactGoalsCPP",
+        "TestCard2BVSideConstraintsCoreAndIndependentModel",
+        "TestCard2BVParametersTranslationInconsistencyAndTrace",
+        "TestCard2BVAllocationFrontiers",
+        "TestCard2BVCancellationAndClosedTraceRecovery",
+        "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+        "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences"
       ],
       "conditionals": [
         {
@@ -42126,6 +42195,38 @@
             "TestBVBoundCheckStatisticsCleanupAndGuards",
             "TestBVBoundCheckLimitsTranslationCancellationAndTrace",
             "TestBVBoundCheckAllocationFrontiers",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Register card2bv clean tactic for SMT-LIB solving, scoped models, named cores and source empty parameter descriptors",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/card2bv_tactic.go",
+            "pkg/tactic/arith/card2bv_trace.go",
+            "pkg/tactic/arith/card2bv_tactic_test.go",
+            "pkg/tactic/arith/card2bv_cpp_test.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/tactic/tactic_goal_ownership.go",
+            "pkg/tactic/tactic_goal_empty_proof_test.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+          ],
+          "tests": [
+            "TestCard2BVExactGoalsCPP",
+            "TestCard2BVSideConstraintsCoreAndIndependentModel",
+            "TestCard2BVParametersTranslationInconsistencyAndTrace",
+            "TestCard2BVAllocationFrontiers",
+            "TestCard2BVCancellationAndClosedTraceRecovery",
+            "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+            "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
             "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
@@ -88829,7 +88930,7 @@
       "path": "src/opt/opt_sls_solver.h",
       "component": "opt",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -88852,11 +88953,13 @@
           "text": "SASSERT(res.is_sat == l_true || res.is_sat == l_undef);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Retained-source audit while resolving card2bv_tactic.h: recursive searches find no include or use of opt_sls_solver.h/opt::sls_solver outside this standalone header; it is absent from the opt component build list. Its legacy pb::card_pb_rewriter/card2bv_rewriter declarations have no out-of-line definitions. This abandoned optimization wrapper is unreachable and is not ported; retained optimization engines remain separate work."
+      ]
     },
     {
       "path": "src/opt/opt_solver.cpp",
@@ -133649,9 +133752,35 @@
       "path": "src/tactic/arith/card2bv_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/card2bv_tactic.go",
+        "pkg/tactic/arith/card2bv_trace.go",
+        "pkg/tactic/arith/card2bv_tactic_test.go",
+        "pkg/tactic/arith/card2bv_cpp_test.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/tactic/tactic_goal_ownership.go",
+        "pkg/tactic/tactic_goal_empty_proof_test.go",
+        "pkg/parsers/smt2/tactics_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+        "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+      ],
+      "tests": [
+        "TestCard2BVExactGoalsCPP",
+        "TestCard2BVSideConstraintsCoreAndIndependentModel",
+        "TestCard2BVParametersTranslationInconsistencyAndTrace",
+        "TestCard2BVAllocationFrontiers",
+        "TestCard2BVCancellationAndClosedTraceRecovery",
+        "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+        "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 60,
@@ -133662,19 +133791,211 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Parameter-copying raw tactic and clean factory; updates replace the snapshot, translation copies current parameters; empty descriptors/statistics and default logic/progress callbacks",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/card2bv_tactic.go",
+            "pkg/tactic/arith/card2bv_trace.go",
+            "pkg/tactic/arith/card2bv_tactic_test.go",
+            "pkg/tactic/arith/card2bv_cpp_test.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/tactic/tactic_goal_ownership.go",
+            "pkg/tactic/tactic_goal_empty_proof_test.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+          ],
+          "tests": [
+            "TestCard2BVExactGoalsCPP",
+            "TestCard2BVSideConstraintsCoreAndIndependentModel",
+            "TestCard2BVParametersTranslationInconsistencyAndTrace",
+            "TestCard2BVAllocationFrontiers",
+            "TestCard2BVCancellationAndClosedTraceRecovery",
+            "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+            "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Application resets prior metadata before report and lexical theory/PB rewriter construction; inconsistent goals return borrowed with unchanged depth",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/card2bv_tactic.go",
+            "pkg/tactic/arith/card2bv_trace.go",
+            "pkg/tactic/arith/card2bv_tactic_test.go",
+            "pkg/tactic/arith/card2bv_cpp_test.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/tactic/tactic_goal_ownership.go",
+            "pkg/tactic/tactic_goal_empty_proof_test.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+          ],
+          "tests": [
+            "TestCard2BVExactGoalsCPP",
+            "TestCard2BVSideConstraintsCoreAndIndependentModel",
+            "TestCard2BVParametersTranslationInconsistencyAndTrace",
+            "TestCard2BVAllocationFrontiers",
+            "TestCard2BVCancellationAndClosedTraceRecovery",
+            "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+            "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Dynamic goal traversal: theory rewrite, non-proof PB rewrite, source modus-ponens composition including empty proofs and original dependency preservation",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/card2bv_tactic.go",
+            "pkg/tactic/arith/card2bv_trace.go",
+            "pkg/tactic/arith/card2bv_tactic_test.go",
+            "pkg/tactic/arith/card2bv_cpp_test.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/tactic/tactic_goal_ownership.go",
+            "pkg/tactic/tactic_goal_empty_proof_test.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+          ],
+          "tests": [
+            "TestCard2BVExactGoalsCPP",
+            "TestCard2BVSideConstraintsCoreAndIndependentModel",
+            "TestCard2BVParametersTranslationInconsistencyAndTrace",
+            "TestCard2BVAllocationFrontiers",
+            "TestCard2BVCancellationAndClosedTraceRecovery",
+            "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+            "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Flush side constraints, append until inconsistency, publish fresh-constant filter regardless of models flag, increment depth and publish original borrowed goal",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/card2bv_tactic.go",
+            "pkg/tactic/arith/card2bv_trace.go",
+            "pkg/tactic/arith/card2bv_tactic_test.go",
+            "pkg/tactic/arith/card2bv_cpp_test.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/tactic/tactic_goal_ownership.go",
+            "pkg/tactic/tactic_goal_empty_proof_test.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+          ],
+          "tests": [
+            "TestCard2BVExactGoalsCPP",
+            "TestCard2BVSideConstraintsCoreAndIndependentModel",
+            "TestCard2BVParametersTranslationInconsistencyAndTrace",
+            "TestCard2BVAllocationFrontiers",
+            "TestCard2BVCancellationAndClosedTraceRecovery",
+            "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+            "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Source well-sorted assertions and before/rewrite/after traces; lexical owner cleanup on success/error, retained partial constructors and consumed release prefixes",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/card2bv_tactic.go",
+            "pkg/tactic/arith/card2bv_trace.go",
+            "pkg/tactic/arith/card2bv_tactic_test.go",
+            "pkg/tactic/arith/card2bv_cpp_test.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/tactic/tactic_goal_ownership.go",
+            "pkg/tactic/tactic_goal_empty_proof_test.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+          ],
+          "tests": [
+            "TestCard2BVExactGoalsCPP",
+            "TestCard2BVSideConstraintsCoreAndIndependentModel",
+            "TestCard2BVParametersTranslationInconsistencyAndTrace",
+            "TestCard2BVAllocationFrontiers",
+            "TestCard2BVCancellationAndClosedTraceRecovery",
+            "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+            "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns copied parameter state and retains lexical applications only while cleanup is unfinished. Applications own theory/PB rewriters, AST/proof references, transferred side-clause roots and a counted filter until result publication. Consumed releases retire their ownership even after errors. Fresh declarations are pinned independently by the published converter. Goal/result model lifetimes survive tactic/rewriter destruction; translation owns an independent parameter snapshot."
+      ],
+      "deviations": [
+        "The source PB traversal is non-proof-generating and leaves new_pr2 empty. Empty proof entries are supported as permitted by goal::update. For five weighted/Boolean-sum/duplicate-input proof cases, the native C++ executable was verified to crash with SIGSEGV when goal::slow_process splits a null proof; Go returns its explicit AST-owner error instead of fabricating proof objects. Native signal evidence is retained in /mnt/oldrog/tmp/g3-card2bv-cpp-proof-refusals.json. Forty defined goal outputs match C++; the five crash inputs have explicit Go refusal tests.",
+        "Header legacy rewrite classes are not reached by the retained tactic, which uses ast/rewriter/pb2bv_rewriter. Their sole named consumer is the abandoned opt_sls_solver.h, audited separately as dead. Incremental SAT/backend integration remains incomplete."
+      ]
     },
     {
       "path": "src/tactic/arith/card2bv_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/card2bv_tactic.go",
+        "pkg/tactic/arith/card2bv_trace.go",
+        "pkg/tactic/arith/card2bv_tactic_test.go",
+        "pkg/tactic/arith/card2bv_cpp_test.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/tactic/tactic_goal_ownership.go",
+        "pkg/tactic/tactic_goal_empty_proof_test.go",
+        "pkg/parsers/smt2/tactics_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+        "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+      ],
+      "tests": [
+        "TestCard2BVExactGoalsCPP",
+        "TestCard2BVSideConstraintsCoreAndIndependentModel",
+        "TestCard2BVParametersTranslationInconsistencyAndTrace",
+        "TestCard2BVAllocationFrontiers",
+        "TestCard2BVCancellationAndClosedTraceRecovery",
+        "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+        "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -133685,11 +134006,55 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained mk_card2bv_tactic declaration and card2bv builtin registration with clean wrapper",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/card2bv_tactic.go",
+            "pkg/tactic/arith/card2bv_trace.go",
+            "pkg/tactic/arith/card2bv_tactic_test.go",
+            "pkg/tactic/arith/card2bv_cpp_test.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/tactic/tactic_goal_ownership.go",
+            "pkg/tactic/tactic_goal_empty_proof_test.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+          ],
+          "tests": [
+            "TestCard2BVExactGoalsCPP",
+            "TestCard2BVSideConstraintsCoreAndIndependentModel",
+            "TestCard2BVParametersTranslationInconsistencyAndTrace",
+            "TestCard2BVAllocationFrontiers",
+            "TestCard2BVCancellationAndClosedTraceRecovery",
+            "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+            "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Legacy pb::card2bv_rewriter/card_pb_rewriter declarations referenced only by unreachable opt_sls_solver.h and lacking definitions",
+          "status": "dead_deleted",
+          "go_targets": [],
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The tactic owns copied parameter state and retains lexical applications only while cleanup is unfinished. Applications own theory/PB rewriters, AST/proof references, transferred side-clause roots and a counted filter until result publication. Consumed releases retire their ownership even after errors. Fresh declarations are pinned independently by the published converter. Goal/result model lifetimes survive tactic/rewriter destruction; translation owns an independent parameter snapshot."
+      ],
+      "deviations": [
+        "The source PB traversal is non-proof-generating and leaves new_pr2 empty. Empty proof entries are supported as permitted by goal::update. For five weighted/Boolean-sum/duplicate-input proof cases, the native C++ executable was verified to crash with SIGSEGV when goal::slow_process splits a null proof; Go returns its explicit AST-owner error instead of fabricating proof objects. Native signal evidence is retained in /mnt/oldrog/tmp/g3-card2bv-cpp-proof-refusals.json. Forty defined goal outputs match C++; the five crash inputs have explicit Go refusal tests.",
+        "Header legacy rewrite classes are not reached by the retained tactic, which uses ast/rewriter/pb2bv_rewriter. Their sole named consumer is the abandoned opt_sls_solver.h, audited separately as dead. Incremental SAT/backend integration remains incomplete."
+      ]
     },
     {
       "path": "src/tactic/arith/degree_shift_tactic.cpp",
@@ -143430,7 +143795,20 @@
         "pkg/tactic/tactic_goal_ownership.go",
         "pkg/tactic/tactic_package_boundary.go",
         "pkg/tactic/tactic_goal_display.go",
-        "pkg/tactic/tactic_goal_translate_test.go"
+        "pkg/tactic/tactic_goal_translate_test.go",
+        "pkg/tactic/arith/card2bv_tactic.go",
+        "pkg/tactic/arith/card2bv_trace.go",
+        "pkg/tactic/arith/card2bv_tactic_test.go",
+        "pkg/tactic/arith/card2bv_cpp_test.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/tactic/tactic_goal_empty_proof_test.go",
+        "pkg/parsers/smt2/tactics_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+        "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
       ],
       "tests": [
         "TestTacticGoalAssertionSplittingAndSourceOrder",
@@ -143453,7 +143831,17 @@
         "TestTacticGoalWellSortedStopsAtFirstBadFormula",
         "TestGoalSourceDefaultDisplayAndProcessPrinter",
         "TestGoalSpecializedDisplayProfiles",
-        "TestTacticGoalTranslatePreservesConfigurationAndDependencies"
+        "TestTacticGoalTranslatePreservesConfigurationAndDependencies",
+        "TestCard2BVExactGoalsCPP",
+        "TestCard2BVSideConstraintsCoreAndIndependentModel",
+        "TestCard2BVParametersTranslationInconsistencyAndTrace",
+        "TestCard2BVAllocationFrontiers",
+        "TestCard2BVCancellationAndClosedTraceRecovery",
+        "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+        "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+        "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "assertions": [
         {
@@ -143544,13 +143932,17 @@
           "name": "default proof-mode constructor and full independently owning goal copy constructor",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_goal.go",
-          "tests": ["TestTacticGoalDefaultAndFullCopyConstructors"]
+          "tests": [
+            "TestTacticGoalDefaultAndFullCopyConstructors"
+          ]
         },
         {
           "name": "goal::translate formulas, optional proofs, dependencies and configuration through one AST translation (goal.cpp:635-655)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_goal.go",
-          "tests": ["TestTacticGoalTranslatePreservesConfigurationAndDependencies"]
+          "tests": [
+            "TestTacticGoalTranslatePreservesConfigurationAndDependencies"
+          ]
         },
         {
           "name": "is_equal formula-set comparison with exact source size and unique-identity semantics (goal.cpp:678-708)",
@@ -143564,7 +143956,9 @@
           "name": "goal::is_well_sorted checks formulas in order and stops after the first failed AST walk (goal.cpp:622-630)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_goal.go",
-          "tests": ["TestTacticGoalWellSortedStopsAtFirstBadFormula"]
+          "tests": [
+            "TestTacticGoalWellSortedStopsAtFirstBadFormula"
+          ]
         },
         {
           "name": "Default formula-only goal::display(std::ostream&) uses source SMT2 expression printer and final newline",
@@ -143578,7 +143972,41 @@
           "name": "attribute, dependency, conjunction, low-level and DIMACS display profiles",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_goal_display.go",
-          "tests": ["TestGoalSpecializedDisplayProfiles"]
+          "tests": [
+            "TestGoalSpecializedDisplayProfiles"
+          ]
+        },
+        {
+          "name": "Goal expression-reference storage accepts empty proof entries allowed by source update; copying and cross-manager translation preserve them without invented proofs",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/card2bv_tactic.go",
+            "pkg/tactic/arith/card2bv_trace.go",
+            "pkg/tactic/arith/card2bv_tactic_test.go",
+            "pkg/tactic/arith/card2bv_cpp_test.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/pseudo_boolean_builtins_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/tactic/tactic_goal_ownership.go",
+            "pkg/tactic/tactic_goal_empty_proof_test.go",
+            "pkg/parsers/smt2/tactics_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/card2bv_core.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/card2bv_weighted_models.smt2"
+          ],
+          "tests": [
+            "TestCard2BVExactGoalsCPP",
+            "TestCard2BVSideConstraintsCoreAndIndependentModel",
+            "TestCard2BVParametersTranslationInconsistencyAndTrace",
+            "TestCard2BVAllocationFrontiers",
+            "TestCard2BVCancellationAndClosedTraceRecovery",
+            "TestTacticGoalUpdateCopyAndTranslationPreserveEmptyProof",
+            "TestCommandContextPseudoBooleanBuiltinVisibilityAndDeclarationReferences",
+            "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [

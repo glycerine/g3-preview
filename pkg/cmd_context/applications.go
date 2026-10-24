@@ -64,6 +64,17 @@ func (c *Context) initBuiltins() error {
 			return err
 		}
 	}
+	family, err = m.RegisterPseudoBooleanPlugin()
+	if err != nil {
+		return err
+	}
+	// The plugin itself gates these names to unspecified logic, ALL and QF_FD.
+	if err = m.GetPseudoBooleanOpNames(&names, logic); err != nil {
+		return err
+	}
+	if err = c.addBuiltinNames(family, &names); err != nil {
+		return err
+	}
 	family, err = m.ArrayFamilyID()
 	if err != nil {
 		return err

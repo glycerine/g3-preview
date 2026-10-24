@@ -2834,6 +2834,8 @@
         "bound_propagation.go",
         "bound_trace.go",
         "bound_values.go",
+        "card2bv_tactic.go",
+        "card2bv_trace.go",
         "diff_neq_compile.go",
         "diff_neq_search.go",
         "diff_neq_tactic.go",
