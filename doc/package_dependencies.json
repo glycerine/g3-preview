@@ -2193,6 +2193,8 @@
         "lite_indices.go",
         "lite_tactic.go",
         "lite_traversal.go",
+        "model_based_projection.go",
+        "model_projection_loop.go",
         "occurs.go",
         "predicate_abstraction.go",
         "predicate_assumptions.go",

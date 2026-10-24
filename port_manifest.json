@@ -91775,7 +91775,7 @@
         "The concrete owning projection service borrows manager/config; each call retains actual lexical ASTRefs, mutable singleton/local formula vectors, partial model evaluator, ASTExprMark and construction-failure receipts until cleanup succeeds. Source recursive term protection reuses the existing typed all-mark AST visitor, including quantifier annotations. Caller vectors own successful appends, compaction and completed replacements on errors. Nineteen first-success campaigns cover constructor, real/integer/nonunit/modular/ITE/distinct/disequality/large-coefficient/opaque projections, singleton, bounded/strict/unbounded maximization and open/closed tracing; all charged fixture storage is released."
       ],
       "deviations": [
-        "Exact math/big.Rat coefficients share the existing concrete simplex.ModelBasedOpt representation; AST numeral construction still uses the owning native numeral service. Concrete insertion-ordered coefficient/ID dictionaries use approved insdict v0.10.1; no C++ hash layout or STL containers are ported. Source root-only marking of residue formulas is preserved; recursive marking protects nonprojected registered arithmetic terms. The unused imp::n_sign and free arith_project wrapper (reached only from src/test) are omitted. The independent qe_mbp dispatcher, array/datatype projection plugins and QSAT/full QE drivers remain separate unported work.",
+        "Exact math/big.Rat coefficients share the existing concrete simplex.ModelBasedOpt representation; AST numeral construction still uses the owning native numeral service. Concrete insertion-ordered coefficient/ID dictionaries use approved insdict v0.10.1; no C++ hash layout or STL containers are ported. Source root-only marking of residue formulas is preserved; recursive marking protects nonprojected registered arithmetic terms. The unused imp::n_sign and free arith_project wrapper (reached only from src/test) are omitted. The independent qe_mbp dispatcher and array/datatype projection plugins are now ported; QSAT/full QE drivers remain separate unfinished work.",
         "The existing simplex bridge now eliminates integer equality rows by exact positive scaling, including scaling divisibility moduli, instead of producing fractional integer coefficients. Source resolve routes equality rows through an inequality-only integer helper whose debug assertions require t_le inputs; the native equality branch deliberately avoids that invalid helper domain and inequality slack cuts. The separate source false-initialized unit-bound flags are preserved, retaining its integer representative selection. Nineteen prebuilt C++ implication/nonvacuity checks verify the native projected constraints; two more verify closed/strict optimum bounds. The C++ oracle uses full QE only to decide quantified counterexample queries after its default SMT returned unknown; native output is submitted unchanged."
       ]
     },
@@ -91915,7 +91915,7 @@
         "The concrete owning projection service borrows manager/config; each call retains actual lexical ASTRefs, mutable singleton/local formula vectors, partial model evaluator, ASTExprMark and construction-failure receipts until cleanup succeeds. Source recursive term protection reuses the existing typed all-mark AST visitor, including quantifier annotations. Caller vectors own successful appends, compaction and completed replacements on errors. Nineteen first-success campaigns cover constructor, real/integer/nonunit/modular/ITE/distinct/disequality/large-coefficient/opaque projections, singleton, bounded/strict/unbounded maximization and open/closed tracing; all charged fixture storage is released."
       ],
       "deviations": [
-        "Exact math/big.Rat coefficients share the existing concrete simplex.ModelBasedOpt representation; AST numeral construction still uses the owning native numeral service. Concrete insertion-ordered coefficient/ID dictionaries use approved insdict v0.10.1; no C++ hash layout or STL containers are ported. Source root-only marking of residue formulas is preserved; recursive marking protects nonprojected registered arithmetic terms. The unused imp::n_sign and free arith_project wrapper (reached only from src/test) are omitted. The independent qe_mbp dispatcher, array/datatype projection plugins and QSAT/full QE drivers remain separate unported work.",
+        "Exact math/big.Rat coefficients share the existing concrete simplex.ModelBasedOpt representation; AST numeral construction still uses the owning native numeral service. Concrete insertion-ordered coefficient/ID dictionaries use approved insdict v0.10.1; no C++ hash layout or STL containers are ported. Source root-only marking of residue formulas is preserved; recursive marking protects nonprojected registered arithmetic terms. The unused imp::n_sign and free arith_project wrapper (reached only from src/test) are omitted. The independent qe_mbp dispatcher and array/datatype projection plugins are now ported; QSAT/full QE drivers remain separate unfinished work.",
         "The existing simplex bridge now eliminates integer equality rows by exact positive scaling, including scaling divisibility moduli, instead of producing fractional integer coefficients. Source resolve routes equality rows through an inequality-only integer helper whose debug assertions require t_le inputs; the native equality branch deliberately avoids that invalid helper domain and inequality slack cuts. The separate source false-initialized unit-bound flags are preserved, retaining its integer representative selection. Nineteen prebuilt C++ implication/nonvacuity checks verify the native projected constraints; two more verify closed/strict optimum bounds. The C++ oracle uses full QE only to decide quantified counterexample queries after its default SMT returned unknown; native output is submitted unchanged."
       ]
     },
@@ -92333,7 +92333,7 @@
       ],
       "deviations": [
         "The source commented-out rw_cfg and its NOT_IMPLEMENTED_YET comparator are unreachable and deliberately omitted. No select/store reducer or universal rewriter adapter is activated. Source is_update_x do/while(false) recognizes only the bare target; store disequalities remain refused. Store equality retains the source loop bound checking all but the final index. Ackermann reduction appends fresh interpreted sel variables but replaces selects with model values, preserving the source behavior. Go maps provide lookup only; explicit slices preserve source traversal/representative order.",
-        "Seventeen prebuilt C++ cases check unchanged native output implies the original under an explicit symbolic array witness and remains satisfiable; refused cases check unchanged-formula equivalence. SMT-LIB let delegates witness substitution to the C++ parser independently of native replacement. This constructive implication proves existence for arbitrary remaining parameters satisfying the output. It avoids the reference executable returning unknown on quantified-array queries; no native result receives additional elimination or repair. Complete MBP dispatch, QSAT and full QE remain unfinished."
+        "Seventeen prebuilt C++ cases check unchanged native output implies the original under an explicit symbolic array witness and remains satisfiable; refused cases check unchanged-formula equivalence. SMT-LIB let delegates witness substitution to the C++ parser independently of native replacement. This constructive implication proves existence for arbitrary remaining parameters satisfying the output. It avoids the reference executable returning unknown on quantified-array queries; no native result receives additional elimination or repair. The complete MBP driver is now ported; QSAT and full QE remain unfinished."
       ]
     },
     {
@@ -92456,7 +92456,7 @@
       ],
       "deviations": [
         "The source commented-out rw_cfg and its NOT_IMPLEMENTED_YET comparator are unreachable and deliberately omitted. No select/store reducer or universal rewriter adapter is activated. Source is_update_x do/while(false) recognizes only the bare target; store disequalities remain refused. Store equality retains the source loop bound checking all but the final index. Ackermann reduction appends fresh interpreted sel variables but replaces selects with model values, preserving the source behavior. Go maps provide lookup only; explicit slices preserve source traversal/representative order.",
-        "Seventeen prebuilt C++ cases check unchanged native output implies the original under an explicit symbolic array witness and remains satisfiable; refused cases check unchanged-formula equivalence. SMT-LIB let delegates witness substitution to the C++ parser independently of native replacement. This constructive implication proves existence for arbitrary remaining parameters satisfying the output. It avoids the reference executable returning unknown on quantified-array queries; no native result receives additional elimination or repair. Complete MBP dispatch, QSAT and full QE remain unfinished."
+        "Seventeen prebuilt C++ cases check unchanged native output implies the original under an explicit symbolic array witness and remains satisfiable; refused cases check unchanged-formula equivalence. SMT-LIB let delegates witness substitution to the C++ parser independently of native replacement. This constructive implication proves existence for arbitrary remaining parameters satisfying the output. It avoids the reference executable returning unknown on quantified-array queries; no native result receives additional elimination or repair. The complete MBP driver is now ported; QSAT and full QE remain unfinished."
       ]
     },
     {
@@ -92777,7 +92777,7 @@
         "DatatypeProjection borrows the AST manager/config and owns its actual persistent model-value ASTRef and ContainsApp target checker. Per-call state retains evaluated values, erased formula roots, reconstructed accessor/constructor/recognizer ASTRefs, partial model evaluator, safe replacers, theory rewriters and construction-failure receipts until cleanup succeeds. Actual model registrations, fresh field interpretations and completed caller-vector writes remain owned on errors. Seventeen first-success reservation campaigns cover constructor, nonrecursive/enum/recursive/direct/nested/negated-distinct/fallback projection, repeated-owner replacement, foreign-field lifting and open/closed tracing; all charged fixture storage is released."
       ],
       "deviations": [
-        "Concrete Go maps/slices and standard string handling replace source pointer containers and field-name string internals. Source project_nonrec does not append its fresh field constants to vars; the native implementation preserves that behavior and registers their interpretations in the supplied model. The source nonconstructor-value early return is retained for absent-variable/incomplete-model calls. No retained method throws cant_project, so its unreachable catch is not represented by a synthetic exception/plugin adapter; actual native child failures propagate with owning cleanup receipts. Shared project_plugin::pick_equality is implemented once with the actual caller reference vector retaining evaluated values. Array projection, the complete MBP driver and QSAT/full QE remain separate unfinished work.",
+        "Concrete Go maps/slices and standard string handling replace source pointer containers and field-name string internals. Source project_nonrec does not append its fresh field constants to vars; the native implementation preserves that behavior and registers their interpretations in the supplied model. The source nonconstructor-value early return is retained for absent-variable/incomplete-model calls. No retained method throws cant_project, so its unreachable catch is not represented by a synthetic exception/plugin adapter; actual native child failures propagate with owning cleanup receipts. Shared project_plugin::pick_equality is implemented once with the actual caller reference vector retaining evaluated values. Array projection and the complete MBP driver are now ported; QSAT/full QE remain separate unfinished work.",
         "Nine prebuilt C++ cases establish that unchanged native output implies the original with its target existentially quantified and remains satisfiable, including fresh model-field symbols. Three more establish equivalence/nonvacuity of foreign-field lifting. These are logical and model-preservation comparisons, without claiming observation of C++ internal fresh names or allocation order. The C++ oracle uses full QE only to decide quantified counterexample formulas; native results receive no extra elimination pass."
       ]
     },
@@ -92900,7 +92900,7 @@
         "DatatypeProjection borrows the AST manager/config and owns its actual persistent model-value ASTRef and ContainsApp target checker. Per-call state retains evaluated values, erased formula roots, reconstructed accessor/constructor/recognizer ASTRefs, partial model evaluator, safe replacers, theory rewriters and construction-failure receipts until cleanup succeeds. Actual model registrations, fresh field interpretations and completed caller-vector writes remain owned on errors. Seventeen first-success reservation campaigns cover constructor, nonrecursive/enum/recursive/direct/nested/negated-distinct/fallback projection, repeated-owner replacement, foreign-field lifting and open/closed tracing; all charged fixture storage is released."
       ],
       "deviations": [
-        "Concrete Go maps/slices and standard string handling replace source pointer containers and field-name string internals. Source project_nonrec does not append its fresh field constants to vars; the native implementation preserves that behavior and registers their interpretations in the supplied model. The source nonconstructor-value early return is retained for absent-variable/incomplete-model calls. No retained method throws cant_project, so its unreachable catch is not represented by a synthetic exception/plugin adapter; actual native child failures propagate with owning cleanup receipts. Shared project_plugin::pick_equality is implemented once with the actual caller reference vector retaining evaluated values. Array projection, the complete MBP driver and QSAT/full QE remain separate unfinished work.",
+        "Concrete Go maps/slices and standard string handling replace source pointer containers and field-name string internals. Source project_nonrec does not append its fresh field constants to vars; the native implementation preserves that behavior and registers their interpretations in the supplied model. The source nonconstructor-value early return is retained for absent-variable/incomplete-model calls. No retained method throws cant_project, so its unreachable catch is not represented by a synthetic exception/plugin adapter; actual native child failures propagate with owning cleanup receipts. Shared project_plugin::pick_equality is implemented once with the actual caller reference vector retaining evaluated values. Array projection and the complete MBP driver are now ported; QSAT/full QE remain separate unfinished work.",
         "Nine prebuilt C++ cases establish that unchanged native output implies the original with its target existentially quantified and remains satisfiable, including fresh model-field symbols. Three more establish equivalence/nonvacuity of foreign-field lifting. These are logical and model-preservation comparisons, without claiming observation of C++ internal fresh names or allocation order. The C++ oracle uses full QE only to decide quantified counterexample formulas; native results receive no extra elimination pass."
       ]
     },
@@ -93580,7 +93580,7 @@
       "path": "src/qe/qe_mbp.cpp",
       "component": "qe",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/qe/arithmetic_projection.go",
         "pkg/qe/arithmetic_linearize.go",
@@ -93607,7 +93607,10 @@
         "pkg/qe/array_projection_selects.go",
         "pkg/qe/projection_partition.go",
         "pkg/qe/array_projection_test.go",
-        "pkg/qe/array_projection_cpp_test.go"
+        "pkg/qe/array_projection_cpp_test.go",
+        "pkg/qe/model_based_projection.go",
+        "pkg/qe/model_projection_loop.go",
+        "pkg/qe/model_based_projection_test.go"
       ],
       "tests": [
         "TestArithmeticProjectionModelPreservationAndVariables",
@@ -93630,7 +93633,17 @@
         "TestArrayProjectionUnknownIndicesRollback",
         "TestArrayProjectionReuseNoopAndOwnerGuards",
         "TestArrayProjectionAllocationFrontiers",
-        "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+        "TestArrayProjectionCPPWitnessAndRefusalEquivalence",
+        "TestModelBasedProjectionConcreteDispatch",
+        "TestModelBasedProjectionSolveFixedPointAndLiteralForwarding",
+        "TestModelBasedProjectionForceOrderReuseAndGuards",
+        "TestModelBasedProjectionMaximizeForwarding",
+        "TestModelBasedProjectionMixedFamiliesAndEmptyInputs",
+        "TestModelBasedProjectionAllocationFrontiers",
+        "TestProjectionEqualityStoppedRewritePreservesCallerSlot",
+        "TestModelBasedProjectionCPPArithmeticImplication",
+        "TestModelBasedProjectionCPPArrayWitness",
+        "TestModelBasedProjectionCPPDatatypeImplication"
       ],
       "assertions": [
         {
@@ -93682,8 +93695,8 @@
           "text": "SASSERT(validate_model(model, fmls));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained project_plugin::mark_rec(expr_mark&,expr*) call used by arithmetic projection to protect all subexpressions of nonprojected terms; existing typed AST all-mark visitor, including quantifier annotations",
@@ -93810,23 +93823,121 @@
             "TestArrayProjectionAllocationFrontiers",
             "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
           ]
+        },
+        {
+          "name": "mbp/impl constructor/destructor/add_plugin/get_plugin: concrete arithmetic/datatype/array ownership, ascending family-id dispatch and retryable cleanup",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/model_based_projection.go",
+            "pkg/qe/model_projection_loop.go",
+            "pkg/qe/model_based_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go"
+          ],
+          "tests": [
+            "TestModelBasedProjectionConcreteDispatch",
+            "TestModelBasedProjectionSolveFixedPointAndLiteralForwarding",
+            "TestModelBasedProjectionForceOrderReuseAndGuards",
+            "TestModelBasedProjectionMaximizeForwarding",
+            "TestModelBasedProjectionMixedFamiliesAndEmptyInputs",
+            "TestModelBasedProjectionAllocationFrontiers",
+            "TestProjectionEqualityStoppedRewritePreservesCallerSlot",
+            "TestModelBasedProjectionCPPArithmeticImplication",
+            "TestModelBasedProjectionCPPArrayWitness",
+            "TestModelBasedProjectionCPPDatatypeImplication"
+          ]
+        },
+        {
+          "name": "preprocess_solve and public solve: literal extraction, equality solving and all plugin cheap-solve hooks to a fixed point, including datatype lifting feeding later equation elimination",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/model_based_projection.go",
+            "pkg/qe/model_projection_loop.go",
+            "pkg/qe/model_based_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go"
+          ],
+          "tests": [
+            "TestModelBasedProjectionConcreteDispatch",
+            "TestModelBasedProjectionSolveFixedPointAndLiteralForwarding",
+            "TestModelBasedProjectionForceOrderReuseAndGuards",
+            "TestModelBasedProjectionMaximizeForwarding",
+            "TestModelBasedProjectionMixedFamiliesAndEmptyInputs",
+            "TestModelBasedProjectionAllocationFrontiers",
+            "TestProjectionEqualityStoppedRewritePreservesCallerSlot",
+            "TestModelBasedProjectionCPPArithmeticImplication",
+            "TestModelBasedProjectionCPPArrayWitness",
+            "TestModelBasedProjectionCPPDatatypeImplication"
+          ]
+        },
+        {
+          "name": "impl::operator() and validate_model: model debug pre/postconditions, filtering, Boolean projection, batch hook followed by reverse variable dispatch, fresh-variable processing, failed-target order, optional model-value substitution/theory rewriting, retry preprocessing and empty-formula clearing",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/model_based_projection.go",
+            "pkg/qe/model_projection_loop.go",
+            "pkg/qe/model_based_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go"
+          ],
+          "tests": [
+            "TestModelBasedProjectionConcreteDispatch",
+            "TestModelBasedProjectionSolveFixedPointAndLiteralForwarding",
+            "TestModelBasedProjectionForceOrderReuseAndGuards",
+            "TestModelBasedProjectionMaximizeForwarding",
+            "TestModelBasedProjectionMixedFamiliesAndEmptyInputs",
+            "TestModelBasedProjectionAllocationFrontiers",
+            "TestProjectionEqualityStoppedRewritePreservesCallerSlot",
+            "TestModelBasedProjectionCPPArithmeticImplication",
+            "TestModelBasedProjectionCPPArrayWitness",
+            "TestModelBasedProjectionCPPDatatypeImplication"
+          ]
+        },
+        {
+          "name": "public extract_literals/maximize forwarding: actual preprocessing owner and a fresh per-call arithmetic maximizer with retained result bounds",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/model_based_projection.go",
+            "pkg/qe/model_projection_loop.go",
+            "pkg/qe/model_based_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go"
+          ],
+          "tests": [
+            "TestModelBasedProjectionConcreteDispatch",
+            "TestModelBasedProjectionSolveFixedPointAndLiteralForwarding",
+            "TestModelBasedProjectionForceOrderReuseAndGuards",
+            "TestModelBasedProjectionMaximizeForwarding",
+            "TestModelBasedProjectionMixedFamiliesAndEmptyInputs",
+            "TestModelBasedProjectionAllocationFrontiers",
+            "TestProjectionEqualityStoppedRewritePreservesCallerSlot",
+            "TestModelBasedProjectionCPPArithmeticImplication",
+            "TestModelBasedProjectionCPPArrayWitness",
+            "TestModelBasedProjectionCPPDatatypeImplication"
+          ]
         }
       ],
       "ownership": [
         "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced.",
         "The private projectionPreprocessor retains its concrete theory rewriter and actual per-call ASTRefs, model evaluator, safe replacers, ContainsApp owners, ASTExprMarks and construction-failure receipts. Erased expressions remain rooted while their children are borrowed. Caller vectors retain completed appends/replacements and source compaction. Fourteen first-success reservation campaigns cover constructor, literal/Boolean/nested extraction, equality/cycle solving, Boolean projection, filtering and open/closed tracing; all charged fixture storage is released. Successful extraction resets its shared Boolean-visited set for reuse.",
         "The same concrete pickProjectionEquality helper serves MBP extraction and recursive datatype solving, with evaluated model values and the selected equality held in each actual caller's mutable ASTRef vector through stopped cleanup.",
-        "Shared partition helpers retain evaluated values in the actual caller ASTRef vector and append owning equality/distinct references to the caller literal vector. No generic callback owner or unused template instantiation is introduced."
+        "Shared partition helpers retain evaluated values in the actual caller ASTRef vector and append owning equality/distinct references to the caller literal vector. No generic callback owner or unused template instantiation is introduced.",
+        "ModelBasedProjection owns concrete plugin members and the common preprocessor. Actual call state retains lexical target/model/substitution ASTRefs, mutable new-variable vector headers, per-call maximizers and child construction-failure receipts through cleanup. Eleven first-success allocation campaigns cover construction, arithmetic/array/store/datatype dispatch, solve/extract, force elimination, maximization and open/closed tracing. Source temporary-before-publish substitution/rewriting is preserved in cheap equality solving and forced fallback; a dedicated stopped-rewrite campaign rejects publication of the intermediate substitution result. All charged fixture storage is released."
       ],
       "deviations": [
-        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
+        "Source pointer/plugin containers use concrete Go members and family-id slices; unused abstract/default plugin adapters are omitted. Only arithmetic overrides the batch hook, so the datatype/array default no-ops require no Go adapter. Source unused_fmls is never populated and has no effect; variable filtering preserves its all-node/annotation traversal. The source resets Boolean deduplication only after successful extraction. Forced elimination remains explicitly optional, and non-forced projection preserves source fresh-variable residue, including Boolean sel variables introduced after the initial Boolean pass. QSAT/qe2/qe_rec/full QE are still separate unfinished consumers; no substitute tactic is registered.",
+        "Forty-five prebuilt C++ comparisons exercise the full driver: nineteen arithmetic and nine datatype existential implication/nonvacuity checks, plus seventeen array witness/refusal cases. Native outputs are submitted unchanged. C++ full QE decides only the arithmetic/datatype counterexample queries; explicit symbolic array witnesses are substituted independently by SMT-LIB let to avoid old-reference quantified-array unknown. These checks establish logical implication and model preservation, not identical internal model choices/fresh names."
       ]
     },
     {
       "path": "src/qe/qe_mbp.h",
       "component": "qe",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/qe/arithmetic_projection.go",
         "pkg/qe/arithmetic_linearize.go",
@@ -93853,7 +93964,10 @@
         "pkg/qe/array_projection_selects.go",
         "pkg/qe/projection_partition.go",
         "pkg/qe/array_projection_test.go",
-        "pkg/qe/array_projection_cpp_test.go"
+        "pkg/qe/array_projection_cpp_test.go",
+        "pkg/qe/model_based_projection.go",
+        "pkg/qe/model_projection_loop.go",
+        "pkg/qe/model_based_projection_test.go"
       ],
       "tests": [
         "TestArithmeticProjectionModelPreservationAndVariables",
@@ -93876,7 +93990,17 @@
         "TestArrayProjectionUnknownIndicesRollback",
         "TestArrayProjectionReuseNoopAndOwnerGuards",
         "TestArrayProjectionAllocationFrontiers",
-        "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
+        "TestArrayProjectionCPPWitnessAndRefusalEquivalence",
+        "TestModelBasedProjectionConcreteDispatch",
+        "TestModelBasedProjectionSolveFixedPointAndLiteralForwarding",
+        "TestModelBasedProjectionForceOrderReuseAndGuards",
+        "TestModelBasedProjectionMaximizeForwarding",
+        "TestModelBasedProjectionMixedFamiliesAndEmptyInputs",
+        "TestModelBasedProjectionAllocationFrontiers",
+        "TestProjectionEqualityStoppedRewritePreservesCallerSlot",
+        "TestModelBasedProjectionCPPArithmeticImplication",
+        "TestModelBasedProjectionCPPArrayWitness",
+        "TestModelBasedProjectionCPPDatatypeImplication"
       ],
       "conditionals": [
         {
@@ -93888,8 +94012,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained project_plugin::mark_rec(expr_mark&,expr*) call used by arithmetic projection to protect all subexpressions of nonprojected terms; existing typed AST all-mark visitor, including quantifier annotations",
@@ -94016,16 +94140,114 @@
             "TestArrayProjectionAllocationFrontiers",
             "TestArrayProjectionCPPWitnessAndRefusalEquivalence"
           ]
+        },
+        {
+          "name": "mbp/impl constructor/destructor/add_plugin/get_plugin: concrete arithmetic/datatype/array ownership, ascending family-id dispatch and retryable cleanup",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/model_based_projection.go",
+            "pkg/qe/model_projection_loop.go",
+            "pkg/qe/model_based_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go"
+          ],
+          "tests": [
+            "TestModelBasedProjectionConcreteDispatch",
+            "TestModelBasedProjectionSolveFixedPointAndLiteralForwarding",
+            "TestModelBasedProjectionForceOrderReuseAndGuards",
+            "TestModelBasedProjectionMaximizeForwarding",
+            "TestModelBasedProjectionMixedFamiliesAndEmptyInputs",
+            "TestModelBasedProjectionAllocationFrontiers",
+            "TestProjectionEqualityStoppedRewritePreservesCallerSlot",
+            "TestModelBasedProjectionCPPArithmeticImplication",
+            "TestModelBasedProjectionCPPArrayWitness",
+            "TestModelBasedProjectionCPPDatatypeImplication"
+          ]
+        },
+        {
+          "name": "preprocess_solve and public solve: literal extraction, equality solving and all plugin cheap-solve hooks to a fixed point, including datatype lifting feeding later equation elimination",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/model_based_projection.go",
+            "pkg/qe/model_projection_loop.go",
+            "pkg/qe/model_based_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go"
+          ],
+          "tests": [
+            "TestModelBasedProjectionConcreteDispatch",
+            "TestModelBasedProjectionSolveFixedPointAndLiteralForwarding",
+            "TestModelBasedProjectionForceOrderReuseAndGuards",
+            "TestModelBasedProjectionMaximizeForwarding",
+            "TestModelBasedProjectionMixedFamiliesAndEmptyInputs",
+            "TestModelBasedProjectionAllocationFrontiers",
+            "TestProjectionEqualityStoppedRewritePreservesCallerSlot",
+            "TestModelBasedProjectionCPPArithmeticImplication",
+            "TestModelBasedProjectionCPPArrayWitness",
+            "TestModelBasedProjectionCPPDatatypeImplication"
+          ]
+        },
+        {
+          "name": "impl::operator() and validate_model: model debug pre/postconditions, filtering, Boolean projection, batch hook followed by reverse variable dispatch, fresh-variable processing, failed-target order, optional model-value substitution/theory rewriting, retry preprocessing and empty-formula clearing",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/model_based_projection.go",
+            "pkg/qe/model_projection_loop.go",
+            "pkg/qe/model_based_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go"
+          ],
+          "tests": [
+            "TestModelBasedProjectionConcreteDispatch",
+            "TestModelBasedProjectionSolveFixedPointAndLiteralForwarding",
+            "TestModelBasedProjectionForceOrderReuseAndGuards",
+            "TestModelBasedProjectionMaximizeForwarding",
+            "TestModelBasedProjectionMixedFamiliesAndEmptyInputs",
+            "TestModelBasedProjectionAllocationFrontiers",
+            "TestProjectionEqualityStoppedRewritePreservesCallerSlot",
+            "TestModelBasedProjectionCPPArithmeticImplication",
+            "TestModelBasedProjectionCPPArrayWitness",
+            "TestModelBasedProjectionCPPDatatypeImplication"
+          ]
+        },
+        {
+          "name": "public extract_literals/maximize forwarding: actual preprocessing owner and a fresh per-call arithmetic maximizer with retained result bounds",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/model_based_projection.go",
+            "pkg/qe/model_projection_loop.go",
+            "pkg/qe/model_based_projection_test.go",
+            "pkg/qe/arithmetic_projection_cpp_test.go",
+            "pkg/qe/array_projection_cpp_test.go",
+            "pkg/qe/datatype_projection_cpp_test.go"
+          ],
+          "tests": [
+            "TestModelBasedProjectionConcreteDispatch",
+            "TestModelBasedProjectionSolveFixedPointAndLiteralForwarding",
+            "TestModelBasedProjectionForceOrderReuseAndGuards",
+            "TestModelBasedProjectionMaximizeForwarding",
+            "TestModelBasedProjectionMixedFamiliesAndEmptyInputs",
+            "TestModelBasedProjectionAllocationFrontiers",
+            "TestProjectionEqualityStoppedRewritePreservesCallerSlot",
+            "TestModelBasedProjectionCPPArithmeticImplication",
+            "TestModelBasedProjectionCPPArrayWitness",
+            "TestModelBasedProjectionCPPDatatypeImplication"
+          ]
         }
       ],
       "ownership": [
         "Arithmetic projection retains its actual ASTExprMark through stopped AST visitation and cleanup; no generic project_plugin adapter or unused template is introduced.",
         "The private projectionPreprocessor retains its concrete theory rewriter and actual per-call ASTRefs, model evaluator, safe replacers, ContainsApp owners, ASTExprMarks and construction-failure receipts. Erased expressions remain rooted while their children are borrowed. Caller vectors retain completed appends/replacements and source compaction. Fourteen first-success reservation campaigns cover constructor, literal/Boolean/nested extraction, equality/cycle solving, Boolean projection, filtering and open/closed tracing; all charged fixture storage is released. Successful extraction resets its shared Boolean-visited set for reuse.",
         "The same concrete pickProjectionEquality helper serves MBP extraction and recursive datatype solving, with evaluated model values and the selected equality held in each actual caller's mutable ASTRef vector through stopped cleanup.",
-        "Shared partition helpers retain evaluated values in the actual caller ASTRef vector and append owning equality/distinct references to the caller literal vector. No generic callback owner or unused template instantiation is introduced."
+        "Shared partition helpers retain evaluated values in the actual caller ASTRef vector and append owning equality/distinct references to the caller literal vector. No generic callback owner or unused template instantiation is introduced.",
+        "ModelBasedProjection owns concrete plugin members and the common preprocessor. Actual call state retains lexical target/model/substitution ASTRefs, mutable new-variable vector headers, per-call maximizers and child construction-failure receipts through cleanup. Eleven first-success allocation campaigns cover construction, arithmetic/array/store/datatype dispatch, solve/extract, force elimination, maximization and open/closed tracing. Source temporary-before-publish substitution/rewriting is preserved in cheap equality solving and forced fallback; a dedicated stopped-rewrite campaign rejects publication of the intermediate substitution result. All charged fixture storage is released."
       ],
       "deviations": [
-        "The common preprocessing stages are private until the complete MBP driver is available. No partial mbp Project/Solve API or qsat/qe2/qe_rec tactic is registered. Plugin construction/dispatch, the overall preprocess_solve fixed point, full force-elimination loop and maximize forwarding wrapper remain unported. Existing concrete safe substitution, occurs-check and all-mark AST visitors are reused; no universal template/plugin adapter or STL implementation is introduced. The source resets Boolean deduplication only after successful extraction; a stopped call retains completed source writes and lexical owners for cleanup. C++ tests establish cube implication and existential projection/nonvacuity, rather than claiming observation of internal C++ model choices."
+        "Source pointer/plugin containers use concrete Go members and family-id slices; unused abstract/default plugin adapters are omitted. Only arithmetic overrides the batch hook, so the datatype/array default no-ops require no Go adapter. Source unused_fmls is never populated and has no effect; variable filtering preserves its all-node/annotation traversal. The source resets Boolean deduplication only after successful extraction. Forced elimination remains explicitly optional, and non-forced projection preserves source fresh-variable residue, including Boolean sel variables introduced after the initial Boolean pass. QSAT/qe2/qe_rec/full QE are still separate unfinished consumers; no substitute tactic is registered.",
+        "Forty-five prebuilt C++ comparisons exercise the full driver: nineteen arithmetic and nine datatype existential implication/nonvacuity checks, plus seventeen array witness/refusal cases. Native outputs are submitted unchanged. C++ full QE decides only the arithmetic/datatype counterexample queries; explicit symbolic array witnesses are substituted independently by SMT-LIB let to avoid old-reference quantified-array unknown. These checks establish logical implication and model preservation, not identical internal model choices/fresh names."
       ]
     },
     {
@@ -94450,7 +94672,7 @@
         "Concrete map-key ASTRefs, formula trail, per-level predicate ASTRefs, scoped assumption ASTRefs and a counted filter-model converter preserve the actual source owners. Reset preserves declaration levels and the filter, matching source; final Close releases the filter count and enclosing charge. Caller output vector appends and completed replacements remain owned on errors. Pending lexical formula references, model evaluators and construction-failure receipts are retained until cleanup succeeds. Eleven first-success campaigns cover constructor, abstraction, rebuilding, assumption creation/retrieval, validation, display, open/closed tracing, model tracing and final close, releasing all charged fixture storage."
       ],
       "deviations": [
-        "Only max_level and pred_abs are ported. The QSAT kernel, quantifier preparation, projection/search loop, tactics/factories, QE modes, qmax and maximize entry point remain unported, pending model-based projection and full QE prerequisites. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule."
+        "Only max_level and pred_abs are ported. The QSAT kernel, quantifier preparation, projection/search loop, tactics/factories, QE modes, qmax and maximize entry point remain unported, with model-based projection now available; full QE and the retained QSAT consumers remain unfinished. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule."
       ]
     },
     {
@@ -94547,7 +94769,7 @@
         "Concrete map-key ASTRefs, formula trail, per-level predicate ASTRefs, scoped assumption ASTRefs and a counted filter-model converter preserve the actual source owners. Reset preserves declaration levels and the filter, matching source; final Close releases the filter count and enclosing charge. Caller output vector appends and completed replacements remain owned on errors. Pending lexical formula references, model evaluators and construction-failure receipts are retained until cleanup succeeds. Eleven first-success campaigns cover constructor, abstraction, rebuilding, assumption creation/retrieval, validation, display, open/closed tracing, model tracing and final close, releasing all charged fixture storage."
       ],
       "deviations": [
-        "Only max_level and pred_abs are ported. The QSAT kernel, quantifier preparation, projection/search loop, tactics/factories, QE modes, qmax and maximize entry point remain unported, pending model-based projection and full QE prerequisites. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule."
+        "Only max_level and pred_abs are ported. The QSAT kernel, quantifier preparation, projection/search loop, tactics/factories, QE modes, qmax and maximize entry point remain unported, with model-based projection now available; full QE and the retained QSAT consumers remain unfinished. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule."
       ]
     },
     {

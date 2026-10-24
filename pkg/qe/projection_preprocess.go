@@ -14,8 +14,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/memory"
 )
 
-// This is the concrete preprocessing member of the pending MBP driver. Keep
-// it private until its datatype/array dispatch and projection loop are ready.
+// This is the concrete preprocessing member of ModelBasedProjection.
 type projectionPreprocessor struct {
 	self        *projectionPreprocessor
 	manager     *ast.ASTManager
@@ -418,15 +417,30 @@ func (p *projectionPreprocessor) solveEqualities(vars, forms *[]ast.ASTRef) (cha
 			return changed, e
 		}
 		removed[left] = true
+		tmp, e := c.ref(ast.ASTHandle{})
+		if e != nil {
+			return changed, e
+		}
 		for _, r := range *forms {
-			if e = sub.ApplyRef(r); e != nil {
-				return changed, e
-			}
 			v, e := m.RefGet(r)
 			if e != nil {
 				return changed, e
 			}
-			if e = p.rewriter.Rewrite(v, r); e != nil {
+			if e = sub.Apply(v, tmp); e != nil {
+				return changed, e
+			}
+			v, e = m.RefGet(tmp)
+			if e != nil {
+				return changed, e
+			}
+			if e = p.rewriter.Rewrite(v, tmp); e != nil {
+				return changed, e
+			}
+			v, e = m.RefGet(tmp)
+			if e != nil {
+				return changed, e
+			}
+			if e = m.SetRef(r, v); e != nil {
 				return changed, e
 			}
 		}

@@ -28,15 +28,29 @@ func datatypeProjectionSort(d *datatypeProjectionFixture, h ast.ASTHandle) strin
 	return "unknown-sort"
 }
 func TestDatatypeProjectionCPPExistentialImplication(t *testing.T) {
+	datatypeProjectionCPPImplication(t, false)
+}
+func TestModelBasedProjectionCPPDatatypeImplication(t *testing.T) {
+	datatypeProjectionCPPImplication(t, true)
+}
+func datatypeProjectionCPPImplication(t *testing.T, driver bool) {
 	for _, mode := range datatypeProjectionModes {
 		t.Run(mode, func(t *testing.T) {
 			c := datatypeCase(t, mode)
 			d := c.d
 			f := d.f
 			m := f.r.manager
-			p := datatypeProjectionOwner(t, d)
 			before := len(d.md.Core().ConstantDeclarations)
-			ok, err := p.ProjectVariable(d.md.Core(), c.target, c.additional, c.forms)
+			ok := true
+			var err error
+			if driver {
+				p := modelProjectionOwner(t, f)
+				vars := predicateRefs(t, f, c.target)
+				err = p.Project(true, vars, d.md.Core(), c.forms)
+			} else {
+				p := datatypeProjectionOwner(t, d)
+				ok, err = p.ProjectVariable(d.md.Core(), c.target, c.additional, c.forms)
+			}
 			fmMust(t, err)
 			if !ok {
 				t.Fatal("projection refused")

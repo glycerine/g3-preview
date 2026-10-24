@@ -35,12 +35,23 @@ func projectionCPP(t *testing.T, script string) string {
 }
 
 func TestArithmeticProjectionCPPModelBasedImplication(t *testing.T) {
+	arithmeticProjectionCPPImplication(t, false)
+}
+func TestModelBasedProjectionCPPArithmeticImplication(t *testing.T) {
+	arithmeticProjectionCPPImplication(t, true)
+}
+func arithmeticProjectionCPPImplication(t *testing.T, driver bool) {
 	for _, mode := range arithmeticProjectionModes {
 		t.Run(mode, func(t *testing.T) {
 			c := arithmeticCase(t, mode)
-			p := arithmeticProjectionOwner(t, c.f)
 			m := c.f.r.manager
-			fmMust(t, p.Project(c.md.Core(), c.vars, c.forms))
+			if driver {
+				p := modelProjectionOwner(t, c.f)
+				fmMust(t, p.Project(true, c.vars, c.md.Core(), c.forms))
+			} else {
+				p := arithmeticProjectionOwner(t, c.f)
+				fmMust(t, p.Project(c.md.Core(), c.vars, c.forms))
+			}
 			format := func(h ast.ASTHandle) string {
 				var s bytes.Buffer
 				fmMust(t, writeExpression(m, c.f.r.config, &s, h))

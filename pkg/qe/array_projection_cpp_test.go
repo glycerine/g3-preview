@@ -9,13 +9,27 @@ import (
 )
 
 func TestArrayProjectionCPPWitnessAndRefusalEquivalence(t *testing.T) {
+	arrayProjectionCPPWitness(t, false)
+}
+func TestModelBasedProjectionCPPArrayWitness(t *testing.T) {
+	arrayProjectionCPPWitness(t, true)
+}
+func arrayProjectionCPPWitness(t *testing.T, driver bool) {
 	for _, mode := range arrayProjectionModes {
 		t.Run(mode, func(t *testing.T) {
 			c := arrayCase(t, mode)
-			p := arrayProjectionOwner(t, c)
 			m := c.f.r.manager
 			before := len(c.md.Core().ConstantDeclarations)
-			ok, err := p.ProjectVariable(c.md.Core(), c.target, c.additional, c.lits)
+			ok := c.success
+			var err error
+			if driver {
+				p := modelProjectionOwner(t, c.f)
+				vars := predicateRefs(t, c.f, c.target)
+				err = p.Project(false, vars, c.md.Core(), c.lits)
+			} else {
+				p := arrayProjectionOwner(t, c)
+				ok, err = p.ProjectVariable(c.md.Core(), c.target, c.additional, c.lits)
+			}
 			fmMust(t, err)
 			if ok != c.success {
 				t.Fatal(ok, c.success)
