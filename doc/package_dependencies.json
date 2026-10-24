@@ -2201,6 +2201,7 @@
         "projection_literals.go",
         "projection_partition.go",
         "projection_preprocess.go",
+        "qsat_preparation.go",
         "trace.go",
         "variable_selection.go"
       ]
