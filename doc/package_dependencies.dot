@@ -467,6 +467,7 @@ digraph packages {
   "tactic/sls" [style=filled, fillcolor="#eeeeee"];
   "tactic/sls" -> "util/params";
   "tactic/smtlogics" [style=filled, fillcolor="#eeeeee"];
+  "tactic/smtlogics" -> "ackermannization";
   "tactic/smtlogics" -> "ast";
   "tactic/smtlogics" -> "sat/tactic";
   "tactic/smtlogics" -> "smtcore";

@@ -1,0 +1,8 @@
+(set-logic QF_BV)
+(set-option :produce-models true)
+(declare-const x (_ BitVec 8))
+(assert (bvsle #xf8 x))
+(assert (bvsle x #xff))
+(assert (not (= x #xff)))
+(check-sat)
+(get-value ((bvsle #xf8 x) (bvsle x #xff) (not (= x #xff))))

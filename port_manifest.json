@@ -39317,7 +39317,24 @@
         "pkg/cmd_context/check_logic.go",
         "pkg/cmd_context/check_logic_test.go",
         "pkg/parsers/smt2/check_logic_test.go",
-        "pkg/ast/ast_decl_parameter_access.go"
+        "pkg/ast/ast_decl_parameter_access.go",
+        "pkg/tactic/smtlogics/qfbv_tactic.go",
+        "pkg/tactic/smtlogics/qflia_tactic.go",
+        "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+        "pkg/tactic/smtlogics/qfbv_translation_test.go",
+        "pkg/cmd_context/qfbv_solver_test.go",
+        "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -39341,7 +39358,13 @@
         "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
         "TestLogicCheckerDifferenceTraceAndClosedStream",
         "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
-        "TestSMT2LogicValidationCPP"
+        "TestSMT2LogicValidationCPP",
+        "TestQFBVTacticCPP",
+        "TestQFBVTacticConstructorAllocationFrontiers",
+        "TestQFBVTacticModelSurvivesStrategyClose",
+        "TestQFBVTacticTranslatedProofAndCoreRoutes",
+        "TestCommandContextQFBVCombinedSolverProofResult",
+        "TestSMTLibRunnerQFBVBranchEvidence"
       ],
       "conditionals": [
         {
@@ -39750,6 +39773,43 @@
             "TestLogicCheckerDifferenceTraceAndClosedStream",
             "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
             "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "Ordinary QF_BV context dispatch uses the source combined strategic solver; session stdout is borrowed for optional native SAT output",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfbv_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfbv_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+          ],
+          "tests": [
+            "TestQFBVTacticCPP",
+            "TestQFBVTacticConstructorAllocationFrontiers",
+            "TestQFBVTacticModelSurvivesStrategyClose",
+            "TestQFBVTacticTranslatedProofAndCoreRoutes",
+            "TestCommandContextQFBVCombinedSolverProofResult",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -40975,7 +41035,26 @@
         "pkg/cmd/g3/test_vectors/ackermann_nested_model.smt2",
         "pkg/cmd/g3/test_vectors/ackermann_nested_unsat.smt2",
         "pkg/cmd/g3/test_vectors/ackermann_proof_refusal.smt2",
-        "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
+        "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2",
+        "pkg/tactic/smtlogics/qfbv_tactic.go",
+        "pkg/tactic/smtlogics/qflia_tactic.go",
+        "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+        "pkg/tactic/smtlogics/qfbv_translation_test.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/qfbv_solver_test.go",
+        "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -41013,7 +41092,13 @@
         "TestArithmeticFragmentProbeNativeContracts",
         "TestArithmeticFragmentProbeAcrossManagerDomains",
         "TestArithmeticFragmentProbesCPP",
-        "TestArithmeticQFUFNRAMetadataGuardsCPP"
+        "TestArithmeticQFUFNRAMetadataGuardsCPP",
+        "TestQFBVTacticCPP",
+        "TestQFBVTacticConstructorAllocationFrontiers",
+        "TestQFBVTacticModelSurvivesStrategyClose",
+        "TestQFBVTacticTranslatedProofAndCoreRoutes",
+        "TestCommandContextQFBVCombinedSolverProofResult",
+        "TestSMTLibRunnerQFBVBranchEvidence"
       ],
       "conditionals": [
         {
@@ -41267,6 +41352,43 @@
             "pkg/cmd/g3/test_vectors/ackermann_usort_models.smt2"
           ],
           "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Register explicit qfbv for check-sat-using, preserving models/scopes, source route choices, proof/core guards, div0 SMT fallback and temporary parameter failure/recovery",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfbv_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfbv_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+          ],
+          "tests": [
+            "TestQFBVTacticCPP",
+            "TestQFBVTacticConstructorAllocationFrontiers",
+            "TestQFBVTacticModelSurvivesStrategyClose",
+            "TestQFBVTacticTranslatedProofAndCoreRoutes",
+            "TestCommandContextQFBVCombinedSolverProofResult",
+            "TestSMTLibRunnerQFBVBranchEvidence",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -123729,7 +123851,10 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/theory_bv_boolean_gates.go",
         "pkg/smtcore/theory_bv_boolean_gates_test.go",
-        "pkg/smtcore/theory_bv_mkbv_test.go"
+        "pkg/smtcore/theory_bv_mkbv_test.go",
+        "pkg/smtcore/theory_bv_div0_congruence_test.go",
+        "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+        "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -123766,7 +123891,10 @@
         "TestSMTBitVectorLogicSetupProfiles",
         "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates",
         "TestSMTBitVectorCarryXor3SourceClausesAndScopes",
-        "TestSMTBitVectorMKBVBooleanArgumentsEnodesAndScopes"
+        "TestSMTBitVectorMKBVBooleanArgumentsEnodesAndScopes",
+        "TestSMTBitVectorDiv0FunctionsUseCoreCongruence",
+        "TestQFBVTacticCPP",
+        "TestSMTLibRunnerQFBVBranchEvidence"
       ],
       "conditionals": [
         {
@@ -124236,12 +124364,31 @@
           "tests": [
             "TestSMTBitVectorMKBVBooleanArgumentsEnodesAndScopes"
           ]
+        },
+        {
+          "name": "Correct source internalize_term refusal for all five division-by-zero function declarations so core UF congruence is enabled; apply_sort_cnstr performs argument/result size approximation and immediate mk_bits after mk_var, enabling fixed-value equality propagation before model publication",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_div0_congruence_test.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2"
+          ],
+          "tests": [
+            "TestSMTBitVectorDiv0FunctionsUseCoreCongruence",
+            "TestQFBVTacticCPP",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "The theory borrows the SMT internalizer, manager and enodes. It owns scoped AST references for published bit vectors and delayed lazy bridge definitions, releases temporary circuit roots after internalization, and releases all remaining roots on scope pop or close.",
         "Bit occurrence keys strip Boolean negations to mirror source literal-variable indexing; scoped bit owners retain the indexed atoms until occurrence removal. Compound interpreted terms participate in fixed-value equality discovery.",
-        "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs."
+        "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs.",
+        "Sort-attached symbolic bit vectors retain the normal bitOwners/bitTrail roots before Boolean internalization; failures keep the published prefix owned for solver cleanup and scope restoration."
       ],
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
@@ -124265,7 +124412,10 @@
         "pkg/smtcore/smt_setup_bv_test.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/theory_bv_boolean_gates.go",
-        "pkg/smtcore/theory_bv_boolean_gates_test.go"
+        "pkg/smtcore/theory_bv_boolean_gates_test.go",
+        "pkg/smtcore/theory_bv_div0_congruence_test.go",
+        "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+        "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -124301,7 +124451,10 @@
         "TestSMTLibRunnerCPPReference",
         "TestSMTBitVectorLogicSetupProfiles",
         "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates",
-        "TestSMTBitVectorCarryXor3SourceClausesAndScopes"
+        "TestSMTBitVectorCarryXor3SourceClausesAndScopes",
+        "TestSMTBitVectorDiv0FunctionsUseCoreCongruence",
+        "TestQFBVTacticCPP",
+        "TestSMTLibRunnerQFBVBranchEvidence"
       ],
       "conditionals": [
         {
@@ -124415,12 +124568,31 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Correct source internalize_term refusal for all five division-by-zero function declarations so core UF congruence is enabled; apply_sort_cnstr performs argument/result size approximation and immediate mk_bits after mk_var, enabling fixed-value equality propagation before model publication",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_div0_congruence_test.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2"
+          ],
+          "tests": [
+            "TestSMTBitVectorDiv0FunctionsUseCoreCongruence",
+            "TestQFBVTacticCPP",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Concrete Go maps and slices own bit metadata and scope trails; ASTRef values own every expression that must outlive its immediate constructor call. SMTTheoryBase remains the borrowed theory-variable and enode adapter.",
         "Bit occurrence keys strip Boolean negations to mirror source literal-variable indexing; scoped bit owners retain the indexed atoms until occurrence removal. Compound interpreted terms participate in fixed-value equality discovery.",
-        "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs."
+        "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs.",
+        "Sort-attached symbolic bit vectors retain the normal bitOwners/bitTrail roots before Boolean internalization; failures keep the published prefix owned for solver cleanup and scope restoration."
       ],
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
@@ -142982,7 +143154,23 @@
         "pkg/cmd/g3/test_vectors/qflia_solver_pseudo_Boolean.smt2",
         "pkg/cmd/g3/test_vectors/qflia_solver_quasi_pb.smt2",
         "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_disjunction.smt2",
-        "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2"
+        "pkg/cmd/g3/test_vectors/qflia_solver_unbounded_ilp.smt2",
+        "pkg/tactic/smtlogics/qfbv_tactic.go",
+        "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+        "pkg/tactic/smtlogics/qfbv_translation_test.go",
+        "pkg/cmd_context/qfbv_solver_test.go",
+        "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
       ],
       "tests": [
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
@@ -142998,7 +143186,13 @@
         "TestSMT2QFIDLStrategicDIMACSFollowsCurrentOutput",
         "TestCommandContextQFLIACombinedSolverProofResult",
         "TestSMTLibRunnerQFLIABranchEvidence",
-        "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput"
+        "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
+        "TestQFBVTacticCPP",
+        "TestQFBVTacticConstructorAllocationFrontiers",
+        "TestQFBVTacticModelSurvivesStrategyClose",
+        "TestQFBVTacticTranslatedProofAndCoreRoutes",
+        "TestCommandContextQFBVCombinedSolverProofResult",
+        "TestSMTLibRunnerQFBVBranchEvidence"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -143129,6 +143323,43 @@
         {
           "name": "Remaining logic dispatcher branches, default tactic/FD/incremental-SAT special solvers and general stored-logic strategic solver_factory owner and public factory constructor",
           "status": "unported"
+        },
+        {
+          "name": "Retained QF_BV logic branch selects the complete bit-vector strategy and combines tactic2solver with the incremental SMT solver using source ordinary-mode/fallback policy",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfbv_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfbv_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+          ],
+          "tests": [
+            "TestQFBVTacticCPP",
+            "TestQFBVTacticConstructorAllocationFrontiers",
+            "TestQFBVTacticModelSurvivesStrategyClose",
+            "TestQFBVTacticTranslatedProofAndCoreRoutes",
+            "TestCommandContextQFBVCombinedSolverProofResult",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -144526,22 +144757,237 @@
       "path": "src/tactic/smtlogics/qfbv_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qfbv_tactic.go",
+        "pkg/tactic/smtlogics/qflia_tactic.go",
+        "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+        "pkg/tactic/smtlogics/qfbv_translation_test.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/qfbv_solver_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+      ],
+      "tests": [
+        "TestQFBVTacticCPP",
+        "TestQFBVTacticConstructorAllocationFrontiers",
+        "TestQFBVTacticModelSurvivesStrategyClose",
+        "TestQFBVTacticTranslatedProofAndCoreRoutes",
+        "TestCommandContextQFBVCombinedSolverProofResult",
+        "TestSMTLibRunnerQFBVBranchEvidence",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained preamble: conservative equation solving, guarded size reduction, copied SOM/local simplifier options, hoist pass, maximum sharing and guarded eager Ackermannization",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfbv_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfbv_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+          ],
+          "tests": [
+            "TestQFBVTacticCPP",
+            "TestQFBVTacticConstructorAllocationFrontiers",
+            "TestQFBVTacticModelSurvivesStrategyClose",
+            "TestQFBVTacticTranslatedProofAndCoreRoutes",
+            "TestCommandContextQFBVCombinedSolverProofResult",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Source equality probe selects BV1 plus SMT with preprocessing disabled; pure QF_BV selects bit blasting, memory-bounded postprocessing, proof/core-dependent AIG and SAT/proof SMT fallback; other goals use SMT",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfbv_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfbv_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+          ],
+          "tests": [
+            "TestQFBVTacticCPP",
+            "TestQFBVTacticConstructorAllocationFrontiers",
+            "TestQFBVTacticModelSurvivesStrategyClose",
+            "TestQFBVTacticTranslatedProofAndCoreRoutes",
+            "TestCommandContextQFBVCombinedSolverProofResult",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Main parameter overrides and final update, clean child factories, independent shared backend references, counted construction failure cleanup, target-manager translation and original model/proof/core lifetime",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfbv_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfbv_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+          ],
+          "tests": [
+            "TestQFBVTacticCPP",
+            "TestQFBVTacticConstructorAllocationFrontiers",
+            "TestQFBVTacticModelSurvivesStrategyClose",
+            "TestQFBVTacticTranslatedProofAndCoreRoutes",
+            "TestCommandContextQFBVCombinedSolverProofResult",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Explicit qfbv registry and ordinary QF_BV combined tactic/SMT dispatch preserving incremental solver fallback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfbv_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfbv_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+          ],
+          "tests": [
+            "TestQFBVTacticCPP",
+            "TestQFBVTacticConstructorAllocationFrontiers",
+            "TestQFBVTacticModelSurvivesStrategyClose",
+            "TestQFBVTacticTranslatedProofAndCoreRoutes",
+            "TestCommandContextQFBVCombinedSolverProofResult",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The existing concrete strategy-construction owner retains tactics, probes, parameter snapshots and failed children until the root composition acquires them; the raw returned root starts with no external reference. Model/proof/dependency results own independent references after strategy cleanup or destruction. Output transport is borrowed from the command session."
+      ],
+      "deviations": [
+        "Unused source local no_flat_p and ctx_simp_p have no retained algorithmic consumer and are omitted. Private preamble/main/custom-backend composition helpers are inlined in the concrete live factory; no adapter is introduced for unused public declarations. Native error returns and retryable construction cleanup replace C++ scoped exception unwinding."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfbv_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qfbv_tactic.go",
+        "pkg/tactic/smtlogics/qflia_tactic.go",
+        "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+        "pkg/tactic/smtlogics/qfbv_translation_test.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/qfbv_solver_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+      ],
+      "tests": [
+        "TestQFBVTacticCPP",
+        "TestQFBVTacticConstructorAllocationFrontiers",
+        "TestQFBVTacticModelSurvivesStrategyClose",
+        "TestQFBVTacticTranslatedProofAndCoreRoutes",
+        "TestCommandContextQFBVCombinedSolverProofResult",
+        "TestSMTLibRunnerQFBVBranchEvidence",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -144552,11 +144998,164 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained preamble: conservative equation solving, guarded size reduction, copied SOM/local simplifier options, hoist pass, maximum sharing and guarded eager Ackermannization",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfbv_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfbv_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+          ],
+          "tests": [
+            "TestQFBVTacticCPP",
+            "TestQFBVTacticConstructorAllocationFrontiers",
+            "TestQFBVTacticModelSurvivesStrategyClose",
+            "TestQFBVTacticTranslatedProofAndCoreRoutes",
+            "TestCommandContextQFBVCombinedSolverProofResult",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Source equality probe selects BV1 plus SMT with preprocessing disabled; pure QF_BV selects bit blasting, memory-bounded postprocessing, proof/core-dependent AIG and SAT/proof SMT fallback; other goals use SMT",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfbv_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfbv_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+          ],
+          "tests": [
+            "TestQFBVTacticCPP",
+            "TestQFBVTacticConstructorAllocationFrontiers",
+            "TestQFBVTacticModelSurvivesStrategyClose",
+            "TestQFBVTacticTranslatedProofAndCoreRoutes",
+            "TestCommandContextQFBVCombinedSolverProofResult",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Main parameter overrides and final update, clean child factories, independent shared backend references, counted construction failure cleanup, target-manager translation and original model/proof/core lifetime",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfbv_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfbv_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+          ],
+          "tests": [
+            "TestQFBVTacticCPP",
+            "TestQFBVTacticConstructorAllocationFrontiers",
+            "TestQFBVTacticModelSurvivesStrategyClose",
+            "TestQFBVTacticTranslatedProofAndCoreRoutes",
+            "TestCommandContextQFBVCombinedSolverProofResult",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Explicit qfbv registry and ordinary QF_BV combined tactic/SMT dispatch preserving incremental solver fallback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qfbv_tactic.go",
+            "pkg/tactic/smtlogics/qflia_tactic.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go",
+            "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/qfbv_solver_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_core.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_equality_models.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_proof.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_sat_models_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_solver_signed_model.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_uf_models.smt2"
+          ],
+          "tests": [
+            "TestQFBVTacticCPP",
+            "TestQFBVTacticConstructorAllocationFrontiers",
+            "TestQFBVTacticModelSurvivesStrategyClose",
+            "TestQFBVTacticTranslatedProofAndCoreRoutes",
+            "TestCommandContextQFBVCombinedSolverProofResult",
+            "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The existing concrete strategy-construction owner retains tactics, probes, parameter snapshots and failed children until the root composition acquires them; the raw returned root starts with no external reference. Model/proof/dependency results own independent references after strategy cleanup or destruction. Output transport is borrowed from the command session."
+      ],
+      "deviations": [
+        "Unused source local no_flat_p and ctx_simp_p have no retained algorithmic consumer and are omitted. Private preamble/main/custom-backend composition helpers are inlined in the concrete live factory; no adapter is introduced for unused public declarations. Native error returns and retryable construction cleanup replace C++ scoped exception unwinding."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfidl_tactic.cpp",

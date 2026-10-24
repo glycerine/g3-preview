@@ -1,0 +1,5 @@
+(set-logic QF_BV)
+(set-option :produce-proofs true)
+(declare-const x (_ BitVec 4))
+(assert (= (bvmul x x) #x2))
+(check-sat)

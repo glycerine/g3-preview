@@ -1,5 +1,5 @@
 // Source: src/tactic/portfolio/smt_strategic_solver.cpp retained QF_AUFLIA and
-// QF_LRA/QF_UF/QF_IDL/QF_LIA branches and smt_strategic_solver_factory::operator().
+// QF_LRA/QF_UF/QF_IDL/QF_LIA/QF_BV branches and smt_strategic_solver_factory::operator().
 package portfolio
 
 import (
@@ -65,6 +65,18 @@ func NewQFLIAStrategicSolverWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, 
 		return nil, err
 	}
 	return newStrategicSolver(m, strategy, "QF_LIA", p, proofs, models, cores, config)
+}
+
+func NewQFBVStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
+	return NewQFBVStrategicSolverWithOutput(m, p, proofs, models, cores, config, os.Stdout)
+}
+
+func NewQFBVStrategicSolverWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig, output io.Writer) (solver.Solver, error) {
+	strategy, err := smtlogics.NewQFBVTacticWithOutput(m, p, config, output)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolver(m, strategy, "QF_BV", p, proofs, models, cores, config)
 }
 
 func newStrategicSolver(m *ast.ASTManager, strategy tactic.Tactic, logic string, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (result solver.Solver, err error) {

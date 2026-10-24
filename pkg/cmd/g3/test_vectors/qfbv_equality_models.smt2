@@ -1,0 +1,7 @@
+(set-logic QF_BV)
+(set-option :produce-models true)
+(declare-const x (_ BitVec 4))
+(declare-const y (_ BitVec 4))
+(assert (not (= ((_ extract 1 0) x) ((_ extract 1 0) y))))
+(check-sat-using qfbv)
+(get-value ((not (= ((_ extract 1 0) x) ((_ extract 1 0) y)))))

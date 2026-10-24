@@ -1408,17 +1408,11 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, gateConte
 	return true, nil
 }
 
-func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error) {
+// Source approximate_term checks both argument and result widths.
+func (t *SMTBitVectorTheory) approximateTerm(expression ast.ASTHandle) (bool, error) {
 	state, err := t.State()
 	if err != nil {
 		return false, err
-	}
-	op, own, err := t.operation(expression)
-	if err != nil || !own {
-		return false, err
-	}
-	if (op == 57 || op == 58) && !t.config.EnableInt2BV {
-		return false, nil
 	}
 	count, err := state.manager.GetNumArgs(expression)
 	if err != nil {
@@ -1443,9 +1437,36 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 			}
 			if width > t.config.BlastMaxSize {
 				t.unsupported = true
-				return false, nil
+				return true, nil
 			}
 		}
+	}
+	return false, nil
+}
+
+func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	op, own, err := t.operation(expression)
+	if err != nil || !own {
+		return false, err
+	}
+	if approximate, err := t.approximateTerm(expression); err != nil || approximate {
+		return false, err
+	}
+	if (op == 57 || op == 58) && !t.config.EnableInt2BV {
+		return false, nil
+	}
+	// The five div0 declarations use the core uninterpreted-function path,
+	// including congruence closure. Their BV sort constraint creates bits.
+	if op >= 12 && op <= 16 {
+		return false, nil
+	}
+	count, err := state.manager.GetNumArgs(expression)
+	if err != nil {
+		return false, err
 	}
 	for i := uint32(0); i < count; i++ {
 		argument, argErr := state.manager.GetArg(expression, i)
@@ -1669,8 +1690,26 @@ func (t *SMTBitVectorTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHan
 	if err != nil || family != t.FamilyID() || t.IsAttachedToVariable(node) {
 		return err
 	}
-	_, err = t.CreateVariable(node)
-	return err
+	approximate, err := t.approximateTerm(node.owner)
+	if err != nil || approximate {
+		return err
+	}
+	if _, err = t.CreateVariable(node); err != nil {
+		return err
+	}
+	// Source apply_sort_cnstr calls mk_bits immediately after mk_var.
+	// In particular UF arguments need actual Boolean variables before
+	// relevancy/assignment can trigger fixed-value equality propagation.
+	bits, err := t.bitsFor(node.owner)
+	if err != nil {
+		return err
+	}
+	for _, bit := range bits {
+		if err = state.Internalize(bit, true); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (t *SMTBitVectorTheory) Relevant(expression ast.ASTHandle) error {

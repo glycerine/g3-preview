@@ -2976,6 +2976,7 @@
     {
       "package": "tactic/smtlogics",
       "imports": [
+        "ackermannization",
         "ast",
         "sat/tactic",
         "smtcore",
@@ -2990,6 +2991,7 @@
       ],
       "production_files": [
         "qfauflia_tactic.go",
+        "qfbv_tactic.go",
         "qfidl_tactic.go",
         "qflia_tactic.go",
         "qflra_tactic.go",

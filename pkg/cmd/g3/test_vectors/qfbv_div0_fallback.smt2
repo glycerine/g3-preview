@@ -1,0 +1,7 @@
+(set-logic QF_BV)
+(set-option :produce-models true)
+(declare-const x (_ BitVec 4))
+(declare-const y (_ BitVec 4))
+(assert (bvult (bvudiv x #x0) (bvudiv y #x0)))
+(check-sat-using (using-params qfbv :hi_div0 false :div0_ackermann_limit 0))
+(get-value ((bvult (bvudiv x #x0) (bvudiv y #x0)) (distinct x y)))
