@@ -1094,8 +1094,16 @@ func (t *SMTBitVectorTheory) publishBridge(expression, definition ast.ASTHandle)
 	return nil
 }
 
-func (t *SMTBitVectorTheory) bridgeAtom(expression, definition ast.ASTHandle, lazy bool) (bool, error) {
+func (t *SMTBitVectorTheory) bridgeAtom(expression, definition ast.ASTHandle, lazy bool) (handled bool, err error) {
 	state, _ := t.State()
+	// Source internalize_le keeps its expr_ref definition alive across
+	// recursive internalization. A nested BV callback may drain temporary
+	// gates, so this lexical root must survive independently of that trail.
+	root, err := state.manager.NewRef(definition)
+	if err != nil {
+		return false, err
+	}
+	defer func() { err = errors.Join(err, state.manager.DelRef(&root)) }()
 	if err := state.Internalize(definition, true); err != nil {
 		return false, fmt.Errorf("internalize bit-vector atom definition: %w", errors.Join(err, t.releaseTemporary()))
 	}
@@ -1103,7 +1111,6 @@ func (t *SMTBitVectorTheory) bridgeAtom(expression, definition ast.ASTHandle, la
 		return false, fmt.Errorf("release bit-vector atom definition: %w", err)
 	}
 	variable, found := state.boolVar[expression]
-	var err error
 	if !found {
 		variable, err = state.MkBoolVar(expression)
 		if err != nil {
@@ -1134,66 +1141,6 @@ func (t *SMTBitVectorTheory) bridgeAtom(expression, definition ast.ASTHandle, la
 		return false, err
 	}
 	return true, nil
-}
-
-// booleanGate3 expands the Boolean-valued BV helper gates emitted by the
-// extended bit-blaster configuration. Carry is the majority of its inputs;
-// xor3 is their odd parity.
-func (t *SMTBitVectorTheory) booleanGate3(expression ast.ASTHandle, operation int32) (ast.ASTHandle, error) {
-	state, _ := t.State()
-	if count, err := state.manager.GetNumArgs(expression); err != nil || count != 3 {
-		if err != nil {
-			return ast.ASTHandle{}, err
-		}
-		return ast.ASTHandle{}, ast.ErrASTDomain
-	}
-	arguments := [3]ast.ASTHandle{}
-	for i := range arguments {
-		argument, err := state.manager.GetArg(expression, uint32(i))
-		if err != nil {
-			return ast.ASTHandle{}, err
-		}
-		arguments[i] = argument
-	}
-	if operation == 60 {
-		partial, err := t.boolXor(arguments[0], arguments[1])
-		if err != nil {
-			return ast.ASTHandle{}, err
-		}
-		if err = t.retainTemporary([]ast.ASTHandle{partial}); err != nil {
-			return ast.ASTHandle{}, err
-		}
-		return t.boolXor(partial, arguments[2])
-	}
-	first, err := t.boolAnd(arguments[0], arguments[1])
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
-	if err = t.retainTemporary([]ast.ASTHandle{first}); err != nil {
-		return ast.ASTHandle{}, err
-	}
-	second, err := t.boolAnd(arguments[0], arguments[2])
-	if err != nil {
-		return ast.ASTHandle{}, errors.Join(err, t.releaseTemporary())
-	}
-	if err = t.retainTemporary([]ast.ASTHandle{second}); err != nil {
-		return ast.ASTHandle{}, errors.Join(err, t.releaseTemporary())
-	}
-	third, err := t.boolAnd(arguments[1], arguments[2])
-	if err != nil {
-		return ast.ASTHandle{}, errors.Join(err, t.releaseTemporary())
-	}
-	if err = t.retainTemporary([]ast.ASTHandle{third}); err != nil {
-		return ast.ASTHandle{}, errors.Join(err, t.releaseTemporary())
-	}
-	partial, err := t.boolOr(first, second)
-	if err != nil {
-		return ast.ASTHandle{}, errors.Join(err, t.releaseTemporary())
-	}
-	if err = t.retainTemporary([]ast.ASTHandle{partial}); err != nil {
-		return ast.ASTHandle{}, errors.Join(err, t.releaseTemporary())
-	}
-	return t.boolOr(partial, third)
 }
 
 func (t *SMTBitVectorTheory) bitsFor(expression ast.ASTHandle) ([]ast.ASTHandle, error) {
@@ -1343,22 +1290,14 @@ func (t *SMTBitVectorTheory) bit2BoolIndex(expression ast.ASTHandle) (uint32, er
 	return uint32(value), nil
 }
 
-func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool, error) {
+func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, gateContext bool) (bool, error) {
 	op, own, err := t.operation(expression)
 	if err != nil || !own {
 		return false, err
 	}
 	if op != smtBVOpBit2Bool {
 		if op == 59 || op == 60 {
-			definition, gateErr := t.booleanGate3(expression, op)
-			if gateErr != nil {
-				return false, fmt.Errorf("expand bit-vector Boolean gate: %w", gateErr)
-			}
-			handled, bridgeErr := t.bridgeAtom(expression, definition, false)
-			if bridgeErr != nil {
-				return false, fmt.Errorf("bridge bit-vector Boolean gate: %w", bridgeErr)
-			}
-			return handled, nil
+			return t.internalizeBooleanGate3(expression, op, gateContext)
 		}
 		if op != 22 && op != 23 && op != 52 && op != 53 && op != 54 {
 			t.unsupported = true

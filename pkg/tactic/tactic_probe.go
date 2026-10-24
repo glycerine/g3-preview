@@ -13,6 +13,17 @@ var ErrRegistryOwner = errors.New("tactic: invalid, copied or retired registrati
 
 type ProbeKind uint8
 
+// ProbeEvaluator is the retained source probe virtual boundary. Concrete
+// arithmetic probes can participate in the same typed compositions without
+// introducing a dependency from base tactics back to arithmetic tactics.
+type ProbeEvaluator interface {
+	Check() error
+	IncRef() error
+	DecRef() error
+	Close() error
+	Eval(*Goal) (float64, error)
+}
+
 const (
 	ProbeConstant ProbeKind = iota
 	ProbeDepth
@@ -54,8 +65,8 @@ type Probe struct {
 	self       *Probe
 	budget     *arena.Budget
 	constant   float64
-	left       *Probe
-	right      *Probe
+	left       ProbeEvaluator
+	right      ProbeEvaluator
 	ownerBytes uint64
 	References uint32
 	kind       ProbeKind
@@ -75,18 +86,18 @@ func NewProbe(b *arena.Budget, kind ProbeKind, value float64) (*Probe, error) {
 	return p, nil
 }
 
-func newComposedProbe(b *arena.Budget, kind ProbeKind, left, right *Probe) (p *Probe, err error) {
+func newComposedProbe(b *arena.Budget, kind ProbeKind, left, right ProbeEvaluator) (p *Probe, err error) {
 	if b == nil || left == nil {
 		return nil, ast.ErrASTHandle
 	}
-	if err = left.open(); err != nil {
+	if err = left.Check(); err != nil {
 		return nil, err
 	}
 	if kind != ProbeNot && right == nil {
 		return nil, ast.ErrASTHandle
 	}
 	if right != nil {
-		if err = right.open(); err != nil {
+		if err = right.Check(); err != nil {
 			return nil, err
 		}
 	}
@@ -110,11 +121,11 @@ func newComposedProbe(b *arena.Budget, kind ProbeKind, left, right *Probe) (p *P
 	return p, nil
 }
 
-func NewNotProbe(b *arena.Budget, p *Probe) (*Probe, error) {
+func NewNotProbe(b *arena.Budget, p ProbeEvaluator) (*Probe, error) {
 	return newComposedProbe(b, ProbeNot, p, nil)
 }
 
-func NewBinaryProbe(b *arena.Budget, kind ProbeKind, left, right *Probe) (*Probe, error) {
+func NewBinaryProbe(b *arena.Budget, kind ProbeKind, left, right ProbeEvaluator) (*Probe, error) {
 	if kind < ProbeAnd || kind > ProbeDivide {
 		return nil, ast.ErrASTDomain
 	}
@@ -126,6 +137,8 @@ func (p *Probe) open() error {
 	}
 	return nil
 }
+
+func (p *Probe) Check() error { return p.open() }
 func (p *Probe) IncRef() error {
 	if e := p.open(); e != nil {
 		return e

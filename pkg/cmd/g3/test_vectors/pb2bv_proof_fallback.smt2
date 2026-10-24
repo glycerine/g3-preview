@@ -1,0 +1,7 @@
+(set-logic QF_LIA)
+(set-option :produce-proofs true)
+(declare-const x Int)
+(assert (>= x 0))
+(assert (<= x 1))
+(assert (> x 1))
+(check-sat-using (or-else (then simplify pb2bv smt) smt))

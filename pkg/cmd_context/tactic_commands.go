@@ -26,7 +26,7 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return nil, err
 	}
 	switch name {
-	case "smt", "simplify", "elim-and", "propagate-values", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
+	case "smt", "simplify", "elim-and", "propagate-values", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -63,6 +63,8 @@ func (c *Context) NewBuiltinTactic(name string) (tactic.Tactic, error) {
 		return arith.MakeDiffNeqTactic(m, c.config.Params, c.config.Globals, nil)
 	case "lia2pb":
 		return arith.MakeLIA2PBTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
+	case "pb2bv":
+		return arith.MakePB2BVTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
 	case "skip":
 		return tactic.NewSkipTactic(), nil
 	case "fail":

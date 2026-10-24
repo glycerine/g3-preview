@@ -432,7 +432,11 @@ func TestTheoryRewriterQuantifierReduction(t *testing.T) {
 		t.Fatal("pulled quantifier body", pulledBody, body, e)
 	}
 
-	pattern, err := m.MkPattern([]ast.ASTHandle{v0})
+	triggerDecl, err := m.MkFuncDecl(astTestSymbol(t, m, "theory-pattern-trigger"), []ast.ASTHandle{boolSort}, boolSort, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	trigger, err := m.MkApp(triggerDecl, []ast.ASTHandle{v0})
+	astTestMust(t, err)
+	pattern, err := m.MkPattern([]ast.ASTHandle{trigger})
 	astTestMust(t, err)
 	annotated, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{boolSort},
 		Names: []usymbol.Symbol{astTestSymbol(t, m, "theory-pattern")}, Body: v0, Patterns: []ast.ASTHandle{pattern}})

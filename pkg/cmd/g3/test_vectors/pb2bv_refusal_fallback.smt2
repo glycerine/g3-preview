@@ -1,0 +1,8 @@
+(set-logic QF_LIA)
+(set-option :produce-models true)
+(declare-const x Int)
+(assert (> x 0))
+(check-sat-using (then simplify pb2bv smt))
+(get-info :reason-unknown)
+(check-sat-using smt)
+(get-value ((> x 0)))

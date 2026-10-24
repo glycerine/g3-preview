@@ -23,7 +23,7 @@ const (
 
 type conditionalTactic struct {
 	self       *conditionalTactic
-	probe      *Probe
+	probe      ProbeEvaluator
 	thenTactic Tactic
 	elseTactic Tactic
 	references uint32
@@ -31,7 +31,7 @@ type conditionalTactic struct {
 	closed     bool
 }
 
-func newConditionalTactic(kind conditionalTacticKind, probe *Probe, thenTactic, elseTactic Tactic) (t *conditionalTactic, err error) {
+func newConditionalTactic(kind conditionalTacticKind, probe ProbeEvaluator, thenTactic, elseTactic Tactic) (t *conditionalTactic, err error) {
 	if thenTactic == nil || kind <= conditionalFailIfNot && probe == nil || kind == conditionalChoose && elseTactic == nil {
 		return nil, ast.ErrASTHandle
 	}
@@ -60,19 +60,19 @@ func newConditionalTactic(kind conditionalTacticKind, probe *Probe, thenTactic, 
 	return t, nil
 }
 
-func NewCondTactic(p *Probe, thenTactic, elseTactic Tactic) (Tactic, error) {
+func NewCondTactic(p ProbeEvaluator, thenTactic, elseTactic Tactic) (Tactic, error) {
 	return newConditionalTactic(conditionalChoose, p, thenTactic, elseTactic)
 }
 
-func NewWhenTactic(p *Probe, child Tactic) (Tactic, error) {
+func NewWhenTactic(p ProbeEvaluator, child Tactic) (Tactic, error) {
 	return newConditionalTactic(conditionalChoose, p, child, NewSkipTactic())
 }
 
-func NewFailIfTactic(p *Probe) (Tactic, error) {
+func NewFailIfTactic(p ProbeEvaluator) (Tactic, error) {
 	return newConditionalTactic(conditionalFailIf, p, NewSkipTactic(), nil)
 }
 
-func NewFailIfNotTactic(p *Probe) (Tactic, error) {
+func NewFailIfNotTactic(p ProbeEvaluator) (Tactic, error) {
 	return newConditionalTactic(conditionalFailIfNot, p, NewSkipTactic(), nil)
 }
 

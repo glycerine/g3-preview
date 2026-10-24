@@ -12,6 +12,17 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"pb2bv_equal_vector_model.smt2":                "sat\n((x 1) (y 1) (z 0) (w 0))\n",
+	"pb2bv_refusal_fallback.smt2":                  "unknown\n(:reason-unknown \"goal is in a fragment unsupported by pb2bv. Offending expression: x\")\nsat\n(((> x 0) true))\n",
+	"pb2bv_proof_fallback.smt2":                    "unsat\n",
+	"pb2bv_clauses_model_scopes.smt2":              "sat\n((x 1)\n (y 1)\n (z 1))\nunsat\nsat\n((x 1)\n (y 1)\n (z 1))\n",
+	"pb2bv_cardinality_model.smt2":                 "sat\n(((= (+ x y z w v) 3) true))\n",
+	"pb2bv_bitvector_model.smt2":                   "sat\n((x 1)\n (y 1)\n (z 1)\n (w 1))\n",
+	"pb2bv_split_model.smt2":                       "sat\n((x 0)\n (y 0)\n (z 1)\n (w 1))\n",
+	"pb2bv_nested_model.smt2":                      "sat\n((x 1)\n (y 1)\n (z 1))\n",
+	"pb2bv_shifted_lia_pipeline.smt2":              "sat\n((x 2)\n (y 7))\n",
+	"pb2bv_core.smt2":                              "unsat\n(total yhi ylo xlo xhi)\n",
+	"bv_weighted_ite_model.smt2":                   "sat\n((a true)\n (b true)\n (c true)\n (d true))\n",
 	"arith_negated_weighted_branches.smt2":         "sat\n(((and (>= (+ a (* 2 b) (* 4 c)) 6) (<= (+ a (* 2 b) (* 4 c)) 7)) true))\nunsat\nsat\n(((and (>= (+ a (* 2 b) (* 4 c)) 6) (<= (+ a (* 2 b) (* 4 c)) 7)) true))\n",
 	"lia2pb_model_scopes.smt2":                     "sat\n((x 5) (y 2))\nunsat\nsat\n((x 5) (y 2))\n",
 	"lia2pb_core.smt2":                             "unsat\n(total yhi ylo xlo xhi)\n",
@@ -315,6 +326,32 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 				t.Fatalf("Go/C++ mismatch\nGo:\n%s\nC++:\n%s", goOutput.String(), cppOutput)
 			}
 		})
+	}
+}
+
+// Keep this reference limitation separate from the agreement set. Direct smt
+// inherits QF_LIA after pb2bv has introduced BV terms, so the release reference
+// omits the required BV theory and can return an invalid integer model. The
+// corresponding ALL vector checks the complete mixed-theory model in Go/C++;
+// source QF_IDL's eventual strategy instead bit-blasts before its SAT backend.
+func TestSMTLibRunnerPB2BVArithmeticLogicReferenceGap(t *testing.T) {
+	reference := os.Getenv("G3_CPP_REFERENCE")
+	if reference == "" {
+		t.Skip("set G3_CPP_REFERENCE to prebuilt z3")
+	}
+	script, err := os.ReadFile(filepath.Join("test_vectors", "pb2bv_qflia_direct_smt_reference_gap.smt2"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	cmd := exec.Command(reference, "-in")
+	cmd.Stdin = bytes.NewReader(script)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatal(err, string(output))
+	}
+	want := "sat\n(((>= (+ (* 2 x) (* 3 y) (* 5 z) (* 7 w)) 17) false))\n"
+	if canonicalOutput(string(output)) != canonicalOutput(want) {
+		t.Fatalf("reference logic-profile behavior changed; reassess this isolated gap: %s", output)
 	}
 }
 

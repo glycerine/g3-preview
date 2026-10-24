@@ -25932,7 +25932,9 @@
         "pkg/ast/rewriter/rewriter_engine.go",
         "pkg/ast/rewriter/rewriter_configuration.go",
         "pkg/ast/rewriter/bool_rewriter_public.go",
-        "pkg/ast/rewriter/bool_rewriter_native_context_test.go"
+        "pkg/ast/rewriter/bool_rewriter_native_context_test.go",
+        "pkg/tactic/arith/pb2bv_encoding.go",
+        "pkg/tactic/arith/pb2bv_tactic_test.go"
       ],
       "tests": [
         "TestModel2ExprEntryConditionSourceArityAndReferenceScope",
@@ -25964,7 +25966,13 @@
         "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
         "TestBoolRewriterPublicCoreThroughOriginalTraversal",
         "TestBoolRewriterNativeLocalContextGrowthAndReferences",
-        "TestBoolRewriterNativeMembershipLeavesForeignMarks"
+        "TestBoolRewriterNativeMembershipLeavesForeignMarks",
+        "TestPB2BVEncodingTruthTables",
+        "TestPB2BVCoefficientNormalization",
+        "TestPB2BVTacticAllocationFrontiers",
+        "TestPB2BVProbeRefusalsParametersAndMemory",
+        "TestPB2BVRootTraceAndProofGuard",
+        "TestPB2BVCPPEncodingShapes"
       ],
       "conditionals": [
         {
@@ -25989,8 +25997,12 @@
           "name": "Stack-local default bool_rewriter::mk_and flat/simplified result and raw-AND fallback for model2expr (bool_rewriter.h:81,135-140)",
           "status": "ported",
           "go_target": "pkg/model/model2expr_entry_condition.go",
-          "go_targets": ["pkg/ast/rewriter/bool_rewriter_default_and.go"],
-          "tests": ["TestModel2ExprEntryConditionSourceArityAndReferenceScope"]
+          "go_targets": [
+            "pkg/ast/rewriter/bool_rewriter_default_and.go"
+          ],
+          "tests": [
+            "TestModel2ExprEntryConditionSourceArityAndReferenceScope"
+          ]
         },
         {
           "name": "private AND/OR core declarations and borrowed inline state fragment",
@@ -26067,6 +26079,24 @@
           "tests": [
             "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
             "TestBoolRewriterStarITEConstantFoldAndCancelReset"
+          ]
+        },
+        {
+          "name": "Retained concrete pb2bv caller boundary for set_elim_and, mk_and, mk_not and mk_ite: expose the configured reducer operations and preserve their owner checks, parameters and result-reference contract",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bool_rewriter_public.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bool_rewriter_public.go",
+            "pkg/tactic/arith/pb2bv_encoding.go",
+            "pkg/tactic/arith/pb2bv_tactic_test.go"
+          ],
+          "tests": [
+            "TestPB2BVEncodingTruthTables",
+            "TestPB2BVCoefficientNormalization",
+            "TestPB2BVTacticAllocationFrontiers",
+            "TestPB2BVProbeRefusalsParametersAndMemory",
+            "TestPB2BVRootTraceAndProofGuard",
+            "TestPB2BVCPPEncodingShapes"
           ]
         }
       ],
@@ -121459,7 +121489,9 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_setup_bv.go",
         "pkg/smtcore/smt_setup_bv_test.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/theory_bv_boolean_gates.go",
+        "pkg/smtcore/theory_bv_boolean_gates_test.go"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -121494,7 +121526,8 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTBitVectorLogicSetupProfiles",
-        "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates"
+        "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates",
+        "TestSMTBitVectorCarryXor3SourceClausesAndScopes"
       ],
       "conditionals": [
         {
@@ -121936,6 +121969,22 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "internalize_carry/internalize_xor3: exact six/eight source Boolean gate clauses, argument internalization, unclassified gate variable, term-context enode flag and scoped rollback; internalize_le definition retains its lexical expr_ref independently of recursively drained temporary gates",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_boolean_gates.go",
+            "pkg/smtcore/theory_bv_boolean_gates_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTBitVectorCarryXor3SourceClausesAndScopes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -121946,7 +121995,8 @@
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
         "Go SAT equivalence clauses replace the source imperative bit-assignment and union-find propagation queues while preserving equality, congruence, conflict and backtracking semantics. Go slices, maps and math/big values replace source vectors, tables and numerals. Diagnostic display and Z3DEBUG invariant routines have no retained consumer.",
-        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial."
+        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
+        "The previous Go carry/XOR3 expansion-through-bridge approximation is removed in favor of the actual source gate clauses. A direct weighted-ITE BV model regression, also reached by the new PB encoder, passes; an overlay restoring old BV production code fails that new regression. The comparison atom definition has its own lexical AST reference across recursive internalization and temporary retirement, matching source expr_ref lifetime."
       ]
     },
     {
@@ -121962,7 +122012,9 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_setup_bv.go",
         "pkg/smtcore/smt_setup_bv_test.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/theory_bv_boolean_gates.go",
+        "pkg/smtcore/theory_bv_boolean_gates_test.go"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -121997,7 +122049,8 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTBitVectorLogicSetupProfiles",
-        "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates"
+        "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates",
+        "TestSMTBitVectorCarryXor3SourceClausesAndScopes"
       ],
       "conditionals": [
         {
@@ -122095,6 +122148,22 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "internalize_carry/internalize_xor3: exact six/eight source Boolean gate clauses, argument internalization, unclassified gate variable, term-context enode flag and scoped rollback; internalize_le definition retains its lexical expr_ref independently of recursively drained temporary gates",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_boolean_gates.go",
+            "pkg/smtcore/theory_bv_boolean_gates_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTBitVectorCarryXor3SourceClausesAndScopes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -122105,7 +122174,8 @@
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
         "The source bit-atom occurrence lists, region allocation, union-find merge auxiliaries and custom justifications are represented by guarded SAT clauses and the shared Go congruence/equality machinery. This removes pointer-region storage while retaining reached solver behavior.",
-        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial."
+        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
+        "The previous Go carry/XOR3 expansion-through-bridge approximation is removed in favor of the actual source gate clauses. A direct weighted-ITE BV model regression, also reached by the new PB encoder, passes; an overlay restoring old BV production code fails that new regression. The comparison atom definition has its own lexical AST reference across recursive internalization and temporary retirement, matching source expr_ref lifetime."
       ]
     },
     {
@@ -131952,9 +132022,33 @@
       "path": "src/tactic/arith/pb2bv_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/pb2bv_tactic.go",
+        "pkg/tactic/arith/pb2bv_check.go",
+        "pkg/tactic/arith/pb2bv_convert.go",
+        "pkg/tactic/arith/pb2bv_encoding.go",
+        "pkg/tactic/arith/pb2bv_apply.go",
+        "pkg/tactic/arith/pb2bv_trace.go",
+        "pkg/tactic/arith/pb2bv_probe.go",
+        "pkg/tactic/arith/pb2bv_tactic_test.go",
+        "pkg/tactic/arith/pb2bv_model_converter.go",
+        "pkg/ast/rewriter/bool_rewriter_public.go",
+        "pkg/tactic/tactic_probe.go",
+        "pkg/tactic/tactic_conditional.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestPB2BVEncodingTruthTables",
+        "TestPB2BVCoefficientNormalization",
+        "TestPB2BVTacticAllocationFrontiers",
+        "TestPB2BVProbeRefusalsParametersAndMemory",
+        "TestPB2BVRootTraceAndProofGuard",
+        "TestPB2BVCPPEncodingShapes",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 138,
@@ -132063,19 +132157,269 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "only_01_visitor/quick_pb_check and is_pb_probe/mk_is_pb_probe: shared marked postorder traversal, ignore quantifier patterns, Boolean versus term ITE/distinct, linear arithmetic, 0/1 integer endpoints and unsupported expression diagnostics; concrete reference-counted is-pb owner composes through the retained probe virtual interface",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/pb2bv_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_tactic.go",
+            "pkg/tactic/arith/pb2bv_check.go",
+            "pkg/tactic/arith/pb2bv_convert.go",
+            "pkg/tactic/arith/pb2bv_encoding.go",
+            "pkg/tactic/arith/pb2bv_apply.go",
+            "pkg/tactic/arith/pb2bv_trace.go",
+            "pkg/tactic/arith/pb2bv_probe.go",
+            "pkg/tactic/arith/pb2bv_tactic_test.go",
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/ast/rewriter/bool_rewriter_public.go",
+            "pkg/tactic/tactic_probe.go",
+            "pkg/tactic/tactic_conditional.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestPB2BVEncodingTruthTables",
+            "TestPB2BVCoefficientNormalization",
+            "TestPB2BVTacticAllocationFrontiers",
+            "TestPB2BVProbeRefusalsParametersAndMemory",
+            "TestPB2BVRootTraceAndProofGuard",
+            "TestPB2BVCPPEncodingShapes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "imp/rw_cfg/rw construction, source checkpoint cooperation and max_memory, parameter updates/descriptions and constructor-only flat=false/elim_and=true overrides; nested substitution before children, retained saved expression and per-call traversal reset",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/pb2bv_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_tactic.go",
+            "pkg/tactic/arith/pb2bv_check.go",
+            "pkg/tactic/arith/pb2bv_convert.go",
+            "pkg/tactic/arith/pb2bv_encoding.go",
+            "pkg/tactic/arith/pb2bv_apply.go",
+            "pkg/tactic/arith/pb2bv_trace.go",
+            "pkg/tactic/arith/pb2bv_probe.go",
+            "pkg/tactic/arith/pb2bv_tactic_test.go",
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/ast/rewriter/bool_rewriter_public.go",
+            "pkg/tactic/tactic_probe.go",
+            "pkg/tactic/tactic_conditional.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestPB2BVEncodingTruthTables",
+            "TestPB2BVCoefficientNormalization",
+            "TestPB2BVTacticAllocationFrontiers",
+            "TestPB2BVProbeRefusalsParametersAndMemory",
+            "TestPB2BVRootTraceAndProofGuard",
+            "TestPB2BVCPPEncodingShapes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "int2lit/mon_lit2lit/mk_unit/adjust/convert: owning declaration-to-positive/negative Boolean caches, scalar and constant equalities, signed inequality conversion, negative coefficient complementation, stable decreasing weights, eq-vector fast path and complemented equality halves",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/pb2bv_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_tactic.go",
+            "pkg/tactic/arith/pb2bv_check.go",
+            "pkg/tactic/arith/pb2bv_convert.go",
+            "pkg/tactic/arith/pb2bv_encoding.go",
+            "pkg/tactic/arith/pb2bv_apply.go",
+            "pkg/tactic/arith/pb2bv_trace.go",
+            "pkg/tactic/arith/pb2bv_probe.go",
+            "pkg/tactic/arith/pb2bv_tactic_test.go",
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/ast/rewriter/bool_rewriter_public.go",
+            "pkg/tactic/tactic_probe.go",
+            "pkg/tactic/tactic_conditional.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestPB2BVEncodingTruthTables",
+            "TestPB2BVCoefficientNormalization",
+            "TestPB2BVTacticAllocationFrontiers",
+            "TestPB2BVProbeRefusalsParametersAndMemory",
+            "TestPB2BVRootTraceAndProofGuard",
+            "TestPB2BVCPPEncodingShapes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "pb2bv_all_clauses init_lits/init_sums/process/operator and cardinality predicate: suffix sums, source recursive conflict-clause order, early cardinality disjunction/conjunction, bounded dynamic ITE cardinality rows and source unsigned cost multiplication",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/pb2bv_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_tactic.go",
+            "pkg/tactic/arith/pb2bv_check.go",
+            "pkg/tactic/arith/pb2bv_convert.go",
+            "pkg/tactic/arith/pb2bv_encoding.go",
+            "pkg/tactic/arith/pb2bv_apply.go",
+            "pkg/tactic/arith/pb2bv_trace.go",
+            "pkg/tactic/arith/pb2bv_probe.go",
+            "pkg/tactic/arith/pb2bv_tactic_test.go",
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/ast/rewriter/bool_rewriter_public.go",
+            "pkg/tactic/tactic_probe.go",
+            "pkg/tactic/tactic_conditional.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestPB2BVEncodingTruthTables",
+            "TestPB2BVCoefficientNormalization",
+            "TestPB2BVTacticAllocationFrontiers",
+            "TestPB2BVProbeRefusalsParametersAndMemory",
+            "TestPB2BVRootTraceAndProofGuard",
+            "TestPB2BVCPPEncodingShapes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "split/mk_pbc/bitblast_pbc: trimming before GCD/ceiling, original a_sum source typo behavior, retained split helper and joining clause, exact sum-coefficient BV width, weighted Boolean-controlled BV numerals, n-ary addition and unsigned comparison",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/pb2bv_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_tactic.go",
+            "pkg/tactic/arith/pb2bv_check.go",
+            "pkg/tactic/arith/pb2bv_convert.go",
+            "pkg/tactic/arith/pb2bv_encoding.go",
+            "pkg/tactic/arith/pb2bv_apply.go",
+            "pkg/tactic/arith/pb2bv_trace.go",
+            "pkg/tactic/arith/pb2bv_probe.go",
+            "pkg/tactic/arith/pb2bv_tactic_test.go",
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/ast/rewriter/bool_rewriter_public.go",
+            "pkg/tactic/tactic_probe.go",
+            "pkg/tactic/tactic_conditional.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestPB2BVEncodingTruthTables",
+            "TestPB2BVCoefficientNormalization",
+            "TestPB2BVTacticAllocationFrontiers",
+            "TestPB2BVProbeRefusalsParametersAndMemory",
+            "TestPB2BVRootTraceAndProofGuard",
+            "TestPB2BVCPPEncodingShapes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "imp::operator()/throw_tactic/display and all live TRACE sites: proof guard, source reset/early return order, complete-output staging before goal updates, bound dependencies, independent integer model converter before helper filtering, depth, model/core flags and final sorting guards",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/pb2bv_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_tactic.go",
+            "pkg/tactic/arith/pb2bv_check.go",
+            "pkg/tactic/arith/pb2bv_convert.go",
+            "pkg/tactic/arith/pb2bv_encoding.go",
+            "pkg/tactic/arith/pb2bv_apply.go",
+            "pkg/tactic/arith/pb2bv_trace.go",
+            "pkg/tactic/arith/pb2bv_probe.go",
+            "pkg/tactic/arith/pb2bv_tactic_test.go",
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/ast/rewriter/bool_rewriter_public.go",
+            "pkg/tactic/tactic_probe.go",
+            "pkg/tactic/tactic_conditional.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestPB2BVEncodingTruthTables",
+            "TestPB2BVCoefficientNormalization",
+            "TestPB2BVTacticAllocationFrontiers",
+            "TestPB2BVProbeRefusalsParametersAndMemory",
+            "TestPB2BVRootTraceAndProofGuard",
+            "TestPB2BVCPPEncodingShapes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "outer constructor/destructor/translate/updt_params/collect_param_descrs/operator()/cleanup and clean factory: updated outer snapshot, fresh implementation publication and concrete retired owner on stopped deletion",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/pb2bv_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_tactic.go",
+            "pkg/tactic/arith/pb2bv_check.go",
+            "pkg/tactic/arith/pb2bv_convert.go",
+            "pkg/tactic/arith/pb2bv_encoding.go",
+            "pkg/tactic/arith/pb2bv_apply.go",
+            "pkg/tactic/arith/pb2bv_trace.go",
+            "pkg/tactic/arith/pb2bv_probe.go",
+            "pkg/tactic/arith/pb2bv_tactic_test.go",
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/ast/rewriter/bool_rewriter_public.go",
+            "pkg/tactic/tactic_probe.go",
+            "pkg/tactic/tactic_conditional.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestPB2BVEncodingTruthTables",
+            "TestPB2BVCoefficientNormalization",
+            "TestPB2BVTacticAllocationFrontiers",
+            "TestPB2BVProbeRefusalsParametersAndMemory",
+            "TestPB2BVRootTraceAndProofGuard",
+            "TestPB2BVCPPEncodingShapes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns copied parameters, bound manager, Boolean reducer, concrete rewriter traversal and saved substitution result, positive/negative Boolean cache references, split-helper integer roots and accumulated bound dependencies. Constructor/update/cleanup retain the source flag and parameter-snapshot ordering. Cleanup publishes a fresh implementation and repairs each borrowed configuration owner before deleting the old implementation; stopped retirement retains a concrete retry owner.",
+        "Lexical typed expression-reference trails keep encoding intermediates alive until the output reference is published. Applications own staged formulas and joined dependencies until all conversions complete, then update goals in source order. The model converter owns declaration pairs independently of tactic lifetime; filtering follows integer reconstruction and removes both Boolean and temporary integer helpers. Constructor, clause/cardinality/BV/split application and populated-cleanup reservation-frontier campaigns pass with zero charged storage after fixture teardown. The concrete is-pb probe owns only its header and borrows parameter services; each Eval owns a lexical bound manager."
+      ],
+      "deviations": [
+        "Native Go slices/maps and exact big.Rat values replace source containers, tagged pointers and rational storage. Ordered binding records enumerate owning cache entries; the source obj_map iteration has no stable ordering contract. No STL, generic numeral adapter or universal template implementation is added. The uninstantiated private visitor and permanently empty m_new_deps storage have no retained algorithm and are omitted.",
+        "The source positive-only normalization, unsigned cardinality-cost multiplication and a_sum += m_c typo are preserved. Source assertion-excluded or undefined domains receive explicit Go errors. Constructor-only Boolean flag overrides and later parameter-update resets remain observable and are tested.",
+        "The is-pb probe uses the actual source-style float64 virtual evaluation/refcount boundary, with a concrete arithmetic probe owner. The shared ProbeEvaluator interface also admits existing concrete probes into Boolean/arithmetic compositions and conditional tactics without a reverse package dependency or any-valued callback layer.",
+        "After a PB-to-BV conversion, a direct smt stage inherits the frontend logic. The prebuilt release reference can omit BV reasoning when that logic remains QF_LIA and return an invalid reconstructed model. This isolated source limitation has a separate reference regression; agreement vectors use ALL for mixed-theory final solving. The source QF_IDL strategy instead requires the still-unported bit-blast/SAT stages."
+      ]
     },
     {
       "path": "src/tactic/arith/pb2bv_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/pb2bv_tactic.go",
+        "pkg/tactic/arith/pb2bv_check.go",
+        "pkg/tactic/arith/pb2bv_convert.go",
+        "pkg/tactic/arith/pb2bv_encoding.go",
+        "pkg/tactic/arith/pb2bv_apply.go",
+        "pkg/tactic/arith/pb2bv_trace.go",
+        "pkg/tactic/arith/pb2bv_probe.go",
+        "pkg/tactic/arith/pb2bv_tactic_test.go",
+        "pkg/tactic/arith/pb2bv_model_converter.go",
+        "pkg/ast/rewriter/bool_rewriter_public.go",
+        "pkg/tactic/tactic_probe.go",
+        "pkg/tactic/tactic_conditional.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestPB2BVEncodingTruthTables",
+        "TestPB2BVCoefficientNormalization",
+        "TestPB2BVTacticAllocationFrontiers",
+        "TestPB2BVProbeRefusalsParametersAndMemory",
+        "TestPB2BVRootTraceAndProofGuard",
+        "TestPB2BVCPPEncodingShapes",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -132086,11 +132430,51 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Complete retained tactic and is-pb probe factories with concrete Go typed ownership and virtual composition",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/pb2bv_tactic.go",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_tactic.go",
+            "pkg/tactic/arith/pb2bv_check.go",
+            "pkg/tactic/arith/pb2bv_convert.go",
+            "pkg/tactic/arith/pb2bv_encoding.go",
+            "pkg/tactic/arith/pb2bv_apply.go",
+            "pkg/tactic/arith/pb2bv_trace.go",
+            "pkg/tactic/arith/pb2bv_probe.go",
+            "pkg/tactic/arith/pb2bv_tactic_test.go",
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/ast/rewriter/bool_rewriter_public.go",
+            "pkg/tactic/tactic_probe.go",
+            "pkg/tactic/tactic_conditional.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestPB2BVEncodingTruthTables",
+            "TestPB2BVCoefficientNormalization",
+            "TestPB2BVTacticAllocationFrontiers",
+            "TestPB2BVProbeRefusalsParametersAndMemory",
+            "TestPB2BVRootTraceAndProofGuard",
+            "TestPB2BVCPPEncodingShapes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns copied parameters, bound manager, Boolean reducer, concrete rewriter traversal and saved substitution result, positive/negative Boolean cache references, split-helper integer roots and accumulated bound dependencies. Constructor/update/cleanup retain the source flag and parameter-snapshot ordering. Cleanup publishes a fresh implementation and repairs each borrowed configuration owner before deleting the old implementation; stopped retirement retains a concrete retry owner.",
+        "Lexical typed expression-reference trails keep encoding intermediates alive until the output reference is published. Applications own staged formulas and joined dependencies until all conversions complete, then update goals in source order. The model converter owns declaration pairs independently of tactic lifetime; filtering follows integer reconstruction and removes both Boolean and temporary integer helpers. Constructor, clause/cardinality/BV/split application and populated-cleanup reservation-frontier campaigns pass with zero charged storage after fixture teardown. The concrete is-pb probe owns only its header and borrows parameter services; each Eval owns a lexical bound manager."
+      ],
+      "deviations": [
+        "Native Go slices/maps and exact big.Rat values replace source containers, tagged pointers and rational storage. Ordered binding records enumerate owning cache entries; the source obj_map iteration has no stable ordering contract. No STL, generic numeral adapter or universal template implementation is added. The uninstantiated private visitor and permanently empty m_new_deps storage have no retained algorithm and are omitted.",
+        "The source positive-only normalization, unsigned cardinality-cost multiplication and a_sum += m_c typo are preserved. Source assertion-excluded or undefined domains receive explicit Go errors. Constructor-only Boolean flag overrides and later parameter-update resets remain observable and are tested.",
+        "The is-pb probe uses the actual source-style float64 virtual evaluation/refcount boundary, with a concrete arithmetic probe owner. The shared ProbeEvaluator interface also admits existing concrete probes into Boolean/arithmetic compositions and conditional tactics without a reverse package dependency or any-valued callback layer.",
+        "After a PB-to-BV conversion, a direct smt stage inherits the frontend logic. The prebuilt release reference can omit BV reasoning when that logic remains QF_LIA and return an invalid reconstructed model. This isolated source limitation has a separate reference regression; agreement vectors use ALL for mixed-theory final solving. The source QF_IDL strategy instead requires the still-unported bit-blast/SAT stages."
+      ]
     },
     {
       "path": "src/tactic/arith/probe_arith.cpp",
@@ -138017,7 +138401,10 @@
         "pkg/tactic/tactic_probe_memory_test.go",
         "pkg/tactic/tactic_probe_structural.go",
         "pkg/tactic/tactic_probe_structural_test.go",
-        "pkg/smtcore/tactic_manager_test.go"
+        "pkg/smtcore/tactic_manager_test.go",
+        "pkg/tactic/tactic_conditional.go",
+        "pkg/tactic/arith/pb2bv_probe.go",
+        "pkg/tactic/arith/pb2bv_tactic_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
@@ -138025,7 +138412,8 @@
         "TestProbeArithmeticComparisonBooleanAndOwnership",
         "TestProbeGoalProductionConfiguration",
         "TestProbeConstantCountsQuantifiersPatternsAndFragments",
-        "TestMemoryProbeReadsSharedProcessAllocation"
+        "TestMemoryProbeReadsSharedProcessAllocation",
+        "TestPB2BVProbeRefusalsParametersAndMemory"
       ],
       "conditionals": [
         {
@@ -138069,6 +138457,20 @@
           "go_target": "pkg/tactic/tactic_probe_structural.go",
           "tests": [
             "TestProbeConstantCountsQuantifiersPatternsAndFragments"
+          ]
+        },
+        {
+          "name": "Original probe virtual parameter boundary for Boolean/arithmetic compositions and conditional tactics: typed ProbeEvaluator evaluation/refcount/owner interface admits the concrete retained is-pb probe without importing arithmetic from the base package",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_probe.go",
+          "go_targets": [
+            "pkg/tactic/tactic_probe.go",
+            "pkg/tactic/tactic_conditional.go",
+            "pkg/tactic/arith/pb2bv_probe.go",
+            "pkg/tactic/arith/pb2bv_tactic_test.go"
+          ],
+          "tests": [
+            "TestPB2BVProbeRefusalsParametersAndMemory"
           ]
         }
       ],
@@ -140107,7 +140509,10 @@
         "pkg/tactic/tactic_using_params.go",
         "pkg/tactic/tactic_using_params_test.go",
         "pkg/tactic/tactic_unary.go",
-        "pkg/tactic/tactic_unary_test.go"
+        "pkg/tactic/tactic_unary_test.go",
+        "pkg/tactic/tactic_probe.go",
+        "pkg/tactic/arith/pb2bv_probe.go",
+        "pkg/tactic/arith/pb2bv_tactic_test.go"
       ],
       "tests": [
         "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
@@ -140133,7 +140538,8 @@
         "TestAnnotateTacticVerboseScopeIncludesFailureExit",
         "TestAnnotateTacticVerbosityGate",
         "TestParallelCombinatorsUseSingleGoroutineSourceBranches",
-        "TestFailIfBranchingAndCleanTacticals"
+        "TestFailIfBranchingAndCleanTacticals",
+        "TestPB2BVProbeRefusalsParametersAndMemory"
       ],
       "conditionals": [
         {
@@ -140429,6 +140835,20 @@
           "go_target": "pkg/tactic/tactic_unary.go",
           "tests": [
             "TestFailIfBranchingAndCleanTacticals"
+          ]
+        },
+        {
+          "name": "Original probe virtual parameter boundary for Boolean/arithmetic compositions and conditional tactics: typed ProbeEvaluator evaluation/refcount/owner interface admits the concrete retained is-pb probe without importing arithmetic from the base package",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_probe.go",
+          "go_targets": [
+            "pkg/tactic/tactic_probe.go",
+            "pkg/tactic/tactic_conditional.go",
+            "pkg/tactic/arith/pb2bv_probe.go",
+            "pkg/tactic/arith/pb2bv_tactic_test.go"
+          ],
+          "tests": [
+            "TestPB2BVProbeRefusalsParametersAndMemory"
           ]
         }
       ],

@@ -90,6 +90,9 @@ func extensionFixture(t *testing.T, traces ...*diagnostic.TraceTags) (*ast.ASTMa
 	m, e := ast.NewASTManager(managerConfig)
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, m.Close()) })
+	// The evaluator constructs arithmetic/BV/array reducers, as the command
+	// context does; initialize their declaration plugins in this fixture too.
+	satOK(t, m.RegisterDeclarationPlugins())
 	md, e := model.NewModel(m)
 	satOK(t, e)
 	out := &ModelRef{}

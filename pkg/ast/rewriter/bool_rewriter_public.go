@@ -30,6 +30,34 @@ func (rw *boolRewriter) SetFlat(flat bool) error {
 	return nil
 }
 
+// SetEliminateAnd and the concrete gate factories serve the retained pb2bv
+// tactic's private configured Boolean reducer.
+func (rw *boolRewriter) SetEliminateAnd(enabled bool) error {
+	if err := rw.configuredOpen(); err != nil {
+		return err
+	}
+	rw.elimAnd = enabled
+	return nil
+}
+func (rw *boolRewriter) MkAnd(args []ast.ASTHandle, out ast.ASTRef) error {
+	if err := rw.configuredOpen(); err != nil {
+		return err
+	}
+	return rw.mkAnd(args, out)
+}
+func (rw *boolRewriter) MkNot(arg ast.ASTHandle, out ast.ASTRef) error {
+	if err := rw.configuredOpen(); err != nil {
+		return err
+	}
+	return rw.mkNot(arg, out)
+}
+func (rw *boolRewriter) MkIte(condition, then, otherwise ast.ASTHandle, out ast.ASTRef) error {
+	if err := rw.configuredOpen(); err != nil {
+		return err
+	}
+	return rw.mkITE(condition, then, otherwise, out)
+}
+
 // MkAppCore retains the source status and owning result-reference contract.
 // RewriteFailed leaves result unchanged, as the original core does.
 func (rw *boolRewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, result ast.ASTRef) (RewriteStatus, error) {

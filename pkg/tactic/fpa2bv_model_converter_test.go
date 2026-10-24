@@ -24,12 +24,30 @@ func TestFPA2BVModelConverterRebuildsFloatsAndKeepsOtherDeclarations(t *testing.
 	astTestMust(t, err)
 	sign, err := m.GetArg(encoded, 0)
 	astTestMust(t, err)
-	packed, err := m.GetArg(sign, 0)
-	astTestMust(t, err)
-	packedDeclaration, err := m.GetDecl(packed)
-	astTestMust(t, err)
 	packedValue, err := m.BitVectorNumeralUnsigned(0x3fc00000, 32)
 	astTestMust(t, err)
+	astTestPin(t, m, packedValue)
+	var auxiliary []struct{ declaration, value ast.ASTHandle }
+	if ast.ASTSourceDebug {
+		// Source Z3DEBUG creates separate sign/exponent/significand constants;
+		// release builds instead extract all three from one packed declaration.
+		for i, part := range []struct{ value, width uint32 }{{0, 1}, {127, 8}, {0x400000, 23}} {
+			h, e := m.GetArg(encoded, uint32(i))
+			astTestMust(t, e)
+			d, e := m.GetDecl(h)
+			astTestMust(t, e)
+			value, e := m.BitVectorNumeralUnsigned(part.value, part.width)
+			astTestMust(t, e)
+			astTestPin(t, m, value)
+			auxiliary = append(auxiliary, struct{ declaration, value ast.ASTHandle }{d, value})
+		}
+	} else {
+		packed, e := m.GetArg(sign, 0)
+		astTestMust(t, e)
+		d, e := m.GetDecl(packed)
+		astTestMust(t, e)
+		auxiliary = append(auxiliary, struct{ declaration, value ast.ASTHandle }{d, packedValue})
+	}
 	boolSort, err := m.MkBoolSort()
 	astTestMust(t, err)
 	plainDeclaration, err := m.MkFuncDecl(astTestSymbol(t, m, "plain-model-value"), nil, boolSort, ast.ASTFuncDeclInfo{})
@@ -38,7 +56,9 @@ func TestFPA2BVModelConverterRebuildsFloatsAndKeepsOtherDeclarations(t *testing.
 	astTestMust(t, err)
 	source, err := model.NewModel(m)
 	astTestMust(t, err)
-	astTestMust(t, source.Core().RegisterConstant(packedDeclaration, packedValue))
+	for _, entry := range auxiliary {
+		astTestMust(t, source.Core().RegisterConstant(entry.declaration, entry.value))
+	}
 	astTestMust(t, source.Core().RegisterConstant(plainDeclaration, plainValue))
 	var reference ModelRef
 	astTestMust(t, reference.Set(source.Core()))
@@ -70,7 +90,9 @@ func TestFPA2BVModelConverterRebuildsFloatsAndKeepsOtherDeclarations(t *testing.
 	if gotPlain != plainValue {
 		t.Fatal("plain constant was not preserved", gotPlain, plainValue)
 	}
-	if consumed, err := target.HasConstantInterpretation(packedDeclaration); err != nil || consumed {
-		t.Fatal("auxiliary packed declaration survived", consumed, err)
+	for _, entry := range auxiliary {
+		if consumed, err := target.HasConstantInterpretation(entry.declaration); err != nil || consumed {
+			t.Fatal("auxiliary float encoding declaration survived", consumed, err)
+		}
 	}
 }
