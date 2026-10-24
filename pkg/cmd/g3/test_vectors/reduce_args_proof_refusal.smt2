@@ -1,0 +1,8 @@
+(set-logic QF_UFBV)
+(set-option :produce-proofs true)
+(declare-fun f ((_ BitVec 4)) Bool)
+(assert (f #x1))
+(assert (not (f #x1)))
+(check-sat-using reduce-args)
+(get-info :reason-unknown)
+(check-sat-using (or-else reduce-args smt))

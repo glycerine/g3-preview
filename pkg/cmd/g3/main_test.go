@@ -215,6 +215,13 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"reduce_args_common_ground_model.smt2":         "sat\n(((f a x) true)\n ((f a y) false)\n ((distinct x y) true))\n",
+	"reduce_args_core_refusal.smt2":                "unknown\n(:reason-unknown \"reduce-args does not support unsat core production\")\nunsat\n(yes no)\n",
+	"reduce_args_mixed_sort_model.smt2":            "sat\n(((f 1 p x) #xa)\n ((f 2 q y) #xb))\n",
+	"reduce_args_nested_model.smt2":                "sat\n(((f (g #x1) x) true)\n ((f (g #x1) y) false)\n ((distinct x y) true))\n",
+	"reduce_args_offset_model.smt2":                "sat\n(((f (bvadd #x1 x) y) true)\n ((f (bvadd #x2 x) z) false))\n",
+	"reduce_args_proof_refusal.smt2":               "unknown\n(:reason-unknown \"reduce-args does not support proof production\")\nunsat\n",
+	"reduce_args_values_models_scopes.smt2":        "sat\n(((f #x0 x) #x11)\n ((f #x1 y) #x22))\nunsat\nsat\n(((f #x0 x) #x11)\n ((f #x1 y) #x22))\n",
 	"qfaufbv_core.smt2":                            "unsat\n(impossible)\n",
 	"qfaufbv_extensional_models.smt2":              "sat\n(((distinct a b) true)\n ((= (select a #b00) (select b #b00)) true))\n",
 	"qfaufbv_limits_recovery.smt2":                 "unknown\n(:reason-unknown \"max. steps exceeded\")\nsat\n(((= (bvmul (select a i) (select a i)) #x9) true))\n",

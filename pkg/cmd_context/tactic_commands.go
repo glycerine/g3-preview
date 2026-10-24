@@ -50,7 +50,7 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return nil, err
 	}
 	switch name {
-	case "smt", "sat", "sat-preprocess", "simplify", "ctx-simplify", "add-bounds", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "bv1-blast", "reduce-bv-size", "ackermannize_bv", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfbv", "qfaufbv", "qfidl", "qflia", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
+	case "smt", "sat", "sat-preprocess", "simplify", "ctx-simplify", "add-bounds", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "bv1-blast", "reduce-bv-size", "reduce-args", "ackermannize_bv", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "diff-neq", "lia2pb", "pb2bv", "qfbv", "qfaufbv", "qfidl", "qflia", "qfauflia", "qflra", "qfuf", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -109,6 +109,8 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return smtlogics.NewQFUFTactic(m, nil, c.config)
 	case "symmetry-reduce":
 		return core.NewSymmetryReduceTactic(m, c.config.Params, c.config.Globals)
+	case "reduce-args":
+		return core.MakeReduceArgsTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
 	case "fix-dl-var":
 		return arith.MakeFixDLVarTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator)
 	case "normalize-bounds":

@@ -17856,7 +17856,10 @@
       "go_targets": [
         "pkg/ast/ast_for_each_expr.go",
         "pkg/ast/ast_for_each_expr_source_test.go",
-        "pkg/smtcore/smt_model_finder_hint_cycle.go"
+        "pkg/smtcore/smt_model_finder_hint_cycle.go",
+        "pkg/tactic/core/reduce_args_analysis.go",
+        "pkg/tactic/core/reduce_args_cpp_test.go",
+        "pkg/tactic/core/reduce_args_tactic_test.go"
       ],
       "tests": [
         "TestASTExprVisitorSourceCountSharedAndAllMarks",
@@ -17871,7 +17874,11 @@
         "TestASTExprVisitorSourcePendingMarkCannotClearForeignActualMark",
         "TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack",
         "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild",
-        "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
+        "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations",
+        "TestReduceArgsExactGoalsCPP",
+        "TestReduceArgsModelLifetimeFilteringAndVariables",
+        "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+        "TestReduceArgsConstructorAndApplicationAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -17911,6 +17918,21 @@
           "go_target": "pkg/smtcore/smt_model_finder_hint_cycle.go",
           "tests": [
             "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations"
+          ]
+        },
+        {
+          "name": "Concrete retained quick_for_each_expr specializations for reduce_args find_non_candidates_proc and populate_decl2args_proc, preserving first postorder visitation, quantifier body/pattern order and declaration analysis effects",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers"
           ]
         }
       ],
@@ -41113,7 +41135,20 @@
         "pkg/cmd/g3/test_vectors/qfaufbv_solver_extensional_models.smt2",
         "pkg/cmd/g3/test_vectors/qfaufbv_solver_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/qfaufbv_solver_proof.smt2",
-        "pkg/cmd/g3/test_vectors/qfaufbv_store_sort_models.smt2"
+        "pkg/cmd/g3/test_vectors/qfaufbv_store_sort_models.smt2",
+        "pkg/tactic/core/reduce_args_analysis.go",
+        "pkg/tactic/core/reduce_args_cpp_test.go",
+        "pkg/tactic/core/reduce_args_model.go",
+        "pkg/tactic/core/reduce_args_tactic.go",
+        "pkg/tactic/core/reduce_args_tactic_test.go",
+        "pkg/tactic/core/reduce_args_trace.go",
+        "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
       ],
       "tests": [
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
@@ -41161,7 +41196,11 @@
         "TestQFAUFBVTacticConstructorAllocationFrontiers",
         "TestQFAUFBVTacticTranslatedProofAndCoreRoutes",
         "TestQFAUFBVTacticModelSurvivesStrategyClose",
-        "TestSMTLibRunnerQFAUFBVBranchEvidence"
+        "TestSMTLibRunnerQFAUFBVBranchEvidence",
+        "TestReduceArgsExactGoalsCPP",
+        "TestReduceArgsModelLifetimeFilteringAndVariables",
+        "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+        "TestReduceArgsConstructorAndApplicationAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -41483,6 +41522,35 @@
             "TestQFAUFBVTacticTranslatedProofAndCoreRoutes",
             "TestQFAUFBVTacticModelSurvivesStrategyClose",
             "TestSMTLibRunnerQFAUFBVBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Registered retained reduce-args clean factory for check-sat-using: source candidate/base analysis, original-function reconstruction with helper filtering, scoped models and proof/core refusal with SMT fallback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -140384,9 +140452,32 @@
       "path": "src/tactic/core/reduce_args_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/reduce_args_analysis.go",
+        "pkg/tactic/core/reduce_args_cpp_test.go",
+        "pkg/tactic/core/reduce_args_model.go",
+        "pkg/tactic/core/reduce_args_tactic.go",
+        "pkg/tactic/core/reduce_args_tactic_test.go",
+        "pkg/tactic/core/reduce_args_trace.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+      ],
+      "tests": [
+        "TestReduceArgsExactGoalsCPP",
+        "TestReduceArgsModelLifetimeFilteringAndVariables",
+        "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+        "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 206,
@@ -140425,19 +140516,223 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_var_plus_offset/may_be_unique: unique values have null base; only binary BV addition with numeral on the left strips the offset; all other bases require no free variables",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "find_non_candidates/populate_decl2args: two goal-order postorder passes visit applications, quantifier body and patterns; reject a declaration if any occurrence has no possible position; intersect possible positions and initial-base identity, then discard all-zero masks",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Concrete rewrite cfg checkpoints, projected argument-tuple equivalence, fresh function declaration domain reduction, owned representative applications/declarations and per-form default rewriting without simplification",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "mk_mc creates original-signature indexed variables, nested ITE definitions over reduced values, extension reconstruction and fresh-declaration filtering in source concat order",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Raw/factory lifecycle, ignored parameters/no descriptors, source proof-before-core refusal preserving previous results, model/metadata clearing, inconsistent/no-candidate paths, implementation cleanup before outer depth/publication and target-manager translation",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "All four TRACE sites, reduced-function progress reporting, source cancellation messages/cooperation and closed-stream behavior",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager, parameter/diagnostic services and cooperation runtime are borrowed. Per-call frames own the traversal, output reference, representative applications, fresh declarations, model-definition roots and counted extension/filter converters. Scratch roots retire at callback exit; failed construction and consumed release prefixes stay reachable for cleanup retry.",
+        "The implementation closes its lexical rewriter/maps before the outer tactic increments depth and publishes the borrowed input goal. Result converters retain independent references after tactic cleanup/destruction. Native model checks verify exactly one remaining helper-declaration reference through its goal application and invalidation after the last goal owner closes."
+      ],
+      "deviations": [
+        "Native Go maps/slices replace C++ maps/hash tables, bit vectors, stacks and buffers. Projected tuple keys encode live AST identities for Go map equality; source hash functions and hash iteration order are not ported. Unconstrained model-default order and fresh symbol spelling can differ. Concrete iterative discovery coalesces repeated idempotent candidate visits without mutating AST mark bits.",
+        "Explicit errors and retained cleanup owners replace exception/scoped destruction. The source factory parameter is ignored; no universal/template adapter or C++ standard-library implementation is introduced."
+      ]
     },
     {
       "path": "src/tactic/core/reduce_args_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/reduce_args_analysis.go",
+        "pkg/tactic/core/reduce_args_cpp_test.go",
+        "pkg/tactic/core/reduce_args_model.go",
+        "pkg/tactic/core/reduce_args_tactic.go",
+        "pkg/tactic/core/reduce_args_tactic_test.go",
+        "pkg/tactic/core/reduce_args_trace.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+        "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+      ],
+      "tests": [
+        "TestReduceArgsExactGoalsCPP",
+        "TestReduceArgsModelLifetimeFilteringAndVariables",
+        "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+        "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -140448,11 +140743,192 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_var_plus_offset/may_be_unique: unique values have null base; only binary BV addition with numeral on the left strips the offset; all other bases require no free variables",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "find_non_candidates/populate_decl2args: two goal-order postorder passes visit applications, quantifier body and patterns; reject a declaration if any occurrence has no possible position; intersect possible positions and initial-base identity, then discard all-zero masks",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Concrete rewrite cfg checkpoints, projected argument-tuple equivalence, fresh function declaration domain reduction, owned representative applications/declarations and per-form default rewriting without simplification",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "mk_mc creates original-signature indexed variables, nested ITE definitions over reduced values, extension reconstruction and fresh-declaration filtering in source concat order",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Raw/factory lifecycle, ignored parameters/no descriptors, source proof-before-core refusal preserving previous results, model/metadata clearing, inconsistent/no-candidate paths, implementation cleanup before outer depth/publication and target-manager translation",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "All four TRACE sites, reduced-function progress reporting, source cancellation messages/cooperation and closed-stream behavior",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/core/reduce_args_analysis.go",
+            "pkg/tactic/core/reduce_args_cpp_test.go",
+            "pkg/tactic/core/reduce_args_model.go",
+            "pkg/tactic/core/reduce_args_tactic.go",
+            "pkg/tactic/core/reduce_args_tactic_test.go",
+            "pkg/tactic/core/reduce_args_trace.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/reduce_args_common_ground_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_core_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_mixed_sort_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_nested_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_offset_model.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_proof_refusal.smt2",
+            "pkg/cmd/g3/test_vectors/reduce_args_values_models_scopes.smt2"
+          ],
+          "tests": [
+            "TestReduceArgsExactGoalsCPP",
+            "TestReduceArgsModelLifetimeFilteringAndVariables",
+            "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
+            "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The manager, parameter/diagnostic services and cooperation runtime are borrowed. Per-call frames own the traversal, output reference, representative applications, fresh declarations, model-definition roots and counted extension/filter converters. Scratch roots retire at callback exit; failed construction and consumed release prefixes stay reachable for cleanup retry.",
+        "The implementation closes its lexical rewriter/maps before the outer tactic increments depth and publishes the borrowed input goal. Result converters retain independent references after tactic cleanup/destruction. Native model checks verify exactly one remaining helper-declaration reference through its goal application and invalidation after the last goal owner closes."
+      ],
+      "deviations": [
+        "Native Go maps/slices replace C++ maps/hash tables, bit vectors, stacks and buffers. Projected tuple keys encode live AST identities for Go map equality; source hash functions and hash iteration order are not ported. Unconstrained model-default order and fresh symbol spelling can differ. Concrete iterative discovery coalesces repeated idempotent candidate visits without mutating AST mark bits.",
+        "Explicit errors and retained cleanup owners replace exception/scoped destruction. The source factory parameter is ignored; no universal/template adapter or C++ standard-library implementation is introduced."
+      ]
     },
     {
       "path": "src/tactic/core/simplify_tactic.cpp",
