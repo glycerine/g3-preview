@@ -19,6 +19,7 @@ func (s *Solver) PopToBaseLevel() error {
 }
 func (s *Solver) SourceInconsistent() (bool, error)             { return s.sourceInconsistent() }
 func (s *Solver) SourceNumVars() (uint32, error)                { return s.sourceNumVars() }
+func (s *Solver) SourceModelIsCurrent() (bool, error)           { return s.sourceModelIsCurrent() }
 func (s *Solver) SourceValueVar(v BoolVar) (lbool.LBool, error) { return s.sourceValueVar(v) }
 
 // CollectBinClauses appends in watch traversal order. On error it returns the

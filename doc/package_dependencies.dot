@@ -314,6 +314,7 @@ digraph packages {
   "sat/sat_solver" -> "model";
   "sat/sat_solver" -> "sat";
   "sat/sat_solver" -> "sat/tactic";
+  "sat/sat_solver" -> "solver";
   "sat/sat_solver" -> "tactic";
   "sat/sat_solver" -> "tactic/arith";
   "sat/sat_solver" -> "tactic/bv";
@@ -321,6 +322,9 @@ digraph packages {
   "sat/sat_solver" -> "util/lbool";
   "sat/sat_solver" -> "util/memory";
   "sat/sat_solver" -> "util/params";
+  "sat/sat_solver" -> "util/statistics";
+  "sat/sat_solver" -> "util/symbol";
+  "sat/sat_solver" -> "util/text";
   "sat/sat_solver" -> "util/z3exception";
   "sat/tactic" [style=filled, fillcolor="#eeeeee"];
   "sat/tactic" -> "arena";

@@ -100461,6 +100461,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_solver/solver.go",
+        "pkg/sat/sat_solver/solver_model.go",
+        "pkg/sat/sat_solver/solver_test.go",
+        "pkg/sat/sat_package_boundary.go",
         "pkg/sat/sat_solver/preprocess.go",
         "pkg/sat/sat_solver/preprocess_test.go",
         "pkg/sat/tactic/sat_goal_incremental.go",
@@ -100473,6 +100477,13 @@
         "pkg/tactic/core/simplify_stopped_cleanup_release_test.go"
       ],
       "tests": [
+        "TestIncrementalSolverChecksScopesAndModelsCPP",
+        "TestIncrementalSolverAssumptionsAndTrackedCore",
+        "TestIncrementalSolverAllocationFrontiers",
+        "TestIncrementalSolverUnknownDiagnosticAndRecovery",
+        "TestIncrementalSolverWideModelsCPP",
+        "TestIncrementalSolverBaseAndShadowParameters",
+        "TestIncrementalSolverProofRefusal",
         "TestIncrementalEncoderPersistentBitBindingsAndUserScopesCPP",
         "TestIncrementalEncoderPBAndUnsupportedInterpretedAtoms",
         "TestIncrementalEncoderAllocationFrontiers",
@@ -100630,17 +100641,38 @@
           ]
         },
         {
-          "name": "Full inc_sat_solver facade/factory: original formula queue/head/scopes, source base-versus-shadow parameter policy, assumptions/tracking/cores, actual checks/results, model extraction, translation, consequences/mutexes, weighted display and all diagnostics",
+          "name": "Incremental assertion/check/model state: original formula queue/head/scopes, base-versus-shadow parameters, tracked and complex assumptions, original unsat cores, SAT model reconstruction and unsupported-atom reason formatting; trace/verbose and DIMACS diagnostics remain",
+          "status": "partial",
+          "go_targets": [
+            "pkg/sat/sat_solver/solver.go",
+            "pkg/sat/sat_solver/solver_model.go",
+            "pkg/sat/sat_solver/solver_test.go",
+            "pkg/sat/sat_package_boundary.go"
+          ],
+          "tests": [
+            "TestIncrementalSolverChecksScopesAndModelsCPP",
+            "TestIncrementalSolverAssumptionsAndTrackedCore",
+            "TestIncrementalSolverAllocationFrontiers",
+            "TestIncrementalSolverUnknownDiagnosticAndRecovery",
+            "TestIncrementalSolverWideModelsCPP",
+            "TestIncrementalSolverBaseAndShadowParameters",
+            "TestIncrementalSolverProofRefusal"
+          ]
+        },
+        {
+          "name": "Complete solver.Solver factory/facade, translation, consequences/mutexes, weighted display and remaining trace/verbose/DIMACS diagnostics",
           "status": "unported",
           "go_targets": [],
           "tests": []
         }
       ],
       "ownership": [
-        "The partial encoder borrows the actual SAT core and evaluator services. It owns copied internal parameters, scoped Expr2Var, persistent bit blaster, counted preprocessing composition, last result and per-compilation translator. Pending partial constructors and concrete child closers remain owned across stopped reset/destruction. Translation temporaries borrow the scoped atom map rather than duplicating its roots. Full solver/model ownership and facade auditing remain incomplete."
+        "The partial encoder borrows the actual SAT core and evaluator services. It owns copied internal parameters, scoped Expr2Var, persistent bit blaster, counted preprocessing composition, last result and per-compilation translator. Pending partial constructors and concrete child closers remain owned across stopped reset/destruction. Translation temporaries borrow the scoped atom map rather than duplicating its roots.",
+        "The incremental Solver owns its SAT runtime/core/encoder, copied base and internal parameters, original formula/tracker/core roots, latest compiled input goal and counted model/converter chain. Lexical assumption, model, evaluator and format owners remain reachable across stopped cleanup. Models returned through AcquireModel hold independent counted references. Constructor/check/complex-assumption/model/repeated-model/interpreted-atom reservation frontiers reach success with zero charged storage after fixture destruction. Full factory/consequence/translation ownership auditing remains incomplete."
       ],
       "deviations": [
-        "This increment ports the persistent preprocessing/internalization component and its source scope operations, not the complete solver.Solver factory. There is no fallback facade or substituted tactic-only solver. The standalone component receives the source internal parameter dictionary; the source facade's separate base/shadow parameter behavior remains to port. Diagnostic trace/verbose/reason-unknown formatting for internalize_goal remains outstanding. Native Go maps and concrete Expr2Var replace source project containers without porting source hashing."
+        "The concrete Solver implements assertion/check/core/model state, but does not yet implement the complete solver.Solver interface: translation, consequences, mutexes, weighted display and remaining diagnostics are outstanding. No fallback facade or substituted tactic-only solver is supplied. Source base and derived m_params shadowing is preserved: user settings update the base snapshot while the SAT core receives internal elim_vars=false. Native Go maps and concrete Expr2Var replace source project containers without porting source hashing.",
+        "Source accumulates bit-blaster model converters across checks/scopes. That chain is preserved; original BV interpretations are reconstructed before bit constants are filtered. Source retains the previous unsat core on a later SAT check and permanently asserts equality guards for complex assumptions. Incomplete failed model conversion stays owned for Close and is explicitly pending rather than exposing a half-converted model. Unsupported-atom reason formatting preserves the vector printer's leading line break."
       ]
     },
     {

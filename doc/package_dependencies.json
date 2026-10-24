@@ -2338,6 +2338,7 @@
         "model",
         "sat",
         "sat/tactic",
+        "solver",
         "tactic",
         "tactic/arith",
         "tactic/bv",
@@ -2345,10 +2346,15 @@
         "util/lbool",
         "util/memory",
         "util/params",
+        "util/statistics",
+        "util/symbol",
+        "util/text",
         "util/z3exception"
       ],
       "production_files": [
-        "preprocess.go"
+        "preprocess.go",
+        "solver.go",
+        "solver_model.go"
       ]
     },
     {
