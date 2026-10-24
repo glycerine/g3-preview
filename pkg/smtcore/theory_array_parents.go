@@ -108,11 +108,9 @@ func (t *SMTArrayTheory) addParentSelect(variable SMTTheoryVar, read *SMTEnode) 
 				return err
 			}
 		}
-		for _, node := range data.asArrays {
-			if err := t.assertSelectAxiom(read.owner, node.owner); err != nil {
-				return err
-			}
-		}
+		// Native add_parent_select visits consts and maps. As-array reads
+		// are instantiated by add_as_array when its constructor joins a
+		// class with existing reads, retaining the source incompleteness.
 	}
 	return nil
 }

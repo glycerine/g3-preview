@@ -119941,6 +119941,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_as_array_triggers_test.go",
+        "pkg/cmd/g3/test_vectors/array_as_array_direct_core_scopes.smt2",
         "pkg/smtcore/theory_array_epsilon_test.go",
         "pkg/smtcore/theory_array_constructor_merge_test.go",
         "pkg/smtcore/theory_array_sorts.go",
@@ -119987,6 +119989,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTFullArrayAsArrayReadAxiomsUseConstructorMergeTrigger",
         "TestSMTFullArrayEpsilonCacheOwnsValuesAcrossTemporaryReferences",
         "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback",
         "TestSMTArraySortDeclarationsOwnedAndScoped",
@@ -120165,6 +120168,23 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "add_parent_select visits const/map constructors while add_as_array instantiates reads already present when its constructor joins the class; no extra late-read as-array rule is introduced, and native as-array incompleteness is preserved; direct-core assumptions bypass combined-solver tactic fallback in strict comparisons",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_parents.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_as_array_triggers_test.go",
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_full_parents.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/array_as_array_direct_core_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMTFullArrayAsArrayReadAxiomsUseConstructorMergeTrigger",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "mk_epsilon retains an owning reference in the concrete sort-to-epsilon trail map, independent of temporary expressions; value declarations keep sort keys alive, child pop releases child ownership, and theory destruction releases base entries even without registered array sorts",
           "status": "ported",
@@ -120423,6 +120443,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/smtcore/theory_array_as_array_triggers_test.go",
+        "pkg/cmd/g3/test_vectors/array_as_array_direct_core_scopes.smt2",
         "pkg/smtcore/theory_array_epsilon_test.go",
         "pkg/smtcore/theory_array_constructor_merge_test.go",
         "pkg/smtcore/theory_array_sorts.go",
@@ -120467,6 +120489,7 @@
         "pkg/smtcore/theory_array.go"
       ],
       "tests": [
+        "TestSMTFullArrayAsArrayReadAxiomsUseConstructorMergeTrigger",
         "TestSMTFullArrayEpsilonCacheOwnsValuesAcrossTemporaryReferences",
         "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback",
         "TestSMTArraySortDeclarationsOwnedAndScoped",
@@ -120504,6 +120527,23 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "add_parent_select visits const/map constructors while add_as_array instantiates reads already present when its constructor joins the class; no extra late-read as-array rule is introduced, and native as-array incompleteness is preserved; direct-core assumptions bypass combined-solver tactic fallback in strict comparisons",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_parents.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_as_array_triggers_test.go",
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_full_parents.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/array_as_array_direct_core_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMTFullArrayAsArrayReadAxiomsUseConstructorMergeTrigger",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "mk_epsilon retains an owning reference in the concrete sort-to-epsilon trail map, independent of temporary expressions; value declarations keep sort keys alive, child pop releases child ownership, and theory destruction releases base entries even without registered array sorts",
           "status": "ported",
@@ -126544,9 +126584,12 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/cmd/g3/combined_solver_gap_test.go",
+        "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2",
         "pkg/solver/combined_solver.go"
       ],
       "tests": [
+        "TestSMTLibRunnerAsArrayCombinedSolverFallbackGap",
         "TestCombinedSolverDelayedInitializationAndIncrementalRouting",
         "TestCombinedSolverAssumptionsAndTrackedAssertionsForceSecond",
         "TestCombinedSolverUnknownPolicyAndTimedFallback",
@@ -126599,6 +126642,7 @@
         "The factory owns both child factories and closes them in reverse construction order. Timed checks balance exactly one resource-limit cancellation when the timer fires."
       ],
       "deviations": [
+        "The combined-solver wrapper is ported, but public CLI/API construction still uses the direct SMT backend and does not connect its tactic-solver fallback. A retained as-array alias script gives UNKNOWN/UNKNOWN/UNKNOWN in the direct core and SAT/UNSAT/SAT through native combined_solver; native verbose output confirms solver 2 failed and solver 1 was tried. The checked-in fallback-gap test records this missing integration separately from strict agreement. A matching check-sat-assuming script disables native fallback and joins the strict set (142 scripts). This evidence does not establish completed solver/tactic/API integration.",
         "CombinedSolverConfig supplies explicit parameter/global services, target configuration and an injectable timed runner. The default timed runner uses a Go timer and the same resource-limit cancel counter as the source scoped timer."
       ]
     },

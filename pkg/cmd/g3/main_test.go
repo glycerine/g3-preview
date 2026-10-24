@@ -10,6 +10,7 @@ import (
 )
 
 var scriptResults = map[string]string{
+	"array_as_array_direct_core_scopes.smt2":       "unknown\nunknown\nunknown\n",
 	"model_macro_cleanup_scopes.smt2":              "sat\n((c false) ((f false) false) ((f true) false))\nsat\n((c true) ((f false) false) ((f true) true))\nsat\n((c false) ((f false) false) ((f true) false))\n",
 	"model_compact_live_updates.smt2":              "sat\n(model (define-fun f ((x!0 Bool)) Bool (ite (= x!0 false) false (ite (= x!0 true) false false)))\n)\nsat\n(model (define-fun f ((x!0 Bool)) Bool false)\n)\n(((f false) false) ((f true) false))\nsat\n(model (define-fun f ((x!0 Bool)) Bool (ite (= x!0 false) false (ite (= x!0 true) false false)))\n)\n",
 	"array_explicit_extensionality_scopes.smt2":    "sat\nunsat\nsat\nunsat\nsat\n",
