@@ -2150,6 +2150,7 @@
         "ast/rewriter",
         "math/simplex",
         "model",
+        "smtcore",
         "tactic",
         "util/cooperate",
         "util/diagnostic",
@@ -2201,6 +2202,7 @@
         "projection_literals.go",
         "projection_partition.go",
         "projection_preprocess.go",
+        "qsat_kernel.go",
         "qsat_preparation.go",
         "trace.go",
         "variable_selection.go"

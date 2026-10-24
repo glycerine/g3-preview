@@ -94434,7 +94434,11 @@
         "pkg/qe/qsat_preparation_test.go",
         "pkg/qe/qsat_preparation_cpp_test.go",
         "pkg/ast/rewriter/quant_hoist.go",
-        "pkg/ast/rewriter/label_rewriter.go"
+        "pkg/ast/rewriter/label_rewriter.go",
+        "pkg/qe/qsat_kernel.go",
+        "pkg/qe/qsat_kernel_test.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/solver/check_sat_result.go"
       ],
       "tests": [
         "TestMaxLevelSentinelMergeAndDisplay",
@@ -94449,7 +94453,12 @@
         "TestQSATPreparationPrefixLevelsAndFilters",
         "TestQSATPreparationResetTraceAndGuards",
         "TestQSATPreparationAllocationFrontiers",
-        "TestQSATPreparationCPPPrefixEquivalence"
+        "TestQSATPreparationCPPPrefixEquivalence",
+        "TestQSATKernelModelCoreResetAndParameters",
+        "TestQSATKernelIndependentSolversArithmeticAndGuards",
+        "TestQSATKernelCPPArithmeticAssumptionCore",
+        "TestQSATPreparationFeedsDualKernelDefinitions",
+        "TestQSATKernelAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -94693,15 +94702,34 @@
             "TestQSATPreparationAllocationFrontiers",
             "TestQSATPreparationCPPPrefixEquivalence"
           ]
+        },
+        {
+          "name": "kernel constructor/destructor/s/reset/assert_expr/get_core: concrete native SMTSolver ownership, exact private parameter overrides, fresh reset solver, assumption-core reference replacement and source trace display",
+          "status": "ported",
+          "go_targets": [
+            "pkg/qe/qsat_kernel.go",
+            "pkg/qe/qsat_kernel_test.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/solver/check_sat_result.go"
+          ],
+          "tests": [
+            "TestQSATKernelModelCoreResetAndParameters",
+            "TestQSATKernelIndependentSolversArithmeticAndGuards",
+            "TestQSATKernelCPPArithmeticAssumptionCore",
+            "TestQSATPreparationFeedsDualKernelDefinitions",
+            "TestQSATKernelAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
         "Concrete map-key ASTRefs, formula trail, per-level predicate ASTRefs, scoped assumption ASTRefs and a counted filter-model converter preserve the actual source owners. Reset preserves declaration levels and the filter, matching source; final Close releases the filter count and enclosing charge. Caller output vector appends and completed replacements remain owned on errors. Pending lexical formula references, model evaluators and construction-failure receipts are retained until cleanup succeeds. Eleven first-success campaigns cover constructor, abstraction, rebuilding, assumption creation/retrieval, validation, display, open/closed tracing, model tracing and final close, releasing all charged fixture storage.",
-        "Private qsatPreparation owns the actual prefix reference vectors and PredicateAbstraction state for the pending search owner. Per-call state retains the lexical local-variable vector, proof reference, concrete LabelRewriter/QuantifierHoister, each actual hoist result and stopped construction-failure receipts until cleanup succeeds. Reset clears prefixes/expression levels while preserving the predicate model filter and declaration levels as source does. Nine first-success allocation campaigns cover construction, SAT/QE alternation, mixed prefixes, labels, blocked occurrences, reuse and open/closed traces; all charged fixture storage is released."
+        "Private qsatPreparation owns the actual prefix reference vectors and PredicateAbstraction state for the pending search owner. Per-call state retains the lexical local-variable vector, proof reference, concrete LabelRewriter/QuantifierHoister, each actual hoist result and stopped construction-failure receipts until cleanup succeeds. Reset clears prefixes/expression levels while preserving the predicate model filter and declaration levels as source does. Nine first-success allocation campaigns cover construction, SAT/QE alternation, mixed prefixes, labels, blocked occurrences, reuse and open/closed traces; all charged fixture storage is released.",
+        "Private qsatKernel owns the actual SMTSolver, private ParamsRef, retired replacement solvers and stopped child-failure receipts. New solvers are created before replacing the old owner; old solver destruction remains retryable. Acquired models and copied core ASTRefs remain live after reset/destruction. Six first-success allocation campaigns cover construction, reset, assertion, core extraction and open/closed core tracing; all charged fixture storage is released. It uses the existing concrete SMT facade and introduces no alternate solver or callback adapter."
       ],
       "deviations": [
-        "max_level, pred_abs and the retained hoist/filter/level/suffix-variable preparation methods are ported. The QSAT kernel, projection/search loop, tactics/factories, QE execution modes, qmax and maximize entry point remain unported, with model-based projection now available. Preparation remains private until the complete search owner exists; it does not register a substitute qsat/qe2/qe_rec tactic. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule.",
-        "Fifty-six direct cases cover fourteen formula shapes in all four source modes, including dependent Boolean/integer prefixes, real universal variables, negative polarity, mixed connectives, ITE branches, labels, repeated declaration names and source-inaccessible term occurrences. Twenty-eight prebuilt C++ comparisons independently reconstruct the native alternating prefix as SMT-LIB text and establish equivalence for every assignment to original free parameters. Only fresh hoisted variables are rebound; source free parameters remain free. Hoisting is tested as its own retained stage, without claiming QSAT search/tactic completion."
+        "max_level, pred_abs and the retained hoist/filter/level/suffix-variable preparation methods are ported. The native QSAT kernel wrapper is also ported; projection/search loop, tactics/factories, QE execution modes, qmax and maximize entry point remain unported, with model-based projection now available. Preparation remains private until the complete search owner exists; it does not register a substitute qsat/qe2/qe_rec tactic. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule.",
+        "Fifty-six direct cases cover fourteen formula shapes in all four source modes, including dependent Boolean/integer prefixes, real universal variables, negative polarity, mixed connectives, ITE branches, labels, repeated declaration names and source-inaccessible term occurrences. Twenty-eight prebuilt C++ comparisons independently reconstruct the native alternating prefix as SMT-LIB text and establish equivalence for every assignment to original free parameters. Only fresh hoisted variables are rebound; source free parameters remain free. Hoisting is tested as its own retained stage, without claiming QSAT search/tactic completion.",
+        "The native solver facade gates model publication explicitly, so qsatKernel sets its actual SetProduceModels flag to implement the source private model=true setting. It preserves model=true, relevancy_lvl=0 and case_split_strategy=CS_ACTIVITY_WITH_CACHE (2), constructs the initial solver before overrides and passes the stored overrides to reset. Native integration checks independent Boolean/arithmetic kernels, literal assumption cores, model/core lifetime across reset, preparation-to-predicate-definition handoff and source trace metadata. A prebuilt C++ arithmetic assumption-conflict comparison passes. The complete QSAT search and tactics are still unregistered/unfinished."
       ]
     },
     {
@@ -94718,7 +94746,11 @@
         "pkg/qe/qsat_preparation_test.go",
         "pkg/qe/qsat_preparation_cpp_test.go",
         "pkg/ast/rewriter/quant_hoist.go",
-        "pkg/ast/rewriter/label_rewriter.go"
+        "pkg/ast/rewriter/label_rewriter.go",
+        "pkg/qe/qsat_kernel.go",
+        "pkg/qe/qsat_kernel_test.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/solver/check_sat_result.go"
       ],
       "tests": [
         "TestMaxLevelSentinelMergeAndDisplay",
@@ -94733,7 +94765,12 @@
         "TestQSATPreparationPrefixLevelsAndFilters",
         "TestQSATPreparationResetTraceAndGuards",
         "TestQSATPreparationAllocationFrontiers",
-        "TestQSATPreparationCPPPrefixEquivalence"
+        "TestQSATPreparationCPPPrefixEquivalence",
+        "TestQSATKernelModelCoreResetAndParameters",
+        "TestQSATKernelIndependentSolversArithmeticAndGuards",
+        "TestQSATKernelCPPArithmeticAssumptionCore",
+        "TestQSATPreparationFeedsDualKernelDefinitions",
+        "TestQSATKernelAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -94823,11 +94860,13 @@
       ],
       "ownership": [
         "Concrete map-key ASTRefs, formula trail, per-level predicate ASTRefs, scoped assumption ASTRefs and a counted filter-model converter preserve the actual source owners. Reset preserves declaration levels and the filter, matching source; final Close releases the filter count and enclosing charge. Caller output vector appends and completed replacements remain owned on errors. Pending lexical formula references, model evaluators and construction-failure receipts are retained until cleanup succeeds. Eleven first-success campaigns cover constructor, abstraction, rebuilding, assumption creation/retrieval, validation, display, open/closed tracing, model tracing and final close, releasing all charged fixture storage.",
-        "Private qsatPreparation owns the actual prefix reference vectors and PredicateAbstraction state for the pending search owner. Per-call state retains the lexical local-variable vector, proof reference, concrete LabelRewriter/QuantifierHoister, each actual hoist result and stopped construction-failure receipts until cleanup succeeds. Reset clears prefixes/expression levels while preserving the predicate model filter and declaration levels as source does. Nine first-success allocation campaigns cover construction, SAT/QE alternation, mixed prefixes, labels, blocked occurrences, reuse and open/closed traces; all charged fixture storage is released."
+        "Private qsatPreparation owns the actual prefix reference vectors and PredicateAbstraction state for the pending search owner. Per-call state retains the lexical local-variable vector, proof reference, concrete LabelRewriter/QuantifierHoister, each actual hoist result and stopped construction-failure receipts until cleanup succeeds. Reset clears prefixes/expression levels while preserving the predicate model filter and declaration levels as source does. Nine first-success allocation campaigns cover construction, SAT/QE alternation, mixed prefixes, labels, blocked occurrences, reuse and open/closed traces; all charged fixture storage is released.",
+        "Private qsatKernel owns the actual SMTSolver, private ParamsRef, retired replacement solvers and stopped child-failure receipts. New solvers are created before replacing the old owner; old solver destruction remains retryable. Acquired models and copied core ASTRefs remain live after reset/destruction. Six first-success allocation campaigns cover construction, reset, assertion, core extraction and open/closed core tracing; all charged fixture storage is released. It uses the existing concrete SMT facade and introduces no alternate solver or callback adapter."
       ],
       "deviations": [
-        "max_level, pred_abs and the retained hoist/filter/level/suffix-variable preparation methods are ported. The QSAT kernel, projection/search loop, tactics/factories, QE execution modes, qmax and maximize entry point remain unported, with model-based projection now available. Preparation remains private until the complete search owner exists; it does not register a substitute qsat/qe2/qe_rec tactic. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule.",
-        "Fifty-six direct cases cover fourteen formula shapes in all four source modes, including dependent Boolean/integer prefixes, real universal variables, negative polarity, mixed connectives, ITE branches, labels, repeated declaration names and source-inaccessible term occurrences. Twenty-eight prebuilt C++ comparisons independently reconstruct the native alternating prefix as SMT-LIB text and establish equivalence for every assignment to original free parameters. Only fresh hoisted variables are rebound; source free parameters remain free. Hoisting is tested as its own retained stage, without claiming QSAT search/tactic completion."
+        "max_level, pred_abs and the retained hoist/filter/level/suffix-variable preparation methods are ported. The native QSAT kernel wrapper is also ported; projection/search loop, tactics/factories, QE execution modes, qmax and maximize entry point remain unported, with model-based projection now available. Preparation remains private until the complete search owner exists; it does not register a substitute qsat/qe2/qe_rec tactic. No qsat/qe2/qe_rec tactic is registered by this increment. Native Go maps/slices replace source containers; no source hash iteration order is promised for map diagnostic display. Missing required level entries, nonapplication abstraction input, invalid scope pops and foreign/copied/closed owners receive native guards for source precondition violations. The seven prebuilt C++ comparisons prove logical equivalence and satisfiable extension of the actual native definitions; they do not claim direct observation of C++ internal predicate names or schedule.",
+        "Fifty-six direct cases cover fourteen formula shapes in all four source modes, including dependent Boolean/integer prefixes, real universal variables, negative polarity, mixed connectives, ITE branches, labels, repeated declaration names and source-inaccessible term occurrences. Twenty-eight prebuilt C++ comparisons independently reconstruct the native alternating prefix as SMT-LIB text and establish equivalence for every assignment to original free parameters. Only fresh hoisted variables are rebound; source free parameters remain free. Hoisting is tested as its own retained stage, without claiming QSAT search/tactic completion.",
+        "The native solver facade gates model publication explicitly, so qsatKernel sets its actual SetProduceModels flag to implement the source private model=true setting. It preserves model=true, relevancy_lvl=0 and case_split_strategy=CS_ACTIVITY_WITH_CACHE (2), constructs the initial solver before overrides and passes the stored overrides to reset. Native integration checks independent Boolean/arithmetic kernels, literal assumption cores, model/core lifetime across reset, preparation-to-predicate-definition handoff and source trace metadata. A prebuilt C++ arithmetic assumption-conflict comparison passes. The complete QSAT search and tactics are still unregistered/unfinished."
       ]
     },
     {

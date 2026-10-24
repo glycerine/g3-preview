@@ -297,6 +297,7 @@ digraph packages {
   "qe" -> "ast/rewriter";
   "qe" -> "math/simplex";
   "qe" -> "model";
+  "qe" -> "smtcore";
   "qe" -> "tactic";
   "qe" -> "util/cooperate";
   "qe" -> "util/diagnostic";
