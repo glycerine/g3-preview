@@ -2809,6 +2809,7 @@
         "linear_equation_trace.go",
         "normalize_bounds_tactic.go",
         "normalize_bounds_trace.go",
+        "pb2bv_model_converter.go",
         "polynomial_builder.go",
         "polynomial_trace.go",
         "propagate_ineq_clean.go",

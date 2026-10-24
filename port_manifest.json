@@ -131832,9 +131832,15 @@
       "path": "src/tactic/arith/pb2bv_model_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/pb2bv_model_converter.go",
+        "pkg/tactic/arith/pb2bv_model_converter_test.go"
+      ],
+      "tests": [
+        "TestPB2BVModelConverterValuesDisplayAndTranslation",
+        "TestPB2BVModelConverterAllocationFrontiers"
+      ],
       "assertions": [
         {
           "line": 41,
@@ -131849,19 +131855,66 @@
           "text": "SASSERT(goal_idx == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Both constructors and destructor: copy concrete original/Boolean declaration pairs, append unmapped bounded constants as null Boolean pairs, retain each acquired declaration and consume release cursors before reporting stopped teardown",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/tactic/arith/pb2bv_model_converter_test.go"
+          ],
+          "tests": [
+            "TestPB2BVModelConverterValuesDisplayAndTranslation",
+            "TestPB2BVModelConverterAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "operator() and indexed overload: source zero-index assertion, preserve false/missing/dont-care zero versus every present nonfalse value one, overwrite original integer interpretations, and exact converting-model diagnostic",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/tactic/arith/pb2bv_model_converter_test.go"
+          ],
+          "tests": [
+            "TestPB2BVModelConverterValuesDisplayAndTranslation",
+            "TestPB2BVModelConverterAllocationFrontiers"
+          ]
+        },
+        {
+          "name": "display and translate: source pair order/name/null formatting, translate both declarations including null, retain independently owned target pairs and source-model borrows",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/tactic/arith/pb2bv_model_converter_test.go"
+          ],
+          "tests": [
+            "TestPB2BVModelConverterValuesDisplayAndTranslation",
+            "TestPB2BVModelConverterAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The converter owns one reference to each nonnull declaration in each published pair. A separate concrete acquired-reference trail retains reached constructor prefixes, including failure before pair publication. Model application borrows the caller model and owns no replacement model. Translation pins its first target declaration before translating the second, then acquires both independently. Constructor, application and translation reservation campaigns verify cleanup; copy/closed/goal-index guards and exact trace tests cover native and combined checked/debug/trace profiles."
+      ],
+      "deviations": [
+        "Native Go pairs/slices replace the C++ pair/vector/container mechanics. The future tactic supplies its concrete ordered bindings instead of exposing a C++ obj_map; map traversal has no stable source ordering guarantee. Go parameter services are borrowed solely for the retained model_v2_pp trace. No unused template or general adapter is added."
+      ]
     },
     {
       "path": "src/tactic/arith/pb2bv_model_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/arith/pb2bv_model_converter.go",
+        "pkg/tactic/arith/pb2bv_model_converter_test.go"
+      ],
+      "tests": [
+        "TestPB2BVModelConverterValuesDisplayAndTranslation",
+        "TestPB2BVModelConverterAllocationFrontiers"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -131872,11 +131925,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Complete retained concrete pb2bv_model_converter declarations and inherited model-converter reference/label/cancel contracts",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/arith/pb2bv_model_converter.go",
+            "pkg/tactic/arith/pb2bv_model_converter_test.go"
+          ],
+          "tests": [
+            "TestPB2BVModelConverterValuesDisplayAndTranslation",
+            "TestPB2BVModelConverterAllocationFrontiers"
+          ]
+        }
+      ],
+      "ownership": [
+        "The converter owns one reference to each nonnull declaration in each published pair. A separate concrete acquired-reference trail retains reached constructor prefixes, including failure before pair publication. Model application borrows the caller model and owns no replacement model. Translation pins its first target declaration before translating the second, then acquires both independently. Constructor, application and translation reservation campaigns verify cleanup; copy/closed/goal-index guards and exact trace tests cover native and combined checked/debug/trace profiles."
+      ],
+      "deviations": [
+        "Native Go pairs/slices replace the C++ pair/vector/container mechanics. The future tactic supplies its concrete ordered bindings instead of exposing a C++ obj_map; map traversal has no stable source ordering guarantee. Go parameter services are borrowed solely for the retained model_v2_pp trace. No unused template or general adapter is added."
+      ]
     },
     {
       "path": "src/tactic/arith/pb2bv_tactic.cpp",
