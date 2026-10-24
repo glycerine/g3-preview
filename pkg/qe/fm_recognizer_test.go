@@ -29,13 +29,21 @@ func fmMust(t *testing.T, err error) {
 }
 
 func newFMFixture(t *testing.T) *fmFixture {
+	return newFMFixtureProofs(t, false)
+}
+
+func newFMFixtureProofs(t *testing.T, proofs bool) *fmFixture {
 	t.Helper()
 	budget := arena.NewBudget(1 << 30)
 	symbols, err := usymbol.NewManager(usymbol.Config{Budget: budget})
 	fmMust(t, err)
 	numerals, err := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
 	fmMust(t, err)
-	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numerals, Budget: budget})
+	mode := ast.ASTProofDisabled
+	if proofs {
+		mode = ast.ASTProofEnabled
+	}
+	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numerals, Budget: budget, ProofMode: mode})
 	fmMust(t, err)
 	p, err := params.NewParamsContext(symbols, numerals, params.ParamsConfig{Budget: budget})
 	fmMust(t, err)

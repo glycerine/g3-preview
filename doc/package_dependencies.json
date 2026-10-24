@@ -2153,6 +2153,7 @@
         "util/memory",
         "util/numeral",
         "util/params",
+        "util/symbol",
         "util/text"
       ],
       "production_files": [
@@ -2174,6 +2175,10 @@
         "fm_resolution.go",
         "fm_subsumption.go",
         "fourier_motzkin.go",
+        "lite.go",
+        "lite_constants.go",
+        "lite_indices.go",
+        "lite_traversal.go",
         "occurs.go",
         "trace.go"
       ]
