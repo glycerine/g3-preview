@@ -13,48 +13,51 @@ import (
 // callbacks/final check must be ported before setup selects it for QF_S.
 type SMTStringTheory struct {
 	*SMTTheoryBase
-	parameterOwner     *SMTStrParams
-	find               *backtrack.UnionFind
-	findTrail          *backtrack.TrailStack
-	level              uint32
-	charset            [256]byte
-	charsetLookup      map[byte]int
-	strings            map[string]ast.ASTHandle
-	refs               []ast.ASTRef
-	cacheAccesses      uint64
-	unusedID           uint32
-	basicTodo          []*SMTEnode
-	concatTodo         []*SMTEnode
-	concatEvalTodo     []*SMTEnode
-	libraryTodo        []*SMTEnode
-	delayedSetup       []ast.ASTHandle
-	delayedAssertions  []ast.ASTRef
-	conversions        []ast.ASTHandle
-	conversionRefs     []ast.ASTRef
-	conversionAxioms   map[ast.ASTHandle]uint32
-	searchStarted      bool
-	freshID            uint32
-	concatCache        map[[2]ast.ASTHandle]ast.ASTHandle
-	variableSet        map[ast.ASTHandle]struct{}
-	internalVariables  map[ast.ASTHandle]struct{}
-	variableScopes     map[uint32]map[ast.ASTHandle]struct{}
-	axiomatized        map[ast.ASTHandle]struct{}
-	contains           []ast.ASTHandle
-	containsRefs       []ast.ASTRef
-	containsByPair     map[[2]ast.ASTHandle]ast.ASTHandle
-	containsIndex      map[ast.ASTHandle]map[[2]ast.ASTHandle]struct{}
-	regexVariables     map[ast.ASTHandle]struct{}
-	regexMemberships   map[ast.ASTHandle]map[string]ast.ASTHandle
-	regexTerms         map[ast.ASTHandle]struct{}
-	regexTermsByString map[ast.ASTHandle][]ast.ASTHandle
-	regexNFACache      map[ast.ASTHandle]*smtStringNFA
-	concatBreakFlags   map[[2]ast.ASTHandle]ast.ASTHandle
-	overlapAssumption  ast.ASTRef
-	cutHistory         map[ast.ASTHandle][]smtStringCut
-	arrangementVars    map[[2]ast.ASTHandle][3]ast.ASTHandle
-	nonemptyID         uint32
-	loopDetected       bool
-	closed             bool
+	parameterOwner      *SMTStrParams
+	find                *backtrack.UnionFind
+	findTrail           *backtrack.TrailStack
+	level               uint32
+	charset             [256]byte
+	charsetLookup       map[byte]int
+	strings             map[string]ast.ASTHandle
+	refs                []ast.ASTRef
+	cacheAccesses       uint64
+	unusedID            uint32
+	basicTodo           []*SMTEnode
+	concatTodo          []*SMTEnode
+	concatEvalTodo      []*SMTEnode
+	libraryTodo         []*SMTEnode
+	delayedSetup        []ast.ASTHandle
+	delayedAssertions   []ast.ASTRef
+	conversions         []ast.ASTHandle
+	conversionRefs      []ast.ASTRef
+	conversionAxioms    map[ast.ASTHandle]uint32
+	searchStarted       bool
+	freshID             uint32
+	concatCache         map[[2]ast.ASTHandle]ast.ASTHandle
+	variableSet         map[ast.ASTHandle]struct{}
+	internalVariables   map[ast.ASTHandle]struct{}
+	lengthTestVariables map[ast.ASTHandle]struct{}
+	valueTestVariables  map[ast.ASTHandle]struct{}
+	unrollTestVariables map[ast.ASTHandle]struct{}
+	variableScopes      map[uint32]map[ast.ASTHandle]struct{}
+	axiomatized         map[ast.ASTHandle]struct{}
+	contains            []ast.ASTHandle
+	containsRefs        []ast.ASTRef
+	containsByPair      map[[2]ast.ASTHandle]ast.ASTHandle
+	containsIndex       map[ast.ASTHandle]map[[2]ast.ASTHandle]struct{}
+	regexVariables      map[ast.ASTHandle]struct{}
+	regexMemberships    map[ast.ASTHandle]map[string]ast.ASTHandle
+	regexTerms          map[ast.ASTHandle]struct{}
+	regexTermsByString  map[ast.ASTHandle][]ast.ASTHandle
+	regexNFACache       map[ast.ASTHandle]*smtStringNFA
+	concatBreakFlags    map[[2]ast.ASTHandle]ast.ASTHandle
+	overlapAssumption   ast.ASTRef
+	cutHistory          map[ast.ASTHandle][]smtStringCut
+	arrangementVars     map[[2]ast.ASTHandle][3]ast.ASTHandle
+	nonemptyID          uint32
+	loopDetected        bool
+	closed              bool
 }
 
 func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStringTheory, error) {
@@ -76,6 +79,9 @@ func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStri
 	t.concatCache = make(map[[2]ast.ASTHandle]ast.ASTHandle)
 	t.variableSet = make(map[ast.ASTHandle]struct{})
 	t.internalVariables = make(map[ast.ASTHandle]struct{})
+	t.lengthTestVariables = make(map[ast.ASTHandle]struct{})
+	t.valueTestVariables = make(map[ast.ASTHandle]struct{})
+	t.unrollTestVariables = make(map[ast.ASTHandle]struct{})
 	t.variableScopes = make(map[uint32]map[ast.ASTHandle]struct{})
 	t.axiomatized = make(map[ast.ASTHandle]struct{})
 	t.containsByPair = make(map[[2]ast.ASTHandle]ast.ASTHandle)
@@ -367,6 +373,7 @@ func (t *SMTStringTheory) Close() (result error) {
 	t.conversionAxioms = nil
 	t.delayedAssertions = nil
 	t.concatCache, t.variableSet, t.internalVariables = nil, nil, nil
+	t.lengthTestVariables, t.valueTestVariables, t.unrollTestVariables = nil, nil, nil
 	t.variableScopes, t.axiomatized = nil, nil
 	t.containsByPair, t.containsIndex = nil, nil
 	t.regexVariables, t.regexTerms, t.regexNFACache = nil, nil, nil

@@ -139104,7 +139104,9 @@
         "pkg/smtcore/theory_str_conversion_agreement.go",
         "pkg/smtcore/theory_str_conversion_agreement_test.go",
         "pkg/smtcore/theory_str_grounded.go",
-        "pkg/smtcore/theory_str_grounded_test.go"
+        "pkg/smtcore/theory_str_grounded_test.go",
+        "pkg/smtcore/theory_str_dependencies.go",
+        "pkg/smtcore/theory_str_dependencies_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139216,7 +139218,15 @@
         "TestSMTStringGroundingAliasesFoldLiteralsAndKeepPremises",
         "TestSMTStringGroundingConstantShortcutFirstConcatAndUnrollRefusal",
         "TestSMTStringComputeContainsGroundedGuardAndNoMatch",
-        "TestSMTStringComputeContainsUnconditionalIdentity"
+        "TestSMTStringComputeContainsUnconditionalIdentity",
+        "TestSMTStringDependencyClassificationTestersLengthAndEmptyChildren",
+        "TestSMTStringDependencyPositiveEqualitySelection",
+        "TestSMTStringDependenciesAliasesCountsAndScopeRecompute",
+        "TestSMTStringDependenciesConstantPriorityAndNativeSelfCycle",
+        "TestSMTStringDependenciesUnrollCoreGroupsAndConcreteOperandSkip",
+        "TestSMTStringDependenciesBoundaryGroupsAndEmptyLiteralRule",
+        "TestSMTStringDependenciesBoundaryGroupsDoNotUnionExistingGroups",
+        "TestSMTStringDependenciesRunGroundedContainmentConsumer"
       ],
       "conditionals": [
         {
@@ -140526,6 +140536,38 @@
             "TestSMTStringComputeContainsGroundedGuardAndNoMatch",
             "TestSMTStringComputeContainsUnconditionalIdentity"
           ]
+        },
+        {
+          "name": "classify_ast_by_type and classify_ast_by_type_in_positive_context complete retained classifiers: concrete length/value/unroll tester exclusions, no traversal through length, empty-child concat filtering with child traversal preserved, unroll discovery and positive assigned equality selection without a relevancy filter; iterative Go traversal preserves native child order",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_dependencies.go",
+          "tests": [
+            "TestSMTStringDependencyClassificationTestersLengthAndEmptyChildren",
+            "TestSMTStringDependencyPositiveEqualitySelection"
+          ]
+        },
+        {
+          "name": "ctx_dep_analysis complete retained active algorithm: noninternal variable seeds, core-enode unroll groups, private String-class variable/concat aliases and value/concat/unroll relations, live compute_contains dispatch, dependency types 1-6 with source precedence, empty-literal boundary constraints, first-existing nonunion boundary groups and exact free-variable counts; enclosing final-check/backpropagation/tester dispatch remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_dependencies.go",
+          "tests": [
+            "TestSMTStringDependenciesAliasesCountsAndScopeRecompute",
+            "TestSMTStringDependenciesConstantPriorityAndNativeSelfCycle",
+            "TestSMTStringDependenciesUnrollCoreGroupsAndConcreteOperandSkip",
+            "TestSMTStringDependenciesBoundaryGroupsAndEmptyLiteralRule",
+            "TestSMTStringDependenciesBoundaryGroupsDoNotUnionExistingGroups",
+            "TestSMTStringDependenciesRunGroundedContainmentConsumer"
+          ]
+        },
+        {
+          "name": "get_alias_index_ast/getMostLeftNodeInConcat/getMostRightNodeInConcat reached concrete helpers: one-step alias fallback, iterative literal/variable concat boundary traversal and stable handle ordering for actual native expression map/set instantiations, without generic comparator or STL adapters",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_dependencies.go",
+          "tests": [
+            "TestSMTStringDependenciesAliasesCountsAndScopeRecompute",
+            "TestSMTStringDependenciesBoundaryGroupsAndEmptyLiteralRule",
+            "TestSMTStringDependenciesBoundaryGroupsDoNotUnionExistingGroups"
+          ]
         }
       ],
       "ownership": [
@@ -140549,7 +140591,8 @@
         "Index constructors and all case/formula temporaries own AST roots through publication; fresh head/tail/index witnesses follow native creation order. Deferred containment equivalences have their own concrete ASTRef queue, retained independently before search, released forward after publication or in native member-destruction order if still pending at close. No permanent substitute queue root or generic callback layer is added.",
         "Initial conversion ASTs and decimal regex range/star/concat intermediates hold concrete local AST roots through internalization and publication. Existing regexMembership implements reached mk_RegexIn without a universal adapter. Conversion registry visits now acquire separate ASTRefs, preserve duplicate/insertion order, and release forward before contains_map at destruction, matching string_int_conversion_terms declaration order; initial axiom ownership is independent.",
         "Conversion-agreement implication operands and parsed numeral/string temporaries own local concrete ASTRefs through assertion. string_int_axioms holds borrowed keys already rooted by assert_axiom lifetime storage; its concrete map records the insertion scope and PopScopes removes only entries from popped scopes. Root/current-outer entries persist. Invalid int-to-string conflicts deliberately do not enter the memo set. Go big.Int implements project decimal accumulation without C atoi/ctype or STL adapters.",
-        "Grounded containment uses concrete typed Go maps/slices for project alias/value/concat graphs and grounded byte-expression vectors. Analysis inputs borrow context/class roots; newly allocated equality and folded-literal intermediates have local concrete ASTRefs through publication, released forward. Published axioms keep their existing lifetime roots. Condition sets and vector/first-concat traversal use the established stable handle slot/generation order instead of process-specific C++ pointer addresses; no generic map, comparator or STL adapter is ported."
+        "Grounded containment uses concrete typed Go maps/slices for project alias/value/concat graphs and grounded byte-expression vectors. Analysis inputs borrow context/class roots; newly allocated equality and folded-literal intermediates have local concrete ASTRefs through publication, released forward. Published axioms keep their existing lifetime roots. Condition sets and vector/first-concat traversal use the established stable handle slot/generation order instead of process-specific C++ pointer addresses; no generic map, comparator or STL adapter is ported.",
+        "Dependency analysis borrows live context/private-class AST roots and returns concrete typed alias/value/relation/count maps for its caller. Newly generated grounding conditions stay locally rooted through compute_contains publication and release forward before the analysis returns; output maps do not retain temporary grounded conditions. Native length/value/unroll tester membership uses three distinct concrete sets and owns no duplicate AST references. These classifier consumers are ported; their tester producers/final-check stages remain pending. Stable expression handle order replaces C++ pointer-map order, and no generic map/template/callback layer is added."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140578,7 +140621,8 @@
         "Reached library operation 10 now handles both literal-zero and extended index-of paths. Preserve the old source tail-relative extended result without adding the start offset; preserve its active delayed containment heuristic, but do not activate the simple path's commented-out assertion. Source assert_implication uses simplifying mk_not, required when a rewritten constant-start guard is itself negated. Conversion handlers 27/28, tester/dependency/unroll/automata/final-check algorithms remain pending. Production QF_S routing remains unchanged; FinalCheck remains GiveUp and legacy String source units remain partial.",
         "All currently reached initial library dispatch operations, including int-to-string 27 and string-to-int 28, now have handlers. Initial conversion constraints intentionally do not imply complete decimal-value agreement: positive string-to-int results only constrain decimal syntax, and nonnegative int-to-string results are initially only nonempty. Native finalcheck_str2int/finalcheck_int2str, dependency/free-variable/tester/unroll/automata/final-check algorithms remain pending. No routing change or legacy String SAT/completion claim is made; FinalCheck remains GiveUp.",
         "The retained finalcheck_str2int/finalcheck_int2str routines are now implemented and directly verified, including source unknown-arithmetic zero-split continuation, root-only numeric lookup (not candidate models), private String-class values, leading-zero decimal parsing, arbitrary-size integers and invalid-value refusals. They are not yet dispatched by the unfinished enclosing final_check_eh pipeline: dependency analysis, backpropagation, free-variable/tester/unroll/automata prerequisites remain to be ported before preserving its stage order. Production String FinalCheck still gives up and production QF_S routing remains unchanged. Missing int-to-string class preserves the source explicit unimplemented precondition as a Go error; no invented fallback model is added.",
-        "Retained compute_contains and its dealias/grounding/partial-subsequence routines are now implemented and directly tested as a prerequisite of ctx_dep_analysis. Preserve source first-concat-only expansion, first sufficient condition set, unroll exclusion, empty operator[] map entries, unchecked variable head in multi-part matching, and lack of a negative assertion for nonmatching partial groundings. Constant-boundary folding delegates the existing source-faithful mk_concat specialization, including its attached-value preconditions. Enclosing dependency/free-variable analysis, backpropagation/tester/unroll/automata/final-check dispatch remains pending. Production QF_S routing is unchanged and String FinalCheck still gives up; source units remain partial."
+        "Retained compute_contains and its dealias/grounding/partial-subsequence routines are now implemented and directly tested as a prerequisite of ctx_dep_analysis. Preserve source first-concat-only expansion, first sufficient condition set, unroll exclusion, empty operator[] map entries, unchecked variable head in multi-part matching, and lack of a negative assertion for nonmatching partial groundings. Constant-boundary folding delegates the existing source-faithful mk_concat specialization, including its attached-value preconditions. Enclosing dependency/free-variable analysis, backpropagation/tester/unroll/automata/final-check dispatch remains pending. Production QF_S routing is unchanged and String FinalCheck still gives up; source units remain partial.",
+        "ctx_dep_analysis and its classifiers/helpers are now implemented and directly verified, including the actual grounded containment consumer. Preserve source-only empty literal boundary constraints, asymmetric left/right concrete-node filtering, first-existing boundary group reuse without unioning existing groups, dependency priorities, self-dependency exclusion and exact free-variable reference counts rather than inferring stronger SCC-based selection. The active source analysis always returns zero; its unused assignment snapshot has no semantic consumer. Enclosing final-check constant/length backpropagation, tester/unroll/automata stages and production routing remain pending. String FinalCheck remains GiveUp, source units remain partial and existing runner comparisons do not establish completion of the legacy owner."
       ]
     },
     {
@@ -140645,7 +140689,9 @@
         "pkg/smtcore/theory_str_conversion_agreement.go",
         "pkg/smtcore/theory_str_conversion_agreement_test.go",
         "pkg/smtcore/theory_str_grounded.go",
-        "pkg/smtcore/theory_str_grounded_test.go"
+        "pkg/smtcore/theory_str_grounded_test.go",
+        "pkg/smtcore/theory_str_dependencies.go",
+        "pkg/smtcore/theory_str_dependencies_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -140758,7 +140804,15 @@
         "TestSMTStringGroundingAliasesFoldLiteralsAndKeepPremises",
         "TestSMTStringGroundingConstantShortcutFirstConcatAndUnrollRefusal",
         "TestSMTStringComputeContainsGroundedGuardAndNoMatch",
-        "TestSMTStringComputeContainsUnconditionalIdentity"
+        "TestSMTStringComputeContainsUnconditionalIdentity",
+        "TestSMTStringDependencyClassificationTestersLengthAndEmptyChildren",
+        "TestSMTStringDependencyPositiveEqualitySelection",
+        "TestSMTStringDependenciesAliasesCountsAndScopeRecompute",
+        "TestSMTStringDependenciesConstantPriorityAndNativeSelfCycle",
+        "TestSMTStringDependenciesUnrollCoreGroupsAndConcreteOperandSkip",
+        "TestSMTStringDependenciesBoundaryGroupsAndEmptyLiteralRule",
+        "TestSMTStringDependenciesBoundaryGroupsDoNotUnionExistingGroups",
+        "TestSMTStringDependenciesRunGroundedContainmentConsumer"
       ],
       "conditionals": [
         {
@@ -141386,6 +141440,38 @@
             "TestSMTStringComputeContainsGroundedGuardAndNoMatch",
             "TestSMTStringComputeContainsUnconditionalIdentity"
           ]
+        },
+        {
+          "name": "classify_ast_by_type and classify_ast_by_type_in_positive_context complete retained classifiers: concrete length/value/unroll tester exclusions, no traversal through length, empty-child concat filtering with child traversal preserved, unroll discovery and positive assigned equality selection without a relevancy filter; iterative Go traversal preserves native child order",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_dependencies.go",
+          "tests": [
+            "TestSMTStringDependencyClassificationTestersLengthAndEmptyChildren",
+            "TestSMTStringDependencyPositiveEqualitySelection"
+          ]
+        },
+        {
+          "name": "ctx_dep_analysis complete retained active algorithm: noninternal variable seeds, core-enode unroll groups, private String-class variable/concat aliases and value/concat/unroll relations, live compute_contains dispatch, dependency types 1-6 with source precedence, empty-literal boundary constraints, first-existing nonunion boundary groups and exact free-variable counts; enclosing final-check/backpropagation/tester dispatch remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_dependencies.go",
+          "tests": [
+            "TestSMTStringDependenciesAliasesCountsAndScopeRecompute",
+            "TestSMTStringDependenciesConstantPriorityAndNativeSelfCycle",
+            "TestSMTStringDependenciesUnrollCoreGroupsAndConcreteOperandSkip",
+            "TestSMTStringDependenciesBoundaryGroupsAndEmptyLiteralRule",
+            "TestSMTStringDependenciesBoundaryGroupsDoNotUnionExistingGroups",
+            "TestSMTStringDependenciesRunGroundedContainmentConsumer"
+          ]
+        },
+        {
+          "name": "get_alias_index_ast/getMostLeftNodeInConcat/getMostRightNodeInConcat reached concrete helpers: one-step alias fallback, iterative literal/variable concat boundary traversal and stable handle ordering for actual native expression map/set instantiations, without generic comparator or STL adapters",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_dependencies.go",
+          "tests": [
+            "TestSMTStringDependenciesAliasesCountsAndScopeRecompute",
+            "TestSMTStringDependenciesBoundaryGroupsAndEmptyLiteralRule",
+            "TestSMTStringDependenciesBoundaryGroupsDoNotUnionExistingGroups"
+          ]
         }
       ],
       "ownership": [
@@ -141410,7 +141496,8 @@
         "Index constructors and all case/formula temporaries own AST roots through publication; fresh head/tail/index witnesses follow native creation order. Deferred containment equivalences have their own concrete ASTRef queue, retained independently before search, released forward after publication or in native member-destruction order if still pending at close. No permanent substitute queue root or generic callback layer is added.",
         "Initial conversion ASTs and decimal regex range/star/concat intermediates hold concrete local AST roots through internalization and publication. Existing regexMembership implements reached mk_RegexIn without a universal adapter. Conversion registry visits now acquire separate ASTRefs, preserve duplicate/insertion order, and release forward before contains_map at destruction, matching string_int_conversion_terms declaration order; initial axiom ownership is independent.",
         "Conversion-agreement implication operands and parsed numeral/string temporaries own local concrete ASTRefs through assertion. string_int_axioms holds borrowed keys already rooted by assert_axiom lifetime storage; its concrete map records the insertion scope and PopScopes removes only entries from popped scopes. Root/current-outer entries persist. Invalid int-to-string conflicts deliberately do not enter the memo set. Go big.Int implements project decimal accumulation without C atoi/ctype or STL adapters.",
-        "Grounded containment uses concrete typed Go maps/slices for project alias/value/concat graphs and grounded byte-expression vectors. Analysis inputs borrow context/class roots; newly allocated equality and folded-literal intermediates have local concrete ASTRefs through publication, released forward. Published axioms keep their existing lifetime roots. Condition sets and vector/first-concat traversal use the established stable handle slot/generation order instead of process-specific C++ pointer addresses; no generic map, comparator or STL adapter is ported."
+        "Grounded containment uses concrete typed Go maps/slices for project alias/value/concat graphs and grounded byte-expression vectors. Analysis inputs borrow context/class roots; newly allocated equality and folded-literal intermediates have local concrete ASTRefs through publication, released forward. Published axioms keep their existing lifetime roots. Condition sets and vector/first-concat traversal use the established stable handle slot/generation order instead of process-specific C++ pointer addresses; no generic map, comparator or STL adapter is ported.",
+        "Dependency analysis borrows live context/private-class AST roots and returns concrete typed alias/value/relation/count maps for its caller. Newly generated grounding conditions stay locally rooted through compute_contains publication and release forward before the analysis returns; output maps do not retain temporary grounded conditions. Native length/value/unroll tester membership uses three distinct concrete sets and owns no duplicate AST references. These classifier consumers are ported; their tester producers/final-check stages remain pending. Stable expression handle order replaces C++ pointer-map order, and no generic map/template/callback layer is added."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141440,7 +141527,8 @@
         "Reached library operation 10 now handles both literal-zero and extended index-of paths. Preserve the old source tail-relative extended result without adding the start offset; preserve its active delayed containment heuristic, but do not activate the simple path's commented-out assertion. Source assert_implication uses simplifying mk_not, required when a rewritten constant-start guard is itself negated. Conversion handlers 27/28, tester/dependency/unroll/automata/final-check algorithms remain pending. Production QF_S routing remains unchanged; FinalCheck remains GiveUp and legacy String source units remain partial.",
         "All currently reached initial library dispatch operations, including int-to-string 27 and string-to-int 28, now have handlers. Initial conversion constraints intentionally do not imply complete decimal-value agreement: positive string-to-int results only constrain decimal syntax, and nonnegative int-to-string results are initially only nonempty. Native finalcheck_str2int/finalcheck_int2str, dependency/free-variable/tester/unroll/automata/final-check algorithms remain pending. No routing change or legacy String SAT/completion claim is made; FinalCheck remains GiveUp.",
         "The retained finalcheck_str2int/finalcheck_int2str routines are now implemented and directly verified, including source unknown-arithmetic zero-split continuation, root-only numeric lookup (not candidate models), private String-class values, leading-zero decimal parsing, arbitrary-size integers and invalid-value refusals. They are not yet dispatched by the unfinished enclosing final_check_eh pipeline: dependency analysis, backpropagation, free-variable/tester/unroll/automata prerequisites remain to be ported before preserving its stage order. Production String FinalCheck still gives up and production QF_S routing remains unchanged. Missing int-to-string class preserves the source explicit unimplemented precondition as a Go error; no invented fallback model is added.",
-        "Retained compute_contains and its dealias/grounding/partial-subsequence routines are now implemented and directly tested as a prerequisite of ctx_dep_analysis. Preserve source first-concat-only expansion, first sufficient condition set, unroll exclusion, empty operator[] map entries, unchecked variable head in multi-part matching, and lack of a negative assertion for nonmatching partial groundings. Constant-boundary folding delegates the existing source-faithful mk_concat specialization, including its attached-value preconditions. Enclosing dependency/free-variable analysis, backpropagation/tester/unroll/automata/final-check dispatch remains pending. Production QF_S routing is unchanged and String FinalCheck still gives up; source units remain partial."
+        "Retained compute_contains and its dealias/grounding/partial-subsequence routines are now implemented and directly tested as a prerequisite of ctx_dep_analysis. Preserve source first-concat-only expansion, first sufficient condition set, unroll exclusion, empty operator[] map entries, unchecked variable head in multi-part matching, and lack of a negative assertion for nonmatching partial groundings. Constant-boundary folding delegates the existing source-faithful mk_concat specialization, including its attached-value preconditions. Enclosing dependency/free-variable analysis, backpropagation/tester/unroll/automata/final-check dispatch remains pending. Production QF_S routing is unchanged and String FinalCheck still gives up; source units remain partial.",
+        "ctx_dep_analysis and its classifiers/helpers are now implemented and directly verified, including the actual grounded containment consumer. Preserve source-only empty literal boundary constraints, asymmetric left/right concrete-node filtering, first-existing boundary group reuse without unioning existing groups, dependency priorities, self-dependency exclusion and exact free-variable reference counts rather than inferring stronger SCC-based selection. The active source analysis always returns zero; its unused assignment snapshot has no semantic consumer. Enclosing final-check constant/length backpropagation, tester/unroll/automata stages and production routing remain pending. String FinalCheck remains GiveUp, source units remain partial and existing runner comparisons do not establish completion of the legacy owner."
       ]
     },
     {

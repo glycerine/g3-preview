@@ -2805,6 +2805,7 @@
         "theory_str_conversion.go",
         "theory_str_conversion_agreement.go",
         "theory_str_cuts.go",
+        "theory_str_dependencies.go",
         "theory_str_equality_lengths.go",
         "theory_str_equality_values.go",
         "theory_str_extract.go",
