@@ -31,6 +31,7 @@ type SMTStringTheory struct {
 	delayedAssertions  []ast.ASTRef
 	conversions        []ast.ASTHandle
 	conversionRefs     []ast.ASTRef
+	conversionAxioms   map[ast.ASTHandle]uint32
 	searchStarted      bool
 	freshID            uint32
 	concatCache        map[[2]ast.ASTHandle]ast.ASTHandle
@@ -87,6 +88,7 @@ func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStri
 	t.concatBreakFlags = make(map[[2]ast.ASTHandle]ast.ASTHandle)
 	t.cutHistory = make(map[ast.ASTHandle][]smtStringCut)
 	t.arrangementVars = make(map[[2]ast.ASTHandle][3]ast.ASTHandle)
+	t.conversionAxioms = make(map[ast.ASTHandle]uint32)
 	// Source initialize_charset's active default alphabet. The unused final
 	// slot remains zero; NUL is excluded from the 255-character search order.
 	index := 0
@@ -303,6 +305,11 @@ func (t *SMTStringTheory) PopScopes(count uint32) error {
 		return ast.ErrASTDomain
 	}
 	t.level -= count
+	for axiom, level := range t.conversionAxioms {
+		if level > t.level {
+			delete(t.conversionAxioms, axiom)
+		}
+	}
 	t.popStringCuts()
 	kept := t.basicTodo[:0]
 	for _, node := range t.basicTodo {
@@ -357,6 +364,7 @@ func (t *SMTStringTheory) Close() (result error) {
 	t.concatTodo, t.concatEvalTodo, t.libraryTodo = nil, nil, nil
 	t.delayedSetup, t.conversions = nil, nil
 	t.conversionRefs = nil
+	t.conversionAxioms = nil
 	t.delayedAssertions = nil
 	t.concatCache, t.variableSet, t.internalVariables = nil, nil, nil
 	t.variableScopes, t.axiomatized = nil, nil

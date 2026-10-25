@@ -139100,7 +139100,9 @@
         "pkg/smtcore/theory_str_index.go",
         "pkg/smtcore/theory_str_index_test.go",
         "pkg/smtcore/theory_str_conversion.go",
-        "pkg/smtcore/theory_str_conversion_test.go"
+        "pkg/smtcore/theory_str_conversion_test.go",
+        "pkg/smtcore/theory_str_conversion_agreement.go",
+        "pkg/smtcore/theory_str_conversion_agreement_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139201,7 +139203,13 @@
         "TestSMTStringToIntInitialBoundsZeroAndDecimalLanguage",
         "TestSMTIntToStringInitialNegativeEmptyEquivalence",
         "TestSMTStringConversionLibraryQueueAndRegexRegistration",
-        "TestSMTStringConversionRegistryOwnsRepeatedSetupVisits"
+        "TestSMTStringConversionRegistryOwnsRepeatedSetupVisits",
+        "TestSMTStringToIntAgreementZeroSplitIsUnasserted",
+        "TestSMTStringToIntAgreementUsesActualNumeralRoot",
+        "TestSMTStringToIntAgreementParsesPrivateClassBytes",
+        "TestSMTIntToStringAgreementParsesOrRefusesClassValue",
+        "TestSMTConversionAgreementMemoScopeRollbackAndMissingClass",
+        "TestSMTConversionAgreementMemoKeepsOuterScopes"
       ],
       "conditionals": [
         {
@@ -140454,6 +140462,37 @@
             "TestSMTStringConversionLibraryQueueAndRegexRegistration",
             "TestSMTStringConversionRegistryOwnsRepeatedSetupVisits"
           ]
+        },
+        {
+          "name": "finalcheck_str2int complete retained stage routine: actual core numeral-root read, non-minus-one canonical input consequence, unasserted zero-equality literal/continuation when arithmetic value unknown, private String-class byte decimal parsing and invalid-input minus-one consequence; scoped duplicate suppression; enclosing final-check phase dispatch remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion_agreement.go",
+          "tests": [
+            "TestSMTStringToIntAgreementZeroSplitIsUnasserted",
+            "TestSMTStringToIntAgreementUsesActualNumeralRoot",
+            "TestSMTStringToIntAgreementParsesPrivateClassBytes"
+          ]
+        },
+        {
+          "name": "finalcheck_int2str complete retained stage routine: private String-class lookup, initial-axiom empty-result no-op, arbitrary-size decimal value implication, repeated unmemoized invalid-value conflicts and explicit source NOT_IMPLEMENTED_YET guard for missing class; enclosing final-check phase dispatch remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion_agreement.go",
+          "tests": [
+            "TestSMTIntToStringAgreementParsesOrRefusesClassValue",
+            "TestSMTConversionAgreementMemoScopeRollbackAndMissingClass"
+          ]
+        },
+        {
+          "name": "string_int_axioms concrete scoped membership specialization and insert_obj_trail rollback: retain asserted AST through existing lifetime trail, suppress duplicate valid implications, remove entries inserted strictly above resulting scope while preserving root/current outer scopes; decimal accumulation uses Go big.Int and direct ASCII digits, not C++ or C library internals",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion_agreement.go",
+          "tests": [
+            "TestSMTStringToIntAgreementUsesActualNumeralRoot",
+            "TestSMTStringToIntAgreementParsesPrivateClassBytes",
+            "TestSMTIntToStringAgreementParsesOrRefusesClassValue",
+            "TestSMTConversionAgreementMemoScopeRollbackAndMissingClass",
+            "TestSMTConversionAgreementMemoKeepsOuterScopes"
+          ]
         }
       ],
       "ownership": [
@@ -140475,7 +140514,8 @@
         "Literal-prefix/suffix families 4/5 introduce no witness/cut state; their borrowed-variable/literal residuals and guarded Boolean formulas remain locally rooted through publication. Opposing family 6 reuses the concrete nonempty witness/native integer-flag cache without an initial seed and, as source requires, never merges cut origins into commonVar. Ordered byte-overlap slices replace std::list directly; no C++ string/list/container implementation is ported. Every overlap alternative retains native equality/length-expression order and local AST roots release forward.",
         "String extraction/replacement constructors root every temporary AST through rewrite and publication, retain the native named fresh String/integer witnesses, and release local vectors forward. Character-at borrows the configured context rewriter; substring/replacement own a reached fresh default rewriter borrowing only the existing manager/parameter services, with partial-owner cleanup delegated to the already ported constructor/destructor. Contains construction retains its term, internalizes it and recursively queues native setup immediately. No C++ string/container internals or universal callback layer is added.",
         "Index constructors and all case/formula temporaries own AST roots through publication; fresh head/tail/index witnesses follow native creation order. Deferred containment equivalences have their own concrete ASTRef queue, retained independently before search, released forward after publication or in native member-destruction order if still pending at close. No permanent substitute queue root or generic callback layer is added.",
-        "Initial conversion ASTs and decimal regex range/star/concat intermediates hold concrete local AST roots through internalization and publication. Existing regexMembership implements reached mk_RegexIn without a universal adapter. Conversion registry visits now acquire separate ASTRefs, preserve duplicate/insertion order, and release forward before contains_map at destruction, matching string_int_conversion_terms declaration order; initial axiom ownership is independent."
+        "Initial conversion ASTs and decimal regex range/star/concat intermediates hold concrete local AST roots through internalization and publication. Existing regexMembership implements reached mk_RegexIn without a universal adapter. Conversion registry visits now acquire separate ASTRefs, preserve duplicate/insertion order, and release forward before contains_map at destruction, matching string_int_conversion_terms declaration order; initial axiom ownership is independent.",
+        "Conversion-agreement implication operands and parsed numeral/string temporaries own local concrete ASTRefs through assertion. string_int_axioms holds borrowed keys already rooted by assert_axiom lifetime storage; its concrete map records the insertion scope and PopScopes removes only entries from popped scopes. Root/current-outer entries persist. Invalid int-to-string conflicts deliberately do not enter the memo set. Go big.Int implements project decimal accumulation without C atoi/ctype or STL adapters."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140502,7 +140542,8 @@
         "All six active simplify_concat_equality arrangement families are implemented and connected. Family 6 includes every matching literal overlap in source order without a feasibility filter; even an impossible hypothetical crop remains in the branch list, and only the normal core constraints eliminate it. The positive-gap branch records no cut origins, preserving native behavior instead of generalizing families 1-3. Full legacy String remains partial because tester dispatch, additional unroll processing, library/conversion operations, automata final checks and full final checking remain incomplete. Production QF_S routing is unchanged and existing runner/C++ comparisons do not prove full legacy String behavior.",
         "Reached library operations 6/7/8 now dispatch substring/replacement/character-at initial axioms instead of the previous unported-operation error. The raw first-occurrence constraints are preserved rather than replacing project algorithms with a modern concrete evaluator. Complete legacy String still requires index/conversion handlers, tester dispatch, additional unroll and automata/final checking. The native extended index-of source decomposes fresh head/tail strings rather than calling substring directly; it will reuse the reached containment constructor. Production QF_S routing is unchanged and FinalCheck remains GiveUp.",
         "Reached library operation 10 now handles both literal-zero and extended index-of paths. Preserve the old source tail-relative extended result without adding the start offset; preserve its active delayed containment heuristic, but do not activate the simple path's commented-out assertion. Source assert_implication uses simplifying mk_not, required when a rewritten constant-start guard is itself negated. Conversion handlers 27/28, tester/dependency/unroll/automata/final-check algorithms remain pending. Production QF_S routing remains unchanged; FinalCheck remains GiveUp and legacy String source units remain partial.",
-        "All currently reached initial library dispatch operations, including int-to-string 27 and string-to-int 28, now have handlers. Initial conversion constraints intentionally do not imply complete decimal-value agreement: positive string-to-int results only constrain decimal syntax, and nonnegative int-to-string results are initially only nonempty. Native finalcheck_str2int/finalcheck_int2str, dependency/free-variable/tester/unroll/automata/final-check algorithms remain pending. No routing change or legacy String SAT/completion claim is made; FinalCheck remains GiveUp."
+        "All currently reached initial library dispatch operations, including int-to-string 27 and string-to-int 28, now have handlers. Initial conversion constraints intentionally do not imply complete decimal-value agreement: positive string-to-int results only constrain decimal syntax, and nonnegative int-to-string results are initially only nonempty. Native finalcheck_str2int/finalcheck_int2str, dependency/free-variable/tester/unroll/automata/final-check algorithms remain pending. No routing change or legacy String SAT/completion claim is made; FinalCheck remains GiveUp.",
+        "The retained finalcheck_str2int/finalcheck_int2str routines are now implemented and directly verified, including source unknown-arithmetic zero-split continuation, root-only numeric lookup (not candidate models), private String-class values, leading-zero decimal parsing, arbitrary-size integers and invalid-value refusals. They are not yet dispatched by the unfinished enclosing final_check_eh pipeline: dependency analysis, backpropagation, free-variable/tester/unroll/automata prerequisites remain to be ported before preserving its stage order. Production String FinalCheck still gives up and production QF_S routing remains unchanged. Missing int-to-string class preserves the source explicit unimplemented precondition as a Go error; no invented fallback model is added."
       ]
     },
     {
@@ -140565,7 +140606,9 @@
         "pkg/smtcore/theory_str_index.go",
         "pkg/smtcore/theory_str_index_test.go",
         "pkg/smtcore/theory_str_conversion.go",
-        "pkg/smtcore/theory_str_conversion_test.go"
+        "pkg/smtcore/theory_str_conversion_test.go",
+        "pkg/smtcore/theory_str_conversion_agreement.go",
+        "pkg/smtcore/theory_str_conversion_agreement_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -140667,7 +140710,13 @@
         "TestSMTStringToIntInitialBoundsZeroAndDecimalLanguage",
         "TestSMTIntToStringInitialNegativeEmptyEquivalence",
         "TestSMTStringConversionLibraryQueueAndRegexRegistration",
-        "TestSMTStringConversionRegistryOwnsRepeatedSetupVisits"
+        "TestSMTStringConversionRegistryOwnsRepeatedSetupVisits",
+        "TestSMTStringToIntAgreementZeroSplitIsUnasserted",
+        "TestSMTStringToIntAgreementUsesActualNumeralRoot",
+        "TestSMTStringToIntAgreementParsesPrivateClassBytes",
+        "TestSMTIntToStringAgreementParsesOrRefusesClassValue",
+        "TestSMTConversionAgreementMemoScopeRollbackAndMissingClass",
+        "TestSMTConversionAgreementMemoKeepsOuterScopes"
       ],
       "conditionals": [
         {
@@ -141238,6 +141287,37 @@
             "TestSMTStringConversionLibraryQueueAndRegexRegistration",
             "TestSMTStringConversionRegistryOwnsRepeatedSetupVisits"
           ]
+        },
+        {
+          "name": "finalcheck_str2int complete retained stage routine: actual core numeral-root read, non-minus-one canonical input consequence, unasserted zero-equality literal/continuation when arithmetic value unknown, private String-class byte decimal parsing and invalid-input minus-one consequence; scoped duplicate suppression; enclosing final-check phase dispatch remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion_agreement.go",
+          "tests": [
+            "TestSMTStringToIntAgreementZeroSplitIsUnasserted",
+            "TestSMTStringToIntAgreementUsesActualNumeralRoot",
+            "TestSMTStringToIntAgreementParsesPrivateClassBytes"
+          ]
+        },
+        {
+          "name": "finalcheck_int2str complete retained stage routine: private String-class lookup, initial-axiom empty-result no-op, arbitrary-size decimal value implication, repeated unmemoized invalid-value conflicts and explicit source NOT_IMPLEMENTED_YET guard for missing class; enclosing final-check phase dispatch remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion_agreement.go",
+          "tests": [
+            "TestSMTIntToStringAgreementParsesOrRefusesClassValue",
+            "TestSMTConversionAgreementMemoScopeRollbackAndMissingClass"
+          ]
+        },
+        {
+          "name": "string_int_axioms concrete scoped membership specialization and insert_obj_trail rollback: retain asserted AST through existing lifetime trail, suppress duplicate valid implications, remove entries inserted strictly above resulting scope while preserving root/current outer scopes; decimal accumulation uses Go big.Int and direct ASCII digits, not C++ or C library internals",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion_agreement.go",
+          "tests": [
+            "TestSMTStringToIntAgreementUsesActualNumeralRoot",
+            "TestSMTStringToIntAgreementParsesPrivateClassBytes",
+            "TestSMTIntToStringAgreementParsesOrRefusesClassValue",
+            "TestSMTConversionAgreementMemoScopeRollbackAndMissingClass",
+            "TestSMTConversionAgreementMemoKeepsOuterScopes"
+          ]
         }
       ],
       "ownership": [
@@ -141260,7 +141340,8 @@
         "Literal-prefix/suffix families 4/5 introduce no witness/cut state; their borrowed-variable/literal residuals and guarded Boolean formulas remain locally rooted through publication. Opposing family 6 reuses the concrete nonempty witness/native integer-flag cache without an initial seed and, as source requires, never merges cut origins into commonVar. Ordered byte-overlap slices replace std::list directly; no C++ string/list/container implementation is ported. Every overlap alternative retains native equality/length-expression order and local AST roots release forward.",
         "String extraction/replacement constructors root every temporary AST through rewrite and publication, retain the native named fresh String/integer witnesses, and release local vectors forward. Character-at borrows the configured context rewriter; substring/replacement own a reached fresh default rewriter borrowing only the existing manager/parameter services, with partial-owner cleanup delegated to the already ported constructor/destructor. Contains construction retains its term, internalizes it and recursively queues native setup immediately. No C++ string/container internals or universal callback layer is added.",
         "Index constructors and all case/formula temporaries own AST roots through publication; fresh head/tail/index witnesses follow native creation order. Deferred containment equivalences have their own concrete ASTRef queue, retained independently before search, released forward after publication or in native member-destruction order if still pending at close. No permanent substitute queue root or generic callback layer is added.",
-        "Initial conversion ASTs and decimal regex range/star/concat intermediates hold concrete local AST roots through internalization and publication. Existing regexMembership implements reached mk_RegexIn without a universal adapter. Conversion registry visits now acquire separate ASTRefs, preserve duplicate/insertion order, and release forward before contains_map at destruction, matching string_int_conversion_terms declaration order; initial axiom ownership is independent."
+        "Initial conversion ASTs and decimal regex range/star/concat intermediates hold concrete local AST roots through internalization and publication. Existing regexMembership implements reached mk_RegexIn without a universal adapter. Conversion registry visits now acquire separate ASTRefs, preserve duplicate/insertion order, and release forward before contains_map at destruction, matching string_int_conversion_terms declaration order; initial axiom ownership is independent.",
+        "Conversion-agreement implication operands and parsed numeral/string temporaries own local concrete ASTRefs through assertion. string_int_axioms holds borrowed keys already rooted by assert_axiom lifetime storage; its concrete map records the insertion scope and PopScopes removes only entries from popped scopes. Root/current-outer entries persist. Invalid int-to-string conflicts deliberately do not enter the memo set. Go big.Int implements project decimal accumulation without C atoi/ctype or STL adapters."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141288,7 +141369,8 @@
         "All six active simplify_concat_equality arrangement families are implemented and connected. Family 6 includes every matching literal overlap in source order without a feasibility filter; even an impossible hypothetical crop remains in the branch list, and only the normal core constraints eliminate it. The positive-gap branch records no cut origins, preserving native behavior instead of generalizing families 1-3. Full legacy String remains partial because tester dispatch, additional unroll processing, library/conversion operations, automata final checks and full final checking remain incomplete. Production QF_S routing is unchanged and existing runner/C++ comparisons do not prove full legacy String behavior.",
         "Reached library operations 6/7/8 now dispatch substring/replacement/character-at initial axioms instead of the previous unported-operation error. The raw first-occurrence constraints are preserved rather than replacing project algorithms with a modern concrete evaluator. Complete legacy String still requires index/conversion handlers, tester dispatch, additional unroll and automata/final checking. The native extended index-of source decomposes fresh head/tail strings rather than calling substring directly; it will reuse the reached containment constructor. Production QF_S routing is unchanged and FinalCheck remains GiveUp.",
         "Reached library operation 10 now handles both literal-zero and extended index-of paths. Preserve the old source tail-relative extended result without adding the start offset; preserve its active delayed containment heuristic, but do not activate the simple path's commented-out assertion. Source assert_implication uses simplifying mk_not, required when a rewritten constant-start guard is itself negated. Conversion handlers 27/28, tester/dependency/unroll/automata/final-check algorithms remain pending. Production QF_S routing remains unchanged; FinalCheck remains GiveUp and legacy String source units remain partial.",
-        "All currently reached initial library dispatch operations, including int-to-string 27 and string-to-int 28, now have handlers. Initial conversion constraints intentionally do not imply complete decimal-value agreement: positive string-to-int results only constrain decimal syntax, and nonnegative int-to-string results are initially only nonempty. Native finalcheck_str2int/finalcheck_int2str, dependency/free-variable/tester/unroll/automata/final-check algorithms remain pending. No routing change or legacy String SAT/completion claim is made; FinalCheck remains GiveUp."
+        "All currently reached initial library dispatch operations, including int-to-string 27 and string-to-int 28, now have handlers. Initial conversion constraints intentionally do not imply complete decimal-value agreement: positive string-to-int results only constrain decimal syntax, and nonnegative int-to-string results are initially only nonempty. Native finalcheck_str2int/finalcheck_int2str, dependency/free-variable/tester/unroll/automata/final-check algorithms remain pending. No routing change or legacy String SAT/completion claim is made; FinalCheck remains GiveUp.",
+        "The retained finalcheck_str2int/finalcheck_int2str routines are now implemented and directly verified, including source unknown-arithmetic zero-split continuation, root-only numeric lookup (not candidate models), private String-class values, leading-zero decimal parsing, arbitrary-size integers and invalid-value refusals. They are not yet dispatched by the unfinished enclosing final_check_eh pipeline: dependency analysis, backpropagation, free-variable/tester/unroll/automata prerequisites remain to be ported before preserving its stage order. Production String FinalCheck still gives up and production QF_S routing remains unchanged. Missing int-to-string class preserves the source explicit unimplemented precondition as a Go error; no invented fallback model is added."
       ]
     },
     {
