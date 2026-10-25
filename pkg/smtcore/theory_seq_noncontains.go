@@ -101,6 +101,133 @@ func (q *smtSequenceNonContainsQueue) PushScope() error {
 	return nil
 }
 
+func (q *smtSequenceNonContainsQueue) EraseSwapBack(index int) error {
+	if err := q.open(); err != nil {
+		return err
+	}
+	if index < 0 || index >= len(q.values) {
+		return ast.ErrASTDomain
+	}
+	if err := q.manager.DelRef(&q.values[index].expression); err != nil {
+		return err
+	}
+	last := len(q.values) - 1
+	q.values[index] = q.values[last]
+	q.values[last] = smtSequenceNonContains{}
+	q.values = q.values[:last]
+	return nil
+}
+
+// Source check_contains/solve_nc: retire solved entries by swap removal and
+// immediately visit replacements, including disjunction children.
+func (t *SMTSequenceTheory) checkNegativeContains() (bool, error) {
+	before := t.state.searchProgress()
+	for i := 0; !t.state.Inconsistent() && i < t.nonContains.Len(); {
+		remove, err := t.solveNegativeContains(i)
+		if err != nil {
+			return false, err
+		}
+		if remove {
+			if err = t.nonContains.EraseSwapBack(i); err != nil {
+				return false, err
+			}
+			continue
+		}
+		i++
+	}
+	return t.state.Inconsistent() || t.state.searchProgress() != before, nil
+}
+
+// Source canonizes(false, e), called before exposing negative witnesses.
+func (t *SMTSequenceTheory) canonizesNegativeSequence(expression ast.ASTHandle) (done bool, result error) {
+	ref, dependency, err := t.canonizeSequenceExpression(expression, nil)
+	if err != nil {
+		return false, err
+	}
+	m := t.state.manager
+	defer func() { result = errors.Join(result, m.DelRef(&ref)) }()
+	canonical, err := m.RefGet(ref)
+	if err != nil {
+		return false, err
+	}
+	if m.IsTrue(canonical) {
+		literal, err := t.state.Literal(expression)
+		if err != nil {
+			return false, err
+		}
+		_, err = t.propagateSequenceLiteral(literal, dependency)
+		return true, err
+	}
+	return m.IsFalse(canonical), nil
+}
+
+func (t *SMTSequenceTheory) solveNegativeContains(index int) (remove bool, result error) {
+	expression, dependency, err := t.nonContains.At(index)
+	if err != nil {
+		return false, err
+	}
+	ref, dependency, err := t.canonizeSequenceExpression(expression, dependency)
+	if err != nil {
+		return false, err
+	}
+	m := t.state.manager
+	defer func() { result = errors.Join(result, m.DelRef(&ref)) }()
+	canonical, err := m.RefGet(ref)
+	if err != nil {
+		return false, err
+	}
+	if m.IsTrue(canonical) {
+		return true, t.setDependencyConflict(dependency)
+	}
+	if m.IsFalse(canonical) {
+		return true, nil
+	}
+	if canonical != expression {
+		if err = t.nonContains.Push(canonical, dependency); err != nil {
+			return false, err
+		}
+		t.state.theoryProgress++
+		return true, nil
+	}
+	family, err := m.GetFamilyID(canonical)
+	if err != nil {
+		return false, err
+	}
+	kind, err := m.GetDeclKind(canonical)
+	if err != nil || family != 0 {
+		return false, err
+	}
+	if kind == ast.ASTOpEq || kind == ast.ASTOpIff {
+		if err = t.state.Internalize(canonical, true); err != nil {
+			return false, err
+		}
+		literal, err := t.state.Literal(canonical)
+		if err != nil {
+			return false, err
+		}
+		_, err = t.propagateSequenceLiteral(literal.Negated(), dependency)
+		return true, err
+	}
+	if kind == ast.ASTOpOr {
+		count, err := m.GetNumArgs(canonical)
+		if err != nil {
+			return false, err
+		}
+		for i := uint32(0); i < count; i++ {
+			child, err := m.GetArg(canonical, i)
+			if err != nil {
+				return false, err
+			}
+			if err = t.nonContains.Push(child, dependency); err != nil {
+				return false, err
+			}
+		}
+		t.state.theoryProgress++
+		return true, nil
+	}
+	return false, nil
+}
+
 func (q *smtSequenceNonContainsQueue) PopScopes(count uint32) (result error) {
 	if err := q.open(); err != nil {
 		return err

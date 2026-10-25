@@ -1,0 +1,8 @@
+unknown
+unsat
+sat
+(((not (str.contains x "a")) true))
+unsat
+sat
+(((= x "7") true))
+unknown

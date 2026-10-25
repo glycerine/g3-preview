@@ -350,6 +350,8 @@ func (t *SMTSequenceTheory) addRelationAxioms(expression ast.ASTHandle, operatio
 	if operation == 4 {
 		return t.addNegativeSuffixWitness(expression, left, right)
 	}
+	// Existing compatibility consequences, pending the complete source
+	// canonical expansion/frontend integration; not source assign_eh credit.
 	prefix, err := state.manager.MkSequencePrefix(right, left)
 	if err != nil {
 		return err

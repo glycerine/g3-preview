@@ -239,6 +239,7 @@ func (t *SMTSequenceTheory) addSolution(variable, value ast.ASTHandle, dependenc
 	if err != nil {
 		return false, err
 	}
+	state.theoryProgress++
 	if err = state.Internalize(variable, false); err != nil {
 		return false, err
 	}

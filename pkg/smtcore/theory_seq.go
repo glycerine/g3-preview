@@ -662,6 +662,12 @@ func (t *SMTSequenceTheory) Assign(variable int32, value bool) error {
 	if err = t.relations.Push(expression, value, dependency); err != nil {
 		return err
 	}
+	if op == 5 && !value {
+		done, err := t.canonizesNegativeSequence(expression)
+		if err != nil || done {
+			return err
+		}
+	}
 	if err = t.addRelationAxioms(expression, op, value); err != nil {
 		return err
 	}
@@ -931,41 +937,6 @@ entries:
 	return false, nil
 }
 
-func (t *SMTSequenceTheory) checkConcreteNonContains() (bool, error) {
-	state, err := t.State()
-	if err != nil {
-		return false, err
-	}
-	for index := 0; index < t.nonContains.Len(); index++ {
-		expression, dependency, entryErr := t.nonContains.At(index)
-		if entryErr != nil {
-			return false, entryErr
-		}
-		left, right, matched, partsErr := state.manager.SequenceBinaryOperationArguments(expression, 5)
-		if partsErr != nil {
-			return false, partsErr
-		}
-		if !matched {
-			return false, ast.ErrASTDomain
-		}
-		leftText, leftConcrete, dependency, entryErr := t.concreteString(left, dependency, make(map[ast.ASTHandle]struct{}))
-		if entryErr != nil {
-			return false, entryErr
-		}
-		rightText, rightConcrete, dependency, entryErr := t.concreteString(right, dependency, make(map[ast.ASTHandle]struct{}))
-		if entryErr != nil {
-			return false, entryErr
-		}
-		if leftConcrete && rightConcrete && strings.Contains(leftText, rightText) {
-			if entryErr = t.setDependencyConflict(dependency); entryErr != nil {
-				return false, entryErr
-			}
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
 func (t *SMTSequenceTheory) checkConcreteRelations() (bool, error) {
 	state, err := t.State()
 	if err != nil {
@@ -1035,7 +1006,15 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		}
 		return state.Inconsistent() || state.searchProgress() != before, nil
 	}
-	progress, err := t.addSolvedTailEmptyMaximum()
+	// Native final_check_eh simplifies equations before reducing m_ncs.
+	progress, err := t.solveWordEquations()
+	if err != nil {
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence word equations: %w", err)
+	}
+	if progress {
+		return SMTFinalCheckContinue, nil
+	}
+	progress, err = t.addSolvedTailEmptyMaximum()
 	if err != nil {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence tail maximum length: %w", err)
 	}
@@ -1110,9 +1089,9 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if conflict {
 		return SMTFinalCheckContinue, nil
 	}
-	conflict, err = t.checkConcreteNonContains()
+	conflict, err = t.checkNegativeContains()
 	if err != nil {
-		return SMTFinalCheckGiveUp, fmt.Errorf("sequence concrete non-contains: %w", err)
+		return SMTFinalCheckGiveUp, fmt.Errorf("sequence negative containment: %w", err)
 	}
 	if conflict {
 		return SMTFinalCheckContinue, nil
@@ -1133,13 +1112,21 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 			}
 		}
 	}
+	// Compatibility consequences remain pending the rest of the source
+	// expansion and scheduling integration.
 	for i := 0; i < t.nonContains.Len(); i++ {
 		expression, _, err := t.nonContains.At(i)
 		if err != nil {
 			return SMTFinalCheckGiveUp, err
 		}
-		if err = t.addNegativeContainsStep(expression); err != nil {
+		operation, own, err := t.operation(expression)
+		if err != nil {
 			return SMTFinalCheckGiveUp, err
+		}
+		if own && operation == 5 {
+			if err = t.addNegativeContainsStep(expression); err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
 		}
 	}
 	if t.axioms.Pending() {
@@ -1198,7 +1185,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if err != nil {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence solved equation audit: %w", err)
 	}
-	if unresolvedEquation || t.unsupported != 0 || regexUnresolved {
+	if unresolvedEquation || t.nonContains.Len() != 0 || t.unsupported != 0 || regexUnresolved {
 		return SMTFinalCheckGiveUp, nil
 	}
 	return SMTFinalCheckDone, nil
