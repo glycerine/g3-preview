@@ -123927,7 +123927,7 @@
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
         "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete.",
         "Earlier profile tests entered feature setup through ordinary CheckSat. They now explicitly use the fresh setup_and_check entry before later incremental checks; expectations for backend selection and parameter owners are unchanged. New regressions independently require logic-only policy for ordinary zero-assumption checks and static policy for fresh no-assumption tactics.",
-        "Negative-containment source audit confirmed setup_QF_S registers theory_str plus mixed integer arithmetic (smt_setup.cpp:725-728), while generic setup_seq_str selects theory_seq/theory_str according to string_solver/static features. Go still registers SMTSequenceTheory for QF_S; theory_str.cpp/.h remain unported. A QF_S sat observation therefore does not verify generic ALL/theory_seq canonical containment. The saved pending_seq_negative_contains_canonize_scopes.smt2 captures the remaining ALL unconstrained-scope sat-versus-unknown difference. No routing implementation is credited by this audit."
+        "Negative-containment source audit confirmed setup_QF_S registers theory_str plus mixed integer arithmetic (smt_setup.cpp:725-728), while generic setup_seq_str selects theory_seq/theory_str according to string_solver/static features. Go still registers SMTSequenceTheory for QF_S; theory_str.cpp/.h have partial helper/owner ports but no selectable native constraint backend. A QF_S sat observation therefore does not verify generic ALL/theory_seq canonical containment. The saved pending_seq_negative_contains_canonize_scopes.smt2 captures the remaining ALL unconstrained-scope sat-versus-unknown difference. No routing implementation is credited by this audit."
       ]
     },
     {
@@ -138686,12 +138686,24 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_str_nfa.go",
-        "pkg/smtcore/theory_str_nfa_test.go"
+        "pkg/smtcore/theory_str_nfa_test.go",
+        "pkg/smtcore/theory_str.go",
+        "pkg/smtcore/theory_str_axioms.go",
+        "pkg/smtcore/theory_str_model.go",
+        "pkg/smtcore/theory_str_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
         "TestSMTStringNFAEpsilonCyclesAndEveryByte",
-        "TestSMTStringNFAUnsupportedAndNonconstantLiteral"
+        "TestSMTStringNFAUnsupportedAndNonconstantLiteral",
+        "TestSMTStringTheoryTypedAttachmentAndAlphabet",
+        "TestSMTStringTheoryPrivateClassesAndScopeRollback",
+        "TestSMTStringTheoryBasicLengthZeroEquivalence",
+        "TestSMTStringTheoryModelFactoryConcatAndFallback",
+        "TestSMTStringTheoryLiteralCacheParameterAndFreshOwner",
+        "TestSMTStringTheoryConcatAxiomsAndSyntacticEvaluation",
+        "TestSMTStringTheoryEqualityLengthAxiomKeepsPremise",
+        "TestSMTStringTheoryConstantLengthCountsBytes"
       ],
       "conditionals": [
         {
@@ -139405,13 +139417,65 @@
             "TestSMTStringNFAEpsilonCyclesAndEveryByte",
             "TestSMTStringNFAUnsupportedAndNonconstantLiteral"
           ]
+        },
+        {
+          "name": "distinct theory_str owner construction, active default initialize_charset ordering, parameter-borrowed mk_string(zstring) lifetime cache and cache-access count, mk_fresh fresh mutable state; remaining constructor/nested regex-solver setup is not yet ported",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_str.go",
+          "tests": [
+            "TestSMTStringTheoryTypedAttachmentAndAlphabet",
+            "TestSMTStringTheoryLiteralCacheParameterAndFreshOwner"
+          ]
+        },
+        {
+          "name": "internalize_atom/internalize_term, String-only mk_var and typed attachment, Boolean relation callback/enode flags, eager constant basic-axiom queue and existing-enode early return",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str.go",
+          "tests": [
+            "TestSMTStringTheoryTypedAttachmentAndAlphabet",
+            "TestSMTStringTheoryConstantLengthCountsBytes"
+          ]
+        },
+        {
+          "name": "source private m_find equivalence-class merge and scoped variable rollback, basicTodo filtering by enode introduction level, source lifetime cache retention and forward m_trail release; handle_equality-before-merge and other pop/propagation queues remain unported",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_str.go",
+          "tests": [
+            "TestSMTStringTheoryPrivateClassesAndScopeRollback",
+            "TestSMTStringTheoryLiteralCacheParameterAndFreshOwner"
+          ]
+        },
+        {
+          "name": "instantiate_basic_string_axioms constant byte length and nonconstant nonnegativity/zero-iff-empty; instantiate_concat_axiom, syntactic try_eval_concat, guarded instantiate_str_eq_length_axiom and assert_axiom publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_axioms.go",
+          "tests": [
+            "TestSMTStringTheoryBasicLengthZeroEquivalence",
+            "TestSMTStringTheoryConcatAxiomsAndSyntacticEvaluation",
+            "TestSMTStringTheoryEqualityLengthAxiomKeepsPremise",
+            "TestSMTStringTheoryConstantLengthCountsBytes"
+          ]
+        },
+        {
+          "name": "z3str2_get_eqc_value scans the private string union-find; mk_value_helper resolves concatenation recursively before class fallback; init_model installs StringFactory, mk_value uses source **UNUSED** decimal fallback names and finalize_model is empty",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_model.go",
+          "tests": [
+            "TestSMTStringTheoryPrivateClassesAndScopeRollback",
+            "TestSMTStringTheoryModelFactoryConcatAndFallback",
+            "TestSMTStringTheoryConcatAxiomsAndSyntacticEvaluation"
+          ]
         }
       ],
       "ownership": [
-        "The concrete NFA consumes an AST only during construction and retains only Go state/transition/epsilon data. Membership and closure sets use Go maps without observable iteration-order dependencies; state allocation follows source operand order. No C++ standard-library code or generic container adapter is ported."
+        "The concrete NFA consumes an AST only during construction and retains only Go state/transition/epsilon data. Membership and closure sets use Go maps without observable iteration-order dependencies; state allocation follows source operand order. No C++ standard-library code or generic container adapter is ported.",
+        "The distinct SMTStringTheory owns a private backtrackable UnionFind and its no-op notification trail, scoped String variable attachments, queued borrowed enodes, a source lifetime literal cache and AST refs for asserted/generated expressions. Parameter owners are borrowed and preserved by Fresh rather than copied or closed. Pop prunes basic enodes introduced above the restored level and reverses union-find trails before dropping theory variables. Native m_trail is an expr_ref_vector and releases forward; lexical axiom-expression refs release in reverse local lifetime order. Raw Go model-value procedures retain generated uncached results through the theory owner. Model factories remain owned by the proto-model."
       ],
       "deviations": [
-        "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. Backend construction/internalization, equality/constraint callbacks, regex cache/consumer integration, final checking, model callback wiring and setup_QF_S/string_solver routing are still unported. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks."
+        "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
+        "Added a distinct SMTStringTheory owner, without changing existing solver setup. String-only attachments and the native Boolean callback/enode behavior are implemented; integer length, Boolean relation and regex results do not acquire string theory variables. The private union-find supplies source model class lookup independently of the core egraph, including repeated scope rollback. The active 255-byte model-search alphabet preserves lowercase/capital/digit/mark/control ordering and excludes NUL; the full byte-string length axiom still counts NUL and high bytes. The source lifetime cache uses the borrowed StringConstantCache parameter dynamically and retains child-scope literals across pops. Fresh borrows the same parameter owner while resetting mutable caches, counters and equivalence classes.",
+        "Ported basic string/concat/guarded string-equality length axiom routines and syntactic concat evaluation; source assertion publication and the basic constant queue are connected. Syntactic evaluation deliberately cannot turn a private model class into an axiom. Model callbacks now install the distinct StringFactory and resolve strings using recursive concat and the private union-find, with exact **UNUSED** decimal fallback names. The native constant-length unit bypasses the lifetime assertion trail, while other assert_axiom expressions are retained as source m_trail requires.",
+        "This is a partial owner/lifecycle/model increment, not a complete theory_str backend. The full constructor/nested regex solver, init_search asserted-formula traversal, handle_equality before private merge, concat arrangement/cut-variable/library queues, legacy regex cache/consumer integration, persisted/replayed axioms, native final_check_eh and setup_QF_S/string_solver routing remain open. FinalCheck explicitly returns GiveUp until those routines are connected, and production setup still selects the existing sequence implementation. No solver-level native completeness or new C++ comparison credit is claimed by these owner tests."
       ]
     },
     {
@@ -139423,13 +139487,25 @@
         "pkg/smtcore/theory_str_nfa.go",
         "pkg/smtcore/theory_str_nfa_test.go",
         "pkg/smtcore/proto_model/string_factory.go",
-        "pkg/smtcore/proto_model/string_factory_test.go"
+        "pkg/smtcore/proto_model/string_factory_test.go",
+        "pkg/smtcore/theory_str.go",
+        "pkg/smtcore/theory_str_axioms.go",
+        "pkg/smtcore/theory_str_model.go",
+        "pkg/smtcore/theory_str_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
         "TestSMTStringNFAEpsilonCyclesAndEveryByte",
         "TestSMTStringNFAUnsupportedAndNonconstantLiteral",
-        "TestStringFactoryNativeDefaultsFreshNamesAndIgnoredRegistration"
+        "TestStringFactoryNativeDefaultsFreshNamesAndIgnoredRegistration",
+        "TestSMTStringTheoryTypedAttachmentAndAlphabet",
+        "TestSMTStringTheoryPrivateClassesAndScopeRollback",
+        "TestSMTStringTheoryBasicLengthZeroEquivalence",
+        "TestSMTStringTheoryModelFactoryConcatAndFallback",
+        "TestSMTStringTheoryLiteralCacheParameterAndFreshOwner",
+        "TestSMTStringTheoryConcatAxiomsAndSyntacticEvaluation",
+        "TestSMTStringTheoryEqualityLengthAxiomKeepsPremise",
+        "TestSMTStringTheoryConstantLengthCountsBytes"
       ],
       "conditionals": [
         {
@@ -139461,15 +139537,67 @@
           "tests": [
             "TestStringFactoryNativeDefaultsFreshNamesAndIgnoredRegistration"
           ]
+        },
+        {
+          "name": "distinct theory_str owner construction, active default initialize_charset ordering, parameter-borrowed mk_string(zstring) lifetime cache and cache-access count, mk_fresh fresh mutable state; remaining constructor/nested regex-solver setup is not yet ported",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_str.go",
+          "tests": [
+            "TestSMTStringTheoryTypedAttachmentAndAlphabet",
+            "TestSMTStringTheoryLiteralCacheParameterAndFreshOwner"
+          ]
+        },
+        {
+          "name": "internalize_atom/internalize_term, String-only mk_var and typed attachment, Boolean relation callback/enode flags, eager constant basic-axiom queue and existing-enode early return",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str.go",
+          "tests": [
+            "TestSMTStringTheoryTypedAttachmentAndAlphabet",
+            "TestSMTStringTheoryConstantLengthCountsBytes"
+          ]
+        },
+        {
+          "name": "source private m_find equivalence-class merge and scoped variable rollback, basicTodo filtering by enode introduction level, source lifetime cache retention and forward m_trail release; handle_equality-before-merge and other pop/propagation queues remain unported",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_str.go",
+          "tests": [
+            "TestSMTStringTheoryPrivateClassesAndScopeRollback",
+            "TestSMTStringTheoryLiteralCacheParameterAndFreshOwner"
+          ]
+        },
+        {
+          "name": "instantiate_basic_string_axioms constant byte length and nonconstant nonnegativity/zero-iff-empty; instantiate_concat_axiom, syntactic try_eval_concat, guarded instantiate_str_eq_length_axiom and assert_axiom publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_axioms.go",
+          "tests": [
+            "TestSMTStringTheoryBasicLengthZeroEquivalence",
+            "TestSMTStringTheoryConcatAxiomsAndSyntacticEvaluation",
+            "TestSMTStringTheoryEqualityLengthAxiomKeepsPremise",
+            "TestSMTStringTheoryConstantLengthCountsBytes"
+          ]
+        },
+        {
+          "name": "z3str2_get_eqc_value scans the private string union-find; mk_value_helper resolves concatenation recursively before class fallback; init_model installs StringFactory, mk_value uses source **UNUSED** decimal fallback names and finalize_model is empty",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_model.go",
+          "tests": [
+            "TestSMTStringTheoryPrivateClassesAndScopeRollback",
+            "TestSMTStringTheoryModelFactoryConcatAndFallback",
+            "TestSMTStringTheoryConcatAxiomsAndSyntacticEvaluation"
+          ]
         }
       ],
       "ownership": [
         "The concrete NFA consumes an AST only during construction and retains only Go state/transition/epsilon data. Membership and closure sets use Go maps without observable iteration-order dependencies; state allocation follows source operand order. No C++ standard-library code or generic container adapter is ported.",
-        "StringFactory retains generated expression refs because the Go ValueFactory interface returns raw handles rather than source expr_ref output parameters. Values are deduplicated by handle, refs close in reverse generation order, and model-owned factory teardown is idempotent. Its string-symbol set contains only generated fresh names; register_value intentionally does not populate it or change the delimiter."
+        "StringFactory retains generated expression refs because the Go ValueFactory interface returns raw handles rather than source expr_ref output parameters. Values are deduplicated by handle, refs close in reverse generation order, and model-owned factory teardown is idempotent. Its string-symbol set contains only generated fresh names; register_value intentionally does not populate it or change the delimiter.",
+        "The distinct SMTStringTheory owns a private backtrackable UnionFind and its no-op notification trail, scoped String variable attachments, queued borrowed enodes, a source lifetime literal cache and AST refs for asserted/generated expressions. Parameter owners are borrowed and preserved by Fresh rather than copied or closed. Pop prunes basic enodes introduced above the restored level and reverses union-find trails before dropping theory variables. Native m_trail is an expr_ref_vector and releases forward; lexical axiom-expression refs release in reverse local lifetime order. Raw Go model-value procedures retain generated uncached results through the theory owner. Model factories remain owned by the proto-model."
       ],
       "deviations": [
-        "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. Backend construction/internalization, equality/constraint callbacks, regex cache/consumer integration, final checking, model callback wiring and setup_QF_S/string_solver routing are still unported. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
-        "The header str_value_factory is implemented separately from seq_factory. Some values are exactly some value/value 1/value 2; fresh names use !hex! with a wrapping uint32 counter, skip previously generated names and share the counter with regex fresh values. Registering an existing !0! is ignored, as native requires, rather than adopting SequenceFactory collision avoidance. Go owns returned handles through factory close to represent native output-ref lifetime. The theory_str init_model/mk_value consumers remain unported and are not credited here."
+        "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
+        "The header str_value_factory is implemented separately from seq_factory. Some values are exactly some value/value 1/value 2; fresh names use !hex! with a wrapping uint32 counter, skip previously generated names and share the counter with regex fresh values. Registering an existing !0! is ignored, as native requires, rather than adopting SequenceFactory collision avoidance. Go owns returned handles through factory close to represent native output-ref lifetime. The subsequent owner increment implements theory_str init_model/mk_value separately from this factory-method credit; full constraint handling and backend selection remain incomplete.",
+        "Added a distinct SMTStringTheory owner, without changing existing solver setup. String-only attachments and the native Boolean callback/enode behavior are implemented; integer length, Boolean relation and regex results do not acquire string theory variables. The private union-find supplies source model class lookup independently of the core egraph, including repeated scope rollback. The active 255-byte model-search alphabet preserves lowercase/capital/digit/mark/control ordering and excludes NUL; the full byte-string length axiom still counts NUL and high bytes. The source lifetime cache uses the borrowed StringConstantCache parameter dynamically and retains child-scope literals across pops. Fresh borrows the same parameter owner while resetting mutable caches, counters and equivalence classes.",
+        "Ported basic string/concat/guarded string-equality length axiom routines and syntactic concat evaluation; source assertion publication and the basic constant queue are connected. Syntactic evaluation deliberately cannot turn a private model class into an axiom. Model callbacks now install the distinct StringFactory and resolve strings using recursive concat and the private union-find, with exact **UNUSED** decimal fallback names. The native constant-length unit bypasses the lifetime assertion trail, while other assert_axiom expressions are retained as source m_trail requires.",
+        "This is a partial owner/lifecycle/model increment, not a complete theory_str backend. The full constructor/nested regex solver, init_search asserted-formula traversal, handle_equality before private merge, concat arrangement/cut-variable/library queues, legacy regex cache/consumer integration, persisted/replayed axioms, native final_check_eh and setup_QF_S/string_solver routing remain open. FinalCheck explicitly returns GiveUp until those routines are connected, and production setup still selects the existing sequence implementation. No solver-level native completeness or new C++ comparison credit is claimed by these owner tests."
       ]
     },
     {
@@ -250579,7 +250707,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 689.415,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated commit 1ca94a9d97793cde24ec562db6845924f91aaaed, unchanged at start/end and verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes sequence prefix cursors/source variable classification, scoped length relevance and class coherence, typed variable attachments, source length-axiom scheduling, assignment-time relation witnesses and active prefix/suffix scheduling. Includes the promoted quant_seq_symbolic_int_prefix.smt2 strict comparison through 1ca94a9d. Excludes subsequent main-worktree negative-containment canonical queue reduction, expression expansion, equation ordering/progress and pending routing differential audit; those have separate focused evidence and remain incomplete."
+    "scope_warning": "Independently verified exact clean isolated commit 1ca94a9d97793cde24ec562db6845924f91aaaed, unchanged at start/end and verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes sequence prefix cursors/source variable classification, scoped length relevance and class coherence, typed variable attachments, source length-axiom scheduling, assignment-time relation witnesses and active prefix/suffix scheduling. Includes the promoted quant_seq_symbolic_int_prefix.smt2 strict comparison through 1ca94a9d. Excludes subsequent main-worktree negative-containment canonical queue reduction, expression expansion, equation ordering/progress and pending routing differential audit; those have separate focused evidence and remain incomplete. Also excludes subsequent standalone theory_str NFA/value-factory helpers and distinct owner/internalization/basic-axiom/model callback work; these are separately verified partial increments."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
