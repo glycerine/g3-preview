@@ -319,6 +319,7 @@ func TestSMTStringRegexStageIntersectionRetainsNativeSelectionQuirks(t *testing.
 func TestSMTStringRegexStageFinalCheckRunsWithoutInventedContinue(t *testing.T) {
 	m, theory, state, _ := stringRegexStageFixture(t)
 	word := stringContainmentWord(t, theory, "stage-final-check-word")
+	astTestMust(t, theory.setUpAxioms(word))
 	regex := stringRegexLiteral(t, m, "ab")
 	member := stringRegexRegister(t, theory, word, regex)
 	stringRegexStageAssign(t, theory, member, lbool.True)

@@ -363,7 +363,7 @@ func TestSMTStringLegacyRegexStarUnrollDefinition(t *testing.T) {
 	if state.context.enodes[unroll].Root() != state.context.enodes[empty].Root() || state.context.enodes[x].Root() != state.context.enodes[empty].Root() {
 		t.Fatal("zero-count unroll definition was not connected to membership")
 	}
-	if status, err := theory.FinalCheck(); err != nil || status != SMTFinalCheckGiveUp {
-		t.Fatal("partial unroll/final-check backend reported completion", status, err)
+	if status, err := theory.FinalCheck(); err != nil || status != SMTFinalCheckDone {
+		t.Fatal("zero-count grounded unroll did not reach native assigned completion", status, err)
 	}
 }

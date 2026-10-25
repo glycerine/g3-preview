@@ -79,8 +79,8 @@ func TestSMTStringFinalCheckBackpropagatesConstantBytesAndGuards(t *testing.T) {
 			}
 			status, err = theory.FinalCheck()
 			astTestMust(t, err)
-			if status != SMTFinalCheckGiveUp {
-				t.Fatal("incomplete final-check suffix incorrectly claimed completion or repeated constant backpropagation", status)
+			if status != SMTFinalCheckDone {
+				t.Fatal("fully assigned constant classes did not reach native completion", status)
 			}
 		}
 	}

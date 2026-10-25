@@ -359,11 +359,18 @@ func (t *SMTStringTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if _, err := t.runStringRegexAutomataStage(); err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
+	free, err := t.unassignedStringVariables(analysis)
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if len(free) == 0 {
+		return t.finalCheckAssignedStrings()
+	}
 	// Native deferred consistency/progress flags are initialized false and
 	// never assigned. Scope diagnostics are trace-only. The reached prefix
 	// above preserves analysis -> constants -> lengths -> regex automata.
-	// The regex stage has no live early return. Free-variable/tester/unroll
-	// stages remain open, so this owner must not report SAT.
+	// The regex stage has no live early return. The remaining free-variable
+	// tester/unroll branch is incomplete, so this case cannot report SAT.
 	return SMTFinalCheckGiveUp, nil
 }
 

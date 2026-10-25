@@ -88,8 +88,8 @@ func TestSMTStringExpressionSolverScopedQueriesAndOwnership(t *testing.T) {
 	}
 	got, err := parent.Check()
 	astTestMust(t, err)
-	if got != lbool.Undef {
-		t.Fatal("incomplete String owner must still prevent a SAT claim", got)
+	if got != lbool.True {
+		t.Fatal("Boolean-only parent with no free String variables did not complete", got)
 	}
 }
 

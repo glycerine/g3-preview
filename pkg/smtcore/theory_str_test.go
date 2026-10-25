@@ -72,6 +72,7 @@ func TestSMTStringTheoryTypedAttachmentAndAlphabet(t *testing.T) {
 	if _, found := theory.charsetLookup[0]; found {
 		t.Fatal("NUL entered the source 255-character search alphabet")
 	}
+	astTestMust(t, theory.setUpAxioms(x))
 	if status, err := theory.FinalCheck(); err != nil || status != SMTFinalCheckGiveUp {
 		t.Fatal("unfinished string constraints were reported complete", status, err)
 	}
