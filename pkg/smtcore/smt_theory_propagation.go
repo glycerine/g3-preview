@@ -191,8 +191,8 @@ func (s *SMTInternalizerState) PropagateTheoryAssignments() error {
 		}
 		s.atomPropagationHead++
 	}
-	if err := s.propagateCongruences(); err != nil {
-		return fmt.Errorf("propagate congruences: %w", err)
+	if err := s.propagateCoreEqualities(); err != nil {
+		return fmt.Errorf("propagate core equalities: %w", err)
 	}
 	return nil
 }
@@ -326,7 +326,7 @@ func (s *SMTInternalizerState) PropagateCore() (bool, error) {
 			return false, nil
 		}
 		relevancyDone := s.relevancy == nil || !s.relevancy.CanPropagate()
-		if s.propagationHead == len(s.assignedLiterals) && s.atomPropagationHead == len(s.assignedLiterals) && s.theoryEqualityHead == len(s.theoryEqualities) && s.theoryDisequalityHead == len(s.theoryDisequalities) && relevancyDone && !theoryProgress && !quantifierProgress && !dynamicAckProgress {
+		if s.propagationHead == len(s.assignedLiterals) && s.atomPropagationHead == len(s.assignedLiterals) && s.pendingHead == len(s.pending) && s.theoryEqualityHead == len(s.theoryEqualities) && s.theoryDisequalityHead == len(s.theoryDisequalities) && relevancyDone && !theoryProgress && !quantifierProgress && !dynamicAckProgress {
 			return true, nil
 		}
 	}

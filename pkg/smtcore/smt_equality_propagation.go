@@ -328,7 +328,7 @@ func (s *SMTInternalizerState) reinsertCongruenceParents(from, to *SMTEnode, alr
 		}
 		parent.congruence = inserted.Node
 		if inserted.Node != parent && inserted.Node.root != parent.root {
-			s.pending = append(s.pending, SMTInternalizerCongruence{Node: parent, Existing: inserted.Node, Commuted: inserted.Commuted})
+			s.pending = append(s.pending, smtPendingEquality{parent, inserted.Node, NewSMTEqualityCongruence(inserted.Commuted)})
 		}
 	}
 	for _, parent := range from.parents {
@@ -559,14 +559,24 @@ func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification 
 	return nil
 }
 
-func (s *SMTInternalizerState) propagateCongruences() error {
+// Source context::assign_eq/push_eq only enqueue; add_eq runs later during
+// propagate_eqs, after Boolean atom callbacks and before theory equality events.
+func (s *SMTInternalizerState) assignEquality(left, right *SMTEnode, justification SMTEqualityJustification) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if left == nil || right == nil || left.manager != s.manager || right.manager != s.manager || smtcoreSourceDebug && left == right {
+		return ast.ErrASTDomain
+	}
+	s.pending = append(s.pending, smtPendingEquality{left, right, justification})
+	return nil
+}
+
+func (s *SMTInternalizerState) propagateCoreEqualities() error {
 	for s.pendingHead < len(s.pending) && !s.inconsistent {
 		entry := s.pending[s.pendingHead]
 		s.pendingHead++
-		if entry.Node == nil || entry.Existing == nil || entry.Node.root == entry.Existing.root {
-			continue
-		}
-		if err := s.addEquality(entry.Node, entry.Existing, NewSMTEqualityCongruence(entry.Commuted)); err != nil {
+		if err := s.addEquality(entry.left, entry.right, entry.justification); err != nil {
 			return fmt.Errorf("merge pending nodes: %w", err)
 		}
 	}

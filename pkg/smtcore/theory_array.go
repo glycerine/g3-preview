@@ -299,7 +299,7 @@ func (t *SMTArrayTheory) assertStoreAxiomCore(store ast.ASTHandle) error {
 	if err = state.Internalize(selected, false); err != nil {
 		return err
 	}
-	if err = state.addEquality(state.context.enodes[selected], state.context.enodes[value], NewSMTEqualityAxiom()); err != nil {
+	if err = state.assignEquality(state.context.enodes[selected], state.context.enodes[value], NewSMTEqualityAxiom()); err != nil {
 		return err
 	}
 	return state.markRelevant(selected)

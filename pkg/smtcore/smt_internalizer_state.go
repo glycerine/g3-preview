@@ -93,6 +93,13 @@ type SMTInternalizerCongruence struct {
 	Commuted bool
 }
 
+// Source context::new_eq: explicit theory equalities and congruences share
+// one FIFO and retain their concrete tagged equality justification.
+type smtPendingEquality struct {
+	left, right   *SMTEnode
+	justification SMTEqualityJustification
+}
+
 type SMTInternalizerState struct {
 	theoryProgress           uint64
 	manager                  *ast.ASTManager
@@ -123,7 +130,7 @@ type SMTInternalizerState struct {
 	enodeStack               []*SMTEnode
 	scopes                   []smtInternalizerScope
 	cachedGeneration         map[ast.ASTHandle]uint32
-	pending                  []SMTInternalizerCongruence
+	pending                  []smtPendingEquality
 	pendingHead              int
 	equalityTrail            []smtEqualitySnapshot
 	disequalityReasons       map[smtEnodePairKey]SMTLiteral
@@ -587,7 +594,7 @@ func (s *SMTInternalizerState) MkEnode(expression ast.ASTHandle, suppressArgumen
 		}
 		node.congruence = inserted.Node
 		if inserted.Node != node {
-			s.pending = append(s.pending, SMTInternalizerCongruence{Node: node, Existing: inserted.Node, Commuted: inserted.Commuted})
+			s.pending = append(s.pending, smtPendingEquality{node, inserted.Node, NewSMTEqualityCongruence(inserted.Commuted)})
 		}
 	} else {
 		node.congruence = node
@@ -609,7 +616,13 @@ func (s *SMTInternalizerState) PendingCongruences() []SMTInternalizerCongruence 
 	if s == nil {
 		return nil
 	}
-	return append([]SMTInternalizerCongruence(nil), s.pending...)
+	var result []SMTInternalizerCongruence
+	for _, entry := range s.pending {
+		if commuted, congruence := entry.justification.UsedCommutativity(); congruence {
+			result = append(result, SMTInternalizerCongruence{entry.left, entry.right, commuted})
+		}
+	}
+	return result
 }
 
 func (s *SMTInternalizerState) PushScope() error {
@@ -902,6 +915,7 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	if scope.pendingLimit < 0 || scope.pendingLimit > len(s.pending) {
 		return ast.ErrASTDomain
 	}
+	clear(s.pending[scope.pendingLimit:])
 	s.pending = s.pending[:scope.pendingLimit]
 	if scope.pendingHead < 0 || scope.pendingHead > len(s.pending) {
 		return ast.ErrASTDomain

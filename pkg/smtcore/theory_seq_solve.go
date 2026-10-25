@@ -252,7 +252,8 @@ func (t *SMTSequenceTheory) addSolution(variable, value ast.ASTHandle, dependenc
 	if err != nil {
 		return false, err
 	}
-	if err = state.addEquality(left, right, NewSMTEqualityJustification(justification)); err != nil {
+	state.ownedJustifications = append(state.ownedJustifications, justification)
+	if err = state.assignEquality(left, right, NewSMTEqualityJustification(justification)); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -281,7 +282,8 @@ func (t *SMTSequenceTheory) propagateWordEquality(leftExpression, rightExpressio
 	if err != nil {
 		return false, err
 	}
-	if err = state.addEquality(left, right, NewSMTEqualityJustification(justification)); err != nil {
+	state.ownedJustifications = append(state.ownedJustifications, justification)
+	if err = state.assignEquality(left, right, NewSMTEqualityJustification(justification)); err != nil {
 		return false, err
 	}
 	return true, nil

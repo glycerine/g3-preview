@@ -79,7 +79,12 @@ func TestSMTLinearArithmeticEqualDefinitionRows(t *testing.T) {
 	}
 	status, err := theory.FinalCheck()
 	astTestMust(t, err)
-	if status != SMTFinalCheckContinue || firstNode.Root() != secondNode.Root() {
+	if status != SMTFinalCheckContinue || firstNode.Root() == secondNode.Root() {
 		t.Fatal("equal definition row propagation", status)
+	}
+	_, err = state.PropagateCore()
+	astTestMust(t, err)
+	if firstNode.Root() != secondNode.Root() {
+		t.Fatal("queued equal definition rows were not merged")
 	}
 }

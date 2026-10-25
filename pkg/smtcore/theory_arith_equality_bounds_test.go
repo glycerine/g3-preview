@@ -32,19 +32,30 @@ func TestSMTArithmeticOwnEqualityRetainedForReplayWithoutContextBounce(t *testin
 		variables = append(variables, node.TheoryVar(family))
 		nodes = append(nodes, node)
 	}
-	astTestMust(t, s.PushScope())
-	before := len(s.ownedJustifications)
-	progress, err := theory.propagateEquality(s, theory.simplexVariables[variables[0]], theory.simplexVariables[variables[1]], nil)
-	astTestMust(t, err)
-	if !progress || nodes[0].root != nodes[1].root || len(s.PendingTheoryEqualities()) != 0 {
-		t.Fatal("own equality was not merged or bounced back through context")
-	}
-	if len(theory.equalityBounds) != 1 || len(theory.pendingBounds) != 2 || len(s.ownedJustifications) != before+1 {
-		t.Fatal("own equality lost replay bounds or scoped explanation ownership")
-	}
-	astTestMust(t, s.PopScopes(1))
-	if len(theory.equalityBounds) != 0 || len(theory.pendingBounds) != 0 || nodes[0].root == nodes[1].root || len(s.ownedJustifications) != before {
-		t.Fatal("own equality replay state escaped scope")
+	for _, deliver := range []bool{false, true} {
+		astTestMust(t, s.PushScope())
+		before := len(s.ownedJustifications)
+		progress, err := theory.propagateEquality(s, theory.simplexVariables[variables[0]], theory.simplexVariables[variables[1]], nil)
+		astTestMust(t, err)
+		if !progress || nodes[0].root == nodes[1].root || len(s.PendingTheoryEqualities()) != 0 {
+			t.Fatal("own equality merged eagerly or bounced back through context")
+		}
+		if deliver {
+			astTestMust(t, s.PropagateTheoryAssignments())
+			if nodes[0].root != nodes[1].root || len(s.PendingTheoryEqualities()) != 0 {
+				t.Fatal("own equality was not merged at the core phase or bounced back")
+			}
+			astTestMust(t, theory.replayOwnEqualities())
+			if len(theory.equalityBounds) != 1 || len(theory.pendingBounds) != 2 || len(s.ownedJustifications) != before+1 {
+				t.Fatal("own equality lost replay bounds or scoped explanation ownership")
+			}
+		} else if !theory.CanPropagate() || len(theory.equalityBounds) != 0 {
+			t.Fatal("undelivered own equality lost its pending replay obligation")
+		}
+		astTestMust(t, s.PopScopes(1))
+		if len(theory.equalityBounds) != 0 || len(theory.pendingBounds) != 0 || len(theory.ownEqualities) != 0 || nodes[0].root == nodes[1].root || len(s.ownedJustifications) != before {
+			t.Fatal("own equality replay state escaped scope")
+		}
 	}
 }
 

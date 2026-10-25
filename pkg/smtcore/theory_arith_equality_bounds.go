@@ -26,6 +26,30 @@ func smtArithmeticPushDependency(out *smtArithmeticAntecedents, dependency simpl
 	return bounds[dependency.Equality-1].lower.pushJustification(out, coefficient, proofs)
 }
 
+type smtArithmeticOwnEquality struct{ left, right SMTTheoryVar }
+
+func (t *SMTLinearArithmeticTheory) replayOwnEqualities() error {
+	for t.ownEqualityHead < len(t.ownEqualities) {
+		entry := t.ownEqualities[t.ownEqualityHead]
+		left, err := t.Enode(entry.left)
+		if err != nil {
+			return err
+		}
+		right, err := t.Enode(entry.right)
+		if err != nil {
+			return err
+		}
+		if left.root != right.root {
+			return nil // The logical-context equality phase has not run yet.
+		}
+		if err = t.NewEquality(entry.left, entry.right); err != nil {
+			return err
+		}
+		t.ownEqualityHead++
+	}
+	return nil
+}
+
 func (t *SMTLinearArithmeticTheory) queueCongruenceEqualityBounds(first, second SMTTheoryVar) error {
 	if first == second {
 		return nil

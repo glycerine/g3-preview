@@ -49,7 +49,7 @@ func TestSMTIncrementalCongruenceAndDisequalityNestedRollback(t *testing.T) {
 	astTestMust(t, s.addDisequality(nodes[0], nodes[3], NewSMTLiteral(v, false)))
 	astTestMust(t, s.PushScope())
 	astTestMust(t, s.addEquality(nodes[0], nodes[1], NullSMTEqualityJustification()))
-	astTestMust(t, s.propagateCongruences())
+	astTestMust(t, s.propagateCoreEqualities())
 	if unary[0].root != unary[1].root || nary[0].root != nary[1].root {
 		t.Fatal("affected unary/n-ary parents were not reinserted")
 	}

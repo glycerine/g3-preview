@@ -79,6 +79,7 @@ type smtLinearArithmeticAtom struct {
 }
 
 type smtLinearArithmeticScope struct {
+	ownEqualities, ownEqualityHead       int
 	equalityBounds                       int
 	pendingBounds, pendingBoundHead      int
 	expressionBounds                     int
@@ -115,6 +116,8 @@ type smtLinearArithmeticStatistics struct {
 // bounds. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	ownEqualities                        []smtArithmeticOwnEquality
+	ownEqualityHead                      int
 	equalityBoundsEnabled                bool
 	equalityBounds                       []smtArithmeticEqualityEndpoints
 	propagateEqualities                  bool
@@ -759,7 +762,7 @@ func (t *SMTLinearArithmeticTheory) Assign(variable int32, truth bool) error {
 }
 
 func (t *SMTLinearArithmeticTheory) CanPropagate() bool {
-	return t != nil && (t.assertionHead < len(t.assertions) || t.pendingBoundHead < len(t.pendingBounds))
+	return t != nil && (t.assertionHead < len(t.assertions) || t.pendingBoundHead < len(t.pendingBounds) || t.ownEqualityHead < len(t.ownEqualities))
 }
 
 func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth, integer bool) (lower bool, value simplex.Infinitesimal) {
@@ -892,17 +895,13 @@ func (t *SMTLinearArithmeticTheory) propagateEqualityWithParameters(state *SMTIn
 		return false, err
 	}
 	state.ownedJustifications = append(state.ownedJustifications, justification)
-	if err = state.addEquality(left, right, NewSMTEqualityJustification(justification)); err != nil {
+	if err = state.assignEquality(left, right, NewSMTEqualityJustification(justification)); err != nil {
 		return false, err
 	}
-	// The source tableau retains the equality it just proved. This Go
-	// tableau is replayed, so retain the same equality in its replay inputs
-	// here; context correctly suppresses notification to the origin theory.
-	if !state.inconsistent {
-		if err = t.NewEquality(leftVariable, rightVariable); err != nil {
-			return false, err
-		}
-	}
+	// The source tableau already knows the equality. This Go tableau is
+	// replayed: defer its equality-bound evidence until the queued core
+	// merge exists, without sending a theory event back to the origin.
+	t.ownEqualities = append(t.ownEqualities, smtArithmeticOwnEquality{leftVariable, rightVariable})
 	return true, nil
 }
 
@@ -1326,6 +1325,9 @@ func (t *SMTLinearArithmeticTheory) Propagate() error {
 	if err != nil {
 		return err
 	}
+	if err = t.replayOwnEqualities(); err != nil {
+		return err
+	}
 	t.drainOptimizationBounds()
 	t.assertionHead = len(t.assertions)
 	for _, assertion := range t.assertions {
@@ -1367,6 +1369,8 @@ func (t *SMTLinearArithmeticTheory) PushScope() error {
 	t.scopes[len(t.scopes)-1].expressionBounds = len(t.expressionBounds)
 	t.scopes[len(t.scopes)-1].pendingBounds = len(t.pendingBounds)
 	t.scopes[len(t.scopes)-1].pendingBoundHead = t.pendingBoundHead
+	t.scopes[len(t.scopes)-1].ownEqualities = len(t.ownEqualities)
+	t.scopes[len(t.scopes)-1].ownEqualityHead = t.ownEqualityHead
 	return nil
 }
 
@@ -1376,6 +1380,9 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
+	clear(t.ownEqualities[scope.ownEqualities:])
+	t.ownEqualities = t.ownEqualities[:scope.ownEqualities]
+	t.ownEqualityHead = scope.ownEqualityHead
 	clear(t.equalityBounds[scope.equalityBounds:])
 	t.equalityBounds = t.equalityBounds[:scope.equalityBounds]
 	clear(t.pendingBounds[scope.pendingBounds:])

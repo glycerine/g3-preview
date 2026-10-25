@@ -55,7 +55,7 @@ func (t *SMTDatatypeTheory) equalityAxiom(left, right ast.ASTHandle, antecedent 
 		return ast.ErrASTDomain
 	}
 	if antecedent == SMTNullLiteral {
-		return state.addEquality(lhs, rhs, NewSMTEqualityAxiom())
+		return state.assignEquality(lhs, rhs, NewSMTEqualityAxiom())
 	}
 	assignment, err := state.Assignment(antecedent)
 	if err != nil {
@@ -75,5 +75,5 @@ func (t *SMTDatatypeTheory) equalityAxiom(left, right ast.ASTHandle, antecedent 
 	// Transfer before merging: a late merge error can leave an equality
 	// edge or conflict referencing this scoped owner.
 	state.ownedJustifications = append(state.ownedJustifications, owner)
-	return state.addEquality(lhs, rhs, NewSMTEqualityJustification(owner))
+	return state.assignEquality(lhs, rhs, NewSMTEqualityJustification(owner))
 }

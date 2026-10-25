@@ -50,8 +50,8 @@ func TestSMTDatatypeEqualityAxiomSourceBranchesAndRollback(t *testing.T) {
 					astTestMust(t, dt.equalityAxiom(x, y, antecedent))
 					direct := !proofs && (guard == "null" || guard == "true" || guard == "constant-true")
 					if direct {
-						if left.root != right.root || len(s.clauses) != clauses || len(s.boolExpr) != bools {
-							t.Fatal("direct datatype equality created SAT encoding")
+						if left.root == right.root || len(s.clauses) != clauses || len(s.boolExpr) != bools {
+							t.Fatal("queued datatype equality merged eagerly or created SAT encoding")
 						}
 						if guard != "null" {
 							if len(s.ownedJustifications) != owners+1 {
@@ -63,6 +63,10 @@ func TestSMTDatatypeEqualityAxiomSourceBranchesAndRollback(t *testing.T) {
 							}
 						} else if len(s.ownedJustifications) != owners {
 							t.Fatal("unconditional equality allocated a conditional owner")
+						}
+						astTestMust(t, s.PropagateTheoryAssignments())
+						if left.root != right.root {
+							t.Fatal("source equality phase did not merge queued datatype equality")
 						}
 						events := s.PendingTheoryEqualities()
 						found := false
@@ -144,8 +148,13 @@ func TestSMTDatatypeConstructorAccessorAxiomsAndCounters(t *testing.T) {
 			astTestMust(t, err)
 			argument, err := f.m.GetArg(f.left, 0)
 			astTestMust(t, err)
-			if !proofs && s.context.enodes[selected].root != s.context.enodes[argument].root {
-				t.Fatal("accessor axiom was delayed through SAT")
+			if !proofs && s.context.enodes[selected].root == s.context.enodes[argument].root {
+				t.Fatal("accessor axiom merged before the source equality phase")
+			}
+			_, err = s.PropagateCore()
+			astTestMust(t, err)
+			if s.context.enodes[selected].root != s.context.enodes[argument].root {
+				t.Fatal("accessor axiom was not propagated")
 			}
 			astTestMust(t, s.PushScope())
 			proof := ast.ASTHandle{}

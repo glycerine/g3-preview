@@ -114846,7 +114846,9 @@
         "pkg/smtcore/smt_pb_lifecycle_test.go",
         "pkg/smtcore/smt_conflict_proof.go",
         "pkg/cmd/g3/pb_strengthening_test.go",
-        "pkg/smtcore/smt_conflict_continuation_test.go"
+        "pkg/smtcore/smt_conflict_continuation_test.go",
+        "pkg/smtcore/smt_context_invariant.go",
+        "pkg/smtcore/smt_core_equality_queue_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -114984,7 +114986,9 @@
         "TestSMTAssignmentRetainsFirstConflictDuringContinuation",
         "TestSMTClausePublicationContinuesWithoutReplacingConflict",
         "TestSMTBinaryClausePublicationAssignsDuringContinuation",
-        "TestSMTEqualityConflictRetainsEarlierBooleanConflict"
+        "TestSMTEqualityConflictRetainsEarlierBooleanConflict",
+        "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
       ],
       "conditionals": [
         {
@@ -116565,6 +116569,21 @@
           "tests": [
             "TestSMTEqualityConflictRetainsEarlierBooleanConflict"
           ]
+        },
+        {
+          "name": "Retained assign_eq/push_eq/propagate_eqs FIFO: explicit theory equalities and congruences, phase ordering, conflict short-circuit, redundant accounting and scoped rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer_state.go",
+          "go_targets": [
+            "pkg/smtcore/smt_equality_propagation.go",
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_context_invariant.go",
+            "pkg/smtcore/smt_core_equality_queue_test.go"
+          ],
+          "tests": [
+            "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+            "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
+          ]
         }
       ],
       "ownership": [
@@ -116601,7 +116620,8 @@
         "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. The complete source default-plugin lazy matching and other retained lifecycle methods still require a separate audit.",
         "The source user base and assumption search level are distinct: source clause simplification is skipped in a temporary assumption scope, including restarts. The previous search-base shortcut could discard assumption reasons. Nearby-variable selection and origin filtering now follow source; remaining context algorithms and TRACE/assertion integration remain partial.",
         "Source context::set_conflict keeps the original justification and not_l while a theory callback continues. Go now preserves that first conflict without suppressing later unassigned literals or clause publication. Shared construction tests cover conflicting assignments, later false/empty clauses and optimized binary assignment reasons.",
-        "A retained equality contradicting an already recorded UF disequality now preserves an earlier Boolean conflict, its not_l and conflict count. The regression failed before this correction and checks that the disequal classes remain separate and scope pop clears child conflict/disequality state. Core equality queue timing remains part of the broader context integration audit."
+        "A retained equality contradicting an already recorded UF disequality now preserves an earlier Boolean conflict, its not_l and conflict count. The regression failed before this correction and checks that the disequal classes remain separate and scope pop clears child conflict/disequality state. Retained producer queue timing is addressed in the shared FIFO increment; broader context work remains partial.",
+        "Retained explicit theory equalities now merge after atom callbacks and before theory equality events. Pending core equalities prevent premature fixed point. FIFO tests cover generated congruence conflict behind an older equality, undelivered child rollback and redundant add_eq statistics. Processed entries are scoped Go history; truncated entries are cleared and justification owners remain scoped. No C++ container internals are modeled."
       ]
     },
     {
@@ -116679,7 +116699,9 @@
         "pkg/smtcore/smt_conflict_proof.go",
         "pkg/smtcore/smt_learned_persistence.go",
         "pkg/cmd/g3/pb_strengthening_test.go",
-        "pkg/smtcore/smt_conflict_continuation_test.go"
+        "pkg/smtcore/smt_conflict_continuation_test.go",
+        "pkg/smtcore/smt_context_invariant.go",
+        "pkg/smtcore/smt_core_equality_queue_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -116769,7 +116791,9 @@
         "TestSMTAssignmentRetainsFirstConflictDuringContinuation",
         "TestSMTClausePublicationContinuesWithoutReplacingConflict",
         "TestSMTBinaryClausePublicationAssignsDuringContinuation",
-        "TestSMTEqualityConflictRetainsEarlierBooleanConflict"
+        "TestSMTEqualityConflictRetainsEarlierBooleanConflict",
+        "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
       ],
       "conditionals": [
         {
@@ -117363,6 +117387,21 @@
           "tests": [
             "TestSMTEqualityConflictRetainsEarlierBooleanConflict"
           ]
+        },
+        {
+          "name": "Retained assign_eq/push_eq/propagate_eqs FIFO: explicit theory equalities and congruences, phase ordering, conflict short-circuit, redundant accounting and scoped rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer_state.go",
+          "go_targets": [
+            "pkg/smtcore/smt_equality_propagation.go",
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_context_invariant.go",
+            "pkg/smtcore/smt_core_equality_queue_test.go"
+          ],
+          "tests": [
+            "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+            "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
+          ]
         }
       ],
       "ownership": [
@@ -117383,7 +117422,8 @@
         "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. The complete source default-plugin lazy matching and other retained lifecycle methods still require a separate audit.",
         "The source user base and assumption search level are distinct: source clause simplification is skipped in a temporary assumption scope, including restarts. The previous search-base shortcut could discard assumption reasons. Nearby-variable selection and origin filtering now follow source; remaining context algorithms and TRACE/assertion integration remain partial.",
         "Source context::set_conflict keeps the original justification and not_l while a theory callback continues. Go now preserves that first conflict without suppressing later unassigned literals or clause publication. Shared construction tests cover conflicting assignments, later false/empty clauses and optimized binary assignment reasons.",
-        "A retained equality contradicting an already recorded UF disequality now preserves an earlier Boolean conflict, its not_l and conflict count. The regression failed before this correction and checks that the disequal classes remain separate and scope pop clears child conflict/disequality state. Core equality queue timing remains part of the broader context integration audit."
+        "A retained equality contradicting an already recorded UF disequality now preserves an earlier Boolean conflict, its not_l and conflict count. The regression failed before this correction and checks that the disequal classes remain separate and scope pop clears child conflict/disequality state. Retained producer queue timing is addressed in the shared FIFO increment; broader context work remains partial.",
+        "Retained explicit theory equalities now merge after atom callbacks and before theory equality events. Pending core equalities prevent premature fixed point. FIFO tests cover generated congruence conflict behind an older equality, undelivered child rollback and redundant add_eq statistics. Processed entries are scoped Go history; truncated entries are cleared and justification owners remain scoped. No C++ container internals are modeled."
       ]
     },
     {
@@ -118583,7 +118623,9 @@
         "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
-        "pkg/smtcore/smt_conflict_continuation_test.go"
+        "pkg/smtcore/smt_conflict_continuation_test.go",
+        "pkg/smtcore/smt_context_invariant.go",
+        "pkg/smtcore/smt_core_equality_queue_test.go"
       ],
       "tests": [
         "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
@@ -118630,7 +118672,9 @@
         "TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions",
         "TestQuantifiedArithmeticTranslatedProofAndCore",
         "TestSMTClausePublicationContinuesWithoutReplacingConflict",
-        "TestSMTBinaryClausePublicationAssignsDuringContinuation"
+        "TestSMTBinaryClausePublicationAssignsDuringContinuation",
+        "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
       ],
       "conditionals": [
         {
@@ -119214,6 +119258,21 @@
             "TestSMTClausePublicationContinuesWithoutReplacingConflict",
             "TestSMTBinaryClausePublicationAssignsDuringContinuation"
           ]
+        },
+        {
+          "name": "Retained assign_eq/push_eq/propagate_eqs FIFO: explicit theory equalities and congruences, phase ordering, conflict short-circuit, redundant accounting and scoped rollback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer_state.go",
+          "go_targets": [
+            "pkg/smtcore/smt_equality_propagation.go",
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_context_invariant.go",
+            "pkg/smtcore/smt_core_equality_queue_test.go"
+          ],
+          "tests": [
+            "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+            "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
+          ]
         }
       ],
       "ownership": [
@@ -119229,7 +119288,8 @@
         "The retained Go kernel directly encodes implication gates because the C++ preprocessing pass that normally eliminates OP_IMPLIES has not reached this facade; the clauses preserve the source Boolean semantics and conservative relevancy dependencies.",
         "NewSMTKernel enables compact binary clauses by source default when proofs are disabled. Proof mode uses ordinary clauses, and scoped clauses retain ordinary clause objects so rollback owns their lifetime.",
         "Learned clauses are installed at their computed backjump scope. Atoms destroyed by backjump are retained and reinternalized before installation, so clauses leave with that scope instead of using the source persistent reinitialization stacks. Garbage collection compacts the unified Go clause slice and repairs every saved scope limit.",
-        "Removed the non-source global inconsistency early return from clause construction. Later auxiliary lemmas retain watches/storage and later empty/false clauses preserve the first conflict. Optimized binary publication now performs the source immediate assignment with the already true opposite of its false second literal as antecedent."
+        "Removed the non-source global inconsistency early return from clause construction. Later auxiliary lemmas retain watches/storage and later empty/false clauses preserve the first conflict. Optimized binary publication now performs the source immediate assignment with the already true opposite of its false second literal as antecedent.",
+        "Retained explicit theory equalities now merge after atom callbacks and before theory equality events. Pending core equalities prevent premature fixed point. FIFO tests cover generated congruence conflict behind an older equality, undelivered child rollback and redundant add_eq statistics. Processed entries are scoped Go history; truncated entries are cleared and justification owners remain scoped. No C++ container internals are modeled."
       ]
     },
     {
@@ -127714,7 +127774,13 @@
         "pkg/smtcore/theory_arith_bound_dependency.go",
         "pkg/smtcore/theory_arith_equality_guards_test.go",
         "pkg/smtcore/theory_arith_equality_bounds.go",
-        "pkg/smtcore/theory_arith_equality_bounds_test.go"
+        "pkg/smtcore/theory_arith_equality_bounds_test.go",
+        "pkg/smtcore/theory_arith_linear_test.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_equality_propagation.go",
+        "pkg/smtcore/smt_theory_propagation.go",
+        "pkg/smtcore/smt_context_invariant.go",
+        "pkg/smtcore/smt_core_equality_queue_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
@@ -127730,7 +127796,9 @@
         "TestSMTArithmeticEqualityConflictThresholdSurvivesPopAndResetsForSearch",
         "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation",
         "TestSMTArithmeticOwnEqualityRetainedForReplayWithoutContextBounce",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
       ],
       "conditionals": [
         {
@@ -127903,6 +127971,27 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "propagate_eq_to_core uses source FIFO; replay-tableau own-equality evidence waits for core merge without notification bounce",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_equality_bounds.go",
+            "pkg/smtcore/theory_arith_equality_bounds_test.go",
+            "pkg/smtcore/theory_arith_linear_test.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_equality_propagation.go",
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_context_invariant.go",
+            "pkg/smtcore/smt_core_equality_queue_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticOwnEqualityRetainedForReplayWithoutContextBounce",
+            "TestSMTLinearArithmeticEqualDefinitionRows",
+            "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+            "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
+          ]
         }
       ],
       "ownership": [
@@ -127913,7 +128002,8 @@
       ],
       "deviations": [
         "The linear specialization recognizes active opposite bound pairs, substitutes fixed monomials, and compares affine definition rows directly instead of maintaining the source row-id offset index.",
-        "C++ retains the proved equality in its persistent tableau; the Go arithmetic tableau replays inputs. Own propagation now records that equality locally through the concrete existing bound/adapter path, replacing an implicit dependence on context bouncing the equality back. Existing nonlinear-alias and mixed-floor scripts enforce behavior; the broader arithmetic source unit remains partial."
+        "C++ retains the proved equality in its persistent tableau; the Go arithmetic tableau replays inputs. Own propagation now records that equality locally through the concrete existing bound/adapter path, replacing an implicit dependence on context bouncing the equality back. Existing nonlinear-alias and mixed-floor scripts enforce behavior; the broader arithmetic source unit remains partial.",
+        "The source tableau already knows its proved equality. Go replay records a concrete scoped own-equality obligation and creates its equality-bound evidence after the core merge, before numerical propagation. CanPropagate includes this work; pop restores entry/head. This is Go replay bookkeeping, not an extra source theory notification. Direct final-check tests require Continue and logical-context propagation before expecting merged roots."
       ]
     },
     {
@@ -130035,7 +130125,12 @@
         "pkg/cmd/g3/test_vectors/array_simple_boolean_witness_scopes.smt2",
         "pkg/cmd/g3/test_vectors/array_full_boolean_witness_scopes.smt2",
         "pkg/smtcore/theory_array.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_equality_propagation.go",
+        "pkg/smtcore/smt_theory_propagation.go",
+        "pkg/smtcore/smt_context_invariant.go",
+        "pkg/smtcore/smt_core_equality_queue_test.go"
       ],
       "tests": [
         "TestSMTGeneratedModelCleansMacroFallbackConstants",
@@ -130063,7 +130158,9 @@
         "TestSMTArrayModelPreservesObservedSelect",
         "TestSMTArrayModelPreservesObservedDefault",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
       ],
       "conditionals": [
         {
@@ -130382,13 +130479,22 @@
           "name": "store, conditional read-over-write and extensionality axiom construction",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array.go",
-          "tests": ["TestSMTArrayReadOverWrite", "TestSMTArrayReadOverWriteThroughEquality", "TestSMTArrayExtensionality"]
+          "tests": [
+            "TestSMTArrayReadOverWrite",
+            "TestSMTArrayReadOverWriteThroughEquality",
+            "TestSMTArrayExtensionality"
+          ]
         },
         {
           "name": "array model initialization, observed-select propagation and lookup-table value construction",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_array.go",
-          "tests": ["TestSMTArrayPublishesModelValues", "TestSMTArrayModelPreservesObservedSelect", "TestSMTArrayModelPreservesObservedDefault", "TestSMTArrayConstructorModelValue"]
+          "tests": [
+            "TestSMTArrayPublishesModelValues",
+            "TestSMTArrayModelPreservesObservedSelect",
+            "TestSMTArrayModelPreservesObservedDefault",
+            "TestSMTArrayConstructorModelValue"
+          ]
         },
         {
           "name": "context::is_relevant policy for observed array select and default model dependencies under disabled filtering, preserving table entries and fallback values across scopes",
@@ -130402,6 +130508,24 @@
             "TestSMTArrayModelPreservesObservedDefault",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "assert_store_axiom1_core non-proof store/select equality publishes through source assign_eq FIFO before select relevance",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_read_queue_test.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_equality_propagation.go",
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_context_invariant.go",
+            "pkg/smtcore/smt_core_equality_queue_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
+            "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+            "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
           ]
         }
       ],
@@ -130418,7 +130542,8 @@
         "Array equality internalization no longer emits extensionality eagerly. Source disequality events enqueue a canonical root pair only after scoped duplicate checks and known relevant read-disequality suppression. Propagation drains the concrete queue; scope pop clears pending work and child fingerprints. A strict runner vector switches extensionality on after equality internalization and before disequality, then checks disabled recovery, raising C++ agreement to 127. Shared-array interface equality and other axiom worklists remain incomplete; base units are now explicitly partial.",
         "Restored source relevance marking for both extensionality equality atoms. Two strict Boolean-index scripts inspect distinct-array model values, exhaust both Boolean indices to force UNSAT, and restore SAT/models after pop. Together with Boolean class assignment propagation these raise strict runner agreement to 126 scripts.",
         "Native fingerprint tables and delayed propagation queues are represented by scoped typed pair maps and eager guarded clauses. Go model procedures depend directly on canonical enode roots and register auxiliary functions through ProtoModel. Shared-array interface-equality scheduling is still required for retained nested array roles and uninterpreted-function parents; the previous no-consumer claim was incorrect.",
-        "Observed array model defaults and select entries are no longer lost when relevancy filtering is disabled. Enabled/disabled mode tests inspect actual model interpretation and evaluator results. A new ALL-logic runner vector checks observed and unobserved selects, default fallback 11, scoped additional entries and contradiction recovery against C++, bringing strict comparisons to 95. Direct default(as-array) get-value reduction remains the existing shared C++/Go evaluator behavior and is not changed by this model dependency fix."
+        "Observed array model defaults and select entries are no longer lost when relevancy filtering is disabled. Enabled/disabled mode tests inspect actual model interpretation and evaluator results. A new ALL-logic runner vector checks observed and unobserved selects, default fallback 11, scoped additional entries and contradiction recovery against C++, bringing strict comparisons to 95. Direct default(as-array) get-value reduction remains the existing shared C++/Go evaluator behavior and is not changed by this model dependency fix.",
+        "The retained non-proof store/select equality is queued; proof mode retains its SAT axiom. Existing deferred read, proof/relevance and scope integration checks remain separate from other partial array work."
       ]
     },
     {
@@ -132304,7 +132429,11 @@
         "pkg/smtcore/theory_datatype_metadata.go",
         "pkg/smtcore/theory_datatype_metadata_test.go",
         "pkg/smtcore/theory_datatype_display.go",
-        "pkg/smtcore/theory_datatype_display_test.go"
+        "pkg/smtcore/theory_datatype_display_test.go",
+        "pkg/smtcore/smt_equality_propagation.go",
+        "pkg/smtcore/smt_theory_propagation.go",
+        "pkg/smtcore/smt_context_invariant.go",
+        "pkg/smtcore/smt_core_equality_queue_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -132345,7 +132474,9 @@
         "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
         "TestSMTDatatypeDisplayPrivateRootsAndScopedMetadata",
         "TestSMTDatatypeEmptyDisplayAndClosedOwner",
-        "TestSMTDatatypeDisplayBoundsConstructorArguments"
+        "TestSMTDatatypeDisplayBoundsConstructorArguments",
+        "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
       ],
       "assertions": [
         {
@@ -132769,6 +132900,25 @@
             "TestSMTDatatypeEmptyDisplayAndClosedOwner",
             "TestSMTDatatypeDisplayBoundsConstructorArguments"
           ]
+        },
+        {
+          "name": "assert_eq_axiom queues non-proof unconditional/guarded equalities until the core phase, retaining scoped dt_eq ownership and origin semantics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_equality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_equality_test.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_equality_propagation.go",
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_context_invariant.go",
+            "pkg/smtcore/smt_core_equality_queue_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeEqualityAxiomSourceBranchesAndRollback",
+            "TestSMTDatatypeConstructorAccessorAxiomsAndCounters",
+            "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+            "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
+          ]
         }
       ],
       "ownership": [
@@ -132783,7 +132933,8 @@
       "deviations": [
         "Guarded SAT clauses and scoped egraph scans still replace portions of source var_data and recognizer arrays. Datatype roots now use the concrete source union-find port. Handled accessors require enodes without artificial result variables; sort constraints attach finite or asserted-quantifier datatype results. Invalid source assertion states return Go errors.",
         "Root metadata and source recognizer-pointer lookup replace runtime egraph scans and synthetic SAT equality guards. The observation scan is test-only. Field-update core output now agrees exactly with C++ (empty bad_identity), superseding the prior separate-order expectation. Unreached reset_eh receives no unused Go API; TRACE/assertion and broader context integration still require audit.",
-        "Explicit source defect correction in occurs_check_explain: when proof-mode union-find selects a variable representative, add the actual variable-to-cached-constructor closing equality if both differ from the representative argument. Literal C++ traversal can omit this necessary premise (zero equalities for a self-cycle, two for a three-node cycle). Existing exact one/three-edge proof and scope-recovery tests enforce the complete explanation while preserving traversal order."
+        "Explicit source defect correction in occurs_check_explain: when proof-mode union-find selects a variable representative, add the actual variable-to-cached-constructor closing equality if both differ from the representative argument. Literal C++ traversal can omit this necessary premise (zero equalities for a self-cycle, two for a three-node cycle). Existing exact one/three-edge proof and scope-recovery tests enforce the complete explanation while preserving traversal order.",
+        "Non-proof publication creates neither SAT encoding nor an immediate merge. Core propagation merges and then exposes theory events. Corrected earlier eager-merge test expectations to the source phase boundaries. All guard/proof branches and constructor/accessor counters remain checked; conditional owners precede queue publication. Final datatype diagnostic/context audit remains open."
       ]
     },
     {
@@ -132820,7 +132971,11 @@
         "pkg/smtcore/theory_datatype_metadata.go",
         "pkg/smtcore/theory_datatype_metadata_test.go",
         "pkg/smtcore/theory_datatype_display.go",
-        "pkg/smtcore/theory_datatype_display_test.go"
+        "pkg/smtcore/theory_datatype_display_test.go",
+        "pkg/smtcore/smt_equality_propagation.go",
+        "pkg/smtcore/smt_theory_propagation.go",
+        "pkg/smtcore/smt_context_invariant.go",
+        "pkg/smtcore/smt_core_equality_queue_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -132860,7 +133015,9 @@
         "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
         "TestSMTDatatypeDisplayPrivateRootsAndScopedMetadata",
         "TestSMTDatatypeEmptyDisplayAndClosedOwner",
-        "TestSMTDatatypeDisplayBoundsConstructorArguments"
+        "TestSMTDatatypeDisplayBoundsConstructorArguments",
+        "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
       ],
       "conditionals": [
         {
@@ -133054,6 +133211,25 @@
             "TestSMTDatatypeEmptyDisplayAndClosedOwner",
             "TestSMTDatatypeDisplayBoundsConstructorArguments"
           ]
+        },
+        {
+          "name": "assert_eq_axiom queues non-proof unconditional/guarded equalities until the core phase, retaining scoped dt_eq ownership and origin semantics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_equality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_equality_test.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_equality_propagation.go",
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_context_invariant.go",
+            "pkg/smtcore/smt_core_equality_queue_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeEqualityAxiomSourceBranchesAndRollback",
+            "TestSMTDatatypeConstructorAccessorAxiomsAndCounters",
+            "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+            "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
+          ]
         }
       ],
       "ownership": [
@@ -133068,7 +133244,8 @@
       "deviations": [
         "The public Go theory interface replaces C++ inheritance, nested trail classes and manual allocation.",
         "Root metadata and source recognizer-pointer lookup replace runtime egraph scans and synthetic SAT equality guards. The observation scan is test-only. Field-update core output now agrees exactly with C++ (empty bad_identity), superseding the prior separate-order expectation. Unreached reset_eh receives no unused Go API; TRACE/assertion and broader context integration still require audit.",
-        "Explicit source defect correction in occurs_check_explain: when proof-mode union-find selects a variable representative, add the actual variable-to-cached-constructor closing equality if both differ from the representative argument. Literal C++ traversal can omit this necessary premise (zero equalities for a self-cycle, two for a three-node cycle). Existing exact one/three-edge proof and scope-recovery tests enforce the complete explanation while preserving traversal order."
+        "Explicit source defect correction in occurs_check_explain: when proof-mode union-find selects a variable representative, add the actual variable-to-cached-constructor closing equality if both differ from the representative argument. Literal C++ traversal can omit this necessary premise (zero equalities for a self-cycle, two for a three-node cycle). Existing exact one/three-edge proof and scope-recovery tests enforce the complete explanation while preserving traversal order.",
+        "Non-proof publication creates neither SAT encoding nor an immediate merge. Core propagation merges and then exposes theory events. Corrected earlier eager-merge test expectations to the source phase boundaries. All guard/proof branches and constructor/accessor counters remain checked; conditional owners precede queue publication. Final datatype diagnostic/context audit remains open."
       ]
     },
     {
@@ -136101,7 +136278,35 @@
       "component": "smt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/smtcore/theory_seq_state.go", "pkg/smtcore/theory_seq_equations.go", "pkg/smtcore/theory_seq_disequations.go", "pkg/smtcore/theory_seq_disequality_solve.go", "pkg/smtcore/theory_seq_disequality_fixed.go", "pkg/smtcore/theory_seq_noncontains.go", "pkg/smtcore/theory_seq_relations.go", "pkg/smtcore/theory_seq_relation_axioms.go", "pkg/smtcore/theory_seq_boundary_negative.go", "pkg/smtcore/theory_seq_axioms.go", "pkg/smtcore/theory_seq_length.go", "pkg/smtcore/theory_seq_tail_bound.go", "pkg/smtcore/theory_seq_fixed_length.go", "pkg/smtcore/theory_seq_length_split.go", "pkg/smtcore/theory_seq_coherence.go", "pkg/smtcore/theory_seq_extensionality.go", "pkg/smtcore/theory_seq_conversion.go", "pkg/smtcore/theory_seq_at.go", "pkg/smtcore/theory_seq_extract.go", "pkg/smtcore/theory_seq_extract_special.go", "pkg/smtcore/theory_seq_index.go", "pkg/smtcore/theory_seq_replace.go", "pkg/smtcore/theory_seq_regex.go", "pkg/smtcore/theory_seq_binary.go", "pkg/smtcore/theory_seq_solve.go", "pkg/smtcore/theory_seq_ground.go", "pkg/smtcore/theory_seq_model.go", "pkg/smtcore/theory_seq.go",
+      "go_targets": [
+        "pkg/smtcore/theory_seq_state.go",
+        "pkg/smtcore/theory_seq_equations.go",
+        "pkg/smtcore/theory_seq_disequations.go",
+        "pkg/smtcore/theory_seq_disequality_solve.go",
+        "pkg/smtcore/theory_seq_disequality_fixed.go",
+        "pkg/smtcore/theory_seq_noncontains.go",
+        "pkg/smtcore/theory_seq_relations.go",
+        "pkg/smtcore/theory_seq_relation_axioms.go",
+        "pkg/smtcore/theory_seq_boundary_negative.go",
+        "pkg/smtcore/theory_seq_axioms.go",
+        "pkg/smtcore/theory_seq_length.go",
+        "pkg/smtcore/theory_seq_tail_bound.go",
+        "pkg/smtcore/theory_seq_fixed_length.go",
+        "pkg/smtcore/theory_seq_length_split.go",
+        "pkg/smtcore/theory_seq_coherence.go",
+        "pkg/smtcore/theory_seq_extensionality.go",
+        "pkg/smtcore/theory_seq_conversion.go",
+        "pkg/smtcore/theory_seq_at.go",
+        "pkg/smtcore/theory_seq_extract.go",
+        "pkg/smtcore/theory_seq_extract_special.go",
+        "pkg/smtcore/theory_seq_index.go",
+        "pkg/smtcore/theory_seq_replace.go",
+        "pkg/smtcore/theory_seq_regex.go",
+        "pkg/smtcore/theory_seq_binary.go",
+        "pkg/smtcore/theory_seq_solve.go",
+        "pkg/smtcore/theory_seq_ground.go",
+        "pkg/smtcore/theory_seq_model.go",
+        "pkg/smtcore/theory_seq.go",
         "pkg/smtcore/theory_seq_extensionality_test.go",
         "pkg/smtcore/theory_seq_empty_test.go",
         "pkg/cmd/g3/main_test.go",
@@ -136117,7 +136322,12 @@
         "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
         "pkg/smtcore/theory_seq_unit_evidence_test.go",
         "pkg/cmd/g3/test_vectors/quant_seq_boundary_equality_core.smt2",
-        "pkg/cmd/g3/test_vectors/quant_seq_boundary_length_core.smt2"
+        "pkg/cmd/g3/test_vectors/quant_seq_boundary_length_core.smt2",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_equality_propagation.go",
+        "pkg/smtcore/smt_theory_propagation.go",
+        "pkg/smtcore/smt_context_invariant.go",
+        "pkg/smtcore/smt_core_equality_queue_test.go"
       ],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
@@ -136194,7 +136404,9 @@
         "TestSMTSequenceExtensionalityHonorsDisabledRelevancy",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestSMTSequenceUnitConcreteCharacterRetainsEqualityEvidence"
+        "TestSMTSequenceUnitConcreteCharacterRetainsEqualityEvidence",
+        "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
       ],
       "conditionals": [
         {
@@ -136631,211 +136843,337 @@
           "name": "solution_map update, root lookup, dependency-preserving transitive find, cache reset, overwrite and scoped rollback (src/smt/theory_seq.cpp:58-150)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_state.go",
-          "tests": ["TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes"]
+          "tests": [
+            "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes"
+          ]
         },
         {
           "name": "exclusion_table canonical unordered pairs, duplicate suppression and scoped rollback (src/smt/theory_seq.cpp:158-185)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_state.go",
-          "tests": ["TestSMTSequenceExclusionTableCanonicalPairsAndScopes"]
+          "tests": [
+            "TestSMTSequenceExclusionTableCanonicalPairsAndScopes"
+          ]
         },
         {
           "name": "eq records and scoped equation-vector push, indexed replacement, pop and nested rollback (src/smt/theory_seq.h:113-139; scoped_vector<eq>)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_equations.go",
-          "tests": ["TestSMTSequenceEquationQueueMutationAndScopedRestore"]
+          "tests": [
+            "TestSMTSequenceEquationQueueMutationAndScopedRestore"
+          ]
         },
         {
           "name": "ne records, owned alternative word pairs, explanation literals, and scoped disequation rollback (src/smt/theory_seq.h:141-184; scoped_vector<ne>)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_disequations.go",
-          "tests": ["TestSMTSequenceDisequationQueueScopesAndOwnedCases"]
+          "tests": [
+            "TestSMTSequenceDisequationQueueScopesAndOwnedCases"
+          ]
         },
         {
           "name": "nc records, false-contains assignment capture, literal dependency, and scoped rollback (src/smt/theory_seq.h:186-205; src/smt/theory_seq.cpp:3990-4004)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_noncontains.go",
-          "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes"]
+          "tests": [
+            "TestSMTSequenceNonContainsQueueAndAssignmentScopes"
+          ]
         },
         {
           "name": "sequence term and atom internalization, structural recognition of generated Skolem words including mixed user/generated concatenations, implemented unit and concat terms plus relation and sequence operations, theory-variable attachment, literal-value equality conflicts, scoped equality and disequality state, native final-check solved-equation audit, and model-value factory hooks (src/smt/theory_seq.cpp:2225-2255,2616-2785,4053-4130)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
-          "tests": ["TestSMTSequenceLogicsInstallSafeCheckpointTheory", "TestSMTSequenceTheoryLiteralConflictAndConcatModel", "TestSMTSequenceTheoryAuditsUnresolvedWordEquation", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel", "TestSMTSequenceTheorySymbolicNonContainsModel"]
+          "tests": [
+            "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
+            "TestSMTSequenceTheoryLiteralConflictAndConcatModel",
+            "TestSMTSequenceTheoryAuditsUnresolvedWordEquation",
+            "TestSMTSequenceTheoryCompletesFixedLengthRegexModel",
+            "TestSMTSequenceTheorySymbolicNonContainsModel"
+          ]
         },
         {
           "name": "solution-map expansion of queued concat leaves and concrete string-word conflict detection with dependency explanations (src/smt/theory_seq.cpp:1341-1533,2856-3066)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
-          "tests": ["TestSMTSequenceTheoryConcreteWordEquationConflict"]
+          "tests": [
+            "TestSMTSequenceTheoryConcreteWordEquationConflict"
+          ]
         },
         {
           "name": "asserted disequality capture, concrete word re-expansion, solution expansion, concat flattening, literal folding, equal-boundary reduction conflicts and justified residual symbolic disequality propagation with SAT-literal dependencies (src/smt/theory_seq.cpp:1841-2013,4086-4106)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
-          "tests": ["TestSMTSequenceTheoryConcreteWordDisequationConflict", "TestSMTSequenceTheoryReducedWordDisequationConflict", "TestSMTSequenceTheoryPropagatesResidualWordDisequality"]
+          "tests": [
+            "TestSMTSequenceTheoryConcreteWordDisequationConflict",
+            "TestSMTSequenceTheoryReducedWordDisequationConflict",
+            "TestSMTSequenceTheoryPropagatesResidualWordDisequality"
+          ]
         },
         {
           "name": "fixed-length sequence disequality reduction to guarded indexed element disequalities using stable seq.nth witnesses, with non-sequence theory callbacks excluded before length construction (src/smt/theory_seq.cpp:1841-2013)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_disequality_fixed.go",
-          "tests": ["TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheorySymbolicNonContainsModel"]
+          "tests": [
+            "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition",
+            "TestSMTSequenceTheorySymbolicNonContainsModel"
+          ]
         },
         {
           "name": "false contains re-expansion and concrete substring conflict with assignment and equality dependencies (src/smt/theory_seq.cpp solve_nc/assign_eh retained concrete case)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
-          "tests": ["TestSMTSequenceTheoryConcreteNonContainsConflict"]
+          "tests": [
+            "TestSMTSequenceTheoryConcreteNonContainsConflict"
+          ]
         },
         {
           "name": "queued equation expansion, concat flattening, empty removal, adjacent string folding, exact and e-graph-equivalent cancellation, native equal-length boundary propagation with residual equation replacement instead of solution-map substitution, string-boundary cancellation, native word-variable recognition for uninterpreted, extract, replace and at terms, variable/occurs recognition, late generated-word unit completion, dependency-preserving equality propagation, solved-equation removal, and internal draining without spurious SAT progress (src/smt/theory_seq.cpp:1341-1648,2856-3066)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_solve.go",
-          "tests": ["TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution", "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries", "TestSMTSequenceTheoryReducesEqualLengthBoundaries", "TestSMTSequenceTheoryConcreteWordEquationConflict", "TestSMTSequenceTheoryNativeWordVariableClassification", "TestSMTSequenceTheoryLiteralConflictAndConcatModel", "TestSMTSequenceTheoryAuditsUnresolvedWordEquation", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel"]
+          "tests": [
+            "TestSMTSequenceTheoryCancelsWordBoundaryAndPropagatesSolution",
+            "TestSMTSequenceTheoryCancelsEquivalentEnodeBoundaries",
+            "TestSMTSequenceTheoryReducesEqualLengthBoundaries",
+            "TestSMTSequenceTheoryConcreteWordEquationConflict",
+            "TestSMTSequenceTheoryNativeWordVariableClassification",
+            "TestSMTSequenceTheoryLiteralConflictAndConcatModel",
+            "TestSMTSequenceTheoryAuditsUnresolvedWordEquation",
+            "TestSMTSequenceTheoryCompletesFixedLengthRegexModel"
+          ]
         },
         {
           "name": "zero-length leading-variable elimination, exact total-length mismatch conflicts, leading-variable overlap decomposition with stable seq.left and seq.right witnesses for empty and non-fixed prefixes under the exact |b| < |X| <= |b| + |Y| model length guards (fixed string and unit prefixes remain covered by the complete binary word routines), and multi-part prefix and suffix splitting at arithmetic-proven equal total lengths with guarded prefix and residual equalities (src/smt/theory_seq.cpp:482-630,1574-1691)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_length_split.go",
-          "tests": ["TestSMTSequenceTheorySplitsFixedLengthPrefixes", "TestSMTSequenceTheoryRejectsFixedLengthWordMismatch", "TestSMTSequenceTheoryBranchesLeadingVariableOverlap", "TestSMTSequenceTheoryBranchesPrefixedVariableOverlap"]
+          "tests": [
+            "TestSMTSequenceTheorySplitsFixedLengthPrefixes",
+            "TestSMTSequenceTheoryRejectsFixedLengthWordMismatch",
+            "TestSMTSequenceTheoryBranchesLeadingVariableOverlap",
+            "TestSMTSequenceTheoryBranchesPrefixedVariableOverlap"
+          ]
         },
         {
           "name": "seq.tail empty maximum-length propagation with arbitrary-precision indices, finite-upper-bound suppression, solved-tail final-check discovery, and guarded length consequence (src/smt/theory_seq.cpp:1524-1538)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_tail_bound.go",
-          "tests": ["TestSMTSequenceTheoryPropagatesTailEmptyMaximumLength"]
+          "tests": [
+            "TestSMTSequenceTheoryPropagatesTailEmptyMaximumLength"
+          ]
         },
         {
           "name": "complete fixed-string binary word-equation branching with finite prefix-overlap alternatives, exhaustive variable-prefix splits against fixed string and generic seq.unit words, an unbounded shared-tail Skolem family, exact rejection of self-referential fixed tails with unequal lengths or no cyclic rotation, and cyclic unit-element compatibility constraints (src/smt/theory_seq.cpp:335-790,1554-1763)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_binary.go",
-          "tests": ["TestSMTSequenceTheoryBranchesBinaryUnitEquation", "TestSMTSequenceTheoryRejectsIncompatibleCyclicUnits", "TestSMTSequenceTheoryBranchesVariableAcrossFixedUnitWord", "TestSMTSequenceTheoryBranchesFixedStringOverlaps", "TestSMTSequenceTheoryBranchesTwoVariablesAcrossFixedWord", "TestSMTSequenceTheoryBranchesVariablePrefixAcrossFixedWord", "TestSMTSequenceTheoryRejectsImpossibleCyclicBinaryEquations"]
+          "tests": [
+            "TestSMTSequenceTheoryBranchesBinaryUnitEquation",
+            "TestSMTSequenceTheoryRejectsIncompatibleCyclicUnits",
+            "TestSMTSequenceTheoryBranchesVariableAcrossFixedUnitWord",
+            "TestSMTSequenceTheoryBranchesFixedStringOverlaps",
+            "TestSMTSequenceTheoryBranchesTwoVariablesAcrossFixedWord",
+            "TestSMTSequenceTheoryBranchesVariablePrefixAcrossFixedWord",
+            "TestSMTSequenceTheoryRejectsImpossibleCyclicBinaryEquations"
+          ]
         },
         {
           "name": "native true-first equality assumptions, residual-word feasibility filtering, empty/whole-prefix candidate advancement for variable word equations containing non-fixed sequence terms, and finite all-unit conflict closure after every feasible prefix has been refuted (src/smt/theory_seq.cpp:661-850)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_branch_variable.go",
-          "tests": ["TestSMTSequenceTheoryBranchesVariablePrefixEqualities", "TestSMTSequenceTheorySkipsInfeasibleVariablePrefixes", "TestSMTSequenceTheoryClosesExhaustedUnitPrefixBranches"]
+          "tests": [
+            "TestSMTSequenceTheoryBranchesVariablePrefixEqualities",
+            "TestSMTSequenceTheorySkipsInfeasibleVariablePrefixes",
+            "TestSMTSequenceTheoryClosesExhaustedUnitPrefixBranches"
+          ]
         },
         {
           "name": "scoped assigned prefix/suffix/contains atoms and concrete relation checking after solution expansion (src/smt/theory_seq.cpp:3927-4010 and m_atoms scope limits)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_relations.go",
-          "tests": ["TestSMTSequenceNonContainsQueueAndAssignmentScopes", "TestSMTSequenceTheoryConcreteRelationConflicts"]
+          "tests": [
+            "TestSMTSequenceNonContainsQueueAndAssignmentScopes",
+            "TestSMTSequenceTheoryConcreteRelationConflicts"
+          ]
         },
         {
           "name": "positive prefix, suffix and contains Skolem witnesses plus false-relation nonempty implications, non-containment prefix/suffix exclusions, and lazy non-containment propagation through the decomposed source tail (src/smt/theory_seq.cpp:3927-4010,4464-4546,4707-4739)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
-          "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms", "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches", "TestSMTSequenceTheoryNonContainsPropagatesToTail", "TestSMTSequenceTheorySymbolicNonContainsModel"]
+          "tests": [
+            "TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms",
+            "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches",
+            "TestSMTSequenceTheoryNonContainsPropagatesToTail",
+            "TestSMTSequenceTheorySymbolicNonContainsModel"
+          ]
         },
         {
           "name": "negative prefix and suffix shared-segment mismatch witnesses with distinct element or exhausted-container alternatives, plus lazy negative-prefix propagation through equal heads to decomposed tails and symmetric negative-suffix propagation through equal last elements to initial segments (src/smt/theory_seq.cpp:4464-4684)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_boundary_negative.go",
-          "tests": ["TestSMTSequenceTheoryNegativeBoundaryWitnesses", "TestSMTSequenceTheoryNegativePrefixPropagatesToTails", "TestSMTSequenceTheoryNegativeSuffixPropagatesToInitialSegments"]
+          "tests": [
+            "TestSMTSequenceTheoryNegativeBoundaryWitnesses",
+            "TestSMTSequenceTheoryNegativePrefixPropagatesToTails",
+            "TestSMTSequenceTheoryNegativeSuffixPropagatesToInitialSegments"
+          ]
         },
         {
           "name": "deduplicated owned axiom queue, propagation head and scoped replay (src/smt/theory_seq.cpp:3068-3108)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_axioms.go",
-          "tests": ["TestSMTSequenceTheoryLengthAxioms"]
+          "tests": [
+            "TestSMTSequenceTheoryLengthAxioms"
+          ]
         },
         {
           "name": "final-check axiom draining with observable SAT and equality progress detection across scoped replay, preserving a theory continue result when regex branching exposes a relevant equality without immediate propagation (src/smt/theory_seq.cpp:252-302,3068-3108)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq.go",
-          "tests": ["TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel", "TestSMTSequenceTheoryCompletesUnboundedRegexModel"]
+          "tests": [
+            "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition",
+            "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel",
+            "TestSMTSequenceTheoryCompletesUnboundedRegexModel"
+          ]
         },
         {
           "name": "exact length axioms for concat, unit, empty, string, arbitrary sequence non-negativity, zero-length iff empty, and int.to.str nonnegative lower bound, exact one-digit threshold, and fixed integer or length driven arbitrary decimal-width refinement (src/smt/theory_seq.cpp:627-633,3313-3390)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_length.go",
-          "tests": ["TestSMTSequenceTheoryLengthAxioms", "TestSMTSequenceTheoryIntegerStringLengthThreshold", "TestSMTSequenceTheoryIntegerStringModelLengthRefinement"]
+          "tests": [
+            "TestSMTSequenceTheoryLengthAxioms",
+            "TestSMTSequenceTheoryIntegerStringLengthThreshold",
+            "TestSMTSequenceTheoryIntegerStringModelLengthRefinement"
+          ]
         },
         {
           "name": "symbolic sequence empty-or-head/tail coherence decomposition with stable seq.nth and seq.tail witnesses (src/smt/theory_seq.cpp check_length_coherence, mk_decompose and propagate_length_coherence)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_coherence.go",
-          "tests": ["TestSMTSequenceTheoryLengthCoherenceDecomposition"]
+          "tests": [
+            "TestSMTSequenceTheoryLengthCoherenceDecomposition"
+          ]
         },
         {
           "name": "demand-driven fixed-length-one singleton decomposition using the stable seq.nth witness (src/smt/theory_seq.cpp fixed_length and mk_decompose)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_length.go",
-          "tests": ["TestSMTSequenceTheoryFixedLengthOneDecomposition"]
+          "tests": [
+            "TestSMTSequenceTheoryFixedLengthOneDecomposition"
+          ]
         },
         {
           "name": "exact fixed nonnegative length decomposition into stable indexed seq.nth units using linear-arithmetic bounds or e-graph numeral equality, capped at the native 2048-element coherence threshold (src/smt/theory_seq.cpp:851-999)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_fixed_length.go",
-          "tests": ["TestSMTSequenceTheoryFixedLengthDecomposition"]
+          "tests": [
+            "TestSMTSequenceTheoryFixedLengthDecomposition"
+          ]
         },
         {
           "name": "positive integer lower-bound coherence exposing the required stable seq.nth prefix units and indexed seq.tail remainder through linear-arithmetic interval evidence, an exact residual upper bound when the original sequence is bounded above, and the native true-first minimum-length remainder equality branch when it is unbounded above, capped below the native 2048-element threshold (src/smt/theory_seq.cpp:851-897)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_fixed_length.go",
-          "tests": ["TestSMTSequenceTheoryLengthLowerBoundDecomposition", "TestSMTSequenceTheoryBranchesUnboundedLengthAtLowerBound", "TestSMTSequenceTheoryLengthBoundsConstrainRemainder"]
+          "tests": [
+            "TestSMTSequenceTheoryLengthLowerBoundDecomposition",
+            "TestSMTSequenceTheoryBranchesUnboundedLengthAtLowerBound",
+            "TestSMTSequenceTheoryLengthBoundsConstrainRemainder"
+          ]
         },
         {
           "name": "relevant symbolic sequence root extensionality through an equality case split, excluding pairs already equal or disequal (src/smt/theory_seq.cpp check_extensionality)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_extensionality.go",
-          "tests": ["TestSMTSequenceTheoryExposesExtensionalityEquality"]
+          "tests": [
+            "TestSMTSequenceTheoryExposesExtensionalityEquality"
+          ]
         },
         {
           "name": "seq.at negative and out-of-bounds empty results plus in-bounds decomposition, prefix length and unit result length (src/smt/theory_seq.cpp:3733-3763)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_at.go",
-          "tests": ["TestSMTSequenceTheoryAtBoundaryAxioms"]
+          "tests": [
+            "TestSMTSequenceTheoryAtBoundaryAxioms"
+          ]
         },
         {
           "name": "general seq.extract negative-offset, out-of-bounds and nonpositive-length empty results plus in-bounds decomposition, exact or truncated result length, and zero-offset prefix specialization including oversized source identity (src/smt/theory_seq.cpp:3586-3649,3701-3718)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_extract.go",
-          "tests": ["TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms", "TestSMTSequenceTheoryExtractOversizedPrefixIsSource"]
+          "tests": [
+            "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms",
+            "TestSMTSequenceTheoryExtractOversizedPrefixIsSource"
+          ]
         },
         {
           "name": "seq.extract tail and drop-last recognition through normalized len(s)-1 arithmetic plus direct seq.tail/seq.first witnesses and nonempty decompositions (src/smt/theory_seq.cpp:3611-3698)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_extract_special.go",
-          "tests": ["TestSMTSequenceTheorySpecialTailAndDropLastDecompositions"]
+          "tests": [
+            "TestSMTSequenceTheorySpecialTailAndDropLastDecompositions"
+          ]
         },
         {
           "name": "str.indexof containment, empty-source, empty-needle, offset boundary, zero-offset witness, tightest-prefix decomposition and premature-match exclusion, and suffix-search axioms (src/smt/theory_seq.cpp:3137-3252)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_index.go",
-          "tests": ["TestSMTSequenceTheoryIndexAxioms", "TestSMTSequenceTheoryIndexTightestPrefixAxioms"]
+          "tests": [
+            "TestSMTSequenceTheoryIndexAxioms",
+            "TestSMTSequenceTheoryIndexTightestPrefixAxioms"
+          ]
         },
         {
           "name": "str.replace empty-source, empty-needle, absent-needle, first-occurrence witness, and tightest-prefix minimality axioms (src/smt/theory_seq.cpp:3137-3285)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_replace.go",
-          "tests": ["TestSMTSequenceTheoryReplaceAxioms", "TestSMTSequenceTheoryReplaceTightestPrefixAxioms"]
+          "tests": [
+            "TestSMTSequenceTheoryReplaceAxioms",
+            "TestSMTSequenceTheoryReplaceTightestPrefixAxioms"
+          ]
         },
         {
           "name": "regular-language membership reduction through the retained Go regex automaton builder, including concrete automata, symbolic singleton languages, final-check retry after word-solution, guarded fixed-length seq.nth expansion, exhaustive guarded decomposition and reduction across small finite arithmetic length intervals, completion after the native minimum-length remainder branch for lower-bounded models, breadth-first concrete witness branching for positive and negative unbounded membership using the asserted language or its complement while skipping words below a proved arithmetic length lower bound, structural accepted-length branching for positive and negative unbounded symbolic-label membership, advancement past refuted witnesses, exact finite-language and finite-length exhaustion implications, scoped exact-regex term tracking, explicit give-up for still-unresolved memberships, and definitive satisfiability for exact reductions (src/smt/theory_seq.cpp:3391-3445,4166-4191)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_regex.go",
-          "tests": ["TestSMTSequenceTheoryRegexMembershipReduction", "TestSMTSequenceTheoryRetriesRegexAfterWordSolution", "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition", "TestSMTSequenceTheoryCompletesFixedLengthRegexModel", "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel", "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel", "TestSMTSequenceTheoryCompletesUnboundedRegexModel", "TestSMTSequenceTheoryAdvancesConcreteRegexWitness", "TestSMTSequenceTheoryCompletesNegativeUnboundedRegexModel", "TestSMTSequenceTheoryCompletesSymbolicUnboundedRegexModel", "TestSMTSequenceTheoryCompletesNegativeSymbolicUnboundedRegexModel", "TestSMTSequenceTheoryClosesEmptyNegativeRegexComplement", "TestSMTSequenceTheoryClosesExhaustedSymbolicRegexLengths", "TestSMTSequenceTheoryClosesExhaustedFiniteRegexLanguage", "TestSMTSequenceTheoryBranchesConcreteRegexWitness"]
+          "tests": [
+            "TestSMTSequenceTheoryRegexMembershipReduction",
+            "TestSMTSequenceTheoryRetriesRegexAfterWordSolution",
+            "TestSMTSequenceTheoryRetriesRegexAfterFixedLengthDecomposition",
+            "TestSMTSequenceTheoryCompletesFixedLengthRegexModel",
+            "TestSMTSequenceTheoryCompletesBoundedLengthRegexModel",
+            "TestSMTSequenceTheoryCompletesMinimumLengthRegexModel",
+            "TestSMTSequenceTheoryCompletesUnboundedRegexModel",
+            "TestSMTSequenceTheoryAdvancesConcreteRegexWitness",
+            "TestSMTSequenceTheoryCompletesNegativeUnboundedRegexModel",
+            "TestSMTSequenceTheoryCompletesSymbolicUnboundedRegexModel",
+            "TestSMTSequenceTheoryCompletesNegativeSymbolicUnboundedRegexModel",
+            "TestSMTSequenceTheoryClosesEmptyNegativeRegexComplement",
+            "TestSMTSequenceTheoryClosesExhaustedSymbolicRegexLengths",
+            "TestSMTSequenceTheoryClosesExhaustedFiniteRegexLanguage",
+            "TestSMTSequenceTheoryBranchesConcreteRegexWitness"
+          ]
         },
         {
           "name": "int.to.str empty iff negative, nonnegative round trip through str.to.int, numeric-language membership for nonnegative conversions, str.to.int lower bound plus exact nonnegative iff [0-9]+ membership, and complete arbitrary-precision ground conversion values including leading-zero parsing (src/smt/theory_seq.cpp:2284-2462)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_conversion.go",
-          "tests": ["TestSMTSequenceTheoryIntegerStringAxioms", "TestSMTSequenceTheoryIntegerStringLanguageAxioms", "TestSMTSequenceTheoryGroundIntegerStringConversionsAreComplete"]
+          "tests": [
+            "TestSMTSequenceTheoryIntegerStringAxioms",
+            "TestSMTSequenceTheoryIntegerStringLanguageAxioms",
+            "TestSMTSequenceTheoryGroundIntegerStringConversionsAreComplete"
+          ]
         },
         {
           "name": "dependency-ordered sequence model values for concat, unit, string literals and int.to.str with fresh cyclic-leaf fallback (src/smt/theory_seq.cpp:2630-2785)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_model.go",
-          "tests": ["TestSMTSequenceStructuredModelValues"]
+          "tests": [
+            "TestSMTSequenceStructuredModelValues"
+          ]
         },
         {
           "name": "complete ground evaluation for nested string concat, length, prefix, suffix, contains, at, extract, indexof and replace, plus exact symbolic reflexive, empty-relation and concat-operand relation identities, concat-empty, replace-pattern-with-itself, negative-index, empty-needle zero-index and nonpositive-extract boundary results with arbitrary-precision index guards and definitive satisfiability (src/smt/theory_seq.cpp:3137-3285,3313-3740,4464-4725)",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_ground.go",
-          "tests": ["TestSMTSequenceTheoryGroundOperationsAreComplete"]
+          "tests": [
+            "TestSMTSequenceTheoryGroundOperationsAreComplete"
+          ]
         },
         {
           "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
@@ -136897,6 +137235,22 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained add_solution/propagate_eq word equalities use source core FIFO with context-owned scoped explanations",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_solve.go",
+          "go_targets": [
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_equality_propagation.go",
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_context_invariant.go",
+            "pkg/smtcore/smt_core_equality_queue_test.go"
+          ],
+          "tests": [
+            "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
+            "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
+          ]
         }
       ],
       "ownership": [
@@ -136908,7 +137262,8 @@
       ],
       "deviations": [
         "Concrete Go maps replace obj_map and pair hash tables. Dependency joins use an immutable concrete assumption DAG and iterative stable linearization rather than the native scoped_dependency_manager template.",
-        "The sequence interface-root scan now uses the source context relevance policy, including unmarked roots when filtering is disabled; scope rollback removes the generated equality. Remaining source canonicalization and sharing refinements are outside this policy increment."
+        "The sequence interface-root scan now uses the source context relevance policy, including unmarked roots when filtering is disabled; scope rollback removes the generated equality. Remaining source canonicalization and sharing refinements are outside this policy increment.",
+        "Sequence solution/word equality producers now enqueue and transfer their extended-theory explanations to the logical context before publication, preserving queued and merged reason lifetime. Complete core sequence solving/scope/model and CLI comparisons check integration; the source unit remains partial."
       ]
     },
     {
@@ -249071,7 +249426,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 707.47,
     "checkout_held_unchanged": true,
-    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification. Includes PB resolution diagnostics, source aggregate/simplex counter widths and kernel no-op reset corrections through 20b421bb, with prebuilt C++ comparisons enabled. Excludes subsequent literal-network diagnostics b4169f7c, complement/term guards 45f59d59 and current conflict-continuation corrections, whose focused integration evidence is separate."
+    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification. Includes PB resolution diagnostics, source aggregate/simplex counter widths and kernel no-op reset corrections through 20b421bb, with prebuilt C++ comparisons enabled. Excludes subsequent literal-network diagnostics b4169f7c, complement/term guards 45f59d59 and current conflict-continuation corrections, whose focused integration evidence is separate. Also excludes subsequent equality conflict retention 80eedc08 and the shared core equality FIFO/replay increment."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
