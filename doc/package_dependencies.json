@@ -2748,6 +2748,7 @@
         "theory_pb_compile.go",
         "theory_pb_normalize.go",
         "theory_pb_resolve.go",
+        "theory_pb_simplex.go",
         "theory_pb_sort.go",
         "theory_pb_watch.go",
         "theory_seq.go",

@@ -23,7 +23,7 @@ type smtPseudoBooleanStatistics struct {
 
 // SMTPseudoBooleanTheory keeps concrete normalized constraints and native
 // variable/literal watches, weighted conflict resolution and restart-triggered
-// sorting-network compilation. Optional simplex integration remains incomplete.
+// sorting-network compilation, with the optional shared-row simplex relaxation.
 type SMTPseudoBooleanTheory struct {
 	*SMTTheoryBase
 	statistics     smtPseudoBooleanStatistics
@@ -35,6 +35,7 @@ type SMTPseudoBooleanTheory struct {
 	controls       SMTPBState
 	configured     bool
 	parameterOwner *SMTPBParams // borrowed only until the source setup boundary
+	simplex        *smtPBSimplex
 }
 
 func NewSMTPseudoBooleanTheory(family ast.FamilyID) (*SMTPseudoBooleanTheory, error) {
@@ -186,6 +187,9 @@ func (t *SMTPseudoBooleanTheory) internalizeAtom(expression ast.ASTHandle, retai
 	t.initVariableWatch(c)
 	t.info(variable).constraint = c
 	t.constraints = append(t.constraints, c)
+	if err = t.simplexInternalize(c); err != nil {
+		return false, err
+	}
 	return true, nil
 }
 
@@ -221,9 +225,13 @@ func (t *SMTPseudoBooleanTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.limits) - int(count)
 	limit := t.limits[level]
-	for _, c := range t.constraints[limit:] {
+	for index := len(t.constraints) - 1; index >= limit; index-- {
+		c := t.constraints[index]
 		t.clearWatch(c)
 		t.info(c.literal.Var()).constraint = nil
+		if err := t.simplexRemove(c); err != nil {
+			return err
+		}
 		t.toCompile = smtPBRemove(t.toCompile, c)
 	}
 	clear(t.constraints[limit:])
@@ -245,6 +253,7 @@ func (t *SMTPseudoBooleanTheory) Close() error {
 	t.limits = nil
 	t.variables = nil
 	t.parameterOwner = nil
+	t.simplex = nil
 	return nil
 }
 
@@ -259,6 +268,13 @@ func (t *SMTPseudoBooleanTheory) CollectStatistics(target *statistics.Statistics
 	target.UpdateUint64("pb compiled clauses", t.statistics.compiledClauses)
 	target.UpdateUint64("pb propagations", t.statistics.propagations)
 	target.UpdateUint64("pb conflicts", t.statistics.conflicts)
+	if t.simplex != nil {
+		s := t.simplex.solver
+		target.UpdateUint64("simplex add rows", s.Matrix().AddRowCount())
+		target.UpdateUint64("simplex num pivots", s.Stats.NumPivots)
+		target.UpdateUint64("simplex num infeasible", s.Stats.NumInfeasible)
+		target.UpdateUint64("simplex num checks", s.Stats.NumChecks)
+	}
 	return nil
 }
 

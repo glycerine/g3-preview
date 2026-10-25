@@ -505,6 +505,12 @@ func (t *SMTPseudoBooleanTheory) assignNative(v int32, isTrue bool) error {
 	if isTrue {
 		sign = 1
 	}
+	if t.controls.EnableSimplex && i.literals[sign] != nil {
+		ok, err := t.simplexAssignArgument(v, isTrue)
+		if err != nil || !ok {
+			return err
+		}
+	}
 	for n := 0; n < len(i.literals[sign]); {
 		removed, err := t.assignLiteralWatch(v, isTrue, i.literals[sign][n], n)
 		if err != nil {
@@ -526,6 +532,12 @@ func (t *SMTPseudoBooleanTheory) assignNative(v int32, isTrue bool) error {
 		}
 	}
 	if i.constraint != nil {
+		if t.controls.EnableSimplex {
+			ok, err := t.simplexAssignPredicate(i.constraint, isTrue)
+			if err != nil || !ok {
+				return err
+			}
+		}
 		return t.assignInequality(i.constraint, isTrue)
 	}
 	return nil

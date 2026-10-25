@@ -134690,7 +134690,9 @@
         "pkg/cmd/g3/pb_strengthening_test.go",
         "pkg/smtcore/theory_pb_compile.go",
         "pkg/smtcore/theory_pb_sort.go",
-        "pkg/smtcore/theory_pb_compile_test.go"
+        "pkg/smtcore/theory_pb_compile_test.go",
+        "pkg/smtcore/theory_pb_simplex.go",
+        "pkg/smtcore/theory_pb_simplex_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -134712,7 +134714,14 @@
         "TestSMTPBCompilationNetworkIndependentTruthOracle",
         "TestSMTPBCompilationThresholdRestartAndRollback",
         "TestSMTPBCompilationWeightedDefinitionsAndBaseFolding",
-        "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery"
+        "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery",
+        "TestSMTPBSimplexSharedRowsBoundConflictsAndRollback",
+        "TestSMTPBSimplexInfeasibleRowExplainsOnlyAssignedPredicates",
+        "TestSMTPBSimplexBoundTrailAndRepresentativeRemoval",
+        "TestSMTPBSimplexNestedPredicateKeepsBooleanAndSlackDistinct",
+        "TestSMTPBSimplexSignedWeightedValuationOracle",
+        "TestSMTPBSimplexFreshTranslationAndAuxiliaryTableaux",
+        "TestSMTPBSimplexPivotedScopedRowRemovalPreservesOuterRows"
       ],
       "conditionals": [
         {
@@ -135088,7 +135097,7 @@
           ]
         },
         {
-          "name": "scope lifecycle: trail variable-watch numeric updates, restore mode/orientation and current variable watches after active literal-watch rollback, preserve untrailed argument permutations, delete scoped constraints and clear stale watch entries before Boolean IDs are reused",
+          "name": "scope lifecycle: trail variable-watch numeric updates, restore mode/orientation and current variable watches after active literal-watch rollback, preserve untrailed argument permutations, delete scoped constraints in reverse creation order so simplex aliases precede their representative owner, and clear stale watch entries before Boolean IDs are reused",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_pb_watch.go",
           "go_targets": [
@@ -135133,7 +135142,31 @@
           ]
         },
         {
-          "name": "optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
+          "name": "optional simplex integration: remove_negations representatives excluding bounds, shared integer rows and initialized Boolean bounds, update_bound/undo_bound/remove_var trails, exact assign_eh hook order, infeasible-row explanations and source theory-lemma conflicts, reverse scoped alias/owner deletion and simplex statistics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_simplex.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_simplex.go",
+            "pkg/smtcore/theory_pb_simplex_test.go",
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTPBSimplexSharedRowsBoundConflictsAndRollback",
+            "TestSMTPBSimplexInfeasibleRowExplainsOnlyAssignedPredicates",
+            "TestSMTPBSimplexBoundTrailAndRepresentativeRemoval",
+            "TestSMTPBSimplexNestedPredicateKeepsBooleanAndSlackDistinct",
+            "TestSMTPBSimplexSignedWeightedValuationOracle",
+            "TestSMTPBSimplexFreshTranslationAndAuxiliaryTableaux",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript",
+            "TestSMTPBSimplexPivotedScopedRowRemovalPreservesOuterRows"
+          ]
+        },
+        {
+          "name": "remaining TRACE/assertion and model/factory lifecycle audit",
           "status": "unported",
           "tests": []
         },
@@ -135198,16 +135231,18 @@
         "PB propagation owners retain the concrete originating inequality in addition to the ordinary theory-propagation owner. Scope ownership keeps that inequality valid while its reasons can be resolved. Each cutting-plane frame owns temporary marks, coefficients, guards and lemma storage; no persistent global mark leaks remain on refusal/error.",
         "Before actual source setup/first use an eager Go placeholder borrows its containing parameter owner; setup copies the four scalar controls and releases that borrow. Fresh plugins copy this installed value, independently of the current mutable driver and other plugin snapshots.",
         "Strengthened auxiliary lemmas own heap-marked theory-axiom objects, preserving their dynamic resolution-barrier type and surviving clause lifetime safely. Ordinary PB conflict lemmas retain the existing heap theory-lemma owner. Generated consequence definitions retain scoped assignment-dependent inputs instead of folding away their proof/core premises.",
-        "Pending compilation borrows concrete inequality pointers; pop removes deleted constraints after undo. Successful compilation installs ordinary scoped auxiliary clauses with region theory-axiom justifications; a scope undo restores compiled=false before native constraint deletion. SAT Boolean variables retain auxiliary AST names without recursive gate internalization. Network scratch is concrete native Go slices."
+        "Pending compilation borrows concrete inequality pointers; pop removes deleted constraints after undo. Successful compilation installs ordinary scoped auxiliary clauses with region theory-axiom justifications; a scope undo restores compiled=false before native constraint deletion. SAT Boolean variables retain auxiliary AST names without recursive gate internalization. Network scratch is concrete native Go slices.",
+        "The optional simplex workspace owns a concrete exact Solver, coefficient-only representative keys, per-predicate bound/slack records, initialized-variable membership and lower/upper literal explanation maps. The AST resource limit is borrowed. Bound trails own cloned prior infinitesimals and restore explanations; membership trails unset both bounds. Reverse constraint deletion removes row aliases before the owning representative; Close retires the trail before dropping the tableau. Translated and cached MBQI auxiliary plugins build independent fresh tableaus while preserving installed scalar controls."
       ],
       "deviations": [
         "The previous eager PB2BV wrapper and exhaustive valuation fallback are removed from this plugin. Native watches, weighted strengthening and source propagation-threshold/restart compilation now run on live PB atoms; the normal PB2BV rewriter remains available to its other retained consumers.",
         "Exact Go big.Rat values replace source rational/mpz storage and are copied when numeral ownership changes. The normalization implementation is concrete for SMTLiteral; no generic callback utility or STL internals are reproduced.",
         "An empty equality with a nonzero bound is folded to false before publishing a constraint. Literal source normalization can leave this impossible negative-bound case unresolved, and no variable callback exists to repair it; the direct Go internalizer regression enforces correct constant semantics.",
         "compile_arg now creates native auxiliary PB Booleans for nonowned arguments. Both source smt_model_generator.cpp mk_value_procs and Go discoverValueProcedures handle Boolean roots before sort-family model callbacks, so their model values use the Boolean assignment path. The prior claim that no retained Go producer creates auxiliary PB applications is superseded. The remaining model/factory registration/lifetime audit is not claimed complete.",
-        "Native weighted resolution, constructor snapshots and native restart-triggered sorting-network compilation are implemented. Optional simplex and remaining TRACE/assertion/model-factory lifecycle audits keep this unit partial.",
+        "Native weighted resolution, constructor snapshots, restart-triggered sorting-network compilation and optional shared-row simplex integration are implemented. Remaining TRACE/assertion and model/factory lifecycle audits keep this unit partial.",
         "Correctness correction for strengthened consequences: internalization retains the scoped false inputs of a residual PB predicate. Literal source folding can turn that definition into an axiom and discard premises needed by later Boolean learning. A pending-callback regression with 2*x+y+z+u>=3 verifies the residual definition, exact guarded learned clause and all original relation valuations; the literal-folding variant fails this regression.",
-        "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits."
+        "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits.",
+        "Correctness correction for nested PB expressions: source uses the same Boolean ID for a predicate and its numeric slack and explicitly notes that nesting is unsupported. A direct retained internalizer regression with A=(x+y>=2), B=(A+z=1), A/B true and z false fails under literal shared IDs with AST source precondition: B applies [0,1] to A's weighted sum. Distinct even Boolean and odd slack columns preserve nonnested relative ordering and SMT literal/core IDs while separating these roles. The corrected direct test passes. The prebuilt C++ CLI returns sat on the corresponding script because its outer preprocessing avoids that direct construction; no C++ wrong-output or teardown-defect exception is claimed for these new vectors."
       ]
     },
     {
@@ -135236,7 +135271,9 @@
         "pkg/cmd/g3/pb_strengthening_test.go",
         "pkg/smtcore/theory_pb_compile.go",
         "pkg/smtcore/theory_pb_sort.go",
-        "pkg/smtcore/theory_pb_compile_test.go"
+        "pkg/smtcore/theory_pb_compile_test.go",
+        "pkg/smtcore/theory_pb_simplex.go",
+        "pkg/smtcore/theory_pb_simplex_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -135258,7 +135295,14 @@
         "TestSMTPBCompilationNetworkIndependentTruthOracle",
         "TestSMTPBCompilationThresholdRestartAndRollback",
         "TestSMTPBCompilationWeightedDefinitionsAndBaseFolding",
-        "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery"
+        "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery",
+        "TestSMTPBSimplexSharedRowsBoundConflictsAndRollback",
+        "TestSMTPBSimplexInfeasibleRowExplainsOnlyAssignedPredicates",
+        "TestSMTPBSimplexBoundTrailAndRepresentativeRemoval",
+        "TestSMTPBSimplexNestedPredicateKeepsBooleanAndSlackDistinct",
+        "TestSMTPBSimplexSignedWeightedValuationOracle",
+        "TestSMTPBSimplexFreshTranslationAndAuxiliaryTableaux",
+        "TestSMTPBSimplexPivotedScopedRowRemovalPreservesOuterRows"
       ],
       "assertions": [
         {
@@ -135336,7 +135380,7 @@
           ]
         },
         {
-          "name": "scope lifecycle: trail variable-watch numeric updates, restore mode/orientation and current variable watches after active literal-watch rollback, preserve untrailed argument permutations, delete scoped constraints and clear stale watch entries before Boolean IDs are reused",
+          "name": "scope lifecycle: trail variable-watch numeric updates, restore mode/orientation and current variable watches after active literal-watch rollback, preserve untrailed argument permutations, delete scoped constraints in reverse creation order so simplex aliases precede their representative owner, and clear stale watch entries before Boolean IDs are reused",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_pb_watch.go",
           "go_targets": [
@@ -135381,7 +135425,31 @@
           ]
         },
         {
-          "name": "optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
+          "name": "optional simplex integration: remove_negations representatives excluding bounds, shared integer rows and initialized Boolean bounds, update_bound/undo_bound/remove_var trails, exact assign_eh hook order, infeasible-row explanations and source theory-lemma conflicts, reverse scoped alias/owner deletion and simplex statistics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_simplex.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_simplex.go",
+            "pkg/smtcore/theory_pb_simplex_test.go",
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTPBSimplexSharedRowsBoundConflictsAndRollback",
+            "TestSMTPBSimplexInfeasibleRowExplainsOnlyAssignedPredicates",
+            "TestSMTPBSimplexBoundTrailAndRepresentativeRemoval",
+            "TestSMTPBSimplexNestedPredicateKeepsBooleanAndSlackDistinct",
+            "TestSMTPBSimplexSignedWeightedValuationOracle",
+            "TestSMTPBSimplexFreshTranslationAndAuxiliaryTableaux",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript",
+            "TestSMTPBSimplexPivotedScopedRowRemovalPreservesOuterRows"
+          ]
+        },
+        {
+          "name": "remaining TRACE/assertion and model/factory lifecycle audit",
           "status": "unported",
           "tests": []
         },
@@ -135446,16 +135514,18 @@
         "PB propagation owners retain the concrete originating inequality in addition to the ordinary theory-propagation owner. Scope ownership keeps that inequality valid while its reasons can be resolved. Each cutting-plane frame owns temporary marks, coefficients, guards and lemma storage; no persistent global mark leaks remain on refusal/error.",
         "Before actual source setup/first use an eager Go placeholder borrows its containing parameter owner; setup copies the four scalar controls and releases that borrow. Fresh plugins copy this installed value, independently of the current mutable driver and other plugin snapshots.",
         "Strengthened auxiliary lemmas own heap-marked theory-axiom objects, preserving their dynamic resolution-barrier type and surviving clause lifetime safely. Ordinary PB conflict lemmas retain the existing heap theory-lemma owner. Generated consequence definitions retain scoped assignment-dependent inputs instead of folding away their proof/core premises.",
-        "Pending compilation borrows concrete inequality pointers; pop removes deleted constraints after undo. Successful compilation installs ordinary scoped auxiliary clauses with region theory-axiom justifications; a scope undo restores compiled=false before native constraint deletion. SAT Boolean variables retain auxiliary AST names without recursive gate internalization. Network scratch is concrete native Go slices."
+        "Pending compilation borrows concrete inequality pointers; pop removes deleted constraints after undo. Successful compilation installs ordinary scoped auxiliary clauses with region theory-axiom justifications; a scope undo restores compiled=false before native constraint deletion. SAT Boolean variables retain auxiliary AST names without recursive gate internalization. Network scratch is concrete native Go slices.",
+        "The optional simplex workspace owns a concrete exact Solver, coefficient-only representative keys, per-predicate bound/slack records, initialized-variable membership and lower/upper literal explanation maps. The AST resource limit is borrowed. Bound trails own cloned prior infinitesimals and restore explanations; membership trails unset both bounds. Reverse constraint deletion removes row aliases before the owning representative; Close retires the trail before dropping the tableau. Translated and cached MBQI auxiliary plugins build independent fresh tableaus while preserving installed scalar controls."
       ],
       "deviations": [
         "The previous eager PB2BV wrapper and exhaustive valuation fallback are removed from this plugin. Native watches, weighted strengthening and source propagation-threshold/restart compilation now run on live PB atoms; the normal PB2BV rewriter remains available to its other retained consumers.",
         "Exact Go big.Rat values replace source rational/mpz storage and are copied when numeral ownership changes. The normalization implementation is concrete for SMTLiteral; no generic callback utility or STL internals are reproduced.",
         "An empty equality with a nonzero bound is folded to false before publishing a constraint. Literal source normalization can leave this impossible negative-bound case unresolved, and no variable callback exists to repair it; the direct Go internalizer regression enforces correct constant semantics.",
         "compile_arg now creates native auxiliary PB Booleans for nonowned arguments. Both source smt_model_generator.cpp mk_value_procs and Go discoverValueProcedures handle Boolean roots before sort-family model callbacks, so their model values use the Boolean assignment path. The prior claim that no retained Go producer creates auxiliary PB applications is superseded. The remaining model/factory registration/lifetime audit is not claimed complete.",
-        "Native weighted resolution, constructor snapshots and native restart-triggered sorting-network compilation are implemented. Optional simplex and remaining TRACE/assertion/model-factory lifecycle audits keep this unit partial.",
+        "Native weighted resolution, constructor snapshots, restart-triggered sorting-network compilation and optional shared-row simplex integration are implemented. Remaining TRACE/assertion and model/factory lifecycle audits keep this unit partial.",
         "Correctness correction for strengthened consequences: internalization retains the scoped false inputs of a residual PB predicate. Literal source folding can turn that definition into an axiom and discard premises needed by later Boolean learning. A pending-callback regression with 2*x+y+z+u>=3 verifies the residual definition, exact guarded learned clause and all original relation valuations; the literal-folding variant fails this regression.",
-        "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits."
+        "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits.",
+        "Correctness correction for nested PB expressions: source uses the same Boolean ID for a predicate and its numeric slack and explicitly notes that nesting is unsupported. A direct retained internalizer regression with A=(x+y>=2), B=(A+z=1), A/B true and z false fails under literal shared IDs with AST source precondition: B applies [0,1] to A's weighted sum. Distinct even Boolean and odd slack columns preserve nonnested relative ordering and SMT literal/core IDs while separating these roles. The corrected direct test passes. The prebuilt C++ CLI returns sat on the corresponding script because its outer preprocessing avoids that direct construction; no C++ wrong-output or teardown-defect exception is claimed for these new vectors."
       ]
     },
     {
@@ -248406,7 +248476,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 713.79,
     "checkout_held_unchanged": true,
-    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification; includes all prior datatype, equality/assumption, native PB watch, weighted resolution and control-snapshot increments, with prebuilt C++ comparisons enabled. Excludes the subsequent PB restart compilation/literal sorting-network and AST cardinality cost correction increment; its focused integration evidence is separate."
+    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification; includes all prior datatype, equality/assumption, native PB watch, weighted resolution and control-snapshot increments, with prebuilt C++ comparisons enabled. Excludes the subsequent PB restart compilation/literal sorting-network and AST cardinality cost correction increment; its focused integration evidence is separate. Also excludes the subsequent optional PB simplex integration and nested Boolean/slack identity correction, whose focused integration evidence is separate."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
