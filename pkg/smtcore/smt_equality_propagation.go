@@ -475,7 +475,7 @@ func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification 
 	if err := s.reinsertCongruenceParents(r1, r2, alreadyTarget); err != nil {
 		return fmt.Errorf("reinsert congruence parents: %w", err)
 	}
-	if s.quantifierManager != nil {
+	if s.quantifierManager != nil && s.quantifierManager.ematching && !s.quantifierManager.registry.Empty() {
 		s.quantifierManager.mam.AddEquality(r1, r2)
 	}
 	if err := s.propagateBooleanClass(r2); err != nil {

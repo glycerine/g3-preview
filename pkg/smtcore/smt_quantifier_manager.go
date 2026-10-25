@@ -17,46 +17,56 @@ import (
 // the Go SMT context. Pattern matching and model-based checking add instances
 // through Registry; this manager schedules and internalizes those instances.
 type SMTQuantifierManager struct {
-	state            *SMTInternalizerState
-	registry         *SMTQuantifierRegistry
-	rewriter         *rewriter.TheoryRewriter
-	checker          *SMTChecker
-	quick            *SMTQuickChecker
-	substitute       *SMTCachedVarSubstitution
-	builder          *SMTQIInstanceBuilder
-	mam              *SMTMAM
-	modelFinder      *SMTModelFinder
-	modelChecker     *SMTModelChecker
-	auxiliarySolver  smtAuxiliarySolverFactory
-	candidateModel   func() (*SMTModelGenerator, error)
-	acceptedModel    *SMTModelGenerator
-	activated        map[ast.ASTHandle]bool
-	activationTrail  []ast.ASTHandle
-	activationScopes []int
-	newEnodeHead     int
-	newEnodeScopes   []int
-	promoteUnsat     bool
-	ematching        bool
-	quickUnsat       bool
-	quickNotSat      bool
-	lazyQuick        bool
-	mbqi             bool
-	mbqiID           string
-	closed           bool
+	state                       *SMTInternalizerState
+	registry                    *SMTQuantifierRegistry
+	rewriter                    *rewriter.TheoryRewriter
+	checker                     *SMTChecker
+	quick                       *SMTQuickChecker
+	substitute                  *SMTCachedVarSubstitution
+	builder                     *SMTQIInstanceBuilder
+	mam                         *SMTMAM
+	lazyMAM                     *SMTMAM
+	modelFinder                 *SMTModelFinder
+	modelChecker                *SMTModelChecker
+	auxiliarySolver             smtAuxiliarySolverFactory
+	candidateModel              func() (*SMTModelGenerator, error)
+	acceptedModel               *SMTModelGenerator
+	activated                   map[ast.ASTHandle]bool
+	activationTrail             []ast.ASTHandle
+	activationScopes            []int
+	newEnodeHead                int
+	newEnodeScopes              []int
+	lazyMatchingIndex           uint32
+	lazyMatchingTrail           []uint32
+	lazyMatchingScopes          []int
+	maxEagerMultipatterns       uint32
+	maxLazyMultipatternMatching uint32
+	lazyInstantiation           bool
+	promoteUnsat                bool
+	ematching                   bool
+	quickUnsat                  bool
+	quickNotSat                 bool
+	lazyQuick                   bool
+	mbqi                        bool
+	mbqiID                      string
+	closed                      bool
 }
 
 type SMTQuantifierManagerConfig struct {
-	Ematching      bool
-	PromoteUnsat   bool
-	QuickUnsat     bool
-	QuickNotSat    bool
-	LazyQuick      bool
-	MBQI           bool
-	MaxCexs        uint32
-	MaxIterations  uint32
-	ForceTemplate  uint32
-	MBQIID         string
-	CandidateModel func() (*SMTModelGenerator, error)
+	MaxEagerMultipatterns       uint32
+	MaxLazyMultipatternMatching uint32
+	LazyInstantiation           bool
+	Ematching                   bool
+	PromoteUnsat                bool
+	QuickUnsat                  bool
+	QuickNotSat                 bool
+	LazyQuick                   bool
+	MBQI                        bool
+	MaxCexs                     uint32
+	MaxIterations               uint32
+	ForceTemplate               uint32
+	MBQIID                      string
+	CandidateModel              func() (*SMTModelGenerator, error)
 }
 
 func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRewriter, config SMTQuantifierManagerConfig) (*SMTQuantifierManager, error) {
@@ -89,6 +99,10 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 	if err != nil {
 		return nil, errors.Join(err, substitute.Close())
 	}
+	lazyMAM, err := NewSMTMAM(state, state.quantifiers)
+	if err != nil {
+		return nil, errors.Join(err, substitute.Close())
+	}
 	modelFinder, err := NewSMTModelFinder(state)
 	if err != nil {
 		return nil, errors.Join(err, substitute.Close())
@@ -96,8 +110,11 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 	modelFinder.SetForceTemplate(config.ForceTemplate)
 	result := &SMTQuantifierManager{
 		state: state, registry: state.quantifiers, rewriter: rw, checker: checker, quick: quick,
-		substitute: substitute, builder: builder, mam: mam, modelFinder: modelFinder, activated: make(map[ast.ASTHandle]bool),
-		promoteUnsat: config.PromoteUnsat, ematching: config.Ematching,
+		substitute: substitute, builder: builder, mam: mam, lazyMAM: lazyMAM, modelFinder: modelFinder, activated: make(map[ast.ASTHandle]bool),
+		maxEagerMultipatterns:       config.MaxEagerMultipatterns,
+		maxLazyMultipatternMatching: config.MaxLazyMultipatternMatching,
+		lazyInstantiation:           config.LazyInstantiation,
+		promoteUnsat:                config.PromoteUnsat, ematching: config.Ematching,
 		quickUnsat: config.QuickUnsat, quickNotSat: config.QuickNotSat, lazyQuick: config.LazyQuick,
 		mbqi: config.MBQI, mbqiID: config.MBQIID, candidateModel: config.CandidateModel,
 	}
@@ -174,6 +191,7 @@ func (q *SMTQuantifierManager) InitSearch() error {
 	if err := q.open(); err != nil {
 		return err
 	}
+	q.lazyMatchingIndex = 0
 	if q.acceptedModel != nil {
 		if err := q.acceptedModel.Close(); err != nil {
 			return err
@@ -198,7 +216,7 @@ func (q *SMTQuantifierManager) CanPropagate() bool {
 	if q == nil || q.closed || q.registry == nil {
 		return false
 	}
-	if q.registry.schedule.HasWork() || q.ematching && q.mam.HasWork() {
+	if q.registry.schedule.HasWork() || q.ematching && !q.registry.Empty() && q.mam.HasWork() {
 		return true
 	}
 	if q.hasNewEnodes() {
@@ -226,6 +244,7 @@ func (q *SMTQuantifierManager) notifyNewEnodes() {
 	}
 	for _, node := range q.state.enodeStack[q.newEnodeHead:] {
 		q.mam.Relevant(node)
+		q.lazyMAM.Relevant(node)
 	}
 	q.newEnodeHead = len(q.state.enodeStack)
 }
@@ -242,12 +261,40 @@ func (q *SMTQuantifierManager) activatePatterns() error {
 		if err != nil {
 			return err
 		}
+		hasUnary := false
 		for i := uint32(0); i < count; i++ {
 			pattern, err := q.state.manager.GetPattern(quantifier, i)
 			if err != nil {
 				return err
 			}
-			if err = q.mam.AddPattern(quantifier, pattern); err != nil {
+			terms, err := q.state.manager.GetNumArgs(pattern)
+			if err != nil {
+				return err
+			}
+			hasUnary = hasUnary || terms == 1
+		}
+		eagerLimit := q.maxEagerMultipatterns
+		if !hasUnary {
+			eagerLimit++
+		}
+		var multipatterns uint32
+		for i := uint32(0); i < count; i++ {
+			pattern, err := q.state.manager.GetPattern(quantifier, i)
+			if err != nil {
+				return err
+			}
+			terms, err := q.state.manager.GetNumArgs(pattern)
+			if err != nil {
+				return err
+			}
+			matcher := q.mam
+			if terms != 1 {
+				if multipatterns >= eagerLimit {
+					matcher = q.lazyMAM
+				}
+				multipatterns++
+			}
+			if err = matcher.AddPattern(quantifier, pattern); err != nil {
 				return err
 			}
 		}
@@ -264,12 +311,17 @@ func (q *SMTQuantifierManager) PushScope() error {
 	if err := q.mam.PushScope(); err != nil {
 		return err
 	}
+	if err := q.lazyMAM.PushScope(); err != nil {
+		return errors.Join(err, q.mam.PopScopes(1))
+	}
 	if err := q.modelFinder.PushScope(); err != nil {
 		_ = q.mam.PopScopes(1)
+		_ = q.lazyMAM.PopScopes(1)
 		return err
 	}
 	q.activationScopes = append(q.activationScopes, len(q.activationTrail))
 	q.newEnodeScopes = append(q.newEnodeScopes, q.newEnodeHead)
+	q.lazyMatchingScopes = append(q.lazyMatchingScopes, len(q.lazyMatchingTrail))
 	return nil
 }
 
@@ -285,6 +337,9 @@ func (q *SMTQuantifierManager) PopScopes(count uint32) error {
 	if err := q.mam.PopScopes(count); err != nil {
 		return err
 	}
+	if err := q.lazyMAM.PopScopes(count); err != nil {
+		return err
+	}
 	if err := q.modelFinder.PopScopes(count); err != nil {
 		return err
 	}
@@ -295,6 +350,12 @@ func (q *SMTQuantifierManager) PopScopes(count uint32) error {
 	q.activationScopes = q.activationScopes[:level]
 	q.newEnodeHead = q.newEnodeScopes[level]
 	q.newEnodeScopes = q.newEnodeScopes[:level]
+	for len(q.lazyMatchingTrail) > q.lazyMatchingScopes[level] {
+		last := len(q.lazyMatchingTrail) - 1
+		q.lazyMatchingIndex = q.lazyMatchingTrail[last]
+		q.lazyMatchingTrail = q.lazyMatchingTrail[:last]
+	}
+	q.lazyMatchingScopes = q.lazyMatchingScopes[:level]
 	return nil
 }
 
@@ -426,25 +487,15 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 		return SMTFinalCheckGiveUp, err
 	}
 	if !full {
+		if q.lazyInstantiation {
+			if err := q.matchLazyPatterns(); err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+		}
 		return SMTFinalCheckDone, nil
 	}
 	if q.registry.Empty() {
 		return SMTFinalCheckDone, nil
-	}
-	if err := q.activatePatterns(); err != nil {
-		return SMTFinalCheckGiveUp, err
-	}
-	q.notifyNewEnodes()
-	if q.ematching && q.mam.HasWork() {
-		if err := q.mam.Match(); err != nil {
-			return SMTFinalCheckGiveUp, err
-		}
-		if q.registry.schedule.HasWork() {
-			if err := q.Propagate(); err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-			return SMTFinalCheckContinue, nil
-		}
 	}
 	done, entries, err := q.registry.schedule.FinalCheck()
 	if err != nil {
@@ -453,7 +504,10 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 	if err = q.instantiate(entries); err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
-	if !done {
+	if err = q.matchLazyPatterns(); err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if !done || q.state.canPropagate() {
 		return SMTFinalCheckContinue, nil
 	}
 	if !q.lazyQuick {
@@ -466,6 +520,35 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 		}
 	}
 	return SMTFinalCheckDone, nil
+}
+
+// Source default_qm_plugin::final_check_quant rematches the separate lazy MAM
+// a bounded number of times. Each increment is trailed; init_search resets the
+// current counter without removing earlier scope trails.
+func (q *SMTQuantifierManager) matchLazyPatterns() error {
+	if !q.ematching || q.registry.Empty() || q.lazyMatchingIndex >= q.maxLazyMultipatternMatching {
+		return nil
+	}
+	if err := q.activatePatterns(); err != nil {
+		return err
+	}
+	if err := q.lazyMAM.Rematch(false); err != nil {
+		return err
+	}
+	q.lazyMatchingTrail = append(q.lazyMatchingTrail, q.lazyMatchingIndex)
+	q.lazyMatchingIndex++
+	return nil
+}
+
+func (q *SMTQuantifierManager) IsShared(node *SMTEnode) bool {
+	return q != nil && !q.closed && len(q.activated) != 0 && (q.mam.IsShared(node) || q.lazyMAM.IsShared(node))
+}
+
+func (q *SMTQuantifierManager) NotifyRelevant(node *SMTEnode) {
+	if q != nil && !q.closed && q.ematching && !q.registry.Empty() {
+		q.mam.Relevant(node)
+		q.lazyMAM.Relevant(node)
+	}
 }
 
 // Source quantifier_manager::check_model is called after ground final checking,
@@ -580,6 +663,7 @@ func (q *SMTQuantifierManager) Close() error {
 		q.closed = true
 		q.builder = nil
 		q.mam = nil
+		q.lazyMAM = nil
 		q.modelFinder = nil
 		q.modelChecker = nil
 		q.candidateModel = nil

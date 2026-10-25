@@ -30,7 +30,7 @@ func (t *SMTArrayTheory) sharedArrayNode(node *SMTEnode) (bool, error) {
 	if root.NumTheoryVars() > 1 {
 		return true, nil
 	}
-	if q := s.quantifierManager; q != nil && len(q.activated) != 0 && q.mam != nil && q.mam.IsShared(root) {
+	if q := s.quantifierManager; q != nil && q.IsShared(root) {
 		return true, nil
 	}
 	// Arrays implement multiple sort instances in the same family. A root

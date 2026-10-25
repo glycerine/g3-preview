@@ -29,7 +29,7 @@ func smtSharedArithmeticNode(owner *SMTTheoryBase, node *SMTEnode, division bool
 	if count > 1 {
 		return true, nil
 	}
-	if q := s.quantifierManager; q != nil && len(q.activated) != 0 && q.mam != nil && q.mam.IsShared(root) {
+	if q := s.quantifierManager; q != nil && q.IsShared(root) {
 		return true, nil
 	}
 	theory := root.theoryVariables.theory

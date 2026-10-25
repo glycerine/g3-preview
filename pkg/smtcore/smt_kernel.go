@@ -359,17 +359,20 @@ func (k *SMTKernel) configureQuantifiers(full *SMTParams, state SMTParamsState, 
 		return err
 	}
 	_, err = NewSMTQuantifierManager(k.internalizer, k.preprocessor, SMTQuantifierManagerConfig{
-		Ematching:      state.Ematching,
-		PromoteUnsat:   qi.PromoteUnsat,
-		QuickUnsat:     qi.QuickChecker >= 1,
-		QuickNotSat:    qi.QuickChecker >= 2,
-		LazyQuick:      qi.LazyQuickChecker,
-		MBQI:           qi.MBQI,
-		MaxCexs:        qi.MaxCexs,
-		MaxIterations:  qi.MaxIterations,
-		ForceTemplate:  qi.ForceTemplate,
-		MBQIID:         mbqiID,
-		CandidateModel: k.buildCandidateModelGenerator,
+		MaxEagerMultipatterns:       qi.MaxEagerMultipatterns,
+		MaxLazyMultipatternMatching: qi.MaxLazyMultipatternMatching,
+		LazyInstantiation:           qi.LazyInstantiation,
+		Ematching:                   state.Ematching,
+		PromoteUnsat:                qi.PromoteUnsat,
+		QuickUnsat:                  qi.QuickChecker >= 1,
+		QuickNotSat:                 qi.QuickChecker >= 2,
+		LazyQuick:                   qi.LazyQuickChecker,
+		MBQI:                        qi.MBQI,
+		MaxCexs:                     qi.MaxCexs,
+		MaxIterations:               qi.MaxIterations,
+		ForceTemplate:               qi.ForceTemplate,
+		MBQIID:                      mbqiID,
+		CandidateModel:              k.buildCandidateModelGenerator,
 	})
 	return err
 }
@@ -482,6 +485,9 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 			manager.mam.dirty = true
 		}
 		manager.ematching = paramsState.Ematching
+		manager.maxEagerMultipatterns = quantifiers.MaxEagerMultipatterns
+		manager.maxLazyMultipatternMatching = quantifiers.MaxLazyMultipatternMatching
+		manager.lazyInstantiation = quantifiers.LazyInstantiation
 		manager.registry.maxInstances = quantifiers.MaxInstances
 		manager.registry.schedule.lazyThreshold = float32(quantifiers.LazyThreshold)
 		// Source qi_queue caches its eager threshold and parsed cost/new-gen

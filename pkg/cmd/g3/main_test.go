@@ -336,6 +336,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"lazy_multipattern_scopes.smt2":                "unsat\nsat\n(((p c) true))\nunsat\nsat\n",
 	"mbqi_restart_cores_models_scopes.smt2":        "unsat\n(blocked_true)\nsat\n(((p true) true) ((p false) true))\nunsat\n(blocked_false)\nsat\n(((p true) true) ((p false) true))\n",
 	"check_base_conflict_repeated.smt2":            "unsat\nunsat\n()\nsat\nunsat\n(p)\nsat\n",
 	"setup_check_tactic_model_scopes.smt2":         "sat\n((x 7))\nunsat\nsat\n((x 7))\n",
