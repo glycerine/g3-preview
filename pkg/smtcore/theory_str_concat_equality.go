@@ -288,7 +288,8 @@ func (t *SMTStringTheory) simplifyStringConcatEquality(left, right ast.ASTHandle
 		}
 	}
 	allVariables := true
-	for _, expression := range []ast.ASTHandle{x, y, a, b} {
+	literals := [4]bool{}
+	for i, expression := range []ast.ASTHandle{x, y, a, b} {
 		if err := t.initializeStringCut(expression); err != nil {
 			return err
 		}
@@ -297,10 +298,14 @@ func (t *SMTStringTheory) simplifyStringConcatEquality(left, right ast.ASTHandle
 			return err
 		}
 		allVariables = allVariables && !literal
+		literals[i] = literal
 	}
 	if allVariables {
 		return t.arrangeVariableConcats(newLeft, newRight)
 	}
-	// Literal-boundary arrangement families 2 through 6 remain pending.
+	if literals == [4]bool{false, false, false, true} || literals == [4]bool{false, true, false, false} {
+		return t.arrangeLiteralSuffixConcats(newLeft, newRight)
+	}
+	// Literal-boundary arrangement families 3 through 6 remain pending.
 	return nil
 }

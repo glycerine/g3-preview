@@ -2813,6 +2813,7 @@
         "theory_str_regex_axioms.go",
         "theory_str_relations.go",
         "theory_str_setup.go",
+        "theory_str_suffix_arrangements.go",
         "theory_str_terms.go",
         "theory_str_unroll.go",
         "theory_utvpi.go",
