@@ -71,10 +71,7 @@ func (s *SMTInternalizerState) setEqualityConflict(justification SMTJustificatio
 	if err != nil {
 		return err
 	}
-	s.inconsistent = true
-	s.conflict = wrapper
-	s.conflictLiteral = literal
-	s.statistics.NumConflicts++
+	s.setBooleanConflict(wrapper, literal)
 	return nil
 }
 

@@ -117,3 +117,41 @@ func TestSMTBinaryClausePublicationAssignsDuringContinuation(t *testing.T) {
 		})
 	}
 }
+
+func TestSMTEqualityConflictRetainsEarlierBooleanConflict(t *testing.T) {
+	m := astTestManager(t)
+	_, values := smtUFConstants(t, m, "continued-equality", 2)
+	equality, err := m.MkEq(values[0], values[1])
+	astTestMust(t, err)
+	_, _, s := smtInternalizerFixture(t, m, nil)
+	astTestMust(t, s.Internalize(equality, false))
+	eq, err := s.Literal(equality)
+	astTestMust(t, err)
+	p := smtRelevancyBool(t, m, "earlier-boolean-conflict")
+	astTestMust(t, s.Internalize(p, true))
+	boolean, err := s.Literal(p)
+	astTestMust(t, err)
+	left, right := s.context.enodes[values[0]], s.context.enodes[values[1]]
+	astTestMust(t, s.PushScope())
+	astTestMust(t, s.AssignLiteral(eq.Negated(), NewSMTBooleanAxiom()))
+	astTestMust(t, s.addDisequality(left, right, eq.Negated()))
+	astTestMust(t, s.AssignLiteral(boolean, NewSMTBooleanAxiom()))
+	astTestMust(t, s.AssignLiteral(boolean.Negated(), NewSMTBooleanAxiom()))
+	first, ok := s.Conflict()
+	if !ok {
+		t.Fatal("missing initial Boolean conflict")
+	}
+	count := s.statistics.NumConflicts
+	astTestMust(t, s.addEquality(left, right, NewSMTEqualityAxiom()))
+	got, _ := s.Conflict()
+	if got != first || s.ConflictLiteral() != boolean || s.statistics.NumConflicts != count {
+		t.Fatal("later equality conflict replaced the first conflict", s.ConflictLiteral(), s.statistics.NumConflicts)
+	}
+	if left.root == right.root {
+		t.Fatal("contradicting equality merged disequal classes")
+	}
+	astTestMust(t, s.PopScopes(1))
+	if s.Inconsistent() || s.context.isDisequal(left, right) {
+		t.Fatal("continuation scope did not restore the parent")
+	}
+}
