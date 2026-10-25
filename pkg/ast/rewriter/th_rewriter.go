@@ -1132,6 +1132,16 @@ func (r *TheoryRewriter) Rewrite(term ast.ASTHandle, out ast.ASTRef) error {
 	return r.traversal.Rewrite(term, out)
 }
 
+// FreshDefault realizes a reached th_rewriter(manager) local constructor
+// using the same borrowed parameter services. Local options, substitutions,
+// solver callbacks and traversal state belong only to the original rewriter.
+func (r *TheoryRewriter) FreshDefault() (*TheoryRewriter, error) {
+	if err := r.open(); err != nil {
+		return nil, err
+	}
+	return NewTheoryRewriter(r.manager, r.context, r.globals, nil)
+}
+
 func (r *TheoryRewriter) RewriteWithProof(term ast.ASTHandle, out, proof ast.ASTRef) error {
 	if err := r.open(); err != nil {
 		return err

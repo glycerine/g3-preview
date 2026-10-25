@@ -299,6 +299,12 @@ func (t *SMTStringTheory) Propagate() error {
 					return ast.ErrASTDomain
 				}
 				switch op {
+				case 6:
+					err = t.instantiateSubstring(node)
+				case 7:
+					err = t.instantiateReplace(node)
+				case 8:
+					err = t.instantiateCharAt(node)
 				case 3, 4:
 					err = t.instantiateBoundaryRelation(node, op == 4)
 				case 5:

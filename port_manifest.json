@@ -37392,7 +37392,11 @@
         "pkg/ast/rewriter/th_rewriter.go",
         "pkg/ast/rewriter/th_rewriter_test.go",
         "pkg/ast/ast_rewriter_access.go",
-        "pkg/ast/rewriter/traversal.go"
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/smtcore/theory_str_extract.go",
+        "pkg/smtcore/theory_str_replace.go",
+        "pkg/smtcore/theory_str_library_extract_test.go",
+        "pkg/ast/rewriter/th_rewriter_fresh_default_test.go"
       ],
       "tests": [
         "TestTheoryRewriterCoreTraversalAcrossFamilies",
@@ -37404,7 +37408,12 @@
         "TestTheoryRewriterParameterDescriptions",
         "TestTheoryRewriterQuantifierReduction",
         "TestTheoryRewriterCloseGuards",
-        "TestTheoryRewriterProofTraversal"
+        "TestTheoryRewriterProofTraversal",
+        "TestSMTStringCharAtAxiomConcreteBoundsAndReduction",
+        "TestSMTStringSubstringAxiomsConcreteTruncationAndInvalidBounds",
+        "TestSMTStringReplaceAxiomsFirstOccurrenceAndNoMatch",
+        "TestSMTStringExtractionAndReplaceLibraryQueue",
+        "TestTheoryRewriterFreshDefaultIsolatesLocalSettingsAndLifetime"
       ],
       "conditionals": [
         {
@@ -37536,16 +37545,29 @@
             "TestTheoryRewriterProofTraversal",
             "TestTraversalProofCongruenceRewriteAndReflexivity"
           ]
+        },
+        {
+          "name": "FreshDefault retained Go parameter-service bridge for native th_rewriter(manager) local construction in String substring/replacement axioms; delegates the existing constructor with nil local options and independent traversal/configuration, without copying substitution or solver callbacks",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterFreshDefaultIsolatesLocalSettingsAndLifetime",
+            "TestSMTStringSubstringAxiomsConcreteTruncationAndInvalidBounds",
+            "TestSMTStringReplaceAxiomsFirstOccurrenceAndNoMatch",
+            "TestSMTStringExtractionAndReplaceLibraryQueue"
+          ]
         }
       ],
       "ownership": [
         "TheoryRewriter owns its copied ParamsRef snapshot, traversal, concrete configurable subrewriters and accumulated ASTDependency reference; it borrows ASTManager, parameter services, substitutions and the optional sequence solver.",
-        "Cleanup destroys and reconstructs traversal/configuration in source order while retaining the owned parameter snapshot. Temporary proof, quantifier and eliminated-result AST references are owning and released after publication."
+        "Cleanup destroys and reconstructs traversal/configuration in source order while retaining the owned parameter snapshot. Temporary proof, quantifier and eliminated-result AST references are owning and released after publication.",
+        "FreshDefault owns a new normal TheoryRewriter and borrows the same manager/global parameter services independently of the original rewriter owner. It inherits neither local options, substitution/solver callbacks nor traversal cache. The existing constructor may return a partial owner; actual String callers register cleanup before checking its error. No new constructor algorithm or simulated stack-owner allocation is credited."
       ],
       "deviations": [
         "Go named methods replace C++ operator overloads. Separate traversal constructors preserve explicit proof and no-proof call sites.",
         "The disabled #if 0 multi-argument unify_add experiment is intentionally not ported. Duplicate annotation filtering uses a native Go map while preserving first occurrence order.",
-        "The source cooperate call is represented by the existing AST budget/cancellation machinery; maximum memory and step failures retain the source callback points."
+        "The source cooperate call is represented by the existing AST budget/cancellation machinery; maximum memory and step failures retain the source callback points.",
+        "The native default-parameter constructor is now reached by concrete String substring/replacement consumers. Go exposes a thin FreshDefault service bridge so those consumers can construct an independent default rewriter using the context existing parameter service identities; no universal factory or unused template adapter is added."
       ]
     },
     {
@@ -37555,14 +37577,23 @@
       "status": "ported",
       "go_targets": [
         "pkg/ast/rewriter/th_rewriter.go",
-        "pkg/ast/rewriter/th_rewriter_test.go"
+        "pkg/ast/rewriter/th_rewriter_test.go",
+        "pkg/smtcore/theory_str_extract.go",
+        "pkg/smtcore/theory_str_replace.go",
+        "pkg/smtcore/theory_str_library_extract_test.go",
+        "pkg/ast/rewriter/th_rewriter_fresh_default_test.go"
       ],
       "tests": [
         "TestTheoryRewriterCoreTraversalAcrossFamilies",
         "TestTheoryRewriterParamsCacheCleanupAndBindings",
         "TestTheoryRewriterSubstitutionDependencies",
         "TestTheoryRewriterCloseGuards",
-        "TestTheoryRewriterProofTraversal"
+        "TestTheoryRewriterProofTraversal",
+        "TestSMTStringCharAtAxiomConcreteBoundsAndReduction",
+        "TestSMTStringSubstringAxiomsConcreteTruncationAndInvalidBounds",
+        "TestSMTStringReplaceAxiomsFirstOccurrenceAndNoMatch",
+        "TestSMTStringExtractionAndReplaceLibraryQueue",
+        "TestTheoryRewriterFreshDefaultIsolatesLocalSettingsAndLifetime"
       ],
       "conditionals": [
         {
@@ -37595,13 +37626,26 @@
           "tests": [
             "TestTheoryRewriterProofTraversal"
           ]
+        },
+        {
+          "name": "FreshDefault retained Go parameter-service bridge for native th_rewriter(manager) local construction in String substring/replacement axioms; delegates the existing constructor with nil local options and independent traversal/configuration, without copying substitution or solver callbacks",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/rewriter/th_rewriter.go",
+          "tests": [
+            "TestTheoryRewriterFreshDefaultIsolatesLocalSettingsAndLifetime",
+            "TestSMTStringSubstringAxiomsConcreteTruncationAndInvalidBounds",
+            "TestSMTStringReplaceAxiomsFirstOccurrenceAndNoMatch",
+            "TestSMTStringExtractionAndReplaceLibraryQueue"
+          ]
         }
       ],
       "ownership": [
-        "TheoryRewriter is a noncopyable Go owner of its parameter snapshot, concrete configuration and traversal. ASTManager, substitutions and sequence solver are borrowed."
+        "TheoryRewriter is a noncopyable Go owner of its parameter snapshot, concrete configuration and traversal. ASTManager, substitutions and sequence solver are borrowed.",
+        "FreshDefault owns a new normal TheoryRewriter and borrows the same manager/global parameter services independently of the original rewriter owner. It inherits neither local options, substitution/solver callbacks nor traversal cache. The existing constructor may return a partial owner; actual String callers register cleanup before checking its error. No new constructor algorithm or simulated stack-owner allocation is credited."
       ],
       "deviations": [
-        "Named Go methods replace overloads."
+        "Named Go methods replace overloads.",
+        "The native default-parameter constructor is now reached by concrete String substring/replacement consumers. Go exposes a thin FreshDefault service bridge so those consumers can construct an independent default rewriter using the context existing parameter service identities; no universal factory or unused template adapter is added."
       ]
     },
     {
@@ -139047,7 +139091,12 @@
         "pkg/smtcore/theory_str_prefix_arrangements.go",
         "pkg/smtcore/theory_str_prefix_arrangements_test.go",
         "pkg/smtcore/theory_str_literal_boundaries.go",
-        "pkg/smtcore/theory_str_literal_boundaries_test.go"
+        "pkg/smtcore/theory_str_literal_boundaries_test.go",
+        "pkg/smtcore/theory_str_extract.go",
+        "pkg/smtcore/theory_str_replace.go",
+        "pkg/smtcore/theory_str_library_extract_test.go",
+        "pkg/ast/rewriter/th_rewriter.go",
+        "pkg/ast/rewriter/th_rewriter_fresh_default_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139134,7 +139183,12 @@
         "TestSMTStringOpposingLiteralBoundariesCoreAndRollback",
         "TestSMTStringOpposingLiteralBoundaryBytesAndOverlapOrder",
         "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
-        "TestSMTStringOpposingBoundaryLoopAlternatives"
+        "TestSMTStringOpposingBoundaryLoopAlternatives",
+        "TestSMTStringCharAtAxiomConcreteBoundsAndReduction",
+        "TestSMTStringSubstringAxiomsConcreteTruncationAndInvalidBounds",
+        "TestSMTStringReplaceAxiomsFirstOccurrenceAndNoMatch",
+        "TestSMTStringExtractionAndReplaceLibraryQueue",
+        "TestTheoryRewriterFreshDefaultIsolatesLocalSettingsAndLifetime"
       ],
       "conditionals": [
         {
@@ -140303,6 +140357,35 @@
             "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
             "TestSMTStringOpposingBoundaryLoopAlternatives"
           ]
+        },
+        {
+          "name": "instantiate_axiom_CharAt complete reached initial axiom: ts0/ts1/ts2 decomposition, index bounds, one-byte middle/result reduction, configured context rewriting and duplicate suppression; active library operation 8 dispatch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_extract.go",
+          "tests": [
+            "TestSMTStringCharAtAxiomConcreteBoundsAndReduction",
+            "TestSMTStringExtractionAndReplaceLibraryQueue"
+          ]
+        },
+        {
+          "name": "instantiate_axiom_Substr complete reached three-case initial axioms: invalid position/count empty result, tail truncation and exact-width decomposition, native signed difference guards, default local rewriter, source witness order and duplicate suppression; active library operation 6 dispatch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_extract.go",
+          "tests": [
+            "TestSMTStringSubstringAxiomsConcreteTruncationAndInvalidBounds",
+            "TestSMTStringExtractionAndReplaceLibraryQueue",
+            "TestTheoryRewriterFreshDefaultIsolatesLocalSettingsAndLifetime"
+          ]
+        },
+        {
+          "name": "mk_contains constructor and instantiate_axiom_Replace complete reached initial axioms: eager containment setup/ownership, first-match decomposition and no-earlier-match prefix, result construction/no-match fallback, default local rewriting and separate result reduction, recursive queue growth and duplicate suppression; active library operation 7 dispatch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_replace.go",
+          "tests": [
+            "TestSMTStringReplaceAxiomsFirstOccurrenceAndNoMatch",
+            "TestSMTStringExtractionAndReplaceLibraryQueue",
+            "TestTheoryRewriterFreshDefaultIsolatesLocalSettingsAndLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -140321,7 +140404,8 @@
         "Concrete cut history is map[ASTHandle][]smtStringCut with native Go maps, signed levels and copy-on-higher-level membership. Project AST roots retain each reached seed/merge operand until owner Close; no C++ stack/map/allocation geometry is reproduced. Popped unreachable history maps are Go-managed, root/negative seeds and persistent witness membership/cache follow source behavior. Witness reuse refreshes enodes and basic queues without swapping reverse-key residuals. New nonempty strings have explicit empty-disequality/positive-length constraints, and the native integer flag is created despite its unused type-1 value. Local axiom roots are released forward after publication.",
         "Suffix-literal type 2 owns one nonempty String residual and the native unused integer flag in the existing concrete cache. Reverse-key reuse checks only the String membership, refreshes its enode and reasserts nonempty constraints. No -1 self-cut seed is introduced: the first allowed cut merges y then m into a new source-level frame; a suppressed overlap adds no witness cut frame. Literal crops use Go byte slices under the native predecessor range precondition; check-local AST roots survive until guarded publication and release forward.",
         "Prefix-literal family 3 reuses the retained single-residual/integer-flag cache without an initial witness self seed. Known and unknown positive cuts merge x then n at the theory level. Fixed prefix extraction uses Go byte slices after the native equality-consistency predecessor; temporary length/guard/crop AST roots survive until publication and release forward. Unknown literal alternatives preserve len(x)=len(crop_literal) expressions rather than substituting numeral text, and enum order/preference differs from suffix family 2.",
-        "Literal-prefix/suffix families 4/5 introduce no witness/cut state; their borrowed-variable/literal residuals and guarded Boolean formulas remain locally rooted through publication. Opposing family 6 reuses the concrete nonempty witness/native integer-flag cache without an initial seed and, as source requires, never merges cut origins into commonVar. Ordered byte-overlap slices replace std::list directly; no C++ string/list/container implementation is ported. Every overlap alternative retains native equality/length-expression order and local AST roots release forward."
+        "Literal-prefix/suffix families 4/5 introduce no witness/cut state; their borrowed-variable/literal residuals and guarded Boolean formulas remain locally rooted through publication. Opposing family 6 reuses the concrete nonempty witness/native integer-flag cache without an initial seed and, as source requires, never merges cut origins into commonVar. Ordered byte-overlap slices replace std::list directly; no C++ string/list/container implementation is ported. Every overlap alternative retains native equality/length-expression order and local AST roots release forward.",
+        "String extraction/replacement constructors root every temporary AST through rewrite and publication, retain the native named fresh String/integer witnesses, and release local vectors forward. Character-at borrows the configured context rewriter; substring/replacement own a reached fresh default rewriter borrowing only the existing manager/parameter services, with partial-owner cleanup delegated to the already ported constructor/destructor. Contains construction retains its term, internalizes it and recursively queues native setup immediately. No C++ string/container internals or universal callback layer is added."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140345,7 +140429,8 @@
         "All variable-concat family 1 branches are connected to actual equality dispatch. Initial cut-frame seeds preserve source -1 levels; pop removes nonzero frames whose level is >= the resulting scope, while level zero persists. The source empty-destination merge branch reads an invalid top; valid pop erases empty entries, and reached-state precondition errors remain explicit rather than inventing an empty-stack interpretation. Remaining tester dispatch, unroll/automata final processing and full final checking still prevent complete legacy String routing. Runner/C++ integration checks cover the existing production engine, while these focused tests exercise the distinct partial legacy owner directly.",
         "Known type-2 cropping relies on the retained new_eq_check length-consistency predecessor to reject deltas exceeding the literal; direct invalid extraction states return the existing domain/precondition error rather than executing an invalid unsigned/signed C++ extract. The actual-core oversized-crop regression proves refusal occurs before cache/arrangement creation. The unknown positive-cut branch has no added strict length inequalities: its nonempty witness supplies the native restriction. All byte positions 0..len(literal) are considered in source order, with original-string alignment at priority 0.5 and other feasible branches at 0.1. Complete legacy String routing/final checking remain pending.",
         "Prefix family 3 is connected to actual equality dispatch. Its known alignment honors StrongArrangements unlike family 2; when positive-cut feasibility fails, native negation is commented out and no new refusal is introduced. Literal-prefix splits precede the residual cut, full-prefix alignment gets priority 0.5, and other options 0.1. A native predecessor regression rejects a negative inferred crop before cache/arrangement construction. Tester dispatch, unroll/automata final processing and final checking remain pending; production QF_S routing is unchanged and passing existing production runner comparisons does not establish complete legacy String behavior.",
-        "All six active simplify_concat_equality arrangement families are implemented and connected. Family 6 includes every matching literal overlap in source order without a feasibility filter; even an impossible hypothetical crop remains in the branch list, and only the normal core constraints eliminate it. The positive-gap branch records no cut origins, preserving native behavior instead of generalizing families 1-3. Full legacy String remains partial because tester dispatch, additional unroll processing, library/conversion operations, automata final checks and full final checking remain incomplete. Production QF_S routing is unchanged and existing runner/C++ comparisons do not prove full legacy String behavior."
+        "All six active simplify_concat_equality arrangement families are implemented and connected. Family 6 includes every matching literal overlap in source order without a feasibility filter; even an impossible hypothetical crop remains in the branch list, and only the normal core constraints eliminate it. The positive-gap branch records no cut origins, preserving native behavior instead of generalizing families 1-3. Full legacy String remains partial because tester dispatch, additional unroll processing, library/conversion operations, automata final checks and full final checking remain incomplete. Production QF_S routing is unchanged and existing runner/C++ comparisons do not prove full legacy String behavior.",
+        "Reached library operations 6/7/8 now dispatch substring/replacement/character-at initial axioms instead of the previous unported-operation error. The raw first-occurrence constraints are preserved rather than replacing project algorithms with a modern concrete evaluator. Complete legacy String still requires index/conversion handlers, tester dispatch, additional unroll and automata/final checking. The native extended index-of source decomposes fresh head/tail strings rather than calling substring directly; it will reuse the reached containment constructor. Production QF_S routing is unchanged and FinalCheck remains GiveUp."
       ]
     },
     {
@@ -140399,7 +140484,12 @@
         "pkg/smtcore/theory_str_prefix_arrangements.go",
         "pkg/smtcore/theory_str_prefix_arrangements_test.go",
         "pkg/smtcore/theory_str_literal_boundaries.go",
-        "pkg/smtcore/theory_str_literal_boundaries_test.go"
+        "pkg/smtcore/theory_str_literal_boundaries_test.go",
+        "pkg/smtcore/theory_str_extract.go",
+        "pkg/smtcore/theory_str_replace.go",
+        "pkg/smtcore/theory_str_library_extract_test.go",
+        "pkg/ast/rewriter/th_rewriter.go",
+        "pkg/ast/rewriter/th_rewriter_fresh_default_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -140487,7 +140577,12 @@
         "TestSMTStringOpposingLiteralBoundariesCoreAndRollback",
         "TestSMTStringOpposingLiteralBoundaryBytesAndOverlapOrder",
         "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
-        "TestSMTStringOpposingBoundaryLoopAlternatives"
+        "TestSMTStringOpposingBoundaryLoopAlternatives",
+        "TestSMTStringCharAtAxiomConcreteBoundsAndReduction",
+        "TestSMTStringSubstringAxiomsConcreteTruncationAndInvalidBounds",
+        "TestSMTStringReplaceAxiomsFirstOccurrenceAndNoMatch",
+        "TestSMTStringExtractionAndReplaceLibraryQueue",
+        "TestTheoryRewriterFreshDefaultIsolatesLocalSettingsAndLifetime"
       ],
       "conditionals": [
         {
@@ -140974,6 +141069,35 @@
             "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
             "TestSMTStringOpposingBoundaryLoopAlternatives"
           ]
+        },
+        {
+          "name": "instantiate_axiom_CharAt complete reached initial axiom: ts0/ts1/ts2 decomposition, index bounds, one-byte middle/result reduction, configured context rewriting and duplicate suppression; active library operation 8 dispatch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_extract.go",
+          "tests": [
+            "TestSMTStringCharAtAxiomConcreteBoundsAndReduction",
+            "TestSMTStringExtractionAndReplaceLibraryQueue"
+          ]
+        },
+        {
+          "name": "instantiate_axiom_Substr complete reached three-case initial axioms: invalid position/count empty result, tail truncation and exact-width decomposition, native signed difference guards, default local rewriter, source witness order and duplicate suppression; active library operation 6 dispatch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_extract.go",
+          "tests": [
+            "TestSMTStringSubstringAxiomsConcreteTruncationAndInvalidBounds",
+            "TestSMTStringExtractionAndReplaceLibraryQueue",
+            "TestTheoryRewriterFreshDefaultIsolatesLocalSettingsAndLifetime"
+          ]
+        },
+        {
+          "name": "mk_contains constructor and instantiate_axiom_Replace complete reached initial axioms: eager containment setup/ownership, first-match decomposition and no-earlier-match prefix, result construction/no-match fallback, default local rewriting and separate result reduction, recursive queue growth and duplicate suppression; active library operation 7 dispatch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_replace.go",
+          "tests": [
+            "TestSMTStringReplaceAxiomsFirstOccurrenceAndNoMatch",
+            "TestSMTStringExtractionAndReplaceLibraryQueue",
+            "TestTheoryRewriterFreshDefaultIsolatesLocalSettingsAndLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -140993,7 +141117,8 @@
         "Concrete cut history is map[ASTHandle][]smtStringCut with native Go maps, signed levels and copy-on-higher-level membership. Project AST roots retain each reached seed/merge operand until owner Close; no C++ stack/map/allocation geometry is reproduced. Popped unreachable history maps are Go-managed, root/negative seeds and persistent witness membership/cache follow source behavior. Witness reuse refreshes enodes and basic queues without swapping reverse-key residuals. New nonempty strings have explicit empty-disequality/positive-length constraints, and the native integer flag is created despite its unused type-1 value. Local axiom roots are released forward after publication.",
         "Suffix-literal type 2 owns one nonempty String residual and the native unused integer flag in the existing concrete cache. Reverse-key reuse checks only the String membership, refreshes its enode and reasserts nonempty constraints. No -1 self-cut seed is introduced: the first allowed cut merges y then m into a new source-level frame; a suppressed overlap adds no witness cut frame. Literal crops use Go byte slices under the native predecessor range precondition; check-local AST roots survive until guarded publication and release forward.",
         "Prefix-literal family 3 reuses the retained single-residual/integer-flag cache without an initial witness self seed. Known and unknown positive cuts merge x then n at the theory level. Fixed prefix extraction uses Go byte slices after the native equality-consistency predecessor; temporary length/guard/crop AST roots survive until publication and release forward. Unknown literal alternatives preserve len(x)=len(crop_literal) expressions rather than substituting numeral text, and enum order/preference differs from suffix family 2.",
-        "Literal-prefix/suffix families 4/5 introduce no witness/cut state; their borrowed-variable/literal residuals and guarded Boolean formulas remain locally rooted through publication. Opposing family 6 reuses the concrete nonempty witness/native integer-flag cache without an initial seed and, as source requires, never merges cut origins into commonVar. Ordered byte-overlap slices replace std::list directly; no C++ string/list/container implementation is ported. Every overlap alternative retains native equality/length-expression order and local AST roots release forward."
+        "Literal-prefix/suffix families 4/5 introduce no witness/cut state; their borrowed-variable/literal residuals and guarded Boolean formulas remain locally rooted through publication. Opposing family 6 reuses the concrete nonempty witness/native integer-flag cache without an initial seed and, as source requires, never merges cut origins into commonVar. Ordered byte-overlap slices replace std::list directly; no C++ string/list/container implementation is ported. Every overlap alternative retains native equality/length-expression order and local AST roots release forward.",
+        "String extraction/replacement constructors root every temporary AST through rewrite and publication, retain the native named fresh String/integer witnesses, and release local vectors forward. Character-at borrows the configured context rewriter; substring/replacement own a reached fresh default rewriter borrowing only the existing manager/parameter services, with partial-owner cleanup delegated to the already ported constructor/destructor. Contains construction retains its term, internalizes it and recursively queues native setup immediately. No C++ string/container internals or universal callback layer is added."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141018,7 +141143,8 @@
         "All variable-concat family 1 branches are connected to actual equality dispatch. Initial cut-frame seeds preserve source -1 levels; pop removes nonzero frames whose level is >= the resulting scope, while level zero persists. The source empty-destination merge branch reads an invalid top; valid pop erases empty entries, and reached-state precondition errors remain explicit rather than inventing an empty-stack interpretation. Remaining tester dispatch, unroll/automata final processing and full final checking still prevent complete legacy String routing. Runner/C++ integration checks cover the existing production engine, while these focused tests exercise the distinct partial legacy owner directly.",
         "Known type-2 cropping relies on the retained new_eq_check length-consistency predecessor to reject deltas exceeding the literal; direct invalid extraction states return the existing domain/precondition error rather than executing an invalid unsigned/signed C++ extract. The actual-core oversized-crop regression proves refusal occurs before cache/arrangement creation. The unknown positive-cut branch has no added strict length inequalities: its nonempty witness supplies the native restriction. All byte positions 0..len(literal) are considered in source order, with original-string alignment at priority 0.5 and other feasible branches at 0.1. Complete legacy String routing/final checking remain pending.",
         "Prefix family 3 is connected to actual equality dispatch. Its known alignment honors StrongArrangements unlike family 2; when positive-cut feasibility fails, native negation is commented out and no new refusal is introduced. Literal-prefix splits precede the residual cut, full-prefix alignment gets priority 0.5, and other options 0.1. A native predecessor regression rejects a negative inferred crop before cache/arrangement construction. Tester dispatch, unroll/automata final processing and final checking remain pending; production QF_S routing is unchanged and passing existing production runner comparisons does not establish complete legacy String behavior.",
-        "All six active simplify_concat_equality arrangement families are implemented and connected. Family 6 includes every matching literal overlap in source order without a feasibility filter; even an impossible hypothetical crop remains in the branch list, and only the normal core constraints eliminate it. The positive-gap branch records no cut origins, preserving native behavior instead of generalizing families 1-3. Full legacy String remains partial because tester dispatch, additional unroll processing, library/conversion operations, automata final checks and full final checking remain incomplete. Production QF_S routing is unchanged and existing runner/C++ comparisons do not prove full legacy String behavior."
+        "All six active simplify_concat_equality arrangement families are implemented and connected. Family 6 includes every matching literal overlap in source order without a feasibility filter; even an impossible hypothetical crop remains in the branch list, and only the normal core constraints eliminate it. The positive-gap branch records no cut origins, preserving native behavior instead of generalizing families 1-3. Full legacy String remains partial because tester dispatch, additional unroll processing, library/conversion operations, automata final checks and full final checking remain incomplete. Production QF_S routing is unchanged and existing runner/C++ comparisons do not prove full legacy String behavior.",
+        "Reached library operations 6/7/8 now dispatch substring/replacement/character-at initial axioms instead of the previous unported-operation error. The raw first-occurrence constraints are preserved rather than replacing project algorithms with a modern concrete evaluator. Complete legacy String still requires index/conversion handlers, tester dispatch, additional unroll and automata/final checking. The native extended index-of source decomposes fresh head/tail strings rather than calling substring directly; it will reuse the reached containment constructor. Production QF_S routing is unchanged and FinalCheck remains GiveUp."
       ]
     },
     {
@@ -252129,14 +252255,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "4e157d484b690a7d00a10cddc48980906fd0d088",
+    "commit": "b73285021519be9cb153f785f2a09dfbea538976",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25T19:25:31.095189+00:00",
-    "completed_utc": "2026-10-25T19:39:15.353330+00:00",
+    "started_utc": "2026-10-25T20:30:47.858885+00:00",
+    "completed_utc": "2026-10-25T20:44:17.188555+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-4e157d48.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-4e157d48.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-4e157d48.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-b7328502.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-b7328502.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-b7328502.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -252152,9 +252278,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 703.402,
+    "lp_seconds": 688.389,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated 4e157d484b690a7d00a10cddc48980906fd0d088, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes prior containment, regex, concat/constant, parent folding, literal-core unroll processing, new true-equality propagation and the retained theory-aware strategy-6 queue/hint/lifecycle/display port and corrected source audit. Excludes subsequent concat-pair cancellation/known-length quick paths, child-length inference and the theory assumption/unsat-core validation integration, which have separate focused/native/debug evidence. The later variable-concat family 1 arrangements, cut histories and overlap-aware pair selection also have separate focused/integration evidence only. The subsequent family-2 literal-suffix arrangements likewise have focused/native/debug integration evidence only. Later family-3 literal-prefix arrangements are also excluded from this full-suite checkpoint. Subsequent families 4-6 literal-boundary arrangements are likewise excluded. The known ALL unconstrained containment sat-versus-unknown case remains pending. Full String equality/final checking and production backend routing remain incomplete."
+    "scope_warning": "Independently verified exact clean isolated b73285021519be9cb153f785f2a09dfbea538976, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes prior String containment/regex/unroll, core true-equality correction, theory-aware branching, theory assumptions/core validation, all six concat arrangement families, cut history lifecycle and overlap-aware pair selection through b7328502. Excludes subsequent character-at/substring/replacement initial library axioms and the fresh-default rewriter service bridge, which have separate focused/native/debug integration evidence. Known ALL unconstrained containment sat-versus-unknown remains pending. Full legacy String library/tester/unroll/automata/final checking and production backend routing remain incomplete."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
