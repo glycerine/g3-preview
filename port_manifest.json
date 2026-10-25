@@ -139346,7 +139346,9 @@
         "pkg/smtcore/theory_str_regex_stage_state.go",
         "pkg/smtcore/theory_str_regex_stage_test.go",
         "pkg/smtcore/theory_str_final_assigned.go",
-        "pkg/smtcore/theory_str_final_assigned_test.go"
+        "pkg/smtcore/theory_str_final_assigned_test.go",
+        "pkg/smtcore/theory_str_free_variable_order.go",
+        "pkg/smtcore/theory_str_free_variable_order_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139525,7 +139527,11 @@
         "TestSMTStringAssignedFinalCheckRequiresAssignedRegexPaths",
         "TestSMTStringAssignedFinalCheckConversionOrderAndContinuation",
         "TestSMTStringAssignedFinalCheckDoesNotHideLaterConversionError",
-        "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes"
+        "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes",
+        "TestSMTStringFreeVariableOrderPrivateRepresentativesAndRoles",
+        "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone",
+        "TestSMTStringFreeVariableOrderUsesRepresentativeDirectParents",
+        "TestSMTStringFreeVariableOrderInternalizesMissingCandidate"
       ],
       "conditionals": [
         {
@@ -141105,6 +141111,25 @@
           ]
         },
         {
+          "name": "get_var_in_eqc and process_free_var representative/leaf/standalone selection prefix: registered private-class members, regex exclusion, deduplication, direct-parent concat checks, standalone core-length probe and native leaf-before-alone visitation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
+          "tests": [
+            "TestSMTStringFreeVariableOrderPrivateRepresentativesAndRoles",
+            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone",
+            "TestSMTStringFreeVariableOrderUsesRepresentativeDirectParents",
+            "TestSMTStringFreeVariableOrderInternalizesMissingCandidate"
+          ]
+        },
+        {
+          "name": "input_var_in_len insertion in set_up_axioms at theory_str.cpp:8297-8305: requires String sort and is_length simultaneously; actual length terms have Int sort. No other retained producer exists, so omit unreachable cache storage and preserve its empty-set behavior in free-variable selection",
+          "status": "reference_only",
+          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
+          "tests": [
+            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone"
+          ]
+        },
+        {
           "name": "final_check_eh !needToAssignFreeVars branch: ordered dynamic stoi/itos conversion agreement, Continue after all callbacks if any progress, assigned-regex path completeness gate, then native Done",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_str_final_assigned.go",
@@ -141158,7 +141183,8 @@
         "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service.",
         "Concrete String automaton owners retain typed private label trees beside the public uint32 condition table. Product reconstructs the current input graphs (including compressed state IDs), acquires independent roots from both label domains before invoking the existing project product algorithm, and materializes new owned predicate conditions. Inputs may close immediately after construction; product chains retain roots until their own close. Unknown symbolic satisfiability and constructor failures close all acquired roots without changing input ownership. Manager/domain and closed-owner guards prevent invalid borrowed views. No universal callbacks, adapters or unused complement-from-existing-automaton operation are added.",
         "Regex stage storage uses concrete Go maps/slices for the actual retained positive unbounded automaton cache. Constructor products/complement automata acquire explicit ownership before cache publication; failed initial-bound guards preserve the native prior automaton/zero-cache writes. Formula caches borrow already retained axiom roots and witness handles; scoped registration flags pop while formulas/witnesses/automata/counters and word-keyed copied big.Int endpoint caches persist. Reuse refreshes existing witness enodes without replacing handles. Local formula frames release AST roots forward. Persisted conflicts and replay queues own separate roots; replay occurs after delayed setup and before search-gated delayed assertions. Destruction closes regex_automata forward in the body, later product owners forward after conversion roots and before contains roots, persisted replay/source vectors before delayed assertions, then nested expression kernel before the earlier AST trail. No template, STL or generic assumption adapter is added.",
-        "Assigned final checking borrows dependency-analysis handles and private String union-find classes; the collected free-variable slice owns no AST roots. Conversion agreement retains its existing callback-owned formula roots, scope-tracked agreement membership and dynamic append-aware conversion vector traversal. Assigned regex completeness reads scoped path membership without inventing model values or allocating unused decoy variables. Existing String model factories/procedures build assigned byte values after actual grounded kernel completion."
+        "Assigned final checking borrows dependency-analysis handles and private String union-find classes; the collected free-variable slice owns no AST roots. Conversion agreement retains its existing callback-owned formula roots, scope-tracked agreement membership and dynamic append-aware conversion vector traversal. Assigned regex completeness reads scoped path membership without inventing model values or allocating unused decoy variables. Existing String model factories/procedures build assigned byte values after actual grounded kernel completion.",
+        "Free-variable ordering borrows candidate/private-class AST handles, stores concrete temporary Go sets/slices and returns a borrowed visitation slice. Missing standalone enodes are internalized exactly at the source check; no invented variable registration, AST candidate values, generic assumption adapter or input-length cache is added. Private-class deduplication and direct representative-parent inspection remain separate; standalone unknown lengths retain the source aloneVars[-1] specialization."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141198,7 +141224,8 @@
         "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter.",
         "The cached-graph product bridge is directly checked against independent finite/cyclic/epsilon/disjoint/range/complement byte languages, live graph mutation after compression, parent-close and chained ownership, unknown-product cleanup and an actual nested SMT solver consumer over symbolic labels. Reuse the existing typed project product algorithm; this is ownership/representation support rather than new generic algorithm credit. Complete automata-stage construction/cache scheduling, retained assumptions and path/intersection final-check dispatch remain pending; source unit statuses and production routing are unchanged.",
         "The complete retained regex-automata stage now runs from actual FinalCheck after dependency/constant/length backpropagation. Preserve unconditional positive linear length axioms, source exact-path polarity/conflict rules, difficulty and effort counters, default-zero unknown endpoints, the disabled lower equality-or-next case, per-word intersection collection without an assignment filter and first cached-positive operand even for false/undefined membership. Later false or undefined operands use regex complement construction. Preserve epsilon-only versus empty-language consequences and persisted conflict replay. The regex_axiom_add FC_CONTINUE is commented out in native source; Go executes this stage then still gives up at the unported free-variable/tester/unroll/final-check suffix. Native unordered container traversal uses the existing deterministic Go handle ordering; per-word vector order is retained. Fresh-only logical cache variants are specialized by audited retained reachability, not fabricated assumption APIs. Production QF_S still selects SMTSequenceTheory; default CLI C++ comparisons do not establish complete legacy String solving. String source units remain partial.",
-        "Actual FinalCheck now continues after the regex stage into the full source free-variable scan and the no-free-variables conversion/path-completeness branch. It can return native Done for fully assigned cases, including a Boolean-only parent with a registered String owner and a grounded legacy String model; cases requiring free-variable testers still GiveUp pending that suffix. Five regressions cover all-variable versus dependency-root scanning, private constants and excluded roles, positive/negative/undefined assigned-regex path gates, disabled automata mode, complete ordered conversion traversal including later errors after earlier progress, unknown zero-split continuation and stable agreements, and actual kernel/model byte preservation. The ASCII grounded result/model is compared directly with the prebuilt C++ z3str3 backend when G3_CPP_REFERENCE is set; NUL/high bytes have independent Go byte checks. Updated older blanket-incomplete expectations for newly supported grounded cases; fixtures intended to test unresolved variables now perform their real set_up_axioms registration. Remaining free-variable selection/tester/unroll algorithms and production QF_S routing are unchanged. Source units remain partial."
+        "Actual FinalCheck now continues after the regex stage into the full source free-variable scan and the no-free-variables conversion/path-completeness branch. It can return native Done for fully assigned cases, including a Boolean-only parent with a registered String owner and a grounded legacy String model; cases requiring free-variable testers still GiveUp pending that suffix. Five regressions cover all-variable versus dependency-root scanning, private constants and excluded roles, positive/negative/undefined assigned-regex path gates, disabled automata mode, complete ordered conversion traversal including later errors after earlier progress, unknown zero-split continuation and stable agreements, and actual kernel/model byte preservation. The ASCII grounded result/model is compared directly with the prebuilt C++ z3str3 backend when G3_CPP_REFERENCE is set; NUL/high bytes have independent Go byte checks. Updated older blanket-incomplete expectations for newly supported grounded cases; fixtures intended to test unresolved variables now perform their real set_up_axioms registration. Remaining free-variable selection/tester/unroll algorithms and production QF_S routing are unchanged. Source units remain partial.",
+        "The process_free_var selection prefix and get_var_in_eqc are directly verified, preserving role asymmetry (regex candidates excluded here, internal candidates not independently filtered), dependency-count irrelevance, registered-private-class deduplication, direct-parent rather than whole-class concat checks, known-length priority, missing-enode internalization and unreachable String-sort length-registration behavior. Native unordered sets use existing deterministic Go handle order; only the actually produced aloneVars[-1] group is represented. This prefix is ready for the remaining length/value tester generator and is not yet wired into the unfinished free-variable dispatch; it does not establish complete tester generation or legacy String solving. Production routing and source unit statuses remain unchanged."
       ]
     },
     {
@@ -141291,7 +141318,9 @@
         "pkg/smtcore/theory_str_regex_stage_state.go",
         "pkg/smtcore/theory_str_regex_stage_test.go",
         "pkg/smtcore/theory_str_final_assigned.go",
-        "pkg/smtcore/theory_str_final_assigned_test.go"
+        "pkg/smtcore/theory_str_final_assigned_test.go",
+        "pkg/smtcore/theory_str_free_variable_order.go",
+        "pkg/smtcore/theory_str_free_variable_order_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -141471,7 +141500,11 @@
         "TestSMTStringAssignedFinalCheckRequiresAssignedRegexPaths",
         "TestSMTStringAssignedFinalCheckConversionOrderAndContinuation",
         "TestSMTStringAssignedFinalCheckDoesNotHideLaterConversionError",
-        "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes"
+        "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes",
+        "TestSMTStringFreeVariableOrderPrivateRepresentativesAndRoles",
+        "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone",
+        "TestSMTStringFreeVariableOrderUsesRepresentativeDirectParents",
+        "TestSMTStringFreeVariableOrderInternalizesMissingCandidate"
       ],
       "conditionals": [
         {
@@ -142369,6 +142402,25 @@
           ]
         },
         {
+          "name": "get_var_in_eqc and process_free_var representative/leaf/standalone selection prefix: registered private-class members, regex exclusion, deduplication, direct-parent concat checks, standalone core-length probe and native leaf-before-alone visitation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
+          "tests": [
+            "TestSMTStringFreeVariableOrderPrivateRepresentativesAndRoles",
+            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone",
+            "TestSMTStringFreeVariableOrderUsesRepresentativeDirectParents",
+            "TestSMTStringFreeVariableOrderInternalizesMissingCandidate"
+          ]
+        },
+        {
+          "name": "input_var_in_len insertion in set_up_axioms at theory_str.cpp:8297-8305: requires String sort and is_length simultaneously; actual length terms have Int sort. No other retained producer exists, so omit unreachable cache storage and preserve its empty-set behavior in free-variable selection",
+          "status": "reference_only",
+          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
+          "tests": [
+            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone"
+          ]
+        },
+        {
           "name": "final_check_eh !needToAssignFreeVars branch: ordered dynamic stoi/itos conversion agreement, Continue after all callbacks if any progress, assigned-regex path completeness gate, then native Done",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_str_final_assigned.go",
@@ -142423,7 +142475,8 @@
         "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service.",
         "Concrete String automaton owners retain typed private label trees beside the public uint32 condition table. Product reconstructs the current input graphs (including compressed state IDs), acquires independent roots from both label domains before invoking the existing project product algorithm, and materializes new owned predicate conditions. Inputs may close immediately after construction; product chains retain roots until their own close. Unknown symbolic satisfiability and constructor failures close all acquired roots without changing input ownership. Manager/domain and closed-owner guards prevent invalid borrowed views. No universal callbacks, adapters or unused complement-from-existing-automaton operation are added.",
         "Regex stage storage uses concrete Go maps/slices for the actual retained positive unbounded automaton cache. Constructor products/complement automata acquire explicit ownership before cache publication; failed initial-bound guards preserve the native prior automaton/zero-cache writes. Formula caches borrow already retained axiom roots and witness handles; scoped registration flags pop while formulas/witnesses/automata/counters and word-keyed copied big.Int endpoint caches persist. Reuse refreshes existing witness enodes without replacing handles. Local formula frames release AST roots forward. Persisted conflicts and replay queues own separate roots; replay occurs after delayed setup and before search-gated delayed assertions. Destruction closes regex_automata forward in the body, later product owners forward after conversion roots and before contains roots, persisted replay/source vectors before delayed assertions, then nested expression kernel before the earlier AST trail. No template, STL or generic assumption adapter is added.",
-        "Assigned final checking borrows dependency-analysis handles and private String union-find classes; the collected free-variable slice owns no AST roots. Conversion agreement retains its existing callback-owned formula roots, scope-tracked agreement membership and dynamic append-aware conversion vector traversal. Assigned regex completeness reads scoped path membership without inventing model values or allocating unused decoy variables. Existing String model factories/procedures build assigned byte values after actual grounded kernel completion."
+        "Assigned final checking borrows dependency-analysis handles and private String union-find classes; the collected free-variable slice owns no AST roots. Conversion agreement retains its existing callback-owned formula roots, scope-tracked agreement membership and dynamic append-aware conversion vector traversal. Assigned regex completeness reads scoped path membership without inventing model values or allocating unused decoy variables. Existing String model factories/procedures build assigned byte values after actual grounded kernel completion.",
+        "Free-variable ordering borrows candidate/private-class AST handles, stores concrete temporary Go sets/slices and returns a borrowed visitation slice. Missing standalone enodes are internalized exactly at the source check; no invented variable registration, AST candidate values, generic assumption adapter or input-length cache is added. Private-class deduplication and direct representative-parent inspection remain separate; standalone unknown lengths retain the source aloneVars[-1] specialization."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -142464,7 +142517,8 @@
         "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter.",
         "The cached-graph product bridge is directly checked against independent finite/cyclic/epsilon/disjoint/range/complement byte languages, live graph mutation after compression, parent-close and chained ownership, unknown-product cleanup and an actual nested SMT solver consumer over symbolic labels. Reuse the existing typed project product algorithm; this is ownership/representation support rather than new generic algorithm credit. Complete automata-stage construction/cache scheduling, retained assumptions and path/intersection final-check dispatch remain pending; source unit statuses and production routing are unchanged.",
         "The complete retained regex-automata stage now runs from actual FinalCheck after dependency/constant/length backpropagation. Preserve unconditional positive linear length axioms, source exact-path polarity/conflict rules, difficulty and effort counters, default-zero unknown endpoints, the disabled lower equality-or-next case, per-word intersection collection without an assignment filter and first cached-positive operand even for false/undefined membership. Later false or undefined operands use regex complement construction. Preserve epsilon-only versus empty-language consequences and persisted conflict replay. The regex_axiom_add FC_CONTINUE is commented out in native source; Go executes this stage then still gives up at the unported free-variable/tester/unroll/final-check suffix. Native unordered container traversal uses the existing deterministic Go handle ordering; per-word vector order is retained. Fresh-only logical cache variants are specialized by audited retained reachability, not fabricated assumption APIs. Production QF_S still selects SMTSequenceTheory; default CLI C++ comparisons do not establish complete legacy String solving. String source units remain partial.",
-        "Actual FinalCheck now continues after the regex stage into the full source free-variable scan and the no-free-variables conversion/path-completeness branch. It can return native Done for fully assigned cases, including a Boolean-only parent with a registered String owner and a grounded legacy String model; cases requiring free-variable testers still GiveUp pending that suffix. Five regressions cover all-variable versus dependency-root scanning, private constants and excluded roles, positive/negative/undefined assigned-regex path gates, disabled automata mode, complete ordered conversion traversal including later errors after earlier progress, unknown zero-split continuation and stable agreements, and actual kernel/model byte preservation. The ASCII grounded result/model is compared directly with the prebuilt C++ z3str3 backend when G3_CPP_REFERENCE is set; NUL/high bytes have independent Go byte checks. Updated older blanket-incomplete expectations for newly supported grounded cases; fixtures intended to test unresolved variables now perform their real set_up_axioms registration. Remaining free-variable selection/tester/unroll algorithms and production QF_S routing are unchanged. Source units remain partial."
+        "Actual FinalCheck now continues after the regex stage into the full source free-variable scan and the no-free-variables conversion/path-completeness branch. It can return native Done for fully assigned cases, including a Boolean-only parent with a registered String owner and a grounded legacy String model; cases requiring free-variable testers still GiveUp pending that suffix. Five regressions cover all-variable versus dependency-root scanning, private constants and excluded roles, positive/negative/undefined assigned-regex path gates, disabled automata mode, complete ordered conversion traversal including later errors after earlier progress, unknown zero-split continuation and stable agreements, and actual kernel/model byte preservation. The ASCII grounded result/model is compared directly with the prebuilt C++ z3str3 backend when G3_CPP_REFERENCE is set; NUL/high bytes have independent Go byte checks. Updated older blanket-incomplete expectations for newly supported grounded cases; fixtures intended to test unresolved variables now perform their real set_up_axioms registration. Remaining free-variable selection/tester/unroll algorithms and production QF_S routing are unchanged. Source units remain partial.",
+        "The process_free_var selection prefix and get_var_in_eqc are directly verified, preserving role asymmetry (regex candidates excluded here, internal candidates not independently filtered), dependency-count irrelevance, registered-private-class deduplication, direct-parent rather than whole-class concat checks, known-length priority, missing-enode internalization and unreachable String-sort length-registration behavior. Native unordered sets use existing deterministic Go handle order; only the actually produced aloneVars[-1] group is represented. This prefix is ready for the remaining length/value tester generator and is not yet wired into the unfinished free-variable dispatch; it does not establish complete tester generation or legacy String solving. Production routing and source unit statuses remain unchanged."
       ]
     },
     {
@@ -253575,14 +253629,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "e8b9d5e633b2a276798889dc43b01d3d1d192ecc",
+    "commit": "08e95d4b0bce97cd0871404e0aac5df6270aa368",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25T22:31:16.074720+00:00",
-    "completed_utc": "2026-10-25T22:44:56.542389+00:00",
+    "started_utc": "2026-10-25T23:31:38.419491+00:00",
+    "completed_utc": "2026-10-25T23:45:16.283896+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-e8b9d5e6.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-e8b9d5e6.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-e8b9d5e6.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-08e95d4b.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-08e95d4b.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-08e95d4b.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -253598,9 +253652,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 697.826,
+    "lp_seconds": 691.374,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated e8b9d5e633b2a276798889dc43b01d3d1d192ecc, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes all prior String dependency/constant/length backpropagation, regex length inference, concrete automaton owner and bound traversal, and retained finite nonzero path constraints through e8b9d5e6. Excludes subsequent regex complexity helpers, mixed-arithmetic bound readers and nested expression-solver integration, which have separate focused and affected-suite evidence. Known ALL unconstrained containment sat-versus-unknown remains pending. Full legacy String automata-stage dispatch, tester/unroll/final checking and production routing remain incomplete."
+    "scope_warning": "Independently verified exact clean isolated 08e95d4b0bce97cd0871404e0aac5df6270aa368, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes dependency/constant/length backpropagation, regex lengths, complexity and mixed-arithmetic bound readers, nested String expression kernel, concrete owned automaton products, finite paths and complete retained regex-stage FinalCheck dispatch through 08e95d4b. Excludes subsequent assigned-variable completion/conversion/path gates and free-variable tester-selection work, which have separate focused and affected-suite evidence. Known ALL unconstrained containment sat-versus-unknown remains pending. Remaining legacy String free-variable length/value testers and unroll/final-check suffix, and production routing remain incomplete."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
