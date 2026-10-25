@@ -264,8 +264,8 @@ func (t *SMTStringTheory) NewEquality(left, right SMTTheoryVar) error {
 	}
 	// Native handle_equality runs before merging. Initial concat shortcuts,
 	// consistency, coherence, grouping, concat cancellation/length quick
-	// paths, variable/suffix-literal arrangements, constant, parent and
-	// literal-unroll stages are connected; arrangement families 3-6 and
+	// paths, concat arrangement families 1-3, constant, parent and
+	// literal-unroll stages are connected; arrangement families 4-6 and
 	// the remaining unroll/tester processing remain open.
 	lhs, rhs := t.variables[left].Owner(), t.variables[right].Owner()
 	shortcut, err := t.stringConcatEqualityShortcut(lhs, rhs)

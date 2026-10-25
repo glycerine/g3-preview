@@ -30,7 +30,7 @@ func (t *SMTStringTheory) stringBoundaryWitness(left, right ast.ASTHandle) (ast.
 	if err != nil {
 		return variable, err
 	}
-	// Unlike type 1, native type 2 does not initialize a self-cut seed for
+	// Unlike type 1, native types 2/3 do not initialize a self-cut seed for
 	// this witness. Its first merge creates a frame containing just origins.
 	t.arrangementVars[key] = [3]ast.ASTHandle{variable, flag, {}}
 	return variable, nil

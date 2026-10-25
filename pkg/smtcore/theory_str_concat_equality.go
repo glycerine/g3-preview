@@ -306,6 +306,9 @@ func (t *SMTStringTheory) simplifyStringConcatEquality(left, right ast.ASTHandle
 	if literals == [4]bool{false, false, false, true} || literals == [4]bool{false, true, false, false} {
 		return t.arrangeLiteralSuffixConcats(newLeft, newRight)
 	}
-	// Literal-boundary arrangement families 3 through 6 remain pending.
+	if literals == [4]bool{true, false, false, false} || literals == [4]bool{false, false, true, false} {
+		return t.arrangeLiteralPrefixConcats(newLeft, newRight)
+	}
+	// Literal-boundary arrangement families 4 through 6 remain pending.
 	return nil
 }

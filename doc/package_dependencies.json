@@ -2809,6 +2809,7 @@
         "theory_str_nfa.go",
         "theory_str_overlap.go",
         "theory_str_parents.go",
+        "theory_str_prefix_arrangements.go",
         "theory_str_regex.go",
         "theory_str_regex_axioms.go",
         "theory_str_relations.go",
