@@ -84,6 +84,7 @@ digraph packages {
   "ast/rewriter" [style=filled, fillcolor="#eeeeee"];
   "ast/rewriter" -> "ast";
   "ast/rewriter" -> "ast/fpa";
+  "ast/rewriter" -> "math/automata";
   "ast/rewriter" -> "math/polynomial";
   "ast/rewriter" -> "util/diagnostic";
   "ast/rewriter" -> "util/lbool";
@@ -379,6 +380,7 @@ digraph packages {
   "smtcore" -> "ast/pattern";
   "smtcore" -> "ast/rewriter";
   "smtcore" -> "ast/rewriter/bit_blaster";
+  "smtcore" -> "math/automata";
   "smtcore" -> "math/euclid";
   "smtcore" -> "math/grobner";
   "smtcore" -> "math/simplex";

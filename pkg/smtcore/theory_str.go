@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"errors"
+	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/backtrack"
@@ -51,6 +52,7 @@ type SMTStringTheory struct {
 	regexTerms          map[ast.ASTHandle]struct{}
 	regexTermsByString  map[ast.ASTHandle][]ast.ASTHandle
 	regexNFACache       map[ast.ASTHandle]*smtStringNFA
+	regexLastLower      map[ast.ASTHandle]*big.Int
 	concatBreakFlags    map[[2]ast.ASTHandle]ast.ASTHandle
 	overlapAssumption   ast.ASTRef
 	cutHistory          map[ast.ASTHandle][]smtStringCut
@@ -91,6 +93,7 @@ func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStri
 	t.regexTerms = make(map[ast.ASTHandle]struct{})
 	t.regexTermsByString = make(map[ast.ASTHandle][]ast.ASTHandle)
 	t.regexNFACache = make(map[ast.ASTHandle]*smtStringNFA)
+	t.regexLastLower = make(map[ast.ASTHandle]*big.Int)
 	t.concatBreakFlags = make(map[[2]ast.ASTHandle]ast.ASTHandle)
 	t.cutHistory = make(map[ast.ASTHandle][]smtStringCut)
 	t.arrangementVars = make(map[[2]ast.ASTHandle][3]ast.ASTHandle)
@@ -388,6 +391,7 @@ func (t *SMTStringTheory) Close() (result error) {
 	t.variableScopes, t.axiomatized = nil, nil
 	t.containsByPair, t.containsIndex = nil, nil
 	t.regexVariables, t.regexTerms, t.regexNFACache = nil, nil, nil
+	t.regexLastLower = nil
 	t.regexMemberships, t.regexTermsByString = nil, nil
 	t.concatBreakFlags = nil
 	t.cutHistory, t.arrangementVars = nil, nil
