@@ -575,6 +575,45 @@ func (p *commandParser) sort() (ast.ASTHandle, error) {
 		}
 		return p.pin(m.MkArraySort(ast.SliceArguments(sorts[:len(sorts)-1]), sorts[len(sorts)-1]))
 	}
+	if name == "Seq" || name == "RegEx" {
+		if !p.context.BuiltinSortAvailable(name) {
+			return ast.ASTHandle{}, fmt.Errorf("unknown sort %s", name)
+		}
+		var sorts []ast.ASTHandle
+		for p.token != RightParenToken {
+			value, err := p.sort()
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			sorts = append(sorts, value)
+		}
+		if len(sorts) != 1 {
+			if name == "Seq" {
+				return ast.ASTHandle{}, fmt.Errorf("Invalid sequence sort, expecting one parameter")
+			}
+			return ast.ASTHandle{}, fmt.Errorf("Invalid regex sort, expecting one parameter")
+		}
+		if err = p.expect(RightParenToken); err != nil {
+			return ast.ASTHandle{}, err
+		}
+		family, err := m.SequenceFamilyID()
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		parameter, err := m.NewParameterAST(sorts[0])
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		kind := int32(0)
+		if name == "RegEx" {
+			kind = 1
+		}
+		value, err := m.MkFamilySort(family, kind, []ast.ASTParameter{parameter})
+		if err = errors.Join(err, m.DelParameter(&parameter)); err != nil {
+			return ast.ASTHandle{}, err
+		}
+		return p.pin(value, nil)
+	}
 	return ast.ASTHandle{}, fmt.Errorf("unsupported sort constructor %s", name)
 }
 

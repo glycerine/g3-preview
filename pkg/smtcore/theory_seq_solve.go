@@ -2,7 +2,12 @@
 // add_solution, solve_eqs, solve_eq, canonize and expand.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
+)
 
 func (t *SMTSequenceTheory) expandWordExpression(expression ast.ASTHandle, dependency *smtSequenceDependency, visiting map[ast.ASTHandle]struct{}) ([]ast.ASTHandle, *smtSequenceDependency, error) {
 	state, err := t.State()
@@ -519,6 +524,122 @@ func (t *SMTSequenceTheory) reduceEqualLengthBoundary(index int, id uint32, left
 	return false, false, nil
 }
 
+// Source is_var/solve_unit_eq also accepts the retained sequence Skolems.
+// Solve these immediately so a forced empty tail is installed before lazy
+// negative-containment callbacks can expose another tail.
+func (t *SMTSequenceTheory) solveSequenceSkolemEquality(left, right ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
+	for _, pair := range [][2]ast.ASTHandle{{left, right}, {right, left}} {
+		op, own, err := t.operation(pair[0])
+		if err != nil {
+			return false, err
+		}
+		if !own || op != 42 {
+			continue
+		}
+		cyclic, err := t.occurs(pair[0], []ast.ASTHandle{pair[1]})
+		if err != nil {
+			return false, err
+		}
+		if !cyclic {
+			return t.addSolution(pair[0], pair[1], dependency)
+		}
+	}
+	return false, nil
+}
+
+// Source simplify_eq/reduce_eq publishes scalar side equations before any
+// egraph cancellation can discard equal unit applications and their elements.
+func (t *SMTSequenceTheory) reduceRewriterEquation(index int, id uint32, left, right []ast.ASTHandle, dependency *smtSequenceDependency) (reduced, progress bool, result error) {
+	state, err := t.State()
+	if err != nil {
+		return false, false, err
+	}
+	parts := left
+	if len(parts) == 0 {
+		parts = right
+	}
+	if len(parts) == 0 {
+		return false, false, nil
+	}
+	sort, err := state.manager.GetSort(parts[0])
+	if err != nil {
+		return false, false, err
+	}
+	lhs, err := t.makeWord(left, sort)
+	if err != nil {
+		return false, false, err
+	}
+	rhs, err := t.makeWord(right, sort)
+	if err != nil {
+		return false, false, err
+	}
+	rw, err := rewriter.NewSequenceRewriter(state.manager)
+	if err != nil {
+		return false, false, err
+	}
+	reduction, err := rw.ReduceEquality(lhs, rhs)
+	if err != nil {
+		return false, false, err
+	}
+	defer func() { result = errors.Join(result, reduction.Close()) }()
+	if reduction.Inconsistent {
+		err := t.setDependencyConflict(dependency)
+		return true, state.Inconsistent(), err
+	}
+	if !reduction.Changed {
+		return false, false, nil
+	}
+	before := state.searchProgress()
+	for i, l := range reduction.EqualitiesLeft {
+		r := reduction.EqualitiesRight[i]
+		sort, err := state.manager.GetSort(l)
+		if err != nil {
+			return false, false, err
+		}
+		sequence, regex, err := t.sequenceSort(sort)
+		if err != nil {
+			return false, false, err
+		}
+		if sequence || regex {
+			solved, err := t.solveUnitWord([]ast.ASTHandle{l}, []ast.ASTHandle{r}, dependency)
+			if err != nil {
+				return false, false, err
+			}
+			if !solved {
+				solved, err = t.solveSequenceSkolemEquality(l, r, dependency)
+				if err != nil {
+					return false, false, err
+				}
+			}
+			if !solved {
+				ls, err := state.manager.SequenceFlattenConcat(l)
+				if err != nil {
+					return false, false, err
+				}
+				rs, err := state.manager.SequenceFlattenConcat(r)
+				if err != nil {
+					return false, false, err
+				}
+				if err = t.equations.Push(t.nextEquation, ls, rs, dependency); err != nil {
+					return false, false, err
+				}
+				t.nextEquation++
+			}
+		} else if _, err = t.propagateWordEquality(l, r, dependency); err != nil {
+			return false, false, err
+		}
+		if state.Inconsistent() {
+			return true, true, nil
+		}
+	}
+	if len(reduction.Left) != 0 || len(reduction.Right) != 0 {
+		err = t.equations.Set(index, id, reduction.Left, reduction.Right, dependency)
+	} else {
+		err = t.removeEquation(index)
+	}
+	return true, state.Inconsistent() || state.searchProgress() != before, err
+}
+
 func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 	for index := 0; index < t.equations.Len(); index++ {
 		id, left, right, dependency, err := t.equations.At(index)
@@ -534,6 +655,17 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 			return false, err
 		}
 		dependency = rightDependency
+		reduced, progress, err := t.reduceRewriterEquation(index, id, left, right, dependency)
+		if err != nil {
+			return false, err
+		}
+		if reduced {
+			if progress {
+				return true, nil
+			}
+			index--
+			continue
+		}
 		left, right, dependency, changed, conflict, err := t.cancelWordBoundaries(left, right, dependency)
 		if err != nil {
 			return false, err
@@ -602,7 +734,7 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 			index--
 			continue
 		}
-		reduced, err := t.addTailEmptyMaximum(left, right)
+		reduced, err = t.addTailEmptyMaximum(left, right)
 		if err != nil || reduced {
 			return reduced, err
 		}
@@ -614,7 +746,7 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if err != nil || rejected {
 			return rejected, err
 		}
-		reduced, progress, err := t.reduceEqualLengthBoundary(index, id, left, right, dependency)
+		reduced, progress, err = t.reduceEqualLengthBoundary(index, id, left, right, dependency)
 		if err != nil {
 			return false, err
 		}

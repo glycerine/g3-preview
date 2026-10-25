@@ -2,7 +2,10 @@
 // containment witnesses plus propagate_non_empty guards.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
+)
 
 func (t *SMTSequenceTheory) relationSkolem(name string, arguments []ast.ASTHandle, sort ast.ASTHandle) (ast.ASTHandle, error) {
 	state, err := t.State()
@@ -28,9 +31,6 @@ func (t *SMTSequenceTheory) addNegativeContainsStep(expression ast.ASTHandle) er
 		}
 		return ast.ErrASTDomain
 	}
-	if err = t.addSequenceCoherenceAxiom(source); err != nil {
-		return err
-	}
 	sort, err := state.manager.GetSort(source)
 	if err != nil {
 		return err
@@ -41,6 +41,33 @@ func (t *SMTSequenceTheory) addNegativeContainsStep(expression ast.ASTHandle) er
 	}
 	sourceEmpty, err := state.manager.MkEq(source, empty)
 	if err != nil {
+		return err
+	}
+	if err = state.Internalize(sourceEmpty, false); err != nil {
+		return err
+	}
+	literal, err := state.Literal(sourceEmpty)
+	if err != nil {
+		return err
+	}
+	value, err := state.Assignment(literal)
+	if err != nil || value == lbool.True {
+		return err
+	}
+	if value == lbool.Undef {
+		if err = state.markRelevant(sourceEmpty); err != nil {
+			return err
+		}
+		data, err := state.BooleanData(literal.Var())
+		if err != nil {
+			return err
+		}
+		// Source add_contains2contains forces the empty phase and retries
+		// after that decision, before exposing the recursive tail atom.
+		data.PhaseAvailable, data.Phase = true, !literal.Sign()
+		return nil
+	}
+	if err = t.addSequenceCoherenceAxiom(source); err != nil {
 		return err
 	}
 	zero, err := t.integer(0)

@@ -370,6 +370,12 @@ func (c *Context) LookupSort(name string) (ast.ASTHandle, error) {
 	if !c.BuiltinSortAvailable(name) {
 		return ast.ASTHandle{}, fmt.Errorf("unknown sort %s", name)
 	}
+	if name == "Seq" {
+		return ast.ASTHandle{}, fmt.Errorf("Invalid sequence sort, expecting one parameter")
+	}
+	if name == "RegEx" {
+		return ast.ASTHandle{}, fmt.Errorf("Invalid regex sort, expecting one parameter")
+	}
 	if name == "Bool" {
 		return m.MkBoolSort()
 	}

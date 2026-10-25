@@ -551,6 +551,37 @@ func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) error {
 	if left == right {
 		return nil
 	}
+	_, leftUnit, err := state.manager.SequenceUnitArgument(left)
+	if err != nil {
+		return err
+	}
+	_, rightUnit, err := state.manager.SequenceUnitArgument(right)
+	if err != nil {
+		return err
+	}
+	if sequence && (leftUnit || rightUnit) {
+		solved, err := t.solveUnitWord([]ast.ASTHandle{left}, []ast.ASTHandle{right}, dependency)
+		if err != nil || solved {
+			return err
+		}
+		solved, err = t.solveSequenceSkolemEquality(left, right, dependency)
+		if err != nil || solved {
+			return err
+		}
+		leftParts, err := state.manager.SequenceFlattenConcat(left)
+		if err != nil {
+			return err
+		}
+		rightParts, err := state.manager.SequenceFlattenConcat(right)
+		if err != nil {
+			return err
+		}
+		if err = t.equations.Push(t.nextEquation, leftParts, rightParts, dependency); err != nil {
+			return err
+		}
+		t.nextEquation++
+		return nil
+	}
 	distinct, bothConcrete, err := t.concreteDistinct(left, right)
 	if err != nil {
 		return err
@@ -1057,6 +1088,24 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	}
 	if conflict {
 		return SMTFinalCheckContinue, nil
+	}
+	for i := 0; i < t.nonContains.Len(); i++ {
+		expression, _, err := t.nonContains.At(i)
+		if err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
+		if err = t.addNegativeContainsStep(expression); err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
+	}
+	if t.nonContains.Len() != 0 && t.axioms.Pending() {
+		progress, err = propagateAxioms(true)
+		if err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
+		if progress {
+			return SMTFinalCheckContinue, nil
+		}
 	}
 	progress, err = t.solveWordEquations()
 	if err != nil {

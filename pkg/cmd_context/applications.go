@@ -129,7 +129,7 @@ func (c *Context) BuiltinSortAvailable(name string) bool {
 		return c.logic == "" || solver.LogicHasBitVector(c.logic)
 	case "Array":
 		return c.logic == "" || solver.LogicHasArray(c.logic)
-	case "String", "StringSequence":
+	case "String", "StringSequence", "Seq", "RegEx":
 		return c.logic == "" || solver.LogicHasSequence(c.logic)
 	}
 	return false
