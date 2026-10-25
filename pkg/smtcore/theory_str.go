@@ -334,10 +334,21 @@ func (t *SMTStringTheory) PopScopes(count uint32) error {
 }
 
 func (t *SMTStringTheory) FinalCheck() (SMTFinalCheckStatus, error) {
-	_, err := t.State()
-	// Remaining native equality/library/final-check stages are incomplete.
-	// This owner must not turn an incomplete port into SAT.
-	return SMTFinalCheckGiveUp, err
+	analysis, err := t.analyzeStringDependencies()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if added, err := t.backpropagateStringConstants(analysis); err != nil || added {
+		return SMTFinalCheckContinue, err
+	}
+	if added, err := t.propagateStringLengths(); err != nil || added {
+		return SMTFinalCheckContinue, err
+	}
+	// Native deferred consistency/progress flags are initialized false and
+	// never assigned. Scope diagnostics are trace-only. The reached prefix
+	// above preserves analysis -> constants -> lengths; regex/free-variable/
+	// tester/unroll stages remain open, so this owner must not report SAT.
+	return SMTFinalCheckGiveUp, nil
 }
 
 func (t *SMTStringTheory) Close() (result error) {

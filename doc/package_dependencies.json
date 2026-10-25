@@ -2797,6 +2797,7 @@
         "theory_str_arrangements.go",
         "theory_str_assumptions.go",
         "theory_str_axioms.go",
+        "theory_str_backpropagation.go",
         "theory_str_concat_classes.go",
         "theory_str_concat_constant.go",
         "theory_str_concat_equality.go",
