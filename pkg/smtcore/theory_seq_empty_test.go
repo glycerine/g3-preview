@@ -1074,6 +1074,7 @@ func TestSMTSequenceTheoryExposesExtensionalityEquality(t *testing.T) {
 	astTestMust(t, state.RegisterTheory(theory))
 	astTestMust(t, state.Internalize(x, false))
 	astTestMust(t, state.Internalize(y, false))
+	smtSequenceInterfaceFixture{m: m, theory: theory, state: state, sort: sort}.parent(t, y)
 	astTestMust(t, context.SetRelevant(x, true))
 	astTestMust(t, context.SetRelevant(y, true))
 	status, err := theory.FinalCheck()

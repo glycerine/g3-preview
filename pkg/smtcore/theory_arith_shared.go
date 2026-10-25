@@ -8,40 +8,67 @@ func (t *SMTLinearArithmeticTheory) sharedArithmeticNode(node *SMTEnode) (bool, 
 	return smtSharedArithmeticNode(t.SMTTheoryBase, node, len(t.divisionTerms) != 0)
 }
 
-func smtSharedArithmeticNode(owner *SMTTheoryBase, node *SMTEnode, division bool) (bool, error) {
+// Source context::is_shared common cases. consultTheory is true only for a
+// single-theory class whose owner-specific sharing rule remains to be checked.
+func (s *SMTInternalizerState) sharedTheoryNode(node *SMTEnode) (shared, consultTheory bool, result error) {
+	if err := s.open(); err != nil {
+		return false, false, err
+	}
+	if node == nil || node.manager != s.manager || node.root == nil {
+		return false, false, ast.ErrASTDomain
+	}
 	root := node.root
-	s := owner.state
 	family, err := s.manager.GetFamilyID(root.owner)
 	if err != nil {
-		return false, err
+		return false, false, err
 	}
-	kind, err := s.manager.GetDeclKind(root.owner)
-	if err != nil {
-		return false, err
-	}
-	if family == s.manager.BasicFamilyID() && kind == ast.ASTOpIte {
-		return true, nil
+	if family == s.manager.BasicFamilyID() {
+		kind, err := s.manager.GetDeclKind(root.owner)
+		if err != nil {
+			return false, false, err
+		}
+		if kind == ast.ASTOpIte {
+			return true, false, nil
+		}
 	}
 	count := root.NumTheoryVars()
 	if count == 0 {
-		return false, nil
+		return false, false, nil
 	}
 	if count > 1 {
-		return true, nil
+		return true, false, nil
 	}
 	if q := s.quantifierManager; q != nil && q.IsShared(root) {
-		return true, nil
+		return true, false, nil
 	}
 	theory := root.theoryVariables.theory
 	for _, parent := range root.parents {
 		family, err := s.manager.GetFamilyID(parent.owner)
 		if err != nil {
-			return false, err
+			return false, false, err
 		}
 		if family != theory && family != s.manager.BasicFamilyID() {
-			return true, nil
+			return true, false, nil
 		}
-		if family == owner.FamilyID() && division {
+	}
+	return false, true, nil
+}
+
+func smtSharedArithmeticNode(owner *SMTTheoryBase, node *SMTEnode, division bool) (bool, error) {
+	s, err := owner.State()
+	if err != nil {
+		return false, err
+	}
+	shared, consult, err := s.sharedTheoryNode(node)
+	if err != nil || !consult || !division {
+		return shared, err
+	}
+	for _, parent := range node.root.parents {
+		family, err := s.manager.GetFamilyID(parent.owner)
+		if err != nil {
+			return false, err
+		}
+		if family == owner.FamilyID() {
 			kind, err := s.manager.GetDeclKind(parent.owner)
 			if err != nil {
 				return false, err

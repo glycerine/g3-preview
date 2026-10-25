@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"quant_seq_shared_boolean_scopes.smt2":        "unsat\nsat\n(((= x z) true) ((= x y) false) ((= (f x) (f z)) true) ((= (f x) (f y)) false))\nunsat\n",
 	"quant_seq_explanation_scopes.smt2":            "unsat\n(associative_words)\nunsat\nsat\n",
 	"quant_seq_unit_disequality_scopes.smt2":       "unsat\n(head words tail)\nsat\nsat\nunsat\n",
 	"quant_seq_residual_evidence_scopes.smt2":      "unsat\n(tails words prefixes)\nsat\nunsat\nsat\n",

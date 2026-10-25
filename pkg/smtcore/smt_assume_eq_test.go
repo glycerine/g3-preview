@@ -7,6 +7,30 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
+func TestSMTSharedTheoryNodeIteAndUnownedRoots(t *testing.T) {
+	m := astTestManager(t)
+	_, values := smtUFConstants(t, m, "shared-unowned", 2)
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	condition := smtRelevancyBool(t, m, "shared-ite-condition")
+	expression, err := m.MkIte(condition, values[0], values[1])
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(expression, false))
+	plain, conditional := state.context.enodes[values[0]], state.context.enodes[expression]
+	if plain == nil || conditional == nil || plain.NumTheoryVars() != 0 || conditional.NumTheoryVars() != 0 {
+		t.Fatal("fixture failed to isolate root sharing without theory attachments")
+	}
+	shared, consult, err := state.sharedTheoryNode(plain)
+	astTestMust(t, err)
+	if shared || consult {
+		t.Fatal("unowned non-ite root was shared or delegated to a theory")
+	}
+	shared, consult, err = state.sharedTheoryNode(conditional)
+	astTestMust(t, err)
+	if !shared || consult {
+		t.Fatal("ite sharing did not precede the zero-theory-variable decision")
+	}
+}
+
 func TestSMTAssumeEqualityScopedPhaseAndRelevancy(t *testing.T) {
 	m, cfg := smtModelGeneratorFixture(t)
 	s, err := NewSMTSolver(m, nil, "QF_UFLRA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})

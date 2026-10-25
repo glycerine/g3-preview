@@ -16,34 +16,15 @@ func (t *SMTArrayTheory) sharedArrayNode(node *SMTEnode) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	shared, consult, err := s.sharedTheoryNode(node)
+	if err != nil || !consult {
+		return shared, err
+	}
 	root := node.root
-	op, basic, err := s.basicOperation(root.owner)
-	if err != nil {
-		return false, err
-	}
-	if basic && op == ast.ASTOpIte {
-		return true, nil
-	}
-	if root.NumTheoryVars() == 0 {
-		return false, nil
-	}
-	if root.NumTheoryVars() > 1 {
-		return true, nil
-	}
-	if q := s.quantifierManager; q != nil && q.IsShared(root) {
-		return true, nil
-	}
 	// Arrays implement multiple sort instances in the same family. A root
 	// used in two roles is shared even if every parent has the array family.
 	var arrayRole, indexRole, valueRole bool
 	for _, parent := range root.parents {
-		family, err := s.manager.GetFamilyID(parent.owner)
-		if err != nil {
-			return false, err
-		}
-		if family != t.FamilyID() && family != s.manager.BasicFamilyID() {
-			return true, nil
-		}
 		op, array, err := t.arrayOperation(parent.owner)
 		if err != nil {
 			return false, err
