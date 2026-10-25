@@ -135314,7 +135314,7 @@
           ]
         },
         {
-          "name": "Remaining whole-unit and inline PB assertion/VERIFY audit; literal sorting-network TRACE/assertions tracked separately in sorting_network.h",
+          "name": "Remaining whole-unit and inline PB assertion/VERIFY audit; final literal sorting-network whole-instantiation audit tracked separately in sorting_network.h",
           "status": "unported",
           "tests": []
         },
@@ -135506,7 +135506,7 @@
         "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits.",
         "Correctness correction for nested PB expressions: source uses the same Boolean ID for a predicate and its numeric slack and explicitly notes that nesting is unsupported. A direct retained internalizer regression with A=(x+y>=2), B=(A+z=1), A/B true and z false fails under literal shared IDs with AST source precondition: B applies [0,1] to A's weighted sum. Distinct even Boolean and odd slack columns preserve nonnested relative ordering and SMT literal/core IDs while separating these roles. The corrected direct test passes. The prebuilt C++ CLI returns sat on the corresponding script because its outer preprocessing avoids that direct construction; no C++ wrong-output or teardown-defect exception is claimed for these new vectors.",
         "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete.",
-        "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and literal-network diagnostic audits remain incomplete."
+        "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and final literal-network audits remain incomplete; subsequent literal-network diagnostic evidence is recorded in sorting_network.h."
       ]
     },
     {
@@ -135746,7 +135746,7 @@
           ]
         },
         {
-          "name": "Remaining whole-unit and inline PB assertion/VERIFY audit; literal sorting-network TRACE/assertions tracked separately in sorting_network.h",
+          "name": "Remaining whole-unit and inline PB assertion/VERIFY audit; final literal sorting-network whole-instantiation audit tracked separately in sorting_network.h",
           "status": "unported",
           "tests": []
         },
@@ -135938,7 +135938,7 @@
         "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits.",
         "Correctness correction for nested PB expressions: source uses the same Boolean ID for a predicate and its numeric slack and explicitly notes that nesting is unsupported. A direct retained internalizer regression with A=(x+y>=2), B=(A+z=1), A/B true and z false fails under literal shared IDs with AST source precondition: B applies [0,1] to A's weighted sum. Distinct even Boolean and odd slack columns preserve nonnested relative ordering and SMT literal/core IDs while separating these roles. The corrected direct test passes. The prebuilt C++ CLI returns sat on the corresponding script because its outer preprocessing avoids that direct construction; no C++ wrong-output or teardown-defect exception is claimed for these new vectors.",
         "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete.",
-        "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and literal-network diagnostic audits remain incomplete."
+        "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and final literal-network audits remain incomplete; subsequent literal-network diagnostic evidence is recorded in sorting_network.h."
       ]
     },
     {
@@ -231939,7 +231939,9 @@
         "pkg/smtcore/theory_pb_compile_test.go",
         "pkg/ast/util_psort_ast_costs.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/smtcore/theory_pb_stats_test.go"
+        "pkg/smtcore/theory_pb_stats_test.go",
+        "pkg/smtcore/theory_pb_sort_trace.go",
+        "pkg/smtcore/theory_pb_sort_trace_test.go"
       ],
       "tests": [
         "TestPsortASTContextActualFactoriesClausesAndTrail",
@@ -231967,7 +231969,12 @@
         "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause"
+        "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause",
+        "TestSMTPBLiteralNetworkTraceActualComparatorClauseOrder",
+        "TestSMTPBLiteralNetworkTraceDualCardAndSubsetFamilies",
+        "TestSMTPBLiteralNetworkTraceBadStreamPreservesClauses",
+        "TestSMTPBLiteralNetworkDebugGuardsPrecedeEffects",
+        "TestSMTPBLiteralNetworkRecursiveDiagnosticsPreserveThreshold"
       ],
       "conditionals": [
         {
@@ -232164,7 +232171,7 @@
           ]
         },
         {
-          "name": "Concrete SMTLiteral psort_nw<theory_pb::psort_expr> reached by PB compile_ineq: ge/le dualization, at-most-one groups, source unsigned cost selection, card/sort/merge and subset encodings; remaining literal-instantiation TRACE/assertion audit",
+          "name": "Concrete SMTLiteral psort_nw<theory_pb::psort_expr> reached by PB compile_ineq: ge/le dualization, at-most-one groups, source unsigned cost selection, card/sort/merge and subset encodings; source TRACE records and branch-site guards; final whole-instantiation audit remains",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_pb_sort.go",
           "go_targets": [
@@ -232180,6 +232187,22 @@
             "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained SMTLiteral dualization, at-most-one, clause, card/sort/merge/interleave, truncated/direct merge and subset TRACE entry/completion records; source debug guards before live factory/clause effects",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_sort_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_sort_trace_test.go",
+            "pkg/smtcore/theory_pb_sort.go"
+          ],
+          "tests": [
+            "TestSMTPBLiteralNetworkTraceActualComparatorClauseOrder",
+            "TestSMTPBLiteralNetworkTraceDualCardAndSubsetFamilies",
+            "TestSMTPBLiteralNetworkTraceBadStreamPreservesClauses",
+            "TestSMTPBLiteralNetworkDebugGuardsPrecedeEffects",
+            "TestSMTPBLiteralNetworkRecursiveDiagnosticsPreserveThreshold"
           ]
         }
       ],
@@ -232197,7 +232220,8 @@
         "The exported AST context preserves the complete psort algorithm; downstream SMT and tactic callers retain their own integration obligations. Literal scratch uses native []ASTHandle slices and captured spans, with no Runtime payload serialization or vector copy/growth acquisition metadata. Native frame cleanup also releases a partial range after a reached input read error. Real AST reference/registration allocations retain their separate failure and ownership checks.",
         "Retained ast_ext2 clauses/trail now use owning []ASTHandle with INC before native append. Removed ASTRefVector construction, capacity/refusal emulation and unpublished push receipt frames. Cleanup retains reverse member/ascending element order and consumed-DEC progress; source teardown retains its first cause while owning Close can resume. Actual AST factory and network reservation campaigns and independent clause oracles remain. Forty repeated cached factories/singleton clauses verify exact reference ownership and append order; native growth needs no arena reservation, while debug retains actual factory checks. Escaped owners close after manager teardown without stale node callbacks. No source container allocation geometry is credited.",
         "Reopened from ported to partial because PB compilation now reaches a distinct concrete SMTLiteral instantiation. Its actual algorithms, source costs, clauses and scope lifetime are implemented and independently tested; its TRACE/assertion audit remains open. Existing AST/unsigned instantiations retain their separate evidence. Corrected AST vc_card_rec to preserve source vc_smerge(a,b,c) argument order, which differs from executable smerge(c,a,b); the source-derived k=1,n=5 regression fails before correction (3 variables,6 clauses) and passes after (5,6).",
-        "Concrete SMTLiteral network variable/clause/literal statistics use source unsigned uint32 wrap before factory/clause effects. Literal-network TRACE/assertion audit remains open."
+        "Concrete SMTLiteral network variable/clause/literal statistics use source unsigned uint32 wrap before factory/clause effects. Literal-network TRACE/assertion audit remains open.",
+        "Literal-network diagnostics now preserve source file/function/line, entry and completion order, trailing literal spacing, and sticky ostream behavior while disabled/native traces erase operands. Added source debug guards for retained recursive/direct shape and cost domains, with branch conditions enforcing ge/le range invariants; unused EQ/bitonic/template helpers are not introduced. A 12-input recursive cardinality network is checked by an independent existential clause-SAT oracle for every true-input count. Final whole-instantiation audit remains separate from this diagnostic increment."
       ]
     },
     {
